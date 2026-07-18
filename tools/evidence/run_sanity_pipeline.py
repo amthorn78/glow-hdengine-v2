@@ -19,6 +19,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+from engine.db.ddl_identity_projection import project_ddl_identity
+from tools.evidence.retained_evidence_safety import validate_retained_text_safety
 
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
@@ -196,109 +198,26 @@ def _read_json(path: Path) -> dict:
 
 def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
     """Reject recognizable secret values and persisted raw request/response data."""
-    retained_value = (
-        r'(?:"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|'
-        r'presence\((?:"[^"]*"|\'[^\']*\')\)|'
-        r'\$\{[^}\r\n]*\}|[^\s,"\'}\]]+)'
-    )
-    credential_assignment = re.compile(
-        rf"(?i)(?P<key_quote>[\"']?)\b(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
-    )
-    bearer = re.compile(rf"(?i)\bBearer\s+(?P<value>{retained_value})")
-    vendor_header = re.compile(
-        rf"(?i)(?P<key_quote>[\"']?)\bHD-(?:Geocode|Api)-Key\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
-    )
-    birth_assignment = re.compile(
-        rf"(?i)(?P<key_quote>[\"']?)\b(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
-    )
-    birth_option = re.compile(
-        rf"(?i)--(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)(?:=|\s+)(?P<value>{retained_value})"
-    )
-    forbidden_uri = re.compile(r"(?i)\b(?:postgres(?:ql)?|railway)://")
-
-    def _normalized_value(raw: str) -> str:
-        value = raw.strip()
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"\"", "'"}:
-            value = value[1:-1]
-        return value
-
-    def _value_is_safe(
-        raw: str, allowed: set[str], *, allow_presence: bool = False
-    ) -> bool:
-        value = _normalized_value(raw)
-        if value.lower() in allowed or SAFE_ENV_REFERENCE.fullmatch(value) is not None:
-            return True
-        return allow_presence and re.fullmatch(
-            r"presence\((['\"])(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\1\)",
-            value,
-            flags=re.IGNORECASE,
-        ) is not None
-
-    def _birth_value_is_safe(raw: str) -> bool:
-        value = _normalized_value(raw)
-        lowered = value.lower()
-        if lowered in {
-            "<redacted>",
-            "redacted",
-            "set:redacted",
-            "unset",
-            "none",
-            "null",
-            "false",
-            "not-recorded",
-            "not_recorded",
-            "***",
-        }:
-            return True
-        if SAFE_ENV_REFERENCE.fullmatch(value):
-            return True
-        return bool(
-            re.fullmatch(
-                r"<approved-synthetic-(?:birthdate|birthtime|location)>", lowered
-            )
-        )
-
+    messages = {
+        "NON_UTF8_RETAINED_TEXT": "is not UTF-8 secret-safe evidence",
+        "FORBIDDEN_SERVICE_URI": "contains an unredacted service URI",
+        "UNREDACTED_BEARER_VALUE": "contains an unredacted bearer value",
+        "UNREDACTED_VENDOR_HEADER_VALUE": "contains an unredacted vendor header value",
+        "UNREDACTED_CREDENTIAL_VALUE": "contains an unredacted credential value",
+        "UNREDACTED_BIRTH_INPUT_VALUE": "contains an unredacted birth-input value",
+        "UNSAFE_RAW_PAYLOAD_MARKER_VALUE": "contains persisted raw request, response, or vendor data",
+    }
     for name in required:
         if name == "checksums.sha256":
             continue
         path = packet / name
         try:
-            text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError) as exc:
-            raise ValueError(f"{packet.name}: {name} is not UTF-8 secret-safe evidence") from exc
-        if forbidden_uri.search(text):
-            raise ValueError(f"{packet.name}: {name} contains an unredacted service URI")
-        for match in bearer.finditer(text):
-            if not _value_is_safe(match.group("value"), {"<redacted>", "redacted"}):
-                raise ValueError(f"{packet.name}: {name} contains an unredacted bearer value")
-        for match in vendor_header.finditer(text):
-            if not _value_is_safe(
-                match.group("value"),
-                {"<redacted>", "redacted", "set:redacted", "set", "unset", "***"},
-            ):
-                raise ValueError(f"{packet.name}: {name} contains an unredacted vendor header value")
-        for match in credential_assignment.finditer(text):
-            if not _value_is_safe(
-                match.group("value"),
-                {"redacted", "<redacted>", "set:redacted", "set", "unset"},
-                allow_presence=True,
-            ):
-                raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
-        for pattern in (birth_assignment, birth_option):
-            for match in pattern.finditer(text):
-                if not _birth_value_is_safe(match.group("value")):
-                    raise ValueError(
-                        f"{packet.name}: {name} contains an unredacted birth-input value"
-                    )
-        raw_payload_key = re.compile(
-            r'(?i)"(?:raw_vendor_(?:payload|envelope)|raw_(?:request|response)_body)"\s*:'
-        )
-        safe_raw_value = re.compile(
-            r'(?i)^(?:false|null|"(?:none|redacted)")(?=\s*(?:[,}\]\n]|$))'
-        )
-        for match in raw_payload_key.finditer(text):
-            if not safe_raw_value.match(text[match.end():].lstrip()):
-                raise ValueError(f"{packet.name}: {name} contains persisted raw request, response, or vendor data")
+            payload = path.read_bytes()
+        except OSError as exc:
+            raise ValueError(f"{packet.name}: {name} is not readable secret-safe evidence") from exc
+        errors = validate_retained_text_safety(path, payload)
+        if errors:
+            raise ValueError(f"{packet.name}: {name} {messages[errors[0]]}")
 
 
 def validate_pr05_path_proof_prerequisites(root: Path = ROOT) -> None:
@@ -357,25 +276,14 @@ def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
 
 
 def _normalize_ddl_provider_value(value: object) -> tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...]:
-    if not isinstance(value, list) or not value:
-        raise ValueError("ops-01: ddl_fingerprint provider value must be a non-empty list")
-    normalized: list[tuple[str, str, tuple[tuple[str, str], ...]]] = []
-    for item in value:
-        if not isinstance(item, dict) or not isinstance(item.get("name"), str) or not isinstance(item.get("kind"), str):
-            raise ValueError("ops-01: ddl_fingerprint provider object is malformed")
-        columns = item.get("columns", [])
-        if not isinstance(columns, list):
-            raise ValueError("ops-01: ddl_fingerprint columns must be a list")
-        normalized_columns: list[tuple[str, str]] = []
-        for column in columns:
-            if not isinstance(column, dict) or not isinstance(column.get("name"), str):
-                raise ValueError("ops-01: ddl_fingerprint column is malformed")
-            data_type = column.get("data_type", column.get("type"))
-            if not isinstance(data_type, str):
-                raise ValueError("ops-01: ddl_fingerprint column type is malformed")
-            normalized_columns.append((column["name"], data_type))
-        normalized.append((item["name"], item["kind"], tuple(sorted(normalized_columns))))
-    return tuple(sorted(normalized))
+    try:
+        projection = project_ddl_identity(value)
+    except ValueError as exc:
+        raise ValueError("ops-01: ddl_fingerprint provider value is malformed") from exc
+    return tuple(
+        (str(item["kind"]), str(item["name"]), tuple((str(col["name"]), str(col["type"])) for col in item["columns"]))
+        for item in projection
+    )
 
 
 def _normalized_provider_value(name: str, provider: dict) -> object:

@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from adapter import db_access as resolver
+from engine.db.ddl_identity_projection import project_ddl_identity
 from engine.db.errors import AdapterError
 
 from scripts.db import _util
@@ -361,49 +362,7 @@ def _canonical_value(value: Any) -> str:
 
 
 def _ddl_projection(value: Any) -> Any:
-    """Normalize DDL fingerprint rows to shared fields across providers.
-
-    Direct introspection includes richer metadata (nullable/default/constraints/view SQL),
-    while bridge captures a reduced projection. Provider parity compares only the
-    shared schema identity surface: object kind/name and column name/type.
-    """
-    if not isinstance(value, list):
-        return value
-    projected: List[Dict[str, Any]] = []
-    for obj in value:
-        if not isinstance(obj, Mapping):
-            continue
-        row: Dict[str, Any] = {
-            "kind": obj.get("kind"),
-            "name": obj.get("name"),
-        }
-        columns = obj.get("columns")
-        if isinstance(columns, list):
-            proj_cols: List[Dict[str, Any]] = []
-            for col in columns:
-                if not isinstance(col, Mapping):
-                    continue
-                proj_cols.append(
-                    {
-                        "name": col.get("name"),
-                        "type": col.get("type") or col.get("data_type"),
-                    }
-                )
-            row["columns"] = sorted(
-                proj_cols,
-                key=lambda item: (
-                    str(item.get("name") or ""),
-                    str(item.get("type") or ""),
-                ),
-            )
-        projected.append(row)
-    return sorted(
-        projected,
-        key=lambda item: (
-            str(item.get("kind") or ""),
-            str(item.get("name") or ""),
-        ),
-    )
+    return project_ddl_identity(value)
 
 
 def _parity_match(name: str, direct_value: Any, bridge_value: Any) -> bool:

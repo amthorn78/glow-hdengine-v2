@@ -7,6 +7,8 @@ import os
 import shlex
 import subprocess
 import sys
+import argparse
+import copy
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +22,7 @@ from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determin
 from tools.qa.step_log_header import append_output, create_header, write_header
 
 QA_ROOT = ROOT / "audit/qa/hde-epic024"
+TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
 DOC_DELTAS_ROOT = ROOT / "audit/docdeltas"
 ACCEPTANCE_MAP_PATH = ROOT / "docs/acceptance_map_epic024.json"
 
@@ -70,11 +73,14 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def _write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _text_bytes(content: str) -> bytes:
     if not content.endswith("\n"):
         content += "\n"
-    path.write_text(content, encoding="utf-8")
+    return content.encode("utf-8")
+
+def _write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(_text_bytes(content))
 
 
 def _write_canonical_json(path: Path, payload: object) -> None:
@@ -289,8 +295,8 @@ def _write_close_pack() -> tuple[Path, Path]:
     return close_report, close_manifest
 
 
-def _write_token_matrix(*, bootstrap_status: str) -> Path:
-    matrix_path = QA_ROOT / "token_evidence_matrix.md"
+def _render_token_matrix(*, bootstrap_status: str) -> bytes:
+    matrix_path = TOKEN_MATRIX_PATH
     bootstrap_ok = bootstrap_status == "PASS"
     bootstrap_tooling_fail = bootstrap_status in {"FAIL_TOOLING", "TOOLING_BLOCKED"}
     rows = [
@@ -541,11 +547,16 @@ def _write_token_matrix(*, bootstrap_status: str) -> Path:
                 notes=row["notes"],
             )
         )
-    _write_text(matrix_path, "\n".join(lines))
-    return matrix_path
+    return _text_bytes("\n".join(lines))
 
 
-def _write_acceptance_map(*, bootstrap_status: str) -> Path:
+def _write_token_matrix(*, bootstrap_status: str) -> Path:
+    TOKEN_MATRIX_PATH.parent.mkdir(parents=True, exist_ok=True)
+    TOKEN_MATRIX_PATH.write_bytes(_render_token_matrix(bootstrap_status=bootstrap_status))
+    return TOKEN_MATRIX_PATH
+
+
+def _render_acceptance_map(*, bootstrap_status: str) -> bytes:
     bootstrap_ok = bootstrap_status == "PASS"
     bootstrap_tooling_fail = bootstrap_status in {"FAIL_TOOLING", "TOOLING_BLOCKED"}
     tokens = [
@@ -765,8 +776,69 @@ def _write_acceptance_map(*, bootstrap_status: str) -> Path:
         },
     ]
     payload = {"epic_id": "HDE-EPIC024", "tokens": tokens}
-    _write_canonical_json(ACCEPTANCE_MAP_PATH, payload)
+    return _canonical_json_bytes(payload)
+
+
+def _write_acceptance_map(*, bootstrap_status: str) -> Path:
+    ACCEPTANCE_MAP_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ACCEPTANCE_MAP_PATH.write_bytes(_render_acceptance_map(bootstrap_status=bootstrap_status))
     return ACCEPTANCE_MAP_PATH
+
+
+def _status_rows_from_matrix(text: str) -> dict[str, str]:
+    rows: dict[str, str] = {}
+    for line in text.splitlines():
+        if not line.startswith("| ") or line.startswith("| ---") or "token_name" in line:
+            continue
+        parts = [part.strip() for part in line.strip().strip("|").split("|")]
+        if len(parts) != 7:
+            continue
+        token, status = parts[0], parts[5]
+        if token in rows:
+            raise ValueError(f"duplicate token matrix row: {token}")
+        rows[token] = status
+    return rows
+
+
+def _derive_retained_bootstrap_status(acceptance_map: object, token_matrix: str) -> str:
+    if not isinstance(acceptance_map, dict) or not isinstance(acceptance_map.get("tokens"), list):
+        raise ValueError("acceptance map malformed")
+    map_rows: dict[str, str] = {}
+    for row in acceptance_map["tokens"]:
+        if not isinstance(row, dict) or not isinstance(row.get("name"), str) or not isinstance(row.get("status"), str):
+            continue
+        name = row["name"]
+        if name in map_rows:
+            raise ValueError(f"duplicate acceptance token: {name}")
+        map_rows[name] = row["status"]
+    matrix_rows = _status_rows_from_matrix(token_matrix)
+    pair = (map_rows.get("QA_BOOTSTRAP_OK"), map_rows.get("QA_BOOTSTRAP_TOOLING_FAIL"), matrix_rows.get("QA_BOOTSTRAP_OK"), matrix_rows.get("QA_BOOTSTRAP_TOOLING_FAIL"))
+    if pair == ("implemented", "token_incomplete", "Implemented", "Token-incomplete"):
+        return "PASS"
+    if pair == ("token_incomplete", "implemented", "Token-incomplete", "Implemented"):
+        return "TOOLING_BLOCKED"
+    raise ValueError("conflicting retained bootstrap status")
+
+
+def _one_path_diff_ok(old: bytes, new: bytes) -> bool:
+    return old.replace(b"artifacts/sanity/sanity.log", b"audit/gates/sanity_pipeline/sanity_pipeline.log") == new and old.count(b"artifacts/sanity/sanity.log") == 1 and new.count(b"audit/gates/sanity_pipeline/sanity_pipeline.log") == 1
+
+
+def _selective_acceptance_bindings(*, write: bool) -> int:
+    old_map_b = ACCEPTANCE_MAP_PATH.read_bytes()
+    old_matrix_b = TOKEN_MATRIX_PATH.read_bytes()
+    status = _derive_retained_bootstrap_status(json.loads(old_map_b.decode("utf-8")), old_matrix_b.decode("utf-8"))
+    new_map_b = _render_acceptance_map(bootstrap_status=status)
+    new_matrix_b = _render_token_matrix(bootstrap_status=status)
+    if old_map_b == new_map_b and old_matrix_b == new_matrix_b:
+        return 0
+    if not (_one_path_diff_ok(old_map_b, new_map_b) and _one_path_diff_ok(old_matrix_b, new_matrix_b)):
+        raise ValueError("selective acceptance binding diff is not exactly the approved sanity path update")
+    if write:
+        ACCEPTANCE_MAP_PATH.write_bytes(new_map_b)
+        TOKEN_MATRIX_PATH.write_bytes(new_matrix_b)
+        return 0
+    return 1
 
 
 def _write_acceptance_map_viability() -> tuple[Path, List[str]]:
@@ -1077,7 +1149,13 @@ def _check_specs() -> list[CheckSpec]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--refresh-acceptance-bindings-only", action="store_true")
+    parser.add_argument("--check-acceptance-bindings", action="store_true")
+    args = parser.parse_args()
     ensure_determinism_env(apply=True)
+    if args.refresh_acceptance_bindings_only or args.check_acceptance_bindings:
+        return _selective_acceptance_bindings(write=args.refresh_acceptance_bindings_only)
     QA_ROOT.mkdir(parents=True, exist_ok=True)
     env = _env_for_subprocess()
 
