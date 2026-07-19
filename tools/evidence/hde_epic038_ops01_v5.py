@@ -1585,6 +1585,27 @@ def validate_ops01r_discovery_result(
         if obj.get("status") != "PASS":
             errors.add("DISCOVERY_RESULT_STAGE_FAILED")
 
+        target = _mapping(obj.get("target"))
+        target_fields = {
+            "project_id",
+            "project_name",
+            "environment_id",
+            "environment_name",
+            "service_id",
+            "service_name",
+        }
+        if set(target) != target_fields or any(
+            not isinstance(target.get(field), str)
+            or not target[field]
+            or target[field] != target[field].strip()
+            or any(
+                ord(character) < 32 or ord(character) == 127
+                for character in target[field]
+            )
+            for field in target_fields
+        ):
+            errors.add("DISCOVERY_RESULT_TARGET_AMBIGUOUS")
+
         authorization_identity = _self_hash(
             authorization, "discovery_authorization_sha256"
         )
@@ -1692,6 +1713,28 @@ def validate_ops01r_live_authorization(
             )
             or obj.get("launch_limit") != 1
             or obj.get("tracked_writes_authorized") is not False
+        ):
+            errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+        expected_child_argv = [
+            _at(obj, "interpreter", "path"),
+            "-I",
+            "-B",
+            _at(obj, "runner", "path"),
+            "--live-child",
+        ]
+        prefix = _at(obj, "discovery", "run_contract", "argv_prefix")
+        boundary = _at(
+            obj, "discovery", "run_contract", "child_argv_start_index"
+        )
+        child_argv = _at(obj, "run", "child_argv")
+        if (
+            any(not isinstance(token, str) or not token for token in expected_child_argv)
+            or not isinstance(prefix, list)
+            or not prefix
+            or any(not isinstance(token, str) or not token for token in prefix)
+            or type(boundary) is not int
+            or boundary != len(prefix)
+            or child_argv != expected_child_argv
         ):
             errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
         actual = {
