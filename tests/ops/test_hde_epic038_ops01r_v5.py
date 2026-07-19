@@ -1920,6 +1920,38 @@ def test_discovery_result_rejects_multiple_version_eligible_templates(tmp_path):
     assert "DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS" in validation.errors
 
 
+def test_discovery_result_handles_invalid_version_regex_without_raising(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ][0].update({"version_regex": "["}),
+    )
+    authorization = json.loads(authorization_path.read_text())
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result.update(
+            {
+                "discovery_authorization_sha256": authorization[
+                    "discovery_authorization_sha256"
+                ]
+            }
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in validation.errors
+    assert "DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE" in validation.errors
+
+
 @pytest.mark.parametrize(
     ("field", "bad_value", "expected_code"),
     [

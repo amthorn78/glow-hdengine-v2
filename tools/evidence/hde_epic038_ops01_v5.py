@@ -2669,6 +2669,15 @@ def _render_discovery_template_vector(
     return tuple(tokens)
 
 
+def _discovery_version_matches(pattern: object, version: object) -> bool:
+    if not isinstance(pattern, str) or not isinstance(version, str):
+        return False
+    try:
+        return re.fullmatch(pattern, version) is not None
+    except re.error:
+        return False
+
+
 def _authorized_stage_vectors(
     authorization: Mapping[str, object], *, stage: str, prior_results: object
 ) -> set[tuple[str, ...]]:
@@ -2695,16 +2704,10 @@ def _authorized_stage_vectors(
         if selection_mode == "single":
             eligible = True
         elif selection_mode == "version":
-            eligible = (
-                isinstance(version, str)
-                and isinstance(version_regex, str)
-                and re.fullmatch(version_regex, version) is not None
-            )
+            eligible = _discovery_version_matches(version_regex, version)
         elif selection_mode == "version_and_help":
             eligible = (
-                isinstance(version, str)
-                and isinstance(version_regex, str)
-                and re.fullmatch(version_regex, version) is not None
+                _discovery_version_matches(version_regex, version)
                 and isinstance(help_tokens, list)
                 and all(isinstance(token, str) for token in help_tokens)
                 and isinstance(required_help_tokens, list)
@@ -2761,9 +2764,7 @@ def _retained_stage_template_matches(
             eligible = True
         else:
             eligible = (
-                isinstance(version, str)
-                and isinstance(version_regex, str)
-                and re.fullmatch(version_regex, version) is not None
+                _discovery_version_matches(version_regex, version)
                 and template.get("required_help_tokens") == []
             )
         candidate = _render_discovery_template_vector(
