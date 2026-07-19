@@ -1384,11 +1384,7 @@ def _discovery_pair(
                 "templates": [
                     {
                         "argv": stage_descriptors[stage],
-                        "required_help_tokens": (
-                            ["[COMMAND]"]
-                            if selection_modes[stage] == "version_and_help"
-                            else []
-                        ),
+                        "required_help_tokens": [],
                         "template_id": f"{stage}-v1",
                         "version_regex": (
                             "" if stage == "cli_version" else r"railway 4\.0\.0"
@@ -1867,6 +1863,63 @@ def test_discovery_authorization_rejects_boolean_stage_integers(tmp_path, field)
     assert "DISCOVERY_AUTH_POLICY_INVALID" in result.errors
 
 
+def test_discovery_authorization_rejects_unretained_help_selector_proof(tmp_path):
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ][0].update({"required_help_tokens": ["project"]}),
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_POLICY_INVALID" in result.errors
+
+
+def test_discovery_result_rejects_multiple_version_eligible_templates(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    original = json.loads(authorization_path.read_text())
+    second_template = json.loads(
+        json.dumps(original["policy"]["stages"][2]["templates"][0])
+    )
+    second_template["template_id"] = "project_inventory-v2"
+    second_template["argv"].append({"kind": "literal", "value": "--json"})
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ].append(second_template),
+    )
+    authorization = json.loads(authorization_path.read_text())
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result.update(
+            {
+                "discovery_authorization_sha256": authorization[
+                    "discovery_authorization_sha256"
+                ]
+            }
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS" in validation.errors
+
+
 @pytest.mark.parametrize(
     ("field", "bad_value", "expected_code"),
     [
@@ -2000,6 +2053,47 @@ def test_runner_rejects_rehashed_policy_expansion_before_subprocess(
 
     with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
         runner.discovery(authorization_path, expected=expected)
+    assert subprocess_calls == []
+
+
+def test_runner_rechecks_authorization_after_staging_walk(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    original_manifest = runner._staging_manifest_for_contract
+    manifest_calls = 0
+    subprocess_calls = []
+
+    def mutate_during_final_walk(*args, **kwargs):
+        nonlocal manifest_calls
+        manifest = original_manifest(*args, **kwargs)
+        manifest_calls += 1
+        if manifest_calls == 3:
+            _rewrite_discovery_authorization(
+                authorization_path,
+                expected,
+                lambda authorization: authorization["requested_target"].update(
+                    {"service_name": "rewritten-after-auth-check"}
+                ),
+            )
+        return manifest
+
+    def fail_if_called(*args, **kwargs):
+        subprocess_calls.append(args)
+        raise AssertionError("subprocess crossed the mutated authorization boundary")
+
+    monkeypatch.setattr(
+        runner,
+        "_staging_manifest_for_contract",
+        mutate_during_final_walk,
+    )
+    monkeypatch.setattr(runner.subprocess, "run", fail_if_called)
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
+        runner.discovery(authorization_path, expected=expected)
+    assert manifest_calls == 3
     assert subprocess_calls == []
 
 

@@ -2424,6 +2424,12 @@ def _discovery_authorization_contract_errors(
                 errors.add("DISCOVERY_AUTH_POLICY_INVALID")
             if stage_name not in {"cli_version", "cli_help"} and not version_regex:
                 errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            # The exact retained-result schema has no help-token proof field.
+            # Keep post-run selection independently replayable by admitting only
+            # the vacuous help predicate; runtime still requires a nonempty,
+            # strictly decoded cli_help response before later stages.
+            if stage_name not in {"cli_version", "cli_help"} and help_tokens != []:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
             python_child_count = 0
             for descriptor_index, descriptor_value in enumerate(descriptors):
                 descriptor = _mapping(descriptor_value)
@@ -2734,29 +2740,31 @@ def _retained_stage_template_matches(
     prior_results: object,
     rendered_argv: tuple[str, ...],
     version: object,
-) -> int:
+) -> tuple[int, int]:
     stages = _at(authorization, "policy", "stages")
     if not isinstance(stages, list):
-        return 0
+        return (0, 0)
     rows = [row for row in stages if _mapping(row).get("stage") == stage]
     if len(rows) != 1:
-        return 0
+        return (0, 0)
     stage_row = _mapping(rows[0])
     templates = stage_row.get("templates")
     if not isinstance(templates, list):
-        return 0
-    matches = 0
+        return (0, 0)
+    eligible_count = 0
+    rendered_match_count = 0
     for template_value in templates:
         template = _mapping(template_value)
         selection_mode = stage_row.get("selection_mode")
         version_regex = template.get("version_regex")
         if selection_mode == "single":
-            version_eligible = True
+            eligible = True
         else:
-            version_eligible = (
+            eligible = (
                 isinstance(version, str)
                 and isinstance(version_regex, str)
                 and re.fullmatch(version_regex, version) is not None
+                and template.get("required_help_tokens") == []
             )
         candidate = _render_discovery_template_vector(
             authorization,
@@ -2764,9 +2772,11 @@ def _retained_stage_template_matches(
             template=template,
             prior_results=prior_results,
         )
-        if version_eligible and candidate == rendered_argv:
-            matches += 1
-    return matches
+        if eligible:
+            eligible_count += 1
+            if candidate == rendered_argv:
+                rendered_match_count += 1
+    return (eligible_count, rendered_match_count)
 
 
 def _discovery_prior_results(obj: Mapping[str, object]) -> dict[str, object]:
@@ -3055,33 +3065,38 @@ def validate_ops01r_discovery_result(
                 ):
                     errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
                     continue
-                match_count = _retained_stage_template_matches(
+                eligible_count, match_count = _retained_stage_template_matches(
                     authorization,
                     stage=DISCOVERY_STAGES[index],
                     prior_results=prior_results,
                     rendered_argv=tuple(rendered),
                     version=railway_version,
                 )
-                if match_count == 0:
+                if eligible_count == 0:
+                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE")
+                elif eligible_count > 1:
+                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS")
+                elif match_count == 0:
                     appears_in_other_stage = any(
-                        _retained_stage_template_matches(
-                            authorization,
-                            stage=other_stage,
-                            prior_results=prior_results,
-                            rendered_argv=tuple(rendered),
-                            version=railway_version,
+                        (
+                            lambda selection: selection[0] == 1
+                            and selection[1] == 1
+                        )(
+                            _retained_stage_template_matches(
+                                authorization,
+                                stage=other_stage,
+                                prior_results=prior_results,
+                                rendered_argv=tuple(rendered),
+                                version=railway_version,
+                            )
                         )
-                        > 0
                         for other_stage in DISCOVERY_STAGES
                         if other_stage != DISCOVERY_STAGES[index]
                     )
                     if appears_in_other_stage:
                         errors.add("DISCOVERY_RESULT_STAGE_ORDER_INVALID")
                     else:
-                        errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE")
                         errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
-                elif match_count > 1:
-                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS")
 
         python_execution = _at(authorization, "policy", "python_execution")
         target_probe_argv = _at(

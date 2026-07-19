@@ -998,6 +998,8 @@ def discovery(
         if authorization_path.read_bytes() != authorization_bytes:
             raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
         require_pristine_staging()
+        if authorization_path.read_bytes() != authorization_bytes:
+            raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
         cp = subprocess.run(
             argv,
             shell=False,
