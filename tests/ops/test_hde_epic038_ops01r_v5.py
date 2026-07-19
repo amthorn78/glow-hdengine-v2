@@ -833,10 +833,16 @@ def test_candidate_rejects_semantically_invalid_primary_proofs(tmp_path):
 
 @pytest.mark.parametrize(
     "mutation",
-    ["missing_input", "wrong_digest", "missing_checker", "wrong_checker_digest"],
+    [
+        "missing_input",
+        "wrong_digest",
+        "missing_checker",
+        "wrong_checker_digest",
+        "broken_checker_symlink",
+    ],
 )
 def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
-    tmp_path, mutation
+    tmp_path, monkeypatch, mutation
 ):
     root, expected = _candidate(tmp_path)
     path = root / "bridge_consistency.result.json"
@@ -853,9 +859,25 @@ def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
         value["governed_checker"]["staged_executable"] = (
             f"{expected.literal_staging_root}/candidate/check_bridge_consistency.py"
         )
-    else:
+    elif mutation == "wrong_checker_digest":
         value["governed_checker"]["repo_sha256"] = "f" * 64
         value["governed_checker"]["staged_sha256"] = "f" * 64
+    else:
+        import tools.evidence.hde_epic038_ops01_v5 as validator_module
+
+        staged_checker = Path(value["governed_checker"]["staged_executable"])
+        staged_checker.unlink()
+        staged_checker.symlink_to(staged_checker.with_name("missing-checker.py"))
+        fallback_root = tmp_path / "fallback-repo"
+        fallback_checker = (
+            fallback_root / "ci/checks/check_bridge_consistency.py"
+        )
+        fallback_checker.parent.mkdir(parents=True)
+        fallback_checker.write_text("fallback checker\n")
+        fallback_sha = _sha(fallback_checker.read_bytes())
+        value["governed_checker"]["repo_sha256"] = fallback_sha
+        value["governed_checker"]["staged_sha256"] = fallback_sha
+        monkeypatch.setattr(validator_module, "ROOT", fallback_root)
     _write_json(path, value)
     ledger = _rewrite_candidate_ledger(root)
     expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
