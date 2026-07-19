@@ -295,14 +295,15 @@ def _git_commit(root: Path) -> str:
     return "UNKNOWN"
 
 
-def _module_origins() -> list[dict[str, str]]:
+def _module_origins(source_root: Path) -> list[dict[str, str]]:
     modules = {
-        "engine.db.ddl_identity_projection": ROOT
+        "engine.db.ddl_identity_projection": source_root
         / "engine/db/ddl_identity_projection.py",
-        "scripts.db.capture_epic011_posture": ROOT
+        "scripts.db.capture_epic011_posture": source_root
         / "scripts/db/capture_epic011_posture.py",
-        "scripts.ops.hde_epic038_ops01r": Path(__file__),
-        "tools.evidence.hde_epic038_ops01_v5": ROOT
+        "scripts.ops.hde_epic038_ops01r": source_root
+        / "scripts/ops/hde_epic038_ops01r.py",
+        "tools.evidence.hde_epic038_ops01_v5": source_root
         / "tools/evidence/hde_epic038_ops01_v5.py",
     }
     origins = []
@@ -616,14 +617,17 @@ def preflight(*, run_id: str | None = None) -> int:
     )
     pre_staging_manifest_sha256 = sha_bytes(canonical_bytes(pre_staging_manifest))
 
-    runner = _file_identity(Path(__file__))
-    validator = _file_identity(ROOT / "tools/evidence/hde_epic038_ops01_v5.py")
-    projector = _file_identity(ROOT / "engine/db/ddl_identity_projection.py")
+    staged_runner = source_root / "scripts/ops/hde_epic038_ops01r.py"
+    staged_validator = source_root / "tools/evidence/hde_epic038_ops01_v5.py"
+    staged_projector = source_root / "engine/db/ddl_identity_projection.py"
+    runner = _file_identity(staged_runner)
+    validator = _file_identity(staged_validator)
+    projector = _file_identity(staged_projector)
     interpreter = _file_identity(Path(sys.executable))
     railway = _optional_executable_identity("railway")
-    producer_argv = bound_python_vector(Path(__file__), "--preflight")
+    producer_argv = bound_python_vector(staged_runner, "--preflight")
     validator_argv = bound_python_vector(
-        ROOT / "tools/evidence/hde_epic038_ops01_v5.py",
+        staged_validator,
         "--validate-preflight",
         "--expected-identity-stdin",
         preflight_path.as_posix(),
@@ -694,7 +698,7 @@ def preflight(*, run_id: str | None = None) -> int:
             "resolved_path": interpreter["resolved_path"],
             "sha256": interpreter["sha256"],
         },
-        "module_origins": _module_origins(),
+        "module_origins": _module_origins(source_root),
         "railway_executable": railway,
         "orchestration": {"producer_vector": list(producer_argv)},
         "actual_external_io_counts": zero_counts,
