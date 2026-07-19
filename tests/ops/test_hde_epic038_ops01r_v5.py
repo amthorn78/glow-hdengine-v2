@@ -656,6 +656,31 @@ def _candidate(
             },
         ]
     _write_json(root / "provider_parity.proof.json", provider_proof)
+    provider_proof_input = {
+        "path": f"{staging_root}/candidate/provider_parity.proof.json",
+        "sha256": _sha((root / "provider_parity.proof.json").read_bytes()),
+    }
+    env_presence_input = {
+        "path": f"{staging_root}/candidate/env_presence.json",
+        "sha256": _sha((root / "env_presence.json").read_bytes()),
+    }
+    bridge_consistency_path = root / "bridge_consistency.result.json"
+    bridge_consistency = json.loads(bridge_consistency_path.read_text())
+    bridge_consistency["bodygraph_comparator"]["direct_input"] = dict(
+        provider_proof_input
+    )
+    bridge_consistency["bodygraph_comparator"]["bridge_input"] = dict(
+        provider_proof_input
+    )
+    bridge_consistency["governed_checker"]["inputs"] = {
+        "adapter_selection": dict(provider_proof_input),
+        "env_connectivity": dict(env_presence_input),
+        "provider_parity": dict(provider_proof_input),
+    }
+    bridge_consistency["governed_checker"]["staged_executable"] = (
+        f"{source_root}/ci/checks/check_bridge_consistency.py"
+    )
+    _write_json(bridge_consistency_path, bridge_consistency)
     summary = {
         "schema": "hde_epic038.ops01.result_summary.v4",
         "full_ddl_semantic_parity_claimed": False,
@@ -802,6 +827,35 @@ def test_candidate_rejects_semantically_invalid_primary_proofs(tmp_path):
 
         assert not result.valid
         assert code in result.errors
+
+
+@pytest.mark.parametrize("mutation", ["missing_input", "wrong_digest", "missing_checker"])
+def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
+    tmp_path, mutation
+):
+    root, expected = _candidate(tmp_path)
+    path = root / "bridge_consistency.result.json"
+    value = json.loads(path.read_text())
+    if mutation == "missing_input":
+        value["bodygraph_comparator"]["direct_input"]["path"] = (
+            f"{expected.literal_staging_root}/bodygraph.direct.compat.json"
+        )
+    elif mutation == "wrong_digest":
+        value["governed_checker"]["inputs"]["env_connectivity"]["sha256"] = (
+            "f" * 64
+        )
+    else:
+        value["governed_checker"]["staged_executable"] = (
+            f"{expected.literal_staging_root}/candidate/check_bridge_consistency.py"
+        )
+    _write_json(path, value)
+    ledger = _rewrite_candidate_ledger(root)
+    expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_BRIDGE_CONSISTENCY_INVALID" in result.errors
 
 
 def test_candidate_requires_full_provider_proof_roster(tmp_path):
