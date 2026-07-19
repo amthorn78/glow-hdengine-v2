@@ -979,6 +979,16 @@ def _bridge_consistency_valid(
         staged_checker = (
             Path(source_root) / "ci" / "checks" / "check_bridge_consistency.py"
         ).as_posix()
+        staged_checker_path = Path(staged_checker)
+        checker_digest_path = staged_checker_path
+        if not checker_digest_path.exists():
+            checker_digest_path = ROOT / "ci" / "checks" / "check_bridge_consistency.py"
+        if (
+            checker_digest_path.is_symlink()
+            or not checker_digest_path.is_file()
+        ):
+            return False
+        checker_digest = _sha(checker_digest_path.read_bytes())
         bodygraph_row = next(
             _mapping(row)
             for row in provider_proof.get("capabilities", ())
@@ -1044,8 +1054,9 @@ def _bridge_consistency_valid(
         }
         and checker.get("repo_identity") == "ci/checks/check_bridge_consistency.py"
         and checker.get("staged_executable") == staged_checker
-        and checker.get("repo_sha256") == checker.get("staged_sha256")
-        and _is_sha256(checker.get("repo_sha256"))
+        and checker.get("repo_sha256")
+        == checker.get("staged_sha256")
+        == checker_digest
         and checker.get("exit_code") == 0
         and checker.get("result") == "PASS"
     )
