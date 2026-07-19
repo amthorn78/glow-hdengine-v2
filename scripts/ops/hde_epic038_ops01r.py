@@ -1846,27 +1846,26 @@ def _write_candidate(
         "status": "PASS",
     }
     bodygraph_sha = str(observations["bodygraph_sha"])
-    input_pair = lambda name, digest=bodygraph_sha: {
-        "path": (candidate_root / name).as_posix(),
-        "sha256": digest,
-    }
     checker_path = ROOT / "ci" / "checks" / "check_bridge_consistency.py"
     checker_sha = sha_bytes(checker_path.read_bytes())
-    adapter_sha = sha_bytes(
-        canonical_bytes(
-            {
-                "bridge": observations["bridge_snapshot"],
-                "direct": observations["direct_snapshot"],
-            }
-        )
+    env_presence_bytes = canonical_bytes(env_presence)
+    provider_proof_bytes = canonical_bytes(provider_proof)
+
+    def retained_input(name: str, content: bytes) -> dict[str, str]:
+        return {
+            "path": (candidate_root / name).as_posix(),
+            "sha256": sha_bytes(content),
+        }
+
+    provider_proof_input = retained_input(
+        "provider_parity.proof.json", provider_proof_bytes
     )
-    env_sha = sha_bytes(canonical_bytes(environment_presence))
-    parity_sha = sha_bytes(canonical_bytes(provider_proof))
+    env_presence_input = retained_input("env_presence.json", env_presence_bytes)
     bridge_consistency = {
         "bodygraph_comparator": {
-            "bridge_input": input_pair("bodygraph.bridge.compat.json"),
+            "bridge_input": dict(provider_proof_input),
             "canonical_sha256": bodygraph_sha,
-            "direct_input": input_pair("bodygraph.direct.compat.json"),
+            "direct_input": dict(provider_proof_input),
             "exit_code": 0,
             "identity": "presenter.json_canon_compare",
             "literal_invocation": "in-process canonical comparison",
@@ -1883,17 +1882,15 @@ def _write_candidate(
         "governed_checker": {
             "exit_code": 0,
             "inputs": {
-                "adapter_selection": input_pair("adapter-selection.json", adapter_sha),
-                "env_connectivity": input_pair("env-connectivity.json", env_sha),
-                "provider_parity": input_pair("provider-parity.json", parity_sha),
+                "adapter_selection": dict(provider_proof_input),
+                "env_connectivity": dict(env_presence_input),
+                "provider_parity": dict(provider_proof_input),
             },
             "literal_invocation": "in-process governed parity validation",
             "repo_identity": "ci/checks/check_bridge_consistency.py",
             "repo_sha256": checker_sha,
             "result": "PASS",
-            "staged_executable": (
-                candidate_root / "check_bridge_consistency.py"
-            ).as_posix(),
+            "staged_executable": checker_path.as_posix(),
             "staged_sha256": checker_sha,
         },
         "predicates": {
@@ -1963,10 +1960,10 @@ def _write_candidate(
         "bridge_consistency.result.json": canonical_bytes(bridge_consistency),
         "commands.txt": commands,
         "db_posture_summary.json": canonical_bytes(db_posture),
-        "env_presence.json": canonical_bytes(env_presence),
+        "env_presence.json": env_presence_bytes,
         "exit_code.txt": b"0\n",
         "nonclaims.json": canonical_bytes(nonclaims),
-        "provider_parity.proof.json": canonical_bytes(provider_proof),
+        "provider_parity.proof.json": provider_proof_bytes,
         "result_summary.json": canonical_bytes(summary),
         "stderr.log": b"none\n",
         "stdout.log": b"PASS\n",
