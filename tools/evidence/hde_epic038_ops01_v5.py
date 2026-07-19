@@ -1556,13 +1556,20 @@ def validate_ops01r_preflight(
         runs = orchestration.get("runs")
         derived_counts = _mapping(orchestration.get("derived_call_counts"))
         run_counts = []
+        run_labels = []
+        run_rows_valid = False
         if isinstance(runs, list) and len(runs) == 2:
-            run_counts = [_mapping(row).get("call_counts") for row in runs]
+            run_rows = [_mapping(row) for row in runs]
+            run_rows_valid = all(set(row) == {"run_label", "call_counts"} for row in run_rows)
+            run_labels = [row.get("run_label") for row in run_rows]
+            run_counts = [row.get("call_counts") for row in run_rows]
         if (
             orchestration.get("schema")
             != "hde_epic038.ops01r.preflight.fake_boundary_two_run.v1"
             or orchestration.get("deterministic") is not True
             or len(run_counts) != 2
+            or not run_rows_valid
+            or run_labels != ["A", "B"]
             or any(_mapping(counts) != expected_counts for counts in run_counts)
             or derived_counts != expected_counts
             or orchestration.get("identity_sha256")
@@ -1595,6 +1602,31 @@ def validate_ops01r_preflight(
             or interpreter.get("isolated_flag") != "-I"
         ):
             errors.add("PREFLIGHT_ARGV_ENV_INVALID")
+        run = _mapping(obj.get("run"))
+        preflight_path_value = run.get("preflight_path")
+        control_root_value = run.get("control_root")
+        source_root_value = run.get("source_root")
+        staging_root_value = run.get("staging_root")
+        try:
+            staging_root = _lexical_absolute(Path(str(staging_root_value)))
+            control_root = _lexical_absolute(Path(str(control_root_value)))
+            source_root = _lexical_absolute(Path(str(source_root_value)))
+            preflight_path = _lexical_absolute(Path(str(preflight_path_value)))
+            control_relative = control_root.relative_to(staging_root).as_posix()
+            if (
+                source_write.get("authorized_exact_write_paths")
+                != [preflight_path.as_posix()]
+                or source_write.get("authorized_recursive_write_roots") != []
+                or source_write.get("authorized_directory_metadata_paths")
+                != [control_relative]
+                or source_write.get("self_bound_excluded_paths")
+                != [preflight_path.as_posix()]
+                or source_write.get("self_bound_excluded_recursive_roots")
+                != [source_root.as_posix()]
+            ):
+                errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        except (OSError, TypeError, ValueError):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
         if (
             _at(obj, "source_write_validation", "pre_source_manifest_sha256")
             != actual["source_manifest_sha256"]

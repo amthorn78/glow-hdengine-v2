@@ -1948,6 +1948,53 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         preflight_identity_sha256=record["preflight_identity_sha256"],
     )
     assert validate_ops01r_preflight(path, expected=expected).valid
+
+    for key, bad_value in (
+        ("authorized_exact_write_paths", [path.with_name("other.json").as_posix()]),
+        ("authorized_recursive_write_roots", [staging_root.as_posix()]),
+        ("authorized_directory_metadata_paths", [staging_root.as_posix()]),
+        ("self_bound_excluded_paths", []),
+        ("self_bound_excluded_recursive_roots", []),
+    ):
+        mutated = json.loads(json.dumps(record))
+        mutated["source_write_validation"][key] = bad_value
+        mutated["preflight_identity_sha256"] = _sha(
+            _canon({k: v for k, v in mutated.items() if k != "preflight_identity_sha256"})
+        )
+        _write_json(path, mutated)
+        result = validate_ops01r_preflight(
+            path,
+            expected=replace(
+                expected,
+                preflight_identity_sha256=mutated["preflight_identity_sha256"],
+            ),
+        )
+        assert not result.valid, key
+        assert "PREFLIGHT_WRITE_SET_INVALID" in result.errors
+
+    for runs in (
+        [{"run_label": "A", "call_counts": counts}, {"run_label": "A", "call_counts": counts}],
+        [{"run_label": "B", "call_counts": counts}, {"run_label": "A", "call_counts": counts}],
+        [{"call_counts": counts}, {"run_label": "B", "call_counts": counts}],
+        [{"run_label": "A", "call_counts": counts, "extra": True}, {"run_label": "B", "call_counts": counts}],
+    ):
+        mutated = json.loads(json.dumps(record))
+        mutated["orchestration"]["runs"] = runs
+        mutated["preflight_identity_sha256"] = _sha(
+            _canon({k: v for k, v in mutated.items() if k != "preflight_identity_sha256"})
+        )
+        _write_json(path, mutated)
+        result = validate_ops01r_preflight(
+            path,
+            expected=replace(
+                expected,
+                preflight_identity_sha256=mutated["preflight_identity_sha256"],
+            ),
+        )
+        assert not result.valid, runs
+        assert "PREFLIGHT_ORCHESTRATION_INVALID" in result.errors
+
+    _write_json(path, record)
     assert not validate_ops01r_preflight(
         path,
         expected=replace(expected, runner_sha256="f" * 64),
