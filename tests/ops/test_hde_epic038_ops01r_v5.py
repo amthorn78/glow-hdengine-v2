@@ -2225,6 +2225,66 @@ def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
     assert validate_ops01r_preflight(path, expected=expected).valid
 
 
+def test_preflight_binds_components_and_modules_to_materialized_source(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    run_id = hashlib.sha256(tmp_path.as_posix().encode()).hexdigest()[:32]
+    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    shutil.rmtree(staging_root, ignore_errors=True)
+    files = {
+        "engine/db/ddl_identity_projection.py": b"staged projector\n",
+        "scripts/db/capture_epic011_posture.py": b"staged capture\n",
+        "scripts/ops/hde_epic038_ops01r.py": b"staged runner\n",
+        "tools/evidence/hde_epic038_ops01_v5.py": b"staged validator\n",
+    }
+
+    def materialize(source_root, commit):
+        for relative, content in files.items():
+            path = source_root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+    monkeypatch.setattr(runner, "materialize_source_worktree", materialize)
+    monkeypatch.setattr(runner, "_git_commit", lambda root: "1" * 40)
+    try:
+        assert runner.preflight(run_id=run_id) == 0
+        record = json.loads((staging_root / "control/preflight.json").read_text())
+        source_root = staging_root / "source"
+        for name, relative in (
+            ("runner", "scripts/ops/hde_epic038_ops01r.py"),
+            ("validator", "tools/evidence/hde_epic038_ops01_v5.py"),
+            ("projector", "engine/db/ddl_identity_projection.py"),
+        ):
+            identity = record["components"][name]
+            expected_path = (source_root / relative).as_posix()
+            assert identity["lexical_path"] == expected_path
+            assert identity["resolved_path"] == expected_path
+            assert identity["sha256"] == _sha(files[relative])
+
+        expected_origins = {
+            "engine.db.ddl_identity_projection": "engine/db/ddl_identity_projection.py",
+            "scripts.db.capture_epic011_posture": "scripts/db/capture_epic011_posture.py",
+            "scripts.ops.hde_epic038_ops01r": "scripts/ops/hde_epic038_ops01r.py",
+            "tools.evidence.hde_epic038_ops01_v5": "tools/evidence/hde_epic038_ops01_v5.py",
+        }
+        for origin in record["module_origins"]:
+            relative = expected_origins[origin["module"]]
+            expected_path = (source_root / relative).as_posix()
+            assert origin["lexical_origin"] == expected_path
+            assert origin["resolved_origin"] == expected_path
+            assert origin["sha256"] == _sha(files[relative])
+        assert record["interpreter"]["preflight_argv"][3] == (
+            source_root / "scripts/ops/hde_epic038_ops01r.py"
+        ).as_posix()
+        assert record["interpreter"]["preflight_validator_argv"][3] == (
+            source_root / "tools/evidence/hde_epic038_ops01_v5.py"
+        ).as_posix()
+    finally:
+        shutil.rmtree(staging_root, ignore_errors=True)
+
+
 def test_runner_preflight_rejects_python_environment(tmp_path):
     source = _stage_runner_source(tmp_path)
     environment = {
