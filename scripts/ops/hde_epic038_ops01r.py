@@ -14,6 +14,7 @@ import stat
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from dataclasses import dataclass
@@ -1152,11 +1153,17 @@ def _bridge_request(budget: _CallBudget):
         url: str, method: str, data: bytes | None, headers: Mapping[str, str]
     ) -> BridgeResponse:
         budget.advance("bridge_http_requests")
+        path = urllib.parse.urlsplit(url).path
         if method == "GET":
-            if not url.endswith("/health") or data is not None:
+            if path not in {
+                "/health",
+                "/introspect/fingerprint",
+                "/introspect/grants",
+                "/introspect/search_path",
+            } or data is not None:
                 raise RuntimeError("OPS01R_LIVE_BRIDGE_REQUEST_INVALID")
         elif method == "POST":
-            if not url.endswith("/query") or data is None:
+            if path != "/query" or data is None:
                 raise RuntimeError("OPS01R_LIVE_BRIDGE_REQUEST_INVALID")
             request_obj = json.loads(data.decode("utf-8"))
             _read_only_sql(request_obj.get("sql"))
