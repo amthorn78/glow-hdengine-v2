@@ -7,6 +7,7 @@ import dataclasses
 import hashlib
 import json
 import os
+import re
 import stat
 import sys
 from collections.abc import Mapping
@@ -130,6 +131,69 @@ FIXED_COUNTS = {
     "retries": 0,
     "fallbacks": 0,
 }
+
+PREFLIGHT_TOP_LEVEL_KEYS = {
+    "actual_external_io_counts",
+    "components",
+    "expected_call_counts",
+    "interpreter",
+    "module_origins",
+    "nonclaims",
+    "orchestration",
+    "preflight_identity_sha256",
+    "railway_executable",
+    "run",
+    "schema",
+    "source",
+    "source_write_validation",
+    "status",
+}
+PREFLIGHT_RUN_KEYS = {
+    "control_root",
+    "preflight_path",
+    "run_id",
+    "source_root",
+    "staging_root",
+    "working_directory",
+}
+PREFLIGHT_SOURCE_KEYS = {
+    "checkout_state",
+    "commit",
+    "repository",
+    "root",
+    "source_manifest_sha256",
+    "worktree_state",
+}
+PREFLIGHT_INTERPRETER_KEYS = {
+    "bytecode_flag",
+    "bytecode_write_control",
+    "isolated_flag",
+    "lexical_path",
+    "preflight_argv",
+    "preflight_validator_argv",
+    "python_environment_names",
+    "resolved_path",
+    "sha256",
+}
+PREFLIGHT_ORCHESTRATION_KEYS = {
+    "fake_boundary_mode",
+    "run_1",
+    "run_2",
+    "run_count",
+    "vectors_equal",
+}
+PREFLIGHT_ORCHESTRATION_RUN_KEYS = {
+    "actual_external_io_counts",
+    "expected_call_counts",
+}
+FILE_IDENTITY_KEYS = {"lexical_path", "resolved_path", "sha256"}
+PREFLIGHT_MODULE_ORIGIN_KEYS = {
+    "lexical_origin",
+    "module",
+    "resolved_origin",
+    "sha256",
+}
+
 DISCOVERY_RESULT_KEYS = {
     "schema",
     "status",
@@ -196,6 +260,49 @@ PREFLIGHT_NONCLAIMS = (
     "no_bytecode_cache_write",
     "no_unauthorized_staging_write",
 )
+
+DISCOVERY_AUTH_KEYS = {
+    "discovery_authorization_sha256",
+    "discovery_entry_point",
+    "nonclaims",
+    "output_contract",
+    "policy",
+    "preflight",
+    "railway_cli",
+    "requested_target",
+    "run_id",
+    "schema",
+    "source",
+    "subprocess_limit",
+    "working_directory",
+    "write_contract",
+}
+DISCOVERY_POLICY_KEYS = {
+    "argv_rules",
+    "permitted_command_families",
+    "prohibited_command_families",
+    "python_execution",
+    "sanitization",
+    "schema",
+    "stages",
+    "template_selection",
+}
+DISCOVERY_POLICY_STAGE_KEYS = {
+    "max_invocations",
+    "ordinal",
+    "predecessors",
+    "selection_mode",
+    "stage",
+    "templates",
+}
+DISCOVERY_POLICY_TEMPLATE_KEYS = {
+    "argv",
+    "required_help_tokens",
+    "template_id",
+    "version_regex",
+}
+DISCOVERY_POLICY_DESCRIPTOR_KINDS = {"literal", "prior_result", "python_child"}
+
 DISCOVERY_STAGES = (
     "cli_version",
     "cli_help",
@@ -204,12 +311,124 @@ DISCOVERY_STAGES = (
     "service_inventory",
     "target_identity_probe",
 )
+DISCOVERY_STAGE_PREDECESSORS = {
+    stage: list(DISCOVERY_STAGES[:index])
+    for index, stage in enumerate(DISCOVERY_STAGES)
+}
+DISCOVERY_STAGE_SELECTION_MODES = {
+    "cli_version": "single",
+    "cli_help": "version",
+    "project_inventory": "version_and_help",
+    "environment_inventory": "version_and_help",
+    "service_inventory": "version_and_help",
+    "target_identity_probe": "version_and_help",
+}
+DISCOVERY_PERMITTED_COMMAND_FAMILIES = list(DISCOVERY_STAGES)
+DISCOVERY_PROHIBITED_COMMAND_FAMILIES = [
+    "arbitrary_child_execution",
+    "database_connect",
+    "deployment",
+    "environment_mutation",
+    "linked_context_change",
+    "log_stream",
+    "project_mutation",
+    "redeployment",
+    "remote_shell",
+    "restart",
+    "selection_change",
+    "service_mutation",
+    "variable_read",
+    "variable_write",
+]
+DISCOVERY_FORBIDDEN_TOKENS = [
+    "add",
+    "connect",
+    "delete",
+    "deploy",
+    "disconnect",
+    "down",
+    "link",
+    "logs",
+    "redeploy",
+    "remove",
+    "restart",
+    "set",
+    "shell",
+    "ssh",
+    "unlink",
+    "unset",
+    "up",
+    "variables",
+]
 SELECTOR = {
     "alias": "epic011-s10-invariance-1",
     "identity_source": "docs/run/EPIC011_TEST_IDENTITIES.md",
     "non_pii": True,
     "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afab",
 }
+
+RESULT_SUMMARY_KEYS = {
+    "acceptance_tokens",
+    "active_parity_corpus",
+    "active_parity_rows",
+    "actual_call_counts",
+    "authorization",
+    "authorization_sha256",
+    "bodygraph_selector",
+    "captured_at_utc",
+    "checksum_policy",
+    "discovery_identity_sha256",
+    "epic_closeout",
+    "execution",
+    "expected_call_counts",
+    "full_ddl_semantic_parity_claimed",
+    "literal_staging_root",
+    "observations",
+    "ops_observation_status",
+    "packaged_at_utc",
+    "pf09_status_movement",
+    "preflight_identity_sha256",
+    "qa_status",
+    "remediation_findings_resolved",
+    "repository",
+    "runner_sha256",
+    "schema",
+    "scope",
+}
+RESULT_SUMMARY_EXECUTION_KEYS = {
+    "candidate_validator_argv",
+    "commands_sha256",
+    "launch_executions",
+    "source_checkout_state",
+    "source_write_validation",
+}
+RESULT_SUMMARY_OBSERVATION_KEYS = {
+    "bodygraph_row_parity",
+    "bridge_consistency",
+    "bridge_provider",
+    "claimed_rows",
+    "db_posture",
+    "ddl_identity_projection",
+    "direct_provider",
+    "matched_rows",
+    "search_path",
+}
+RESULT_SUMMARY_REPOSITORY_KEYS = {
+    "branch",
+    "head",
+    "post_execution_worktree",
+    "pre_execution_worktree",
+    "root",
+}
+RESULT_SUMMARY_FINDINGS = [
+    "F-004_LITERAL_COMMANDS",
+    "F-005_RAW_STREAM_AND_CHECKER_BINDING",
+    "F-006_BODYGRAPH_ROW_PARITY",
+    "F-007_OPS01_SCOPE",
+    "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE",
+    "F-009_DDL_IDENTITY_PROJECTION_CONTRACT",
+]
+
 PROVIDER_PROOF_KEYS = {
     "active_parity_corpus",
     "attempts",
@@ -1180,12 +1399,112 @@ def validate_ops01_v5_package(
         errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
 
     try:
-        summary = _mapping(_read_json(root / "result_summary.json"))
+        summary_path = root / "result_summary.json"
+        summary_bytes = summary_path.read_bytes()
+        summary = _mapping(_read_json(summary_path))
+        if _canon(summary) != summary_bytes:
+            errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
+        authorization = _mapping(summary.get("authorization"))
+        execution = _mapping(summary.get("execution"))
+        observations = _mapping(summary.get("observations"))
+        repository = _mapping(summary.get("repository"))
+        checksum_policy = _mapping(summary.get("checksum_policy"))
+        source_write = _mapping(execution.get("source_write_validation"))
+        active_corpus = _mapping(proof.get("active_parity_corpus"))
+        live_parity = _mapping(proof.get("live_provider_parity"))
+        authorization_run = _mapping(authorization.get("run"))
+        authorization_write = _mapping(authorization.get("write_contract"))
+        expected_candidate_argv = [
+            _at(authorization, "interpreter", "path"),
+            "-I",
+            "-B",
+            _at(authorization, "validator", "path"),
+            "--validate-candidate",
+            "--expected-identity-stdin",
+            authorization_run.get("candidate_root"),
+        ]
         if (
-            summary.get("schema") != "hde_epic038.ops01.result_summary.v4"
+            set(summary) != RESULT_SUMMARY_KEYS
+            or "status" in summary
+            or summary.get("schema") != "hde_epic038.ops01.result_summary.v4"
             or summary.get("full_ddl_semantic_parity_claimed") is not False
+            or summary.get("acceptance_tokens") != "NOT_CLAIMED"
+            or summary.get("epic_closeout") != "NOT_CLAIMED"
+            or summary.get("pf09_status_movement") != "NONE"
+            or summary.get("qa_status") != "NOT_CLAIMED"
+            or summary.get("ops_observation_status") != "PASS"
+            or summary.get("scope")
+            != "bounded_read_only_db_posture_and_direct_bridge_bodygraph_row_parity"
+            or summary.get("bodygraph_selector") != SELECTOR
+            or summary.get("active_parity_corpus") != active_corpus.get("name")
+            or summary.get("active_parity_rows") != active_corpus.get("ordered_rows")
+            or active_corpus.get("selector") != SELECTOR
+            or checksum_policy
+            != {"algorithm": "sha256", "ledger_excludes_itself": True}
+            or set(repository) != RESULT_SUMMARY_REPOSITORY_KEYS
+            or repository.get("branch") != "DETACHED"
+            or repository.get("head") != _at(authorization, "source", "commit")
+            or repository.get("root") != _at(authorization, "source", "root")
+            or repository.get("pre_execution_worktree") != "clean"
+            or repository.get("post_execution_worktree") != "clean"
+            or set(observations) != RESULT_SUMMARY_OBSERVATION_KEYS
+            or observations
+            != {
+                "bodygraph_row_parity": "match",
+                "bridge_consistency": "PASS",
+                "bridge_provider": live_parity.get("bridge_provider_rows"),
+                "claimed_rows": live_parity.get("claimed_row_count"),
+                "db_posture": "PASS",
+                "ddl_identity_projection": "projection_match",
+                "direct_provider": live_parity.get("direct_provider_rows"),
+                "matched_rows": live_parity.get("matched_row_count"),
+                "search_path": "hde, public",
+            }
+            or summary.get("remediation_findings_resolved")
+            != RESULT_SUMMARY_FINDINGS
+            or set(execution) != RESULT_SUMMARY_EXECUTION_KEYS
+            or execution.get("candidate_validator_argv")
+            != expected_candidate_argv
+            or execution.get("launch_executions") != 1
+            or execution.get("source_checkout_state") != "DETACHED"
+            or set(source_write) != SOURCE_WRITE_KEYS
+            or source_write.get("mode") != "live"
+            or source_write.get("python_argv")
+            != authorization_run.get("child_argv")
+            or source_write.get("python_environment_names") != []
+            or source_write.get("bytecode_write_control") != "python_flag_-B"
+            or source_write.get("manifest_algorithm")
+            != "hde_epic038.source_tree_manifest.v1"
+            or source_write.get("staging_manifest_algorithm")
+            != "hde_epic038.non_source_staging_manifest.v1"
+            or source_write.get("authorized_exact_write_paths")
+            != authorization_write.get("success_authorized_exact_paths")
+            or source_write.get("authorized_recursive_write_roots")
+            != authorization_write.get("success_authorized_recursive_write_roots")
+            or source_write.get("authorized_directory_metadata_paths")
+            != authorization_write.get("success_authorized_directory_metadata_paths")
+            or source_write.get("self_bound_excluded_paths")
+            != authorization_write.get("self_bound_excluded_paths")
+            or source_write.get("self_bound_excluded_recursive_roots")
+            != authorization_write.get("self_bound_excluded_recursive_roots")
+            or source_write.get("source_root")
+            != _at(authorization, "source", "root")
+            or source_write.get("source_tree_unchanged") is not True
+            or source_write.get("staging_write_set_valid") is not True
+            or source_write.get("status") != "PASS"
+            or source_write.get("prohibited_cache_paths") != []
+            or source_write.get("unauthorized_staging_paths") != []
+            or not isinstance(summary.get("captured_at_utc"), str)
+            or not isinstance(summary.get("packaged_at_utc"), str)
+            or summary.get("captured_at_utc") != proof.get("captured_at_utc")
         ):
             errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
+        if (root / "exit_code.txt").read_bytes() != b"0\n":
+            errors.add("OPS01_V5_EXIT_CODE_INVALID")
+        if (root / "stdout.log").read_bytes() != b"PASS\n":
+            errors.add("OPS01_V5_STDOUT_INVALID")
+        if (root / "stderr.log").read_bytes() != b"none\n":
+            errors.add("OPS01_V5_STDERR_INVALID")
         counts = _mapping(summary.get("actual_call_counts"))
         if set(counts) != set(CALL_COUNT_FIELDS) or any(
             type(counts[field]) is not int or counts[field] < 0
@@ -1201,7 +1520,6 @@ def validate_ops01_v5_package(
         )
         errors.update(identity_errors)
         errors.update(_candidate_expected_errors(actual, expected))
-        authorization = _mapping(summary.get("authorization"))
         if not _commands_match_authorization(commands_bytes, authorization):
             errors.add("OPS01_V5_COMMANDS_INVALID")
 
@@ -1311,6 +1629,55 @@ def _manifest_delta(
     return changes
 
 
+def _identity_matches_file(
+    value: object,
+    *,
+    lexical_path: Path | None = None,
+    expected_sha256: str | None = None,
+) -> bool:
+    identity = _mapping(value)
+    if set(identity) != FILE_IDENTITY_KEYS:
+        return False
+    lexical_value = identity.get("lexical_path")
+    resolved_value = identity.get("resolved_path")
+    sha256_value = identity.get("sha256")
+    if not all(
+        isinstance(item, str) and item
+        for item in (lexical_value, resolved_value, sha256_value)
+    ):
+        return False
+    lexical = _lexical_absolute(Path(lexical_value))
+    if lexical_path is not None and lexical != _lexical_absolute(lexical_path):
+        return False
+    try:
+        resolved = lexical.resolve(strict=True)
+        metadata = resolved.stat()
+        actual_sha256 = _sha(resolved.read_bytes())
+    except OSError:
+        return False
+    return (
+        not lexical.is_symlink() or resolved != lexical
+    ) and stat.S_ISREG(metadata.st_mode) and (
+        Path(resolved_value) == resolved
+        and sha256_value == actual_sha256
+        and (expected_sha256 is None or sha256_value == expected_sha256)
+    )
+
+
+def _source_has_cache_residue(root: Path) -> bool:
+    try:
+        for current, directories, files in os.walk(root, followlinks=False):
+            if "__pycache__" in Path(current).parts:
+                return True
+            if any(name == "__pycache__" for name in directories):
+                return True
+            if any(name.endswith(".pyc") for name in files):
+                return True
+    except OSError:
+        return True
+    return False
+
+
 def _preflight_live_tree_errors(
     path: Path,
     obj: Mapping[str, object],
@@ -1326,12 +1693,14 @@ def _preflight_live_tree_errors(
         isinstance(value, str)
         for value in (source_root_value, staging_root_value, preflight_path_value)
     ):
-        return {"PREFLIGHT_SOURCE_MANIFEST_MISMATCH", "PREFLIGHT_WRITE_SET_INVALID"}
+        return {"PREFLIGHT_PATH_MISMATCH", "PREFLIGHT_WRITE_SET_MISMATCH"}
     source_root = _lexical_absolute(Path(source_root_value))
     staging_root = _lexical_absolute(Path(staging_root_value))
     preflight_path = _lexical_absolute(Path(preflight_path_value))
     if preflight_path != _lexical_absolute(path):
-        errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        errors.add("PREFLIGHT_PATH_MISMATCH")
+    if _source_has_cache_residue(source_root):
+        errors.add("PREFLIGHT_SOURCE_RESIDUE_DETECTED")
     try:
         source_manifest = _tree_manifest(
             source_root, schema="hde_epic038.source_tree_manifest.v1"
@@ -1347,7 +1716,7 @@ def _preflight_live_tree_errors(
 
         retained_pre = source_write.get("pre_staging_manifest")
         if not isinstance(retained_pre, list):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
             retained_pre = []
         retained_pre_manifest = {
             "schema": "hde_epic038.non_source_staging_manifest.v1",
@@ -1358,7 +1727,7 @@ def _preflight_live_tree_errors(
             retained_pre_sha != expected.pre_staging_manifest_sha256
             or retained_pre_sha != source_write.get("pre_staging_manifest_sha256")
         ):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
 
         recursive_exclusions: tuple[Path, ...] = ()
         if staging_root in (source_root, *source_root.parents):
@@ -1371,10 +1740,10 @@ def _preflight_live_tree_errors(
         )
         post_sha = _sha(_canon(post_manifest))
         if post_sha != source_write.get("post_staging_manifest_sha256"):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
         delta = _manifest_delta(retained_pre, post_manifest["entries"])
         if delta != source_write.get("observed_staging_changes"):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
         control_relative = _lexical_absolute(Path(run.get("control_root", ""))).relative_to(
             staging_root
         ).as_posix()
@@ -1383,12 +1752,12 @@ def _preflight_live_tree_errors(
             or not set(change.get("change_kinds", ())) <= {"ctime_ns", "mtime_ns"}
             for change in delta
         ):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
         working = _lexical_absolute(Path(str(run.get("working_directory", ""))))
         if not working.is_dir() or any(working.iterdir()):
-            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
     except (OSError, TypeError, ValueError):
-        errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
     return errors
 
 
@@ -1401,10 +1770,207 @@ def validate_ops01r_preflight(
         obj = _mapping(_read_json(path))
         if _canon(obj) != data:
             errors.add("PREFLIGHT_BYTES_NONCANONICAL")
+        run = _mapping(obj.get("run"))
+        source = _mapping(obj.get("source"))
+        components = _mapping(obj.get("components"))
+        interpreter = _mapping(obj.get("interpreter"))
+        source_write = _mapping(obj.get("source_write_validation"))
+        orchestration = _mapping(obj.get("orchestration"))
+        module_origins = obj.get("module_origins")
+        railway = _mapping(obj.get("railway_executable"))
+        roster_invalid = (
+            set(obj) != PREFLIGHT_TOP_LEVEL_KEYS
+            or set(run) != PREFLIGHT_RUN_KEYS
+            or set(source) != PREFLIGHT_SOURCE_KEYS
+            or set(interpreter) != PREFLIGHT_INTERPRETER_KEYS
+            or set(components) != {"projector", "runner", "validator"}
+            or any(
+                set(_mapping(components.get(name))) != FILE_IDENTITY_KEYS
+                for name in ("projector", "runner", "validator")
+            )
+            or set(railway) != FILE_IDENTITY_KEYS
+            or set(source_write) != SOURCE_WRITE_KEYS
+            or set(orchestration) != PREFLIGHT_ORCHESTRATION_KEYS
+            or any(
+                set(_mapping(orchestration.get(name)))
+                != PREFLIGHT_ORCHESTRATION_RUN_KEYS
+                for name in ("run_1", "run_2")
+            )
+            or not isinstance(module_origins, list)
+            or any(
+                set(_mapping(row)) != PREFLIGHT_MODULE_ORIGIN_KEYS
+                for row in module_origins or []
+            )
+            or any(
+                set(_mapping(row))
+                != {
+                    "ctime_ns",
+                    "kind",
+                    "mode",
+                    "mtime_ns",
+                    "path",
+                    "sha256",
+                    "size",
+                    "target",
+                }
+                for row in source_write.get("pre_staging_manifest", [])
+                if isinstance(source_write.get("pre_staging_manifest"), list)
+            )
+            or any(
+                set(_mapping(row)) != {"change_kinds", "path"}
+                for row in source_write.get("observed_staging_changes", [])
+                if isinstance(source_write.get("observed_staging_changes"), list)
+            )
+        )
+        if roster_invalid:
+            errors.add("PREFLIGHT_UNKNOWN_KEY")
         if obj.get("schema") != "hde_epic038.ops01r.preflight.v1":
             errors.add("PREFLIGHT_SCHEMA_INVALID")
         if obj.get("status") != "PASS":
             errors.add("PREFLIGHT_STATUS_INVALID")
+
+        run_id = run.get("run_id")
+        try:
+            if (
+                not isinstance(run_id, str)
+                or len(run_id) != 32
+                or any(character not in "0123456789abcdef" for character in run_id)
+            ):
+                raise ValueError
+            staging_root = _lexical_absolute(
+                Path("/tmp/hde-epic038-ops01r") / run_id
+            )
+            source_root = staging_root / "source"
+            control_root = staging_root / "control"
+            working_directory = staging_root / "preflight-work"
+            preflight_path = control_root / "preflight.json"
+            if run != {
+                "control_root": control_root.as_posix(),
+                "preflight_path": preflight_path.as_posix(),
+                "run_id": run_id,
+                "source_root": source_root.as_posix(),
+                "staging_root": staging_root.as_posix(),
+                "working_directory": working_directory.as_posix(),
+            } or _lexical_absolute(path) != preflight_path:
+                errors.add("PREFLIGHT_PATH_MISMATCH")
+        except (OSError, TypeError, ValueError):
+            errors.add("PREFLIGHT_PATH_MISMATCH")
+            staging_root = _lexical_absolute(Path(str(run.get("staging_root", "/"))))
+            source_root = _lexical_absolute(Path(str(run.get("source_root", "/"))))
+            control_root = _lexical_absolute(Path(str(run.get("control_root", "/"))))
+            preflight_path = _lexical_absolute(Path(str(run.get("preflight_path", "/"))))
+
+        if source != {
+            "checkout_state": "DETACHED",
+            "commit": expected.source_commit,
+            "repository": "amthorn78/glow-hdengine-v2",
+            "root": source_root.as_posix(),
+            "source_manifest_sha256": expected.source_manifest_sha256,
+            "worktree_state": "clean",
+        }:
+            errors.add("PREFLIGHT_SOURCE_IDENTITY_MISMATCH")
+
+        component_paths = {
+            "projector": source_root / "engine/db/ddl_identity_projection.py",
+            "runner": source_root / "scripts/ops/hde_epic038_ops01r.py",
+            "validator": source_root / "tools/evidence/hde_epic038_ops01_v5.py",
+        }
+        component_hashes = {
+            "projector": expected.projector_sha256,
+            "runner": expected.runner_sha256,
+            "validator": expected.validator_sha256,
+        }
+        if any(
+            not _identity_matches_file(
+                components.get(name),
+                lexical_path=component_paths[name],
+                expected_sha256=component_hashes[name],
+            )
+            for name in component_paths
+        ):
+            errors.add("PREFLIGHT_COMPONENT_IDENTITY_MISMATCH")
+
+        interpreter_identity = {
+            key: interpreter.get(key) for key in FILE_IDENTITY_KEYS
+        }
+        interpreter_path_value = interpreter.get("lexical_path")
+        if (
+            not isinstance(interpreter_path_value, str)
+            or not _identity_matches_file(
+                interpreter_identity,
+                lexical_path=Path(interpreter_path_value),
+                expected_sha256=expected.interpreter_sha256,
+            )
+        ):
+            errors.add("PREFLIGHT_INTERPRETER_IDENTITY_MISMATCH")
+
+        expected_modules = {
+            "engine.db.ddl_identity_projection": component_paths["projector"],
+            "scripts.db.capture_epic011_posture": source_root
+            / "scripts/db/capture_epic011_posture.py",
+            "scripts.ops.hde_epic038_ops01r": component_paths["runner"],
+            "tools.evidence.hde_epic038_ops01_v5": component_paths["validator"],
+        }
+        if not isinstance(module_origins, list) or [
+            _mapping(row).get("module") for row in module_origins
+        ] != sorted(expected_modules):
+            errors.add("PREFLIGHT_MODULE_ORIGIN_MISMATCH")
+        else:
+            for row in module_origins:
+                module_row = _mapping(row)
+                module = str(module_row.get("module"))
+                identity = {
+                    "lexical_path": module_row.get("lexical_origin"),
+                    "resolved_path": module_row.get("resolved_origin"),
+                    "sha256": module_row.get("sha256"),
+                }
+                if not _identity_matches_file(
+                    identity, lexical_path=expected_modules[module]
+                ):
+                    errors.add("PREFLIGHT_MODULE_ORIGIN_MISMATCH")
+
+        if not _identity_matches_file(
+            railway, expected_sha256=expected.railway_executable_sha256
+        ):
+            errors.add("PREFLIGHT_RAILWAY_EXECUTABLE_IDENTITY_MISMATCH")
+
+        if (
+            interpreter.get("bytecode_flag") != "-B"
+            or interpreter.get("bytecode_write_control") != "python_flag_-B"
+            or interpreter.get("isolated_flag") != "-I"
+            or source_write.get("bytecode_write_control") != "python_flag_-B"
+        ):
+            errors.add("PREFLIGHT_BYTECODE_CONTROL_MISMATCH")
+
+        expected_producer_argv = [
+            interpreter.get("lexical_path"),
+            "-I",
+            "-B",
+            _at(obj, "components", "runner", "lexical_path"),
+            "--preflight",
+        ]
+        expected_validator_argv = [
+            interpreter.get("lexical_path"),
+            "-I",
+            "-B",
+            _at(obj, "components", "validator", "lexical_path"),
+            "--validate-preflight",
+            "--expected-identity-stdin",
+            run.get("preflight_path"),
+        ]
+        if (
+            interpreter.get("preflight_argv") != expected_producer_argv
+            or source_write.get("python_argv") != expected_producer_argv
+            or interpreter.get("preflight_validator_argv")
+            != expected_validator_argv
+        ):
+            errors.add("PREFLIGHT_PYTHON_ARGV_MISMATCH")
+        if (
+            interpreter.get("python_environment_names") != []
+            or source_write.get("python_environment_names") != []
+        ):
+            errors.add("PREFLIGHT_PYTHON_ENVIRONMENT_INVALID")
+
         actual_io = _mapping(obj.get("actual_external_io_counts"))
         if set(actual_io) != set(PREFLIGHT_ZERO_IO_FIELDS) or any(
             type(actual_io[field]) is not int or actual_io[field] != 0
@@ -1414,6 +1980,19 @@ def validate_ops01r_preflight(
         if obj.get("nonclaims") != list(PREFLIGHT_NONCLAIMS):
             errors.add("PREFLIGHT_NONCLAIMS_INVALID")
         expected_counts = _mapping(obj.get("expected_call_counts"))
+        run_1 = _mapping(orchestration.get("run_1"))
+        run_2 = _mapping(orchestration.get("run_2"))
+        if (
+            orchestration.get("fake_boundary_mode")
+            != "count_before_fail_on_touch_delegate"
+            or orchestration.get("run_count") != 2
+            or orchestration.get("vectors_equal") is not True
+            or _mapping(run_1.get("expected_call_counts")) != expected_counts
+            or _mapping(run_2.get("expected_call_counts")) != expected_counts
+            or _mapping(run_1.get("actual_external_io_counts")) != actual_io
+            or _mapping(run_2.get("actual_external_io_counts")) != actual_io
+        ):
+            errors.add("PREFLIGHT_ORCHESTRATION_MISMATCH")
         if set(expected_counts) != set(CALL_COUNT_FIELDS) or any(
             type(expected_counts[field]) is not int or expected_counts[field] < 0
             for field in expected_counts
@@ -1426,10 +2005,32 @@ def validate_ops01r_preflight(
         if obj.get("preflight_identity_sha256") != actual["preflight_identity_sha256"]:
             errors.add("PREFLIGHT_IDENTITY_MISMATCH")
         if (
+            source_write.get("authorized_exact_write_paths")
+            != [preflight_path.as_posix()]
+            or source_write.get("authorized_recursive_write_roots") != []
+            or source_write.get("authorized_directory_metadata_paths")
+            != [control_root.as_posix()]
+            or source_write.get("self_bound_excluded_paths")
+            != [preflight_path.as_posix()]
+            or source_write.get("self_bound_excluded_recursive_roots") != []
+            or source_write.get("source_root") != source_root.as_posix()
+            or source_write.get("mode") != "preflight"
+            or source_write.get("manifest_algorithm")
+            != "hde_epic038.source_tree_manifest.v1"
+            or source_write.get("staging_manifest_algorithm")
+            != "hde_epic038.non_source_staging_manifest.v1"
+            or source_write.get("status") != "PASS"
+        ):
+            errors.add("PREFLIGHT_WRITE_SET_MISMATCH")
+        if (
             _at(obj, "source_write_validation", "pre_source_manifest_sha256")
             != actual["source_manifest_sha256"]
             or _at(obj, "source_write_validation", "post_source_manifest_sha256")
             != actual["source_manifest_sha256"]
+            or source_write.get("source_tree_unchanged") is not True
+            or source_write.get("prohibited_cache_paths") != []
+            or source_write.get("unauthorized_staging_paths") != []
+            or source_write.get("staging_write_set_valid") is not True
         ):
             errors.add("PREFLIGHT_SOURCE_MANIFEST_MISMATCH")
         if not _all_expected_values_match(actual, expected):
@@ -1474,12 +2075,433 @@ def _discovery_authorization_actual_identity(
     }
 
 
+def _discovery_authorization_contract_errors(
+    obj: Mapping[str, object], authorization_path: Path, *, require_pristine_staging: bool
+) -> set[str]:
+    errors: set[str] = set()
+    if set(obj) != DISCOVERY_AUTH_KEYS:
+        errors.add("DISCOVERY_AUTH_UNKNOWN_KEY")
+
+    run_id = obj.get("run_id")
+    try:
+        if (
+            not isinstance(run_id, str)
+            or len(run_id) != 32
+            or any(character not in "0123456789abcdef" for character in run_id)
+        ):
+            raise ValueError
+        staging_root = _lexical_absolute(
+            Path("/tmp/hde-epic038-ops01r") / run_id
+        )
+        source_root = staging_root / "source"
+        control_root = staging_root / "control"
+        expected_authorization_path = control_root / "discovery_authorization.json"
+        output_path = control_root / "discovery.json"
+        working_path = staging_root / "discovery-work"
+        if _lexical_absolute(authorization_path) != expected_authorization_path:
+            errors.add("DISCOVERY_AUTH_PATH_MISMATCH")
+    except (OSError, TypeError, ValueError):
+        errors.add("DISCOVERY_AUTH_PATH_MISMATCH")
+        staging_root = _lexical_absolute(Path(str(_discovery_staging_root(obj) or "/")))
+        source_root = staging_root / "source"
+        control_root = staging_root / "control"
+        output_path = control_root / "discovery.json"
+        working_path = staging_root / "discovery-work"
+
+    source = _mapping(obj.get("source"))
+    if (
+        set(source)
+        != {"commit", "repository", "root", "source_manifest_sha256", "state"}
+        or source.get("repository") != "amthorn78/glow-hdengine-v2"
+        or source.get("root") != source_root.as_posix()
+        or source.get("state") != "DETACHED"
+        or not _is_sha256(source.get("source_manifest_sha256"))
+        or not isinstance(source.get("commit"), str)
+        or re.fullmatch(r"[0-9a-f]{40}", str(source.get("commit"))) is None
+    ):
+        errors.add("DISCOVERY_AUTH_SOURCE_IDENTITY_MISMATCH")
+
+    entry = _mapping(obj.get("discovery_entry_point"))
+    entry_path = source_root / "scripts/ops/hde_epic038_ops01r.py"
+    if not _identity_matches_file(entry, lexical_path=entry_path):
+        errors.add("DISCOVERY_AUTH_ENTRY_POINT_IDENTITY_MISMATCH")
+
+    preflight = _mapping(obj.get("preflight"))
+    preflight_path = control_root / "preflight.json"
+    preflight_obj: Mapping[str, object] = {}
+    if (
+        set(preflight)
+        != {"path", "preflight_identity_sha256", "source_manifest_sha256"}
+        or preflight.get("path") != preflight_path.as_posix()
+        or preflight.get("source_manifest_sha256")
+        != source.get("source_manifest_sha256")
+        or not _is_sha256(preflight.get("preflight_identity_sha256"))
+    ):
+        errors.add("DISCOVERY_AUTH_PREFLIGHT_IDENTITY_MISMATCH")
+    try:
+        preflight_bytes = preflight_path.read_bytes()
+        preflight_obj = _mapping(_read_json(preflight_path))
+        if (
+            preflight_path.is_symlink()
+            or _canon(preflight_obj) != preflight_bytes
+            or preflight_obj.get("schema") != "hde_epic038.ops01r.preflight.v1"
+            or preflight_obj.get("status") != "PASS"
+            or preflight_obj.get("preflight_identity_sha256")
+            != _self_hash(preflight_obj, "preflight_identity_sha256")
+            or preflight_obj.get("preflight_identity_sha256")
+            != preflight.get("preflight_identity_sha256")
+            or _at(preflight_obj, "source", "source_manifest_sha256")
+            != source.get("source_manifest_sha256")
+            or _at(preflight_obj, "source", "commit") != source.get("commit")
+            or _at(preflight_obj, "source", "repository")
+            != source.get("repository")
+            or _at(preflight_obj, "source", "root") != source.get("root")
+            or _at(preflight_obj, "source", "checkout_state") != source.get("state")
+            or _at(preflight_obj, "run", "run_id") != run_id
+            or _at(preflight_obj, "run", "source_root") != source_root.as_posix()
+            or _at(preflight_obj, "run", "staging_root") != staging_root.as_posix()
+        ):
+            errors.add("DISCOVERY_AUTH_PREFLIGHT_IDENTITY_MISMATCH")
+    except (OSError, UnicodeError, ValueError, TypeError):
+        errors.add("DISCOVERY_AUTH_PREFLIGHT_IDENTITY_MISMATCH")
+
+    railway = _mapping(obj.get("railway_cli"))
+    if (
+        not _identity_matches_file(railway)
+        or railway != _mapping(preflight_obj.get("railway_executable"))
+    ):
+        errors.add("DISCOVERY_AUTH_CLI_IDENTITY_MISMATCH")
+
+    preflight_runner = _mapping(_at(preflight_obj, "components", "runner"))
+    if entry != preflight_runner:
+        errors.add("DISCOVERY_AUTH_ENTRY_POINT_IDENTITY_MISMATCH")
+
+    try:
+        source_manifest = _tree_manifest(
+            source_root, schema="hde_epic038.source_tree_manifest.v1"
+        )
+        if (
+            _source_has_cache_residue(source_root)
+            or _sha(_canon(source_manifest)) != source.get("source_manifest_sha256")
+        ):
+            errors.add("DISCOVERY_AUTH_SOURCE_MANIFEST_MISMATCH")
+    except (OSError, TypeError, ValueError):
+        errors.add("DISCOVERY_AUTH_SOURCE_MANIFEST_MISMATCH")
+
+    requested = _mapping(obj.get("requested_target"))
+    if (
+        set(requested)
+        != {"environment_name", "project_name", "service_name"}
+        or any(
+            not isinstance(value, str)
+            or not value
+            or value != value.strip()
+            or any(ord(character) < 32 or ord(character) == 127 for character in value)
+            for value in requested.values()
+        )
+    ):
+        errors.add("DISCOVERY_AUTH_REQUESTED_TARGET_INVALID")
+    if type(obj.get("subprocess_limit")) is not int or obj.get("subprocess_limit") != 6:
+        errors.add("DISCOVERY_AUTH_SUBPROCESS_LIMIT_INVALID")
+
+    output = _mapping(obj.get("output_contract"))
+    if output != {
+        "canonical_json": True,
+        "path": output_path.as_posix(),
+        "raw_cli_output_retained": False,
+        "schema": "hde_epic038.ops01r.discovery.v1",
+        "trailing_lf": True,
+    }:
+        errors.add("DISCOVERY_AUTH_OUTPUT_CONTRACT_INVALID")
+
+    working = _mapping(obj.get("working_directory"))
+    if working != {
+        "linked_context_required": False,
+        "must_be_empty": True,
+        "path": working_path.as_posix(),
+    }:
+        errors.add("DISCOVERY_AUTH_WORKING_DIRECTORY_INVALID")
+    try:
+        if not working_path.is_dir() or any(working_path.iterdir()):
+            errors.add("DISCOVERY_AUTH_WORKING_DIRECTORY_INVALID")
+    except OSError:
+        errors.add("DISCOVERY_AUTH_WORKING_DIRECTORY_INVALID")
+
+    write_contract = _mapping(obj.get("write_contract"))
+    write_keys = {
+        "authorized_directory_metadata_paths",
+        "authorized_exact_write_paths",
+        "authorized_recursive_write_roots",
+        "pre_staging_manifest",
+        "pre_staging_manifest_sha256",
+        "self_bound_excluded_paths",
+        "self_bound_excluded_recursive_roots",
+        "source_root_writes_authorized",
+    }
+    retained_pre = write_contract.get("pre_staging_manifest")
+    retained_manifest = {
+        "schema": "hde_epic038.non_source_staging_manifest.v1",
+        "entries": retained_pre,
+    }
+    if (
+        set(write_contract) != write_keys
+        or write_contract.get("authorized_directory_metadata_paths")
+        != [control_root.as_posix()]
+        or write_contract.get("authorized_exact_write_paths")
+        != [output_path.as_posix()]
+        or write_contract.get("authorized_recursive_write_roots") != []
+        or write_contract.get("self_bound_excluded_paths")
+        != sorted(
+            (authorization_path.as_posix(), output_path.as_posix()),
+            key=lambda value: value.encode("utf-8"),
+        )
+        or write_contract.get("self_bound_excluded_recursive_roots") != []
+        or write_contract.get("source_root_writes_authorized") is not False
+        or not isinstance(retained_pre, list)
+        or write_contract.get("pre_staging_manifest_sha256")
+        != _sha(_canon(retained_manifest))
+    ):
+        errors.add("DISCOVERY_AUTH_WRITE_SET_INVALID")
+    if require_pristine_staging and isinstance(retained_pre, list):
+        try:
+            recaptured = _tree_manifest(
+                staging_root,
+                schema="hde_epic038.non_source_staging_manifest.v1",
+                excluded_paths=(authorization_path, output_path),
+                excluded_recursive_roots=(source_root,),
+            )
+            if recaptured["entries"] != retained_pre:
+                errors.add("DISCOVERY_AUTH_WRITE_SET_INVALID")
+        except (OSError, TypeError, ValueError):
+            errors.add("DISCOVERY_AUTH_WRITE_SET_INVALID")
+
+    policy = _mapping(obj.get("policy"))
+    if set(policy) != DISCOVERY_POLICY_KEYS or policy.get("schema") != "hde_epic038.ops01r.discovery_policy.v1":
+        errors.add("DISCOVERY_AUTH_UNKNOWN_KEY")
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if policy.get("permitted_command_families") != DISCOVERY_PERMITTED_COMMAND_FAMILIES:
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if policy.get("prohibited_command_families") != DISCOVERY_PROHIBITED_COMMAND_FAMILIES:
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if _mapping(policy.get("argv_rules")) != {
+        "allow_control_characters": False,
+        "allow_empty_tokens": False,
+        "allow_endpoint_or_secret_values": False,
+        "allow_shell": False,
+        "executable_token_source": "authorized_railway_cli_lexical_path",
+        "forbidden_casefolded_tokens": DISCOVERY_FORBIDDEN_TOKENS,
+    }:
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if _mapping(policy.get("template_selection")) != {
+        "cardinality": "exactly_one",
+        "help_match": "every_required_help_token_present_as_case_sensitive_exact_token",
+        "tie_break": "none_fail_on_zero_or_multiple",
+        "version_match": "python_re_fullmatch_on_normalized_version",
+    }:
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if _mapping(policy.get("sanitization")) != {
+        "allowed_value_classes": [
+            "boolean",
+            "cli_version",
+            "identity_field_name",
+            "integer_count",
+            "sanitized_argv",
+            "schema_literal",
+            "sha256",
+            "target_id",
+            "target_name",
+        ],
+        "endpoint_values_retained": False,
+        "forbidden_field_name_regex": r"(?i)(secret|token|password|passwd|api[_-]?key|database_url|db_bridge_url|authorization|cookie)",
+        "raw_stderr_retained": False,
+        "raw_stdout_retained": False,
+        "secret_like_output_action": "fail",
+    }:
+        errors.add("DISCOVERY_AUTH_SANITIZATION_INVALID")
+
+    python_execution = _mapping(policy.get("python_execution"))
+    interpreter_path = _at(preflight_obj, "interpreter", "lexical_path")
+    validator_path = _at(preflight_obj, "components", "validator", "lexical_path")
+    prefix = [interpreter_path, "-I", "-B"]
+    expected_python_execution = {
+        "authorization_validator_argv": [
+            *prefix,
+            validator_path,
+            "--validate-discovery-authorization",
+            "--expected-identity-stdin",
+            authorization_path.as_posix(),
+        ],
+        "bytecode_flag": "-B",
+        "bytecode_write_control": "python_flag_-B",
+        "discovery_producer_argv": [
+            *prefix,
+            entry_path.as_posix(),
+            "--discovery",
+            authorization_path.as_posix(),
+        ],
+        "environment_name_rule": "no_casefolded_python_prefix",
+        "interpreter_argv_prefix": prefix,
+        "python_environment_names": [],
+        "result_validator_argv": [
+            *prefix,
+            validator_path,
+            "--validate-discovery-result",
+            "--expected-identity-stdin",
+            output_path.as_posix(),
+            authorization_path.as_posix(),
+        ],
+        "target_probe_argv": [
+            *prefix,
+            entry_path.as_posix(),
+            "--target-identity-probe",
+        ],
+    }
+    if set(python_execution) != set(expected_python_execution):
+        errors.add("DISCOVERY_AUTH_UNKNOWN_KEY")
+    if python_execution.get("bytecode_flag") != "-B" or python_execution.get("bytecode_write_control") != "python_flag_-B":
+        errors.add("DISCOVERY_AUTH_BYTECODE_CONTROL_MISMATCH")
+    if python_execution.get("python_environment_names") != [] or python_execution.get("environment_name_rule") != "no_casefolded_python_prefix":
+        errors.add("DISCOVERY_AUTH_PYTHON_ENVIRONMENT_INVALID")
+    if python_execution != expected_python_execution:
+        errors.add("DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH")
+
+    stages = policy.get("stages")
+    if not isinstance(stages, list) or len(stages) != len(DISCOVERY_STAGES):
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+        stages = []
+    for index, stage_name in enumerate(DISCOVERY_STAGES, start=1):
+        template_ids: set[str] = set()
+        stage_row = _mapping(stages[index - 1]) if len(stages) >= index else {}
+        if (
+            set(stage_row) != DISCOVERY_POLICY_STAGE_KEYS
+            or stage_row.get("stage") != stage_name
+            or type(stage_row.get("ordinal")) is not int
+            or stage_row.get("ordinal") != index
+            or type(stage_row.get("max_invocations")) is not int
+            or stage_row.get("max_invocations") != 1
+            or stage_row.get("predecessors")
+            != DISCOVERY_STAGE_PREDECESSORS[stage_name]
+            or stage_row.get("selection_mode")
+            != DISCOVERY_STAGE_SELECTION_MODES[stage_name]
+        ):
+            errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+        templates = stage_row.get("templates")
+        if not isinstance(templates, list) or not templates:
+            errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            continue
+        for template_value in templates:
+            template = _mapping(template_value)
+            if set(template) != DISCOVERY_POLICY_TEMPLATE_KEYS:
+                errors.add("DISCOVERY_AUTH_UNKNOWN_KEY")
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                continue
+            template_id = template.get("template_id")
+            version_regex = template.get("version_regex")
+            help_tokens = template.get("required_help_tokens")
+            descriptors = template.get("argv")
+            if (
+                not isinstance(template_id, str)
+                or not template_id
+                or template_id in template_ids
+                or not isinstance(version_regex, str)
+                or not isinstance(help_tokens, list)
+                or any(not isinstance(token, str) or not token for token in help_tokens)
+                or not isinstance(descriptors, list)
+                or not descriptors
+            ):
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                continue
+            template_ids.add(template_id)
+            try:
+                re.compile(version_regex)
+            except re.error:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            if stage_name == "cli_version" and (
+                version_regex or help_tokens or len(templates) != 1
+            ):
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            if stage_name == "cli_help" and (not version_regex or help_tokens):
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            if stage_name not in {"cli_version", "cli_help"} and not version_regex:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            # The exact retained-result schema has no help-token proof field.
+            # Keep post-run selection independently replayable by admitting only
+            # the vacuous help predicate; runtime still requires a nonempty,
+            # strictly decoded cli_help response before later stages.
+            if stage_name not in {"cli_version", "cli_help"} and help_tokens != []:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            python_child_count = 0
+            for descriptor_index, descriptor_value in enumerate(descriptors):
+                descriptor = _mapping(descriptor_value)
+                kind = descriptor.get("kind")
+                if kind == "literal":
+                    token = descriptor.get("value")
+                    if (
+                        set(descriptor) != {"kind", "value"}
+                        or not isinstance(token, str)
+                        or not token
+                        or any(ord(character) < 32 or ord(character) == 127 for character in token)
+                    ):
+                        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                    if isinstance(token, str) and token.lstrip("-").casefold() in DISCOVERY_FORBIDDEN_TOKENS:
+                        errors.add("DISCOVERY_AUTH_PROHIBITED_COMMAND")
+                elif kind == "prior_result":
+                    allowed_fields = {
+                        "project_inventory": {"project_id", "project_name"},
+                        "environment_inventory": {"environment_id", "environment_name"},
+                        "service_inventory": {"service_id", "service_name"},
+                    }
+                    source_stage = descriptor.get("source_stage")
+                    if (
+                        set(descriptor) != {"field", "kind", "source_stage"}
+                        or source_stage not in DISCOVERY_STAGE_PREDECESSORS[stage_name]
+                        or descriptor.get("field")
+                        not in allowed_fields.get(str(source_stage), set())
+                    ):
+                        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                elif kind == "python_child":
+                    python_child_count += 1
+                    if (
+                        set(descriptor) != {"kind"}
+                        or stage_name != "target_identity_probe"
+                        or descriptor_index != len(descriptors) - 1
+                    ):
+                        errors.add("DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH")
+                else:
+                    errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            if (stage_name == "target_identity_probe") != (python_child_count == 1):
+                errors.add("DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH")
+
+    if obj.get("nonclaims") != [
+        "no_glow_import",
+        "no_provider_construction",
+        "no_db_call",
+        "no_bridge_call",
+        "no_vendor_call",
+        "no_deployment",
+        "no_restart",
+        "no_relink",
+        "no_selection_change",
+        "no_variable_mutation",
+        "no_tracked_write",
+    ]:
+        errors.add("DISCOVERY_AUTH_NONCLAIMS_INVALID")
+    return errors
+
+
 def _validate_discovery_authorization_object(
     obj: Mapping[str, object],
     raw_bytes: bytes,
     expected: Ops01RDiscoveryAuthorizationExpectedIdentity,
+    *,
+    authorization_path: Path,
+    require_pristine_staging: bool,
 ) -> set[str]:
-    errors: set[str] = set()
+    errors = _discovery_authorization_contract_errors(
+        obj,
+        authorization_path,
+        require_pristine_staging=require_pristine_staging,
+    )
     actual = _discovery_authorization_actual_identity(obj)
     if _canon(obj) != raw_bytes:
         errors.add("DISCOVERY_AUTH_BYTES_NONCANONICAL")
@@ -1515,7 +2537,13 @@ def validate_ops01r_discovery_authorization(
         raw_bytes = path.read_bytes()
         obj = _mapping(_read_json(path))
         return _result(
-            _validate_discovery_authorization_object(obj, raw_bytes, expected)
+            _validate_discovery_authorization_object(
+                obj,
+                raw_bytes,
+                expected,
+                authorization_path=path,
+                require_pristine_staging=True,
+            )
         )
     except OSError:
         return _result({"DISCOVERY_AUTH_FILE_UNREADABLE"})
@@ -1530,30 +2558,36 @@ def validate_ops01r_discovery_dispatch(
     prior_results: object,
     rendered_argv: tuple[str, ...],
 ) -> Ops01V5ValidationResult:
-    prohibited = {
-        "add",
-        "connect",
-        "delete",
-        "deploy",
-        "disconnect",
-        "down",
-        "link",
-        "logs",
-        "redeploy",
-        "remove",
-        "restart",
-        "set",
-        "shell",
-        "ssh",
-        "unlink",
-        "unset",
-        "up",
-        "variables",
-    }
-    if any(token.lstrip("-").casefold() in prohibited for token in rendered_argv):
+    if any(
+        not _safe_identity_string(token)
+        or token.lstrip("-").casefold() in DISCOVERY_FORBIDDEN_TOKENS
+        for token in rendered_argv
+    ):
         return _result({"DISCOVERY_AUTH_PROHIBITED_COMMAND"})
     try:
+        raw_bytes = authorization_path.read_bytes()
         authorization = _mapping(_read_json(authorization_path))
+        static_errors = _discovery_authorization_contract_errors(
+            authorization,
+            authorization_path,
+            require_pristine_staging=False,
+        )
+        if (
+            authorization_path.is_symlink()
+            or _canon(authorization) != raw_bytes
+            or authorization.get("schema")
+            != "hde_epic038.ops01r.discovery_authorization.v1"
+            or authorization.get("discovery_authorization_sha256")
+            != _self_hash(authorization, "discovery_authorization_sha256")
+            or static_errors
+        ):
+            code = (
+                "DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH"
+                if stage == "target_identity_probe"
+                and "DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH" in static_errors
+                else "DISCOVERY_AUTH_PROHIBITED_COMMAND"
+            )
+            return _result({code})
         if tuple(rendered_argv) not in _authorized_stage_vectors(
             authorization, stage=stage, prior_results=prior_results
         ):
@@ -1577,6 +2611,73 @@ def _prior_stage_value(
     return stage_value.get(field)
 
 
+def _render_discovery_template_vector(
+    authorization: Mapping[str, object],
+    *,
+    stage: str,
+    template: Mapping[str, object],
+    prior_results: object,
+) -> tuple[str, ...] | None:
+    executable = _at(authorization, "railway_cli", "lexical_path")
+    target_probe_argv = _at(
+        authorization, "policy", "python_execution", "target_probe_argv"
+    )
+    descriptors = template.get("argv")
+    if (
+        not isinstance(executable, str)
+        or not executable
+        or not isinstance(descriptors, list)
+        or not descriptors
+    ):
+        return None
+    tokens = [executable]
+    for index, descriptor_value in enumerate(descriptors):
+        descriptor = _mapping(descriptor_value)
+        kind = descriptor.get("kind")
+        if kind == "literal" and set(descriptor) == {"kind", "value"}:
+            value = descriptor.get("value")
+        elif kind == "prior_result" and set(descriptor) == {
+            "field",
+            "kind",
+            "source_stage",
+        }:
+            value = _prior_stage_value(
+                prior_results,
+                descriptor.get("source_stage"),
+                descriptor.get("field"),
+            )
+        elif (
+            kind == "python_child"
+            and set(descriptor) == {"kind"}
+            and stage == "target_identity_probe"
+            and index == len(descriptors) - 1
+            and isinstance(target_probe_argv, list)
+            and all(isinstance(token, str) for token in target_probe_argv)
+        ):
+            tokens.extend(target_probe_argv)
+            continue
+        else:
+            return None
+        if not _safe_identity_string(value):
+            return None
+        tokens.append(value)
+    if any(
+        token.lstrip("-").casefold() in DISCOVERY_FORBIDDEN_TOKENS
+        for token in tokens
+    ):
+        return None
+    return tuple(tokens)
+
+
+def _discovery_version_matches(pattern: object, version: object) -> bool:
+    if not isinstance(pattern, str) or not isinstance(version, str):
+        return False
+    try:
+        return re.fullmatch(pattern, version) is not None
+    except re.error:
+        return False
+
+
 def _authorized_stage_vectors(
     authorization: Mapping[str, object], *, stage: str, prior_results: object
 ) -> set[tuple[str, ...]]:
@@ -1587,66 +2688,104 @@ def _authorized_stage_vectors(
     matches = [row for row in stages if _mapping(row).get("stage") == stage]
     if len(matches) != 1:
         return set()
-    templates = _mapping(matches[0]).get("templates")
-    executable = _at(authorization, "railway_cli", "lexical_path")
-    target_probe_argv = _at(policy, "python_execution", "target_probe_argv")
-    if (
-        not isinstance(templates, list)
-        or not isinstance(executable, str)
-        or not executable
-    ):
+    stage_row = _mapping(matches[0])
+    templates = stage_row.get("templates")
+    if not isinstance(templates, list):
         return set()
-    vectors: set[tuple[str, ...]] = set()
-    for template in templates:
-        descriptors = _mapping(template).get("argv")
-        if not isinstance(descriptors, list) or not descriptors:
-            continue
-        tokens = [executable]
-        valid = True
-        for index, descriptor in enumerate(descriptors):
-            descriptor = _mapping(descriptor)
-            kind = descriptor.get("kind")
-            if kind == "literal" and set(descriptor) == {"kind", "value"}:
-                value = descriptor.get("value")
-            elif kind == "prior_result" and set(descriptor) == {
-                "field",
-                "kind",
-                "source_stage",
-            }:
-                value = _prior_stage_value(
-                    prior_results,
-                    descriptor.get("source_stage"),
-                    descriptor.get("field"),
+    prior = _mapping(prior_results)
+    version = _at(prior, "cli_version", "version")
+    help_tokens = _at(prior, "cli_help", "help_tokens")
+    selection_mode = stage_row.get("selection_mode")
+    selected: list[Mapping[str, object]] = []
+    for template_value in templates:
+        template = _mapping(template_value)
+        version_regex = template.get("version_regex")
+        required_help_tokens = template.get("required_help_tokens")
+        if selection_mode == "single":
+            eligible = True
+        elif selection_mode == "version":
+            eligible = _discovery_version_matches(version_regex, version)
+        elif selection_mode == "version_and_help":
+            eligible = (
+                _discovery_version_matches(version_regex, version)
+                and isinstance(help_tokens, list)
+                and all(isinstance(token, str) for token in help_tokens)
+                and isinstance(required_help_tokens, list)
+                and all(
+                    isinstance(token, str) and token in help_tokens
+                    for token in required_help_tokens
                 )
-            elif (
-                kind == "python_child"
-                and set(descriptor) == {"kind"}
-                and stage == "target_identity_probe"
-                and index == len(descriptors) - 1
-                and isinstance(target_probe_argv, list)
-                and all(isinstance(token, str) for token in target_probe_argv)
-            ):
-                tokens.extend(target_probe_argv)
-                continue
-            else:
-                valid = False
-                break
-            if (
-                not isinstance(value, str)
-                or not value
-                or any(ord(character) < 32 or ord(character) == 127 for character in value)
-            ):
-                valid = False
-                break
-            tokens.append(value)
-        if valid:
-            vectors.add(tuple(tokens))
+            )
+        else:
+            eligible = False
+        if eligible:
+            selected.append(template)
+    if len(selected) != 1:
+        return set()
+
+    vectors: set[tuple[str, ...]] = set()
+    for template in selected:
+        rendered = _render_discovery_template_vector(
+            authorization,
+            stage=stage,
+            template=template,
+            prior_results=prior_results,
+        )
+        if rendered is not None:
+            vectors.add(rendered)
     return vectors
+
+
+def _retained_stage_template_matches(
+    authorization: Mapping[str, object],
+    *,
+    stage: str,
+    prior_results: object,
+    rendered_argv: tuple[str, ...],
+    version: object,
+) -> tuple[int, int]:
+    stages = _at(authorization, "policy", "stages")
+    if not isinstance(stages, list):
+        return (0, 0)
+    rows = [row for row in stages if _mapping(row).get("stage") == stage]
+    if len(rows) != 1:
+        return (0, 0)
+    stage_row = _mapping(rows[0])
+    templates = stage_row.get("templates")
+    if not isinstance(templates, list):
+        return (0, 0)
+    eligible_count = 0
+    rendered_match_count = 0
+    for template_value in templates:
+        template = _mapping(template_value)
+        selection_mode = stage_row.get("selection_mode")
+        version_regex = template.get("version_regex")
+        if selection_mode == "single":
+            eligible = True
+        else:
+            eligible = (
+                _discovery_version_matches(version_regex, version)
+                and template.get("required_help_tokens") == []
+            )
+        candidate = _render_discovery_template_vector(
+            authorization,
+            stage=stage,
+            template=template,
+            prior_results=prior_results,
+        )
+        if eligible:
+            eligible_count += 1
+            if candidate == rendered_argv:
+                rendered_match_count += 1
+    return (eligible_count, rendered_match_count)
 
 
 def _discovery_prior_results(obj: Mapping[str, object]) -> dict[str, object]:
     target = _mapping(obj.get("target"))
     return {
+        "cli_version": {
+            "version": _at(obj, "railway_cli", "version"),
+        },
         "project_inventory": {
             "project_id": target.get("project_id"),
             "project_name": target.get("project_name"),
@@ -1759,6 +2898,8 @@ def _discovery_write_set_errors(
     ):
         errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
         retained_entries = []
+    if _source_has_cache_residue(source_root):
+        errors.add("DISCOVERY_RESULT_SOURCE_RESIDUE_DETECTED")
     try:
         source_manifest = _tree_manifest(
             source_root, schema="hde_epic038.source_tree_manifest.v1"
@@ -1827,7 +2968,11 @@ def validate_ops01r_discovery_result(
         authorization_bytes = authorization_path.read_bytes()
         authorization = _mapping(_read_json(authorization_path))
         auth_errors = _validate_discovery_authorization_object(
-            authorization, authorization_bytes, expected
+            authorization,
+            authorization_bytes,
+            expected,
+            authorization_path=authorization_path,
+            require_pristine_staging=False,
         )
         if auth_errors:
             errors.add("DISCOVERY_RESULT_AUTHORIZATION_MISMATCH")
@@ -1906,9 +3051,11 @@ def validate_ops01r_discovery_result(
         if not isinstance(command_manifest, list) or len(command_manifest) != len(
             DISCOVERY_STAGES
         ):
-            errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
+            errors.add("DISCOVERY_RESULT_STAGE_COUNT_INVALID")
         else:
             railway_path = _at(authorization, "railway_cli", "lexical_path")
+            prior_results = _discovery_prior_results(obj)
+            railway_version = _at(obj, "railway_cli", "version")
             for index, rendered in enumerate(command_manifest):
                 if (
                     not isinstance(rendered, list)
@@ -1916,14 +3063,41 @@ def validate_ops01r_discovery_result(
                     or any(not isinstance(token, str) for token in rendered)
                     or not isinstance(railway_path, str)
                     or rendered[0] != railway_path
-                    or not validate_ops01r_discovery_dispatch(
-                        authorization_path,
-                        stage=DISCOVERY_STAGES[index],
-                        prior_results=_discovery_prior_results(obj),
-                        rendered_argv=tuple(rendered),
-                    ).valid
                 ):
                     errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
+                    continue
+                eligible_count, match_count = _retained_stage_template_matches(
+                    authorization,
+                    stage=DISCOVERY_STAGES[index],
+                    prior_results=prior_results,
+                    rendered_argv=tuple(rendered),
+                    version=railway_version,
+                )
+                if eligible_count == 0:
+                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE")
+                elif eligible_count > 1:
+                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS")
+                elif match_count == 0:
+                    appears_in_other_stage = any(
+                        (
+                            lambda selection: selection[0] == 1
+                            and selection[1] == 1
+                        )(
+                            _retained_stage_template_matches(
+                                authorization,
+                                stage=other_stage,
+                                prior_results=prior_results,
+                                rendered_argv=tuple(rendered),
+                                version=railway_version,
+                            )
+                        )
+                        for other_stage in DISCOVERY_STAGES
+                        if other_stage != DISCOVERY_STAGES[index]
+                    )
+                    if appears_in_other_stage:
+                        errors.add("DISCOVERY_RESULT_STAGE_ORDER_INVALID")
+                    else:
+                        errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
 
         python_execution = _at(authorization, "policy", "python_execution")
         target_probe_argv = _at(
@@ -1974,6 +3148,28 @@ def validate_ops01r_discovery_result(
             != len(child_environment)
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+        if (
+            not isinstance(prefix, list)
+            or not isinstance(target_probe_argv, list)
+            or not isinstance(command_manifest, list)
+            or not command_manifest
+            or command_manifest[-1] != prefix + target_probe_argv
+            or run_contract.get("python_execution") != python_execution
+        ):
+            errors.add("DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH")
+        result_python_execution = _mapping(run_contract.get("python_execution"))
+        if (
+            result_python_execution.get("bytecode_flag") != "-B"
+            or result_python_execution.get("bytecode_write_control")
+            != "python_flag_-B"
+        ):
+            errors.add("DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH")
+        if (
+            result_python_execution.get("python_environment_names") != []
+            or result_python_execution.get("environment_name_rule")
+            != "no_casefolded_python_prefix"
+        ):
+            errors.add("DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID")
 
         identity_contract = obj.get("identity_contract")
         expected_by_dimension = {
@@ -2022,6 +3218,15 @@ def validate_ops01r_discovery_result(
             != len(identity_contract)
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+        if isinstance(identity_contract, list) and any(
+            isinstance(_mapping(row).get("field_name"), str)
+            and re.search(
+                r"(?i)(secret|token|password|passwd|api[_-]?key|database_url|db_bridge_url|authorization|cookie)",
+                str(_mapping(row).get("field_name")),
+            )
+            for row in identity_contract
+        ):
+            errors.add("DISCOVERY_RESULT_SECRET_LIKE_OUTPUT")
         else:
             environment_by_name = {
                 _mapping(row).get("name"): _mapping(row)
@@ -2106,16 +3311,26 @@ def validate_ops01r_discovery_result(
             or source_write.get("mode") != "discovery"
             or source_write.get("status") != "PASS"
             or source_write.get("source_tree_unchanged") is not True
-            or source_write.get("staging_write_set_valid") is not True
-            or source_write.get("bytecode_write_control") != "python_flag_-B"
             or source_write.get("manifest_algorithm")
             != "hde_epic038.source_tree_manifest.v1"
+            or source_write.get("pre_source_manifest_sha256")
+            != expected.source_manifest_sha256
+            or source_write.get("post_source_manifest_sha256")
+            != expected.source_manifest_sha256
+        ):
+            errors.add("DISCOVERY_RESULT_SOURCE_MANIFEST_MISMATCH")
+        if source_write.get("bytecode_write_control") != "python_flag_-B":
+            errors.add("DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH")
+        if source_write.get("python_environment_names") != []:
+            errors.add("DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID")
+        if source_write.get("python_argv") != target_probe_argv:
+            errors.add("DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH")
+        if (
+            source_write.get("staging_write_set_valid") is not True
             or source_write.get("staging_manifest_algorithm")
             != "hde_epic038.non_source_staging_manifest.v1"
-            or source_write.get("python_environment_names") != []
             or source_write.get("prohibited_cache_paths") != []
             or source_write.get("unauthorized_staging_paths") != []
-            or source_write.get("python_argv") != target_probe_argv
             or source_write.get("authorized_exact_write_paths")
             != _at(authorization, "write_contract", "authorized_exact_write_paths")
             or source_write.get("authorized_recursive_write_roots")
@@ -2136,12 +3351,8 @@ def validate_ops01r_discovery_result(
                 "write_contract",
                 "self_bound_excluded_recursive_roots",
             )
-            or source_write.get("pre_source_manifest_sha256")
-            != expected.source_manifest_sha256
-            or source_write.get("post_source_manifest_sha256")
-            != expected.source_manifest_sha256
         ):
-            errors.add("DISCOVERY_RESULT_SOURCE_MANIFEST_MISMATCH")
+            errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
         if (
             source_write.get("pre_staging_manifest_sha256")
             != expected.pre_staging_manifest_sha256

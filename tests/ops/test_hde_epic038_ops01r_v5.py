@@ -24,6 +24,8 @@ from tools.evidence.hde_epic038_ops01_v5 import (
     DISCOVERY_STAGES,
     PREFLIGHT_NONCLAIMS,
     PREFLIGHT_ZERO_IO_FIELDS,
+    NONCLAIMS,
+    RESULT_SUMMARY_KEYS,
     V5_PRIMARY_FILES,
     _manifest_delta,
     _tree_manifest,
@@ -303,7 +305,11 @@ def _candidate(
             "root": source_root,
             "source_manifest_sha256": source_manifest,
         },
-        "run": {"child_argv": child_argv, "staging_root": staging_root},
+        "run": {
+            "candidate_root": root.as_posix(),
+            "child_argv": child_argv,
+            "staging_root": staging_root,
+        },
         "runner": {"path": runner_path, "sha256": runner_sha},
         "validator": {"path": validator_path, "sha256": validator_sha},
         "projector": {"path": projector_path, "sha256": projector_sha},
@@ -311,7 +317,17 @@ def _candidate(
         "preflight_identity_sha256": preflight_identity,
         "discovery": discovery,
         "expected_call_counts": counts,
-        "write_contract": {"pre_staging_manifest_sha256": pre_staging},
+        "write_contract": {
+            "pre_staging_manifest_sha256": pre_staging,
+            "success_authorized_directory_metadata_paths": [f"{staging_root}/control"],
+            "success_authorized_exact_paths": [f"{staging_root}/control/live_authority_consumed.json"],
+            "success_authorized_recursive_write_roots": [root.as_posix()],
+            "self_bound_excluded_paths": [
+                f"{staging_root}/control/failure.json",
+                f"{staging_root}/control/live_authorization.json",
+            ],
+            "self_bound_excluded_recursive_roots": [root.as_posix()],
+        },
     }
     commands = _canon(argv_prefix + child_argv)
     (root / "commands.txt").write_bytes(commands)
@@ -684,26 +700,99 @@ def _candidate(
     )
     _write_json(bridge_consistency_path, bridge_consistency)
     summary = {
-        "schema": "hde_epic038.ops01.result_summary.v4",
-        "full_ddl_semantic_parity_claimed": False,
+        "acceptance_tokens": "NOT_CLAIMED",
+        "active_parity_corpus": "hde_epic038_ops01_live_bodygraph_parity_v4",
+        "active_parity_rows": [
+            "grants",
+            "search_path",
+            "select_one",
+            "ddl_fingerprint",
+            "bodygraph_payload_row",
+        ],
+        "actual_call_counts": counts,
         "authorization": authorization,
         "authorization_sha256": _sha(_canon(authorization)),
+        "bodygraph_selector": selector,
+        "captured_at_utc": captured_at,
+        "checksum_policy": {"algorithm": "sha256", "ledger_excludes_itself": True},
         "discovery_identity_sha256": discovery["discovery_identity_sha256"],
-        "literal_staging_root": staging_root,
-        "preflight_identity_sha256": preflight_identity,
-        "runner_sha256": runner_sha,
-        "repository": {"head": source_commit},
-        "expected_call_counts": counts,
-        "actual_call_counts": counts,
+        "epic_closeout": "NOT_CLAIMED",
         "execution": {
+            "candidate_validator_argv": [
+                interpreter_path,
+                "-I",
+                "-B",
+                validator_path,
+                "--validate-candidate",
+                "--expected-identity-stdin",
+                root.as_posix(),
+            ],
             "commands_sha256": _sha(commands),
+            "launch_executions": 1,
+            "source_checkout_state": "DETACHED",
             "source_write_validation": {
-                "pre_source_manifest_sha256": source_manifest,
+                "authorized_directory_metadata_paths": [f"{staging_root}/control"],
+                "authorized_exact_write_paths": [f"{staging_root}/control/live_authority_consumed.json"],
+                "authorized_recursive_write_roots": [root.as_posix()],
+                "bytecode_write_control": "python_flag_-B",
+                "manifest_algorithm": "hde_epic038.source_tree_manifest.v1",
+                "mode": "live",
+                "observed_staging_changes": [],
                 "post_source_manifest_sha256": source_manifest,
-                "pre_staging_manifest_sha256": pre_staging,
                 "post_staging_manifest_sha256": post_staging,
+                "pre_source_manifest_sha256": source_manifest,
+                "pre_staging_manifest": [],
+                "pre_staging_manifest_sha256": pre_staging,
+                "prohibited_cache_paths": [],
+                "python_argv": child_argv,
+                "python_environment_names": [],
+                "self_bound_excluded_paths": authorization["write_contract"]["self_bound_excluded_paths"],
+                "self_bound_excluded_recursive_roots": [root.as_posix()],
+                "source_root": source_root,
+                "source_tree_unchanged": True,
+                "staging_manifest_algorithm": "hde_epic038.non_source_staging_manifest.v1",
+                "staging_write_set_valid": True,
+                "status": "PASS",
+                "unauthorized_staging_paths": [],
             },
         },
+        "expected_call_counts": counts,
+        "full_ddl_semantic_parity_claimed": False,
+        "literal_staging_root": staging_root,
+        "observations": {
+            "bodygraph_row_parity": "match",
+            "bridge_consistency": "PASS",
+            "bridge_provider": "available",
+            "claimed_rows": 5,
+            "db_posture": "PASS",
+            "ddl_identity_projection": "projection_match",
+            "direct_provider": "available",
+            "matched_rows": 5,
+            "search_path": "hde, public",
+        },
+        "ops_observation_status": "PASS",
+        "packaged_at_utc": captured_at,
+        "pf09_status_movement": "NONE",
+        "preflight_identity_sha256": preflight_identity,
+        "qa_status": "NOT_CLAIMED",
+        "remediation_findings_resolved": [
+            "F-004_LITERAL_COMMANDS",
+            "F-005_RAW_STREAM_AND_CHECKER_BINDING",
+            "F-006_BODYGRAPH_ROW_PARITY",
+            "F-007_OPS01_SCOPE",
+            "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE",
+            "F-009_DDL_IDENTITY_PROJECTION_CONTRACT",
+        ],
+        "runner_sha256": runner_sha,
+        "repository": {
+            "branch": "DETACHED",
+            "head": source_commit,
+            "post_execution_worktree": "clean",
+            "pre_execution_worktree": "clean",
+            "root": source_root,
+        },
+        "schema": "hde_epic038.ops01.result_summary.v4",
+        "scope": "bounded_read_only_db_posture_and_direct_bridge_bodygraph_row_parity",
     }
     _write_json(root / "result_summary.json", summary)
     ledger = _rewrite_candidate_ledger(root)
@@ -1130,12 +1219,26 @@ def _discovery_pair(
     *,
     produce_result: bool = True,
 ) -> tuple[Path, Path, Ops01RDiscoveryAuthorizationExpectedIdentity]:
-    staging_root = tmp_path / ("b" * 32)
+    run_id = hashlib.sha256(tmp_path.as_posix().encode()).hexdigest()[:32]
+    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    shutil.rmtree(staging_root, ignore_errors=True)
     control = staging_root / "control"
     control.mkdir(parents=True)
     source_root = staging_root / "source"
     source_root.mkdir()
     (source_root / "tracked.py").write_text("VALUE = 1\n")
+    runner_path = source_root / "scripts/ops/hde_epic038_ops01r.py"
+    validator_path = source_root / "tools/evidence/hde_epic038_ops01_v5.py"
+    for component_path, content in (
+        (runner_path, "RUNNER = 1\n"),
+        (validator_path, "VALIDATOR = 1\n"),
+    ):
+        component_path.parent.mkdir(parents=True, exist_ok=True)
+        component_path.write_text(content)
+    railway_path = staging_root / "bin/railway"
+    railway_path.parent.mkdir()
+    railway_path.write_bytes(b"#!/bin/sh\nexit 0\n")
+    railway_path.chmod(0o755)
     working_directory = staging_root / "discovery-work"
     working_directory.mkdir()
     source_manifest_object = _tree_manifest(
@@ -1144,6 +1247,44 @@ def _discovery_pair(
     source_manifest = _sha(_canon(source_manifest_object))
     authorization_path = control / "discovery_authorization.json"
     result_path = control / "discovery.json"
+    preflight_path = control / "preflight.json"
+
+    def file_identity(path: Path) -> dict[str, str]:
+        return {
+            "lexical_path": path.as_posix(),
+            "resolved_path": path.resolve().as_posix(),
+            "sha256": _sha(path.resolve().read_bytes()),
+        }
+
+    runner_identity = file_identity(runner_path)
+    validator_identity = file_identity(validator_path)
+    railway_identity = file_identity(railway_path)
+    interpreter_path = Path(sys.executable)
+    interpreter_identity = file_identity(interpreter_path)
+    preflight = {
+        "components": {
+            "runner": runner_identity,
+            "validator": validator_identity,
+        },
+        "interpreter": interpreter_identity,
+        "railway_executable": railway_identity,
+        "run": {
+            "run_id": run_id,
+            "source_root": source_root.as_posix(),
+            "staging_root": staging_root.as_posix(),
+        },
+        "schema": "hde_epic038.ops01r.preflight.v1",
+        "source": {
+            "checkout_state": "DETACHED",
+            "commit": "2" * 40,
+            "repository": "amthorn78/glow-hdengine-v2",
+            "root": source_root.as_posix(),
+            "source_manifest_sha256": source_manifest,
+        },
+        "status": "PASS",
+    }
+    preflight["preflight_identity_sha256"] = _sha(_canon(preflight))
+    _write_json(preflight_path, preflight)
     authorization_path.touch()
     pre_staging_object = _tree_manifest(
         staging_root,
@@ -1152,40 +1293,102 @@ def _discovery_pair(
         excluded_recursive_roots=(source_root,),
     )
     pre_staging_sha = _sha(_canon(pre_staging_object))
-    target_probe_argv = [
-        "/usr/bin/python3",
+    python_prefix = [
+        interpreter_path.as_posix(),
         "-I",
         "-B",
-        (source_root / "scripts/ops/hde_epic038_ops01r.py").as_posix(),
+    ]
+    target_probe_argv = [
+        *python_prefix,
+        runner_path.as_posix(),
         "--target-identity-probe",
     ]
-    stage_commands = {
-        "cli_version": ["--version"],
-        "cli_help": ["help"],
-        "project_inventory": ["project", "list"],
-        "environment_inventory": ["environment", "list"],
-        "service_inventory": ["service", "list"],
+    stage_descriptors = {
+        "cli_version": [
+            {"kind": "literal", "value": "--version"},
+        ],
+        "cli_help": [
+            {"kind": "literal", "value": "help"},
+        ],
+        "project_inventory": [
+            {"kind": "literal", "value": "project"},
+            {"kind": "literal", "value": "list"},
+        ],
+        "environment_inventory": [
+            {"kind": "literal", "value": "environment"},
+            {"kind": "literal", "value": "list"},
+            {"kind": "literal", "value": "--project"},
+            {
+                "field": "project_id",
+                "kind": "prior_result",
+                "source_stage": "project_inventory",
+            },
+        ],
+        "service_inventory": [
+            {"kind": "literal", "value": "service"},
+            {"kind": "literal", "value": "list"},
+            {"kind": "literal", "value": "--project"},
+            {
+                "field": "project_id",
+                "kind": "prior_result",
+                "source_stage": "project_inventory",
+            },
+            {"kind": "literal", "value": "--environment"},
+            {
+                "field": "environment_id",
+                "kind": "prior_result",
+                "source_stage": "environment_inventory",
+            },
+        ],
+        "target_identity_probe": [
+            {"kind": "literal", "value": "run"},
+            {"kind": "literal", "value": "--project"},
+            {
+                "field": "project_id",
+                "kind": "prior_result",
+                "source_stage": "project_inventory",
+            },
+            {"kind": "literal", "value": "--environment"},
+            {
+                "field": "environment_id",
+                "kind": "prior_result",
+                "source_stage": "environment_inventory",
+            },
+            {"kind": "literal", "value": "--service"},
+            {
+                "field": "service_id",
+                "kind": "prior_result",
+                "source_stage": "service_inventory",
+            },
+            {"kind": "literal", "value": "--"},
+            {"kind": "python_child"},
+        ],
+    }
+    selection_modes = {
+        "cli_version": "single",
+        "cli_help": "version",
+        "project_inventory": "version_and_help",
+        "environment_inventory": "version_and_help",
+        "service_inventory": "version_and_help",
+        "target_identity_probe": "version_and_help",
     }
     policy_stages = []
     for ordinal, stage in enumerate(DISCOVERY_STAGES, start=1):
-        descriptors = (
-            [{"kind": "literal", "value": token} for token in stage_commands[stage]]
-            if stage != "target_identity_probe"
-            else [
-                {"kind": "literal", "value": "run"},
-                {"kind": "literal", "value": "--"},
-                {"kind": "python_child"},
-            ]
-        )
         policy_stages.append(
             {
+                "max_invocations": 1,
+                "ordinal": ordinal,
+                "predecessors": list(DISCOVERY_STAGES[: ordinal - 1]),
+                "selection_mode": selection_modes[stage],
                 "stage": stage,
                 "templates": [
                     {
-                        "argv": descriptors,
+                        "argv": stage_descriptors[stage],
                         "required_help_tokens": [],
                         "template_id": f"{stage}-v1",
-                        "version_regex": "",
+                        "version_regex": (
+                            "" if stage == "cli_version" else r"railway 4\.0\.0"
+                        ),
                     }
                 ],
             }
@@ -1194,27 +1397,129 @@ def _discovery_pair(
         "schema": "hde_epic038.ops01r.discovery_authorization.v1",
         "source": {
             "commit": "2" * 40,
+            "repository": "amthorn78/glow-hdengine-v2",
             "root": source_root.as_posix(),
             "source_manifest_sha256": source_manifest,
+            "state": "DETACHED",
         },
-        "discovery_entry_point": {"sha256": "3" * 64},
+        "discovery_entry_point": runner_identity,
         "preflight": {
-            "preflight_identity_sha256": "4" * 64,
+            "path": preflight_path.as_posix(),
+            "preflight_identity_sha256": preflight[
+                "preflight_identity_sha256"
+            ],
             "source_manifest_sha256": source_manifest,
         },
-        "railway_cli": {
-            "lexical_path": "railway",
-            "resolved_path": "/usr/bin/railway",
-            "sha256": "5" * 64,
-        },
+        "railway_cli": railway_identity,
         "policy": {
+            "argv_rules": {
+                "allow_control_characters": False,
+                "allow_empty_tokens": False,
+                "allow_endpoint_or_secret_values": False,
+                "allow_shell": False,
+                "executable_token_source": "authorized_railway_cli_lexical_path",
+                "forbidden_casefolded_tokens": [
+                    "add",
+                    "connect",
+                    "delete",
+                    "deploy",
+                    "disconnect",
+                    "down",
+                    "link",
+                    "logs",
+                    "redeploy",
+                    "remove",
+                    "restart",
+                    "set",
+                    "shell",
+                    "ssh",
+                    "unlink",
+                    "unset",
+                    "up",
+                    "variables",
+                ],
+            },
+            "permitted_command_families": list(DISCOVERY_STAGES),
+            "prohibited_command_families": [
+                "arbitrary_child_execution",
+                "database_connect",
+                "deployment",
+                "environment_mutation",
+                "linked_context_change",
+                "log_stream",
+                "project_mutation",
+                "redeployment",
+                "remote_shell",
+                "restart",
+                "selection_change",
+                "service_mutation",
+                "variable_read",
+                "variable_write",
+            ],
             "python_execution": {
+                "authorization_validator_argv": [
+                    *python_prefix,
+                    validator_path.as_posix(),
+                    "--validate-discovery-authorization",
+                    "--expected-identity-stdin",
+                    authorization_path.as_posix(),
+                ],
+                "bytecode_flag": "-B",
+                "bytecode_write_control": "python_flag_-B",
+                "discovery_producer_argv": [
+                    *python_prefix,
+                    runner_path.as_posix(),
+                    "--discovery",
+                    authorization_path.as_posix(),
+                ],
+                "environment_name_rule": "no_casefolded_python_prefix",
+                "interpreter_argv_prefix": python_prefix,
+                "python_environment_names": [],
+                "result_validator_argv": [
+                    *python_prefix,
+                    validator_path.as_posix(),
+                    "--validate-discovery-result",
+                    "--expected-identity-stdin",
+                    result_path.as_posix(),
+                    authorization_path.as_posix(),
+                ],
                 "target_probe_argv": target_probe_argv,
             },
+            "sanitization": {
+                "allowed_value_classes": [
+                    "boolean",
+                    "cli_version",
+                    "identity_field_name",
+                    "integer_count",
+                    "sanitized_argv",
+                    "schema_literal",
+                    "sha256",
+                    "target_id",
+                    "target_name",
+                ],
+                "endpoint_values_retained": False,
+                "forbidden_field_name_regex": r"(?i)(secret|token|password|passwd|api[_-]?key|database_url|db_bridge_url|authorization|cookie)",
+                "raw_stderr_retained": False,
+                "raw_stdout_retained": False,
+                "secret_like_output_action": "fail",
+            },
+            "schema": "hde_epic038.ops01r.discovery_policy.v1",
             "stages": policy_stages,
+            "template_selection": {
+                "cardinality": "exactly_one",
+                "help_match": "every_required_help_token_present_as_case_sensitive_exact_token",
+                "tie_break": "none_fail_on_zero_or_multiple",
+                "version_match": "python_re_fullmatch_on_normalized_version",
+            },
         },
-        "output_contract": {"path": result_path.as_posix()},
-        "run_id": "b" * 32,
+        "output_contract": {
+            "canonical_json": True,
+            "path": result_path.as_posix(),
+            "raw_cli_output_retained": False,
+            "schema": "hde_epic038.ops01r.discovery.v1",
+            "trailing_lf": True,
+        },
+        "run_id": run_id,
         "requested_target": {
             "project_name": "ample-illumination",
             "environment_name": "production",
@@ -1233,6 +1538,7 @@ def _discovery_pair(
             "no_variable_mutation",
             "no_tracked_write",
         ],
+        "subprocess_limit": 6,
         "working_directory": {
             "linked_context_required": False,
             "must_be_empty": True,
@@ -1254,29 +1560,61 @@ def _discovery_pair(
     }
     authorization["discovery_authorization_sha256"] = _sha(_canon(authorization))
     _write_json(authorization_path, authorization)
+    assert _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(authorization_path, result_path),
+        excluded_recursive_roots=(source_root,),
+    )["entries"] == pre_staging_object["entries"]
     expected = Ops01RDiscoveryAuthorizationExpectedIdentity(
         discovery_authorization_sha256=authorization[
             "discovery_authorization_sha256"
         ],
-        discovery_entry_point_sha256="3" * 64,
+        discovery_entry_point_sha256=runner_identity["sha256"],
         literal_staging_root=staging_root.as_posix(),
         pre_staging_manifest_sha256=pre_staging_sha,
-        preflight_identity_sha256="4" * 64,
-        railway_executable_sha256="5" * 64,
+        preflight_identity_sha256=preflight["preflight_identity_sha256"],
+        railway_executable_sha256=railway_identity["sha256"],
         source_commit="2" * 40,
         source_manifest_sha256=source_manifest,
     )
+    railway_lexical = railway_path.as_posix()
     manifest: list[object] = [
-        ["railway", "--version"],
-        ["railway", "help"],
-        ["railway", "project", "list"],
-        ["railway", "environment", "list"],
-        ["railway", "service", "list"],
-        ["railway", "run", "--", *target_probe_argv],
+        [railway_lexical, "--version"],
+        [railway_lexical, "help"],
+        [railway_lexical, "project", "list"],
+        [
+            railway_lexical,
+            "environment",
+            "list",
+            "--project",
+            "project-id",
+        ],
+        [
+            railway_lexical,
+            "service",
+            "list",
+            "--project",
+            "project-id",
+            "--environment",
+            "environment-id",
+        ],
+        [
+            railway_lexical,
+            "run",
+            "--project",
+            "project-id",
+            "--environment",
+            "environment-id",
+            "--service",
+            "service-id",
+            "--",
+            *target_probe_argv,
+        ],
     ]
     if not produce_result:
         return result_path, authorization_path, expected
-    prefix = ["railway", "run", "--"]
+    prefix = manifest[-1][: -len(target_probe_argv)]
     identity_contract = [
         {
             "expected_value": "environment-id",
@@ -1332,16 +1670,16 @@ def _discovery_pair(
     result = {
         "schema": "hde_epic038.ops01r.discovery.v1",
         "status": "PASS",
-        "discovery_run_id": "b" * 32,
+        "discovery_run_id": run_id,
         "discovery_authorization_sha256": authorization[
             "discovery_authorization_sha256"
         ],
         "command_manifest": manifest,
         "command_manifest_sha256": _sha(_canon(manifest)),
         "railway_cli": {
-            "path": "railway",
-            "resolved_path": "/usr/bin/railway",
-            "sha256": "5" * 64,
+            "path": railway_identity["lexical_path"],
+            "resolved_path": railway_identity["resolved_path"],
+            "sha256": railway_identity["sha256"],
             "version": "railway 4.0.0",
         },
         "target": {
@@ -1402,6 +1740,49 @@ def _discovery_pair(
     return result_path, authorization_path, expected
 
 
+def _rewrite_discovery_authorization(
+    authorization_path: Path,
+    expected: Ops01RDiscoveryAuthorizationExpectedIdentity,
+    mutation,
+) -> Ops01RDiscoveryAuthorizationExpectedIdentity:
+    authorization = json.loads(authorization_path.read_text())
+    mutation(authorization)
+    authorization["discovery_authorization_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in authorization.items()
+                if key != "discovery_authorization_sha256"
+            }
+        )
+    )
+    _write_json(authorization_path, authorization)
+    return replace(
+        expected,
+        discovery_authorization_sha256=authorization[
+            "discovery_authorization_sha256"
+        ],
+    )
+
+
+def _rewrite_discovery_result(result_path: Path, mutation) -> None:
+    result = json.loads(result_path.read_text())
+    mutation(result)
+    result["command_manifest_sha256"] = _sha(
+        _canon(result["command_manifest"])
+    )
+    result["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in result.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, result)
+
+
 def test_discovery_result_is_bound_to_reviewed_authorization(tmp_path):
     result_path, authorization_path, expected = _discovery_pair(tmp_path)
     assert validate_ops01r_discovery_result(
@@ -1420,10 +1801,341 @@ def test_discovery_result_is_bound_to_reviewed_authorization(tmp_path):
     assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in result.errors
 
 
+@pytest.mark.parametrize(
+    ("mutation", "expected_code"),
+    [
+        (
+            lambda authorization: authorization["policy"].update(
+                {"unreviewed_policy": True}
+            ),
+            "DISCOVERY_AUTH_UNKNOWN_KEY",
+        ),
+        (
+            lambda authorization: authorization["policy"]["stages"][2][
+                "templates"
+            ][0].update({"unreviewed_template": True}),
+            "DISCOVERY_AUTH_UNKNOWN_KEY",
+        ),
+        (
+            lambda authorization: authorization["policy"]["python_execution"][
+                "discovery_producer_argv"
+            ].append("--alternate"),
+            "DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH",
+        ),
+    ],
+)
+def test_discovery_authorization_recursively_closes_policy(
+    tmp_path, mutation, expected_code
+):
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    expected = _rewrite_discovery_authorization(
+        authorization_path, expected, mutation
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert expected_code in result.errors
+
+
+@pytest.mark.parametrize("field", ["max_invocations", "ordinal"])
+def test_discovery_authorization_rejects_boolean_stage_integers(tmp_path, field):
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][0].update(
+            {field: True}
+        ),
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_POLICY_INVALID" in result.errors
+
+
+def test_discovery_authorization_rejects_unretained_help_selector_proof(tmp_path):
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ][0].update({"required_help_tokens": ["project"]}),
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_POLICY_INVALID" in result.errors
+
+
+def test_discovery_result_rejects_multiple_version_eligible_templates(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    original = json.loads(authorization_path.read_text())
+    second_template = json.loads(
+        json.dumps(original["policy"]["stages"][2]["templates"][0])
+    )
+    second_template["template_id"] = "project_inventory-v2"
+    second_template["argv"].append({"kind": "literal", "value": "--json"})
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ].append(second_template),
+    )
+    authorization = json.loads(authorization_path.read_text())
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result.update(
+            {
+                "discovery_authorization_sha256": authorization[
+                    "discovery_authorization_sha256"
+                ]
+            }
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS" in validation.errors
+
+
+def test_discovery_result_handles_invalid_version_regex_without_raising(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][2][
+            "templates"
+        ][0].update({"version_regex": "["}),
+    )
+    authorization = json.loads(authorization_path.read_text())
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result.update(
+            {
+                "discovery_authorization_sha256": authorization[
+                    "discovery_authorization_sha256"
+                ]
+            }
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in validation.errors
+    assert "DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE" in validation.errors
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value", "expected_code"),
+    [
+        (
+            "bytecode_write_control",
+            "environment_only",
+            "DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH",
+        ),
+        (
+            "python_environment_names",
+            ["PYTHONPATH"],
+            "DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID",
+        ),
+        (
+            "python_argv",
+            ["/tmp/not-the-authorized-python"],
+            "DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH",
+        ),
+    ],
+)
+def test_discovery_result_uses_specific_python_contract_codes(
+    tmp_path, field, bad_value, expected_code
+):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result["source_write_validation"].update(
+            {field: bad_value}
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert expected_code in validation.errors
+
+
+def test_discovery_result_reports_stage_order_drift(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+
+    def swap_first_two_stages(result):
+        result["command_manifest"][0], result["command_manifest"][1] = (
+            result["command_manifest"][1],
+            result["command_manifest"][0],
+        )
+
+    _rewrite_discovery_result(result_path, swap_first_two_stages)
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_STAGE_ORDER_INVALID" in validation.errors
+
+
+def test_discovery_result_rejects_secret_like_identity_field(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result["identity_contract"][0].update(
+            {"field_name": "RAILWAY_SECRET_ID"}
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_SECRET_LIKE_OUTPUT" in validation.errors
+
+
+def test_discovery_result_reports_source_cache_residue(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    cache_root = authorization_path.parent.parent / "source/__pycache__"
+    cache_root.mkdir()
+    (cache_root / "residue.pyc").write_bytes(b"not bytecode\n")
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_SOURCE_RESIDUE_DETECTED" in validation.errors
+
+
+def test_runner_rejects_rehashed_policy_expansion_before_subprocess(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+    import tools.evidence.hde_epic038_ops01_v5 as validator
+
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    original_dispatch = validator.validate_ops01r_discovery_dispatch
+    subprocess_calls = []
+
+    def mutate_after_dispatch(*args, **kwargs):
+        result = original_dispatch(*args, **kwargs)
+        _rewrite_discovery_authorization(
+            authorization_path,
+            expected,
+            lambda authorization: authorization["policy"]["stages"][1][
+                "templates"
+            ][0]["argv"].append({"kind": "literal", "value": "status"}),
+        )
+        return result
+
+    def fail_if_called(*args, **kwargs):
+        subprocess_calls.append(args)
+        raise AssertionError("subprocess crossed the mutated authorization boundary")
+
+    monkeypatch.setattr(
+        validator,
+        "validate_ops01r_discovery_dispatch",
+        mutate_after_dispatch,
+    )
+    monkeypatch.setattr(runner.subprocess, "run", fail_if_called)
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
+        runner.discovery(authorization_path, expected=expected)
+    assert subprocess_calls == []
+
+
+def test_runner_rechecks_authorization_after_staging_walk(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    original_manifest = runner._staging_manifest_for_contract
+    manifest_calls = 0
+    subprocess_calls = []
+
+    def mutate_during_final_walk(*args, **kwargs):
+        nonlocal manifest_calls
+        manifest = original_manifest(*args, **kwargs)
+        manifest_calls += 1
+        if manifest_calls == 3:
+            _rewrite_discovery_authorization(
+                authorization_path,
+                expected,
+                lambda authorization: authorization["requested_target"].update(
+                    {"service_name": "rewritten-after-auth-check"}
+                ),
+            )
+        return manifest
+
+    def fail_if_called(*args, **kwargs):
+        subprocess_calls.append(args)
+        raise AssertionError("subprocess crossed the mutated authorization boundary")
+
+    monkeypatch.setattr(
+        runner,
+        "_staging_manifest_for_contract",
+        mutate_during_final_walk,
+    )
+    monkeypatch.setattr(runner.subprocess, "run", fail_if_called)
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
+        runner.discovery(authorization_path, expected=expected)
+    assert manifest_calls == 3
+    assert subprocess_calls == []
+
+
 def test_discovery_result_replays_command_policy(tmp_path):
     result_path, authorization_path, expected = _discovery_pair(tmp_path)
     payload = json.loads(result_path.read_text())
-    payload["command_manifest"] = [["railway", "deploy"]]
+    payload["command_manifest"][0] = [
+        payload["railway_cli"]["path"],
+        "deploy",
+    ]
     payload["command_manifest_sha256"] = _sha(_canon(payload["command_manifest"]))
     payload["discovery_identity_sha256"] = _sha(
         _canon(
@@ -1469,23 +2181,25 @@ def test_discovery_result_requires_all_six_stages(tmp_path):
     )
 
     assert not result.valid
-    assert "DISCOVERY_RESULT_ARGV_MISMATCH" in result.errors
+    assert "DISCOVERY_RESULT_STAGE_COUNT_INVALID" in result.errors
 
 
 def test_discovery_dispatch_requires_exact_authorized_stage_argv(tmp_path):
-    _, authorization_path, _ = _discovery_pair(tmp_path)
+    _, authorization_path, _ = _discovery_pair(tmp_path, produce_result=False)
+    authorization = json.loads(authorization_path.read_text())
+    railway_path = authorization["railway_cli"]["lexical_path"]
     assert validate_ops01r_discovery_dispatch(
         authorization_path,
         stage="cli_version",
         prior_results={},
-        rendered_argv=("railway", "--version"),
+        rendered_argv=(railway_path, "--version"),
     ).valid
 
     result = validate_ops01r_discovery_dispatch(
         authorization_path,
         stage="cli_version",
         prior_results={},
-        rendered_argv=("railway", "run", "python", "-c", "print('unsafe')"),
+        rendered_argv=(railway_path, "run", "python", "-c", "print('unsafe')"),
     )
 
     assert not result.valid
@@ -1585,7 +2299,9 @@ def test_runner_discovery_parser_does_not_treat_version_or_help_as_target_json()
     assert runner._parse_stage("cli_version", "railway 4.0.0\n") == {
         "version": "railway 4.0.0"
     }
-    assert runner._parse_stage("cli_help", "Usage: railway [COMMAND]\n") == {}
+    assert runner._parse_stage("cli_help", "Usage: railway [COMMAND]\n") == {
+        "help_tokens": ["Usage:", "railway", "[COMMAND]"]
+    }
 
 
 def test_runner_discovery_parser_requires_exact_no_write_target_probe_result():
@@ -1740,8 +2456,11 @@ def test_runner_discovery_emits_bound_run_contract(tmp_path, monkeypatch):
     probe_argv = json.loads(authorization_path.read_text())["policy"][
         "python_execution"
     ]["target_probe_argv"]
-    assert payload["run_contract"]["argv_prefix"] == ["railway", "run", "--"]
-    assert payload["run_contract"]["child_argv_start_index"] == 3
+    expected_prefix = payload["command_manifest"][-1][: -len(probe_argv)]
+    assert payload["run_contract"]["argv_prefix"] == expected_prefix
+    assert payload["run_contract"]["child_argv_start_index"] == len(
+        expected_prefix
+    )
     assert payload["command_manifest"][-1] == [
         *payload["run_contract"]["argv_prefix"],
         *probe_argv,
@@ -1780,18 +2499,33 @@ def test_runner_discovery_rejects_post_subprocess_staging_write(
 
     with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_WRITE_SET_MISMATCH"):
         runner.discovery(authorization_path, expected=expected)
-    assert calls == list(DISCOVERY_STAGES)
+    assert calls == list(DISCOVERY_STAGES[:-1])
 
 
 def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
-    staging_root = tmp_path / "run"
+    run_id = hashlib.sha256(tmp_path.as_posix().encode()).hexdigest()[:32]
+    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    shutil.rmtree(staging_root, ignore_errors=True)
     source_root = staging_root / "source"
     control_root = staging_root / "control"
     working_directory = staging_root / "preflight-work"
     source_root.mkdir(parents=True)
     control_root.mkdir()
     working_directory.mkdir()
-    (source_root / "tracked.py").write_text("VALUE = 1\n")
+    component_contents = {
+        "engine/db/ddl_identity_projection.py": b"PROJECTOR = 1\n",
+        "scripts/db/capture_epic011_posture.py": b"CAPTURE = 1\n",
+        "scripts/ops/hde_epic038_ops01r.py": b"RUNNER = 1\n",
+        "tools/evidence/hde_epic038_ops01_v5.py": b"VALIDATOR = 1\n",
+    }
+    for relative, content in component_contents.items():
+        component_path = source_root / relative
+        component_path.parent.mkdir(parents=True, exist_ok=True)
+        component_path.write_bytes(content)
+    railway_path = staging_root / "bin/railway"
+    railway_path.parent.mkdir()
+    railway_path.write_bytes(b"#!/bin/sh\nexit 0\n")
+    railway_path.chmod(0o755)
     path = control_root / "preflight.json"
     source_manifest_object = _tree_manifest(
         source_root, schema="hde_epic038.source_tree_manifest.v1"
@@ -1811,13 +2545,7 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         excluded_paths=(path,),
         excluded_recursive_roots=(source_root,),
     )
-    record = {
-        "schema": "hde_epic038.ops01r.preflight.v1",
-        "status": "PASS",
-        "actual_external_io_counts": {
-            name: 0 for name in PREFLIGHT_ZERO_IO_FIELDS
-        },
-        "expected_call_counts": {
+    counts = {
             "bodygraph_reads": 2,
             "bridge_http_requests": 6,
             "bridge_provider_selections": 1,
@@ -1828,35 +2556,112 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
             "logical_observations": 10,
             "retries": 0,
             "vendor_requests": 0,
+        }
+    producer_argv = [
+        sys.executable,
+        "-I",
+        "-B",
+        (source_root / "scripts/ops/hde_epic038_ops01r.py").as_posix(),
+        "--preflight",
+    ]
+    zero_io = {name: 0 for name in PREFLIGHT_ZERO_IO_FIELDS}
+    orchestration = {
+        "fake_boundary_mode": "count_before_fail_on_touch_delegate",
+        "run_1": {
+            "actual_external_io_counts": zero_io,
+            "expected_call_counts": counts,
         },
+        "run_2": {
+            "actual_external_io_counts": zero_io,
+            "expected_call_counts": counts,
+        },
+        "run_count": 2,
+        "vectors_equal": True,
+    }
+    record = {
+        "schema": "hde_epic038.ops01r.preflight.v1",
+        "status": "PASS",
+        "actual_external_io_counts": zero_io,
+        "expected_call_counts": counts,
         "nonclaims": list(PREFLIGHT_NONCLAIMS),
         "run": {
             "control_root": control_root.as_posix(),
             "preflight_path": path.as_posix(),
+            "run_id": run_id,
             "source_root": source_root.as_posix(),
             "staging_root": staging_root.as_posix(),
             "working_directory": working_directory.as_posix(),
         },
         "source": {
+            "checkout_state": "DETACHED",
             "commit": "2" * 40,
+            "repository": "amthorn78/glow-hdengine-v2",
+            "root": source_root.as_posix(),
             "source_manifest_sha256": source_manifest,
+            "worktree_state": "clean",
         },
         "components": {
-            "runner": {"sha256": "3" * 64},
-            "validator": {"sha256": "4" * 64},
-            "projector": {"sha256": "5" * 64},
+            "runner": {"lexical_path": producer_argv[3], "resolved_path": producer_argv[3], "sha256": _sha(component_contents["scripts/ops/hde_epic038_ops01r.py"])},
+            "validator": {"lexical_path": (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "resolved_path": (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "sha256": _sha(component_contents["tools/evidence/hde_epic038_ops01_v5.py"])},
+            "projector": {"lexical_path": (source_root / "engine/db/ddl_identity_projection.py").as_posix(), "resolved_path": (source_root / "engine/db/ddl_identity_projection.py").as_posix(), "sha256": _sha(component_contents["engine/db/ddl_identity_projection.py"])},
         },
-        "interpreter": {"sha256": "6" * 64},
-        "railway_executable": {"sha256": "7" * 64},
+        "interpreter": {
+            "bytecode_flag": "-B",
+            "bytecode_write_control": "python_flag_-B",
+            "isolated_flag": "-I",
+            "lexical_path": sys.executable,
+            "preflight_argv": producer_argv,
+            "preflight_validator_argv": [sys.executable, "-I", "-B", (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "--validate-preflight", "--expected-identity-stdin", path.as_posix()],
+            "python_environment_names": [],
+            "resolved_path": Path(sys.executable).resolve().as_posix(),
+            "sha256": _sha(Path(sys.executable).resolve().read_bytes()),
+        },
+        "module_origins": [
+            {
+                "lexical_origin": (source_root / relative).as_posix(),
+                "module": module,
+                "resolved_origin": (source_root / relative).as_posix(),
+                "sha256": _sha(component_contents[relative]),
+            }
+            for module, relative in sorted(
+                {
+                    "engine.db.ddl_identity_projection": "engine/db/ddl_identity_projection.py",
+                    "scripts.db.capture_epic011_posture": "scripts/db/capture_epic011_posture.py",
+                    "scripts.ops.hde_epic038_ops01r": "scripts/ops/hde_epic038_ops01r.py",
+                    "tools.evidence.hde_epic038_ops01_v5": "tools/evidence/hde_epic038_ops01_v5.py",
+                }.items()
+            )
+        ],
+        "orchestration": orchestration,
+        "railway_executable": {
+            "lexical_path": railway_path.as_posix(),
+            "resolved_path": railway_path.as_posix(),
+            "sha256": _sha(railway_path.read_bytes()),
+        },
         "source_write_validation": {
-            "pre_source_manifest_sha256": source_manifest,
+            "authorized_directory_metadata_paths": [control_root.as_posix()],
+            "authorized_exact_write_paths": [path.as_posix()],
+            "authorized_recursive_write_roots": [],
+            "bytecode_write_control": "python_flag_-B",
+            "manifest_algorithm": "hde_epic038.source_tree_manifest.v1",
+            "mode": "preflight",
+            "observed_staging_changes": _manifest_delta(pre_staging_object["entries"], post_staging_object["entries"]),
             "post_source_manifest_sha256": source_manifest,
+            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
+            "pre_source_manifest_sha256": source_manifest,
             "pre_staging_manifest": pre_staging_object["entries"],
             "pre_staging_manifest_sha256": pre_staging,
-            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
-            "observed_staging_changes": _manifest_delta(
-                pre_staging_object["entries"], post_staging_object["entries"]
-            ),
+            "prohibited_cache_paths": [],
+            "python_argv": producer_argv,
+            "python_environment_names": [],
+            "self_bound_excluded_paths": [path.as_posix()],
+            "self_bound_excluded_recursive_roots": [],
+            "source_root": source_root.as_posix(),
+            "source_tree_unchanged": True,
+            "staging_manifest_algorithm": "hde_epic038.non_source_staging_manifest.v1",
+            "staging_write_set_valid": True,
+            "status": "PASS",
+            "unauthorized_staging_paths": [],
         },
     }
     record["preflight_identity_sha256"] = _sha(_canon(record))
@@ -1866,14 +2671,86 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         source_manifest_sha256=source_manifest,
         pre_staging_manifest_sha256=pre_staging,
         literal_staging_root=record["run"]["staging_root"],
-        runner_sha256="3" * 64,
-        validator_sha256="4" * 64,
-        projector_sha256="5" * 64,
-        interpreter_sha256="6" * 64,
-        railway_executable_sha256="7" * 64,
+        runner_sha256=_sha(component_contents["scripts/ops/hde_epic038_ops01r.py"]),
+        validator_sha256=_sha(component_contents["tools/evidence/hde_epic038_ops01_v5.py"]),
+        projector_sha256=_sha(component_contents["engine/db/ddl_identity_projection.py"]),
+        interpreter_sha256=_sha(Path(sys.executable).resolve().read_bytes()),
+        railway_executable_sha256=_sha(railway_path.read_bytes()),
         preflight_identity_sha256=record["preflight_identity_sha256"],
     )
     assert validate_ops01r_preflight(path, expected=expected).valid
+
+    for key, bad_value in (
+        ("authorized_exact_write_paths", [path.with_name("other.json").as_posix()]),
+        ("authorized_recursive_write_roots", [staging_root.as_posix()]),
+        ("authorized_directory_metadata_paths", [staging_root.as_posix()]),
+        ("self_bound_excluded_paths", []),
+        ("self_bound_excluded_recursive_roots", [source_root.as_posix()]),
+    ):
+        mutated = json.loads(json.dumps(record))
+        mutated["source_write_validation"][key] = bad_value
+        mutated["preflight_identity_sha256"] = _sha(
+            _canon({k: v for k, v in mutated.items() if k != "preflight_identity_sha256"})
+        )
+        _write_json(path, mutated)
+        result = validate_ops01r_preflight(
+            path,
+            expected=replace(
+                expected,
+                preflight_identity_sha256=mutated["preflight_identity_sha256"],
+            ),
+        )
+        assert not result.valid, key
+        assert "PREFLIGHT_WRITE_SET_MISMATCH" in result.errors
+
+    for key, value in (
+        ("run_count", 1),
+        ("vectors_equal", False),
+        ("fake_boundary_mode", "copied_constants"),
+    ):
+        mutated = json.loads(json.dumps(record))
+        mutated["orchestration"][key] = value
+        mutated["preflight_identity_sha256"] = _sha(
+            _canon({k: v for k, v in mutated.items() if k != "preflight_identity_sha256"})
+        )
+        _write_json(path, mutated)
+        result = validate_ops01r_preflight(
+            path,
+            expected=replace(
+                expected,
+                preflight_identity_sha256=mutated["preflight_identity_sha256"],
+            ),
+        )
+        assert not result.valid, key
+        assert "PREFLIGHT_ORCHESTRATION_MISMATCH" in result.errors
+
+    for field, bad_vector in (
+        ("preflight_argv", ["/tmp/not-python", "-I", "-B", producer_argv[3], "--preflight"]),
+        ("preflight_argv", [*producer_argv, "--extra"]),
+        (
+            "preflight_validator_argv",
+            [sys.executable, "-I", "-B", record["components"]["validator"]["lexical_path"], "--validate-preflight", path.as_posix()],
+        ),
+    ):
+        mutated = json.loads(json.dumps(record))
+        mutated["interpreter"][field] = bad_vector
+        if field == "preflight_argv":
+            mutated["source_write_validation"]["python_argv"] = bad_vector
+        mutated["preflight_identity_sha256"] = _sha(
+            _canon({k: v for k, v in mutated.items() if k != "preflight_identity_sha256"})
+        )
+        _write_json(path, mutated)
+        result = validate_ops01r_preflight(
+            path,
+            expected=replace(
+                expected,
+                preflight_identity_sha256=mutated["preflight_identity_sha256"],
+            ),
+        )
+        assert not result.valid, field
+        assert "PREFLIGHT_PYTHON_ARGV_MISMATCH" in result.errors
+
+    _write_json(path, record)
     assert not validate_ops01r_preflight(
         path,
         expected=replace(expected, runner_sha256="f" * 64),
@@ -1933,7 +2810,8 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     )
     assert not result.valid
     assert "PREFLIGHT_SOURCE_MANIFEST_MISMATCH" in result.errors
-    assert "PREFLIGHT_WRITE_SET_INVALID" in result.errors
+    assert "PREFLIGHT_WRITE_SET_MISMATCH" in result.errors
+    shutil.rmtree(staging_root, ignore_errors=True)
 
 
 def _live_authorization_pair(
@@ -2187,11 +3065,17 @@ def _stage_runner_source(tmp_path: Path) -> Path:
 
 def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
     source = _stage_runner_source(tmp_path)
+    railway_bin = tmp_path / "bin"
+    railway_bin.mkdir()
+    railway = railway_bin / "railway"
+    railway.write_text("#!/bin/sh\nexit 0\n")
+    railway.chmod(0o755)
     environment = {
         name: value
         for name, value in os.environ.items()
         if not name.casefold().startswith("python")
     }
+    environment["PATH"] = railway_bin.as_posix()
     process = subprocess.run(
         [
             sys.executable,
@@ -2238,10 +3122,10 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
     staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
     shutil.rmtree(staging_root, ignore_errors=True)
     files = {
-        "engine/db/ddl_identity_projection.py": b"staged projector\n",
-        "scripts/db/capture_epic011_posture.py": b"staged capture\n",
-        "scripts/ops/hde_epic038_ops01r.py": b"staged runner\n",
-        "tools/evidence/hde_epic038_ops01_v5.py": b"staged validator\n",
+        "engine/db/ddl_identity_projection.py": Path("engine/db/ddl_identity_projection.py").read_bytes(),
+        "scripts/db/capture_epic011_posture.py": Path("scripts/db/capture_epic011_posture.py").read_bytes(),
+        "scripts/ops/hde_epic038_ops01r.py": Path("scripts/ops/hde_epic038_ops01r.py").read_bytes(),
+        "tools/evidence/hde_epic038_ops01_v5.py": Path("tools/evidence/hde_epic038_ops01_v5.py").read_bytes(),
     }
 
     def materialize(source_root, commit):
@@ -2249,6 +3133,13 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
             path = source_root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
+
+    railway_bin = tmp_path / "bin"
+    railway_bin.mkdir()
+    railway = railway_bin / "railway"
+    railway.write_text("#!/bin/sh\necho railway 4.0.0\n")
+    railway.chmod(0o755)
+    monkeypatch.setenv("PATH", railway_bin.as_posix())
 
     monkeypatch.setattr(runner, "materialize_source_worktree", materialize)
     monkeypatch.setattr(runner, "_git_commit", lambda root: "1" * 40)
@@ -2285,6 +3176,9 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
         assert record["interpreter"]["preflight_validator_argv"][3] == (
             source_root / "tools/evidence/hde_epic038_ops01_v5.py"
         ).as_posix()
+        assert record["railway_executable"]["lexical_path"] == railway.as_posix()
+        assert record["railway_executable"]["resolved_path"] == railway.as_posix()
+        assert record["railway_executable"]["sha256"] == _sha(railway.read_bytes())
     finally:
         shutil.rmtree(staging_root, ignore_errors=True)
 
