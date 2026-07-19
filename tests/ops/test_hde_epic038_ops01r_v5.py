@@ -114,14 +114,125 @@ def test_validator_cli_imports_from_outside_the_repo(tmp_path):
     assert process.returncode == 0, process.stderr
 
 
-def test_runner_dormant_modes_do_not_run_external_ops():
+def test_unauthorized_live_child_does_not_run_external_ops():
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
     process = subprocess.run(
-        [sys.executable, "scripts/ops/hde_epic038_ops01r.py", "--live-child"],
+        [
+            sys.executable,
+            "-I",
+            "-B",
+            "scripts/ops/hde_epic038_ops01r.py",
+            "--live-child",
+        ],
+        env=environment,
         capture_output=True,
         text=True,
     )
     assert process.returncode != 0
-    assert "dormant" in process.stderr
+    assert "OPS01R_LIVE_AUTH_INVALID" in process.stderr
+
+
+@pytest.mark.parametrize(
+    "script,mode,flags",
+    [
+        ("scripts/ops/hde_epic038_ops01r.py", "--target-identity-probe", []),
+        ("scripts/ops/hde_epic038_ops01r.py", "--target-identity-probe", ["-I"]),
+        ("scripts/ops/hde_epic038_ops01r.py", "--target-identity-probe", ["-B"]),
+        ("tools/evidence/hde_epic038_ops01_v5.py", "--help", []),
+        ("tools/evidence/hde_epic038_ops01_v5.py", "--help", ["-I"]),
+        ("tools/evidence/hde_epic038_ops01_v5.py", "--help", ["-B"]),
+    ],
+)
+def test_source_loading_entry_points_require_isolated_no_bytecode_python(
+    script, mode, flags
+):
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+
+    process = subprocess.run(
+        [sys.executable, *flags, script, mode],
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    assert process.returncode != 0
+    assert "OPS01_V5_PYTHON_ARGV_MISMATCH" in process.stderr
+
+
+def test_target_identity_probe_rejects_python_environment():
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+    environment["PythonPath"] = "/tmp/unauthorized-python-path"
+
+    process = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-B",
+            "scripts/ops/hde_epic038_ops01r.py",
+            "--target-identity-probe",
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    assert process.returncode != 0
+    assert "OPS01_V5_PYTHON_ENVIRONMENT_INVALID" in process.stderr
+
+
+def test_target_identity_probe_emits_names_and_presence_only():
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+    environment.update(
+        {
+            "DATABASE_URL": "postgresql://not-retained",
+            "DB_BRIDGE_URL": "https://not-retained.invalid",
+            "RAILWAY_ENVIRONMENT_ID": "env-id",
+            "RAILWAY_PROJECT_ID": "project-id",
+            "RAILWAY_SERVICE_ID": "service-id",
+        }
+    )
+
+    process = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-B",
+            "scripts/ops/hde_epic038_ops01r.py",
+            "--target-identity-probe",
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    payload = json.loads(process.stdout)
+
+    assert payload["endpoint_presence"] == {
+        "DATABASE_URL": True,
+        "DB_BRIDGE_URL": True,
+    }
+    assert payload["identity_fields"] == [
+        {"name": "RAILWAY_ENVIRONMENT_ID", "value": "env-id"},
+        {"name": "RAILWAY_PROJECT_ID", "value": "project-id"},
+        {"name": "RAILWAY_SERVICE_ID", "value": "service-id"},
+    ]
+    assert "not-retained" not in process.stdout
 
 
 def _candidate(
@@ -143,23 +254,26 @@ def _candidate(
     runner_sha = "6" * 64
     validator_sha = "7" * 64
     projector_sha = "8" * 64
-    staging_root = literal_staging_root or (
-        "/tmp/hde-epic038-ops01r/" + "a" * 32
-    )
+    staging_root = literal_staging_root or tmp_path.as_posix()
     if counts is None:
         counts = {
             "bodygraph_reads": 2,
-            "bridge_http_requests": 0,
+            "bridge_http_requests": 6,
             "bridge_provider_selections": 1,
-            "direct_connection_attempts": 0,
+            "direct_connection_attempts": 8,
             "direct_provider_selections": 1,
-            "direct_sql_statements": 0,
+            "direct_sql_statements": 13,
             "fallbacks": 0,
             "logical_observations": 10,
             "retries": 0,
             "vendor_requests": 0,
         }
     source_root = f"{staging_root}/source"
+    checker_path = Path(source_root) / "ci/checks/check_bridge_consistency.py"
+    checker_path.parent.mkdir(parents=True, exist_ok=True)
+    if not checker_path.exists():
+        checker_path.write_text("fixture checker\n")
+    checker_sha = _sha(checker_path.read_bytes())
     runner_path = f"{source_root}/scripts/ops/hde_epic038_ops01r.py"
     validator_path = f"{source_root}/tools/evidence/hde_epic038_ops01_v5.py"
     projector_path = f"{source_root}/engine/db/ddl_identity_projection.py"
@@ -332,7 +446,6 @@ def _candidate(
         },
     )
     canonical_sha = "a" * 64
-    checker_sha = "b" * 64
     input_pair = lambda name: {
         "path": f"{staging_root}/{name}.json",
         "sha256": canonical_sha,
@@ -545,6 +658,31 @@ def _candidate(
             },
         ]
     _write_json(root / "provider_parity.proof.json", provider_proof)
+    provider_proof_input = {
+        "path": f"{staging_root}/candidate/provider_parity.proof.json",
+        "sha256": _sha((root / "provider_parity.proof.json").read_bytes()),
+    }
+    env_presence_input = {
+        "path": f"{staging_root}/candidate/env_presence.json",
+        "sha256": _sha((root / "env_presence.json").read_bytes()),
+    }
+    bridge_consistency_path = root / "bridge_consistency.result.json"
+    bridge_consistency = json.loads(bridge_consistency_path.read_text())
+    bridge_consistency["bodygraph_comparator"]["direct_input"] = dict(
+        provider_proof_input
+    )
+    bridge_consistency["bodygraph_comparator"]["bridge_input"] = dict(
+        provider_proof_input
+    )
+    bridge_consistency["governed_checker"]["inputs"] = {
+        "adapter_selection": dict(provider_proof_input),
+        "env_connectivity": dict(env_presence_input),
+        "provider_parity": dict(provider_proof_input),
+    }
+    bridge_consistency["governed_checker"]["staged_executable"] = (
+        f"{source_root}/ci/checks/check_bridge_consistency.py"
+    )
+    _write_json(bridge_consistency_path, bridge_consistency)
     summary = {
         "schema": "hde_epic038.ops01.result_summary.v4",
         "full_ddl_semantic_parity_claimed": False,
@@ -628,11 +766,11 @@ def test_candidate_requires_exact_fixed_call_counts(tmp_path):
     missing_case.mkdir()
     missing_counts = {
         "bodygraph_reads": 2,
-        "bridge_http_requests": 0,
+        "bridge_http_requests": 6,
         "bridge_provider_selections": 1,
-        "direct_connection_attempts": 0,
+        "direct_connection_attempts": 8,
         "direct_provider_selections": 1,
-        "direct_sql_statements": 0,
+        "direct_sql_statements": 13,
         "fallbacks": 0,
         "logical_observations": 10,
         "retries": 0,
@@ -693,6 +831,63 @@ def test_candidate_rejects_semantically_invalid_primary_proofs(tmp_path):
         assert code in result.errors
 
 
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing_input",
+        "wrong_digest",
+        "missing_checker",
+        "wrong_checker_digest",
+        "broken_checker_symlink",
+    ],
+)
+def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
+    tmp_path, monkeypatch, mutation
+):
+    root, expected = _candidate(tmp_path)
+    path = root / "bridge_consistency.result.json"
+    value = json.loads(path.read_text())
+    if mutation == "missing_input":
+        value["bodygraph_comparator"]["direct_input"]["path"] = (
+            f"{expected.literal_staging_root}/bodygraph.direct.compat.json"
+        )
+    elif mutation == "wrong_digest":
+        value["governed_checker"]["inputs"]["env_connectivity"]["sha256"] = (
+            "f" * 64
+        )
+    elif mutation == "missing_checker":
+        value["governed_checker"]["staged_executable"] = (
+            f"{expected.literal_staging_root}/candidate/check_bridge_consistency.py"
+        )
+    elif mutation == "wrong_checker_digest":
+        value["governed_checker"]["repo_sha256"] = "f" * 64
+        value["governed_checker"]["staged_sha256"] = "f" * 64
+    else:
+        import tools.evidence.hde_epic038_ops01_v5 as validator_module
+
+        staged_checker = Path(value["governed_checker"]["staged_executable"])
+        staged_checker.unlink()
+        staged_checker.symlink_to(staged_checker.with_name("missing-checker.py"))
+        fallback_root = tmp_path / "fallback-repo"
+        fallback_checker = (
+            fallback_root / "ci/checks/check_bridge_consistency.py"
+        )
+        fallback_checker.parent.mkdir(parents=True)
+        fallback_checker.write_text("fallback checker\n")
+        fallback_sha = _sha(fallback_checker.read_bytes())
+        value["governed_checker"]["repo_sha256"] = fallback_sha
+        value["governed_checker"]["staged_sha256"] = fallback_sha
+        monkeypatch.setattr(validator_module, "ROOT", fallback_root)
+    _write_json(path, value)
+    ledger = _rewrite_candidate_ledger(root)
+    expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_BRIDGE_CONSISTENCY_INVALID" in result.errors
+
+
 def test_candidate_requires_full_provider_proof_roster(tmp_path):
     root, expected = _candidate(tmp_path)
     proof_path = root / "provider_parity.proof.json"
@@ -751,6 +946,7 @@ def _live_capture(
     authorization_path = control_root / "live_authorization.json"
     authorization_path.touch()
     failure_summary_path = control_root / "failure.json"
+    consumed_marker_path = control_root / "live_authority_consumed.json"
     summary_path = candidate_root / "result_summary.json"
     summary = json.loads(summary_path.read_text())
     authorization = summary["authorization"]
@@ -775,39 +971,81 @@ def _live_capture(
         "authorization_path": authorization_path.as_posix(),
         "candidate_root": candidate_root.as_posix(),
         "child_argv": authorization["run"]["child_argv"],
+        "run_id": "fixture-live-run",
         "staging_root": staging_root.as_posix(),
     }
-    authorization["write_contract"].update(
-        {
-            "pre_staging_manifest_sha256": staging_manifest_sha256,
-            "failure_summary_path": failure_summary_path.as_posix(),
-            "self_bound_excluded_paths": sorted(
-                (
-                    authorization_path.as_posix(),
-                    failure_summary_path.as_posix(),
-                ),
-                key=lambda value: value.encode("utf-8"),
-            ),
-            "self_bound_excluded_recursive_roots": [candidate_root.as_posix()],
-        }
+    excluded_paths = sorted(
+        (authorization_path.as_posix(), failure_summary_path.as_posix()),
+        key=lambda value: value.encode("utf-8"),
     )
-    source_write.update(
-        {
-            "post_source_manifest_sha256": source_manifest_sha256,
-            "post_staging_manifest_sha256": staging_manifest_sha256,
-            "pre_source_manifest_sha256": source_manifest_sha256,
-            "pre_staging_manifest": staging_manifest["entries"],
-            "pre_staging_manifest_sha256": staging_manifest_sha256,
-            "self_bound_excluded_paths": authorization["write_contract"][
-                "self_bound_excluded_paths"
-            ],
-            "self_bound_excluded_recursive_roots": [candidate_root.as_posix()],
-            "source_root": source_root.as_posix(),
-        }
-    )
+    recursive_roots = [candidate_root.as_posix()]
+    metadata_paths = [control_root.as_posix()]
+    authorization["write_contract"] = {
+        "consumed_marker_path": consumed_marker_path.as_posix(),
+        "failure_authorized_directory_metadata_paths": metadata_paths,
+        "failure_authorized_exact_paths": [
+            consumed_marker_path.as_posix(),
+            failure_summary_path.as_posix(),
+        ],
+        "failure_authorized_recursive_write_roots": recursive_roots,
+        "failure_summary_path": failure_summary_path.as_posix(),
+        "pre_staging_manifest": staging_manifest["entries"],
+        "pre_staging_manifest_sha256": staging_manifest_sha256,
+        "self_bound_excluded_paths": excluded_paths,
+        "self_bound_excluded_recursive_roots": recursive_roots,
+        "source_root_writes_authorized": False,
+        "success_authorized_directory_metadata_paths": metadata_paths,
+        "success_authorized_exact_paths": [consumed_marker_path.as_posix()],
+        "success_authorized_recursive_write_roots": recursive_roots,
+    }
     summary["authorization_sha256"] = _sha(_canon(authorization))
     summary["literal_staging_root"] = staging_root.as_posix()
     _write_json(authorization_path, authorization)
+    _write_json(
+        consumed_marker_path,
+        {
+            "authorization_sha256": summary["authorization_sha256"],
+            "run_id": authorization["run"]["run_id"],
+            "schema": "hde_epic038.ops01r.live_authority_consumed.v1",
+        },
+    )
+    post_staging_manifest = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(authorization_path, failure_summary_path),
+        excluded_recursive_roots=(source_root, candidate_root),
+    )
+    post_staging_manifest_sha256 = _sha(_canon(post_staging_manifest))
+    source_write.clear()
+    source_write.update(
+        {
+            "authorized_directory_metadata_paths": metadata_paths,
+            "authorized_exact_write_paths": [consumed_marker_path.as_posix()],
+            "authorized_recursive_write_roots": recursive_roots,
+            "bytecode_write_control": "python_flag_-B",
+            "manifest_algorithm": "hde_epic038.source_tree_manifest.v1",
+            "mode": "live",
+            "observed_staging_changes": _manifest_delta(
+                staging_manifest["entries"], post_staging_manifest["entries"]
+            ),
+            "post_source_manifest_sha256": source_manifest_sha256,
+            "post_staging_manifest_sha256": post_staging_manifest_sha256,
+            "pre_source_manifest_sha256": source_manifest_sha256,
+            "pre_staging_manifest": staging_manifest["entries"],
+            "pre_staging_manifest_sha256": staging_manifest_sha256,
+            "prohibited_cache_paths": [],
+            "python_argv": authorization["run"]["child_argv"],
+            "python_environment_names": [],
+            "self_bound_excluded_paths": excluded_paths,
+            "self_bound_excluded_recursive_roots": recursive_roots,
+            "source_root": source_root.as_posix(),
+            "source_tree_unchanged": True,
+            "staging_manifest_algorithm": "hde_epic038.non_source_staging_manifest.v1",
+            "staging_write_set_valid": True,
+            "status": "PASS",
+            "unauthorized_staging_paths": [],
+        }
+    )
     _write_json(summary_path, summary)
     ledger = _rewrite_candidate_ledger(candidate_root)
     expected = replace(
@@ -815,7 +1053,7 @@ def _live_capture(
         authorization_sha256=summary["authorization_sha256"],
         candidate_ledger_sha256=_sha(ledger),
         literal_staging_root=staging_root.as_posix(),
-        live_post_staging_manifest_sha256=staging_manifest_sha256,
+        live_post_staging_manifest_sha256=post_staging_manifest_sha256,
         live_pre_staging_manifest_sha256=staging_manifest_sha256,
         source_manifest_sha256=source_manifest_sha256,
     )
@@ -837,6 +1075,45 @@ def test_live_capture_recomputes_source_and_non_candidate_staging(tmp_path):
     assert "OPS01_V5_SOURCE_MANIFEST_MISMATCH" in result.errors
 
 
+def test_live_capture_rejects_result_claimed_write_set_expansion(tmp_path):
+    staging_root, source_root, expected = _live_capture(tmp_path)
+    candidate_root = staging_root / "candidate"
+    summary_path = candidate_root / "result_summary.json"
+    summary = json.loads(summary_path.read_text())
+    source_write = summary["execution"]["source_write_validation"]
+    unauthorized = staging_root / "unauthorized.txt"
+    unauthorized.write_text("not authorized\n")
+    post_staging = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=tuple(
+            Path(value) for value in source_write["self_bound_excluded_paths"]
+        ),
+        excluded_recursive_roots=(source_root, candidate_root),
+    )
+    post_staging_sha = _sha(_canon(post_staging))
+    source_write["authorized_exact_write_paths"].append(unauthorized.as_posix())
+    source_write["authorized_directory_metadata_paths"].append(
+        staging_root.as_posix()
+    )
+    source_write["observed_staging_changes"] = _manifest_delta(
+        source_write["pre_staging_manifest"], post_staging["entries"]
+    )
+    source_write["post_staging_manifest_sha256"] = post_staging_sha
+    _write_json(summary_path, summary)
+    ledger = _rewrite_candidate_ledger(candidate_root)
+    expected = replace(
+        expected,
+        candidate_ledger_sha256=_sha(ledger),
+        live_post_staging_manifest_sha256=post_staging_sha,
+    )
+
+    result = validate_ops01r_live_capture(staging_root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_LIVE_CAPTURE_IDENTITY_MISMATCH" in result.errors
+
+
 def test_live_capture_revalidates_excluded_authorization(tmp_path):
     staging_root, _, expected = _live_capture(tmp_path)
     authorization_path = staging_root / "control" / "live_authorization.json"
@@ -850,16 +1127,36 @@ def test_live_capture_revalidates_excluded_authorization(tmp_path):
 
 def _discovery_pair(
     tmp_path: Path,
+    *,
+    produce_result: bool = True,
 ) -> tuple[Path, Path, Ops01RDiscoveryAuthorizationExpectedIdentity]:
     staging_root = tmp_path / ("b" * 32)
     control = staging_root / "control"
     control.mkdir(parents=True)
-    source_manifest = "1" * 64
+    source_root = staging_root / "source"
+    source_root.mkdir()
+    (source_root / "tracked.py").write_text("VALUE = 1\n")
+    working_directory = staging_root / "discovery-work"
+    working_directory.mkdir()
+    source_manifest_object = _tree_manifest(
+        source_root, schema="hde_epic038.source_tree_manifest.v1"
+    )
+    source_manifest = _sha(_canon(source_manifest_object))
+    authorization_path = control / "discovery_authorization.json"
+    result_path = control / "discovery.json"
+    authorization_path.touch()
+    pre_staging_object = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(authorization_path, result_path),
+        excluded_recursive_roots=(source_root,),
+    )
+    pre_staging_sha = _sha(_canon(pre_staging_object))
     target_probe_argv = [
         "/usr/bin/python3",
         "-I",
         "-B",
-        (staging_root / "source/scripts/ops/hde_epic038_ops01r.py").as_posix(),
+        (source_root / "scripts/ops/hde_epic038_ops01r.py").as_posix(),
         "--target-identity-probe",
     ]
     stage_commands = {
@@ -897,7 +1194,7 @@ def _discovery_pair(
         "schema": "hde_epic038.ops01r.discovery_authorization.v1",
         "source": {
             "commit": "2" * 40,
-            "root": (staging_root / "source").as_posix(),
+            "root": source_root.as_posix(),
             "source_manifest_sha256": source_manifest,
         },
         "discovery_entry_point": {"sha256": "3" * 64},
@@ -905,16 +1202,57 @@ def _discovery_pair(
             "preflight_identity_sha256": "4" * 64,
             "source_manifest_sha256": source_manifest,
         },
-        "railway_cli": {"lexical_path": "railway", "sha256": "5" * 64},
+        "railway_cli": {
+            "lexical_path": "railway",
+            "resolved_path": "/usr/bin/railway",
+            "sha256": "5" * 64,
+        },
         "policy": {
-            "python_execution": {"target_probe_argv": target_probe_argv},
+            "python_execution": {
+                "target_probe_argv": target_probe_argv,
+            },
             "stages": policy_stages,
         },
-        "output_contract": {"path": (control / "discovery.json").as_posix()},
-        "write_contract": {"pre_staging_manifest_sha256": "6" * 64},
+        "output_contract": {"path": result_path.as_posix()},
+        "run_id": "b" * 32,
+        "requested_target": {
+            "project_name": "ample-illumination",
+            "environment_name": "production",
+            "service_name": "glow-hdengine-v2",
+        },
+        "nonclaims": [
+            "no_glow_import",
+            "no_provider_construction",
+            "no_db_call",
+            "no_bridge_call",
+            "no_vendor_call",
+            "no_deployment",
+            "no_restart",
+            "no_relink",
+            "no_selection_change",
+            "no_variable_mutation",
+            "no_tracked_write",
+        ],
+        "working_directory": {
+            "linked_context_required": False,
+            "must_be_empty": True,
+            "path": working_directory.as_posix(),
+        },
+        "write_contract": {
+            "authorized_directory_metadata_paths": [control.as_posix()],
+            "authorized_exact_write_paths": [result_path.as_posix()],
+            "authorized_recursive_write_roots": [],
+            "pre_staging_manifest": pre_staging_object["entries"],
+            "pre_staging_manifest_sha256": pre_staging_sha,
+            "self_bound_excluded_paths": sorted(
+                (authorization_path.as_posix(), result_path.as_posix()),
+                key=lambda value: value.encode("utf-8"),
+            ),
+            "self_bound_excluded_recursive_roots": [],
+            "source_root_writes_authorized": False,
+        },
     }
     authorization["discovery_authorization_sha256"] = _sha(_canon(authorization))
-    authorization_path = control / "discovery_authorization.json"
     _write_json(authorization_path, authorization)
     expected = Ops01RDiscoveryAuthorizationExpectedIdentity(
         discovery_authorization_sha256=authorization[
@@ -922,7 +1260,7 @@ def _discovery_pair(
         ],
         discovery_entry_point_sha256="3" * 64,
         literal_staging_root=staging_root.as_posix(),
-        pre_staging_manifest_sha256="6" * 64,
+        pre_staging_manifest_sha256=pre_staging_sha,
         preflight_identity_sha256="4" * 64,
         railway_executable_sha256="5" * 64,
         source_commit="2" * 40,
@@ -936,15 +1274,76 @@ def _discovery_pair(
         ["railway", "service", "list"],
         ["railway", "run", "--", *target_probe_argv],
     ]
+    if not produce_result:
+        return result_path, authorization_path, expected
+    prefix = ["railway", "run", "--"]
+    identity_contract = [
+        {
+            "expected_value": "environment-id",
+            "field_name": "RAILWAY_ENVIRONMENT_ID",
+            "target_dimension": "environment",
+            "value_kind": "target_id",
+        },
+        {
+            "expected_value": "project-id",
+            "field_name": "RAILWAY_PROJECT_ID",
+            "target_dimension": "project",
+            "value_kind": "target_id",
+        },
+        {
+            "expected_value": "service-id",
+            "field_name": "RAILWAY_SERVICE_ID",
+            "target_dimension": "service",
+            "value_kind": "target_id",
+        },
+    ]
+    child_environment_contract = sorted(
+        [
+            {"name": "ALLOW_DB_WRITE", "source": "runner", "value_policy": "exact:0"},
+            {"name": "ALLOW_NETWORK", "source": "runner", "value_policy": "exact:0"},
+            {"name": "APP_ENV", "source": "runner", "value_policy": "exact:dev"},
+            {"name": "DATABASE_URL", "source": "railway_service", "value_policy": "presence_only"},
+            {"name": "DB_BRIDGE_URL", "source": "railway_service", "value_policy": "presence_only"},
+            {"name": "LANG", "source": "runner", "value_policy": "exact:C"},
+            {"name": "LC_ALL", "source": "runner", "value_policy": "exact:C"},
+            {"name": "SAFE_MODE", "source": "runner", "value_policy": "exact:1"},
+            {"name": "TZ", "source": "runner", "value_policy": "exact:UTC"},
+            *[
+                {
+                    "name": row["field_name"],
+                    "source": "railway_target_identity",
+                    "value_policy": f"exact:{row['expected_value']}",
+                }
+                for row in identity_contract
+            ],
+        ],
+        key=lambda row: row["name"].encode("utf-8"),
+    )
+    result_path.touch()
+    post_staging_object = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(authorization_path, result_path),
+        excluded_recursive_roots=(source_root,),
+    )
+    observed_delta = _manifest_delta(
+        pre_staging_object["entries"], post_staging_object["entries"]
+    )
     result = {
         "schema": "hde_epic038.ops01r.discovery.v1",
         "status": "PASS",
+        "discovery_run_id": "b" * 32,
         "discovery_authorization_sha256": authorization[
             "discovery_authorization_sha256"
         ],
         "command_manifest": manifest,
         "command_manifest_sha256": _sha(_canon(manifest)),
-        "railway_cli": {"sha256": "5" * 64},
+        "railway_cli": {
+            "path": "railway",
+            "resolved_path": "/usr/bin/railway",
+            "sha256": "5" * 64,
+            "version": "railway 4.0.0",
+        },
         "target": {
             "project_id": "project-id",
             "project_name": "ample-illumination",
@@ -953,14 +1352,52 @@ def _discovery_pair(
             "service_id": "service-id",
             "service_name": "glow-hdengine-v2",
         },
+        "run_contract": {
+            "argv_prefix": prefix,
+            "child_argv_start_index": len(prefix),
+            "child_environment_contract": child_environment_contract,
+            "linked_context_required": False,
+            "python_execution": authorization["policy"]["python_execution"],
+            "target_dimensions": ["project", "environment", "service"],
+        },
+        "identity_contract": identity_contract,
+        "counts": {
+            "command_manifest_entries": 6,
+            "discovery_subprocesses": 6,
+            "provider_constructions": 0,
+            "db_connections": 0,
+            "direct_sql_statements": 0,
+            "bridge_http_requests": 0,
+            "vendor_requests": 0,
+        },
+        "nonclaims": authorization["nonclaims"],
         "source_write_validation": {
+            "authorized_directory_metadata_paths": [control.as_posix()],
+            "authorized_exact_write_paths": [result_path.as_posix()],
+            "authorized_recursive_write_roots": [],
+            "bytecode_write_control": "python_flag_-B",
+            "manifest_algorithm": "hde_epic038.source_tree_manifest.v1",
+            "mode": "discovery",
+            "observed_staging_changes": observed_delta,
             "pre_source_manifest_sha256": source_manifest,
             "post_source_manifest_sha256": source_manifest,
-            "pre_staging_manifest_sha256": "6" * 64,
+            "pre_staging_manifest": pre_staging_object["entries"],
+            "pre_staging_manifest_sha256": pre_staging_sha,
+            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
+            "prohibited_cache_paths": [],
+            "python_argv": target_probe_argv,
+            "python_environment_names": [],
+            "self_bound_excluded_paths": authorization["write_contract"]["self_bound_excluded_paths"],
+            "self_bound_excluded_recursive_roots": [],
+            "source_root": source_root.as_posix(),
+            "source_tree_unchanged": True,
+            "staging_manifest_algorithm": "hde_epic038.non_source_staging_manifest.v1",
+            "staging_write_set_valid": True,
+            "status": "PASS",
+            "unauthorized_staging_paths": [],
         },
     }
     result["discovery_identity_sha256"] = _sha(_canon(result))
-    result_path = control / "discovery.json"
     _write_json(result_path, result)
     return result_path, authorization_path, expected
 
@@ -1116,6 +1553,236 @@ def test_discovery_result_rejects_tampered_authorization_hash(tmp_path):
     assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in result.errors
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "not json",
+        _canon({"project_name": "ample-illumination"}).decode("ascii"),
+        _canon(
+            {
+                "project_id": "",
+                "project_name": "ample-illumination",
+            }
+        ).decode("ascii"),
+        _canon(
+            {
+                "project_id": "project-id",
+                "project_name": " ample-illumination",
+            }
+        ).decode("ascii"),
+    ],
+)
+def test_runner_discovery_parser_rejects_missing_or_invalid_target_identity(payload):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage("project_inventory", payload)
+
+
+def test_runner_discovery_parser_does_not_treat_version_or_help_as_target_json():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    assert runner._parse_stage("cli_version", "railway 4.0.0\n") == {
+        "version": "railway 4.0.0"
+    }
+    assert runner._parse_stage("cli_help", "Usage: railway [COMMAND]\n") == {}
+
+
+def test_runner_discovery_parser_requires_exact_no_write_target_probe_result():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    valid = _canon(
+        {
+            "endpoint_presence": {
+                "DATABASE_URL": True,
+                "DB_BRIDGE_URL": True,
+            },
+            "identity_fields": [
+                {"name": "RAILWAY_PROJECT_ID", "value": "project-id"}
+            ],
+            "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+            "writes": 0,
+        }
+    ).decode("ascii")
+    assert runner._parse_stage("target_identity_probe", valid) == json.loads(valid)
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage(
+            "target_identity_probe",
+            _canon(
+                {
+                    "endpoint_presence": {
+                        "DATABASE_URL": True,
+                        "DB_BRIDGE_URL": True,
+                    },
+                    "identity_fields": [],
+                    "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+                    "writes": 1,
+                }
+            ).decode("ascii"),
+        )
+
+
+def test_discovery_result_rejects_incomplete_target_identity(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    payload = json.loads(result_path.read_text())
+    del payload["target"]["service_id"]
+    payload["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in payload.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, payload)
+
+    result = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_TARGET_AMBIGUOUS" in result.errors
+
+
+def test_discovery_result_rejects_unlisted_child_environment(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    payload = json.loads(result_path.read_text())
+    payload["run_contract"]["child_environment_contract"].append(
+        {
+            "name": "HD_API_KEY",
+            "source": "railway_service",
+            "value_policy": "presence_only",
+        }
+    )
+    payload["run_contract"]["child_environment_contract"].sort(
+        key=lambda row: row["name"].encode("utf-8")
+    )
+    payload["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in payload.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, payload)
+
+    result = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID" in result.errors
+
+
+def _discovery_stage_outputs() -> dict[str, str]:
+    return {
+        "cli_version": "railway 4.0.0\n",
+        "cli_help": "Usage: railway [COMMAND]\n",
+        "project_inventory": _canon(
+            {"project_id": "project-id", "project_name": "ample-illumination"}
+        ).decode("ascii"),
+        "environment_inventory": _canon(
+            {
+                "environment_id": "environment-id",
+                "environment_name": "production",
+            }
+        ).decode("ascii"),
+        "service_inventory": _canon(
+            {"service_id": "service-id", "service_name": "glow-hdengine-v2"}
+        ).decode("ascii"),
+        "target_identity_probe": _canon(
+            {
+                "endpoint_presence": {
+                    "DATABASE_URL": True,
+                    "DB_BRIDGE_URL": True,
+                },
+                "identity_fields": [
+                    {"name": "RAILWAY_PROJECT_ID", "value": "project-id"},
+                    {
+                        "name": "RAILWAY_ENVIRONMENT_ID",
+                        "value": "environment-id",
+                    },
+                    {"name": "RAILWAY_SERVICE_ID", "value": "service-id"},
+                ],
+                "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+                "writes": 0,
+            }
+        ).decode("ascii"),
+    }
+
+
+def test_runner_discovery_emits_bound_run_contract(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    result_path, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    outputs = _discovery_stage_outputs()
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        stage = DISCOVERY_STAGES[len(calls)]
+        calls.append((tuple(argv), kwargs))
+        return subprocess.CompletedProcess(argv, 0, outputs[stage], "")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+
+    assert runner.discovery(authorization_path, expected=expected) == 0
+    payload = json.loads(result_path.read_text())
+    probe_argv = json.loads(authorization_path.read_text())["policy"][
+        "python_execution"
+    ]["target_probe_argv"]
+    assert payload["run_contract"]["argv_prefix"] == ["railway", "run", "--"]
+    assert payload["run_contract"]["child_argv_start_index"] == 3
+    assert payload["command_manifest"][-1] == [
+        *payload["run_contract"]["argv_prefix"],
+        *probe_argv,
+    ]
+    assert {
+        row["target_dimension"] for row in payload["identity_contract"]
+    } == {"project", "environment", "service"}
+    assert len(calls) == len(DISCOVERY_STAGES)
+    assert all(call[1]["cwd"].name == "discovery-work" for call in calls)
+    assert validate_ops01r_discovery_result(
+        result_path, authorization_path=authorization_path, expected=expected
+    ).valid
+
+
+def test_runner_discovery_rejects_post_subprocess_staging_write(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    outputs = _discovery_stage_outputs()
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        stage = DISCOVERY_STAGES[len(calls)]
+        calls.append(stage)
+        if stage == "service_inventory":
+            authorization_path.parent.parent.joinpath("unauthorized.txt").write_text(
+                "unauthorized\n"
+            )
+        return subprocess.CompletedProcess(argv, 0, outputs[stage], "")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_WRITE_SET_MISMATCH"):
+        runner.discovery(authorization_path, expected=expected)
+    assert calls == list(DISCOVERY_STAGES)
+
+
 def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     staging_root = tmp_path / "run"
     source_root = staging_root / "source"
@@ -1152,11 +1819,11 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         },
         "expected_call_counts": {
             "bodygraph_reads": 2,
-            "bridge_http_requests": 0,
+            "bridge_http_requests": 6,
             "bridge_provider_selections": 1,
-            "direct_connection_attempts": 0,
+            "direct_connection_attempts": 8,
             "direct_provider_selections": 1,
-            "direct_sql_statements": 0,
+            "direct_sql_statements": 13,
             "fallbacks": 0,
             "logical_observations": 10,
             "retries": 0,
@@ -1274,52 +1941,189 @@ def _live_authorization_pair(
 ) -> tuple[Path, dict[str, object], Ops01RLiveAuthorizationExpectedIdentity]:
     counts = {
         "bodygraph_reads": 2,
-        "bridge_http_requests": 0,
+        "bridge_http_requests": 6,
         "bridge_provider_selections": 1,
-        "direct_connection_attempts": 0,
+        "direct_connection_attempts": 8,
         "direct_provider_selections": 1,
-        "direct_sql_statements": 0,
+        "direct_sql_statements": 13,
         "fallbacks": 0,
         "logical_observations": 10,
         "retries": 0,
         "vendor_requests": 0,
     }
+    staging_root = tmp_path / ("a" * 32)
+    source_root = staging_root / "source"
+    control_root = staging_root / "control"
+    candidate_root = staging_root / "candidate"
+    source_root.mkdir(parents=True)
+    control_root.mkdir()
+    candidate_root.mkdir()
+    runner_path = source_root / "scripts/ops/hde_epic038_ops01r.py"
+    validator_path = source_root / "tools/evidence/hde_epic038_ops01_v5.py"
+    projector_path = source_root / "engine/db/ddl_identity_projection.py"
+    for path_value, content in (
+        (runner_path, "RUNNER = 1\n"),
+        (validator_path, "VALIDATOR = 1\n"),
+        (projector_path, "PROJECTOR = 1\n"),
+    ):
+        path_value.parent.mkdir(parents=True, exist_ok=True)
+        path_value.write_text(content)
+    source_manifest_object = _tree_manifest(
+        source_root, schema="hde_epic038.source_tree_manifest.v1"
+    )
+    source_manifest = _sha(_canon(source_manifest_object))
+    path = control_root / "live_authorization.json"
+    failure_path = control_root / "failure.json"
+    marker_path = control_root / "live_authority_consumed.json"
+    path.touch()
+    pre_staging_object = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(path, failure_path),
+        excluded_recursive_roots=(source_root, candidate_root),
+    )
+    pre_staging_sha = _sha(_canon(pre_staging_object))
+    interpreter_path = Path(sys.executable).resolve()
+    child = [
+        interpreter_path.as_posix(),
+        "-I",
+        "-B",
+        runner_path.as_posix(),
+        "--live-child",
+    ]
+    prefix = ["railway", "run", "--service", "glow-hdengine-v2", "--"]
+    discovery: dict[str, object] = {
+        "schema": "hde_epic038.ops01r.discovery.v1",
+        "status": "PASS",
+        "railway_cli": {"sha256": "9" * 64},
+        "target": {
+            "project_id": "project-id",
+            "project_name": "ample-illumination",
+            "environment_id": "environment-id",
+            "environment_name": "production",
+            "service_id": "service-id",
+            "service_name": "glow-hdengine-v2",
+        },
+        "identity_contract": [
+            {
+                "expected_value": "project-id",
+                "field_name": "RAILWAY_PROJECT_ID",
+                "target_dimension": "project",
+                "value_kind": "target_id",
+            }
+        ],
+        "run_contract": {
+            "argv_prefix": prefix,
+            "child_argv_start_index": len(prefix),
+            "child_environment_contract": [
+                {"name": "DATABASE_URL", "source": "railway_service", "value_policy": "presence_only"},
+                {"name": "DB_BRIDGE_URL", "source": "railway_service", "value_policy": "presence_only"},
+                {"name": "RAILWAY_PROJECT_ID", "source": "railway_target_identity", "value_policy": "exact:project-id"},
+            ],
+        },
+    }
+    discovery["discovery_identity_sha256"] = _sha(_canon(discovery))
     authorization: dict[str, object] = {
         "schema": "hde_epic038.ops01r.authorization.v1",
         "source": {
+            "repository": "amthorn78/glow-hdengine-v2",
             "commit": "1" * 40,
-            "source_manifest_sha256": "2" * 64,
+            "root": source_root.as_posix(),
+            "source_manifest_sha256": source_manifest,
+            "state": "DETACHED",
         },
-        "run": {"staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32},
-        "runner": {"sha256": "3" * 64},
-        "validator": {"sha256": "4" * 64},
-        "projector": {"sha256": "5" * 64},
-        "interpreter": {"sha256": "6" * 64},
+        "run": {
+            "authorization_path": path.as_posix(),
+            "candidate_root": candidate_root.as_posix(),
+            "child_argv": child,
+            "launcher_argv": [
+                interpreter_path.as_posix(),
+                "-I",
+                "-B",
+                runner_path.as_posix(),
+                "--live-launch",
+                path.as_posix(),
+            ],
+            "live_authorization_validator_argv": [
+                interpreter_path.as_posix(),
+                "-I",
+                "-B",
+                validator_path.as_posix(),
+                "--validate-live-authorization",
+                "--expected-identity-stdin",
+                path.as_posix(),
+            ],
+            "live_capture_validator_argv": [
+                interpreter_path.as_posix(),
+                "-I",
+                "-B",
+                validator_path.as_posix(),
+                "--validate-live-capture",
+                "--expected-identity-stdin",
+                staging_root.as_posix(),
+            ],
+            "run_id": "a" * 32,
+            "staging_root": staging_root.as_posix(),
+        },
+        "runner": {
+            "path": runner_path.as_posix(),
+            "sha256": _sha(runner_path.read_bytes()),
+        },
+        "validator": {
+            "path": validator_path.as_posix(),
+            "sha256": _sha(validator_path.read_bytes()),
+        },
+        "projector": {
+            "path": projector_path.as_posix(),
+            "sha256": _sha(projector_path.read_bytes()),
+        },
+        "interpreter": {
+            "bytecode_flag": "-B",
+            "bytecode_write_control": "python_flag_-B",
+            "isolated_flag": "-I",
+            "path": interpreter_path.as_posix(),
+            "python_environment_names": [],
+            "resolved_path": interpreter_path.as_posix(),
+            "sha256": _sha(interpreter_path.read_bytes()),
+        },
         "preflight_identity_sha256": "7" * 64,
-        "discovery": {
-            "discovery_identity_sha256": "8" * 64,
-            "railway_cli": {"sha256": "9" * 64},
-        },
+        "discovery": discovery,
         "launch_limit": 1,
         "expected_call_counts": counts,
         "tracked_writes_authorized": False,
-        "write_contract": {"pre_staging_manifest_sha256": "a" * 64},
+        "write_contract": {
+            "consumed_marker_path": marker_path.as_posix(),
+            "failure_authorized_directory_metadata_paths": [control_root.as_posix()],
+            "failure_authorized_exact_paths": [marker_path.as_posix(), failure_path.as_posix()],
+            "failure_authorized_recursive_write_roots": [candidate_root.as_posix()],
+            "failure_summary_path": failure_path.as_posix(),
+            "pre_staging_manifest": pre_staging_object["entries"],
+            "pre_staging_manifest_sha256": pre_staging_sha,
+            "self_bound_excluded_paths": sorted(
+                (path.as_posix(), failure_path.as_posix()),
+                key=lambda value: value.encode("utf-8"),
+            ),
+            "self_bound_excluded_recursive_roots": [candidate_root.as_posix()],
+            "source_root_writes_authorized": False,
+            "success_authorized_directory_metadata_paths": [control_root.as_posix()],
+            "success_authorized_exact_paths": [marker_path.as_posix()],
+            "success_authorized_recursive_write_roots": [candidate_root.as_posix()],
+        },
     }
-    path = tmp_path / "live_authorization.json"
     _write_json(path, authorization)
     expected = Ops01RLiveAuthorizationExpectedIdentity(
         authorization_sha256=_sha(_canon(authorization)),
-        discovery_identity_sha256="8" * 64,
-        interpreter_sha256="6" * 64,
-        live_pre_staging_manifest_sha256="a" * 64,
+        discovery_identity_sha256=discovery["discovery_identity_sha256"],
+        interpreter_sha256=authorization["interpreter"]["sha256"],
+        live_pre_staging_manifest_sha256=pre_staging_sha,
         literal_staging_root=authorization["run"]["staging_root"],
         preflight_identity_sha256="7" * 64,
-        projector_sha256="5" * 64,
+        projector_sha256=authorization["projector"]["sha256"],
         railway_executable_sha256="9" * 64,
-        runner_sha256="3" * 64,
+        runner_sha256=authorization["runner"]["sha256"],
         source_commit="1" * 40,
-        source_manifest_sha256="2" * 64,
-        validator_sha256="4" * 64,
+        source_manifest_sha256=source_manifest,
+        validator_sha256=authorization["validator"]["sha256"],
     )
     return path, authorization, expected
 
@@ -1344,6 +2148,25 @@ def test_live_authorization_requires_canonical_schema_closed_bytes(tmp_path):
     )
     assert not result.valid
     assert "OPS01_AUTH_SCHEMA_INVALID" in result.errors
+
+
+@pytest.mark.parametrize("tampered_field", ["interpreter", "runner"])
+def test_live_authorization_rejects_unbound_child_vector(tmp_path, tampered_field):
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    index = 0 if tampered_field == "interpreter" else 3
+    authorization["run"]["child_argv"][index] += ".tampered"
+    _write_json(path, authorization)
+
+    result = validate_ops01r_live_authorization(
+        path,
+        expected=replace(
+            expected,
+            authorization_sha256=_sha(_canon(authorization)),
+        ),
+    )
+
+    assert not result.valid
+    assert "OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH" in result.errors
 
 
 def _stage_runner_source(tmp_path: Path) -> Path:
@@ -1402,6 +2225,70 @@ def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
     assert validate_ops01r_preflight(path, expected=expected).valid
 
 
+def test_preflight_binds_components_and_modules_to_materialized_source(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    for name in tuple(os.environ):
+        if name.casefold().startswith("python"):
+            monkeypatch.delenv(name)
+
+    run_id = hashlib.sha256(tmp_path.as_posix().encode()).hexdigest()[:32]
+    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    shutil.rmtree(staging_root, ignore_errors=True)
+    files = {
+        "engine/db/ddl_identity_projection.py": b"staged projector\n",
+        "scripts/db/capture_epic011_posture.py": b"staged capture\n",
+        "scripts/ops/hde_epic038_ops01r.py": b"staged runner\n",
+        "tools/evidence/hde_epic038_ops01_v5.py": b"staged validator\n",
+    }
+
+    def materialize(source_root, commit):
+        for relative, content in files.items():
+            path = source_root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+    monkeypatch.setattr(runner, "materialize_source_worktree", materialize)
+    monkeypatch.setattr(runner, "_git_commit", lambda root: "1" * 40)
+    try:
+        assert runner.preflight(run_id=run_id) == 0
+        record = json.loads((staging_root / "control/preflight.json").read_text())
+        source_root = staging_root / "source"
+        for name, relative in (
+            ("runner", "scripts/ops/hde_epic038_ops01r.py"),
+            ("validator", "tools/evidence/hde_epic038_ops01_v5.py"),
+            ("projector", "engine/db/ddl_identity_projection.py"),
+        ):
+            identity = record["components"][name]
+            expected_path = (source_root / relative).as_posix()
+            assert identity["lexical_path"] == expected_path
+            assert identity["resolved_path"] == expected_path
+            assert identity["sha256"] == _sha(files[relative])
+
+        expected_origins = {
+            "engine.db.ddl_identity_projection": "engine/db/ddl_identity_projection.py",
+            "scripts.db.capture_epic011_posture": "scripts/db/capture_epic011_posture.py",
+            "scripts.ops.hde_epic038_ops01r": "scripts/ops/hde_epic038_ops01r.py",
+            "tools.evidence.hde_epic038_ops01_v5": "tools/evidence/hde_epic038_ops01_v5.py",
+        }
+        for origin in record["module_origins"]:
+            relative = expected_origins[origin["module"]]
+            expected_path = (source_root / relative).as_posix()
+            assert origin["lexical_origin"] == expected_path
+            assert origin["resolved_origin"] == expected_path
+            assert origin["sha256"] == _sha(files[relative])
+        assert record["interpreter"]["preflight_argv"][3] == (
+            source_root / "scripts/ops/hde_epic038_ops01r.py"
+        ).as_posix()
+        assert record["interpreter"]["preflight_validator_argv"][3] == (
+            source_root / "tools/evidence/hde_epic038_ops01_v5.py"
+        ).as_posix()
+    finally:
+        shutil.rmtree(staging_root, ignore_errors=True)
+
+
 def test_runner_preflight_rejects_python_environment(tmp_path):
     source = _stage_runner_source(tmp_path)
     environment = {
@@ -1427,3 +2314,338 @@ def test_runner_preflight_rejects_python_environment(tmp_path):
 
     assert process.returncode != 0
     assert "OPS01_V5_PYTHON_ENVIRONMENT_INVALID" in process.stderr
+
+
+def test_runner_rejects_invalid_discovery_authorization_before_subprocess(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    authorization = tmp_path / "discovery_authorization.json"
+    _write_json(authorization, {"schema": "invalid"})
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
+        runner.discovery(
+            authorization,
+            expected=Ops01RDiscoveryAuthorizationExpectedIdentity(*(["x"] * 8)),
+        )
+    assert calls == []
+
+
+def test_runner_rejects_invalid_live_authorization_before_consumption_or_subprocess(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    control = tmp_path / "control"
+    control.mkdir()
+    authorization = control / "live_authorization.json"
+    _write_json(authorization, {"schema": "invalid"})
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_AUTH_INVALID"):
+        runner.live_launch(
+            authorization,
+            expected=Ops01RLiveAuthorizationExpectedIdentity(*(["x"] * 12)),
+        )
+    assert calls == []
+    assert not (control / "live_authority_consumed.json").exists()
+
+
+def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(
+    tmp_path, monkeypatch
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    child = authorization["run"]["child_argv"]
+    prefix = authorization["discovery"]["run_contract"]["argv_prefix"]
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append((tuple(argv), kwargs))
+        (Path(authorization["run"]["candidate_root"]) / "produced.txt").write_text(
+            "produced\n"
+        )
+        return subprocess.CompletedProcess(argv, 0, "", "")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+
+    assert runner.live_launch(path, expected=expected) == 0
+    assert len(calls) == 1
+    assert calls[0][0] == tuple(prefix + child)
+    assert calls[0][1]["shell"] is False
+    for name, value in {
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "ALLOW_DB_WRITE": "0",
+        "APP_ENV": "dev",
+    }.items():
+        assert calls[0][1]["env"][name] == value
+    assert not any(
+        name.casefold().startswith("python") for name in calls[0][1]["env"]
+    )
+    marker = Path(authorization["write_contract"]["consumed_marker_path"])
+    assert marker.exists()
+    marker_payload = json.loads(marker.read_text())
+    assert marker_payload["authorization_sha256"] == expected.authorization_sha256
+    assert marker_payload["run_id"] == authorization["run"]["run_id"]
+
+
+@pytest.mark.parametrize("tampered_index", [0, 3, 4])
+def test_live_launch_rejects_unbound_child_vector_before_consumption(
+    tmp_path, monkeypatch, tampered_index
+):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    authorization["run"]["child_argv"][tampered_index] += ".tampered"
+    authorization["discovery"]["run_contract"] = {
+        "argv_prefix": ["railway", "run", "--"],
+        "child_argv_start_index": 3,
+    }
+    _write_json(path, authorization)
+    expected = replace(
+        expected,
+        authorization_sha256=_sha(_canon(authorization)),
+    )
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_AUTH_INVALID"):
+        runner.live_launch(path, expected=expected)
+    assert calls == []
+    assert not Path(
+        authorization["write_contract"]["consumed_marker_path"]
+    ).exists()
+
+
+def test_live_child_executes_authorized_capture_pipeline(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    authorization = {
+        "expected_call_counts": dict(runner.EXPECTED_CALL_COUNTS),
+        "source": {"root": (tmp_path / "source").as_posix()},
+        "run": {"staging_root": tmp_path.as_posix()},
+    }
+    events = []
+
+    monkeypatch.setattr(
+        runner,
+        "_live_runtime_authorization",
+        lambda: (
+            tmp_path / "control/live_authorization.json",
+            authorization,
+            "a" * 64,
+        ),
+    )
+    monkeypatch.setattr(
+        runner,
+        "_close_live_environment",
+        lambda value: events.append("environment") or {},
+    )
+
+    def fake_capture(value, budget):
+        events.append("capture")
+        budget.actual = dict(budget.expected)
+        return {"observed": True}
+
+    monkeypatch.setattr(runner, "_capture_live_observations", fake_capture)
+    monkeypatch.setattr(
+        runner,
+        "_live_source_write_validation",
+        lambda *args: events.append("source-write") or {"status": "PASS"},
+    )
+    monkeypatch.setattr(
+        runner,
+        "_write_candidate",
+        lambda *args: events.append("candidate"),
+    )
+
+    assert runner.main(["--live-child"]) == 0
+    assert events == ["environment", "capture", "source-write", "candidate"]
+
+
+def _install_bridge_response_stub(monkeypatch):
+    providers_module = type(sys)("engine.db.providers")
+    bridge_module = type(sys)("engine.db.providers.bridge_provider")
+
+    class BridgeResponse:
+        def __init__(self, *, status, body, headers):
+            self.status = status
+            self.body = body
+            self.headers = headers
+
+    bridge_module.BridgeResponse = BridgeResponse
+    monkeypatch.setitem(sys.modules, "engine.db.providers", providers_module)
+    monkeypatch.setitem(
+        sys.modules, "engine.db.providers.bridge_provider", bridge_module
+    )
+
+
+def test_bridge_request_allows_only_governed_read_only_gets(monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _install_bridge_response_stub(monkeypatch)
+    calls = []
+
+    class Response:
+        status = 200
+        headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def getcode(self):
+            return self.status
+
+        def read(self):
+            return b'{"status":"ok"}'
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.full_url, request.method, request.data, timeout))
+            return Response()
+
+    monkeypatch.setattr(
+        runner.urllib.request, "build_opener", lambda *handlers: Opener()
+    )
+    budget = runner._CallBudget.from_authorization(
+        {"expected_call_counts": dict(runner.EXPECTED_CALL_COUNTS)}
+    )
+    request = runner._bridge_request(budget)
+
+    for path in (
+        "/health",
+        "/introspect/grants",
+        "/introspect/search_path",
+        "/introspect/fingerprint",
+    ):
+        response = request(f"https://bridge.invalid{path}", "GET", None, {})
+        assert response.status == 200
+
+    assert [entry[0] for entry in calls] == [
+        "https://bridge.invalid/health",
+        "https://bridge.invalid/introspect/grants",
+        "https://bridge.invalid/introspect/search_path",
+        "https://bridge.invalid/introspect/fingerprint",
+    ]
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://bridge.invalid/introspect/version",
+        "https://bridge.invalid/unlisted/health",
+    ],
+)
+def test_bridge_request_rejects_unlisted_gets_before_io(monkeypatch, url):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _install_bridge_response_stub(monkeypatch)
+
+    class Opener:
+        def open(self, *args, **kwargs):
+            pytest.fail("external bridge I/O attempted")
+
+    monkeypatch.setattr(
+        runner.urllib.request,
+        "build_opener",
+        lambda *handlers: Opener(),
+    )
+    budget = runner._CallBudget.from_authorization(
+        {"expected_call_counts": dict(runner.EXPECTED_CALL_COUNTS)}
+    )
+    request = runner._bridge_request(budget)
+
+    with pytest.raises(RuntimeError, match="OPS01R_LIVE_BRIDGE_REQUEST_INVALID"):
+        request(url, "GET", None, {})
+
+
+def test_live_child_validates_target_before_reading_db_endpoints(monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    class TrackingEnvironment(dict):
+        def __init__(self, values):
+            super().__init__(values)
+            self.value_reads = []
+
+        def get(self, name, default=None):
+            self.value_reads.append(name)
+            return super().get(name, default)
+
+    environment = TrackingEnvironment(
+        {
+            "ALLOW_DB_WRITE": "0",
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "DATABASE_URL": "postgresql://credential",
+            "DB_BRIDGE_URL": "https://bridge.invalid",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "RAILWAY_SERVICE_ID": "wrong-service",
+            "SAFE_MODE": "1",
+            "TZ": "UTC",
+        }
+    )
+    contract = [
+        {"name": name, "source": source, "value_policy": policy}
+        for name, source, policy in (
+            ("DATABASE_URL", "railway_service", "presence_only"),
+            ("DB_BRIDGE_URL", "railway_service", "presence_only"),
+            ("ALLOW_DB_WRITE", "runner", "exact:0"),
+            ("ALLOW_NETWORK", "runner", "exact:0"),
+            ("APP_ENV", "runner", "exact:dev"),
+            ("LANG", "runner", "exact:C"),
+            ("LC_ALL", "runner", "exact:C"),
+            (
+                "RAILWAY_SERVICE_ID",
+                "railway_target_identity",
+                "exact:wrong-service",
+            ),
+            ("SAFE_MODE", "runner", "exact:1"),
+            ("TZ", "runner", "exact:UTC"),
+        )
+    ]
+    authorization = {
+        "discovery": {
+            "identity_contract": [
+                {
+                    "expected_value": "authorized-service",
+                    "field_name": "RAILWAY_SERVICE_ID",
+                    "target_dimension": "service",
+                    "value_kind": "target_id",
+                }
+            ],
+            "run_contract": {"child_environment_contract": contract},
+        }
+    }
+    monkeypatch.setattr(runner.os, "environ", environment)
+
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_TARGET_IDENTITY_INVALID"):
+        runner._close_live_environment(authorization)
+
+    assert "DATABASE_URL" not in environment.value_reads
+    assert "DB_BRIDGE_URL" not in environment.value_reads
