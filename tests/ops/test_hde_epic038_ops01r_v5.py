@@ -2230,6 +2230,10 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
 ):
     import scripts.ops.hde_epic038_ops01r as runner
 
+    for name in tuple(os.environ):
+        if name.casefold().startswith("python"):
+            monkeypatch.delenv(name)
+
     run_id = hashlib.sha256(tmp_path.as_posix().encode()).hexdigest()[:32]
     staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
     shutil.rmtree(staging_root, ignore_errors=True)
