@@ -2337,6 +2337,105 @@ def test_live_child_executes_authorized_capture_pipeline(tmp_path, monkeypatch):
     assert events == ["environment", "capture", "source-write", "candidate"]
 
 
+def _install_bridge_response_stub(monkeypatch):
+    providers_module = type(sys)("engine.db.providers")
+    bridge_module = type(sys)("engine.db.providers.bridge_provider")
+
+    class BridgeResponse:
+        def __init__(self, *, status, body, headers):
+            self.status = status
+            self.body = body
+            self.headers = headers
+
+    bridge_module.BridgeResponse = BridgeResponse
+    monkeypatch.setitem(sys.modules, "engine.db.providers", providers_module)
+    monkeypatch.setitem(
+        sys.modules, "engine.db.providers.bridge_provider", bridge_module
+    )
+
+
+def test_bridge_request_allows_only_governed_read_only_gets(monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _install_bridge_response_stub(monkeypatch)
+    calls = []
+
+    class Response:
+        status = 200
+        headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def getcode(self):
+            return self.status
+
+        def read(self):
+            return b'{"status":"ok"}'
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.full_url, request.method, request.data, timeout))
+            return Response()
+
+    monkeypatch.setattr(
+        runner.urllib.request, "build_opener", lambda *handlers: Opener()
+    )
+    budget = runner._CallBudget.from_authorization(
+        {"expected_call_counts": dict(runner.EXPECTED_CALL_COUNTS)}
+    )
+    request = runner._bridge_request(budget)
+
+    for path in (
+        "/health",
+        "/introspect/grants",
+        "/introspect/search_path",
+        "/introspect/fingerprint",
+    ):
+        response = request(f"https://bridge.invalid{path}", "GET", None, {})
+        assert response.status == 200
+
+    assert [entry[0] for entry in calls] == [
+        "https://bridge.invalid/health",
+        "https://bridge.invalid/introspect/grants",
+        "https://bridge.invalid/introspect/search_path",
+        "https://bridge.invalid/introspect/fingerprint",
+    ]
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://bridge.invalid/introspect/version",
+        "https://bridge.invalid/unlisted/health",
+    ],
+)
+def test_bridge_request_rejects_unlisted_gets_before_io(monkeypatch, url):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    _install_bridge_response_stub(monkeypatch)
+
+    class Opener:
+        def open(self, *args, **kwargs):
+            pytest.fail("external bridge I/O attempted")
+
+    monkeypatch.setattr(
+        runner.urllib.request,
+        "build_opener",
+        lambda *handlers: Opener(),
+    )
+    budget = runner._CallBudget.from_authorization(
+        {"expected_call_counts": dict(runner.EXPECTED_CALL_COUNTS)}
+    )
+    request = runner._bridge_request(budget)
+
+    with pytest.raises(RuntimeError, match="OPS01R_LIVE_BRIDGE_REQUEST_INVALID"):
+        request(url, "GET", None, {})
+
+
 def test_live_child_validates_target_before_reading_db_endpoints(monkeypatch):
     import scripts.ops.hde_epic038_ops01r as runner
 
