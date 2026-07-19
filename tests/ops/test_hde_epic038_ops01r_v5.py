@@ -114,14 +114,14 @@ def test_validator_cli_imports_from_outside_the_repo(tmp_path):
     assert process.returncode == 0, process.stderr
 
 
-def test_runner_dormant_modes_do_not_run_external_ops():
+def test_unauthorized_live_child_does_not_run_external_ops():
     process = subprocess.run(
         [sys.executable, "scripts/ops/hde_epic038_ops01r.py", "--live-child"],
         capture_output=True,
         text=True,
     )
     assert process.returncode != 0
-    assert "dormant" in process.stderr
+    assert "OPS01R_LIVE_CHILD_REQUIRES_RAILWAY_AUTHORIZATION" in process.stderr
 
 
 def _candidate(
@@ -1427,3 +1427,42 @@ def test_runner_preflight_rejects_python_environment(tmp_path):
 
     assert process.returncode != 0
     assert "OPS01_V5_PYTHON_ENVIRONMENT_INVALID" in process.stderr
+
+
+def test_runner_rejects_invalid_discovery_authorization_before_subprocess(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    authorization = tmp_path / "discovery_authorization.json"
+    _write_json(authorization, {"schema": "invalid"})
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
+        runner.discovery(authorization)
+    assert calls == []
+
+
+def test_runner_rejects_invalid_live_authorization_before_consumption_or_subprocess(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    control = tmp_path / "control"
+    control.mkdir()
+    authorization = control / "live_authorization.json"
+    _write_json(authorization, {"schema": "invalid"})
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_AUTH_INVALID"):
+        runner.live_launch(authorization)
+    assert calls == []
+    assert not (control / "live_authorization.json.consumed").exists()

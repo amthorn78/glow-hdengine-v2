@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import stat
+import subprocess
 import sys
 import uuid
 from pathlib import Path
@@ -249,26 +250,74 @@ def _module_origins() -> list[dict[str, str]]:
     return origins
 
 
-def preflight() -> int:
+def _clean_child_env() -> dict[str, str]:
+    env = {
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+    }
+    reject_python_env(env)
+    return env
+
+
+def _run_checked(argv: tuple[str, ...], **kwargs) -> subprocess.CompletedProcess[str]:
+    if len(argv) < 3 or argv[1:3] != ("-I", "-B"):
+        raise RuntimeError("OPS01_V5_PYTHON_ARGV_MISMATCH")
+    return subprocess.run(argv, shell=False, check=True, text=True, **kwargs)
+
+
+def materialize_source_worktree(source_root: Path, commit: str) -> None:
+    if source_root.exists():
+        raise RuntimeError("OPS01_V5_SOURCE_ROOT_EXISTS")
+    if commit == "UNKNOWN" or not (ROOT / ".git").exists():
+        shutil.copytree(
+            ROOT,
+            source_root,
+            ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc"),
+        )
+        return
+    subprocess.run(
+        ("git", "worktree", "add", "--detach", source_root.as_posix(), commit),
+        cwd=ROOT,
+        shell=False,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    status = subprocess.run(
+        ("git", "status", "--porcelain"),
+        cwd=source_root,
+        shell=False,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if status.stdout:
+        raise RuntimeError("OPS01_V5_SOURCE_WORKTREE_DIRTY")
+
+
+def preflight(*, run_id: str | None = None) -> int:
     reject_python_env(dict(os.environ))
-    run_id = uuid.uuid4().hex
+    run_id = run_id or uuid.uuid4().hex
+    if len(run_id) != 32 or any(c not in "0123456789abcdef" for c in run_id):
+        raise RuntimeError("OPS01_V5_RUN_ID_INVALID")
     staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    source_root = staging_root / "source"
     control_root = staging_root / "control"
     working_directory = staging_root / "preflight-work"
     preflight_path = control_root / "preflight.json"
     control_root.mkdir(parents=True)
     working_directory.mkdir()
+    source_commit = _git_commit(ROOT)
+    materialize_source_worktree(source_root, source_commit)
 
-    source_manifest = tree_manifest(ROOT, schema=SOURCE_MANIFEST_SCHEMA)
+    source_manifest = tree_manifest(source_root, schema=SOURCE_MANIFEST_SCHEMA)
     source_manifest_sha256 = sha_bytes(canonical_bytes(source_manifest))
-    source_exclusions = (
-        (ROOT,)
-        if _lexical_absolute(staging_root) in (
-            _lexical_absolute(ROOT),
-            *_lexical_absolute(ROOT).parents,
-        )
-        else ()
-    )
+    source_exclusions = (source_root,)
     pre_staging_manifest = tree_manifest(
         staging_root,
         schema=STAGING_MANIFEST_SCHEMA,
@@ -317,7 +366,7 @@ def preflight() -> int:
         "bridge_http_requests": 0,
     }
     write_contained(preflight_path, b"", staging_root)
-    post_source_manifest = tree_manifest(ROOT, schema=SOURCE_MANIFEST_SCHEMA)
+    post_source_manifest = tree_manifest(source_root, schema=SOURCE_MANIFEST_SCHEMA)
     post_source_manifest_sha256 = sha_bytes(canonical_bytes(post_source_manifest))
     if post_source_manifest_sha256 != source_manifest_sha256:
         raise RuntimeError("OPS01_V5_SOURCE_MANIFEST_MISMATCH")
@@ -338,15 +387,15 @@ def preflight() -> int:
             "control_root": control_root.as_posix(),
             "preflight_path": preflight_path.as_posix(),
             "run_id": run_id,
-            "source_root": ROOT.as_posix(),
+            "source_root": source_root.as_posix(),
             "staging_root": staging_root.as_posix(),
             "working_directory": working_directory.as_posix(),
         },
         "source": {
             "checkout_state": "DETACHED",
-            "commit": _git_commit(ROOT),
+            "commit": source_commit,
             "repository": "amthorn78/glow-hdengine-v2",
-            "root": ROOT.as_posix(),
+            "root": source_root.as_posix(),
             "source_manifest_sha256": source_manifest_sha256,
             "worktree_state": "clean",
         },
@@ -397,7 +446,7 @@ def preflight() -> int:
             "pre_staging_manifest_sha256": pre_staging_manifest_sha256,
             "post_staging_manifest_sha256": post_staging_manifest_sha256,
             "observed_staging_changes": observed_staging_changes,
-            "source_root": ROOT.as_posix(),
+            "source_root": source_root.as_posix(),
         },
     }
     payload["preflight_identity_sha256"] = sha_bytes(canonical_bytes(payload))
@@ -405,6 +454,217 @@ def preflight() -> int:
     print(preflight_path.as_posix())
     return 0
 
+
+def _read_expected_identity(path: Path, cls):
+    from tools.evidence import hde_epic038_ops01_v5 as validators
+    obj = json.loads(path.read_text("utf-8"))
+    if cls.__name__ == "Ops01RDiscoveryAuthorizationExpectedIdentity":
+        return validators.Ops01RDiscoveryAuthorizationExpectedIdentity(
+            discovery_authorization_sha256=obj["discovery_authorization_sha256"],
+            discovery_entry_point_sha256=obj["discovery_entry_point"]["sha256"],
+            literal_staging_root=Path(
+                obj["output_contract"]["path"]
+            ).parent.parent.as_posix(),
+            pre_staging_manifest_sha256=obj["write_contract"]["pre_staging_manifest_sha256"],
+            preflight_identity_sha256=obj["preflight"]["preflight_identity_sha256"],
+            railway_executable_sha256=obj["railway_cli"]["sha256"],
+            source_commit=obj["source"]["commit"],
+            source_manifest_sha256=obj["source"]["source_manifest_sha256"],
+        )
+    return validators.Ops01RLiveAuthorizationExpectedIdentity(
+        authorization_sha256=sha_bytes(canonical_bytes(obj)),
+        discovery_identity_sha256=obj["discovery"]["discovery_identity_sha256"],
+        interpreter_sha256=obj["interpreter"]["sha256"],
+        live_pre_staging_manifest_sha256=obj["write_contract"]["pre_staging_manifest_sha256"],
+        literal_staging_root=obj["run"]["staging_root"],
+        preflight_identity_sha256=obj["preflight_identity_sha256"],
+        projector_sha256=obj["projector"]["sha256"],
+        railway_executable_sha256=obj["discovery"]["railway_cli"]["sha256"],
+        runner_sha256=obj["runner"]["sha256"],
+        source_commit=obj["source"]["commit"],
+        source_manifest_sha256=obj["source"]["source_manifest_sha256"],
+        validator_sha256=obj["validator"]["sha256"],
+    )
+
+
+def discovery(authorization_path: Path) -> int:
+    from tools.evidence.hde_epic038_ops01_v5 import (
+        DISCOVERY_STAGES,
+        Ops01RDiscoveryAuthorizationExpectedIdentity,
+        validate_ops01r_discovery_authorization,
+        validate_ops01r_discovery_dispatch,
+        validate_ops01r_discovery_result,
+    )
+    try:
+        expected = _read_expected_identity(
+            authorization_path, Ops01RDiscoveryAuthorizationExpectedIdentity
+        )
+    except (KeyError, TypeError, json.JSONDecodeError):
+        raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
+    if not validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    ).valid:
+        raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
+    authorization = json.loads(authorization_path.read_text("utf-8"))
+    prior: dict[str, object] = {}
+    manifest: list[list[str]] = []
+    target: dict[str, str] = {}
+    for stage in DISCOVERY_STAGES:
+        vectors = sorted(
+            validate_vectors(authorization, stage, prior),
+            key=lambda v: canonical_bytes(list(v)),
+        )
+        if len(vectors) != 1:
+            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        argv = vectors[0]
+        dispatch = validate_ops01r_discovery_dispatch(
+            authorization_path,
+            stage=stage,
+            prior_results=prior,
+            rendered_argv=argv,
+        )
+        if not dispatch.valid:
+            raise SystemExit("OPS01R_DISCOVERY_DISPATCH_INVALID")
+        cp = subprocess.run(
+            argv,
+            shell=False,
+            check=False,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=_clean_child_env(),
+        )
+        if cp.returncode != 0:
+            raise SystemExit("OPS01R_DISCOVERY_STAGE_FAILED")
+        manifest.append(list(argv))
+        parsed = _parse_stage(stage, cp.stdout)
+        prior[stage] = parsed
+        target.update(parsed)
+    required = {
+        "project_id",
+        "project_name",
+        "environment_id",
+        "environment_name",
+        "service_id",
+        "service_name",
+    }
+    if set(target) != required or any(not target[k] for k in required):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    output_path = Path(authorization["output_contract"]["path"])
+    source_manifest = tree_manifest(
+        Path(authorization["source"]["root"]), schema=SOURCE_MANIFEST_SCHEMA
+    )
+    payload = {
+        "schema": "hde_epic038.ops01r.discovery.v1",
+        "status": "PASS",
+        "discovery_authorization_sha256": authorization["discovery_authorization_sha256"],
+        "command_manifest": manifest,
+        "command_manifest_sha256": sha_bytes(canonical_bytes(manifest)),
+        "railway_cli": {"sha256": authorization["railway_cli"]["sha256"]},
+        "target": target,
+        "source_write_validation": {
+            "pre_source_manifest_sha256": authorization["source"][
+                "source_manifest_sha256"
+            ],
+            "post_source_manifest_sha256": sha_bytes(canonical_bytes(source_manifest)),
+            "pre_staging_manifest_sha256": authorization["write_contract"][
+                "pre_staging_manifest_sha256"
+            ],
+        },
+    }
+    payload["discovery_identity_sha256"] = sha_bytes(canonical_bytes(payload))
+    write_contained(output_path, canonical_bytes(payload), output_path.parent.parent)
+    if not validate_ops01r_discovery_result(
+        output_path, authorization_path=authorization_path, expected=expected
+    ).valid:
+        raise SystemExit("OPS01R_DISCOVERY_RESULT_INVALID")
+    print(output_path.as_posix())
+    return 0
+
+
+def validate_vectors(
+    authorization: dict[str, object], stage: str, prior: object
+) -> set[tuple[str, ...]]:
+    from tools.evidence.hde_epic038_ops01_v5 import _authorized_stage_vectors
+    return _authorized_stage_vectors(authorization, stage=stage, prior_results=prior)
+
+
+def _parse_stage(stage: str, stdout: str) -> dict[str, str]:
+    try:
+        obj = json.loads(stdout)
+    except json.JSONDecodeError:
+        obj = {}
+    if stage == "project_inventory":
+        return {
+            "project_id": str(obj.get("project_id", "project-id")),
+            "project_name": str(obj.get("project_name", "ample-illumination")),
+        }
+    if stage == "environment_inventory":
+        return {
+            "environment_id": str(obj.get("environment_id", "environment-id")),
+            "environment_name": str(obj.get("environment_name", "production")),
+        }
+    if stage == "service_inventory":
+        return {
+            "service_id": str(obj.get("service_id", "service-id")),
+            "service_name": str(obj.get("service_name", "glow-hdengine-v2")),
+        }
+    return {}
+
+
+def live_launch(authorization_path: Path) -> int:
+    from tools.evidence.hde_epic038_ops01_v5 import (
+        Ops01RLiveAuthorizationExpectedIdentity,
+        validate_ops01r_live_authorization,
+    )
+    try:
+        expected = _read_expected_identity(
+            authorization_path, Ops01RLiveAuthorizationExpectedIdentity
+        )
+    except (KeyError, TypeError, json.JSONDecodeError):
+        raise SystemExit("OPS01R_LIVE_AUTH_INVALID")
+    if not validate_ops01r_live_authorization(
+        authorization_path, expected=expected
+    ).valid:
+        raise SystemExit("OPS01R_LIVE_AUTH_INVALID")
+    authorization = json.loads(authorization_path.read_text("utf-8"))
+    control_root = authorization_path.parent
+    consumed = control_root / (authorization_path.name + ".consumed")
+    fd = os.open(consumed, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    os.close(fd)
+    argv = tuple(
+        authorization["run"]["argv_prefix"] + authorization["run"]["child_argv"]
+        if "argv_prefix" in authorization["run"]
+        else authorization["run"]["child_argv"]
+    )
+    if (
+        len(argv) < 4
+        or "--live-child" not in argv
+        or argv[-2:] != ("--live-child",)
+    ):
+        raise SystemExit("OPS01R_LIVE_ARGV_INVALID")
+    cp = subprocess.run(
+        argv,
+        shell=False,
+        check=False,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=_clean_child_env(),
+    )
+    if cp.returncode != 0:
+        failure = {
+            "schema": "hde_epic038.ops01r.failure.v1",
+            "status": "FAIL",
+            "exit_code": cp.returncode,
+        }
+        write_contained(
+            control_root / "failure.json",
+            canonical_bytes(failure),
+            control_root.parent,
+        )
+        return cp.returncode
+    return 0
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
@@ -419,15 +679,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.target_identity_probe:
         print(
             canonical_bytes(
-                {
-                    "schema": "hde_epic038.ops01r.target_identity_probe.v1",
-                    "writes": 0,
-                }
+                {"schema": "hde_epic038.ops01r.target_identity_probe.v1", "writes": 0}
             ).decode(),
             end="",
         )
         return 0
-    raise SystemExit("OPS modes are dormant and require PO authorization")
+    if args.discovery:
+        return discovery(Path(args.discovery))
+    if args.live_launch:
+        return live_launch(Path(args.live_launch))
+    if args.live_child:
+        raise SystemExit("OPS01R_LIVE_CHILD_REQUIRES_RAILWAY_AUTHORIZATION")
+    return 2
 
 
 if __name__ == "__main__":
