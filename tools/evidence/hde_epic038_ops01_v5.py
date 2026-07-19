@@ -980,6 +980,8 @@ def _bridge_consistency_valid(
             Path(source_root) / "ci" / "checks" / "check_bridge_consistency.py"
         ).as_posix()
         staged_checker_path = Path(staged_checker)
+        if staged_checker_path.is_symlink():
+            return False
         checker_digest_path = staged_checker_path
         if not checker_digest_path.exists():
             checker_digest_path = ROOT / "ci" / "checks" / "check_bridge_consistency.py"
