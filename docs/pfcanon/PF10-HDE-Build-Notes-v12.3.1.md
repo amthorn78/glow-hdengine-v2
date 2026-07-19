@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3  
+**Version:** v12.3.1  
 Effective Date: 2026.07.19
 
 **Status:** Living  
@@ -12870,6 +12870,106 @@ F) Artifact and evidence outputs
 * Human Index, Machine Mirror, SHA sentinels, architecture snapshot, affected bundles/manifests, and path proofs are converged.  
 * Current default OPS admission remains coherently v4; no live candidate or v5 tracked packet is falsely claimed.  
 * Evidence pointer: GitHub Repo | NET-002–NET-052, NET-063 | `"current blobs at ffe67e3"` | `"v4 default/no tracked v5 packet"`.
+
+## 2.11) PO-Delegated OPS Execution Authority — PO Authorization Controls Executor Identity
+
+Timestamp: 071926 21:03
+
+Details: Establishes explicit Product Owner delegation as the controlling project-level authority for who may execute an OPS task, superseding older actor-identity prohibitions while preserving task-specific authorization, evidence, safety, and external platform boundaries.
+
+### Decision
+
+For Glow project governance, an explicit current Product Owner instruction is the final authority on whether an otherwise-permitted OPS action may be executed personally by the PO or delegated to an automated session agent acting on the PO's behalf.
+
+“PO-only” identifies the owner of authorization, accountability, and acceptance. It does not require the PO to be the physical keystroke actor when the PO directly delegates execution. An automated session agent executing under that delegation is an authorized executor, not an independent approver.
+
+An agent MUST NOT refuse, defer, or reclassify an OPS task as human-execution-only solely because:
+
+* the task is labeled `OPS`, `PO-only`, `human operator`, or equivalent;  
+* permanent PF text predating this addendum prohibits automated-agent execution;  
+* the agent itself is not a human; or  
+* the PO chooses supervised agent execution instead of manual command entry.
+
+A refusal based only on executor identity is a governance error while this addendum is active.
+
+### Supersession of the PF09 executor-identity rule
+
+This later PF10 addendum supersedes PF09.6 — Canon HDE Build Checklist Distillation, §0.2, **Ops tasks (PO-only execution; evidence required)** only where that section says automated agents cannot execute or attempt PO-only operations.
+
+The controlling replacement posture is:
+
+Ops tasks MUST be authorized by the Product Owner. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent. The delegated agent MAY perform the authorized operation on the PO's behalf and MUST follow the same scope, safety, evidence, redaction, and completion-claim controls that bind a human operator.
+
+All other requirements in that PF09.6 unit remain active, including concrete success criteria, repo-stored OPS evidence, secret-free capture, and separation of OPS evidence from QA evidence.
+
+After adoption, repo agent instructions MUST be interpreted consistently with this addendum wherever they defer to PF10. This addendum does not authorize an agent to edit PF-Canon contrary to the repository's canon-maintenance controls; canonical adoption remains a human PF-Canon-owner action.
+
+### Delegation contract
+
+A direct PO command to execute an identified OPS task constitutes project-level authorization to act as the PO's delegated executor when all of the following are true:
+
+1. The task identity, operational objective, and target are concrete in the PO instruction or an applicable approved OPS instruction.  
+2. The requested action remains inside that task's approved scope.  
+3. Any action-specific or phase-specific authorization required by the OPS contract exists in its required form and is valid at the dispatch boundary.  
+4. The agent has the required tool capability, access, and credential presence without exposing credential values.  
+5. Required preconditions, stop checks, rollback controls where applicable, and evidence-capture paths are concrete.  
+6. The operation is permitted by system, platform, host, service-provider, organizational, legal, and safety controls external to PF-Canon.
+
+When these predicates are satisfied, the agent MUST proceed with the delegated operation. It MUST NOT demand a second generic “human-only” approval merely because the action is operational, privileged, live, mutating, deploy-related, configuration-related, secret-backed, or externally visible. Any task-specific approval explicitly required by the applicable OPS contract remains required.
+
+A broad directive such as “execute OPS-01R” is sufficient project-level delegation when the approved OPS instruction supplies the concrete commands, targets, stop checks, and evidence contract. It is not authority to invent missing commands, widen scope, bypass a required approval, or perform unrelated follow-up work.
+
+### Permitted stops and required blocker response
+
+The delegated agent MUST stop only when an objective blocker prevents valid execution, including:
+
+* a higher-priority system, platform, host, service-provider, organizational, legal, or safety rule prohibits the action;  
+* the required tool, network route, account access, credential presence, or execution capability is unavailable;  
+* a mandatory target, command, authorization artifact, byte identity, hash, stop check, rollback control, or evidence path is absent or invalid;  
+* the requested target or effect is materially ambiguous and guessing could change or destroy unintended state;  
+* current state has changed in a way that invalidates the approved authorization or safety boundary; or  
+* the operation would exceed the delegated OPS scope.
+
+When stopped, the agent MUST identify the single concrete blocker, preserve completed safe work and evidence, state exactly what PO value or external action resolves the blocker, and resume once resolved. It MUST NOT substitute a generic actor-type refusal for that specific blocker.
+
+Product Owner authorization is the final word inside the Glow project-governance lane. It cannot override external system or platform policies, manufacture unavailable capabilities or credentials, validate nonexistent run-specific artifacts, or make an unsafe or ambiguous command concrete. No PF document can require an agent to violate those higher-order boundaries.
+
+### Mutating, privileged, deployment, configuration, and secret-backed operations
+
+All OPS classes are eligible for explicit PO delegation when otherwise permitted; delegation is not limited to read-only discovery.
+
+For a mutating, privileged, deployment, configuration, database, or secret-backed operation:
+
+* the exact target and authorized effect MUST be concrete before dispatch;  
+* any task-required rollback or recovery action MUST be concrete before dispatch when feasible;  
+* a required STOP CHECK MUST occur immediately before the irreversible or externally mutating boundary;  
+* secret values MUST remain out of commands, logs, chat output, and repo evidence unless an external system securely injects them without disclosure;  
+* completion MUST be supported by the required secret-free OPS evidence; and  
+* a direct PO instruction satisfies the project-level human authorization requirement, but does not waive additional task-specific or platform-required confirmation.
+
+### HDE-EPIC038 OPS-01R application
+
+HDE-EPIC038 OPS-01R is eligible for execution by a PO-delegated automated session agent under this addendum.
+
+Delegation does not collapse OPS-01R's separate authorization phases. The exact discovery-authorization bytes and hash must exist before the PO approves discovery. The exact live-authorization bytes and hash must exist before the PO approves live execution. Approval of one phase does not approve the other, and prospective approval of bytes or hashes that do not yet exist is invalid.
+
+The delegated agent MAY prepare and independently validate each authorization artifact, present its exact identity for PO approval, execute the corresponding phase after approval, and capture the required OPS evidence. The applicable one-launch, no-retry, byte-stability, source-integrity, staging-write, command-vector, redaction, and evidence-admission controls remain binding. A retry or changed authorization identity requires whatever new approval the OPS contract specifies.
+
+### Accountability, evidence, and claims
+
+The PO remains the authorizing principal and accountable owner. The delegated agent is the executor and evidence producer for the authorized operation.
+
+Delegation does not convert OPS into PR work or QA work. OPS evidence remains OPS evidence, and it does not itself establish QA PASS, acceptance-token satisfaction, PF09 status movement, epic completion, deployment success beyond the evidenced target, or closeout.
+
+No agent or human operator may claim OPS completion without the required repo-stored, secret-free evidence meeting its success criteria.
+
+### Permanent drainage target
+
+Drain this decision into PF09.6 — Canon HDE Build Checklist Distillation, §0.2, **Ops tasks (PO-only execution; evidence required)** by replacing the automated-agent prohibition with the PO-authorized executor model above. Preserve the evidence, redaction, success-criteria, and OPS-versus-QA separation requirements.
+
+Until drainage, this later PF10 addendum is the controlling PF source on OPS executor identity.
+
+Also should be drained into ANY OTHER CANONICAL DOCS that govern interaction between humans and AI agents.
 
 ---
 
