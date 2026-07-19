@@ -121,11 +121,55 @@ CALL_COUNT_FIELDS = (
 FIXED_COUNTS = {
     "logical_observations": 10,
     "bodygraph_reads": 2,
+    "direct_connection_attempts": 8,
+    "direct_sql_statements": 13,
+    "bridge_http_requests": 6,
     "direct_provider_selections": 1,
     "bridge_provider_selections": 1,
     "vendor_requests": 0,
     "retries": 0,
     "fallbacks": 0,
+}
+DISCOVERY_RESULT_KEYS = {
+    "schema",
+    "status",
+    "discovery_run_id",
+    "discovery_authorization_sha256",
+    "command_manifest",
+    "command_manifest_sha256",
+    "railway_cli",
+    "target",
+    "run_contract",
+    "identity_contract",
+    "counts",
+    "nonclaims",
+    "source_write_validation",
+    "discovery_identity_sha256",
+}
+SOURCE_WRITE_KEYS = {
+    "authorized_directory_metadata_paths",
+    "authorized_exact_write_paths",
+    "authorized_recursive_write_roots",
+    "bytecode_write_control",
+    "manifest_algorithm",
+    "mode",
+    "observed_staging_changes",
+    "post_source_manifest_sha256",
+    "post_staging_manifest_sha256",
+    "pre_source_manifest_sha256",
+    "pre_staging_manifest",
+    "pre_staging_manifest_sha256",
+    "prohibited_cache_paths",
+    "python_argv",
+    "python_environment_names",
+    "self_bound_excluded_paths",
+    "self_bound_excluded_recursive_roots",
+    "source_root",
+    "source_tree_unchanged",
+    "staging_manifest_algorithm",
+    "staging_write_set_valid",
+    "status",
+    "unauthorized_staging_paths",
 }
 PREFLIGHT_ZERO_IO_FIELDS = (
     "bridge_transport_delegations",
@@ -1553,6 +1597,160 @@ def _discovery_prior_results(obj: Mapping[str, object]) -> dict[str, object]:
     }
 
 
+def _safe_identity_string(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and bool(value)
+        and value == value.strip()
+        and not any(ord(character) < 32 or ord(character) == 127 for character in value)
+    )
+
+
+def _absolute_string_list(value: object) -> list[str] | None:
+    if not isinstance(value, list) or any(
+        not _safe_identity_string(item) or not Path(item).is_absolute()
+        for item in value
+    ):
+        return None
+    return value
+
+
+def _discovery_write_set_errors(
+    path: Path,
+    authorization_path: Path,
+    authorization: Mapping[str, object],
+    result: Mapping[str, object],
+    expected: Ops01RDiscoveryAuthorizationExpectedIdentity,
+) -> set[str]:
+    errors: set[str] = set()
+    source_write = _mapping(result.get("source_write_validation"))
+    write_contract = _mapping(authorization.get("write_contract"))
+    source_root_value = _at(authorization, "source", "root")
+    output_path_value = _at(authorization, "output_contract", "path")
+    if not isinstance(source_root_value, str) or not isinstance(output_path_value, str):
+        return {"DISCOVERY_RESULT_WRITE_SET_MISMATCH"}
+    source_root = _lexical_absolute(Path(source_root_value))
+    staging_root = _lexical_absolute(Path(expected.literal_staging_root))
+    output_path = _lexical_absolute(Path(output_path_value))
+    excluded_paths = _absolute_string_list(
+        write_contract.get("self_bound_excluded_paths")
+    )
+    excluded_roots = _absolute_string_list(
+        write_contract.get("self_bound_excluded_recursive_roots")
+    )
+    exact_paths = _absolute_string_list(
+        write_contract.get("authorized_exact_write_paths")
+    )
+    recursive_roots = _absolute_string_list(
+        write_contract.get("authorized_recursive_write_roots")
+    )
+    metadata_paths = _absolute_string_list(
+        write_contract.get("authorized_directory_metadata_paths")
+    )
+    if any(
+        value is None
+        for value in (
+            excluded_paths,
+            excluded_roots,
+            exact_paths,
+            recursive_roots,
+            metadata_paths,
+        )
+    ):
+        return {"DISCOVERY_RESULT_WRITE_SET_MISMATCH"}
+    assert excluded_paths is not None
+    assert excluded_roots is not None
+    assert exact_paths is not None
+    assert recursive_roots is not None
+    assert metadata_paths is not None
+    expected_exclusions = sorted(
+        (authorization_path.as_posix(), output_path.as_posix()),
+        key=lambda value: value.encode("utf-8"),
+    )
+    if (
+        source_root != staging_root / "source"
+        or output_path != staging_root / "control" / "discovery.json"
+        or _lexical_absolute(path) != output_path
+        or excluded_paths != expected_exclusions
+        or excluded_roots
+        or exact_paths != [output_path.as_posix()]
+        or recursive_roots
+        or metadata_paths != [(staging_root / "control").as_posix()]
+        or write_contract.get("source_root_writes_authorized") is not False
+    ):
+        errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+
+    retained_entries = write_contract.get("pre_staging_manifest")
+    retained_hash = write_contract.get("pre_staging_manifest_sha256")
+    retained = {
+        "schema": "hde_epic038.non_source_staging_manifest.v1",
+        "entries": retained_entries,
+    }
+    if (
+        not isinstance(retained_entries, list)
+        or not isinstance(retained_hash, str)
+        or _sha(_canon(retained)) != retained_hash
+        or retained_hash != expected.pre_staging_manifest_sha256
+    ):
+        errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+        retained_entries = []
+    try:
+        source_manifest = _tree_manifest(
+            source_root, schema="hde_epic038.source_tree_manifest.v1"
+        )
+        source_sha = _sha(_canon(source_manifest))
+        if (
+            source_sha != expected.source_manifest_sha256
+            or source_sha != _at(authorization, "source", "source_manifest_sha256")
+            or source_sha != source_write.get("pre_source_manifest_sha256")
+            or source_sha != source_write.get("post_source_manifest_sha256")
+        ):
+            errors.add("DISCOVERY_RESULT_SOURCE_MANIFEST_MISMATCH")
+        post_manifest = _tree_manifest(
+            staging_root,
+            schema="hde_epic038.non_source_staging_manifest.v1",
+            excluded_paths=tuple(Path(item) for item in excluded_paths),
+            excluded_recursive_roots=(
+                source_root,
+                *(Path(item) for item in excluded_roots),
+            ),
+        )
+        post_hash = _sha(_canon(post_manifest))
+        delta = _manifest_delta(retained_entries, post_manifest["entries"])
+        if (
+            post_hash != source_write.get("post_staging_manifest_sha256")
+            or delta != source_write.get("observed_staging_changes")
+        ):
+            errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+        exact = {_lexical_absolute(Path(item)) for item in exact_paths}
+        recursive = tuple(_lexical_absolute(Path(item)) for item in recursive_roots)
+        metadata = {_lexical_absolute(Path(item)) for item in metadata_paths}
+        for change in delta:
+            relative = change.get("path")
+            kinds = change.get("change_kinds")
+            if not isinstance(relative, str) or not isinstance(kinds, list):
+                errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+                continue
+            changed = staging_root if relative == "." else staging_root / relative
+            changed = _lexical_absolute(changed)
+            if not (
+                changed in exact
+                or any(root in (changed, *changed.parents) for root in recursive)
+                or (changed in metadata and set(kinds) <= {"ctime_ns", "mtime_ns"})
+            ):
+                errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+        working_path = _at(authorization, "working_directory", "path")
+        if (
+            not isinstance(working_path, str)
+            or not Path(working_path).is_dir()
+            or any(Path(working_path).iterdir())
+        ):
+            errors.add("DISCOVERY_RESULT_LINKED_CONTEXT_DETECTED")
+    except (OSError, TypeError, ValueError):
+        errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+    return errors
+
+
 def validate_ops01r_discovery_result(
     path: Path,
     *,
@@ -1582,8 +1780,12 @@ def validate_ops01r_discovery_result(
             errors.add("DISCOVERY_RESULT_BYTES_NONCANONICAL")
         if obj.get("schema") != "hde_epic038.ops01r.discovery.v1":
             errors.add("DISCOVERY_RESULT_SCHEMA_INVALID")
+        if set(obj) != DISCOVERY_RESULT_KEYS:
+            errors.add("DISCOVERY_RESULT_UNKNOWN_KEY")
         if obj.get("status") != "PASS":
             errors.add("DISCOVERY_RESULT_STAGE_FAILED")
+        if obj.get("discovery_run_id") != authorization.get("run_id"):
+            errors.add("DISCOVERY_RESULT_IDENTITY_MISMATCH")
 
         target = _mapping(obj.get("target"))
         target_fields = {
@@ -1603,6 +1805,14 @@ def validate_ops01r_discovery_result(
                 for character in target[field]
             )
             for field in target_fields
+        ):
+            errors.add("DISCOVERY_RESULT_TARGET_AMBIGUOUS")
+        requested_target = _mapping(authorization.get("requested_target"))
+        if (
+            target.get("project_name") != requested_target.get("project_name")
+            or target.get("environment_name")
+            != requested_target.get("environment_name")
+            or target.get("service_name") != requested_target.get("service_name")
         ):
             errors.add("DISCOVERY_RESULT_TARGET_AMBIGUOUS")
 
@@ -1650,11 +1860,218 @@ def validate_ops01r_discovery_result(
                 ):
                     errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
 
-        if _at(obj, "railway_cli", "sha256") != expected.railway_executable_sha256:
+        python_execution = _at(authorization, "policy", "python_execution")
+        target_probe_argv = _at(
+            authorization, "policy", "python_execution", "target_probe_argv"
+        )
+        run_contract = _mapping(obj.get("run_contract"))
+        prefix = run_contract.get("argv_prefix")
+        boundary = run_contract.get("child_argv_start_index")
+        child_environment = run_contract.get("child_environment_contract")
+        if (
+            set(run_contract)
+            != {
+                "argv_prefix",
+                "child_argv_start_index",
+                "child_environment_contract",
+                "linked_context_required",
+                "python_execution",
+                "target_dimensions",
+            }
+            or not isinstance(prefix, list)
+            or not prefix
+            or any(not _safe_identity_string(token) for token in prefix)
+            or type(boundary) is not int
+            or boundary != len(prefix)
+            or not isinstance(target_probe_argv, list)
+            or not isinstance(command_manifest, list)
+            or not command_manifest
+            or command_manifest[-1] != prefix + target_probe_argv
+            or run_contract.get("python_execution") != python_execution
+            or run_contract.get("linked_context_required") is not False
+            or run_contract.get("target_dimensions")
+            != ["project", "environment", "service"]
+            or not isinstance(child_environment, list)
+            or child_environment
+            != sorted(
+                child_environment,
+                key=lambda row: str(_mapping(row).get("name", "")).encode("utf-8"),
+            )
+            or any(
+                not _has_exact_keys(row, {"name", "source", "value_policy"})
+                or not _safe_identity_string(_mapping(row).get("name"))
+                or not _safe_identity_string(_mapping(row).get("source"))
+                or not _safe_identity_string(_mapping(row).get("value_policy"))
+                or str(_mapping(row).get("name", "")).casefold().startswith("python")
+                for row in child_environment
+            )
+            or len({_mapping(row).get("name") for row in child_environment})
+            != len(child_environment)
+        ):
+            errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+
+        identity_contract = obj.get("identity_contract")
+        expected_by_dimension = {
+            "project": target.get("project_id"),
+            "environment": target.get("environment_id"),
+            "service": target.get("service_id"),
+        }
+        if (
+            not isinstance(identity_contract, list)
+            or identity_contract
+            != sorted(
+                identity_contract,
+                key=lambda row: str(_mapping(row).get("field_name", "")).encode(
+                    "utf-8"
+                ),
+            )
+            or len(identity_contract) != 3
+            or any(
+                not _has_exact_keys(
+                    row,
+                    {
+                        "field_name",
+                        "target_dimension",
+                        "value_kind",
+                        "expected_value",
+                    },
+                )
+                or _mapping(row).get("value_kind") != "target_id"
+                or _mapping(row).get("target_dimension") not in expected_by_dimension
+                or _mapping(row).get("expected_value")
+                != expected_by_dimension.get(_mapping(row).get("target_dimension"))
+                or not _safe_identity_string(_mapping(row).get("field_name"))
+                for row in identity_contract
+            )
+            or {
+                _mapping(row).get("target_dimension") for row in identity_contract
+            }
+            != set(expected_by_dimension)
+            or {
+                _mapping(row).get("field_name") for row in identity_contract
+            }
+            - {_mapping(row).get("name") for row in child_environment}
+            or len(
+                {_mapping(row).get("field_name") for row in identity_contract}
+            )
+            != len(identity_contract)
+        ):
+            errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+        else:
+            environment_by_name = {
+                _mapping(row).get("name"): _mapping(row)
+                for row in child_environment
+            }
+            expected_child_environment = [
+                {"name": "ALLOW_DB_WRITE", "source": "runner", "value_policy": "exact:0"},
+                {"name": "ALLOW_NETWORK", "source": "runner", "value_policy": "exact:0"},
+                {"name": "APP_ENV", "source": "runner", "value_policy": "exact:dev"},
+                {"name": "DATABASE_URL", "source": "railway_service", "value_policy": "presence_only"},
+                {"name": "DB_BRIDGE_URL", "source": "railway_service", "value_policy": "presence_only"},
+                {"name": "LANG", "source": "runner", "value_policy": "exact:C"},
+                {"name": "LC_ALL", "source": "runner", "value_policy": "exact:C"},
+                {"name": "SAFE_MODE", "source": "runner", "value_policy": "exact:1"},
+                {"name": "TZ", "source": "runner", "value_policy": "exact:UTC"},
+                *[
+                    {
+                        "name": _mapping(row).get("field_name"),
+                        "source": "railway_target_identity",
+                        "value_policy": f"exact:{_mapping(row).get('expected_value')}",
+                    }
+                    for row in identity_contract
+                ],
+            ]
+            expected_child_environment.sort(
+                key=lambda row: str(row["name"]).encode("utf-8")
+            )
+            if any(
+                _mapping(environment_by_name.get(_mapping(row).get("field_name"))).get(
+                    "source"
+                )
+                != "railway_target_identity"
+                or _mapping(
+                    environment_by_name.get(_mapping(row).get("field_name"))
+                ).get("value_policy")
+                != f"exact:{_mapping(row).get('expected_value')}"
+                for row in identity_contract
+            ) or any(
+                _mapping(environment_by_name.get(name)).get("value_policy")
+                != "presence_only"
+                for name in ("DATABASE_URL", "DB_BRIDGE_URL")
+            ) or child_environment != expected_child_environment:
+                errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+
+        counts = _mapping(obj.get("counts"))
+        expected_count_keys = {
+            "command_manifest_entries",
+            "discovery_subprocesses",
+            "provider_constructions",
+            "db_connections",
+            "direct_sql_statements",
+            "bridge_http_requests",
+            "vendor_requests",
+        }
+        if (
+            set(counts) != expected_count_keys
+            or counts.get("command_manifest_entries") != len(DISCOVERY_STAGES)
+            or counts.get("discovery_subprocesses") != len(DISCOVERY_STAGES)
+            or any(
+                counts.get(field) != 0
+                for field in expected_count_keys
+                - {"command_manifest_entries", "discovery_subprocesses"}
+            )
+        ):
+            errors.add("DISCOVERY_RESULT_COUNT_MISMATCH")
+        if obj.get("nonclaims") != authorization.get("nonclaims"):
+            errors.add("DISCOVERY_RESULT_NONCLAIMS_INVALID")
+
+        railway = _mapping(obj.get("railway_cli"))
+        if (
+            set(railway) != {"path", "resolved_path", "sha256", "version"}
+            or railway.get("path") != _at(authorization, "railway_cli", "lexical_path")
+            or railway.get("resolved_path")
+            != _at(authorization, "railway_cli", "resolved_path")
+            or railway.get("sha256") != expected.railway_executable_sha256
+            or not _safe_identity_string(railway.get("version"))
+        ):
             errors.add("DISCOVERY_RESULT_CLI_IDENTITY_MISMATCH")
         source_write = _mapping(obj.get("source_write_validation"))
         if (
-            source_write.get("pre_source_manifest_sha256")
+            set(source_write) != SOURCE_WRITE_KEYS
+            or source_write.get("mode") != "discovery"
+            or source_write.get("status") != "PASS"
+            or source_write.get("source_tree_unchanged") is not True
+            or source_write.get("staging_write_set_valid") is not True
+            or source_write.get("bytecode_write_control") != "python_flag_-B"
+            or source_write.get("manifest_algorithm")
+            != "hde_epic038.source_tree_manifest.v1"
+            or source_write.get("staging_manifest_algorithm")
+            != "hde_epic038.non_source_staging_manifest.v1"
+            or source_write.get("python_environment_names") != []
+            or source_write.get("prohibited_cache_paths") != []
+            or source_write.get("unauthorized_staging_paths") != []
+            or source_write.get("python_argv") != target_probe_argv
+            or source_write.get("authorized_exact_write_paths")
+            != _at(authorization, "write_contract", "authorized_exact_write_paths")
+            or source_write.get("authorized_recursive_write_roots")
+            != _at(
+                authorization, "write_contract", "authorized_recursive_write_roots"
+            )
+            or source_write.get("authorized_directory_metadata_paths")
+            != _at(
+                authorization,
+                "write_contract",
+                "authorized_directory_metadata_paths",
+            )
+            or source_write.get("self_bound_excluded_paths")
+            != _at(authorization, "write_contract", "self_bound_excluded_paths")
+            or source_write.get("self_bound_excluded_recursive_roots")
+            != _at(
+                authorization,
+                "write_contract",
+                "self_bound_excluded_recursive_roots",
+            )
+            or source_write.get("pre_source_manifest_sha256")
             != expected.source_manifest_sha256
             or source_write.get("post_source_manifest_sha256")
             != expected.source_manifest_sha256
@@ -1663,8 +2080,15 @@ def validate_ops01r_discovery_result(
         if (
             source_write.get("pre_staging_manifest_sha256")
             != expected.pre_staging_manifest_sha256
+            or source_write.get("pre_staging_manifest")
+            != _at(authorization, "write_contract", "pre_staging_manifest")
         ):
             errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
+        errors.update(
+            _discovery_write_set_errors(
+                path, authorization_path, authorization, obj, expected
+            )
+        )
     except OSError:
         errors.add("DISCOVERY_RESULT_FILE_UNREADABLE")
     except (UnicodeError, ValueError, TypeError):
@@ -1715,6 +2139,94 @@ def validate_ops01r_live_authorization(
             or obj.get("tracked_writes_authorized") is not False
         ):
             errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+        source = _mapping(obj.get("source"))
+        run = _mapping(obj.get("run"))
+        runner = _mapping(obj.get("runner"))
+        validator = _mapping(obj.get("validator"))
+        projector = _mapping(obj.get("projector"))
+        interpreter = _mapping(obj.get("interpreter"))
+        write_contract = _mapping(obj.get("write_contract"))
+        staging_root_value = run.get("staging_root")
+        if not isinstance(staging_root_value, str):
+            errors.add("OPS01_AUTH_WRITE_SET_INVALID")
+            staging_root = Path("/")
+        else:
+            staging_root = _lexical_absolute(Path(staging_root_value))
+        source_root = staging_root / "source"
+        control_root = staging_root / "control"
+        candidate_root = staging_root / "candidate"
+        authorization_path = control_root / "live_authorization.json"
+        failure_path = control_root / "failure.json"
+        marker_path = control_root / "live_authority_consumed.json"
+        expected_validator_argv = [
+            interpreter.get("path"),
+            "-I",
+            "-B",
+            validator.get("path"),
+            "--validate-live-authorization",
+            "--expected-identity-stdin",
+            authorization_path.as_posix(),
+        ]
+        expected_launcher_argv = [
+            interpreter.get("path"),
+            "-I",
+            "-B",
+            runner.get("path"),
+            "--live-launch",
+            authorization_path.as_posix(),
+        ]
+        expected_capture_argv = [
+            interpreter.get("path"),
+            "-I",
+            "-B",
+            validator.get("path"),
+            "--validate-live-capture",
+            "--expected-identity-stdin",
+            staging_root.as_posix(),
+        ]
+        if (
+            set(source)
+            != {"repository", "commit", "root", "source_manifest_sha256", "state"}
+            or source.get("repository") != "amthorn78/glow-hdengine-v2"
+            or source.get("root") != source_root.as_posix()
+            or source.get("state") != "DETACHED"
+            or set(run)
+            != {
+                "authorization_path",
+                "candidate_root",
+                "child_argv",
+                "launcher_argv",
+                "live_authorization_validator_argv",
+                "live_capture_validator_argv",
+                "run_id",
+                "staging_root",
+            }
+            or run.get("authorization_path") != authorization_path.as_posix()
+            or run.get("candidate_root") != candidate_root.as_posix()
+            or run.get("launcher_argv") != expected_launcher_argv
+            or run.get("live_authorization_validator_argv")
+            != expected_validator_argv
+            or run.get("live_capture_validator_argv") != expected_capture_argv
+            or not _safe_identity_string(run.get("run_id"))
+            or set(runner) != {"path", "sha256"}
+            or set(validator) != {"path", "sha256"}
+            or set(projector) != {"path", "sha256"}
+            or set(interpreter)
+            != {
+                "bytecode_flag",
+                "bytecode_write_control",
+                "isolated_flag",
+                "path",
+                "python_environment_names",
+                "resolved_path",
+                "sha256",
+            }
+            or interpreter.get("isolated_flag") != "-I"
+            or interpreter.get("bytecode_flag") != "-B"
+            or interpreter.get("bytecode_write_control") != "python_flag_-B"
+            or interpreter.get("python_environment_names") != []
+        ):
+            errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
         expected_child_argv = [
             _at(obj, "interpreter", "path"),
             "-I",
@@ -1737,6 +2249,130 @@ def validate_ops01r_live_authorization(
             or child_argv != expected_child_argv
         ):
             errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+        discovery = _mapping(obj.get("discovery"))
+        if (
+            discovery.get("schema") != "hde_epic038.ops01r.discovery.v1"
+            or discovery.get("status") != "PASS"
+            or discovery.get("discovery_identity_sha256")
+            != _self_hash(discovery, "discovery_identity_sha256")
+            or discovery.get("discovery_identity_sha256")
+            != expected.discovery_identity_sha256
+        ):
+            errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+        expected_write_keys = {
+            "consumed_marker_path",
+            "failure_authorized_directory_metadata_paths",
+            "failure_authorized_exact_paths",
+            "failure_authorized_recursive_write_roots",
+            "failure_summary_path",
+            "pre_staging_manifest",
+            "pre_staging_manifest_sha256",
+            "self_bound_excluded_paths",
+            "self_bound_excluded_recursive_roots",
+            "source_root_writes_authorized",
+            "success_authorized_directory_metadata_paths",
+            "success_authorized_exact_paths",
+            "success_authorized_recursive_write_roots",
+        }
+        retained_entries = write_contract.get("pre_staging_manifest")
+        retained_hash = write_contract.get("pre_staging_manifest_sha256")
+        retained = {
+            "schema": "hde_epic038.non_source_staging_manifest.v1",
+            "entries": retained_entries,
+        }
+        expected_excluded_paths = sorted(
+            (authorization_path.as_posix(), failure_path.as_posix()),
+            key=lambda value: value.encode("utf-8"),
+        )
+        if (
+            set(write_contract) != expected_write_keys
+            or write_contract.get("consumed_marker_path") != marker_path.as_posix()
+            or write_contract.get("failure_summary_path") != failure_path.as_posix()
+            or write_contract.get("success_authorized_exact_paths")
+            != [marker_path.as_posix()]
+            or write_contract.get("success_authorized_recursive_write_roots")
+            != [candidate_root.as_posix()]
+            or write_contract.get("failure_authorized_exact_paths")
+            != [marker_path.as_posix(), failure_path.as_posix()]
+            or write_contract.get("failure_authorized_recursive_write_roots")
+            != [candidate_root.as_posix()]
+            or write_contract.get("success_authorized_directory_metadata_paths")
+            != [control_root.as_posix()]
+            or write_contract.get("failure_authorized_directory_metadata_paths")
+            != [control_root.as_posix()]
+            or write_contract.get("self_bound_excluded_paths")
+            != expected_excluded_paths
+            or write_contract.get("self_bound_excluded_recursive_roots")
+            != [candidate_root.as_posix()]
+            or write_contract.get("source_root_writes_authorized") is not False
+            or not isinstance(retained_entries, list)
+            or not isinstance(retained_hash, str)
+            or _sha(_canon(retained)) != retained_hash
+            or retained_hash != expected.live_pre_staging_manifest_sha256
+        ):
+            errors.add("OPS01_AUTH_WRITE_SET_INVALID")
+        try:
+            if (
+                _lexical_absolute(path) != authorization_path
+                or path.is_symlink()
+                or source_root.is_symlink()
+                or candidate_root.is_symlink()
+                or not source_root.is_dir()
+                or not candidate_root.is_dir()
+                or any(candidate_root.iterdir())
+                or marker_path.exists()
+                or failure_path.exists()
+            ):
+                raise ValueError("live authorization path state invalid")
+            source_manifest = _tree_manifest(
+                source_root, schema="hde_epic038.source_tree_manifest.v1"
+            )
+            if _sha(_canon(source_manifest)) != expected.source_manifest_sha256:
+                errors.add("OPS01_AUTH_SOURCE_MANIFEST_MISMATCH")
+            post_staging = _tree_manifest(
+                staging_root,
+                schema="hde_epic038.non_source_staging_manifest.v1",
+                excluded_paths=tuple(
+                    Path(value)
+                    for value in write_contract.get("self_bound_excluded_paths", [])
+                ),
+                excluded_recursive_roots=(
+                    source_root,
+                    *(Path(value) for value in write_contract.get("self_bound_excluded_recursive_roots", [])),
+                ),
+            )
+            if post_staging != retained:
+                errors.add("OPS01_AUTH_WRITE_SET_INVALID")
+            for component, component_expected in (
+                (runner, expected.runner_sha256),
+                (validator, expected.validator_sha256),
+                (projector, expected.projector_sha256),
+            ):
+                component_path = Path(str(component.get("path", "")))
+                if (
+                    component_path.is_symlink()
+                    or not component_path.is_file()
+                    or source_root
+                    not in (
+                        component_path.resolve(),
+                        *component_path.resolve().parents,
+                    )
+                    or _sha(component_path.read_bytes()) != component_expected
+                    or component.get("sha256") != component_expected
+                ):
+                    errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+            interpreter_path = Path(str(interpreter.get("path", "")))
+            if (
+                not interpreter_path.resolve().is_file()
+                or interpreter_path.resolve().as_posix()
+                != interpreter.get("resolved_path")
+                or _sha(interpreter_path.resolve().read_bytes())
+                != expected.interpreter_sha256
+                or interpreter.get("sha256") != expected.interpreter_sha256
+            ):
+                errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+        except (OSError, TypeError, ValueError):
+            errors.add("OPS01_AUTH_WRITE_SET_INVALID")
         actual = {
             "authorization_sha256": authorization_sha256,
             "discovery_identity_sha256": _at(
@@ -1788,6 +2424,25 @@ def validate_ops01r_live_capture(
             _at(summary, "execution", "source_write_validation")
         )
         write_contract = _mapping(authorization.get("write_contract"))
+        if (
+            set(source_write) != SOURCE_WRITE_KEYS
+            or source_write.get("mode") != "live"
+            or source_write.get("status") != "PASS"
+            or source_write.get("source_tree_unchanged") is not True
+            or source_write.get("staging_write_set_valid") is not True
+            or source_write.get("prohibited_cache_paths") != []
+            or source_write.get("unauthorized_staging_paths") != []
+            or source_write.get("python_environment_names") != []
+            or source_write.get("python_argv")
+            != _at(authorization, "run", "child_argv")
+            or source_write.get("authorized_exact_write_paths")
+            != write_contract.get("success_authorized_exact_paths")
+            or source_write.get("authorized_recursive_write_roots")
+            != write_contract.get("success_authorized_recursive_write_roots")
+            or source_write.get("authorized_directory_metadata_paths")
+            != write_contract.get("success_authorized_directory_metadata_paths")
+        ):
+            raise ValueError("live source/write result invalid")
 
         source_root_value = _at(authorization, "source", "root")
         if not isinstance(source_root_value, str):
@@ -1821,6 +2476,10 @@ def validate_ops01r_live_capture(
             if (
                 _sha(_canon(pre_staging_manifest))
                 != expected.live_pre_staging_manifest_sha256
+                or pre_staging_entries
+                != write_contract.get("pre_staging_manifest")
+                or source_write.get("pre_staging_manifest_sha256")
+                != write_contract.get("pre_staging_manifest_sha256")
             ):
                 errors.add("OPS01_V5_LIVE_PRE_STAGING_MANIFEST_MISMATCH")
 
@@ -1855,6 +2514,15 @@ def validate_ops01r_live_capture(
 
         authorization_file = _lexical_absolute(Path(authorization_path))
         failure_summary_file = _lexical_absolute(Path(failure_summary_path))
+        marker_path = write_contract.get("consumed_marker_path")
+        if not isinstance(marker_path, str):
+            raise ValueError("live marker path missing")
+        marker_file = _lexical_absolute(Path(marker_path))
+        expected_marker = {
+            "authorization_sha256": expected.authorization_sha256,
+            "run_id": _at(authorization, "run", "run_id"),
+            "schema": "hde_epic038.ops01r.live_authority_consumed.v1",
+        }
         authorization_bytes = authorization_file.read_bytes()
         if (
             authorization_file.is_symlink()
@@ -1862,6 +2530,16 @@ def validate_ops01r_live_capture(
             or authorization_bytes != _canon(authorization)
             or _sha(authorization_bytes) != expected.authorization_sha256
             or failure_summary_file.exists()
+            or marker_file != staging_root / "control" / "live_authority_consumed.json"
+            or marker_file.is_symlink()
+            or not stat.S_ISREG(marker_file.lstat().st_mode)
+            or marker_file.read_bytes() != _canon(expected_marker)
+            or write_contract.get("success_authorized_exact_paths")
+            != [marker_file.as_posix()]
+            or write_contract.get("success_authorized_recursive_write_roots")
+            != [candidate_root.as_posix()]
+            or write_contract.get("success_authorized_directory_metadata_paths")
+            != [(staging_root / "control").as_posix()]
         ):
             raise ValueError("live excluded control file mismatch")
 
@@ -1877,8 +2555,44 @@ def validate_ops01r_live_capture(
         if (
             _sha(_canon(post_staging_manifest))
             != expected.live_post_staging_manifest_sha256
+            or source_write.get("post_staging_manifest_sha256")
+            != expected.live_post_staging_manifest_sha256
         ):
             errors.add("OPS01_V5_LIVE_POST_STAGING_MANIFEST_MISMATCH")
+        delta = _manifest_delta(
+            pre_staging_entries if isinstance(pre_staging_entries, list) else [],
+            post_staging_manifest["entries"],
+        )
+        if delta != source_write.get("observed_staging_changes"):
+            errors.add("OPS01_V5_LIVE_POST_STAGING_MANIFEST_MISMATCH")
+        exact_paths = {
+            _lexical_absolute(Path(value))
+            for value in source_write.get("authorized_exact_write_paths", [])
+        }
+        recursive_roots = tuple(
+            _lexical_absolute(Path(value))
+            for value in source_write.get("authorized_recursive_write_roots", [])
+        )
+        metadata_paths = {
+            _lexical_absolute(Path(value))
+            for value in source_write.get("authorized_directory_metadata_paths", [])
+        }
+        for change in delta:
+            relative = change.get("path")
+            kinds = change.get("change_kinds")
+            if not isinstance(relative, str) or not isinstance(kinds, list):
+                raise ValueError("live delta invalid")
+            changed = staging_root if relative == "." else staging_root / relative
+            changed = _lexical_absolute(changed)
+            if not (
+                changed in exact_paths
+                or any(root in (changed, *changed.parents) for root in recursive_roots)
+                or (
+                    changed in metadata_paths
+                    and set(kinds) <= {"ctime_ns", "mtime_ns"}
+                )
+            ):
+                errors.add("OPS01_V5_LIVE_POST_STAGING_MANIFEST_MISMATCH")
     except OSError:
         errors.add("OPS01_V5_WRITE_SET_MISMATCH")
     except (TypeError, ValueError):
@@ -1972,5 +2686,17 @@ def main(argv: list[str] | None = None) -> int:
     return 0 if result.valid else 1
 
 
+def _require_source_loading_process_contract() -> None:
+    if (
+        sys.flags.isolated != 1
+        or sys.flags.dont_write_bytecode != 1
+        or Path(sys.argv[0]).resolve() != Path(__file__).resolve()
+    ):
+        raise SystemExit("OPS01_V5_PYTHON_ARGV_MISMATCH")
+    if any(name.casefold().startswith("python") for name in os.environ):
+        raise SystemExit("OPS01_V5_PYTHON_ENVIRONMENT_INVALID")
+
+
 if __name__ == "__main__":
+    _require_source_loading_process_contract()
     raise SystemExit(main())
