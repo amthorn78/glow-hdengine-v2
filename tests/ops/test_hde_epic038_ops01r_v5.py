@@ -1769,6 +1769,24 @@ def _rewrite_discovery_authorization(
     )
 
 
+def _rewrite_discovery_result(result_path: Path, mutation) -> None:
+    result = json.loads(result_path.read_text())
+    mutation(result)
+    result["command_manifest_sha256"] = _sha(
+        _canon(result["command_manifest"])
+    )
+    result["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in result.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, result)
+
+
 def test_discovery_result_is_bound_to_reviewed_authorization(tmp_path):
     result_path, authorization_path, expected = _discovery_pair(tmp_path)
     assert validate_ops01r_discovery_result(
@@ -1826,6 +1844,124 @@ def test_discovery_authorization_recursively_closes_policy(
 
     assert not result.valid
     assert expected_code in result.errors
+
+
+@pytest.mark.parametrize("field", ["max_invocations", "ordinal"])
+def test_discovery_authorization_rejects_boolean_stage_integers(tmp_path, field):
+    _, authorization_path, expected = _discovery_pair(
+        tmp_path, produce_result=False
+    )
+    expected = _rewrite_discovery_authorization(
+        authorization_path,
+        expected,
+        lambda authorization: authorization["policy"]["stages"][0].update(
+            {field: True}
+        ),
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_POLICY_INVALID" in result.errors
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value", "expected_code"),
+    [
+        (
+            "bytecode_write_control",
+            "environment_only",
+            "DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH",
+        ),
+        (
+            "python_environment_names",
+            ["PYTHONPATH"],
+            "DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID",
+        ),
+        (
+            "python_argv",
+            ["/tmp/not-the-authorized-python"],
+            "DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH",
+        ),
+    ],
+)
+def test_discovery_result_uses_specific_python_contract_codes(
+    tmp_path, field, bad_value, expected_code
+):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result["source_write_validation"].update(
+            {field: bad_value}
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert expected_code in validation.errors
+
+
+def test_discovery_result_reports_stage_order_drift(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+
+    def swap_first_two_stages(result):
+        result["command_manifest"][0], result["command_manifest"][1] = (
+            result["command_manifest"][1],
+            result["command_manifest"][0],
+        )
+
+    _rewrite_discovery_result(result_path, swap_first_two_stages)
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_STAGE_ORDER_INVALID" in validation.errors
+
+
+def test_discovery_result_rejects_secret_like_identity_field(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    _rewrite_discovery_result(
+        result_path,
+        lambda result: result["identity_contract"][0].update(
+            {"field_name": "RAILWAY_SECRET_ID"}
+        ),
+    )
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_SECRET_LIKE_OUTPUT" in validation.errors
+
+
+def test_discovery_result_reports_source_cache_residue(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    cache_root = authorization_path.parent.parent / "source/__pycache__"
+    cache_root.mkdir()
+    (cache_root / "residue.pyc").write_bytes(b"not bytecode\n")
+
+    validation = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not validation.valid
+    assert "DISCOVERY_RESULT_SOURCE_RESIDUE_DETECTED" in validation.errors
 
 
 def test_runner_rejects_rehashed_policy_expansion_before_subprocess(

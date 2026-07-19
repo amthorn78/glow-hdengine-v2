@@ -2375,7 +2375,9 @@ def _discovery_authorization_contract_errors(
         if (
             set(stage_row) != DISCOVERY_POLICY_STAGE_KEYS
             or stage_row.get("stage") != stage_name
+            or type(stage_row.get("ordinal")) is not int
             or stage_row.get("ordinal") != index
+            or type(stage_row.get("max_invocations")) is not int
             or stage_row.get("max_invocations") != 1
             or stage_row.get("predecessors")
             != DISCOVERY_STAGE_PREDECESSORS[stage_name]
@@ -2885,6 +2887,8 @@ def _discovery_write_set_errors(
     ):
         errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
         retained_entries = []
+    if _source_has_cache_residue(source_root):
+        errors.add("DISCOVERY_RESULT_SOURCE_RESIDUE_DETECTED")
     try:
         source_manifest = _tree_manifest(
             source_root, schema="hde_epic038.source_tree_manifest.v1"
@@ -3059,8 +3063,23 @@ def validate_ops01r_discovery_result(
                     version=railway_version,
                 )
                 if match_count == 0:
-                    errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE")
-                    errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
+                    appears_in_other_stage = any(
+                        _retained_stage_template_matches(
+                            authorization,
+                            stage=other_stage,
+                            prior_results=prior_results,
+                            rendered_argv=tuple(rendered),
+                            version=railway_version,
+                        )
+                        > 0
+                        for other_stage in DISCOVERY_STAGES
+                        if other_stage != DISCOVERY_STAGES[index]
+                    )
+                    if appears_in_other_stage:
+                        errors.add("DISCOVERY_RESULT_STAGE_ORDER_INVALID")
+                    else:
+                        errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_NONE")
+                        errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
                 elif match_count > 1:
                     errors.add("DISCOVERY_RESULT_TEMPLATE_SELECTION_AMBIGUOUS")
 
@@ -3113,6 +3132,28 @@ def validate_ops01r_discovery_result(
             != len(child_environment)
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+        if (
+            not isinstance(prefix, list)
+            or not isinstance(target_probe_argv, list)
+            or not isinstance(command_manifest, list)
+            or not command_manifest
+            or command_manifest[-1] != prefix + target_probe_argv
+            or run_contract.get("python_execution") != python_execution
+        ):
+            errors.add("DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH")
+        result_python_execution = _mapping(run_contract.get("python_execution"))
+        if (
+            result_python_execution.get("bytecode_flag") != "-B"
+            or result_python_execution.get("bytecode_write_control")
+            != "python_flag_-B"
+        ):
+            errors.add("DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH")
+        if (
+            result_python_execution.get("python_environment_names") != []
+            or result_python_execution.get("environment_name_rule")
+            != "no_casefolded_python_prefix"
+        ):
+            errors.add("DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID")
 
         identity_contract = obj.get("identity_contract")
         expected_by_dimension = {
@@ -3161,6 +3202,15 @@ def validate_ops01r_discovery_result(
             != len(identity_contract)
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_CONTRACT_INVALID")
+        if isinstance(identity_contract, list) and any(
+            isinstance(_mapping(row).get("field_name"), str)
+            and re.search(
+                r"(?i)(secret|token|password|passwd|api[_-]?key|database_url|db_bridge_url|authorization|cookie)",
+                str(_mapping(row).get("field_name")),
+            )
+            for row in identity_contract
+        ):
+            errors.add("DISCOVERY_RESULT_SECRET_LIKE_OUTPUT")
         else:
             environment_by_name = {
                 _mapping(row).get("name"): _mapping(row)
@@ -3245,16 +3295,26 @@ def validate_ops01r_discovery_result(
             or source_write.get("mode") != "discovery"
             or source_write.get("status") != "PASS"
             or source_write.get("source_tree_unchanged") is not True
-            or source_write.get("staging_write_set_valid") is not True
-            or source_write.get("bytecode_write_control") != "python_flag_-B"
             or source_write.get("manifest_algorithm")
             != "hde_epic038.source_tree_manifest.v1"
+            or source_write.get("pre_source_manifest_sha256")
+            != expected.source_manifest_sha256
+            or source_write.get("post_source_manifest_sha256")
+            != expected.source_manifest_sha256
+        ):
+            errors.add("DISCOVERY_RESULT_SOURCE_MANIFEST_MISMATCH")
+        if source_write.get("bytecode_write_control") != "python_flag_-B":
+            errors.add("DISCOVERY_RESULT_BYTECODE_CONTROL_MISMATCH")
+        if source_write.get("python_environment_names") != []:
+            errors.add("DISCOVERY_RESULT_PYTHON_ENVIRONMENT_INVALID")
+        if source_write.get("python_argv") != target_probe_argv:
+            errors.add("DISCOVERY_RESULT_PYTHON_ARGV_MISMATCH")
+        if (
+            source_write.get("staging_write_set_valid") is not True
             or source_write.get("staging_manifest_algorithm")
             != "hde_epic038.non_source_staging_manifest.v1"
-            or source_write.get("python_environment_names") != []
             or source_write.get("prohibited_cache_paths") != []
             or source_write.get("unauthorized_staging_paths") != []
-            or source_write.get("python_argv") != target_probe_argv
             or source_write.get("authorized_exact_write_paths")
             != _at(authorization, "write_contract", "authorized_exact_write_paths")
             or source_write.get("authorized_recursive_write_roots")
@@ -3275,12 +3335,8 @@ def validate_ops01r_discovery_result(
                 "write_contract",
                 "self_bound_excluded_recursive_roots",
             )
-            or source_write.get("pre_source_manifest_sha256")
-            != expected.source_manifest_sha256
-            or source_write.get("post_source_manifest_sha256")
-            != expected.source_manifest_sha256
         ):
-            errors.add("DISCOVERY_RESULT_SOURCE_MANIFEST_MISMATCH")
+            errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
         if (
             source_write.get("pre_staging_manifest_sha256")
             != expected.pre_staging_manifest_sha256
