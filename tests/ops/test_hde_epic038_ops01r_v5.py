@@ -1116,6 +1116,87 @@ def test_discovery_result_rejects_tampered_authorization_hash(tmp_path):
     assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in result.errors
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "not json",
+        _canon({"project_name": "ample-illumination"}).decode("ascii"),
+        _canon(
+            {
+                "project_id": "",
+                "project_name": "ample-illumination",
+            }
+        ).decode("ascii"),
+        _canon(
+            {
+                "project_id": "project-id",
+                "project_name": " ample-illumination",
+            }
+        ).decode("ascii"),
+    ],
+)
+def test_runner_discovery_parser_rejects_missing_or_invalid_target_identity(payload):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage("project_inventory", payload)
+
+
+def test_runner_discovery_parser_does_not_treat_version_or_help_as_target_json():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    assert runner._parse_stage("cli_version", "railway 4.0.0\n") == {}
+    assert runner._parse_stage("cli_help", "Usage: railway [COMMAND]\n") == {}
+
+
+def test_runner_discovery_parser_requires_exact_no_write_target_probe_result():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    valid = _canon(
+        {
+            "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+            "writes": 0,
+        }
+    ).decode("ascii")
+    assert runner._parse_stage("target_identity_probe", valid) == {}
+
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage(
+            "target_identity_probe",
+            _canon(
+                {
+                    "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+                    "writes": 1,
+                }
+            ).decode("ascii"),
+        )
+
+
+def test_discovery_result_rejects_incomplete_target_identity(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    payload = json.loads(result_path.read_text())
+    del payload["target"]["service_id"]
+    payload["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in payload.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, payload)
+
+    result = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_TARGET_AMBIGUOUS" in result.errors
+
+
 def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     staging_root = tmp_path / "run"
     source_root = staging_root / "source"
@@ -1290,15 +1371,37 @@ def _live_authorization_pair(
             "commit": "1" * 40,
             "source_manifest_sha256": "2" * 64,
         },
-        "run": {"staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32},
-        "runner": {"sha256": "3" * 64},
+        "run": {
+            "child_argv": [
+                "/usr/bin/python3",
+                "-I",
+                "-B",
+                "/repo/scripts/ops/hde_epic038_ops01r.py",
+                "--live-child",
+            ],
+            "staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32,
+        },
+        "runner": {
+            "path": "/repo/scripts/ops/hde_epic038_ops01r.py",
+            "sha256": "3" * 64,
+        },
         "validator": {"sha256": "4" * 64},
         "projector": {"sha256": "5" * 64},
-        "interpreter": {"sha256": "6" * 64},
+        "interpreter": {"path": "/usr/bin/python3", "sha256": "6" * 64},
         "preflight_identity_sha256": "7" * 64,
         "discovery": {
             "discovery_identity_sha256": "8" * 64,
             "railway_cli": {"sha256": "9" * 64},
+            "run_contract": {
+                "argv_prefix": [
+                    "railway",
+                    "run",
+                    "--service",
+                    "glow-hdengine-v2",
+                    "--",
+                ],
+                "child_argv_start_index": 5,
+            },
         },
         "launch_limit": 1,
         "expected_call_counts": counts,
@@ -1344,6 +1447,25 @@ def test_live_authorization_requires_canonical_schema_closed_bytes(tmp_path):
     )
     assert not result.valid
     assert "OPS01_AUTH_SCHEMA_INVALID" in result.errors
+
+
+@pytest.mark.parametrize("tampered_field", ["interpreter", "runner"])
+def test_live_authorization_rejects_unbound_child_vector(tmp_path, tampered_field):
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    index = 0 if tampered_field == "interpreter" else 3
+    authorization["run"]["child_argv"][index] += ".tampered"
+    _write_json(path, authorization)
+
+    result = validate_ops01r_live_authorization(
+        path,
+        expected=replace(
+            expected,
+            authorization_sha256=_sha(_canon(authorization)),
+        ),
+    )
+
+    assert not result.valid
+    assert "OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH" in result.errors
 
 
 def _stage_runner_source(tmp_path: Path) -> Path:
@@ -1443,11 +1565,16 @@ def test_runner_rejects_invalid_discovery_authorization_before_subprocess(tmp_pa
     )
 
     with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_AUTH_INVALID"):
-        runner.discovery(authorization)
+        runner.discovery(
+            authorization,
+            expected=Ops01RDiscoveryAuthorizationExpectedIdentity(*(["x"] * 8)),
+        )
     assert calls == []
 
 
-def test_runner_rejects_invalid_live_authorization_before_consumption_or_subprocess(tmp_path, monkeypatch):
+def test_runner_rejects_invalid_live_authorization_before_consumption_or_subprocess(
+    tmp_path, monkeypatch
+):
     import scripts.ops.hde_epic038_ops01r as runner
 
     control = tmp_path / "control"
@@ -1463,16 +1590,27 @@ def test_runner_rejects_invalid_live_authorization_before_consumption_or_subproc
     )
 
     with pytest.raises(SystemExit, match="OPS01R_LIVE_AUTH_INVALID"):
-        runner.live_launch(authorization)
+        runner.live_launch(
+            authorization,
+            expected=Ops01RLiveAuthorizationExpectedIdentity(*(["x"] * 12)),
+        )
     assert calls == []
     assert not (control / "live_authorization.json.consumed").exists()
 
 
-def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(tmp_path, monkeypatch):
+def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(
+    tmp_path, monkeypatch
+):
     import scripts.ops.hde_epic038_ops01r as runner
 
-    path, authorization, _ = _live_authorization_pair(tmp_path)
-    child = ["/usr/bin/python3", "-I", "-B", "/repo/scripts/ops/hde_epic038_ops01r.py", "--live-child"]
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    child = [
+        "/usr/bin/python3",
+        "-I",
+        "-B",
+        "/repo/scripts/ops/hde_epic038_ops01r.py",
+        "--live-child",
+    ]
     prefix = ["railway", "run", "--service", "glow-hdengine-v2", "--"]
     authorization["run"]["child_argv"] = child
     authorization["discovery"]["run_contract"] = {
@@ -1480,6 +1618,10 @@ def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(t
         "child_argv_start_index": len(prefix),
     }
     _write_json(path, authorization)
+    expected = replace(
+        expected,
+        authorization_sha256=_sha(_canon(authorization)),
+    )
     calls = []
 
     def fake_run(argv, **kwargs):
@@ -1488,7 +1630,7 @@ def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(t
 
     monkeypatch.setattr(runner.subprocess, "run", fake_run)
 
-    assert runner.live_launch(path) == 0
+    assert runner.live_launch(path, expected=expected) == 0
     assert len(calls) == 1
     assert calls[0][0] == tuple(prefix + child)
     assert calls[0][1]["shell"] is False
@@ -1502,22 +1644,23 @@ def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(t
     assert (path.parent / "live_authorization.json.consumed").exists()
 
 
-def test_live_launch_rejects_bad_child_suffix_before_consumption(tmp_path, monkeypatch):
+@pytest.mark.parametrize("tampered_index", [0, 3, 4])
+def test_live_launch_rejects_unbound_child_vector_before_consumption(
+    tmp_path, monkeypatch, tampered_index
+):
     import scripts.ops.hde_epic038_ops01r as runner
 
-    path, authorization, _ = _live_authorization_pair(tmp_path)
-    authorization["run"]["child_argv"] = [
-        "/usr/bin/python3",
-        "-I",
-        "-B",
-        "/repo/scripts/ops/hde_epic038_ops01r.py",
-        "--wrong-child",
-    ]
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    authorization["run"]["child_argv"][tampered_index] += ".tampered"
     authorization["discovery"]["run_contract"] = {
         "argv_prefix": ["railway", "run", "--"],
         "child_argv_start_index": 3,
     }
     _write_json(path, authorization)
+    expected = replace(
+        expected,
+        authorization_sha256=_sha(_canon(authorization)),
+    )
     calls = []
     monkeypatch.setattr(
         runner.subprocess,
@@ -1526,7 +1669,7 @@ def test_live_launch_rejects_bad_child_suffix_before_consumption(tmp_path, monke
         or pytest.fail("external subprocess invoked"),
     )
 
-    with pytest.raises(SystemExit, match="OPS01R_LIVE_ARGV_INVALID"):
-        runner.live_launch(path)
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_AUTH_INVALID"):
+        runner.live_launch(path, expected=expected)
     assert calls == []
     assert not (path.parent / "live_authorization.json.consumed").exists()
