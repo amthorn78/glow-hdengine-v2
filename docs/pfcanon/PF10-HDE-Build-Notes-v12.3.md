@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.2.9  
-Effective Date: 2026.07.18
+**Version:** v12.3  
+Effective Date: 2026.07.19
 
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -11864,13 +11864,7 @@ Canon proof excerpt:
 
 DECISION: OPS ACCEPTABLE
 
-Add to **§1.1 Addendum Index**:
-
-2.9) PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004
-
----
-
-## 
+## 2.9) PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004
 
 Timestamp: 071826 17:28
 
@@ -11902,9 +11896,7 @@ The minimum coherent post-merge rescope consists of the following bounded work:
 * `RSC-004`: qualify the exact source, runner, validator, projector, interpreter, target, environment, and expected call vector before one separately authorized OPS-01R attempt.  
 * `RSC-005`: independently validate the candidate and integrate it atomically through a separate PR-C, followed by canonical evidence convergence and v5-only release-sanity validation.
 
-`RSC-001`, `RSC-002`, and `RSC-004` introduce no canon change. `RSC-005` introduces no additional canon decision beyond the migration required to adopt `ADR-CANON-004`.
-
-### **ADR-CANON-004 — Versioned Glow-Owned DDL Identity Projection for OPS Provider Evidence**
+`RSC-001`, `RSC-002`, and `RSC-004` introduce no canon change. `RSC-005` introduces no additional canon decision beyond the migration required to adopt `ADR-CANON-004`.**ADR-CANON-004 — Versioned Glow-Owned DDL Identity Projection for OPS Provider Evidence**
 
 Decision: `APPROVED`
 
@@ -12178,8 +12170,707 @@ This addendum does not authorize or claim:
 
 No PF-Canon document, plan document, implementation, repository state, external service, database, or OPS state is changed merely by recording this addendum.
 
----
+## 2.10) PR-06 Remediation PR-A HDE-EPIC038
 
-The ADR source establishes the projection-only contract, stable evidence identities, no-status-movement posture, plan-revision dependency, and later drainage targets. The addendum number follows the current PF10 index, which ends at 2.8. The IA decision approving the CRD and `ADR-CANON-004` is recorded in the approved review artifact.
+### Review Summary
+
+* Original PR introduced the selective EPIC024 binding repair, shared retained-evidence scanner, shared DDL projector, initial independent v5 validator, tracked runner, tests, and governed companion convergence. Its OPS-01R runner/validator contract remained materially incomplete.  
+* Remedial PR 1 implemented bounded discovery, live authorization, one-shot launch, capture, source/staging manifests, and broader adversarial tests. Exact preflight rosters, write-contract bindings, template replay, and dispatch-boundary checks remained incomplete. No unacceptable final drift survives.  
+* Remedial PR 2 closed those remaining gaps: PATH-bound Railway identity, exact preflight write values and argv, exact `run_1`/`run_2` orchestration, final authorization-byte check, closed discovery template replay, deterministic malformed-regex handling, result-summary rosters, and focused EPIC024 tests.  
+* The combined scope is the effective delta from `ca841c6b8cca80f7f800a884e669c570e6f30dcb` through `ffe67e3d2c2831cb42c12dc583340ddde77d0980`. Current `main` remains exactly that final merged state.  
+* All seven visible CI jobs passed at every lineage head. Final code, governed artifacts, review findings, exact current blobs, and focused behavioral smokes were also inspected; CI was not used alone.  
+* PF09.6 impact is exactly mapped to HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST001.11, and HDE-DIST005.2. No status movement is supported.  
+* Remaining risk is confined to separately authorized OPS-01R execution and later PR-C integration. Those are explicitly outside PR-A and are not current remediation gaps.
+
+### GitHub / Repo Inspection
+
+* Repository identity: `amthorn78/glow-hdengine-v2`, private repository.  
+* Reviewed/default target branch: `main`.  
+* Current reviewed HEAD: `ffe67e3d2c2831cb42c12dc583340ddde77d0980`.  
+* Lifecycle baseline: `ca841c6b8cca80f7f800a884e669c570e6f30dcb`.  
+* Original PR:  
+  * Base: `main` at `ca841c6b8cca80f7f800a884e669c570e6f30dcb`.  
+  * Head: `codex/implement-pr-a-for-epic038-remediation` at `2f3d53c2a71c7cf88af518d505937ab71f73ccdd`.  
+  * State: merged.  
+  * Merge identifier: `2e9b1b44d4090711f007453031cfe30f62867c65`.  
+  * Changed files: 63—NET-001 through NET-059 and NET-061 through NET-064.  
+* Remedial PR 1:  
+  * Base: `main` at `2e9b1b44d4090711f007453031cfe30f62867c65`, exactly the Original PR merge.  
+  * Head: `codex/complete-ops-01r-runner-contract` at `19bea7b800bd3eabaf1665a60dd2a3e698f60a8f`.  
+  * State: merged.  
+  * Merge identifier: `34f32bf74093ff7f93d6de1ebc258b4a591d0066`.  
+  * Changed files: NET-056, NET-059, NET-061.  
+* Remedial PR 2:  
+  * Base: `main` at `34f32bf74093ff7f93d6de1ebc258b4a591d0066`, exactly the Remedial PR 1 merge.  
+  * Head: `codex/create-remediation-plan-for-glow-hdengine-v2` at `8c35a7b924560c644ae8d256f94f2c66520e6187`.  
+  * State: merged.  
+  * Merge identifier: `ffe67e3d2c2831cb42c12dc583340ddde77d0980`.  
+  * Changed files: NET-056, NET-059, NET-060, NET-061.  
+* Supplied order is the actual consecutive merge order: `ca841c6 → 2e9b1b4 → 34f32bf → ffe67e3`.  
+* Lifecycle touched-file set: 64 files, enumerated exactly once as NET-001 through NET-064 below.  
+* Every current touched-file blob was fetched at current `main`; all match the Final Lineage PR state.  
+* Governed evidence inspected includes `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, affected EPIC020 bundles/manifests, architecture snapshot, and all affected path proofs.  
+* Visible CI:  
+  * Original PR run [29659658580](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29659658580): seven jobs passed.  
+  * Remedial PR 1 run [29670814023](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29670814023): seven jobs passed.  
+  * Remedial PR 2 run [29679307753](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29679307753): seven jobs passed.  
+* Search method: queried GitHub API for recent commits on current `main`; scope: commits after Final Lineage PR; tool: GitHub API; result: `ffe67e3d…` is first/current, followed by `34f32bf…` and `2e9b1b4…`; 0 later commits.  
+* The Remedial PR 2 branch name contains “plan,” but no plan was created or changed. Search method: searched Remedial PR 2 for `plan`, `Implementation Plan`, and `remediation plan` (case: insensitive); scope: complete four-file patch; tool: bundle-search; result: 0 hits.  
+* PF23 was not used as authority. PF20 was treated as historical only.
+
+Material GitHub Repo evidence pointer: GitHub Repo | default branch metadata/current commit | `"default_branch":"main"` | `"sha":"ffe67e3d2c2831cb42c12dc583340ddde77d0980"`.
+
+### Provenance (PR Lineage)
+
+* Claim: Original PR is the first merged implementation attempt and established the non-OPS repairs plus initial OPS-01R surfaces.  
+  Source: Original PR.  
+  Evidence pointer: Original PR | PR \#360 metadata and merge diff | `"merged":true,"mergeCommit":"2e9b1b44d4090711f007453031cfe30f62867c65"` | `"63 changed files"`.  
+* Claim: Remedial PR 1 immediately follows the Original PR and implements the previously missing live/discovery/capture path.  
+  Source: Remedial PR 1\.  
+  Evidence pointer: Remedial PR 1 | PR \#361 base/merge metadata | `"base":"2e9b1b44d4090711f007453031cfe30f62867c65"` | `"mergeCommit":"34f32bf74093ff7f93d6de1ebc258b4a591d0066"`.  
+* Claim: Remedial PR 2 immediately follows Remedial PR 1 and closes the remaining exact-contract/review findings.  
+  Source: Remedial PR 2\.  
+  Evidence pointer: Remedial PR 2 | PR \#362 base/merge metadata | `"base":"34f32bf74093ff7f93d6de1ebc258b4a591d0066"` | `"mergeCommit":"ffe67e3d2c2831cb42c12dc583340ddde77d0980"`.  
+* Claim: Current repository state is identical to the final lineage merged state.  
+  Source: GitHub Repo.  
+  Evidence pointer: GitHub Repo | current `main` HEAD and current file blobs | `"ffe67e3d2c2831cb42c12dc583340ddde77d0980"` | `"64/64 touched files inspected"`.
+
+#### Original PR Material Hunk Ledger
+
+Hunk ID: OPR-001; File: `.github/workflows/ci.yml`; Patch and hunk header: `diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml || @@ -66,7 +66,7 @@ jobs:`; Material effect: adds the OPS-01R v5 regression suite to CI; Risk category: validation coverage; Evidence pointer: Original PR | patch/hunk above | `"tests/ops/test_hde_epic038_ops01r_v5.py"` | `"merged patch inspected"`.
+
+Hunk IDs OPR-002 through OPR-029 each cover one governed artifact hunk:
+
+* OPR-002 — `artifacts/architecture/architecture_snapshot.keys_only.json` — `@@ -1 +1 @@` — refreshes the architecture snapshot.  
+* OPR-003 — `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-004 — `artifacts/audit/ENDPOINTS_CATALOG.json.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-005 — `artifacts/audit/ENDPOINTS_CATALOG.json.sha256.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-006 — `artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-007 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-008 — `EVIDENCE_INDEX_MIRROR_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-009 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-010 — `EVIDENCE_INDEX_UPDATED_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-011 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-012 — `EVIDENCE_INDEX_UPDATED_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-013 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-014 — `EVIDENCE_PATHS_VALIDATED_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-015 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-016 — `EVIDENCE_PATHS_VALIDATED_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-017 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-018 — `INTVER_200_CTYPE_JSON_UTF8_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-019 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-020 — `INTVER_200_CTYPE_JSON_UTF8_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-021 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-022 — `INTVER_HEAD_PARITY_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-023 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-024 — `INTVER_HEAD_PARITY_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-025 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-026 — `TWO_RUN_IDENTITY_OK.bundle.json` — `@@ -1 +1 @@`.  
+* OPR-027 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.  
+* OPR-028 — `TWO_RUN_IDENTITY_OK.manifest.json` — `@@ -1 +1 @@`.  
+* OPR-029 — its `.path_proof.txt` — `@@ -1,5 +1,5 @@`.
+
+For OPR-002–OPR-029: Material effect: canonical updater convergence of snapshot/bundle/manifest/path identities; Risk category: governed evidence/index/mirror/manifest/path proof; Evidence pointer: Original PR | each listed `diff --git` header and hunk | `"regenerated governed companion"` | `"merged patch inspected"`.
+
+Hunk IDs OPR-030 through OPR-037; File: `artifacts/evidence_index.jsonl`; Patch and hunk headers: `@@ -27,24 +27,24 @@`, `@@ -64,14 +64,14 @@`, `@@ -186,9 +186,9 @@`, `@@ -229,15 +229,15 @@`, `@@ -371,18 +371,18 @@`, `@@ -391,7 +391,7 @@`, `@@ -468,8 +468,8 @@`, `@@ -522,7 +522,7 @@`; Material effect: regenerates affected Machine Mirror row blocks; Risk category: governed evidence/index/mirror/manifest/path proof; Evidence pointer: Original PR | `diff --git a/artifacts/evidence_index.jsonl b/artifacts/evidence_index.jsonl` | `"eight material row blocks"` | `"merged patch inspected"`.
+
+Hunk ID: OPR-038; File: `artifacts/evidence_index.jsonl.path_proof.txt`; Patch: `@@ -1,6 +1,6 @@`; Material effect: refreshes mirror path proof; Risk: governed evidence; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk ID: OPR-039; File: `artifacts/evidence_index.jsonl.sha256`; Patch: `@@ -1 +1 @@`; Material effect: refreshes mirror SHA-256; Risk: governed evidence; Evidence pointer: Original PR | patch | `"SHA-256 refreshed"` | `"merged"`.
+
+Hunk ID: OPR-040; File: `artifacts/evidence_index.jsonl.sha256.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes SHA path proof; Risk: governed evidence; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk IDs OPR-041 through OPR-049 each cover the listed path-proof hunk `@@ -1,5 +1,5 @@`: `artifacts/proofs/endpoints_env_gate_proof.log.path_proof.txt`, `reader_success_get_head_304.json.path_proof.txt`, `success_304.txt.path_proof.txt`, `success_encoding_invariance.txt.path_proof.txt`, `success_get.txt.path_proof.txt`, `success_head.txt.path_proof.txt`, `success_writers_errors.txt.path_proof.txt`, `artifacts/reader/endpoints_snapshot.json.path_proof.txt`, and `audit/gates/topology/orientation_demo.txt.path_proof.txt`; Material effect: refreshes sibling proof identities; Risk: governed evidence; Evidence pointer: Original PR | each listed patch | `"canonical proof convergence"` | `"merged patch inspected"`.
+
+Hunk ID: OPR-050; File: `audit/qa/hde-epic024/token_evidence_matrix.md`; Patch: `@@ -20,7 +20,7 @@`; Material effect: changes only the `SANITY_PIPELINE_OK` evidence path; Risk: token/QA posture; Evidence pointer: Original PR | patch | `"artifacts/sanity/sanity.log"` | `"audit/gates/sanity_pipeline/sanity_pipeline.log"`.
+
+Hunk ID: OPR-051; File: `audit/qa/hde-epic024/token_evidence_matrix.md.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes proof; Risk: token/QA posture; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk IDs OPR-052 and OPR-053; Files: `docs/ENDPOINTS_CATALOG.json.path_proof.txt`, `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes proof identities; Risk: governed evidence; Evidence pointer: Original PR | patches | `"path proof refreshed"` | `"merged"`.
+
+Hunk ID: OPR-054; File: `docs/acceptance_map_epic024.json`; Patch: `@@ -1 +1 @@`; Material effect: changes exactly one `SANITY_PIPELINE_OK.evidence_titles` path while preserving statuses and ordering; Risk: token/QA posture; Evidence pointer: Original PR | patch | `"artifacts/sanity/sanity.log"` | `"audit/gates/sanity_pipeline/sanity_pipeline.log"`.
+
+Hunk ID: OPR-055; File: `docs/acceptance_map_epic024.json.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes proof; Risk: token/QA posture; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk IDs OPR-056 through OPR-061; File: `docs/evidence/INDEX.json`; Patch headers: recovered JSON entries `[29]` through `[34]`; Material effect: updates only the bundle/manifest SHA-256 fields for `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_INDEX_UPDATED_OK`, and `EVIDENCE_PATHS_VALIDATED_OK`; Risk: governed evidence/index; Evidence pointer: Original PR | recovered complete before/after JSON, 529 entries each | `"six changed SHA-256 values"` | `"all other entries identical"`.
+
+Hunk ID: OPR-062; File: `docs/evidence/INDEX.json.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes index proof; Risk: governed evidence; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk ID: OPR-063; File: `docs/evidence/INDEX.sha256`; Patch: `@@ -1 +1 @@`; Material effect: refreshes Human Index SHA-256; Risk: governed evidence; Evidence pointer: Original PR | patch | `"SHA-256 refreshed"` | `"merged"`.
+
+Hunk ID: OPR-064; File: `docs/evidence/INDEX.sha256.path_proof.txt`; Patch: `@@ -1,5 +1,5 @@`; Material effect: refreshes proof; Risk: governed evidence; Evidence pointer: Original PR | patch | `"path proof refreshed"` | `"merged"`.
+
+Hunk ID: OPR-065; File: `engine/db/ddl_identity_projection.py`; Patch: `@@ -0,0 +1,62 @@`; Material effect: adds strict shared `hde.ddl_identity_projection.v1` projection; Risk: contract/schema; Evidence pointer: Original PR | patch | `"DDL_IDENTITY_PROJECTION_SCHEMA"` | `"project_ddl_identity"`.
+
+Hunk ID: OPR-066; File: `glow_hdengine.egg-info/SOURCES.txt`; Patch: `@@ -53,6 +53,7 @@`; Material effect: adds the projector to the source inventory; Risk: packaging; Evidence pointer: Original PR | patch | `"engine/db/ddl_identity_projection.py"` | `"merged"`.
+
+Hunk IDs OPR-067 and OPR-068; File: `scripts/db/capture_epic011_posture.py`; Patches: `@@ -17,6 +17,7 @@`, `@@ -361,49 +362,7 @@`; Material effect: imports the shared projector and replaces duplicate projection logic with delegation; Risk: contract/schema; Evidence pointer: Original PR | patches | `"project_ddl_identity"` | `"duplicate projection body removed"`.
+
+Hunk ID: OPR-069; File: `scripts/ops/hde_epic038_ops01r.py`; Patch: `@@ -0,0 +1,434 @@`; Material effect: adds the initial tracked OPS-01R runner/preflight scaffold; Risk: OPS-sensitive contract/error handling; Evidence pointer: Original PR | patch | `"434 added lines"` | `"initial scaffold"`.
+
+Hunk ID: OPR-070; File: `tests/db/test_ddl_identity_projection.py`; Patch: `@@ -0,0 +1,16 @@`; Material effect: adds projector ordering/equivalence/malformed-input tests; Risk: tests; Evidence pointer: Original PR | patch | `"focused projector tests"` | `"merged"`.
+
+Hunk ID: OPR-071; File: `tests/evidence/test_retained_evidence_safety.py`; Patch: `@@ -0,0 +1,26 @@`; Material effect: adds marker/safe-RHS/secret/UTF-8 tests; Risk: tests; Evidence pointer: Original PR | patch | `"retained-evidence safety matrix"` | `"merged"`.
+
+Hunk ID: OPR-072; File: `tests/ops/test_hde_epic038_ops01r_v5.py`; Patch: `@@ -0,0 +1,1429 @@`; Material effect: adds initial candidate/preflight/discovery/live mutation coverage; Risk: tests; Evidence pointer: Original PR | patch | `"1429 added lines"` | `"initial OPS-01R suite"`.
+
+Hunk ID: OPR-073; File: `tools/evidence/hde_epic038_ops01_v5.py`; Patch: `@@ -0,0 +1,1933 @@`; Material effect: adds independent dormant v5 candidate/control-record validators; Risk: OPS-sensitive contract/schema/error handling; Evidence pointer: Original PR | patch | `"1933 added lines"` | `"initial validator"`.
+
+Hunk ID: OPR-074; File: `tools/evidence/retained_evidence_safety.py`; Patch: `@@ -0,0 +1,79 @@`; Material effect: adds shared strict-UTF-8 scanner using all-match iteration; Risk: security/privacy/secrets; Evidence pointer: Original PR | patch | `"finditer"` | `"fixed reason-code roster"`.
+
+Hunk IDs OPR-075 through OPR-077; File: `tools/evidence/run_sanity_pipeline.py`; Patches: `@@ -19,6 +19,8 @@`, `@@ -196,109 +198,26 @@`, `@@ -357,25 +276,14 @@`; Material effect: imports shared projector/scanner, removes duplicate normalization/scanner logic, and routes Stage 12 through shared reason-code validation; Risk: security and release-admission contract; Evidence pointer: Original PR | patches | `"project_ddl_identity"` | `"validate_retained_text_safety"`.
+
+Hunk IDs OPR-078 through OPR-084; File: `tools/qa/run_hde_epic024_harness.py`; Patches: `@@ -7,6 +7,8 @@`, `@@ -20,6 +22,7 @@`, `@@ -70,11 +73,14 @@`, `@@ -289,8 +295,8 @@`, `@@ -541,11 +547,16 @@`, `@@ -765,10 +776,71 @@`, `@@ -1077,7 +1149,13 @@`; Material effects: add pure renderer support and canonical primary constants; canonicalize byte construction; preserve close-pack behavior; extract token-matrix and acceptance-map renderers; derive retained status and exact one-path diff; add selective refresh/check modes that bypass `_check_specs`; Risk: governed token/QA posture and evidence writes; Evidence pointer: Original PR | listed patches | `"--refresh-acceptance-bindings-only"` | `"--check-acceptance-bindings"`.
+
+#### Remedial PR 1 Material Hunk Ledger
+
+Hunk IDs R1PR-001 through R1PR-011; File: `scripts/ops/hde_epic038_ops01r.py`; Patch headers respectively: `@@ -3,13 +3,22 @@`, `@@ -19,6 +28,56 @@`, `@@ -138,11 +197,22 @@`, `@@ -225,14 +295,15 @@`, `@@ -249,26 +320,295 @@`, `@@ -277,14 +617,17 @@`, `@@ -304,20 +647,9 @@`, `@@ -338,15 +670,15 @@`, `@@ -366,7 +698,7 @@`, `@@ -397,7 +729,7 @@`, `@@ -406,29 +738,1494 @@`; Material effects: add live/discovery dependencies, fixed call/nonclaim constants, exact `-I -B`, case-folded `PYTHON*` rejection, staged module identities, sanitized environments/manifests, source/write binding, six-stage discovery, one-shot launch, candidate production, capture, and CLI dispatch; Risk: OPS-sensitive contract/error handling; Evidence pointer: Remedial PR 1 | listed patches | `"bounded discovery/live/capture"` | `"merged patch inspected"`.
+
+Hunk ID: R1PR-012; File: `tests/ops/test_hde_epic038_ops01r_v5.py`; Patch and hunk headers: 19 adjacent test hunks from `@@ -114,14 +114,125 @@` through `@@ -1427,3 +2314,338 @@`; Material effect: expands adversarial candidate, discovery, preflight, live authorization/capture, source-binding, and zero-I/O tests; Risk: tests; Evidence pointer: Remedial PR 1 | complete per-file patch | `"expanded to 2,600+ lines"` | `"merged"`.
+
+Hunk IDs R1PR-013 through R1PR-027; File: `tools/evidence/hde_epic038_ops01_v5.py`; Patch headers: `@@ -121,12 +121,56 @@`, `@@ -862,7 +906,12 @@`, `@@ -909,6 +958,52 @@`, `@@ -937,23 +1032,33 @@`, `@@ -1118,7 +1223,11 @@`, `@@ -1553,6 +1662,160 @@`, `@@ -1582,8 +1845,41 @@`, `@@ -1629,11 +1925,218 @@`, `@@ -1642,8 +2145,15 @@`, `@@ -1694,6 +2204,240 @@`, `@@ -1745,6 +2489,25 @@`, `@@ -1778,6 +2541,10 @@`, `@@ -1812,13 +2579,32 @@`, `@@ -1834,8 +2620,44 @@`, `@@ -1929,5 +2751,17 @@`; Material effects: add exact call rosters, strengthen candidate semantic binding, validate discovery results, source/write facts, closed live authorization, live-capture recomputation, expected/actual identities, candidate validation, and complete CLI modes; Risk: OPS-sensitive contract/schema/error handling; Evidence pointer: Remedial PR 1 | listed patches | `"complete live-path validation"` | `"merged patch inspected"`.
+
+#### Remedial PR 2 Material Hunk Ledger
+
+Hunk IDs R2PR-001 through R2PR-013; File: `scripts/ops/hde_epic038_ops01r.py`; Patch headers: `@@ -9,6 +9,7 @@`, `@@ -41,6 +42,36 @@`, `@@ -591,32 +622,91 @@`, `@@ -625,41 +715,30 @@`, `@@ -682,11 +761,7 @@`, `@@ -700,7 +775,7 @@`, `@@ -717,23 +792,95 @@`, `@@ -818,14 +965,28 @@`, `@@ -834,6 +995,11 @@`, `@@ -843,6 +1009,8 @@`, `@@ -1021,10 +1189,24 @@`, `@@ -1930,12 +2112,28 @@`, `@@ -1954,11 +2152,40 @@`; Material effects: add strict help parsing, zero-I/O and exact two-run structure, staged preflight production, PATH-bound Railway identity, exact argv and write values, manifest recapture, pristine checks, immediate pre-dispatch authorization check, strict UTF-8, closed result-summary/nonclaim/finding rosters; Risk: OPS-sensitive contract/error handling; Evidence pointer: Remedial PR 2 | listed patches | `"exact closed preflight/discovery contract"` | `"merged patch inspected"`.
+
+Hunk ID: R2PR-014; File: `tests/ops/test_hde_epic038_ops01r_v5.py`; Patch and hunk headers: 24 adjacent test hunks from `@@ -24,6 +24,8 @@` through `@@ -2285,6 +3176,9 @@`; Material effect: adds adversarial regressions for result-summary rosters, policy/template replay, failure codes, exact write/argv/orchestration, PATH-only Railway identity, malformed regex, and dispatch-race closure; Risk: tests; Evidence pointer: Remedial PR 2 | complete per-file patch | `"PATH-only executable fixture"` | `"dispatch-boundary mutation fixture"`.
+
+Hunk ID: R2PR-015; File: `tests/qa/test_epic024_bootstrap_status.py`; Patch and hunk headers: `@@ -1,4 +1,16 @@`, `@@ -9,3 +21,80 @@`; Material effect: adds pure-renderer, retained-status, exact-diff, selective-write, check-mode, and no-write tests; Risk: tests; Evidence pointer: Remedial PR 2 | patches | `"exact one-path diff"` | `"_check_specs not called"`.
+
+Hunk IDs R2PR-016 through R2PR-042; File: `tools/evidence/hde_epic038_ops01_v5.py`; Patch headers: `@@ -7,6 +7,7 @@`, `@@ -130,6 +131,69 @@`, `@@ -196,6 +260,49 @@`, `@@ -204,12 +311,124 @@`, `@@ -1180,12 +1399,112 @@`, `@@ -1201,7 +1520,6 @@`, `@@ -1311,6 +1629,55 @@`, `@@ -1326,12 +1693,14 @@`, `@@ -1347,7 +1716,7 @@`, `@@ -1358,7 +1727,7 @@`, `@@ -1371,10 +1740,10 @@`, `@@ -1383,12 +1752,12 @@`, `@@ -1401,10 +1770,207 @@`, `@@ -1414,6 +1980,19 @@`, `@@ -1425,11 +2004,33 @@`, `@@ -1474,12 +2075,433 @@`, `@@ -1515,7 +2537,13 @@`, `@@ -1530,30 +2558,36 @@`, `@@ -1577,6 +2611,73 @@`, `@@ -1587,66 +2688,104 @@`, `@@ -1759,6 +2898,8 @@`, `@@ -1827,7 +2968,11 @@`, `@@ -1906,24 +3051,53 @@`, `@@ -1974,6 +3148,28 @@`, `@@ -2022,6 +3218,15 @@`, `@@ -2106,16 +3311,26 @@`, `@@ -2136,12 +3351,8 @@`; Material effects: add recursive preflight/discovery rosters, exact real-file identities, exact write/argv/two-run validation, complete policy/template replay, deterministic invalid-regex handling, six-stage enforcement, authorization/result revalidation, source-residue checks, strict identity-field safety, and deterministic failure classification; Risk: OPS-sensitive contract/schema/error handling; Evidence pointer: Remedial PR 2 | listed patches | `"closed recursive validation"` | `"merged patch inspected"`.
+
+### Net Effective Diff Review
+
+For every NET item below, “current matches final” means the GitHub blob at current `main` is byte-identical to the blob at `ffe67e3d2c2831cb42c12dc583340ddde77d0980`. No listed file was fully reverted to lifecycle baseline.
+
+NET-001 — File/artifact: `.github/workflows/ci.yml`; Covered hunks: OPR-001; Lifecycle state progression: Original—OPS suite added; Remedial 1—not touched; Remedial 2—not touched; Final lineage merged state: blob `6ea3513ddc23256d9b20bf35f7bb5295c8732068`; Current final repo state: current matches final; Later-change impact: None; Risk: Medium; High-risk assessment: PASS—exact OPS regression file remains in CI; Assessment: PASS; Evidence pointer/GitHub proof: GitHub Repo | file at current HEAD | `"6ea3513d…"` | `"no later commit"`; PF reference: None.
+
+NET-002 — `artifacts/architecture/architecture_snapshot.keys_only.json`; OPR-002; Progression: Original—regenerated; R1/R2—not touched; Final/current blob `bad80da5a6b4c8a4f0c8c4542320ebe5deb9ab0f`; Later impact: None; Risk: High; High-risk assessment/Assessment: PASS—governed snapshot and checks converge; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"bad80da5…"` | `"current matches final"`; PF: None.
+
+NET-003 — `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt`; OPR-003; Original—refreshed; R1/R2—not touched; Final/current `e01233c134e4103aac166ad953d04d66882c9527`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"e01233c1…"` | `"current matches final"`; PF: None.
+
+NET-004 — `artifacts/audit/ENDPOINTS_CATALOG.json.path_proof.txt`; OPR-004; Original—refreshed; R1/R2—not touched; Final/current `d18122e2533dc81fa365b27a929baa92d26559e3`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"d18122e2…"` | `"current matches final"`; PF: None.
+
+NET-005 — `artifacts/audit/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`; OPR-005; Original—refreshed; R1/R2—not touched; Final/current `547180d9d3d03fd36ba9ff1253e68f8e3282b5d1`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"547180d9…"` | `"current matches final"`; PF: None.
+
+NET-006 — `artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json`; OPR-006; Original—regenerated; R1/R2—not touched; Final/current `245397e80e0a8e3ddd33108bea86f08671e2bb15`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"245397e8…"` | `"current matches final"`; PF: None.
+
+NET-007 — its `.path_proof.txt`; OPR-007; Original—refreshed; R1/R2—not touched; Final/current `c6c6965934f98ab9d45cc23dae9d724daec11dd2`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"c6c69659…"` | `"current matches final"`; PF: None.
+
+NET-008 — `EVIDENCE_INDEX_MIRROR_OK.manifest.json`; OPR-008; Original—regenerated; R1/R2—not touched; Final/current `604ad9449eaa714cdcd7dd9b8ea81aaf3e433319`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"604ad944…"` | `"current matches final"`; PF: None.
+
+NET-009 — its `.path_proof.txt`; OPR-009; Original—refreshed; R1/R2—not touched; Final/current `0838313012024373b4a5ae64567cb06695332862`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"08383130…"` | `"current matches final"`; PF: None.
+
+NET-010 — `EVIDENCE_INDEX_UPDATED_OK.bundle.json`; OPR-010; Original—regenerated; R1/R2—not touched; Final/current `90cfb7883521829411ebce60b20800e1c733dea5`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"90cfb788…"` | `"current matches final"`; PF: None.
+
+NET-011 — its `.path_proof.txt`; OPR-011; Original—refreshed; R1/R2—not touched; Final/current `8782e93eab46b459bc60d93b0af19134b11f5b61`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"8782e93e…"` | `"current matches final"`; PF: None.
+
+NET-012 — `EVIDENCE_INDEX_UPDATED_OK.manifest.json`; OPR-012; Original—regenerated; R1/R2—not touched; Final/current `dedb89c072649af83e92d3f527501fe080780c85`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"dedb89c0…"` | `"current matches final"`; PF: None.
+
+NET-013 — its `.path_proof.txt`; OPR-013; Original—refreshed; R1/R2—not touched; Final/current `0f75ed3e0e8282b2c54044bde0b2edb673b530fb`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"0f75ed3e…"` | `"current matches final"`; PF: None.
+
+NET-014 — `EVIDENCE_PATHS_VALIDATED_OK.bundle.json`; OPR-014; Original—regenerated; R1/R2—not touched; Final/current `9d56e97d5a20d4f49c592c98800fa9d7087e61a7`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"9d56e97d…"` | `"current matches final"`; PF: None.
+
+NET-015 — its `.path_proof.txt`; OPR-015; Original—refreshed; R1/R2—not touched; Final/current `41d518c699cd245406103474266b9bd1890415ac`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"41d518c6…"` | `"current matches final"`; PF: None.
+
+NET-016 — `EVIDENCE_PATHS_VALIDATED_OK.manifest.json`; OPR-016; Original—regenerated; R1/R2—not touched; Final/current `be75d65f9fe022aecebac5c36d6ba5281582b36f`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"be75d65f…"` | `"current matches final"`; PF: None.
+
+NET-017 — its `.path_proof.txt`; OPR-017; Original—refreshed; R1/R2—not touched; Final/current `03562d4f43248e790f9c90991a3b2c2d0dc8f9b3`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"03562d4f…"` | `"current matches final"`; PF: None.
+
+NET-018 — `INTVER_200_CTYPE_JSON_UTF8_OK.bundle.json`; OPR-018; Original—regenerated; R1/R2—not touched; Final/current `3e5b95c24fce27132ac46f90feadd4103caccbaf`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"3e5b95c2…"` | `"current matches final"`; PF: None.
+
+NET-019 — its `.path_proof.txt`; OPR-019; Original—refreshed; R1/R2—not touched; Final/current `f1bc5d985d14080d0ac8c535361a0c95c7ec4a47`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"f1bc5d98…"` | `"current matches final"`; PF: None.
+
+NET-020 — `INTVER_200_CTYPE_JSON_UTF8_OK.manifest.json`; OPR-020; Original—regenerated; R1/R2—not touched; Final/current `063204a515e0e87fd87d12479fe91b6d7765246c`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"063204a5…"` | `"current matches final"`; PF: None.
+
+NET-021 — its `.path_proof.txt`; OPR-021; Original—refreshed; R1/R2—not touched; Final/current `84c010d29c86433fa9d854107092f527a6533ba6`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"84c010d2…"` | `"current matches final"`; PF: None.
+
+NET-022 — `INTVER_HEAD_PARITY_OK.bundle.json`; OPR-022; Original—regenerated; R1/R2—not touched; Final/current `7e0956311c81c6aff0bc27098b117794dc1007d9`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"7e095631…"` | `"current matches final"`; PF: None.
+
+NET-023 — its `.path_proof.txt`; OPR-023; Original—refreshed; R1/R2—not touched; Final/current `a321cc171c34d7d67c4d418fb431855e396b3f51`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"a321cc17…"` | `"current matches final"`; PF: None.
+
+NET-024 — `INTVER_HEAD_PARITY_OK.manifest.json`; OPR-024; Original—regenerated; R1/R2—not touched; Final/current `722817d209ebf7307f5ac3bdf286bc747b99ac64`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"722817d2…"` | `"current matches final"`; PF: None.
+
+NET-025 — its `.path_proof.txt`; OPR-025; Original—refreshed; R1/R2—not touched; Final/current `46f483e122519fadaf5593cd52451ae86a4291a6`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"46f483e1…"` | `"current matches final"`; PF: None.
+
+NET-026 — `TWO_RUN_IDENTITY_OK.bundle.json`; OPR-026; Original—regenerated; R1/R2—not touched; Final/current `515b34e877b9331c76d18cf0c5a9ec3c241117be`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"515b34e8…"` | `"current matches final"`; PF: None.
+
+NET-027 — its `.path_proof.txt`; OPR-027; Original—refreshed; R1/R2—not touched; Final/current `27726664c370b37d5c61ac0667d026f8d6cf9cfa`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"27726664…"` | `"current matches final"`; PF: None.
+
+NET-028 — `TWO_RUN_IDENTITY_OK.manifest.json`; OPR-028; Original—regenerated; R1/R2—not touched; Final/current `0a914cbde1a0960c292d5bfc93accbf68d53da6a`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"0a914cbd…"` | `"current matches final"`; PF: None.
+
+NET-029 — its `.path_proof.txt`; OPR-029; Original—refreshed; R1/R2—not touched; Final/current `a580c4c86db55110b011f1b1f89c86b8b2c1c2d5`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"a580c4c8…"` | `"current matches final"`; PF: None.
+
+NET-030 — `artifacts/evidence_index.jsonl`; OPR-030–OPR-037; Original—eight row blocks regenerated; R1/R2—not touched; Final/current `54192391d1ea8fe567b83226ce8e997efb60ed44`; Later: None; Risk: High; High-risk assessment: PASS—mirror schema/hash/path checks passed; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"54192391…"` | `"current matches final"`; PF: None.
+
+NET-031 — `artifacts/evidence_index.jsonl.path_proof.txt`; OPR-038; Original—refreshed; R1/R2—not touched; Final/current `acfdee3f940cfc8e4f0ed9761daf6bb1ef3c1966`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"acfdee3f…"` | `"current matches final"`; PF: None.
+
+NET-032 — `artifacts/evidence_index.jsonl.sha256`; OPR-039; Original—refreshed; R1/R2—not touched; Final/current `414ae64de910b4c17b7b34f4e7a01a45a4dc7481`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"414ae64d…"` | `"current matches final"`; PF: None.
+
+NET-033 — `artifacts/evidence_index.jsonl.sha256.path_proof.txt`; OPR-040; Original—refreshed; R1/R2—not touched; Final/current `77bcf1878f81d3cc00318a7c1088d088ab2d9d70`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"77bcf187…"` | `"current matches final"`; PF: None.
+
+NET-034 — `artifacts/proofs/endpoints_env_gate_proof.log.path_proof.txt`; OPR-041; Original—refreshed; R1/R2—not touched; Final/current `dd0665a7531b45becf03f438f96eb481f1d63f83`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"dd0665a7…"` | `"current matches final"`; PF: None.
+
+NET-035 — `artifacts/proofs/reader_success_get_head_304.json.path_proof.txt`; OPR-042; Original—refreshed; R1/R2—not touched; Final/current `b83c366d1bb96e59278a26df586b2e4a58f76870`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"b83c366d…"` | `"current matches final"`; PF: None.
+
+NET-036 — `artifacts/proofs/success_304.txt.path_proof.txt`; OPR-043; Original—refreshed; R1/R2—not touched; Final/current `73c41622e652ae3b3d6efc97869f2acc36480ab8`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"73c41622…"` | `"current matches final"`; PF: None.
+
+NET-037 — `artifacts/proofs/success_encoding_invariance.txt.path_proof.txt`; OPR-044; Original—refreshed; R1/R2—not touched; Final/current `7302ebdc4ccb91bbcca0bf7d9a5e8ab36a73f7c2`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"7302ebdc…"` | `"current matches final"`; PF: None.
+
+NET-038 — `artifacts/proofs/success_get.txt.path_proof.txt`; OPR-045; Original—refreshed; R1/R2—not touched; Final/current `35ff10d2f26a0cbfea632e86a64f13b9a62bbdad`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"35ff10d2…"` | `"current matches final"`; PF: None.
+
+NET-039 — `artifacts/proofs/success_head.txt.path_proof.txt`; OPR-046; Original—refreshed; R1/R2—not touched; Final/current `3fdc5fbc6f0ae8ff4e7af7533922699db879d95b`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"3fdc5fbc…"` | `"current matches final"`; PF: None.
+
+NET-040 — `artifacts/proofs/success_writers_errors.txt.path_proof.txt`; OPR-047; Original—refreshed; R1/R2—not touched; Final/current `86db6b5ceb3cccaeeea59634b09a1b8316fe7d48`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"86db6b5c…"` | `"current matches final"`; PF: None.
+
+NET-041 — `artifacts/reader/endpoints_snapshot.json.path_proof.txt`; OPR-048; Original—refreshed; R1/R2—not touched; Final/current `5c4ab61e483e5c1ac3cdbb3faa50edcc50229cde`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"5c4ab61e…"` | `"current matches final"`; PF: None.
+
+NET-042 — `audit/gates/topology/orientation_demo.txt.path_proof.txt`; OPR-049; Original—refreshed; R1/R2—not touched; Final/current `c6b49647a6d1eabdb1d77b2f8ecaf7440b2a8644`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"c6b49647…"` | `"current matches final"`; PF: None.
+
+NET-043 — `audit/qa/hde-epic024/token_evidence_matrix.md`; OPR-050; Original—exact SANITY path corrected; R1/R2—not touched; Final/current `b935b352df47ba686c47cfaac88fe2f940864777`; Later: None; Risk: High; High-risk assessment: PASS—only the path changed, not token status; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"b935b352…"` | `"current matches final"`; PF: None.
+
+NET-044 — its `.path_proof.txt`; OPR-051; Original—refreshed; R1/R2—not touched; Final/current `1843be15a8e8e2b715387b76f045d6e83b6fbb07`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"1843be15…"` | `"current matches final"`; PF: None.
+
+NET-045 — `docs/ENDPOINTS_CATALOG.json.path_proof.txt`; OPR-052; Original—refreshed; R1/R2—not touched; Final/current `c5f2361ac9d392c7c3b9fe771c4cf0ce5b04f83d`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"c5f2361a…"` | `"current matches final"`; PF: None.
+
+NET-046 — `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`; OPR-053; Original—refreshed; R1/R2—not touched; Final/current `f79900101e2a5b0a84abb32e6a7636bb7cf8889b`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"f7990010…"` | `"current matches final"`; PF: None.
+
+NET-047 — `docs/acceptance_map_epic024.json`; OPR-054; Original—exact SANITY path corrected; R1/R2—not touched; Final/current `e6ce3bf709bb8e76b06970160df795739a947bab`; Later: None; Risk: High; High-risk assessment: PASS—one evidence-title path changed; historical statuses retained; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"e6ce3bf7…"` | `"current matches final"`; PF: None.
+
+NET-048 — its `.path_proof.txt`; OPR-055; Original—refreshed; R1/R2—not touched; Final/current `82415dbfd03fd50ffb9d8de7459ff3408ab4f852`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | exact path/current HEAD | `"82415dbf…"` | `"current matches final"`; PF: None.
+
+NET-049 — `docs/evidence/INDEX.json`; OPR-056–OPR-061; Original—six companion SHA values updated; R1/R2—not touched; Final/current `901a08a071f65230cbe9c2bcc3151cd8c37efb89`; Later: None; Risk: High; High-risk assessment: PASS—529-entry before/after comparison showed only six expected SHA changes; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"901a08a0…"` | `"current matches final"`; PF: None.
+
+NET-050 — `docs/evidence/INDEX.json.path_proof.txt`; OPR-062; Original—refreshed; R1/R2—not touched; Final/current `0d27907f530a47ac3e5c109075be67813143ca8b`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"0d27907f…"` | `"current matches final"`; PF: None.
+
+NET-051 — `docs/evidence/INDEX.sha256`; OPR-063; Original—refreshed; R1/R2—not touched; Final/current `49ba40da96d8db8839f113cac3aa13fb53eb3328`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"49ba40da…"` | `"current matches final"`; PF: None.
+
+NET-052 — `docs/evidence/INDEX.sha256.path_proof.txt`; OPR-064; Original—refreshed; R1/R2—not touched; Final/current `01f1c585df1d8a4f7165562265e3d3ff678b4d67`; Later: None; Risk: High; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"01f1c585…"` | `"current matches final"`; PF: None.
+
+NET-053 — `engine/db/ddl_identity_projection.py`; OPR-065; Original—shared strict projector added; R1/R2—not touched; Final/current `03323032464c1856f4d635d21b76c078f284e1f3`; Later: None; Risk: High; High-risk assessment: PASS—exact included/unexamined rosters, ordering, and malformed/duplicate/alias-conflict refusal; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"03323032…"` | `"current matches final"`; PF: None.
+
+NET-054 — `glow_hdengine.egg-info/SOURCES.txt`; OPR-066; Original—projector added to package inventory; R1/R2—not touched; Final/current `63812a0ff103388f8b0ef3e17ec6b8c530b2c4d0`; Later: None; Risk: Low; High-risk assessment: Not applicable; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"63812a0f…"` | `"current matches final"`; PF: None.
+
+NET-055 — `scripts/db/capture_epic011_posture.py`; OPR-067, OPR-068; Original—duplicate projection semantics removed and shared projector used; R1/R2—not touched; Final/current `5067dc8d9edec09d312b42c0a0b85362735678b7`; Later: None; Risk: High; High-risk assessment: PASS—the retained wrapper only delegates and does not implement alternate projection semantics; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"5067dc8d…"` | `"current matches final"`; PF: None.
+
+NET-056 — `scripts/ops/hde_epic038_ops01r.py`; OPR-069, R1PR-001–R1PR-011, R2PR-001–R2PR-013; Progression: Original—initial preflight scaffold; R1—bounded discovery/live/capture implementation; R2—exact-contract, PATH, write, template, race, and summary hardening; Final/current `52e9eae2da88db8a9bd450bfd3b092a48e60f52b`; Reversion: earlier internal forms partially superseded, no baseline restoration; Later: None; Risk: High; High-risk assessment: PASS—final producer enforces staged `-I -B`, empty `PYTHON*`, PATH-bound Railway identity, final auth-byte stability, one launch, and closed writes; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"52e9eae2…"` | `"current matches final"`; PF: None.
+
+NET-057 — `tests/db/test_ddl_identity_projection.py`; OPR-070; Original—focused projector tests added; R1/R2—not touched; Final/current `24c736bb99a427136dd692bd11cc492b30505312`; Later: None; Risk: Medium; High-risk assessment: Not applicable; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"24c736bb…"` | `"current matches final"`; PF: None.
+
+NET-058 — `tests/evidence/test_retained_evidence_safety.py`; OPR-071; Original—scanner matrix added; R1/R2—not touched; Final/current `645da565e042ede525fcc2ff128fd9af621b7489`; Later: None; Risk: Medium; High-risk assessment: Not applicable; Assessment: PASS—CI runs `tests/evidence`; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"645da565…"` | `"current matches final"`; PF: None.
+
+NET-059 — `tests/ops/test_hde_epic038_ops01r_v5.py`; OPR-072, R1PR-012, R2PR-014; Original—initial suite; R1—live-path and source/write coverage; R2—exact-contract and all reported-finding regressions; Final/current `c28a73ec0dfc44f977ec23b8a63b47f0758c93c6`; Later: None; Risk: Medium; High-risk assessment: Not applicable; Assessment: PASS—exact file passed CI at all three heads; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"c28a73ec…"` | `"current matches final"`; PF: None.
+
+NET-060 — `tests/qa/test_epic024_bootstrap_status.py`; Covered hunks: R2PR-015; Original/R1—not touched; R2—focused selective-mode tests added; Final/current `b3925c318a57280da0de2570d1141a9bacebb9af`; Later: None; Risk: Medium; High-risk assessment: Not applicable; Assessment: PASS—PR test report and exact-blob smoke confirm behavior; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"b3925c31…"` | `"current matches final"`; PF: None.
+
+NET-061 — `tools/evidence/hde_epic038_ops01_v5.py`; OPR-073, R1PR-013–R1PR-027, R2PR-016–R2PR-042; Progression: Original—initial candidate/control validators; R1—full live/discovery/capture validation; R2—closed recursive rosters, exact replay, deterministic regex/help/write/argv handling; Final/current `02543923abce1acdeb3f72a0ab6a74f42e109cde`; Reversion: earlier internal forms partially superseded, no baseline restoration; Later: None; Risk: High; High-risk assessment: PASS—all reviewed identity, argv, regex, template, write-set, and semantic-proof gaps are closed; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"02543923…"` | `"current matches final"`; PF: None.
+
+NET-062 — `tools/evidence/retained_evidence_safety.py`; OPR-074; Original—shared scanner added; R1/R2—not touched; Final/current `43d6c10095768541c9e6aded03d4b46edc6ad388`; Later: None; Risk: High; High-risk assessment: PASS—strict UTF-8, every marker scanned, exact safe forms, fixed reason codes; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"43d6c100…"` | `"current matches final"`; PF: None.
+
+NET-063 — `tools/evidence/run_sanity_pipeline.py`; OPR-075–OPR-077; Original—shared scanner/projector adopted and duplicate logic removed; R1/R2—not touched; Final/current `ec6db04f4bea6b3abf646db1865ba5db3c4bbb5d`; Later: None; Risk: High; High-risk assessment: PASS—default OPS constants remain v4 while shared admission safety is active; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"ec6db04f…"` | `"current matches final"`; PF: None.
+
+NET-064 — `tools/qa/run_hde_epic024_harness.py`; OPR-078–OPR-084; Original—pure renderers, retained-status derivation, exact-diff, selective refresh/check modes added; R1/R2—not touched; Final/current `51152ac7ce941664b788401613f41879ba36bb6e`; Later: None; Risk: High; High-risk assessment: PASS—only the two governed primaries are writable and `_check_specs` is bypassed; Assessment: PASS; Evidence/GitHub proof: GitHub Repo | path/current HEAD | `"51152ac7…"` | `"current matches final"`; PF: None.
+
+### Validation & Evidence Review
+
+VAL-001  
+Purpose: Prove lifecycle identity/order.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: PR metadata, bases, heads, merge identifiers, and current commit history.  
+Result: PASS.  
+Observation: Each successive base equals its predecessor’s merge; current HEAD equals the Final Lineage PR merge.  
+Evidence pointer: GitHub Repo | PRs \#360/\#361/\#362 | `"2e9b1b4 → 34f32bf → ffe67e3"` | `"main=ffe67e3"`.  
+Why it matters: Establishes one reviewable lifecycle and combined change-set.
+
+VAL-002  
+Purpose: Verify current touched-file reality.  
+Source: GitHub Repo.  
+Method: Current file fetch and blob identity for all 64 union files.  
+Result: PASS.  
+Observation: 64/64 files exist and match Final Lineage PR blobs.  
+Evidence pointer: GitHub Repo | current `main` file API | `"64 files inspected"` | `"0 later changes"`.  
+Why it matters: CI and historical diffs alone cannot establish current state.
+
+VAL-003  
+Purpose: Original PR CI.  
+Source: Original PR.  
+Check: Actions run 29659658580\.  
+Result: PASS.  
+Observation: `test`, `sanity-pipeline`, `rails-policy-gates`, `EPIC020 evidence bundles/index`, `EPIC020 compat HTTP`, `PR-01 compat conjunction`, and `epic020 acceptance suites` all succeeded.  
+Evidence pointer: Original PR | Actions run 29659658580 | `"conclusion":"success"` | `"7/7 jobs success"`.  
+Why it matters: Validates the initial merged scope.
+
+VAL-004  
+Purpose: Remedial PR 1 CI.  
+Source: Remedial PR 1\.  
+Check: Actions run 29670814023\.  
+Result: PASS.  
+Observation: Same seven jobs succeeded, including the exact OPS regression file.  
+Evidence pointer: Remedial PR 1 | Actions run 29670814023 | `"conclusion":"success"` | `"7/7 jobs success"`.  
+Why it matters: Validates the live-path remediation.
+
+VAL-005  
+Purpose: Remedial PR 2 CI.  
+Source: Remedial PR 2\.  
+Check: Actions run 29679307753\.  
+Result: PASS.  
+Observation: Same seven jobs succeeded after exact-contract hardening.  
+Evidence pointer: Remedial PR 2 | Actions run 29679307753 | `"conclusion":"success"` | `"7/7 jobs success"`.  
+Why it matters: Validates final lineage code.
+
+VAL-006  
+Purpose: Determine review-finding disposition.  
+Source: Original PR, Remedial PR 1, Remedial PR 2\.  
+Method: GitHub review-thread GraphQL and final reviewer comments.  
+Result: PASS.  
+Observation: Original PR has 22 administratively unresolved historical threads—14 outdated and 8 current-line—but every substantive issue is closed in later code/tests. Remedial PR 1 has 12/12 resolved; Remedial PR 2 has 6/6 resolved. Final Codex reviews reported no major issues.  
+Evidence pointer: Original PR | reviewThreads/final comment | `"22 total, 14 outdated"` | `"Didn't find any major issues. Nice work!"`; Remedial PR 1 | reviewThreads | `"12/12 resolved"` | [final comment](https://github.com/amthorn78/glow-hdengine-v2/pull/361#issuecomment-5013895662); Remedial PR 2 | reviewThreads | `"6/6 resolved"` | [final comment](https://github.com/amthorn78/glow-hdengine-v2/pull/362#issuecomment-5014994647).  
+Why it matters: Thread administration did not conceal a surviving behavioral gap.
+
+VAL-007  
+Purpose: Confirm PATH preservation when binding Railway CLI identity.  
+Source: Remedial PR 2\.  
+Method: Current producer inspection and PATH-only executable regression.  
+Result: PASS.  
+Observation: The staged child environment explicitly carries the caller’s `PATH`; preflight requires a nonempty resolved Railway identity and hash.  
+Evidence pointer: Remedial PR 2 | `scripts/ops/hde_epic038_ops01r.py`, R2PR-004 | `"child_env['PATH']"` | `"railway_executable resolved regular file"`; `tests/ops/test_hde_epic038_ops01r_v5.py`, R2PR-014 | `"PATH-only Railway executable"` | `"identity retained"`.  
+Why it matters: Evidence now binds the same discoverable CLI class later subprocesses may execute.
+
+VAL-008  
+Purpose: Confirm exact preflight write-contract values.  
+Source: Remedial PR 2\.  
+Method: Producer/validator comparison and mutation tests.  
+Result: PASS.  
+Observation: Exact write paths, recursive roots, metadata paths, and self exclusions are recomputed from preflight/control/source paths.  
+Evidence pointer: Remedial PR 2 | R2PR-007, R2PR-030 | `"authorized_exact_write_paths=[preflight_path]"` | `"self_bound_excluded_paths=[preflight_path]"`.  
+Why it matters: A retained artifact cannot widen its claimed write authority.
+
+VAL-009  
+Purpose: Confirm deterministic two-run boundary.  
+Source: Implementation Doc; Remedial PR 2\.  
+Method: Approved schema comparison and recursive-key validation.  
+Result: PASS.  
+Observation: The approved contract is exact named members `run_1` and `run_2`, each with exact `actual_external_io_counts` and `expected_call_counts`. A separate `run_label: A/B` row is not part of the source contract. Current validator rejects missing, extra, or malformed members.  
+Evidence pointer: Implementation Doc | §`RSC-004.A` source and offline preflight contract | `"orchestration has exactly fake_boundary_mode, run_1, run_2, run_count, and vectors_equal"` | `"run_1 and run_2 each have exactly actual_external_io_counts and expected_call_counts"`; Remedial PR 2 | R2PR-029 | `"exact named run_1/run_2 vectors"` | `"run_count=2"`.  
+Why it matters: The earlier A/B-label finding is settled by enforcing the actual approved schema, not an obsolete row model.
+
+VAL-010  
+Purpose: Confirm exact preflight argv vectors.  
+Source: Remedial PR 2\.  
+Method: Full-vector reconstruction and mutation tests.  
+Result: PASS.  
+Observation: Producer is exactly `[interpreter, "-I", "-B", runner, "--preflight"]`; validator is exactly the seven-token vector with `--validate-preflight`, `--expected-identity-stdin`, and preflight path.  
+Evidence pointer: Implementation Doc | §`RSC-004.A` | `"exact sole producer argv"` | `"preflight_validator_argv=[...]"`; Remedial PR 2 | R2PR-004, R2PR-028 | `"whole-vector equality"` | `"extra/missing/substituted token rejection"`.  
+Why it matters: Preflight cannot misstate its producing command.
+
+VAL-011  
+Purpose: Confirm authorization stability at discovery dispatch.  
+Source: Remedial PR 2\.  
+Method: Control-flow inspection and mutation fixture.  
+Result: PASS.  
+Observation: Final authorization byte equality occurs after the last staging walk and immediately before `subprocess.run`.  
+Evidence pointer: Remedial PR 2 | `scripts/ops/hde_epic038_ops01r.py`, R2PR-009 | `"authorization_path.read_bytes() == authorization_bytes"` | `"directly before subprocess.run"`.  
+Why it matters: Mutation during tree inspection cannot permit target-probe I/O.
+
+VAL-012  
+Purpose: Confirm help-token template eligibility.  
+Source: Remedial PR 2\.  
+Method: Runtime selector and retained replay inspection.  
+Result: PASS.  
+Observation: Runtime discovery evaluates normalized help tokens. Retained authorization rejects nonempty help selectors because raw help is not retained, leaving exactly one independently replayable version-eligible template.  
+Evidence pointer: Remedial PR 2 | R2PR-011, R2PR-035 | `"required_help_tokens"` | `"unverifiable help predicates rejected"`.  
+Why it matters: Retained validation cannot accept a template whose selector cannot be proven.
+
+VAL-013  
+Purpose: Confirm malformed discovery regex handling.  
+Source: Remedial PR 2\.  
+Method: Helper and regression inspection.  
+Result: PASS.  
+Observation: `_discovery_version_matches` catches `re.error` and returns false; validation produces deterministic discovery-result errors instead of crashing.  
+Evidence pointer: Remedial PR 2 | R2PR-035 | `"except re.error"` | `"return False"`; tests R2PR-014 | `"malformed version_regex"` | `"deterministic failure"`.  
+Why it matters: Tampered authorization cannot crash the CLI.
+
+VAL-014  
+Purpose: Corroborate scanner, DDL, and selective EPIC024 behavior independently of CI.  
+Source: GitHub Repo.  
+Method: Exact current blobs were hash-matched to GitHub, compiled with `python -B`, and exercised with read-only behavioral smokes.  
+Result: PASS.  
+Observation: Compact later unsafe markers reject; safe forms pass; DDL ordering/view normalization pass and alias conflicts reject; PASS/TOOLING\_BLOCKED retention, conflict refusal, one-path diff, check no-write, exactly-two-file write, and `_check_specs` bypass all pass.  
+Evidence pointer: GitHub Repo | current blobs `43d6c100…`, `03323032…`, `51152ac7…` | `"hash-object matched GitHub"` | `"behavioral smoke PASS"`.  
+Why it matters: Directly checks high-risk final-file behavior.
+
+VAL-015  
+Purpose: Validate governed evidence convergence.  
+Source: Original PR; GitHub Repo.  
+Method: Index/mirror/bundle/hash/path/LF workflows and complete before/after index comparison.  
+Result: PASS.  
+Observation: Updater, mirror schema, index hash, path proofs, bundle validation, and LF checks passed; `docs/evidence/INDEX.json` retained 529 entries with exactly six expected SHA changes.  
+Evidence pointer: Original PR | complete patch and CI | `"529 entries before/after"` | `"six expected SHA changes"`; GitHub Repo | current governed blobs | `"byte-identical final state"` | `"checks success"`.  
+Why it matters: Primary changes and companions are atomic and reviewable.
+
+VAL-016  
+Purpose: Confirm PR-A boundary remains v4 and OPS/PR-C were not executed or integrated.  
+Source: GitHub Repo; Implementation Doc.  
+Method: Current constants and exact repository search.  
+Result: PASS.  
+Observation: `run_sanity_pipeline.py` still uses `hde_epic038.ops01.provider_parity.v4` and corpus v3. No tracked v5 packet exists under `audit/ops`.  
+Evidence pointer: GitHub Repo | `tools/evidence/run_sanity_pipeline.py` | `"OPS01_PROVIDER_PROOF_SCHEMA = hde_epic038.ops01.provider_parity.v4"` | `"OPS01_CORPUS_NAME = hde_epic038_ops01_live_bodygraph_parity_v3"`; Implementation Doc | §RSC-005 | `"main remains coherently v4 after PR-A"` | `"separate PR-C"`.  
+Search method: searched GitHub Repo for `hde_epic038.ops01.provider_parity.v5` (case: sensitive); scope: current default branch; tool: GitHub search; result: 4 hits—in runner, independent validator, CRD, and OPS tests; 0 hits under `audit/ops`.  
+Why it matters: The lineage did not overclaim OPS execution or integration.
+
+### Requirement Satisfaction Crosswalk
+
+REQ-001  
+Requirement: PR-A boundary—land independent repairs and dormant v5 machinery while preserving v4 default admission and excluding OPS/PR-C.  
+Lifecycle progression: Original—Satisfied; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-005 | `"main remains coherently v4 after PR-A"` | `"separate PR-C"`; GitHub Repo | NET-063 | `"v4 default constants"` | `"no tracked v5 packet"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9.
+
+REQ-002  
+Requirement: RSC-001 selective two-primary EPIC024 repair, exact one-path semantic diff, retained status, no QA rerun, no other writes, focused tests.  
+Lifecycle progression: Original—Not satisfied because implementation/primaries landed but focused selective-mode tests were incomplete; Remedial 1—Not satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-001 | `"exactly two historical primaries"` | `"without running _check_specs"`; GitHub Repo | NET-043, NET-047, NET-060, NET-064 | `"one-path diff"` | `"focused tests present"`.  
+PF09 IDs: HDE-DIST001.6, HDE-DIST005.2.
+
+REQ-003  
+Requirement: RSC-002 shared strict retained-text scanner with exact markers, exact safe RHS forms, all-match inspection, strict UTF-8, stable reason codes.  
+Lifecycle progression: Original—Satisfied; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-002 | `"closed marker roster and closed safe-scalar roster"` | `"strict UTF-8"`; GitHub Repo | NET-058, NET-062, NET-063 | `"finditer"` | `"fixed reason codes"`.  
+PF09 IDs: HDE-DIST001.6, HDE-DIST001.11.
+
+REQ-004  
+Requirement: RSC-003 one strict shared versioned DDL identity projector used by producer and validator with focused malformed/ordering tests.  
+Lifecycle progression: Original—Satisfied; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-003 | `"sole DDL identity-projection implementation"` | `"hde.ddl_identity_projection.v1"`; GitHub Repo | NET-053, NET-055, NET-057, NET-063 | `"shared projector"` | `"duplicate semantics removed"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9.
+
+REQ-005  
+Requirement: Independent v5 candidate validator with closed inventory, schema, semantic identities, checksum/result-summary/nonclaim bindings, and mutation tests.  
+Lifecycle progression: Original—Not satisfied; Remedial 1—Not satisfied because exact result/preflight/policy rosters remained open; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-003 and §RSC-004.D | `"independent validate_ops01_v5_package"` | `"closed inventory/ledger/semantic gate"`; GitHub Repo | NET-059, NET-061 | `"closed recursive rosters"` | `"CI PASS"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9.
+
+REQ-006  
+Requirement: RSC-004.A exact detached-source preflight, component/interpreter/Railway identities, `-I -B`, empty `PYTHON*`, manifests, zero I/O, exact two-run orchestration, and closed write contract.  
+Lifecycle progression: Original—Not satisfied; Remedial 1—Not satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §`RSC-004.A` | `"exact sole producer argv"` | `"Deterministic two-run structure"`; GitHub Repo | NET-056, NET-059, NET-061 | `"PATH identity"` | `"exact write/argv/run_1/run_2 validation"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.6.
+
+REQ-007  
+Requirement: RSC-004.B bounded six-stage discovery with authenticated authorization/policy, exact template replay, source/write validation, and immediate dispatch boundary.  
+Lifecycle progression: Original—Not satisfied; Remedial 1—Not satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §`RSC-004.B` bounded Railway discovery gate | `"six stages"` | `"bounded Railway discovery"`; GitHub Repo | R2PR-008–R2PR-011, R2PR-031–R2PR-038 | `"exact stage replay"` | `"final auth-byte check"`.  
+PF09 IDs: HDE-DIST001.9.
+
+REQ-008  
+Requirement: RSC-004.C closed live authorization, exact child vector, one launch, exact expected/actual counts, and no retry.  
+Lifecycle progression: Original—Not satisfied; Remedial 1—Not satisfied because exact surrounding contracts remained incomplete; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §`RSC-004.C` authorization and live equality contract | `"one launch"` | `"no second or recovery launch"`; GitHub Repo | NET-056, NET-059, NET-061 | `"fixed call counts"` | `"post-marker authority consumed"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9.
+
+REQ-009  
+Requirement: RSC-004.D independently recomputed live capture over actual source/non-candidate staging, exact exclusions/write sets, candidate admission, and sanitized failure posture.  
+Lifecycle progression: Original—Not satisfied; Remedial 1—Not satisfied because result/write/policy exactness remained incomplete; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §`RSC-004.D` | `"capture-time validation recomputes the actual source manifest"` | `"nested permanent packet validator must also PASS"`; GitHub Repo | NET-056, NET-059, NET-061 | `"live capture validation"` | `"deterministic write-set errors"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9.
+
+REQ-010  
+Requirement: Sufficient focused tests, visible CI, updater/index/mirror/hash/path/LF convergence, and current-file verification.  
+Lifecycle progression: Original—Satisfied for its landed scope; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: GitHub Repo | Actions runs 29659658580, 29670814023, 29679307753 | `"7/7 jobs success each"` | `"64/64 current blobs inspected"`; NET-001–NET-064.  
+PF09 IDs: HDE-DIST001.6, HDE-DIST005.2.
+
+REQ-011  
+Requirement: Preserve nonclaims—no QA run/reapproval, token satisfaction, PF09 movement, OPS execution, deployment, bridge mutation, or closeout.  
+Lifecycle progression: Original—Satisfied; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §12 Approval Limitations and Nonclaims | `"no QA"` | `"no PF09 movement"`; GitHub Repo | NET-043, NET-047, NET-056, NET-061 | `"nonclaims retained"` | `"default v4"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST001.11, HDE-DIST005.2.
+
+REQ-012  
+Requirement: RSC-005, live OPS-01R, and PR-C remain separate future actions and are not falsely claimed by this lineage.  
+Lifecycle progression: Original—Satisfied; Remedial 1—Satisfied; Remedial 2—Satisfied.  
+Current state: Satisfied.  
+Evidence pointers: Implementation Doc | §RSC-005 | `"integrate ... in a separate PR-C"` | `"prohibit a second OPS execution during integration"`; GitHub Repo | current v4 constants and search | `"0 v5 packet hits under audit/ops"` | `"no OPS evidence integration"`.  
+PF09 IDs: HDE-DIST001.4, HDE-DIST001.9, HDE-DIST005.2.
+
+### RCA
+
+A) Bug/Failure statement
+
+* EPIC024’s two producer-owned historical primaries retained a stale sanity-log binding after PR 359\.  
+* Stage 12’s earlier marker handling had a syntax/all-match blind spot.  
+* DDL identity comparison was duplicated and unversioned.  
+* Initial OPS-01R runner/validator work did not fully enforce the approved source, authorization, write-set, discovery, and capture boundaries.
+
+Evidence pointer: Implementation Doc | §6 Causal Map | `"CAUSE-001 - EPIC024 generated-output drift"` | `"CAUSE-004 - OPS source/import qualification and unresolved launch contract"`.
+
+B) Root cause(s)
+
+* Generated primaries and updater companions were not refreshed atomically after the canonical path changed.  
+* Earlier scanning logic could stop at or reason from an insufficient assignment representation.  
+* Producer and validator owned separate DDL normalization semantics.  
+* The initial runner scaffold admitted self-reported fields without every value being rebound to independently recomputed paths, bytes, vectors, templates, and manifests.
+
+C) Fix progression across every Lineage PR
+
+* Original PR corrected the two historical primaries, introduced shared scanner/projector modules, removed duplicate consumer semantics, added governed companion convergence, and established initial OPS-01R machinery. The OPS exact-contract surface remained incomplete.  
+* Remedial PR 1 implemented discovery, live authorization, one-shot execution, capture, candidate production, and broad source/write tests. Recursive preflight/policy/summary exactness still required correction.  
+* Remedial PR 2 closed PATH identity, exact argv/write/run structure, dispatch-byte stability, template eligibility, invalid-regex determinism, result-summary rosters, and focused selective-mode test gaps.
+
+D) Final fix verification
+
+Current blobs are identical to the Final Lineage PR, every listed user finding has a direct code/test disposition, all visible CI jobs passed, current high-risk behavior passed exact-blob smoke checks, and no later commit altered reviewed state.
+
+Evidence pointer: GitHub Repo | current HEAD and Actions | `"ffe67e3d2c2831cb42c12dc583340ddde77d0980"` | `"three successful lineage runs"`.
+
+### PF09 Impact & Status Posture
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation, v1.1.2  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.4  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: The shared DDL projector and bounded OPS evidence machinery improve DB-posture proof semantics, but no live candidate was executed or integrated and no status movement is claimed.  
+Evidence pointer(s): Implementation Doc | §PF09 consequences | `"HDE-DIST001.4 Partial"` | `"None"`; GitHub Repo | NET-053, NET-055, NET-056, NET-061 | `"projection contract present"` | `"v4 packet remains current"`.  
+GitHub Repo proof: current blobs at `ffe67e3d…`.  
+PF proof excerpts:
+
+#### Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)
+
+*Subtask status:* Partial
+
+Linked NET/Finding IDs: NET-053, NET-055, NET-056, NET-061.
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation, v1.1.2  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.6  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: Shared safety admission, selective canonical binding, CI, and evidence convergence strengthen the one-button release-sanity surface without completing the larger subtask.  
+Evidence pointer(s): Implementation Doc | §RSC-001, §RSC-002, §PF09 consequences | `"HDE-DIST001.6 Partial"` | `"None"`; GitHub Repo | NET-001, NET-043, NET-047, NET-058, NET-062–NET-064 | `"CI PASS"` | `"canonical path and shared scanner"`.  
+GitHub Repo proof: current blobs at `ffe67e3d…`.  
+PF proof excerpts:
+
+#### Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline
+
+**Subtask description:**  
+Implement a one-button runner that executes the release & provenance sanity pipeline end-to-end and fails closed on any drift:
+
+**Subtask status:** Partial
+
+Linked NET/Finding IDs: NET-001, NET-043, NET-047, NET-058, NET-062, NET-063, NET-064.
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation, v1.1.2  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.9  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: The lineage strengthens direct/bridge DDL comparison and preserves distinct provenance, but does not execute or integrate new bridge-parity evidence.  
+Evidence pointer(s): Implementation Doc | §RSC-003, §PF09 consequences | `"HDE-DIST001.9 Partial"` | `"None"`; GitHub Repo | NET-053, NET-055, NET-056, NET-061 | `"shared projection"` | `"no bridge mutation"`.  
+GitHub Repo proof: current blobs and v4 retained packet at `ffe67e3d…`.  
+PF proof excerpts:
+
+#### Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity
+
+**Subtask description:**  
+Prove parity between direct DB reads and bridge-mediated reads for BodyGraph, and capture the associated environment connectivity posture:
+
+**Subtask status:** **Partial**
+
+Linked NET/Finding IDs: NET-053, NET-055, NET-056, NET-061.
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation, v1.1.2  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.11  
+Current PF09 status: Optional  
+Status recommendation: No status change recommended  
+Why supported: The scanner preserves the no-raw-payload posture, but this lineage performs no mapped-cache write/read-back or live persistence work.  
+Evidence pointer(s): Implementation Doc | §RSC-002, §PF09 consequences | `"HDE-DIST001.11 Optional"` | `"None"`; GitHub Repo | NET-058, NET-062, NET-063 | `"raw marker safety"` | `"no production write authorization"`.  
+GitHub Repo proof: current scanner blob `43d6c100…`.  
+PF proof excerpts:
+
+#### Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening
+
+Implement and prove a durable mapped-cache persistence path for configured-v2 chart-backed BodyGraph resolution in non-prod or controlled rails before any production-facing write posture is considered.
+
+**Subtask status:** Optional
+
+Linked NET/Finding IDs: NET-058, NET-062, NET-063.
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation, v1.1.2  
+PF09 task ID: HDE-DIST005  
+PF09 subtask ID(s): HDE-DIST005.2  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: The lineage preserves Human Index, Machine Mirror, checksum, path-proof, and updater ownership, but this is one scoped convergence event rather than completion of the global discipline.  
+Evidence pointer(s): Implementation Doc | §RSC-001, §PF09 consequences | `"HDE-DIST005.2 Partial"` | `"None"`; GitHub Repo | NET-002–NET-052 | `"updater/mirror/hash/path/LF checks passed"` | `"current blobs converge"`.  
+GitHub Repo proof: current governed artifacts at `ffe67e3d…`.  
+PF proof excerpts:
+
+#### Subtask HDE-DIST005.2 — Global Index & Mirror discipline
+
+For any artifact added/moved/removed in this phase:  
+Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR.
+
+**Subtask status:** Partial
+
+Linked NET/Finding IDs: NET-002 through NET-052.
+
+### Findings
+
+No findings.
+
+### Evidence Print (PASS PROOF; merged work)
+
+A) Acceptance coverage evidence
+
+* All current requirements REQ-001 through REQ-012 are Satisfied.  
+* Every material hunk is assigned once to OPR-001–OPR-084, R1PR-001–R1PR-027, or R2PR-001–R2PR-042 and covered once by NET-001–NET-064.  
+* Evidence pointer: GitHub Repo | complete lineage diffs/current files | `"153 ledger items"` | `"64 NET items"`.
+
+B) Per-PR lifecycle proof
+
+* Original PR: established the selective binding repair, safety scanner, shared DDL projector, initial independent v5 validator/runner, tests, and governed companion convergence. Its later OPS gaps are explicitly reflected as historically Not satisfied. Evidence pointer: Original PR | merge `2e9b1b4…` | `"63 files"` | `"CI success"`.  
+* Remedial PR 1: supplied the bounded discovery/live/capture implementation and extensive adversarial tests. Its remaining exact-contract gaps were corrected without unacceptable surviving drift. Evidence pointer: Remedial PR 1 | merge `34f32bf…` | `"3 files"` | `"12/12 threads resolved"`.  
+* Remedial PR 2: closed every remaining exact-contract and listed review finding, added focused EPIC024 tests, and passed all visible checks. Evidence pointer: Remedial PR 2 | merge `ffe67e3…` | `"4 files"` | `"6/6 threads resolved"`.
+
+C) Evidence and verification posture
+
+* Direct code review, current blob identity, exact contract comparison, review-thread disposition, governed companion inspection, CI, and exact-blob behavioral smokes all agree.  
+* Evidence pointer: GitHub Repo | current HEAD | `"64/64 touched files match"` | `"0 later commits"`.
+
+D) Token/gate evidence
+
+* No new token satisfaction or QA gate is claimed.  
+* The token-related change is limited to correcting the `SANITY_PIPELINE_OK` evidence path while retaining historical statuses and nonclaims.  
+* Evidence pointer: GitHub Repo | NET-043 and NET-047 | `"audit/gates/sanity_pipeline/sanity_pipeline.log"` | `"historical statuses unchanged"`.
+
+E) Test/CI proof
+
+* All seven visible jobs passed at all three PR heads.  
+* The CI pytest command includes `tests/evidence`, `tests/ops/test_evidence_index.py`, and `tests/ops/test_hde_epic038_ops01r_v5.py`.  
+* Focused DDL and selective EPIC024 results are reported in the PR evidence and corroborated by read-only exact-blob smokes.  
+* Evidence pointer: Original PR, Remedial PR 1, Remedial PR 2 | Actions runs 29659658580, 29670814023, 29679307753 | `"success"` | `"7/7 each"`.
+
+F) Artifact and evidence outputs
+
+* The two governed EPIC024 primaries contain the canonical sanity path.  
+* Human Index, Machine Mirror, SHA sentinels, architecture snapshot, affected bundles/manifests, and path proofs are converged.  
+* Current default OPS admission remains coherently v4; no live candidate or v5 tracked packet is falsely claimed.  
+* Evidence pointer: GitHub Repo | NET-002–NET-052, NET-063 | `"current blobs at ffe67e3"` | `"v4 default/no tracked v5 packet"`.
+
+---
 
 \<eof\>  
