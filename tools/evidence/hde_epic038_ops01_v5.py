@@ -906,7 +906,12 @@ def _db_posture_valid(value: Mapping[str, object], *, staging_root: str) -> bool
 
 
 def _bridge_consistency_valid(
-    value: Mapping[str, object], *, staging_root: str
+    value: Mapping[str, object],
+    *,
+    staging_root: str,
+    candidate_root: Path,
+    authorization: Mapping[str, object],
+    provider_proof: Mapping[str, object],
 ) -> bool:
     if set(value) != {
         "bodygraph_comparator",
@@ -953,6 +958,40 @@ def _bridge_consistency_valid(
         _mapping(comparator.get("bridge_input")),
     )
     checker_inputs = _mapping(checker.get("inputs"))
+    try:
+        provider_proof_input = {
+            "path": (
+                Path(staging_root) / "candidate" / "provider_parity.proof.json"
+            ).as_posix(),
+            "sha256": _sha(
+                (candidate_root / "provider_parity.proof.json").read_bytes()
+            ),
+        }
+        env_presence_input = {
+            "path": (
+                Path(staging_root) / "candidate" / "env_presence.json"
+            ).as_posix(),
+            "sha256": _sha((candidate_root / "env_presence.json").read_bytes()),
+        }
+        source_root = _mapping(authorization.get("source")).get("root")
+        if not isinstance(source_root, str):
+            return False
+        staged_checker = (
+            Path(source_root) / "ci" / "checks" / "check_bridge_consistency.py"
+        ).as_posix()
+        bodygraph_row = next(
+            _mapping(row)
+            for row in provider_proof.get("capabilities", ())
+            if isinstance(row, Mapping) and row.get("name") == "bodygraph_payload_row"
+        )
+        direct_bodygraph_sha = _mapping(bodygraph_row.get("direct")).get(
+            "canonical_sha256"
+        )
+        bridge_bodygraph_sha = _mapping(bodygraph_row.get("bridge")).get(
+            "canonical_sha256"
+        )
+    except (OSError, StopIteration, TypeError):
+        return False
     all_paths = [item.get("path") for item in comparator_inputs]
     for name in ("adapter_selection", "env_connectivity", "provider_parity"):
         item = _mapping(checker_inputs.get(name))
@@ -981,6 +1020,8 @@ def _bridge_consistency_valid(
         value.get("schema") == "hde_epic038.ops01.bridge_consistency.v3"
         and value.get("status") == "PASS"
         and all(_has_exact_keys(item, pair_keys) for item in comparator_inputs)
+        and comparator_inputs
+        == (provider_proof_input, provider_proof_input)
         and all(_path_is_beneath(path, staging_root) for path in all_paths)
         and _path_is_beneath(checker.get("staged_executable"), staging_root)
         and all(_is_sha256(item.get("sha256")) for item in comparator_inputs)
@@ -988,14 +1029,21 @@ def _bridge_consistency_valid(
         and comparator.get("exit_code") == 0
         and comparator.get("result") == "FILE_EQ_CANON_BYTES_OK"
         and comparator.get("canonical_sha256")
-        == comparator_inputs[0].get("sha256")
-        == comparator_inputs[1].get("sha256")
+        == direct_bodygraph_sha
+        == bridge_bodygraph_sha
         and set(_mapping(value.get("command_exit_codes"))) == expected_exit_names
         and all(type(item) is int and item == 0 for item in _mapping(value.get("command_exit_codes")).values())
         and set(_mapping(value.get("predicates"))) == expected_predicates
         and all(item is True for item in _mapping(value.get("predicates")).values())
         and _has_exact_keys(checker_inputs, {"adapter_selection", "env_connectivity", "provider_parity"})
+        and checker_inputs
+        == {
+            "adapter_selection": provider_proof_input,
+            "env_connectivity": env_presence_input,
+            "provider_parity": provider_proof_input,
+        }
         and checker.get("repo_identity") == "ci/checks/check_bridge_consistency.py"
+        and checker.get("staged_executable") == staged_checker
         and checker.get("repo_sha256") == checker.get("staged_sha256")
         and _is_sha256(checker.get("repo_sha256"))
         and checker.get("exit_code") == 0
@@ -1162,7 +1210,11 @@ def validate_ops01_v5_package(
             (
                 "bridge_consistency.result.json",
                 lambda value: _bridge_consistency_valid(
-                    value, staging_root=expected.literal_staging_root
+                    value,
+                    staging_root=expected.literal_staging_root,
+                    candidate_root=root,
+                    authorization=authorization,
+                    provider_proof=proof,
                 ),
                 "OPS01_V5_BRIDGE_CONSISTENCY_INVALID",
             ),
