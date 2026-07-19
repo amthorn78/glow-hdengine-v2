@@ -254,9 +254,7 @@ def _candidate(
     runner_sha = "6" * 64
     validator_sha = "7" * 64
     projector_sha = "8" * 64
-    staging_root = literal_staging_root or (
-        "/tmp/hde-epic038-ops01r/" + "a" * 32
-    )
+    staging_root = literal_staging_root or tmp_path.as_posix()
     if counts is None:
         counts = {
             "bodygraph_reads": 2,
@@ -271,6 +269,11 @@ def _candidate(
             "vendor_requests": 0,
         }
     source_root = f"{staging_root}/source"
+    checker_path = Path(source_root) / "ci/checks/check_bridge_consistency.py"
+    checker_path.parent.mkdir(parents=True, exist_ok=True)
+    if not checker_path.exists():
+        checker_path.write_text("fixture checker\n")
+    checker_sha = _sha(checker_path.read_bytes())
     runner_path = f"{source_root}/scripts/ops/hde_epic038_ops01r.py"
     validator_path = f"{source_root}/tools/evidence/hde_epic038_ops01_v5.py"
     projector_path = f"{source_root}/engine/db/ddl_identity_projection.py"
@@ -443,7 +446,6 @@ def _candidate(
         },
     )
     canonical_sha = "a" * 64
-    checker_sha = "b" * 64
     input_pair = lambda name: {
         "path": f"{staging_root}/{name}.json",
         "sha256": canonical_sha,
@@ -829,7 +831,10 @@ def test_candidate_rejects_semantically_invalid_primary_proofs(tmp_path):
         assert code in result.errors
 
 
-@pytest.mark.parametrize("mutation", ["missing_input", "wrong_digest", "missing_checker"])
+@pytest.mark.parametrize(
+    "mutation",
+    ["missing_input", "wrong_digest", "missing_checker", "wrong_checker_digest"],
+)
 def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
     tmp_path, mutation
 ):
@@ -844,10 +849,13 @@ def test_bridge_consistency_rejects_unretained_or_unbound_inputs(
         value["governed_checker"]["inputs"]["env_connectivity"]["sha256"] = (
             "f" * 64
         )
-    else:
+    elif mutation == "missing_checker":
         value["governed_checker"]["staged_executable"] = (
             f"{expected.literal_staging_root}/candidate/check_bridge_consistency.py"
         )
+    else:
+        value["governed_checker"]["repo_sha256"] = "f" * 64
+        value["governed_checker"]["staged_sha256"] = "f" * 64
     _write_json(path, value)
     ledger = _rewrite_candidate_ledger(root)
     expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
