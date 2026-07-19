@@ -815,6 +815,8 @@ def preflight(*, run_id: str | None = None) -> int:
     staged_runner = source_root / "scripts/ops/hde_epic038_ops01r.py"
     producer_argv = bound_python_vector(staged_runner, "--preflight")
     child_env = _clean_child_env()
+    if "PATH" in os.environ:
+        child_env["PATH"] = os.environ["PATH"]
     child_env.update(
         {
             "OPS01R_PREFLIGHT_STAGED": "1",

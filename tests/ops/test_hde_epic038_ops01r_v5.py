@@ -2324,6 +2324,13 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
 
+    railway_bin = tmp_path / "bin"
+    railway_bin.mkdir()
+    railway = railway_bin / "railway"
+    railway.write_text("#!/bin/sh\necho railway 4.0.0\n")
+    railway.chmod(0o755)
+    monkeypatch.setenv("PATH", railway_bin.as_posix())
+
     monkeypatch.setattr(runner, "materialize_source_worktree", materialize)
     monkeypatch.setattr(runner, "_git_commit", lambda root: "1" * 40)
     try:
@@ -2359,6 +2366,9 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
         assert record["interpreter"]["preflight_validator_argv"][3] == (
             source_root / "tools/evidence/hde_epic038_ops01_v5.py"
         ).as_posix()
+        assert record["railway_executable"]["lexical_path"] == railway.as_posix()
+        assert record["railway_executable"]["resolved_path"] == railway.as_posix()
+        assert record["railway_executable"]["sha256"] == _sha(railway.read_bytes())
     finally:
         shutil.rmtree(staging_root, ignore_errors=True)
 
