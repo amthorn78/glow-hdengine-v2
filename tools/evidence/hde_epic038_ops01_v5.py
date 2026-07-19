@@ -130,6 +130,58 @@ FIXED_COUNTS = {
     "retries": 0,
     "fallbacks": 0,
 }
+
+PREFLIGHT_TOP_LEVEL_KEYS = {
+    "actual_external_io_counts",
+    "components",
+    "expected_call_counts",
+    "interpreter",
+    "module_origins",
+    "nonclaims",
+    "orchestration",
+    "preflight_identity_sha256",
+    "railway_executable",
+    "run",
+    "schema",
+    "source",
+    "source_write_validation",
+    "status",
+}
+PREFLIGHT_RUN_KEYS = {
+    "control_root",
+    "preflight_path",
+    "run_id",
+    "source_root",
+    "staging_root",
+    "working_directory",
+}
+PREFLIGHT_SOURCE_KEYS = {
+    "checkout_state",
+    "commit",
+    "repository",
+    "root",
+    "source_manifest_sha256",
+    "worktree_state",
+}
+PREFLIGHT_INTERPRETER_KEYS = {
+    "bytecode_flag",
+    "bytecode_write_control",
+    "isolated_flag",
+    "lexical_path",
+    "preflight_argv",
+    "preflight_validator_argv",
+    "python_environment_names",
+    "resolved_path",
+    "sha256",
+}
+PREFLIGHT_ORCHESTRATION_KEYS = {
+    "derived_call_counts",
+    "deterministic",
+    "identity_sha256",
+    "runs",
+    "schema",
+}
+
 DISCOVERY_RESULT_KEYS = {
     "schema",
     "status",
@@ -196,6 +248,31 @@ PREFLIGHT_NONCLAIMS = (
     "no_bytecode_cache_write",
     "no_unauthorized_staging_write",
 )
+
+DISCOVERY_AUTH_KEYS = {
+    "discovery_authorization_sha256",
+    "discovery_entry_point",
+    "nonclaims",
+    "output_contract",
+    "policy",
+    "preflight",
+    "railway_cli",
+    "requested_target",
+    "run_id",
+    "schema",
+    "source",
+    "working_directory",
+    "write_contract",
+}
+DISCOVERY_POLICY_STAGE_KEYS = {"stage", "templates"}
+DISCOVERY_POLICY_TEMPLATE_KEYS = {
+    "argv",
+    "required_help_tokens",
+    "template_id",
+    "version_regex",
+}
+DISCOVERY_POLICY_DESCRIPTOR_KINDS = {"literal", "prior_result", "python_child"}
+
 DISCOVERY_STAGES = (
     "cli_version",
     "cli_help",
@@ -210,6 +287,29 @@ SELECTOR = {
     "non_pii": True,
     "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afab",
 }
+
+RESULT_SUMMARY_KEYS = {
+    "actual_call_counts",
+    "authorization",
+    "authorization_sha256",
+    "checksum_policy",
+    "corpus",
+    "discovery_identity_sha256",
+    "execution",
+    "expected_call_counts",
+    "full_ddl_semantic_parity_claimed",
+    "literal_staging_root",
+    "nonclaims",
+    "observation",
+    "preflight_identity_sha256",
+    "remediation",
+    "repository",
+    "runner_sha256",
+    "schema",
+    "scope",
+    "selector",
+}
+
 PROVIDER_PROOF_KEYS = {
     "active_parity_corpus",
     "attempts",
@@ -1180,12 +1280,36 @@ def validate_ops01_v5_package(
         errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
 
     try:
-        summary = _mapping(_read_json(root / "result_summary.json"))
+        summary_path = root / "result_summary.json"
+        summary_bytes = summary_path.read_bytes()
+        summary = _mapping(_read_json(summary_path))
+        if _canon(summary) != summary_bytes:
+            errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
         if (
-            summary.get("schema") != "hde_epic038.ops01.result_summary.v4"
+            set(summary) != RESULT_SUMMARY_KEYS
+            or "status" in summary
+            or summary.get("schema") != "hde_epic038.ops01.result_summary.v4"
             or summary.get("full_ddl_semantic_parity_claimed") is not False
+            or _mapping(summary.get("scope")).get("default_release_sanity_admission") != "v4"
+            or _mapping(summary.get("scope")).get("pr_c_integration") is not False
+            or _mapping(summary.get("observation")).get("full_ddl_semantic_parity_claimed") is not False
+            or summary.get("nonclaims") != list(NONCLAIMS)
+            or _mapping(summary.get("corpus")).get("four_row_corpus_exact") is not True
+            or _mapping(summary.get("corpus")).get("selector") != SELECTOR
+            or summary.get("selector") != SELECTOR
+            or _mapping(summary.get("checksum_policy")).get("algorithm") != "sha256"
+            or _mapping(summary.get("checksum_policy")).get("terminal_files_checked") != ["exit_code.txt", "stderr.log", "stdout.log"]
+            or _mapping(summary.get("remediation")).get("default_admission_remains_v4") is not True
+            or _mapping(summary.get("remediation")).get("pf09_status_change") != "none"
+            or _mapping(summary.get("remediation")).get("pr_c_ready_claimed") is not False
         ):
             errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
+        if (root / "exit_code.txt").read_bytes() != b"0\n":
+            errors.add("OPS01_V5_EXIT_CODE_INVALID")
+        if (root / "stdout.log").read_bytes() != b"PASS\n":
+            errors.add("OPS01_V5_STDOUT_INVALID")
+        if (root / "stderr.log").read_bytes() != b"none\n":
+            errors.add("OPS01_V5_STDERR_INVALID")
         counts = _mapping(summary.get("actual_call_counts"))
         if set(counts) != set(CALL_COUNT_FIELDS) or any(
             type(counts[field]) is not int or counts[field] < 0
@@ -1401,6 +1525,21 @@ def validate_ops01r_preflight(
         obj = _mapping(_read_json(path))
         if _canon(obj) != data:
             errors.add("PREFLIGHT_BYTES_NONCANONICAL")
+        if set(obj) != PREFLIGHT_TOP_LEVEL_KEYS:
+            errors.add("PREFLIGHT_ROSTER_INVALID")
+        if set(_mapping(obj.get("run"))) != PREFLIGHT_RUN_KEYS:
+            errors.add("PREFLIGHT_ROSTER_INVALID")
+        if set(_mapping(obj.get("source"))) != PREFLIGHT_SOURCE_KEYS:
+            errors.add("PREFLIGHT_ROSTER_INVALID")
+        if set(_mapping(obj.get("interpreter"))) != PREFLIGHT_INTERPRETER_KEYS:
+            errors.add("PREFLIGHT_ROSTER_INVALID")
+        if set(_mapping(obj.get("components"))) != {"projector", "runner", "validator"}:
+            errors.add("PREFLIGHT_ROSTER_INVALID")
+        if set(_mapping(obj.get("source_write_validation"))) != SOURCE_WRITE_KEYS:
+            errors.add("PREFLIGHT_SOURCE_WRITE_ROSTER_INVALID")
+        orchestration = _mapping(obj.get("orchestration"))
+        if set(orchestration) != PREFLIGHT_ORCHESTRATION_KEYS:
+            errors.add("PREFLIGHT_ORCHESTRATION_INVALID")
         if obj.get("schema") != "hde_epic038.ops01r.preflight.v1":
             errors.add("PREFLIGHT_SCHEMA_INVALID")
         if obj.get("status") != "PASS":
@@ -1414,6 +1553,22 @@ def validate_ops01r_preflight(
         if obj.get("nonclaims") != list(PREFLIGHT_NONCLAIMS):
             errors.add("PREFLIGHT_NONCLAIMS_INVALID")
         expected_counts = _mapping(obj.get("expected_call_counts"))
+        runs = orchestration.get("runs")
+        derived_counts = _mapping(orchestration.get("derived_call_counts"))
+        run_counts = []
+        if isinstance(runs, list) and len(runs) == 2:
+            run_counts = [_mapping(row).get("call_counts") for row in runs]
+        if (
+            orchestration.get("schema")
+            != "hde_epic038.ops01r.preflight.fake_boundary_two_run.v1"
+            or orchestration.get("deterministic") is not True
+            or len(run_counts) != 2
+            or any(_mapping(counts) != expected_counts for counts in run_counts)
+            or derived_counts != expected_counts
+            or orchestration.get("identity_sha256")
+            != _sha(_canon([expected_counts, expected_counts]))
+        ):
+            errors.add("PREFLIGHT_ORCHESTRATION_INVALID")
         if set(expected_counts) != set(CALL_COUNT_FIELDS) or any(
             type(expected_counts[field]) is not int or expected_counts[field] < 0
             for field in expected_counts
@@ -1425,11 +1580,30 @@ def validate_ops01r_preflight(
         actual = _preflight_actual_identity(obj)
         if obj.get("preflight_identity_sha256") != actual["preflight_identity_sha256"]:
             errors.add("PREFLIGHT_IDENTITY_MISMATCH")
+        interpreter = _mapping(obj.get("interpreter"))
+        source_write = _mapping(obj.get("source_write_validation"))
+        producer_argv = interpreter.get("preflight_argv")
+        if (
+            not isinstance(producer_argv, list)
+            or producer_argv != source_write.get("python_argv")
+            or len(producer_argv) < 4
+            or producer_argv[1:3] != ["-I", "-B"]
+            or producer_argv[3] != _at(obj, "components", "runner", "lexical_path")
+            or interpreter.get("python_environment_names") != []
+            or source_write.get("python_environment_names") != []
+            or interpreter.get("bytecode_flag") != "-B"
+            or interpreter.get("isolated_flag") != "-I"
+        ):
+            errors.add("PREFLIGHT_ARGV_ENV_INVALID")
         if (
             _at(obj, "source_write_validation", "pre_source_manifest_sha256")
             != actual["source_manifest_sha256"]
             or _at(obj, "source_write_validation", "post_source_manifest_sha256")
             != actual["source_manifest_sha256"]
+            or source_write.get("source_tree_unchanged") is not True
+            or source_write.get("prohibited_cache_paths") != []
+            or source_write.get("unauthorized_staging_paths") != []
+            or source_write.get("staging_write_set_valid") is not True
         ):
             errors.add("PREFLIGHT_SOURCE_MANIFEST_MISMATCH")
         if not _all_expected_values_match(actual, expected):
@@ -1505,6 +1679,87 @@ def _validate_discovery_authorization_object(
         != actual["source_manifest_sha256"]
     ):
         errors.add("DISCOVERY_AUTH_SOURCE_MANIFEST_MISMATCH")
+    if set(obj) != DISCOVERY_AUTH_KEYS:
+        errors.add("DISCOVERY_AUTH_ROSTER_INVALID")
+    policy = _mapping(obj.get("policy"))
+    stages = policy.get("stages")
+    python_execution = _mapping(policy.get("python_execution"))
+    target_probe_argv = python_execution.get("target_probe_argv")
+    if (
+        set(policy) != {"python_execution", "stages"}
+        or set(python_execution) != {"target_probe_argv"}
+        or not isinstance(target_probe_argv, list)
+        or not all(isinstance(token, str) for token in target_probe_argv)
+        or len(target_probe_argv) < 4
+        or target_probe_argv[1:3] != ["-I", "-B"]
+    ):
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    if not isinstance(stages, list) or [
+        _mapping(stage).get("stage") for stage in stages
+    ] != list(DISCOVERY_STAGES):
+        errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    else:
+        for stage_row in stages:
+            stage_map = _mapping(stage_row)
+            if set(stage_map) != DISCOVERY_POLICY_STAGE_KEYS:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                continue
+            templates = stage_map.get("templates")
+            if not isinstance(templates, list) or len(templates) != 1:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                continue
+            template = _mapping(templates[0])
+            if set(template) != DISCOVERY_POLICY_TEMPLATE_KEYS:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+            argv = template.get("argv")
+            if not isinstance(argv, list) or not argv:
+                errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                continue
+            for descriptor in argv:
+                descriptor_map = _mapping(descriptor)
+                if descriptor_map.get("kind") not in DISCOVERY_POLICY_DESCRIPTOR_KINDS:
+                    errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                if descriptor_map.get("kind") == "literal" and set(descriptor_map) != {"kind", "value"}:
+                    errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                if descriptor_map.get("kind") == "prior_result" and set(descriptor_map) != {"field", "kind", "source_stage"}:
+                    errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+                if descriptor_map.get("kind") == "python_child" and set(descriptor_map) != {"kind"}:
+                    errors.add("DISCOVERY_AUTH_POLICY_INVALID")
+    working = _mapping(obj.get("working_directory"))
+    if (
+        set(working) != {"linked_context_required", "must_be_empty", "path"}
+        or working.get("linked_context_required") is not False
+        or working.get("must_be_empty") is not True
+        or not isinstance(working.get("path"), str)
+    ):
+        errors.add("DISCOVERY_AUTH_WORKING_DIRECTORY_INVALID")
+    write_contract = _mapping(obj.get("write_contract"))
+    required_write = {
+        "authorized_directory_metadata_paths",
+        "authorized_exact_write_paths",
+        "authorized_recursive_write_roots",
+        "pre_staging_manifest",
+        "pre_staging_manifest_sha256",
+        "self_bound_excluded_paths",
+        "self_bound_excluded_recursive_roots",
+        "source_root_writes_authorized",
+    }
+    if set(write_contract) != required_write or write_contract.get("source_root_writes_authorized") is not False:
+        errors.add("DISCOVERY_AUTH_WRITE_CONTRACT_INVALID")
+    if obj.get("nonclaims") != [
+        "no_glow_import",
+        "no_provider_construction",
+        "no_db_call",
+        "no_bridge_call",
+        "no_vendor_call",
+        "no_deployment",
+        "no_restart",
+        "no_relink",
+        "no_selection_change",
+        "no_variable_mutation",
+        "no_tracked_write",
+    ]:
+        errors.add("DISCOVERY_AUTH_NONCLAIMS_INVALID")
     return errors
 
 

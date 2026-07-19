@@ -24,6 +24,8 @@ from tools.evidence.hde_epic038_ops01_v5 import (
     DISCOVERY_STAGES,
     PREFLIGHT_NONCLAIMS,
     PREFLIGHT_ZERO_IO_FIELDS,
+    NONCLAIMS,
+    RESULT_SUMMARY_KEYS,
     V5_PRIMARY_FILES,
     _manifest_delta,
     _tree_manifest,
@@ -685,6 +687,30 @@ def _candidate(
     _write_json(bridge_consistency_path, bridge_consistency)
     summary = {
         "schema": "hde_epic038.ops01.result_summary.v4",
+        "scope": {
+            "candidate_only": True,
+            "default_release_sanity_admission": "v4",
+            "ops01r_attempts": 1,
+            "pr_c_integration": False,
+        },
+        "observation": {
+            "full_ddl_semantic_parity_claimed": False,
+            "live_provider_parity": "bounded_read_only",
+            "result": "candidate_captured",
+        },
+        "nonclaims": list(NONCLAIMS),
+        "corpus": {"four_row_corpus_exact": True, "selector": selector},
+        "selector": selector,
+        "checksum_policy": {
+            "algorithm": "sha256",
+            "ledger": "checksums.sha256",
+            "terminal_files_checked": ["exit_code.txt", "stderr.log", "stdout.log"],
+        },
+        "remediation": {
+            "default_admission_remains_v4": True,
+            "pf09_status_change": "none",
+            "pr_c_ready_claimed": False,
+        },
         "full_ddl_semantic_parity_claimed": False,
         "authorization": authorization,
         "authorization_sha256": _sha(_canon(authorization)),
@@ -692,7 +718,7 @@ def _candidate(
         "literal_staging_root": staging_root,
         "preflight_identity_sha256": preflight_identity,
         "runner_sha256": runner_sha,
-        "repository": {"head": source_commit},
+        "repository": {"head": source_commit, "source_manifest_sha256": source_manifest},
         "expected_call_counts": counts,
         "actual_call_counts": counts,
         "execution": {
@@ -1811,13 +1837,7 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         excluded_paths=(path,),
         excluded_recursive_roots=(source_root,),
     )
-    record = {
-        "schema": "hde_epic038.ops01r.preflight.v1",
-        "status": "PASS",
-        "actual_external_io_counts": {
-            name: 0 for name in PREFLIGHT_ZERO_IO_FIELDS
-        },
-        "expected_call_counts": {
+    counts = {
             "bodygraph_reads": 2,
             "bridge_http_requests": 6,
             "bridge_provider_selections": 1,
@@ -1828,35 +1848,89 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
             "logical_observations": 10,
             "retries": 0,
             "vendor_requests": 0,
-        },
+        }
+    producer_argv = [
+        sys.executable,
+        "-I",
+        "-B",
+        (source_root / "scripts/ops/hde_epic038_ops01r.py").as_posix(),
+        "--preflight",
+    ]
+    orchestration = {
+        "schema": "hde_epic038.ops01r.preflight.fake_boundary_two_run.v1",
+        "deterministic": True,
+        "runs": [
+            {"run_label": "A", "call_counts": counts},
+            {"run_label": "B", "call_counts": counts},
+        ],
+        "derived_call_counts": counts,
+        "identity_sha256": _sha(_canon([counts, counts])),
+    }
+    record = {
+        "schema": "hde_epic038.ops01r.preflight.v1",
+        "status": "PASS",
+        "actual_external_io_counts": {name: 0 for name in PREFLIGHT_ZERO_IO_FIELDS},
+        "expected_call_counts": counts,
         "nonclaims": list(PREFLIGHT_NONCLAIMS),
         "run": {
             "control_root": control_root.as_posix(),
             "preflight_path": path.as_posix(),
+            "run_id": "a" * 32,
             "source_root": source_root.as_posix(),
             "staging_root": staging_root.as_posix(),
             "working_directory": working_directory.as_posix(),
         },
         "source": {
+            "checkout_state": "DETACHED",
             "commit": "2" * 40,
+            "repository": "amthorn78/glow-hdengine-v2",
+            "root": source_root.as_posix(),
             "source_manifest_sha256": source_manifest,
+            "worktree_state": "clean",
         },
         "components": {
-            "runner": {"sha256": "3" * 64},
-            "validator": {"sha256": "4" * 64},
-            "projector": {"sha256": "5" * 64},
+            "runner": {"lexical_path": producer_argv[3], "resolved_path": producer_argv[3], "sha256": "3" * 64},
+            "validator": {"lexical_path": (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "resolved_path": (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "sha256": "4" * 64},
+            "projector": {"lexical_path": (source_root / "engine/db/ddl_identity_projection.py").as_posix(), "resolved_path": (source_root / "engine/db/ddl_identity_projection.py").as_posix(), "sha256": "5" * 64},
         },
-        "interpreter": {"sha256": "6" * 64},
+        "interpreter": {
+            "bytecode_flag": "-B",
+            "bytecode_write_control": "python_flag_-B",
+            "isolated_flag": "-I",
+            "lexical_path": sys.executable,
+            "preflight_argv": producer_argv,
+            "preflight_validator_argv": [sys.executable, "-I", "-B", (source_root / "tools/evidence/hde_epic038_ops01_v5.py").as_posix(), "--validate-preflight", "--expected-identity-stdin", path.as_posix()],
+            "python_environment_names": [],
+            "resolved_path": sys.executable,
+            "sha256": "6" * 64,
+        },
+        "module_origins": [],
+        "orchestration": orchestration,
         "railway_executable": {"sha256": "7" * 64},
         "source_write_validation": {
-            "pre_source_manifest_sha256": source_manifest,
+            "authorized_directory_metadata_paths": [control_root.relative_to(staging_root).as_posix()],
+            "authorized_exact_write_paths": [path.as_posix()],
+            "authorized_recursive_write_roots": [],
+            "bytecode_write_control": "python_flag_-B",
+            "manifest_algorithm": "hde_epic038.source_tree_manifest.v1",
+            "mode": "preflight",
+            "observed_staging_changes": _manifest_delta(pre_staging_object["entries"], post_staging_object["entries"]),
             "post_source_manifest_sha256": source_manifest,
+            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
+            "pre_source_manifest_sha256": source_manifest,
             "pre_staging_manifest": pre_staging_object["entries"],
             "pre_staging_manifest_sha256": pre_staging,
-            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
-            "observed_staging_changes": _manifest_delta(
-                pre_staging_object["entries"], post_staging_object["entries"]
-            ),
+            "prohibited_cache_paths": [],
+            "python_argv": producer_argv,
+            "python_environment_names": [],
+            "self_bound_excluded_paths": [path.as_posix()],
+            "self_bound_excluded_recursive_roots": [source_root.as_posix()],
+            "source_root": source_root.as_posix(),
+            "source_tree_unchanged": True,
+            "staging_manifest_algorithm": "hde_epic038.non_source_staging_manifest.v1",
+            "staging_write_set_valid": True,
+            "status": "PASS",
+            "unauthorized_staging_paths": [],
         },
     }
     record["preflight_identity_sha256"] = _sha(_canon(record))
@@ -2238,10 +2312,10 @@ def test_preflight_binds_components_and_modules_to_materialized_source(
     staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
     shutil.rmtree(staging_root, ignore_errors=True)
     files = {
-        "engine/db/ddl_identity_projection.py": b"staged projector\n",
-        "scripts/db/capture_epic011_posture.py": b"staged capture\n",
-        "scripts/ops/hde_epic038_ops01r.py": b"staged runner\n",
-        "tools/evidence/hde_epic038_ops01_v5.py": b"staged validator\n",
+        "engine/db/ddl_identity_projection.py": Path("engine/db/ddl_identity_projection.py").read_bytes(),
+        "scripts/db/capture_epic011_posture.py": Path("scripts/db/capture_epic011_posture.py").read_bytes(),
+        "scripts/ops/hde_epic038_ops01r.py": Path("scripts/ops/hde_epic038_ops01r.py").read_bytes(),
+        "tools/evidence/hde_epic038_ops01_v5.py": Path("tools/evidence/hde_epic038_ops01_v5.py").read_bytes(),
     }
 
     def materialize(source_root, commit):

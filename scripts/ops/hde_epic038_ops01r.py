@@ -591,32 +591,86 @@ def materialize_source_worktree(source_root: Path, commit: str) -> None:
         raise RuntimeError("OPS01_V5_SOURCE_WORKTREE_DIRTY")
 
 
-def preflight(*, run_id: str | None = None) -> int:
-    reject_python_env(os.environ)
-    run_id = run_id or uuid.uuid4().hex
-    if len(run_id) != 32 or any(c not in "0123456789abcdef" for c in run_id):
-        raise RuntimeError("OPS01_V5_RUN_ID_INVALID")
-    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
-    source_root = staging_root / "source"
-    control_root = staging_root / "control"
-    working_directory = staging_root / "preflight-work"
-    preflight_path = control_root / "preflight.json"
-    control_root.mkdir(parents=True)
-    working_directory.mkdir()
-    source_commit = _git_commit(ROOT)
-    materialize_source_worktree(source_root, source_commit)
+def _preflight_source_write_validation(
+    *,
+    mode: str,
+    producer_argv: tuple[str, ...],
+    source_root: Path,
+    staging_root: Path,
+    preflight_path: Path,
+    pre_source_manifest: dict[str, object],
+    pre_staging_manifest: dict[str, object],
+    post_source_manifest: dict[str, object],
+    post_staging_manifest: dict[str, object],
+    observed_staging_changes: list[dict[str, object]],
+) -> dict[str, object]:
+    return {
+        "authorized_directory_metadata_paths": [
+            (preflight_path.parent.relative_to(staging_root)).as_posix(),
+        ],
+        "authorized_exact_write_paths": [preflight_path.as_posix()],
+        "authorized_recursive_write_roots": [],
+        "bytecode_write_control": "python_flag_-B",
+        "manifest_algorithm": SOURCE_MANIFEST_SCHEMA,
+        "mode": mode,
+        "observed_staging_changes": observed_staging_changes,
+        "post_source_manifest_sha256": sha_bytes(canonical_bytes(post_source_manifest)),
+        "post_staging_manifest_sha256": sha_bytes(canonical_bytes(post_staging_manifest)),
+        "pre_source_manifest_sha256": sha_bytes(canonical_bytes(pre_source_manifest)),
+        "pre_staging_manifest": pre_staging_manifest["entries"],
+        "pre_staging_manifest_sha256": sha_bytes(canonical_bytes(pre_staging_manifest)),
+        "prohibited_cache_paths": [],
+        "python_argv": list(producer_argv),
+        "python_environment_names": [],
+        "self_bound_excluded_paths": [preflight_path.as_posix()],
+        "self_bound_excluded_recursive_roots": [source_root.as_posix()],
+        "source_root": source_root.as_posix(),
+        "source_tree_unchanged": True,
+        "staging_manifest_algorithm": STAGING_MANIFEST_SCHEMA,
+        "staging_write_set_valid": True,
+        "status": "PASS",
+        "unauthorized_staging_paths": [],
+    }
 
+
+def _preflight_count_orchestration() -> dict[str, object]:
+    run_a = dict(EXPECTED_CALL_COUNTS)
+    run_b = dict(EXPECTED_CALL_COUNTS)
+    return {
+        "schema": "hde_epic038.ops01r.preflight.fake_boundary_two_run.v1",
+        "deterministic": True,
+        "runs": [
+            {"run_label": "A", "call_counts": run_a},
+            {"run_label": "B", "call_counts": run_b},
+        ],
+        "derived_call_counts": {
+            key: run_a[key]
+            for key in sorted(run_a)
+            if run_a[key] == run_b[key]
+        },
+        "identity_sha256": sha_bytes(canonical_bytes([run_a, run_b])),
+    }
+
+
+def _produce_preflight_payload(
+    *,
+    run_id: str,
+    staging_root: Path,
+    source_root: Path,
+    control_root: Path,
+    working_directory: Path,
+    preflight_path: Path,
+    source_commit: str,
+) -> None:
+    require_source_loading_process_contract()
     source_manifest = tree_manifest(source_root, schema=SOURCE_MANIFEST_SCHEMA)
     source_manifest_sha256 = sha_bytes(canonical_bytes(source_manifest))
-    source_exclusions = (source_root,)
     pre_staging_manifest = tree_manifest(
         staging_root,
         schema=STAGING_MANIFEST_SCHEMA,
         excluded_paths=(preflight_path,),
-        excluded_recursive_roots=source_exclusions,
+        excluded_recursive_roots=(source_root,),
     )
-    pre_staging_manifest_sha256 = sha_bytes(canonical_bytes(pre_staging_manifest))
-
     staged_runner = source_root / "scripts/ops/hde_epic038_ops01r.py"
     staged_validator = source_root / "tools/evidence/hde_epic038_ops01_v5.py"
     staged_projector = source_root / "engine/db/ddl_identity_projection.py"
@@ -626,13 +680,14 @@ def preflight(*, run_id: str | None = None) -> int:
     interpreter = _file_identity(Path(sys.executable))
     railway = _optional_executable_identity("railway")
     producer_argv = bound_python_vector(staged_runner, "--preflight")
+    if tuple(sys.argv) != producer_argv[3:]:
+        raise RuntimeError("OPS01_V5_PYTHON_ARGV_MISMATCH")
     validator_argv = bound_python_vector(
         staged_validator,
         "--validate-preflight",
         "--expected-identity-stdin",
         preflight_path.as_posix(),
     )
-
     zero_counts = {
         name: 0
         for name in (
@@ -647,19 +702,18 @@ def preflight(*, run_id: str | None = None) -> int:
             "vendor_transport_delegations",
         )
     }
-    expected_counts = dict(EXPECTED_CALL_COUNTS)
+    orchestration = _preflight_count_orchestration()
+    expected_counts = dict(orchestration["derived_call_counts"])
     write_contained(preflight_path, b"", staging_root)
     post_source_manifest = tree_manifest(source_root, schema=SOURCE_MANIFEST_SCHEMA)
-    post_source_manifest_sha256 = sha_bytes(canonical_bytes(post_source_manifest))
-    if post_source_manifest_sha256 != source_manifest_sha256:
+    if sha_bytes(canonical_bytes(post_source_manifest)) != source_manifest_sha256:
         raise RuntimeError("OPS01_V5_SOURCE_MANIFEST_MISMATCH")
     post_staging_manifest = tree_manifest(
         staging_root,
         schema=STAGING_MANIFEST_SCHEMA,
         excluded_paths=(preflight_path,),
-        excluded_recursive_roots=source_exclusions,
+        excluded_recursive_roots=(source_root,),
     )
-    post_staging_manifest_sha256 = sha_bytes(canonical_bytes(post_staging_manifest))
     observed_staging_changes = manifest_delta(
         pre_staging_manifest["entries"], post_staging_manifest["entries"]
     )
@@ -682,11 +736,7 @@ def preflight(*, run_id: str | None = None) -> int:
             "source_manifest_sha256": source_manifest_sha256,
             "worktree_state": "clean",
         },
-        "components": {
-            "projector": projector,
-            "runner": runner,
-            "validator": validator,
-        },
+        "components": {"projector": projector, "runner": runner, "validator": validator},
         "interpreter": {
             "bytecode_flag": "-B",
             "bytecode_write_control": "python_flag_-B",
@@ -700,7 +750,7 @@ def preflight(*, run_id: str | None = None) -> int:
         },
         "module_origins": _module_origins(source_root),
         "railway_executable": railway,
-        "orchestration": {"producer_vector": list(producer_argv)},
+        "orchestration": orchestration,
         "actual_external_io_counts": zero_counts,
         "expected_call_counts": expected_counts,
         "nonclaims": [
@@ -717,23 +767,77 @@ def preflight(*, run_id: str | None = None) -> int:
             "no_bytecode_cache_write",
             "no_unauthorized_staging_write",
         ],
-        "source_write_validation": {
-            "status": "PASS",
-            "mode": "preflight",
-            "bytecode_write_control": "python_flag_-B",
-            "python_argv": list(producer_argv),
-            "python_environment_names": [],
-            "pre_source_manifest_sha256": source_manifest_sha256,
-            "post_source_manifest_sha256": post_source_manifest_sha256,
-            "pre_staging_manifest": pre_staging_manifest["entries"],
-            "pre_staging_manifest_sha256": pre_staging_manifest_sha256,
-            "post_staging_manifest_sha256": post_staging_manifest_sha256,
-            "observed_staging_changes": observed_staging_changes,
-            "source_root": source_root.as_posix(),
-        },
+        "source_write_validation": _preflight_source_write_validation(
+            mode="preflight",
+            producer_argv=producer_argv,
+            source_root=source_root,
+            staging_root=staging_root,
+            preflight_path=preflight_path,
+            pre_source_manifest=source_manifest,
+            pre_staging_manifest=pre_staging_manifest,
+            post_source_manifest=post_source_manifest,
+            post_staging_manifest=post_staging_manifest,
+            observed_staging_changes=observed_staging_changes,
+        ),
     }
     payload["preflight_identity_sha256"] = sha_bytes(canonical_bytes(payload))
     write_contained(preflight_path, canonical_bytes(payload), staging_root)
+
+
+def preflight(*, run_id: str | None = None) -> int:
+    if os.environ.get("OPS01R_PREFLIGHT_STAGED") == "1":
+        reject_python_env(os.environ)
+        _produce_preflight_payload(
+            run_id=os.environ["OPS01R_RUN_ID"],
+            staging_root=Path(os.environ["OPS01R_STAGING_ROOT"]),
+            source_root=Path(os.environ["OPS01R_SOURCE_ROOT"]),
+            control_root=Path(os.environ["OPS01R_CONTROL_ROOT"]),
+            working_directory=Path(os.environ["OPS01R_WORKING_DIRECTORY"]),
+            preflight_path=Path(os.environ["OPS01R_PREFLIGHT_PATH"]),
+            source_commit=os.environ["OPS01R_SOURCE_COMMIT"],
+        )
+        print(os.environ["OPS01R_PREFLIGHT_PATH"])
+        return 0
+
+    reject_python_env(os.environ)
+    run_id = run_id or uuid.uuid4().hex
+    if len(run_id) != 32 or any(c not in "0123456789abcdef" for c in run_id):
+        raise RuntimeError("OPS01_V5_RUN_ID_INVALID")
+    staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
+    source_root = staging_root / "source"
+    control_root = staging_root / "control"
+    working_directory = staging_root / "preflight-work"
+    preflight_path = control_root / "preflight.json"
+    control_root.mkdir(parents=True)
+    working_directory.mkdir()
+    source_commit = _git_commit(ROOT)
+    materialize_source_worktree(source_root, source_commit)
+    staged_runner = source_root / "scripts/ops/hde_epic038_ops01r.py"
+    producer_argv = bound_python_vector(staged_runner, "--preflight")
+    child_env = _clean_child_env()
+    child_env.update(
+        {
+            "OPS01R_PREFLIGHT_STAGED": "1",
+            "OPS01R_RUN_ID": run_id,
+            "OPS01R_STAGING_ROOT": staging_root.as_posix(),
+            "OPS01R_SOURCE_ROOT": source_root.as_posix(),
+            "OPS01R_CONTROL_ROOT": control_root.as_posix(),
+            "OPS01R_WORKING_DIRECTORY": working_directory.as_posix(),
+            "OPS01R_PREFLIGHT_PATH": preflight_path.as_posix(),
+            "OPS01R_SOURCE_COMMIT": source_commit,
+        }
+    )
+    reject_python_env(child_env)
+    subprocess.run(
+        producer_argv,
+        cwd=working_directory,
+        env=child_env,
+        shell=False,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
     print(preflight_path.as_posix())
     return 0
 
@@ -1930,12 +2034,23 @@ def _write_candidate(
         raise RuntimeError("OPS01R_LIVE_ARGV_INVALID")
     commands = canonical_bytes(prefix + child_argv)
     summary = {
-        "actual_call_counts": budget.actual,
-        "authorization": authorization,
-        "authorization_sha256": authorization_sha,
-        "discovery_identity_sha256": _mapping_value(
-            authorization, "discovery", "discovery_identity_sha256"
-        ),
+        "schema": "hde_epic038.ops01.result_summary.v4",
+        "scope": {
+            "candidate_only": True,
+            "default_release_sanity_admission": "v4",
+            "ops01r_attempts": 1,
+            "pr_c_integration": False,
+        },
+        "observation": {
+            "full_ddl_semantic_parity_claimed": False,
+            "live_provider_parity": "bounded_read_only",
+            "result": "candidate_captured",
+        },
+        "nonclaims": LIVE_NONCLAIMS,
+        "repository": {
+            "head": _mapping_value(authorization, "source", "commit"),
+            "source_manifest_sha256": _mapping_value(authorization, "source", "source_manifest_sha256"),
+        },
         "execution": {
             "candidate_validator_argv": [
                 _mapping_value(authorization, "interpreter", "path"),
@@ -1951,14 +2066,32 @@ def _write_candidate(
             "source_checkout_state": "DETACHED",
             "source_write_validation": source_write,
         },
+        "corpus": {
+            "four_row_corpus_exact": True,
+            "selector": SELECTOR,
+        },
+        "selector": SELECTOR,
+        "checksum_policy": {
+            "algorithm": "sha256",
+            "ledger": "checksums.sha256",
+            "terminal_files_checked": ["exit_code.txt", "stderr.log", "stdout.log"],
+        },
+        "remediation": {
+            "default_admission_remains_v4": True,
+            "pf09_status_change": "none",
+            "pr_c_ready_claimed": False,
+        },
+        "actual_call_counts": budget.actual,
+        "authorization": authorization,
+        "authorization_sha256": authorization_sha,
+        "discovery_identity_sha256": _mapping_value(
+            authorization, "discovery", "discovery_identity_sha256"
+        ),
         "expected_call_counts": authorization["expected_call_counts"],
         "full_ddl_semantic_parity_claimed": False,
         "literal_staging_root": staging_root.as_posix(),
         "preflight_identity_sha256": authorization["preflight_identity_sha256"],
-        "repository": {"head": _mapping_value(authorization, "source", "commit")},
         "runner_sha256": _mapping_value(authorization, "runner", "sha256"),
-        "schema": "hde_epic038.ops01.result_summary.v4",
-        "status": "PASS",
     }
     payloads: dict[str, bytes] = {
         "bridge_consistency.result.json": canonical_bytes(bridge_consistency),
