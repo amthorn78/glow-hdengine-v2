@@ -1466,3 +1466,67 @@ def test_runner_rejects_invalid_live_authorization_before_consumption_or_subproc
         runner.live_launch(authorization)
     assert calls == []
     assert not (control / "live_authorization.json.consumed").exists()
+
+
+def test_live_launch_uses_discovery_bound_railway_prefix_and_live_child_suffix(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    path, authorization, _ = _live_authorization_pair(tmp_path)
+    child = ["/usr/bin/python3", "-I", "-B", "/repo/scripts/ops/hde_epic038_ops01r.py", "--live-child"]
+    prefix = ["railway", "run", "--service", "glow-hdengine-v2", "--"]
+    authorization["run"]["child_argv"] = child
+    authorization["discovery"]["run_contract"] = {
+        "argv_prefix": prefix,
+        "child_argv_start_index": len(prefix),
+    }
+    _write_json(path, authorization)
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append((tuple(argv), kwargs))
+        return subprocess.CompletedProcess(argv, 0, "", "")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+
+    assert runner.live_launch(path) == 0
+    assert len(calls) == 1
+    assert calls[0][0] == tuple(prefix + child)
+    assert calls[0][1]["shell"] is False
+    assert calls[0][1]["env"] == {
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+    }
+    assert (path.parent / "live_authorization.json.consumed").exists()
+
+
+def test_live_launch_rejects_bad_child_suffix_before_consumption(tmp_path, monkeypatch):
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    path, authorization, _ = _live_authorization_pair(tmp_path)
+    authorization["run"]["child_argv"] = [
+        "/usr/bin/python3",
+        "-I",
+        "-B",
+        "/repo/scripts/ops/hde_epic038_ops01r.py",
+        "--wrong-child",
+    ]
+    authorization["discovery"]["run_contract"] = {
+        "argv_prefix": ["railway", "run", "--"],
+        "child_argv_start_index": 3,
+    }
+    _write_json(path, authorization)
+    calls = []
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *a, **k: calls.append((a, k))
+        or pytest.fail("external subprocess invoked"),
+    )
+
+    with pytest.raises(SystemExit, match="OPS01R_LIVE_ARGV_INVALID"):
+        runner.live_launch(path)
+    assert calls == []
+    assert not (path.parent / "live_authorization.json.consumed").exists()

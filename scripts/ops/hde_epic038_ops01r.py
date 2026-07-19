@@ -629,20 +629,22 @@ def live_launch(authorization_path: Path) -> int:
         raise SystemExit("OPS01R_LIVE_AUTH_INVALID")
     authorization = json.loads(authorization_path.read_text("utf-8"))
     control_root = authorization_path.parent
+    prefix = authorization["discovery"]["run_contract"]["argv_prefix"]
+    child_argv = authorization["run"]["child_argv"]
+    argv = tuple(prefix + child_argv)
+    if (
+        not isinstance(prefix, list)
+        or not all(isinstance(token, str) for token in prefix)
+        or not isinstance(child_argv, list)
+        or not all(isinstance(token, str) for token in child_argv)
+        or len(child_argv) != 5
+        or child_argv[1:3] != ["-I", "-B"]
+        or child_argv[-1] != "--live-child"
+    ):
+        raise SystemExit("OPS01R_LIVE_ARGV_INVALID")
     consumed = control_root / (authorization_path.name + ".consumed")
     fd = os.open(consumed, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     os.close(fd)
-    argv = tuple(
-        authorization["run"]["argv_prefix"] + authorization["run"]["child_argv"]
-        if "argv_prefix" in authorization["run"]
-        else authorization["run"]["child_argv"]
-    )
-    if (
-        len(argv) < 4
-        or "--live-child" not in argv
-        or argv[-2:] != ("--live-child",)
-    ):
-        raise SystemExit("OPS01R_LIVE_ARGV_INVALID")
     cp = subprocess.run(
         argv,
         shell=False,
