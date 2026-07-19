@@ -455,52 +455,24 @@ def preflight(*, run_id: str | None = None) -> int:
     return 0
 
 
-def _read_expected_identity(path: Path, cls):
-    from tools.evidence import hde_epic038_ops01_v5 as validators
-    obj = json.loads(path.read_text("utf-8"))
-    if cls.__name__ == "Ops01RDiscoveryAuthorizationExpectedIdentity":
-        return validators.Ops01RDiscoveryAuthorizationExpectedIdentity(
-            discovery_authorization_sha256=obj["discovery_authorization_sha256"],
-            discovery_entry_point_sha256=obj["discovery_entry_point"]["sha256"],
-            literal_staging_root=Path(
-                obj["output_contract"]["path"]
-            ).parent.parent.as_posix(),
-            pre_staging_manifest_sha256=obj["write_contract"]["pre_staging_manifest_sha256"],
-            preflight_identity_sha256=obj["preflight"]["preflight_identity_sha256"],
-            railway_executable_sha256=obj["railway_cli"]["sha256"],
-            source_commit=obj["source"]["commit"],
-            source_manifest_sha256=obj["source"]["source_manifest_sha256"],
-        )
-    return validators.Ops01RLiveAuthorizationExpectedIdentity(
-        authorization_sha256=sha_bytes(canonical_bytes(obj)),
-        discovery_identity_sha256=obj["discovery"]["discovery_identity_sha256"],
-        interpreter_sha256=obj["interpreter"]["sha256"],
-        live_pre_staging_manifest_sha256=obj["write_contract"]["pre_staging_manifest_sha256"],
-        literal_staging_root=obj["run"]["staging_root"],
-        preflight_identity_sha256=obj["preflight_identity_sha256"],
-        projector_sha256=obj["projector"]["sha256"],
-        railway_executable_sha256=obj["discovery"]["railway_cli"]["sha256"],
-        runner_sha256=obj["runner"]["sha256"],
-        source_commit=obj["source"]["commit"],
-        source_manifest_sha256=obj["source"]["source_manifest_sha256"],
-        validator_sha256=obj["validator"]["sha256"],
-    )
-
-
-def discovery(authorization_path: Path) -> int:
+def discovery(
+    authorization_path: Path,
+    *,
+    expected=None,
+) -> int:
     from tools.evidence.hde_epic038_ops01_v5 import (
         DISCOVERY_STAGES,
         Ops01RDiscoveryAuthorizationExpectedIdentity,
+        _parse_expected_stdin,
         validate_ops01r_discovery_authorization,
         validate_ops01r_discovery_dispatch,
         validate_ops01r_discovery_result,
     )
-    try:
-        expected = _read_expected_identity(
-            authorization_path, Ops01RDiscoveryAuthorizationExpectedIdentity
+    if expected is None:
+        expected = _parse_expected_stdin(
+            Ops01RDiscoveryAuthorizationExpectedIdentity,
+            "DISCOVERY_AUTH_EXPECTED_INPUT_INVALID",
         )
-    except (KeyError, TypeError, json.JSONDecodeError):
-        raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
     if not validate_ops01r_discovery_authorization(
         authorization_path, expected=expected
     ).valid:
@@ -590,58 +562,86 @@ def validate_vectors(
 
 
 def _parse_stage(stage: str, stdout: str) -> dict[str, str]:
+    fields_by_stage = {
+        "project_inventory": ("project_id", "project_name"),
+        "environment_inventory": ("environment_id", "environment_name"),
+        "service_inventory": ("service_id", "service_name"),
+    }
+    fields = fields_by_stage.get(stage)
+    if stage == "target_identity_probe":
+        try:
+            probe = json.loads(stdout)
+        except (json.JSONDecodeError, UnicodeError):
+            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        if probe != {
+            "schema": "hde_epic038.ops01r.target_identity_probe.v1",
+            "writes": 0,
+        }:
+            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        return {}
+    if fields is None:
+        return {}
     try:
         obj = json.loads(stdout)
-    except json.JSONDecodeError:
-        obj = {}
-    if stage == "project_inventory":
-        return {
-            "project_id": str(obj.get("project_id", "project-id")),
-            "project_name": str(obj.get("project_name", "ample-illumination")),
-        }
-    if stage == "environment_inventory":
-        return {
-            "environment_id": str(obj.get("environment_id", "environment-id")),
-            "environment_name": str(obj.get("environment_name", "production")),
-        }
-    if stage == "service_inventory":
-        return {
-            "service_id": str(obj.get("service_id", "service-id")),
-            "service_name": str(obj.get("service_name", "glow-hdengine-v2")),
-        }
-    return {}
+    except (json.JSONDecodeError, UnicodeError):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    if not isinstance(obj, dict) or set(obj) != set(fields):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    parsed = {field: obj[field] for field in fields}
+    if any(
+        not isinstance(value, str)
+        or not value
+        or value != value.strip()
+        or any(ord(character) < 32 or ord(character) == 127 for character in value)
+        for value in parsed.values()
+    ):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    return parsed
 
 
-def live_launch(authorization_path: Path) -> int:
+def live_launch(authorization_path: Path, *, expected=None) -> int:
     from tools.evidence.hde_epic038_ops01_v5 import (
         Ops01RLiveAuthorizationExpectedIdentity,
+        _parse_expected_stdin,
         validate_ops01r_live_authorization,
     )
-    try:
-        expected = _read_expected_identity(
-            authorization_path, Ops01RLiveAuthorizationExpectedIdentity
+    if expected is None:
+        expected = _parse_expected_stdin(
+            Ops01RLiveAuthorizationExpectedIdentity,
+            "OPS01_AUTH_EXPECTED_INPUT_INVALID",
         )
-    except (KeyError, TypeError, json.JSONDecodeError):
-        raise SystemExit("OPS01R_LIVE_AUTH_INVALID")
     if not validate_ops01r_live_authorization(
         authorization_path, expected=expected
     ).valid:
         raise SystemExit("OPS01R_LIVE_AUTH_INVALID")
     authorization = json.loads(authorization_path.read_text("utf-8"))
     control_root = authorization_path.parent
-    prefix = authorization["discovery"]["run_contract"]["argv_prefix"]
-    child_argv = authorization["run"]["child_argv"]
-    argv = tuple(prefix + child_argv)
+    try:
+        prefix = authorization["discovery"]["run_contract"]["argv_prefix"]
+        boundary = authorization["discovery"]["run_contract"][
+            "child_argv_start_index"
+        ]
+        child_argv = authorization["run"]["child_argv"]
+        expected_child_argv = [
+            authorization["interpreter"]["path"],
+            "-I",
+            "-B",
+            authorization["runner"]["path"],
+            "--live-child",
+        ]
+    except (KeyError, TypeError):
+        raise SystemExit("OPS01R_LIVE_ARGV_INVALID")
     if (
         not isinstance(prefix, list)
         or not all(isinstance(token, str) for token in prefix)
+        or type(boundary) is not int
+        or boundary != len(prefix)
         or not isinstance(child_argv, list)
         or not all(isinstance(token, str) for token in child_argv)
-        or len(child_argv) != 5
-        or child_argv[1:3] != ["-I", "-B"]
-        or child_argv[-1] != "--live-child"
+        or child_argv != expected_child_argv
     ):
         raise SystemExit("OPS01R_LIVE_ARGV_INVALID")
+    argv = tuple(prefix + child_argv)
     consumed = control_root / (authorization_path.name + ".consumed")
     fd = os.open(consumed, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     os.close(fd)
