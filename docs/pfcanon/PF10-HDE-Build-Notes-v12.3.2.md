@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.1  
-Effective Date: 2026.07.19
+**Version:** v12.3.2  
+Effective Date: 2026.07.20
 
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -58,7 +58,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.6) OPS-01 HDE-EPIC038  
 2.7) PR-05 HDE-EPIC038  
 2.8) OPS-02 HDE-EPIC038  
-2.9) PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004
+2.9) PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004  
+2.10) PR-06 Remediation PR-A HDE-EPIC038  
+2.11) PO-Delegated OPS Execution Authority — PO Authorization Controls Executor Identity  
+2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport
 
 # 2\) Numbered Addenda
 
@@ -12970,6 +12973,208 @@ Drain this decision into PF09.6 — Canon HDE Build Checklist Distillation, §0.
 Until drainage, this later PF10 addendum is the controlling PF source on OPS executor identity.
 
 Also should be drained into ANY OTHER CANONICAL DOCS that govern interaction between humans and AI agents.
+
+## 2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport
+
+### Decision and effective posture
+
+The Product Owner has retired `pg-bridge` from the Glow HD Engine architecture and reports that the Railway `pg-bridge` service has already been removed.
+
+Effective immediately for project governance:
+
+* `pg-bridge` is deprecated and retired. It is not an active Glow infrastructure service, database transport, fallback, conformance target, development-access mechanism, or evidence target.  
+* `DB_BRIDGE_URL` is deprecated and retired. It MUST NOT be required, provisioned, restored, consumed, or treated as a valid HDE runtime input.  
+* `DB_FORCE_BRIDGE` and `DB_ALLOW_BRIDGE_IN_PROD` are retired bridge-control keys. They MUST NOT select, enable, or restore bridge behavior.  
+* `DATABASE_URL` is the sole canonical HDE database endpoint key.  
+* Direct PostgreSQL access through the Glow-owned psycopg provider is the sole active HDE database transport.  
+* Absence of `DB_BRIDGE_URL` is the required configuration posture. It is not a missing-configuration error, degraded state, discovery ambiguity, or acceptance failure.  
+* Failure or unavailability of direct PostgreSQL access MUST fail closed. Runtime selection MUST NOT fall back to a bridge, alternate HTTP database transport, vendor path, or inferred endpoint.
+
+This addendum governs intended architecture and project behavior. The PO-reported Railway removal is an external-state fact that must be evidenced separately whenever a task requires proof of current Railway state. This text does not manufacture retrospective execution evidence.
+
+### Supersession of prior bridge requirements
+
+This later addendum supersedes every earlier PF10 requirement on the exact retired topic that:
+
+* requires `pg-bridge` availability;  
+* requires `DB_BRIDGE_URL` presence;  
+* permits automatic or forced bridge fallback;  
+* treats `pg-bridge` as a production, development, Codespaces, QA, OPS, or evidence target;  
+* requires direct-versus-bridge runtime parity;  
+* requires a bridge provider observation, bridge selection snapshot, bridge HTTP call budget, bridge consistency result, or bridge-backed BodyGraph comparison as current acceptance evidence; or  
+* treats absence of bridge configuration as an error.
+
+In particular, PF10 §2.9 remains authoritative for the Glow-owned DDL identity projector, exact Python `-I -B` controls, source and write isolation, authorization-byte integrity, secret-free evidence, closed rails, no-retry boundaries, and nonclaims. Its live `pg-bridge`, `DB_BRIDGE_URL`, direct-versus-bridge parity, bridge call-vector, and bridge-dependent v5 candidate requirements are superseded by this §2.12.
+
+No historical document, runner, validator, test, evidence artifact, token, plan passage, or retained packet may be used to restore the retired bridge posture merely because it still contains a bridge reference.
+
+### HDE-EPIC038 and OPS-01R disposition
+
+The bridge-dependent HDE-EPIC038 OPS-01R lane is retired.
+
+The 2026-07-20 OPS-01R execution remains truthfully classified as a failed and ineligible attempt under the requirements that governed that execution. It did not produce an admissible v5 candidate and MUST NOT be relabeled as `PASS`, accepted, or completed.
+
+The architectural response to that result is retirement of the bridge dependency, not repair of `pg-bridge` and not another bridge-parity attempt. Therefore:
+
+* no further OPS-01R discovery, live authorization, retry, recovery launch, direct-versus-bridge comparison, or v5 bridge-dependent candidate capture is required or authorized;  
+* the unproduced bridge-dependent v5 candidate is no longer a current HDE-EPIC038 completion requirement;  
+* the bridge-dependent PR-C packet-integration lane described in PF10 §2.9 is canceled and MUST NOT be executed;  
+* the current retained OPS-01 packet remains historical evidence of the architecture and observations that existed when it was captured;  
+* the retained packet MUST NOT be rewritten, regenerated, or relabeled to imply current bridge availability or current direct-versus-bridge parity;  
+* non-governed OPS-01R diagnostics remain failure and decision-support records only; and  
+* any future direct-only database-posture evidence family requires separately authorized scope and a direct-only contract. It MUST NOT inherit bridge fields, bridge predicates, bridge call counts, or bridge success claims by default.
+
+`SUPERSEDED` is the correct disposition for the retired bridge-dependent operational requirement. `SUPERSEDED` is not `PASS`, QA acceptance, PF09 completion, token satisfaction, epic completion, or closeout.
+
+### Runtime and configuration contract
+
+The required target runtime contract after implementation drainage is:
+
+1. `DATABASE_URL` is the only database endpoint considered by HDE database selection.  
+2. The direct psycopg provider is the only selectable provider.  
+3. A configured direct endpoint is used only under the applicable environment, rails, credential, and OPS authorization controls.  
+4. If the direct endpoint is absent, invalid, unavailable, or unauthorized, database access fails closed without alternate-provider selection.  
+5. The presence of any retired bridge key is configuration drift. Validation MUST report the key name only and MUST NOT print or retain its value.  
+6. No code path may open an HTTP request to a database bridge or synthesize a bridge URL from another value.  
+7. No production or development workflow may recreate `pg-bridge` as an undocumented compatibility service.
+
+The required names-only retired-key roster is:
+
+* `DB_BRIDGE_URL`  
+* `DB_FORCE_BRIDGE`  
+* `DB_ALLOW_BRIDGE_IN_PROD`
+
+During the implementation transition, bridge-selection requests MUST fail closed before bridge network I/O. Silent fallback, silent compatibility behavior, and ignoring a forced-bridge request while reporting success are nonconforming.
+
+### Development and OPS access posture
+
+Development activity that needs access to a live or shared Glow database remains OPS work when it crosses the repository boundary or uses privileged database credentials.
+
+GitHub Codespaces may be used as the operator execution environment when explicitly authorized, but Codespaces does not create a second database service, hostname, provider, or evidence lane. Codespaces database access uses `DATABASE_URL` and direct psycopg only.
+
+Agent execution remains governed by PF10 §2.11. A PO-delegated agent may perform an authorized direct-database OPS task when its target, authorization, rails, commands, stop checks, and evidence contract are concrete. This addendum does not grant standing database access, authorize SQL writes, or waive task-specific approvals.
+
+### Repository implementation consequences
+
+This addendum authorizes no implementation by itself. A separately authorized implementation change must remove active bridge behavior coherently rather than leaving a selectable but undocumented compatibility path.
+
+The current Repo loci directly affected include:
+
+* `engine/db/adapter.py` \- remove bridge fallback, bridge forcing, bridge-production override, and `DB_BRIDGE_URL` consumption;  
+* `engine/db/providers/bridge_provider.py` \- retire the active provider implementation and all runtime imports or registrations;  
+* `scripts/ops/hde_epic038_ops01r.py` \- retire bridge discovery, bridge endpoint presence, bridge provider selection, bridge HTTP budgets, bridge comparisons, and bridge-dependent candidate production;  
+* `tools/evidence/hde_epic038_ops01_v5.py` \- retire bridge-required validation contracts and prevent historical schemas from being interpreted as current bridge availability;  
+* `tools/evidence/run_sanity_pipeline.py` \- remove bridge-required current release admission while preserving explicit historical-artifact validation where still needed;  
+* `tools/evidence/update_evidence_index.py` \- preserve existing historical bindings but stop assigning current bridge-fallback meaning to new evidence;  
+* bridge-selection, bridge-provider, OPS-01R, release-sanity, environment-contract, and evidence-index tests \- replace active bridge expectations with direct-only selection and fail-closed retired-key tests; and  
+* operator and CLI guidance \- remove executable instructions that require `DB_BRIDGE_URL`, force bridge selection, or target `pg-bridge`.
+
+Implementation must include focused proof that:
+
+* only the direct provider can be selected;  
+* missing or failed direct access produces no bridge attempt;  
+* retired bridge keys cannot cause external bridge I/O;  
+* no raw endpoint or credential value enters logs, exceptions, snapshots, or retained evidence;  
+* historical governed artifacts remain byte-stable unless a separately authorized migration changes them; and  
+* current checks do not require a live bridge service or `DB_BRIDGE_URL`.
+
+### Evidence and historical-artifact posture
+
+Existing governed artifacts that contain bridge observations, bridge fields, bridge URLs in redacted presence form, bridge provider names, or bridge-related tokens remain historical records. They preserve what was captured under the then-current contract.
+
+Historical artifacts:
+
+* MUST NOT be rewritten solely to erase accurate historical bridge references;  
+* MUST NOT be used to claim that `pg-bridge` remains deployed or supported;  
+* MUST NOT be regenerated by calling a retired bridge;  
+* MUST retain their existing hashes, path proofs, Human Evidence Index bindings, and Machine Mirror bindings until a separately authorized evidence migration changes them; and  
+* MUST be described as historical whenever used after this addendum to explain lineage or prior results.
+
+No new governed evidence may claim `DEV_DB_BRIDGE_FALLBACK_OK`, bridge availability, bridge parity, bridge consistency, or successful bridge selection. Any such token or field retained in historical evidence is historical only and not newly claimable.
+
+### PF09 consequences
+
+This addendum causes no automatic PF09 status movement.
+
+* `HDE-DIST001.4` remains `Partial`; its active database-posture obligation is direct PostgreSQL posture under read-only or otherwise explicitly authorized rails. Bridge fallback and bridge parity are no longer active obligations.  
+* `HDE-DIST001.6` remains `Partial`; one-button and release-sanity work must converge on the direct-only runtime and must not require bridge availability.  
+* `HDE-DIST001.9` remains `Partial` pending permanent drainage. Its direct-versus-bridge parity requirements are retired. Permanent drainage must redefine the remaining row around direct database connectivity and environment posture or retire the bridge-specific subtask without converting historical evidence into `Done`.  
+* `HDE-DIST001.11` remains `Optional`.  
+* `HDE-DIST005.2` remains `Partial`; Index, Mirror, checksum, and path-proof discipline remains unchanged.
+
+No PF09 row becomes `Done` merely because the bridge architecture was retired.
+
+### Required permanent drainage
+
+Drain this decision into the owning PF documents without changing historical facts:
+
+1. PF07 \- Glow Infrastructure  
+     
+   * Remove `pg-bridge` from active component maps and the active Railway resource catalog.  
+   * Remove `DB_BRIDGE_URL` from active environment mappings and connection precedence.  
+   * Mark `DB_BRIDGE_URL`, `DB_FORCE_BRIDGE`, and `DB_ALLOW_BRIDGE_IN_PROD` as retired names if a compatibility-history roster is retained.  
+   * Record `DATABASE_URL` and direct psycopg as the sole active HDE database binding.
+
+   
+
+2. PF09.6 \- Canon HDE Build Checklist Distillation  
+     
+   * Remove active bridge fallback language from `HDE-DIST001.4`.  
+   * Retire or redefine the bridge-specific requirements in `HDE-DIST001.9` without automatic status movement.  
+   * Preserve OPS evidence, secret-free capture, and Index/Mirror obligations.
+
+   
+
+3. PF12 \- Canon HDE Schemas and Artifacts  
+     
+   * Mark bridge-required evidence families and bridge-specific fields as historical where they remain retained.  
+   * Define any future direct-only evidence contract separately rather than mutating historical bridge packet semantics in place.  
+   * Preserve governed paths, hashes, path proofs, Human Index, and Machine Mirror coherence.
+
+   
+
+4. PF14 \- Canon HDE Mechanics Guide  
+     
+   * Replace active DBAccess bridge fallback and bridge-force semantics with direct-only provider selection and fail-closed direct-unavailable behavior.
+
+   
+
+5. PF04 \- HDE Governance  
+     
+   * Retire any bridge-fallback acceptance-token semantics, including `DEV_DB_BRIDGE_FALLBACK_OK`, from current claimability.  
+   * Preserve rails, secret handling, external-I/O authorization, and evidence requirements for direct database access.
+
+Until drainage, this later PF10 addendum is the controlling PF source for the retirement of `pg-bridge`, `DB_BRIDGE_URL`, `DB_FORCE_BRIDGE`, `DB_ALLOW_BRIDGE_IN_PROD`, and bridge-dependent HDE-EPIC038 requirements.
+
+### Adoption sequence
+
+1. Adopt this PF10 addendum through the authorized PF10 maintenance path.  
+2. Stop using bridge-dependent OPS instructions, discovery policies, validators, and evidence requirements as executable current guidance.  
+3. Capture separate secret-free infrastructure evidence when proof of Railway service or variable removal is required.  
+4. Implement the direct-only repository transition through separately authorized implementation work.  
+5. Validate direct-only selection, retired-key refusal, no bridge I/O, secret safety, and historical-artifact preservation.  
+6. Drain the decision into PF07, PF09.6, PF12, PF14, and PF04.  
+7. Review HDE-EPIC038 remaining obligations without treating the failed OPS-01R attempt or this architectural retirement as QA PASS, PF09 completion, or epic closeout.
+
+### Explicit nonclaims
+
+This addendum does not itself:
+
+* prove the current external Railway service inventory or variable inventory;  
+* execute or accept OPS-01R;  
+* convert the failed OPS-01R attempt into `PASS`;  
+* create a direct-only replacement evidence packet;  
+* modify code, tests, configuration, Railway, PostgreSQL, schemas, grants, roles, data, or deployments;  
+* authorize database writes, migrations, deployments, service recreation, or secret disclosure;  
+* establish QA PASS or acceptance-token satisfaction;  
+* move PF09 status;  
+* accept HDE-EPIC038 implementation;  
+* complete the remediation slice; or  
+* close HDE-EPIC038.
+
+This addendum changes the controlling architecture and current obligations only on the exact retired bridge topic. All unrelated PF10 and PF-Canon requirements remain unchanged.
+
+---
 
 ---
 
