@@ -1313,16 +1313,19 @@ def _discovery_pair(
         "project_inventory": [
             {"kind": "literal", "value": "project"},
             {"kind": "literal", "value": "list"},
+            {"kind": "literal", "value": "--json"},
         ],
         "environment_inventory": [
-            {"kind": "literal", "value": "environment"},
-            {"kind": "literal", "value": "list"},
+            {"kind": "literal", "value": "status"},
             {"kind": "literal", "value": "--project"},
             {
                 "field": "project_id",
                 "kind": "prior_result",
                 "source_stage": "project_inventory",
             },
+            {"kind": "literal", "value": "--environment"},
+            {"kind": "literal", "value": "production"},
+            {"kind": "literal", "value": "--json"},
         ],
         "service_inventory": [
             {"kind": "literal", "value": "service"},
@@ -1339,6 +1342,7 @@ def _discovery_pair(
                 "kind": "prior_result",
                 "source_stage": "environment_inventory",
             },
+            {"kind": "literal", "value": "--json"},
         ],
         "target_identity_probe": [
             {"kind": "literal", "value": "run"},
@@ -1582,13 +1586,15 @@ def _discovery_pair(
     manifest: list[object] = [
         [railway_lexical, "--version"],
         [railway_lexical, "help"],
-        [railway_lexical, "project", "list"],
+        [railway_lexical, "project", "list", "--json"],
         [
             railway_lexical,
-            "environment",
-            "list",
+            "status",
             "--project",
             "project-id",
+            "--environment",
+            "production",
+            "--json",
         ],
         [
             railway_lexical,
@@ -1598,6 +1604,7 @@ def _discovery_pair(
             "project-id",
             "--environment",
             "environment-id",
+            "--json",
         ],
         [
             railway_lexical,
@@ -2272,17 +2279,24 @@ def test_discovery_result_rejects_tampered_authorization_hash(tmp_path):
     [
         "not json",
         _canon({"project_name": "ample-illumination"}).decode("ascii"),
+        _canon([{"id": "", "name": "ample-illumination"}]).decode("ascii"),
+        _canon([{"id": "project-id", "name": " ample-illumination"}]).decode(
+            "ascii"
+        ),
         _canon(
-            {
-                "project_id": "",
-                "project_name": "ample-illumination",
-            }
+            [
+                {"id": "project-id-1", "name": "ample-illumination"},
+                {"id": "project-id-2", "name": "ample-illumination"},
+            ]
         ).decode("ascii"),
         _canon(
-            {
-                "project_id": "project-id",
-                "project_name": " ample-illumination",
-            }
+            [
+                {
+                    "id": "project-id",
+                    "name": "ample-illumination",
+                    "apiToken": "must-not-be-consumed",
+                }
+            ]
         ).decode("ascii"),
     ],
 )
@@ -2290,7 +2304,128 @@ def test_runner_discovery_parser_rejects_missing_or_invalid_target_identity(payl
     import scripts.ops.hde_epic038_ops01r as runner
 
     with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
-        runner._parse_stage("project_inventory", payload)
+        runner._parse_stage(
+            "project_inventory",
+            payload,
+            requested_target={"project_name": "ample-illumination"},
+        )
+
+
+def test_runner_discovery_parser_normalizes_native_railway_json_inventory():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    requested = {
+        "project_name": "ample-illumination",
+        "environment_name": "production",
+        "service_name": "glow-hdengine-v2",
+    }
+    project = runner._parse_stage(
+        "project_inventory",
+        _canon(
+            [
+                {
+                    "id": "project-id",
+                    "name": "ample-illumination",
+                    "workspace": {"id": "workspace-id", "name": "Personal"},
+                }
+            ]
+        ).decode("ascii"),
+        requested_target=requested,
+    )
+    environment = runner._parse_stage(
+        "environment_inventory",
+        _canon(
+            {
+                "environments": {
+                    "edges": [
+                        {
+                            "node": {
+                                "canAccess": True,
+                                "id": "environment-id",
+                                "name": "production",
+                            }
+                        }
+                    ]
+                },
+                "id": "project-id",
+                "name": "ample-illumination",
+            }
+        ).decode("ascii"),
+        requested_target=requested,
+        prior_results={"project_inventory": project},
+    )
+    service = runner._parse_stage(
+        "service_inventory",
+        _canon(
+            [
+                {
+                    "id": "service-id",
+                    "isLinked": False,
+                    "name": "glow-hdengine-v2",
+                    "status": "SUCCESS",
+                }
+            ]
+        ).decode("ascii"),
+        requested_target=requested,
+    )
+
+    assert project == {
+        "project_id": "project-id",
+        "project_name": "ample-illumination",
+    }
+    assert environment == {
+        "environment_id": "environment-id",
+        "environment_name": "production",
+    }
+    assert service == {
+        "service_id": "service-id",
+        "service_name": "glow-hdengine-v2",
+    }
+
+
+def test_runner_discovery_parser_rejects_native_inventory_scope_or_case_drift():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    requested = {
+        "project_name": "ample-illumination",
+        "environment_name": "production",
+        "service_name": "glow-hdengine-v2",
+    }
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage(
+            "environment_inventory",
+            _canon(
+                {
+                    "environments": {
+                        "edges": [
+                            {
+                                "node": {
+                                    "id": "environment-id",
+                                    "name": "production",
+                                }
+                            }
+                        ]
+                    },
+                    "id": "different-project-id",
+                    "name": "ample-illumination",
+                }
+            ).decode("ascii"),
+            requested_target=requested,
+            prior_results={
+                "project_inventory": {
+                    "project_id": "project-id",
+                    "project_name": "ample-illumination",
+                }
+            },
+        )
+    with pytest.raises(SystemExit, match="OPS01R_DISCOVERY_TARGET_AMBIGUOUS"):
+        runner._parse_stage(
+            "service_inventory",
+            _canon([{"id": "service-id", "name": "Glow-HDengine-v2"}]).decode(
+                "ascii"
+            ),
+            requested_target=requested,
+        )
 
 
 def test_runner_discovery_parser_does_not_treat_version_or_help_as_target_json():
@@ -2403,16 +2538,40 @@ def _discovery_stage_outputs() -> dict[str, str]:
         "cli_version": "railway 4.0.0\n",
         "cli_help": "Usage: railway [COMMAND]\n",
         "project_inventory": _canon(
-            {"project_id": "project-id", "project_name": "ample-illumination"}
+            [
+                {
+                    "id": "project-id",
+                    "name": "ample-illumination",
+                    "workspace": {"id": "workspace-id", "name": "Personal"},
+                }
+            ]
         ).decode("ascii"),
         "environment_inventory": _canon(
             {
-                "environment_id": "environment-id",
-                "environment_name": "production",
+                "environments": {
+                    "edges": [
+                        {
+                            "node": {
+                                "canAccess": True,
+                                "id": "environment-id",
+                                "name": "production",
+                            }
+                        }
+                    ]
+                },
+                "id": "project-id",
+                "name": "ample-illumination",
             }
         ).decode("ascii"),
         "service_inventory": _canon(
-            {"service_id": "service-id", "service_name": "glow-hdengine-v2"}
+            [
+                {
+                    "id": "service-id",
+                    "isLinked": False,
+                    "name": "glow-hdengine-v2",
+                    "status": "SUCCESS",
+                }
+            ]
         ).decode("ascii"),
         "target_identity_probe": _canon(
             {

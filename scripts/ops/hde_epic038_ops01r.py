@@ -1015,7 +1015,12 @@ def discovery(
         if cp.returncode != 0:
             raise SystemExit("OPS01R_DISCOVERY_STAGE_FAILED")
         manifest.append(list(argv))
-        parsed = _parse_stage(stage, cp.stdout)
+        parsed = _parse_stage(
+            stage,
+            cp.stdout,
+            requested_target=requested_target,
+            prior_results=prior,
+        )
         prior[stage] = parsed
         if stage.endswith("_inventory"):
             target.update(
@@ -1181,13 +1186,54 @@ def validate_vectors(
     return _authorized_stage_vectors(authorization, stage=stage, prior_results=prior)
 
 
-def _parse_stage(stage: str, stdout: str) -> dict[str, object]:
-    fields_by_stage = {
-        "project_inventory": ("project_id", "project_name"),
-        "environment_inventory": ("environment_id", "environment_name"),
-        "service_inventory": ("service_id", "service_name"),
+def _discovery_json_has_secret_like_field(value: object) -> bool:
+    forbidden = re.compile(
+        r"(?i)(secret|token|password|passwd|api[_-]?key|database_url|db_bridge_url|authorization|cookie)"
+    )
+    if isinstance(value, dict):
+        return any(
+            not isinstance(key, str)
+            or forbidden.search(key) is not None
+            or _discovery_json_has_secret_like_field(child)
+            for key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(_discovery_json_has_secret_like_field(child) for child in value)
+    return False
+
+
+def _inventory_identity(
+    items: object,
+    *,
+    requested_name: object,
+    id_field: str,
+    name_field: str,
+) -> dict[str, object]:
+    if (
+        not isinstance(items, list)
+        or not _safe_identity_string(requested_name)
+        or any(not isinstance(item, dict) for item in items)
+    ):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    matches = [item for item in items if item.get("name") == requested_name]
+    if len(matches) != 1:
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    identity = {
+        id_field: matches[0].get("id"),
+        name_field: matches[0].get("name"),
     }
-    fields = fields_by_stage.get(stage)
+    if any(not _safe_identity_string(value) for value in identity.values()):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    return identity
+
+
+def _parse_stage(
+    stage: str,
+    stdout: str,
+    *,
+    requested_target: object = None,
+    prior_results: object = None,
+) -> dict[str, object]:
     if stage == "cli_version":
         normalized = (
             stdout.replace("\r\n", "\n")
@@ -1224,24 +1270,56 @@ def _parse_stage(stage: str, stdout: str) -> dict[str, object]:
         ):
             raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
         return probe
-    if fields is None:
+    if stage not in {
+        "project_inventory",
+        "environment_inventory",
+        "service_inventory",
+    }:
         return {}
     try:
         obj = json.loads(stdout)
     except (json.JSONDecodeError, UnicodeError):
         raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
-    if not isinstance(obj, dict) or set(obj) != set(fields):
+    if _discovery_json_has_secret_like_field(obj):
         raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
-    parsed = {field: obj[field] for field in fields}
-    if any(
-        not isinstance(value, str)
-        or not value
-        or value != value.strip()
-        or any(ord(character) < 32 or ord(character) == 127 for character in value)
-        for value in parsed.values()
+    requested = requested_target if isinstance(requested_target, dict) else {}
+    if stage == "project_inventory":
+        return _inventory_identity(
+            obj,
+            requested_name=requested.get("project_name"),
+            id_field="project_id",
+            name_field="project_name",
+        )
+    if stage == "service_inventory":
+        return _inventory_identity(
+            obj,
+            requested_name=requested.get("service_name"),
+            id_field="service_id",
+            name_field="service_name",
+        )
+
+    prior = prior_results if isinstance(prior_results, dict) else {}
+    project = prior.get("project_inventory")
+    if (
+        not isinstance(obj, dict)
+        or not isinstance(project, dict)
+        or obj.get("id") != project.get("project_id")
+        or obj.get("name") != project.get("project_name")
     ):
         raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
-    return parsed
+    environments = obj.get("environments")
+    edges = environments.get("edges") if isinstance(environments, dict) else None
+    if not isinstance(edges, list) or any(
+        not isinstance(edge, dict) for edge in edges
+    ):
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    nodes = [edge.get("node") for edge in edges]
+    return _inventory_identity(
+        nodes,
+        requested_name=requested.get("environment_name"),
+        id_field="environment_id",
+        name_field="environment_name",
+    )
 
 
 @dataclass
