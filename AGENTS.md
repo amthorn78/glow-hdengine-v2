@@ -3,7 +3,8 @@
 ## Scope and hierarchy
 - This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — HDE-Build Notes (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
-- `docs/pfcanon/**` is read-only for Codex/dev agents; cite PF canon by title/§ only.
+- `docs/pfcanon/**` is read-only for Codex/dev agents by default; cite PF canon by title/§ only.
+- **Explicit PO-directed PF-Canon exception:** when the PO directly and specifically instructs an agent to add, replace, rename, or remove identified file(s) under `docs/pfcanon/**`, that instruction authorizes the exact requested PF-Canon file operation and its requested commit or publication action. Validate the identified source and target paths, preserve all unrelated PF-Canon content, and report the resulting commit identity. This exception does not authorize unspecified PF-Canon edits, independent editorial changes, or manual edits to generated or governed evidence.
 
 ## Agent roster (repo-facing)
 - **Lead Dev / Product Owner:** approves epic scopes and evidence plans; owns acceptance maps/manifests and public/ops surface sign-off. Touches docs and governance bindings (acceptance maps, manifests, close reports).
