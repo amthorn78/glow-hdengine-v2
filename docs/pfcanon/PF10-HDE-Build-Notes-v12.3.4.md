@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.2  
+**Version:** v12.3.4  
 Effective Date: 2026.07.20
 
 **Status:** Living  
@@ -61,7 +61,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.9) PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004  
 2.10) PR-06 Remediation PR-A HDE-EPIC038  
 2.11) PO-Delegated OPS Execution Authority — PO Authorization Controls Executor Identity  
-2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport
+2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport  
+2.13) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine  
+2.14) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet  
+2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership
 
 # 2\) Numbered Addenda
 
@@ -11887,7 +11890,7 @@ Decision basis: PO-authorized `CRD-HDE-EPIC038-POST-PR359-REMEDIATION v1.3`; Glo
 * Permanent PF-Canon drainage is required later but is not an execution prerequisite, required implementation deliverable, required check, acceptance condition, or closeout gate.  
 * PF09 status remains unchanged.
 
-For this exact post-merge slice, r1 remains the approved epic-scope baseline. This CRD does not edit either plan. Before implementation relies on the approved rescope, a separately authorized next-version Current Implementation Plan revision must be approved unless a newer explicit PO instruction changes this posture.
+> For this exact post-merge slice, r1 remains the approved epic-scope baseline. This CRD does not edit either plan. Before implementation relies on the approved rescope, a separately authorized next-version Current Implementation Plan revision must be approved unless a newer explicit PO instruction changes this posture.
 
 ### **Approved post-merge rescope**
 
@@ -12028,7 +12031,7 @@ Unknown keys are rejected at every governed contract level. Provider values may 
 
 ### **Historical v4 qualification**
 
-PF10 §2.6's historical v4 ddl\_fingerprint result labeled match records an unversioned shared-field comparison only. It does not prove full semantic DDL parity. Until PR-C integrates a valid v5 packet, v4 remains the current retained packet. After PR-C, record the current v5 result as projection\_match. Every other §2.6 provider-parity row, evidence-only posture, Partial status, and QA, acceptance, PF09-movement, deployment, and closeout nonclaim remains unchanged.
+> PF10 §2.6's historical v4 ddl\_fingerprint result labeled match records an unversioned shared-field comparison only. It does not prove full semantic DDL parity. Until PR-C integrates a valid v5 packet, v4 remains the current retained packet. After PR-C, record the current v5 result as projection\_match. Every other §2.6 provider-parity row, evidence-only posture, Partial status, and QA, acceptance, PF09-movement, deployment, and closeout nonclaim remains unchanged.
 
 The phrase “After PR-C, record” is prospective. No v5 implementation, OPS result, candidate packet, PR-C integration, or validation result may be recorded as complete before the corresponding fact exists and is independently verified.
 
@@ -12750,9 +12753,9 @@ Evidence pointer(s): Implementation Doc | §PF09 consequences | `"HDE-DIST001.4 
 GitHub Repo proof: current blobs at `ffe67e3d…`.  
 PF proof excerpts:
 
-#### Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)
+> #### Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)
 
-*Subtask status:* Partial
+> *Subtask status:* Partial
 
 Linked NET/Finding IDs: NET-053, NET-055, NET-056, NET-061.
 
@@ -12766,12 +12769,12 @@ Evidence pointer(s): Implementation Doc | §RSC-001, §RSC-002, §PF09 consequen
 GitHub Repo proof: current blobs at `ffe67e3d…`.  
 PF proof excerpts:
 
-#### Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline
+> #### Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline
 
-**Subtask description:**  
-Implement a one-button runner that executes the release & provenance sanity pipeline end-to-end and fails closed on any drift:
+> **Subtask description:**  
+> Implement a one-button runner that executes the release & provenance sanity pipeline end-to-end and fails closed on any drift:
 
-**Subtask status:** Partial
+> **Subtask status:** Partial
 
 Linked NET/Finding IDs: NET-001, NET-043, NET-047, NET-058, NET-062, NET-063, NET-064.
 
@@ -12785,12 +12788,12 @@ Evidence pointer(s): Implementation Doc | §RSC-003, §PF09 consequences | `"HDE
 GitHub Repo proof: current blobs and v4 retained packet at `ffe67e3d…`.  
 PF proof excerpts:
 
-#### Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity
+> #### Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity
 
-**Subtask description:**  
-Prove parity between direct DB reads and bridge-mediated reads for BodyGraph, and capture the associated environment connectivity posture:
+> **Subtask description:**  
+> Prove parity between direct DB reads and bridge-mediated reads for BodyGraph, and capture the associated environment connectivity posture:
 
-**Subtask status:** **Partial**
+> **Subtask status:** **Partial**
 
 Linked NET/Finding IDs: NET-053, NET-055, NET-056, NET-061.
 
@@ -12804,11 +12807,11 @@ Evidence pointer(s): Implementation Doc | §RSC-002, §PF09 consequences | `"HDE
 GitHub Repo proof: current scanner blob `43d6c100…`.  
 PF proof excerpts:
 
-#### Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening
+> #### Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening
 
-Implement and prove a durable mapped-cache persistence path for configured-v2 chart-backed BodyGraph resolution in non-prod or controlled rails before any production-facing write posture is considered.
+> Implement and prove a durable mapped-cache persistence path for configured-v2 chart-backed BodyGraph resolution in non-prod or controlled rails before any production-facing write posture is considered.
 
-**Subtask status:** Optional
+> **Subtask status:** Optional
 
 Linked NET/Finding IDs: NET-058, NET-062, NET-063.
 
@@ -12822,12 +12825,12 @@ Evidence pointer(s): Implementation Doc | §RSC-001, §PF09 consequences | `"HDE
 GitHub Repo proof: current governed artifacts at `ffe67e3d…`.  
 PF proof excerpts:
 
-#### Subtask HDE-DIST005.2 — Global Index & Mirror discipline
+> #### Subtask HDE-DIST005.2 — Global Index & Mirror discipline
 
-For any artifact added/moved/removed in this phase:  
-Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR.
+> For any artifact added/moved/removed in this phase:  
+> Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR.
 
-**Subtask status:** Partial
+> **Subtask status:** Partial
 
 Linked NET/Finding IDs: NET-002 through NET-052.
 
@@ -12901,7 +12904,7 @@ This later PF10 addendum supersedes PF09.6 — Canon HDE Build Checklist Distill
 
 The controlling replacement posture is:
 
-Ops tasks MUST be authorized by the Product Owner. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent. The delegated agent MAY perform the authorized operation on the PO's behalf and MUST follow the same scope, safety, evidence, redaction, and completion-claim controls that bind a human operator.
+> Ops tasks MUST be authorized by the Product Owner. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent. The delegated agent MAY perform the authorized operation on the PO's behalf and MUST follow the same scope, safety, evidence, redaction, and completion-claim controls that bind a human operator.
 
 All other requirements in that PF09.6 unit remain active, including concrete success criteria, repo-stored OPS evidence, secret-free capture, and separation of OPS evidence from QA evidence.
 
@@ -13176,6 +13179,429 @@ This addendum changes the controlling architecture and current obligations only 
 
 ---
 
+## 2.13) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine
+
+Timestamp: 072026 20:10  
+Details: The Glow Implementation Agent technically approved `ADR-CANON-006` with canon effect `SUPERSEDES` for the exact current-versus-historical evidence scope defined below. This addendum records that approved technical decision as living PF10 truth pending separately authorized implementation, evidence production, plan revision, and permanent drainage.
+
+### Coverage disposition
+
+* `ADR-CANON-004` remains covered by Addendum 2.9 only for the strict Glow-owned DDL identity projector and projection-only truth semantics retained after Addendum 2.12.  
+* `ADR-CANON-005` is already covered by Addendum 2.12, **pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport**, and is not duplicated here.  
+* This addendum supplies the previously uncovered living decision for `ADR-CANON-006`.
+
+### Decision and effective evidence posture
+
+Current direct-only database-selection evidence and retained bridge-era evidence MUST have separate identities, owners, meanings, and release predicates.
+
+The current direct-selection evidence family is:
+
+| Contract item | Controlling decision |
+| :---- | :---- |
+| Schema identity | `hde_epic038.direct_db_selection.v1` |
+| Schema path | `schemas/hde_epic038_direct_db_selection.v1.json` |
+| Primary path | `artifacts/runtime/direct_db_selection.snapshot.json` |
+| Artifact key | `epic038.pr06r.direct_db_selection` |
+| Record type | `epic038_pr06r_direct_db_selection` |
+| Sole primary producer | `tools/evidence/generate_hde_epic038_direct_db_selection.py` |
+| Current consumers | `ci/checks/check_direct_db_contract.py`; `tools/evidence/run_sanity_pipeline.py`; `tools/evidence/update_evidence_index.py`; focused unit and evidence tests |
+| Companion owner | `tools/evidence/update_evidence_index.py` only |
+
+The primary contains exactly the top-level fields `schema`, `retired_keys`, `cases`, `predicates`, `result`, and `failure`. Unknown keys are rejected at every object level. Serialization is canonical UTF-8 without BOM, ASCII-sorted object keys, compact separators, and exactly one trailing LF. Arrays preserve the contract order stated here.
+
+`retired_keys` is exactly the ASCII-sorted roster:
+
+* `DB_ALLOW_BRIDGE_IN_PROD`  
+* `DB_BRIDGE_URL`  
+* `DB_FORCE_BRIDGE`
+
+`cases` contains exactly these four rows in this order:
+
+1. `healthy_direct`  
+2. `missing_database_url`  
+3. `unavailable_database_url`  
+4. `retired_keys_present`
+
+Every case contains exactly `case`, `app_env`, `database_url_presence`, `retired_keys_present`, `attempts`, `selected`, `error`, `alternate_transport_attempts`, and `result`.
+
+The decisive case rules are:
+
+* `healthy_direct`: one `psycopg` attempt with status `ok` and reason `null`; selected provider `psycopg`; error `null`.  
+* `missing_database_url`: one `psycopg` attempt with status `skip` and reason `missing_database_url`; selected provider `none`; error class/code `PrimaryUnavailable` / `missing_database_url`.  
+* `unavailable_database_url`: one `psycopg` attempt with status `error` and reason `primary_connect_failed`; selected provider `none`; error class/code `PrimaryUnavailable` / `primary_connect_failed`.  
+* `retired_keys_present`: all three retired key names present; zero provider attempts; selected provider `none`; error class/code `RetiredBridgeConfiguration` / `retired_bridge_configuration`.
+
+`database_url_presence` is only `present_redacted` or `unset`. Attempt provider is only `psycopg`; attempt status is only `ok`, `skip`, or `error`; attempt reason is a stable string or `null`; selected provider is only `psycopg` or `none`; and `alternate_transport_attempts` is integer zero in every passing case.
+
+`predicates` contains exactly:
+
+* `direct_only_provider`  
+* `missing_direct_fails_closed`  
+* `unavailable_direct_fails_closed`  
+* `retired_keys_fail_before_provider_attempt`  
+* `alternate_transport_attempts_zero`  
+* `secret_values_absent`
+
+`result` is `PASS` only when every predicate is true and every exact case invariant holds. `failure` is `null` on PASS. On failure, `failure` is exactly `{code,failed_predicates}` with sorted names-only codes. The producer writes the same primary path as a negative receipt, exits nonzero, and no release or PF09-support claim may consume that receipt as support.
+
+The schema file is indexed separately under artifact key `epic038.pr06r.direct_db_selection_schema` and record type `epic038_pr06r_schema`.
+
+### Historical bridge evidence quarantine
+
+Existing bridge-era primaries remain historical records. This includes:
+
+* `artifacts/db_bridge/**`  
+* the bridge-era `artifacts/runtime/env_connectivity.snapshot.json`  
+* bridge Presenter comparisons and schemas  
+* `audit/ops/hde-epic038/ops-01/**`
+
+Their primary bytes, producer provenance, primary checksum identities, sibling path proofs, Human Evidence Index rows, and Machine Evidence Mirror rows MUST remain intact unless a separately authorized historical migration is approved.
+
+The canonical updater MAY change Index and Mirror record metadata so these rows are explicitly classified as `historical_bridge_evidence`. The notes for those records MUST state that they do not prove current service availability, runtime support, direct-versus-bridge parity, bridge consistency, bridge fallback, token satisfaction, or a current OPS PASS.
+
+Historical bridge evidence MUST NOT be regenerated through a retired transport and MUST NOT satisfy a current direct-only release gate. Non-governed OPS-01R diagnostics remain failure and decision-support records only and MUST NOT be imported into the governed PASS family.
+
+`DEV_DB_BRIDGE_FALLBACK_OK`, bridge proof labels, and bridge-success fields are not claimable by new evidence rows. Accurate historical occurrences remain historical only.
+
+### Index, Mirror, path-proof, checksum, and release consequences
+
+The canonical updater adds exactly one Human Evidence Index row and one Machine Evidence Mirror row for the direct-selection primary and exactly one row in each ledger for its schema. It creates the sibling path proofs and refreshes the Human Index hash sentinel, Machine Mirror checksum, and their required path proofs in the same implementation change. No feature producer may write these companions manually.
+
+The release stage formerly named `DB-bridge parity` becomes `Direct DB selection contract` and requires the new primary to report `PASS`.
+
+A separate stage named `Historical bridge evidence integrity` may validate retained file presence, retained checksums, readable and canonical posture, and secret-safe nonclaims. It may report only `HISTORICAL_INTEGRITY_OK`. It MUST NOT recompute bridge predicates, require bridge availability, or emit a current bridge PASS.
+
+### Ownership, migration, and rollback
+
+PR-06R-A implements the schema, producer, direct checker, and focused tests. PR-06R-B owns the atomic tracked-byte and updater/release-binding migration after a valid OPS-03 packet exists.
+
+Migration order is:
+
+1. Adopt the direct-only runtime decision in Addendum 2.12.  
+2. Implement the direct-selection schema, producer, checker, and tests.  
+3. Stop active bridge evidence generation.  
+4. Produce the direct-selection primary.  
+5. Capture and admit OPS-03 under Addendum 2.14.  
+6. Finalize all current primaries and schemas.  
+7. Reclassify old bridge rows as historical and add the new current rows in one canonical updater run.  
+8. Regenerate topology orientation after the final evidence skeleton.  
+9. Validate every schema, canonical byte, path proof, checksum, Index/Mirror identity, historical hash, and release predicate.
+
+Rollback reverts the new primary, schema, and updater-generated companion changes together. Historical primaries stay untouched. Release admission remains failed until a coherent direct-only evidence graph exists. Rollback MUST NOT restore current bridge PASS semantics.
+
+### Permanent drainage targets
+
+Drain this decision, after implementation evidence exists, into:
+
+* **HDE Schemas and Artifacts**, §8.7, for the new direct-selection family and the historical bridge classification posture.  
+* **HDE Schemas and Artifacts**, §8.6.3.4, for current DB/OPS bindings, artifact identities, and path-proof ownership.  
+* **HDE Mechanics Guide**, §§20.3 and 20.3.1, to remove active bridge-parity mechanics while preserving truthful row-level proof and scope rationale.  
+* **HDE Governance**, §2.0 `Acceptance Tokens`, to retire bridge-only token semantics without creating a new token by implication.
+
+### Explicit nonclaims
+
+This addendum does not itself implement the producer or schema, generate or validate the primary, alter historical bytes, execute OPS, prove external database availability, prove Railway state, authorize a database write, establish QA PASS, satisfy a token, move PF09 status, revise the plan, deploy, migrate, accept the remediation slice, or close HDE-EPIC038.
+
 ---
 
-\<eof\>  
+## 2.14) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet
+
+Timestamp: 072026 20:10  
+Details: The Glow Implementation Agent technically approved `ADR-CANON-007` with canon effect `EXTENDS`. This addendum establishes the missing living contract for one separately authorized, source-bound, direct-only, read-only OPS-03 packet. It does not execute OPS or authorize standing database access.
+
+### Decision and execution boundary
+
+OPS-03 is the sole current live database-posture evidence lane for the HDE-EPIC038 direct-only remediation. It is a new evidence family and does not upgrade, alias, relabel, rerun, or replace the historical provenance of OPS-01 or the failed OPS-01R attempt.
+
+The operational target is the HDE database reachable only through an operator-supplied `DATABASE_URL`, with `APP_ENV=dev`, database schema `hde`, and search path `hde, public`. No Railway CLI, bridge service, HTTP database transport, vendor adapter, alternate DSN source, retry adapter, or database write participates.
+
+Agent execution remains governed by Addendum 2.11, **PO-Delegated OPS Execution Authority — PO Authorization Controls Executor Identity**. Task-specific PO approval of exact authorization bytes is mandatory before launch.
+
+### Authorization identity
+
+The canonical authorization schema is `hde_epic038.ops03.authorization.v1` at `schemas/hde_epic038_ops03_authorization.v1.json`.
+
+The authorization contains exactly:
+
+* `schema`  
+* `run_id`  
+* `authorized_at_utc`  
+* `expires_at_utc`  
+* `source_commit`  
+* `runner_sha256`  
+* `validator_sha256`  
+* `interpreter`  
+* `target`  
+* `rails`  
+* `retired_keys_required_absent`  
+* `ordered_query_ids`  
+* `expected_counts`  
+* `candidate_root`  
+* `exact_argv`  
+* `one_attempt`
+
+`run_id` matches `^[a-z0-9][a-z0-9-]{15,63}$` and determines these exact derived roots:
+
+* run root: `/tmp/hde-epic038-ops03/<run_id>/`  
+* control root: `/tmp/hde-epic038-ops03/<run_id>/control/`  
+* candidate root: `/tmp/hde-epic038-ops03/<run_id>/candidate/`  
+* failure root: `/tmp/hde-epic038-ops03/<run_id>/failure/`
+
+`<run_id>` is exact concatenation of the validated authorization field, not an unresolved execution input.
+
+`interpreter` contains exactly `{resolved_path,sha256}`.
+
+`target` is exactly `{app_env:'dev',database_schema:'hde',search_path:['hde','public']}` and contains no host, DSN, password, or role value.
+
+`rails` is exactly `{safe_mode:'1',allow_network:'0',allow_db_write:'0',db_read_authorized:true}`. `ALLOW_NETWORK=0` forbids general HTTP, vendor, CLI, and other network activity. `db_read_authorized` is the sole narrow exception for the bound direct PostgreSQL provider path and never authorizes a second target, provider, protocol, retry, or write.
+
+`retired_keys_required_absent` is exactly:
+
+* `DB_ALLOW_BRIDGE_IN_PROD`  
+* `DB_BRIDGE_URL`  
+* `DB_FORCE_BRIDGE`
+
+`ordered_query_ids` is exactly:
+
+1. `set_transaction_read_only`  
+2. `set_search_path`  
+3. `connection_identity`  
+4. `search_path`  
+5. `runtime_role_grants`  
+6. `ddl_columns`  
+7. `ddl_constraints`  
+8. `boundary_views`  
+9. `partition_inventory`  
+10. `partition_verify`
+
+`expected_counts` is exactly:
+
+* `provider_selections: 1`  
+* `health_connections: 1`  
+* `health_sql_statements: 1`  
+* `posture_transactions: 1`  
+* `posture_sql_statements: 10`  
+* `direct_connections: 2`  
+* `sql_statements: 11`  
+* `sql_writes: 0`  
+* `retries: 0`  
+* `alternate_provider_attempts: 0`
+
+The health statement is exactly `SELECT 1`. The ten posture statements are the ordered query roster.
+
+`candidate_root` equals the exact derived candidate path and is never a Repo path.
+
+`exact_argv` binds three vectors in order: capture producer, receipt-emitting independent validator, and final read-only validator. Every Python vector uses the same resolved interpreter followed by exact `-I`, `-B`, the bound script path, and its bound mode, authorization, and candidate arguments.
+
+`one_attempt` is literal `true`. The runner writes a launch marker before provider selection. Any failure after the marker consumes the authorization. A retry requires new PO-approved authorization bytes.
+
+### Environment, source, and write isolation
+
+The runner starts a clean child environment containing only required locale and rail names, `APP_ENV`, and `DATABASE_URL`. No `PYTHON*` environment name is forwarded. The `DATABASE_URL` value is passed only to the child direct provider and is never serialized, logged, hashed as evidence content, or included in a retained exception.
+
+The runner proves full source-manifest equality and absence of `__pycache__` and `.pyc` residue before and after capture. Writes are limited to the exact derived control, candidate, and failure roots. The launch marker and authorization-consumption record live in the control root; success primaries live in the candidate root; a failure receipt lives in the failure root. Source and Repo writes are not authorized.
+
+### Read-only database observation
+
+The runner calls `DBAccess.for_current_env` exactly once. The existing health operation opens one direct connection and executes exactly `SELECT 1`.
+
+The runner then calls `DBAccess.readonly_tx` exactly once with the ten ordered posture statements. `set_transaction_read_only` is first and must succeed before any observation. `set_search_path` is second. The remaining statements are read-only `SHOW` or `SELECT` observations corresponding one-to-one to their query IDs. The connection-identity observation includes `current_setting('transaction_read_only')`, so the read-only predicate is observed, not inferred.
+
+The provider never commits and always rolls back in `finally`, including after successful observation. Static SQL classification and provider-level enforcement both reject mutating SQL. Any extra statement, connection, provider attempt, transaction, or retry is a failure.
+
+### Success packet inventory and ownership
+
+The candidate success root contains exactly ten primaries:
+
+| Primary | Artifact key | Record type | Sole producer |
+| :---- | :---- | :---- | :---- |
+| `commands.txt` | `epic038.ops03.commands` | `epic038_ops03_text` | `scripts/ops/hde_epic038_ops03.py` |
+| `stdout.log` | `epic038.ops03.stdout` | `epic038_ops03_log` | `scripts/ops/hde_epic038_ops03.py` |
+| `stderr.log` | `epic038.ops03.stderr` | `epic038_ops03_log` | `scripts/ops/hde_epic038_ops03.py` |
+| `exit_code.txt` | `epic038.ops03.exit_code` | `epic038_ops03_text` | `scripts/ops/hde_epic038_ops03.py` |
+| `env_presence.json` | `epic038.ops03.env_presence` | `epic038_ops03_env_presence` | `scripts/ops/hde_epic038_ops03.py` |
+| `db_posture_summary.json` | `epic038.ops03.db_posture_summary` | `epic038_ops03_db_posture` | `scripts/ops/hde_epic038_ops03.py` |
+| `nonclaims.json` | `epic038.ops03.nonclaims` | `epic038_ops03_nonclaims` | `scripts/ops/hde_epic038_ops03.py` |
+| `result_summary.json` | `epic038.ops03.result_summary` | `epic038_ops03_result` | `scripts/ops/hde_epic038_ops03.py` |
+| `validation_receipt.json` | `epic038.ops03.validation_receipt` | `epic038_ops03_validation` | `tools/evidence/hde_epic038_ops03.py --emit-receipt` |
+| `checksums.sha256` | `epic038.ops03.checksums` | `epic038_ops03_checksum` | `scripts/ops/hde_epic038_ops03.py` |
+
+The tracked destination after independent admission is exactly `audit/ops/hde-epic038/ops-03/` plus each filename. The runner never writes the tracked destination. PR-06R-B copies the validated bytes exactly and does not become their producer.
+
+`commands.txt` contains three LF-terminated lines named `capture_argv=`, `receipt_argv=`, and `validate_argv=` followed by canonical JSON argv arrays. `stderr.log` is empty on PASS. `exit_code.txt` is exactly `0` plus LF. `checksums.sha256` contains one ASCII-sorted `<64-lowercase-hex><two spaces><filename>` line for each preceding primary and never lists itself.
+
+### JSON contracts and schema roster
+
+All JSON contracts reject unknown keys at every level and use canonical bytes.
+
+* `env_presence.json` uses schema `hde_epic038.ops03.env_presence.v1` and contains exactly `schema`, `run_id`, `app_env`, `rails`, `database_url_presence`, `retired_key_presence`, and `determinism_pins`. `DATABASE_URL` is recorded only as `SET_REDACTED`; every retired key is `UNSET`; rails and pins match authorization.  
+* `db_posture_summary.json` uses schema `hde_epic038.ops03.db_posture_summary.v1` and contains exactly `schema`, `run_id`, `source_commit`, `provider`, `selection_attempts`, `ordered_query_ids`, `query_results`, `observations`, `counts`, `predicates`, and `result`. Provider is `psycopg`. DDL identity cites `hde.ddl_identity_projection.v1`. Every decisive predicate must be true for PASS.  
+* `nonclaims.json` uses schema `hde_epic038.ops03.nonclaims.v1` and contains exactly `schema`, `run_id`, and `nonclaims`. The sorted roster is `acceptance_token_satisfaction`, `deployment`, `epic_closeout`, `migration`, `pf09_status_movement`, `production_write_authorization`, `qa_pass`, `railway_inventory_proof`, and `retired_transport_availability`.  
+* `result_summary.json` uses schema `hde_epic038.ops03.result_summary.v1` and contains exactly `schema`, `run_id`, `source_commit`, `authorization_sha256`, `capture_result`, `decisive_predicates`, `primary_files`, and `nonclaims_ref`. `capture_result` is `PASS`. `primary_files` lists exactly the first eight runner-owned data primaries in ASCII order and excludes the later validator receipt and checksum ledger.  
+* `validation_receipt.json` uses schema `hde_epic038.ops03.validation_receipt.v1` and contains exactly `schema`, `run_id`, `authorization_sha256`, `validated_files`, `predicates`, and `result`. Its predicates are `authorization_valid`, `source_identity_valid`, `schemas_valid`, `canonical_bytes_valid`, `inventory_valid`, `counts_valid`, `secret_scan_valid`, and `nonclaims_valid`, all true for PASS.
+
+The seven schema paths are:
+
+* `schemas/hde_epic038_ops03_authorization.v1.json`  
+* `schemas/hde_epic038_ops03_env_presence.v1.json`  
+* `schemas/hde_epic038_ops03_db_posture_summary.v1.json`  
+* `schemas/hde_epic038_ops03_nonclaims.v1.json`  
+* `schemas/hde_epic038_ops03_result_summary.v1.json`  
+* `schemas/hde_epic038_ops03_validation_receipt.v1.json`  
+* `schemas/hde_epic038_ops03_failure_receipt.v1.json`
+
+Each tracked schema is indexed with artifact key `epic038.ops03.schema.<basename-without-extension>` and record type `epic038_ops03_schema`.
+
+### Failure receipt and admissibility
+
+On pre-marker or post-marker failure, the runner emits exactly `/tmp/hde-epic038-ops03/<run_id>/failure/failure_receipt.json` using schema `hde_epic038.ops03.failure_receipt.v1` with exact fields `schema`, `run_id`, `authorization_sha256`, `phase`, `code`, `launch_consumed`, `candidate_admissible`, and `nonclaims`.
+
+Pre-marker failure performs no external database operation. Post-marker failure records authorization consumption and stops. `candidate_admissible` is always false. The receipt contains no traceback, exception message, query rows, DSN, host, role name, or secret. Failure receipts are diagnostic only, are not copied into the success root, are not indexed, and are never transformed into PASS.
+
+### Validation, admission, migration, and rollback
+
+Independent authorization validation precedes launch-marker creation. Independent receipt validation precedes checksum creation. Final packet validation is read-only. PR-06R-B repeats validation before and after exact byte copy. Mutation tests cover every field, count, path, argv vector, source hash, canonical byte, checksum, secret marker, SQL class, and extra-file case.
+
+During PR-06R-B, the canonical updater creates sibling path proofs for all ten primaries and seven schemas, then refreshes the Human Evidence Index, Machine Evidence Mirror, hash sentinels, checksums, and required path proofs. Feature producers do not write those companions.
+
+An OPS failure produces no tracked evidence and blocks PR-06R-B. A PR-06R-B validation failure removes the staged packet from the proposed change before commit. Historical evidence remains untouched.
+
+### Permanent drainage targets
+
+Drain this decision into:
+
+* **HDE Schemas and Artifacts**, §§8.6.3.4 and 8.7, for the OPS-03 schemas, root, artifact keys, record types, producers, companions, validation, and relationship to historical OPS-01.  
+* **HDE Governance**, §2.0 `Acceptance Tokens`, only to state that OPS-03 does not mint a new acceptance token by implication and that retired bridge-only token semantics remain unclaimable.
+
+Addendum 2.11's task-specific PO delegation and the general secret-safe, read-only, no-overclaim, evidence-admission, and acceptance-separation rails remain unchanged.
+
+### Explicit nonclaims
+
+This addendum does not itself approve exact run authorization bytes, execute OPS-03, establish external database availability, prove Railway inventory, write or migrate a database, modify a service, deploy, create QA PASS, satisfy a token, move PF09 status, revise the plan, accept the remediation slice, complete the epic, or close HDE-EPIC038.
+
+---
+
+## 2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership
+
+Timestamp: 072026 20:10  
+Details: The Glow Implementation Agent technically approved `ADR-CANON-008` with canon effect `AMENDS`. This addendum establishes the exact direct-only meaning of the affected Distillation rows and the provenance-preserving PR-06R execution sequence. It causes no automatic PF09 status movement.
+
+### Decision and effective PF09 posture
+
+For HDE-EPIC038 only:
+
+* `HDE-DIST001.4` is amended by removing active bridge fallback and provider-parity obligations. Its active completion meaning is direct-provider selection, strict retired-key refusal, typed direct failure, direct database posture, least-privilege and search-path observation, DDL identity projection, constraint and boundary-view observation, partition posture, and current governed evidence binding.  
+* `HDE-DIST001.9` is renamed and redefined as **`Direct database connectivity & retired-transport enforcement`**. It proves `DATABASE_URL` and `psycopg` only; every retired key refuses before provider I/O; missing or unavailable direct access fails closed with typed posture; alternate-provider attempts are zero; live direct posture is read-only; DDL truth is projection-only under `hde.ddl_identity_projection.v1`; and current local plus OPS-03 evidence is bound in the Human Evidence Index and Machine Evidence Mirror.  
+* `HDE-DIST001.6` retains its one-button release-sanity meaning, but its current dependencies are the direct-only evidence graph and the ordered pipeline below.  
+* `HDE-DIST001.11` retains its configured-v2 mapped-cache meaning. Existing local evidence and OPS-02 remain the bounded evidence owners; bridge-specific no-I/O hooks are replaced with transport-neutral guards without reopening or rerunning OPS-02.  
+* `HDE-DIST005.2` retains its Human Index, Machine Mirror, checksum, path-proof, updater, and orientation discipline.
+
+Every other PF09 row and the general PF09 status model remain unchanged.
+
+This addendum does not change any recorded status. `HDE-DIST001.4`, `HDE-DIST001.6`, `HDE-DIST001.9`, and `HDE-DIST005.2` remain `Partial`; `HDE-DIST001.11` remains `Optional` until separately reviewed evidence supports a later human PF09 action.
+
+### Ownership and adoption sequence
+
+The mandatory execution sequence is:
+
+1. IA technical approval of the rescoping decision.  
+2. Separately authorized revision of the current Implementation Plan lineage.  
+3. `PR-06R-A` implementation, review, and merge of direct-only source convergence, retired-key refusal, direct local evidence, OPS-03 tooling, schemas, transport-neutral mapped-cache guards, and focused tests.  
+4. PO approval of exact OPS-03 authorization bytes bound to the merged PR-06R-A source commit.  
+5. One OPS-03 execution and independent admission under Addendum 2.14.  
+6. `PR-06R-B` exact packet copy, current-versus-historical evidence binding, canonical updater convergence, final direct-only release integration, and row-specific support crosswalk.  
+7. Final technical and evidence review.  
+8. Separate permanent PF drainage and any row-specific PF09 status maintenance.
+
+`r1` remains the epic-scope baseline. The obsolete bridge-dependent OPS-01R and PR-C clauses are removed from the next Implementation Plan revision, not retained as optional fallback.
+
+Implementation belongs to PR-06R-A. Live direct posture belongs to OPS-03. Atomic final integration and the support crosswalk belong to PR-06R-B. PF09 wording and status maintenance remain separately authorized human-owned work. No implementation or OPS actor writes PF09 status.
+
+### Canonical release-sanity stage order
+
+The canonical entrypoint writes `audit/gates/sanity_pipeline/sanity_pipeline.log` and uses exactly these nineteen mandatory stages in order:
+
+1. Environment pins.  
+2. Identity and release provenance.  
+3. Canonical JSON.  
+4. Reader/CLI, AB/BA, two-run, and preimage determinism.  
+5. A7 Catalog transport.  
+6. CI rails.  
+7. Direct DB selection contract.  
+8. Direct DB posture artifacts.  
+9. BodyGraph policy.  
+10. Architecture snapshot.  
+11. Configured-v2 mapped-cache local evidence.  
+12. Historical bridge evidence integrity.  
+13. OPS-02 mapped-cache packet validation.  
+14. OPS-03 direct DB posture packet validation.  
+15. Human Index and Machine Mirror refresh.  
+16. Evidence-path validation.  
+17. Mirror schema and Index/Mirror hash validation.  
+18. Topology orientation validation.  
+19. Final-LF validation.
+
+Stage 12 may report only `HISTORICAL_INTEGRITY_OK`. It cannot report current bridge availability, parity, capability, consistency, fallback, or current OPS PASS. Stage 14 is mandatory for final PASS. No required stage may be skipped. The pipeline stops on the first failure, performs no external I/O, does not rerun OPS, and does not repair an inconsistent evidence graph.
+
+### Current evidence binding and updater ownership
+
+PR-06R-B replaces current bridge rows used for release admission with the direct-selection primary from Addendum 2.13 and the OPS-03 packet from Addendum 2.14.
+
+Historical OPS-01 and bridge bindings remain under historical record types and notes. Their existing keys and paths may remain when changing them would damage historical traceability. OPS-02 remains current bounded support for `HDE-DIST001.11` and is not rerun.
+
+All current primaries and schemas are finalized before the canonical updater runs. `tools/evidence/update_evidence_index.py` runs once and is the sole writer of the Human Evidence Index, Machine Evidence Mirror, sibling path proofs, and Index/Mirror hashes. `tools/evidence/orientation_demo.py` runs only after the final evidence skeleton exists. Release validation then reads the resulting bytes and never regenerates OPS material.
+
+A failed packet validator, duplicate or missing record, historical-byte change, updater failure, orientation failure, path-proof failure, checksum failure, or release-stage failure blocks the whole PR-06R-B integration. No partial generated set is committed.
+
+### Row-specific supportability predicates
+
+`Supportable from repo evidence` may be stated for a row only when every predicate for that row is satisfied.
+
+| PF09 row | Required predicates |
+| :---- | :---- |
+| `HDE-DIST001.4` | No executable bridge path remains in active source; retired keys refuse before provider construction or I/O; the direct-selection primary is `PASS`; direct posture primaries are current and schema-valid; OPS-03 is `PASS`; grants, search path, DDL/constraint, boundary-view, and partition observations satisfy current predicates; secret values are absent; every required path is indexed and mergeable. |
+| `HDE-DIST001.6` | All nineteen mandatory stages run in exact order from the canonical entrypoint; none is skipped; every stage reports its expected success code; the pipeline performs no OPS or external I/O; current and historical semantics remain distinct; canonical JSON, determinism, rails, updater, path, Mirror/Index hash, topology, and final-LF checks pass. |
+| `HDE-DIST001.9` | The row wording is adopted as direct connectivity and retired-transport enforcement; healthy direct selection succeeds through `psycopg`; missing or unavailable direct access fails closed; every retired key, including an empty value, refuses before provider attempt; alternate attempts are zero; OPS-03 proves direct read-only posture; DDL comparison claims only the v1 projection; no current bridge parity or fallback claim remains. |
+| `HDE-DIST001.11` | Existing local mapped-cache and OPS-02 validators pass; write/read-back parity, idempotence, closed-rails refusal, no raw vendor persistence, and secret safety remain proven; the local generator imports no retired provider and performs no live provider or vendor I/O; current bindings remain complete. |
+| `HDE-DIST005.2` | Every new primary and schema has exactly one Human Index row and one Machine Mirror row, the correct sibling path proof, correct checksum and hash linkage, and authorized record meaning; historical primaries retain exact checksums; no duplicate, orphan, manually written companion, ignored required file, or path/schema/hash failure exists; updater and orientation ordering is proven. |
+
+A completed row may be recommended independently of an incomplete row. Failure of a row predicate leaves that row unchanged and prohibits a supportability claim for that row.
+
+### Later status posture
+
+Only after PR-06R-B is merged and final review supports the exact row may a separate PF09 maintenance action consider:
+
+* `HDE-DIST001.4`: `Partial` to `Done`  
+* `HDE-DIST001.6`: `Partial` to `Done`  
+* `HDE-DIST001.9`: `Partial` to `Done` under the amended title  
+* `HDE-DIST001.11`: `Optional` to `Done`  
+* `HDE-DIST005.2`: `Partial` to `Done`
+
+These are potential later actions, not changes made by this addendum, the CRD, implementation, OPS, or QA.
+
+### Rollback and fail-closed posture
+
+PR-06R-A rollback may disable database entrypoints or revert to another direct-only commit. It MUST NOT restore bridge selection.
+
+Any OPS-03 pre-launch authorization, source, or rail mismatch produces no database call. Any post-marker failure consumes the authorization, produces only an inadmissible temporary failure receipt, and requires new PO-approved bytes for another attempt.
+
+PR-06R-B rollback removes the proposed current evidence bindings and generated set atomically while retaining the direct-only runtime and all historical primaries. Every PF09 status remains unchanged. Bridge parity is never restored as a rollback or closure path.
+
+### Permanent drainage targets
+
+Drain this decision into:
+
+* **Canon HDE Build Checklist Distillation**, exact rows `HDE-DIST001.4` and `HDE-DIST001.9`, for the semantic amendments.  
+* **Canon HDE Build Checklist Distillation**, rows `HDE-DIST001.6`, `HDE-DIST001.11`, and `HDE-DIST005.2`, only for dependency, evidence, and later status-note drainage.  
+* The next authorized Implementation Plan revision, for D1, D8, D10, D12, D13, PR-06, OPS-01, and OPS-02 ownership and dependency changes.
+
+Permanent drainage order is direct-only runtime and evidence implementation, final support review, then PF09 wording and any separately approved row status maintenance. All unrelated PF09 content remains unchanged.
+
+### Explicit nonclaims
+
+This addendum does not revise the plan, implement PR-06R-A or PR-06R-B, approve or execute OPS-03, create QA PASS, satisfy a token, move PF09 status, change a database or product payload, deploy, migrate, update the board, accept the remediation slice, complete HDE-EPIC038, or perform closeout.
+
+---
+
+\<eof\>
+
