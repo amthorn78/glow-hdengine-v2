@@ -1325,7 +1325,6 @@ def _discovery_pair(
             },
             {"kind": "literal", "value": "--environment"},
             {"kind": "literal", "value": "production"},
-            {"kind": "literal", "value": "--json"},
         ],
         "service_inventory": [
             {"kind": "literal", "value": "service"},
@@ -1594,7 +1593,6 @@ def _discovery_pair(
             "project-id",
             "--environment",
             "production",
-            "--json",
         ],
         [
             railway_lexical,
@@ -2383,6 +2381,68 @@ def test_runner_discovery_parser_normalizes_native_railway_json_inventory():
     }
 
 
+def test_runner_discovery_parser_normalizes_native_railway_human_status():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    requested = {
+        "project_name": "ample-illumination",
+        "environment_name": "production",
+        "service_name": "glow-hdengine-v2",
+    }
+    result = runner._parse_stage(
+        "environment_inventory",
+        """
+Workspace:       Personal
+
+Project:         ample-illumination
+Project ID:      project-id
+
+Environment:     production
+Environment ID:  environment-id
+
+All resources
+""",
+        requested_target=requested,
+        prior_results={
+            "project_inventory": {
+                "project_id": "project-id",
+                "project_name": "ample-illumination",
+            }
+        },
+    )
+
+    assert result == {
+        "environment_id": "environment-id",
+        "environment_name": "production",
+    }
+
+
+def test_runner_discovery_diagnostics_are_stage_specific_and_secret_safe():
+    import scripts.ops.hde_epic038_ops01r as runner
+
+    with pytest.raises(SystemExit) as exc_info:
+        runner._parse_stage(
+            "project_inventory",
+            _canon(
+                [
+                    {
+                        "apiToken": "must-not-be-consumed",
+                        "id": "project-id",
+                        "name": "ample-illumination",
+                    }
+                ]
+            ).decode("ascii"),
+            requested_target={"project_name": "ample-illumination"},
+        )
+
+    assert str(exc_info.value) == (
+        "OPS01R_DISCOVERY_TARGET_AMBIGUOUS:"
+        "project_inventory:secret_like_field"
+    )
+    assert "apiToken" not in str(exc_info.value)
+    assert "must-not-be-consumed" not in str(exc_info.value)
+
+
 def test_runner_discovery_parser_rejects_native_inventory_scope_or_case_drift():
     import scripts.ops.hde_epic038_ops01r as runner
 
@@ -2546,23 +2606,12 @@ def _discovery_stage_outputs() -> dict[str, str]:
                 }
             ]
         ).decode("ascii"),
-        "environment_inventory": _canon(
-            {
-                "environments": {
-                    "edges": [
-                        {
-                            "node": {
-                                "canAccess": True,
-                                "id": "environment-id",
-                                "name": "production",
-                            }
-                        }
-                    ]
-                },
-                "id": "project-id",
-                "name": "ample-illumination",
-            }
-        ).decode("ascii"),
+        "environment_inventory": (
+            "Project:         ample-illumination\n"
+            "Project ID:      project-id\n"
+            "Environment:     production\n"
+            "Environment ID:  environment-id\n"
+        ),
         "service_inventory": _canon(
             [
                 {

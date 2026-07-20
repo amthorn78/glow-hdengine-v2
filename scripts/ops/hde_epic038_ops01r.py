@@ -406,6 +406,21 @@ def _safe_identity_string(value: object) -> bool:
     )
 
 
+def _discovery_target_reject(stage: str, reason: str) -> None:
+    """Fail closed with a bounded diagnostic that cannot contain target data."""
+    allowed_stages = {
+        "cli_version",
+        "cli_help",
+        "project_inventory",
+        "environment_inventory",
+        "service_inventory",
+        "target_identity_probe",
+    }
+    if stage not in allowed_stages or re.fullmatch(r"[a-z0-9_]+", reason) is None:
+        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    raise SystemExit(f"OPS01R_DISCOVERY_TARGET_AMBIGUOUS:{stage}:{reason}")
+
+
 def _target_probe_payload(environment: Mapping[str, str]) -> dict[str, object]:
     """Expose only non-secret Railway identity candidates and endpoint presence."""
     identity_fields = []
@@ -437,11 +452,10 @@ def _derive_discovery_contracts(
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     identity_fields = probe.get("identity_fields")
     endpoint_presence = probe.get("endpoint_presence")
-    if not isinstance(identity_fields, list) or endpoint_presence != {
-        "DATABASE_URL": True,
-        "DB_BRIDGE_URL": True,
-    }:
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+    if not isinstance(identity_fields, list):
+        _discovery_target_reject("target_identity_probe", "identity_fields_shape")
+    if endpoint_presence != {"DATABASE_URL": True, "DB_BRIDGE_URL": True}:
+        _discovery_target_reject("target_identity_probe", "endpoint_presence")
     candidates: list[dict[str, str]] = []
     for row in identity_fields:
         if (
@@ -450,7 +464,7 @@ def _derive_discovery_contracts(
             or not _safe_identity_string(row.get("name"))
             or not _safe_identity_string(row.get("value"))
         ):
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject("target_identity_probe", "identity_field_shape")
         candidates.append({"name": row["name"], "value": row["value"]})
 
     identity_contract: list[dict[str, str]] = []
@@ -461,7 +475,9 @@ def _derive_discovery_contracts(
     ):
         matches = [row for row in candidates if row["value"] == target[field]]
         if len(matches) != 1:
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(
+                "target_identity_probe", f"{dimension}_identity_cardinality"
+            )
         identity_contract.append(
             {
                 "expected_value": target[field],
@@ -983,7 +999,7 @@ def discovery(
             key=lambda v: canonical_bytes(list(v)),
         )
         if len(vectors) != 1:
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(stage, "template_cardinality")
         argv = vectors[0]
         if authorization_path.read_bytes() != authorization_bytes:
             raise SystemExit("OPS01R_DISCOVERY_AUTH_INVALID")
@@ -1013,7 +1029,7 @@ def discovery(
             errors="strict",
         )
         if cp.returncode != 0:
-            raise SystemExit("OPS01R_DISCOVERY_STAGE_FAILED")
+            raise SystemExit(f"OPS01R_DISCOVERY_STAGE_FAILED:{stage}")
         manifest.append(list(argv))
         parsed = _parse_stage(
             stage,
@@ -1039,14 +1055,14 @@ def discovery(
         "service_name",
     }
     if set(target) != required or any(not target[k] for k in required):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject("target_identity_probe", "target_completeness")
     if (
         not isinstance(requested_target, dict)
         or target.get("project_name") != requested_target.get("project_name")
         or target.get("environment_name") != requested_target.get("environment_name")
         or target.get("service_name") != requested_target.get("service_name")
     ):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject("target_identity_probe", "target_name_mismatch")
     identity_contract, child_environment_contract = _derive_discovery_contracts(
         target, probe
     )
@@ -1205,6 +1221,7 @@ def _discovery_json_has_secret_like_field(value: object) -> bool:
 def _inventory_identity(
     items: object,
     *,
+    stage: str,
     requested_name: object,
     id_field: str,
     name_field: str,
@@ -1214,17 +1231,63 @@ def _inventory_identity(
         or not _safe_identity_string(requested_name)
         or any(not isinstance(item, dict) for item in items)
     ):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "inventory_shape")
     matches = [item for item in items if item.get("name") == requested_name]
     if len(matches) != 1:
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "name_cardinality")
     identity = {
         id_field: matches[0].get("id"),
         name_field: matches[0].get("name"),
     }
     if any(not _safe_identity_string(value) for value in identity.values()):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "identity_shape")
     return identity
+
+
+def _status_environment_identity(
+    stdout: str,
+    *,
+    requested_target: Mapping[str, object],
+    prior_results: Mapping[str, object],
+) -> dict[str, object]:
+    """Parse only the four fixed identity labels from Railway human status."""
+    project = prior_results.get("project_inventory")
+    if not isinstance(project, dict):
+        _discovery_target_reject("environment_inventory", "prior_project_shape")
+    normalized = stdout.replace("\r\n", "\n").replace("\r", "\n")
+    normalized = re.sub(r"\x1b\[[0-9;]*m", "", normalized)
+    expected_labels = {
+        "Project": requested_target.get("project_name"),
+        "Project ID": project.get("project_id"),
+        "Environment": requested_target.get("environment_name"),
+    }
+    captured: dict[str, list[str]] = {
+        "Project": [],
+        "Project ID": [],
+        "Environment": [],
+        "Environment ID": [],
+    }
+    for line in normalized.split("\n"):
+        match = re.fullmatch(
+            r"(Project|Project ID|Environment|Environment ID):[ \t]+(.+)",
+            line,
+        )
+        if match is not None:
+            captured[match.group(1)].append(match.group(2))
+    if any(len(values) != 1 for values in captured.values()):
+        _discovery_target_reject("environment_inventory", "status_label_cardinality")
+    if any(captured[label][0] != value for label, value in expected_labels.items()):
+        _discovery_target_reject("environment_inventory", "status_scope_mismatch")
+    environment_id = captured["Environment ID"][0]
+    environment_name = captured["Environment"][0]
+    if not _safe_identity_string(environment_id) or not _safe_identity_string(
+        environment_name
+    ):
+        _discovery_target_reject("environment_inventory", "identity_shape")
+    return {
+        "environment_id": environment_id,
+        "environment_name": environment_name,
+    }
 
 
 def _parse_stage(
@@ -1241,7 +1304,7 @@ def _parse_stage(
             .strip(" \t\n\v\f")
         )
         if "\n" in normalized or not _safe_identity_string(normalized):
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(stage, "version_shape")
         return {"version": normalized}
     if stage == "cli_help":
         normalized = stdout.replace("\r\n", "\n").replace("\r", "\n")
@@ -1251,13 +1314,13 @@ def _parse_stage(
             if token
         ]
         if not tokens:
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(stage, "help_shape")
         return {"help_tokens": tokens}
     if stage == "target_identity_probe":
         try:
             probe = json.loads(stdout)
         except (json.JSONDecodeError, UnicodeError):
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(stage, "json_shape")
         if (
             not isinstance(probe, dict)
             or set(probe)
@@ -1268,7 +1331,7 @@ def _parse_stage(
             or not isinstance(probe.get("endpoint_presence"), dict)
             or not isinstance(probe.get("identity_fields"), list)
         ):
-            raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+            _discovery_target_reject(stage, "probe_contract")
         return probe
     if stage not in {
         "project_inventory",
@@ -1276,16 +1339,24 @@ def _parse_stage(
         "service_inventory",
     }:
         return {}
+    requested = requested_target if isinstance(requested_target, dict) else {}
+    prior = prior_results if isinstance(prior_results, dict) else {}
+    if stage == "environment_inventory" and not stdout.lstrip().startswith("{"):
+        return _status_environment_identity(
+            stdout,
+            requested_target=requested,
+            prior_results=prior,
+        )
     try:
         obj = json.loads(stdout)
     except (json.JSONDecodeError, UnicodeError):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "json_shape")
     if _discovery_json_has_secret_like_field(obj):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
-    requested = requested_target if isinstance(requested_target, dict) else {}
+        _discovery_target_reject(stage, "secret_like_field")
     if stage == "project_inventory":
         return _inventory_identity(
             obj,
+            stage=stage,
             requested_name=requested.get("project_name"),
             id_field="project_id",
             name_field="project_name",
@@ -1293,12 +1364,12 @@ def _parse_stage(
     if stage == "service_inventory":
         return _inventory_identity(
             obj,
+            stage=stage,
             requested_name=requested.get("service_name"),
             id_field="service_id",
             name_field="service_name",
         )
 
-    prior = prior_results if isinstance(prior_results, dict) else {}
     project = prior.get("project_inventory")
     if (
         not isinstance(obj, dict)
@@ -1306,16 +1377,17 @@ def _parse_stage(
         or obj.get("id") != project.get("project_id")
         or obj.get("name") != project.get("project_name")
     ):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "project_scope_mismatch")
     environments = obj.get("environments")
     edges = environments.get("edges") if isinstance(environments, dict) else None
     if not isinstance(edges, list) or any(
         not isinstance(edge, dict) for edge in edges
     ):
-        raise SystemExit("OPS01R_DISCOVERY_TARGET_AMBIGUOUS")
+        _discovery_target_reject(stage, "environment_edges_shape")
     nodes = [edge.get("node") for edge in edges]
     return _inventory_identity(
         nodes,
+        stage=stage,
         requested_name=requested.get("environment_name"),
         id_field="environment_id",
         name_field="environment_name",
