@@ -30,11 +30,27 @@ def _valid_log() -> bool:
             and "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true\n" in text)
 
 
+def _log_version() -> tuple[int, int, int, int, int] | None:
+    """Return filesystem generation metadata for the canonical sanity receipt."""
+    try:
+        stat = LOG.stat()
+    except OSError:
+        return None
+    return (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+
+
 def main() -> int:
     env = os.environ.copy()
     env.update(PINS)
+    prior_log_version = _log_version()
     result = subprocess.run([sys.executable, "tools/evidence/run_sanity_pipeline.py"], cwd=ROOT, env=env)
-    if result.returncode == 1 and _valid_log():
+    current_log_version = _log_version()
+    if (
+        result.returncode == 1
+        and current_log_version is not None
+        and current_log_version != prior_log_version
+        and _valid_log()
+    ):
         return 0
     return result.returncode or 1
 
