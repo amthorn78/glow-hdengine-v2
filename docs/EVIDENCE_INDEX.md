@@ -213,11 +213,13 @@
 
 # Appendix-D — Evidence Index (EPIC-011)
 
-## Bridge adapter & rails-open scope
-* `artifacts/db_bridge/adapter_selection.snapshot.json`
-* `artifacts/db_bridge/health.json`
-* `artifacts/db_bridge/root.json`
-* `artifacts/db_bridge/query_select_1.json`
+## Historical bridge adapter evidence
+* `artifacts/db_bridge/adapter_selection.snapshot.json` — historical; does not prove current runtime support.
+* `artifacts/db_bridge/health.json` — historical; does not prove current runtime support.
+* `artifacts/db_bridge/root.json` — historical; does not prove current runtime support.
+* `artifacts/db_bridge/query_select_1.json` — historical; does not prove current runtime support.
+
+## Current direct DB posture & rails-open scope
 * `artifacts/db/introspect.search_path.json`
 * `artifacts/db/introspect.grants.json`
 * `artifacts/db/introspect.fingerprint.json`
