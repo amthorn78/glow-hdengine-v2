@@ -1,9 +1,5 @@
 import importlib
 
-import importlib
-
-import pytest
-
 
 def _reload():
     import sys
@@ -14,23 +10,48 @@ def _reload():
     return importlib.reload(module)
 
 
-@pytest.mark.epic006
-def test_attempt_both_dsn_first(monkeypatch):
-    monkeypatch.setenv("DATABASE_URL", "postgresql://example")
-    monkeypatch.delenv("DB_BRIDGE_URL", raising=False)
+class _DirectDB:
+    attempts = ({"provider": "psycopg", "status": "ok", "reason": None},)
+
+
+def test_compatibility_resolver_reports_one_direct_attempt(monkeypatch):
     module = _reload()
-    res = module.db_resolve("dsn")
-    assert res["dsn"]["status"] in {"ok", "unreachable", "skip"}
-    assert res["bridge"]["status"] in {"ok", "unreachable", "skip"}
+    monkeypatch.setattr(
+        module.DBAccess,
+        "for_current_env",
+        staticmethod(lambda: _DirectDB()),
+    )
+
+    result = module.db_resolve("dsn")
+
+    assert result == {
+        "schema": "hde.db.resolve.v2",
+        "active": "psycopg",
+        "attempts": [
+            {"provider": "psycopg", "status": "ok", "reason": None}
+        ],
+        "error": None,
+    }
+    assert "dsn" not in result
+    assert "bridge" not in result
 
 
-@pytest.mark.epic006
-def test_attempt_both_bridge_then_dsn(monkeypatch):
+def test_compatibility_resolver_refuses_retired_bridge_configuration(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-leak")
     monkeypatch.setenv("DB_BRIDGE_URL", "https://bridge.example")
-    monkeypatch.setenv("SAFE_MODE", "0")
-    monkeypatch.setenv("ALLOW_NETWORK", "1")
-    monkeypatch.delenv("DATABASE_URL", raising=False)
     module = _reload()
-    res = module.db_resolve("dsn")
-    assert res["bridge"]["status"] in {"ok", "unreachable", "skip"}
-    assert res["dsn"]["status"] in {"ok", "unreachable", "skip"}
+
+    result = module.db_resolve("dsn")
+
+    assert result == {
+        "schema": "hde.db.resolve.v2",
+        "active": "none",
+        "attempts": [],
+        "error": {
+            "class": "RetiredBridgeConfiguration",
+            "code": "retired_bridge_configuration",
+            "retired_keys": ["DB_BRIDGE_URL"],
+        },
+    }
+    assert "must-not-leak" not in repr(result)
+    assert "bridge.example" not in repr(result)
