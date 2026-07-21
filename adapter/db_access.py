@@ -67,27 +67,62 @@ def resolve_env_matrix() -> tuple[bool, Dict[str, Any]]:
         return False, payload
 
 
+def _smoke_result_id(rows: Any, label: str) -> str:
+    if (
+        not isinstance(rows, (list, tuple))
+        or len(rows) != 1
+        or not isinstance(rows[0], (list, tuple))
+        or len(rows[0]) != 1
+        or rows[0][0] is None
+    ):
+        raise RuntimeError(f"smoke_{label}_missing_id")
+    return str(rows[0][0])
+
+
+def _validate_smoke_transaction(results: Any) -> None:
+    if not isinstance(results, (list, tuple)) or len(results) != 4:
+        raise RuntimeError("smoke_transaction_result_shape")
+    ids = (
+        _smoke_result_id(results[1], "generated"),
+        _smoke_result_id(results[2], "insert"),
+        _smoke_result_id(results[3], "cleanup"),
+    )
+    if len(set(ids)) != 1:
+        raise RuntimeError("smoke_transaction_id_mismatch")
+
+
 def db_rw_smoke(preference: str = "dsn") -> tuple[str, str]:
-    """Run the legacy write/delete smoke through the selected DBAccess facade."""
+    """Run the legacy write/delete smoke through one validated DBAccess transaction."""
     if os.getenv("DB_REQUIRED", "0") != "1":
         return "skip", "DB_REQUIRED=0"
     try:
         db = DBAccess.for_current_env()
-        results = db.tx([
-            DBAccess.statement("SET LOCAL search_path TO hde, public"),
-            DBAccess.statement(
-                "WITH inserted AS ("
-                "INSERT INTO hde.public_results (id, release_id, payload) "
-                "VALUES (gen_random_uuid(), 'qa_smoke', '{}'::jsonb) RETURNING id"
-                "), deleted AS ("
-                "DELETE FROM hde.public_results WHERE id IN (SELECT id FROM inserted) RETURNING id"
-                ") SELECT id FROM deleted",
-                fetch=True,
-            ),
-        ])
-        deleted = results[1] if len(results) > 1 else None
-        if not deleted or not deleted[0]:
-            raise RuntimeError("smoke_cleanup_missing_id")
+        db.tx(
+            [
+                DBAccess.statement("SET LOCAL search_path TO hde, public"),
+                DBAccess.statement(
+                    "SELECT set_config("
+                    "'hde.qa_smoke_id', gen_random_uuid()::text, true"
+                    ")",
+                    fetch=True,
+                ),
+                DBAccess.statement(
+                    "INSERT INTO hde.public_results (id, release_id, payload) "
+                    "VALUES ("
+                    "current_setting('hde.qa_smoke_id')::uuid, "
+                    "'qa_smoke', '{}'::jsonb"
+                    ") RETURNING id",
+                    fetch=True,
+                ),
+                DBAccess.statement(
+                    "DELETE FROM hde.public_results "
+                    "WHERE id = current_setting('hde.qa_smoke_id')::uuid "
+                    "RETURNING id",
+                    fetch=True,
+                ),
+            ],
+            validate=_validate_smoke_transaction,
+        )
         return "ok", "db_rw_smoke_ok"
     except PrimaryUnavailable:
         return "skip", "no_working_path"
