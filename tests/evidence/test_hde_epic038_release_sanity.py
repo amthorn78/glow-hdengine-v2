@@ -889,16 +889,52 @@ def test_sanity_gate_accepts_only_pr_a_nonfinal_log(tmp_path, monkeypatch):
     assert gate._valid_log() is False
 
 
+def test_sanity_gate_rejects_stale_valid_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+    log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(gate.subprocess, "run", lambda *args, **kwargs: _result(1))
+    assert gate._valid_log() is True
+    assert gate.main() == 1
+
+
+def test_sanity_gate_accepts_fresh_valid_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    log.write_text("stale receipt\n", encoding="utf-8")
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+
+    def run(*args, **kwargs):
+        log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+        return _result(1)
+
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(gate.subprocess, "run", run)
+    assert gate.main() == 0
+
+
 @pytest.mark.parametrize(
     ("returncode", "valid_log", "expected"),
     ((1, True, 0), (1, False, 1), (0, True, 1), (2, True, 2)),
 )
 def test_sanity_gate_only_tolerates_exact_pr_a_nonfinal_receipt(
-    monkeypatch, returncode, valid_log, expected
+    tmp_path, monkeypatch, returncode, valid_log, expected
 ):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
-    monkeypatch.setattr(gate.subprocess, "run", lambda *args, **kwargs: _result(returncode))
+    log = tmp_path / "sanity_pipeline.log"
+    log.write_text("stale receipt\n", encoding="utf-8")
+
+    def run(*args, **kwargs):
+        log.write_text(f"fresh receipt {returncode}\n", encoding="utf-8")
+        return _result(returncode)
+
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(gate.subprocess, "run", run)
     monkeypatch.setattr(gate, "_valid_log", lambda: valid_log)
     assert gate.main() == expected
 
