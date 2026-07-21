@@ -154,3 +154,26 @@ def test_http_session_use_of_retired_environ_subscript_is_rejected(tmp_path):
     violations = check.scan(tmp_path)
     assert any("active_retired_key_consumption" in row for row in violations)
     assert any("retired_key_http_bridge_use" in row for row in violations)
+
+def test_active_guidance_cannot_hide_behind_retired_context(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/RUN.md",
+        "Set retired DB_BRIDGE_URL to the bridge endpoint.\n",
+    )
+    assert any(
+        "retired_key_active_guidance" in row for row in check.scan(tmp_path)
+    )
+
+
+def test_negated_and_historical_retained_key_lines_remain_refusal_only(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/SECRETS.md",
+        "Do not set retired DB_BRIDGE_URL to an endpoint; it must remain absent.\n"
+        "Historical retained evidence records DB_FORCE_BRIDGE was set to REDACTED; "
+        "this is not current guidance.\n",
+    )
+    assert check.scan(tmp_path) == ()
