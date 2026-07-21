@@ -9,6 +9,8 @@ from .providers.psycopg_provider import PsycopgProvider
 from .errors import AdapterError, IntrospectionError, PrimaryUnavailable, RetiredBridgeConfiguration
 
 Params = Sequence[Any] | Mapping[str, Any] | None
+TxResult = Sequence[Any] | None
+TxValidator = Callable[[Sequence[TxResult]], None]
 
 RETIRED_DB_TRANSPORT_KEYS: tuple[str, ...] = (
     "DB_ALLOW_BRIDGE_IN_PROD",
@@ -35,7 +37,12 @@ class Provider(Protocol):
     def health(self) -> None: ...
     def query(self, sql: str, params: Params = None) -> List[Sequence[Any]]: ...
     def exec(self, sql: str, params: Params = None) -> None: ...
-    def tx(self, statements: Sequence[Statement]) -> List[Sequence[Any] | None]: ...
+    def tx(
+        self,
+        statements: Sequence[Statement],
+        *,
+        validate: TxValidator | None = None,
+    ) -> List[TxResult]: ...
     def readonly_tx(self, statements: Sequence[Statement]) -> List[Sequence[Any] | None]: ...
     def introspect(self, kind: str) -> Any: ...
 
@@ -178,8 +185,13 @@ class DBAccess:
         return self._provider.query(sql, params)
     def exec(self, sql: str, params: Params = None) -> None:
         self._provider.exec(sql, params)
-    def tx(self, statements: Sequence[Statement]) -> List[Sequence[Any] | None]:
-        return self._provider.tx(statements)
+    def tx(
+        self,
+        statements: Sequence[Statement],
+        *,
+        validate: TxValidator | None = None,
+    ) -> List[TxResult]:
+        return self._provider.tx(statements, validate=validate)
     def readonly_tx(self, statements: Sequence[Statement]) -> List[Sequence[Any] | None]:
         return self._provider.readonly_tx(statements)
     def introspect(self, kind: str) -> Any:
