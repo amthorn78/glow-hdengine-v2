@@ -864,8 +864,6 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
             return seal_code
-    if failure == STAGE_NAMES[-1] and final_bytes.endswith(f"first_failed_stage:{STAGE_NAMES[-1]}\nsummary:FAIL\n".encode("utf-8")):
-        return 0
     return 0 if passed else (code or 1)
 
 
