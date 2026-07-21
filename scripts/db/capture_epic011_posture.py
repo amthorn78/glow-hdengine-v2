@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import datetime as dt
-import hashlib
 import json
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
-CAPTURE_ROOT = ROOT
+CAPTURE_ROOT = ROOT / "artifacts"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -36,35 +35,17 @@ def _iso(timestamp: dt.datetime) -> str:
 def _artifact_path(relative_path: str) -> Path:
     requested = Path(relative_path)
     try:
-        requested.relative_to("artifacts")
+        artifact_relative = requested.relative_to("artifacts")
     except ValueError as exc:
         raise ValueError(f"capture path must be under artifacts/: {relative_path}") from exc
-    path = CAPTURE_ROOT / requested
+    path = CAPTURE_ROOT / artifact_relative
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
-
-
-def _write_path_proof(path: Path) -> None:
-    stat = path.stat()
-    mtime = dt.datetime.fromtimestamp(stat.st_mtime, tz=dt.timezone.utc).replace(
-        microsecond=0
-    )
-    proof = "\n".join(
-        (
-            f"path: {path.relative_to(ROOT)}",
-            f"sha256: {hashlib.sha256(path.read_bytes()).hexdigest()}",
-            f"size_bytes: {stat.st_size}",
-            f"mtime_utc: {_iso(mtime)}",
-            "",
-        )
-    )
-    Path(f"{path}.path_proof.txt").write_text(proof, encoding="utf-8")
 
 
 def _write_bytes(relative_path: str, data: bytes) -> None:
     path = _artifact_path(relative_path)
     path.write_bytes(data)
-    _write_path_proof(path)
 
 
 def _write_text(relative_path: str, text: str) -> None:
