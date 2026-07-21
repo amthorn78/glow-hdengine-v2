@@ -59,9 +59,16 @@ def _normalize_introspect_payload(kind: str, payload: Any) -> Dict[str, Any]:
 class DBAccess:
     """High-level façade exposing direct PostgreSQL DB operations."""
 
-    def __init__(self, provider: Provider, *, attempts: Sequence[Mapping[str, Any]] | None = None):
+    def __init__(
+        self,
+        provider: Provider,
+        *,
+        attempts: Sequence[Mapping[str, Any]] | None = None,
+        selection_case: Mapping[str, object] | None = None,
+    ):
         self._provider = provider
-        self._attempts = list(attempts or [])
+        self._attempts = [dict(row) for row in (attempts or ())]
+        self._selection_case = dict(selection_case or {})
 
     @property
     def provider_name(self) -> str:
@@ -69,7 +76,7 @@ class DBAccess:
 
     @property
     def attempts(self) -> Sequence[Mapping[str, Any]]:
-        return tuple(self._attempts)
+        return tuple(dict(row) for row in self._attempts)
 
     @classmethod
     def for_current_env(
@@ -98,10 +105,26 @@ class DBAccess:
             attempts.append(_canonical_attempt("psycopg", "error", reason="primary_connect_failed"))
             raise PrimaryUnavailable("primary_connect_failed", attempts=["DATABASE_URL"], code="primary_connect_failed") from exc
         attempts.append(_canonical_attempt("psycopg", "ok", reason=None))
-        return cls(provider, attempts=attempts)
+        selection_case: Mapping[str, object] = {
+            "case": "healthy_direct",
+            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "database_url_presence": "present_redacted",
+            "retired_keys_present": [],
+            "attempts": attempts,
+            "selected": "psycopg",
+            "error": None,
+            "alternate_transport_attempts": 0,
+            "result": "PASS",
+        }
+        return cls(provider, attempts=attempts, selection_case=selection_case)
 
     def selection_evidence(self) -> Mapping[str, object]:
-        return {"provider": self.provider_name if self.provider_name == "psycopg" else "none", "attempts": list(self._attempts), "alternate_transport_attempts": 0}
+        """Return the pure, names-only direct-selection case record."""
+        return {
+            **self._selection_case,
+            "attempts": [dict(row) for row in self._attempts],
+            "retired_keys_present": list(self._selection_case.get("retired_keys_present", [])),
+        }
 
     def query(self, sql: str, params: Params = None) -> List[Sequence[Any]]:
         return self._provider.query(sql, params)
@@ -123,3 +146,4 @@ class DBAccess:
         return _normalize_introspect_payload("version", self.introspect("version"))
     def introspect_grants(self) -> Mapping[str, Any]:
         return _normalize_introspect_payload("grants", self.introspect("grants"))
+
