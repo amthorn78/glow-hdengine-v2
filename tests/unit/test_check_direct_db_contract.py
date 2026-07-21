@@ -117,6 +117,40 @@ def test_refusal_roster_file_cannot_hide_retired_key_membership_consumption(tmp_
     assert len(membership_violations) == 2
 
 
+def test_aliased_os_imports_cannot_hide_retired_key_consumption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os as operating_system\n"
+        "from os import environ as env\n"
+        "from os import getenv as read_env\n"
+        "operating_system.getenv('DB_BRIDGE_URL')\n"
+        "operating_system.environ.get('DB_FORCE_BRIDGE')\n"
+        "env['DB_ALLOW_BRIDGE_IN_PROD']\n"
+        "if 'DB_BRIDGE_URL' in env:\n"
+        "    read_env('DB_FORCE_BRIDGE')\n",
+    )
+    violations = check.scan(tmp_path)
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in violations
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 5, 6, 7, 8}
+
+
+def test_unimported_env_mapping_name_is_not_treated_as_os_environ(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "env = {'DB_BRIDGE_URL': 'historical-name-only'}\n"
+        "assert env.get('DB_BRIDGE_URL') == 'historical-name-only'\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
 def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
     _minimal_tree(tmp_path)
     _write(
