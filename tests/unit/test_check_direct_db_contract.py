@@ -140,6 +140,32 @@ def test_aliased_os_imports_cannot_hide_retired_key_consumption(tmp_path):
     assert consumption_lines == {4, 5, 6, 7, 8}
 
 
+def test_assigned_os_symbols_cannot_hide_retired_key_consumption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "operating_system = os\n"
+        "env = operating_system.environ\n"
+        "copied_env = env.copy()\n"
+        "read_env = operating_system.getenv\n"
+        "typed_env: object = copied_env\n"
+        "if 'DB_BRIDGE_URL' in env:\n"
+        "    pass\n"
+        "copied_env.get('DB_FORCE_BRIDGE')\n"
+        "typed_env['DB_ALLOW_BRIDGE_IN_PROD']\n"
+        "read_env('DB_BRIDGE_URL')\n",
+    )
+    violations = check.scan(tmp_path)
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in violations
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {7, 9, 10, 11}
+
+
 def test_unimported_env_mapping_name_is_not_treated_as_os_environ(tmp_path):
     _minimal_tree(tmp_path)
     _write(
