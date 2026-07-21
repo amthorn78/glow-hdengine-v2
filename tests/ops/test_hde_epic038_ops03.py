@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import json
 import shutil
@@ -255,3 +256,153 @@ def test_invalid_run_id_cannot_escape_failure_root(tmp_path):
         consumed=False,
     )
     assert not (tmp_path / "escape").exists()
+
+
+@pytest.mark.parametrize(
+    "mutator",
+    [
+        lambda auth: auth.update({"schema": "hde_epic038.ops03.authorization.v0"}),
+        lambda auth: auth.update({"run_id": "bad"}),
+        lambda auth: auth.update({"authorized_at_utc": "2026-07-21T11:00:00"}),
+        lambda auth: auth.update({"expires_at_utc": "2026-07-21T10:00:00Z"}),
+        lambda auth: auth["target"].update({"app_env": "prod"}),
+        lambda auth: auth["rails"].update({"safe_mode": "0"}),
+        lambda auth: auth["retired_keys_required_absent"].pop(),
+        lambda auth: auth["ordered_query_ids"].reverse(),
+        lambda auth: auth["expected_counts"].update({"provider_selections": 2}),
+        lambda auth: auth.update({"candidate_root": "/tmp/not-authorized/"}),
+        lambda auth: auth["exact_argv"]["capture"].append("--unexpected"),
+        lambda auth: auth.update({"one_attempt": False}),
+    ],
+)
+def test_authorization_rejects_each_bound_contract_mutation(authorization, mutator):
+    auth_path, auth, _base, _candidate = authorization
+    mutated = copy.deepcopy(auth)
+    mutator(mutated)
+    auth_path.write_bytes(runner.canonical_bytes(mutated))
+
+    with pytest.raises(runner.Ops03Error):
+        runner.validate_authorization(mutated, auth_path, now=NOW)
+
+
+@pytest.mark.parametrize(
+    ("mutator", "expected_code"),
+    [
+        (lambda auth: auth.update({"runner_sha256": "f" * 64}), "runner_hash_mismatch"),
+        (lambda auth: auth.update({"validator_sha256": "f" * 64}), "validator_hash_mismatch"),
+        (
+            lambda auth: auth["interpreter"].update({"sha256": "f" * 64}),
+            "interpreter_hash_mismatch",
+        ),
+        (
+            lambda auth: auth["interpreter"].update({"resolved_path": "/tmp/not-python"}),
+            "interpreter_path_mismatch",
+        ),
+    ],
+)
+def test_source_identity_rejects_each_bound_hash_or_path(
+    authorization,
+    mutator,
+    expected_code,
+):
+    _auth_path, auth, _base, _candidate = authorization
+    mutated = copy.deepcopy(auth)
+    mutator(mutated)
+
+    with pytest.raises(runner.Ops03Error) as exc:
+        runner.validate_source_identity(mutated, enforce_repo=False)
+    assert exc.value.code == expected_code
+    assert expected_code in validator.source_identity_errors(mutated, enforce_repo=False)
+
+
+@pytest.mark.parametrize("count_name", tuple(runner.EXPECTED_COUNTS))
+def test_validator_rejects_each_authorized_count_mutation(authorization, count_name):
+    auth_path, _auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    path = candidate / "db_posture_summary.json"
+    posture = json.loads(path.read_text(encoding="utf-8"))
+    posture["counts"][count_name] += 1
+    path.write_bytes(runner.canonical_bytes(posture))
+
+    receipt = validator.validate_packet(
+        auth_path,
+        candidate,
+        final=False,
+        enforce_source=False,
+        now=NOW,
+    )
+    assert receipt["result"] == "FAIL"
+    assert receipt["predicates"]["counts_valid"] is False
+
+
+@pytest.mark.parametrize(
+    ("filename", "mutator"),
+    [
+        ("env_presence.json", lambda value: value.update({"app_env": "prod"})),
+        ("nonclaims.json", lambda value: value["nonclaims"].pop()),
+        (
+            "result_summary.json",
+            lambda value: value.update({"authorization_sha256": "f" * 64}),
+        ),
+        (
+            "db_posture_summary.json",
+            lambda value: value["ordered_query_ids"].reverse(),
+        ),
+    ],
+)
+def test_validator_rejects_bound_primary_field_mutations(
+    authorization,
+    filename,
+    mutator,
+):
+    auth_path, _auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    path = candidate / filename
+    value = json.loads(path.read_text(encoding="utf-8"))
+    mutator(value)
+    path.write_bytes(runner.canonical_bytes(value))
+
+    receipt = validator.validate_packet(
+        auth_path,
+        candidate,
+        final=False,
+        enforce_source=False,
+        now=NOW,
+    )
+    assert receipt["result"] == "FAIL"
+
+
+def test_final_validator_rejects_checksum_and_receipt_tampering(authorization):
+    auth_path, _auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    assert _seal(auth_path, candidate)["result"] == "PASS"
+
+    receipt_path = candidate / validator.RECEIPT_FILE
+    original_receipt = receipt_path.read_bytes()
+    receipt_value = json.loads(original_receipt)
+    receipt_value["authorization_sha256"] = "f" * 64
+    receipt_path.write_bytes(validator.canonical_bytes(receipt_value))
+    runner.write_checksums(candidate)
+    receipt = validator.validate_packet(
+        auth_path,
+        candidate,
+        final=True,
+        enforce_source=False,
+        now=NOW,
+    )
+    assert receipt["result"] == "FAIL"
+    assert receipt["predicates"]["inventory_valid"] is False
+
+    receipt_path.write_bytes(original_receipt)
+    runner.write_checksums(candidate)
+    checksum = candidate / validator.CHECKSUM_FILE
+    checksum.write_text(checksum.read_text(encoding="ascii") + "0" * 64 + "  extra.txt\n", encoding="ascii")
+    receipt = validator.validate_packet(
+        auth_path,
+        candidate,
+        final=True,
+        enforce_source=False,
+        now=NOW,
+    )
+    assert receipt["result"] == "FAIL"
+    assert receipt["predicates"]["inventory_valid"] is False
