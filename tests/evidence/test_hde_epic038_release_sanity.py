@@ -867,7 +867,7 @@ def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
 def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
     log = tmp_path / "sanity.log"
-    assert sanity.run_pipeline(log_path=log) == 0
+    assert sanity.run_pipeline(log_path=log) == 1
     text = log.read_text(encoding="utf-8")
     assert "pr_a_state:nonfinal_fail_closed" in text
     assert "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required" in text
@@ -887,3 +887,23 @@ def test_sanity_gate_accepts_only_pr_a_nonfinal_log(tmp_path, monkeypatch):
     assert gate._valid_log() is True
     log.write_text(log.read_text(encoding="utf-8").replace("summary:FAIL", "summary:PASS"), encoding="utf-8")
     assert gate._valid_log() is False
+
+
+@pytest.mark.parametrize(
+    ("returncode", "valid_log", "expected"),
+    ((1, True, 0), (1, False, 1), (0, True, 1), (2, True, 2)),
+)
+def test_sanity_gate_only_tolerates_exact_pr_a_nonfinal_receipt(
+    monkeypatch, returncode, valid_log, expected
+):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    monkeypatch.setattr(gate.subprocess, "run", lambda *args, **kwargs: _result(returncode))
+    monkeypatch.setattr(gate, "_valid_log", lambda: valid_log)
+    assert gate.main() == expected
+
+
+def test_ci_uses_explicit_nonfinal_gate_wrapper():
+    workflow = (sanity.ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "run: python tools/evidence/run_sanity_pipeline_gate.py" in workflow
+    assert "run: python tools/evidence/run_sanity_pipeline.py" not in workflow
