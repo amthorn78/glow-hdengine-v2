@@ -243,15 +243,14 @@ def test_write_smoke_deletes_only_the_inserted_row(monkeypatch):
     monkeypatch.setenv("DB_REQUIRED", "1")
 
     class FakeDB:
-        def exec(self, sql, params=None):
-            connection.cursor_object.execute(sql, params)
-
-        def query(self, sql, params=None):
-            connection.cursor_object.execute(sql, params)
-            return [(inserted_id,)]
+        def tx(self, statements):
+            for stmt in statements:
+                connection.cursor_object.execute(stmt.sql, stmt.params)
+            return [None, [(inserted_id,)]]
 
     monkeypatch.setattr(compatibility.DBAccess, "for_current_env", classmethod(lambda cls: FakeDB()))
     assert compatibility.db_rw_smoke() == ("ok", "db_rw_smoke_ok")
-    delete_sql, delete_params = connection.cursor_object.calls[-1]
-    assert delete_sql == "DELETE FROM hde.public_results WHERE id=%s"
-    assert delete_params == (inserted_id,)
+    cleanup_sql, cleanup_params = connection.cursor_object.calls[-1]
+    assert "WITH inserted AS" in cleanup_sql
+    assert "DELETE FROM hde.public_results WHERE id IN (SELECT id FROM inserted)" in cleanup_sql
+    assert cleanup_params is None

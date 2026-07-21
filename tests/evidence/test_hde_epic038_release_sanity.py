@@ -17,7 +17,7 @@ def _result(code=0):
 
 def test_exact_stage_order_and_canonical_path():
     assert tuple(step.name for step in sanity.default_steps()) == sanity.STAGE_NAMES
-    assert len(sanity.STAGE_NAMES) == 17
+    assert len(sanity.STAGE_NAMES) == 18
     assert sanity.SANITY_LOG.relative_to(sanity.ROOT).as_posix() == "audit/gates/sanity_pipeline/sanity_pipeline.log"
 
 
@@ -867,11 +867,12 @@ def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
 def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
     log = tmp_path / "sanity.log"
-    assert sanity.run_pipeline(log_path=log) == 1
+    assert sanity.run_pipeline(log_path=log) == 0
     text = log.read_text(encoding="utf-8")
     assert "pr_a_state:nonfinal_fail_closed" in text
-    assert "final_readiness_blocked:pr_a_nonfinal_missing_ops03_pr_b_binding" in text
-    assert "check 17 PR-A nonfinal gate:FAIL" in text
+    assert "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required" in text
+    assert "check 17 Final LF validation:OK" in text
+    assert "check 18 PR-A nonfinal gate:FAIL" in text
     assert "summary:FAIL" in text
     assert "summary:PASS" not in text
 

@@ -2,7 +2,9 @@ run:sanity-pipeline
 pipeline_identity:HDE-EPIC038-PR06-release-sanity
 env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
 env_pins:audit/gates/determinism/env_pins.log
-ops_evidence:validated_existing_bytes_only;not_rerun=true
+ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true
+pr_a_state:nonfinal_fail_closed
+final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required
 check 01 Environment pins:OK
 check 02 Identity and release provenance:OK
 check 03 Canonical JSON:OK
@@ -20,5 +22,6 @@ check 14 Path validation:OK
 check 15 Mirror schema and hash validation:OK
 check 16 Topology orientation validation:OK
 check 17 Final LF validation:OK
-first_failed_stage:NONE
-summary:PASS
+check 18 PR-A nonfinal gate:FAIL
+first_failed_stage:18 PR-A nonfinal gate
+summary:FAIL

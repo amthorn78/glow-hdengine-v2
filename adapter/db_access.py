@@ -73,11 +73,21 @@ def db_rw_smoke(preference: str = "dsn") -> tuple[str, str]:
         return "skip", "DB_REQUIRED=0"
     try:
         db = DBAccess.for_current_env()
-        db.exec("SET search_path TO hde, public")
-        rows = db.query("INSERT INTO hde.public_results (id, release_id, payload) VALUES (gen_random_uuid(), 'qa_smoke', '{}'::jsonb) RETURNING id")
-        if not rows or not rows[0]:
-            raise RuntimeError("smoke_insert_missing_id")
-        db.exec("DELETE FROM hde.public_results WHERE id=%s", (rows[0][0],))
+        results = db.tx([
+            DBAccess.statement("SET LOCAL search_path TO hde, public"),
+            DBAccess.statement(
+                "WITH inserted AS ("
+                "INSERT INTO hde.public_results (id, release_id, payload) "
+                "VALUES (gen_random_uuid(), 'qa_smoke', '{}'::jsonb) RETURNING id"
+                "), deleted AS ("
+                "DELETE FROM hde.public_results WHERE id IN (SELECT id FROM inserted) RETURNING id"
+                ") SELECT id FROM deleted",
+                fetch=True,
+            ),
+        ])
+        deleted = results[1] if len(results) > 1 else None
+        if not deleted or not deleted[0]:
+            raise RuntimeError("smoke_cleanup_missing_id")
         return "ok", "db_rw_smoke_ok"
     except PrimaryUnavailable:
         return "skip", "no_working_path"
