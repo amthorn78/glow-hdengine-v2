@@ -34,7 +34,9 @@ def main() -> int:
     env = os.environ.copy()
     env.update(PINS)
     result = subprocess.run([sys.executable, "tools/evidence/run_sanity_pipeline.py"], cwd=ROOT, env=env)
-    return 0 if result.returncode == 0 and _valid_log() else (result.returncode or 1)
+    if result.returncode == 1 and _valid_log():
+        return 0
+    return result.returncode or 1
 
 
 if __name__ == "__main__":
