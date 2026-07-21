@@ -15,7 +15,7 @@ The alias map ensures QA can pass the mnemonic `epic011-s10-invariance-1` everyw
 ## Where this identity is used today
 - **Source invariance + parity harnesses (S9/S10/S11)** — `artifacts/bodygraph/source_invariance/*.json`, presenter parity logs, and `tools/evidence/generate_rails_closed_phase1.py` all reference this identity, proving ingest↔DB stability without touching a production user.
 - **Resolver + ingest code paths** — `engine/bodygraph/ingest.resolve_db_user_id` and CLI commands such as `python -m engine.cli bg:resolve --user epic011-s10-invariance-1 --source vendor --upsert` exercise the alias bridge and write rows keyed to the mapped UUID.
-- **Dev/CI QA plans** — Any harness that needs a deterministic EPIC011 BodyGraph (fixtures, pytest `epic011` marker suites, or `scripts/db_bridge/*`) should use this exact identity and metadata bundle.
+- **Dev/CI QA plans** — Any harness that needs a deterministic EPIC011 BodyGraph (fixtures, pytest `epic011` marker suites, or `scripts/db_adapter/capture_adapter_introspection.py`) should use this exact identity and metadata bundle.
 
 If a downstream system needs to translate the synthetic alias to an app-specific identifier, perform that mapping outside the engine and keep it 1:1 so the alias continues to land on the canonical DB row.
 

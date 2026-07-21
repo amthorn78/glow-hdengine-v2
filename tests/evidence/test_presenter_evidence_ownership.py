@@ -14,7 +14,7 @@ from engine.bodygraph import ingest
 from presenter import json_canon_compare
 from scripts.db import capture_epic011_posture
 from scripts.ops import admin_vendor_qa
-from tools.evidence import generate_db_bridge_parity as bridge_generator
+from tools.evidence import generate_hde_epic038_direct_db_selection as direct_generator
 from tools.evidence import generate_presenter_history as history_generator
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,42 +63,21 @@ def test_presenter_history_atomic_failure_preserves_destination(tmp_path, monkey
     assert list(tmp_path.iterdir()) == [destination]
 
 
-def test_db_bridge_owns_strict_dedicated_receipt_not_shared_history():
+def test_direct_selection_generator_does_not_touch_shared_presenter_history(tmp_path):
     shared_before = SHARED.read_bytes()
-    _run("tools/evidence/generate_db_bridge_parity.py")
+    out = tmp_path / "direct_selection.json"
+    assert direct_generator.main(["--out", str(out)]) == 0
     assert SHARED.read_bytes() == shared_before
-    payload = json.loads(DEDICATED.read_bytes())
-    schema = json.loads(SCHEMA.read_bytes())
-    jsonschema.validate(payload, schema)
-    assert payload["status"] == "PASS"
-    assert payload["direct"]["acquisition_id"] != payload["bridge"]["acquisition_id"]
-    assert payload["direct"]["emitted_sha256"] == payload["bridge"]["emitted_sha256"]
-    parity_bytes = (ROOT / payload["provider_parity_path"]).read_bytes()
-    assert payload["provider_parity_sha256"] == hashlib.sha256(parity_bytes).hexdigest()
-    assert payload["predicates"]["unsafe_fields_absent"] is True
-    assert payload["negative_receipt"]["divergence_detected"] is True
-    assert payload["payload_posture"] == "hashes_and_counts_only_no_case_values"
-    _run("tools/evidence/generate_db_bridge_parity.py", "--check")
-
-
-def test_presenter_receipt_fails_closed_on_unbound_or_unsafe_material():
-    parity_bytes = (ROOT / "artifacts/db_bridge/provider_parity.proof.json").read_bytes()
-    unbound = bridge_generator._presenter_receipt(
-        parity_bytes, expected_parity_bytes=b"different expected artifact bytes"
-    )
-    assert unbound["status"] == "FAIL"
-    assert bridge_generator._receipt_payload_safe({"value": [[1]]}) is False
-    assert bridge_generator._receipt_payload_safe({"sql": "SELECT 1"}) is False
-
+    payload = json.loads(out.read_bytes())
+    assert payload["result"] == "PASS"
+    assert payload["predicates"]["direct_only_provider"] is True
 
 def test_no_replay_constants_or_implicit_governed_log_defaults():
-    bridge_source = (ROOT / "tools/evidence/generate_db_bridge_parity.py").read_text()
-    assert "PRESENTER_BASE_RECORDS" not in bridge_source
-    assert "artifacts/presenter/json_canon_compare.log" not in bridge_source
+    source = (ROOT / "tools/evidence/generate_hde_epic038_direct_db_selection.py").read_text()
+    assert "artifacts/presenter/json_canon_compare.log" not in source
     assert inspect.signature(ingest.ingest_vendor_bodygraph).parameters["canon_log"].default is None
     parsed = json_canon_compare._build_parser().parse_args(["left.json", "right.json"])
     assert parsed.log is None
-
 
 def test_compare_without_log_is_stdout_only(tmp_path, capsys):
     left = tmp_path / "left.json"

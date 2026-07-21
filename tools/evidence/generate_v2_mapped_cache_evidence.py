@@ -25,7 +25,6 @@ from jsonschema import Draft202012Validator
 import engine.bodygraph.resolver as resolver_module
 import engine.bodygraph.vendor_client as vendor_client_module
 import engine.db.adapter as db_adapter_module
-import engine.db.providers.bridge_provider as bridge_provider_module
 import engine.db.providers.psycopg_provider as psycopg_provider_module
 import engine.ops.http_log as http_log_module
 from engine.bodygraph.mapped_cache import persist_mapped_bodygraph
@@ -56,9 +55,6 @@ _CONNECTION_ENV_KEYS = (
     "APP_ENV",
     "ENGINE_ENV",
     "DATABASE_URL",
-    "DB_BRIDGE_URL",
-    "DB_ALLOW_BRIDGE_IN_PROD",
-    "DB_FORCE_BRIDGE",
     "DB_FORCE_PG",
     "HD_API_BASE_URL",
     "HDAPI_BASE_URL",
@@ -152,18 +148,12 @@ def _hermetic_execution() -> Iterator[HermeticGuard]:
     environment_state = _EnvironmentRestoreState()
     log_snapshot = _shared_log_snapshot()
     original_log_path = http_log_module.LOG_PATH
-    original_bridge_logger = bridge_provider_module.log_http_call
     guard = HermeticGuard()
     forbidden = {
         "resolver.DBAccess.for_current_env": (resolver_module.DBAccess, "for_current_env"),
         "resolver.HdApiClient.from_env": (resolver_module.HdApiClient, "from_env"),
         "db.adapter.PsycopgProvider": (db_adapter_module, "PsycopgProvider"),
         "db.psycopg_provider.PsycopgProvider._connect": (psycopg_provider_module.PsycopgProvider, "_connect"),
-        "db.adapter.BridgeProvider": (db_adapter_module, "BridgeProvider"),
-        "db.bridge_provider.BridgeProvider": (bridge_provider_module, "BridgeProvider"),
-        "db.bridge_provider._default_request": (bridge_provider_module, "_default_request"),
-        "db.bridge_provider.urllib.request.urlopen": (bridge_provider_module.urllib.request, "urlopen"),
-        "db.bridge_provider.log_http_call": (bridge_provider_module, "log_http_call"),
         "vendor.HdApiClient.fetch": (vendor_client_module.HdApiClient, "fetch"),
         "vendor.HdApiClient._default_request": (vendor_client_module.HdApiClient, "_default_request"),
         "vendor.urllib.request.build_opener": (vendor_client_module.urlrequest, "build_opener"),
@@ -184,8 +174,6 @@ def _hermetic_execution() -> Iterator[HermeticGuard]:
         _assert_shared_log_unchanged(log_snapshot)
         if http_log_module.LOG_PATH is not original_log_path:
             raise HermeticityViolation("HTTP_LOG_PATH_NOT_RESTORED")
-        if bridge_provider_module.log_http_call is not original_bridge_logger:
-            raise HermeticityViolation("BRIDGE_LOGGER_NOT_RESTORED")
         attempted = sorted(seam for seam, count in guard.attempts.items() if count)
         if attempted:
             raise HermeticityViolation("FORBIDDEN_SEAMS_ATTEMPTED:" + ",".join(attempted))

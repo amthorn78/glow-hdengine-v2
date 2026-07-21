@@ -9,6 +9,72 @@ from ..errors import IntrospectionError, PrimaryUnavailable, SqlExecError, TxErr
 Params = Sequence[Any] | Mapping[str, Any] | None
 
 
+_COMMENT_MARKERS = ("--", "/*", "*/")
+_MUTATING_TOKENS = frozenset(
+    {"ALTER", "CALL", "COPY", "CREATE", "DELETE", "DO", "DROP", "GRANT",
+     "INSERT", "MERGE", "REVOKE", "TRUNCATE", "UPDATE"}
+)
+_SQL_TOKEN_SEPARATORS = str.maketrans({char: " " for char in "()[],.=+-*/%<>!|'\""})
+_OPS_SEARCH_PATH = "SET LOCAL SEARCH_PATH TO HDE, PUBLIC"
+
+
+def _single_statement_sql(sql: str) -> str | None:
+    """Return one normalized statement, rejecting batching and comment tricks."""
+
+    if not isinstance(sql, str):
+        return None
+    stripped = sql.strip()
+    if not stripped or any(marker in stripped for marker in _COMMENT_MARKERS):
+        return None
+    if stripped.endswith(";"):
+        stripped = stripped[:-1].rstrip()
+    if not stripped or ";" in stripped:
+        return None
+    return " ".join(stripped.split()).upper()
+
+
+def _normalized_sql(sql: str) -> str:
+    return _single_statement_sql(sql) or ""
+
+
+def _readonly_sql_allowed(sql: str, *, first: bool = False) -> bool:
+    normalized = _single_statement_sql(sql)
+    if normalized is None:
+        return False
+    if first:
+        return normalized == "SET TRANSACTION READ ONLY"
+    if normalized == _OPS_SEARCH_PATH:
+        return True
+    if not normalized.startswith(("SHOW ", "SELECT ")):
+        return False
+    words = set(normalized.translate(_SQL_TOKEN_SEPARATORS).split())
+    return words.isdisjoint(_MUTATING_TOKENS)
+
+
+def validate_readonly_statements(statements: Sequence[Any]) -> None:
+    """Fail closed unless *statements* are one bounded read-only SQL batch."""
+
+    if not statements:
+        raise TxError(
+            "readonly_tx_requires_statements",
+            attempts=["DATABASE_URL"],
+            code="readonly_tx_requires_statements",
+        )
+    sqls = [getattr(stmt, "sql", "") for stmt in statements]
+    if not _readonly_sql_allowed(sqls[0], first=True):
+        raise TxError(
+            "readonly_tx_requires_read_only_first",
+            attempts=["DATABASE_URL"],
+            code="readonly_tx_requires_read_only_first",
+        )
+    if any(not _readonly_sql_allowed(sql) for sql in sqls[1:]):
+        raise TxError(
+            "readonly_tx_rejected_sql",
+            attempts=["DATABASE_URL"],
+            code="readonly_tx_rejected_sql",
+        )
+
+
 class PsycopgProvider:
     """Provider that executes SQL through psycopg."""
 
@@ -104,6 +170,55 @@ class PsycopgProvider:
                 "tx_failed",
                 attempts=["DATABASE_URL"],
                 code="tx_failed",
+            ) from exc
+        return results
+
+
+    def readonly_tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
+        validate_readonly_statements(statements)
+        results: List[Sequence[Any] | None] = []
+        try:
+            with self._connect() as conn:
+                transaction_failed = False
+                try:
+                    with conn.cursor() as cur:
+                        for stmt in statements:
+                            sql = getattr(stmt, "sql")
+                            params = getattr(stmt, "params", None)
+                            fetch = bool(getattr(stmt, "fetch", False))
+                            cur.execute(sql, params)
+                            if fetch:
+                                fetched = cur.fetchall()
+                                results.append([tuple(row) if not isinstance(row, tuple) else row for row in fetched])
+                            else:
+                                results.append(None)
+                except TxError:
+                    transaction_failed = True
+                    raise
+                except Exception as exc:
+                    transaction_failed = True
+                    raise TxError(
+                        "readonly_tx_failed",
+                        attempts=["DATABASE_URL"],
+                        code="readonly_tx_failed",
+                    ) from exc
+                finally:
+                    try:
+                        conn.rollback()
+                    except Exception as exc:
+                        if not transaction_failed:
+                            raise TxError(
+                                "readonly_tx_rollback_failed",
+                                attempts=["DATABASE_URL"],
+                                code="readonly_tx_rollback_failed",
+                            ) from exc
+        except TxError:
+            raise
+        except Exception as exc:
+            raise TxError(
+                "readonly_tx_failed",
+                attempts=["DATABASE_URL"],
+                code="readonly_tx_failed",
             ) from exc
         return results
 

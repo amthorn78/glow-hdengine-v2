@@ -127,7 +127,7 @@ class SanityStep:
 STAGE_NAMES = (
     "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
     "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
-    "06 CI rails", "07 DB posture", "08 BodyGraph policy", "09 DB-bridge parity",
+    "06 CI rails", "07 DB posture", "08 BodyGraph policy", "09 Direct DB contract",
     "10 Architecture snapshot", "11 Configured-v2 mapped-cache local evidence",
     "12 OPS evidence checksum and summary validation", "13 Human Index and Machine Mirror refresh",
     "14 Path validation", "15 Mirror schema and hash validation",
@@ -170,7 +170,7 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
         SanityStep(STAGE_NAMES[6], (_py("tools/evidence/generate_db_runtime_posture.py"),)),
         SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
-        SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_db_bridge_parity.py"),)),
+        SanityStep(STAGE_NAMES[8], (_py("ci/checks/check_direct_db_contract.py"),)),
         SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py"),)),
         SanityStep(STAGE_NAMES[10], (
             ("__validate_pr05_proofs__",),

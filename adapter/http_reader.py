@@ -446,10 +446,6 @@ def get_reader_bp(emit_fn=None):
         allow_network = os.getenv("ALLOW_NETWORK", "0")
         return "open" if safe_mode == "0" and allow_network == "1" else "closed"
 
-    def _db_snapshot_path() -> str:
-        with tempfile.NamedTemporaryFile(delete=False) as handle:
-            return handle.name
-
     def _rails_env_snapshot() -> dict[str, str]:
         def _value(key: str) -> str:
             value = os.getenv(key)
@@ -468,15 +464,12 @@ def get_reader_bp(emit_fn=None):
     def ops_db_unavailable():
         g._log_override = {"route": "ops.db.unavailable"}
         with NoIoGuard() as guard:
-            snapshot_path = _db_snapshot_path()
             original_env = {
                 "DATABASE_URL": os.environ.get("DATABASE_URL", _ENV_UNSET),
                 "DB_FORCE_PG": os.environ.get("DB_FORCE_PG", _ENV_UNSET),
-                "DB_FORCE_BRIDGE": os.environ.get("DB_FORCE_BRIDGE", _ENV_UNSET),
             }
             os.environ["DATABASE_URL"] = os.environ.get("DATABASE_URL", "db://unavailable")
             os.environ["DB_FORCE_PG"] = "1"
-            os.environ["DB_FORCE_BRIDGE"] = "0"
             def _raise_primary(_: str):
                 raise PrimaryUnavailable(
                     "forced_db_unavailable",
@@ -485,11 +478,7 @@ def get_reader_bp(emit_fn=None):
                 )
             try:
                 try:
-                    DBAccess.for_current_env(
-                        snapshot_path=snapshot_path,
-                        psycopg_factory=_raise_primary,
-                        bridge_factory=lambda value: _raise_primary(value),
-                    )
+                    DBAccess.for_current_env(psycopg_factory=_raise_primary)
                 except AdapterError as exc:
                     details = {"adapter_code": getattr(exc, "code", "adapter_error")}
                     env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
@@ -500,7 +489,6 @@ def get_reader_bp(emit_fn=None):
                     )
                     resp = _emit_writer_response(env, status=503, sort_keys=False)
             finally:
-                Path(snapshot_path).unlink(missing_ok=True)
                 for key, value in original_env.items():
                     if value is _ENV_UNSET:
                         os.environ.pop(key, None)

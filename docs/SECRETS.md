@@ -1,25 +1,11 @@
-# Secrets (reference-only for 008)
-The pipeline code does not read any secrets in this card. We document names for future cards:
-- HD_API_BASE_URL
-- HD_API_KEY
-- HD_API_SECRET
+# Secrets and environment variables
 
-CI may export them if present; absence must not fail 008.
+## Active database secret
 
-## Runtime environment variables (names-only)
-- `DATABASE_URL` - PostgreSQL DSN. **Required** when DB paths are live (prod); optional in dev.
-- `GEO_API_KEY` - Geocoder provider key (vendor ingest).
-- `HDAPI_BASE_URL` - Vendor HD API base URL (outbound).
-- `HD_API_KEY` - Vendor HD API key (outbound).
-- `SAFE_MODE` - Default 1 in tests; disables network.
-- `ALLOW_NETWORK` - Set `1` to allow network in approved flows (e.g., bridges).
-- `PP_ENV` - Process profile (dev/staging/prod) for ops posture.
-- `PORT` - HTTP bind port (service).
-- `TZ` - Timezone; tests pin to `UTC`.
-- `DB_BRIDGE_URL` - Optional read-only bridge URL for DB posture gathering (when allowed).
-- `ENGINE_TAG`, `RELEASE_ID`, `PRODUCT_INVOCATION_TAG`, `EMITTER_SHA256` - Identity surfaces for headers/QA.
+- `DATABASE_URL` - Direct PostgreSQL DSN used by the current HDE DB adapter. Treat the value as secret; diagnostics may record only presence or `SET_REDACTED`.
 
-### Runtime DB variables (names only)
-- `DATABASE_URL` - canonical DSN used in production.
-- `DB_BRIDGE_URL` - HTTPS bridge endpoint for QA and ops.
-- `SAFE_MODE`, `ALLOW_NETWORK` - must be `0`/`1` respectively before bridge calls are attempted.
+## Retired database transport keys
+
+The following names are retired and are refusal-only current configuration: `DB_ALLOW_BRIDGE_IN_PROD`, `DB_BRIDGE_URL`, and `DB_FORCE_BRIDGE`. Their presence, even with empty or whitespace values, fails DB provider selection before provider construction or external I/O. Do not configure them for current HDE runtime behavior.
+
+Historical evidence may still mention bridge-era names as immutable history; that does not make them active configuration.

@@ -50,16 +50,5 @@ def test_db_runtime_contract_fails_closed_when_required_object_is_missing():
     else:
         raise AssertionError('missing governed DDL object was accepted')
 
-def test_db_bridge_false_pass_and_fixture_separation():
-    run(['tools/evidence/generate_db_bridge_parity.py'])
-    p=json.loads((ROOT/'artifacts/db_bridge/provider_parity.proof.json').read_text())
-    assert p['fixture_parity']['status']=='pass'
-    assert p['live_provider_parity']['parity_status']!='pass'
-    bad={'missing','skip','unavailable','not_exercised','error'}
-    assert any(row['parity'] in bad or row['direct']['status'] in bad or row['bridge']['status'] in bad for row in p['capabilities'])
-    run(['tools/evidence/generate_db_bridge_parity.py','--check'])
-    assert (ROOT/'artifacts/bodygraph/vendor_upsert.epic038_synthetic.json').exists()
-    assert (ROOT/'artifacts/bodygraph/db_resolve.epic038_synthetic.json').exists()
-    receipt=json.loads((ROOT/'artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json').read_text())
-    assert receipt['status']=='PASS'
-    assert receipt['predicates']['presenter_bytes_equal'] is True
+def test_direct_db_contract_checker_passes():
+    run(['ci/checks/check_direct_db_contract.py'])

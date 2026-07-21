@@ -11,7 +11,7 @@ check 05 A7 Catalog transport:OK
 check 06 CI rails:OK
 check 07 DB posture:OK
 check 08 BodyGraph policy:OK
-check 09 DB-bridge parity:OK
+check 09 Direct DB contract:OK
 check 10 Architecture snapshot:OK
 check 11 Configured-v2 mapped-cache local evidence:OK
 check 12 OPS evidence checksum and summary validation:OK

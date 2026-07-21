@@ -1,8 +1,7 @@
 """DB adapter public exports."""
 from .adapter import DBAccess, Statement
 from .errors import (
-    BridgeUnavailable,
-    BridgeUnsupported,
+    RetiredBridgeConfiguration,
     IntrospectionError,
     PrimaryUnavailable,
     SqlExecError,
@@ -13,8 +12,7 @@ __all__ = [
     "DBAccess",
     "Statement",
     "PrimaryUnavailable",
-    "BridgeUnavailable",
-    "BridgeUnsupported",
+    "RetiredBridgeConfiguration",
     "SqlExecError",
     "TxError",
     "IntrospectionError",

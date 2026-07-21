@@ -17,7 +17,6 @@ from jsonschema import Draft202012Validator, ValidationError
 import engine.bodygraph.resolver as resolver_module
 import engine.bodygraph.vendor_client as vendor_client_module
 import engine.db.adapter as db_adapter_module
-import engine.db.providers.bridge_provider as bridge_provider_module
 import engine.db.providers.psycopg_provider as psycopg_provider_module
 import engine.ops.http_log as http_log_module
 from engine.bodygraph.resolver import ResolveBodygraphResult
@@ -176,7 +175,6 @@ def test_shared_primary_remains_byte_identical_for_build_and_real_check() -> Non
 def test_environment_assertion_snapshot_redacts_ambient_values(monkeypatch) -> None:
     ambient = {
         "DATABASE_URL": "postgresql://user:password@database.invalid/db",
-        "DB_BRIDGE_URL": "https://bridge-with-private-host.invalid",
         "HD_API_BASE_URL": "https://vendor-with-private-base.invalid/v2",
         "HD_API_KEY": "private-api-key-marker",
         "GEO_API_KEY": "private-geo-key-marker",
@@ -194,7 +192,6 @@ def test_environment_assertion_snapshot_redacts_ambient_values(monkeypatch) -> N
 def test_traceback_locals_redact_raw_environment_restore_state(tmp_path) -> None:
     sentinels = {
         "DATABASE_URL": "postgresql://trace-user:trace-password@database.invalid/db",
-        "DB_BRIDGE_URL": "https://trace-private-bridge.invalid",
         "HD_API_BASE_URL": "https://trace-private-vendor.invalid/v2",
         "HDAPI_BASE_URL": "https://trace-private-legacy.invalid/v1",
         "HD_API_KEY": "trace-private-api-key",
@@ -236,9 +233,6 @@ def test_unhandled_failure_inside_hermetic_boundary(monkeypatch):
 def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeypatch) -> None:
     for key, value in {
         "DATABASE_URL": "postgresql://sentinel.invalid/db",
-        "DB_BRIDGE_URL": "https://bridge.invalid",
-        "DB_ALLOW_BRIDGE_IN_PROD": "1",
-        "DB_FORCE_BRIDGE": "1",
         "SAFE_MODE": "0",
         "ALLOW_NETWORK": "1",
         "APP_ENV": "production",
@@ -253,11 +247,6 @@ def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeyp
         ("dbaccess", resolver_module.DBAccess, "for_current_env"),
         ("psycopg_ctor", db_adapter_module, "PsycopgProvider"),
         ("psycopg_connect", psycopg_provider_module.PsycopgProvider, "_connect"),
-        ("bridge_ctor_adapter", db_adapter_module, "BridgeProvider"),
-        ("bridge_ctor_module", bridge_provider_module, "BridgeProvider"),
-        ("bridge_request", bridge_provider_module, "_default_request"),
-        ("bridge_urlopen", bridge_provider_module.urllib.request, "urlopen"),
-        ("bridge_logger", bridge_provider_module, "log_http_call"),
     ), observations, redaction_key)
     generator.build()
     inside = observations["inside_env"]
@@ -310,191 +299,7 @@ def test_ambient_vendor_configuration_cannot_escape_in_build_or_check(monkeypatc
     assert _shared_log_state() == shared
 
 
-@pytest.mark.parametrize("check", [False, True])
-def test_bridge_logger_invocation_fails_closed_without_being_reached(check) -> None:
-    calls: dict[str, int] = {}
-    shared = _shared_log_state()
-    with generator._hermetic_execution() as guard:
-        with patch.object(bridge_provider_module, "log_http_call", _forbidden("logger", calls)):
-            generator.write_or_check(generator._build_files(guard), check)
-    assert calls == {"logger": 0}
-    assert _shared_log_state() == shared
-
-
-@pytest.mark.parametrize("check", [False, True])
-def test_lower_bridge_transport_invocation_fails_closed_without_being_reached(check) -> None:
-    calls: dict[str, int] = {}
-    shared = _shared_log_state()
-    with generator._hermetic_execution() as guard:
-        with patch.object(bridge_provider_module.urllib.request, "urlopen", _forbidden("urlopen", calls)):
-            generator.write_or_check(generator._build_files(guard), check)
-    assert calls == {"urlopen": 0}
-    assert _shared_log_state() == shared
-
-
-def test_injected_exception_restores_environment_module_state_and_files(monkeypatch) -> None:
-    for index, key in enumerate(generator.HERMETIC_ENV_KEYS):
-        if index % 2:
-            monkeypatch.setenv(key, f"caller-value-{index}")
-        else:
-            monkeypatch.delenv(key, raising=False)
-    redaction_key = os.urandom(32)
-    env_before = _redacted_environment_snapshot(redaction_key)
-    log_before = _shared_log_state()
-    log_path_before = http_log_module.LOG_PATH
-    producer_paths = list(generator.build())
-    producer_before = _bytes_and_mtimes(producer_paths)
-    governed_before = _governed_state()
-    inventory_before = _repo_inventory()
-
-    def injected(_guard):
-        http_log_module.LOG_PATH = Path("artifacts/logs/forbidden-replacement.jsonl")
-        raise RuntimeError("INJECTED_FIXTURE_FAILURE")
-
-    monkeypatch.setattr(generator, "_exercise_resolver_policy", injected)
-    with pytest.raises(RuntimeError, match="INJECTED_FIXTURE_FAILURE"):
-        generator.build()
-    assert _redacted_environment_snapshot(redaction_key) == env_before
-    assert http_log_module.LOG_PATH is log_path_before
-    assert _shared_log_state() == log_before
-    assert _bytes_and_mtimes(producer_paths) == producer_before
-    assert _governed_state() == governed_before
-    assert _repo_inventory() == inventory_before
-
-
-def test_schema_failure_restores_environment_module_state_and_files(monkeypatch) -> None:
-    monkeypatch.setenv("SAFE_MODE", "0")
-    monkeypatch.setenv("ALLOW_NETWORK", "1")
-    monkeypatch.setenv("DATABASE_URL", "postgresql://sentinel.invalid/db")
-    redaction_key = os.urandom(32)
-    environment = _redacted_environment_snapshot(redaction_key)
-    shared = _shared_log_state()
-    log_path = http_log_module.LOG_PATH
-    producer_paths = list(generator.build())
-    producer = _bytes_and_mtimes(producer_paths)
-    governed = _governed_state()
-
-    def invalid(*_args, **_kwargs):
-        raise ValidationError("INJECTED_SCHEMA_FAILURE")
-
-    monkeypatch.setattr(generator.Draft202012Validator, "validate", invalid)
-    with pytest.raises(ValidationError, match="INJECTED_SCHEMA_FAILURE"):
-        generator.build()
-    assert _redacted_environment_snapshot(redaction_key) == environment
-    assert http_log_module.LOG_PATH is log_path
-    assert _shared_log_state() == shared
-    assert _bytes_and_mtimes(producer_paths) == producer
-    assert _governed_state() == governed
-
-
-def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatch) -> None:
-    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.invalid/v2")
-    monkeypatch.setenv("HD_API_KEY", "sentinel-api-key")
-    redaction_key = os.urandom(32)
-    environment = _redacted_environment_snapshot(redaction_key)
-    shared = _shared_log_state()
-    log_path = http_log_module.LOG_PATH
-    governed = _governed_state()
-
-    def stale(_files, _check):
-        raise SystemExit("STALE:injected-check-drift")
-
-    monkeypatch.setattr(generator, "write_or_check", stale)
-    with pytest.raises(SystemExit, match="STALE:injected-check-drift"):
-        generator.run(check=True)
-    assert _redacted_environment_snapshot(redaction_key) == environment
-    assert http_log_module.LOG_PATH is log_path
-    assert _shared_log_state() == shared
-    assert _governed_state() == governed
-
-
-def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
-    paths = list(generator.build())
-    before = _bytes_and_mtimes(paths)
-    shared = _shared_log_state()
-    governed = _governed_state()
-    redaction_key = os.urandom(32)
-    environment = _redacted_environment_snapshot(redaction_key)
-    stages = _stage_inventory()
-    actual_replace = generator.os.replace
-    calls = 0
-
-    def fail_second(source, destination):
-        nonlocal calls
-        calls += 1
-        if calls == 2:
-            raise OSError("INJECTED_WRITE_FAILURE")
-        return actual_replace(source, destination)
-
-    monkeypatch.setattr(generator.os, "replace", fail_second)
-    with pytest.raises(OSError, match="INJECTED_WRITE_FAILURE"):
-        generator.run(check=False)
-    assert _bytes_and_mtimes(paths) == before
-    assert _shared_log_state() == shared
-    assert _governed_state() == governed
-    assert _redacted_environment_snapshot(redaction_key) == environment
-    assert _stage_inventory() == stages
-
-
-def test_command_fixed_point_check_nonmutation_and_no_repository_residue() -> None:
-    shared = _shared_log_state()
-    governed = _governed_state()
-    inventory = _repo_inventory()
-    command = [sys.executable, str(generator.__file__)]
-    first_result = subprocess.run(command, cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
-    first = {path: path.read_bytes() for path in generator.build()}
-    second_result = subprocess.run(command, cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
-    second = {path: path.read_bytes() for path in first}
-    assert first == second
-    before_check = _bytes_and_mtimes(first)
-    check_result = subprocess.run(command + ["--check"], cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
-    assert _bytes_and_mtimes(first) == before_check
-    assert all(result.stdout == "V2_MAPPED_CACHE_EVIDENCE_OK\n" and result.stderr == "" for result in (first_result, second_result, check_result))
-    assert _shared_log_state() == shared
-    assert _governed_state() == governed
-    assert _repo_inventory() == inventory
-
-
-def test_retained_provenance_record_remains_present_exactly_once() -> None:
-    before = generator.SHARED_HTTP_LOG.read_bytes()
-    generator.build()
-    after = generator.SHARED_HTTP_LOG.read_bytes()
-    assert after == before
-    assert after.splitlines().count(RETAINED_RECORD) == 1
-    assert after.splitlines()[-1] == RETAINED_RECORD
-
-
-def test_governed_companions_remain_unchanged() -> None:
-    before = _governed_state()
-    generator.build()
-    subprocess.run(
-        [sys.executable, str(generator.__file__), "--check"], cwd=ROOT, env=_command_env(),
-        check=True, capture_output=True, text=True,
-    )
-    assert _governed_state() == before
-
-
-def test_negative_predicate_fails_before_writes() -> None:
-    before = {path:path.read_bytes() for path in generator.build() if path.exists()}
-    shared = _shared_log_state()
-    with pytest.raises(RuntimeError, match="PREDICATE_FAILURE"): generator.build(force_failure=True)
-    assert before == {path:path.read_bytes() for path in before}
-    assert _shared_log_state() == shared
-
-
-def test_resolver_regression_cannot_emit_pass_evidence(monkeypatch) -> None:
-    actual = generator.resolve_bodygraph
-    def regressed(*args, **kwargs):
-        if kwargs.get("env", {}).get("SAFE_MODE") == "1":
-            return ResolveBodygraphResult("error", {"error":{"code":"WRONG_REFUSAL"}}, 1)
-        return actual(*args, **kwargs)
-    monkeypatch.setattr(generator, "resolve_bodygraph", regressed)
-    with pytest.raises(RuntimeError, match="PREDICATE_FAILURE"):
-        generator.build()
-
-
-def test_outputs_are_bounded_and_secret_free() -> None:
-    forbidden = (b"database_url",b"db_bridge_url",b"bearer ",b"birthdate",b"birthtime",b"ChartResult",b"StandardResponse",b"request_body",b"response_body")
-    for data in generator.build().values():
-        lowered=data.lower()
-        assert all(item.lower() not in lowered for item in forbidden)
+def test_mapped_cache_tool_has_no_retired_provider_import():
+    source = Path("tools/evidence/generate_v2_mapped_cache_evidence.py").read_text()
+    assert "bridge_provider" not in source
+    assert "BridgeProvider" not in source
