@@ -867,7 +867,7 @@ def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
 def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
     log = tmp_path / "sanity.log"
-    assert sanity.run_pipeline(log_path=log) == 1
+    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
     text = log.read_text(encoding="utf-8")
     assert "pr_a_state:nonfinal_fail_closed" in text
     assert "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required" in text
@@ -875,6 +875,25 @@ def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
     assert "check 18 PR-A nonfinal gate:FAIL" in text
     assert "summary:FAIL" in text
     assert "summary:PASS" not in text
+
+
+@pytest.mark.parametrize(
+    ("seal_code", "expected"),
+    ((0, sanity.PR_A_NONFINAL_EXIT), (1, 1), (sanity.PR_A_NONFINAL_EXIT, 1)),
+)
+def test_pr_a_nonfinal_exit_requires_successful_rebind(
+    tmp_path, monkeypatch, seal_code, expected
+):
+    log = tmp_path / "sanity.log"
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
+    monkeypatch.setattr(sanity, "validate_pr05_path_proof_prerequisites", lambda: None)
+    monkeypatch.setattr(sanity, "validate_ops_packages", lambda: None)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: seal_code)
+    assert sanity.run_pipeline(log_path=log) == expected
+    assert log.read_text(encoding="utf-8").endswith(
+        f"first_failed_stage:{sanity.STAGE_NAMES[-1]}\nsummary:FAIL\n"
+    )
 
 
 def test_sanity_gate_accepts_only_pr_a_nonfinal_log(tmp_path, monkeypatch):
@@ -896,9 +915,13 @@ def test_sanity_gate_rejects_stale_valid_nonfinal_log(tmp_path, monkeypatch):
     results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
     log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
     monkeypatch.setattr(gate, "LOG", log)
-    monkeypatch.setattr(gate.subprocess, "run", lambda *args, **kwargs: _result(1))
+    monkeypatch.setattr(
+        gate.subprocess,
+        "run",
+        lambda *args, **kwargs: _result(gate.PR_A_NONFINAL_EXIT),
+    )
     assert gate._valid_log() is True
-    assert gate.main() == 1
+    assert gate.main() == gate.PR_A_NONFINAL_EXIT
 
 
 def test_sanity_gate_accepts_fresh_valid_nonfinal_log(tmp_path, monkeypatch):
@@ -910,7 +933,7 @@ def test_sanity_gate_accepts_fresh_valid_nonfinal_log(tmp_path, monkeypatch):
 
     def run(*args, **kwargs):
         log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
-        return _result(1)
+        return _result(gate.PR_A_NONFINAL_EXIT)
 
     monkeypatch.setattr(gate, "LOG", log)
     monkeypatch.setattr(gate.subprocess, "run", run)
@@ -919,13 +942,20 @@ def test_sanity_gate_accepts_fresh_valid_nonfinal_log(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize(
     ("returncode", "valid_log", "expected"),
-    ((1, True, 0), (1, False, 1), (0, True, 1), (2, True, 2)),
+    (
+        (sanity.PR_A_NONFINAL_EXIT, True, 0),
+        (sanity.PR_A_NONFINAL_EXIT, False, sanity.PR_A_NONFINAL_EXIT),
+        (1, True, 1),
+        (0, True, 1),
+        (2, True, 2),
+    ),
 )
 def test_sanity_gate_only_tolerates_exact_pr_a_nonfinal_receipt(
     tmp_path, monkeypatch, returncode, valid_log, expected
 ):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
+    assert gate.PR_A_NONFINAL_EXIT == sanity.PR_A_NONFINAL_EXIT
     log = tmp_path / "sanity_pipeline.log"
     log.write_text("stale receipt\n", encoding="utf-8")
 
