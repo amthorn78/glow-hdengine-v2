@@ -1,1 +1,42 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"cases":{"type":"array"},"failure":{"type":["object","null"]},"predicates":{"type":"object"},"result":{"enum":["PASS","FAIL"]},"retired_keys":{"items":{"type":"string"},"type":"array"},"schema":{"const":"hde_epic038.direct_db_selection.v1"}},"required":["schema","retired_keys","cases","predicates","result","failure"],"type":"object"}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hde_epic038.direct_db_selection.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "retired_keys", "cases", "predicates", "result", "failure"],
+  "allOf": [
+    {
+      "if": {"properties": {"result": {"const": "PASS"}}, "required": ["result"]},
+      "then": {
+        "properties": {
+          "failure": {"type": "null"},
+          "predicates": {
+            "properties": {
+              "direct_only_provider": {"const": true},
+              "missing_direct_fails_closed": {"const": true},
+              "unavailable_direct_fails_closed": {"const": true},
+              "retired_keys_fail_before_provider_attempt": {"const": true},
+              "alternate_transport_attempts_zero": {"const": true},
+              "secret_values_absent": {"const": true}
+            }
+          }
+        }
+      },
+      "else": {"properties": {"failure": {"type": "object"}}}
+    }
+  ],
+  "properties": {
+    "schema": {"const": "hde_epic038.direct_db_selection.v1"},
+    "retired_keys": {"type": "array", "prefixItems": [{"const": "DB_ALLOW_BRIDGE_IN_PROD"}, {"const": "DB_BRIDGE_URL"}, {"const": "DB_FORCE_BRIDGE"}], "items": false},
+    "cases": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/case"}},
+    "predicates": {"$ref": "#/$defs/predicates"},
+    "result": {"enum": ["PASS", "FAIL"]},
+    "failure": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["code", "failed_predicates"], "properties": {"code": {"const": "predicate_failure"}, "failed_predicates": {"type": "array", "uniqueItems": true, "items": {"enum": ["alternate_transport_attempts_zero", "direct_only_provider", "missing_direct_fails_closed", "retired_keys_fail_before_provider_attempt", "secret_values_absent", "unavailable_direct_fails_closed"]}}}}]}
+  },
+  "$defs": {
+    "attempt": {"type": "object", "additionalProperties": false, "required": ["provider", "status", "reason"], "properties": {"provider": {"const": "psycopg"}, "status": {"enum": ["ok", "skip", "error"]}, "reason": {"type": ["string", "null"], "pattern": "^[a-z0-9_]+$"}}},
+    "error": {"type": "object", "additionalProperties": false, "required": ["class", "code"], "properties": {"class": {"enum": ["PrimaryUnavailable", "RetiredBridgeConfiguration"]}, "code": {"enum": ["missing_database_url", "primary_connect_failed", "retired_bridge_configuration"]}}},
+    "case": {"type": "object", "additionalProperties": false, "required": ["case", "app_env", "database_url_presence", "retired_keys_present", "attempts", "selected", "error", "alternate_transport_attempts", "result"], "properties": {"case": {"enum": ["healthy_direct", "missing_database_url", "unavailable_database_url", "retired_keys_present"]}, "app_env": {"type": "string", "minLength": 1, "maxLength": 32, "pattern": "^[a-z0-9_-]+$"}, "database_url_presence": {"enum": ["present_redacted", "unset"]}, "retired_keys_present": {"type": "array", "uniqueItems": true, "items": {"enum": ["DB_ALLOW_BRIDGE_IN_PROD", "DB_BRIDGE_URL", "DB_FORCE_BRIDGE"]}}, "attempts": {"type": "array", "maxItems": 1, "items": {"$ref": "#/$defs/attempt"}}, "selected": {"enum": ["psycopg", "none"]}, "error": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/error"}]}, "alternate_transport_attempts": {"const": 0}, "result": {"enum": ["PASS", "FAIL"]}}},
+    "predicates": {"type": "object", "additionalProperties": false, "required": ["direct_only_provider", "missing_direct_fails_closed", "unavailable_direct_fails_closed", "retired_keys_fail_before_provider_attempt", "alternate_transport_attempts_zero", "secret_values_absent"], "properties": {"direct_only_provider": {"type": "boolean"}, "missing_direct_fails_closed": {"type": "boolean"}, "unavailable_direct_fails_closed": {"type": "boolean"}, "retired_keys_fail_before_provider_attempt": {"type": "boolean"}, "alternate_transport_attempts_zero": {"type": "boolean"}, "secret_values_absent": {"type": "boolean"}}}
+  }
+}
