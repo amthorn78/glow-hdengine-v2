@@ -1,1 +1,30 @@
-{"":"https://json-schema.org/draft/2020-12/schema","additionalProperties":true,"properties":{"schema":{"type":"string"}},"required":["schema"],"type":"object"}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hde_epic038.ops03.authorization.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "authorized_at_utc", "expires_at_utc", "source_commit", "runner_sha256", "validator_sha256", "interpreter", "target", "rails", "retired_keys_required_absent", "ordered_query_ids", "expected_counts", "candidate_root", "exact_argv", "one_attempt"],
+  "properties": {
+    "schema": {"const": "hde_epic038.ops03.authorization.v1"},
+    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
+    "authorized_at_utc": {"type": "string", "format": "date-time"},
+    "expires_at_utc": {"type": "string", "format": "date-time"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "runner_sha256": {"$ref": "#/$defs/sha256"},
+    "validator_sha256": {"$ref": "#/$defs/sha256"},
+    "interpreter": {"type": "object", "additionalProperties": false, "required": ["resolved_path", "sha256"], "properties": {"resolved_path": {"type": "string", "pattern": "^/[^\\u0000]+$"}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "target": {"type": "object", "additionalProperties": false, "required": ["app_env", "database_schema", "search_path"], "properties": {"app_env": {"const": "dev"}, "database_schema": {"const": "hde"}, "search_path": {"type": "array", "prefixItems": [{"const": "hde"}, {"const": "public"}], "items": false}}},
+    "rails": {"type": "object", "additionalProperties": false, "required": ["safe_mode", "allow_network", "allow_db_write", "db_read_authorized"], "properties": {"safe_mode": {"const": "1"}, "allow_network": {"const": "0"}, "allow_db_write": {"const": "0"}, "db_read_authorized": {"const": true}}},
+    "retired_keys_required_absent": {"type": "array", "prefixItems": [{"const": "DB_ALLOW_BRIDGE_IN_PROD"}, {"const": "DB_BRIDGE_URL"}, {"const": "DB_FORCE_BRIDGE"}], "items": false},
+    "ordered_query_ids": {"type": "array", "prefixItems": [{"const": "set_transaction_read_only"}, {"const": "set_search_path"}, {"const": "connection_identity"}, {"const": "search_path"}, {"const": "runtime_role_grants"}, {"const": "ddl_columns"}, {"const": "ddl_constraints"}, {"const": "boundary_views"}, {"const": "partition_inventory"}, {"const": "partition_verify"}], "items": false},
+    "expected_counts": {"$ref": "#/$defs/counts"},
+    "candidate_root": {"type": "string", "pattern": "^/tmp/hde-epic038-ops03/[a-z0-9][a-z0-9-]{15,63}/candidate/$"},
+    "exact_argv": {"type": "object", "additionalProperties": false, "required": ["capture", "receipt", "validate"], "properties": {"capture": {"$ref": "#/$defs/argv"}, "receipt": {"$ref": "#/$defs/argv"}, "validate": {"$ref": "#/$defs/argv"}}},
+    "one_attempt": {"const": true}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "argv": {"type": "array", "minItems": 6, "maxItems": 10, "items": {"type": "string", "minLength": 1, "maxLength": 512}},
+    "counts": {"type": "object", "additionalProperties": false, "required": ["provider_selections", "health_connections", "health_sql_statements", "posture_transactions", "posture_sql_statements", "direct_connections", "sql_statements", "sql_writes", "retries", "alternate_provider_attempts"], "properties": {"provider_selections": {"const": 1}, "health_connections": {"const": 1}, "health_sql_statements": {"const": 1}, "posture_transactions": {"const": 1}, "posture_sql_statements": {"const": 10}, "direct_connections": {"const": 2}, "sql_statements": {"const": 11}, "sql_writes": {"const": 0}, "retries": {"const": 0}, "alternate_provider_attempts": {"const": 0}}}
+  }
+}
