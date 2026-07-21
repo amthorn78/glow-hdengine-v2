@@ -54,3 +54,20 @@ def test_direct_contract_scan_allows_retired_names_only_in_refusal_rosters(tmp_p
     assert check.scan(tmp_path) == ()
     _write(tmp_path, "scripts/current.py", "print('DB_BRIDGE_URL')\n")
     assert any("retired_key_outside_refusal_roster" in row for row in check.scan(tmp_path))
+
+
+def test_direct_contract_scan_allows_only_explicit_historical_doc_paths(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/EVIDENCE_INDEX.md",
+        "Historical retained path: `artifacts/db_bridge/health.json`; not current runtime guidance.\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+    _write(
+        tmp_path,
+        "docs/EVIDENCE_INDEX.md",
+        "Run the current capture from `artifacts/db_bridge/health.json`.\n",
+    )
+    assert any("active_retired_path:artifacts/db_bridge/" in row for row in check.scan(tmp_path))
