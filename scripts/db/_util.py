@@ -12,8 +12,6 @@ from engine.db import (
     TxError,
 )
 
-ADAPTER_SNAPSHOT = "artifacts/db_bridge/adapter_selection.snapshot.json"
-
 # Backwards-compatible alias used by legacy scripts/tests.
 MissingDbConfigError = PrimaryUnavailable
 
@@ -37,11 +35,13 @@ def write_json(path: str, payload: Any) -> None:
     import json
 
     target = ensure_artifact(path)
-    target.write_text(json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n", encoding="utf-8")
+    target.write_text(
+        json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 __all__ = [
-    "ADAPTER_SNAPSHOT",
     "DBAccess",
     "Statement",
     "db_access",
