@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PINS = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
+PR_A_NONFINAL_EXIT = 3
 
 
 def _valid_log() -> bool:
@@ -46,7 +47,7 @@ def main() -> int:
     result = subprocess.run([sys.executable, "tools/evidence/run_sanity_pipeline.py"], cwd=ROOT, env=env)
     current_log_version = _log_version()
     if (
-        result.returncode == 1
+        result.returncode == PR_A_NONFINAL_EXIT
         and current_log_version is not None
         and current_log_version != prior_log_version
         and _valid_log()
