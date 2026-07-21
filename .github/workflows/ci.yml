@@ -228,6 +228,18 @@ jobs:
       - run: python -m pip install pytest
       - name: Regenerate identity closure artifacts
         run: python tools/evidence/regenerate_identity_closure.py
+      - name: Package regenerated identity closure for remediation
+        run: |
+          git diff --diff-filter=ACMRT --name-only > /tmp/pr363_identity_closure_files.txt
+          git diff --binary > /tmp/pr363_identity_closure.patch
+          tar --create --gzip --file /tmp/pr363_identity_closure.tar.gz --files-from /tmp/pr363_identity_closure_files.txt
+      - name: Upload regenerated identity closure for remediation
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr363-identity-closure
+          path: |
+            /tmp/pr363_identity_closure_files.txt
+            /tmp/pr363_identity_closure.patch
+            /tmp/pr363_identity_closure.tar.gz
       - name: Run sanity pipeline
         run: python tools/evidence/run_sanity_pipeline.py
-
