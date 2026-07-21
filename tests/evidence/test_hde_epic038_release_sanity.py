@@ -862,3 +862,27 @@ def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
     )
     assert mirror_proof["sha256"] == mirror_digest
     assert mirror_proof["mirror_body_sha256"] == mirror_row["sha256"]
+
+
+def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
+    log = tmp_path / "sanity.log"
+    assert sanity.run_pipeline(log_path=log) == 1
+    text = log.read_text(encoding="utf-8")
+    assert "pr_a_state:nonfinal_fail_closed" in text
+    assert "final_readiness_blocked:pr_a_nonfinal_missing_ops03_pr_b_binding" in text
+    assert "check 17 PR-A nonfinal gate:FAIL" in text
+    assert "summary:FAIL" in text
+    assert "summary:PASS" not in text
+
+
+def test_sanity_gate_accepts_only_pr_a_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+    log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+    monkeypatch.setattr(gate, "LOG", log)
+    assert gate._valid_log() is True
+    log.write_text(log.read_text(encoding="utf-8").replace("summary:FAIL", "summary:PASS"), encoding="utf-8")
+    assert gate._valid_log() is False

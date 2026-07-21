@@ -22,9 +22,12 @@ def _valid_log() -> bool:
     return (data.endswith(b"\n") and not data.endswith(b"\n\n") and len(stages) == 17
             and text.startswith("run:sanity-pipeline\n")
             and "\nenv:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC\n" in text
-            and all(line.endswith(":OK") for line in stages)
-            and "first_failed_stage:NONE\nsummary:PASS\n" in text
-            and "ops_evidence:validated_existing_bytes_only;not_rerun=true\n" in text)
+            and all(line.endswith(":OK") for line in stages[:-1])
+            and stages[-1] == "check 17 PR-A nonfinal gate:FAIL"
+            and "pr_a_state:nonfinal_fail_closed\n" in text
+            and "final_readiness_blocked:pr_a_nonfinal_missing_ops03_pr_b_binding\n" in text
+            and "first_failed_stage:17 PR-A nonfinal gate\nsummary:FAIL\n" in text
+            and "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true\n" in text)
 
 
 def main() -> int:

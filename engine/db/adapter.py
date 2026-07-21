@@ -88,22 +88,33 @@ class DBAccess:
         env = os.environ if environ is None else environ
         retired = retired_db_transport_keys_present(env)
         if retired:
-            raise RetiredBridgeConfiguration(retired)
+            exc = RetiredBridgeConfiguration(retired)
+            exc.selection_case = cls._failure_case(env, exc, attempts=[])
+            exc.attempt_rows = []
+            raise exc
         dsn = (env.get("DATABASE_URL") or "").strip()
         attempts: List[Mapping[str, Any]] = []
         if not dsn:
             attempts.append(_canonical_attempt("psycopg", "skip", reason="missing_database_url"))
-            raise PrimaryUnavailable("missing_database_url", attempts=["DATABASE_URL"], code="missing_database_url")
+            exc = PrimaryUnavailable("missing_database_url", attempts=["DATABASE_URL"], code="missing_database_url")
+            exc.attempt_rows = [dict(row) for row in attempts]
+            exc.selection_case = cls._failure_case(env, exc, attempts=attempts)
+            raise exc
         ctor = psycopg_factory or (lambda value: PsycopgProvider(value))
         try:
             provider = ctor(dsn)
             provider.health()
         except PrimaryUnavailable as exc:
             attempts.append(_canonical_attempt("psycopg", "error", reason=exc.code))
+            exc.attempt_rows = [dict(row) for row in attempts]
+            exc.selection_case = cls._failure_case(env, exc, attempts=attempts)
             raise
         except Exception as exc:
             attempts.append(_canonical_attempt("psycopg", "error", reason="primary_connect_failed"))
-            raise PrimaryUnavailable("primary_connect_failed", attempts=["DATABASE_URL"], code="primary_connect_failed") from exc
+            wrapped = PrimaryUnavailable("primary_connect_failed", attempts=["DATABASE_URL"], code="primary_connect_failed")
+            wrapped.attempt_rows = [dict(row) for row in attempts]
+            wrapped.selection_case = cls._failure_case(env, wrapped, attempts=attempts)
+            raise wrapped from exc
         attempts.append(_canonical_attempt("psycopg", "ok", reason=None))
         selection_case: Mapping[str, object] = {
             "case": "healthy_direct",
@@ -117,6 +128,43 @@ class DBAccess:
             "result": "PASS",
         }
         return cls(provider, attempts=attempts, selection_case=selection_case)
+
+
+    @staticmethod
+    def statement(sql: str, params: Params = None, *, fetch: bool = False) -> Statement:
+        return Statement(sql=sql, params=params, fetch=fetch)
+
+    @staticmethod
+    def _failure_case(env: Mapping[str, str], exc: AdapterError, *, attempts: Sequence[Mapping[str, Any]]) -> Mapping[str, object]:
+        retired = list(getattr(exc, "retired_keys", ()))
+        return {
+            "case": "retired_keys_present" if retired else ("missing_database_url" if exc.code == "missing_database_url" else "unavailable_database_url"),
+            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "database_url_presence": "present_redacted" if (env.get("DATABASE_URL") or "").strip() else "unset",
+            "retired_keys_present": retired,
+            "attempts": [dict(row) for row in attempts],
+            "selected": "none",
+            "error": {"class": exc.__class__.__name__, "code": exc.code},
+            "alternate_transport_attempts": 0,
+            "result": "PASS",
+        }
+
+    @staticmethod
+    def selection_failure_evidence(exc: AdapterError) -> Mapping[str, object]:
+        case = getattr(exc, "selection_case", None)
+        if isinstance(case, Mapping):
+            return dict(case)
+        return {
+            "case": "retired_keys_present" if isinstance(exc, RetiredBridgeConfiguration) else "unavailable_database_url",
+            "app_env": "dev",
+            "database_url_presence": "unset",
+            "retired_keys_present": list(getattr(exc, "retired_keys", ())),
+            "attempts": [dict(row) for row in getattr(exc, "attempt_rows", [])],
+            "selected": "none",
+            "error": {"class": exc.__class__.__name__, "code": exc.code},
+            "alternate_transport_attempts": 0,
+            "result": "PASS",
+        }
 
     def selection_evidence(self) -> Mapping[str, object]:
         """Return the pure, names-only direct-selection case record."""
@@ -146,4 +194,3 @@ class DBAccess:
         return _normalize_introspect_payload("version", self.introspect("version"))
     def introspect_grants(self) -> Mapping[str, Any]:
         return _normalize_introspect_payload("grants", self.introspect("grants"))
-

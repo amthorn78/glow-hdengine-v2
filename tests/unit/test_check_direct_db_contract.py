@@ -52,8 +52,8 @@ def test_direct_contract_scan_allows_retired_names_only_in_refusal_rosters(tmp_p
         encoding="utf-8",
     )
     assert check.scan(tmp_path) == ()
-    _write(tmp_path, "scripts/current.py", "print('DB_BRIDGE_URL')\n")
-    assert any("retired_key_outside_refusal_roster" in row for row in check.scan(tmp_path))
+    _write(tmp_path, "scripts/current.py", "import os\nprint(os.getenv('DB_BRIDGE_URL'))\n")
+    assert any("active_retired_key_consumption" in row for row in check.scan(tmp_path))
 
 
 def test_direct_contract_scan_allows_only_explicit_historical_doc_paths(tmp_path):
@@ -71,3 +71,28 @@ def test_direct_contract_scan_allows_only_explicit_historical_doc_paths(tmp_path
         "Run the current capture from `artifacts/db_bridge/health.json`.\n",
     )
     assert any("active_retired_path:artifacts/db_bridge/" in row for row in check.scan(tmp_path))
+
+
+def test_refusal_file_cannot_hide_http_bridge_construction(tmp_path):
+    _minimal_tree(tmp_path)
+    adapter = tmp_path / "engine/db/adapter.py"
+    adapter.write_text(
+        adapter.read_text(encoding="utf-8")
+        + "\nimport os, urllib.request\n"
+        + "def bad():\n    return urllib.request.urlopen(os.getenv('DB_BRIDGE_URL'))\n",
+        encoding="utf-8",
+    )
+    violations = check.scan(tmp_path)
+    assert any("active_retired_key_consumption" in row or "retired_key_http_bridge_use" in row for row in violations)
+
+
+def test_active_guidance_for_retired_bridge_key_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(tmp_path, "docs/RUN.md", "Set DB_BRIDGE_URL to the bridge endpoint and run the server.\n")
+    assert any("retired_key_active_guidance" in row for row in check.scan(tmp_path))
+
+
+def test_ignored_build_residue_is_not_scanned(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(tmp_path, "build/generated.py", "BridgeProvider DB_BRIDGE_URL\n")
+    assert check.scan(tmp_path) == ()

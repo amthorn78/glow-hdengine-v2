@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.ops.http_log import LOG_PATH
+from engine.ops.http_log import LOG_PATH_ENV
 
 REQUIRED_ENV = {
     "SAFE_MODE": "0",
@@ -38,25 +38,27 @@ def _check_env() -> None:
             raise SystemExit(f"Expected {key}={expected!r} but saw {actual!r}")
 
 
-def _reset_log() -> None:
-    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    LOG_PATH.write_text("", encoding="utf-8")
+def _child_log_path() -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return Path("artifacts/ops/rails_open_scope") / f"keys_only.{os.getpid()}.{stamp}.jsonl"
 
 
-def _run_command(command: Sequence[str]) -> None:
+def _run_command(command: Sequence[str], *, log_path: Path) -> None:
     print("Running:", " ".join(command))
-    result = subprocess.run(command, check=False)
+    env = os.environ.copy()
+    env[LOG_PATH_ENV] = str(log_path)
+    result = subprocess.run(command, check=False, env=env)
     if result.returncode:
         raise SystemExit(
             f"Command {' '.join(command)} failed with exit code {result.returncode}"
         )
 
 
-def _load_records() -> Iterable[dict[str, object]]:
-    if not LOG_PATH.exists():
-        raise SystemExit(f"Log file {LOG_PATH} not found")
+def _load_records(log_path: Path) -> Iterable[dict[str, object]]:
+    if not log_path.exists():
+        raise SystemExit(f"Log file {log_path} not found")
     for line_number, line in enumerate(
-        LOG_PATH.read_text(encoding="utf-8").splitlines(), start=1
+        log_path.read_text(encoding="utf-8").splitlines(), start=1
     ):
         if not line.strip():
             continue
@@ -64,10 +66,10 @@ def _load_records() -> Iterable[dict[str, object]]:
             value = json.loads(line)
         except json.JSONDecodeError as exc:
             raise SystemExit(
-                f"Invalid JSON on line {line_number} of {LOG_PATH}: {exc}"
+                f"Invalid JSON on line {line_number} of {log_path}: {exc}"
             ) from exc
         if not isinstance(value, dict):
-            raise SystemExit(f"Invalid record on line {line_number} of {LOG_PATH}")
+            raise SystemExit(f"Invalid record on line {line_number} of {log_path}")
         yield value
 
 
@@ -104,10 +106,12 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
 
 def main() -> int:
     _check_env()
-    _reset_log()
+    log_path = _child_log_path()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path.write_text("", encoding="utf-8")
     for command in HARNESS_COMMANDS:
-        _run_command(command)
-    _write_summary(_load_records())
+        _run_command(command, log_path=log_path)
+    _write_summary(_load_records(log_path))
     return 0
 
 
