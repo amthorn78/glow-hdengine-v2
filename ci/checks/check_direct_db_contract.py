@@ -54,8 +54,64 @@ RETIRED_KEYS = (
     "DB_BRIDGE_URL",
     "DB_FORCE_BRIDGE",
 )
-REFUSAL_CONTEXT_WORDS = ("retired", "refusal", "refuse", "absent", "deny", "deprecated", "historical", "nonclaim", "roster", "required_absent")
-ACTIVE_GUIDANCE_WORDS = ("set ", "export ", "configure", "use ", "run ", "fallback", "url", "endpoint", "http", "request")
+REFUSAL_CONTEXT_WORDS = (
+    "retired",
+    "refusal",
+    "refuse",
+    "absent",
+    "deny",
+    "deprecated",
+    "historical",
+    "nonclaim",
+    "roster",
+    "required_absent",
+    "forbid",
+    "prohibit",
+    "rejected",
+    "removed",
+    "unset",
+)
+ACTIVE_GUIDANCE_WORDS = (
+    "set ",
+    "export ",
+    "configure",
+    "use ",
+    "run ",
+    "fallback",
+    "endpoint",
+    "http",
+    "request",
+)
+EXPLICIT_NEGATION_PHRASES = (
+    "must not",
+    "do not",
+    "shall not",
+    "may not",
+    "never ",
+    "cannot",
+    "can't",
+    "not set",
+    "not export",
+    "not configure",
+    "not configured",
+    "not use",
+    "not run",
+    "no longer",
+    "required_absent",
+    "required absent",
+    "forbidden",
+    "prohibited",
+    "rejected",
+)
+HISTORICAL_ONLY_PHRASES = (
+    "historical retained",
+    "retained historical",
+    "historical evidence",
+    "historical record",
+    "historical nonclaim",
+    "historical non-claim",
+    "not current",
+)
 HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
@@ -129,8 +185,13 @@ def _git_tracked_files(root: Path) -> tuple[Path, ...]:
 
 def _line_refusal_only(line: str) -> bool:
     lowered = line.lower()
-    return any(word in lowered for word in REFUSAL_CONTEXT_WORDS) and not (
-        any(word in lowered for word in ACTIVE_GUIDANCE_WORDS) and not any(word in lowered for word in ("retired", "refusal", "historical", "must not", "do not"))
+    if not any(word in lowered for word in REFUSAL_CONTEXT_WORDS):
+        return False
+    if not any(word in lowered for word in ACTIVE_GUIDANCE_WORDS):
+        return True
+    return any(
+        phrase in lowered
+        for phrase in (*EXPLICIT_NEGATION_PHRASES, *HISTORICAL_ONLY_PHRASES)
     )
 
 
