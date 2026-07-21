@@ -101,11 +101,13 @@ def test_refusal_roster_file_cannot_hide_retired_key_membership_consumption(tmp_
     _minimal_tree(tmp_path)
     adapter = tmp_path / "engine/db/adapter.py"
     adapter.write_text(
-        adapter.read_text(encoding="utf-8")
-        + "\nimport os\n"
-        + "if 'DB_BRIDGE_URL' in os.environ:\n    raise RuntimeError('active')\n"
-        + "from os import environ\n"
-        + "if 'DB_FORCE_BRIDGE' not in environ:\n    raise RuntimeError('active')\n",
+        "import os\n"
+        "from os import environ\n"
+        "RETIRED_DB_TRANSPORT_KEYS = ()\n"
+        "def retired_db_transport_keys_present():\n    return ()\n"
+        "def readonly_tx():\n    return None\n"
+        "if 'DB_BRIDGE_URL' in os.environ:\n    raise RuntimeError('active')\n"
+        "if 'DB_FORCE_BRIDGE' not in environ:\n    raise RuntimeError('active')\n",
         encoding="utf-8",
     )
     violations = check.scan(tmp_path)
