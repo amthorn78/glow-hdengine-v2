@@ -149,22 +149,47 @@ class PsycopgProvider:
                 code="sql_exec_failed",
             ) from exc
 
-    def tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
+    def tx(
+        self,
+        statements: Sequence[Any],
+        *,
+        validate: Callable[[Sequence[Sequence[Any] | None]], None] | None = None,
+    ) -> List[Sequence[Any] | None]:
         results: List[Sequence[Any] | None] = []
         try:
             with self._connect() as conn:
-                with conn.cursor() as cur:
-                    for stmt in statements:
-                        sql = getattr(stmt, "sql")
-                        params = getattr(stmt, "params", None)
-                        fetch = bool(getattr(stmt, "fetch", False))
-                        cur.execute(sql, params)
-                        if fetch:
-                            fetched = cur.fetchall()
-                            results.append([tuple(row) if not isinstance(row, tuple) else row for row in fetched])
-                        else:
-                            results.append(None)
-                conn.commit()
+                try:
+                    with conn.cursor() as cur:
+                        for stmt in statements:
+                            sql = getattr(stmt, "sql")
+                            params = getattr(stmt, "params", None)
+                            fetch = bool(getattr(stmt, "fetch", False))
+                            cur.execute(sql, params)
+                            if fetch:
+                                fetched = cur.fetchall()
+                                results.append(
+                                    [
+                                        tuple(row) if not isinstance(row, tuple) else row
+                                        for row in fetched
+                                    ]
+                                )
+                            else:
+                                results.append(None)
+                    if validate is not None:
+                        validate(tuple(results))
+                    conn.commit()
+                except Exception:
+                    try:
+                        conn.rollback()
+                    except Exception as exc:
+                        raise TxError(
+                            "tx_rollback_failed",
+                            attempts=["DATABASE_URL"],
+                            code="tx_rollback_failed",
+                        ) from exc
+                    raise
+        except TxError:
+            raise
         except Exception as exc:
             raise TxError(
                 "tx_failed",
