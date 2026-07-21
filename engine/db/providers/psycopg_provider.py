@@ -9,6 +9,17 @@ from ..errors import IntrospectionError, PrimaryUnavailable, SqlExecError, TxErr
 Params = Sequence[Any] | Mapping[str, Any] | None
 
 
+def _normalized_sql(sql: str) -> str:
+    return " ".join((sql or "").strip().rstrip(";").split()).upper()
+
+
+def _readonly_sql_allowed(sql: str) -> bool:
+    normalized = _normalized_sql(sql)
+    if normalized == "SET TRANSACTION READ ONLY":
+        return True
+    return normalized.startswith(("SET ", "SHOW ", "SELECT "))
+
+
 class PsycopgProvider:
     """Provider that executes SQL through psycopg."""
 
@@ -105,6 +116,43 @@ class PsycopgProvider:
                 attempts=["DATABASE_URL"],
                 code="tx_failed",
             ) from exc
+        return results
+
+
+    def readonly_tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
+        if not statements:
+            raise TxError("readonly_tx_requires_statements", attempts=["DATABASE_URL"], code="readonly_tx_requires_statements")
+        sqls = [getattr(stmt, "sql", "") for stmt in statements]
+        if _normalized_sql(sqls[0]) != "SET TRANSACTION READ ONLY":
+            raise TxError("readonly_tx_requires_read_only_first", attempts=["DATABASE_URL"], code="readonly_tx_requires_read_only_first")
+        if any(not _readonly_sql_allowed(sql) for sql in sqls):
+            raise TxError("readonly_tx_rejected_sql", attempts=["DATABASE_URL"], code="readonly_tx_rejected_sql")
+        results: List[Sequence[Any] | None] = []
+        conn = None
+        try:
+            with self._connect() as conn_obj:
+                conn = conn_obj
+                with conn.cursor() as cur:
+                    for stmt in statements:
+                        sql = getattr(stmt, "sql")
+                        params = getattr(stmt, "params", None)
+                        fetch = bool(getattr(stmt, "fetch", False))
+                        cur.execute(sql, params)
+                        if fetch:
+                            fetched = cur.fetchall()
+                            results.append([tuple(row) if not isinstance(row, tuple) else row for row in fetched])
+                        else:
+                            results.append(None)
+        except TxError:
+            raise
+        except Exception as exc:
+            raise TxError("readonly_tx_failed", attempts=["DATABASE_URL"], code="readonly_tx_failed") from exc
+        finally:
+            if conn is not None:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
         return results
 
     def introspect(self, kind: str) -> Any:

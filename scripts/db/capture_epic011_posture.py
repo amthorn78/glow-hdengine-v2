@@ -323,7 +323,7 @@ def _capture_provider(label: str, captured_at: str) -> Dict[str, Any]:
     }
     with _temporary_env(overrides):
         try:
-            db = _util.DBAccess.for_current_env(snapshot_path=None)
+            db = _util.DBAccess.for_current_env()
         except AdapterError as exc:
             capture.update(
                 {
@@ -450,7 +450,7 @@ def _adapter_snapshot(db: "DBAccess", env_tag: str, captured_at: str) -> Dict[st
         "flags": {
             "env": env_tag or "unset",
             "DATABASE_URL_present": bool(os.getenv("DATABASE_URL")),
-            "DB_BRIDGE_URL_present": bool(os.getenv("DB_BRIDGE_URL")),
+            "retired_DB_BRIDGE_URL_present": bool(os.getenv("DB_BRIDGE_URL")),
             "rails_open": _rails_open(),
             "force_pg": os.getenv("DB_FORCE_PG") == "1",
             "force_bridge": os.getenv("DB_FORCE_BRIDGE") == "1",

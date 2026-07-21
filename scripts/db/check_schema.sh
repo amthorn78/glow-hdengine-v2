@@ -16,8 +16,6 @@ try:
     value = (db.introspect("search_path") or "").strip()
 except (
     _util.PrimaryUnavailable,
-    _util.BridgeUnavailable,
-    _util.BridgeUnsupported,
     _util.IntrospectionError,
 ):
     value = "missing_db_config"

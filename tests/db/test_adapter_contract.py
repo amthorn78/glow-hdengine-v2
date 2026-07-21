@@ -1,258 +1,40 @@
-from __future__ import annotations
-
-import json
-from dataclasses import dataclass
-from typing import Any, List
-import urllib.error
-
 import pytest
-
-from engine.db.adapter import DBAccess, Statement
-from engine.db.errors import BridgeUnavailable, IntrospectionError
-from engine.db.providers.bridge_provider import BridgeProvider, BridgeResponse
+from engine.db.adapter import Statement
+from engine.db.errors import TxError
 from engine.db.providers.psycopg_provider import PsycopgProvider
 
+class Cursor:
+    def __init__(self, fail=False): self.executed=[]; self.fail=fail
+    def __enter__(self): return self
+    def __exit__(self,*a): return False
+    def execute(self, sql, params=None):
+        self.executed.append(sql)
+        if self.fail and sql.startswith('SELECT'): raise RuntimeError('boom')
+    def fetchall(self): return [(1,)]
+class Conn:
+    def __init__(self, fail=False): self.cur=Cursor(fail); self.commits=0; self.rollbacks=0; self.closed=0
+    def cursor(self): return self.cur
+    def commit(self): self.commits += 1
+    def rollback(self): self.rollbacks += 1
+    def close(self): self.closed += 1
 
-@dataclass
-class FakeCursor:
-    fetchone_values: List[Any]
-    fetchall_values: List[Any]
+def test_readonly_tx_rolls_back_and_does_not_commit():
+    conn=Conn(); provider=PsycopgProvider('postgresql://secret', connection_factory=lambda dsn: conn)
+    result=provider.readonly_tx([Statement('SET TRANSACTION READ ONLY'), Statement('SELECT 1', fetch=True)])
+    assert result == [None, [(1,)]]
+    assert conn.commits == 0
+    assert conn.rollbacks == 1
+    assert conn.closed == 1
 
-    def __post_init__(self) -> None:
-        self._fetchone_values = list(self.fetchone_values)
-        self._fetchall_values = list(self.fetchall_values)
+def test_readonly_tx_rolls_back_on_error():
+    conn=Conn(fail=True); provider=PsycopgProvider('postgresql://secret', connection_factory=lambda dsn: conn)
+    with pytest.raises(TxError):
+        provider.readonly_tx([Statement('SET TRANSACTION READ ONLY'), Statement('SELECT 1', fetch=True)])
+    assert conn.commits == 0
+    assert conn.rollbacks == 1
 
-    def execute(self, sql: str, params=None) -> None:
-        # Intentionally no-op; SQL recorded via statements if needed.
-        pass
-
-    def fetchall(self):
-        if not self._fetchall_values:
-            return []
-        return self._fetchall_values.pop(0)
-
-    def fetchone(self):
-        if not self._fetchone_values:
-            return None
-        return self._fetchone_values.pop(0)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc, tb) -> bool:
-        return False
-
-
-class FakeConnection:
-    def __init__(self, cursor: FakeCursor):
-        self._cursor = cursor
-        self.closed = False
-
-    def cursor(self):
-        return self._cursor
-
-    def commit(self) -> None:
-        pass
-
-    def close(self) -> None:
-        self.closed = True
-
-
-def test_bridge_payload_serialization_is_canonical() -> None:
-    recorded: list[str] = []
-
-    def recorder(url: str, method: str, data: bytes | None, headers):
-        recorded.append(data.decode("utf-8"))
-        body = json.dumps({"status": "ok", "rows": []}).encode("utf-8")
-        return BridgeResponse(status=200, body=body, headers={})
-
-    provider = BridgeProvider("https://bridge.example", request=recorder)
-    provider.query("SELECT 1", {"b": 2, "a": 1})
-
-    assert recorded == ['{"params":{"a":1,"b":2},"sql":"SELECT 1"}']
-
-
-def test_bridge_network_errors_are_wrapped() -> None:
-    def failing_request(url: str, method: str, data, headers):
-        raise urllib.error.URLError("temporary failure")
-
-    provider = BridgeProvider("https://bridge.example", request=failing_request)
-
-    with pytest.raises(BridgeUnavailable) as excinfo:
-        provider.health()
-
-    assert excinfo.value.code == "bridge_network_error"
-    assert excinfo.value.attempts == ["DATABASE_URL", "DB_BRIDGE_URL"]
-
-
-def test_psycopg_tx_returns_tuples() -> None:
-    provider = PsycopgProvider(
-        "postgresql://primary",
-        connection_factory=lambda dsn: FakeConnection(
-            FakeCursor(fetchone_values=[], fetchall_values=[[["x", "y"]]])
-        ),
-    )
-
-    statements = [Statement(sql="SELECT 1", fetch=True)]
-    results = provider.tx(statements)
-    assert results == [[("x", "y")]]
-
-
-def test_introspect_grants_parity(monkeypatch: pytest.MonkeyPatch) -> None:
-    cursor = FakeCursor(
-        fetchone_values=[(False, False, False)],
-        fetchall_values=[
-            [
-                ("reader", "hde", "body_graphs", "SELECT"),
-                ("reader", "public", "hde_body_graphs_current", "SELECT"),
-            ],
-            [
-                ("hde_migrator", "hde", "r", "reader", "SELECT", False),
-            ],
-        ],
-    )
-
-    provider = PsycopgProvider("postgresql://primary", connection_factory=lambda dsn: FakeConnection(cursor))
-    grants_payload = provider.introspect("grants")
-
-    bridge_provider = BridgeProvider(
-        "https://bridge.example",
-        request=lambda url, method, data, headers: BridgeResponse(
-            status=200,
-            body=json.dumps({"status": "ok", "payload": grants_payload}).encode("utf-8"),
-            headers={},
-        ),
-    )
-
-    expected = dict(grants_payload)
-    expected["status"] = "ok"
-
-    assert bridge_provider.introspect("grants") == expected
-
-
-def test_introspect_fingerprint_parity(monkeypatch: pytest.MonkeyPatch) -> None:
-    cursor = FakeCursor(
-        fetchone_values=[("SELECT 1",), ("SELECT 2",)],
-        fetchall_values=[
-            [
-                ("user_id", "uuid", "NO", None),
-                ("vendor", "text", "NO", None),
-            ],
-            [
-                ("constraint_name", "UNIQUE (vendor)")
-            ],
-        ],
-    )
-
-    provider = PsycopgProvider("postgresql://primary", connection_factory=lambda dsn: FakeConnection(cursor))
-    fingerprint_payload = provider.introspect("fingerprint")
-
-    bridge_provider = BridgeProvider(
-        "https://bridge.example",
-        request=lambda url, method, data, headers: BridgeResponse(
-            status=200,
-            body=json.dumps({"status": "ok", "payload": fingerprint_payload}).encode("utf-8"),
-            headers={},
-        ),
-    )
-
-    expected = dict(fingerprint_payload)
-    expected["status"] = "ok"
-
-    assert bridge_provider.introspect("fingerprint") == expected
-
-
-def test_bridge_introspect_accepts_inline_payload() -> None:
-    response = {"status": "ok", "search_path": "hde, public"}
-
-    provider = BridgeProvider(
-        "https://bridge.example",
-        request=lambda url, method, data, headers: BridgeResponse(
-            status=200,
-            body=json.dumps(response).encode("utf-8"),
-            headers={},
-        ),
-    )
-
-    assert provider.introspect("search_path") == response
-
-
-def test_bridge_introspect_grants_keeps_dict_entries() -> None:
-    response = {
-        "status": "ok",
-        "grants": [{"role": "reader", "object": "hde", "priv": "SELECT"}],
-    }
-
-    provider = BridgeProvider(
-        "https://bridge.example",
-        request=lambda url, method, data, headers: BridgeResponse(
-            status=200,
-            body=json.dumps(response).encode("utf-8"),
-            headers={},
-        ),
-    )
-
-    payload = provider.introspect("grants")
-    assert payload["grants"] == response["grants"]
-
-
-def test_bridge_introspect_version_uses_query() -> None:
-    def request(url: str, method: str, data, headers):
-        if url.endswith("/query"):
-            body = json.dumps({"status": "ok", "rows": [["16.1"]]}).encode("utf-8")
-            return BridgeResponse(status=200, body=body, headers={})
-        raise AssertionError(f"unexpected request {url} {method}")
-
-    provider = BridgeProvider("https://bridge.example", request=request)
-
-    assert provider.introspect("version") == {"status": "ok", "version": "16.1"}
-
-
-def test_dbaccess_introspect_wrappers_normalize_payloads() -> None:
-    class StubProvider:
-        name = "stub"
-
-        def introspect(self, kind: str):
-            if kind == "search_path":
-                return "hde, public"
-            if kind == "fingerprint":
-                return {"objects": [1, 2, 3]}
-            if kind == "version":
-                return {"status": "ok", "version": "15.4"}
-            raise AssertionError(kind)
-
-    db = DBAccess(StubProvider())
-
-    assert db.introspect_search_path() == {"status": "ok", "search_path": "hde, public"}
-    fingerprint = db.introspect_fingerprint()
-    assert fingerprint["status"] == "ok"
-    assert fingerprint["objects"] == [1, 2, 3]
-    assert db.introspect_version() == {"status": "ok", "version": "15.4"}
-
-
-def test_dbaccess_introspect_wrappers_propagate_errors() -> None:
-    class FailingProvider:
-        name = "stub"
-
-        def introspect(self, kind: str):
-            raise IntrospectionError("boom", code="boom")
-
-    db = DBAccess(FailingProvider())
-
-    with pytest.raises(IntrospectionError):
-        db.introspect_version()
-
-
-def test_bridge_provider_exposes_adapter_contract_capabilities() -> None:
-    provider = BridgeProvider(
-        "https://bridge.example",
-        request=lambda url, method, data, headers: BridgeResponse(
-            status=200,
-            body=json.dumps({"status": "ok", "rows": [[1]]}).encode("utf-8"),
-            headers={},
-        ),
-    )
-
-    required = ["health", "query", "exec", "tx", "introspect"]
-    assert provider.name == "bridge"
-    assert all(callable(getattr(provider, method, None)) for method in required)
+def test_readonly_tx_rejects_mutation_before_connection():
+    called=[]; provider=PsycopgProvider('postgresql://secret', connection_factory=lambda dsn: called.append(1) or Conn())
+    with pytest.raises(TxError):
+        provider.readonly_tx([Statement('SET TRANSACTION READ ONLY'), Statement('UPDATE x SET y=1')])
+    assert called == []

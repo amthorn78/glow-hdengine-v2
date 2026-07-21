@@ -1,7 +1,7 @@
 """Exception hierarchy for DB adapter."""
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 
 class AdapterError(RuntimeError):
@@ -20,12 +20,16 @@ class PrimaryUnavailable(AdapterError):
     code = "primary_unavailable"
 
 
-class BridgeUnavailable(AdapterError):
-    code = "bridge_unavailable"
+class RetiredBridgeConfiguration(AdapterError):
+    code = "retired_bridge_configuration"
 
-
-class BridgeUnsupported(AdapterError):
-    code = "bridge_unsupported"
+    def __init__(self, retired_keys: Sequence[str]):
+        self.retired_keys = tuple(sorted(retired_keys))
+        super().__init__(
+            "retired_bridge_configuration:" + ",".join(self.retired_keys),
+            attempts=[],
+            code=self.code,
+        )
 
 
 class SqlExecError(AdapterError):

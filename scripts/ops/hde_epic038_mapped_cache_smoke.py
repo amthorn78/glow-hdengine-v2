@@ -154,7 +154,7 @@ def _legacy_fallback_probe() -> dict[str, Any]:
 
 
 def _execute(args: argparse.Namespace) -> dict[str, Any]:
-    db = DBAccess.for_current_env(snapshot_path=None)
+    db = DBAccess.for_current_env()
     db.health()
     client = HdApiClient.from_env(env=os.environ, retry=SINGLE_REQUEST_RETRY)
     request = client.build_contract_route_request(

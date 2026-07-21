@@ -170,7 +170,10 @@ def analyze() -> dict[str, Any]:
     registrations: list[dict[str, Any]] = []
     imports: list[str] = []
     for path in tracked():
-        text = (ROOT / path).read_text(encoding="utf-8")
+        source_path = ROOT / path
+        if not source_path.exists():
+            continue
+        text = source_path.read_text(encoding="utf-8")
         tree = ast.parse(text, filename=path)
         imported = sorted(
             {node.names[0].name.split(".")[0] for node in ast.walk(tree) if isinstance(node, ast.Import) and node.names}

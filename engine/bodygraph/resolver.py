@@ -231,7 +231,7 @@ def _resolve_vendor_v2_chart(
         )
     if not dry_run:
         try:
-            db = DBAccess.for_current_env(snapshot_path=None)
+            db = DBAccess.for_current_env()
         except AdapterError as exc:
             return _vendor_error(
                 VendorError("DB_WRITER_UNAVAILABLE", "mapped-cache database target unavailable", details={"code": exc.code}),

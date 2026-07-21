@@ -19,8 +19,6 @@ try:
     payload = db.introspect("grants")
 except (
     _util.PrimaryUnavailable,
-    _util.BridgeUnavailable,
-    _util.BridgeUnsupported,
     _util.IntrospectionError,
 ):
     write_lines([

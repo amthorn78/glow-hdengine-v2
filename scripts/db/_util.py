@@ -6,8 +6,6 @@ from typing import Any
 from engine.db import (
     DBAccess,
     Statement,
-    BridgeUnavailable,
-    BridgeUnsupported,
     IntrospectionError,
     PrimaryUnavailable,
     SqlExecError,
@@ -21,7 +19,7 @@ MissingDbConfigError = PrimaryUnavailable
 
 
 def db_access() -> DBAccess:
-    return DBAccess.for_current_env(snapshot_path=ADAPTER_SNAPSHOT)
+    return DBAccess.for_current_env()
 
 
 def ensure_artifact(path: str) -> Path:
@@ -51,8 +49,6 @@ __all__ = [
     "write_text",
     "write_json",
     "MissingDbConfigError",
-    "BridgeUnavailable",
-    "BridgeUnsupported",
     "IntrospectionError",
     "PrimaryUnavailable",
     "SqlExecError",

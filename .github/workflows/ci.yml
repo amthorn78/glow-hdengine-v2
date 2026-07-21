@@ -57,7 +57,7 @@ jobs:
           exit "$report_status"
       - run: python tools/evidence/refresh_step_logs_manifest.py --check
       - run: ci/checks/check_evidence_index_hash.sh
-      - run: python ci/checks/check_bridge_consistency.py
+      - run: python ci/checks/check_direct_db_contract.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
       - name: Run EPIC021 QA harness entrypoint self-test (closed rails)
@@ -66,7 +66,7 @@ jobs:
         run: python -m pytest tests/qa/test_epic021_harness_entrypoint.py
       # Legacy evidence tests below intentionally build ephemeral EPIC020/021
       # artifacts. The committed closure has already been verified read-only above.
-      - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops01r_v5.py
+      - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py
       - run: python -m pytest tests/order tests/mech/test_order_properties.py
       - run: python -m pytest tests/cli/test_serializer_guards.py
   compat-conj-pr01-closure:

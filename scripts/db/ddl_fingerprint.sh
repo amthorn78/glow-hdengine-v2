@@ -61,8 +61,6 @@ try:
     fingerprint = db.introspect("fingerprint")
 except (
     _util.PrimaryUnavailable,
-    _util.BridgeUnavailable,
-    _util.BridgeUnsupported,
     _util.IntrospectionError,
 ):
     fingerprint = offline_fingerprint()
