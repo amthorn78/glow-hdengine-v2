@@ -195,14 +195,64 @@ def _line_refusal_only(line: str) -> bool:
     )
 
 
-def _is_environ_mapping(node: ast.AST) -> bool:
+def _os_import_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
+    """Return local names bound to os, os.environ, and os.getenv."""
+    os_names = {"os"}
+    environ_names = {"environ"}
+    getenv_names = {"getenv"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for imported in node.names:
+                if imported.name == "os":
+                    os_names.add(imported.asname or imported.name)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module == "os":
+            for imported in node.names:
+                local_name = imported.asname or imported.name
+                if imported.name == "environ":
+                    environ_names.add(local_name)
+                elif imported.name == "getenv":
+                    getenv_names.add(local_name)
+    return os_names, environ_names, getenv_names
+
+
+def _is_environ_mapping(
+    node: ast.AST, os_names: set[str], environ_names: set[str]
+) -> bool:
     return (
         isinstance(node, ast.Name)
-        and node.id == "environ"
+        and node.id in environ_names
         or isinstance(node, ast.Attribute)
         and isinstance(node.value, ast.Name)
-        and node.value.id == "os"
+        and node.value.id in os_names
         and node.attr == "environ"
+    )
+
+
+def _retired_env_call(
+    node: ast.Call,
+    os_names: set[str],
+    environ_names: set[str],
+    getenv_names: set[str],
+) -> bool:
+    func = node.func
+    is_reader = (
+        isinstance(func, ast.Name)
+        and func.id in getenv_names
+        or isinstance(func, ast.Attribute)
+        and (
+            func.attr == "getenv"
+            and isinstance(func.value, ast.Name)
+            and func.value.id in os_names
+            or func.attr == "get"
+            and _is_environ_mapping(func.value, os_names, environ_names)
+        )
+    )
+    values = [*node.args, *(keyword.value for keyword in node.keywords)]
+    return is_reader and any(
+        isinstance(value, ast.Constant)
+        and isinstance(value.value, str)
+        and value.value in RETIRED_KEYS
+        for value in values
     )
 
 
@@ -244,17 +294,21 @@ def _is_http_call(node: ast.Call) -> bool:
     )
 
 
-def _retired_environ_subscript(node: ast.Subscript) -> bool:
+def _retired_environ_subscript(
+    node: ast.Subscript, os_names: set[str], environ_names: set[str]
+) -> bool:
     key = node.slice
     return (
-        _is_environ_mapping(node.value)
+        _is_environ_mapping(node.value, os_names, environ_names)
         and isinstance(key, ast.Constant)
         and isinstance(key.value, str)
         and key.value in RETIRED_KEYS
     )
 
 
-def _retired_membership_compare(node: ast.Compare) -> bool:
+def _retired_membership_compare(
+    node: ast.Compare, os_names: set[str], environ_names: set[str]
+) -> bool:
     left = node.left
     for operator, right in zip(node.ops, node.comparators):
         if (
@@ -262,7 +316,7 @@ def _retired_membership_compare(node: ast.Compare) -> bool:
             and isinstance(left, ast.Constant)
             and isinstance(left.value, str)
             and left.value in RETIRED_KEYS
-            and _is_environ_mapping(right)
+            and _is_environ_mapping(right, os_names, environ_names)
         ):
             return True
         left = right
@@ -274,29 +328,22 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
         tree = ast.parse(text)
     except SyntaxError:
         return ()
+    os_names, environ_names, getenv_names = _os_import_aliases(tree)
     lines: set[int] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
-            func = node.func
-            func_name = ""
-            if isinstance(func, ast.Attribute):
-                func_name = func.attr
-                if isinstance(func.value, ast.Name):
-                    func_name = f"{func.value.id}.{func.attr}"
-                elif isinstance(func.value, ast.Attribute):
-                    func_name = f"{func.value.attr}.{func.attr}"
-            elif isinstance(func, ast.Name):
-                func_name = func.id
-            args = list(node.args)
-            const_args = [arg.value for arg in args if isinstance(arg, ast.Constant) and isinstance(arg.value, str)]
-            if func_name in {"os.getenv", "getenv", "os.environ.get", "environ.get"} and any(arg in RETIRED_KEYS for arg in const_args):
+            if _retired_env_call(node, os_names, environ_names, getenv_names):
                 lines.add(node.lineno)
             segment = ast.get_source_segment(text, node) or ""
             if any(key in segment for key in RETIRED_KEYS) and _is_http_call(node):
                 lines.add(node.lineno)
-        if isinstance(node, ast.Compare) and _retired_membership_compare(node):
+        if isinstance(node, ast.Compare) and _retired_membership_compare(
+            node, os_names, environ_names
+        ):
             lines.add(node.lineno)
-        if isinstance(node, ast.Subscript) and _retired_environ_subscript(node):
+        if isinstance(node, ast.Subscript) and _retired_environ_subscript(
+            node, os_names, environ_names
+        ):
             lines.add(node.lineno)
     return tuple(sorted(lines))
 
