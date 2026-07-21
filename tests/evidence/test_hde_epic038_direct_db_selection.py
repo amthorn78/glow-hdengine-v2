@@ -71,7 +71,7 @@ def test_direct_selection_validator_rejects_case_and_secret_mutation():
         "code": "predicate_failure",
         "failed_predicates": ["direct_only_provider"],
     }
-    assert generator.validate_contract(payload) == ()
+    assert "schema_invalid" in generator.validate_contract(payload)
 
 
 def test_retired_case_uses_membership_even_for_empty_values():

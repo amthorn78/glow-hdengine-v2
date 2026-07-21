@@ -214,46 +214,59 @@ def test_write_smoke_deletes_only_the_inserted_row(monkeypatch):
         def __init__(self):
             self.calls = []
 
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *_args):
-            return False
-
         def execute(self, sql, params=None):
             self.calls.append((" ".join(sql.split()), params))
 
-        def fetchone(self):
-            return (inserted_id,)
-
-    class SmokeConnection:
-        def __init__(self):
-            self.cursor_object = SmokeCursor()
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *_args):
-            return False
-
-        def cursor(self):
-            return self.cursor_object
-
-    connection = SmokeConnection()
+    cursor = SmokeCursor()
     monkeypatch.setenv("DB_REQUIRED", "1")
-    monkeypatch.setenv("DATABASE_URL", "not-serialized")
-    monkeypatch.setattr(
-        compatibility,
-        "db_resolve",
-        lambda _preference="dsn": {"active": "psycopg"},
-    )
-    monkeypatch.setitem(
-        sys.modules,
-        "psycopg",
-        SimpleNamespace(connect=lambda *_args, **_kwargs: connection),
-    )
+
+    class FakeDB:
+        def tx(self, statements, *, validate=None):
+            for stmt in statements:
+                cursor.execute(stmt.sql, stmt.params)
+            results = [
+                None,
+                [(inserted_id,)],
+                [(inserted_id,)],
+                [(inserted_id,)],
+            ]
+            assert validate is not None
+            validate(results)
+            return results
+
+    monkeypatch.setattr(compatibility.DBAccess, "for_current_env", classmethod(lambda cls: FakeDB()))
     assert compatibility.db_rw_smoke() == ("ok", "db_rw_smoke_ok")
-    delete_sql, delete_params = connection.cursor_object.calls[-1]
-    assert delete_sql == "DELETE FROM hde.public_results WHERE id=%s"
-    assert delete_params == (inserted_id,)
-    assert all("WHERE release_id='qa_smoke'" not in sql for sql, _ in connection.cursor_object.calls)
+    assert len(cursor.calls) == 4
+    insert_sql, insert_params = cursor.calls[2]
+    cleanup_sql, cleanup_params = cursor.calls[3]
+    assert insert_sql.startswith("INSERT INTO hde.public_results")
+    assert cleanup_sql.startswith("DELETE FROM hde.public_results")
+    assert "current_setting('hde.qa_smoke_id')::uuid" in insert_sql
+    assert "current_setting('hde.qa_smoke_id')::uuid" in cleanup_sql
+    assert "WITH inserted AS" not in insert_sql
+    assert "WITH inserted AS" not in cleanup_sql
+    assert insert_params is None
+    assert cleanup_params is None
+
+
+def test_write_tx_validator_runs_before_commit_and_rolls_back_on_failure():
+    connection = Connection()
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: connection,
+    )
+    validator_calls = []
+
+    def reject(results):
+        assert connection.commit_calls == 0
+        validator_calls.append(tuple(results))
+        raise RuntimeError("cleanup validation failed")
+
+    with pytest.raises(TxError) as exc:
+        provider.tx([Statement("SELECT 1", fetch=True)], validate=reject)
+
+    assert exc.value.code == "tx_failed"
+    assert validator_calls == [([(1,)],)]
+    assert connection.commit_calls == 0
+    assert connection.rollback_calls == 1
+    assert connection.close_calls == 1

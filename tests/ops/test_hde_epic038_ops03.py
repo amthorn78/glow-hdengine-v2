@@ -406,3 +406,14 @@ def test_final_validator_rejects_checksum_and_receipt_tampering(authorization):
     )
     assert receipt["result"] == "FAIL"
     assert receipt["predicates"]["inventory_valid"] is False
+
+
+def test_pr_a_nonfinal_missing_ops03_pr_b_binding_keeps_finalization_before_nonfinal_gate():
+    from tools.evidence import run_sanity_pipeline as sanity
+
+    steps = sanity.default_steps()
+    assert steps[-2].name == "17 Final LF validation"
+    assert steps[-2].commands == sanity._finalization_commands()
+    assert steps[-1].name == "18 PR-A nonfinal gate"
+    assert steps[-1].commands == (("__pr_a_nonfinal__",),)
+    assert sanity.PR_A_NONFINAL_REASON == "pr_a_nonfinal_ops03_pr_b_binding_required"

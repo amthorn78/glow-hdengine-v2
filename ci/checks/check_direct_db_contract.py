@@ -2,7 +2,9 @@
 """Fail closed if active source reintroduces a retired DB transport."""
 from __future__ import annotations
 
+import ast
 import json
+import subprocess
 from pathlib import Path
 from typing import Iterable
 
@@ -19,6 +21,9 @@ EXCLUDED_PREFIXES = (
     "tests/",
     "codex/out/",
     "notes/",
+    "build/",
+    "dist/",
+    "*.egg-info/",
 )
 TEXT_SUFFIXES = {".py", ".md", ".yml", ".yaml", ".sh", ".txt"}
 RETIRED_PATHS = (
@@ -49,19 +54,65 @@ RETIRED_KEYS = (
     "DB_BRIDGE_URL",
     "DB_FORCE_BRIDGE",
 )
-RETIRED_KEY_ALLOWLIST = {
-    "engine/db/adapter.py",
-    "adapter/db_access.py",
-    "tools/evidence/generate_hde_epic038_direct_db_selection.py",
-    "scripts/ops/hde_epic038_ops03.py",
-    "tools/evidence/hde_epic038_ops03.py",
-    "tools/evidence/generate_architecture_snapshot.py",
-    "tools/evidence/generate_env_matrix_snapshot.py",
-    "tools/evidence/retained_evidence_safety.py",
-    "ci/checks/check_direct_db_contract.py",
-    "docs/ADAPTER_DB.md",
-    "docs/SECRETS.md",
-}
+REFUSAL_CONTEXT_WORDS = (
+    "retired",
+    "refusal",
+    "refuse",
+    "absent",
+    "deny",
+    "deprecated",
+    "historical",
+    "nonclaim",
+    "roster",
+    "required_absent",
+    "forbid",
+    "prohibit",
+    "rejected",
+    "removed",
+    "unset",
+)
+ACTIVE_GUIDANCE_WORDS = (
+    "set ",
+    "export ",
+    "configure",
+    "use ",
+    "run ",
+    "fallback",
+    "endpoint",
+    "http",
+    "request",
+)
+EXPLICIT_NEGATION_PHRASES = (
+    "must not",
+    "do not",
+    "shall not",
+    "may not",
+    "never ",
+    "cannot",
+    "can't",
+    "not set",
+    "not export",
+    "not configure",
+    "not configured",
+    "not use",
+    "not run",
+    "no longer",
+    "required_absent",
+    "required absent",
+    "forbidden",
+    "prohibited",
+    "rejected",
+)
+HISTORICAL_ONLY_PHRASES = (
+    "historical retained",
+    "retained historical",
+    "historical evidence",
+    "historical record",
+    "historical nonclaim",
+    "historical non-claim",
+    "not current",
+)
+HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/run_sanity_pipeline.py",
@@ -123,6 +174,286 @@ SCHEMAS = (
 )
 
 
+
+def _git_tracked_files(root: Path) -> tuple[Path, ...]:
+    try:
+        result = subprocess.run(["git", "ls-files", "-c", "-m", "-o", "--exclude-standard"], cwd=root, check=True, capture_output=True, text=True)
+    except Exception:
+        return tuple(path for path in root.rglob("*") if path.is_file())
+    return tuple(root / line for line in result.stdout.splitlines() if line.strip())
+
+
+def _line_refusal_only(line: str) -> bool:
+    lowered = line.lower()
+    if not any(word in lowered for word in REFUSAL_CONTEXT_WORDS):
+        return False
+    if not any(word in lowered for word in ACTIVE_GUIDANCE_WORDS):
+        return True
+    return any(
+        phrase in lowered
+        for phrase in (*EXPLICIT_NEGATION_PHRASES, *HISTORICAL_ONLY_PHRASES)
+    )
+
+
+def _is_os_module(node: ast.AST, os_names: set[str]) -> bool:
+    return isinstance(node, ast.Name) and node.id in os_names
+
+
+def _is_environ_mapping(
+    node: ast.AST, os_names: set[str], environ_names: set[str]
+) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id in environ_names
+        or isinstance(node, ast.Attribute)
+        and _is_os_module(node.value, os_names)
+        and node.attr == "environ"
+    )
+
+
+def _is_environ_source(
+    node: ast.AST, os_names: set[str], environ_names: set[str]
+) -> bool:
+    if _is_environ_mapping(node, os_names, environ_names):
+        return True
+    if not isinstance(node, ast.Call):
+        return False
+    func = node.func
+    if (
+        isinstance(func, ast.Attribute)
+        and func.attr == "copy"
+        and _is_environ_source(func.value, os_names, environ_names)
+    ):
+        return True
+    return (
+        isinstance(func, ast.Name)
+        and func.id == "dict"
+        and bool(node.args)
+        and _is_environ_source(node.args[0], os_names, environ_names)
+    )
+
+
+def _is_getenv_reader(
+    node: ast.AST, os_names: set[str], getenv_names: set[str]
+) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id in getenv_names
+        or isinstance(node, ast.Attribute)
+        and node.attr == "getenv"
+        and _is_os_module(node.value, os_names)
+    )
+
+
+def _target_bindings(
+    target: ast.AST, value: ast.AST
+) -> tuple[tuple[str, ast.AST], ...]:
+    if isinstance(target, ast.Name):
+        return ((target.id, value),)
+    if (
+        isinstance(target, (ast.List, ast.Tuple))
+        and isinstance(value, (ast.List, ast.Tuple))
+        and len(target.elts) == len(value.elts)
+    ):
+        return tuple(
+            binding
+            for item_target, item_value in zip(target.elts, value.elts)
+            for binding in _target_bindings(item_target, item_value)
+        )
+    return ()
+
+
+def _assignment_bindings(node: ast.AST) -> tuple[tuple[str, ast.AST], ...]:
+    if isinstance(node, ast.Assign):
+        return tuple(
+            binding
+            for target in node.targets
+            for binding in _target_bindings(target, node.value)
+        )
+    if isinstance(node, ast.AnnAssign) and node.value is not None:
+        return _target_bindings(node.target, node.value)
+    if isinstance(node, ast.NamedExpr):
+        return _target_bindings(node.target, node.value)
+    return ()
+
+
+def _os_symbol_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
+    """Return local names bound to os, os.environ, and os.getenv."""
+    os_names = {"os"}
+    environ_names = {"environ"}
+    getenv_names = {"getenv"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for imported in node.names:
+                if imported.name == "os":
+                    os_names.add(imported.asname or imported.name)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module == "os":
+            for imported in node.names:
+                local_name = imported.asname or imported.name
+                if imported.name == "environ":
+                    environ_names.add(local_name)
+                elif imported.name == "getenv":
+                    getenv_names.add(local_name)
+
+    while True:
+        previous = (len(os_names), len(environ_names), len(getenv_names))
+        for node in ast.walk(tree):
+            for local_name, value in _assignment_bindings(node):
+                if _is_os_module(value, os_names):
+                    os_names.add(local_name)
+                elif _is_environ_source(value, os_names, environ_names):
+                    environ_names.add(local_name)
+                elif _is_getenv_reader(value, os_names, getenv_names):
+                    getenv_names.add(local_name)
+        if previous == (len(os_names), len(environ_names), len(getenv_names)):
+            return os_names, environ_names, getenv_names
+
+
+def _retired_env_call(
+    node: ast.Call,
+    os_names: set[str],
+    environ_names: set[str],
+    getenv_names: set[str],
+) -> bool:
+    func = node.func
+    is_reader = _is_getenv_reader(func, os_names, getenv_names) or (
+        isinstance(func, ast.Attribute)
+        and func.attr == "get"
+        and _is_environ_source(func.value, os_names, environ_names)
+    )
+    values = [*node.args, *(keyword.value for keyword in node.keywords)]
+    return is_reader and any(
+        isinstance(value, ast.Constant)
+        and isinstance(value.value, str)
+        and value.value in RETIRED_KEYS
+        for value in values
+    )
+
+
+def _dotted_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        prefix = _dotted_name(node.value)
+        return f"{prefix}.{node.attr}" if prefix else node.attr
+    return ""
+
+
+def _is_http_call(node: ast.Call) -> bool:
+    name = _dotted_name(node.func).lower()
+    if name in {
+        "requests.get",
+        "requests.post",
+        "requests.request",
+        "httpx.get",
+        "httpx.post",
+        "httpx.request",
+        "urllib.request.urlopen",
+        "urlopen",
+    }:
+        return True
+    if not isinstance(node.func, ast.Attribute) or node.func.attr.lower() not in {
+        "delete",
+        "get",
+        "head",
+        "patch",
+        "post",
+        "put",
+        "request",
+    }:
+        return False
+    owner = _dotted_name(node.func.value).lower()
+    return owner in {"client", "http", "http_client", "session"} or owner.startswith(
+        ("httpx.", "requests.")
+    )
+
+
+def _retired_environ_subscript(
+    node: ast.Subscript, os_names: set[str], environ_names: set[str]
+) -> bool:
+    key = node.slice
+    return (
+        _is_environ_source(node.value, os_names, environ_names)
+        and isinstance(key, ast.Constant)
+        and isinstance(key.value, str)
+        and key.value in RETIRED_KEYS
+    )
+
+
+def _retired_membership_compare(
+    node: ast.Compare, os_names: set[str], environ_names: set[str]
+) -> bool:
+    left = node.left
+    for operator, right in zip(node.ops, node.comparators):
+        if (
+            isinstance(operator, (ast.In, ast.NotIn))
+            and isinstance(left, ast.Constant)
+            and isinstance(left.value, str)
+            and left.value in RETIRED_KEYS
+            and _is_environ_source(right, os_names, environ_names)
+        ):
+            return True
+        left = right
+    return False
+
+
+def _python_retired_consumption(text: str) -> tuple[int, ...]:
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    os_names, environ_names, getenv_names = _os_symbol_aliases(tree)
+    lines: set[int] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            if _retired_env_call(node, os_names, environ_names, getenv_names):
+                lines.add(node.lineno)
+            segment = ast.get_source_segment(text, node) or ""
+            if any(key in segment for key in RETIRED_KEYS) and _is_http_call(node):
+                lines.add(node.lineno)
+        if isinstance(node, ast.Compare) and _retired_membership_compare(
+            node, os_names, environ_names
+        ):
+            lines.add(node.lineno)
+        if isinstance(node, ast.Subscript) and _retired_environ_subscript(
+            node, os_names, environ_names
+        ):
+            lines.add(node.lineno)
+    return tuple(sorted(lines))
+
+
+def _python_retired_http_use(text: str) -> tuple[int, ...]:
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    lines: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not _is_http_call(node):
+            continue
+        segment = ast.get_source_segment(text, node) or ""
+        if any(key in segment for key in RETIRED_KEYS):
+            lines.add(node.lineno)
+    return tuple(sorted(lines))
+
+
+def _retired_key_violations(relative: str, text: str) -> list[str]:
+    out: list[str] = []
+    if relative.endswith(".py"):
+        for line_number in _python_retired_consumption(text):
+            out.append(f"{relative}:{line_number}:active_retired_key_consumption")
+        for line_number in _python_retired_http_use(text):
+            out.append(f"{relative}:{line_number}:retired_key_http_bridge_use")
+    for line_number, line in enumerate(text.splitlines(), 1):
+        if not any(key in line for key in RETIRED_KEYS):
+            continue
+        if any(marker in line for marker in HTTP_MARKERS):
+            out.append(f"{relative}:{line_number}:retired_key_http_bridge_use")
+            continue
+        if relative.endswith((".md", ".txt", ".yml", ".yaml", ".sh")) and not _line_refusal_only(line):
+            out.append(f"{relative}:{line_number}:retired_key_active_guidance")
+    return out
+
 def _relative(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
 
@@ -133,7 +464,8 @@ def _active(root: Path, path: Path) -> bool:
         path.is_file()
         and path.suffix in TEXT_SUFFIXES
         and relative not in {"CHANGELOG.md", "AGENTS.md"}
-        and not any(relative.startswith(prefix) for prefix in EXCLUDED_PREFIXES)
+        and not any(relative.startswith(prefix) for prefix in EXCLUDED_PREFIXES if not prefix.startswith("*"))
+        and ".egg-info/" not in relative
     )
 
 
@@ -143,7 +475,7 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
         if (root / relative).exists():
             violations.add(f"{relative}:retired_path_present")
 
-    for path in root.rglob("*"):
+    for path in _git_tracked_files(root):
         if not _active(root, path):
             continue
         relative = _relative(root, path)
@@ -165,9 +497,8 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
                         violations.add(
                             f"{relative}:{line_number}:active_retired_path:{marker}"
                         )
-        for key in RETIRED_KEYS:
-            if key in text and relative not in RETIRED_KEY_ALLOWLIST and relative not in HISTORICAL_READERS:
-                violations.add(f"{relative}:retired_key_outside_refusal_roster:{key}")
+        if relative != "ci/checks/check_direct_db_contract.py":
+            violations.update(_retired_key_violations(relative, text))
 
     for relative, markers in MANDATORY_MARKERS.items():
         path = root / relative

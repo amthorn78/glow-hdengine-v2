@@ -24,6 +24,8 @@ from tools.evidence.retained_evidence_safety import validate_retained_text_safet
 
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
+PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
+PR_A_NONFINAL_EXIT = 3
 
 OPS_FILES = {
     "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
@@ -132,6 +134,7 @@ STAGE_NAMES = (
     "12 OPS evidence checksum and summary validation", "13 Human Index and Machine Mirror refresh",
     "14 Path validation", "15 Mirror schema and hash validation",
     "16 Topology orientation validation", "17 Final LF validation",
+    "18 PR-A nonfinal gate",
 )
 
 
@@ -182,6 +185,7 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
         SanityStep(STAGE_NAMES[16], _finalization_commands()),
+        SanityStep(STAGE_NAMES[17], (("__pr_a_nonfinal__",),)),
     ]
 
 
@@ -769,6 +773,9 @@ def _run_stage(step: SanityStep) -> int:
             except ValueError as exc:
                 print(str(exc), file=sys.stderr)
                 return 1
+        elif command == ("__pr_a_nonfinal__",):
+            print(PR_A_NONFINAL_REASON, file=sys.stderr)
+            return PR_A_NONFINAL_EXIT
         else:
             result = _run_command(command)
             if result.returncode:
@@ -781,7 +788,7 @@ def _run_stage(step: SanityStep) -> int:
 
 
 def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
-    lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:validated_existing_bytes_only;not_rerun=true"]
+    lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true", "pr_a_state:nonfinal_fail_closed", f"final_readiness_blocked:{PR_A_NONFINAL_REASON}"]
     for name, status in results:
         canonical_status = "OK" if status == "OK" else "FAIL"
         lines.append(f"check {name}:{canonical_status}")
@@ -848,7 +855,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             seal_code = _rebind_failure_log()
             if seal_code:
                 print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-                return seal_code
+                return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
             return 1
         return 0
 
@@ -857,7 +864,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-            return seal_code
+            return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
     return 0 if passed else (code or 1)
 
 

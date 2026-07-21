@@ -17,7 +17,7 @@ def _result(code=0):
 
 def test_exact_stage_order_and_canonical_path():
     assert tuple(step.name for step in sanity.default_steps()) == sanity.STAGE_NAMES
-    assert len(sanity.STAGE_NAMES) == 17
+    assert len(sanity.STAGE_NAMES) == 18
     assert sanity.SANITY_LOG.relative_to(sanity.ROOT).as_posix() == "audit/gates/sanity_pipeline/sanity_pipeline.log"
 
 
@@ -862,3 +862,114 @@ def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
     )
     assert mirror_proof["sha256"] == mirror_digest
     assert mirror_proof["mirror_body_sha256"] == mirror_row["sha256"]
+
+
+def test_pr_a_default_pipeline_is_nonfinal_fail_closed(tmp_path, monkeypatch):
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
+    log = tmp_path / "sanity.log"
+    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    text = log.read_text(encoding="utf-8")
+    assert "pr_a_state:nonfinal_fail_closed" in text
+    assert "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required" in text
+    assert "check 17 Final LF validation:OK" in text
+    assert "check 18 PR-A nonfinal gate:FAIL" in text
+    assert "summary:FAIL" in text
+    assert "summary:PASS" not in text
+
+
+@pytest.mark.parametrize(
+    ("seal_code", "expected"),
+    ((0, sanity.PR_A_NONFINAL_EXIT), (1, 1), (sanity.PR_A_NONFINAL_EXIT, 1)),
+)
+def test_pr_a_nonfinal_exit_requires_successful_rebind(
+    tmp_path, monkeypatch, seal_code, expected
+):
+    log = tmp_path / "sanity.log"
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result())
+    monkeypatch.setattr(sanity, "validate_pr05_path_proof_prerequisites", lambda: None)
+    monkeypatch.setattr(sanity, "validate_ops_packages", lambda: None)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: seal_code)
+    assert sanity.run_pipeline(log_path=log) == expected
+    assert log.read_text(encoding="utf-8").endswith(
+        f"first_failed_stage:{sanity.STAGE_NAMES[-1]}\nsummary:FAIL\n"
+    )
+
+
+def test_sanity_gate_accepts_only_pr_a_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+    log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+    monkeypatch.setattr(gate, "LOG", log)
+    assert gate._valid_log() is True
+    log.write_text(log.read_text(encoding="utf-8").replace("summary:FAIL", "summary:PASS"), encoding="utf-8")
+    assert gate._valid_log() is False
+
+
+def test_sanity_gate_rejects_stale_valid_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+    log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(
+        gate.subprocess,
+        "run",
+        lambda *args, **kwargs: _result(gate.PR_A_NONFINAL_EXIT),
+    )
+    assert gate._valid_log() is True
+    assert gate.main() == gate.PR_A_NONFINAL_EXIT
+
+
+def test_sanity_gate_accepts_fresh_valid_nonfinal_log(tmp_path, monkeypatch):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    log = tmp_path / "sanity_pipeline.log"
+    log.write_text("stale receipt\n", encoding="utf-8")
+    results = [(name, "OK") for name in sanity.STAGE_NAMES[:-1]] + [(sanity.STAGE_NAMES[-1], "FAIL")]
+
+    def run(*args, **kwargs):
+        log.write_bytes(sanity._render_log(results, sanity.STAGE_NAMES[-1], "FAIL"))
+        return _result(gate.PR_A_NONFINAL_EXIT)
+
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(gate.subprocess, "run", run)
+    assert gate.main() == 0
+
+
+@pytest.mark.parametrize(
+    ("returncode", "valid_log", "expected"),
+    (
+        (sanity.PR_A_NONFINAL_EXIT, True, 0),
+        (sanity.PR_A_NONFINAL_EXIT, False, sanity.PR_A_NONFINAL_EXIT),
+        (1, True, 1),
+        (0, True, 1),
+        (2, True, 2),
+    ),
+)
+def test_sanity_gate_only_tolerates_exact_pr_a_nonfinal_receipt(
+    tmp_path, monkeypatch, returncode, valid_log, expected
+):
+    from tools.evidence import run_sanity_pipeline_gate as gate
+
+    assert gate.PR_A_NONFINAL_EXIT == sanity.PR_A_NONFINAL_EXIT
+    log = tmp_path / "sanity_pipeline.log"
+    log.write_text("stale receipt\n", encoding="utf-8")
+
+    def run(*args, **kwargs):
+        log.write_text(f"fresh receipt {returncode}\n", encoding="utf-8")
+        return _result(returncode)
+
+    monkeypatch.setattr(gate, "LOG", log)
+    monkeypatch.setattr(gate.subprocess, "run", run)
+    monkeypatch.setattr(gate, "_valid_log", lambda: valid_log)
+    assert gate.main() == expected
+
+
+def test_ci_uses_explicit_nonfinal_gate_wrapper():
+    workflow = (sanity.ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "run: python tools/evidence/run_sanity_pipeline_gate.py" in workflow
+    assert "run: python tools/evidence/run_sanity_pipeline.py" not in workflow
