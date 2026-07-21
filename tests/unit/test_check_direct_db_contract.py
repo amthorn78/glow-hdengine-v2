@@ -96,3 +96,36 @@ def test_ignored_build_residue_is_not_scanned(tmp_path):
     _minimal_tree(tmp_path)
     _write(tmp_path, "build/generated.py", "BridgeProvider DB_BRIDGE_URL\n")
     assert check.scan(tmp_path) == ()
+
+def test_refusal_roster_file_cannot_hide_retired_key_membership_consumption(tmp_path):
+    _minimal_tree(tmp_path)
+    adapter = tmp_path / "engine/db/adapter.py"
+    adapter.write_text(
+        adapter.read_text(encoding="utf-8")
+        + "\nimport os\n"
+        + "if 'DB_BRIDGE_URL' in os.environ:\n    raise RuntimeError('active')\n"
+        + "from os import environ\n"
+        + "if 'DB_FORCE_BRIDGE' not in environ:\n    raise RuntimeError('active')\n",
+        encoding="utf-8",
+    )
+    violations = check.scan(tmp_path)
+    membership_violations = [
+        row for row in violations if "active_retired_key_consumption" in row
+    ]
+    assert len(membership_violations) == 2
+
+
+def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "import os\n"
+        "if 'DB_ALLOW_BRIDGE_IN_PROD' in os.environ:\n"
+        "    raise RuntimeError('active')\n",
+    )
+    assert any(
+        "tools/evidence/run_sanity_pipeline.py:2:active_retired_key_consumption"
+        in row
+        for row in check.scan(tmp_path)
+    )
