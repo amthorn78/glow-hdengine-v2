@@ -129,3 +129,26 @@ def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
         in row
         for row in check.scan(tmp_path)
     )
+
+def test_historical_reader_mapping_get_is_not_environment_consumption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "rails = {'direct': {'DB_FORCE_BRIDGE': 'UNSET'}}\n"
+        "assert rails['direct'].get('DB_FORCE_BRIDGE') == 'UNSET'\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_http_session_use_of_retired_environ_subscript_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "from os import environ\n"
+        "session.get(environ['DB_BRIDGE_URL'])\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("active_retired_key_consumption" in row for row in violations)
+    assert any("retired_key_http_bridge_use" in row for row in violations)
