@@ -58,6 +58,8 @@ jobs:
       - run: python tools/evidence/refresh_step_logs_manifest.py --check
       - run: ci/checks/check_evidence_index_hash.sh
       - run: python ci/checks/check_direct_db_contract.py
+      - name: Run direct PostgreSQL contract suites
+        run: python -m pytest tests/db tests/unit/test_check_direct_db_contract.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
       - name: Run EPIC021 QA harness entrypoint self-test (closed rails)
@@ -228,3 +230,4 @@ jobs:
         run: python tools/evidence/regenerate_identity_closure.py
       - name: Run sanity pipeline
         run: python tools/evidence/run_sanity_pipeline.py
+
