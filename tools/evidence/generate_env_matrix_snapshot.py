@@ -22,7 +22,8 @@ DEFAULT_RAILS = {
 }
 DETERMINISM_PINS = {"LANG": "C", "LC_ALL": "C", "TZ": "UTC"}
 
-# This is a governed default-presence fixture, not a probe of operator secrets.
+# This pre-existing governed fixture retains bridge-era names as historical
+# absence labels only. They are fixed false and are never read as runtime inputs.
 PRESENCE = {
     "DATABASE_URL": False,
     "DB_BRIDGE_URL": False,
