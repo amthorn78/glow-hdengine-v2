@@ -56,7 +56,7 @@ RETIRED_KEYS = (
 )
 REFUSAL_CONTEXT_WORDS = ("retired", "refusal", "refuse", "absent", "deny", "deprecated", "historical", "nonclaim", "roster", "required_absent")
 ACTIVE_GUIDANCE_WORDS = ("set ", "export ", "configure", "use ", "run ", "fallback", "url", "endpoint", "http", "request")
-HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", ".post(", ".get(", "http://", "https://")
+HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/run_sanity_pipeline.py",
@@ -145,6 +145,54 @@ def _is_environ_mapping(node: ast.AST) -> bool:
     )
 
 
+def _dotted_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        prefix = _dotted_name(node.value)
+        return f"{prefix}.{node.attr}" if prefix else node.attr
+    return ""
+
+
+def _is_http_call(node: ast.Call) -> bool:
+    name = _dotted_name(node.func).lower()
+    if name in {
+        "requests.get",
+        "requests.post",
+        "requests.request",
+        "httpx.get",
+        "httpx.post",
+        "httpx.request",
+        "urllib.request.urlopen",
+        "urlopen",
+    }:
+        return True
+    if not isinstance(node.func, ast.Attribute) or node.func.attr.lower() not in {
+        "delete",
+        "get",
+        "head",
+        "patch",
+        "post",
+        "put",
+        "request",
+    }:
+        return False
+    owner = _dotted_name(node.func.value).lower()
+    return owner in {"client", "http", "http_client", "session"} or owner.startswith(
+        ("httpx.", "requests.")
+    )
+
+
+def _retired_environ_subscript(node: ast.Subscript) -> bool:
+    key = node.slice
+    return (
+        _is_environ_mapping(node.value)
+        and isinstance(key, ast.Constant)
+        and isinstance(key.value, str)
+        and key.value in RETIRED_KEYS
+    )
+
+
 def _retired_membership_compare(node: ast.Compare) -> bool:
     left = node.left
     for operator, right in zip(node.ops, node.comparators):
@@ -183,14 +231,27 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             if func_name in {"os.getenv", "getenv", "os.environ.get", "environ.get"} and any(arg in RETIRED_KEYS for arg in const_args):
                 lines.add(node.lineno)
             segment = ast.get_source_segment(text, node) or ""
-            if any(key in segment for key in RETIRED_KEYS) and any(marker in segment for marker in HTTP_MARKERS):
+            if any(key in segment for key in RETIRED_KEYS) and _is_http_call(node):
                 lines.add(node.lineno)
         if isinstance(node, ast.Compare) and _retired_membership_compare(node):
             lines.add(node.lineno)
-        if isinstance(node, ast.Subscript):
-            segment = ast.get_source_segment(text, node) or ""
-            if "os.environ" in segment and any(key in segment for key in RETIRED_KEYS):
-                lines.add(node.lineno)
+        if isinstance(node, ast.Subscript) and _retired_environ_subscript(node):
+            lines.add(node.lineno)
+    return tuple(sorted(lines))
+
+
+def _python_retired_http_use(text: str) -> tuple[int, ...]:
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    lines: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not _is_http_call(node):
+            continue
+        segment = ast.get_source_segment(text, node) or ""
+        if any(key in segment for key in RETIRED_KEYS):
+            lines.add(node.lineno)
     return tuple(sorted(lines))
 
 
@@ -199,6 +260,8 @@ def _retired_key_violations(relative: str, text: str) -> list[str]:
     if relative.endswith(".py"):
         for line_number in _python_retired_consumption(text):
             out.append(f"{relative}:{line_number}:active_retired_key_consumption")
+        for line_number in _python_retired_http_use(text):
+            out.append(f"{relative}:{line_number}:retired_key_http_bridge_use")
     for line_number, line in enumerate(text.splitlines(), 1):
         if not any(key in line for key in RETIRED_KEYS):
             continue
