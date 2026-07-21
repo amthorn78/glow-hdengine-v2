@@ -1,1 +1,36 @@
-{"":"https://json-schema.org/draft/2020-12/schema","additionalProperties":true,"properties":{"schema":{"type":"string"}},"required":["schema"],"type":"object"}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hde_epic038.ops03.validation_receipt.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "authorization_sha256", "validated_files", "predicates", "result"],
+  "allOf": [
+    {
+      "if": {"properties": {"result": {"const": "PASS"}}, "required": ["result"]},
+      "then": {
+        "properties": {
+          "predicates": {
+            "properties": {
+              "authorization_valid": {"const": true},
+              "source_identity_valid": {"const": true},
+              "schemas_valid": {"const": true},
+              "canonical_bytes_valid": {"const": true},
+              "inventory_valid": {"const": true},
+              "counts_valid": {"const": true},
+              "secret_scan_valid": {"const": true},
+              "nonclaims_valid": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema": {"const": "hde_epic038.ops03.validation_receipt.v1"},
+    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
+    "authorization_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "validated_files": {"type": "array", "prefixItems": [{"const": "commands.txt"}, {"const": "db_posture_summary.json"}, {"const": "env_presence.json"}, {"const": "exit_code.txt"}, {"const": "nonclaims.json"}, {"const": "result_summary.json"}, {"const": "stderr.log"}, {"const": "stdout.log"}], "items": false},
+    "predicates": {"type": "object", "additionalProperties": false, "required": ["authorization_valid", "source_identity_valid", "schemas_valid", "canonical_bytes_valid", "inventory_valid", "counts_valid", "secret_scan_valid", "nonclaims_valid"], "properties": {"authorization_valid": {"type": "boolean"}, "source_identity_valid": {"type": "boolean"}, "schemas_valid": {"type": "boolean"}, "canonical_bytes_valid": {"type": "boolean"}, "inventory_valid": {"type": "boolean"}, "counts_valid": {"type": "boolean"}, "secret_scan_valid": {"type": "boolean"}, "nonclaims_valid": {"type": "boolean"}}},
+    "result": {"enum": ["PASS", "FAIL"]}
+  }
+}
