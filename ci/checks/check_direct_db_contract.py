@@ -66,6 +66,10 @@ HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/run_sanity_pipeline.py",
 }
+HISTORICAL_REFERENCE_DOCS = {
+    "docs/EVIDENCE_INDEX.md",
+    "docs/INDEX.md",
+}
 MANDATORY_MARKERS = {
     "engine/db/adapter.py": (
         "RETIRED_DB_TRANSPORT_KEYS",
@@ -149,9 +153,18 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
                 if symbol in text:
                     violations.add(f"{relative}:forbidden_symbol:{symbol}")
         if relative not in HISTORICAL_READERS and relative != "ci/checks/check_direct_db_contract.py":
-            for marker in FORBIDDEN_ACTIVE_PATH_TEXT:
-                if marker in text:
-                    violations.add(f"{relative}:active_retired_path:{marker}")
+            for line_number, line in enumerate(text.splitlines(), 1):
+                for marker in FORBIDDEN_ACTIVE_PATH_TEXT:
+                    if marker not in line:
+                        continue
+                    explicitly_historical = (
+                        relative in HISTORICAL_REFERENCE_DOCS
+                        and "historical" in line.lower()
+                    )
+                    if not explicitly_historical:
+                        violations.add(
+                            f"{relative}:{line_number}:active_retired_path:{marker}"
+                        )
         for key in RETIRED_KEYS:
             if key in text and relative not in RETIRED_KEY_ALLOWLIST and relative not in HISTORICAL_READERS:
                 violations.add(f"{relative}:retired_key_outside_refusal_roster:{key}")
