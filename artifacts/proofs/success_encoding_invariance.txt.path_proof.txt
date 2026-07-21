@@ -1,5 +1,5 @@
 path: artifacts/proofs/success_encoding_invariance.txt
 size_bytes: 403
 sha256: 259f4b54d662155e6038d899c8800ed6b28efafa26defb0f91f2fddde89e60ed
-mtime_utc: 2026-07-21T01:48:08Z
-produced_at_utc: 2026-07-21T01:48:46Z
+mtime_utc: 2026-07-21T04:37:49Z
+produced_at_utc: 2026-07-21T04:38:24Z
