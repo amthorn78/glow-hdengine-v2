@@ -134,6 +134,32 @@ def _line_refusal_only(line: str) -> bool:
     )
 
 
+def _is_environ_mapping(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id == "environ"
+        or isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "os"
+        and node.attr == "environ"
+    )
+
+
+def _retired_membership_compare(node: ast.Compare) -> bool:
+    left = node.left
+    for operator, right in zip(node.ops, node.comparators):
+        if (
+            isinstance(operator, (ast.In, ast.NotIn))
+            and isinstance(left, ast.Constant)
+            and isinstance(left.value, str)
+            and left.value in RETIRED_KEYS
+            and _is_environ_mapping(right)
+        ):
+            return True
+        left = right
+    return False
+
+
 def _python_retired_consumption(text: str) -> tuple[int, ...]:
     try:
         tree = ast.parse(text)
@@ -159,6 +185,8 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             segment = ast.get_source_segment(text, node) or ""
             if any(key in segment for key in RETIRED_KEYS) and any(marker in segment for marker in HTTP_MARKERS):
                 lines.add(node.lineno)
+        if isinstance(node, ast.Compare) and _retired_membership_compare(node):
+            lines.add(node.lineno)
         if isinstance(node, ast.Subscript):
             segment = ast.get_source_segment(text, node) or ""
             if "os.environ" in segment and any(key in segment for key in RETIRED_KEYS):
@@ -224,7 +252,7 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
                         violations.add(
                             f"{relative}:{line_number}:active_retired_path:{marker}"
                         )
-        if relative not in HISTORICAL_READERS and relative != "ci/checks/check_direct_db_contract.py":
+        if relative != "ci/checks/check_direct_db_contract.py":
             violations.update(_retired_key_violations(relative, text))
 
     for relative, markers in MANDATORY_MARKERS.items():
