@@ -195,7 +195,89 @@ def _line_refusal_only(line: str) -> bool:
     )
 
 
-def _os_import_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
+def _is_os_module(node: ast.AST, os_names: set[str]) -> bool:
+    return isinstance(node, ast.Name) and node.id in os_names
+
+
+def _is_environ_mapping(
+    node: ast.AST, os_names: set[str], environ_names: set[str]
+) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id in environ_names
+        or isinstance(node, ast.Attribute)
+        and _is_os_module(node.value, os_names)
+        and node.attr == "environ"
+    )
+
+
+def _is_environ_source(
+    node: ast.AST, os_names: set[str], environ_names: set[str]
+) -> bool:
+    if _is_environ_mapping(node, os_names, environ_names):
+        return True
+    if not isinstance(node, ast.Call):
+        return False
+    func = node.func
+    if (
+        isinstance(func, ast.Attribute)
+        and func.attr == "copy"
+        and _is_environ_source(func.value, os_names, environ_names)
+    ):
+        return True
+    return (
+        isinstance(func, ast.Name)
+        and func.id == "dict"
+        and bool(node.args)
+        and _is_environ_source(node.args[0], os_names, environ_names)
+    )
+
+
+def _is_getenv_reader(
+    node: ast.AST, os_names: set[str], getenv_names: set[str]
+) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id in getenv_names
+        or isinstance(node, ast.Attribute)
+        and node.attr == "getenv"
+        and _is_os_module(node.value, os_names)
+    )
+
+
+def _target_bindings(
+    target: ast.AST, value: ast.AST
+) -> tuple[tuple[str, ast.AST], ...]:
+    if isinstance(target, ast.Name):
+        return ((target.id, value),)
+    if (
+        isinstance(target, (ast.List, ast.Tuple))
+        and isinstance(value, (ast.List, ast.Tuple))
+        and len(target.elts) == len(value.elts)
+    ):
+        return tuple(
+            binding
+            for item_target, item_value in zip(target.elts, value.elts)
+            for binding in _target_bindings(item_target, item_value)
+        )
+    return ()
+
+
+def _assignment_bindings(node: ast.AST) -> tuple[tuple[str, ast.AST], ...]:
+    if isinstance(node, ast.Assign):
+        return tuple(
+            binding
+            for target in node.targets
+            for binding in _target_bindings(target, node.value)
+        )
+    if isinstance(node, ast.AnnAssign) and node.value is not None:
+        return _target_bindings(node.target, node.value)
+    if isinstance(node, ast.NamedExpr):
+        return _target_bindings(node.target, node.value)
+    return ()
+
+
+def _os_symbol_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
     """Return local names bound to os, os.environ, and os.getenv."""
     os_names = {"os"}
     environ_names = {"environ"}
@@ -212,20 +294,19 @@ def _os_import_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
                     environ_names.add(local_name)
                 elif imported.name == "getenv":
                     getenv_names.add(local_name)
-    return os_names, environ_names, getenv_names
 
-
-def _is_environ_mapping(
-    node: ast.AST, os_names: set[str], environ_names: set[str]
-) -> bool:
-    return (
-        isinstance(node, ast.Name)
-        and node.id in environ_names
-        or isinstance(node, ast.Attribute)
-        and isinstance(node.value, ast.Name)
-        and node.value.id in os_names
-        and node.attr == "environ"
-    )
+    while True:
+        previous = (len(os_names), len(environ_names), len(getenv_names))
+        for node in ast.walk(tree):
+            for local_name, value in _assignment_bindings(node):
+                if _is_os_module(value, os_names):
+                    os_names.add(local_name)
+                elif _is_environ_source(value, os_names, environ_names):
+                    environ_names.add(local_name)
+                elif _is_getenv_reader(value, os_names, getenv_names):
+                    getenv_names.add(local_name)
+        if previous == (len(os_names), len(environ_names), len(getenv_names)):
+            return os_names, environ_names, getenv_names
 
 
 def _retired_env_call(
@@ -235,17 +316,10 @@ def _retired_env_call(
     getenv_names: set[str],
 ) -> bool:
     func = node.func
-    is_reader = (
-        isinstance(func, ast.Name)
-        and func.id in getenv_names
-        or isinstance(func, ast.Attribute)
-        and (
-            func.attr == "getenv"
-            and isinstance(func.value, ast.Name)
-            and func.value.id in os_names
-            or func.attr == "get"
-            and _is_environ_mapping(func.value, os_names, environ_names)
-        )
+    is_reader = _is_getenv_reader(func, os_names, getenv_names) or (
+        isinstance(func, ast.Attribute)
+        and func.attr == "get"
+        and _is_environ_source(func.value, os_names, environ_names)
     )
     values = [*node.args, *(keyword.value for keyword in node.keywords)]
     return is_reader and any(
@@ -299,7 +373,7 @@ def _retired_environ_subscript(
 ) -> bool:
     key = node.slice
     return (
-        _is_environ_mapping(node.value, os_names, environ_names)
+        _is_environ_source(node.value, os_names, environ_names)
         and isinstance(key, ast.Constant)
         and isinstance(key.value, str)
         and key.value in RETIRED_KEYS
@@ -316,7 +390,7 @@ def _retired_membership_compare(
             and isinstance(left, ast.Constant)
             and isinstance(left.value, str)
             and left.value in RETIRED_KEYS
-            and _is_environ_mapping(right, os_names, environ_names)
+            and _is_environ_source(right, os_names, environ_names)
         ):
             return True
         left = right
@@ -328,7 +402,7 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
         tree = ast.parse(text)
     except SyntaxError:
         return ()
-    os_names, environ_names, getenv_names = _os_import_aliases(tree)
+    os_names, environ_names, getenv_names = _os_symbol_aliases(tree)
     lines: set[int] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
