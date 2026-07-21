@@ -53,8 +53,11 @@ def db_rw_smoke(preference: str = "dsn") -> tuple[str, str]:
             except Exception:
                 cur.execute("SET search_path TO hde, public")
             cur.execute("INSERT INTO hde.public_results (id, release_id, payload) VALUES (gen_random_uuid(), 'qa_smoke', '{}'::jsonb) RETURNING id")
-            cur.fetchone()
-            cur.execute("DELETE FROM hde.public_results WHERE release_id=%s", ("qa_smoke",))
+            inserted = cur.fetchone()
+            if not inserted:
+                raise RuntimeError("smoke_insert_missing_id")
+            cur.execute("DELETE FROM hde.public_results WHERE id=%s", (inserted[0],))
             return "ok", "db_rw_smoke_ok"
     except Exception:
         return "error", "db_rw_smoke_failed"
+
