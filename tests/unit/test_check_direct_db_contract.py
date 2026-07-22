@@ -460,6 +460,42 @@ def test_alias_tracing_binds_comprehension_targets_before_reads(tmp_path):
     assert consumption_lines == {3, 4, 5}
 
 
+def test_module_constants_are_visible_to_earlier_function_bodies(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read():\n"
+        "    key = BRIDGE_KEY\n"
+        "    return os.getenv(key)\n"
+        "BRIDGE_KEY = 'DB_BRIDGE_URL'\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4}
+
+
+def test_function_local_constants_do_not_leak_across_scopes(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def define_local():\n"
+        "    local_key = 'DB_BRIDGE_URL'\n"
+        "def read_other_scope():\n"
+        "    return os.getenv(local_key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
