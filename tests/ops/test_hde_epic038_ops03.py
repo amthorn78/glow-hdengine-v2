@@ -2061,6 +2061,15 @@ def test_runtime_role_elevated_capability_cannot_pass(flag_index, authorization)
     assert failure["code"] == "posture_predicate_failed"
 
 
+def test_runtime_role_query_detects_sequence_write_privileges():
+    sql = runner.QUERY_STATEMENTS[4].sql
+    assert "seq.relkind = 'S'" in sql
+    assert "aclexplode(COALESCE(seq.relacl, acldefault('s', seq.relowner)))" in sql
+    assert "seq_acl.privilege_type <> 'SELECT'" in sql
+    assert "seq_acl.grantee = 0" in sql
+    assert "pg_has_role(current_user, seq_acl.grantee, 'USAGE')" in sql
+
+
 @pytest.mark.parametrize(
     "capability_index",
     range(2, 7),
