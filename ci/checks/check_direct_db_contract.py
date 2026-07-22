@@ -482,23 +482,13 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
     except SyntaxError:
         return ()
     os_names, environ_names, getenv_names = _os_symbol_aliases(tree)
-    aliases = _constant_string_bindings(tree)
     lines: set[int] = set()
-    tainted_names: set[str] = set()
-    for node in ast.walk(tree):
-        for local_name, value in _assignment_bindings(node):
-            if isinstance(value, ast.Call) and (
-                _retired_env_call(value, os_names, environ_names, getenv_names, aliases)
-                or _unresolved_env_call(value, os_names, environ_names, getenv_names, aliases)
-            ):
-                tainted_names.add(local_name)
-                lines.add(value.lineno)
-            if isinstance(value, ast.Subscript) and _retired_environ_subscript(
-                value, os_names, environ_names, aliases
-            ):
-                tainted_names.add(local_name)
-                lines.add(value.lineno)
-    for node in ast.walk(tree):
+
+    def check_node(
+        node: ast.AST,
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+    ) -> None:
         if isinstance(node, ast.Call):
             if _retired_env_call(node, os_names, environ_names, getenv_names, aliases):
                 lines.add(node.lineno)
@@ -518,6 +508,50 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             node, os_names, environ_names, aliases
         ):
             lines.add(node.lineno)
+
+    def scan_statements(
+        statements: list[ast.stmt],
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+    ) -> None:
+        for stmt in statements:
+            statement_aliases = dict(aliases)
+            statement_tainted = set(tainted_names)
+            for node in ast.walk(stmt):
+                check_node(node, statement_aliases, statement_tainted)
+                for local_name, value in _assignment_bindings(node):
+                    if isinstance(value, ast.Call) and (
+                        _retired_env_call(value, os_names, environ_names, getenv_names, statement_aliases)
+                        or _unresolved_env_call(value, os_names, environ_names, getenv_names, statement_aliases)
+                    ):
+                        statement_tainted.add(local_name)
+                    if isinstance(value, ast.Subscript) and _retired_environ_subscript(
+                        value, os_names, environ_names, statement_aliases
+                    ):
+                        statement_tainted.add(local_name)
+            for local_name, value in _assignment_bindings(stmt):
+                resolved = _resolve_string_values(value, aliases)
+                if resolved:
+                    aliases[local_name] = resolved
+                else:
+                    aliases.pop(local_name, None)
+                if local_name in statement_tainted:
+                    tainted_names.add(local_name)
+                else:
+                    tainted_names.discard(local_name)
+            for child in ast.iter_child_nodes(stmt):
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    scan_statements(child.body, dict(aliases), set(tainted_names))
+                elif isinstance(child, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+                    for attr in ("body", "orelse", "finalbody"):
+                        nested = getattr(child, attr, None)
+                        if nested:
+                            scan_statements(nested, dict(aliases), set(tainted_names))
+                    if isinstance(child, ast.Try):
+                        for handler in child.handlers:
+                            scan_statements(handler.body, dict(aliases), set(tainted_names))
+
+    scan_statements(tree.body, {}, set())
     return tuple(sorted(lines))
 
 

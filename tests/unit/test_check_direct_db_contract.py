@@ -231,6 +231,22 @@ def test_computed_retired_key_environment_to_http_flow_is_rejected(tmp_path):
     assert any("scripts/current.py:4:active_retired_key_consumption" in row for row in violations)
 
 
+def test_alias_tracing_uses_assignment_value_at_read_site(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "os.getenv(key)\n"
+        "key = 'SAFE_MODE'\n",
+    )
+    assert any(
+        "scripts/current.py:3:active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
 def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
     _minimal_tree(tmp_path)
     _write(

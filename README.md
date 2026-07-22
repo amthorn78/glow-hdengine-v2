@@ -28,7 +28,7 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - Narrative router evidence is keys-only and governed under `audit/gates/narratives/keys_10x4.table.json`, `artifacts/narratives/router/parity_abba.log`, and `artifacts/narratives/router/cli_http_parity.log` (indexed via `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`).
   - Narrative registry evidence is governed by `tools/evidence/generate_narrative_registry_diff.py` with outputs at `audit/gates/narratives/registry.diff.json` and `audit/gates/narratives/pack_identity.txt`, plus Doc-Delta evidence at `audit/docdeltas/hde-epic032_doc_deltas.md`.
   - Current DB runtime selection is direct-only through `DATABASE_URL` and `psycopg`; bridge-era evidence remains historical and is not current runtime guidance.
-  - Bridge-era labels `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, `DB_BRIDGE_FALLBACK_OK`, and `DEV_DB_BRIDGE_FALLBACK_OK` remain historical/proof-label references only in current repo posture; they are not current claimable runtime guidance.
+  - Bridge-era proof labels `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` remain historical/proof-label references only in current repo posture; `DEV_DB_BRIDGE_FALLBACK_OK` remains the scoped acceptance token when the scope is dev bridge fallback, not current runtime guidance.
   - Scope boundaries remain explicit: no public Reader route/flag/payload-field change, no narrative prose-generation contract, and no HDAPI v2 conformance claim introduced by EPIC032 docs.
 
 - What HDE-EPIC036 adds for Fermentation Pass 7:
