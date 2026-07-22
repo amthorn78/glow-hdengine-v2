@@ -145,6 +145,17 @@ QUERY_STATEMENTS = (
         "AND priv.privilege_type <> 'SELECT' "
         "AND (priv.grantee = 'PUBLIC' OR (grantee.oid IS NOT NULL "
         "AND pg_has_role(current_user, grantee.oid, 'USAGE')))) "
+        # PostgreSQL omits its nonstandard sequence UPDATE grant from
+        # information_schema.usage_privileges, so inspect the effective ACL and
+        # treat every sequence privilege except SELECT as write-capable.
+        "OR EXISTS (SELECT 1 FROM pg_class seq "
+        "JOIN pg_namespace nsp ON nsp.oid = seq.relnamespace "
+        "CROSS JOIN LATERAL aclexplode(COALESCE(seq.relacl, "
+        "acldefault('s', seq.relowner))) seq_acl "
+        "WHERE nsp.nspname IN ('hde', 'public') AND seq.relkind = 'S' "
+        "AND seq_acl.privilege_type <> 'SELECT' "
+        "AND (seq_acl.grantee = 0 OR "
+        "pg_has_role(current_user, seq_acl.grantee, 'USAGE'))) "
         "OR EXISTS (SELECT 1 FROM pg_class cls "
         "JOIN pg_namespace nsp ON nsp.oid = cls.relnamespace "
         "WHERE nsp.nspname IN ('hde', 'public') "
