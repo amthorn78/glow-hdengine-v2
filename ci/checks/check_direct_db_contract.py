@@ -532,6 +532,26 @@ def _function_parameter_names(
     return names
 
 
+def _function_default_bindings(
+    node: ast.FunctionDef | ast.AsyncFunctionDef,
+) -> tuple[tuple[str, ast.AST], ...]:
+    arguments = node.args
+    positional = [*arguments.posonlyargs, *arguments.args]
+    positional_bindings = tuple(
+        (parameter.arg, default)
+        for parameter, default in zip(
+            positional[-len(arguments.defaults) :] if arguments.defaults else (),
+            arguments.defaults,
+        )
+    )
+    keyword_bindings = tuple(
+        (parameter.arg, default)
+        for parameter, default in zip(arguments.kwonlyargs, arguments.kw_defaults)
+        if default is not None
+    )
+    return (*positional_bindings, *keyword_bindings)
+
+
 def _python_retired_consumption(text: str) -> tuple[int, ...]:
     try:
         tree = ast.parse(text)
@@ -668,6 +688,12 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 for parameter_name in _function_parameter_names(stmt):
                     function_aliases.pop(parameter_name, None)
                     function_tainted.discard(parameter_name)
+                for parameter_name, default in _function_default_bindings(stmt):
+                    resolved = _resolve_string_values(default, aliases)
+                    if resolved:
+                        function_aliases[parameter_name] = resolved
+                    if assignment_value_is_tainted(default, aliases, tainted_names):
+                        function_tainted.add(parameter_name)
                 scan_statements(stmt.body, function_aliases, function_tainted)
             elif isinstance(stmt, ast.ClassDef):
                 scan_statements(stmt.body, dict(aliases), set(tainted_names))
