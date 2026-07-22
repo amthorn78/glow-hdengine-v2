@@ -493,6 +493,23 @@ def _loop_target_alias_bindings(
             return _loop_target_alias_bindings(
                 target.elts[1], iterable.args[0], aliases
             )
+        if (
+            iterable.func.id == "zip"
+            and isinstance(target, (ast.List, ast.Tuple))
+            and len(target.elts) == len(iterable.args)
+        ):
+            merged: dict[str, tuple[str, ...]] = {}
+            for item_target, item_iterable in zip(target.elts, iterable.args):
+                bindings = _loop_target_alias_bindings(
+                    item_target, item_iterable, aliases
+                )
+                for name, values in bindings.items():
+                    combined = list(merged.get(name, ()))
+                    for value in values:
+                        if value not in combined:
+                            combined.append(value)
+                    merged[name] = tuple(combined)
+            return merged
     if isinstance(target, ast.Name):
         resolved = _resolve_string_values(iterable, aliases)
         return {target.id: resolved} if resolved else {}
