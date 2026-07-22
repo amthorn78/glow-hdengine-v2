@@ -492,6 +492,21 @@ def _retired_membership_compare(
     return False
 
 
+def _statement_scope_nodes(stmt: ast.stmt) -> tuple[ast.AST, ...]:
+    """Walk one statement without descending into nested statement bodies."""
+    nodes: list[ast.AST] = []
+
+    def collect(node: ast.AST) -> None:
+        nodes.append(node)
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.stmt):
+                continue
+            collect(child)
+
+    collect(stmt)
+    return tuple(nodes)
+
+
 def _python_retired_consumption(text: str) -> tuple[int, ...]:
     try:
         tree = ast.parse(text)
@@ -534,7 +549,7 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
         for stmt in statements:
             statement_aliases = dict(aliases)
             statement_tainted = set(tainted_names)
-            for node in ast.walk(stmt):
+            for node in _statement_scope_nodes(stmt):
                 check_node(node, statement_aliases, statement_tainted)
                 for local_name, value in _assignment_bindings(node):
                     if isinstance(value, ast.Call) and (
