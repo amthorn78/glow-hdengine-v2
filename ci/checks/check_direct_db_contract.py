@@ -54,6 +54,7 @@ RETIRED_KEYS = (
     "DB_BRIDGE_URL",
     "DB_FORCE_BRIDGE",
 )
+_CANONICAL_ADAPTER_MODULE_ALIAS = ("__canonical_engine_db_adapter_module__",)
 REFUSAL_CONTEXT_WORDS = (
     "retired",
     "refusal",
@@ -304,6 +305,26 @@ def _retired_roster_import_names(node: ast.AST) -> tuple[str, ...]:
     )
 
 
+def _canonical_adapter_import_names(node: ast.AST) -> tuple[str, ...]:
+    if isinstance(node, ast.Import):
+        return tuple(
+            imported.asname
+            for imported in node.names
+            if imported.name == "engine.db.adapter" and imported.asname is not None
+        )
+    if not (
+        isinstance(node, ast.ImportFrom)
+        and node.level == 0
+        and node.module == "engine.db"
+    ):
+        return ()
+    return tuple(
+        imported.asname or imported.name
+        for imported in node.names
+        if imported.name == "adapter"
+    )
+
+
 def _constant_string_bindings(tree: ast.Module) -> dict[str, tuple[str, ...]]:
     """Return module-scope string aliases without leaking nested local bindings."""
     aliases: dict[str, tuple[str, ...]] = {
@@ -311,6 +332,13 @@ def _constant_string_bindings(tree: ast.Module) -> dict[str, tuple[str, ...]]:
         for node in tree.body
         for name in _retired_roster_import_names(node)
     }
+    aliases.update(
+        {
+            name: _CANONICAL_ADAPTER_MODULE_ALIAS
+            for node in tree.body
+            for name in _canonical_adapter_import_names(node)
+        }
+    )
     while True:
         previous = dict(aliases)
         for node in tree.body:
@@ -332,6 +360,11 @@ def _resolve_string_values(
         return _resolve_string_values(node.value, aliases)
     if isinstance(node, ast.Name):
         return aliases.get(node.id)
+    if isinstance(node, ast.Attribute) and node.attr == "RETIRED_DB_TRANSPORT_KEYS":
+        if _dotted_name(node.value) == "engine.db.adapter":
+            return RETIRED_KEYS
+        if _resolve_string_values(node.value, aliases) == _CANONICAL_ADAPTER_MODULE_ALIAS:
+            return RETIRED_KEYS
     if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
         source = _resolve_string_values(node.value, aliases)
         if source is None:
@@ -861,6 +894,9 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     tainted_names.discard(local_name)
             for local_name in _retired_roster_import_names(stmt):
                 aliases[local_name] = RETIRED_KEYS
+                tainted_names.discard(local_name)
+            for local_name in _canonical_adapter_import_names(stmt):
+                aliases[local_name] = _CANONICAL_ADAPTER_MODULE_ALIAS
                 tainted_names.discard(local_name)
             if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 function_aliases = dict(aliases)
