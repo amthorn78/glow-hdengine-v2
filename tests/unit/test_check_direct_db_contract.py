@@ -311,6 +311,26 @@ def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
         for row in check.scan(tmp_path)
     )
 
+
+def test_unresolved_environment_subscript_fails_closed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read(bridge_key):\n"
+        "    return os.environ[bridge_key]\n"
+        "def safe(safe_key):\n"
+        "    return os.environ[safe_key]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3}
+
+
 def test_active_guidance_cannot_hide_behind_retired_context(tmp_path):
     _minimal_tree(tmp_path)
     _write(
