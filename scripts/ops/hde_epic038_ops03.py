@@ -195,13 +195,13 @@ def _read_canonical_json(path: Path) -> tuple[Mapping[str, Any], bytes]:
     return value, raw
 
 
-def _read_json_noncanonical(path: Path) -> tuple[Any | None, bool]:
+def _read_json_noncanonical(path: Path) -> tuple[Any | None, bool, bytes]:
     try:
         raw = path.read_bytes()
         value = json.loads(raw.decode("utf-8", "strict"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-        return None, False
-    return value, raw == canonical_bytes(value)
+        return None, False, b""
+    return value, raw == canonical_bytes(value), raw
 
 
 def _authorization_is_stable(path: Path, expected: bytes) -> bool:
@@ -847,8 +847,10 @@ def capture(
         return 0
     except Ops03Error as exc:
         if auth is None:
-            parsed, _canonical = _read_json_noncanonical(auth_path)
+            parsed, _canonical, recovered_bytes = _read_json_noncanonical(auth_path)
             auth = parsed if isinstance(parsed, Mapping) else None
+            if recovered_bytes:
+                authorization_bytes = recovered_bytes
         if auth is not None:
             if consumed:
                 _discard_candidate(auth)

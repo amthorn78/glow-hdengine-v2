@@ -466,7 +466,8 @@ def test_source_identity_rejects_preimport_dirty_or_shadow_code(monkeypatch, aut
 
 def test_parseable_noncanonical_authorization_emits_pre_marker_receipt(authorization):
     auth_path, auth, base, candidate = authorization
-    auth_path.write_text(json.dumps(auth, indent=2) + "\n", encoding="utf-8")
+    noncanonical = (json.dumps(auth, indent=2) + "\n").encode("utf-8")
+    auth_path.write_bytes(noncanonical)
     calls = []
 
     def builder(_counters):
@@ -480,6 +481,7 @@ def test_parseable_noncanonical_authorization_emits_pre_marker_receipt(authoriza
     assert failure["code"] == "authorization_not_canonical"
     assert failure["phase"] == "pre_marker"
     assert failure["launch_consumed"] is False
+    assert failure["authorization_sha256"] == runner.sha256_bytes(noncanonical)
 
 
 def test_partial_marker_record_failure_is_consumed(monkeypatch, authorization):
