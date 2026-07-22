@@ -350,6 +350,20 @@ def _constant_string_bindings(tree: ast.Module) -> dict[str, tuple[str, ...]]:
             return aliases
 
 
+def _constant_int(node: ast.AST) -> int | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, int):
+        return node.value
+    if (
+        isinstance(node, ast.UnaryOp)
+        and isinstance(node.op, (ast.UAdd, ast.USub))
+        and isinstance(node.operand, ast.Constant)
+        and isinstance(node.operand.value, int)
+    ):
+        value = node.operand.value
+        return value if isinstance(node.op, ast.UAdd) else -value
+    return None
+
+
 def _resolve_string_values(
     node: ast.AST, aliases: dict[str, tuple[str, ...]]
 ) -> tuple[str, ...] | None:
@@ -395,13 +409,27 @@ def _resolve_string_values(
         and len(node.args) == 1
     ):
         return _resolve_string_values(node.args[0], aliases)
-    if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
+    if isinstance(node, ast.Subscript):
         source = _resolve_string_values(node.value, aliases)
         if source is None:
             return None
-        index = node.slice.value
-        if isinstance(index, int) and -len(source) <= index < len(source):
+        index = _constant_int(node.slice)
+        if index is not None and -len(source) <= index < len(source):
             return (source[index],)
+        if isinstance(node.slice, ast.Slice):
+            bounds: list[int | None] = []
+            for bound in (node.slice.lower, node.slice.upper, node.slice.step):
+                if bound is None:
+                    bounds.append(None)
+                    continue
+                resolved_bound = _constant_int(bound)
+                if resolved_bound is None:
+                    return tuple(value for value in source if value in RETIRED_KEYS) or None
+                bounds.append(resolved_bound)
+            try:
+                return source[slice(*bounds)]
+            except ValueError:
+                return tuple(value for value in source if value in RETIRED_KEYS) or None
         return tuple(value for value in source if value in RETIRED_KEYS) or None
     return None
 
