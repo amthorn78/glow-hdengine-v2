@@ -290,9 +290,27 @@ def _literal_string_tuple(node: ast.AST) -> tuple[str, ...] | None:
     return None
 
 
+def _retired_roster_import_names(node: ast.AST) -> tuple[str, ...]:
+    if not (
+        isinstance(node, ast.ImportFrom)
+        and node.level == 0
+        and node.module == "engine.db.adapter"
+    ):
+        return ()
+    return tuple(
+        imported.asname or imported.name
+        for imported in node.names
+        if imported.name == "RETIRED_DB_TRANSPORT_KEYS"
+    )
+
+
 def _constant_string_bindings(tree: ast.Module) -> dict[str, tuple[str, ...]]:
     """Return module-scope string aliases without leaking nested local bindings."""
-    aliases: dict[str, tuple[str, ...]] = {}
+    aliases: dict[str, tuple[str, ...]] = {
+        name: RETIRED_KEYS
+        for node in tree.body
+        for name in _retired_roster_import_names(node)
+    }
     while True:
         previous = dict(aliases)
         for node in tree.body:
@@ -565,10 +583,7 @@ def _statement_scope_nodes(stmt: ast.stmt) -> tuple[ast.AST, ...]:
     return tuple(nodes)
 
 
-def _function_parameter_names(
-    node: ast.FunctionDef | ast.AsyncFunctionDef,
-) -> set[str]:
-    arguments = node.args
+def _parameter_names(arguments: ast.arguments) -> set[str]:
     names = {
         argument.arg
         for argument in [
@@ -584,10 +599,9 @@ def _function_parameter_names(
     return names
 
 
-def _function_default_bindings(
-    node: ast.FunctionDef | ast.AsyncFunctionDef,
+def _default_bindings(
+    arguments: ast.arguments,
 ) -> tuple[tuple[str, ast.AST], ...]:
-    arguments = node.args
     positional = [*arguments.posonlyargs, *arguments.args]
     positional_bindings = tuple(
         (parameter.arg, default)
@@ -707,6 +721,27 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             tuple[str, tuple[str, ...] | None, bool]
         ],
     ) -> None:
+        if isinstance(node, ast.Lambda):
+            for _, default in _default_bindings(node.args):
+                scan_expression(
+                    default, aliases, tainted_names, named_expression_updates
+                )
+            lambda_aliases = dict(aliases)
+            lambda_tainted = set(tainted_names)
+            for parameter_name in _parameter_names(node.args):
+                lambda_aliases.pop(parameter_name, None)
+                lambda_tainted.discard(parameter_name)
+            for parameter_name, default in _default_bindings(node.args):
+                resolved = _resolve_string_values(default, aliases)
+                if resolved:
+                    lambda_aliases[parameter_name] = resolved
+                if assignment_value_is_tainted(default, aliases, tainted_names):
+                    lambda_tainted.add(parameter_name)
+            scan_expression(
+                node.body, lambda_aliases, lambda_tainted, []
+            )
+            return
+
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
             comprehension_aliases = dict(aliases)
             comprehension_tainted = set(tainted_names)
@@ -824,13 +859,16 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     tainted_names.add(local_name)
                 else:
                     tainted_names.discard(local_name)
+            for local_name in _retired_roster_import_names(stmt):
+                aliases[local_name] = RETIRED_KEYS
+                tainted_names.discard(local_name)
             if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 function_aliases = dict(aliases)
                 function_tainted = set(tainted_names)
-                for parameter_name in _function_parameter_names(stmt):
+                for parameter_name in _parameter_names(stmt.args):
                     function_aliases.pop(parameter_name, None)
                     function_tainted.discard(parameter_name)
-                for parameter_name, default in _function_default_bindings(stmt):
+                for parameter_name, default in _default_bindings(stmt.args):
                     resolved = _resolve_string_values(default, aliases)
                     if resolved:
                         function_aliases[parameter_name] = resolved
@@ -878,6 +916,12 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 replace_state(aliases, tainted_names, merge_states(exit_states))
             elif isinstance(stmt, (ast.With, ast.AsyncWith)):
                 body_aliases, body_tainted = dict(aliases), set(tainted_names)
+                for item in stmt.items:
+                    if item.optional_vars is None:
+                        continue
+                    for target_name in _target_names(item.optional_vars):
+                        body_aliases.pop(target_name, None)
+                        body_tainted.discard(target_name)
                 scan_statements(stmt.body, body_aliases, body_tainted)
                 replace_state(aliases, tainted_names, (body_aliases, body_tainted))
             elif isinstance(stmt, ast.Try):
@@ -890,6 +934,9 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 for handler in stmt.handlers:
                     handler_aliases = dict(entry_aliases)
                     handler_tainted = set(entry_tainted)
+                    if handler.name is not None:
+                        handler_aliases.pop(handler.name, None)
+                        handler_tainted.discard(handler.name)
                     scan_statements(handler.body, handler_aliases, handler_tainted)
                     exit_states.append((handler_aliases, handler_tainted))
                 merged = merge_states(exit_states)
