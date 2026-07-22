@@ -271,6 +271,44 @@ def test_alias_tracing_scans_function_and_control_flow_bodies(tmp_path):
     )
 
 
+def test_compound_body_scans_apply_inner_aliases_before_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def f():\n"
+        "    key = 'SAFE_MODE'\n"
+        "    os.getenv(key)\n"
+        "if True:\n"
+        "    key = 'SAFE_MODE'\n"
+        "    os.environ.get(key)\n"
+        "for key in ('SAFE_MODE',):\n"
+        "    os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_compound_statement_headers_remain_scanned(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "if os.getenv('DB_BRIDGE_URL'):\n"
+        "    pass\n"
+        "for value in (os.environ['DB_FORCE_BRIDGE'],):\n"
+        "    pass\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {2, 4}
+
+
 def test_alias_tracing_binds_loop_targets_before_body_scan(tmp_path):
     _minimal_tree(tmp_path)
     _write(
