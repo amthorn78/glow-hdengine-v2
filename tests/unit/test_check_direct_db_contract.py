@@ -394,6 +394,28 @@ def test_alias_tracing_binds_loop_targets_before_body_scan(tmp_path):
     assert consumption_lines == {4, 8}
 
 
+def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "if (key := 'DB_BRIDGE_URL'):\n"
+        "    os.getenv(key)\n"
+        "os.getenv(other := 'DB_FORCE_BRIDGE')\n"
+        "os.environ[third := 'DB_ALLOW_BRIDGE_IN_PROD']\n"
+        "(later := 'DB_BRIDGE_URL')\n"
+        "os.getenv(later)\n"
+        "os.getenv(safe := 'SAFE_MODE')\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 4, 5, 7}
+
+
 def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
     _minimal_tree(tmp_path)
     _write(
