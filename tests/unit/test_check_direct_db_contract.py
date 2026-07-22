@@ -496,6 +496,81 @@ def test_function_local_constants_do_not_leak_across_scopes(tmp_path):
     )
 
 
+def test_lambda_parameters_shadow_outer_aliases_and_bind_defaults(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "safe = lambda key: os.getenv(key)\n"
+        "captured = lambda key=key: os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4}
+
+
+def test_with_and_exception_targets_shadow_outer_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "with manager() as key:\n"
+        "    os.getenv(key)\n"
+        "try:\n"
+        "    pass\n"
+        "except Exception as key:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_canonical_retired_roster_imports_bind_loop_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS\n"
+        "for key in RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n"
+        "def nested():\n"
+        "    from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "    return [os.environ.get(key) for key in roster]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 7}
+
+
+def test_unrelated_same_named_import_is_not_the_canonical_roster(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from unrelated import RETIRED_DB_TRANSPORT_KEYS\n"
+        "for key in RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
