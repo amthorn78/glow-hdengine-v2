@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import datetime as dt
 import json
+import os
 import shutil
 import sys
 import uuid
@@ -417,3 +418,161 @@ def test_pr_a_nonfinal_missing_ops03_pr_b_binding_keeps_finalization_before_nonf
     assert steps[-1].name == "18 PR-A nonfinal gate"
     assert steps[-1].commands == (("__pr_a_nonfinal__",),)
     assert sanity.PR_A_NONFINAL_REASON == "pr_a_nonfinal_ops03_pr_b_binding_required"
+
+
+def test_source_identity_rejects_ignored_native_import_modules(monkeypatch, authorization):
+    _auth_path, auth, _base, _candidate = authorization
+
+    def fake_git(args):
+        class Completed:
+            returncode = 0
+            stdout = ""
+        result = Completed()
+        if args[:4] == ("ls-files", "--others", "--ignored", "--exclude-standard"):
+            result.stdout = "engine/shadow/native.so\n"
+        elif args[:2] == ("rev-parse", "HEAD"):
+            result.stdout = auth["source_commit"] + "\n"
+        return result
+
+    monkeypatch.setattr(runner, "_git", fake_git)
+    monkeypatch.setattr(validator, "_git", fake_git)
+    monkeypatch.setattr(Path, "rglob", lambda self, pattern: iter(()))
+    with pytest.raises(runner.Ops03Error) as exc:
+        runner.validate_source_identity(auth, enforce_repo=True)
+    assert exc.value.code == "ignored_native_module_present"
+    assert "ignored_native_module_present" in validator.source_identity_errors(auth, enforce_repo=True)
+
+
+def test_source_identity_rejects_preimport_dirty_or_shadow_code(monkeypatch, authorization):
+    _auth_path, auth, _base, _candidate = authorization
+
+    def fake_git(args):
+        class Completed:
+            returncode = 0
+            stdout = ""
+        result = Completed()
+        if args[:2] == ("rev-parse", "HEAD"):
+            result.stdout = auth["source_commit"] + "\n"
+        elif args[:1] == ("status",):
+            result.stdout = "?? engine/db/adapter.py\n"
+        return result
+
+    monkeypatch.setattr(runner, "_git", fake_git)
+    monkeypatch.setattr(Path, "rglob", lambda self, pattern: iter(()))
+    with pytest.raises(runner.Ops03Error) as exc:
+        runner.validate_source_identity(auth, enforce_repo=True)
+    assert exc.value.code == "source_tree_not_pristine"
+
+
+def test_parseable_noncanonical_authorization_emits_pre_marker_receipt(authorization):
+    auth_path, auth, base, candidate = authorization
+    auth_path.write_text(json.dumps(auth, indent=2) + "\n", encoding="utf-8")
+    calls = []
+
+    def builder(_counters):
+        return lambda dsn: calls.append(dsn) or FixtureProvider()
+
+    assert _capture(authorization, builder=builder) == 1
+    assert calls == []
+    assert not (base / "control/launch.marker").exists()
+    assert not candidate.exists()
+    failure = json.loads((base / "failure/failure_receipt.json").read_text(encoding="utf-8"))
+    assert failure["code"] == "authorization_not_canonical"
+    assert failure["phase"] == "pre_marker"
+    assert failure["launch_consumed"] is False
+
+
+def test_partial_marker_record_failure_is_consumed(monkeypatch, authorization):
+    _auth_path, _auth, base, candidate = authorization
+    original = runner.Path.write_bytes
+
+    def flaky_write(path, payload):
+        if path.name == "authorization_consumed.json":
+            raise OSError("fixture record failure")
+        return original(path, payload)
+
+    monkeypatch.setattr(runner.Path, "write_bytes", flaky_write)
+    assert _capture(authorization) == 1
+    assert (base / "control/launch.marker").read_bytes() == b"launch_consumed=true\n"
+    assert not candidate.exists()
+    failure = json.loads((base / "failure/failure_receipt.json").read_text(encoding="utf-8"))
+    assert failure["code"] == "authorization_consumption_record_write_failed"
+    assert failure["launch_consumed"] is True
+
+
+def test_run_root_symlink_rejected_before_marker(authorization, tmp_path):
+    _auth_path, _auth, base, candidate = authorization
+    target = tmp_path / "outside"
+    target.mkdir()
+    base.symlink_to(target, target_is_directory=True)
+    assert _capture(authorization) == 1
+    assert not candidate.exists()
+    assert not (base / "control/launch.marker").exists()
+
+
+def test_stale_failure_receipt_makes_final_validation_authoritative(authorization):
+    auth_path, auth, base, candidate = authorization
+    assert _capture(authorization) == 0
+    failure_dir = base / "failure"
+    failure_dir.mkdir()
+    runner.write_failure(auth, runner.sha256_path(auth_path), phase="capture", code="unexpected_failure", consumed=True)
+    receipt = validator.validate_packet(auth_path, candidate, final=False, enforce_source=False, now=NOW)
+    assert receipt["result"] == "FAIL"
+    assert receipt["predicates"]["authorization_valid"] is False
+
+
+def test_preexisting_and_unwritable_roots_are_contained(authorization, monkeypatch):
+    _auth_path, _auth, base, candidate = authorization
+    base.mkdir(parents=True)
+    assert _capture(authorization) == 1
+    assert not candidate.exists()
+    failure = json.loads((base / "failure/failure_receipt.json").read_text(encoding="utf-8"))
+    assert failure["code"] == "authorization_already_consumed"
+
+    shutil.rmtree(base)
+    real_mkdir = runner.Path.mkdir
+
+    def deny_mkdir(path, *args, **kwargs):
+        if path == base:
+            raise PermissionError("fixture denied")
+        return real_mkdir(path, *args, **kwargs)
+
+    monkeypatch.setattr(runner.Path, "mkdir", deny_mkdir)
+    assert _capture(authorization) == 1
+
+
+def test_late_failure_cleanup_failure_blocks_readmission(monkeypatch, authorization):
+    auth_path, _auth, base, candidate = authorization
+    with monkeypatch.context() as mp:
+        mp.setattr(runner.shutil, "rmtree", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("cleanup denied")))
+        assert _capture(authorization, builder=_provider_builder(fail_posture=True)) == 1
+    assert candidate.exists()
+    failure = json.loads((base / "failure/failure_receipt.json").read_text(encoding="utf-8"))
+    assert failure["launch_consumed"] is True
+    receipt = validator.validate_packet(auth_path, candidate, final=False, enforce_source=False, now=NOW)
+    assert receipt["result"] == "FAIL"
+
+
+def test_provider_child_has_separate_pid_and_clean_dsn_environment(authorization, tmp_path):
+    probe = tmp_path / "provider_probe.json"
+
+    def builder(counters):
+        def factory(dsn):
+            probe.write_bytes(runner.canonical_bytes({
+                "parent_pid": os.getppid(),
+                "child_pid": os.getpid(),
+                "dsn": dsn,
+                "python_keys": sorted(k for k in os.environ if k.startswith("PYTHON")),
+                "env": dict(os.environ),
+            }))
+            counters.provider_selections += 1
+            return runner.CountingProvider(FixtureProvider(), counters, count_connections_by_call=True)
+
+        return factory
+
+    assert _capture(authorization, builder=builder) == 0
+    seen = json.loads(probe.read_text(encoding="utf-8"))
+    assert seen["child_pid"] != os.getpid()
+    assert seen["dsn"] == CLEAN_ENV["DATABASE_URL"]
+    assert seen["python_keys"] == []
+    assert seen["env"] == CLEAN_ENV

@@ -12,13 +12,9 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from jsonschema import Draft202012Validator, FormatChecker
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-from tools.evidence.retained_evidence_safety import validate_retained_text_safety
 
 RUNNER = (ROOT / "scripts/ops/hde_epic038_ops03.py").resolve()
 VALIDATOR = Path(__file__).resolve()
@@ -158,6 +154,8 @@ def _schema(name: str) -> Mapping[str, Any]:
 
 def _schema_valid(value: Any, name: str) -> bool:
     try:
+        from jsonschema import Draft202012Validator, FormatChecker
+
         validator = Draft202012Validator(_schema(name), format_checker=FormatChecker())
         return next(validator.iter_errors(value), None) is None
     except (OSError, ValueError, json.JSONDecodeError):
@@ -283,6 +281,9 @@ def source_identity_errors(auth: Mapping[str, Any], *, enforce_repo: bool = True
         errors.add("source_manifest_mismatch")
     if any(ROOT.rglob("*.pyc")) or any(path.is_dir() for path in ROOT.rglob("__pycache__")):
         errors.add("bytecode_residue_present")
+    ignored_native = _git(("ls-files", "--others", "--ignored", "--exclude-standard", "--", "*.so", "*.pyd"))
+    if ignored_native.returncode or ignored_native.stdout:
+        errors.add("ignored_native_module_present")
     return tuple(sorted(errors))
 
 
@@ -385,6 +386,8 @@ def _secret_scan_valid(candidate: Path, names: Sequence[str]) -> bool:
             payload = path.read_bytes()
         except OSError:
             return False
+        from tools.evidence.retained_evidence_safety import validate_retained_text_safety
+
         if validate_retained_text_safety(path, payload):
             return False
     return True
@@ -436,6 +439,12 @@ def validate_packet(
             candidate_matches = False
         if not candidate_matches:
             auth_errors = ("candidate_path_mismatch",)
+    failure_state_present = False
+    if not auth_errors:
+        _, _, _authorized_candidate, failure = derived_paths(str(auth["run_id"]))
+        failure_state_present = (failure / "failure_receipt.json").exists()
+        if failure_state_present:
+            auth_errors = ("failure_state_present",)
     if not auth_errors and not _invocation_valid(auth, actual_argv, mode):
         auth_errors = ("validator_invocation_mismatch",)
     source_errors = source_identity_errors(auth, enforce_repo=enforce_source) if not auth_errors else ("source_not_checked",)

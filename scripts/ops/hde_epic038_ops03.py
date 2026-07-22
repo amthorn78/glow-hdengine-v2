@@ -15,19 +15,22 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
-from jsonschema import Draft202012Validator, FormatChecker
-
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.db.adapter import DBAccess, RETIRED_DB_TRANSPORT_KEYS, Statement
-from engine.db.ddl_identity_projection import (
-    DDL_IDENTITY_PROJECTION_SCHEMA,
-    project_ddl_identity,
+RETIRED_DB_TRANSPORT_KEYS = (
+    "DB_ALLOW_BRIDGE_IN_PROD",
+    "DB_BRIDGE_URL",
+    "DB_FORCE_BRIDGE",
 )
-from engine.db.providers.psycopg_provider import PsycopgProvider, validate_readonly_statements
-from tools.evidence.retained_evidence_safety import validate_retained_text_safety
+
+
+@dataclass(frozen=True)
+class Statement:
+    sql: str
+    fetch: bool = False
+
 
 RUNNER = Path(__file__).resolve()
 VALIDATOR = (ROOT / "tools/evidence/hde_epic038_ops03.py").resolve()
@@ -192,6 +195,15 @@ def _read_canonical_json(path: Path) -> tuple[Mapping[str, Any], bytes]:
     return value, raw
 
 
+def _read_json_noncanonical(path: Path) -> tuple[Any | None, bool]:
+    try:
+        raw = path.read_bytes()
+        value = json.loads(raw.decode("utf-8", "strict"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None, False
+    return value, raw == canonical_bytes(value)
+
+
 def _authorization_is_stable(path: Path, expected: bytes) -> bool:
     try:
         return path.read_bytes() == expected
@@ -244,6 +256,8 @@ def validate_authorization(
     *,
     now: dt.datetime | None = None,
 ) -> None:
+    from jsonschema import Draft202012Validator, FormatChecker
+
     validator = Draft202012Validator(_schema(AUTH_SCHEMA), format_checker=FormatChecker())
     if next(validator.iter_errors(auth), None) is not None:
         raise Ops03Error("pre_marker", "authorization_schema_invalid", consumed=False)
@@ -305,7 +319,51 @@ def validate_source_identity(auth: Mapping[str, Any], *, enforce_repo: bool = Tr
         raise Ops03Error("pre_marker", "source_manifest_mismatch", consumed=False)
     if any(ROOT.rglob("*.pyc")) or any(path.is_dir() for path in ROOT.rglob("__pycache__")):
         raise Ops03Error("pre_marker", "bytecode_residue_present", consumed=False)
+    ignored_native = _git(("ls-files", "--others", "--ignored", "--exclude-standard", "--", "*.so", "*.pyd"))
+    if ignored_native.returncode or ignored_native.stdout:
+        raise Ops03Error("pre_marker", "ignored_native_module_present", consumed=False)
 
+
+
+def _safe_child(path: Path, *, must_not_exist: bool = False) -> None:
+    resolved_root = RUN_ROOT.resolve()
+    try:
+        if path.exists() or path.is_symlink():
+            if must_not_exist or path.is_symlink():
+                raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False)
+            if not path.is_dir():
+                raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False)
+            resolved = path.resolve(strict=True)
+            if resolved_root not in (resolved, *resolved.parents):
+                raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False)
+        else:
+            parent = path.parent
+            if parent.exists():
+                parent_resolved = parent.resolve(strict=True)
+                if parent_resolved != resolved_root and resolved_root not in parent_resolved.parents:
+                    raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False)
+    except OSError as exc:
+        raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False) from exc
+
+
+def _ensure_authorized_paths(base: Path, control: Path, candidate: Path, failure: Path, *, must_not_exist: bool) -> None:
+    if base.parent.resolve() != RUN_ROOT.resolve():
+        raise Ops03Error("pre_marker", "run_root_mismatch", consumed=False)
+    for path in (base, control, candidate, failure):
+        _safe_child(path, must_not_exist=must_not_exist and path == base)
+
+
+def _safe_mkdir(path: Path, *, phase: str, consumed: bool) -> None:
+    try:
+        if path.exists() or path.is_symlink():
+            raise Ops03Error(phase, "unsafe_or_stale_run_root", consumed=consumed)
+        path.mkdir(parents=True, exist_ok=False)
+        if path.is_symlink() or not path.is_dir():
+            raise Ops03Error(phase, "unsafe_or_stale_run_root", consumed=consumed)
+    except Ops03Error:
+        raise
+    except OSError as exc:
+        raise Ops03Error(phase, "run_root_unwritable", consumed=consumed) from exc
 
 def _clean_db_environment(auth: Mapping[str, Any], ambient: Mapping[str, str]) -> dict[str, str]:
     retired = tuple(sorted(name for name in RETIRED_DB_TRANSPORT_KEYS if name in ambient))
@@ -402,6 +460,20 @@ class CountingProvider:
         return self._inner.introspect(*args, **kwargs)
 
 
+def _repo_db_symbols():
+    from engine.db.adapter import DBAccess
+    from engine.db.ddl_identity_projection import DDL_IDENTITY_PROJECTION_SCHEMA, project_ddl_identity
+    from engine.db.providers.psycopg_provider import PsycopgProvider, validate_readonly_statements
+
+    return DBAccess, DDL_IDENTITY_PROJECTION_SCHEMA, PsycopgProvider, project_ddl_identity, validate_readonly_statements
+
+
+def _retained_text_is_unsafe(path: Path, payload: bytes) -> bool:
+    from tools.evidence.retained_evidence_safety import validate_retained_text_safety
+
+    return bool(validate_retained_text_safety(path, payload))
+
+
 def live_provider_factory(counters: Counters) -> Callable[[str], CountingProvider]:
     def factory(dsn: str) -> CountingProvider:
         counters.provider_selections += 1
@@ -413,7 +485,7 @@ def live_provider_factory(counters: Counters) -> Callable[[str], CountingProvide
             return psycopg.connect(value, connect_timeout=5)  # type: ignore[attr-defined]
 
         return CountingProvider(
-            PsycopgProvider(dsn, connection_factory=connect),
+            _repo_db_symbols()[2](dsn, connection_factory=connect),
             counters,
             count_connections_by_call=False,
         )
@@ -493,6 +565,7 @@ def build_posture(
             {"kind": "table", "name": "hde.body_graphs", "columns": columns},
             *({"kind": "view", "name": name} for name in EXPECTED_VIEWS),
         ]
+        _DBAccess, DDL_IDENTITY_PROJECTION_SCHEMA, _PsycopgProvider, project_ddl_identity, _validate = _repo_db_symbols()
         projection = project_ddl_identity(projection_input)
         observed_partitions = sorted(str(row[0]) for row in rows[8])
         verified_partitions = sorted(str(row[0]) for row in rows[9] if bool(row[1]))
@@ -544,6 +617,43 @@ def build_posture(
     }
 
 
+
+def _capture_provider_child(
+    auth: Mapping[str, Any],
+    authorization_sha256: str,
+    candidate: Path,
+    db_env: Mapping[str, str],
+    provider_factory_builder: Callable[[Counters], Callable[[str], Any]],
+) -> None:
+    status_path = candidate.parent / "control" / "provider_child_status.json"
+    pid = os.fork()
+    if pid == 0:
+        try:
+            for name in tuple(os.environ):
+                if name.startswith("PYTHON") or name == "DATABASE_URL":
+                    os.environ.pop(name, None)
+            os.environ.clear()
+            os.environ.update(db_env)
+            counters = Counters()
+            provider_factory = provider_factory_builder(counters)
+            DBAccess, _schema_name, _provider, _project, _validate = _repo_db_symbols()
+            db = DBAccess.for_current_env(environ=dict(os.environ), psycopg_factory=provider_factory)
+            results = db.readonly_tx(QUERY_STATEMENTS)
+            posture = build_posture(auth, db, results, counters)
+            _write_capture_files(auth, authorization_sha256, candidate, posture)
+            status = {"pid": os.getpid(), "parent_pid": os.getppid(), "result": "PASS"}
+            status_path.write_bytes(canonical_bytes(status))
+            os._exit(0)
+        except BaseException:
+            try:
+                status_path.write_bytes(canonical_bytes({"pid": os.getpid(), "parent_pid": os.getppid(), "result": "FAIL"}))
+            except BaseException:
+                pass
+            os._exit(1)
+    _, rc = os.waitpid(pid, 0)
+    if rc != 0:
+        raise Ops03Error("capture", "unexpected_failure", consumed=True)
+
 def _write_capture_files(
     auth: Mapping[str, Any],
     authorization_sha256: str,
@@ -587,7 +697,7 @@ def _write_capture_files(
     if tuple(sorted(files)) != tuple(sorted(PRIMARY_FILES)):
         raise Ops03Error("capture", "primary_inventory_internal_error", consumed=True)
     for name, payload in files.items():
-        if validate_retained_text_safety(candidate / name, payload):
+        if _retained_text_is_unsafe(candidate / name, payload):
             raise Ops03Error("capture", "secret_scan_failed", consumed=True)
         (candidate / name).write_bytes(payload)
 
@@ -613,15 +723,21 @@ def _run_validator(argv: Sequence[str]) -> None:
 
 
 def _write_marker(control: Path, auth: Mapping[str, Any], authorization_sha256: str) -> None:
-    control.mkdir(parents=True, exist_ok=False)
-    (control / "launch.marker").write_bytes(b"launch_consumed=true\n")
+    _safe_mkdir(control, phase="pre_marker", consumed=False)
+    try:
+        (control / "launch.marker").write_bytes(b"launch_consumed=true\n")
+    except OSError as exc:
+        raise Ops03Error("pre_marker", "launch_marker_write_failed", consumed=False) from exc
     consumption = {
         "schema": "hde_epic038.ops03.authorization_consumption.v1",
         "run_id": auth["run_id"],
         "authorization_sha256": authorization_sha256,
         "launch_consumed": True,
     }
-    (control / "authorization_consumed.json").write_bytes(canonical_bytes(consumption))
+    try:
+        (control / "authorization_consumed.json").write_bytes(canonical_bytes(consumption))
+    except OSError as exc:
+        raise Ops03Error("pre_provider", "authorization_consumption_record_write_failed", consumed=True) from exc
 
 
 def write_failure(
@@ -636,7 +752,12 @@ def write_failure(
     if not isinstance(run_id, str) or RUN_ID_RE.fullmatch(run_id) is None:
         return
     _, _, _, failure = derived_paths(run_id)
-    failure.mkdir(parents=True, exist_ok=True)
+    try:
+        if failure.exists() and (failure.is_symlink() or not failure.is_dir()):
+            return
+        failure.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return
     receipt = {
         "schema": "hde_epic038.ops03.failure_receipt.v1",
         "run_id": auth["run_id"],
@@ -647,6 +768,8 @@ def write_failure(
         "candidate_admissible": False,
         "nonclaims": list(NONCLAIMS),
     }
+    from jsonschema import Draft202012Validator
+
     schema = _schema(FAILURE_SCHEMA)
     if next(Draft202012Validator(schema).iter_errors(receipt), None) is not None:
         return
@@ -688,27 +811,27 @@ def capture(
             raise Ops03Error("pre_marker", "capture_argv_mismatch", consumed=False)
         validate_source_identity(auth, enforce_repo=enforce_source)
         base, control, candidate, _ = derived_paths(str(auth["run_id"]))
+        if base.is_symlink():
+            raise Ops03Error("pre_marker", "unsafe_or_stale_run_root", consumed=False)
         if base.exists():
             raise Ops03Error("pre_marker", "authorization_already_consumed", consumed=False)
+        _ensure_authorized_paths(base, control, candidate, base / "failure", must_not_exist=False)
         db_env = _clean_db_environment(auth, os.environ if ambient is None else ambient)
+        DBAccess, _schema_name, _provider, _project, validate_readonly_statements = _repo_db_symbols()
         validate_readonly_statements(QUERY_STATEMENTS)
         if not _authorization_is_stable(auth_path, authorization_bytes):
             raise Ops03Error("pre_marker", "authorization_bytes_changed", consumed=False)
-        base.mkdir(parents=True, exist_ok=False)
+        _safe_mkdir(base, phase="pre_marker", consumed=False)
         authorization_sha256 = sha256_bytes(authorization_bytes)
         _write_marker(control, auth, authorization_sha256)
         consumed = True
         if not _authorization_is_stable(auth_path, authorization_bytes):
             raise Ops03Error("pre_provider", "authorization_bytes_changed", consumed=True)
-        candidate.mkdir(parents=True, exist_ok=False)
-        counters = Counters()
-        provider_factory = provider_factory_builder(counters)
-        db = DBAccess.for_current_env(environ=db_env, psycopg_factory=provider_factory)
-        results = db.readonly_tx(QUERY_STATEMENTS)
+        _safe_mkdir(candidate, phase="capture", consumed=True)
+        _capture_provider_child(auth, authorization_sha256, candidate, db_env, provider_factory_builder)
+        db_env = {}
         if not _authorization_is_stable(auth_path, authorization_bytes):
             raise Ops03Error("capture", "authorization_bytes_changed", consumed=True)
-        posture = build_posture(auth, db, results, counters)
-        _write_capture_files(auth, authorization_sha256, candidate, posture)
         validate_source_identity(auth, enforce_repo=enforce_source)
         if invoke_validators:
             if not _authorization_is_stable(auth_path, authorization_bytes):
@@ -723,6 +846,9 @@ def capture(
                 raise Ops03Error("final_validation", "authorization_bytes_changed", consumed=True)
         return 0
     except Ops03Error as exc:
+        if auth is None:
+            parsed, _canonical = _read_json_noncanonical(auth_path)
+            auth = parsed if isinstance(parsed, Mapping) else None
         if auth is not None:
             if consumed:
                 _discard_candidate(auth)
