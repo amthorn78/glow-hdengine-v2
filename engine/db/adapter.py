@@ -19,9 +19,15 @@ RETIRED_DB_TRANSPORT_KEYS: tuple[str, ...] = (
 )
 
 
+def _environment_key_names(environ: Mapping[str, str]) -> frozenset[str]:
+    """Return environment key names without reading any mapped value."""
+    return frozenset(iter(environ))
+
+
 def retired_db_transport_keys_present(environ: Mapping[str, str]) -> tuple[str, ...]:
     """Return retired transport key names present in *environ*, independent of value."""
-    return tuple(sorted(name for name in RETIRED_DB_TRANSPORT_KEYS if name in environ))
+    present = _environment_key_names(environ)
+    return tuple(name for name in RETIRED_DB_TRANSPORT_KEYS if name in present)
 
 
 @dataclass(frozen=True)
@@ -143,8 +149,12 @@ class DBAccess:
 
     @staticmethod
     def _database_url_presence(env: Mapping[str, str]) -> str:
-        """Return endpoint presence without serializing the endpoint value."""
-        return "present_redacted" if "DATABASE_URL" in env else "unset"
+        """Return endpoint presence without reading or serializing its mapped value."""
+        return (
+            "present_redacted"
+            if any(name == "DATABASE_URL" for name in env)
+            else "unset"
+        )
 
     @staticmethod
     def _retired_failure_case(env: Mapping[str, str], exc: RetiredBridgeConfiguration) -> Mapping[str, object]:
