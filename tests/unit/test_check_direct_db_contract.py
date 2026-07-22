@@ -309,6 +309,65 @@ def test_compound_statement_headers_remain_scanned(tmp_path):
     assert consumption_lines == {2, 4}
 
 
+def test_function_parameters_clear_same_named_outer_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def read(key):\n"
+        "    return os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_compound_block_aliases_propagate_to_following_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from contextlib import nullcontext\n"
+        "if True:\n"
+        "    key = 'DB_BRIDGE_URL'\n"
+        "os.getenv(key)\n"
+        "while False:\n"
+        "    other = 'DB_FORCE_BRIDGE'\n"
+        "os.environ.get(other)\n"
+        "with nullcontext():\n"
+        "    third = 'DB_ALLOW_BRIDGE_IN_PROD'\n"
+        "os.environ[third]\n"
+        "try:\n"
+        "    fourth = 'DB_BRIDGE_URL'\n"
+        "except Exception:\n"
+        "    pass\n"
+        "os.getenv(fourth)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {5, 8, 11, 16}
+
+
+def test_all_if_branches_can_replace_retired_alias_with_safe_value(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "if condition:\n"
+        "    key = 'SAFE_MODE'\n"
+        "else:\n"
+        "    key = 'APP_ENV'\n"
+        "os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
 def test_alias_tracing_binds_loop_targets_before_body_scan(tmp_path):
     _minimal_tree(tmp_path)
     _write(
