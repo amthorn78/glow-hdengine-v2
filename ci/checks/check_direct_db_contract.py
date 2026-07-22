@@ -311,6 +311,8 @@ def _resolve_string_values(
     literal = _literal_string_tuple(node)
     if literal is not None:
         return literal
+    if isinstance(node, ast.NamedExpr):
+        return _resolve_string_values(node.value, aliases)
     if isinstance(node, ast.Name):
         return aliases.get(node.id)
     if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
@@ -497,6 +499,10 @@ def _statement_scope_nodes(stmt: ast.stmt) -> tuple[ast.AST, ...]:
     nodes: list[ast.AST] = []
 
     def collect(node: ast.AST) -> None:
+        if isinstance(node, ast.NamedExpr):
+            collect(node.value)
+            nodes.append(node)
+            return
         nodes.append(node)
         for child in ast.iter_child_nodes(node):
             if isinstance(child, ast.stmt):
@@ -586,6 +592,27 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
         tainted_names.clear()
         tainted_names.update(merged_tainted)
 
+    def assignment_value_is_tainted(
+        value: ast.AST,
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+    ) -> bool:
+        if isinstance(value, ast.Name) and value.id in tainted_names:
+            return True
+        if isinstance(value, ast.Call):
+            return _retired_env_call(
+                value, os_names, environ_names, getenv_names, aliases
+            ) or _unresolved_env_call(
+                value, os_names, environ_names, getenv_names, aliases
+            )
+        if isinstance(value, ast.Subscript):
+            return _retired_environ_subscript(
+                value, os_names, environ_names, aliases
+            ) or _unresolved_environ_subscript(
+                value, os_names, environ_names, aliases
+            )
+        return False
+
     def scan_statements(
         statements: list[ast.stmt],
         aliases: dict[str, tuple[str, ...]],
@@ -594,23 +621,28 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
         for stmt in statements:
             statement_aliases = dict(aliases)
             statement_tainted = set(tainted_names)
+            named_expression_updates: list[
+                tuple[str, tuple[str, ...] | None, bool]
+            ] = []
             for node in _statement_scope_nodes(stmt):
                 check_node(node, statement_aliases, statement_tainted)
                 for local_name, value in _assignment_bindings(node):
-                    if isinstance(value, ast.Call) and (
-                        _retired_env_call(value, os_names, environ_names, getenv_names, statement_aliases)
-                        or _unresolved_env_call(value, os_names, environ_names, getenv_names, statement_aliases)
-                    ):
+                    value_tainted = assignment_value_is_tainted(
+                        value, statement_aliases, statement_tainted
+                    )
+                    if value_tainted:
                         statement_tainted.add(local_name)
-                    if isinstance(value, ast.Subscript) and (
-                        _retired_environ_subscript(
-                            value, os_names, environ_names, statement_aliases
+                    else:
+                        statement_tainted.discard(local_name)
+                    if isinstance(node, ast.NamedExpr):
+                        resolved = _resolve_string_values(value, statement_aliases)
+                        if resolved:
+                            statement_aliases[local_name] = resolved
+                        else:
+                            statement_aliases.pop(local_name, None)
+                        named_expression_updates.append(
+                            (local_name, resolved, value_tainted)
                         )
-                        or _unresolved_environ_subscript(
-                            value, os_names, environ_names, statement_aliases
-                        )
-                    ):
-                        statement_tainted.add(local_name)
             for local_name, value in _assignment_bindings(stmt):
                 resolved = _resolve_string_values(value, aliases)
                 if resolved:
@@ -618,6 +650,15 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 else:
                     aliases.pop(local_name, None)
                 if local_name in statement_tainted:
+                    tainted_names.add(local_name)
+                else:
+                    tainted_names.discard(local_name)
+            for local_name, resolved, value_tainted in named_expression_updates:
+                if resolved:
+                    aliases[local_name] = resolved
+                else:
+                    aliases.pop(local_name, None)
+                if value_tainted:
                     tainted_names.add(local_name)
                 else:
                     tainted_names.discard(local_name)
