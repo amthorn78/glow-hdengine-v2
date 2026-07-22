@@ -245,6 +245,14 @@ def test_selection_evidence_never_serializes_hostile_app_env(scenario):
         [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT 1; UPDATE x SET y=1")],
         [Statement("SET TRANSACTION READ ONLY -- comment")],
         [Statement("SET TRANSACTION READ ONLY"), Statement("SET TRANSACTION READ WRITE")],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT nextval('seq')", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_advisory_lock(1)", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT set_config('x','y',false)", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT * FROM hde.body_graphs FOR SHARE", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT value INTO temp_copy FROM hde.body_graphs", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_read_file('/etc/passwd')", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SHOW ALL", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), *[Statement("SELECT 1", fetch=True) for _ in range(10)]],
     ],
 )
 def test_readonly_tx_rejects_wrong_first_mutation_batching_and_comments(statements):

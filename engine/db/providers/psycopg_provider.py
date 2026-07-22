@@ -12,10 +12,36 @@ Params = Sequence[Any] | Mapping[str, Any] | None
 _COMMENT_MARKERS = ("--", "/*", "*/")
 _MUTATING_TOKENS = frozenset(
     {"ALTER", "CALL", "COPY", "CREATE", "DELETE", "DO", "DROP", "GRANT",
-     "INSERT", "MERGE", "REVOKE", "TRUNCATE", "UPDATE"}
+     "INSERT", "INTO", "LOCK", "MERGE", "REVOKE", "SHARE", "TRUNCATE", "UPDATE"}
+)
+_SIDE_EFFECT_OR_SENSITIVE_TOKENS = frozenset(
+    {
+        "DBLINK_CONNECT",
+        "DBLINK_EXEC",
+        "LO_CREATE",
+        "LO_UNLINK",
+        "NEXTVAL",
+        "PG_ADVISORY_LOCK",
+        "PG_ADVISORY_LOCK_SHARED",
+        "PG_ADVISORY_UNLOCK",
+        "PG_ADVISORY_UNLOCK_ALL",
+        "PG_ADVISORY_UNLOCK_SHARED",
+        "PG_CANCEL_BACKEND",
+        "PG_LOGICAL_EMIT_MESSAGE",
+        "PG_LS_DIR",
+        "PG_NOTIFY",
+        "PG_READ_BINARY_FILE",
+        "PG_READ_FILE",
+        "PG_SLEEP",
+        "PG_STAT_FILE",
+        "PG_TERMINATE_BACKEND",
+        "SET_CONFIG",
+        "SETVAL",
+    }
 )
 _SQL_TOKEN_SEPARATORS = str.maketrans({char: " " for char in "()[],.=+-*/%<>!|'\""})
 _OPS_SEARCH_PATH = "SET LOCAL SEARCH_PATH TO HDE, PUBLIC"
+_MAX_READONLY_STATEMENTS = 10
 
 
 def _single_statement_sql(sql: str) -> str | None:
@@ -45,10 +71,12 @@ def _readonly_sql_allowed(sql: str, *, first: bool = False) -> bool:
         return normalized == "SET TRANSACTION READ ONLY"
     if normalized == _OPS_SEARCH_PATH:
         return True
-    if not normalized.startswith(("SHOW ", "SELECT ")):
+    if normalized.startswith("SHOW "):
+        return normalized == "SHOW SEARCH_PATH"
+    if not normalized.startswith("SELECT "):
         return False
     words = set(normalized.translate(_SQL_TOKEN_SEPARATORS).split())
-    return words.isdisjoint(_MUTATING_TOKENS)
+    return words.isdisjoint(_MUTATING_TOKENS | _SIDE_EFFECT_OR_SENSITIVE_TOKENS)
 
 
 def validate_readonly_statements(statements: Sequence[Any]) -> None:
@@ -59,6 +87,12 @@ def validate_readonly_statements(statements: Sequence[Any]) -> None:
             "readonly_tx_requires_statements",
             attempts=["DATABASE_URL"],
             code="readonly_tx_requires_statements",
+        )
+    if len(statements) > _MAX_READONLY_STATEMENTS:
+        raise TxError(
+            "readonly_tx_too_many_statements",
+            attempts=["DATABASE_URL"],
+            code="readonly_tx_too_many_statements",
         )
     sqls = [getattr(stmt, "sql", "") for stmt in statements]
     if not _readonly_sql_allowed(sqls[0], first=True):

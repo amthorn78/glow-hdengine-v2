@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from engine.ops import http_log
 
 
@@ -25,3 +27,55 @@ def test_log_http_call_keys_only(tmp_path, monkeypatch):
     assert set(record) <= {"at", "route", "status", "duration_ms", "release_id", "idempotence_hash"}
     assert isinstance(record["duration_ms"], float)
     assert record["duration_ms"] == round(record["duration_ms"], 3)
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        "/tmp/keys_only.jsonl",
+        "../keys_only.jsonl",
+        "artifacts/ops/rails_open_scope/../keys_only.jsonl",
+        "artifacts/ops/rails_open_scope/arbitrary.jsonl",
+    ],
+)
+def test_log_override_rejects_absolute_traversal_and_unowned_names(
+    tmp_path, monkeypatch, override
+):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv(http_log.LOG_PATH_ENV, override)
+    fallback = tmp_path / "fallback.jsonl"
+    monkeypatch.setattr(http_log, "LOG_PATH", fallback)
+
+    http_log.log_http_call(route="db.read", status=200, duration_ms=1)
+
+    assert not fallback.exists()
+    assert tuple(tmp_path.rglob("*.jsonl")) == ()
+
+
+def test_log_override_rejects_symlink_target(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    capture_root = tmp_path / http_log.CAPTURE_LOG_ROOT
+    capture_root.mkdir(parents=True)
+    victim = tmp_path / "victim.txt"
+    victim.write_text("unchanged\n", encoding="utf-8")
+    name = "keys_only.123.20260722T120000Z.jsonl"
+    (capture_root / name).symlink_to(victim)
+    monkeypatch.setenv(
+        http_log.LOG_PATH_ENV,
+        (http_log.CAPTURE_LOG_ROOT / name).as_posix(),
+    )
+
+    http_log.log_http_call(route="db.read", status=200, duration_ms=1)
+
+    assert victim.read_text(encoding="utf-8") == "unchanged\n"
+
+
+def test_owned_capture_override_writes_only_fixed_subtree(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    name = "keys_only.123.20260722T120000Z.jsonl"
+    relative = http_log.CAPTURE_LOG_ROOT / name
+    monkeypatch.setenv(http_log.LOG_PATH_ENV, relative.as_posix())
+
+    http_log.log_http_call(route="db.read", status=200, duration_ms=1)
+
+    assert json.loads((tmp_path / relative).read_text(encoding="utf-8"))["route"] == "db.read"

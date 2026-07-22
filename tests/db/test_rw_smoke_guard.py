@@ -2,6 +2,8 @@ import importlib
 
 import pytest
 
+from engine.db.errors import PrimaryUnavailable, RetiredBridgeConfiguration
+
 
 @pytest.mark.epic006
 def test_smoke_skips_without_required(monkeypatch):
@@ -12,7 +14,7 @@ def test_smoke_skips_without_required(monkeypatch):
     importlib.reload(db_access)
     status, detail = db_access.db_rw_smoke()
     assert status == "skip"
-    assert detail == "DB_REQUIRED=0"
+    assert detail == "db_rw_smoke_disabled"
 
 
 def test_db_rw_smoke_uses_dbaccess_not_raw_psycopg(monkeypatch):
@@ -63,3 +65,48 @@ def test_db_rw_smoke_rejects_missing_cleanup_before_success(monkeypatch):
     monkeypatch.setattr(db_access.DBAccess, "for_current_env", classmethod(lambda cls: FakeDB()))
     assert db_access.db_rw_smoke() == ("error", "db_rw_smoke_failed")
     assert validated == [True]
+
+
+def test_db_rw_smoke_preserves_retired_configuration_failure(monkeypatch):
+    import adapter.db_access as db_access
+
+    def refuse():
+        raise RetiredBridgeConfiguration(("DB_BRIDGE_URL",))
+
+    monkeypatch.setenv("DB_REQUIRED", "1")
+    monkeypatch.setattr(db_access.DBAccess, "for_current_env", refuse)
+
+    assert db_access.db_rw_smoke() == (
+        "error",
+        "retired_bridge_configuration",
+    )
+
+
+@pytest.mark.parametrize(
+    ("code", "expected"),
+    [
+        ("missing_database_url", "missing_database_url"),
+        ("primary_connect_failed", "primary_connect_failed"),
+        ("postgresql://must-not-leak", "primary_unavailable"),
+    ],
+)
+def test_db_rw_smoke_returns_stable_primary_codes(monkeypatch, code, expected):
+    import adapter.db_access as db_access
+
+    def refuse():
+        raise PrimaryUnavailable("postgresql://must-not-leak", code=code)
+
+    monkeypatch.setenv("DB_REQUIRED", "1")
+    monkeypatch.setattr(db_access.DBAccess, "for_current_env", refuse)
+
+    result = db_access.db_rw_smoke()
+
+    assert result == ("skip", expected)
+    assert "must-not-leak" not in repr(result)
+
+
+def test_db_rw_smoke_retired_preference_argument_is_not_executable():
+    import adapter.db_access as db_access
+
+    with pytest.raises(TypeError):
+        db_access.db_rw_smoke("dsn")
