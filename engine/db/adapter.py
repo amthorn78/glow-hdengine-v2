@@ -96,7 +96,7 @@ class DBAccess:
         retired = retired_db_transport_keys_present(env)
         if retired:
             exc = RetiredBridgeConfiguration(retired)
-            exc.selection_case = cls._failure_case(env, exc, attempts=[])
+            exc.selection_case = cls._retired_failure_case(env, exc)
             exc.attempt_rows = []
             raise exc
         dsn = (env.get("DATABASE_URL") or "").strip()
@@ -142,12 +142,33 @@ class DBAccess:
         return Statement(sql=sql, params=params, fetch=fetch)
 
     @staticmethod
+    def _database_url_presence(env: Mapping[str, str]) -> str:
+        """Return endpoint presence without serializing the endpoint value."""
+        return "present_redacted" if "DATABASE_URL" in env else "unset"
+
+    @staticmethod
+    def _retired_failure_case(env: Mapping[str, str], exc: RetiredBridgeConfiguration) -> Mapping[str, object]:
+        return {
+            "case": "retired_keys_present",
+            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "database_url_presence": DBAccess._database_url_presence(env),
+            "retired_keys_present": list(exc.retired_keys),
+            "attempts": [],
+            "selected": "none",
+            "error": {"class": exc.__class__.__name__, "code": exc.code},
+            "alternate_transport_attempts": 0,
+            "result": "PASS",
+        }
+
+    @staticmethod
     def _failure_case(env: Mapping[str, str], exc: AdapterError, *, attempts: Sequence[Mapping[str, Any]]) -> Mapping[str, object]:
         retired = list(getattr(exc, "retired_keys", ()))
+        if retired and isinstance(exc, RetiredBridgeConfiguration):
+            return DBAccess._retired_failure_case(env, exc)
         return {
             "case": "retired_keys_present" if retired else ("missing_database_url" if exc.code == "missing_database_url" else "unavailable_database_url"),
             "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
-            "database_url_presence": "present_redacted" if (env.get("DATABASE_URL") or "").strip() else "unset",
+            "database_url_presence": DBAccess._database_url_presence(env) if exc.code == "missing_database_url" else ("present_redacted" if (env.get("DATABASE_URL") or "").strip() else "unset"),
             "retired_keys_present": retired,
             "attempts": [dict(row) for row in attempts],
             "selected": "none",

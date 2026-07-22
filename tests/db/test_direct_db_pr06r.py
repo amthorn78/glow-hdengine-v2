@@ -67,6 +67,36 @@ def test_retired_keys_are_membership_sorted_and_block_factory_without_value_leak
     assert "must-not-leak" not in str(exc.value)
 
 
+def test_retired_keys_raise_before_database_url_value_access():
+    class EndpointTrap(dict):
+        def __getitem__(self, key):
+            if key == "DATABASE_URL":
+                raise AssertionError("DATABASE_URL value was read")
+            return super().__getitem__(key)
+
+        def get(self, key, default=None):
+            if key == "DATABASE_URL":
+                raise AssertionError("DATABASE_URL value was read")
+            return super().get(key, default)
+
+    calls = []
+    env = EndpointTrap(
+        {
+            "APP_ENV": "dev",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "https://must-not-read",
+        }
+    )
+    with pytest.raises(RetiredBridgeConfiguration) as exc:
+        DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda dsn: calls.append(dsn) or Provider(),
+        )
+    assert calls == []
+    assert exc.value.selection_case["database_url_presence"] == "present_redacted"
+    assert exc.value.selection_case["retired_keys_present"] == ["DB_BRIDGE_URL"]
+
+
 def test_direct_success_has_one_health_and_one_selection_attempt():
     provider = Provider()
     db = DBAccess.for_current_env(

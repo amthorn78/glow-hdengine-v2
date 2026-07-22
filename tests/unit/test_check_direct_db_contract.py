@@ -215,6 +215,36 @@ def test_http_session_use_of_retired_environ_subscript_is_rejected(tmp_path):
     assert any("active_retired_key_consumption" in row for row in violations)
     assert any("retired_key_http_bridge_use" in row for row in violations)
 
+
+def test_computed_retired_key_environment_to_http_flow_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os, requests\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "url = os.environ.get(key)\n"
+        "requests.get(url)\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("scripts/current.py:3:active_retired_key_consumption" in row for row in violations)
+    assert any("scripts/current.py:4:active_retired_key_consumption" in row for row in violations)
+
+
+def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read(bridge_key):\n"
+        "    return os.environ.get(bridge_key)\n",
+    )
+    assert any(
+        "scripts/current.py:3:active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
 def test_active_guidance_cannot_hide_behind_retired_context(tmp_path):
     _minimal_tree(tmp_path)
     _write(

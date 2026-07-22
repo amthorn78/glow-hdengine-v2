@@ -277,6 +277,60 @@ def _assignment_bindings(node: ast.AST) -> tuple[tuple[str, ast.AST], ...]:
     return ()
 
 
+def _literal_string_tuple(node: ast.AST) -> tuple[str, ...] | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return (node.value,)
+    if isinstance(node, (ast.Tuple, ast.List, ast.Set)):
+        values: list[str] = []
+        for item in node.elts:
+            if not isinstance(item, ast.Constant) or not isinstance(item.value, str):
+                return None
+            values.append(item.value)
+        return tuple(values)
+    return None
+
+
+def _constant_string_bindings(tree: ast.AST) -> dict[str, tuple[str, ...]]:
+    """Return simple in-file string/sequence aliases for retired-key tracing."""
+    aliases: dict[str, tuple[str, ...]] = {}
+    for _ in range(4):
+        previous = dict(aliases)
+        for node in ast.walk(tree):
+            for local_name, value in _assignment_bindings(node):
+                resolved = _resolve_string_values(value, aliases)
+                if resolved:
+                    aliases[local_name] = resolved
+        if aliases == previous:
+            break
+    return aliases
+
+
+def _resolve_string_values(
+    node: ast.AST, aliases: dict[str, tuple[str, ...]]
+) -> tuple[str, ...] | None:
+    literal = _literal_string_tuple(node)
+    if literal is not None:
+        return literal
+    if isinstance(node, ast.Name):
+        return aliases.get(node.id)
+    if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
+        source = _resolve_string_values(node.value, aliases)
+        if source is None:
+            return None
+        index = node.slice.value
+        if isinstance(index, int) and -len(source) <= index < len(source):
+            return (source[index],)
+        return tuple(value for value in source if value in RETIRED_KEYS) or None
+    return None
+
+
+def _contains_retired_key(node: ast.AST, aliases: dict[str, tuple[str, ...]]) -> bool:
+    values = _resolve_string_values(node, aliases)
+    if values is None:
+        return False
+    return any(value in RETIRED_KEYS for value in values)
+
+
 def _os_symbol_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
     """Return local names bound to os, os.environ, and os.getenv."""
     os_names = {"os"}
@@ -314,6 +368,7 @@ def _retired_env_call(
     os_names: set[str],
     environ_names: set[str],
     getenv_names: set[str],
+    aliases: dict[str, tuple[str, ...]],
 ) -> bool:
     func = node.func
     is_reader = _is_getenv_reader(func, os_names, getenv_names) or (
@@ -322,12 +377,36 @@ def _retired_env_call(
         and _is_environ_source(func.value, os_names, environ_names)
     )
     values = [*node.args, *(keyword.value for keyword in node.keywords)]
-    return is_reader and any(
-        isinstance(value, ast.Constant)
-        and isinstance(value.value, str)
-        and value.value in RETIRED_KEYS
-        for value in values
+    return is_reader and any(_contains_retired_key(value, aliases) for value in values)
+
+
+def _unresolved_env_call(
+    node: ast.Call,
+    os_names: set[str],
+    environ_names: set[str],
+    getenv_names: set[str],
+    aliases: dict[str, tuple[str, ...]],
+) -> bool:
+    func = node.func
+    is_reader = _is_getenv_reader(func, os_names, getenv_names) or (
+        isinstance(func, ast.Attribute)
+        and func.attr == "get"
+        and _is_environ_source(func.value, os_names, environ_names)
     )
+    if not is_reader:
+        return False
+    values = [*node.args, *(keyword.value for keyword in node.keywords)]
+    if not values:
+        return False
+    key = values[0]
+    if _contains_retired_key(key, aliases):
+        return False
+    if isinstance(key, ast.Constant) and isinstance(key.value, str):
+        return False
+    if isinstance(key, ast.Name):
+        lowered = key.id.lower()
+        return "bridge" in lowered or "retired" in lowered
+    return False
 
 
 def _dotted_name(node: ast.AST) -> str:
@@ -369,27 +448,27 @@ def _is_http_call(node: ast.Call) -> bool:
 
 
 def _retired_environ_subscript(
-    node: ast.Subscript, os_names: set[str], environ_names: set[str]
+    node: ast.Subscript,
+    os_names: set[str],
+    environ_names: set[str],
+    aliases: dict[str, tuple[str, ...]],
 ) -> bool:
-    key = node.slice
-    return (
-        _is_environ_source(node.value, os_names, environ_names)
-        and isinstance(key, ast.Constant)
-        and isinstance(key.value, str)
-        and key.value in RETIRED_KEYS
+    return _is_environ_source(node.value, os_names, environ_names) and _contains_retired_key(
+        node.slice, aliases
     )
 
 
 def _retired_membership_compare(
-    node: ast.Compare, os_names: set[str], environ_names: set[str]
+    node: ast.Compare,
+    os_names: set[str],
+    environ_names: set[str],
+    aliases: dict[str, tuple[str, ...]],
 ) -> bool:
     left = node.left
     for operator, right in zip(node.ops, node.comparators):
         if (
             isinstance(operator, (ast.In, ast.NotIn))
-            and isinstance(left, ast.Constant)
-            and isinstance(left.value, str)
-            and left.value in RETIRED_KEYS
+            and _contains_retired_key(left, aliases)
             and _is_environ_source(right, os_names, environ_names)
         ):
             return True
@@ -403,20 +482,40 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
     except SyntaxError:
         return ()
     os_names, environ_names, getenv_names = _os_symbol_aliases(tree)
+    aliases = _constant_string_bindings(tree)
     lines: set[int] = set()
+    tainted_names: set[str] = set()
+    for node in ast.walk(tree):
+        for local_name, value in _assignment_bindings(node):
+            if isinstance(value, ast.Call) and (
+                _retired_env_call(value, os_names, environ_names, getenv_names, aliases)
+                or _unresolved_env_call(value, os_names, environ_names, getenv_names, aliases)
+            ):
+                tainted_names.add(local_name)
+                lines.add(value.lineno)
+            if isinstance(value, ast.Subscript) and _retired_environ_subscript(
+                value, os_names, environ_names, aliases
+            ):
+                tainted_names.add(local_name)
+                lines.add(value.lineno)
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
-            if _retired_env_call(node, os_names, environ_names, getenv_names):
+            if _retired_env_call(node, os_names, environ_names, getenv_names, aliases):
                 lines.add(node.lineno)
-            segment = ast.get_source_segment(text, node) or ""
-            if any(key in segment for key in RETIRED_KEYS) and _is_http_call(node):
+            if _unresolved_env_call(node, os_names, environ_names, getenv_names, aliases):
+                lines.add(node.lineno)
+            if _is_http_call(node) and any(
+                _contains_retired_key(arg, aliases)
+                or (isinstance(arg, ast.Name) and arg.id in tainted_names)
+                for arg in [*node.args, *(keyword.value for keyword in node.keywords)]
+            ):
                 lines.add(node.lineno)
         if isinstance(node, ast.Compare) and _retired_membership_compare(
-            node, os_names, environ_names
+            node, os_names, environ_names, aliases
         ):
             lines.add(node.lineno)
         if isinstance(node, ast.Subscript) and _retired_environ_subscript(
-            node, os_names, environ_names
+            node, os_names, environ_names, aliases
         ):
             lines.add(node.lineno)
     return tuple(sorted(lines))
