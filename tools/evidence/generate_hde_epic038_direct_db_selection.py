@@ -58,6 +58,15 @@ def _expected_attempt(code: str) -> list[dict[str, object]]:
     }]
 
 
+def _database_url_presence(environ: Mapping[str, str]) -> str:
+    """Classify DATABASE_URL by key iteration without reading its value."""
+    return (
+        "present_redacted"
+        if any(name == "DATABASE_URL" for name in environ)
+        else "unset"
+    )
+
+
 def run_case(name: str, environ: Mapping[str, str], *, fail: bool = False) -> dict[str, object]:
     calls: list[str] = []
 
@@ -75,7 +84,7 @@ def run_case(name: str, environ: Mapping[str, str], *, fail: bool = False) -> di
         return {
             "case": name,
             "app_env": (environ.get("APP_ENV") or "dev").strip() or "dev",
-            "database_url_presence": "present_redacted" if environ.get("DATABASE_URL") else "unset",
+            "database_url_presence": _database_url_presence(environ),
             "retired_keys_present": list(exc.retired_keys),
             "attempts": [],
             "selected": "none",

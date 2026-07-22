@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Mapping
 
 import pytest
 
@@ -85,3 +86,90 @@ def test_retired_case_uses_membership_even_for_empty_values():
     )
     assert row["attempts"] == []
     assert row["retired_keys_present"] == list(generator.RETIRED_DB_TRANSPORT_KEYS)
+
+
+def test_retired_case_does_not_read_database_url_value():
+    class EndpointTrap(Mapping):
+        def __init__(self, values):
+            self._values = dict(values)
+            self.accessed = []
+
+        def __iter__(self):
+            return iter(self._values)
+
+        def __len__(self):
+            return len(self._values)
+
+        def __getitem__(self, key):
+            self.accessed.append(key)
+            if key == "DATABASE_URL":
+                raise AssertionError("DATABASE_URL value was read")
+            return self._values[key]
+
+    env = EndpointTrap(
+        {
+            "APP_ENV": "dev",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "https://must-not-read",
+        }
+    )
+    row = generator.run_case(
+        "retired_keys_present",
+        env,
+    )
+    assert "DATABASE_URL" not in env.accessed
+    assert row["database_url_presence"] == "present_redacted"
+    assert row["retired_keys_present"] == ["DB_BRIDGE_URL"]
+    assert row["attempts"] == []
+
+
+@pytest.mark.parametrize(
+    ("mutator", "expected"),
+    [
+        (lambda value: value.__setitem__("retired_keys", []), "schema_invalid"),
+        (
+            lambda value: value.__setitem__(
+                "retired_keys", list(generator.RETIRED_DB_TRANSPORT_KEYS[:2])
+            ),
+            "schema_invalid",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "retired_keys", list(reversed(generator.RETIRED_DB_TRANSPORT_KEYS))
+            ),
+            "schema_invalid",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "retired_keys",
+                [
+                    "DB_ALLOW_BRIDGE_IN_PROD",
+                    "DB_BRIDGE_URL",
+                    "DB_BRIDGE_URL",
+                ],
+            ),
+            "schema_invalid",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "retired_keys",
+                [*generator.RETIRED_DB_TRANSPORT_KEYS, "DB_EXTRA"],
+            ),
+            "schema_invalid",
+        ),
+        (
+            lambda value: value["cases"][3].__setitem__("retired_keys_present", []),
+            "schema_invalid",
+        ),
+        (
+            lambda value: value["cases"][3].__setitem__(
+                "retired_keys_present", list(reversed(generator.RETIRED_DB_TRANSPORT_KEYS))
+            ),
+            "schema_invalid",
+        ),
+    ],
+)
+def test_retired_roster_exact_length_and_order_mutations_fail(mutator, expected):
+    payload = copy.deepcopy(generator.build())
+    mutator(payload)
+    assert expected in generator.validate_contract(payload)

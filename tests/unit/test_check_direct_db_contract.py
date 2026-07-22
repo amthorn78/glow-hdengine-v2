@@ -215,6 +215,557 @@ def test_http_session_use_of_retired_environ_subscript_is_rejected(tmp_path):
     assert any("active_retired_key_consumption" in row for row in violations)
     assert any("retired_key_http_bridge_use" in row for row in violations)
 
+
+def test_computed_retired_key_environment_to_http_flow_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os, requests\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "url = os.environ.get(key)\n"
+        "requests.get(url)\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("scripts/current.py:3:active_retired_key_consumption" in row for row in violations)
+    assert any("scripts/current.py:4:active_retired_key_consumption" in row for row in violations)
+
+
+def test_alias_tracing_uses_assignment_value_at_read_site(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "os.getenv(key)\n"
+        "key = 'SAFE_MODE'\n",
+    )
+    assert any(
+        "scripts/current.py:3:active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_alias_tracing_scans_function_and_control_flow_bodies(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def f():\n"
+        "    key = 'DB_BRIDGE_URL'\n"
+        "    os.getenv(key)\n"
+        "if True:\n"
+        "    key = 'DB_FORCE_BRIDGE'\n"
+        "    os.environ.get(key)\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any(
+        "scripts/current.py:4:active_retired_key_consumption" in row
+        for row in violations
+    )
+    assert any(
+        "scripts/current.py:7:active_retired_key_consumption" in row
+        for row in violations
+    )
+
+
+def test_compound_body_scans_apply_inner_aliases_before_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def f():\n"
+        "    key = 'SAFE_MODE'\n"
+        "    os.getenv(key)\n"
+        "if True:\n"
+        "    key = 'SAFE_MODE'\n"
+        "    os.environ.get(key)\n"
+        "for key in ('SAFE_MODE',):\n"
+        "    os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_compound_statement_headers_remain_scanned(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "if os.getenv('DB_BRIDGE_URL'):\n"
+        "    pass\n"
+        "for value in (os.environ['DB_FORCE_BRIDGE'],):\n"
+        "    pass\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {2, 4}
+
+
+def test_function_parameters_clear_same_named_outer_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def read(key):\n"
+        "    return os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_function_defaults_preserve_captured_retired_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def captured(key=key):\n"
+        "    return os.getenv(key)\n"
+        "def direct(other='DB_FORCE_BRIDGE'):\n"
+        "    return os.environ.get(other)\n"
+        "def keyword_only(*, third=key):\n"
+        "    return os.environ[third]\n"
+        "def safe(key='SAFE_MODE'):\n"
+        "    return os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8}
+
+
+def test_compound_block_aliases_propagate_to_following_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from contextlib import nullcontext\n"
+        "if True:\n"
+        "    key = 'DB_BRIDGE_URL'\n"
+        "os.getenv(key)\n"
+        "while False:\n"
+        "    other = 'DB_FORCE_BRIDGE'\n"
+        "os.environ.get(other)\n"
+        "with nullcontext():\n"
+        "    third = 'DB_ALLOW_BRIDGE_IN_PROD'\n"
+        "os.environ[third]\n"
+        "try:\n"
+        "    fourth = 'DB_BRIDGE_URL'\n"
+        "except Exception:\n"
+        "    pass\n"
+        "os.getenv(fourth)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {5, 8, 11, 16}
+
+
+def test_all_if_branches_can_replace_retired_alias_with_safe_value(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "if condition:\n"
+        "    key = 'SAFE_MODE'\n"
+        "else:\n"
+        "    key = 'APP_ENV'\n"
+        "os.getenv(key)\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_alias_tracing_binds_loop_targets_before_body_scan(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "keys = ('DB_BRIDGE_URL', 'DB_FORCE_BRIDGE')\n"
+        "for key in keys:\n"
+        "    os.getenv(key)\n"
+        "def nested():\n"
+        "    nested_keys = ('DB_ALLOW_BRIDGE_IN_PROD',)\n"
+        "    for nested_key in nested_keys:\n"
+        "        os.environ.get(nested_key)\n"
+        "safe_keys = ('SAFE_MODE',)\n"
+        "for safe_key in safe_keys:\n"
+        "    os.getenv(safe_key)\n",
+    )
+    violations = check.scan(tmp_path)
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in violations
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 8}
+
+
+def test_alias_tracing_binds_destructured_literal_loop_targets(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "for key, ignored in (('DB_BRIDGE_URL', None),):\n"
+        "    os.getenv(key)\n"
+        "for ignored, other in ((None, 'DB_FORCE_BRIDGE'),):\n"
+        "    os.environ.get(other)\n"
+        "for safe, ignored in (('SAFE_MODE', None),):\n"
+        "    os.getenv(safe)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 5}
+
+
+def test_alias_tracing_binds_comprehension_targets_before_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "keys = ('DB_BRIDGE_URL',)\n"
+        "[os.getenv(key) for key in keys]\n"
+        "[os.environ.get(key) for key, _ in (('DB_FORCE_BRIDGE', None),)]\n"
+        "tuple(os.getenv(key) for key in ('DB_ALLOW_BRIDGE_IN_PROD',))\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "[os.getenv(key) for key in ('SAFE_MODE',)]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 4, 5}
+
+
+def test_module_constants_are_visible_to_earlier_function_bodies(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read():\n"
+        "    key = BRIDGE_KEY\n"
+        "    return os.getenv(key)\n"
+        "BRIDGE_KEY = 'DB_BRIDGE_URL'\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4}
+
+
+def test_function_local_constants_do_not_leak_across_scopes(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def define_local():\n"
+        "    local_key = 'DB_BRIDGE_URL'\n"
+        "def read_other_scope():\n"
+        "    return os.getenv(local_key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_lambda_parameters_shadow_outer_aliases_and_bind_defaults(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "safe = lambda key: os.getenv(key)\n"
+        "captured = lambda key=key: os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4}
+
+
+def test_with_and_exception_targets_shadow_outer_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "with manager() as key:\n"
+        "    os.getenv(key)\n"
+        "try:\n"
+        "    pass\n"
+        "except Exception as key:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_canonical_retired_roster_imports_bind_loop_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS\n"
+        "for key in RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n"
+        "def nested():\n"
+        "    from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "    return [os.environ.get(key) for key in roster]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 7}
+
+
+def test_unrelated_same_named_import_is_not_the_canonical_roster(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from unrelated import RETIRED_DB_TRANSPORT_KEYS\n"
+        "for key in RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_module_qualified_canonical_rosters_bind_loop_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "import engine.db.adapter as adapter\n"
+        "for key in adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n"
+        "from engine.db import adapter as db_adapter\n"
+        "[os.environ.get(key) for key in db_adapter.RETIRED_DB_TRANSPORT_KEYS]\n"
+        "import engine.db.adapter\n"
+        "for key in engine.db.adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 9}
+
+
+def test_unrelated_module_qualified_roster_is_not_canonical(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "import unrelated as adapter\n"
+        "for key in adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_roster_wrapper_calls_bind_loop_and_enumerate_targets(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "for key in list(roster):\n"
+        "    os.getenv(key)\n"
+        "for key in tuple(roster):\n"
+        "    os.environ.get(key)\n"
+        "for _, key in enumerate(sorted(roster)):\n"
+        "    os.getenv(key)\n"
+        "for key, _ in list((('DB_BRIDGE_URL', None),)):\n"
+        "    os.getenv(key)\n"
+        "for key in list(('SAFE_MODE',)):\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8, 10}
+
+
+def test_constant_computed_retired_key_strings_are_resolved(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "prefix = 'DB_'\n"
+        "bridge = prefix + 'BRIDGE_URL'\n"
+        "os.getenv(bridge)\n"
+        "force = f'{prefix}FORCE_BRIDGE'\n"
+        "os.environ.get(force)\n"
+        "allow = f\"DB_ALLOW_{'BRIDGE_IN_PROD'}\"\n"
+        "os.environ[allow]\n"
+        "safe = 'SAFE_' + 'MODE'\n"
+        "os.getenv(safe)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8}
+
+
+def test_signed_sliced_and_dynamic_roster_subscripts_are_resolved(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "os.getenv(roster[-1])\n"
+        "for key in roster[:2]:\n"
+        "    os.getenv(key)\n"
+        "for key in roster[::-1]:\n"
+        "    os.environ.get(key)\n"
+        "index = 1\n"
+        "os.getenv(roster[index])\n"
+        "for key in roster[:0]:\n"
+        "    os.getenv(key)\n"
+        "safe = ('SAFE_MODE',)\n"
+        "os.getenv(safe[-1])\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 5, 7, 9}
+
+
+def test_zipped_rosters_bind_corresponding_loop_targets(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "labels = ('allow', 'url', 'force')\n"
+        "for key, _ in zip(roster, labels):\n"
+        "    os.getenv(key)\n"
+        "for _, key in zip(labels, list(roster)):\n"
+        "    os.environ.get(key)\n"
+        "for key, _ in zip(('SAFE_MODE',), labels):\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {5, 7}
+
+
+def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "if (key := 'DB_BRIDGE_URL'):\n"
+        "    os.getenv(key)\n"
+        "os.getenv(other := 'DB_FORCE_BRIDGE')\n"
+        "os.environ[third := 'DB_ALLOW_BRIDGE_IN_PROD']\n"
+        "(later := 'DB_BRIDGE_URL')\n"
+        "os.getenv(later)\n"
+        "os.getenv(safe := 'SAFE_MODE')\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 4, 5, 7}
+
+
+def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read(bridge_key):\n"
+        "    return os.environ.get(bridge_key)\n",
+    )
+    assert any(
+        "scripts/current.py:3:active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_unresolved_environment_subscript_fails_closed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "def read(bridge_key):\n"
+        "    return os.environ[bridge_key]\n"
+        "def safe(safe_key):\n"
+        "    return os.environ[safe_key]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3}
+
+
 def test_active_guidance_cannot_hide_behind_retired_context(tmp_path):
     _minimal_tree(tmp_path)
     _write(

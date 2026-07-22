@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Mapping
 from types import SimpleNamespace
 
 import pytest
@@ -65,6 +66,43 @@ def test_retired_keys_are_membership_sorted_and_block_factory_without_value_leak
         "DB_ALLOW_BRIDGE_IN_PROD,DB_BRIDGE_URL,DB_FORCE_BRIDGE"
     )
     assert "must-not-leak" not in str(exc.value)
+
+
+def test_retired_keys_raise_before_database_url_value_access():
+    class EndpointTrap(Mapping):
+        def __init__(self, values):
+            self._values = dict(values)
+            self.accessed = []
+
+        def __iter__(self):
+            return iter(self._values)
+
+        def __len__(self):
+            return len(self._values)
+
+        def __getitem__(self, key):
+            self.accessed.append(key)
+            if key == "DATABASE_URL":
+                raise AssertionError("DATABASE_URL value was read")
+            return self._values[key]
+
+    calls = []
+    env = EndpointTrap(
+        {
+            "APP_ENV": "dev",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "https://must-not-read",
+        }
+    )
+    with pytest.raises(RetiredBridgeConfiguration) as exc:
+        DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda dsn: calls.append(dsn) or Provider(),
+        )
+    assert calls == []
+    assert "DATABASE_URL" not in env.accessed
+    assert exc.value.selection_case["database_url_presence"] == "present_redacted"
+    assert exc.value.selection_case["retired_keys_present"] == ["DB_BRIDGE_URL"]
 
 
 def test_direct_success_has_one_health_and_one_selection_attempt():

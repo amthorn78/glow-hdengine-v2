@@ -233,6 +233,10 @@ def test_unhandled_failure_inside_hermetic_boundary(monkeypatch):
 def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeypatch) -> None:
     for key, value in {
         "DATABASE_URL": "postgresql://sentinel.invalid/db",
+        "DB_ALLOW_BRIDGE_IN_PROD": "1",
+        "DB_BRIDGE_URL": "https://bridge.invalid",
+        "DB_FORCE_BRIDGE": "1",
+        "HDE_KEYS_ONLY_LOG_PATH": "/tmp/must-not-use.jsonl",
         "SAFE_MODE": "0",
         "ALLOW_NETWORK": "1",
         "APP_ENV": "production",
