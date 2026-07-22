@@ -687,6 +687,29 @@ def test_signed_sliced_and_dynamic_roster_subscripts_are_resolved(tmp_path):
     assert consumption_lines == {3, 5, 7, 9}
 
 
+def test_zipped_rosters_bind_corresponding_loop_targets(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "labels = ('allow', 'url', 'force')\n"
+        "for key, _ in zip(roster, labels):\n"
+        "    os.getenv(key)\n"
+        "for _, key in zip(labels, list(roster)):\n"
+        "    os.environ.get(key)\n"
+        "for key, _ in zip(('SAFE_MODE',), labels):\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {5, 7}
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
