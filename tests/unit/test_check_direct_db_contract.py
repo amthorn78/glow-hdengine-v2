@@ -610,6 +610,56 @@ def test_unrelated_module_qualified_roster_is_not_canonical(tmp_path):
     )
 
 
+def test_roster_wrapper_calls_bind_loop_and_enumerate_targets(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "for key in list(roster):\n"
+        "    os.getenv(key)\n"
+        "for key in tuple(roster):\n"
+        "    os.environ.get(key)\n"
+        "for _, key in enumerate(sorted(roster)):\n"
+        "    os.getenv(key)\n"
+        "for key, _ in list((('DB_BRIDGE_URL', None),)):\n"
+        "    os.getenv(key)\n"
+        "for key in list(('SAFE_MODE',)):\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8, 10}
+
+
+def test_constant_computed_retired_key_strings_are_resolved(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "prefix = 'DB_'\n"
+        "bridge = prefix + 'BRIDGE_URL'\n"
+        "os.getenv(bridge)\n"
+        "force = f'{prefix}FORCE_BRIDGE'\n"
+        "os.environ.get(force)\n"
+        "allow = f\"DB_ALLOW_{'BRIDGE_IN_PROD'}\"\n"
+        "os.environ[allow]\n"
+        "safe = 'SAFE_' + 'MODE'\n"
+        "os.getenv(safe)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8}
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
