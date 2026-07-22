@@ -539,17 +539,16 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     tainted_names.add(local_name)
                 else:
                     tainted_names.discard(local_name)
-            for child in ast.iter_child_nodes(stmt):
-                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                    scan_statements(child.body, dict(aliases), set(tainted_names))
-                elif isinstance(child, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
-                    for attr in ("body", "orelse", "finalbody"):
-                        nested = getattr(child, attr, None)
-                        if nested:
-                            scan_statements(nested, dict(aliases), set(tainted_names))
-                    if isinstance(child, ast.Try):
-                        for handler in child.handlers:
-                            scan_statements(handler.body, dict(aliases), set(tainted_names))
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                scan_statements(stmt.body, dict(aliases), set(tainted_names))
+            elif isinstance(stmt, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+                for attr in ("body", "orelse", "finalbody"):
+                    nested = getattr(stmt, attr, None)
+                    if nested:
+                        scan_statements(nested, dict(aliases), set(tainted_names))
+                if isinstance(stmt, ast.Try):
+                    for handler in stmt.handlers:
+                        scan_statements(handler.body, dict(aliases), set(tainted_names))
 
     scan_statements(tree.body, {}, set())
     return tuple(sorted(lines))
