@@ -290,19 +290,18 @@ def _literal_string_tuple(node: ast.AST) -> tuple[str, ...] | None:
     return None
 
 
-def _constant_string_bindings(tree: ast.AST) -> dict[str, tuple[str, ...]]:
-    """Return simple in-file string/sequence aliases for retired-key tracing."""
+def _constant_string_bindings(tree: ast.Module) -> dict[str, tuple[str, ...]]:
+    """Return module-scope string aliases without leaking nested local bindings."""
     aliases: dict[str, tuple[str, ...]] = {}
-    for _ in range(4):
+    while True:
         previous = dict(aliases)
-        for node in ast.walk(tree):
+        for node in tree.body:
             for local_name, value in _assignment_bindings(node):
                 resolved = _resolve_string_values(value, aliases)
                 if resolved:
                     aliases[local_name] = resolved
         if aliases == previous:
-            break
-    return aliases
+            return aliases
 
 
 def _resolve_string_values(
@@ -908,7 +907,7 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     exit_states.append((case_aliases, case_tainted))
                 replace_state(aliases, tainted_names, merge_states(exit_states))
 
-    scan_statements(tree.body, {}, set())
+    scan_statements(tree.body, _constant_string_bindings(tree), set())
     return tuple(sorted(lines))
 
 
