@@ -12,6 +12,11 @@ from tools.evidence import generate_hde_epic038_direct_db_selection as generator
 def test_direct_selection_generation_is_exact_canonical_and_checkable(tmp_path):
     out = tmp_path / "direct.json"
     assert generator.main(["--out", str(out)]) == 0
+    first = out.read_bytes()
+    assert generator.main(["--out", str(out), "--check"]) == 0
+    second_out = tmp_path / "direct-second.json"
+    assert generator.main(["--out", str(second_out)]) == 0
+    assert second_out.read_bytes() == first
     raw = out.read_bytes()
     assert raw.endswith(b"\n") and not raw.endswith(b"\n\n")
     assert raw == generator.canonical_bytes(json.loads(raw))
@@ -47,6 +52,31 @@ def test_direct_selection_schema_rejects_unknown_keys_at_every_object_level(muta
     assert "schema_invalid" in generator.validate_contract(payload)
 
 
+def test_direct_selection_producer_writes_schema_valid_negative_receipt(monkeypatch, tmp_path):
+    original = generator.run_case
+
+    def mutated(case, environ, *, fail=False):
+        row = original(case, environ, fail=fail)
+        if case == "healthy_direct":
+            row["selected"] = "none"
+            row["result"] = "FAIL"
+        return row
+
+    monkeypatch.setattr(generator, "run_case", mutated)
+    out = tmp_path / "direct.json"
+    assert generator.main(["--out", str(out)]) == 1
+    payload = json.loads(out.read_bytes())
+    assert generator.validate_contract(payload) == ()
+    assert payload["result"] == "FAIL"
+    assert payload["failure"] == {
+        "code": "predicate_failure",
+        "failed_predicates": ["direct_only_provider"],
+    }
+    assert payload["predicates"]["secret_values_absent"] is True
+    assert out.read_bytes() == generator.canonical_bytes(payload)
+    assert generator.main(["--out", str(out), "--check"]) == 1
+
+
 def test_direct_selection_validator_rejects_case_and_secret_mutation():
     payload = copy.deepcopy(generator.build())
     payload["cases"][0]["selected"] = "none"
@@ -72,7 +102,7 @@ def test_direct_selection_validator_rejects_case_and_secret_mutation():
         "code": "predicate_failure",
         "failed_predicates": ["direct_only_provider"],
     }
-    assert "schema_invalid" in generator.validate_contract(payload)
+    assert generator.validate_contract(payload) == ()
 
 
 def test_retired_case_uses_membership_even_for_empty_values():

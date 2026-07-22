@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 from pathlib import Path
@@ -120,32 +121,69 @@ def _case_is(actual: Mapping[str, object], expected: Mapping[str, object]) -> bo
     return dict(actual) == dict(expected)
 
 
+def _derive_predicates(cases: object) -> dict[str, bool] | None:
+    expected = _expected_cases()
+    if not isinstance(cases, list) or len(cases) != len(expected):
+        return None
+    return {
+        "direct_only_provider": isinstance(cases[0], Mapping)
+        and _case_is(cases[0], expected[0]),
+        "missing_direct_fails_closed": isinstance(cases[1], Mapping)
+        and _case_is(cases[1], expected[1]),
+        "unavailable_direct_fails_closed": isinstance(cases[2], Mapping)
+        and _case_is(cases[2], expected[2]),
+        "retired_keys_fail_before_provider_attempt": isinstance(cases[3], Mapping)
+        and _case_is(cases[3], expected[3]),
+        "alternate_transport_attempts_zero": all(
+            isinstance(case, Mapping)
+            and case.get("alternate_transport_attempts") == 0
+            for case in cases
+        ),
+        "secret_values_absent": not any(
+            validate_retained_text_safety(OUT, canonical_bytes(case))
+            for case in cases
+        ),
+    }
+
+
+def _payload(cases: list[dict[str, object]]) -> dict[str, object]:
+    predicates = _derive_predicates(cases)
+    if predicates is None:  # pragma: no cover - fixed producer inventory
+        raise AssertionError("direct selection case inventory is not fixed")
+    failed = sorted(name for name in PREDICATE_ORDER if not predicates[name])
+    return {
+        "schema": SCHEMA,
+        "retired_keys": list(RETIRED_DB_TRANSPORT_KEYS),
+        "cases": cases,
+        "predicates": predicates,
+        "result": "FAIL" if failed else "PASS",
+        "failure": (
+            {"code": "predicate_failure", "failed_predicates": failed}
+            if failed
+            else None
+        ),
+    }
+
+
+def _fallback_negative_receipt() -> dict[str, object]:
+    """Return a strict, secret-safe receipt if a producer mutation breaks shape."""
+
+    cases = copy.deepcopy(_expected_cases())
+    for case in cases:
+        case["result"] = "FAIL"
+    cases[0]["alternate_transport_attempts"] = 1
+    return _payload(cases)
+
+
 def validate_contract(payload: Mapping[str, object]) -> tuple[str, ...]:
     errors: list[str] = []
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     if list(Draft202012Validator(schema).iter_errors(payload)):
         errors.append("schema_invalid")
     cases = payload.get("cases")
-    expected = _expected_cases()
-    if not isinstance(cases, list) or len(cases) != len(expected):
+    derived_predicates = _derive_predicates(cases)
+    if derived_predicates is None:
         errors.append("case_inventory_invalid")
-        derived_predicates = None
-    else:
-        derived_predicates = {
-            "direct_only_provider": _case_is(cases[0], expected[0]),
-            "missing_direct_fails_closed": _case_is(cases[1], expected[1]),
-            "unavailable_direct_fails_closed": _case_is(cases[2], expected[2]),
-            "retired_keys_fail_before_provider_attempt": _case_is(cases[3], expected[3]),
-            "alternate_transport_attempts_zero": all(
-                isinstance(case, Mapping)
-                and case.get("alternate_transport_attempts") == 0
-                for case in cases
-            ),
-            "secret_values_absent": not any(
-                validate_retained_text_safety(OUT, canonical_bytes(case))
-                for case in cases
-            ),
-        }
     predicates = payload.get("predicates")
     if not isinstance(predicates, Mapping) or set(predicates) != set(PREDICATE_ORDER):
         errors.append("predicate_inventory_invalid")
@@ -175,28 +213,9 @@ def build() -> dict[str, object]:
         run_case("unavailable_database_url", {"APP_ENV": "dev", "DATABASE_URL": "set-redacted"}, fail=True),
         run_case("retired_keys_present", {"APP_ENV": "dev", "DATABASE_URL": "set-redacted", **{name: "" for name in RETIRED_DB_TRANSPORT_KEYS}}),
     ]
-    expected = _expected_cases()
-    predicates = {
-        "direct_only_provider": _case_is(cases[0], expected[0]),
-        "missing_direct_fails_closed": _case_is(cases[1], expected[1]),
-        "unavailable_direct_fails_closed": _case_is(cases[2], expected[2]),
-        "retired_keys_fail_before_provider_attempt": _case_is(cases[3], expected[3]),
-        "alternate_transport_attempts_zero": all(case.get("alternate_transport_attempts") == 0 for case in cases),
-        "secret_values_absent": not any(validate_retained_text_safety(OUT, canonical_bytes(case)) for case in cases),
-    }
-    ok = all(predicates.values())
-    payload: dict[str, object] = {
-        "schema": SCHEMA,
-        "retired_keys": list(RETIRED_DB_TRANSPORT_KEYS),
-        "cases": cases,
-        "predicates": predicates,
-        "result": "PASS" if ok else "FAIL",
-        "failure": None if ok else {"code": "predicate_failure", "failed_predicates": sorted(name for name, value in predicates.items() if not value)},
-    }
+    payload = _payload(cases)
     if validate_contract(payload):
-        predicates["secret_values_absent"] = False
-        payload["result"] = "FAIL"
-        payload["failure"] = {"code": "predicate_failure", "failed_predicates": sorted(name for name, value in predicates.items() if not value)}
+        payload = _fallback_negative_receipt()
     return payload
 
 
@@ -206,6 +225,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
     data = build()
+    if validate_contract(data):
+        return 1
     raw = canonical_bytes(data)
     if args.check:
         return 0 if args.out.exists() and args.out.read_bytes() == raw and data["result"] == "PASS" else 1

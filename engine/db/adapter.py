@@ -18,6 +18,10 @@ RETIRED_DB_TRANSPORT_KEYS: tuple[str, ...] = (
     "DB_FORCE_BRIDGE",
 )
 
+_SAFE_APP_ENV_NAMES = frozenset(
+    {"ci", "dev", "local", "prod", "production", "staging", "test"}
+)
+
 
 def _environment_key_names(environ: Mapping[str, str]) -> frozenset[str]:
     """Return environment key names without reading any mapped value."""
@@ -28,6 +32,13 @@ def retired_db_transport_keys_present(environ: Mapping[str, str]) -> tuple[str, 
     """Return retired transport key names present in *environ*, independent of value."""
     present = _environment_key_names(environ)
     return tuple(name for name in RETIRED_DB_TRANSPORT_KEYS if name in present)
+
+
+def _safe_app_env_name(environ: Mapping[str, str]) -> str:
+    """Return a bounded environment label without serializing arbitrary input."""
+
+    name = (environ.get("APP_ENV") or "dev").strip().lower()
+    return name if name in _SAFE_APP_ENV_NAMES else "unknown"
 
 
 @dataclass(frozen=True)
@@ -116,12 +127,9 @@ class DBAccess:
         ctor = psycopg_factory or (lambda value: PsycopgProvider(value))
         try:
             provider = ctor(dsn)
+            if getattr(provider, "name", None) != "psycopg":
+                raise TypeError("unexpected_direct_provider")
             provider.health()
-        except PrimaryUnavailable as exc:
-            attempts.append(_canonical_attempt("psycopg", "error", reason=exc.code))
-            exc.attempt_rows = [dict(row) for row in attempts]
-            exc.selection_case = cls._failure_case(env, exc, attempts=attempts)
-            raise
         except Exception as exc:
             attempts.append(_canonical_attempt("psycopg", "error", reason="primary_connect_failed"))
             wrapped = PrimaryUnavailable("primary_connect_failed", attempts=["DATABASE_URL"], code="primary_connect_failed")
@@ -131,7 +139,7 @@ class DBAccess:
         attempts.append(_canonical_attempt("psycopg", "ok", reason=None))
         selection_case: Mapping[str, object] = {
             "case": "healthy_direct",
-            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "app_env": _safe_app_env_name(env),
             "database_url_presence": "present_redacted",
             "retired_keys_present": [],
             "attempts": attempts,
@@ -160,7 +168,7 @@ class DBAccess:
     def _retired_failure_case(env: Mapping[str, str], exc: RetiredBridgeConfiguration) -> Mapping[str, object]:
         return {
             "case": "retired_keys_present",
-            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "app_env": _safe_app_env_name(env),
             "database_url_presence": DBAccess._database_url_presence(env),
             "retired_keys_present": list(exc.retired_keys),
             "attempts": [],
@@ -177,7 +185,7 @@ class DBAccess:
             return DBAccess._retired_failure_case(env, exc)
         return {
             "case": "retired_keys_present" if retired else ("missing_database_url" if exc.code == "missing_database_url" else "unavailable_database_url"),
-            "app_env": (env.get("APP_ENV") or "dev").strip() or "dev",
+            "app_env": _safe_app_env_name(env),
             "database_url_presence": DBAccess._database_url_presence(env) if exc.code == "missing_database_url" else ("present_redacted" if (env.get("DATABASE_URL") or "").strip() else "unset"),
             "retired_keys_present": retired,
             "attempts": [dict(row) for row in attempts],

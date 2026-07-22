@@ -68,6 +68,21 @@ def test_retired_keys_are_membership_sorted_and_block_factory_without_value_leak
     assert "must-not-leak" not in str(exc.value)
 
 
+@pytest.mark.parametrize("key", RETIRED_DB_TRANSPORT_KEYS)
+@pytest.mark.parametrize("value", ["", "0", " ", "set"])
+def test_each_retired_key_value_is_refused_by_membership(key, value):
+    calls = []
+    env = {"DATABASE_URL": "not-serialized", key: value}
+    assert retired_db_transport_keys_present(env) == (key,)
+    with pytest.raises(RetiredBridgeConfiguration) as caught:
+        DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda dsn: calls.append(dsn) or Provider(),
+        )
+    assert caught.value.retired_keys == (key,)
+    assert calls == []
+
+
 def test_retired_keys_raise_before_database_url_value_access():
     class EndpointTrap(Mapping):
         def __init__(self, values):
@@ -127,6 +142,17 @@ def test_direct_success_has_one_health_and_one_selection_attempt():
     }
 
 
+def test_selection_evidence_is_pure_and_does_not_touch_filesystem(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    db = DBAccess.for_current_env(
+        environ={"APP_ENV": "dev", "DATABASE_URL": "not-serialized"},
+        psycopg_factory=lambda _dsn: Provider(),
+    )
+    before = tuple(tmp_path.iterdir())
+    assert db.selection_evidence()["selected"] == "psycopg"
+    assert tuple(tmp_path.iterdir()) == before
+
+
 def test_missing_and_unavailable_database_url_fail_closed_with_stable_codes():
     calls = []
     with pytest.raises(PrimaryUnavailable) as missing:
@@ -143,6 +169,71 @@ def test_missing_and_unavailable_database_url_fail_closed_with_stable_codes():
     assert unavailable.value.code == "primary_connect_failed"
     assert provider.health_calls == 1
     assert "not-serialized" not in str(unavailable.value)
+
+
+def test_direct_failure_normalizes_injected_primary_error_and_never_serializes_it():
+    secret = "postgresql://user:password@host/db"
+
+    class HostileProvider(Provider):
+        def health(self):
+            self.health_calls += 1
+            raise PrimaryUnavailable(secret, code=secret)
+
+    provider = HostileProvider()
+    with pytest.raises(PrimaryUnavailable) as caught:
+        DBAccess.for_current_env(
+            environ={"APP_ENV": secret, "DATABASE_URL": "not-serialized"},
+            psycopg_factory=lambda _dsn: provider,
+        )
+
+    assert str(caught.value) == "primary_connect_failed"
+    assert caught.value.code == "primary_connect_failed"
+    assert caught.value.attempt_rows == [
+        {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"}
+    ]
+    assert caught.value.selection_case["app_env"] == "unknown"
+    assert secret not in repr(caught.value.selection_case)
+
+
+def test_non_psycopg_factory_result_is_rejected_before_health():
+    class AlternateProvider(Provider):
+        name = "bridge"
+
+    provider = AlternateProvider()
+    with pytest.raises(PrimaryUnavailable) as caught:
+        DBAccess.for_current_env(
+            environ={"DATABASE_URL": "not-serialized"},
+            psycopg_factory=lambda _dsn: provider,
+        )
+
+    assert caught.value.code == "primary_connect_failed"
+    assert provider.health_calls == 0
+    assert caught.value.attempt_rows == [
+        {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"}
+    ]
+
+
+@pytest.mark.parametrize("scenario", ["success", "missing", "unavailable", "retired"])
+def test_selection_evidence_never_serializes_hostile_app_env(scenario):
+    secret = "postgresql://user:password@host/db"
+    env = {"APP_ENV": secret}
+    provider = Provider(fail_health=scenario == "unavailable")
+    if scenario != "missing":
+        env["DATABASE_URL"] = "not-serialized"
+    if scenario == "retired":
+        env["DB_FORCE_BRIDGE"] = ""
+
+    try:
+        db = DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda _dsn: provider,
+        )
+        receipt = db.selection_evidence()
+    except (PrimaryUnavailable, RetiredBridgeConfiguration) as exc:
+        receipt = DBAccess.selection_failure_evidence(exc)
+
+    assert receipt["app_env"] == "unknown"
+    assert secret not in repr(receipt)
 
 
 @pytest.mark.parametrize(
