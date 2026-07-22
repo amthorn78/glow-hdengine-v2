@@ -322,6 +322,30 @@ def test_function_parameters_clear_same_named_outer_aliases(tmp_path):
     assert check.scan(tmp_path) == ()
 
 
+def test_function_defaults_preserve_captured_retired_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "def captured(key=key):\n"
+        "    return os.getenv(key)\n"
+        "def direct(other='DB_FORCE_BRIDGE'):\n"
+        "    return os.environ.get(other)\n"
+        "def keyword_only(*, third=key):\n"
+        "    return os.environ[third]\n"
+        "def safe(key='SAFE_MODE'):\n"
+        "    return os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 8}
+
+
 def test_compound_block_aliases_propagate_to_following_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
