@@ -439,6 +439,27 @@ def test_alias_tracing_binds_destructured_literal_loop_targets(tmp_path):
     assert consumption_lines == {3, 5}
 
 
+def test_alias_tracing_binds_comprehension_targets_before_reads(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "keys = ('DB_BRIDGE_URL',)\n"
+        "[os.getenv(key) for key in keys]\n"
+        "[os.environ.get(key) for key, _ in (('DB_FORCE_BRIDGE', None),)]\n"
+        "tuple(os.getenv(key) for key in ('DB_ALLOW_BRIDGE_IN_PROD',))\n"
+        "key = 'DB_BRIDGE_URL'\n"
+        "[os.getenv(key) for key in ('SAFE_MODE',)]\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 4, 5}
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
