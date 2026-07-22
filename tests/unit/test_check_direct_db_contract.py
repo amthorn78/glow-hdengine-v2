@@ -271,6 +271,32 @@ def test_alias_tracing_scans_function_and_control_flow_bodies(tmp_path):
     )
 
 
+def test_alias_tracing_binds_loop_targets_before_body_scan(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "keys = ('DB_BRIDGE_URL', 'DB_FORCE_BRIDGE')\n"
+        "for key in keys:\n"
+        "    os.getenv(key)\n"
+        "def nested():\n"
+        "    nested_keys = ('DB_ALLOW_BRIDGE_IN_PROD',)\n"
+        "    for nested_key in nested_keys:\n"
+        "        os.environ.get(nested_key)\n"
+        "safe_keys = ('SAFE_MODE',)\n"
+        "for safe_key in safe_keys:\n"
+        "    os.getenv(safe_key)\n",
+    )
+    violations = check.scan(tmp_path)
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in violations
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 8}
+
+
 def test_unresolved_computed_environment_value_read_fails_closed(tmp_path):
     _minimal_tree(tmp_path)
     _write(
