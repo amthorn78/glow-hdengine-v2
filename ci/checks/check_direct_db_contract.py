@@ -507,6 +507,25 @@ def _statement_scope_nodes(stmt: ast.stmt) -> tuple[ast.AST, ...]:
     return tuple(nodes)
 
 
+def _function_parameter_names(
+    node: ast.FunctionDef | ast.AsyncFunctionDef,
+) -> set[str]:
+    arguments = node.args
+    names = {
+        argument.arg
+        for argument in [
+            *arguments.posonlyargs,
+            *arguments.args,
+            *arguments.kwonlyargs,
+        ]
+    }
+    if arguments.vararg is not None:
+        names.add(arguments.vararg.arg)
+    if arguments.kwarg is not None:
+        names.add(arguments.kwarg.arg)
+    return names
+
+
 def _python_retired_consumption(text: str) -> tuple[int, ...]:
     try:
         tree = ast.parse(text)
@@ -540,6 +559,32 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             or _unresolved_environ_subscript(node, os_names, environ_names, aliases)
         ):
             lines.add(node.lineno)
+
+    def merge_states(
+        states: list[tuple[dict[str, tuple[str, ...]], set[str]]],
+    ) -> tuple[dict[str, tuple[str, ...]], set[str]]:
+        merged_aliases: dict[str, tuple[str, ...]] = {}
+        merged_tainted: set[str] = set()
+        for state_aliases, state_tainted in states:
+            merged_tainted.update(state_tainted)
+            for name, values in state_aliases.items():
+                combined = list(merged_aliases.get(name, ()))
+                for value in values:
+                    if value not in combined:
+                        combined.append(value)
+                merged_aliases[name] = tuple(combined)
+        return merged_aliases, merged_tainted
+
+    def replace_state(
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+        state: tuple[dict[str, tuple[str, ...]], set[str]],
+    ) -> None:
+        merged_aliases, merged_tainted = state
+        aliases.clear()
+        aliases.update(merged_aliases)
+        tainted_names.clear()
+        tainted_names.update(merged_tainted)
 
     def scan_statements(
         statements: list[ast.stmt],
@@ -576,27 +621,86 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     tainted_names.add(local_name)
                 else:
                     tainted_names.discard(local_name)
-            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                function_aliases = dict(aliases)
+                function_tainted = set(tainted_names)
+                for parameter_name in _function_parameter_names(stmt):
+                    function_aliases.pop(parameter_name, None)
+                    function_tainted.discard(parameter_name)
+                scan_statements(stmt.body, function_aliases, function_tainted)
+            elif isinstance(stmt, ast.ClassDef):
                 scan_statements(stmt.body, dict(aliases), set(tainted_names))
             elif isinstance(stmt, (ast.For, ast.AsyncFor)):
+                entry_state = (dict(aliases), set(tainted_names))
                 loop_aliases = dict(aliases)
+                loop_tainted = set(tainted_names)
                 loop_values = _resolve_string_values(stmt.iter, aliases)
                 if isinstance(stmt.target, ast.Name):
                     if loop_values:
                         loop_aliases[stmt.target.id] = loop_values
                     else:
                         loop_aliases.pop(stmt.target.id, None)
-                scan_statements(stmt.body, loop_aliases, set(tainted_names))
+                    loop_tainted.discard(stmt.target.id)
+                scan_statements(stmt.body, loop_aliases, loop_tainted)
+                exit_states = [entry_state, (loop_aliases, loop_tainted)]
                 if stmt.orelse:
-                    scan_statements(stmt.orelse, dict(aliases), set(tainted_names))
-            elif isinstance(stmt, (ast.If, ast.While, ast.With, ast.AsyncWith, ast.Try)):
-                for attr in ("body", "orelse", "finalbody"):
-                    nested = getattr(stmt, attr, None)
-                    if nested:
-                        scan_statements(nested, dict(aliases), set(tainted_names))
-                if isinstance(stmt, ast.Try):
-                    for handler in stmt.handlers:
-                        scan_statements(handler.body, dict(aliases), set(tainted_names))
+                    orelse_aliases = dict(loop_aliases)
+                    orelse_tainted = set(loop_tainted)
+                    scan_statements(stmt.orelse, orelse_aliases, orelse_tainted)
+                    exit_states.append((orelse_aliases, orelse_tainted))
+                replace_state(aliases, tainted_names, merge_states(exit_states))
+            elif isinstance(stmt, ast.If):
+                entry_state = (dict(aliases), set(tainted_names))
+                body_aliases, body_tainted = dict(aliases), set(tainted_names)
+                scan_statements(stmt.body, body_aliases, body_tainted)
+                exit_states = [(body_aliases, body_tainted)]
+                if stmt.orelse:
+                    orelse_aliases, orelse_tainted = dict(aliases), set(tainted_names)
+                    scan_statements(stmt.orelse, orelse_aliases, orelse_tainted)
+                    exit_states.append((orelse_aliases, orelse_tainted))
+                else:
+                    exit_states.append(entry_state)
+                replace_state(aliases, tainted_names, merge_states(exit_states))
+            elif isinstance(stmt, ast.While):
+                entry_state = (dict(aliases), set(tainted_names))
+                body_aliases, body_tainted = dict(aliases), set(tainted_names)
+                scan_statements(stmt.body, body_aliases, body_tainted)
+                exit_states = [entry_state, (body_aliases, body_tainted)]
+                if stmt.orelse:
+                    orelse_aliases, orelse_tainted = dict(aliases), set(tainted_names)
+                    scan_statements(stmt.orelse, orelse_aliases, orelse_tainted)
+                    exit_states.append((orelse_aliases, orelse_tainted))
+                replace_state(aliases, tainted_names, merge_states(exit_states))
+            elif isinstance(stmt, (ast.With, ast.AsyncWith)):
+                body_aliases, body_tainted = dict(aliases), set(tainted_names)
+                scan_statements(stmt.body, body_aliases, body_tainted)
+                replace_state(aliases, tainted_names, (body_aliases, body_tainted))
+            elif isinstance(stmt, ast.Try):
+                entry_aliases, entry_tainted = dict(aliases), set(tainted_names)
+                body_aliases, body_tainted = dict(aliases), set(tainted_names)
+                scan_statements(stmt.body, body_aliases, body_tainted)
+                if stmt.orelse:
+                    scan_statements(stmt.orelse, body_aliases, body_tainted)
+                exit_states = [(body_aliases, body_tainted)]
+                for handler in stmt.handlers:
+                    handler_aliases = dict(entry_aliases)
+                    handler_tainted = set(entry_tainted)
+                    scan_statements(handler.body, handler_aliases, handler_tainted)
+                    exit_states.append((handler_aliases, handler_tainted))
+                merged = merge_states(exit_states)
+                if stmt.finalbody:
+                    final_aliases, final_tainted = merged
+                    scan_statements(stmt.finalbody, final_aliases, final_tainted)
+                    merged = (final_aliases, final_tainted)
+                replace_state(aliases, tainted_names, merged)
+            elif isinstance(stmt, ast.Match):
+                entry_state = (dict(aliases), set(tainted_names))
+                exit_states = [entry_state]
+                for case in stmt.cases:
+                    case_aliases, case_tainted = dict(aliases), set(tainted_names)
+                    scan_statements(case.body, case_aliases, case_tainted)
+                    exit_states.append((case_aliases, case_tainted))
+                replace_state(aliases, tainted_names, merge_states(exit_states))
 
     scan_statements(tree.body, {}, set())
     return tuple(sorted(lines))
