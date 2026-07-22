@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+from collections.abc import Mapping
 
 import pytest
 
@@ -88,27 +89,35 @@ def test_retired_case_uses_membership_even_for_empty_values():
 
 
 def test_retired_case_does_not_read_database_url_value():
-    class EndpointTrap(dict):
+    class EndpointTrap(Mapping):
+        def __init__(self, values):
+            self._values = dict(values)
+            self.accessed = []
+
+        def __iter__(self):
+            return iter(self._values)
+
+        def __len__(self):
+            return len(self._values)
+
         def __getitem__(self, key):
+            self.accessed.append(key)
             if key == "DATABASE_URL":
                 raise AssertionError("DATABASE_URL value was read")
-            return super().__getitem__(key)
+            return self._values[key]
 
-        def get(self, key, default=None):
-            if key == "DATABASE_URL":
-                raise AssertionError("DATABASE_URL value was read")
-            return super().get(key, default)
-
+    env = EndpointTrap(
+        {
+            "APP_ENV": "dev",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "https://must-not-read",
+        }
+    )
     row = generator.run_case(
         "retired_keys_present",
-        EndpointTrap(
-            {
-                "APP_ENV": "dev",
-                "DATABASE_URL": "postgresql://must-not-read",
-                "DB_BRIDGE_URL": "https://must-not-read",
-            }
-        ),
+        env,
     )
+    assert "DATABASE_URL" not in env.accessed
     assert row["database_url_presence"] == "present_redacted"
     assert row["retired_keys_present"] == ["DB_BRIDGE_URL"]
     assert row["attempts"] == []
