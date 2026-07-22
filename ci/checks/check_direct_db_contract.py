@@ -541,7 +541,18 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                     tainted_names.discard(local_name)
             if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 scan_statements(stmt.body, dict(aliases), set(tainted_names))
-            elif isinstance(stmt, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith, ast.Try)):
+            elif isinstance(stmt, (ast.For, ast.AsyncFor)):
+                loop_aliases = dict(aliases)
+                loop_values = _resolve_string_values(stmt.iter, aliases)
+                if isinstance(stmt.target, ast.Name):
+                    if loop_values:
+                        loop_aliases[stmt.target.id] = loop_values
+                    else:
+                        loop_aliases.pop(stmt.target.id, None)
+                scan_statements(stmt.body, loop_aliases, set(tainted_names))
+                if stmt.orelse:
+                    scan_statements(stmt.orelse, dict(aliases), set(tainted_names))
+            elif isinstance(stmt, (ast.If, ast.While, ast.With, ast.AsyncWith, ast.Try)):
                 for attr in ("body", "orelse", "finalbody"):
                     nested = getattr(stmt, attr, None)
                     if nested:
