@@ -333,6 +333,59 @@ def _contains_retired_key(node: ast.AST, aliases: dict[str, tuple[str, ...]]) ->
     return any(value in RETIRED_KEYS for value in values)
 
 
+def _target_names(target: ast.AST) -> tuple[str, ...]:
+    if isinstance(target, ast.Name):
+        return (target.id,)
+    if isinstance(target, ast.Starred):
+        return _target_names(target.value)
+    if isinstance(target, (ast.List, ast.Tuple)):
+        return tuple(name for item in target.elts for name in _target_names(item))
+    return ()
+
+
+def _pattern_alias_bindings(
+    target: ast.AST,
+    value: ast.AST,
+    aliases: dict[str, tuple[str, ...]],
+) -> dict[str, tuple[str, ...]]:
+    if isinstance(target, ast.Name):
+        resolved = _resolve_string_values(value, aliases)
+        return {target.id: resolved} if resolved else {}
+    if isinstance(target, ast.Starred):
+        return _pattern_alias_bindings(target.value, value, aliases)
+    if (
+        isinstance(target, (ast.List, ast.Tuple))
+        and isinstance(value, (ast.List, ast.Tuple))
+        and len(target.elts) == len(value.elts)
+    ):
+        bindings: dict[str, tuple[str, ...]] = {}
+        for item_target, item_value in zip(target.elts, value.elts):
+            bindings.update(_pattern_alias_bindings(item_target, item_value, aliases))
+        return bindings
+    return {}
+
+
+def _loop_target_alias_bindings(
+    target: ast.AST,
+    iterable: ast.AST,
+    aliases: dict[str, tuple[str, ...]],
+) -> dict[str, tuple[str, ...]]:
+    if isinstance(target, ast.Name):
+        resolved = _resolve_string_values(iterable, aliases)
+        return {target.id: resolved} if resolved else {}
+    if not isinstance(iterable, (ast.List, ast.Tuple, ast.Set)):
+        return {}
+    merged: dict[str, tuple[str, ...]] = {}
+    for item in iterable.elts:
+        for name, values in _pattern_alias_bindings(target, item, aliases).items():
+            combined = list(merged.get(name, ()))
+            for value in values:
+                if value not in combined:
+                    combined.append(value)
+            merged[name] = tuple(combined)
+    return merged
+
+
 def _os_symbol_aliases(tree: ast.AST) -> tuple[set[str], set[str], set[str]]:
     """Return local names bound to os, os.environ, and os.getenv."""
     os_names = {"os"}
@@ -701,13 +754,15 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 entry_state = (dict(aliases), set(tainted_names))
                 loop_aliases = dict(aliases)
                 loop_tainted = set(tainted_names)
-                loop_values = _resolve_string_values(stmt.iter, aliases)
-                if isinstance(stmt.target, ast.Name):
-                    if loop_values:
-                        loop_aliases[stmt.target.id] = loop_values
+                loop_bindings = _loop_target_alias_bindings(
+                    stmt.target, stmt.iter, aliases
+                )
+                for target_name in _target_names(stmt.target):
+                    if target_name in loop_bindings:
+                        loop_aliases[target_name] = loop_bindings[target_name]
                     else:
-                        loop_aliases.pop(stmt.target.id, None)
-                    loop_tainted.discard(stmt.target.id)
+                        loop_aliases.pop(target_name, None)
+                    loop_tainted.discard(target_name)
                 scan_statements(stmt.body, loop_aliases, loop_tainted)
                 exit_states = [entry_state, (loop_aliases, loop_tainted)]
                 if stmt.orelse:
