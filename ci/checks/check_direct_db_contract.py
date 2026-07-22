@@ -358,6 +358,29 @@ def _resolve_string_values(
         return literal
     if isinstance(node, ast.NamedExpr):
         return _resolve_string_values(node.value, aliases)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left = _resolve_string_values(node.left, aliases)
+        right = _resolve_string_values(node.right, aliases)
+        if left is not None and right is not None and len(left) == len(right) == 1:
+            return (left[0] + right[0],)
+        return None
+    if isinstance(node, ast.JoinedStr):
+        parts: list[str] = []
+        for value in node.values:
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                parts.append(value.value)
+                continue
+            if not (
+                isinstance(value, ast.FormattedValue)
+                and value.conversion == -1
+                and value.format_spec is None
+            ):
+                return None
+            resolved = _resolve_string_values(value.value, aliases)
+            if resolved is None or len(resolved) != 1:
+                return None
+            parts.append(resolved[0])
+        return ("".join(parts),)
     if isinstance(node, ast.Name):
         return aliases.get(node.id)
     if isinstance(node, ast.Attribute) and node.attr == "RETIRED_DB_TRANSPORT_KEYS":
@@ -365,6 +388,13 @@ def _resolve_string_values(
             return RETIRED_KEYS
         if _resolve_string_values(node.value, aliases) == _CANONICAL_ADAPTER_MODULE_ALIAS:
             return RETIRED_KEYS
+    if (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in {"frozenset", "iter", "list", "reversed", "set", "sorted", "tuple"}
+        and len(node.args) == 1
+    ):
+        return _resolve_string_values(node.args[0], aliases)
     if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant):
         source = _resolve_string_values(node.value, aliases)
         if source is None:
@@ -420,6 +450,21 @@ def _loop_target_alias_bindings(
     iterable: ast.AST,
     aliases: dict[str, tuple[str, ...]],
 ) -> dict[str, tuple[str, ...]]:
+    if isinstance(iterable, ast.Call) and isinstance(iterable.func, ast.Name):
+        if (
+            iterable.func.id in {"frozenset", "iter", "list", "reversed", "set", "sorted", "tuple"}
+            and len(iterable.args) == 1
+        ):
+            return _loop_target_alias_bindings(target, iterable.args[0], aliases)
+        if (
+            iterable.func.id == "enumerate"
+            and iterable.args
+            and isinstance(target, (ast.List, ast.Tuple))
+            and len(target.elts) == 2
+        ):
+            return _loop_target_alias_bindings(
+                target.elts[1], iterable.args[0], aliases
+            )
     if isinstance(target, ast.Name):
         resolved = _resolve_string_values(iterable, aliases)
         return {target.id: resolved} if resolved else {}
