@@ -571,6 +571,45 @@ def test_unrelated_same_named_import_is_not_the_canonical_roster(tmp_path):
     )
 
 
+def test_module_qualified_canonical_rosters_bind_loop_aliases(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "import engine.db.adapter as adapter\n"
+        "for key in adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n"
+        "from engine.db import adapter as db_adapter\n"
+        "[os.environ.get(key) for key in db_adapter.RETIRED_DB_TRANSPORT_KEYS]\n"
+        "import engine.db.adapter\n"
+        "for key in engine.db.adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {4, 6, 9}
+
+
+def test_unrelated_module_qualified_roster_is_not_canonical(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "import unrelated as adapter\n"
+        "for key in adapter.RETIRED_DB_TRANSPORT_KEYS:\n"
+        "    os.getenv(key)\n",
+    )
+    assert not any(
+        "scripts/current.py" in row and "active_retired_key_consumption" in row
+        for row in check.scan(tmp_path)
+    )
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
