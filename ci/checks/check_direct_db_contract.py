@@ -380,6 +380,19 @@ def _retired_env_call(
     return is_reader and any(_contains_retired_key(value, aliases) for value in values)
 
 
+def _unresolved_retired_key(
+    node: ast.AST, aliases: dict[str, tuple[str, ...]]
+) -> bool:
+    if _contains_retired_key(node, aliases):
+        return False
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return False
+    if isinstance(node, ast.Name):
+        lowered = node.id.lower()
+        return "bridge" in lowered or "retired" in lowered
+    return False
+
+
 def _unresolved_env_call(
     node: ast.Call,
     os_names: set[str],
@@ -398,15 +411,7 @@ def _unresolved_env_call(
     values = [*node.args, *(keyword.value for keyword in node.keywords)]
     if not values:
         return False
-    key = values[0]
-    if _contains_retired_key(key, aliases):
-        return False
-    if isinstance(key, ast.Constant) and isinstance(key.value, str):
-        return False
-    if isinstance(key, ast.Name):
-        lowered = key.id.lower()
-        return "bridge" in lowered or "retired" in lowered
-    return False
+    return _unresolved_retired_key(values[0], aliases)
 
 
 def _dotted_name(node: ast.AST) -> str:
@@ -458,6 +463,17 @@ def _retired_environ_subscript(
     )
 
 
+def _unresolved_environ_subscript(
+    node: ast.Subscript,
+    os_names: set[str],
+    environ_names: set[str],
+    aliases: dict[str, tuple[str, ...]],
+) -> bool:
+    return _is_environ_source(
+        node.value, os_names, environ_names
+    ) and _unresolved_retired_key(node.slice, aliases)
+
+
 def _retired_membership_compare(
     node: ast.Compare,
     os_names: set[str],
@@ -504,8 +520,9 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             node, os_names, environ_names, aliases
         ):
             lines.add(node.lineno)
-        if isinstance(node, ast.Subscript) and _retired_environ_subscript(
-            node, os_names, environ_names, aliases
+        if isinstance(node, ast.Subscript) and (
+            _retired_environ_subscript(node, os_names, environ_names, aliases)
+            or _unresolved_environ_subscript(node, os_names, environ_names, aliases)
         ):
             lines.add(node.lineno)
 
@@ -525,8 +542,13 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                         or _unresolved_env_call(value, os_names, environ_names, getenv_names, statement_aliases)
                     ):
                         statement_tainted.add(local_name)
-                    if isinstance(value, ast.Subscript) and _retired_environ_subscript(
-                        value, os_names, environ_names, statement_aliases
+                    if isinstance(value, ast.Subscript) and (
+                        _retired_environ_subscript(
+                            value, os_names, environ_names, statement_aliases
+                        )
+                        or _unresolved_environ_subscript(
+                            value, os_names, environ_names, statement_aliases
+                        )
                     ):
                         statement_tainted.add(local_name)
             for local_name, value in _assignment_bindings(stmt):
