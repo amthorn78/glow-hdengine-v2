@@ -660,6 +660,33 @@ def test_constant_computed_retired_key_strings_are_resolved(tmp_path):
     assert consumption_lines == {4, 6, 8}
 
 
+def test_signed_sliced_and_dynamic_roster_subscripts_are_resolved(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os\n"
+        "from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS as roster\n"
+        "os.getenv(roster[-1])\n"
+        "for key in roster[:2]:\n"
+        "    os.getenv(key)\n"
+        "for key in roster[::-1]:\n"
+        "    os.environ.get(key)\n"
+        "index = 1\n"
+        "os.getenv(roster[index])\n"
+        "for key in roster[:0]:\n"
+        "    os.getenv(key)\n"
+        "safe = ('SAFE_MODE',)\n"
+        "os.getenv(safe[-1])\n",
+    )
+    consumption_lines = {
+        int(row.split(":")[1])
+        for row in check.scan(tmp_path)
+        if "scripts/current.py" in row and "active_retired_key_consumption" in row
+    }
+    assert consumption_lines == {3, 5, 7, 9}
+
+
 def test_walrus_aliases_are_bound_before_retired_key_reads(tmp_path):
     _minimal_tree(tmp_path)
     _write(
