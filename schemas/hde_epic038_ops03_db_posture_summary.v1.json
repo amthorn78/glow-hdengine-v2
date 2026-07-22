@@ -3,24 +3,394 @@
   "$id": "hde_epic038.ops03.db_posture_summary.v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "run_id", "source_commit", "provider", "selection_attempts", "ordered_query_ids", "query_results", "observations", "counts", "predicates", "result"],
+  "required": [
+    "schema",
+    "run_id",
+    "source_commit",
+    "provider",
+    "selection_attempts",
+    "ordered_query_ids",
+    "query_results",
+    "observations",
+    "counts",
+    "predicates",
+    "result"
+  ],
   "properties": {
-    "schema": {"const": "hde_epic038.ops03.db_posture_summary.v1"},
-    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
-    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "provider": {"const": "psycopg"},
-    "selection_attempts": {"type": "array", "prefixItems": [{"type": "object", "additionalProperties": false, "required": ["provider", "status", "reason"], "properties": {"provider": {"const": "psycopg"}, "status": {"const": "ok"}, "reason": {"type": "null"}}}], "items": false},
-    "ordered_query_ids": {"$ref": "#/$defs/query_ids"},
-    "query_results": {"type": "array", "minItems": 10, "maxItems": 10, "items": {"type": "object", "additionalProperties": false, "required": ["query_id", "status", "row_count", "canonical_sha256"], "properties": {"query_id": {"enum": ["set_transaction_read_only", "set_search_path", "connection_identity", "search_path", "runtime_role_grants", "ddl_columns", "ddl_constraints", "boundary_views", "partition_inventory", "partition_verify"]}, "status": {"const": "ok"}, "row_count": {"type": "integer", "minimum": 0, "maximum": 10000}, "canonical_sha256": {"$ref": "#/$defs/sha256"}}}},
-    "observations": {"type": "object", "additionalProperties": false, "required": ["connection_identity_presence", "search_path", "runtime_role_flags", "ddl_identity", "constraint_count", "boundary_views", "partition_posture"], "properties": {"connection_identity_presence": {"const": true}, "search_path": {"type": "array", "prefixItems": [{"const": "hde"}, {"const": "public"}], "items": false}, "runtime_role_flags": {"type": "object", "additionalProperties": false, "required": ["rolsuper", "rolcreatedb", "rolcreaterole"], "properties": {"rolsuper": {"const": false}, "rolcreatedb": {"const": false}, "rolcreaterole": {"const": false}}}, "ddl_identity": {"type": "object", "additionalProperties": false, "required": ["schema", "canonical_sha256"], "properties": {"schema": {"const": "hde.ddl_identity_projection.v1"}, "canonical_sha256": {"$ref": "#/$defs/sha256"}}}, "constraint_count": {"type": "integer", "minimum": 1}, "boundary_views": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["name", "read_only"], "properties": {"name": {"enum": ["hde.body_graphs_current", "public.hde_body_graphs_current"]}, "read_only": {"const": true}}}}, "partition_posture": {"type": "object", "additionalProperties": false, "required": ["expected_tables", "observed_tables", "all_expected_present"], "properties": {"expected_tables": {"$ref": "#/$defs/partition_names"}, "observed_tables": {"$ref": "#/$defs/partition_names"}, "all_expected_present": {"const": true}}}}},
-    "counts": {"$ref": "#/$defs/counts"},
-    "predicates": {"type": "object", "additionalProperties": false, "required": ["authorization_match", "direct_provider_only", "read_only_transaction", "search_path_exact", "least_privilege_role", "ddl_identity_valid", "constraints_observed", "boundary_views_readonly", "partition_posture_observed", "counts_exact", "secret_values_absent"], "properties": {"authorization_match": {"const": true}, "direct_provider_only": {"const": true}, "read_only_transaction": {"const": true}, "search_path_exact": {"const": true}, "least_privilege_role": {"const": true}, "ddl_identity_valid": {"const": true}, "constraints_observed": {"const": true}, "boundary_views_readonly": {"const": true}, "partition_posture_observed": {"const": true}, "counts_exact": {"const": true}, "secret_values_absent": {"const": true}}},
-    "result": {"const": "PASS"}
+    "schema": {
+      "const": "hde_epic038.ops03.db_posture_summary.v1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "provider": {
+      "const": "psycopg"
+    },
+    "selection_attempts": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "provider": {
+              "const": "psycopg"
+            },
+            "status": {
+              "const": "ok"
+            },
+            "reason": {
+              "type": "null"
+            }
+          }
+        }
+      ],
+      "items": false
+    },
+    "ordered_query_ids": {
+      "$ref": "#/$defs/query_ids"
+    },
+    "query_results": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "query_id",
+          "status",
+          "row_count",
+          "canonical_sha256"
+        ],
+        "properties": {
+          "query_id": {
+            "enum": [
+              "set_transaction_read_only",
+              "set_search_path",
+              "connection_identity",
+              "search_path",
+              "runtime_role_grants",
+              "ddl_columns",
+              "ddl_constraints",
+              "boundary_views",
+              "partition_inventory",
+              "partition_verify"
+            ]
+          },
+          "status": {
+            "const": "ok"
+          },
+          "row_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "canonical_sha256": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connection_identity_presence",
+        "search_path",
+        "runtime_role_flags",
+        "ddl_identity",
+        "constraint_count",
+        "boundary_views",
+        "partition_posture"
+      ],
+      "properties": {
+        "connection_identity_presence": {
+          "const": true
+        },
+        "search_path": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "hde"
+            },
+            {
+              "const": "public"
+            }
+          ],
+          "items": false
+        },
+        "runtime_role_flags": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rolsuper",
+            "rolcreatedb",
+            "rolcreaterole",
+            "rolreplication",
+            "rolbypassrls",
+            "schema_create",
+            "relation_write"
+          ],
+          "properties": {
+            "rolsuper": {
+              "const": false
+            },
+            "rolcreatedb": {
+              "const": false
+            },
+            "rolcreaterole": {
+              "const": false
+            },
+            "rolreplication": {
+              "const": false
+            },
+            "rolbypassrls": {
+              "const": false
+            },
+            "schema_create": {
+              "const": false
+            },
+            "relation_write": {
+              "const": false
+            }
+          }
+        },
+        "ddl_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema",
+            "canonical_sha256"
+          ],
+          "properties": {
+            "schema": {
+              "const": "hde.ddl_identity_projection.v1"
+            },
+            "canonical_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "constraint_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "boundary_views": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "read_only"
+            ],
+            "properties": {
+              "name": {
+                "enum": [
+                  "hde.body_graphs_current",
+                  "public.hde_body_graphs_current"
+                ]
+              },
+              "read_only": {
+                "const": true
+              }
+            }
+          }
+        },
+        "partition_posture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expected_tables",
+            "observed_tables",
+            "all_expected_present"
+          ],
+          "properties": {
+            "expected_tables": {
+              "$ref": "#/$defs/partition_names"
+            },
+            "observed_tables": {
+              "$ref": "#/$defs/partition_names"
+            },
+            "all_expected_present": {
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "counts": {
+      "$ref": "#/$defs/counts"
+    },
+    "predicates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorization_match",
+        "direct_provider_only",
+        "read_only_transaction",
+        "search_path_exact",
+        "least_privilege_role",
+        "ddl_identity_valid",
+        "constraints_observed",
+        "boundary_views_readonly",
+        "partition_posture_observed",
+        "counts_exact",
+        "secret_values_absent"
+      ],
+      "properties": {
+        "authorization_match": {
+          "const": true
+        },
+        "direct_provider_only": {
+          "const": true
+        },
+        "read_only_transaction": {
+          "const": true
+        },
+        "search_path_exact": {
+          "const": true
+        },
+        "least_privilege_role": {
+          "const": true
+        },
+        "ddl_identity_valid": {
+          "const": true
+        },
+        "constraints_observed": {
+          "const": true
+        },
+        "boundary_views_readonly": {
+          "const": true
+        },
+        "partition_posture_observed": {
+          "const": true
+        },
+        "counts_exact": {
+          "const": true
+        },
+        "secret_values_absent": {
+          "const": true
+        }
+      }
+    },
+    "result": {
+      "const": "PASS"
+    }
   },
   "$defs": {
-    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "query_ids": {"type": "array", "prefixItems": [{"const": "set_transaction_read_only"}, {"const": "set_search_path"}, {"const": "connection_identity"}, {"const": "search_path"}, {"const": "runtime_role_grants"}, {"const": "ddl_columns"}, {"const": "ddl_constraints"}, {"const": "boundary_views"}, {"const": "partition_inventory"}, {"const": "partition_verify"}], "items": false},
-    "partition_names": {"type": "array", "prefixItems": [{"const": "hde.pair_evaluation"}, {"const": "hde.public_results"}], "items": false},
-    "counts": {"type": "object", "additionalProperties": false, "required": ["provider_selections", "health_connections", "health_sql_statements", "posture_transactions", "posture_sql_statements", "direct_connections", "sql_statements", "sql_writes", "retries", "alternate_provider_attempts"], "properties": {"provider_selections": {"const": 1}, "health_connections": {"const": 1}, "health_sql_statements": {"const": 1}, "posture_transactions": {"const": 1}, "posture_sql_statements": {"const": 10}, "direct_connections": {"const": 2}, "sql_statements": {"const": 11}, "sql_writes": {"const": 0}, "retries": {"const": 0}, "alternate_provider_attempts": {"const": 0}}}
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "query_ids": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "set_transaction_read_only"
+        },
+        {
+          "const": "set_search_path"
+        },
+        {
+          "const": "connection_identity"
+        },
+        {
+          "const": "search_path"
+        },
+        {
+          "const": "runtime_role_grants"
+        },
+        {
+          "const": "ddl_columns"
+        },
+        {
+          "const": "ddl_constraints"
+        },
+        {
+          "const": "boundary_views"
+        },
+        {
+          "const": "partition_inventory"
+        },
+        {
+          "const": "partition_verify"
+        }
+      ],
+      "items": false
+    },
+    "partition_names": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "hde.pair_evaluation"
+        },
+        {
+          "const": "hde.public_results"
+        }
+      ],
+      "items": false
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_selections",
+        "health_connections",
+        "health_sql_statements",
+        "posture_transactions",
+        "posture_sql_statements",
+        "direct_connections",
+        "sql_statements",
+        "sql_writes",
+        "retries",
+        "alternate_provider_attempts"
+      ],
+      "properties": {
+        "provider_selections": {
+          "const": 1
+        },
+        "health_connections": {
+          "const": 1
+        },
+        "health_sql_statements": {
+          "const": 1
+        },
+        "posture_transactions": {
+          "const": 1
+        },
+        "posture_sql_statements": {
+          "const": 10
+        },
+        "direct_connections": {
+          "const": 2
+        },
+        "sql_statements": {
+          "const": 11
+        },
+        "sql_writes": {
+          "const": 0
+        },
+        "retries": {
+          "const": 0
+        },
+        "alternate_provider_attempts": {
+          "const": 0
+        }
+      }
+    }
   }
 }
