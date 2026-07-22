@@ -686,6 +686,109 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             )
         return False
 
+    def bind_iteration_target(
+        target: ast.AST,
+        iterable: ast.AST,
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+    ) -> None:
+        bindings = _loop_target_alias_bindings(target, iterable, aliases)
+        for target_name in _target_names(target):
+            if target_name in bindings:
+                aliases[target_name] = bindings[target_name]
+            else:
+                aliases.pop(target_name, None)
+            tainted_names.discard(target_name)
+
+    def scan_expression(
+        node: ast.AST,
+        aliases: dict[str, tuple[str, ...]],
+        tainted_names: set[str],
+        named_expression_updates: list[
+            tuple[str, tuple[str, ...] | None, bool]
+        ],
+    ) -> None:
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            comprehension_aliases = dict(aliases)
+            comprehension_tainted = set(tainted_names)
+            for generator in node.generators:
+                scan_expression(
+                    generator.iter,
+                    comprehension_aliases,
+                    comprehension_tainted,
+                    named_expression_updates,
+                )
+                bind_iteration_target(
+                    generator.target,
+                    generator.iter,
+                    comprehension_aliases,
+                    comprehension_tainted,
+                )
+                for condition in generator.ifs:
+                    scan_expression(
+                        condition,
+                        comprehension_aliases,
+                        comprehension_tainted,
+                        named_expression_updates,
+                    )
+            if isinstance(node, ast.DictComp):
+                scan_expression(
+                    node.key,
+                    comprehension_aliases,
+                    comprehension_tainted,
+                    named_expression_updates,
+                )
+                scan_expression(
+                    node.value,
+                    comprehension_aliases,
+                    comprehension_tainted,
+                    named_expression_updates,
+                )
+            else:
+                scan_expression(
+                    node.elt,
+                    comprehension_aliases,
+                    comprehension_tainted,
+                    named_expression_updates,
+                )
+            return
+
+        if isinstance(node, ast.NamedExpr):
+            scan_expression(
+                node.value, aliases, tainted_names, named_expression_updates
+            )
+            check_node(node, aliases, tainted_names)
+            for local_name, value in _assignment_bindings(node):
+                value_tainted = assignment_value_is_tainted(
+                    value, aliases, tainted_names
+                )
+                if value_tainted:
+                    tainted_names.add(local_name)
+                else:
+                    tainted_names.discard(local_name)
+                resolved = _resolve_string_values(value, aliases)
+                if resolved:
+                    aliases[local_name] = resolved
+                else:
+                    aliases.pop(local_name, None)
+                named_expression_updates.append(
+                    (local_name, resolved, value_tainted)
+                )
+            return
+
+        check_node(node, aliases, tainted_names)
+        for local_name, value in _assignment_bindings(node):
+            if assignment_value_is_tainted(value, aliases, tainted_names):
+                tainted_names.add(local_name)
+            else:
+                tainted_names.discard(local_name)
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.stmt):
+                continue
+            scan_expression(
+                child, aliases, tainted_names, named_expression_updates
+            )
+
     def scan_statements(
         statements: list[ast.stmt],
         aliases: dict[str, tuple[str, ...]],
@@ -697,25 +800,12 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
             named_expression_updates: list[
                 tuple[str, tuple[str, ...] | None, bool]
             ] = []
-            for node in _statement_scope_nodes(stmt):
-                check_node(node, statement_aliases, statement_tainted)
-                for local_name, value in _assignment_bindings(node):
-                    value_tainted = assignment_value_is_tainted(
-                        value, statement_aliases, statement_tainted
-                    )
-                    if value_tainted:
-                        statement_tainted.add(local_name)
-                    else:
-                        statement_tainted.discard(local_name)
-                    if isinstance(node, ast.NamedExpr):
-                        resolved = _resolve_string_values(value, statement_aliases)
-                        if resolved:
-                            statement_aliases[local_name] = resolved
-                        else:
-                            statement_aliases.pop(local_name, None)
-                        named_expression_updates.append(
-                            (local_name, resolved, value_tainted)
-                        )
+            scan_expression(
+                stmt,
+                statement_aliases,
+                statement_tainted,
+                named_expression_updates,
+            )
             for local_name, value in _assignment_bindings(stmt):
                 resolved = _resolve_string_values(value, aliases)
                 if resolved:
@@ -754,15 +844,9 @@ def _python_retired_consumption(text: str) -> tuple[int, ...]:
                 entry_state = (dict(aliases), set(tainted_names))
                 loop_aliases = dict(aliases)
                 loop_tainted = set(tainted_names)
-                loop_bindings = _loop_target_alias_bindings(
-                    stmt.target, stmt.iter, aliases
+                bind_iteration_target(
+                    stmt.target, stmt.iter, loop_aliases, loop_tainted
                 )
-                for target_name in _target_names(stmt.target):
-                    if target_name in loop_bindings:
-                        loop_aliases[target_name] = loop_bindings[target_name]
-                    else:
-                        loop_aliases.pop(target_name, None)
-                    loop_tainted.discard(target_name)
                 scan_statements(stmt.body, loop_aliases, loop_tainted)
                 exit_states = [entry_state, (loop_aliases, loop_tainted)]
                 if stmt.orelse:
