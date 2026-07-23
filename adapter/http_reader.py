@@ -499,6 +499,13 @@ def get_reader_bp(emit_fn=None):
                     environ=forced_env,
                     psycopg_factory=_raise_primary,
                 )
+            except RetiredBridgeConfiguration as exc:
+                details = {
+                    "adapter_code": exc.code,
+                    "retired_keys": list(exc.retired_keys),
+                }
+                env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
+                resp = _emit_writer_response(env, status=503, sort_keys=False)
             except AdapterError:
                 # This diagnostic route deliberately injects the historical
                 # forced-unavailable scenario.  Keep its public bytes stable

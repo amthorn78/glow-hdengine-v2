@@ -243,6 +243,16 @@ def test_forced_unavailable_route_uses_overlay_without_ambient_dsn_read(
     assert captured["environ"].maps[0] == {"DATABASE_URL": "db://unavailable"}
     assert captured["environ"].maps[1] is http_reader.os.environ
     assert b"must-not-be-read" not in response.data
+    assert json.loads(response.data) == {
+        "schema": "v1",
+        "ok": False,
+        "code": "ERR_WRITER_RAILS_CLOSED",
+        "error": "rails are closed",
+        "details": {
+            "adapter_code": "retired_bridge_configuration",
+            "retired_keys": ["DB_BRIDGE_URL"],
+        },
+    }
 
 
 def test_diagnostic_writer_ignores_conditionals(client):
