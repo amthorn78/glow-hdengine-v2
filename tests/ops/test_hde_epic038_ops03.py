@@ -199,6 +199,8 @@ def test_ops03_schema_sources_are_canonical_and_well_formed():
     (
         (True, {"type": "integer"}, False),
         (1, {"type": "integer", "minimum": 1, "maximum": 1}, True),
+        (1.0, {"type": "integer"}, True),
+        (1.5, {"type": "integer"}, False),
         ("x", {"unknown": True}, False),
         ("x", {"$ref": "https://example.invalid/schema"}, False),
         ("x", {"$ref": "#/$defs/missing", "$defs": {}}, False),
@@ -213,6 +215,21 @@ def test_ops03_schema_sources_are_canonical_and_well_formed():
         ("x", {"type": "string", "pattern": "["}, False),
         ("2026-07-21", {"type": "string", "format": "date-time"}, False),
         (
+            "2026-07-21t12:00:00.125-07:30",
+            {"type": "string", "format": "date-time"},
+            True,
+        ),
+        (
+            "2026-02-29T12:00:00Z",
+            {"type": "string", "format": "date-time"},
+            False,
+        ),
+        (
+            "2026-07-21T12:00:00+24:00",
+            {"type": "string", "format": "date-time"},
+            False,
+        ),
+        (
             ["a", "b"],
             {
                 "type": "array",
@@ -225,6 +242,14 @@ def test_ops03_schema_sources_are_canonical_and_well_formed():
 )
 def test_strict_schema_validator_is_fail_closed(value, schema, expected):
     assert strict_json_schema.is_valid(value, schema) is expected
+
+
+@pytest.mark.parametrize("value", [1, 1.0, -2.0, 0])
+def test_strict_schema_integer_semantics_match_draft_2020(value):
+    schema = {"type": "integer"}
+    reference = Draft202012Validator(schema)
+
+    assert strict_json_schema.is_valid(value, schema) == reference.is_valid(value)
 
 
 @pytest.fixture

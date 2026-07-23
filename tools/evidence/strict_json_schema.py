@@ -50,14 +50,22 @@ _NONNEGATIVE_INTEGER_KEYS = frozenset(
 )
 _NUMERIC_KEYS = frozenset({"maximum", "minimum"})
 _LOCAL_REF = re.compile(r"^#/\$defs/([A-Za-z0-9_.-]+)$")
-_UTC_DATE_TIME = re.compile(
-    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
-    r"(?:\.[0-9]+)?Z$"
+_RFC3339_DATE_TIME = re.compile(
+    r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})[Tt]"
+    r"(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2})"
+    r"(?:\.[0-9]+)?(?P<zone>[Zz]|[+-][0-9]{2}:[0-9]{2})$"
 )
 
 
 def _is_integer(value: Any) -> bool:
-    return isinstance(value, int) and not isinstance(value, bool)
+    return (
+        (isinstance(value, int) and not isinstance(value, bool))
+        or (
+            isinstance(value, float)
+            and math.isfinite(value)
+            and value.is_integer()
+        )
+    )
 
 
 def _is_number(value: Any) -> bool:
@@ -223,13 +231,28 @@ def _type_matches(value: Any, expected: str) -> bool:
 
 
 def _date_time_valid(value: str) -> bool:
-    if _UTC_DATE_TIME.fullmatch(value) is None:
+    match = _RFC3339_DATE_TIME.fullmatch(value)
+    if match is None:
         return False
     try:
-        parsed = dt.datetime.fromisoformat(value[:-1] + "+00:00")
+        dt.date(
+            int(match.group("year")),
+            int(match.group("month")),
+            int(match.group("day")),
+        )
     except ValueError:
         return False
-    return parsed.tzinfo == dt.timezone.utc
+    hour = int(match.group("hour"))
+    minute = int(match.group("minute"))
+    second = int(match.group("second"))
+    if hour > 23 or minute > 59 or second > 60:
+        return False
+    zone = match.group("zone")
+    if zone not in {"Z", "z"}:
+        offset_hour, offset_minute = map(int, zone[1:].split(":"))
+        if offset_hour > 23 or offset_minute > 59:
+            return False
+    return True
 
 
 def _resolve_ref(reference: str, root: Mapping[str, Any]) -> tuple[str, Any] | None:
