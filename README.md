@@ -102,11 +102,12 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
 
 ### Release identity (EPIC022 Remediation 1)
 
-- Freeze-Pack source of truth is the checked-in `catalog/manifest.json` (single contract; no alternates). Top-level keys are exactly `root`, `version`, `built_at_utc`, `files`; the manifest must not list itself.
+- Release source of truth is the checked-in `catalog/manifest.json` (single contract; no alternates). Top-level keys are exactly `root`, `version`, `built_at_utc`, `files`; the manifest must not list itself.
 - Canonical bytes rule: UTF-8, ASCII-sorted keys (recursively), compact separators, and exactly one trailing `\n`. `release_id = sha256(canonical_bytes(catalog/manifest.json))` (lowercase hex).
-- Evidence copy: `artifacts/math/freeze_pack_manifest.json` is a byte-identical copy of `catalog/manifest.json` (no schema translation or subsets); `manifest_snapshot.json` and similar summaries are evidence-only and are not identity inputs. Alternate manifest-like artifacts must use different names/paths.
-- Governed evidence set (must exist and be non-empty): `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, and `artifacts/proofs/env_pins.txt`.
-- Canonical validation entrypoints: `python scripts/release_id_recompute.py --check` (fail-closed recompute), `python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint), and the closed-rails sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`) that wires the gate alongside other deterministic checks. The recompute/gate `--check` path is read-only and fails if any governed release artifact differs from deterministic expected bytes.
+- Runtime identity derives that digest once from the packaged manifest; release cuts never rewrite a Python identity constant. `catalog` is package data, so source checkouts and installed builds use the same bytes.
+- A release cut intentionally changes only the manifest: `python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. `python scripts/release_id_recompute.py --check-manifest-only` validates the committed input and declared file hashes without reading or repairing derivatives.
+- Current release-bound evidence is built from a temporary tracked-file copy with `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. CI uploads the strict `hde.release_attestation.v1` bundle; source-tree output is refused, the child environment is secret-free and closed-rails, and the PR-A bundle records the required stage-14 downstream stop rather than release admission.
+- The checked-in EPIC022 files under `artifacts/math/` and their existing bindings remain frozen capture-time evidence pending permanent canon drainage. They are not regenerated for each new release and are not current runtime identity inputs.
 
 ## Quickstart (closed rails default)
 
@@ -129,7 +130,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Dev Reader helper (`scripts/dev_start_reader.sh`) remains available for dev/test/local harnessing; APP_ENV gating applies.
 - Use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) or `ci/checks/check_env_pins.sh` to confirm pins.
-- Release identity validation (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check` (canonical bytes + fail-closed recompute), `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint in CI), and `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py` (runs the gate plus deterministic suites). Evidence outputs: `artifacts/math/release_id.txt` (release_id), `artifacts/math/release_id_recompute.log` (recompute trace), `artifacts/math/checksums_audit.log` (manifest file audit), `artifacts/math/manifest_snapshot.json` (evidence-only summary), and `artifacts/proofs/env_pins.txt` (rails proof). `--check` is read-only and verifies every governed release artifact against deterministic expected bytes.
+- Release identity validation (closed rails): run `python scripts/release_id_recompute.py --check-manifest-only` in the source checkout. Build the exact-head evidence bundle with `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`; CI publishes that directory with `actions/upload-artifact`. Do not run the internal closure directly in the source tree.
 
 ## Evidence & QA (EPIC037 + prior epics)
 

@@ -14,6 +14,14 @@ adapter/logging_filter.py
 adapter/no_io_guard.py
 adapter/retry_after.py
 adapter/wsgi.py
+catalog/__init__.py
+catalog/channels_catalog_v1.json
+catalog/channels_v1.json
+catalog/gates_v1.json
+catalog/magic10.json
+catalog/magic10_caps.json
+catalog/magic10_seeds.json
+catalog/manifest.json
 engine/__init__.py
 engine/constants.py
 engine/emit_public.py

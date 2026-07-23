@@ -16,6 +16,7 @@ import argparse
 import datetime as _dt
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
@@ -2711,6 +2712,24 @@ def _parse_utc_iso8601(raw: str) -> _dt.datetime:
     return dt
 
 
+def _isolated_release_timestamp() -> str | None:
+    """Return the immutable cut timestamp for isolated release generation."""
+
+    if os.environ.get("HDE_ISOLATED_RELEASE_BUILD") != "1":
+        return None
+    try:
+        payload = json.loads(
+            (ROOT / "catalog/manifest.json").read_text(encoding="utf-8")
+        )
+        value = payload["built_at_utc"]
+        if not isinstance(value, str):
+            raise TypeError
+        _parse_utc_iso8601(value)
+    except (OSError, UnicodeError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        raise SystemExit("ISOLATED_RELEASE_TIMESTAMP_INVALID") from exc
+    return value
+
+
 def _load_mirror_roles() -> dict[tuple[str, str], str]:
     roles: dict[tuple[str, str], str] = {}
     if not MIRROR_PATH.exists():
@@ -2749,10 +2768,10 @@ def _write_path_proof(
 ) -> tuple[str, str]:
     """Write or validate a path-proof for the given relative path.
 
-    NEW CANON (EPIC017 WS-D4 mtime semantics): mtime_utc captures the filesystem
-    mtime at evidence refresh time, truncated to seconds. It is not required to
-    remain equal to future stat() values across clones. Proof checks validate
-    shape and monotonicity but do not fail solely due to mtime drift.
+    mtime_utc captures provenance at evidence refresh time. Git does not
+    preserve that metadata, so later checks validate its UTC shape while
+    integrity remains bound by path, sha256, size, and declared extra fields.
+    Clone-local stat() values are never evidence inputs.
     """
 
     proof_rel = f"{rel}.path_proof.txt"
@@ -2775,25 +2794,15 @@ def _write_path_proof(
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
-    stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
-    if not check:
-        for candidate in (requested_mtime, existing_mtime):
-            if not candidate:
-                continue
-            try:
-                if _parse_utc_iso8601(candidate) > stat_mtime_dt:
-                    requested_mtime = None
-                    existing_mtime = None
-                    break
-            except Exception:  # noqa: BLE001
-                requested_mtime = None
-                existing_mtime = None
-                break
     if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
         requested_produced = None
         requested_mtime = None
         existing_produced = None
         existing_mtime = None
+    isolated_timestamp = _isolated_release_timestamp()
+    if isolated_timestamp is not None:
+        requested_produced = isolated_timestamp
+        requested_mtime = isolated_timestamp
     if not check and existing:
         try:
             existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
@@ -2808,11 +2817,7 @@ def _write_path_proof(
             and existing_mtime is not None
             and existing_produced is not None
         ):
-            try:
-                if _parse_utc_iso8601(existing_mtime) <= stat_mtime_dt:
-                    return proof_rel, existing_produced
-            except Exception:  # noqa: BLE001
-                pass
+            return proof_rel, existing_produced
     if requested_produced and existing_mtime:
         try:
             if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
@@ -2857,8 +2862,6 @@ def _write_path_proof(
         if rel in NON_BACKDATED_PROOF_RELS and produced_parsed < mtime_parsed:
             raise SystemExit(f"PROOF_PRODUCED_BACKDATED:{proof_rel}")
 
-        if mtime_parsed > stat_mtime_dt:
-            raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
         return proof_rel, produced_raw
 
     mtime = mtime_floor
@@ -3446,7 +3449,10 @@ def main(argv: list[str] | None = None) -> None:
 
     def _run_once(*, check: bool) -> None:
         _validate_epic038_pr02_semantics()
-        produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+        isolated_timestamp = _isolated_release_timestamp()
+        produced_default = isolated_timestamp or _isoformat(
+            _dt.datetime.now(tz=_dt.timezone.utc)
+        )
         mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
         mirror_proof_existing = _load_existing_proof(mirror_proof_path)
         mirror_produced = mirror_proof_existing.get("produced_at_utc")
@@ -3455,9 +3461,11 @@ def main(argv: list[str] | None = None) -> None:
                 _parse_utc_iso8601(mirror_produced)
             except Exception:  # noqa: BLE001
                 mirror_produced = None
-        if mirror_produced:
+        if mirror_produced and isolated_timestamp is None:
             produced_default = mirror_produced
-        if any(_stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS):
+        if isolated_timestamp is None and any(
+            _stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS
+        ):
             produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
 
         entries = _load_human_index()

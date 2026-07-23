@@ -319,6 +319,28 @@ def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
     ]
 
 
+def check_manifest_only(
+    manifest_path: Path | str = Path("catalog/manifest.json"),
+) -> int:
+    """Validate the immutable release input without reading derived evidence."""
+
+    require_closed_rails()
+    path = Path(manifest_path)
+    manifest_obj, _raw, _canonical, problems = _compute_manifest_bytes(path)
+    if manifest_obj is None:
+        problems.append("manifest_unvalidated")
+    else:
+        for audit_line in _audit_files(
+            manifest_obj,
+            repo_root=path.parent.parent,
+        ):
+            if not audit_line.startswith("PASS "):
+                problems.append(f"manifest_file_audit:{audit_line}")
+    for problem in sorted(set(problems)):
+        print(f"MANIFEST_ERROR:{problem}", file=sys.stderr)
+    return 0 if not problems else 1
+
+
 def recompute(
     *,
     manifest_path: Path | str = Path("catalog/manifest.json"),
@@ -391,15 +413,37 @@ def recompute(
 def main(argv: Iterable[str] | None = None) -> int:  # pragma: no cover
     parser = argparse.ArgumentParser(description="Recompute and validate release_id from the canonical manifest")
     parser.add_argument("--manifest", default="catalog/manifest.json", help="Path to the source-of-truth manifest")
-    parser.add_argument("--check", action="store_true", help="Fail non-zero on mismatches without suppressing writes")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail non-zero on derived-output mismatches without writing",
+    )
+    parser.add_argument(
+        "--check-manifest-only",
+        action="store_true",
+        help="Read-only validation of the canonical manifest and its declared inputs",
+    )
     parser.add_argument(
         "--refresh-manifest",
         action="store_true",
-        help="Refresh manifest file hashes and sizes before regenerating release artifacts",
+        help=argparse.SUPPRESS,
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
-    if args.check and args.refresh_manifest:
-        parser.error("--refresh-manifest cannot be combined with --check")
+    if args.check_manifest_only:
+        if args.check or args.refresh_manifest:
+            parser.error(
+                "--check-manifest-only cannot be combined with --check or --refresh-manifest"
+            )
+        return check_manifest_only(Path(args.manifest))
+    if args.refresh_manifest:
+        parser.error(
+            "--refresh-manifest is retired; use scripts/cut_release_manifest.py"
+        )
+    if not args.check and os.environ.get("HDE_ISOLATED_RELEASE_BUILD") != "1":
+        parser.error(
+            "source-tree release evidence writes are retired; "
+            "use tools/evidence/build_release_attestation.py"
+        )
     return recompute(
         manifest_path=Path(args.manifest),
         check=args.check,

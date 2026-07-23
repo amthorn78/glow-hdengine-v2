@@ -8,7 +8,9 @@
 - Env pins: `python scripts/ensure_env.py` → expect `[ENV] OK` with rails above; CI mirrors this via `ci/checks/check_env_pins.sh`.
 - Serializer parity: `pytest -q tests/test_sercanon.py` (runs under pinned locale/timezone).
 - Registry report spot-check: `python tools/generate_registry_report.py --check` to validate catalog inputs and serializer wiring.
-- Release identity gate (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check` (fail-closed canonical recompute) and `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_release_identity.sh` (Python entrypoint). Both commands run under the canonical manifest contract (`catalog/manifest.json` only; keys `{root,version,built_at_utc,files}`, no self-listing; canonical bytes rule). `--check` writes `artifacts/math/release_id_recompute.log` and its sha sidecar even on failure; use a clean workspace or discard local changes.
+- Release input gate (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only`. It validates canonical `catalog/manifest.json` and its declared file hashes without writing.
+- Intentional release cut: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. This updates only the manifest; commit that input once.
+- Exact-head attestation: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. The tool uses an isolated tracked-file copy, validates a fixed point and the PR-A stage-14 stop, and emits `attestation.json`, its checksum, a names-only transcript, and generated evidence outside the Repo.
 
 ## Evidence and guard workflow
 ```bash
@@ -29,7 +31,7 @@ python tools/evidence/orientation_demo.py
 python tools/evidence/run_sanity_pipeline.py
 ```
 Outputs are governed and require `.path_proof.txt` plus INDEX/mirror updates; the sanity pipeline runs under closed rails and mirrors registry_report/sanity artifacts into Index/Mirror when combined with the index updater.
-- Release identity outputs (must exist and be non-empty under PF10/PF12 discipline): `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, `artifacts/proofs/env_pins.txt`. `artifacts/math/freeze_pack_manifest.json` is the byte-identical evidence copy of `catalog/manifest.json`; `manifest_snapshot.json` is evidence-only and not an identity input. The identity gate is also wired into `python tools/evidence/run_sanity_pipeline.py`.
+- Existing checked-in EPIC022 release outputs remain frozen capture-time evidence. Current release derivatives and the legacy closure are produced only inside the external attestation build; direct source-tree closure execution is refused.
 
 ## Config & bundles (D5/D6)
 ```bash

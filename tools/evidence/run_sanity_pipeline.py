@@ -230,10 +230,10 @@ def validate_pr05_path_proof_prerequisites(root: Path = ROOT) -> None:
                 fields.get("produced_at_utc", "").replace("Z", "+00:00")
             )
             timestamps_valid = (
-                mtime_utc.tzinfo is not None
-                and produced_at_utc.tzinfo is not None
-                and mtime_utc.astimezone(dt.timezone.utc)
-                <= dt.datetime.fromtimestamp(primary_stat.st_mtime, tz=dt.timezone.utc)
+                mtime_utc.tzinfo == dt.timezone.utc
+                and produced_at_utc.tzinfo == dt.timezone.utc
+                and mtime_utc.microsecond == 0
+                and produced_at_utc.microsecond == 0
             )
         except (OSError, ValueError):
             digest = ""

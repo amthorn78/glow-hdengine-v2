@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -931,9 +932,25 @@ def test_pr05_preflight_roster_matches_governed_index_and_current_proofs():
     sanity.validate_pr05_path_proof_prerequisites()
 
 
+def test_pr05_preflight_is_independent_of_clone_filesystem_mtime(
+    tmp_path,
+):
+    root = tmp_path / "repo"
+    for rel in sanity.PR05_PRIMARY_PATHS:
+        primary = root / rel
+        proof = root / f"{rel}.path_proof.txt"
+        primary.parent.mkdir(parents=True, exist_ok=True)
+        proof.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(sanity.ROOT / rel, primary)
+        shutil.copy2(sanity.ROOT / f"{rel}.path_proof.txt", proof)
+        os.utime(primary, (1, 1))
+
+    sanity.validate_pr05_path_proof_prerequisites(root)
+
+
 @pytest.mark.parametrize(
     "mutation",
-    ("missing", "stale", "invalid-mtime", "future-mtime", "invalid-produced-at"),
+    ("missing", "stale", "invalid-mtime", "invalid-produced-at"),
 )
 def test_pr05_preflight_rejects_missing_or_stale_inherited_proof(
     tmp_path, mutation
@@ -967,8 +984,6 @@ def test_pr05_preflight_rejects_missing_or_stale_inherited_proof(
         )
     elif mutation == "invalid-mtime":
         replace_field("mtime_utc", "invalid")
-    elif mutation == "future-mtime":
-        replace_field("mtime_utc", "9999-12-31T23:59:59Z")
     else:
         replace_field("produced_at_utc", "invalid")
     with pytest.raises(ValueError, match="path proof"):
@@ -1435,14 +1450,11 @@ def test_sanity_gate_only_tolerates_exact_fresh_nonfinal_receipt(
     assert gate.main() == expected
 
 
-def test_ci_uses_explicit_nonfinal_gate_wrapper():
+def test_ci_builds_and_publishes_nonfinal_gate_in_external_attestation():
     workflow = (sanity.ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    assert "run: python tools/evidence/run_sanity_pipeline_gate.py" in workflow
     assert "run: python tools/evidence/run_sanity_pipeline.py" not in workflow
-    closure_invocations = [
-        line.strip()
-        for line in workflow.splitlines()
-        if "python tools/evidence/regenerate_identity_closure.py" in line
-    ]
-    assert closure_invocations
-    assert all(line.endswith("--check") for line in closure_invocations)
+    assert "tools/evidence/regenerate_identity_closure.py" not in workflow
+    assert "tools/evidence/build_release_attestation.py" in workflow
+    assert '--output "$RUNNER_TEMP/hde-release-attestation"' in workflow
+    assert '--verify "$RUNNER_TEMP/hde-release-attestation"' in workflow
+    assert "actions/upload-artifact@v4" in workflow

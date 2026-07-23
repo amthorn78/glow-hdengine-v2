@@ -24,18 +24,17 @@ jobs:
       - run: python -m pip install pytest
       - run: ci/checks/check_env_pins.sh
       - run: ci/checks/check_cli_help.sh
-      - name: Verify committed closure before any write-capable QA
-        env:
-          PIP_NO_INDEX: "1"
+      - name: Verify immutable release input without derived-tree writes
         run: |
           git diff --exit-code
-          python tools/evidence/regenerate_identity_closure.py --check
+          python scripts/release_id_recompute.py --check-manifest-only
+          python -m pytest -q tests/runtime/test_identity.py
           git diff --exit-code
       # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
       - run: python tools/cli/serializer_grep_guard.py
       - run: python tools/cli/emitter_symbol_proof.py
-      - name: Run canonical JSON gate (closed rails)
-        run: python tools/evidence/run_canonical_json_gate.py --check-only
+      # Current release-bound canonical captures are rebuilt in the isolated
+      # attestation job below. Historical checked-in evidence remains immutable.
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
       - run: python tools/evidence/orientation_demo.py --check
@@ -234,10 +233,21 @@ jobs:
       - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
       - run: python -m pip install pytest
-      - name: Verify committed identity closure without repair
-        run: |
-          git diff --exit-code
-          python tools/evidence/regenerate_identity_closure.py --check
-          git diff --exit-code
-      - name: Run and validate PR-A nonfinal sanity pipeline
-        run: python tools/evidence/run_sanity_pipeline_gate.py
+      - name: Build PR-A release attestation outside the source tree
+        run: >-
+          python tools/evidence/build_release_attestation.py
+          --output "$RUNNER_TEMP/hde-release-attestation"
+          --require-clean
+      - name: Run canonical JSON gate (closed rails)
+        run: >-
+          python tools/evidence/build_release_attestation.py
+          --verify "$RUNNER_TEMP/hde-release-attestation"
+          --require-clean
+      - name: Publish exact-head release attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hde-release-attestation-${{ github.sha }}
+          path: ${{ runner.temp }}/hde-release-attestation
+          if-no-files-found: error
+          retention-days: 30

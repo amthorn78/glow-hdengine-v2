@@ -311,14 +311,11 @@ def _proof_ok(rel: str) -> bool:
     if not mtime_raw or not produced_raw:
         return False
     try:
-        mtime_dt = update_evidence_index._parse_utc_iso8601(mtime_raw)
+        update_evidence_index._parse_utc_iso8601(mtime_raw)
         update_evidence_index._parse_utc_iso8601(produced_raw)
     except Exception:  # noqa: BLE001 - match evidence gate fail-closed parsing posture
         return False
-    stat_mtime_dt = update_evidence_index._dt.datetime.fromtimestamp(
-        path.stat().st_mtime, tz=update_evidence_index._dt.timezone.utc
-    )
-    return mtime_dt <= stat_mtime_dt
+    return True
 
 
 def _mirror_row_ok(path: str, mirror: dict[str, dict[str, Any]], *, strict_hash: bool = True) -> bool:

@@ -3,9 +3,71 @@ from __future__ import annotations
 import datetime as _dt
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from tools.evidence import update_evidence_index
+
+
+def test_path_proof_validation_is_independent_of_clone_mtime(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    artifact = tmp_path / "artifact.log"
+    artifact.write_bytes(b"bound bytes\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    kwargs = {
+        "rel": "artifact.log",
+        "sha256": digest,
+        "size_bytes": artifact.stat().st_size,
+        "mtime_utc": "2026-07-23T00:00:00Z",
+        "produced_at": "2026-07-23T00:00:01Z",
+        "default_produced_at": "2026-07-23T00:00:01Z",
+        "stat_mtime": artifact.stat().st_mtime,
+    }
+    update_evidence_index._write_path_proof(check=False, **kwargs)
+    proof = tmp_path / "artifact.log.path_proof.txt"
+    original = proof.read_bytes()
+
+    os.utime(artifact, (1, 1))
+    clone_kwargs = {**kwargs, "stat_mtime": artifact.stat().st_mtime}
+    update_evidence_index._write_path_proof(check=True, **clone_kwargs)
+    update_evidence_index._write_path_proof(check=False, **clone_kwargs)
+    assert proof.read_bytes() == original
+
+
+def test_isolated_path_proof_uses_immutable_manifest_timestamp(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    monkeypatch.setenv("HDE_ISOLATED_RELEASE_BUILD", "1")
+    catalog = tmp_path / "catalog"
+    catalog.mkdir()
+    (catalog / "manifest.json").write_text(
+        json.dumps({"built_at_utc": "2026-07-23T00:00:00Z"}) + "\n",
+        encoding="utf-8",
+    )
+    artifact = tmp_path / "artifact.log"
+    artifact.write_bytes(b"bound bytes\n")
+
+    update_evidence_index._write_path_proof(
+        "artifact.log",
+        sha256=hashlib.sha256(artifact.read_bytes()).hexdigest(),
+        size_bytes=artifact.stat().st_size,
+        mtime_utc="2099-01-01T00:00:00Z",
+        produced_at="2099-01-01T00:00:00Z",
+        default_produced_at="2099-01-01T00:00:00Z",
+        check=False,
+        stat_mtime=artifact.stat().st_mtime,
+    )
+
+    proof = update_evidence_index._load_existing_proof(
+        tmp_path / "artifact.log.path_proof.txt"
+    )
+    assert proof["mtime_utc"] == "2026-07-23T00:00:00Z"
+    assert proof["produced_at_utc"] == "2026-07-23T00:00:00Z"
 
 
 def test_index_canonical_and_hash_matches(tmp_path):
@@ -79,12 +141,11 @@ def test_mirror_schema_and_parity():
         parsed_mtime = _dt.datetime.fromisoformat(proof["mtime_utc"].replace("Z", "+00:00"))
         assert parsed_mtime.tzinfo == _dt.timezone.utc
         assert parsed_mtime.microsecond == 0
-        artifact_stat_mtime = _dt.datetime.fromtimestamp(
-            Path(rec["discovered_physical_path"]).stat().st_mtime, tz=_dt.timezone.utc
+        parsed_produced = _dt.datetime.fromisoformat(
+            proof["produced_at_utc"].replace("Z", "+00:00")
         )
-        # NEW CANON (EPIC017 WS-D4): mtime_utc records refresh-time mtime and only
-        # needs to be monotone (not necessarily equal across clones).
-        assert parsed_mtime <= artifact_stat_mtime
+        assert parsed_produced.tzinfo == _dt.timezone.utc
+        assert parsed_produced.microsecond == 0
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     lines = mirror_path.read_text(encoding="utf-8").splitlines(True)

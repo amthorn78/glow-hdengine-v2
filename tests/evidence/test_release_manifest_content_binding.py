@@ -155,11 +155,6 @@ def test_closure_write_regenerates_env_matrix(monkeypatch):
         "_is_current",
         lambda *args, **kwargs: False,
     )
-    monkeypatch.setattr(
-        regenerate_identity_closure,
-        "_refresh_cut_time_identity",
-        lambda: None,
-    )
 
     regenerate_identity_closure._write_closure()
 
@@ -195,28 +190,25 @@ def test_closure_write_skips_current_producers(monkeypatch):
     calls: list[tuple[str, ...]] = []
     monkeypatch.setattr(regenerate_identity_closure, "_is_current", lambda *args, **kwargs: True)
     monkeypatch.setattr(regenerate_identity_closure, "_run", lambda *args, **kwargs: calls.append(args))
-    monkeypatch.setattr(regenerate_identity_closure, "_refresh_cut_time_identity", lambda: None)
 
     regenerate_identity_closure._write_closure()
 
-    assert calls == [("scripts/release_id_recompute.py", "--check")]
+    assert calls == [
+        ("scripts/release_id_recompute.py",),
+        ("scripts/release_id_recompute.py", "--check"),
+    ]
 
 
-def test_cut_time_release_refresh_updates_only_release_field():
-    old_release = "1" * 64
-    new_release = "2" * 64
-    source = (
-        '_CUT_TIME_IDENTITY = {\n'
-        '    "engine_tag": "hdengine@prod",\n'
-        f'    "release_id": "{old_release}",\n'
-        '}\n'
+def test_closure_never_refreshes_manifest_or_rewrites_identity_source(monkeypatch):
+    calls: list[tuple[str, ...]] = []
+    monkeypatch.setattr(regenerate_identity_closure, "_is_current", lambda *args, **kwargs: True)
+    monkeypatch.setattr(regenerate_identity_closure, "_run", lambda *args, **kwargs: calls.append(args))
+
+    regenerate_identity_closure._write_closure()
+
+    assert all("--refresh-manifest" not in call for call in calls)
+    source = Path("tools/evidence/regenerate_identity_closure.py").read_text(
+        encoding="utf-8"
     )
-
-    updated = regenerate_identity_closure._replace_cut_time_release_id(
-        source,
-        new_release,
-    )
-
-    assert f'"release_id": "{new_release}"' in updated
-    assert "hdengine@prod" in updated
-    assert old_release not in updated
+    assert "_CUT_TIME_IDENTITY" not in source
+    assert "IDENTITY_SOURCE.write_text" not in source
