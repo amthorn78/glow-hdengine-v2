@@ -54,7 +54,7 @@ def test_preflight_refuses_noncanonical_uuid_before_io(monkeypatch, user_id):
         _preflight(value)
 
 
-def test_database_is_health_checked_before_vendor_fetch(monkeypatch):
+def test_database_is_health_checked_before_vendor_fetch(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     calls = []
     class DB:
@@ -63,12 +63,12 @@ def test_database_is_health_checked_before_vendor_fetch(monkeypatch):
             raise RuntimeError("unavailable")
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", lambda **kwargs: calls.append("vendor") or None)
-    with pytest.raises(RuntimeError, match="unavailable"):
-        main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
+    assert main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"]) == 1
     assert calls == ["db_health"]
+    assert capsys.readouterr().err == "OPS_FAILED error_class=RuntimeError\n"
 
 
-def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch):
+def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     captured = {}
 
@@ -90,10 +90,10 @@ def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypat
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", client_from_env)
 
-    with pytest.raises(SystemExit, match="attempt count must equal one"):
-        main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
+    assert main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"]) == 1
 
     assert captured["retry"] == SINGLE_REQUEST_RETRY
+    assert capsys.readouterr().err == "OPS_FAILED error_class=RuntimeError\n"
 
 
 def test_packet_arguments_must_be_supplied_together(monkeypatch, tmp_path):

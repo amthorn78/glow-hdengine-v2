@@ -112,7 +112,7 @@ def test_success_uses_mapped_cache_once_and_snapshot_none(monkeypatch):
     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: calls.append(kwargs) or db)
     result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
     assert result.status == "ok" and client.calls == 1
-    assert calls == [{"snapshot_path": None}]
+    assert calls == [{}]
     assert captured["db"] is db and captured["cache"]["payload_posture"] == "adapter_mapped_no_raw_vendor_payload"
     assert result.payload["ingest"]["canonical_sha256"] == "b" * 64
 
