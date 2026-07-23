@@ -234,7 +234,10 @@ jobs:
       - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
       - run: python -m pip install pytest
-      - name: Regenerate identity closure artifacts
-        run: python tools/evidence/regenerate_identity_closure.py
+      - name: Verify committed identity closure without repair
+        run: |
+          git diff --exit-code
+          python tools/evidence/regenerate_identity_closure.py --check
+          git diff --exit-code
       - name: Run and validate PR-A nonfinal sanity pipeline
         run: python tools/evidence/run_sanity_pipeline_gate.py

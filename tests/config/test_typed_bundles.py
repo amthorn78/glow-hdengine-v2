@@ -50,6 +50,17 @@ def test_two_run_identity(rails_env: dict[str, str]) -> None:
     assert be_first == be_second
 
 
+def test_bundle_check_mode_is_read_only(rails_env: dict[str, str]) -> None:
+    fe_before, be_before = _run_generators(rails_env)
+    subprocess.run(
+        [sys.executable, "tools/config/generate_bundles.py", "--check"],
+        check=True,
+        env=rails_env,
+    )
+    assert FE_BUNDLE_PATH.read_bytes() == fe_before
+    assert BE_BUNDLE_PATH.read_bytes() == be_before
+
+
 def test_frontend_bundle_schema_and_sources(rails_env: dict[str, str]) -> None:
     _run_generators(rails_env)
     fe_bundle = _read_canonical(FE_BUNDLE_PATH)

@@ -133,23 +133,25 @@ def default_steps() -> list[SanityStep]:
     return [
         SanityStep(STAGE_NAMES[0], (("ci/checks/check_env_pins.sh",),)),
         SanityStep(STAGE_NAMES[1], (
-            _py("tools/evidence/generate_identity_provenance.py"),
-            _py("tools/evidence/generate_release_bindings.py"),
-            _py("tools/evidence/generate_env_matrix_snapshot.py"),
+            _py("tools/config/generate_config_artifacts.py", "--check"),
+            _py("tools/config/generate_bundles.py", "--check"),
+            _py("tools/evidence/generate_identity_provenance.py", "--check"),
+            _py("tools/evidence/generate_release_bindings.py", "--check"),
+            _py("tools/evidence/generate_env_matrix_snapshot.py", "--check"),
             _py("scripts/release_id_recompute.py", "--check"),
             _py("ci/checks/check_release_identity.sh"),
         )),
         SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
-        SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
-        SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py"),)),
-        SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
+        SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
+        SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py", "--check"),)),
+        SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py", "--check"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
         SanityStep(STAGE_NAMES[6], (("__validate_direct_selection__",), _py("ci/checks/check_direct_db_contract.py"))),
-        SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_db_runtime_posture.py"),)),
-        SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
-        SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py"),)),
+        SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_db_runtime_posture.py", "--check"),)),
+        SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_bodygraph_policy_proofs.py", "--check"),)),
+        SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py", "--check"),)),
         SanityStep(STAGE_NAMES[10], (
             ("__validate_pr05_proofs__",),
-            _py("tools/evidence/generate_v2_mapped_cache_evidence.py"),
+            _py("tools/evidence/generate_v2_mapped_cache_evidence.py", "--check"),
         )),
         SanityStep(STAGE_NAMES[11], (("__validate_historical_ops01__",),)),
         SanityStep(STAGE_NAMES[12], (("__validate_ops02__",),)),
@@ -826,7 +828,12 @@ def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary:
 def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
     data = _render_log(results, first_failure, summary)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(data)
+    try:
+        current = path.read_bytes()
+    except OSError:
+        current = None
+    if current != data:
+        path.write_bytes(data)
     return data
 
 
@@ -902,8 +909,12 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             return 1
         return 0
 
+    try:
+        prior_final_bytes = log_path.read_bytes()
+    except OSError:
+        prior_final_bytes = None
     _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
-    if not passed and canonical_run:
+    if not passed and canonical_run and prior_final_bytes != final_bytes:
         seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PINS = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 PR_A_NONFINAL_EXIT = 3
+FRESH_NONFINAL_STDERR = "pr_a_nonfinal_ops03_pr_b_binding_required\n"
 STAGE_NAMES = (
     "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
     "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
@@ -56,28 +57,28 @@ def _valid_log() -> bool:
     return data == ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def _log_version() -> tuple[int, int, int, int, int] | None:
-    """Return filesystem generation metadata for the canonical sanity receipt."""
-    try:
-        stat = LOG.stat()
-    except OSError:
-        return None
-    return (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
-
-
 def main() -> int:
     env = os.environ.copy()
     env.update(PINS)
-    prior_log_version = _log_version()
-    result = subprocess.run([sys.executable, "tools/evidence/run_sanity_pipeline.py"], cwd=ROOT, env=env)
-    current_log_version = _log_version()
+    result = subprocess.run(
+        [sys.executable, "tools/evidence/run_sanity_pipeline.py"],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
     if (
         result.returncode == PR_A_NONFINAL_EXIT
-        and current_log_version is not None
-        and current_log_version != prior_log_version
+        and result.stdout == ""
+        and result.stderr == FRESH_NONFINAL_STDERR
         and _valid_log()
     ):
+        print(FRESH_NONFINAL_STDERR, end="", file=sys.stderr)
         return 0
+    if result.stdout:
+        print(result.stdout, end="", file=sys.stdout)
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
     return result.returncode or 1
 
 

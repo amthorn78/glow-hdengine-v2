@@ -113,6 +113,29 @@ def test_pipeline_has_separate_direct_historical_ops02_and_ops03_validators():
     assert all("__validate_ops__" not in step.commands for step in steps)
 
 
+def test_pre_ops_pipeline_consumes_prebuilt_artifacts_without_repairing_them():
+    write_capable_generators = {
+        "tools/config/generate_config_artifacts.py",
+        "tools/config/generate_bundles.py",
+        "tools/evidence/generate_identity_provenance.py",
+        "tools/evidence/generate_release_bindings.py",
+        "tools/evidence/generate_env_matrix_snapshot.py",
+        "tools/evidence/generate_determinism_gate_proofs.py",
+        "tools/evidence/generate_open_rails_abba_proof.py",
+        "tools/evidence/generate_a7_transport_proofs.py",
+        "tools/evidence/generate_rails_gate_evidence.py",
+        "tools/evidence/generate_db_runtime_posture.py",
+        "tools/evidence/generate_bodygraph_policy_proofs.py",
+        "tools/evidence/generate_architecture_snapshot.py",
+        "tools/evidence/generate_v2_mapped_cache_evidence.py",
+    }
+    for step in sanity.default_steps()[:11]:
+        for command in step.commands:
+            scripts = write_capable_generators.intersection(command)
+            if scripts:
+                assert "--check" in command or "--check-only" in command
+
+
 def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
     commands = [command for step in sanity.default_steps() for command in step.commands]
     updater = (sanity.sys.executable, "tools/evidence/update_evidence_index.py")
@@ -227,6 +250,29 @@ def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     assert log.read_text(encoding="utf-8").endswith(
         "first_failed_stage:late\nsummary:FAIL\n"
     )
+
+
+def test_unchanged_canonical_failure_receipt_is_not_rebound(tmp_path, monkeypatch):
+    log = tmp_path / "sanity.log"
+    expected = _nonfinal_log()
+    log.write_bytes(expected)
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    _mock_pre_ops_success(monkeypatch)
+    monkeypatch.setattr(
+        sanity,
+        "validate_ops03_tracked_packet",
+        lambda: (_ for _ in ()).throw(
+            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
+        ),
+    )
+    monkeypatch.setattr(
+        sanity,
+        "_rebind_failure_log",
+        lambda: (_ for _ in ()).throw(AssertionError("unchanged receipt rebound")),
+    )
+
+    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert log.read_bytes() == expected
 
 
 def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatch):
@@ -1333,7 +1379,7 @@ def test_sanity_gate_rejects_stale_valid_nonfinal_log(tmp_path, monkeypatch):
     assert gate.main() == gate.PR_A_NONFINAL_EXIT
 
 
-def test_sanity_gate_accepts_fresh_exact_nonfinal_log(tmp_path, monkeypatch):
+def test_sanity_gate_accepts_fresh_exact_nonfinal_log(tmp_path, monkeypatch, capsys):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
     log = tmp_path / "sanity_pipeline.log"
@@ -1341,11 +1387,19 @@ def test_sanity_gate_accepts_fresh_exact_nonfinal_log(tmp_path, monkeypatch):
 
     def run(*args, **kwargs):
         log.write_bytes(_nonfinal_log())
-        return _result(gate.PR_A_NONFINAL_EXIT)
+        return subprocess.CompletedProcess(
+            [],
+            gate.PR_A_NONFINAL_EXIT,
+            "",
+            gate.FRESH_NONFINAL_STDERR,
+        )
 
     monkeypatch.setattr(gate, "LOG", log)
     monkeypatch.setattr(gate.subprocess, "run", run)
     assert gate.main() == 0
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == gate.FRESH_NONFINAL_STDERR
 
 
 @pytest.mark.parametrize(
@@ -1368,7 +1422,12 @@ def test_sanity_gate_only_tolerates_exact_fresh_nonfinal_receipt(
 
     def run(*args, **kwargs):
         log.write_text(f"fresh receipt {returncode}\n", encoding="utf-8")
-        return _result(returncode)
+        return subprocess.CompletedProcess(
+            [],
+            returncode,
+            "",
+            gate.FRESH_NONFINAL_STDERR if valid_log else "",
+        )
 
     monkeypatch.setattr(gate, "LOG", log)
     monkeypatch.setattr(gate.subprocess, "run", run)
@@ -1380,3 +1439,10 @@ def test_ci_uses_explicit_nonfinal_gate_wrapper():
     workflow = (sanity.ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "run: python tools/evidence/run_sanity_pipeline_gate.py" in workflow
     assert "run: python tools/evidence/run_sanity_pipeline.py" not in workflow
+    closure_invocations = [
+        line.strip()
+        for line in workflow.splitlines()
+        if "python tools/evidence/regenerate_identity_closure.py" in line
+    ]
+    assert closure_invocations
+    assert all(line.endswith("--check") for line in closure_invocations)

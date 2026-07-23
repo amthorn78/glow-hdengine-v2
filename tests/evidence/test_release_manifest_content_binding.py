@@ -148,7 +148,12 @@ def test_closure_write_regenerates_env_matrix(monkeypatch):
     monkeypatch.setattr(
         regenerate_identity_closure,
         "_run",
-        lambda *args: calls.append(args),
+        lambda *args, **kwargs: calls.append(args),
+    )
+    monkeypatch.setattr(
+        regenerate_identity_closure,
+        "_is_current",
+        lambda *args, **kwargs: False,
     )
     monkeypatch.setattr(
         regenerate_identity_closure,
@@ -163,6 +168,38 @@ def test_closure_write_regenerates_env_matrix(monkeypatch):
     assert calls.index(env_matrix_call) < calls.index(
         ("tools/evidence/update_evidence_index.py",)
     )
+
+
+def test_closure_roster_covers_release_dependent_local_derivatives():
+    writes = {step.write for step in regenerate_identity_closure.CLOSURE_STEPS}
+    checks = {step.check for step in regenerate_identity_closure.CLOSURE_STEPS}
+    expected_writes = {
+        ("tools/config/generate_config_artifacts.py",),
+        ("tools/config/generate_bundles.py",),
+        ("tools/evidence/generate_determinism_gate_proofs.py",),
+        ("tools/evidence/generate_open_rails_abba_proof.py",),
+        ("tools/evidence/generate_a7_transport_proofs.py",),
+        ("tools/evidence/generate_architecture_snapshot.py",),
+        ("tools/evidence/generate_v2_mapped_cache_evidence.py",),
+        ("tools/evidence/update_evidence_index.py",),
+        ("tools/evidence/orientation_demo.py",),
+    }
+    assert expected_writes <= writes
+    for write in expected_writes:
+        step = next(item for item in regenerate_identity_closure.CLOSURE_STEPS if item.write == write)
+        assert step.check in checks
+        assert step.check[-1] in {"--check", "--check-only"}
+
+
+def test_closure_write_skips_current_producers(monkeypatch):
+    calls: list[tuple[str, ...]] = []
+    monkeypatch.setattr(regenerate_identity_closure, "_is_current", lambda *args, **kwargs: True)
+    monkeypatch.setattr(regenerate_identity_closure, "_run", lambda *args, **kwargs: calls.append(args))
+    monkeypatch.setattr(regenerate_identity_closure, "_refresh_cut_time_identity", lambda: None)
+
+    regenerate_identity_closure._write_closure()
+
+    assert calls == [("scripts/release_id_recompute.py", "--check")]
 
 
 def test_cut_time_release_refresh_updates_only_release_field():

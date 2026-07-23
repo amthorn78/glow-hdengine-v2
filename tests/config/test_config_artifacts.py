@@ -55,3 +55,18 @@ def test_band_edges_config() -> None:
     assert clamp[0] <= clamp[1]
     assert edges[-1] == clamp[1]
     assert obj["rounding"] == "ROUND_HALF_UP"
+
+
+def test_config_artifact_check_mode_is_read_only() -> None:
+    paths = (
+        Path("artifacts/registry/registry_report.json"),
+        Path("artifacts/thresholds/magic10_config.json"),
+        Path("artifacts/thresholds/band_edges.json"),
+    )
+    before = {path: path.read_bytes() for path in paths}
+    subprocess.run(
+        [sys.executable, "tools/config/generate_config_artifacts.py", "--check"],
+        check=True,
+        env=closed_rails_env(),
+    )
+    assert {path: path.read_bytes() for path in paths} == before
