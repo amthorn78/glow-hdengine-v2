@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.7  
+**Version:** v12.3.8  
 Effective Date: 2026.07.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -65,7 +65,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.14) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet  
 2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership  
 2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics  
-2.17) HDE-EPIC038 PR-06R-A
+2.17) HDE-EPIC038 PR-06R-A  
+2.18) HDE-EPIC038 OPS-03 Planning Failure: No HDE Database Roles Exist
 
 # 2\) Numbered Addenda
 
@@ -14212,6 +14213,99 @@ Evidence: GitHub Repo | `audit/gates/sanity_pipeline/sanity_pipeline.log`; exact
 * **PF09 action:** No status change recommended.
 
 DECISION: MERGED WORK ACCEPTABLE
+
+## 2.18) HDE-EPIC038 OPS-03 Planning Failure: No HDE Database Roles Exist
+
+Timestamp: 072326 23:03  
+Details: The Product Owner identified and corrected a planning failure introduced by the Implementation Author in the HDE-EPIC038 OPS-03 lineage. The planning and implementation contract imposed a dedicated least-privilege database-role posture without first inspecting the live database, locating canonical proof that such roles had been established, or planning the work required to create them. The resulting OPS-03 attempt evaluated the real database against a nonexistent role model and failed. This addendum records the actual database-role posture, assigns responsibility correctly, and supersedes contrary role-existence assumptions in Addenda 2.14 through 2.17.
+
+### Definitive current database-role posture
+
+Within Glow/HDE, the definitive current fact is: **no database roles exist.**
+
+There is no Glow/HDE database-role system. No project-created reader, writer, application, runtime, migration, owner, admin, service, or least-privilege database role has been defined, provisioned, granted, or verified.
+
+The database is currently accessed through the existing `postgres` administrative identity. That identity is not an HDE role model and does not establish the existence of any planned specialized role.
+
+No tracked migration creates an HDE database role. The tracked PR-04 DDL contains no grant statements or default-privilege statements and generates `NO_GRANT_STATEMENTS_ESTABLISHED`. Existing introspection evidence records the elevated `postgres` identity and its privileges; it does not record a dedicated HDE reader or any other HDE role.
+
+Repository-local names such as `hde_reader` and `hde_writer`, synthetic role rows in tests, schema fields such as `runtime_role_flags`, and the predicate name `least_privilege_role` are proposed models, fixtures, or acceptance machinery. They are not proof that corresponding live database roles exist.
+
+### Planning failure
+
+The Implementation Author converted a desired future security posture into an assumed current prerequisite.
+
+Specifically:
+
+* Addendum 2.14 established `runtime_role_grants` as an OPS-03 observation and required every decisive predicate to be true for PASS.  
+* Addendum 2.15 made “least-privilege” observation part of the active completion meaning for `HDE-DIST001.4` and required grants to satisfy current predicates.  
+* PR-06R-A implemented `least_privilege_role=true` as a mandatory OPS-03 success condition, requiring the effective database identity to have no superuser, create-database, create-role, replication, bypass-RLS, schema-create, ownership, or relation-write capability.  
+* Tests proved that the software would accept a synthetic all-false role fixture. They did not prove that a matching live role existed.  
+* No planning-time database inspection or canonical provisioning record established a dedicated reader role before the one-attempt OPS task was authorized.
+
+The subsequent failure analysis compounded the error by describing the issue as an underspecified credential posture and suggesting that the operator should have supplied or attested to a dedicated reader. That was incorrect. The operator could not supply a role that had never been created. The failure belongs to the planning and acceptance contract, not to the Product Owner, the operator, or the supplied `DATABASE_URL`.
+
+### Correct interpretation of the failed OPS-03 attempt
+
+The failed attempt proves that the authorized direct PostgreSQL path reached the database, executed its bounded read-only observation sequence, and rejected the actual database posture under the imposed predicates. It does not prove that the wrong existing credential was supplied, that a dedicated reader was available but omitted, or that the operator failed a prerequisite.
+
+The OPS-03 success contract was unsatisfiable against the actual current role posture because it required a specialized role that did not exist.
+
+The consumed authorization remains consumed. No success packet was produced, no PR-06R-B admission occurred, and no repository or persistent database mutation resulted.
+
+### Supersession and current planning rule
+
+For the exact topic of database-role existence and OPS-03 role prerequisites, this addendum supersedes contrary implications or assumptions in Addenda 2.14 through 2.17.
+
+The direct-only PostgreSQL transport decision, closed-rails posture, authorization binding, read-only transaction requirement, no-write controls, secret-safety requirements, and provenance rules remain unchanged.
+
+Until explicitly authorized role-provisioning work has been completed and verified:
+
+* no plan, OPS instruction, test, schema, evidence contract, or completion predicate may state or imply that an HDE reader, writer, runtime, application, migration, owner, or least-privilege role exists;  
+* no operator attestation may be requested for the existence or use of such a role;  
+* `least_privilege_role=true` cannot be treated as a satisfiable current OPS-03 PASS requirement;  
+* synthetic fixtures and desired privilege matrices must remain clearly labeled as proposed or test-only;  
+* database-role existence must be established through direct inspection and authoritative provisioning evidence, never inferred from desired architecture, PF wording, repository labels, tests, schemas, or acceptance predicates.
+
+No new OPS-03 attempt may be authorized until the Product Owner approves one of two explicit paths:
+
+1. rescope OPS-03 to observe and truthfully record the actual current database identity and privileges without requiring a nonexistent specialized role; or  
+2. authorize, implement, and verify explicit database-role provisioning before constructing new OPS-03 authorization bytes.
+
+### PF09 posture
+
+This addendum does not infer that an existing PF09 task created database roles. PF09 language concerning least-privilege posture, grants, or a completed status is not evidence that external database roles were provisioned.
+
+`HDE-SEPA001.3 — Grants / DDL least-privilege posture` is recorded as `Done`, but that recorded status and its listed artifacts do not prove that external HDE database roles were created. Its wording, evidence meaning, and status must be reviewed separately before deciding whether it requires correction, reopening, or a distinct role-provisioning task. This addendum makes none of those changes by implication.
+
+If the Product Owner determines that separate database roles are required, the work must be established through an explicit PF09 task or authorized PF09 amendment. That work must define, at minimum:
+
+* the required role set and exact responsibilities;  
+* ownership and privilege boundaries;  
+* creation, grant, revoke, and default-privilege behavior;  
+* application, migration, OPS, and administrative credential use;  
+* secret storage, rotation, and recovery ownership;  
+* deployment order, rollback, and failure handling;  
+* direct live verification and admissible evidence.
+
+No PF09 task ID, subtask ID, status change, reopening, completion claim, or phase placement is created by implication. Those require separate source review and Product Owner authorization.
+
+### Required downstream correction
+
+Before further OPS-03 or PR-06R-B work, the active planning and implementation lineage must be reviewed for every dependency on the nonexistent role model. At minimum, the OPS-03 predicates, schemas, runner behavior, validator behavior, authorization prerequisites, failure semantics, evidence contract, and PF09 supportability language must be corrected to match the Product Owner’s selected path.
+
+The correction must distinguish:
+
+* actual current database state;  
+* desired future security architecture;  
+* work required to create that architecture;  
+* evidence that proves the work was completed.
+
+None may be substituted for another.
+
+### Explicit nonclaims
+
+This addendum does not create or provision a database role, authorize database mutation, select the final role architecture, create a PF09 task, change PF09 status, revise implementation code, approve new OPS-03 authorization bytes, execute or rerun OPS-03, admit a success packet, perform PR-06R-B, create QA PASS, satisfy a token, complete HDE-EPIC038, or close the epic.
 
 \<eof\>
 
