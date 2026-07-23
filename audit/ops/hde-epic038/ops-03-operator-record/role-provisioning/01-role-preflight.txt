@@ -1,0 +1,28 @@
+ database_name | current_role |        server_version         
+---------------+--------------+-------------------------------
+ railway       | postgres     | 17.6 (Debian 17.6-2.pgdg13+1)
+
+  rolname  | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls 
+-----------+-------------+----------+-------------+---------------+----------------+--------------
+ hde_owner | f           | f        | f           | f             | f              | f
+ hde_rw    | f           | f        | f           | f             | f              | f
+ postgres  | t           | t        | t           | t             | t              | t
+
+ nspname |       owner       
+---------+-------------------
+ hde     | postgres
+ public  | pg_database_owner
+
+ body_graphs_present | hde_boundary_view_present | public_boundary_view_present | pair_evaluation_present | public_results_present 
+---------------------+---------------------------+------------------------------+-------------------------+------------------------
+ t                   | t                         | t                            | t                       | t
+
+ schema_name | privilege_type | granted_to_public 
+-------------+----------------+-------------------
+
+ table_schema | table_name | privilege_type | grantee 
+--------------+------------+----------------+---------
+
+ rolname 
+---------
+

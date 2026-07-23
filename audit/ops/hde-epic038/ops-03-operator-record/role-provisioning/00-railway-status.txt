@@ -1,0 +1,30 @@
+
+Workspace:       amthorn78's Projects
+
+Project:         ample-illumination
+Project ID:      ce01529f-679f-4f52-a979-23113299a59b
+
+Environment:     production
+Environment ID:  a06b149a-2876-40bf-84a0-7880feaf8b67
+
+Linked service
+
+Postgres
+    status:        ● Online
+    image:         ghcr.io/railwayapp-templates/postgres-ssl:17
+    volume:        postgres-volume · /var/lib/postgresql/data · 116 MB / 500 MB
+    region:        EU West
+    deployment ID: bd8b82a4-11bb-4354-8948-0f13b3a2a87b
+    service ID:    c4d54416-d1ab-4818-898b-9b9be03bc69a
+
+────────────────────────────────────────────────
+
+All resources
+
+    Services
+      - glow-backend-v4: ● Online · https://glow-backend-v4-production.up.railway.app
+      - glow-hdengine-v2: ● Online · https://glow-hdengine-v2-production.up.railway.app
+    Databases
+      - Redis: ● Online · redis-volume
+      - Postgres: ● Online · postgres-volume
+

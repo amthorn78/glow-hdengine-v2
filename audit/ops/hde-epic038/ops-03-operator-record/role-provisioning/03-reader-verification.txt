@@ -1,0 +1,28 @@
+Pager usage is off.
+BEGIN
+SET
+  effective_role  | transaction_read_only | search_path_exact 
+------------------+-----------------------+-------------------
+ hde_ops03_reader | t                     | t
+
+ rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | schema_create | relation_write 
+----------+-------------+---------------+----------------+--------------+---------------+----------------
+ f        | f           | f             | f              | f            | f             | f
+
+ body_graph_columns_visible 
+----------------------------
+ t
+
+ body_graph_constraints_visible 
+--------------------------------
+ t
+
+ boundary_views_visible 
+------------------------
+ t
+
+ expected_partitions_visible 
+-----------------------------
+ t
+
+ROLLBACK

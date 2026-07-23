@@ -1,0 +1,13 @@
+ALTER ROLE
+     rolname      | login_disabled | password_cleared 
+------------------+----------------+------------------
+ hde_ops03_reader | t              | t
+
+  rolname   | no_login 
+------------+----------
+ hde_reader | t
+
+ reader_membership_retained 
+----------------------------
+ t
+

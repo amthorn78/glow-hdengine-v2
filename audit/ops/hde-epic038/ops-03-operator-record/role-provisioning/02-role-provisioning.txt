@@ -1,0 +1,25 @@
+BEGIN
+CREATE ROLE
+CREATE ROLE
+GRANT ROLE
+DO
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER ROLE
+ALTER ROLE
+COMMIT
+ALTER ROLE
+     rolname      | rolcanlogin | rolinherit | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolconnlimit 
+------------------+-------------+------------+----------+-------------+---------------+----------------+--------------+--------------
+ hde_ops03_reader | t           | t          | f        | f           | f             | f              | f            |            2
+ hde_reader       | f           | f          | f        | f           | f             | f              | f            |           -1
+
+ reader_membership_active 
+--------------------------
+ t
+
