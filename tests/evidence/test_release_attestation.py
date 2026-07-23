@@ -63,6 +63,34 @@ def test_child_environment_is_closed_and_drops_sensitive_values(monkeypatch):
     assert "HD_API_KEY" not in child
 
 
+def test_success_transcript_is_names_only_and_runtime_independent(
+    tmp_path,
+    monkeypatch,
+):
+    outputs = iter(
+        (
+            subprocess.CompletedProcess(
+                args=[], returncode=0, stdout="25 passed in 0.35s\n", stderr=""
+            ),
+            subprocess.CompletedProcess(
+                args=[], returncode=0, stdout="25 passed in 0.31s\n", stderr=""
+            ),
+        )
+    )
+    monkeypatch.setattr(builder.subprocess, "run", lambda *_args, **_kwargs: next(outputs))
+    monkeypatch.setattr(builder, "_clean_child_env", lambda _source: {})
+    first: list[str] = []
+    second: list[str] = []
+
+    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), first)
+    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), second)
+
+    assert first == second
+    assert "0.35" not in "\n".join(first)
+    assert "0.31" not in "\n".join(second)
+    assert "stdout_recorded=false" in first
+
+
 def test_source_tree_digest_is_order_independent_and_names_only():
     records = {
         "b": {"path": "b", "sha256": "b" * 64, "size": 2},

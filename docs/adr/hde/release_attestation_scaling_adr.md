@@ -32,6 +32,7 @@ No edge points from the external attestation back into tracked source.
 - Host-specific virtual-environment files are not source inputs. The legacy tracked `.venv` entries are removed from Git (the ignored local environment remains on disk), and future tracked environment roots fail source inventory.
 - The external output path must be outside the source tree and empty; existing output is never overwritten.
 - The bundle binds the exact commit, a deterministic tracked-tree digest, manifest/release digest, sorted file inventory, hashes, sizes, build transcript, and the PR-A stage-14 stop.
+- Success transcripts retain only stage, command, and exit-code facts; subprocess bytes and timing are not persisted, so repeated builds for one exact source produce an identical content tree.
 - Unknown schema fields, mutation, missing or extra files, checksum drift, noncanonical bytes, a failure receipt, and a non-exact source in CI fail closed.
 - Generated material that fails the retained secret-safety contract is omitted with names-only reason codes; its companions are omitted with it. A failed build removes partial output and emits only a names-only failure receipt.
 - Frozen bridge-era roots and all OPS roots are explicit isolated-write refusals. The bundle verifier recomputes the current clean Git commit and tracked-tree digest when exact-source verification is required.

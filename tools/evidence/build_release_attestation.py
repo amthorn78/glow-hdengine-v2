@@ -348,12 +348,8 @@ def _run_stage(
                 for index, arg in enumerate(argv)
             ),
             f"exit_code={proc.returncode}",
-            "stdout_begin",
-            proc.stdout.rstrip("\n"),
-            "stdout_end",
-            "stderr_begin",
-            proc.stderr.rstrip("\n"),
-            "stderr_end",
+            "stdout_recorded=false",
+            "stderr_recorded=false",
         ]
     )
     if proc.returncode != 0:
