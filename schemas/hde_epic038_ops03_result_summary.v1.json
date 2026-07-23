@@ -1,17 +1,1 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hde_epic038.ops03.result_summary.v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema", "run_id", "source_commit", "authorization_sha256", "capture_result", "decisive_predicates", "primary_files", "nonclaims_ref"],
-  "properties": {
-    "schema": {"const": "hde_epic038.ops03.result_summary.v1"},
-    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
-    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "authorization_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "capture_result": {"const": "PASS"},
-    "decisive_predicates": {"type": "object", "additionalProperties": false, "required": ["authorization_match", "direct_provider_only", "read_only_transaction", "search_path_exact", "least_privilege_role", "ddl_identity_valid", "constraints_observed", "boundary_views_readonly", "partition_posture_observed", "counts_exact", "secret_values_absent"], "properties": {"authorization_match": {"const": true}, "direct_provider_only": {"const": true}, "read_only_transaction": {"const": true}, "search_path_exact": {"const": true}, "least_privilege_role": {"const": true}, "ddl_identity_valid": {"const": true}, "constraints_observed": {"const": true}, "boundary_views_readonly": {"const": true}, "partition_posture_observed": {"const": true}, "counts_exact": {"const": true}, "secret_values_absent": {"const": true}}},
-    "primary_files": {"type": "array", "prefixItems": [{"const": "commands.txt"}, {"const": "db_posture_summary.json"}, {"const": "env_presence.json"}, {"const": "exit_code.txt"}, {"const": "nonclaims.json"}, {"const": "result_summary.json"}, {"const": "stderr.log"}, {"const": "stdout.log"}], "items": false},
-    "nonclaims_ref": {"const": "nonclaims.json"}
-  }
-}
+{"$id":"hde_epic038.ops03.result_summary.v1","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"authorization_sha256":{"pattern":"^[0-9a-f]{64}$","type":"string"},"capture_result":{"const":"PASS"},"decisive_predicates":{"additionalProperties":false,"properties":{"authorization_match":{"const":true},"boundary_views_readonly":{"const":true},"constraints_observed":{"const":true},"counts_exact":{"const":true},"ddl_identity_valid":{"const":true},"direct_provider_only":{"const":true},"least_privilege_role":{"const":true},"partition_posture_observed":{"const":true},"read_only_transaction":{"const":true},"search_path_exact":{"const":true},"secret_values_absent":{"const":true}},"required":["authorization_match","direct_provider_only","read_only_transaction","search_path_exact","least_privilege_role","ddl_identity_valid","constraints_observed","boundary_views_readonly","partition_posture_observed","counts_exact","secret_values_absent"],"type":"object"},"nonclaims_ref":{"const":"nonclaims.json"},"primary_files":{"items":false,"maxItems":8,"minItems":8,"prefixItems":[{"const":"commands.txt"},{"const":"db_posture_summary.json"},{"const":"env_presence.json"},{"const":"exit_code.txt"},{"const":"nonclaims.json"},{"const":"result_summary.json"},{"const":"stderr.log"},{"const":"stdout.log"}],"type":"array"},"run_id":{"pattern":"^[a-z0-9][a-z0-9-]{15,63}$","type":"string"},"schema":{"const":"hde_epic038.ops03.result_summary.v1"},"source_commit":{"pattern":"^[0-9a-f]{40}$","type":"string"}},"required":["schema","run_id","source_commit","authorization_sha256","capture_result","decisive_predicates","primary_files","nonclaims_ref"],"type":"object"}

@@ -12,6 +12,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 from scripts.ops import hde_epic038_ops03 as runner
 from tools.evidence import hde_epic038_ops03 as validator
@@ -27,6 +28,15 @@ CLEAN_ENV = {
     "TZ": "UTC",
     "DATABASE_URL": "fixture-not-serialized",
 }
+OPS03_SCHEMA_FILES = (
+    "hde_epic038_ops03_authorization.v1.json",
+    "hde_epic038_ops03_db_posture_summary.v1.json",
+    "hde_epic038_ops03_env_presence.v1.json",
+    "hde_epic038_ops03_failure_receipt.v1.json",
+    "hde_epic038_ops03_nonclaims.v1.json",
+    "hde_epic038_ops03_result_summary.v1.json",
+    "hde_epic038_ops03_validation_receipt.v1.json",
+)
 
 
 class FixtureProvider:
@@ -38,12 +48,21 @@ class FixtureProvider:
         fail_posture: bool = False,
         role_row=None,
         boundary_rows=None,
+        partition_rows=None,
     ):
         self.fail_posture = fail_posture
         self.role_row = role_row or (False, False, False, False, False, False, False)
         self.boundary_rows = boundary_rows or (
             ("hde", "body_graphs_current", "NO", "NO", "NO", "NO", "NO"),
             ("public", "hde_body_graphs_current", "NO", "NO", "NO", "NO", "NO"),
+        )
+        self.partition_rows = (
+            partition_rows
+            if partition_rows is not None
+            else (
+                ("hde.pair_evaluation", "r", "RANGE (evaluated_at)"),
+                ("hde.public_results", "r", "RANGE (created_at)"),
+            )
         )
 
     def health(self) -> None:
@@ -62,10 +81,7 @@ class FixtureProvider:
             [("id", "uuid", "NO", "gen_random_uuid()")],
             [("body_graphs_pkey", "PRIMARY KEY (id)")],
             list(self.boundary_rows),
-            [
-                ("hde.pair_evaluation", "r", "release_id"),
-                ("hde.public_results", "r", "release_id"),
-            ],
+            list(self.partition_rows),
             [("hde.pair_evaluation", True), ("hde.public_results", True)],
         ]
 
@@ -82,7 +98,13 @@ class FixtureProvider:
         return {}
 
 
-def _provider_builder(*, fail_posture: bool = False, role_row=None, boundary_rows=None):
+def _provider_builder(
+    *,
+    fail_posture: bool = False,
+    role_row=None,
+    boundary_rows=None,
+    partition_rows=None,
+):
     def builder(counters):
         def factory(_dsn):
             counters.provider_selections += 1
@@ -91,6 +113,7 @@ def _provider_builder(*, fail_posture: bool = False, role_row=None, boundary_row
                     fail_posture=fail_posture,
                     role_row=role_row,
                     boundary_rows=boundary_rows,
+                    partition_rows=partition_rows,
                 ),
                 counters,
                 count_connections_by_call=True,
@@ -136,6 +159,38 @@ def _replace_contract_node(value, path):
         target = target[part]
     leaf = path[-1]
     target[leaf] = _invalid_contract_value(target[leaf])
+
+
+def _standalone_schema_validator(filename: str) -> Draft202012Validator:
+    schema_path = runner.ROOT / "schemas" / filename
+    schema = json.loads(schema_path.read_bytes())
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema, format_checker=FormatChecker())
+
+
+def _nested_value(value, path):
+    target = value
+    for part in path:
+        target = target[part]
+    return target
+
+
+def test_ops03_schema_sources_are_canonical_and_well_formed():
+    discovered = tuple(
+        sorted(
+            path.name
+            for path in (runner.ROOT / "schemas").glob(
+                "hde_epic038_ops03_*.json"
+            )
+        )
+    )
+    assert discovered == tuple(sorted(OPS03_SCHEMA_FILES))
+    for filename in OPS03_SCHEMA_FILES:
+        path = runner.ROOT / "schemas" / filename
+        raw = path.read_bytes()
+        value = json.loads(raw)
+        assert raw == runner.canonical_bytes(value), filename
+        Draft202012Validator.check_schema(value)
 
 
 @pytest.fixture
@@ -227,6 +282,207 @@ def test_runner_builds_exact_semantic_packet_and_validator_seals_it(authorizatio
     final = _seal(auth_path, candidate)
     assert final["result"] == "PASS"
     assert tuple(sorted(path.name for path in candidate.iterdir())) == validator.FINAL_FILES
+
+
+def test_ops03_schemas_standalone_accept_canonical_contract_bytes(authorization):
+    auth_path, auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    failure = {
+        "schema": "hde_epic038.ops03.failure_receipt.v1",
+        "run_id": auth["run_id"],
+        "authorization_sha256": runner.sha256_path(auth_path),
+        "phase": "pre_marker",
+        "code": "fixture_failure",
+        "launch_consumed": False,
+        "candidate_admissible": False,
+        "nonclaims": list(runner.NONCLAIMS),
+    }
+    samples = {
+        "hde_epic038_ops03_authorization.v1.json": (
+            auth,
+            auth_path.read_bytes(),
+        ),
+        "hde_epic038_ops03_db_posture_summary.v1.json": (
+            json.loads((candidate / "db_posture_summary.json").read_bytes()),
+            (candidate / "db_posture_summary.json").read_bytes(),
+        ),
+        "hde_epic038_ops03_env_presence.v1.json": (
+            json.loads((candidate / "env_presence.json").read_bytes()),
+            (candidate / "env_presence.json").read_bytes(),
+        ),
+        "hde_epic038_ops03_failure_receipt.v1.json": (
+            failure,
+            runner.canonical_bytes(failure),
+        ),
+        "hde_epic038_ops03_nonclaims.v1.json": (
+            json.loads((candidate / "nonclaims.json").read_bytes()),
+            (candidate / "nonclaims.json").read_bytes(),
+        ),
+        "hde_epic038_ops03_result_summary.v1.json": (
+            json.loads((candidate / "result_summary.json").read_bytes()),
+            (candidate / "result_summary.json").read_bytes(),
+        ),
+    }
+    assert _seal(auth_path, candidate)["result"] == "PASS"
+    validation_receipt_bytes = (candidate / validator.RECEIPT_FILE).read_bytes()
+    samples["hde_epic038_ops03_validation_receipt.v1.json"] = (
+        json.loads(validation_receipt_bytes),
+        validation_receipt_bytes,
+    )
+
+    assert set(samples) == set(OPS03_SCHEMA_FILES)
+    for schema_name, (value, raw) in samples.items():
+        assert raw == runner.canonical_bytes(value), schema_name
+        _standalone_schema_validator(schema_name).validate(value)
+
+
+def test_ops03_schemas_standalone_reject_truncated_extra_and_reordered_vectors(
+    authorization,
+):
+    auth_path, auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    posture = json.loads((candidate / "db_posture_summary.json").read_bytes())
+    nonclaims = json.loads((candidate / "nonclaims.json").read_bytes())
+    result_summary = json.loads((candidate / "result_summary.json").read_bytes())
+    failure = {
+        "schema": "hde_epic038.ops03.failure_receipt.v1",
+        "run_id": auth["run_id"],
+        "authorization_sha256": runner.sha256_path(auth_path),
+        "phase": "pre_marker",
+        "code": "fixture_failure",
+        "launch_consumed": False,
+        "candidate_admissible": False,
+        "nonclaims": list(runner.NONCLAIMS),
+    }
+    assert _seal(auth_path, candidate)["result"] == "PASS"
+    validation_receipt = json.loads(
+        (candidate / validator.RECEIPT_FILE).read_bytes()
+    )
+    contracts = (
+        ("hde_epic038_ops03_authorization.v1.json", auth, ("target", "search_path")),
+        (
+            "hde_epic038_ops03_authorization.v1.json",
+            auth,
+            ("retired_keys_required_absent",),
+        ),
+        (
+            "hde_epic038_ops03_authorization.v1.json",
+            auth,
+            ("ordered_query_ids",),
+        ),
+        (
+            "hde_epic038_ops03_authorization.v1.json",
+            auth,
+            ("exact_argv", "capture"),
+        ),
+        (
+            "hde_epic038_ops03_authorization.v1.json",
+            auth,
+            ("exact_argv", "receipt"),
+        ),
+        (
+            "hde_epic038_ops03_authorization.v1.json",
+            auth,
+            ("exact_argv", "validate"),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("selection_attempts",),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("ordered_query_ids",),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("query_results",),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("observations", "search_path"),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("observations", "boundary_views"),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("observations", "partition_posture", "expected_tables"),
+        ),
+        (
+            "hde_epic038_ops03_db_posture_summary.v1.json",
+            posture,
+            ("observations", "partition_posture", "observed_tables"),
+        ),
+        (
+            "hde_epic038_ops03_failure_receipt.v1.json",
+            failure,
+            ("nonclaims",),
+        ),
+        (
+            "hde_epic038_ops03_nonclaims.v1.json",
+            nonclaims,
+            ("nonclaims",),
+        ),
+        (
+            "hde_epic038_ops03_result_summary.v1.json",
+            result_summary,
+            ("primary_files",),
+        ),
+        (
+            "hde_epic038_ops03_validation_receipt.v1.json",
+            validation_receipt,
+            ("validated_files",),
+        ),
+    )
+
+    for schema_name, value, path in contracts:
+        schema_validator = _standalone_schema_validator(schema_name)
+        schema_validator.validate(value)
+        vector = _nested_value(value, path)
+        mutations = (vector[:-1], [*vector, copy.deepcopy(vector[-1])])
+        if len(vector) > 1:
+            mutations = (
+                *mutations,
+                list(reversed(vector)),
+                [copy.deepcopy(vector[0]) for _ in vector],
+            )
+        for replacement in mutations:
+            mutated = copy.deepcopy(value)
+            target = _nested_value(mutated, path[:-1]) if path[:-1] else mutated
+            target[path[-1]] = replacement
+            assert not schema_validator.is_valid(mutated), (
+                schema_name,
+                path,
+                replacement,
+            )
+
+
+def test_validation_receipt_schema_rejects_fail_with_all_predicates_true(
+    authorization,
+):
+    auth_path, _auth, _base, candidate = authorization
+    assert _capture(authorization) == 0
+    assert _seal(auth_path, candidate)["result"] == "PASS"
+    receipt = json.loads((candidate / validator.RECEIPT_FILE).read_bytes())
+    schema_validator = _standalone_schema_validator(
+        "hde_epic038_ops03_validation_receipt.v1.json"
+    )
+
+    false_negative = copy.deepcopy(receipt)
+    false_negative["result"] = "FAIL"
+    with pytest.raises(ValidationError):
+        schema_validator.validate(false_negative)
+
+    legitimate_failure = copy.deepcopy(false_negative)
+    legitimate_failure["predicates"]["counts_valid"] = False
+    schema_validator.validate(legitimate_failure)
 
 
 def test_runtime_role_query_covers_ownership_and_column_write_grants():
@@ -325,7 +581,7 @@ class PsycopgProvider:
                 ("hde", "body_graphs_current", "NO", "NO", "NO", "NO", "NO"),
                 ("public", "hde_body_graphs_current", "NO", "NO", "NO", "NO", "NO"),
             ],
-            [("hde.pair_evaluation", "r", "release_id"), ("hde.public_results", "r", "release_id")],
+            [("hde.pair_evaluation", "r", "RANGE (evaluated_at)"), ("hde.public_results", "r", "RANGE (created_at)")],
             [("hde.pair_evaluation", True), ("hde.public_results", True)],
         ]
 """,
@@ -1665,15 +1921,57 @@ def test_final_validator_rejects_each_checksum_input_mutation(authorization):
     checksum_path.write_text("\n".join(original_lines) + "\n", encoding="ascii")
 
 
-def test_pr_a_nonfinal_missing_ops03_pr_b_binding_keeps_finalization_before_nonfinal_gate():
+def test_pr_a_missing_ops03_stops_natural_pipeline_at_stage14(
+    tmp_path,
+    monkeypatch,
+):
     from tools.evidence import run_sanity_pipeline as sanity
 
+    log = tmp_path / "sanity.log"
+    calls = []
+
+    def pass_command(command):
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0, b"", b"")
+
+    for key, value in sanity.DETERMINISM_ENV_PINS.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "_run_command", pass_command)
+    monkeypatch.setattr(sanity, "validate_pr05_path_proof_prerequisites", lambda: None)
+    monkeypatch.setattr(sanity, "validate_direct_selection_contract", lambda: None)
+    monkeypatch.setattr(sanity, "validate_historical_bridge_evidence", lambda: None)
+    monkeypatch.setattr(sanity, "validate_ops02_package", lambda: None)
+    monkeypatch.setattr(
+        sanity,
+        "validate_ops03_tracked_packet",
+        lambda: (_ for _ in ()).throw(
+            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
+        ),
+    )
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
+
     steps = sanity.default_steps()
-    assert steps[-2].name == "17 Final LF validation"
-    assert steps[-2].commands == sanity._finalization_commands()
-    assert steps[-1].name == "18 PR-A nonfinal gate"
-    assert steps[-1].commands == (("__pr_a_nonfinal__",),)
-    assert sanity.PR_A_NONFINAL_REASON == "pr_a_nonfinal_ops03_pr_b_binding_required"
+    assert len(steps) == 19
+    assert steps[13].commands == (("__validate_ops03__",),)
+    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    lines = log.read_text(encoding="utf-8").splitlines()
+    assert [line for line in lines if line.startswith("check ")] == [
+        f"check {name}:{'OK' if index < 13 else 'FAIL'}"
+        for index, name in enumerate(sanity.STAGE_NAMES)
+    ]
+    for name in sanity.STAGE_NAMES[14:]:
+        assert (
+            f"not_executed {name}:"
+            f"earlier_mandatory_failure={sanity.STAGE_NAMES[13]}"
+            in lines
+        )
+    assert not any(
+        command in calls for step in steps[14:] for command in step.commands
+    )
+    assert f"first_failed_stage:{sanity.STAGE_NAMES[13]}" in lines
+    assert "summary:FAIL" in lines
+    assert "summary:PASS" not in lines
 
 
 @pytest.mark.parametrize(
@@ -2068,6 +2366,41 @@ def test_runtime_role_query_detects_sequence_write_privileges():
     assert "seq_acl.privilege_type <> 'SELECT'" in sql
     assert "seq_acl.grantee = 0" in sql
     assert "pg_has_role(current_user, seq_acl.grantee, 'USAGE')" in sql
+
+
+@pytest.mark.parametrize(
+    "partition_rows",
+    (
+        (
+            ("hde.pair_evaluation", "h", "HASH (evaluated_at)"),
+            ("hde.public_results", "r", "RANGE (created_at)"),
+        ),
+        (
+            ("hde.pair_evaluation", "r", "RANGE (release_id)"),
+            ("hde.public_results", "r", "RANGE (created_at)"),
+        ),
+        (
+            ("hde.pair_evaluation", "r", "RANGE (evaluated_at)"),
+            ("hde.public_results", "r", "RANGE (release_id)"),
+        ),
+    ),
+    ids=("wrong-strategy", "wrong-pair-key", "wrong-results-key"),
+)
+def test_partition_strategy_or_key_mismatch_cannot_pass(
+    partition_rows,
+    authorization,
+):
+    _auth_path, _auth, base, candidate = authorization
+    assert _capture(
+        authorization,
+        builder=_provider_builder(partition_rows=partition_rows),
+    ) == 1
+    assert not candidate.exists()
+    failure = json.loads(
+        (base / "failure/failure_receipt.json").read_text(encoding="utf-8")
+    )
+    assert failure["code"] == "posture_predicate_failed"
+    assert failure["launch_consumed"] is True
 
 
 @pytest.mark.parametrize(

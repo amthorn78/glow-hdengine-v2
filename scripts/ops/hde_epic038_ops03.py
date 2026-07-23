@@ -108,6 +108,10 @@ POSTURE_PREDICATES = (
     "secret_values_absent",
 )
 EXPECTED_PARTITIONS = ("hde.pair_evaluation", "hde.public_results")
+EXPECTED_PARTITION_DEFINITIONS = {
+    "hde.pair_evaluation": ("r", "RANGE (evaluated_at)"),
+    "hde.public_results": ("r", "RANGE (created_at)"),
+}
 EXPECTED_VIEWS = ("hde.body_graphs_current", "public.hde_body_graphs_current")
 CHILD_READY_TIMEOUT_SECONDS = 10.0
 PROVIDER_CHILD_TIMEOUT_SECONDS = 60.0
@@ -1047,6 +1051,19 @@ def build_posture(
         _DBAccess, DDL_IDENTITY_PROJECTION_SCHEMA, _PsycopgProvider, project_ddl_identity, _validate = _repo_db_symbols()
         projection = project_ddl_identity(projection_input)
         observed_partitions = sorted(str(row[0]) for row in rows[8])
+        partition_definitions_exact = (
+            len(rows[8]) == len(EXPECTED_PARTITION_DEFINITIONS)
+            and all(
+                len(row) == 3
+                and str(row[0]) in EXPECTED_PARTITION_DEFINITIONS
+                and (
+                    str(row[1]).lower(),
+                    " ".join(str(row[2]).split()),
+                )
+                == EXPECTED_PARTITION_DEFINITIONS[str(row[0])]
+                for row in rows[8]
+            )
+        )
         verified_partitions = sorted(str(row[0]) for row in rows[9] if bool(row[1]))
     except (IndexError, TypeError, ValueError) as exc:
         raise Ops03Error("capture", "observation_shape_invalid", consumed=True) from exc
@@ -1063,7 +1080,12 @@ def build_posture(
         "partition_posture": {
             "expected_tables": list(EXPECTED_PARTITIONS),
             "observed_tables": observed_partitions,
-            "all_expected_present": observed_partitions == list(EXPECTED_PARTITIONS) == verified_partitions,
+            "all_expected_present": (
+                partition_definitions_exact
+                and observed_partitions
+                == list(EXPECTED_PARTITIONS)
+                == verified_partitions
+            ),
         },
     }
     predicates = {
