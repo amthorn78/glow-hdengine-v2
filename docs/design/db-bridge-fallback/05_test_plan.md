@@ -1,15 +1,17 @@
-# Test Plan — Bridge adapter & evidence
+# Historical Test Plan — Retired bridge adapter and evidence
+
+Status: historical retained design record, not a current test plan or runbook. The bridge-era tests and harness commands below must not be restored or executed.
 
 ## Automated
-- **Unit**: Adapter/provider tests inject success/failure stubs to assert fallback ordering, typed error codes, and JSON normalization for `introspect_*`.
+- **Unit**: Historical retained record, not current guidance: bridge-era tests asserted fallback ordering and bridge payload normalization.
 - **HTTP logging**: `tests/ops/test_http_logging.py` validates the keys-only schema and rounding of `engine.ops.http_log.log_http_call`.
 - **Evidence parity**: `tests/ops/test_evidence_index.py` ensures every governed artifact has matching `.path_proof.txt`, human index entry, machine mirror record, sha256, and size parity.
-- **Adapter contracts**: `tests/db/test_adapter_contract.py` covers bridge version probe, search_path/grants/fingerprint normalization, and network error mapping.
+- **Adapter contracts**: Historical retained record, not current guidance: bridge-era tests covered bridge probes and network error mapping.
 
 ## Manual / harness
-- `python scripts/db_bridge/capture_introspection.py` — confirm bridge endpoints return canonical JSON and write to `artifacts/db_bridge/` + `artifacts/db/`.
-- `python scripts/db_adapter/capture_adapter_introspection.py` — ensure adapter-level snapshots mirror bridge payloads without leaking secrets.
-- `python scripts/ops/capture_rails_open_scope.py` — run after the above harnesses to verify only `db_bridge.*` routes were logged and that `vendor_call_count: 0`.
-- Spot-check `artifacts/runtime/env_matrix.snapshot.json` / `env_matrix.diff.json` to confirm selection snapshots remain single-object, canonical JSON.
+- Historical retained command, not current guidance: `python scripts/db_bridge/capture_introspection.py` wrote `artifacts/db_bridge/` captures and must not be run.
+- Historical retained command, not current guidance: the adapter introspection harness mirrored bridge payloads and must not be used to claim current support.
+- Historical retained command, not current guidance: the rails-open scope harness observed bridge routes and must not be rerun for this retirement.
+- Historical retained record, not current guidance: bridge-era env-matrix snapshots remain frozen inputs, not current selection proof.
 
-Exit criteria: automated suites green, harnesses refreshed under open rails, and all resulting artifacts indexed with up-to-date `.path_proof.txt`, `docs/evidence/INDEX.json`, and `artifacts/evidence_index.jsonl` entries.
+Current exit criteria are owned by the direct-only PR-06R-A contract. They require static guidance scanning, direct-only selection/refusal coverage, and preservation of historical bytes; they do not permit bridge harness execution or refresh.

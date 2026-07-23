@@ -11,24 +11,49 @@ ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PINS = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 PR_A_NONFINAL_EXIT = 3
+STAGE_NAMES = (
+    "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
+    "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
+    "06 CI rails", "07 Direct DB selection contract", "08 Direct DB posture artifacts",
+    "09 BodyGraph policy", "10 Architecture snapshot",
+    "11 Configured-v2 mapped-cache local evidence",
+    "12 Historical bridge evidence integrity",
+    "13 OPS-02 mapped-cache packet validation",
+    "14 OPS-03 direct DB posture packet validation",
+    "15 Human Index and Machine Mirror refresh", "16 Evidence-path validation",
+    "17 Mirror schema and index/mirror hash validation",
+    "18 Topology orientation validation", "19 Final-LF validation",
+)
 
 
 def _valid_log() -> bool:
     try:
         data = LOG.read_bytes()
-        text = data.decode("utf-8")
+        data.decode("utf-8")
     except (OSError, UnicodeError):
         return False
-    stages = [line for line in text.splitlines() if line.startswith("check ")]
-    return (data.endswith(b"\n") and not data.endswith(b"\n\n") and len(stages) == 18
-            and text.startswith("run:sanity-pipeline\n")
-            and "\nenv:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC\n" in text
-            and all(line.endswith(":OK") for line in stages[:-1])
-            and stages[-1] == "check 18 PR-A nonfinal gate:FAIL"
-            and "pr_a_state:nonfinal_fail_closed\n" in text
-            and "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required\n" in text
-            and "first_failed_stage:18 PR-A nonfinal gate\nsummary:FAIL\n" in text
-            and "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true\n" in text)
+    lines = [
+        "run:sanity-pipeline",
+        "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
+        "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC",
+        "env_pins:audit/gates/determinism/env_pins.log",
+        (
+            "ops_evidence:retained_integrity_provenance_secret_safe_only;"
+            "historical_nonclaim=true;not_rerun=true"
+        ),
+        "pr_a_state:nonfinal_fail_closed",
+        "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required",
+    ]
+    for index, name in enumerate(STAGE_NAMES):
+        lines.append(f"check {name}:{'OK' if index < 13 else 'FAIL'}")
+        if index == 11:
+            lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
+        if index >= 14:
+            lines.append(
+                f"not_executed {name}:earlier_mandatory_failure={STAGE_NAMES[13]}"
+            )
+    lines.extend((f"first_failed_stage:{STAGE_NAMES[13]}", "summary:FAIL"))
+    return data == ("\n".join(lines) + "\n").encode("utf-8")
 
 
 def _log_version() -> tuple[int, int, int, int, int] | None:

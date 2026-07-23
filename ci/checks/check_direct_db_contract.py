@@ -15,8 +15,6 @@ EXCLUDED_PREFIXES = (
     "docs/crd/",
     "docs/plans/",
     "docs/pfcanon/",
-    "docs/design/",
-    "docs/adr/",
     "handoff/",
     "tests/",
     "codex/out/",
@@ -116,12 +114,9 @@ HISTORICAL_ONLY_PHRASES = (
 HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
-    "tools/evidence/run_sanity_pipeline.py",
 }
-HISTORICAL_REFERENCE_DOCS = {
-    "docs/EVIDENCE_INDEX.md",
-    "docs/INDEX.md",
-}
+HISTORICAL_GUIDANCE_SUFFIXES = (".md", ".txt")
+CURRENT_GUIDANCE_PREFIXES = ("docs/adr/", "docs/design/")
 MANDATORY_MARKERS = {
     "engine/db/adapter.py": (
         "RETIRED_DB_TRANSPORT_KEYS",
@@ -193,6 +188,25 @@ def _line_refusal_only(line: str) -> bool:
     return any(
         phrase in lowered
         for phrase in (*EXPLICIT_NEGATION_PHRASES, *HISTORICAL_ONLY_PHRASES)
+    )
+
+
+def _historical_guidance_reference(relative: str, line: str) -> bool:
+    """Allow retired names only in an explicitly non-current prose line."""
+    return relative.endswith(HISTORICAL_GUIDANCE_SUFFIXES) and _line_refusal_only(line)
+
+
+def _active_bridge_guidance(relative: str, line: str) -> bool:
+    """Detect prose that still tells a reader how to use a bridge transport."""
+    if not relative.endswith(HISTORICAL_GUIDANCE_SUFFIXES):
+        return False
+    if relative != "AGENTS.md" and not relative.startswith(CURRENT_GUIDANCE_PREFIXES):
+        return False
+    lowered = line.lower()
+    return (
+        "bridge" in lowered
+        and any(word in lowered for word in ACTIVE_GUIDANCE_WORDS)
+        and not _line_refusal_only(line)
     )
 
 
@@ -1125,7 +1139,7 @@ def _active(root: Path, path: Path) -> bool:
     return (
         path.is_file()
         and path.suffix in TEXT_SUFFIXES
-        and relative not in {"CHANGELOG.md", "AGENTS.md"}
+        and relative != "CHANGELOG.md"
         and not any(relative.startswith(prefix) for prefix in EXCLUDED_PREFIXES if not prefix.startswith("*"))
         and ".egg-info/" not in relative
     )
@@ -1143,19 +1157,24 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
         relative = _relative(root, path)
         text = path.read_text(encoding="utf-8", errors="ignore")
         if relative != "ci/checks/check_direct_db_contract.py":
-            for symbol in FORBIDDEN_SYMBOLS:
-                if symbol in text:
-                    violations.add(f"{relative}:forbidden_symbol:{symbol}")
+            for line_number, line in enumerate(text.splitlines(), 1):
+                if _active_bridge_guidance(relative, line):
+                    violations.add(
+                        f"{relative}:{line_number}:bridge_active_guidance"
+                    )
+                for symbol in FORBIDDEN_SYMBOLS:
+                    if symbol in line and not _historical_guidance_reference(
+                        relative, line
+                    ):
+                        violations.add(
+                            f"{relative}:{line_number}:forbidden_symbol:{symbol}"
+                        )
         if relative not in HISTORICAL_READERS and relative != "ci/checks/check_direct_db_contract.py":
             for line_number, line in enumerate(text.splitlines(), 1):
                 for marker in FORBIDDEN_ACTIVE_PATH_TEXT:
                     if marker not in line:
                         continue
-                    explicitly_historical = (
-                        relative in HISTORICAL_REFERENCE_DOCS
-                        and "historical" in line.lower()
-                    )
-                    if not explicitly_historical:
+                    if not _historical_guidance_reference(relative, line):
                         violations.add(
                             f"{relative}:{line_number}:active_retired_path:{marker}"
                         )

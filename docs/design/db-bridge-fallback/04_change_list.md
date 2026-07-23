@@ -1,8 +1,10 @@
-# Change List — Bridge adapter & evidence
+# Historical Change List — Retired bridge adapter and evidence
 
-1. Keep `DBAccess` as the single entry point for provider selection (psycopg → HTTPS bridge) and persist attempts to `artifacts/db_bridge/adapter_selection.snapshot.json`.
-2. Require HTTPS `DB_BRIDGE_URL` and wrap network/HTTP errors as typed `AdapterError` codes (`bridge_requires_https`, `bridge_network_error`, etc.).
-3. Add adapter-level introspection helpers and normalize payloads for version, search_path, grants, and fingerprint results.
-4. Introduce keys-only HTTP logging via `engine.ops.http_log.log_http_call` and ensure bridge requests emit `{at,route,status,duration_ms,idempotence_hash?,release_id?}` only.
-5. Ship harness scripts (`scripts/db_bridge/capture_introspection.py`, `scripts/db_adapter/capture_adapter_introspection.py`, `scripts/ops/capture_rails_open_scope.py`) to capture canonical JSON artifacts and scope reports.
-6. Update docs (`README.md`, `AGENTS.md`, `docs/ADAPTER_DB.md`, this design package) plus Evidence Index and machine mirror entries (with `.path_proof.txt`) in the same PR.
+Status: historical retained design record, not a current change list or implementation guide. These bridge-era actions must not be replayed.
+
+1. Historical retained record, not current guidance: bridge-era `DBAccess` attempted psycopg and then HTTPS bridge and wrote `artifacts/db_bridge/adapter_selection.snapshot.json`; current runtime must not do either bridge action.
+2. Historical retained record, not current guidance: `DB_BRIDGE_URL` and bridge HTTP error codes belonged to the retired transport and must not be configured or restored.
+3. Historical retained record, not current guidance: adapter introspection normalized bridge-era payloads.
+4. Historical retained record, not current guidance: bridge HTTP requests emitted keys-only metadata; current DB access must not issue bridge HTTP requests.
+5. Historical retained record, not current guidance: `scripts/db_bridge/capture_introspection.py` and related harnesses captured bridge bytes and must not be run or restored.
+6. Historical retained record, not current guidance: the bridge-era change updated docs and governed companions together. Current historical primary bytes must not be rewritten.

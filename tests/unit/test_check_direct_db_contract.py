@@ -92,6 +92,91 @@ def test_active_guidance_for_retired_bridge_key_is_rejected(tmp_path):
     assert any("retired_key_active_guidance" in row for row in check.scan(tmp_path))
 
 
+def test_active_accepted_adr_is_scanned_for_retired_bridge_guidance(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/adr/current_transport.md",
+        "## Status\nAccepted\n\nConfigure DB_BRIDGE_URL and use BridgeProvider fallback.\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("retired_key_active_guidance" in row for row in violations)
+    assert any("forbidden_symbol:BridgeProvider" in row for row in violations)
+
+
+def test_active_design_and_root_agent_guidance_are_scanned(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/current_transport.md",
+        "Run scripts/db_bridge/capture_introspection.py for the current fallback.\n",
+    )
+    _write(
+        tmp_path,
+        "AGENTS.md",
+        "Export DB_FORCE_BRIDGE=1 to use the current fallback.\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("active_retired_path:scripts/db_bridge/" in row for row in violations)
+    assert any("AGENTS.md:1:retired_key_active_guidance" in row for row in violations)
+
+
+def test_bridge_guidance_without_a_specific_key_or_path_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/current_transport.md",
+        "Use the bridge fallback when direct access fails.\n",
+    )
+    assert any(
+        "docs/design/current_transport.md:1:bridge_active_guidance" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_explicit_historical_adr_and_design_references_are_allowed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/adr/retired_transport.md",
+        "Historical retained record, not current guidance: DB_BRIDGE_URL once selected BridgeProvider fallback.\n",
+    )
+    _write(
+        tmp_path,
+        "docs/design/retired_transport.md",
+        "Historical retained record, not current guidance: scripts/db_bridge/capture_introspection.py wrote artifacts/db_bridge/ captures.\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_historical_file_header_does_not_hide_active_guidance_line(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/mixed_transport.md",
+        "Status: historical retained record, not current guidance.\n"
+        "Run scripts/db_bridge/capture_introspection.py for current fallback.\n",
+    )
+    assert any(
+        "docs/design/mixed_transport.md:2:active_retired_path:scripts/db_bridge/"
+        in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_executable_source_cannot_use_historical_wording_as_an_exemption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "BridgeProvider = object  # historical retained record, not current\n",
+    )
+    assert any(
+        "scripts/current.py:1:forbidden_symbol:BridgeProvider" in row
+        for row in check.scan(tmp_path)
+    )
+
+
 def test_ignored_build_residue_is_not_scanned(tmp_path):
     _minimal_tree(tmp_path)
     _write(tmp_path, "build/generated.py", "BridgeProvider DB_BRIDGE_URL\n")
@@ -189,6 +274,19 @@ def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
     assert any(
         "tools/evidence/run_sanity_pipeline.py:2:active_retired_key_consumption"
         in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_release_pipeline_cannot_hide_active_retired_evidence_path(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "CURRENT = 'artifacts/db_bridge/current.json'\n",
+    )
+    assert any(
+        "active_retired_path:artifacts/db_bridge/" in row
         for row in check.scan(tmp_path)
     )
 

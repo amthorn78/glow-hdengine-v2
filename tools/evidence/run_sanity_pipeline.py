@@ -12,14 +12,13 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
+from typing import Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
-from engine.db.ddl_identity_projection import project_ddl_identity
 from tools.evidence.retained_evidence_safety import validate_retained_text_safety
 
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
@@ -27,74 +26,43 @@ PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
 PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
 PR_A_NONFINAL_EXIT = 3
 
-OPS_FILES = {
-    "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
-    "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
-}
-
-OPS01_CORPUS_NAME = "hde_epic038_ops01_live_bodygraph_parity_v3"
-OPS01_PROVIDER_PROOF_SCHEMA = "hde_epic038.ops01.provider_parity.v4"
-OPS01_STAGING_ROOT = "/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z"
-OPS01_DIRECT_PROVIDER = "psycopg"
-OPS01_BRIDGE_PROVIDER = "bridge"
-OPS_COMMANDS_SHA256 = {
-    "ops-01": "038c4f8fe7735c41a3679e7f80ba99f2cb23632fbf37a33bf70ddf0884087e45",
-    "ops-02": "d3ca676d0157ce30bf64d4b419610e3a5ceebc0dc13785475028b90ed31f163b",
-}
-OPS01_MUTATING_SQL = re.compile(
-    r"(?im)^\s*(?:INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|MERGE|COPY)\b"
+HISTORICAL_OPS01_FILES = (
+    "commands.txt",
+    "stdout.log",
+    "stderr.log",
+    "exit_code.txt",
+    "env_presence.json",
+    "db_posture_summary.json",
+    "provider_parity.proof.json",
+    "bridge_consistency.result.json",
+    "nonclaims.json",
+    "result_summary.json",
+    "checksums.sha256",
 )
-OPS01_PARITY_ROWS = (
-    "grants",
-    "search_path",
-    "select_one",
-    "ddl_fingerprint",
-    "bodygraph_payload_row",
+HISTORICAL_OPS01_LEDGER_SHA256 = (
+    "f4fd52eff5c8f2b61bbb9d97c3889a4bff2d12f581ba8e26dfb2d250ad1049d8"
 )
-OPS01_BRIDGE_COMMANDS = {
-    "bridge_bodygraph_read",
-    "canonical_comparison",
-    "db_posture_capture",
-    "direct_bodygraph_read",
-    "governed_checker",
-}
-OPS01_BRIDGE_PREDICATES = {
-    "all_actions_closed_rails",
-    "bodygraph_bridge_available",
-    "bodygraph_direct_available",
-    "bodygraph_row_match",
-    "bodygraph_provider_selection_provenance",
-    "bodygraph_selector_approved",
-    "four_row_corpus_exact",
-    "provider_selection_consistent",
-    "search_path_exact",
-}
-OPS01_SELECTION_SNAPSHOT_CONTENT = {
-    "direct": {
-        "schema": "v1",
-        "selected": OPS01_DIRECT_PROVIDER,
-        "attempts": [{"provider": OPS01_DIRECT_PROVIDER, "status": "ok"}],
-        "selection_order": [OPS01_DIRECT_PROVIDER],
-        "flags": {
-            "env": "dev",
-            "force_pg": True,
-            "force_bridge": False,
-            "allow_bridge_prod": False,
-        },
-    },
-    "bridge": {
-        "schema": "v1",
-        "selected": OPS01_BRIDGE_PROVIDER,
-        "attempts": [{"provider": OPS01_BRIDGE_PROVIDER, "status": "ok"}],
-        "selection_order": [OPS01_BRIDGE_PROVIDER],
-        "flags": {
-            "env": "dev",
-            "force_pg": False,
-            "force_bridge": True,
-            "allow_bridge_prod": False,
-        },
-    },
-}
+OPS02_FILES = (
+    "commands.txt",
+    "stdout.log",
+    "stderr.log",
+    "exit_code.txt",
+    "env_presence.json",
+    "request_summary.json",
+    "mapped_output_summary.json",
+    "read_back_summary.json",
+    "canonical_parity.log",
+    "idempotence.log",
+    "no_raw_vendor_payload_persistence.log",
+    "legacy_fallback_preservation.log",
+    "nonclaims.json",
+    "result_summary.json",
+    "checksums.sha256",
+)
+OPS02_COMMANDS_SHA256 = (
+    "d3ca676d0157ce30bf64d4b419610e3a5ceebc0dc13785475028b90ed31f163b"
+)
+OPS03_TRACKED_ROOT = Path("audit/ops/hde-epic038/ops-03")
 
 PR05_PRIMARY_PATHS = (
     "artifacts/bodygraph/v2_mapped_cache/write_transcript.json",
@@ -126,35 +94,27 @@ class SanityStep:
             object.__setattr__(self, "commands", tuple(tuple(item) for item in command))
 
 
+class Ops03PacketUnavailable(ValueError):
+    """The downstream OPS-03 packet has not been admitted yet."""
+
+
 STAGE_NAMES = (
     "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
     "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
-    "06 CI rails", "07 DB posture", "08 BodyGraph policy", "09 Direct DB contract",
-    "10 Architecture snapshot", "11 Configured-v2 mapped-cache local evidence",
-    "12 OPS evidence checksum and summary validation", "13 Human Index and Machine Mirror refresh",
-    "14 Path validation", "15 Mirror schema and hash validation",
-    "16 Topology orientation validation", "17 Final LF validation",
-    "18 PR-A nonfinal gate",
+    "06 CI rails", "07 Direct DB selection contract", "08 Direct DB posture artifacts",
+    "09 BodyGraph policy", "10 Architecture snapshot",
+    "11 Configured-v2 mapped-cache local evidence",
+    "12 Historical bridge evidence integrity",
+    "13 OPS-02 mapped-cache packet validation",
+    "14 OPS-03 direct DB posture packet validation",
+    "15 Human Index and Machine Mirror refresh", "16 Evidence-path validation",
+    "17 Mirror schema and index/mirror hash validation",
+    "18 Topology orientation validation", "19 Final-LF validation",
 )
 
 
 def _py(path: str, *args: str) -> tuple[str, ...]:
     return (sys.executable, path, *args)
-
-
-def _finalization_commands() -> tuple[tuple[str, ...], ...]:
-    """Return the bounded writer/check sequence for the final evidence bytes."""
-    return (
-        _py("tools/evidence/update_evidence_index.py"),
-        _py("tools/evidence/orientation_demo.py"),
-        _py("tools/evidence/update_evidence_index.py"),
-        _py("tools/evidence/update_evidence_index.py", "--check"),
-        _py("tools/evidence/orientation_demo.py", "--check"),
-        _py("tools/evidence/validate_evidence_paths.py"),
-        ("ci/checks/check_mirror_schema.sh",),
-        ("bash", "ci/checks/check_evidence_index_hash.sh"),
-        ("ci/checks/check_final_lf.sh",),
-    )
 
 
 def default_steps() -> list[SanityStep]:
@@ -171,21 +131,22 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
         SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py"),)),
         SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
-        SanityStep(STAGE_NAMES[6], (_py("tools/evidence/generate_db_runtime_posture.py"),)),
-        SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
-        SanityStep(STAGE_NAMES[8], (_py("ci/checks/check_direct_db_contract.py"),)),
+        SanityStep(STAGE_NAMES[6], (("__validate_direct_selection__",), _py("ci/checks/check_direct_db_contract.py"))),
+        SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_db_runtime_posture.py"),)),
+        SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
         SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py"),)),
         SanityStep(STAGE_NAMES[10], (
             ("__validate_pr05_proofs__",),
             _py("tools/evidence/generate_v2_mapped_cache_evidence.py"),
         )),
-        SanityStep(STAGE_NAMES[11], (("__validate_ops__",),)),
-        SanityStep(STAGE_NAMES[12], (_py("tools/evidence/update_evidence_index.py"),)),
-        SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
-        SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
-        SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
-        SanityStep(STAGE_NAMES[16], _finalization_commands()),
-        SanityStep(STAGE_NAMES[17], (("__pr_a_nonfinal__",),)),
+        SanityStep(STAGE_NAMES[11], (("__validate_historical_ops01__",),)),
+        SanityStep(STAGE_NAMES[12], (("__validate_ops02__",),)),
+        SanityStep(STAGE_NAMES[13], (("__validate_ops03__",),)),
+        SanityStep(STAGE_NAMES[14], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"))),
+        SanityStep(STAGE_NAMES[15], (_py("tools/evidence/validate_evidence_paths.py"),)),
+        SanityStep(STAGE_NAMES[16], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
+        SanityStep(STAGE_NAMES[17], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
+        SanityStep(STAGE_NAMES[18], (("ci/checks/check_final_lf.sh",),)),
     ]
 
 
@@ -279,133 +240,6 @@ def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
         raise ValueError(f"ops-02: {path.name} predicate failed")
 
 
-def _normalize_ddl_provider_value(value: object) -> tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...]:
-    try:
-        projection = project_ddl_identity(value)
-    except ValueError as exc:
-        raise ValueError("ops-01: ddl_fingerprint provider value is malformed") from exc
-    return tuple(
-        (str(item["kind"]), str(item["name"]), tuple((str(col["name"]), str(col["type"])) for col in item["columns"]))
-        for item in projection
-    )
-
-
-def _normalized_provider_value(name: str, provider: dict) -> object:
-    value = provider.get("value")
-    if name == "grants":
-        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-            raise ValueError("ops-01: grants provider value is malformed")
-        return tuple(sorted(value))
-    if name == "search_path":
-        if not isinstance(value, str):
-            raise ValueError("ops-01: search_path provider value is malformed")
-        return tuple(part.strip() for part in value.split(","))
-    if name == "select_one":
-        if type(value) is not int:
-            raise ValueError("ops-01: select_one provider value is malformed")
-        return value
-    if name == "ddl_fingerprint":
-        return _normalize_ddl_provider_value(value)
-    raise ValueError(f"ops-01: unsupported parity row {name}")
-
-
-def _canonical_json_bytes(value: object) -> bytes:
-    return (
-        json.dumps(value, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
-        + "\n"
-    ).encode("utf-8")
-
-
-def _validate_bodygraph_selection_snapshot(bodygraph: dict, side: str) -> None:
-    provider = OPS01_DIRECT_PROVIDER if side == "direct" else OPS01_BRIDGE_PROVIDER
-    provider_row = bodygraph.get(side)
-    snapshot = provider_row.get("selection_snapshot") if isinstance(provider_row, dict) else None
-    if not isinstance(snapshot, dict):
-        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot is missing or malformed")
-    content = snapshot.get("content")
-    expected_content = OPS01_SELECTION_SNAPSHOT_CONTENT[side]
-    if not isinstance(content, dict) or _canonical_json_bytes(content) != _canonical_json_bytes(expected_content):
-        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot content drift")
-    expected_path = (
-        f"{OPS01_STAGING_ROOT}/{side}-cwd/artifacts/db_bridge/"
-        "adapter_selection.snapshot.json"
-    )
-    if snapshot.get("path") != expected_path:
-        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot path substitution")
-    digest = snapshot.get("sha256")
-    recomputed = hashlib.sha256(_canonical_json_bytes(content)).hexdigest()
-    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or digest != recomputed:
-        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot hash drift")
-    if content.get("selected") != provider or provider_row.get("provider") != provider:
-        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot provider substitution")
-
-
-def _compare_provider_values(rows: Sequence[dict]) -> str:
-    by_name = {row["name"]: row for row in rows}
-    for name in OPS01_PARITY_ROWS[:-1]:
-        row = by_name[name]
-        if _normalized_provider_value(name, row["direct"]) != _normalized_provider_value(name, row["bridge"]):
-            raise ValueError(f"ops-01: provider values disagree for {name}")
-    bodygraph = by_name["bodygraph_payload_row"]
-    _validate_bodygraph_selection_snapshot(bodygraph, "direct")
-    _validate_bodygraph_selection_snapshot(bodygraph, "bridge")
-    direct_sha = bodygraph["direct"].get("canonical_sha256")
-    bridge_sha = bodygraph["bridge"].get("canonical_sha256")
-    if (
-        not isinstance(direct_sha, str)
-        or not re.fullmatch(r"[0-9a-f]{64}", direct_sha)
-        or bridge_sha != direct_sha
-        or bodygraph["direct"].get("provider") != OPS01_DIRECT_PROVIDER
-        or bodygraph["bridge"].get("provider") != OPS01_BRIDGE_PROVIDER
-        or bodygraph.get("comparison") != "FILE_EQ_CANON_BYTES_OK"
-        or bodygraph["direct"].get("raw_bodygraph_payload_recorded") is not False
-        or bodygraph["bridge"].get("raw_bodygraph_payload_recorded") is not False
-    ):
-        raise ValueError("ops-01: BodyGraph provider identities, hashes, or persistence posture disagree")
-    return direct_sha
-
-
-def _validate_ops01_environment(packet: Path) -> None:
-    env = _read_json(packet / "env_presence.json")
-    presence = env.get("environment_presence")
-    rails = env.get("execution_rails")
-    if (
-        env.get("secret_posture") != "presence_only"
-        or not isinstance(presence, dict)
-        or presence
-        != {
-            "ALLOW_DB_WRITE": "0",
-            "ALLOW_NETWORK": "0",
-            "APP_ENV": "SET:dev",
-            "DATABASE_URL": "SET:REDACTED",
-            "DB_BRIDGE_URL": "SET:REDACTED",
-            "ENGINE_ENV": "UNSET",
-            "LANG": "C",
-            "LC_ALL": "C",
-            "SAFE_MODE": "1",
-            "TZ": "UTC",
-        }
-        or not isinstance(rails, dict)
-        or set(rails) != OPS01_BRIDGE_COMMANDS
-    ):
-        raise ValueError("ops-01: env_presence.json execution posture failed")
-    if any(
-        not isinstance(values, dict)
-        or values.get("SAFE_MODE") != "1"
-        or values.get("ALLOW_NETWORK") != "0"
-        or values.get("ALLOW_DB_WRITE") != "0"
-        for values in rails.values()
-    ):
-        raise ValueError("ops-01: env_presence.json closed-rails predicates failed")
-    if (
-        rails["direct_bodygraph_read"].get("DB_FORCE_PG") != "1"
-        or rails["direct_bodygraph_read"].get("DB_FORCE_BRIDGE") != "UNSET"
-        or rails["bridge_bodygraph_read"].get("DB_FORCE_BRIDGE") != "1"
-        or rails["bridge_bodygraph_read"].get("DB_FORCE_PG") != "UNSET"
-    ):
-        raise ValueError("ops-01: env_presence.json provider-selection rails failed")
-
-
 def _validate_ops02_environment(packet: Path) -> dict:
     env = _read_json(packet / "env_presence.json")
     presence = env.get("environment_presence")
@@ -485,158 +319,13 @@ def _validate_ops02_production_refusal(root: Path) -> None:
         )
 
 
-def _validate_ops01(packet: Path, summary: dict) -> None:
-    """Derive OPS-01 PASS from its fixed corpus and lower-level primaries."""
-    _validate_ops01_environment(packet)
-    observations = summary.get("observations")
-    if not isinstance(observations, dict):
-        raise ValueError("ops-01: result_summary.json observations must be an object")
-
-    db_posture = _read_json(packet / "db_posture_summary.json")
-    boundary_views = db_posture.get("boundary_views")
-    boundary_views_valid = (
-        isinstance(boundary_views, list)
-        and bool(boundary_views)
-        and all(
-            isinstance(view, dict)
-            and view.get("readonly") is True
-            and view.get("is_insertable_into") == "NO"
-            and view.get("is_trigger_updatable") == "NO"
-            and view.get("is_updatable") == "NO"
-            for view in boundary_views
-        )
-    )
-    if (
-        db_posture.get("status") != "PASS"
-        or db_posture.get("observation_mode") != "read_only"
-        or db_posture.get("search_path") != "hde, public"
-        or db_posture.get("search_path_exact") is not True
-        or db_posture.get("boundary_views_readonly") is not True
-        or db_posture.get("partition_plan_status") != "PASS"
-        or not boundary_views_valid
-    ):
-        raise ValueError("ops-01: db_posture_summary.json PASS predicates failed")
-
-    parity = _read_json(packet / "provider_parity.proof.json")
-    corpus = parity.get("active_parity_corpus")
-    live_parity = parity.get("live_provider_parity")
-    provider_observations = parity.get("provider_observations")
-    rows = parity.get("capabilities")
-    rows_well_formed = (
-        isinstance(rows, list)
-        and bool(rows)
-        and all(
-            isinstance(row, dict)
-            and isinstance(row.get("direct"), dict)
-            and isinstance(row.get("bridge"), dict)
-            for row in rows
-        )
-    )
-    if not rows_well_formed:
-        raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or malformed claimed row")
-    row_names = tuple(row.get("name") for row in rows)
-    remediation_findings = summary.get("remediation_findings_resolved")
-    if (
-        parity.get("schema") != OPS01_PROVIDER_PROOF_SCHEMA
-        or parity.get("remediation_marker")
-        != "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE"
-        or not isinstance(corpus, dict)
-        or corpus.get("name") != OPS01_CORPUS_NAME
-        or corpus.get("ordered_rows") != list(OPS01_PARITY_ROWS)
-        or row_names != OPS01_PARITY_ROWS
-        or summary.get("active_parity_corpus") != OPS01_CORPUS_NAME
-        or summary.get("active_parity_rows") != list(OPS01_PARITY_ROWS)
-        or summary.get("literal_staging_root") != OPS01_STAGING_ROOT
-        or summary.get("runner_sha256") != OPS_COMMANDS_SHA256["ops-01"]
-        or not isinstance(remediation_findings, list)
-        or "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE"
-        not in remediation_findings
-    ):
-        raise ValueError("ops-01: provider parity exact corpus identity or ordered rows failed")
-    if any(
-        row.get("parity") != "match"
-        or row["direct"].get("status") != "ok"
-        or row["bridge"].get("status") != "ok"
-        for row in rows
-    ):
-        raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
-    bodygraph_sha = _compare_provider_values(rows)
-    expected_count = len(OPS01_PARITY_ROWS)
-    if (
-        parity.get("status") != "PASS"
-        or parity.get("selected") != OPS01_DIRECT_PROVIDER
-        or parity.get("attempts")
-        != [{"provider": OPS01_DIRECT_PROVIDER, "status": "ok"}]
-        or not isinstance(live_parity, dict)
-        or live_parity.get("direct_provider_rows") != "available"
-        or live_parity.get("bridge_provider_rows") != "available"
-        or live_parity.get("claimed_row_count") != expected_count
-        or live_parity.get("matched_row_count") != expected_count
-        or live_parity.get("parity_status") != "pass"
-        or not isinstance(provider_observations, dict)
-        or provider_observations.get("direct") != "ok"
-        or provider_observations.get("bridge") != "ok"
-    ):
-        raise ValueError("ops-01: provider_parity.proof.json PASS predicates failed")
-    selector = corpus.get("selector")
-    bodygraph_row = rows[-1]
-    if not isinstance(selector, dict) or summary.get("bodygraph_selector") != selector or bodygraph_row.get("selector") != selector:
-        raise ValueError("ops-01: provider parity selector identity disagreement")
-
-    bridge = _read_json(packet / "bridge_consistency.result.json")
-    command_exit_codes = bridge.get("command_exit_codes")
-    governed_checker = bridge.get("governed_checker")
-    comparator = bridge.get("bodygraph_comparator")
-    bridge_predicates = bridge.get("predicates")
-    exit_codes_valid = (
-        isinstance(command_exit_codes, dict)
-        and OPS01_BRIDGE_COMMANDS.issubset(command_exit_codes)
-        and all(type(value) is int and value == 0 for value in command_exit_codes.values())
-    )
-    predicates_valid = (
-        isinstance(bridge_predicates, dict)
-        and OPS01_BRIDGE_PREDICATES.issubset(bridge_predicates)
-        and all(value is True for value in bridge_predicates.values())
-    )
-    comparator_inputs = comparator.get("direct_input") if isinstance(comparator, dict) else None
-    comparator_bridge_input = comparator.get("bridge_input") if isinstance(comparator, dict) else None
-    if (
-        bridge.get("status") != "PASS"
-        or not exit_codes_valid
-        or not isinstance(governed_checker, dict)
-        or governed_checker.get("exit_code") != 0
-        or governed_checker.get("result") != "PASS"
-        or not isinstance(comparator, dict)
-        or comparator.get("exit_code") != 0
-        or comparator.get("result") != "FILE_EQ_CANON_BYTES_OK"
-        or comparator.get("canonical_sha256") != bodygraph_sha
-        or not isinstance(comparator_inputs, dict)
-        or comparator_inputs.get("sha256") != bodygraph_sha
-        or not isinstance(comparator_bridge_input, dict)
-        or comparator_bridge_input.get("sha256") != bodygraph_sha
-        or not predicates_valid
-    ):
-        raise ValueError("ops-01: bridge_consistency.result.json PASS predicates failed")
-
-    if (
-        summary.get("ops_observation_status") != "PASS"
-        or observations.get("db_posture") != db_posture.get("status")
-        or observations.get("bridge_consistency") != bridge.get("status")
-        or observations.get("direct_provider") != "available"
-        or observations.get("bridge_provider") != "available"
-        or observations.get("bodygraph_row_parity") != "match"
-        or observations.get("search_path") != db_posture.get("search_path")
-        or observations.get("claimed_rows") != expected_count
-        or observations.get("matched_rows") != expected_count
-    ):
-        raise ValueError("ops-01: result_summary.json disagrees with primary OPS evidence")
-
-
-def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
+def _validate_packet_inventory(
+    root: Path, package: str, required: Sequence[str]
+) -> Path:
     packet = root / "audit/ops/hde-epic038" / package
     for name in required:
         path = packet / name
-        if not path.is_file() or path.stat().st_size == 0:
+        if path.is_symlink() or not path.is_file() or path.stat().st_size == 0:
             raise ValueError(f"{package}: required file {name} is missing or empty")
     try:
         retained_entries = list(packet.iterdir())
@@ -644,13 +333,6 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         raise ValueError(f"{package}: packet directory is not readable") from exc
     retained_files = sorted(entry.name for entry in retained_entries if entry.is_file())
     _validate_secret_safety(packet, retained_files)
-    commands_bytes = (packet / "commands.txt").read_bytes()
-    if package == "ops-01" and OPS01_MUTATING_SQL.search(
-        commands_bytes.decode("utf-8")
-    ):
-        raise ValueError("ops-01: commands.txt contains a mutating SQL command")
-    if hashlib.sha256(commands_bytes).hexdigest() != OPS_COMMANDS_SHA256[package]:
-        raise ValueError(f"{package}: commands.txt is not the approved command surface")
     allowed_files = set(required) | {f"{name}.path_proof.txt" for name in required}
     unexpected = sorted(entry.name for entry in retained_entries if entry.name not in allowed_files)
     if unexpected:
@@ -679,6 +361,60 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         actual = hashlib.sha256((packet / name).read_bytes()).hexdigest()
         if actual != rows[name]:
             raise ValueError(f"{package}: checksums.sha256 mismatch for {name}")
+    return packet
+
+
+def validate_historical_bridge_evidence(root: Path = ROOT) -> None:
+    """Validate only frozen OPS-01 bytes; never re-derive historical success."""
+
+    packet = _validate_packet_inventory(root, "ops-01", HISTORICAL_OPS01_FILES)
+    ledger = (packet / "checksums.sha256").read_bytes()
+    if hashlib.sha256(ledger).hexdigest() != HISTORICAL_OPS01_LEDGER_SHA256:
+        raise ValueError("ops-01: frozen historical checksum ledger drift")
+    for name in HISTORICAL_OPS01_FILES:
+        primary = packet / name
+        proof = packet / f"{name}.path_proof.txt"
+        if proof.is_symlink() or not proof.is_file() or not proof.read_bytes():
+            raise ValueError(f"ops-01: historical path proof is missing: {name}")
+        fields: dict[str, str] = {}
+        for line in proof.read_text(encoding="utf-8").splitlines():
+            if ":" in line:
+                key, value = line.split(":", 1)
+                fields[key.strip()] = value.strip()
+        expected_path = f"audit/ops/hde-epic038/ops-01/{name}"
+        if (
+            fields.get("path") != expected_path
+            or fields.get("sha256") != hashlib.sha256(primary.read_bytes()).hexdigest()
+            or fields.get("size_bytes") != str(primary.stat().st_size)
+            or not fields.get("mtime_utc")
+            or not fields.get("produced_at_utc")
+        ):
+            raise ValueError(f"ops-01: historical path proof drift: {name}")
+        if not name.endswith(".json"):
+            continue
+        value = _read_json(primary)
+        if primary.read_bytes() != (
+            json.dumps(value, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
+            + "\n"
+        ).encode("utf-8"):
+            raise ValueError(f"ops-01: historical JSON is not canonical: {name}")
+    nonclaims = _read_json(packet / "nonclaims.json").get("nonclaims")
+    required_nonclaims = {
+        "no_acceptance_token_claim",
+        "no_epic_closeout_claim",
+        "no_pf09_status_movement",
+        "no_qa_pass_claim",
+    }
+    if not isinstance(nonclaims, list) or not required_nonclaims.issubset(nonclaims):
+        raise ValueError("ops-01: historical nonclaims are incomplete")
+
+
+def validate_ops02_package(root: Path = ROOT) -> None:
+    package = "ops-02"
+    packet = _validate_packet_inventory(root, package, OPS02_FILES)
+    commands_bytes = (packet / "commands.txt").read_bytes()
+    if hashlib.sha256(commands_bytes).hexdigest() != OPS02_COMMANDS_SHA256:
+        raise ValueError("ops-02: commands.txt is not the approved command surface")
     if (packet / "exit_code.txt").read_text(encoding="utf-8").strip() != "0":
         raise ValueError(f"{package}: exit_code.txt is not successful")
     summary = _read_json(packet / "result_summary.json")
@@ -686,9 +422,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     required_nonclaims = {"no_qa_pass_claim", "no_acceptance_token_claim", "no_pf09_status_movement", "no_epic_closeout_claim"}
     if not isinstance(nonclaims, list) or not all(isinstance(item, str) for item in nonclaims) or not required_nonclaims.issubset(nonclaims):
         raise ValueError(f"{package}: nonclaims.json is incomplete")
-    if package == "ops-01":
-        _validate_ops01(packet, summary)
-    else:
+    if package == "ops-02":
         route_policy = _validate_ops02_environment(packet)
         predicates = summary.get("predicates", {})
         if not isinstance(predicates, dict):
@@ -747,8 +481,193 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
 
 
 def validate_ops_packages(root: Path = ROOT) -> None:
-    for package, required in OPS_FILES.items():
-        _validate_packet(root, package, required)
+    """Compatibility helper for tests; stages invoke the validators separately."""
+
+    validate_historical_bridge_evidence(root)
+    validate_ops02_package(root)
+
+
+def validate_direct_selection_contract() -> None:
+    """Exercise the direct-selection producer in memory without writing evidence."""
+
+    from tools.evidence import generate_hde_epic038_direct_db_selection as direct
+
+    first = direct.build()
+    second = direct.build()
+    if (
+        direct.validate_contract(first)
+        or first.get("result") != "PASS"
+        or direct.canonical_bytes(first) != direct.canonical_bytes(second)
+    ):
+        raise ValueError("direct selection contract validation failed")
+
+
+def _ops03_json(files: Mapping[str, bytes], name: str) -> dict:
+    from tools.evidence import hde_epic038_ops03 as ops03
+
+    try:
+        value = json.loads(files[name].decode("utf-8", "strict"))
+    except (KeyError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"ops-03: {name} is not canonical JSON") from exc
+    if not isinstance(value, dict) or files[name] != ops03.canonical_bytes(value):
+        raise ValueError(f"ops-03: {name} is not canonical JSON")
+    schema_name = ops03.JSON_SCHEMAS[name]
+    if not ops03._schema_valid(value, schema_name):
+        raise ValueError(f"ops-03: {name} schema validation failed")
+    return value
+
+
+def validate_ops03_tracked_packet(root: Path = ROOT) -> None:
+    """Validate an admitted packet without executing OPS-03 or external I/O."""
+
+    from tools.evidence import hde_epic038_ops03 as ops03
+
+    packet = root / OPS03_TRACKED_ROOT
+    if packet.is_symlink():
+        raise ValueError("ops-03: tracked packet root is not a real directory")
+    if not packet.exists():
+        raise Ops03PacketUnavailable(PR_A_NONFINAL_REASON)
+    if not packet.is_dir():
+        raise ValueError("ops-03: tracked packet root is not a real directory")
+    try:
+        entries = tuple(packet.iterdir())
+    except OSError as exc:
+        raise ValueError("ops-03: tracked packet is not readable") from exc
+    expected = set(ops03.FINAL_FILES)
+    allowed = expected | {f"{name}.path_proof.txt" for name in expected}
+    unexpected = sorted(entry.name for entry in entries if entry.name not in allowed)
+    if unexpected:
+        raise ValueError(f"ops-03: unexpected tracked entry {unexpected[0]}")
+    files: dict[str, bytes] = {}
+    for name in expected:
+        path = packet / name
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"ops-03: required file {name} is missing or unsafe")
+        files[name] = path.read_bytes()
+        if name != "stderr.log" and not files[name]:
+            raise ValueError(f"ops-03: required file {name} is empty")
+    _validate_secret_safety(packet, tuple(sorted(expected)))
+    if files["stdout.log"] != b"OPS03_CAPTURE_PASS\n" or files["stderr.log"] != b"":
+        raise ValueError("ops-03: success logs are not exact")
+    if files["exit_code.txt"] != b"0\n":
+        raise ValueError("ops-03: exit code is not exact")
+
+    checksum_rows: dict[str, str] = {}
+    for number, line in enumerate(files[ops03.CHECKSUM_FILE].decode("ascii").splitlines(), 1):
+        match = re.fullmatch(r"([0-9a-f]{64})  ([A-Za-z0-9_.-]+)", line)
+        if not match or match.group(2) in checksum_rows:
+            raise ValueError(f"ops-03: checksum row {number} is malformed")
+        checksum_rows[match.group(2)] = match.group(1)
+    if tuple(sorted(checksum_rows)) != ops03.CHECKSUM_INPUTS:
+        raise ValueError("ops-03: checksum inventory is not exact")
+    if any(
+        checksum_rows[name] != hashlib.sha256(files[name]).hexdigest()
+        for name in ops03.CHECKSUM_INPUTS
+    ):
+        raise ValueError("ops-03: checksum mismatch")
+
+    values = {
+        name: _ops03_json(files, name)
+        for name in ops03.JSON_SCHEMAS
+    }
+    posture = values["db_posture_summary.json"]
+    env = values["env_presence.json"]
+    nonclaims = values["nonclaims.json"]
+    summary = values["result_summary.json"]
+    receipt = values[ops03.RECEIPT_FILE]
+    run_id = summary.get("run_id")
+    source_commit = summary.get("source_commit")
+    authorization_sha256 = summary.get("authorization_sha256")
+    query_results = posture.get("query_results")
+    if (
+        not isinstance(run_id, str)
+        or re.fullmatch(r"[a-z0-9][a-z0-9-]{15,63}", run_id) is None
+        or any(value.get("run_id") != run_id for value in values.values())
+        or not isinstance(source_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", source_commit) is None
+        or posture.get("source_commit") != source_commit
+        or not isinstance(authorization_sha256, str)
+        or re.fullmatch(r"[0-9a-f]{64}", authorization_sha256) is None
+        or receipt.get("authorization_sha256") != authorization_sha256
+        or posture.get("provider") != "psycopg"
+        or posture.get("selection_attempts")
+        != [{"provider": "psycopg", "status": "ok", "reason": None}]
+        or posture.get("ordered_query_ids") != list(ops03.ORDERED_QUERY_IDS)
+        or not isinstance(query_results, list)
+        or [row.get("query_id") for row in query_results if isinstance(row, dict)]
+        != list(ops03.ORDERED_QUERY_IDS)
+        or posture.get("counts") != ops03.EXPECTED_COUNTS
+        or posture.get("result") != "PASS"
+        or set(posture.get("predicates", {})) != set(ops03.POSTURE_PREDICATES)
+        or not all(posture["predicates"].values())
+        or nonclaims.get("nonclaims") != list(ops03.NONCLAIMS)
+        or summary.get("capture_result") != "PASS"
+        or summary.get("primary_files") != list(ops03.PRIMARY_FILES)
+        or set(summary.get("decisive_predicates", {})) != set(ops03.POSTURE_PREDICATES)
+        or not all(summary["decisive_predicates"].values())
+        or receipt.get("validated_files") != list(ops03.PRIMARY_FILES)
+        or set(receipt.get("predicates", {})) != set(ops03.RECEIPT_PREDICATES)
+        or not all(receipt["predicates"].values())
+        or receipt.get("result") != "PASS"
+    ):
+        raise ValueError("ops-03: packet contract disagreement")
+
+    command_lines = files["commands.txt"].splitlines(keepends=True)
+    if len(command_lines) != 3:
+        raise ValueError("ops-03: command inventory is not exact")
+    commands: list[list[str]] = []
+    for line in command_lines:
+        try:
+            command = json.loads(line.decode("utf-8", "strict"))
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError("ops-03: command row is invalid") from exc
+        if (
+            not isinstance(command, list)
+            or not command
+            or not all(isinstance(item, str) for item in command)
+            or line != (json.dumps(command, separators=(",", ":")) + "\n").encode("utf-8")
+        ):
+            raise ValueError("ops-03: command row is not canonical")
+        commands.append(command)
+    interpreter = commands[0][0]
+    authorization = commands[0][5] if len(commands[0]) > 5 else ""
+    candidate = f"/tmp/hde-epic038-ops03/{run_id}/candidate"
+    runner_path = commands[0][3] if len(commands[0]) > 3 else ""
+    validator_path = commands[1][3] if len(commands[1]) > 3 else ""
+    if (
+        not runner_path.endswith("/scripts/ops/hde_epic038_ops03.py")
+        or not validator_path.endswith("/tools/evidence/hde_epic038_ops03.py")
+        or not Path(authorization).is_absolute()
+        or "\x00" in authorization
+        or commands[2][3:4] != [validator_path]
+        or commands[0]
+        != [interpreter, "-I", "-B", runner_path, "--authorization", authorization]
+        or commands[1]
+        != [
+            interpreter,
+            "-I",
+            "-B",
+            validator_path,
+            "--emit-receipt",
+            "--authorization",
+            authorization,
+            "--candidate",
+            candidate,
+        ]
+        or commands[2]
+        != [
+            interpreter,
+            "-I",
+            "-B",
+            validator_path,
+            "--validate",
+            "--authorization",
+            authorization,
+            "--candidate",
+            candidate,
+        ]
+    ):
+        raise ValueError("ops-03: authorized command shape disagreement")
 
 
 def _run_command(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
@@ -764,18 +683,36 @@ def _run_stage(step: SanityStep) -> int:
         if command == ("__validate_pr05_proofs__",):
             try:
                 validate_pr05_path_proof_prerequisites()
-            except ValueError as exc:
-                print(str(exc), file=sys.stderr)
+            except Exception:
+                print("pr05_path_proof_validation_failed", file=sys.stderr)
                 return 1
-        elif command == ("__validate_ops__",):
+        elif command == ("__validate_direct_selection__",):
             try:
-                validate_ops_packages()
-            except ValueError as exc:
-                print(str(exc), file=sys.stderr)
+                validate_direct_selection_contract()
+            except Exception:
+                print("direct_selection_contract_validation_failed", file=sys.stderr)
                 return 1
-        elif command == ("__pr_a_nonfinal__",):
-            print(PR_A_NONFINAL_REASON, file=sys.stderr)
-            return PR_A_NONFINAL_EXIT
+        elif command == ("__validate_historical_ops01__",):
+            try:
+                validate_historical_bridge_evidence()
+            except Exception:
+                print("historical_ops01_integrity_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_ops02__",):
+            try:
+                validate_ops02_package()
+            except Exception:
+                print("ops02_packet_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_ops03__",):
+            try:
+                validate_ops03_tracked_packet()
+            except Ops03PacketUnavailable as exc:
+                print(str(exc), file=sys.stderr)
+                return PR_A_NONFINAL_EXIT
+            except Exception:
+                print("ops03_packet_validation_failed", file=sys.stderr)
+                return 1
         else:
             result = _run_command(command)
             if result.returncode:
@@ -788,10 +725,19 @@ def _run_stage(step: SanityStep) -> int:
 
 
 def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
-    lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true", "pr_a_state:nonfinal_fail_closed", f"final_readiness_blocked:{PR_A_NONFINAL_REASON}"]
+    lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true"]
+    if any(status == "NONFINAL_MISSING_OPS03" for _, status in results):
+        lines.extend(
+            (
+                "pr_a_state:nonfinal_fail_closed",
+                f"final_readiness_blocked:{PR_A_NONFINAL_REASON}",
+            )
+        )
     for name, status in results:
         canonical_status = "OK" if status == "OK" else "FAIL"
         lines.append(f"check {name}:{canonical_status}")
+        if name == STAGE_NAMES[11] and status == "OK":
+            lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
         if status.startswith("NOT_EXECUTED_EARLIER_FAILURE:"):
             lines.append(f"not_executed {name}:earlier_mandatory_failure={status.split(':', 1)[1]}")
     lines.extend((f"first_failed_stage:{first_failure}", f"summary:{summary}"))
@@ -822,14 +768,32 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
     failure = "NONE"
     code = 0
     prospective_pass: bytes | None = None
+    sealing_index = next(
+        (index for index, step in enumerate(roster) if step.name == STAGE_NAMES[14]),
+        len(roster) - 1,
+    )
     for index, step in enumerate(roster):
         # The final updater must bind the final sanity bytes, not an interim
         # version.  Render the prospective PASS log before that updater runs;
         # the normal final render below is byte-identical on success.
-        if canonical_run and index == len(roster) - 1 and failure == "NONE":
-            prospective_pass = _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
+        if canonical_run and index == sealing_index and failure == "NONE":
+            prospective_pass = _write_log(
+                log_path,
+                [*results, *((later.name, "OK") for later in roster[index:])],
+                "NONE",
+                "PASS",
+            )
         code = _run_stage(step)
-        results.append((step.name, "OK" if code == 0 else "FAIL"))
+        status = (
+            "OK"
+            if code == 0
+            else (
+                "NONFINAL_MISSING_OPS03"
+                if code == PR_A_NONFINAL_EXIT and step.name == STAGE_NAMES[13]
+                else "FAIL"
+            )
+        )
+        results.append((step.name, status))
         if code:
             failure = step.name
             results.extend((later.name, f"NOT_EXECUTED_EARLIER_FAILURE:{step.name}") for later in roster[index + 1:])
