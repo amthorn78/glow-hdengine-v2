@@ -157,7 +157,10 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[14], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"))),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[16], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
-        SanityStep(STAGE_NAMES[17], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
+        SanityStep(
+            STAGE_NAMES[17],
+            (_py("tools/evidence/orientation_demo.py", "--check"),),
+        ),
         SanityStep(STAGE_NAMES[18], (("ci/checks/check_final_lf.sh",),)),
     ]
 

@@ -113,7 +113,7 @@ def test_pipeline_has_separate_direct_historical_ops02_and_ops03_validators():
     assert all("__validate_ops__" not in step.commands for step in steps)
 
 
-def test_updater_write_occurs_once_before_orientation_write():
+def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
     commands = [command for step in sanity.default_steps() for command in step.commands]
     updater = (sanity.sys.executable, "tools/evidence/update_evidence_index.py")
     updater_check = (*updater, "--check")
@@ -121,10 +121,10 @@ def test_updater_write_occurs_once_before_orientation_write():
     orientation_check = (*orientation, "--check")
     assert commands.count(updater) == 1
     assert commands.count(updater_check) == 1
-    assert commands.count(orientation) == 1
+    assert commands.count(orientation) == 0
     assert commands.count(orientation_check) == 1
-    assert commands.index(updater) < commands.index(updater_check) < commands.index(orientation)
-    assert commands.index(orientation) < commands.index(orientation_check)
+    assert commands.index(updater) < commands.index(updater_check)
+    assert commands.index(updater_check) < commands.index(orientation_check)
 
 
 def test_first_failure_is_fail_closed_and_later_stages_are_recorded(
