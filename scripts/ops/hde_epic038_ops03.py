@@ -726,9 +726,14 @@ def _raw_worktree_entry(relative: str) -> tuple[bytes, str] | None:
             parents.append((cursor, _stat_generation(info)))
         path = ROOT / relative_path
         before = path.lstat()
-        if not stat.S_ISREG(before.st_mode):
+        if stat.S_ISLNK(before.st_mode):
+            payload = os.readlink(os.fsencode(path))
+            mode = "120000"
+        elif stat.S_ISREG(before.st_mode):
+            payload = path.read_bytes()
+            mode = "100755" if stat.S_IMODE(before.st_mode) & 0o111 else "100644"
+        else:
             return None
-        payload = path.read_bytes()
         after = path.lstat()
         if _stat_generation(before) != _stat_generation(after) or len(payload) != after.st_size:
             return None
@@ -737,7 +742,6 @@ def _raw_worktree_entry(relative: str) -> tuple[bytes, str] | None:
                 return None
     except OSError:
         return None
-    mode = "100755" if stat.S_IMODE(after.st_mode) & 0o111 else "100644"
     return payload, mode
 
 
@@ -764,9 +768,7 @@ def _source_manifest_auxiliary_error() -> str | None:
     if index_entries != head_entries:
         return "source_manifest_mismatch"
     for relative, (mode, object_id) in head_entries.items():
-        if mode == "120000":
-            return "tracked_source_symlink_present"
-        if mode not in {"100644", "100755"}:
+        if mode not in {"100644", "100755", "120000"}:
             return "tracked_source_type_invalid"
         worktree = _raw_worktree_entry(relative)
         if worktree is None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
-import hashlib, json, os, tempfile
+import hashlib, json, os
+from collections import ChainMap
 from datetime import datetime, timezone
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask, g
@@ -17,8 +18,8 @@ from engine.compat.errors import error_envelope
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorError
 from engine.http.compat_handler import compat_blueprint
-from engine.db import DBAccess
-from engine.db.errors import AdapterError, PrimaryUnavailable
+from engine.db import DBAccess, Statement
+from engine.db.errors import AdapterError, PrimaryUnavailable, RetiredBridgeConfiguration
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
 _PROCESS_PID = os.getpid()
@@ -50,7 +51,6 @@ _DEV_WRITER_CONJUNCTION_ERROR_TYPE = "dev.writer.conjunction.error.v1"
 
 _IDEMPOTENCE_CACHE: dict[str, dict[str, object]] = {}
 _IDEMPOTENCE_CACHE_LOCK = Lock()
-_ENV_UNSET = object()
 
 
 class _WriterTransportResponse(Response):
@@ -228,50 +228,53 @@ def _persist_idempotence_db(
     canonical_preimage_text: str,
     canonical_json: dict[str, object],
 ) -> bool:
-    dsn = (os.environ.get("DATABASE_URL") or "").strip()
-    if not dsn:
-        return False
     try:
-        import psycopg  # type: ignore
-    except Exception:
+        db = DBAccess.for_current_env()
+    except RetiredBridgeConfiguration:
+        # Retired configuration is an intentional typed refusal.  It must not
+        # be converted into the process-local fallback.
+        raise
+    except AdapterError:
         return False
 
     try:
-        with psycopg.connect(dsn, connect_timeout=5) as conn, conn.cursor() as cur:  # type: ignore[attr-defined]
-            try:
-                cur.execute("SET LOCAL search_path TO hde, public")
-            except Exception:
-                cur.execute("SET search_path TO hde, public")
-            cur.execute(
-                """
+        results = db.tx(
+            (
+                Statement("SET LOCAL search_path TO hde, public"),
+                Statement(
+                    """
                 INSERT INTO hde.idempotent_writes (idempotence_hash, canonical_bytes, canonical_json)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (idempotence_hash) DO NOTHING
                 RETURNING canonical_bytes
-                """,
-                (
-                    digest,
-                    canonical_preimage_text,
-                    canon.sercanon(canonical_json, sort_keys=True).decode("utf-8"),
+                    """,
+                    (
+                        digest,
+                        canonical_preimage_text,
+                        canon.sercanon(canonical_json, sort_keys=True).decode("utf-8"),
+                    ),
+                    fetch=True,
+                ),
+                Statement(
+                    "SELECT canonical_bytes FROM hde.idempotent_writes WHERE idempotence_hash=%s",
+                    (digest,),
+                    fetch=True,
                 ),
             )
-            inserted = cur.fetchone()
-            conn.commit()
-            if inserted:
-                return True
-            cur.execute(
-                "SELECT canonical_bytes FROM hde.idempotent_writes WHERE idempotence_hash=%s",
-                (digest,),
-            )
-            row = cur.fetchone()
-            conn.commit()
-            if row and row[0] != canonical_preimage_text:
-                raise ValueError("idempotence hash collision for diagnostic writer")
-            return True
-    except ValueError:
-        raise
-    except Exception:
+        )
+    except AdapterError:
         return False
+
+    if len(results) != 3:
+        return False
+    inserted = results[1] or ()
+    selected = results[2] or ()
+    rows = inserted or selected
+    if not rows or not isinstance(rows[0], (list, tuple)) or not rows[0]:
+        return False
+    if rows[0][0] != canonical_preimage_text:
+        raise ValueError("idempotence hash collision for diagnostic writer")
+    return True
 
 
 def _persist_idempotence_record(
@@ -464,40 +467,34 @@ def get_reader_bp(emit_fn=None):
     def ops_db_unavailable():
         g._log_override = {"route": "ops.db.unavailable"}
         with NoIoGuard() as guard:
-            original_env = {
-                "DATABASE_URL": os.environ.get("DATABASE_URL", _ENV_UNSET),
-                "DB_FORCE_PG": os.environ.get("DB_FORCE_PG", _ENV_UNSET),
-            }
-            os.environ["DATABASE_URL"] = os.environ.get("DATABASE_URL", "db://unavailable")
-            os.environ["DB_FORCE_PG"] = "1"
             def _raise_primary(_: str):
                 raise PrimaryUnavailable(
                     "forced_db_unavailable",
                     attempts=["forced_db_unavailable"],
                     code="forced_db_unavailable",
                 )
+            # Override the diagnostic DSN without reading or mutating the
+            # ambient value.  ChainMap key iteration lets the adapter refuse a
+            # present retired key before it accesses any DATABASE_URL value.
+            forced_env = ChainMap({"DATABASE_URL": "db://unavailable"}, os.environ)
             try:
-                try:
-                    DBAccess.for_current_env(psycopg_factory=_raise_primary)
-                except AdapterError:
-                    # This diagnostic route deliberately injects the historical
-                    # forced-unavailable scenario.  Keep its public bytes stable
-                    # while the direct-only adapter normalizes the internal
-                    # provider failure to primary_connect_failed.
-                    details = {"adapter_code": "forced_db_unavailable"}
-                    env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
-                    resp = _emit_writer_response(env, status=503, sort_keys=False)
-                else:
-                    env = error_envelope(
-                        "ERR_WRITER_RAILS_CLOSED", details={"adapter_code": "unexpected_db_available"}
-                    )
-                    resp = _emit_writer_response(env, status=503, sort_keys=False)
-            finally:
-                for key, value in original_env.items():
-                    if value is _ENV_UNSET:
-                        os.environ.pop(key, None)
-                    else:
-                        os.environ[key] = value
+                DBAccess.for_current_env(
+                    environ=forced_env,
+                    psycopg_factory=_raise_primary,
+                )
+            except AdapterError:
+                # This diagnostic route deliberately injects the historical
+                # forced-unavailable scenario.  Keep its public bytes stable
+                # while the direct-only adapter normalizes the internal
+                # provider failure to primary_connect_failed.
+                details = {"adapter_code": "forced_db_unavailable"}
+                env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
+                resp = _emit_writer_response(env, status=503, sort_keys=False)
+            else:
+                env = error_envelope(
+                    "ERR_WRITER_RAILS_CLOSED", details={"adapter_code": "unexpected_db_available"}
+                )
+                resp = _emit_writer_response(env, status=503, sort_keys=False)
         g._no_io_attempts = guard.attempts
         return resp
 

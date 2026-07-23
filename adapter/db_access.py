@@ -223,6 +223,8 @@ def _validate_env_matrix_payload(value: Any) -> None:
         result_row = _require_exact_keys(result, _RESULT_KEYS, label="env_matrix_result")
         if result_row["provider"] != "psycopg" or error is not None:
             raise ValueError("env_matrix_success_relationship")
+        if checks[0]["value_kind"] != "present_redacted":
+            raise ValueError("env_matrix_success_database_url")
         if any(row["value_kind"] == "present_retired" for row in checks[1:]):
             raise ValueError("env_matrix_success_retired_key")
         return
@@ -234,6 +236,15 @@ def _validate_env_matrix_payload(value: Any) -> None:
     ]
     if retired_from_checks != error["retired_keys"]:
         raise ValueError("env_matrix_retired_key_relationship")
+    database_url_presence = checks[0]["value_kind"]
+    error_code = error["code"]
+    if error_code == "missing_database_url" and database_url_presence != "unset":
+        raise ValueError("env_matrix_missing_database_url_relationship")
+    if (
+        error_code in {"adapter_error", "primary_connect_failed", "primary_unavailable"}
+        and database_url_presence != "present_redacted"
+    ):
+        raise ValueError("env_matrix_unavailable_database_url_relationship")
 
 
 def resolve_env_matrix() -> tuple[bool, dict[str, Any]]:
@@ -252,6 +263,15 @@ def resolve_env_matrix() -> tuple[bool, dict[str, Any]]:
         }
     except AdapterError as exc:
         case = DBAccess.selection_failure_evidence(exc)
+        if not isinstance(getattr(exc, "selection_case", None), Mapping):
+            case = {
+                **case,
+                "database_url_presence": (
+                    "present_redacted"
+                    if any(name == "DATABASE_URL" for name in os.environ)
+                    else "unset"
+                ),
+            }
         payload = {
             "schema": "hde.db.env_selection.v2",
             "ok": False,

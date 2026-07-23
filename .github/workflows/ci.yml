@@ -59,7 +59,15 @@ jobs:
       - run: ci/checks/check_evidence_index_hash.sh
       - run: python ci/checks/check_direct_db_contract.py
       - name: Run direct PostgreSQL contract suites
-        run: python -m pytest tests/db tests/unit/test_check_direct_db_contract.py
+        run: |
+          python -m pytest \
+            tests/db \
+            tests/unit/test_check_direct_db_contract.py \
+            tests/bodygraph/test_bg_resolve_v2_mapped_cache.py \
+            tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py \
+            tests/bodygraph/test_ingest.py \
+            tests/ops/test_capture_rails_open_scope.py \
+            tests/ops/test_http_logging.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
       - name: Run EPIC021 QA harness entrypoint self-test (closed rails)

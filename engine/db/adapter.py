@@ -233,6 +233,8 @@ class DBAccess:
         *,
         validate: TxValidator | None = None,
     ) -> List[TxResult]:
+        if validate is None:
+            return self._provider.tx(statements)
         return self._provider.tx(statements, validate=validate)
     def readonly_tx(self, statements: Sequence[Statement]) -> List[Sequence[Any] | None]:
         return self._provider.readonly_tx(statements)

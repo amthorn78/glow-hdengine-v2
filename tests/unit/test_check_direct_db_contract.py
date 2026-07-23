@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from ci.checks import check_direct_db_contract as check
 
 
@@ -149,6 +151,98 @@ def test_ordinary_http_and_subprocess_commands_remain_allowed(tmp_path):
         "subprocess.run(['curl', 'https://example.invalid/health'])\n",
     )
     assert check.scan(tmp_path) == ()
+
+
+def test_raw_psycopg_import_and_connect_are_rejected_outside_owned_paths(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "adapter/current.py",
+        "import psycopg as pg\npg.connect('postgresql://forbidden')\n",
+    )
+
+    violations = check.scan(tmp_path)
+    assert "adapter/current.py:1:unauthorized_psycopg_import" in violations
+    assert "adapter/current.py:2:unauthorized_psycopg_connect" in violations
+
+
+def test_raw_psycopg_connect_alias_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "from psycopg import connect as open_db\nopen_db('postgresql://forbidden')\n",
+    )
+
+    violations = check.scan(tmp_path)
+    assert "scripts/current.py:1:unauthorized_psycopg_import" in violations
+    assert "scripts/current.py:2:unauthorized_psycopg_connect" in violations
+
+
+def test_owned_psycopg_provider_and_exact_ops_runner_seam_remain_authorized(tmp_path):
+    _minimal_tree(tmp_path)
+    provider = tmp_path / "engine/db/providers/psycopg_provider.py"
+    provider.write_text(
+        "# SET TRANSACTION READ ONLY\n"
+        "# validate_readonly_statements\n"
+        "# conn.rollback()\n"
+        "import psycopg\n"
+        "psycopg.connect('fixture')\n",
+        encoding="utf-8",
+    )
+    runner = tmp_path / check.OPS03_RAW_PSYCOPG_OWNER
+    runner.write_text(
+        "# ORDERED_QUERY_IDS expected_argv authorization_bytes_changed tools.evidence.strict_json_schema\n"
+        "def live_provider_factory(counters):\n"
+        "    def factory(dsn):\n"
+        "        def connect(value):\n"
+        "            import psycopg\n"
+        "            return psycopg.connect(value, connect_timeout=5)\n"
+        "        return connect\n"
+        "    return factory\n",
+        encoding="utf-8",
+    )
+
+    assert check.scan(tmp_path) == ()
+
+
+def test_ops_runner_rejects_any_second_raw_psycopg_seam(tmp_path):
+    _minimal_tree(tmp_path)
+    runner = tmp_path / check.OPS03_RAW_PSYCOPG_OWNER
+    runner.write_text(
+        "# ORDERED_QUERY_IDS expected_argv authorization_bytes_changed tools.evidence.strict_json_schema\n"
+        "def live_provider_factory(counters):\n"
+        "    def factory(dsn):\n"
+        "        def connect(value):\n"
+        "            import psycopg\n"
+        "            return psycopg.connect(value, connect_timeout=5)\n"
+        "        return connect\n"
+        "    return factory\n"
+        "import psycopg\n"
+        "psycopg.connect('second')\n",
+        encoding="utf-8",
+    )
+
+    violations = check.scan(tmp_path)
+    assert any("unauthorized_psycopg_import" in row for row in violations)
+    assert any("unauthorized_psycopg_connect" in row for row in violations)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "__import__('psycopg').connect('forbidden')\n",
+        "import importlib\nimportlib.import_module('psycopg').connect('forbidden')\n",
+        "from importlib import import_module as load\npg = load('psycopg')\npg.connect('forbidden')\n",
+    ],
+)
+def test_dynamic_psycopg_import_and_connect_are_rejected(tmp_path, source):
+    _minimal_tree(tmp_path)
+    _write(tmp_path, "scripts/current.py", source)
+
+    violations = check.scan(tmp_path)
+    assert any("unauthorized_psycopg_import" in row for row in violations)
+    assert any("unauthorized_psycopg_connect" in row for row in violations)
 
 
 def test_active_guidance_for_retired_bridge_key_is_rejected(tmp_path):

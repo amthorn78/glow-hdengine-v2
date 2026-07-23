@@ -3,6 +3,7 @@ from __future__ import annotations
 import builtins
 import copy
 import datetime as dt
+import hashlib
 import json
 import os
 import shutil
@@ -3047,17 +3048,58 @@ def test_source_manifest_rejects_hidden_index_mutation(monkeypatch, tmp_path, fl
     assert validator._source_manifest_auxiliary_error() == "source_index_flags_unsafe"
 
 
-def test_source_manifest_rejects_tracked_symlink(monkeypatch, tmp_path):
+@pytest.mark.parametrize("module", (runner, validator))
+def test_source_manifest_binds_tracked_symlink_without_following_it(
+    monkeypatch, tmp_path, module
+):
     repo = tmp_path / "repo"
     repo.mkdir()
-    target = tmp_path / "target.py"
+    target = repo / "target.py"
     target.write_text("VALUE = 1\n", encoding="utf-8")
-    (repo / "linked.py").symlink_to(target)
+    linked = repo / "linked.py"
+    linked.symlink_to("target.py")
     _commit_test_repository(repo)
-    monkeypatch.setattr(runner, "ROOT", repo)
-    monkeypatch.setattr(validator, "ROOT", repo)
-    assert runner._source_manifest_auxiliary_error() == "tracked_source_symlink_present"
-    assert validator._source_manifest_auxiliary_error() == "tracked_source_symlink_present"
+    monkeypatch.setattr(module, "ROOT", repo)
+
+    assert module._source_manifest_auxiliary_error() is None
+    raw = module._raw_worktree_entry("linked.py")
+    assert raw == (b"target.py", "120000")
+
+    linked.unlink()
+    linked.symlink_to("other.py")
+    assert module._source_manifest_auxiliary_error() == "source_manifest_mismatch"
+
+    linked.unlink()
+    linked.write_text("target.py", encoding="utf-8")
+    assert module._source_manifest_auxiliary_error() == "source_manifest_mismatch"
+
+
+@pytest.mark.parametrize("module", (runner, validator))
+def test_current_head_tracked_symlink_blobs_match_without_dereference(module):
+    result = subprocess.run(
+        ["git", "-C", str(module.ROOT), "ls-tree", "-r", "-z", "--full-tree", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    entries = module._manifest_entries(result.stdout, index=False)
+    assert entries is not None
+    symlinks = {
+        relative: object_id
+        for relative, (mode, object_id) in entries.items()
+        if mode == "120000"
+    }
+    assert symlinks
+
+    for relative, object_id in symlinks.items():
+        worktree = module._raw_worktree_entry(relative)
+        assert worktree is not None
+        payload, mode = worktree
+        blob = hashlib.sha1(
+            f"blob {len(payload)}\0".encode("ascii") + payload
+        ).hexdigest()
+        assert mode == "120000"
+        assert blob == object_id
 
 
 def test_source_manifest_rejects_git_replacement_objects(monkeypatch, tmp_path):

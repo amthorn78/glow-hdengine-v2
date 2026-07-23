@@ -23,6 +23,7 @@ from engine.bodygraph.projection import project_bodygraph
 from engine.bodygraph.v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
 from engine.bodygraph.vendor_client import HdApiClient, VendorRetryConfig, classify_bg_resolve_route_policy
 from engine.db import DBAccess
+from engine.db.adapter import retired_db_transport_keys_present
 from engine.serializer.canon import sercanon
 
 REQUIRED_ENV = ("HD_API_BASE_URL", "HD_API_KEY", "GEO_API_KEY", "DATABASE_URL")
@@ -62,16 +63,23 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _preflight(args: argparse.Namespace) -> None:
-    if os.environ.get("SAFE_MODE") != "0" or os.environ.get("ALLOW_NETWORK") != "1":
+def _preflight(args: argparse.Namespace, *, environ=None) -> None:
+    env = os.environ if environ is None else environ
+    retired = retired_db_transport_keys_present(env)
+    if retired:
+        raise SystemExit(
+            "OPS_REFUSED: retired database transport environment names are present: "
+            + ",".join(retired)
+        )
+    if env.get("SAFE_MODE") != "0" or env.get("ALLOW_NETWORK") != "1":
         raise SystemExit("OPS_REFUSED: explicit open rails required")
-    app_env = os.environ.get("APP_ENV", "").strip().lower()
+    app_env = env.get("APP_ENV", "").strip().lower()
     if not app_env or app_env in PRODUCTION_LIKE:
         raise SystemExit("OPS_REFUSED: explicit non-production APP_ENV required")
-    missing = [name for name in REQUIRED_ENV if not os.environ.get(name, "").strip()]
+    missing = [name for name in REQUIRED_ENV if not env.get(name, "").strip()]
     if missing:
         raise SystemExit("OPS_REFUSED: required environment names are unset: " + ",".join(missing))
-    route_policy = classify_bg_resolve_route_policy(os.environ["HD_API_BASE_URL"])
+    route_policy = classify_bg_resolve_route_policy(env["HD_API_BASE_URL"])
     if not route_policy["supported"] or route_policy["route_family"] != "recommended_v2_chart":
         raise SystemExit("OPS_REFUSED: HD_API_BASE_URL must select the configured-v2 charts route")
     try:

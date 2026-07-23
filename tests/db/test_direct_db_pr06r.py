@@ -18,6 +18,7 @@ from engine.db.errors import (
     IntrospectionError,
     PrimaryUnavailable,
     RetiredBridgeConfiguration,
+    SqlExecError,
     TxError,
 )
 from engine.db.providers.psycopg_provider import PsycopgProvider
@@ -537,6 +538,16 @@ def test_write_tx_validator_runs_before_commit_and_rolls_back_on_failure():
 @pytest.mark.parametrize(
     ("operation", "expected_type", "expected_code"),
     [
+        (
+            lambda provider: provider.query("SELECT 1"),
+            SqlExecError,
+            "sql_query_failed",
+        ),
+        (
+            lambda provider: provider.exec("SELECT 1"),
+            SqlExecError,
+            "sql_exec_failed",
+        ),
         (
             lambda provider: provider.tx([Statement("SELECT 1", fetch=True)]),
             TxError,

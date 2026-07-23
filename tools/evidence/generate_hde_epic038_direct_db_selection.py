@@ -224,7 +224,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=OUT)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    data = build()
+    try:
+        data = build()
+    except Exception:
+        data = _fallback_negative_receipt()
     if validate_contract(data):
         return 1
     raw = canonical_bytes(data)

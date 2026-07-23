@@ -1,5 +1,6 @@
 from argparse import Namespace
 import hashlib
+from collections.abc import Mapping
 
 import pytest
 
@@ -31,6 +32,82 @@ def configure(monkeypatch, base_url):
         "HD_API_BASE_URL":base_url, "HD_API_KEY":"set", "GEO_API_KEY":"set", "DATABASE_URL":"set",
     }.items():
         monkeypatch.setenv(key, value)
+
+
+class EndpointTrap(Mapping):
+    def __init__(self, values):
+        self._values = dict(values)
+        self.accessed = []
+
+    def __iter__(self):
+        return iter(self._values)
+
+    def __len__(self):
+        return len(self._values)
+
+    def __getitem__(self, key):
+        self.accessed.append(key)
+        if key == "DATABASE_URL":
+            raise AssertionError("DATABASE_URL value was read")
+        return self._values[key]
+
+
+def test_preflight_refuses_retired_membership_before_database_url_value():
+    env = EndpointTrap(
+        {
+            "SAFE_MODE": "0",
+            "ALLOW_NETWORK": "1",
+            "APP_ENV": "test",
+            "HD_API_BASE_URL": "https://fixture.invalid/v2",
+            "HD_API_KEY": "set",
+            "GEO_API_KEY": "set",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "",
+        }
+    )
+
+    with pytest.raises(SystemExit, match="DB_BRIDGE_URL"):
+        _preflight(args(), environ=env)
+
+    assert "DATABASE_URL" not in env.accessed
+
+
+def test_main_retired_refusal_precedes_repository_provider_vendor_and_packet(
+    monkeypatch,
+):
+    configure(monkeypatch, "https://fixture.invalid/v2")
+    monkeypatch.setenv("DB_BRIDGE_URL", "")
+    calls = []
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: calls.append("repository"),
+    )
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._execute",
+        lambda *_args: calls.append("execute"),
+    )
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._write_packet",
+        lambda *_args: calls.append("packet"),
+    )
+
+    with pytest.raises(SystemExit, match="DB_BRIDGE_URL"):
+        main(
+            [
+                "--synthetic-user-id",
+                args().synthetic_user_id,
+                "--synthetic-person-uid",
+                "fixture",
+                "--birthdate",
+                "fixture",
+                "--birthtime",
+                "fixture",
+                "--location",
+                "fixture",
+            ]
+        )
+
+    assert calls == []
 
 
 def test_preflight_accepts_only_configured_v2_chart_base(monkeypatch):

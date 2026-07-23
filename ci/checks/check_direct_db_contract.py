@@ -117,6 +117,10 @@ HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/run_sanity_pipeline.py",
 }
+AUTHORIZED_PSYCOPG_IMPORT_PATHS = frozenset(
+    {"engine/db/providers/psycopg_provider.py"}
+)
+OPS03_RAW_PSYCOPG_OWNER = "scripts/ops/hde_epic038_ops03.py"
 HISTORICAL_VALIDATION_ROSTERS = {
     "tools/evidence/run_sanity_pipeline.py": frozenset(
         {"HISTORICAL_BRIDGE_PRIMARY_SHA256"}
@@ -189,6 +193,15 @@ MANDATORY_MARKERS = {
     "scripts/ops/capture_rails_open_scope.py": (
         "capture_adapter_introspection.py",
         "provider: psycopg",
+        "retired_db_transport_keys_present(env)",
+    ),
+    "scripts/ops/hde_epic038_mapped_cache_smoke.py": (
+        "retired_db_transport_keys_present(env)",
+        "DBAccess.for_current_env()",
+    ),
+    "adapter/http_reader.py": (
+        "DBAccess.for_current_env()",
+        "Statement(\"SET LOCAL search_path TO hde, public\")",
     ),
 }
 SCHEMAS = (
@@ -700,6 +713,167 @@ def _dotted_name(node: ast.AST) -> str:
         prefix = _dotted_name(node.value)
         return f"{prefix}.{node.attr}" if prefix else node.attr
     return ""
+
+
+def _is_psycopg_module_literal(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and (node.value == "psycopg" or node.value.startswith("psycopg."))
+    )
+
+
+def _dynamic_psycopg_import(
+    node: ast.AST,
+    importlib_names: set[str],
+    import_module_names: set[str],
+) -> bool:
+    if not isinstance(node, ast.Call) or not node.args:
+        return False
+    func = node.func
+    return _is_psycopg_module_literal(node.args[0]) and (
+        isinstance(func, ast.Name)
+        and func.id in {"__import__", *import_module_names}
+        or isinstance(func, ast.Attribute)
+        and func.attr == "import_module"
+        and isinstance(func.value, ast.Name)
+        and func.value.id in importlib_names
+    )
+
+
+def _python_direct_psycopg_use(text: str) -> tuple[tuple[int, str], ...]:
+    """Find raw psycopg imports and connection calls outside their owners."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    module_names = {"psycopg"}
+    connect_names: set[str] = set()
+    importlib_names = {"importlib"}
+    import_module_names: set[str] = set()
+    violations: set[tuple[int, str]] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for imported in node.names:
+                if imported.name == "psycopg" or imported.name.startswith("psycopg."):
+                    module_names.add(imported.asname or imported.name.split(".", 1)[0])
+                    violations.add((node.lineno, "unauthorized_psycopg_import"))
+                elif imported.name == "importlib":
+                    importlib_names.add(imported.asname or imported.name)
+        elif isinstance(node, ast.ImportFrom) and node.module is not None:
+            if node.module == "psycopg" or node.module.startswith("psycopg."):
+                violations.add((node.lineno, "unauthorized_psycopg_import"))
+                for imported in node.names:
+                    if imported.name == "connect":
+                        connect_names.add(imported.asname or imported.name)
+            elif node.module == "importlib":
+                for imported in node.names:
+                    if imported.name == "import_module":
+                        import_module_names.add(imported.asname or imported.name)
+        if _dynamic_psycopg_import(node, importlib_names, import_module_names):
+            violations.add((node.lineno, "unauthorized_psycopg_import"))
+
+    while True:
+        previous = (set(module_names), set(connect_names))
+        for node in ast.walk(tree):
+            for local_name, value in _assignment_bindings(node):
+                if (
+                    isinstance(value, ast.Name)
+                    and value.id in module_names
+                    or _dynamic_psycopg_import(
+                        value, importlib_names, import_module_names
+                    )
+                ):
+                    module_names.add(local_name)
+                if isinstance(value, ast.Name) and value.id in connect_names:
+                    connect_names.add(local_name)
+                if (
+                    isinstance(value, ast.Attribute)
+                    and value.attr == "connect"
+                    and isinstance(value.value, ast.Name)
+                    and value.value.id in module_names
+                ):
+                    connect_names.add(local_name)
+        if previous == (module_names, connect_names):
+            break
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name) and node.func.id in connect_names:
+            violations.add((node.lineno, "unauthorized_psycopg_connect"))
+        elif isinstance(node.func, ast.Attribute) and node.func.attr == "connect":
+            if (
+                isinstance(node.func.value, ast.Name)
+                and node.func.value.id in module_names
+                or _dynamic_psycopg_import(
+                    node.func.value, importlib_names, import_module_names
+                )
+            ):
+                violations.add((node.lineno, "unauthorized_psycopg_connect"))
+    return tuple(sorted(violations))
+
+
+def _ops03_authorized_psycopg_use(
+    text: str,
+) -> frozenset[tuple[int, str]]:
+    """Authorize only live_provider_factory.factory.connect's one raw seam."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return frozenset()
+    owners = [
+        node
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "live_provider_factory"
+    ]
+    if len(owners) != 1:
+        return frozenset()
+    factories = [
+        node
+        for node in owners[0].body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "factory"
+    ]
+    if len(factories) != 1:
+        return frozenset()
+    connectors = [
+        node
+        for node in factories[0].body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "connect"
+    ]
+    if len(connectors) != 1:
+        return frozenset()
+    imports = [
+        node
+        for node in ast.walk(connectors[0])
+        if isinstance(node, ast.Import)
+        and len(node.names) == 1
+        and node.names[0].name == "psycopg"
+        and node.names[0].asname is None
+    ]
+    calls = [
+        node
+        for node in ast.walk(connectors[0])
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "connect"
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "psycopg"
+    ]
+    if len(imports) != 1 or len(calls) != 1:
+        return frozenset()
+    allowed = frozenset(
+        {
+            (imports[0].lineno, "unauthorized_psycopg_import"),
+            (calls[0].lineno, "unauthorized_psycopg_connect"),
+        }
+    )
+    return allowed if frozenset(_python_direct_psycopg_use(text)) == allowed else frozenset()
 
 
 def _is_http_call(node: ast.Call) -> bool:
@@ -1351,6 +1525,17 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
                         )
         if relative != "ci/checks/check_direct_db_contract.py":
             violations.update(_retired_key_violations(relative, text))
+        if relative.endswith(".py") and relative != "ci/checks/check_direct_db_contract.py":
+            raw_psycopg_uses = _python_direct_psycopg_use(text)
+            allowed_psycopg_uses = (
+                _ops03_authorized_psycopg_use(text)
+                if relative == OPS03_RAW_PSYCOPG_OWNER
+                else frozenset()
+            )
+            if relative not in AUTHORIZED_PSYCOPG_IMPORT_PATHS:
+                for line_number, violation in raw_psycopg_uses:
+                    if (line_number, violation) not in allowed_psycopg_uses:
+                        violations.add(f"{relative}:{line_number}:{violation}")
 
     for relative, markers in MANDATORY_MARKERS.items():
         path = root / relative

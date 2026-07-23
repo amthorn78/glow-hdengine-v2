@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from collections import ChainMap
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any, Mapping, MutableMapping, Sequence
 import uuid
 
 from engine.db import DBAccess, Statement
+from engine.db.adapter import retired_db_transport_keys_present
 from engine.db.errors import AdapterError
 from engine.presenter import emitter
 
@@ -142,6 +144,26 @@ def ingest_vendor_bodygraph(
     if not allow_network:
         raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network blocked by rails")
     start = time.monotonic()
+    db = db_access
+    if not dry_run:
+        db_env = ChainMap(env, os.environ)
+        if db is not None:
+            retired = retired_db_transport_keys_present(db_env)
+            if retired:
+                raise VendorError(
+                    "DB_WRITER_UNAVAILABLE",
+                    "database target unavailable",
+                    details={"code": "retired_bridge_configuration"},
+                )
+        else:
+            try:
+                db = DBAccess.for_current_env(environ=db_env)
+            except AdapterError as exc:
+                raise VendorError(
+                    "DB_WRITER_UNAVAILABLE",
+                    "database target unavailable",
+                    details={"code": exc.code},
+                ) from None
     client = client or HdApiClient.from_env(log_path=retry_log, env=_client_config_env(env))
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
     vendor_result = client.fetch(request)
@@ -176,7 +198,7 @@ def ingest_vendor_bodygraph(
             db_rows_after=0,
             payload=vendor_result.payload,
         )
-    db = db_access or DBAccess.for_current_env()
+    assert db is not None
     rows_before = _row_count(db, inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)
     _persist_bodygraph(db, inputs.user_id, vendor_version, request, payload_text)
     db_rows_after = _row_count(db, inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)

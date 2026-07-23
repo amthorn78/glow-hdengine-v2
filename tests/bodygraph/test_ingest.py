@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 from engine.bodygraph.ingest import VendorInputs, ingest_vendor_bodygraph
-from engine.bodygraph.vendor_client import VendorRequest, VendorResult
+from engine.bodygraph.vendor_client import VendorError, VendorRequest, VendorResult
+from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 
 
 class FakeClient:
@@ -126,3 +127,50 @@ def test_ingest_dry_run_skips_db(monkeypatch: pytest.MonkeyPatch) -> None:
     assert outcome.db_rows_after == 0
     assert outcome.parity_match is True
     assert outcome.payload == {"ok": True}
+
+
+def test_write_ingest_refuses_empty_retired_key_before_vendor_provider_and_logs(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+    provider_calls = []
+    vendor_calls = []
+    monkeypatch.setattr(
+        "engine.db.adapter.PsycopgProvider",
+        lambda _dsn: provider_calls.append("provider") or pytest.fail("provider attempted"),
+    )
+
+    class RefusingClient(FakeClient):
+        def build_request(self, **kwargs):
+            vendor_calls.append("build")
+            return super().build_request(**kwargs)
+
+        def fetch(self, request):
+            vendor_calls.append("fetch")
+            return super().fetch(request)
+
+    success_log = tmp_path / "success.log"
+    retry_log = tmp_path / "retry.log"
+    env = {
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+        "DATABASE_URL": "postgresql://must-not-read",
+        "DB_BRIDGE_URL": "",
+    }
+
+    with pytest.raises(VendorError) as caught:
+        ingest_vendor_bodygraph(
+            VendorInputs("user", "2000-01-01", "00:00", "Fixture"),
+            env=env,
+            client=RefusingClient(),
+            retry_log=retry_log,
+            success_log=success_log,
+        )
+
+    assert caught.value.code == "DB_WRITER_UNAVAILABLE"
+    assert caught.value.details == {"code": "retired_bridge_configuration"}
+    assert provider_calls == []
+    assert vendor_calls == []
+    assert not success_log.exists()
+    assert not retry_log.exists()

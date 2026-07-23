@@ -89,6 +89,9 @@ def test_env_matrix_missing_direct_has_exact_v2_failure_shape(monkeypatch):
 
 
 def test_env_matrix_normalizes_untrusted_error_codes(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-leak")
+    _clear_retired_keys(monkeypatch)
+
     def refuse(**_kwargs):
         raise PrimaryUnavailable(
             "postgresql://must-not-leak",
@@ -134,6 +137,42 @@ def test_env_matrix_contract_validator_rejects_unknown_keys_and_drift(monkeypatc
     mutations.append(inconsistent)
 
     for mutation in mutations:
+        with pytest.raises(ValueError):
+            db_access._validate_env_matrix_payload(mutation)
+
+
+def test_env_matrix_contract_validator_rejects_database_presence_contradictions(
+    monkeypatch,
+):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://redacted")
+    _clear_retired_keys(monkeypatch)
+    _, success = db_access.resolve_env_matrix()
+
+    success_without_database = deepcopy(success)
+    success_without_database["checks"][0]["value_kind"] = "unset"
+
+    missing_with_database = deepcopy(success)
+    missing_with_database.update(
+        {
+            "ok": False,
+            "result": None,
+            "error": {
+                "class": "PrimaryUnavailable",
+                "code": "missing_database_url",
+                "retired_keys": [],
+            },
+        }
+    )
+
+    unavailable_without_database = deepcopy(missing_with_database)
+    unavailable_without_database["checks"][0]["value_kind"] = "unset"
+    unavailable_without_database["error"]["code"] = "primary_connect_failed"
+
+    for mutation in (
+        success_without_database,
+        missing_with_database,
+        unavailable_without_database,
+    ):
         with pytest.raises(ValueError):
             db_access._validate_env_matrix_payload(mutation)
 

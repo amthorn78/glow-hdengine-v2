@@ -77,6 +77,24 @@ def test_direct_selection_producer_writes_schema_valid_negative_receipt(monkeypa
     assert generator.main(["--out", str(out), "--check"]) == 1
 
 
+def test_direct_selection_producer_exception_writes_same_path_negative_receipt(
+    monkeypatch, tmp_path
+):
+    def fail_without_serializing_values(*_args, **_kwargs):
+        raise RuntimeError("postgresql://must-not-survive")
+
+    monkeypatch.setattr(generator, "run_case", fail_without_serializing_values)
+    out = tmp_path / "direct.json"
+
+    assert generator.main(["--out", str(out)]) == 1
+    payload = json.loads(out.read_bytes())
+    assert generator.validate_contract(payload) == ()
+    assert payload["result"] == "FAIL"
+    assert payload["failure"] is not None
+    assert b"must-not-survive" not in out.read_bytes()
+    assert out.read_bytes() == generator.canonical_bytes(payload)
+
+
 def test_direct_selection_validator_rejects_case_and_secret_mutation():
     payload = copy.deepcopy(generator.build())
     payload["cases"][0]["selected"] = "none"

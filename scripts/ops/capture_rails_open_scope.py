@@ -21,6 +21,7 @@ from engine.ops.http_log import (
     read_owned_text,
     replace_owned_text,
 )
+from engine.db.adapter import retired_db_transport_keys_present
 
 REQUIRED_ENV = {
     "SAFE_MODE": "0",
@@ -35,11 +36,18 @@ HARNESS_COMMANDS: Sequence[Sequence[str]] = (
 SUMMARY_PATH = Path("artifacts/ops/rails_open_scope.txt")
 
 
-def _check_env() -> None:
-    if not (os.getenv("DATABASE_URL") or "").strip():
+def _check_env(environ=None) -> None:
+    env = os.environ if environ is None else environ
+    retired = retired_db_transport_keys_present(env)
+    if retired:
+        raise SystemExit(
+            "Retired database transport environment names are present: "
+            + ",".join(retired)
+        )
+    if not (env.get("DATABASE_URL") or "").strip():
         raise SystemExit("Missing required environment value: DATABASE_URL")
     for key, expected in REQUIRED_ENV.items():
-        actual = os.getenv(key)
+        actual = env.get(key)
         if actual != expected:
             raise SystemExit(f"Expected {key}={expected!r} but saw {actual!r}")
 
@@ -93,7 +101,7 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
         + datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         f"safe_mode: {os.getenv('SAFE_MODE', '<unset>')}",
         f"allow_network: {os.getenv('ALLOW_NETWORK', '<unset>')}",
-        f"database_url_present: {bool((os.getenv('DATABASE_URL') or '').strip())}",
+        f"database_url_present: {'DATABASE_URL' in os.environ}",
         "provider: psycopg",
         "route_counts:",
     ]
