@@ -10,8 +10,8 @@ Status: historical retained design record, not a current test plan or runbook. T
 
 ## Manual / harness
 - Historical retained command, not current guidance: `python scripts/db_bridge/capture_introspection.py` wrote `artifacts/db_bridge/` captures and must not be run.
-- Historical retained command, not current guidance: the adapter introspection harness mirrored bridge payloads and must not be used to claim current support.
-- Historical retained command, not current guidance: the rails-open scope harness observed bridge routes and must not be rerun for this retirement.
+- Historical retained behavior, not current guidance: bridge-era revisions of `scripts/db_adapter/capture_adapter_introspection.py` and `scripts/ops/capture_rails_open_scope.py` mirrored bridge payloads and observed bridge routes; those revisions must not be restored or used to claim current support.
+- Current direct-only behavior: `scripts/db_adapter/capture_adapter_introspection.py` delegates only to `DBAccess`/psycopg, and `scripts/ops/capture_rails_open_scope.py` invokes only that direct harness after retired-key refusal. PR-06R-A exercises their source and fixture tests only; it does not run a database or open-rails capture.
 - Historical retained record, not current guidance: bridge-era env-matrix snapshots remain frozen inputs, not current selection proof.
 
-Current exit criteria are owned by the direct-only PR-06R-A contract. They require static guidance scanning, direct-only selection/refusal coverage, and preservation of historical bytes; they do not permit bridge harness execution or refresh.
+Current exit criteria are owned by the direct-only PR-06R-A contract. They require static guidance scanning, direct-only selection/refusal coverage, and preservation of historical bytes; they do not permit bridge harness execution or refresh. Authorization-bound OPS-03 uses its separate runner after PR-06R-A, and PR-06R-B alone owns final evidence admission.
