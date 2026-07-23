@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.5  
+**Version:** v12.3.7  
 Effective Date: 2026.07.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -63,9 +63,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport  
 2.13) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine  
 2.14) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet  
-2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership
-
-2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics
+2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership  
+2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics  
+2.17) HDE-EPIC038 PR-06R-A
 
 # 2\) Numbered Addenda
 
@@ -13612,13 +13612,13 @@ PR \#366 is merged, and local `main` is current at merge commit `6e69d7a77f539d7
 
 ## **Proposed Addendum**
 
-# **2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics**
+## 2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics
 
 **Timestamp:** 072326 18:31
 
 **Details:** The Product Owner authorized implementation of the scalable release model and its bounded canon consequences during final remediation of HDE-EPIC038 `PR-06R-A`. PR \#366 merged into `main` with final source head `6b96cdc71681879d6d9a3e11b926911a511f6982` and merge commit `6e69d7a77f539d736ffcc0596bd51fa7d0004a90`. This addendum records the resulting release-identity, attestation, frozen-evidence, registry-evidence, path-proof, and generated-file architecture as living PF10 truth pending permanent drainage.
 
-## **Canon effect and supersession boundary**
+### Canon effect and supersession boundary
 
 For the exact topics below, this later addendum:
 
@@ -13633,7 +13633,7 @@ For the exact topics below, this later addendum:
 
 Addenda 2.12 through 2.15 remain controlling for direct-only database selection, retired-key refusal, historical bridge quarantine, OPS-03, PF09.6 semantics, and PR-06R ownership except where this addendum expressly changes release or path-proof mechanics.
 
-## **Single release-identity source**
+### Single release-identity source
 
 `catalog/manifest.json` is the single release-identity input stored in Git.
 
@@ -13664,7 +13664,7 @@ Source validation is read-only:
 
 A Git commit does not inherently change the release ID. The release ID changes only when the canonical manifest bytes change. A change to a manifest-listed source file causes the read-only audit to fail until one intentional final cut is made after source stabilization.
 
-## **Acyclic release graph**
+### Acyclic release graph
 
 The required dependency direction is:
 
@@ -13711,7 +13711,7 @@ Timing, raw subprocess output, secrets, DSNs, vendor values, and database observ
 
 CI builds and independently verifies this bundle outside the source tree and publishes it with bounded retention. The CI artifact is exact-head PR evidence, not a durable governed release admission record and not a replacement for PR-06R-B.
 
-## **Frozen checked-in release evidence**
+### Frozen checked-in release evidence
 
 Existing checked-in EPIC022 release evidence and its companions are frozen capture-time records.
 
@@ -13726,7 +13726,7 @@ They:
 
 Current release provenance belongs to the external attestation. Historical checked-in evidence remains historical.
 
-## **Registry and configuration evidence**
+### Registry and configuration evidence
 
 `artifacts/registry/registry_report.json` is configuration evidence, not release-identity evidence.
 
@@ -13736,7 +13736,7 @@ Config bundles derived from the registry report inherit this release-agnostic po
 
 Release and source provenance belong to the external attestation.
 
-## **Portable path-proof semantics**
+### Portable path-proof semantics
 
 Git does not preserve filesystem mtimes. Clone-local `stat().st_mtime` is therefore not evidence and must not determine whether a governed path proof is valid.
 
@@ -13753,7 +13753,7 @@ Path-proof correctness is established by:
 
 For this exact portability scope, this addendum supersedes conflicting clone-local mtime comparison requirements in **HDE Schemas and Artifacts**, **HDE Mechanics Guide**, and **Glow QA Guide**. Their path, hash, size, schema, ownership, canonical-generation, and no-hand-edit requirements remain unchanged.
 
-## **Generated development and packaging files**
+### Generated development and packaging files
 
 Host-specific generated development files are not source.
 
@@ -13761,7 +13761,7 @@ Local `.venv` trees and generated `*.egg-info` metadata must remain ignored and 
 
 A tracked virtual-environment root or tracked generated package metadata is repository contamination and must fail source-inventory or clean-tree validation.
 
-## **PR-06R-A implementation record**
+### PR-06R-A implementation record
 
 PR \#366 implemented this architecture together with the approved direct-only remediation.
 
@@ -13787,7 +13787,7 @@ Exact-head validation included:
 
 The final exact-head review reported no findings, and every inline review thread was resolved before merge.
 
-## **PR-A and downstream release boundary**
+### PR-A and downstream release boundary
 
 The PR-A attestation records:
 
@@ -13809,7 +13809,7 @@ The mandatory sequence remains:
 
 The external PR-A attestation does not satisfy OPS-03, PR-06R-B, the final nineteen-stage release PASS, or any PF09 predicate by itself.
 
-## **Rollback**
+### Rollback
 
 Rollback must revert the runtime manifest derivation, release-cut command, isolated attestation builder, workflow publication, schemas, and this architectural decision together.
 
@@ -13824,7 +13824,7 @@ Rollback must not restore:
 
 If external attestation publication is unavailable, the attestation job fails while tracked source and the canonical manifest remain immutable.
 
-## **Permanent drainage targets**
+### Permanent drainage targets
 
 Drain this decision into:
 
@@ -13836,7 +13836,7 @@ Drain this decision into:
 
 Permanent drainage must preserve Addenda 2.12 through 2.15’s direct-only database and evidence boundaries. It causes no automatic status movement.
 
-## **Explicit nonclaims**
+### Explicit nonclaims
 
 This addendum does not:
 
@@ -13854,6 +13854,364 @@ This addendum does not:
 * perform permanent drainage merely by recording the target.
 
 All unrelated PF10 and permanent-canon requirements remain unchanged.
+
+## 2.17) HDE-EPIC038 PR-06R-A
+
+### Executive Review Summary
+
+* The approved scope is direct-only source convergence, retired-transport removal, local direct-selection evidence tooling, fixture-only OPS-03 tooling, and a deliberately nonfinal PR-A pipeline.  
+* [PR \#363](https://github.com/amthorn78/glow-hdengine-v2/pull/363) established the main implementation but left compatibility, scanner, and OPS-03 hardening gaps.  
+* [PR \#364](https://github.com/amthorn78/glow-hdengine-v2/pull/364) centralized compatibility behavior, strengthened scanning, and introduced the exact PR-A nonfinal gate.  
+* [PR \#365](https://github.com/amthorn78/glow-hdengine-v2/pull/365) closed retired-key value-read and extensive scanner/data-flow gaps.  
+* [PR \#366](https://github.com/amthorn78/glow-hdengine-v2/pull/366) closed the remaining OPS-03 isolation, filesystem, state-machine, validation-race, and release-evidence defects.  
+* Current source contains one direct PostgreSQL selection owner, no executable bridge lane, strict evidence contracts, and a fail-closed stage-14 downstream stop.  
+* All four exact-head CI runs passed; all 54 lineage review threads are resolved; PR \#366 received a clean review against its exact final head.  
+* No current requirement failure, material uncertainty, actionable finding, or downstream-boundary violation remains.
+
+### Scope and Coverage Record
+
+#### Changed-path coverage
+
+| Tier | Count | Reviewed scope |
+| ----- | ----- | ----- |
+| Tier A | 190 | All production, provider, schema, validator, producer, pipeline, governed artifact, index/mirror, path-proof, and executable-cleanup paths |
+| Tier B | 63 | 44 regression/support tests and 19 technical/developer guidance files |
+| Tier C | 5 | Removed generated `glow_hdengine.egg-info/**` metadata |
+| **Total** | **258** | Matches both the four-PR union and the lifecycle-baseline-to-final comparison |
+
+#### Tier A groups
+
+* Runtime/public behavior — 11 paths: `adapter/db_access.py`, `adapter/http_reader.py`, and the nine touched `engine/**` paths, including the removed bridge provider.  
+* CI and safety gates — 6 paths: `.github/workflows/ci.yml`, direct/bridge contract checkers, mirror checker, and rails job definitions.  
+* Schemas — 10 paths: direct-selection, seven OPS-03, and two external-release-attestation schemas.  
+* Execution scripts — 13 paths under `scripts/**`, including direct posture, OPS-03, mapped-cache, rails, and release-identity tooling plus removed bridge/OPS-01R scripts.  
+* Producers, validators, and updaters — 18 paths under `tools/config/**`, `tools/evidence/**`, and registry tooling.  
+* Catalog/configuration — `catalog/__init__.py`, `catalog/manifest.json`, and `pyproject.toml`.  
+* Source-contamination cleanup — nine removed tracked `.venv/**` executables/symlinks.  
+* Governed documentation indexes/proofs — eight Index, endpoint, ADR, and run-guide proof paths.  
+* Governed artifacts — 89 paths: architecture 2; audit 2; BodyGraph 2; CLI 15; evidence-index 4; identity 6; math 7; internal-version 6; parity 2; proofs 12; Reader 1; EPIC020 bundles 24; config bundles 4; registry 2\.  
+* Governed audit gates — 23 paths covering canonical JSON, determinism, Reader/CLI parity, sanity, and topology.
+
+Every governed instance was reconciled against its producer, canonical form, companion ownership, index/mirror topology, and exact-head integrity checks. No Tier A path was treated as inventory-only.
+
+#### Tier B and Tier C
+
+* Tier B tests covered DB selection, compatibility shapes, HTTP refusal, Reader/CLI behavior, direct evidence, mapped-cache isolation, OPS-03 mutation/failure behavior, pipeline gates, release identity, and generated-artifact coherence.  
+* Tier B guidance covered current DB use, secrets, CLI/run instructions, accepted ADRs, and explicitly historical bridge design records.  
+* Tier C consists only of five deleted generated `glow_hdengine.egg-info/**` files. Inventory-only treatment is safe because `pyproject.toml` and the packaging/installability gates were reviewed, the files are host-generated, and PF10 §2.16 requires them to remain untracked.
+
+#### History and review coverage
+
+* PR review threads: \#363 `4/4` resolved; \#364 `12/12`; \#365 `21/21`; \#366 `17/17`.  
+* Historical reconstruction was applied to every Tier A change, bridge deletion, review finding, scanner remediation, OPS-03 failure boundary, pipeline/downstream dispute, generated-evidence change, and release-identity redesign.  
+* The one later commit was separately compared with the final lineage merge and changed only PF10 v12.3.4 to v12.3.5.  
+* Nonblocking retrieval limitation: workflow/job wrappers expose the first page, but each exact head returned one expected workflow and exactly seven terminal successful jobs, with no omitted expected job.  
+* No tests, OPS operation, database access, or external mutation was performed by this review.
+
+### PR Lineage Summary
+
+#### Original PR \#363
+
+* **Title:** `PR-06R-A: Converge HDE DB selection on direct psycopg`  
+* **Merge identifier:** `a618ba7bbfef7e5f32c847dbdb4c0b0e07f22e79`  
+* **Stated purpose:** Establish direct-only runtime selection, bridge retirement, local direct-selection evidence, and OPS-03 tooling.  
+* **Changed-file count:** 149  
+* **High-risk surfaces changed:** DB selector/provider, compatibility adapter, bridge deletion roster, direct checker, schemas, OPS-03, evidence producers, governed artifacts.  
+* **Review findings:** Four threads covering content validation, schema strictness, SQL safety, and row-specific smoke cleanup; all resolved.  
+* **Required checks:** [Exact-head run 29802495058](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29802495058), 7/7 jobs successful.  
+* **Material contribution:** Created the direct-only architecture and most PR-A tooling.  
+* **Gaps passed forward:** Compatibility ownership, retired-key scanner completeness, nonfinal pipeline handling, and OPS-03 hardening.  
+* **Evidence:** Original PR \#363 | body, final head `3dca8a0fcfd58ccf0f9cf8105778cd3e95923719`, threads, workflow.
+
+#### Remedial PR \#364
+
+* **Title:** `Use DBAccess for env selection & smoke, enhance retired-key scanning, and add PR-A nonfinal gate`  
+* **Merge identifier:** `43853eed0079bb555137776b82aaec89542aa44a`  
+* **Stated purpose:** Remove duplicated selection policy, strengthen active-source scanning, and make the stage-14 PR-A stop explicit.  
+* **Changed-file count:** 66  
+* **High-risk surfaces changed:** `adapter/db_access.py`, selector evidence, static scanner, rails log isolation, sanity pipeline and gate.  
+* **Review findings:** Twelve threads concerning transaction behavior, gate ordering/freshness/failure semantics, and scanner aliases/guidance; all resolved.  
+* **Required checks:** [Exact-head run 29873635497](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29873635497), 7/7 jobs successful.  
+* **Material contribution:** Centralized selection behavior and established the truthful nonfinal pipeline state.  
+* **Gaps passed forward:** Computed-key/value-read scanner bypasses and additional alias/scope cases.  
+* **Evidence:** Remedial PR \#364 | final head `ad5aa2199404d8c11a8cbeb08b3be3c0e5127ea8`, threads, workflow.
+
+#### Remedial PR \#365
+
+* **Title:** `Detect retired DB bridge keys without reading DATABASE_URL, tighten static checks, and update docs`  
+* **Merge identifier:** `1fbf8754a8e220fd68a57aca71e9ec28a13df91e`  
+* **Stated purpose:** Guarantee membership-only refusal timing and close scanner data-flow gaps.  
+* **Changed-file count:** 12  
+* **High-risk surfaces changed:** `engine/db/adapter.py`, direct checker, direct-selection/mapped-cache producers, schema, redaction guidance, scanner tests.  
+* **Review findings:** Twenty-one threads covering scope, aliases, imports, wrappers, constant expressions, subscripts, comprehensions, and structural loop binding; all resolved.  
+* **Required checks:** [Exact-head run 29893224822](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/29893224822), 7/7 jobs successful.  
+* **Material contribution:** Made retired-key refusal value-blind and expanded the checker to fail closed across realistic Python data flow.  
+* **Gaps passed forward:** OPS-03 source-before-import, child isolation, symlink safety, marker consumption, error propagation, and failed-candidate readmission.  
+* **Evidence:** Remedial PR \#365 | final head `b62ec1f9a50825cecd47fdd0f728519f1f36bdb5`, threads, workflow.
+
+#### Remedial PR \#366
+
+* **Title:** `HDE-EPIC038 PR-06R-A: finalize direct-only remediation and OPS-03 tooling`  
+* **Merge identifier:** `6e69d7a77f539d736ffcc0596bd51fa7d0004a90`  
+* **Stated purpose:** Close the complete PR-A contract, including OPS-03 state safety and scalable external release attestation.  
+* **Changed-file count:** 205  
+* **High-risk surfaces changed:** OPS-03 runner/validator/tests, posture schema, direct scanner, mapped-cache guards, release manifest/identity, external attestation, pipeline, CI, artifacts, proofs, and generated-file cleanup.  
+* **Review findings:** Seventeen threads; all resolved. Material issues included authorization hashing, symlink roots, child error propagation, sequence privileges, command parsing, stage ownership, mapped-cache isolation, refusal envelopes, path-proof portability, manifest consistency, and registry identity coupling.  
+* **Required checks:** [Exact-head run 30000554815](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30000554815), 7/7 jobs successful.  
+* **Material contribution:** Closed all remaining source, security, evidence, state-machine, and reviewability gaps.  
+* **Gaps passed forward:** Only expressly downstream OPS-03 execution and PR-06R-B admission.  
+* **Evidence:** Remedial PR \#366 | final head `6b96cdc71681879d6d9a3e11b926911a511f6982`; terminal review: “Didn't find any major issues.”
+
+### PR-06R-A Requirement Satisfaction Crosswalk
+
+| ID | Governing locator and requirement | Current disposition | Current implementation and evidence | History and validation | Boundary / finding |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| REQ-001 | CRD §§2, 8–9: preserve `PR-06R-A → OPS-03 → PR-06R-B`; PR-A is source/tooling only | SATISFIED | Current sanity log records `pr_a_state:nonfinal_fail_closed` and stage-14 stop; no live OPS-03 directory or direct-selection primary exists | PRs \#364 and \#366 made the boundary explicit; exact-head CI passed | OPS and PR-B remain downstream; no finding |
+| REQ-002 | RSC-001 `BUG-001`: retain EPIC024 canonical sanity binding without reopening QA | SATISFIED | `docs/acceptance_map_epic024.json` and the token matrix still bind `audit/gates/sanity_pipeline/sanity_pipeline.log`; no EPIC024 rerun/reclassification | Full evidence tests passed | PR-A’s later nonfinal gate creates no QA or token claim; no finding |
+| REQ-003 | RSC-001 `BUG-002`: retain multi-syntax/raw-marker secret safety | SATISFIED | `tools/evidence/retained_evidence_safety.py` remains the shared scanner used by direct and OPS-03 evidence | Focused scanner tests and evidence suite passed | No historical rewrite; no finding |
+| REQ-004 | RSC-001 and ADR-CANON-004: retain strict pure DDL projector and projection-only truth | SATISFIED | `engine/db/ddl_identity_projection.py` retains `hde.ddl_identity_projection.v1`; OPS-03 cites that schema rather than claiming full DDL equality | Projector and OPS posture tests passed | Bridge-dependent v5 clauses remain superseded; no finding |
+| REQ-005 | RSC-002/ADR-CANON-005: sole selector, exact retired roster, membership-only names-only refusal, exact API | SATISFIED | `engine/db/adapter.py` defines the exact three-key tuple; refusal precedes DSN access; `RetiredBridgeConfiguration` has fixed code/message and tuple keys | \#365 closed value-read and scanner gaps; direct DB tests passed | No finding |
+| REQ-006 | RSC-002: one direct provider attempt, typed failure, pure selection evidence, no fallback/retry | SATISFIED | `DBAccess.for_current_env` constructs only `PsycopgProvider`, performs one health call, records exact attempt evidence, and writes nothing | Direct-selection and failure-path tests passed | No alternate provider exists; no finding |
+| REQ-007 | RSC-002: exact read-only transaction roster, one connection/cursor, no commit, rollback in `finally` | SATISFIED | `PsycopgProvider.readonly_tx` validates the fixed ten-statement roster before connecting; first statement is exact read-only; rollback is unconditional | SQL mutation, batching, comment, success/failure, and `BaseException` tests passed | Existing write transaction semantics remain separate; no finding |
+| REQ-008 | RSC-002: compatibility resolver delegates to sole owner and emits strict v2 shapes | SATISFIED | `adapter/db_access.py` delegates selection to `DBAccess`; env matrix, resolver, and smoke paths are direct-only with stable names-only errors | \#364 centralized behavior; DB compatibility suites passed | No second selection path; no finding |
+| REQ-009 | RSC-002: delete six active bridge surfaces and bridge exceptions; add direct checker | SATISFIED | All six required paths return 404 at current HEAD; bridge exceptions are absent; `check_direct_db_contract.py` scans active tracked source/current guidance | \#363 deletion plus \#364–\#365 scanner remediation; checker passed in CI | No finding |
+| REQ-010 | RSC-002: direct-only posture capture and transport-neutral mapped-cache guards | SATISFIED | EPIC011 capture uses direct DB paths; mapped-cache tools guard generic provider/outbound I/O and import no deleted bridge provider | Mapped-cache local/OPS-02 compatibility tests passed | OPS-02 was not rerun; no finding |
+| REQ-011 | RSC-002: preserve Reader/CLI bytes, BodyGraph semantics, durable payloads, and existing write rails | SATISFIED | Reader/CLI adapters retain response/serialization contracts; only retired-configuration refusal is newly typed; BodyGraph mapped-cache behavior remains bounded | HTTP, CLI parity, BodyGraph, rails, and smoke suites passed | No public route or payload expansion; no finding |
+| REQ-012 | RSC-003/ADR-CANON-006: direct-selection schema/producer, exact cases/predicates, canonical and negative behavior | SATISFIED | Strict schema and sole producer implement the exact four ordered cases, exact predicates, canonical LF bytes, deterministic generation, and same-path negative receipt | Eight focused tests plus direct checker passed | Fixture-only; no external call; no finding |
+| REQ-013 | RSC-003: final tracked direct-selection bytes and binding | DOWNSTREAM BY APPROVED BOUNDARY | `artifacts/runtime/direct_db_selection.snapshot.json` is intentionally absent | Stage 7 validates the local contract without claiming final tracked admission | PR-06R-B owns final bytes, index rows, proofs, and binding |
+| REQ-014 | RSC-003: preserve bridge-era primaries and meaning as immutable history | SATISFIED | Historical artifacts remain under historical paths; stage 12 reports only `HISTORICAL_INTEGRITY_OK`; no current bridge PASS is derived | Historical hash, canonical, extra-file, and nonclaim tests passed | No rerun or relabeling; no finding |
+| REQ-015 | RSC-004/ADR-CANON-007: runner, independent validator, seven schemas, fixture/mutation tests | SATISFIED | Exact runner/validator loci and all seven schemas exist; tests use fake/local providers | `tests/ops/test_hde_epic038_ops03.py` contains 102 test functions and exhaustive parametrized mutations; CI passed | No OPS execution; no finding |
+| REQ-016 | RSC-004: exact authorization fields, roots, counts, argv, one-attempt marker semantics | SATISFIED | Schema and both implementations independently enforce exact roots, target, rails, rosters, counts, `-I -B` vectors, candidate root, and one-attempt bytes | Every authorization node/vector and count receives mutation coverage | No finding |
+| REQ-017 | RSC-004: stdlib source gate, clean child, child-only DSN, no `PYTHON*`, write confinement | SATISFIED | Source identity is checked before repository imports; HEAD/index/worktree bytes and modes are bound; ignored importable modules, replacement refs, residue, and untracked files fail closed; parent scrubs DSN after fork | Source-order, real-Git, child PID/env, scrub-failure, timeout, and import-trap tests passed | No source-tree or tracked-evidence write; no finding |
+| REQ-018 | RSC-004: exact health/read-only SQL activity and counters | SATISFIED | One selector, one health `SELECT 1`, one `readonly_tx`, ten fixed statements, two connections total, no writes/retries/alternate attempts | Query roster, grants/ownership/sequence, view, partition, and count mutations passed | No live DB used during validation; no finding |
+| REQ-019 | RSC-004: exact ten-file success packet and producer ownership | SATISFIED | Runner owns eight initial primaries plus checksum; validator alone emits receipt; candidate success inventory is exact; control-only state does not enter packet inventory | Inventory, extra-file, producer, command-line, checksum-input, and attestation tests passed | Tracked destination remains downstream; no finding |
+| REQ-020 | RSC-004: strict JSON/text/checksum/secret contracts | SATISFIED | All objects reject unknown keys; canonical UTF-8/LF and checksum ordering are enforced; stable codes and nonclaims are exact; secret safety scans every retained primary | Schema-node, canonical-byte, secret-class, receipt, and checksum mutations passed | No finding |
+| REQ-021 | RSC-004: failure receipt, pre/post-marker classification, durable nonadmission | SATISFIED | Secure descriptor-bound no-follow roots; marker creation is the consumption boundary; post-marker failures retain consumed state; pending/committed/failure transitions prevent later readmission | Tests cover noncanonical auth, partial marker writes, symlinks, stale roots, cleanup/receipt failure, finalization races, and rollback interruption | No finding |
+| REQ-022 | RSC-004: independent validation before receipt/checksum/final admission | SATISFIED | Source and authorization precede marker; independent receipt validation precedes checksum; final validation is read-only and returns byte attestation; terminal state is rechecked | Validator argv, source/auth races, candidate mutation, timeout, and final-admission tests passed | PR-B must repeat validation around copy; no finding |
+| REQ-023 | RSC-005: exact nineteen-stage pipeline structure and fail-closed stage 14 | SATISFIED | `run_sanity_pipeline.py` has the exact roster; current log shows stages 1–13 OK, stage 14 FAIL, and stages 15–19 not executed | Pipeline and gate tests prove exact ordering, freshness, first-failure, and nonfinal receipt | Final PASS is not claimed; no finding |
+| REQ-024 | RSC-005/ADR-CANON-008: live OPS-03, exact copy, current/historical switch, updater, final stages, support crosswalk | DOWNSTREAM BY APPROVED BOUNDARY | No `audit/ops/hde-epic038/ops-03/` exists and no final OPS-03/current direct evidence is registered | Absence is the tested `pr_a_nonfinal_ops03_pr_b_binding_required` condition | OPS-03 and PR-06R-B own this work |
+| REQ-025 | CRD §9 validation order: static, direct, consumer, mapped-cache, evidence, OPS fixtures, architecture, full exact-head CI and review | SATISFIED | All required lanes are represented in the final workflow and current tests | Run 30000554815 passed all seven jobs; exact-head clean review followed resolution of all threads | No finding |
+| REQ-026 | CRD §9 rollback/fail-closed rules | SATISFIED | Runtime cannot restore bridge fallback; evidence/OPS failures stop before downstream admission; OPS failure states remain inadmissible | Failure, interruption, symlink, timeout, scanner, and pipeline tests passed | PR-B rollback remains downstream; no finding |
+| REQ-027 | CRD §§9, 12 and approval limitations: no OPS, external access, QA/PF/token/status/deploy/closeout claims | SATISFIED | PR bodies, current log, nonclaim schemas, and PF10 §2.16 consistently retain these exclusions | Search and review found no contradictory completion claim | PF09 statuses remain unchanged; no finding |
+
+### Final Effective Implementation Review
+
+#### SURF-001
+
+* **Surface:** Direct provider selection and typed refusal  
+* **Tier:** A  
+* **Paths:** `engine/db/adapter.py`, `engine/db/errors.py`  
+* **Applicable requirements:** REQ-005, REQ-006  
+* **What was reviewed:** API signature, ordering, environment membership, error construction, attempt evidence, and purity.  
+* **Current behavior:** Exact retired-key presence fails before DSN value access or provider construction; otherwise exactly one direct provider is attempted.  
+* **Historical reconstruction:** \#365’s computed-key and membership-without-read remediation was checked against current source.  
+* **Test and evidence quality:** Behavioral mappings that raise on value access prove timing, rather than relying on source-text checks.  
+* **Risk assessment:** No residual selector, leak, or alternate-attempt path found.  
+* **Conclusion:** SATISFIED.  
+* **Evidence pointers:** GitHub Repo | `engine/db/adapter.py::retired_db_transport_keys_present`, `DBAccess.for_current_env`; tests | `test_direct_db_pr06r.py`.
+
+#### SURF-002
+
+* **Surface:** Provider read-only transaction and compatibility façade  
+* **Tier:** A  
+* **Paths:** `engine/db/providers/psycopg_provider.py`, `adapter/db_access.py`  
+* **Applicable requirements:** REQ-007, REQ-008  
+* **What was reviewed:** SQL classifier, fixed roster, connection lifecycle, rollback, resolver/env shapes, smoke cleanup, and error normalization.  
+* **Current behavior:** One direct implementation serves current and compatibility callers; read-only SQL cannot be extended or batched.  
+* **Historical reconstruction:** \#363–\#364 transaction and duplicated-resolver findings were checked against current code.  
+* **Test and evidence quality:** Exact statement-by-statement mutations and success/failure rollback tests.  
+* **Risk assessment:** No duplicate selection owner or fail-open SQL path found.  
+* **Conclusion:** SATISFIED.  
+* **Evidence pointers:** GitHub Repo | `PsycopgProvider.readonly_tx`; `adapter/db_access.py::{db_resolve,resolve_env_matrix,db_rw_smoke}`.
+
+#### SURF-003
+
+* **Surface:** Executable bridge retirement and static prevention  
+* **Tier:** A  
+* **Paths:** Six removed bridge/OPS/checker paths; `ci/checks/check_direct_db_contract.py`; current DB guidance.  
+* **Applicable requirements:** REQ-009, REQ-014  
+* **What was reviewed:** Deletion, imports, registrations, commands, raw provider use, HTTP bridge construction, guidance exclusions, and historical allowances.  
+* **Current behavior:** Retired names remain only in refusal rosters, historical evidence/design records, schemas, scanner logic, and negative tests.  
+* **Historical reconstruction:** All \#364–\#365 scanner threads were followed through current alias, scope, import, wrapper, subscript, `zip`, walrus, and unresolved-expression handling.  
+* **Test and evidence quality:** Sixty-two focused checker tests plus the CI checker.  
+* **Risk assessment:** No executable bridge path found.  
+* **Conclusion:** SATISFIED.  
+* **Search proof:** Searched current GitHub source for `BridgeProvider`, all three retired keys, `pg-bridge`, `bridge_factory`, and `urllib.request`; method: repository code search plus exact-path fetch; result: the six prohibited paths are absent, and remaining in-scope matches are refusal/history/checker/test uses.
+
+#### SURF-004
+
+* **Surface:** Preserved Reader, CLI, BodyGraph, mapped-cache, and retained remediation  
+* **Tier:** A/B  
+* **Paths:** `adapter/http_reader.py`, touched BodyGraph files, mapped-cache tools/scripts, retained scanner, DDL projector, EPIC024 acceptance binding.  
+* **Applicable requirements:** REQ-002–REQ-004, REQ-010, REQ-011  
+* **What was reviewed:** Public bytes, typed refusal mapping, payload semantics, local no-I/O behavior, retained evidence safety, and DDL projection.  
+* **Current behavior:** Product contracts remain stable; only retired-configuration presence gains the approved typed refusal.  
+* **Historical reconstruction:** Bridge-specific mapped-cache interception was replaced by transport-neutral guards without reopening OPS-02.  
+* **Test and evidence quality:** Reader/CLI parity, HTTP, BodyGraph, mapped-cache, retained-safety, and projector suites.  
+* **Risk assessment:** No public or durable-payload drift found.  
+* **Conclusion:** SATISFIED.
+
+#### SURF-005
+
+* **Surface:** Local direct-selection evidence  
+* **Tier:** A  
+* **Paths:** Producer, strict schema, direct checker, and focused tests.  
+* **Applicable requirements:** REQ-012, REQ-013  
+* **What was reviewed:** Case order, exact outcomes, predicates, canonical bytes, deterministic generation, negative receipt, and secret safety.  
+* **Current behavior:** The local contract is complete; final tracked bytes are deliberately absent.  
+* **Historical reconstruction:** \#365’s value-blind retired case was verified in the current producer.  
+* **Test and evidence quality:** Unknown-key, mutation, two-run, negative, membership-only, and no-DSN-read coverage.  
+* **Risk assessment:** No producer/schema disagreement found.  
+* **Conclusion:** SATISFIED for PR-A; final primary correctly downstream.  
+* **Search proof:** Exact fetch of `artifacts/runtime/direct_db_selection.snapshot.json` at current HEAD returned 404\.
+
+#### SURF-006
+
+* **Surface:** OPS-03 authorization, source identity, process/environment isolation, and filesystem boundary  
+* **Tier:** A  
+* **Paths:** `scripts/ops/hde_epic038_ops03.py`, authorization/failure schemas, OPS tests.  
+* **Applicable requirements:** REQ-015–REQ-017, REQ-021  
+* **What was reviewed:** Bootstrap ordering, child readiness, parent DSN scrubbing, clean environment, source manifest, ignored native modules, descriptors, symlinks, private roots, deadlines, and marker semantics.  
+* **Current behavior:** No repository import follows failed source authorization; no provider call precedes durable marker consumption; derived-root operations are descriptor-bound and fail closed.  
+* **Historical reconstruction:** All six previously reported OPS-03 blocker classes were checked against current code and exact regressions.  
+* **Test and evidence quality:** Real-Git, import-trap, native-module, PID/env, symlink, stale-root, marker, timeout, and cleanup-failure tests.  
+* **Risk assessment:** No reproducible isolation or root-escape defect found.  
+* **Conclusion:** SATISFIED.
+
+#### SURF-007
+
+* **Surface:** OPS-03 observation, packet sealing, independent validation, and terminal state  
+* **Tier:** A  
+* **Paths:** Runner, validator, remaining six packet schemas, posture schema, and OPS tests.  
+* **Applicable requirements:** REQ-018–REQ-022  
+* **What was reviewed:** SQL roster/counts, role/view/partition predicates, candidate inventory, receipt ownership, checksums, canonical bytes, secret scanning, pending/commit/failure transitions, terminal races, and readmission.  
+* **Current behavior:** Only a fully attested candidate with stable authorization, source, control state, inventory, and hashes can become admissible.  
+* **Historical reconstruction:** Authorization hashing, child error propagation, sequence grants, partial marker writes, and late cleanup failures were all rechecked.  
+* **Test and evidence quality:** Exhaustive field/node/count/path/argv/checksum/secret/SQL/extra-file mutations plus hostile transition tests.  
+* **Risk assessment:** Complex but reviewable; no current correctness blocker found.  
+* **Conclusion:** SATISFIED.
+
+#### SURF-008
+
+* **Surface:** Current-versus-historical evidence and release pipeline  
+* **Tier:** A  
+* **Paths:** Sanity runner/gate, updater, orientation, evidence paths, indexes, mirrors, historical bridge/OPS-02 artifacts and tests.  
+* **Applicable requirements:** REQ-014, REQ-023, REQ-024  
+* **What was reviewed:** Exact stage order, first-failure semantics, historical integrity-only result, no OPS execution, updater ownership, and PR-B stop.  
+* **Current behavior:** Stages 1–13 pass; stage 14 fails for the exact missing downstream packet; no later stage executes.  
+* **Historical reconstruction:** Resolved review requests to register OPS-03 or accept full PASS were correctly rejected as PR-B scope.  
+* **Test and evidence quality:** Stage order, mutation, freshness, first-failure, historical hashing, and exact nonfinal receipt tests.  
+* **Risk assessment:** No false PASS or historical-current conflation found.  
+* **Conclusion:** SATISFIED.
+
+#### SURF-009
+
+* **Surface:** Manifest-derived identity and external release attestation  
+* **Tier:** A  
+* **Paths:** `catalog/manifest.json`, runtime identity, release-cut/audit scripts, external builder, attestation schemas, CI, registry/config producers.  
+* **Applicable requirements:** REQ-001, REQ-011, REQ-025  
+* **What was reviewed:** Acyclic identity graph, clean source, external empty destination, tracked-copy isolation, deterministic bundle, release-agnostic registry/config output, and no source repair.  
+* **Current behavior:** Runtime derives identity from canonical manifest bytes; CI builds an external exact-head artifact that explicitly records `release_admission=NOT_ATTEMPTED`.  
+* **Historical reconstruction:** \#366’s manifest and registry review threads and the later PF10 exact-topic adoption were checked.  
+* **Test and evidence quality:** Manifest fixed-point, external build/verify, registry determinism, config, and current CI.  
+* **Risk assessment:** No PR-B admission claim or source/evidence cycle found.  
+* **Conclusion:** SATISFIED.  
+* **Evidence pointer:** PF10 — HDE Build Notes | §2.16 | external attestation is exact-head PR evidence, not durable release admission.
+
+#### SURF-010
+
+* **Surface:** Governed artifacts, indexes, mirrors, proofs, guidance, and generated-file cleanup  
+* **Tier:** A/B/C  
+* **Paths:** 89 artifacts, 23 audit-gate files, eight governed docs/proofs, current guidance, `.venv/**`, and `egg-info/**`.  
+* **Applicable requirements:** REQ-009, REQ-014, REQ-025–REQ-027  
+* **What was reviewed:** Producer ownership, canonical structure, hashes, proofs, mirror/index topology, historical meaning, current guidance, and tracked-source cleanliness.  
+* **Current behavior:** Current artifacts are coherent; frozen captures retain historical meaning; generated environment/package metadata is untracked.  
+* **Test and evidence quality:** Updater `--check`, mirror schema, index hash, path, canonical JSON, final-LF, config, installability, and external attestation checks.  
+* **Risk assessment:** No stale active command, orphan binding, or tracked generated environment remains.  
+* **Conclusion:** SATISFIED.
+
+### Validation and Evidence Review
+
+| ID | Purpose and method | Reviewed state | Result | Observation and sufficiency |
+| ----- | ----- | ----- | ----- | ----- |
+| VAL-001 | Prove lineage identity and exact order through PR metadata and commit comparison | Baseline `de061a…` through merge `6e69d7…` | PASS | Each merge is the next PR’s exact base; union and net comparison both contain 258 paths |
+| VAL-002 | Original and remedial exact-head workflows | Heads of \#363, \#364, \#365 | PASS | Runs 29802495058, 29873635497, and 29893224822 each completed 7/7 jobs |
+| VAL-003 | Final exact-head workflow | PR \#366 head `6b96cdc716…` | PASS | [Run 30000554815](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30000554815) completed all seven jobs successfully |
+| VAL-004 | Direct runtime, compatibility, scanner, mapped-cache, and no-I/O proof | Final head | PASS | Test lane ran the direct checker and direct PostgreSQL contract suites; PF10 §2.16 records 250 focused passes |
+| VAL-005 | Evidence, schemas, OPS-03 fixtures/mutations, and pipeline proof | Final head | PASS | Test lane ran `tests/evidence` and `tests/ops/test_hde_epic038_ops03.py`; PF10 §2.16 records 1,053 passes |
+| VAL-006 | PR-A release-attestation and nonfinal-boundary proof | Final head | PASS | Sanity job built and verified the external bundle; current canonical log has exact stage-14 nonfinal failure |
+| VAL-007 | Review findings and current-head reviewability | Final head | PASS | All 54 lineage threads are resolved; final \#366 review reports no major issues against `6b96cdc716…` |
+| VAL-008 | Later-change regression check | `6e69d7…` to current `da3784c…` | PASS | Only PF10 v12.3.5 changed; no reviewed implementation, test, schema, or artifact surface changed |
+
+No validation was executed by this review. Results above are inspected repository and GitHub evidence.
+
+### PF09 Impact and Status Posture
+
+Source: **PF09.6-Canon-HDE-Build-Checklist-Distillation v1.1.2**.
+
+| Item | Current status | PR-A effect | Recommendation |
+| ----- | ----- | ----- | ----- |
+| `HDE-DIST001.4` | Partial | Direct-only source/tooling is present; live OPS-03 and final binding are absent | No status change recommended |
+| `HDE-DIST001.6` | Partial | Nineteen-stage structure exists, but final stages correctly remain blocked | No status change recommended |
+| `HDE-DIST001.9` | Partial | Direct-only runtime exists; live posture/admission and permanent wording drainage remain downstream | No status change recommended |
+| `HDE-DIST001.11` | Optional | Transport-neutral mapped-cache proof remains preserved; no status action is authorized | No status change recommended |
+| `HDE-DIST005.2` | Partial | Current discipline is preserved, but OPS-03/PR-B final rows and companions do not yet exist | No status change recommended |
+
+PF10 §§2.15–2.16 expressly retain these statuses and prohibit PR-A from creating a PF09 movement or supportability claim.
+
+### Findings
+
+No findings.
+
+### Evidence Print (PASS PROOF; merged work)
+
+#### A. Contract coverage
+
+All 27 applicable requirement groups are either `SATISFIED` or `DOWNSTREAM BY APPROVED BOUNDARY`. None is `NOT SATISFIED` or `UNCLEAR`.
+
+Evidence: Approved Rescoping CRD | RSC-001 through RSC-005, ADR-CANON-004 through ADR-CANON-008; GitHub Repo | current `main` implementation and tests.
+
+#### B. Final implementation proof
+
+The review covered the sole DB selector, compatibility façade, read-only provider, bridge deletion and scanner, public Reader/CLI and mapped-cache behavior, direct-selection tooling, complete OPS-03 authorization and packet state machine, evidence pipeline, external attestation, indexes, mirrors, proofs, and governed artifacts. No executable bridge, alternate provider, secret-value serialization, fail-open packet path, or false final release PASS remains.
+
+Evidence: GitHub Repo | `engine/db/**`, `adapter/**`, `ci/checks/check_direct_db_contract.py`, `scripts/ops/hde_epic038_ops03.py`, `tools/evidence/hde_epic038_ops03.py`, schemas and tests.
+
+#### C. Lineage remediation proof
+
+* \#363 established the direct-only implementation and primary tooling.  
+* \#364 centralized compatibility ownership and made the PR-A nonfinal state explicit.  
+* \#365 closed retired-key value-read and scanner/data-flow bypasses.  
+* \#366 closed the remaining OPS-03 isolation, filesystem, terminal-state, release-identity, and evidence-reviewability gaps.
+
+All actionable threads are resolved, their corrections survive in current source, and the final head received a clean review.
+
+Evidence: Original PR \#363; Remedial PRs \#364, \#365, and \#366 | metadata, threads, final heads, and terminal reviews.
+
+#### D. Validation and CI proof
+
+The final reviewed source head is `6b96cdc71681879d6d9a3e11b926911a511f6982`. GitHub Actions run 30000554815 completed all seven jobs successfully, including the direct checker, direct PostgreSQL contracts, evidence/OPS tests, mirror schema, index/hash, canonical/final-LF gates, and external release-attestation build. The PR head and merge tree are equivalent.
+
+Evidence: [GitHub Actions run 30000554815](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30000554815); PR \#366; PF10 §2.16 exact-head record.
+
+#### E. Evidence and boundary proof
+
+There are no live OPS-03 bytes, no tracked final direct-selection primary, and no PR-B admission. The current pipeline truthfully stops at stage 14, historical bridge evidence is integrity-only, OPS-02 remains bounded to mapped-cache support, and PF09/QA/token/deployment/closeout nonclaims remain intact. The only later commit changes PF10, not implementation.
+
+Evidence: GitHub Repo | `audit/gates/sanity_pipeline/sanity_pipeline.log`; exact-path absence checks; PF10 §§2.15–2.16; comparison `6e69d7…da3784…`.
+
+### Doc Delta Candidates (PF-Canon only)
+
+* **Candidate ID:** DC-001  
+* **Permanent PF target and exact locator:** PF09.6-Canon-HDE-Build-Checklist-Distillation v1.1.2, rows `HDE-DIST001.4` and `HDE-DIST001.9`  
+* **Basis:** `CANON MISMATCH`  
+* **Delta:** Replace active bridge-fallback/provider-parity wording with the direct-only completion semantics already established in PF10 §2.15; retain current statuses.  
+* **Why:** Current PF09.6 still describes bridge fallback/parity, while the exact-topic authority and merged implementation use direct PostgreSQL plus retired-transport enforcement.  
+* **Evidence:** PF09.6 row `.4` still lists bridge fallback/provider parity; row `.9` remains titled “DB–bridge parity & env connectivity.” PF10 §2.15 redefines both for direct-only posture.  
+* **Exact canon excerpt:** “DB–bridge parity & env connectivity”  
+* **PF09 action:** No status change recommended.
+
+DECISION: MERGED WORK ACCEPTABLE
 
 \<eof\>
 
