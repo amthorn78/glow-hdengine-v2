@@ -186,10 +186,19 @@ class DBAccess:
         retired = list(getattr(exc, "retired_keys", ()))
         if retired and isinstance(exc, RetiredBridgeConfiguration):
             return DBAccess._retired_failure_case(env, exc)
+        database_url_presence = (
+            "unset"
+            if exc.code == "missing_database_url"
+            else (
+                "present_redacted"
+                if (env.get("DATABASE_URL") or "").strip()
+                else "unset"
+            )
+        )
         return {
             "case": "retired_keys_present" if retired else ("missing_database_url" if exc.code == "missing_database_url" else "unavailable_database_url"),
             "app_env": _safe_app_env_name(env),
-            "database_url_presence": DBAccess._database_url_presence(env) if exc.code == "missing_database_url" else ("present_redacted" if (env.get("DATABASE_URL") or "").strip() else "unset"),
+            "database_url_presence": database_url_presence,
             "retired_keys_present": retired,
             "attempts": [dict(row) for row in attempts],
             "selected": "none",

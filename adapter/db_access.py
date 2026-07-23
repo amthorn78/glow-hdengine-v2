@@ -264,12 +264,17 @@ def resolve_env_matrix() -> tuple[bool, dict[str, Any]]:
     except AdapterError as exc:
         case = DBAccess.selection_failure_evidence(exc)
         if not isinstance(getattr(exc, "selection_case", None), Mapping):
+            normalized_error = _normalized_error_payload(exc)
             case = {
                 **case,
                 "database_url_presence": (
-                    "present_redacted"
-                    if any(name == "DATABASE_URL" for name in os.environ)
-                    else "unset"
+                    "unset"
+                    if normalized_error["code"] == "missing_database_url"
+                    else (
+                        "present_redacted"
+                        if any(name == "DATABASE_URL" for name in os.environ)
+                        else "unset"
+                    )
                 ),
             }
         payload = {

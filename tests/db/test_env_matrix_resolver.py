@@ -88,6 +88,42 @@ def test_env_matrix_missing_direct_has_exact_v2_failure_shape(monkeypatch):
     }
 
 
+@pytest.mark.parametrize("database_url", ["", " \t "])
+def test_env_matrix_empty_direct_is_typed_as_missing(monkeypatch, database_url):
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    _clear_retired_keys(monkeypatch)
+
+    ok, payload = db_access.resolve_env_matrix()
+
+    assert ok is False
+    assert payload["checks"][0] == {
+        "name": "DATABASE_URL",
+        "value_kind": "unset",
+    }
+    assert payload["result"] is None
+    assert payload["error"] == {
+        "class": "PrimaryUnavailable",
+        "code": "missing_database_url",
+        "retired_keys": [],
+    }
+
+
+def test_env_matrix_unannotated_missing_error_keeps_empty_direct_unset(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", " ")
+    _clear_retired_keys(monkeypatch)
+
+    def refuse(**_kwargs):
+        raise PrimaryUnavailable(code="missing_database_url")
+
+    monkeypatch.setattr(db_access.DBAccess, "for_current_env", refuse)
+
+    ok, payload = db_access.resolve_env_matrix()
+
+    assert ok is False
+    assert payload["checks"][0]["value_kind"] == "unset"
+    assert payload["error"]["code"] == "missing_database_url"
+
+
 def test_env_matrix_normalizes_untrusted_error_codes(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-leak")
     _clear_retired_keys(monkeypatch)

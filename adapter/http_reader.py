@@ -91,11 +91,12 @@ def _writer_error(
     code: str,
     *,
     status: int,
+    details: object | None = None,
     extra_headers: dict[str, str] | None = None,
     envelope_type: str | None = None,
     sort_keys: bool = True,
 ) -> Response:
-    envelope = error_envelope(code)
+    envelope = error_envelope(code, details=details)
     if envelope_type:
         envelope["type"] = envelope_type
     return _emit_writer_response(
@@ -103,6 +104,22 @@ def _writer_error(
         status=status,
         extra_headers=extra_headers,
         sort_keys=sort_keys,
+    )
+
+
+def _retired_db_writer_error(
+    exc: RetiredBridgeConfiguration,
+    *,
+    envelope_type: str | None = None,
+) -> Response:
+    return _writer_error(
+        "ERR_WRITER_RAILS_CLOSED",
+        status=503,
+        details={
+            "adapter_code": exc.code,
+            "retired_keys": list(exc.retired_keys),
+        },
+        envelope_type=envelope_type,
     )
 
 
@@ -581,7 +598,13 @@ def get_reader_bp(emit_fn=None):
             writer_route_id=_DEV_WRITER_CONJUNCTION_ROUTE_ID,
         )
         g._idempotence_hash = digest
-        _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+        try:
+            _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+        except RetiredBridgeConfiguration as exc:
+            return _retired_db_writer_error(
+                exc,
+                envelope_type=_DEV_WRITER_CONJUNCTION_ERROR_TYPE,
+            )
 
         response = _emit_conjunction_response(
             left=left,
@@ -840,7 +863,10 @@ def diagnostic_writer():
     payload = payload or {}
     digest, canonical_preimage_text, canonical_json = _build_diagnostic_preimage(payload)
     g._idempotence_hash = digest
-    _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+    try:
+        _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+    except RetiredBridgeConfiguration as exc:
+        return _retired_db_writer_error(exc)
 
     return _emit_writer_response({"ok": True, "message": "diagnostic"}, status=200)
 

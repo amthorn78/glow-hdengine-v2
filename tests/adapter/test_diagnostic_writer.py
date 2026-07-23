@@ -166,6 +166,45 @@ def test_idempotence_db_refuses_empty_retired_key_before_provider_or_fallback(
     assert digest not in http_reader._IDEMPOTENCE_CACHE
 
 
+@pytest.mark.parametrize("retired_key", RETIRED_DB_TRANSPORT_KEYS)
+def test_diagnostic_writer_returns_typed_retired_config_refusal(
+    client, monkeypatch, retired_key
+):
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-be-used")
+    monkeypatch.setenv(retired_key, "")
+    provider_calls = []
+    monkeypatch.setattr(
+        "engine.db.adapter.PsycopgProvider",
+        lambda _dsn: provider_calls.append("provider") or pytest.fail("provider attempted"),
+    )
+    digest, _, _ = http_reader._build_diagnostic_preimage({})
+    http_reader._IDEMPOTENCE_CACHE.pop(digest, None)
+
+    response = client.post(
+        "/ops/writer/diagnostic",
+        headers={"Authorization": "Bearer admin-token"},
+    )
+
+    assert response.status_code == 503
+    assert response.headers["Cache-Control"] == "no-store"
+    assert response.headers["Content-Type"] == "application/json; charset=utf-8"
+    assert "ETag" not in response.headers
+    assert json.loads(response.data) == {
+        "schema": "v1",
+        "ok": False,
+        "code": "ERR_WRITER_RAILS_CLOSED",
+        "error": "rails are closed",
+        "details": {
+            "adapter_code": "retired_bridge_configuration",
+            "retired_keys": [retired_key],
+        },
+    }
+    assert provider_calls == []
+    assert digest not in http_reader._IDEMPOTENCE_CACHE
+
+
 def test_idempotence_db_detects_existing_hash_collision(monkeypatch):
     class FakeDB:
         def tx(self, _statements):
