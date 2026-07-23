@@ -184,7 +184,11 @@ def _resolve_vendor(
             route_policy=route_policy,
         )
     try:
-        outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
+        outcome = ingest_vendor_bodygraph(
+            vendor_inputs,
+            env=database_env,
+            dry_run=dry_run,
+        )
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {

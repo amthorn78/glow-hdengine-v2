@@ -224,3 +224,41 @@ def test_explicit_legacy_fallback_remains_legacy(monkeypatch):
     result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=True, env=env(HD_API_BASE_URL="https://vendor.test/v1"), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
     assert result.status == "ok" and seen
     assert result.payload["resolver"]["route_policy"]["classification"] == "explicit_legacy_fallback"
+
+
+@pytest.mark.parametrize("retired_key", RETIRED_DB_TRANSPORT_KEYS)
+@pytest.mark.parametrize("retired_value", ["", None])
+def test_explicit_legacy_fallback_preserves_scoped_retired_key_refusal(
+    monkeypatch, retired_key, retired_value
+):
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        "engine.db.adapter.PsycopgProvider",
+        lambda _dsn: pytest.fail("direct provider constructed"),
+    )
+    monkeypatch.setattr(
+        "engine.bodygraph.ingest.HdApiClient.from_env",
+        lambda **kwargs: pytest.fail("vendor constructed"),
+    )
+
+    result = resolve_bodygraph(
+        "operator",
+        source="vendor",
+        upsert=True,
+        dry_run=False,
+        env=env(
+            HD_API_BASE_URL="https://vendor.test/v1",
+            DATABASE_URL="postgresql://must-not-read",
+            **{retired_key: retired_value},
+        ),
+        birthdate="2000-01-01",
+        birthtime="00:00",
+        location="Fixture",
+    )
+
+    assert result.payload["error"] == {
+        "code": "DB_WRITER_UNAVAILABLE",
+        "message": "database target unavailable",
+        "details": {"code": "retired_bridge_configuration"},
+    }
