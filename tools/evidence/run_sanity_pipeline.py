@@ -616,16 +616,24 @@ def validate_ops03_tracked_packet(root: Path = ROOT) -> None:
     if len(command_lines) != 3:
         raise ValueError("ops-03: command inventory is not exact")
     commands: list[list[str]] = []
-    for line in command_lines:
+    command_names = ("capture", "receipt", "validate")
+    for name, line in zip(command_names, command_lines):
+        prefix = f"{name}_argv=".encode("ascii")
+        if not line.startswith(prefix):
+            raise ValueError("ops-03: command row identity is invalid")
         try:
-            command = json.loads(line.decode("utf-8", "strict"))
+            command = json.loads(line[len(prefix):].decode("utf-8", "strict"))
         except (UnicodeError, json.JSONDecodeError) as exc:
             raise ValueError("ops-03: command row is invalid") from exc
         if (
             not isinstance(command, list)
             or not command
             or not all(isinstance(item, str) for item in command)
-            or line != (json.dumps(command, separators=(",", ":")) + "\n").encode("utf-8")
+            or line
+            != prefix
+            + (json.dumps(command, sort_keys=True, separators=(",", ":")) + "\n").encode(
+                "utf-8"
+            )
         ):
             raise ValueError("ops-03: command row is not canonical")
         commands.append(command)

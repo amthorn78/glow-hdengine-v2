@@ -1124,8 +1124,12 @@ def _write_tracked_ops03_packet(root: Path) -> Path:
     ]
     (packet / "commands.txt").write_bytes(
         b"".join(
-            (json.dumps(command, separators=(",", ":")) + "\n").encode("utf-8")
-            for command in commands
+            (
+                f"{name}_argv="
+                + json.dumps(command, sort_keys=True, separators=(",", ":"))
+                + "\n"
+            ).encode("utf-8")
+            for name, command in zip(("capture", "receipt", "validate"), commands)
         )
     )
     (packet / "stdout.log").write_bytes(b"OPS03_CAPTURE_PASS\n")
@@ -1178,6 +1182,8 @@ def test_missing_tracked_ops03_is_the_exact_downstream_condition(tmp_path):
         ("unexpected", "unexpected tracked entry"),
         ("schema", "schema validation failed"),
         ("commands", "authorized command shape disagreement"),
+        ("command_prefix", "command row identity is invalid"),
+        ("command_encoding", "command row is not canonical"),
         ("secret", "unredacted service URI"),
     ),
 )
@@ -1201,17 +1207,32 @@ def test_tracked_ops03_packet_mutations_fail_closed(
         path.write_bytes(ops03.canonical_bytes(value))
         _refresh_ops03_checksums(packet)
     elif mutation == "commands":
-        commands = [
-            json.loads(line)
-            for line in (packet / "commands.txt").read_text(encoding="utf-8").splitlines()
-        ]
+        command_names = ("capture", "receipt", "validate")
+        commands = []
+        for name, line in zip(
+            command_names,
+            (packet / "commands.txt").read_text(encoding="utf-8").splitlines(),
+        ):
+            commands.append(json.loads(line.removeprefix(f"{name}_argv=")))
         commands[1][4] = "--wrong-mode"
         (packet / "commands.txt").write_bytes(
             b"".join(
-                (json.dumps(command, separators=(",", ":")) + "\n").encode("utf-8")
-                for command in commands
+                (
+                    f"{name}_argv="
+                    + json.dumps(command, sort_keys=True, separators=(",", ":"))
+                    + "\n"
+                ).encode("utf-8")
+                for name, command in zip(command_names, commands)
             )
         )
+        _refresh_ops03_checksums(packet)
+    elif mutation == "command_prefix":
+        path = packet / "commands.txt"
+        path.write_bytes(path.read_bytes().replace(b"capture_argv=", b"runner_argv=", 1))
+        _refresh_ops03_checksums(packet)
+    elif mutation == "command_encoding":
+        path = packet / "commands.txt"
+        path.write_bytes(path.read_bytes().replace(b"capture_argv=[", b"capture_argv=[ ", 1))
         _refresh_ops03_checksums(packet)
     else:
         (packet / "stderr.log").write_text(
