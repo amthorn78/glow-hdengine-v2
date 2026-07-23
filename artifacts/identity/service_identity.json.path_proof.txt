@@ -1,5 +1,5 @@
 path: artifacts/identity/service_identity.json
 size_bytes: 347
-sha256: 8bfd17d8336f643ce133ec189a85db92df84f4b33626be33ce78ac1531c2c86e
+sha256: df2a2c580cfa279c5b2e817d1a848214763b647062aaff3162d17c337835a32b
 mtime_utc: 2026-07-11T14:44:35Z
 produced_at_utc: 2026-07-08T18:40:15Z
