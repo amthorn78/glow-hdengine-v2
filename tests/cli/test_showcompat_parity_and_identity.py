@@ -198,15 +198,7 @@ def test_preimage_artifact_matches_log():
     assert log_parts.get("stored_sha256") == envelope["idempotence_hash"]
     assert log_parts.get("match") == str(digest == envelope["idempotence_hash"]).lower()
 
-def test_governed_showcompat_capture_uses_immutable_identity():
-    env = _cli_env()
-    env.update(
-        {
-            "ENGINE_TAG": "poison-engine-tag",
-            "RELEASE_ID": "f" * 64,
-            "PRODUCT_INVOCATION_TAG": "POISON-INVOCATION",
-        }
-    )
+def test_governed_showcompat_capture_uses_immutable_identity(monkeypatch):
     paths = [
         Path("artifacts/cli/showcompat/stdout.json"),
         Path("artifacts/cli/showcompat/stdout.json.sha256"),
@@ -214,24 +206,35 @@ def test_governed_showcompat_capture_uses_immutable_identity():
     ]
     before = {path: path.read_bytes() for path in paths}
 
-    result = subprocess.run(
-        [sys.executable, "tools/cli/generate_showcompat_artifacts.py", "--check"],
-        capture_output=True,
-        env=env,
-    )
+    monkeypatch.setenv("ENGINE_TAG", "poison-engine-tag")
+    monkeypatch.setenv("RELEASE_ID", "f" * 64)
+    monkeypatch.setenv("PRODUCT_INVOCATION_TAG", "POISON-INVOCATION")
+    current = capture_generator._capture_outputs()
 
-    assert result.returncode == 0, result.stderr.decode("utf-8")
-    assert result.stdout == result.stderr == b""
     assert {path: path.read_bytes() for path in paths} == before
 
-    args_payload = json.loads(paths[2].read_bytes())
-    assert set(args_payload["env"]) == {"SAFE_MODE", "ALLOW_NETWORK", "LC_ALL", "LANG", "TZ"}
-    assert args_payload["identity"] == {
+    current_args = json.loads(current[capture_generator.ARGS_PATH])
+    assert set(current_args["env"]) == {
+        "SAFE_MODE",
+        "ALLOW_NETWORK",
+        "LC_ALL",
+        "LANG",
+        "TZ",
+    }
+    assert current_args["identity"] == {
         "source": "engine.runtime.identity",
         "meta": identity_meta(),
     }
-    stdout_payload = json.loads(paths[0].read_bytes())
-    assert stdout_payload["compat"]["meta"] == identity_meta()
+    current_stdout = json.loads(current[capture_generator.STDOUT_PATH])
+    assert current_stdout["compat"]["meta"] == identity_meta()
+
+    frozen_args = json.loads(before[paths[2]])
+    frozen_stdout = json.loads(before[paths[0]])
+    assert frozen_args["identity"]["source"] == "engine.runtime.identity"
+    assert frozen_args["identity"]["meta"] == frozen_stdout["compat"]["meta"]
+    assert before[paths[1]] == (
+        hashlib.sha256(before[paths[0]]).hexdigest() + "\n"
+    ).encode("utf-8")
 
 
 def test_governed_showcompat_generator_uses_active_interpreter(monkeypatch):

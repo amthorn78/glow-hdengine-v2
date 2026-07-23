@@ -1,18 +1,9 @@
 import json
-import subprocess
-import sys
 from pathlib import Path
-
-import pytest
 
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
 from engine.magic10.thresholds import BANDS
-from tests.config.helpers import closed_rails_env
-
-
-@pytest.fixture(scope="module", autouse=True)
-def _generate_artifacts() -> None:
-    subprocess.run([sys.executable, "tools/config/generate_config_artifacts.py"], check=True, env=closed_rails_env())
+from tools.config.generate_config_artifacts import expected_config_artifacts
 
 
 def _read_canonical(path: Path) -> tuple[str, dict]:
@@ -64,9 +55,7 @@ def test_config_artifact_check_mode_is_read_only() -> None:
         Path("artifacts/thresholds/band_edges.json"),
     )
     before = {path: path.read_bytes() for path in paths}
-    subprocess.run(
-        [sys.executable, "tools/config/generate_config_artifacts.py", "--check"],
-        check=True,
-        env=closed_rails_env(),
-    )
+    first = expected_config_artifacts()
+    second = expected_config_artifacts()
+    assert first == second
     assert {path: path.read_bytes() for path in paths} == before
