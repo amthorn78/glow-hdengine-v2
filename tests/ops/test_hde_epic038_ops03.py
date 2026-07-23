@@ -16,6 +16,7 @@ from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 from scripts.ops import hde_epic038_ops03 as runner
 from tools.evidence import hde_epic038_ops03 as validator
+from tools.evidence import strict_json_schema
 
 NOW = dt.datetime(2026, 7, 21, 12, 0, tzinfo=dt.timezone.utc)
 CLEAN_ENV = {
@@ -193,6 +194,39 @@ def test_ops03_schema_sources_are_canonical_and_well_formed():
         Draft202012Validator.check_schema(value)
 
 
+@pytest.mark.parametrize(
+    ("value", "schema", "expected"),
+    (
+        (True, {"type": "integer"}, False),
+        (1, {"type": "integer", "minimum": 1, "maximum": 1}, True),
+        ("x", {"unknown": True}, False),
+        ("x", {"$ref": "https://example.invalid/schema"}, False),
+        ("x", {"$ref": "#/$defs/missing", "$defs": {}}, False),
+        (
+            "x",
+            {
+                "$ref": "#/$defs/loop",
+                "$defs": {"loop": {"$ref": "#/$defs/loop"}},
+            },
+            False,
+        ),
+        ("x", {"type": "string", "pattern": "["}, False),
+        ("2026-07-21", {"type": "string", "format": "date-time"}, False),
+        (
+            ["a", "b"],
+            {
+                "type": "array",
+                "prefixItems": [{"const": "a"}],
+                "items": False,
+            },
+            False,
+        ),
+    ),
+)
+def test_strict_schema_validator_is_fail_closed(value, schema, expected):
+    assert strict_json_schema.is_valid(value, schema) is expected
+
+
 @pytest.fixture
 def authorization(tmp_path):
     runner.RUN_ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -333,7 +367,9 @@ def test_ops03_schemas_standalone_accept_canonical_contract_bytes(authorization)
     assert set(samples) == set(OPS03_SCHEMA_FILES)
     for schema_name, (value, raw) in samples.items():
         assert raw == runner.canonical_bytes(value), schema_name
-        _standalone_schema_validator(schema_name).validate(value)
+        schema_validator = _standalone_schema_validator(schema_name)
+        schema_validator.validate(value)
+        assert strict_json_schema.is_valid(value, schema_validator.schema), schema_name
 
 
 def test_ops03_schemas_standalone_reject_truncated_extra_and_reordered_vectors(
@@ -462,6 +498,11 @@ def test_ops03_schemas_standalone_reject_truncated_extra_and_reordered_vectors(
                 path,
                 replacement,
             )
+            assert not strict_json_schema.is_valid(mutated, schema_validator.schema), (
+                schema_name,
+                path,
+                replacement,
+            )
 
 
 @pytest.mark.parametrize(
@@ -494,6 +535,10 @@ def test_failure_receipt_schema_accepts_phase_consistent_launch_state(
     _standalone_schema_validator(
         "hde_epic038_ops03_failure_receipt.v1.json"
     ).validate(receipt)
+    schema = json.loads(
+        (runner.ROOT / "schemas/hde_epic038_ops03_failure_receipt.v1.json").read_bytes()
+    )
+    assert strict_json_schema.is_valid(receipt, schema)
 
 
 @pytest.mark.parametrize(
@@ -527,6 +572,10 @@ def test_failure_receipt_schema_rejects_phase_inconsistent_launch_state(
         _standalone_schema_validator(
             "hde_epic038_ops03_failure_receipt.v1.json"
         ).validate(receipt)
+    schema = json.loads(
+        (runner.ROOT / "schemas/hde_epic038_ops03_failure_receipt.v1.json").read_bytes()
+    )
+    assert not strict_json_schema.is_valid(receipt, schema)
 
 
 def test_validation_receipt_schema_rejects_fail_with_all_predicates_true(
@@ -539,15 +588,20 @@ def test_validation_receipt_schema_rejects_fail_with_all_predicates_true(
     schema_validator = _standalone_schema_validator(
         "hde_epic038_ops03_validation_receipt.v1.json"
     )
+    assert strict_json_schema.is_valid(receipt, schema_validator.schema)
 
     false_negative = copy.deepcopy(receipt)
     false_negative["result"] = "FAIL"
     with pytest.raises(ValidationError):
         schema_validator.validate(false_negative)
+    assert not strict_json_schema.is_valid(false_negative, schema_validator.schema)
 
     legitimate_failure = copy.deepcopy(false_negative)
     legitimate_failure["predicates"]["counts_valid"] = False
     schema_validator.validate(legitimate_failure)
+    assert strict_json_schema.is_valid(
+        legitimate_failure, schema_validator.schema
+    )
 
 
 def test_runtime_role_query_covers_ownership_and_column_write_grants():
@@ -571,6 +625,10 @@ def test_positive_isolated_runner_validator_sealing_path(authorization, tmp_path
     shutil.copy2(
         runner.ROOT / "tools/evidence/retained_evidence_safety.py",
         repo / "tools/evidence/retained_evidence_safety.py",
+    )
+    shutil.copy2(
+        runner.ROOT / "tools/evidence/strict_json_schema.py",
+        repo / "tools/evidence/strict_json_schema.py",
     )
     for schema in (
         "hde_epic038_ops03_authorization.v1.json",
@@ -3063,16 +3121,17 @@ def test_isolated_runner_rejects_ignored_symlink_package_before_import(tmp_path)
     copied_validator = repo / "tools/evidence/hde_epic038_ops03.py"
     shutil.copy2(runner.RUNNER, copied_runner)
     shutil.copy2(runner.VALIDATOR, copied_validator)
-    (repo / ".gitignore").write_text("jsonschema\n", encoding="utf-8")
+    (repo / ".gitignore").write_text(
+        "tools/evidence/strict_json_schema.py\n", encoding="utf-8"
+    )
     source_commit = _commit_test_repository(repo)
     sentinel = tmp_path / "shadow-imported"
-    shadow_target = tmp_path / "jsonschema-package"
-    shadow_target.mkdir()
-    (shadow_target / "__init__.py").write_text(
+    shadow_target = tmp_path / "strict_json_schema.py"
+    shadow_target.write_text(
         f"from pathlib import Path\nPath({str(sentinel)!r}).write_text('imported', encoding='utf-8')\n",
         encoding="utf-8",
     )
-    (repo / "jsonschema").symlink_to(shadow_target, target_is_directory=True)
+    (repo / "tools/evidence/strict_json_schema.py").symlink_to(shadow_target)
     run_id = "ops03-test-" + uuid.uuid4().hex[:24]
     base, _control, candidate, _failure = runner.derived_paths(run_id)
     auth_path = tmp_path / "authorization.json"

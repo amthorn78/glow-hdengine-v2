@@ -362,10 +362,9 @@ def _schema(name: str) -> Mapping[str, Any]:
 
 def _schema_valid(value: Any, name: str) -> bool:
     try:
-        from jsonschema import Draft202012Validator, FormatChecker
+        from tools.evidence.strict_json_schema import is_valid as schema_is_valid
 
-        validator = Draft202012Validator(_schema(name), format_checker=FormatChecker())
-        return next(validator.iter_errors(value), None) is None
+        return schema_is_valid(value, _schema(name))
     except (OSError, ValueError, json.JSONDecodeError):
         return False
 
@@ -1101,7 +1100,7 @@ def validate_packet(
         actual_names = tuple(sorted(files))
         inventory_exact = actual_names == expected_names and entries_are_regular
         values, core_canonical = _load_candidate_json(files)
-        schemas_valid = _core_schema_valid(values)
+        schemas_valid = not source_errors and _core_schema_valid(values)
         content_valid, counts_valid = (
             _content_valid(auth, authorization_sha256, files, values)
             if not auth_errors

@@ -159,11 +159,17 @@ MANDATORY_MARKERS = {
         "ORDERED_QUERY_IDS",
         "expected_argv",
         "authorization_bytes_changed",
+        "tools.evidence.strict_json_schema",
     ),
     "tools/evidence/hde_epic038_ops03.py": (
-        "Draft202012Validator",
+        "tools.evidence.strict_json_schema",
         "validate_retained_text_safety",
         "_checksums_valid",
+    ),
+    "tools/evidence/strict_json_schema.py": (
+        "_SCHEMA_KEYS",
+        "_references_acyclic",
+        "def is_valid",
     ),
     "tools/evidence/generate_hde_epic038_direct_db_selection.py": (
         "hde_epic038.direct_db_selection.v1",

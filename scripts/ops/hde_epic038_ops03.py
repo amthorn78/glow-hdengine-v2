@@ -597,10 +597,9 @@ def validate_authorization(
     *,
     now: dt.datetime | None = None,
 ) -> None:
-    from jsonschema import Draft202012Validator, FormatChecker
+    from tools.evidence.strict_json_schema import is_valid as schema_is_valid
 
-    validator = Draft202012Validator(_schema(AUTH_SCHEMA), format_checker=FormatChecker())
-    if next(validator.iter_errors(auth), None) is not None:
+    if not schema_is_valid(auth, _schema(AUTH_SCHEMA)):
         raise Ops03Error("pre_marker", "authorization_schema_invalid", consumed=False)
     run_id = str(auth["run_id"])
     _, _, candidate, _ = derived_paths(run_id)

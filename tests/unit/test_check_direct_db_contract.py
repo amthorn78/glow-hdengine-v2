@@ -34,6 +34,16 @@ def test_direct_contract_scan_accepts_minimal_direct_only_tree(tmp_path):
     assert check.scan(tmp_path) == ()
 
 
+def test_direct_contract_scan_requires_bounded_ops_schema_validator(tmp_path):
+    _minimal_tree(tmp_path)
+    (tmp_path / "tools/evidence/strict_json_schema.py").unlink()
+
+    assert (
+        "tools/evidence/strict_json_schema.py:mandatory_file_missing"
+        in check.scan(tmp_path)
+    )
+
+
 def test_direct_contract_scan_rejects_retired_file_symbol_and_active_output(tmp_path):
     _minimal_tree(tmp_path)
     _write(tmp_path, "engine/db/providers/bridge_provider.py", "class BridgeProvider: pass\n")

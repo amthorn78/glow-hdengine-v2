@@ -16,23 +16,23 @@ _OPS03_READONLY_SIGNATURES = (
     # set_transaction_read_only
     ("6c20e5345ee8028f61cc0541aeb60699e5cffa99c8f79ff7f8c62b0a8dad1837", False),
     # set_search_path
-    ("af8da0d6f83056f8112485041890d45aaa879a91ecc9f8d6090ef64f2742fb18", False),
+    ("9e5bd3f169b20cd5eef67d17c1c850faabc76b5d4840d8417b48eb53c3f3ca33", False),
     # connection_identity
-    ("65ef0b855a313d4658ff116ee5e5af3e82794b4b0ad70562e544b24d9233e0ca", True),
+    ("7d1c4f70894e3a70bb3aa1eb3fa250c173eb533006b2e6bab07d1a4dc12492a2", True),
     # search_path
-    ("7f61e34d59607c563d6fc7b58be362e7b9fe000e8332a2285c03ddbd5423a4bf", True),
+    ("35309ee6e38fa437a24aaa0fc3b225d3a6e87c286db4a980e55a5ca2d4d7e0d1", True),
     # runtime_role_grants
-    ("ecb83bde8b112f6fadc5bdf5288d42b96e0fc751b80a9406eb2224bdeac0d3c0", True),
+    ("ae1f99db0d880643f85a9b085482d6c506b3e189f78f73a1b7cc6922233081f1", True),
     # ddl_columns
-    ("86b9c707f5ee72cab35081b9db934ed42728e8b862c7e0daad4d1c1241032eac", True),
+    ("6d628498cad9b583dac94d60112921a5dc2c9c56900b03cdf132b5d3e9b80aaa", True),
     # ddl_constraints
-    ("dd5059a30814c3af26ceddbb9398bbcf794c440e547d94f3c7f7ac9a7c4419a4", True),
+    ("0587da97e1a3fd8d7e87c76a0de0488f6d1d84f65342366b5459d842d93f6b4b", True),
     # boundary_views
-    ("545b8ae329096bb6314830d9f3650ed7882821b761917b66634ec7a3727e3c43", True),
+    ("fc15ff297a9b5ff1d60f8b7be5c8b354c61f4242730d3fc2835536db160c8328", True),
     # partition_inventory
-    ("0b341af49cfce830daf0517a2573f3033030269da2e55d01dc3080afb4bbb618", True),
+    ("31ff2d756587027e3e3b8cd1960d9ab1a96b689049b13db85cc71bfe1e90ffe6", True),
     # partition_verify
-    ("e6762f64a95930487ec05bdb15f32f65522f95eb9ee1efee5f31ca03041ab7d8", True),
+    ("9131eb9d54ef5c609af9453b2e27745926781696c15e3d2bfd64b7331d553fed", True),
 )
 
 
@@ -52,10 +52,13 @@ def _single_statement_sql(sql: str) -> str | None:
 
 
 def _readonly_statement_signature(statement: Any) -> tuple[str, bool] | None:
-    normalized = _single_statement_sql(getattr(statement, "sql", ""))
-    if normalized is None or getattr(statement, "params", None) is not None:
+    sql = getattr(statement, "sql", "")
+    if (
+        _single_statement_sql(sql) is None
+        or getattr(statement, "params", None) is not None
+    ):
         return None
-    return sha256(normalized.encode("utf-8")).hexdigest(), bool(
+    return sha256(sql.encode("utf-8")).hexdigest(), bool(
         getattr(statement, "fetch", False)
     )
 
@@ -168,6 +171,7 @@ class PsycopgProvider:
         validate: Callable[[Sequence[Sequence[Any] | None]], None] | None = None,
     ) -> List[Sequence[Any] | None]:
         results: List[Sequence[Any] | None] = []
+        failure: TxError | None = None
         try:
             with self._connect() as conn:
                 try:
@@ -191,23 +195,29 @@ class PsycopgProvider:
                         validate(tuple(results))
                     conn.commit()
                 except Exception:
+                    failure = TxError(
+                        "tx_failed",
+                        attempts=["DATABASE_URL"],
+                        code="tx_failed",
+                    )
+                if failure is not None:
                     try:
                         conn.rollback()
-                    except Exception as exc:
-                        raise TxError(
+                    except Exception:
+                        failure = TxError(
                             "tx_rollback_failed",
                             attempts=["DATABASE_URL"],
                             code="tx_rollback_failed",
-                        ) from exc
-                    raise
-        except TxError:
-            raise
-        except Exception as exc:
-            raise TxError(
-                "tx_failed",
-                attempts=["DATABASE_URL"],
-                code="tx_failed",
-            ) from exc
+                        )
+        except Exception:
+            if failure is None:
+                failure = TxError(
+                    "tx_failed",
+                    attempts=["DATABASE_URL"],
+                    code="tx_failed",
+                )
+        if failure is not None:
+            raise failure from None
         return results
 
 
@@ -272,6 +282,10 @@ class PsycopgProvider:
 
     # helpers -----------------------------------------------------------
     def _introspect_grants(self) -> Mapping[str, Any]:
+        flags: Sequence[Any] = (False, False, False)
+        entries: Sequence[Sequence[Any]] = ()
+        adp_rows: Sequence[Sequence[Any]] = ()
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
@@ -324,12 +338,14 @@ class PsycopgProvider:
                         """
                     )
                     adp_rows = cur.fetchall()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "grants_unavailable",
                 attempts=["DATABASE_URL"],
                 code="grants_unavailable",
-            ) from exc
+            ) from None
 
         entries_norm = []
         for grantee, schema, name, privilege in entries:
@@ -368,6 +384,10 @@ class PsycopgProvider:
         def normalize_sql(text: str) -> str:
             return " ".join((text or "").split())
 
+        columns_rows: Sequence[Sequence[Any]] = ()
+        constraint_rows: Sequence[Sequence[Any]] = ()
+        views: List[tuple[str, str]] = []
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
@@ -399,7 +419,6 @@ class PsycopgProvider:
                     )
                     constraint_rows = cur.fetchall()
 
-                    views: List[tuple[str, str]] = []
                     for schema, name in (("hde", "body_graphs_current"), ("public", "hde_body_graphs_current")):
                         cur.execute(
                             "SELECT pg_get_viewdef(%s::regclass, true)",
@@ -407,12 +426,14 @@ class PsycopgProvider:
                         )
                         viewdef = (cur.fetchone() or ("",))[0] or ""
                         views.append((f"{schema}.{name}", normalize_sql(viewdef)))
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "fingerprint_unavailable",
                 attempts=["DATABASE_URL"],
                 code="fingerprint_unavailable",
-            ) from exc
+            ) from None
 
         columns = []
         for name, data_type, is_nullable, column_default in columns_rows:
@@ -450,14 +471,18 @@ class PsycopgProvider:
         return fingerprint
 
     def _introspect_version(self) -> Mapping[str, Any]:
+        rows: Sequence[Sequence[Any]] = ()
+        failed = False
         try:
             rows = self.query("SELECT current_setting('server_version')")
-        except SqlExecError as exc:
+        except SqlExecError:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "version_unavailable",
                 attempts=["DATABASE_URL"],
                 code="version_unavailable",
-            ) from exc
+            ) from None
 
         version = ""
         if rows and rows[0]:

@@ -14,7 +14,12 @@ from engine.db.adapter import (
     Statement,
     retired_db_transport_keys_present,
 )
-from engine.db.errors import PrimaryUnavailable, RetiredBridgeConfiguration, TxError
+from engine.db.errors import (
+    IntrospectionError,
+    PrimaryUnavailable,
+    RetiredBridgeConfiguration,
+    TxError,
+)
 from engine.db.providers.psycopg_provider import PsycopgProvider
 from scripts.ops.hde_epic038_ops03 import QUERY_STATEMENTS
 
@@ -318,6 +323,33 @@ def test_readonly_tx_rejects_each_exact_roster_sql_mutation_before_connection(in
     assert connection_calls == []
 
 
+@pytest.mark.parametrize(
+    "index",
+    tuple(
+        index
+        for index, statement in enumerate(QUERY_STATEMENTS)
+        if "'hde'" in statement.sql
+    ),
+)
+def test_readonly_tx_rejects_literal_case_mutation_before_connection(index):
+    connection_calls = []
+    statements = list(QUERY_STATEMENTS)
+    original = statements[index]
+    statements[index] = Statement(
+        original.sql.replace("'hde'", "'HDE'", 1),
+        fetch=original.fetch,
+    )
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda dsn: connection_calls.append(dsn) or object(),
+    )
+
+    with pytest.raises(TxError, match="readonly_tx_roster_mismatch"):
+        provider.readonly_tx(statements)
+
+    assert connection_calls == []
+
+
 @pytest.mark.parametrize("mutation", ["params", "fetch"])
 def test_readonly_tx_rejects_non_sql_roster_mutation_before_connection(mutation):
     connection_calls = []
@@ -480,3 +512,80 @@ def test_write_tx_validator_runs_before_commit_and_rolls_back_on_failure():
     assert connection.commit_calls == 0
     assert connection.rollback_calls == 1
     assert connection.close_calls == 1
+
+
+@pytest.mark.parametrize(
+    ("operation", "expected_type", "expected_code"),
+    [
+        (
+            lambda provider: provider.tx([Statement("SELECT 1", fetch=True)]),
+            TxError,
+            "tx_failed",
+        ),
+        (
+            lambda provider: provider.introspect("grants"),
+            IntrospectionError,
+            "grants_unavailable",
+        ),
+        (
+            lambda provider: provider.introspect("fingerprint"),
+            IntrospectionError,
+            "fingerprint_unavailable",
+        ),
+        (
+            lambda provider: provider.introspect("version"),
+            IntrospectionError,
+            "version_unavailable",
+        ),
+    ],
+)
+def test_provider_operations_drop_hostile_connection_exception(
+    operation, expected_type, expected_code
+):
+    secret = "postgresql://user:password@host/private"
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: (_ for _ in ()).throw(RuntimeError(secret)),
+    )
+
+    with pytest.raises(expected_type) as caught:
+        operation(provider)
+
+    assert caught.value.code == expected_code
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )
+
+
+def test_write_tx_rollback_failure_drops_hostile_exceptions():
+    secret = "postgresql://user:password@host/private"
+
+    class HostileRollbackConnection(Connection):
+        def rollback(self):
+            self.rollback_calls += 1
+            raise RuntimeError(secret)
+
+    connection = HostileRollbackConnection()
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: connection,
+    )
+
+    with pytest.raises(TxError) as caught:
+        provider.tx(
+            [Statement("SELECT 1", fetch=True)],
+            validate=lambda _results: (_ for _ in ()).throw(RuntimeError(secret)),
+        )
+
+    assert caught.value.code == "tx_rollback_failed"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )
