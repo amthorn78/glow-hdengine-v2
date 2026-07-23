@@ -1,12 +1,10 @@
 import hashlib
 import json
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
 
-from tests.config.helpers import closed_rails_env
+from tools.config.generate_bundles import expected_bundles
 
 
 jsonschema = pytest.importorskip(
@@ -32,26 +30,28 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _run_generators(env: dict[str, str]) -> tuple[bytes, bytes]:
-    subprocess.run([sys.executable, "tools/config/generate_config_artifacts.py"], check=True, env=env)
-    subprocess.run([sys.executable, "tools/config/generate_bundles.py"], check=True, env=env)
-    return FE_BUNDLE_PATH.read_bytes(), BE_BUNDLE_PATH.read_bytes()
+def _expected_bundle_bytes() -> tuple[bytes, bytes]:
+    expected = expected_bundles()
+    return expected[FE_BUNDLE_PATH], expected[BE_BUNDLE_PATH]
 
 
-@pytest.fixture(scope="module")
-def rails_env() -> dict[str, str]:
-    return closed_rails_env()
-
-
-def test_two_run_identity(rails_env: dict[str, str]) -> None:
-    fe_first, be_first = _run_generators(rails_env)
-    fe_second, be_second = _run_generators(rails_env)
+def test_two_run_identity() -> None:
+    fe_first, be_first = _expected_bundle_bytes()
+    fe_second, be_second = _expected_bundle_bytes()
     assert fe_first == fe_second
     assert be_first == be_second
 
 
-def test_frontend_bundle_schema_and_sources(rails_env: dict[str, str]) -> None:
-    _run_generators(rails_env)
+def test_bundle_check_mode_is_read_only() -> None:
+    fe_before = FE_BUNDLE_PATH.read_bytes()
+    be_before = BE_BUNDLE_PATH.read_bytes()
+    fe_expected, be_expected = _expected_bundle_bytes()
+    assert (fe_expected, be_expected) == (fe_before, be_before)
+    assert FE_BUNDLE_PATH.read_bytes() == fe_before
+    assert BE_BUNDLE_PATH.read_bytes() == be_before
+
+
+def test_frontend_bundle_schema_and_sources() -> None:
     fe_bundle = _read_canonical(FE_BUNDLE_PATH)
     fe_schema = json.loads((ROOT / "docs" / "schemas" / "config_bundle_fe.json").read_text(encoding="utf-8"))
     jsonschema.validate(instance=fe_bundle, schema=fe_schema)
@@ -73,8 +73,7 @@ def test_frontend_bundle_schema_and_sources(rails_env: dict[str, str]) -> None:
         assert src["size_bytes"] == artifact_path.stat().st_size
 
 
-def test_backend_bundle_schema_and_sources(rails_env: dict[str, str]) -> None:
-    _run_generators(rails_env)
+def test_backend_bundle_schema_and_sources() -> None:
     be_bundle = _read_canonical(BE_BUNDLE_PATH)
     be_schema = json.loads((ROOT / "docs" / "schemas" / "config_bundle_be.json").read_text(encoding="utf-8"))
     jsonschema.validate(instance=be_bundle, schema=be_schema)

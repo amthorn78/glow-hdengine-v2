@@ -1,5 +1,5 @@
 path: artifacts/cli/install/installability_summary.json
 size_bytes: 935
-sha256: eb3b2b3767e55fd85b8182c11272a57fd8cfcc3a2b44c3261684d08d3ebf44a5
+sha256: bf15c44014a6d98d6f2856e5ef89bfdf79359f31527b7336898fb7b993cd548e
 mtime_utc: 2026-03-13T04:25:28Z
 produced_at_utc: 2026-01-05T05:39:56Z

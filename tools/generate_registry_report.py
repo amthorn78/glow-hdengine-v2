@@ -74,11 +74,6 @@ def _build_registry_inputs(config: RegistryConfig) -> Mapping[str, object]:
     order_path = catalog_root / "magic10.json"
     caps_path = catalog_root / "magic10_caps.json"
     seeds_path = catalog_root / "magic10_seeds.json"
-    manifest_path = catalog_root / "manifest.json"
-    manifest_entries = [
-        {"path": entry.path, "sha256": entry.sha256, "size_bytes": entry.size}
-        for entry in config.manifest.files
-    ]
     return {
         "catalogs": {
             "channels_v1": _catalog_meta(channels_path, count=len(config.channels)),
@@ -96,15 +91,6 @@ def _build_registry_inputs(config: RegistryConfig) -> Mapping[str, object]:
                 "path": str(seeds_path.relative_to(ROOT)),
                 "sha256": _sha256_path(seeds_path),
             },
-        },
-        "manifest": {
-            "path": str(manifest_path.relative_to(ROOT)),
-            "sha256": _sha256_path(manifest_path),
-            "entries": manifest_entries,
-            "count": len(manifest_entries),
-            "root": config.manifest.root,
-            "version": config.manifest.version,
-            "built_at_utc": config.manifest.built_at_utc,
         },
     }
 

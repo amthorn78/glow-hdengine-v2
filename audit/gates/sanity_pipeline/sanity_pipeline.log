@@ -11,17 +11,24 @@ check 03 Canonical JSON:OK
 check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:OK
 check 05 A7 Catalog transport:OK
 check 06 CI rails:OK
-check 07 DB posture:OK
-check 08 BodyGraph policy:OK
-check 09 Direct DB contract:OK
+check 07 Direct DB selection contract:OK
+check 08 Direct DB posture artifacts:OK
+check 09 BodyGraph policy:OK
 check 10 Architecture snapshot:OK
 check 11 Configured-v2 mapped-cache local evidence:OK
-check 12 OPS evidence checksum and summary validation:OK
-check 13 Human Index and Machine Mirror refresh:OK
-check 14 Path validation:OK
-check 15 Mirror schema and hash validation:OK
-check 16 Topology orientation validation:OK
-check 17 Final LF validation:OK
-check 18 PR-A nonfinal gate:FAIL
-first_failed_stage:18 PR-A nonfinal gate
+check 12 Historical bridge evidence integrity:OK
+stage_result:12:HISTORICAL_INTEGRITY_OK
+check 13 OPS-02 mapped-cache packet validation:OK
+check 14 OPS-03 direct DB posture packet validation:FAIL
+check 15 Human Index and Machine Mirror refresh:FAIL
+not_executed 15 Human Index and Machine Mirror refresh:earlier_mandatory_failure=14 OPS-03 direct DB posture packet validation
+check 16 Evidence-path validation:FAIL
+not_executed 16 Evidence-path validation:earlier_mandatory_failure=14 OPS-03 direct DB posture packet validation
+check 17 Mirror schema and index/mirror hash validation:FAIL
+not_executed 17 Mirror schema and index/mirror hash validation:earlier_mandatory_failure=14 OPS-03 direct DB posture packet validation
+check 18 Topology orientation validation:FAIL
+not_executed 18 Topology orientation validation:earlier_mandatory_failure=14 OPS-03 direct DB posture packet validation
+check 19 Final-LF validation:FAIL
+not_executed 19 Final-LF validation:earlier_mandatory_failure=14 OPS-03 direct DB posture packet validation
+first_failed_stage:14 OPS-03 direct DB posture packet validation
 summary:FAIL

@@ -1,14 +1,16 @@
-# Risks & Rollback — Bridge adapter (EPIC-011)
+# Historical Risks and Current Rollback Boundary — Retired bridge adapter
+
+Status: historical retained design record plus a current non-restoration boundary; it is not a bridge operations runbook.
 
 ## Key Risks
-- **Invalid bridge URL**: Non-HTTPS URLs or missing `DB_BRIDGE_URL` block fallback. *Mitigation*: `BridgeProvider` enforces HTTPS and raises `bridge_requires_https` / `missing_bridge_url` early; adapter tests cover these paths.
-- **Payload drift**: Bridge responses could add unexpected fields. *Mitigation*: harness scripts write canonical JSON checked into the Evidence Index; adapter normalization ensures search_path, grants, fingerprint, and version stay typed.
-- **Logging leakage**: Mistakes could log bodies or headers. *Mitigation*: `engine.ops.http_log.log_http_call` only records keys `{at,route,status,duration_ms,idempotence_hash?,release_id?}`; tests guard the schema.
-- **Silent vendor access**: Rails-open runs might hit vendor HTTP. *Mitigation*: `scripts/ops/capture_rails_open_scope.py` computes per-route counts and fails if any `vendor.*` entry appears.
+- **Historical invalid-URL risk**: Historical retained record, not current guidance: `DB_BRIDGE_URL` and `BridgeProvider` once enforced bridge URL policy; both are retired and must not be restored.
+- **Historical payload drift**: Historical retained record, not current guidance: bridge-era captures used canonical JSON and normalized fields.
+- **Historical logging leakage**: Historical retained record, not current guidance: bridge-era HTTP logging was keys-only.
+- **Historical silent external access**: Historical retained record, not current guidance: a bridge-era rails-open harness counted routes; it must not be rerun as current proof.
 
 ## Rollback Strategy
-1. Disable bridge usage by setting `DB_FORCE_PG=1` (or removing `DB_BRIDGE_URL`) while leaving harness scripts intact for parity checks.
-2. Revert the adapter/bridge modules to the prior release tag and prune bridge artifacts from the Evidence Index (documenting removals in `docs/SYNC_LOG.md`).
-3. Retain `artifacts/logs/keys_only.sample.jsonl` and scope reports for the rollback window to show vendor HTTP stayed disabled.
+1. Current rollback must not restore bridge selection, retired keys, HTTP calls, harnesses, or provider parity.
+2. If direct-only DB entrypoints are unsafe, block them or revert to a known direct-only commit; never revert to bridge-enabled source.
+3. Preserve historical bridge primaries and their checksum/provenance records byte-for-byte; do not prune or refresh them during runtime rollback.
 
-Rollback preserves canonical outputs and refuses to bypass the shared emitter; evidence remains auditable throughout the transition.
+Rollback remains fail closed, preserves public bytes and historical evidence truth, and does not authorize OPS, DB writes, deployment, or PF09 movement.

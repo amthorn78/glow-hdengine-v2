@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import traceback
 from collections.abc import Mapping
 from types import SimpleNamespace
 
@@ -13,8 +14,15 @@ from engine.db.adapter import (
     Statement,
     retired_db_transport_keys_present,
 )
-from engine.db.errors import PrimaryUnavailable, RetiredBridgeConfiguration, TxError
+from engine.db.errors import (
+    IntrospectionError,
+    PrimaryUnavailable,
+    RetiredBridgeConfiguration,
+    SqlExecError,
+    TxError,
+)
 from engine.db.providers.psycopg_provider import PsycopgProvider
+from scripts.ops.hde_epic038_ops03 import QUERY_STATEMENTS
 
 
 class Provider:
@@ -66,6 +74,21 @@ def test_retired_keys_are_membership_sorted_and_block_factory_without_value_leak
         "DB_ALLOW_BRIDGE_IN_PROD,DB_BRIDGE_URL,DB_FORCE_BRIDGE"
     )
     assert "must-not-leak" not in str(exc.value)
+
+
+@pytest.mark.parametrize("key", RETIRED_DB_TRANSPORT_KEYS)
+@pytest.mark.parametrize("value", ["", "0", " ", "set"])
+def test_each_retired_key_value_is_refused_by_membership(key, value):
+    calls = []
+    env = {"DATABASE_URL": "not-serialized", key: value}
+    assert retired_db_transport_keys_present(env) == (key,)
+    with pytest.raises(RetiredBridgeConfiguration) as caught:
+        DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda dsn: calls.append(dsn) or Provider(),
+        )
+    assert caught.value.retired_keys == (key,)
+    assert calls == []
 
 
 def test_retired_keys_raise_before_database_url_value_access():
@@ -127,6 +150,17 @@ def test_direct_success_has_one_health_and_one_selection_attempt():
     }
 
 
+def test_selection_evidence_is_pure_and_does_not_touch_filesystem(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    db = DBAccess.for_current_env(
+        environ={"APP_ENV": "dev", "DATABASE_URL": "not-serialized"},
+        psycopg_factory=lambda _dsn: Provider(),
+    )
+    before = tuple(tmp_path.iterdir())
+    assert db.selection_evidence()["selected"] == "psycopg"
+    assert tuple(tmp_path.iterdir()) == before
+
+
 def test_missing_and_unavailable_database_url_fail_closed_with_stable_codes():
     calls = []
     with pytest.raises(PrimaryUnavailable) as missing:
@@ -145,6 +179,97 @@ def test_missing_and_unavailable_database_url_fail_closed_with_stable_codes():
     assert "not-serialized" not in str(unavailable.value)
 
 
+def test_direct_failure_normalizes_injected_primary_error_and_never_serializes_it():
+    secret = "postgresql://user:password@host/db"
+
+    class HostileProvider(Provider):
+        def health(self):
+            self.health_calls += 1
+            raise PrimaryUnavailable(secret, code=secret)
+
+    provider = HostileProvider()
+    with pytest.raises(PrimaryUnavailable) as caught:
+        DBAccess.for_current_env(
+            environ={"APP_ENV": secret, "DATABASE_URL": "not-serialized"},
+            psycopg_factory=lambda _dsn: provider,
+        )
+
+    assert str(caught.value) == "primary_connect_failed"
+    assert caught.value.code == "primary_connect_failed"
+    assert caught.value.attempt_rows == [
+        {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"}
+    ]
+    assert caught.value.selection_case["app_env"] == "unknown"
+    assert secret not in repr(caught.value.selection_case)
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )
+
+
+def test_provider_failure_traceback_drops_raw_connection_exception():
+    secret = "postgresql://user:password@host/db"
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: (_ for _ in ()).throw(RuntimeError(secret)),
+    )
+
+    with pytest.raises(PrimaryUnavailable) as caught:
+        provider.health()
+
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )
+
+
+def test_non_psycopg_factory_result_is_rejected_before_health():
+    class AlternateProvider(Provider):
+        name = "bridge"
+
+    provider = AlternateProvider()
+    with pytest.raises(PrimaryUnavailable) as caught:
+        DBAccess.for_current_env(
+            environ={"DATABASE_URL": "not-serialized"},
+            psycopg_factory=lambda _dsn: provider,
+        )
+
+    assert caught.value.code == "primary_connect_failed"
+    assert provider.health_calls == 0
+    assert caught.value.attempt_rows == [
+        {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"}
+    ]
+
+
+@pytest.mark.parametrize("scenario", ["success", "missing", "unavailable", "retired"])
+def test_selection_evidence_never_serializes_hostile_app_env(scenario):
+    secret = "postgresql://user:password@host/db"
+    env = {"APP_ENV": secret}
+    provider = Provider(fail_health=scenario == "unavailable")
+    if scenario != "missing":
+        env["DATABASE_URL"] = "not-serialized"
+    if scenario == "retired":
+        env["DB_FORCE_BRIDGE"] = ""
+
+    try:
+        db = DBAccess.for_current_env(
+            environ=env,
+            psycopg_factory=lambda _dsn: provider,
+        )
+        receipt = db.selection_evidence()
+    except (PrimaryUnavailable, RetiredBridgeConfiguration) as exc:
+        receipt = DBAccess.selection_failure_evidence(exc)
+
+    assert receipt["app_env"] == "unknown"
+    assert secret not in repr(receipt)
+
+
 @pytest.mark.parametrize(
     "statements",
     [
@@ -154,6 +279,18 @@ def test_missing_and_unavailable_database_url_fail_closed_with_stable_codes():
         [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT 1; UPDATE x SET y=1")],
         [Statement("SET TRANSACTION READ ONLY -- comment")],
         [Statement("SET TRANSACTION READ ONLY"), Statement("SET TRANSACTION READ WRITE")],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT nextval('seq')", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_advisory_lock(1)", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT set_config('x','y',false)", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT * FROM hde.body_graphs FOR SHARE", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT value INTO temp_copy FROM hde.body_graphs", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_read_file('/etc/passwd')", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_file_write('/tmp/x','x',false)", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT lo_export(1,'/tmp/x')", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT pg_reload_conf()", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT custom_side_effect()", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), Statement("SHOW ALL", fetch=True)],
+        [Statement("SET TRANSACTION READ ONLY"), *[Statement("SELECT 1", fetch=True) for _ in range(10)]],
     ],
 )
 def test_readonly_tx_rejects_wrong_first_mutation_batching_and_comments(statements):
@@ -164,6 +301,74 @@ def test_readonly_tx_rejects_wrong_first_mutation_batching_and_comments(statemen
     )
     with pytest.raises(TxError):
         provider.readonly_tx(statements)
+    assert connection_calls == []
+
+
+@pytest.mark.parametrize("index", range(len(QUERY_STATEMENTS)))
+def test_readonly_tx_rejects_each_exact_roster_sql_mutation_before_connection(index):
+    connection_calls = []
+    statements = list(QUERY_STATEMENTS)
+    original = statements[index]
+    statements[index] = Statement(
+        f"{original.sql} || ''",
+        fetch=original.fetch,
+    )
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda dsn: connection_calls.append(dsn) or object(),
+    )
+
+    with pytest.raises(TxError, match="readonly_tx_roster_mismatch"):
+        provider.readonly_tx(statements)
+
+    assert connection_calls == []
+
+
+@pytest.mark.parametrize(
+    "index",
+    tuple(
+        index
+        for index, statement in enumerate(QUERY_STATEMENTS)
+        if "'hde'" in statement.sql
+    ),
+)
+def test_readonly_tx_rejects_literal_case_mutation_before_connection(index):
+    connection_calls = []
+    statements = list(QUERY_STATEMENTS)
+    original = statements[index]
+    statements[index] = Statement(
+        original.sql.replace("'hde'", "'HDE'", 1),
+        fetch=original.fetch,
+    )
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda dsn: connection_calls.append(dsn) or object(),
+    )
+
+    with pytest.raises(TxError, match="readonly_tx_roster_mismatch"):
+        provider.readonly_tx(statements)
+
+    assert connection_calls == []
+
+
+@pytest.mark.parametrize("mutation", ["params", "fetch"])
+def test_readonly_tx_rejects_non_sql_roster_mutation_before_connection(mutation):
+    connection_calls = []
+    statements = list(QUERY_STATEMENTS)
+    original = statements[0]
+    statements[0] = Statement(
+        original.sql,
+        params=("unexpected",) if mutation == "params" else None,
+        fetch=True if mutation == "fetch" else original.fetch,
+    )
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda dsn: connection_calls.append(dsn) or object(),
+    )
+
+    with pytest.raises(TxError, match="readonly_tx_roster_mismatch"):
+        provider.readonly_tx(statements)
+
     assert connection_calls == []
 
 
@@ -180,7 +385,7 @@ class Cursor:
 
     def execute(self, sql, params=None):
         self.statements.append((sql, params))
-        if self.fail_on_select and sql == "SELECT 1":
+        if self.fail_on_select and sql.startswith("SELECT"):
             raise RuntimeError("query failed")
 
     def fetchall(self):
@@ -218,9 +423,9 @@ def test_readonly_tx_rolls_back_without_commit_on_success_and_failure():
     success = Connection()
     provider = PsycopgProvider("not-serialized", connection_factory=lambda _dsn: success)
     result = provider.readonly_tx(
-        [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT 1", fetch=True)]
+        QUERY_STATEMENTS
     )
-    assert result == [None, [(1,)]]
+    assert len(result) == len(QUERY_STATEMENTS)
     assert success.rollback_calls == 1
     assert success.commit_calls == 0
     assert success.close_calls == 1
@@ -229,7 +434,7 @@ def test_readonly_tx_rolls_back_without_commit_on_success_and_failure():
     provider = PsycopgProvider("not-serialized", connection_factory=lambda _dsn: failure)
     with pytest.raises(TxError) as exc:
         provider.readonly_tx(
-            [Statement("SET TRANSACTION READ ONLY"), Statement("SELECT 1", fetch=True)]
+            QUERY_STATEMENTS
         )
     assert exc.value.code == "readonly_tx_failed"
     assert failure.rollback_calls == 1
@@ -241,8 +446,28 @@ def test_readonly_tx_surfaces_rollback_failure_after_success():
     connection = Connection(fail_rollback=True)
     provider = PsycopgProvider("not-serialized", connection_factory=lambda _dsn: connection)
     with pytest.raises(TxError) as exc:
-        provider.readonly_tx([Statement("SET TRANSACTION READ ONLY")])
+        provider.readonly_tx(QUERY_STATEMENTS)
     assert exc.value.code == "readonly_tx_rollback_failed"
+
+
+def test_readonly_tx_rolls_back_and_closes_on_base_exception():
+    connection = Connection()
+
+    def interrupt(_sql, _params=None):
+        raise KeyboardInterrupt
+
+    connection.cursor_object.execute = interrupt
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: connection,
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        provider.readonly_tx(QUERY_STATEMENTS)
+
+    assert connection.rollback_calls == 1
+    assert connection.commit_calls == 0
+    assert connection.close_calls == 1
 
 
 def test_write_smoke_deletes_only_the_inserted_row(monkeypatch):
@@ -308,3 +533,90 @@ def test_write_tx_validator_runs_before_commit_and_rolls_back_on_failure():
     assert connection.commit_calls == 0
     assert connection.rollback_calls == 1
     assert connection.close_calls == 1
+
+
+@pytest.mark.parametrize(
+    ("operation", "expected_type", "expected_code"),
+    [
+        (
+            lambda provider: provider.query("SELECT 1"),
+            SqlExecError,
+            "sql_query_failed",
+        ),
+        (
+            lambda provider: provider.exec("SELECT 1"),
+            SqlExecError,
+            "sql_exec_failed",
+        ),
+        (
+            lambda provider: provider.tx([Statement("SELECT 1", fetch=True)]),
+            TxError,
+            "tx_failed",
+        ),
+        (
+            lambda provider: provider.introspect("grants"),
+            IntrospectionError,
+            "grants_unavailable",
+        ),
+        (
+            lambda provider: provider.introspect("fingerprint"),
+            IntrospectionError,
+            "fingerprint_unavailable",
+        ),
+        (
+            lambda provider: provider.introspect("version"),
+            IntrospectionError,
+            "version_unavailable",
+        ),
+    ],
+)
+def test_provider_operations_drop_hostile_connection_exception(
+    operation, expected_type, expected_code
+):
+    secret = "postgresql://user:password@host/private"
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: (_ for _ in ()).throw(RuntimeError(secret)),
+    )
+
+    with pytest.raises(expected_type) as caught:
+        operation(provider)
+
+    assert caught.value.code == expected_code
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )
+
+
+def test_write_tx_rollback_failure_drops_hostile_exceptions():
+    secret = "postgresql://user:password@host/private"
+
+    class HostileRollbackConnection(Connection):
+        def rollback(self):
+            self.rollback_calls += 1
+            raise RuntimeError(secret)
+
+    connection = HostileRollbackConnection()
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: connection,
+    )
+
+    with pytest.raises(TxError) as caught:
+        provider.tx(
+            [Statement("SELECT 1", fetch=True)],
+            validate=lambda _results: (_ for _ in ()).throw(RuntimeError(secret)),
+        )
+
+    assert caught.value.code == "tx_rollback_failed"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert secret not in "".join(
+        traceback.format_exception(
+            type(caught.value), caught.value, caught.value.__traceback__
+        )
+    )

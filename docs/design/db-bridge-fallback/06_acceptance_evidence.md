@@ -1,13 +1,15 @@
-# Acceptance Evidence — Bridge adapter (EPIC-011)
+# Historical Evidence Inventory — Retired bridge adapter (EPIC-011)
+
+Status: historical retained evidence inventory, not current acceptance guidance. The listed bridge-era bytes retain their original provenance and must not be refreshed, reinterpreted as current support, or used to claim token satisfaction.
 
 | Evidence | Description | Storage |
 | --- | --- | --- |
-| `artifacts/db_bridge/adapter_selection.snapshot.json` | Canonical JSON recording provider attempts (`psycopg`/`bridge`) and final selection. | `artifacts/db_bridge/` |
-| `artifacts/db_bridge/{health.json,root.json,query_select_1.json}` | Bridge HTTP captures proving `/health`, `/`, and `/query` under rails-open. | `artifacts/db_bridge/` |
-| `artifacts/db/introspect.{search_path,grants,fingerprint}.json` | Bridge introspection payloads (present-even-empty grants, canonical fingerprint). | `artifacts/db/` |
-| `artifacts/engine/db_adapter.{version,search_path,fingerprint}.json` | Adapter-level introspection outputs normalized by `DBAccess`. | `artifacts/engine/` |
-| `artifacts/logs/keys_only.sample.jsonl` | Keys-only HTTP log (`{at,route,status,duration_ms,idempotence_hash?,release_id?}`) for all bridge calls. | `artifacts/logs/` |
-| `artifacts/ops/rails_open_scope.txt` | Summary confirming only bridge routes executed (`vendor_call_count: 0`). | `artifacts/ops/` |
+| Historical retained evidence, not current support: `artifacts/db_bridge/adapter_selection.snapshot.json` | Bridge-era provider attempts and final selection; must not be recomputed. | Historical retained `artifacts/db_bridge/`, not a current output home. |
+| Historical retained evidence, not current support: `artifacts/db_bridge/{health.json,root.json,query_select_1.json}` | Bridge-era HTTP captures; must not be treated as current service availability. | Historical retained `artifacts/db_bridge/`, not a current output home. |
+| Historical retained evidence, not current support: `artifacts/db/introspect.{search_path,grants,fingerprint}.json` | Bridge-era introspection payloads. | `artifacts/db/` |
+| Historical retained evidence, not current support: `artifacts/engine/db_adapter.{version,search_path,fingerprint}.json` | Bridge-era adapter-normalized outputs. | `artifacts/engine/` |
+| Historical retained evidence, not current support: `artifacts/logs/keys_only.sample.jsonl` | Bridge-era keys-only HTTP log; it must not be interpreted as current bridge activity. | `artifacts/logs/` |
+| Historical retained evidence, not current support: `artifacts/ops/rails_open_scope.txt` | Bridge-era route summary; it must not be rerun or treated as current support. | `artifacts/ops/` |
 | `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` | Indexed pointers + hash sentinel; every artifact has a `.path_proof.txt`. | `docs/evidence/`, `artifacts/` |
 
-Acceptance is met when these artifacts are refreshed (canonical JSON, UTF-8, single trailing LF), `.path_proof.txt` files are updated, and both indices pass the mirror validation tests.
+Historical integrity is preserved by byte/checksum, readability, provenance, secret-safety, and historical-nonclaim checks only. This inventory makes no current provider-parity, service-availability, QA, token, deployment, PF09, or closeout claim.

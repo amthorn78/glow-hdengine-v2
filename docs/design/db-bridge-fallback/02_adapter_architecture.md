@@ -1,20 +1,22 @@
-# Adapter Architecture — Bridge provider selection
+# Historical Adapter Architecture — Retired bridge provider selection
+
+Status: historical retained design record, not current runtime or operator guidance. The flow below describes bridge-era behavior and must not be executed or restored.
 
 ## Connection Flow
-1. `DBAccess.for_current_env` resolves `DATABASE_URL` and `DB_BRIDGE_URL` from the environment.
-2. The adapter attempts psycopg via `DATABASE_URL` first, running a health check before returning the provider.
-3. If the primary is unavailable (or `DB_FORCE_BRIDGE=1`), the adapter instantiates `BridgeProvider` with HTTPS `DB_BRIDGE_URL`, calls `GET /health`, and records the attempt in `artifacts/db_bridge/adapter_selection.snapshot.json`.
-4. Bridge operations (`query`, `introspect_*`, `tx`) use the shared `_json_request` helper, which wraps network failures as typed adapter errors and logs keys-only metadata.
+1. Historical retained record, not current guidance: `DBAccess.for_current_env` once resolved `DATABASE_URL` and `DB_BRIDGE_URL`.
+2. Historical retained record, not current guidance: the bridge-era adapter attempted psycopg first.
+3. Historical retained record, not current guidance: `DB_FORCE_BRIDGE`, `BridgeProvider`, `DB_BRIDGE_URL`, bridge health I/O, and `artifacts/db_bridge/adapter_selection.snapshot.json` belonged to the retired fallback and must not be restored or executed.
+4. Historical retained record, not current guidance: bridge operations once used a shared HTTP helper and keys-only logging; current DB access must not make bridge HTTP requests.
 
 ## Module Responsibilities
-- `engine/db/adapter.py`: provider selection, typed attempts, and adapter-level introspection helpers.
-- `engine/db/providers/bridge_provider.py`: HTTPS client (`/health`, `/`, `/query`, `/introspect/{search_path,grants,fingerprint}`, version probe) with keys-only logging and typed error mapping.
-- `engine/ops/http_log.py`: append-only JSONL sink for `{at,route,status,duration_ms,idempotence_hash?,release_id?}`.
-- `scripts/db_bridge/capture_introspection.py`, `scripts/db_adapter/capture_adapter_introspection.py`, `scripts/ops/capture_rails_open_scope.py`: harnesses that exercise the bridge and adapter surfaces.
+- Current: `engine/db/adapter.py` is the sole provider selector and permits direct psycopg only.
+- Historical retained record, not current guidance: `engine/db/providers/bridge_provider.py` was the retired HTTPS client and must not exist as active source.
+- Historical retained record, not current guidance: `engine/ops/http_log.py` recorded bridge-era keys-only metadata; it is not a bridge execution surface.
+- Historical retained record, not current guidance: `scripts/db_bridge/capture_introspection.py` and related bridge harnesses must not be run or restored.
 
 ## Integration Points
-- Transport suites ensure refusal surfaces remain unchanged while the adapter selects bridge fallback.
+- Current transport suites prove retired-key refusal and direct-only selection without fallback or external I/O.
 - CLI (`hdctl`, `engine.cli`) reuses `DBAccess` so evidence harnesses and runtime commands share the same selection flow.
-- Evidence indices (`docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`) and `.path_proof.txt` files are updated in the same PR as harness captures (PF09 / PF12 discipline).
+- Historical retained record, not current guidance: bridge-era captures were cataloged with governed companions. Historical primary bytes must not be refreshed or reclassified as current support by a runtime harness.
 
-The architecture keeps fallback deterministic and observable: selection snapshots, keys-only logs, and canonical JSON artifacts make bridge usage auditable without exposing payload bodies or secrets.
+Historical bridge bytes remain auditable as history only. They do not prove current service availability, transport support, provider parity, or acceptance-token satisfaction.

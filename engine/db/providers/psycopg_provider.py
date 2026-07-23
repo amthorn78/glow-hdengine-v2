@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from hashlib import sha256
 from typing import Any, Callable, List, Mapping, Sequence
 
 from ..errors import IntrospectionError, PrimaryUnavailable, SqlExecError, TxError
@@ -10,12 +11,29 @@ Params = Sequence[Any] | Mapping[str, Any] | None
 
 
 _COMMENT_MARKERS = ("--", "/*", "*/")
-_MUTATING_TOKENS = frozenset(
-    {"ALTER", "CALL", "COPY", "CREATE", "DELETE", "DO", "DROP", "GRANT",
-     "INSERT", "MERGE", "REVOKE", "TRUNCATE", "UPDATE"}
+_OPS03_FIRST_SQL = "SET TRANSACTION READ ONLY"
+_OPS03_READONLY_SIGNATURES = (
+    # set_transaction_read_only
+    ("6c20e5345ee8028f61cc0541aeb60699e5cffa99c8f79ff7f8c62b0a8dad1837", False),
+    # set_search_path
+    ("9e5bd3f169b20cd5eef67d17c1c850faabc76b5d4840d8417b48eb53c3f3ca33", False),
+    # connection_identity
+    ("7d1c4f70894e3a70bb3aa1eb3fa250c173eb533006b2e6bab07d1a4dc12492a2", True),
+    # search_path
+    ("35309ee6e38fa437a24aaa0fc3b225d3a6e87c286db4a980e55a5ca2d4d7e0d1", True),
+    # runtime_role_grants
+    ("ae1f99db0d880643f85a9b085482d6c506b3e189f78f73a1b7cc6922233081f1", True),
+    # ddl_columns
+    ("6d628498cad9b583dac94d60112921a5dc2c9c56900b03cdf132b5d3e9b80aaa", True),
+    # ddl_constraints
+    ("0587da97e1a3fd8d7e87c76a0de0488f6d1d84f65342366b5459d842d93f6b4b", True),
+    # boundary_views
+    ("fc15ff297a9b5ff1d60f8b7be5c8b354c61f4242730d3fc2835536db160c8328", True),
+    # partition_inventory
+    ("31ff2d756587027e3e3b8cd1960d9ab1a96b689049b13db85cc71bfe1e90ffe6", True),
+    # partition_verify
+    ("9131eb9d54ef5c609af9453b2e27745926781696c15e3d2bfd64b7331d553fed", True),
 )
-_SQL_TOKEN_SEPARATORS = str.maketrans({char: " " for char in "()[],.=+-*/%<>!|'\""})
-_OPS_SEARCH_PATH = "SET LOCAL SEARCH_PATH TO HDE, PUBLIC"
 
 
 def _single_statement_sql(sql: str) -> str | None:
@@ -33,45 +51,32 @@ def _single_statement_sql(sql: str) -> str | None:
     return " ".join(stripped.split()).upper()
 
 
-def _normalized_sql(sql: str) -> str:
-    return _single_statement_sql(sql) or ""
-
-
-def _readonly_sql_allowed(sql: str, *, first: bool = False) -> bool:
-    normalized = _single_statement_sql(sql)
-    if normalized is None:
-        return False
-    if first:
-        return normalized == "SET TRANSACTION READ ONLY"
-    if normalized == _OPS_SEARCH_PATH:
-        return True
-    if not normalized.startswith(("SHOW ", "SELECT ")):
-        return False
-    words = set(normalized.translate(_SQL_TOKEN_SEPARATORS).split())
-    return words.isdisjoint(_MUTATING_TOKENS)
+def _readonly_statement_signature(statement: Any) -> tuple[str, bool] | None:
+    sql = getattr(statement, "sql", "")
+    if (
+        _single_statement_sql(sql) is None
+        or getattr(statement, "params", None) is not None
+    ):
+        return None
+    return sha256(sql.encode("utf-8")).hexdigest(), bool(
+        getattr(statement, "fetch", False)
+    )
 
 
 def validate_readonly_statements(statements: Sequence[Any]) -> None:
     """Fail closed unless *statements* are one bounded read-only SQL batch."""
 
-    if not statements:
+    signatures = tuple(_readonly_statement_signature(stmt) for stmt in statements)
+    first_sql = (
+        _single_statement_sql(getattr(statements[0], "sql", ""))
+        if statements
+        else None
+    )
+    if first_sql != _OPS03_FIRST_SQL or signatures != _OPS03_READONLY_SIGNATURES:
         raise TxError(
-            "readonly_tx_requires_statements",
+            "readonly_tx_roster_mismatch",
             attempts=["DATABASE_URL"],
-            code="readonly_tx_requires_statements",
-        )
-    sqls = [getattr(stmt, "sql", "") for stmt in statements]
-    if not _readonly_sql_allowed(sqls[0], first=True):
-        raise TxError(
-            "readonly_tx_requires_read_only_first",
-            attempts=["DATABASE_URL"],
-            code="readonly_tx_requires_read_only_first",
-        )
-    if any(not _readonly_sql_allowed(sql) for sql in sqls[1:]):
-        raise TxError(
-            "readonly_tx_rejected_sql",
-            attempts=["DATABASE_URL"],
-            code="readonly_tx_rejected_sql",
+            code="readonly_tx_roster_mismatch",
         )
 
 
@@ -110,44 +115,54 @@ class PsycopgProvider:
                 pass
 
     def health(self) -> None:
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute("SELECT 1")
-        except Exception as exc:  # pragma: no cover - connection failure mocked in tests
+        except Exception:  # pragma: no cover - connection failure mocked in tests
+            failed = True
+        if failed:
             raise PrimaryUnavailable(
                 "primary_connect_failed",
                 attempts=["DATABASE_URL"],
                 code="primary_connect_failed",
-            ) from exc
+            ) from None
 
     def query(self, sql: str, params: Params = None) -> List[Sequence[Any]]:
+        failed = False
+        rows: Sequence[Sequence[Any]] = ()
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute(sql, params)
                     rows = cur.fetchall()
                 conn.commit()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise SqlExecError(
                 "sql_query_failed",
                 attempts=["DATABASE_URL"],
                 code="sql_query_failed",
-            ) from exc
+            ) from None
         return [tuple(row) if not isinstance(row, tuple) else row for row in rows]
 
     def exec(self, sql: str, params: Params = None) -> None:
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute(sql, params)
                 conn.commit()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise SqlExecError(
                 "sql_exec_failed",
                 attempts=["DATABASE_URL"],
                 code="sql_exec_failed",
-            ) from exc
+            ) from None
 
     def tx(
         self,
@@ -156,6 +171,7 @@ class PsycopgProvider:
         validate: Callable[[Sequence[Sequence[Any] | None]], None] | None = None,
     ) -> List[Sequence[Any] | None]:
         results: List[Sequence[Any] | None] = []
+        failure: TxError | None = None
         try:
             with self._connect() as conn:
                 try:
@@ -179,32 +195,38 @@ class PsycopgProvider:
                         validate(tuple(results))
                     conn.commit()
                 except Exception:
+                    failure = TxError(
+                        "tx_failed",
+                        attempts=["DATABASE_URL"],
+                        code="tx_failed",
+                    )
+                if failure is not None:
                     try:
                         conn.rollback()
-                    except Exception as exc:
-                        raise TxError(
+                    except Exception:
+                        failure = TxError(
                             "tx_rollback_failed",
                             attempts=["DATABASE_URL"],
                             code="tx_rollback_failed",
-                        ) from exc
-                    raise
-        except TxError:
-            raise
-        except Exception as exc:
-            raise TxError(
-                "tx_failed",
-                attempts=["DATABASE_URL"],
-                code="tx_failed",
-            ) from exc
+                        )
+        except Exception:
+            if failure is None:
+                failure = TxError(
+                    "tx_failed",
+                    attempts=["DATABASE_URL"],
+                    code="tx_failed",
+                )
+        if failure is not None:
+            raise failure from None
         return results
 
 
     def readonly_tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
         validate_readonly_statements(statements)
         results: List[Sequence[Any] | None] = []
+        failure: TxError | None = None
         try:
             with self._connect() as conn:
-                transaction_failed = False
                 try:
                     with conn.cursor() as cur:
                         for stmt in statements:
@@ -217,34 +239,31 @@ class PsycopgProvider:
                                 results.append([tuple(row) if not isinstance(row, tuple) else row for row in fetched])
                             else:
                                 results.append(None)
-                except TxError:
-                    transaction_failed = True
-                    raise
-                except Exception as exc:
-                    transaction_failed = True
-                    raise TxError(
+                except Exception:
+                    failure = TxError(
                         "readonly_tx_failed",
                         attempts=["DATABASE_URL"],
                         code="readonly_tx_failed",
-                    ) from exc
+                    )
                 finally:
                     try:
                         conn.rollback()
-                    except Exception as exc:
-                        if not transaction_failed:
-                            raise TxError(
+                    except Exception:
+                        if failure is None:
+                            failure = TxError(
                                 "readonly_tx_rollback_failed",
                                 attempts=["DATABASE_URL"],
                                 code="readonly_tx_rollback_failed",
-                            ) from exc
-        except TxError:
-            raise
-        except Exception as exc:
-            raise TxError(
-                "readonly_tx_failed",
-                attempts=["DATABASE_URL"],
-                code="readonly_tx_failed",
-            ) from exc
+                            )
+        except Exception:
+            if failure is None:
+                failure = TxError(
+                    "readonly_tx_failed",
+                    attempts=["DATABASE_URL"],
+                    code="readonly_tx_failed",
+                )
+        if failure is not None:
+            raise failure from None
         return results
 
     def introspect(self, kind: str) -> Any:
@@ -264,6 +283,10 @@ class PsycopgProvider:
 
     # helpers -----------------------------------------------------------
     def _introspect_grants(self) -> Mapping[str, Any]:
+        flags: Sequence[Any] = (False, False, False)
+        entries: Sequence[Sequence[Any]] = ()
+        adp_rows: Sequence[Sequence[Any]] = ()
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
@@ -316,12 +339,14 @@ class PsycopgProvider:
                         """
                     )
                     adp_rows = cur.fetchall()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "grants_unavailable",
                 attempts=["DATABASE_URL"],
                 code="grants_unavailable",
-            ) from exc
+            ) from None
 
         entries_norm = []
         for grantee, schema, name, privilege in entries:
@@ -360,6 +385,10 @@ class PsycopgProvider:
         def normalize_sql(text: str) -> str:
             return " ".join((text or "").split())
 
+        columns_rows: Sequence[Sequence[Any]] = ()
+        constraint_rows: Sequence[Sequence[Any]] = ()
+        views: List[tuple[str, str]] = []
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
@@ -391,7 +420,6 @@ class PsycopgProvider:
                     )
                     constraint_rows = cur.fetchall()
 
-                    views: List[tuple[str, str]] = []
                     for schema, name in (("hde", "body_graphs_current"), ("public", "hde_body_graphs_current")):
                         cur.execute(
                             "SELECT pg_get_viewdef(%s::regclass, true)",
@@ -399,12 +427,14 @@ class PsycopgProvider:
                         )
                         viewdef = (cur.fetchone() or ("",))[0] or ""
                         views.append((f"{schema}.{name}", normalize_sql(viewdef)))
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "fingerprint_unavailable",
                 attempts=["DATABASE_URL"],
                 code="fingerprint_unavailable",
-            ) from exc
+            ) from None
 
         columns = []
         for name, data_type, is_nullable, column_default in columns_rows:
@@ -442,14 +472,18 @@ class PsycopgProvider:
         return fingerprint
 
     def _introspect_version(self) -> Mapping[str, Any]:
+        rows: Sequence[Sequence[Any]] = ()
+        failed = False
         try:
             rows = self.query("SELECT current_setting('server_version')")
-        except SqlExecError as exc:
+        except SqlExecError:
+            failed = True
+        if failed:
             raise IntrospectionError(
                 "version_unavailable",
                 attempts=["DATABASE_URL"],
                 code="version_unavailable",
-            ) from exc
+            ) from None
 
         version = ""
         if rows and rows[0]:

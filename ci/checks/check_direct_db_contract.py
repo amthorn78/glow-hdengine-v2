@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -15,8 +16,6 @@ EXCLUDED_PREFIXES = (
     "docs/crd/",
     "docs/plans/",
     "docs/pfcanon/",
-    "docs/design/",
-    "docs/adr/",
     "handoff/",
     "tests/",
     "codex/out/",
@@ -118,10 +117,37 @@ HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/run_sanity_pipeline.py",
 }
-HISTORICAL_REFERENCE_DOCS = {
-    "docs/EVIDENCE_INDEX.md",
-    "docs/INDEX.md",
+AUTHORIZED_PSYCOPG_IMPORT_PATHS = frozenset(
+    {"engine/db/providers/psycopg_provider.py"}
+)
+OPS03_RAW_PSYCOPG_OWNER = "scripts/ops/hde_epic038_ops03.py"
+HISTORICAL_VALIDATION_ROSTERS = {
+    "tools/evidence/run_sanity_pipeline.py": frozenset(
+        {"HISTORICAL_BRIDGE_PRIMARY_SHA256"}
+    ),
 }
+_BRIDGE_TRANSPORT_PATTERN = re.compile(
+    r"(?:^|[^a-z0-9])(?:pg[-_]?bridge|db[-_]?bridge|"
+    r"bridge[-_](?:url|uri|endpoint|host|base(?:[-_]?url)?))"
+    r"(?:$|[^a-z0-9])",
+    re.IGNORECASE,
+)
+_NETWORK_COMMAND_PATTERN = re.compile(
+    r"(?:^|[\s/])(curl|wget)(?:$|\s)", re.IGNORECASE
+)
+_PROCESS_CALLS = frozenset(
+    {
+        "os.popen",
+        "os.system",
+        "subprocess.call",
+        "subprocess.check_call",
+        "subprocess.check_output",
+        "subprocess.popen",
+        "subprocess.run",
+    }
+)
+HISTORICAL_GUIDANCE_SUFFIXES = (".md", ".txt")
+CURRENT_GUIDANCE_PREFIXES = ("docs/adr/", "docs/design/")
 MANDATORY_MARKERS = {
     "engine/db/adapter.py": (
         "RETIRED_DB_TRANSPORT_KEYS",
@@ -137,11 +163,17 @@ MANDATORY_MARKERS = {
         "ORDERED_QUERY_IDS",
         "expected_argv",
         "authorization_bytes_changed",
+        "tools.evidence.strict_json_schema",
     ),
     "tools/evidence/hde_epic038_ops03.py": (
-        "Draft202012Validator",
+        "tools.evidence.strict_json_schema",
         "validate_retained_text_safety",
         "_checksums_valid",
+    ),
+    "tools/evidence/strict_json_schema.py": (
+        "_SCHEMA_KEYS",
+        "_references_acyclic",
+        "def is_valid",
     ),
     "tools/evidence/generate_hde_epic038_direct_db_selection.py": (
         "hde_epic038.direct_db_selection.v1",
@@ -161,6 +193,15 @@ MANDATORY_MARKERS = {
     "scripts/ops/capture_rails_open_scope.py": (
         "capture_adapter_introspection.py",
         "provider: psycopg",
+        "retired_db_transport_keys_present(env)",
+    ),
+    "scripts/ops/hde_epic038_mapped_cache_smoke.py": (
+        "retired_db_transport_keys_present(env)",
+        "DBAccess.for_current_env()",
+    ),
+    "adapter/http_reader.py": (
+        "DBAccess.for_current_env()",
+        "Statement(\"SET LOCAL search_path TO hde, public\")",
     ),
 }
 SCHEMAS = (
@@ -194,6 +235,62 @@ def _line_refusal_only(line: str) -> bool:
         phrase in lowered
         for phrase in (*EXPLICIT_NEGATION_PHRASES, *HISTORICAL_ONLY_PHRASES)
     )
+
+
+def _historical_guidance_reference(relative: str, line: str) -> bool:
+    """Allow retired names only in an explicitly non-current prose line."""
+    return relative.endswith(HISTORICAL_GUIDANCE_SUFFIXES) and _line_refusal_only(line)
+
+
+def _active_bridge_guidance(relative: str, line: str) -> bool:
+    """Detect prose that still tells a reader how to use a bridge transport."""
+    if not relative.endswith(HISTORICAL_GUIDANCE_SUFFIXES):
+        return False
+    if relative != "AGENTS.md" and not relative.startswith(CURRENT_GUIDANCE_PREFIXES):
+        return False
+    lowered = line.lower()
+    return (
+        "bridge" in lowered
+        and any(word in lowered for word in ACTIVE_GUIDANCE_WORDS)
+        and not _line_refusal_only(line)
+    )
+
+
+def _assignment_target_names(node: ast.AST) -> tuple[str, ...]:
+    return tuple(name for name, _value in _assignment_bindings(node))
+
+
+def _historical_reader_path_lines(relative: str, text: str) -> frozenset[int]:
+    """Return only bridge-path literal lines owned by a historical validation roster."""
+
+    if relative not in HISTORICAL_READERS:
+        return frozenset()
+    if relative not in HISTORICAL_VALIDATION_ROSTERS:
+        # The canonical updater owns historical record classification. Preserve its
+        # existing exemption until PR-06R-B migrates those rows atomically.
+        return frozenset(range(1, len(text.splitlines()) + 1))
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return frozenset()
+    roster_names = HISTORICAL_VALIDATION_ROSTERS[relative]
+    lines: set[int] = set()
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        if not roster_names.intersection(_assignment_target_names(node)):
+            continue
+        value = node.value
+        if value is None:
+            continue
+        for child in ast.walk(value):
+            if (
+                isinstance(child, ast.Constant)
+                and isinstance(child.value, str)
+                and any(marker in child.value for marker in FORBIDDEN_ACTIVE_PATH_TEXT)
+            ):
+                lines.add(child.lineno)
+    return frozenset(lines)
 
 
 def _is_os_module(node: ast.AST, os_names: set[str]) -> bool:
@@ -618,6 +715,167 @@ def _dotted_name(node: ast.AST) -> str:
     return ""
 
 
+def _is_psycopg_module_literal(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Constant)
+        and isinstance(node.value, str)
+        and (node.value == "psycopg" or node.value.startswith("psycopg."))
+    )
+
+
+def _dynamic_psycopg_import(
+    node: ast.AST,
+    importlib_names: set[str],
+    import_module_names: set[str],
+) -> bool:
+    if not isinstance(node, ast.Call) or not node.args:
+        return False
+    func = node.func
+    return _is_psycopg_module_literal(node.args[0]) and (
+        isinstance(func, ast.Name)
+        and func.id in {"__import__", *import_module_names}
+        or isinstance(func, ast.Attribute)
+        and func.attr == "import_module"
+        and isinstance(func.value, ast.Name)
+        and func.value.id in importlib_names
+    )
+
+
+def _python_direct_psycopg_use(text: str) -> tuple[tuple[int, str], ...]:
+    """Find raw psycopg imports and connection calls outside their owners."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    module_names = {"psycopg"}
+    connect_names: set[str] = set()
+    importlib_names = {"importlib"}
+    import_module_names: set[str] = set()
+    violations: set[tuple[int, str]] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for imported in node.names:
+                if imported.name == "psycopg" or imported.name.startswith("psycopg."):
+                    module_names.add(imported.asname or imported.name.split(".", 1)[0])
+                    violations.add((node.lineno, "unauthorized_psycopg_import"))
+                elif imported.name == "importlib":
+                    importlib_names.add(imported.asname or imported.name)
+        elif isinstance(node, ast.ImportFrom) and node.module is not None:
+            if node.module == "psycopg" or node.module.startswith("psycopg."):
+                violations.add((node.lineno, "unauthorized_psycopg_import"))
+                for imported in node.names:
+                    if imported.name == "connect":
+                        connect_names.add(imported.asname or imported.name)
+            elif node.module == "importlib":
+                for imported in node.names:
+                    if imported.name == "import_module":
+                        import_module_names.add(imported.asname or imported.name)
+        if _dynamic_psycopg_import(node, importlib_names, import_module_names):
+            violations.add((node.lineno, "unauthorized_psycopg_import"))
+
+    while True:
+        previous = (set(module_names), set(connect_names))
+        for node in ast.walk(tree):
+            for local_name, value in _assignment_bindings(node):
+                if (
+                    isinstance(value, ast.Name)
+                    and value.id in module_names
+                    or _dynamic_psycopg_import(
+                        value, importlib_names, import_module_names
+                    )
+                ):
+                    module_names.add(local_name)
+                if isinstance(value, ast.Name) and value.id in connect_names:
+                    connect_names.add(local_name)
+                if (
+                    isinstance(value, ast.Attribute)
+                    and value.attr == "connect"
+                    and isinstance(value.value, ast.Name)
+                    and value.value.id in module_names
+                ):
+                    connect_names.add(local_name)
+        if previous == (module_names, connect_names):
+            break
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name) and node.func.id in connect_names:
+            violations.add((node.lineno, "unauthorized_psycopg_connect"))
+        elif isinstance(node.func, ast.Attribute) and node.func.attr == "connect":
+            if (
+                isinstance(node.func.value, ast.Name)
+                and node.func.value.id in module_names
+                or _dynamic_psycopg_import(
+                    node.func.value, importlib_names, import_module_names
+                )
+            ):
+                violations.add((node.lineno, "unauthorized_psycopg_connect"))
+    return tuple(sorted(violations))
+
+
+def _ops03_authorized_psycopg_use(
+    text: str,
+) -> frozenset[tuple[int, str]]:
+    """Authorize only live_provider_factory.factory.connect's one raw seam."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return frozenset()
+    owners = [
+        node
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "live_provider_factory"
+    ]
+    if len(owners) != 1:
+        return frozenset()
+    factories = [
+        node
+        for node in owners[0].body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "factory"
+    ]
+    if len(factories) != 1:
+        return frozenset()
+    connectors = [
+        node
+        for node in factories[0].body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "connect"
+    ]
+    if len(connectors) != 1:
+        return frozenset()
+    imports = [
+        node
+        for node in ast.walk(connectors[0])
+        if isinstance(node, ast.Import)
+        and len(node.names) == 1
+        and node.names[0].name == "psycopg"
+        and node.names[0].asname is None
+    ]
+    calls = [
+        node
+        for node in ast.walk(connectors[0])
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "connect"
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "psycopg"
+    ]
+    if len(imports) != 1 or len(calls) != 1:
+        return frozenset()
+    allowed = frozenset(
+        {
+            (imports[0].lineno, "unauthorized_psycopg_import"),
+            (calls[0].lineno, "unauthorized_psycopg_connect"),
+        }
+    )
+    return allowed if frozenset(_python_direct_psycopg_use(text)) == allowed else frozenset()
+
+
 def _is_http_call(node: ast.Call) -> bool:
     name = _dotted_name(node.func).lower()
     if name in {
@@ -645,6 +903,86 @@ def _is_http_call(node: ast.Call) -> bool:
     return owner in {"client", "http", "http_client", "session"} or owner.startswith(
         ("httpx.", "requests.")
     )
+
+
+def _contains_bridge_transport_text(value: str) -> bool:
+    return _BRIDGE_TRANSPORT_PATTERN.search(value) is not None
+
+
+def _bridge_transport_value(
+    node: ast.AST,
+    aliases: dict[str, tuple[str, ...]],
+    tainted_names: set[str],
+) -> bool:
+    """Recognize a bridge endpoint/key without treating ordinary HTTP as forbidden."""
+
+    if isinstance(node, ast.Name) and (
+        node.id in tainted_names or _contains_bridge_transport_text(node.id)
+    ):
+        return True
+    resolved = _resolve_string_values(node, aliases)
+    if resolved is not None and any(
+        _contains_bridge_transport_text(value) for value in resolved
+    ):
+        return True
+    return any(
+        _bridge_transport_value(child, aliases, tainted_names)
+        for child in ast.iter_child_nodes(node)
+    )
+
+
+def _network_command_value(
+    node: ast.AST, aliases: dict[str, tuple[str, ...]]
+) -> bool:
+    resolved = _resolve_string_values(node, aliases)
+    if resolved is not None and any(
+        _NETWORK_COMMAND_PATTERN.search(value) is not None
+        or value.lower() in {"curl", "wget"}
+        for value in resolved
+    ):
+        return True
+    return any(
+        _network_command_value(child, aliases) for child in ast.iter_child_nodes(node)
+    )
+
+
+def _python_bridge_transport_use(text: str) -> tuple[tuple[int, str], ...]:
+    """Find bridge-specific HTTP construction and executable network commands."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    aliases = _constant_string_bindings(tree)
+    tainted_names: set[str] = set()
+    while True:
+        previous = set(tainted_names)
+        for node in ast.walk(tree):
+            for target_name, value in _assignment_bindings(node):
+                if _bridge_transport_value(value, aliases, tainted_names):
+                    tainted_names.add(target_name)
+        if tainted_names == previous:
+            break
+
+    violations: set[tuple[int, str]] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        values = [*node.args, *(keyword.value for keyword in node.keywords)]
+        if _is_http_call(node) and any(
+            _bridge_transport_value(value, aliases, tainted_names) for value in values
+        ):
+            violations.add((node.lineno, "bridge_http_construction"))
+        if (
+            _dotted_name(node.func).lower() in _PROCESS_CALLS
+            and any(_network_command_value(value, aliases) for value in values)
+            and any(
+                _bridge_transport_value(value, aliases, tainted_names)
+                for value in values
+            )
+        ):
+            violations.add((node.lineno, "bridge_executable_command"))
+    return tuple(sorted(violations))
 
 
 def _retired_environ_subscript(
@@ -1106,7 +1444,18 @@ def _retired_key_violations(relative: str, text: str) -> list[str]:
             out.append(f"{relative}:{line_number}:active_retired_key_consumption")
         for line_number in _python_retired_http_use(text):
             out.append(f"{relative}:{line_number}:retired_key_http_bridge_use")
+        for line_number, violation in _python_bridge_transport_use(text):
+            out.append(f"{relative}:{line_number}:{violation}")
     for line_number, line in enumerate(text.splitlines(), 1):
+        if (
+            not relative.endswith(".py")
+            and _contains_bridge_transport_text(line)
+            and not _historical_guidance_reference(relative, line)
+        ):
+            if _NETWORK_COMMAND_PATTERN.search(line):
+                out.append(f"{relative}:{line_number}:bridge_executable_command")
+            elif any(marker in line for marker in HTTP_MARKERS):
+                out.append(f"{relative}:{line_number}:bridge_http_construction")
         if not any(key in line for key in RETIRED_KEYS):
             continue
         if any(marker in line for marker in HTTP_MARKERS):
@@ -1125,7 +1474,7 @@ def _active(root: Path, path: Path) -> bool:
     return (
         path.is_file()
         and path.suffix in TEXT_SUFFIXES
-        and relative not in {"CHANGELOG.md", "AGENTS.md"}
+        and relative != "CHANGELOG.md"
         and not any(relative.startswith(prefix) for prefix in EXCLUDED_PREFIXES if not prefix.startswith("*"))
         and ".egg-info/" not in relative
     )
@@ -1143,24 +1492,50 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
         relative = _relative(root, path)
         text = path.read_text(encoding="utf-8", errors="ignore")
         if relative != "ci/checks/check_direct_db_contract.py":
-            for symbol in FORBIDDEN_SYMBOLS:
-                if symbol in text:
-                    violations.add(f"{relative}:forbidden_symbol:{symbol}")
-        if relative not in HISTORICAL_READERS and relative != "ci/checks/check_direct_db_contract.py":
+            for line_number, line in enumerate(text.splitlines(), 1):
+                if _active_bridge_guidance(relative, line):
+                    violations.add(
+                        f"{relative}:{line_number}:bridge_active_guidance"
+                    )
+                for symbol in FORBIDDEN_SYMBOLS:
+                    if symbol in line and not _historical_guidance_reference(
+                        relative, line
+                    ):
+                        violations.add(
+                            f"{relative}:{line_number}:forbidden_symbol:{symbol}"
+                        )
+        if (
+            relative not in HISTORICAL_READERS
+            and relative != "ci/checks/check_direct_db_contract.py"
+        ):
+            historical_path_lines = frozenset()
+        else:
+            historical_path_lines = _historical_reader_path_lines(relative, text)
+        if relative != "ci/checks/check_direct_db_contract.py":
             for line_number, line in enumerate(text.splitlines(), 1):
                 for marker in FORBIDDEN_ACTIVE_PATH_TEXT:
                     if marker not in line:
                         continue
-                    explicitly_historical = (
-                        relative in HISTORICAL_REFERENCE_DOCS
-                        and "historical" in line.lower()
-                    )
-                    if not explicitly_historical:
+                    if (
+                        line_number not in historical_path_lines
+                        and not _historical_guidance_reference(relative, line)
+                    ):
                         violations.add(
                             f"{relative}:{line_number}:active_retired_path:{marker}"
                         )
         if relative != "ci/checks/check_direct_db_contract.py":
             violations.update(_retired_key_violations(relative, text))
+        if relative.endswith(".py") and relative != "ci/checks/check_direct_db_contract.py":
+            raw_psycopg_uses = _python_direct_psycopg_use(text)
+            allowed_psycopg_uses = (
+                _ops03_authorized_psycopg_use(text)
+                if relative == OPS03_RAW_PSYCOPG_OWNER
+                else frozenset()
+            )
+            if relative not in AUTHORIZED_PSYCOPG_IMPORT_PATHS:
+                for line_number, violation in raw_psycopg_uses:
+                    if (line_number, violation) not in allowed_psycopg_uses:
+                        violations.add(f"{relative}:{line_number}:{violation}")
 
     for relative, markers in MANDATORY_MARKERS.items():
         path = root / relative

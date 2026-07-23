@@ -21,7 +21,7 @@ def test_ops_rails_refusal_get(monkeypatch):
 
     assert resp.status_code == 503
     assert resp.data.decode("utf-8") == (
-        '{"schema":"v1","ok":false,"code":"rails_closed","error":"rails are closed"}\n'
+        '{"schema":"v1","ok":false,"code":"ERR_WRITER_RAILS_CLOSED","error":"rails are closed"}\n'
     )
     assert resp.headers["Content-Type"] == "application/json; charset=utf-8"
     assert resp.headers["Cache-Control"] == "no-store"
@@ -52,7 +52,7 @@ def test_ops_rails_refusal_post(monkeypatch):
 
     assert resp.status_code == 503
     assert resp.data.decode("utf-8") == (
-        '{"schema":"v1","ok":false,"code":"rails_closed","error":"rails are closed"}\n'
+        '{"schema":"v1","ok":false,"code":"ERR_WRITER_RAILS_CLOSED","error":"rails are closed"}\n'
     )
     assert len(app.config["LOG_SINK"]) == 1
     log_line = json.loads(app.config["LOG_SINK"][0])

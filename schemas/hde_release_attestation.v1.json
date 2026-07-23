@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hde.release_attestation.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source_commit",
+    "source_commit_exact",
+    "source_tree_sha256",
+    "release_id",
+    "manifest_sha256",
+    "validation_result",
+    "release_admission",
+    "pipeline_stop",
+    "rails",
+    "files",
+    "omitted_files",
+    "transcript",
+    "nonclaims"
+  ],
+  "properties": {
+    "schema": {"const": "hde.release_attestation.v1"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_commit_exact": {"type": "boolean"},
+    "source_tree_sha256": {"$ref": "#/$defs/sha256"},
+    "release_id": {"$ref": "#/$defs/sha256"},
+    "manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "validation_result": {"const": "PASS"},
+    "release_admission": {"const": "NOT_ATTEMPTED"},
+    "pipeline_stop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "reason"],
+      "properties": {
+        "stage": {"const": 14},
+        "reason": {"const": "pr_a_nonfinal_ops03_pr_b_binding_required"}
+      }
+    },
+    "rails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ALLOW_NETWORK", "LANG", "LC_ALL", "PIP_NO_INDEX", "SAFE_MODE", "TZ"],
+      "properties": {
+        "ALLOW_NETWORK": {"const": "0"},
+        "LANG": {"const": "C"},
+        "LC_ALL": {"const": "C"},
+        "PIP_NO_INDEX": {"const": "1"},
+        "SAFE_MODE": {"const": "1"},
+        "TZ": {"const": "UTC"}
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/file"}
+    },
+    "omitted_files": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/omitted_file"}
+    },
+    "transcript": {"$ref": "#/$defs/file"},
+    "nonclaims": {
+      "type": "array",
+      "prefixItems": [
+        {"const": "no_ops03_execution"},
+        {"const": "no_live_packet"},
+        {"const": "no_database_write"},
+        {"const": "no_pr06r_b_admission"},
+        {"const": "no_release_pipeline_pass_claim"}
+      ],
+      "items": false,
+      "minItems": 5,
+      "maxItems": 5
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "omitted_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "reason_codes"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+        }
+      }
+    }
+  }
+}

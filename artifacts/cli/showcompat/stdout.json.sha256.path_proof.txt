@@ -1,5 +1,5 @@
 path: artifacts/cli/showcompat/stdout.json.sha256
 size_bytes: 65
-sha256: 2f0e7aaea1b1c0f4216fdf262d85b4622db09466b932d91009d17fd1c9bf4e74
+sha256: 0f89f6fed21d88a935ee2b3a42b0cd21b87ae4d9888a8eb72c91e754c0882652
 mtime_utc: 2025-12-19T05:17:15Z
 produced_at_utc: 2025-11-30T03:58:47Z

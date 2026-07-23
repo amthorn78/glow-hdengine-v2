@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from ci.checks import check_direct_db_contract as check
 
 
@@ -32,6 +34,16 @@ def _minimal_tree(root: Path) -> None:
 def test_direct_contract_scan_accepts_minimal_direct_only_tree(tmp_path):
     _minimal_tree(tmp_path)
     assert check.scan(tmp_path) == ()
+
+
+def test_direct_contract_scan_requires_bounded_ops_schema_validator(tmp_path):
+    _minimal_tree(tmp_path)
+    (tmp_path / "tools/evidence/strict_json_schema.py").unlink()
+
+    assert (
+        "tools/evidence/strict_json_schema.py:mandatory_file_missing"
+        in check.scan(tmp_path)
+    )
 
 
 def test_direct_contract_scan_rejects_retired_file_symbol_and_active_output(tmp_path):
@@ -86,10 +98,242 @@ def test_refusal_file_cannot_hide_http_bridge_construction(tmp_path):
     assert any("active_retired_key_consumption" in row or "retired_key_http_bridge_use" in row for row in violations)
 
 
+def test_literal_pg_bridge_http_construction_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import urllib.request\n"
+        "urllib.request.urlopen('https://pg-bridge.internal/health')\n",
+    )
+    assert any(
+        "scripts/current.py:2:bridge_http_construction" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_alternate_bridge_endpoint_alias_to_http_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os, requests\n"
+        "url = os.getenv('PG_BRIDGE_ENDPOINT')\n"
+        "requests.get(url)\n",
+    )
+    assert any(
+        "scripts/current.py:3:bridge_http_construction" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_curl_pg_bridge_command_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import subprocess\n"
+        "subprocess.run(['curl', 'https://pg-bridge.internal/health'])\n",
+    )
+    assert any(
+        "scripts/current.py:2:bridge_executable_command" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_ordinary_http_and_subprocess_commands_remain_allowed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import requests, subprocess\n"
+        "requests.get('https://example.invalid/health')\n"
+        "subprocess.run(['curl', 'https://example.invalid/health'])\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_raw_psycopg_import_and_connect_are_rejected_outside_owned_paths(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "adapter/current.py",
+        "import psycopg as pg\npg.connect('postgresql://forbidden')\n",
+    )
+
+    violations = check.scan(tmp_path)
+    assert "adapter/current.py:1:unauthorized_psycopg_import" in violations
+    assert "adapter/current.py:2:unauthorized_psycopg_connect" in violations
+
+
+def test_raw_psycopg_connect_alias_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "from psycopg import connect as open_db\nopen_db('postgresql://forbidden')\n",
+    )
+
+    violations = check.scan(tmp_path)
+    assert "scripts/current.py:1:unauthorized_psycopg_import" in violations
+    assert "scripts/current.py:2:unauthorized_psycopg_connect" in violations
+
+
+def test_owned_psycopg_provider_and_exact_ops_runner_seam_remain_authorized(tmp_path):
+    _minimal_tree(tmp_path)
+    provider = tmp_path / "engine/db/providers/psycopg_provider.py"
+    provider.write_text(
+        "# SET TRANSACTION READ ONLY\n"
+        "# validate_readonly_statements\n"
+        "# conn.rollback()\n"
+        "import psycopg\n"
+        "psycopg.connect('fixture')\n",
+        encoding="utf-8",
+    )
+    runner = tmp_path / check.OPS03_RAW_PSYCOPG_OWNER
+    runner.write_text(
+        "# ORDERED_QUERY_IDS expected_argv authorization_bytes_changed tools.evidence.strict_json_schema\n"
+        "def live_provider_factory(counters):\n"
+        "    def factory(dsn):\n"
+        "        def connect(value):\n"
+        "            import psycopg\n"
+        "            return psycopg.connect(value, connect_timeout=5)\n"
+        "        return connect\n"
+        "    return factory\n",
+        encoding="utf-8",
+    )
+
+    assert check.scan(tmp_path) == ()
+
+
+def test_ops_runner_rejects_any_second_raw_psycopg_seam(tmp_path):
+    _minimal_tree(tmp_path)
+    runner = tmp_path / check.OPS03_RAW_PSYCOPG_OWNER
+    runner.write_text(
+        "# ORDERED_QUERY_IDS expected_argv authorization_bytes_changed tools.evidence.strict_json_schema\n"
+        "def live_provider_factory(counters):\n"
+        "    def factory(dsn):\n"
+        "        def connect(value):\n"
+        "            import psycopg\n"
+        "            return psycopg.connect(value, connect_timeout=5)\n"
+        "        return connect\n"
+        "    return factory\n"
+        "import psycopg\n"
+        "psycopg.connect('second')\n",
+        encoding="utf-8",
+    )
+
+    violations = check.scan(tmp_path)
+    assert any("unauthorized_psycopg_import" in row for row in violations)
+    assert any("unauthorized_psycopg_connect" in row for row in violations)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "__import__('psycopg').connect('forbidden')\n",
+        "import importlib\nimportlib.import_module('psycopg').connect('forbidden')\n",
+        "from importlib import import_module as load\npg = load('psycopg')\npg.connect('forbidden')\n",
+    ],
+)
+def test_dynamic_psycopg_import_and_connect_are_rejected(tmp_path, source):
+    _minimal_tree(tmp_path)
+    _write(tmp_path, "scripts/current.py", source)
+
+    violations = check.scan(tmp_path)
+    assert any("unauthorized_psycopg_import" in row for row in violations)
+    assert any("unauthorized_psycopg_connect" in row for row in violations)
+
+
 def test_active_guidance_for_retired_bridge_key_is_rejected(tmp_path):
     _minimal_tree(tmp_path)
     _write(tmp_path, "docs/RUN.md", "Set DB_BRIDGE_URL to the bridge endpoint and run the server.\n")
     assert any("retired_key_active_guidance" in row for row in check.scan(tmp_path))
+
+
+def test_active_accepted_adr_is_scanned_for_retired_bridge_guidance(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/adr/current_transport.md",
+        "## Status\nAccepted\n\nConfigure DB_BRIDGE_URL and use BridgeProvider fallback.\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("retired_key_active_guidance" in row for row in violations)
+    assert any("forbidden_symbol:BridgeProvider" in row for row in violations)
+
+
+def test_active_design_and_root_agent_guidance_are_scanned(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/current_transport.md",
+        "Run scripts/db_bridge/capture_introspection.py for the current fallback.\n",
+    )
+    _write(
+        tmp_path,
+        "AGENTS.md",
+        "Export DB_FORCE_BRIDGE=1 to use the current fallback.\n",
+    )
+    violations = check.scan(tmp_path)
+    assert any("active_retired_path:scripts/db_bridge/" in row for row in violations)
+    assert any("AGENTS.md:1:retired_key_active_guidance" in row for row in violations)
+
+
+def test_bridge_guidance_without_a_specific_key_or_path_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/current_transport.md",
+        "Use the bridge fallback when direct access fails.\n",
+    )
+    assert any(
+        "docs/design/current_transport.md:1:bridge_active_guidance" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_explicit_historical_adr_and_design_references_are_allowed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/adr/retired_transport.md",
+        "Historical retained record, not current guidance: DB_BRIDGE_URL once selected BridgeProvider fallback.\n",
+    )
+    _write(
+        tmp_path,
+        "docs/design/retired_transport.md",
+        "Historical retained record, not current guidance: scripts/db_bridge/capture_introspection.py wrote artifacts/db_bridge/ captures; do not run curl https://pg-bridge.invalid.\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_historical_file_header_does_not_hide_active_guidance_line(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "docs/design/mixed_transport.md",
+        "Status: historical retained record, not current guidance.\n"
+        "Run scripts/db_bridge/capture_introspection.py for current fallback.\n",
+    )
+    assert any(
+        "docs/design/mixed_transport.md:2:active_retired_path:scripts/db_bridge/"
+        in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_executable_source_cannot_use_historical_wording_as_an_exemption(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "BridgeProvider = object  # historical retained record, not current\n",
+    )
+    assert any(
+        "scripts/current.py:1:forbidden_symbol:BridgeProvider" in row
+        for row in check.scan(tmp_path)
+    )
 
 
 def test_ignored_build_residue_is_not_scanned(tmp_path):
@@ -189,6 +433,55 @@ def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
     assert any(
         "tools/evidence/run_sanity_pipeline.py:2:active_retired_key_consumption"
         in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_release_pipeline_allows_only_owned_historical_bridge_hash_roster(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "HISTORICAL_BRIDGE_PRIMARY_SHA256 = {\n"
+        "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
+        "}\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_release_pipeline_historical_allowance_does_not_hide_execution(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "from pathlib import Path\n"
+        "HISTORICAL_BRIDGE_PRIMARY_SHA256 = {\n"
+        "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
+        "}\n"
+        "def execute_bridge_artifact():\n"
+        "    return Path('artifacts/db_bridge/query_select_1.json').read_bytes()\n",
+    )
+    violations = check.scan(tmp_path)
+    assert not any(
+        "tools/evidence/run_sanity_pipeline.py:3:active_retired_path" in row
+        for row in violations
+    )
+    assert any(
+        "tools/evidence/run_sanity_pipeline.py:6:active_retired_path:artifacts/db_bridge/"
+        in row
+        for row in violations
+    )
+
+
+def test_release_pipeline_cannot_hide_active_retired_evidence_path(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "CURRENT = 'artifacts/db_bridge/current.json'\n",
+    )
+    assert any(
+        "active_retired_path:artifacts/db_bridge/" in row
         for row in check.scan(tmp_path)
     )
 

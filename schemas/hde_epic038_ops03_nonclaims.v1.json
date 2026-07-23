@@ -1,12 +1,1 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hde_epic038.ops03.nonclaims.v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema", "run_id", "nonclaims"],
-  "properties": {
-    "schema": {"const": "hde_epic038.ops03.nonclaims.v1"},
-    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
-    "nonclaims": {"type": "array", "prefixItems": [{"const": "acceptance_token_satisfaction"}, {"const": "deployment"}, {"const": "epic_closeout"}, {"const": "migration"}, {"const": "pf09_status_movement"}, {"const": "production_write_authorization"}, {"const": "qa_pass"}, {"const": "railway_inventory_proof"}, {"const": "retired_transport_availability"}], "items": false}
-  }
-}
+{"$id":"hde_epic038.ops03.nonclaims.v1","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"nonclaims":{"items":false,"maxItems":9,"minItems":9,"prefixItems":[{"const":"acceptance_token_satisfaction"},{"const":"deployment"},{"const":"epic_closeout"},{"const":"migration"},{"const":"pf09_status_movement"},{"const":"production_write_authorization"},{"const":"qa_pass"},{"const":"railway_inventory_proof"},{"const":"retired_transport_availability"}],"type":"array"},"run_id":{"pattern":"^[a-z0-9][a-z0-9-]{15,63}$","type":"string"},"schema":{"const":"hde_epic038.ops03.nonclaims.v1"}},"required":["schema","run_id","nonclaims"],"type":"object"}

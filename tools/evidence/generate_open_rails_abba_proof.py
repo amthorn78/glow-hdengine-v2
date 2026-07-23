@@ -493,6 +493,18 @@ def generate_fixture(*, check: bool = False) -> dict[str, Any]:
     return proof
 
 
+def validate_current_fixture() -> dict[str, Any]:
+    """Rebuild and validate the current proof without touching frozen capture bytes."""
+
+    proof = build_fixture_proof()
+    if proof["top_level_pass"] is not True:
+        raise SystemExit("OPEN_RAILS_ABBA_PREDICATES_FAILED")
+    encoded = canonical_json_bytes(proof)
+    if canonical_json_bytes(json.loads(encoded)) != encoded:
+        raise SystemExit("OPEN_RAILS_ABBA_NONCANONICAL")
+    return proof
+
+
 def _safe_nonprod_base(base: str) -> tuple[bool, str]:
     lower = base.lower()
     if not base.startswith("https://"):
@@ -751,10 +763,17 @@ def generate_live(*, check: bool = False) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true")
+    mode.add_argument("--check-current", action="store_true")
     parser.add_argument("--live", action="store_true", help="write/check the PO-authorized bounded live vendor proof")
     args = parser.parse_args(argv)
-    proof = generate_live(check=args.check) if args.live else generate_fixture(check=args.check)
+    if args.live and args.check_current:
+        parser.error("--check-current is fixture-only")
+    if args.check_current:
+        proof = validate_current_fixture()
+    else:
+        proof = generate_live(check=args.check) if args.live else generate_fixture(check=args.check)
     print(json.dumps({"status": "OK", "path": LIVE_ABBA_REL if args.live else OPEN_ABBA_REL, "top_level_pass": proof.get("top_level_pass"), "result": proof.get("result", "pass")}, sort_keys=True))
     return 0
 

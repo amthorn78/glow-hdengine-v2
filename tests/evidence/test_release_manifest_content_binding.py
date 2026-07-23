@@ -148,12 +148,12 @@ def test_closure_write_regenerates_env_matrix(monkeypatch):
     monkeypatch.setattr(
         regenerate_identity_closure,
         "_run",
-        lambda *args: calls.append(args),
+        lambda *args, **kwargs: calls.append(args),
     )
     monkeypatch.setattr(
         regenerate_identity_closure,
-        "_refresh_cut_time_identity",
-        lambda: None,
+        "_is_current",
+        lambda *args, **kwargs: False,
     )
 
     regenerate_identity_closure._write_closure()
@@ -165,21 +165,50 @@ def test_closure_write_regenerates_env_matrix(monkeypatch):
     )
 
 
-def test_cut_time_release_refresh_updates_only_release_field():
-    old_release = "1" * 64
-    new_release = "2" * 64
-    source = (
-        '_CUT_TIME_IDENTITY = {\n'
-        '    "engine_tag": "hdengine@prod",\n'
-        f'    "release_id": "{old_release}",\n'
-        '}\n'
-    )
+def test_closure_roster_covers_release_dependent_local_derivatives():
+    writes = {step.write for step in regenerate_identity_closure.CLOSURE_STEPS}
+    checks = {step.check for step in regenerate_identity_closure.CLOSURE_STEPS}
+    expected_writes = {
+        ("tools/config/generate_config_artifacts.py",),
+        ("tools/config/generate_bundles.py",),
+        ("tools/evidence/generate_determinism_gate_proofs.py",),
+        ("tools/evidence/generate_open_rails_abba_proof.py",),
+        ("tools/evidence/generate_a7_transport_proofs.py",),
+        ("tools/evidence/generate_architecture_snapshot.py",),
+        ("tools/evidence/generate_v2_mapped_cache_evidence.py",),
+        ("tools/evidence/update_evidence_index.py",),
+        ("tools/evidence/orientation_demo.py",),
+    }
+    assert expected_writes <= writes
+    for write in expected_writes:
+        step = next(item for item in regenerate_identity_closure.CLOSURE_STEPS if item.write == write)
+        assert step.check in checks
+        assert step.check[-1] in {"--check", "--check-only"}
 
-    updated = regenerate_identity_closure._replace_cut_time_release_id(
-        source,
-        new_release,
-    )
 
-    assert f'"release_id": "{new_release}"' in updated
-    assert "hdengine@prod" in updated
-    assert old_release not in updated
+def test_closure_write_skips_current_producers(monkeypatch):
+    calls: list[tuple[str, ...]] = []
+    monkeypatch.setattr(regenerate_identity_closure, "_is_current", lambda *args, **kwargs: True)
+    monkeypatch.setattr(regenerate_identity_closure, "_run", lambda *args, **kwargs: calls.append(args))
+
+    regenerate_identity_closure._write_closure()
+
+    assert calls == [
+        ("scripts/release_id_recompute.py",),
+        ("scripts/release_id_recompute.py", "--check"),
+    ]
+
+
+def test_closure_never_refreshes_manifest_or_rewrites_identity_source(monkeypatch):
+    calls: list[tuple[str, ...]] = []
+    monkeypatch.setattr(regenerate_identity_closure, "_is_current", lambda *args, **kwargs: True)
+    monkeypatch.setattr(regenerate_identity_closure, "_run", lambda *args, **kwargs: calls.append(args))
+
+    regenerate_identity_closure._write_closure()
+
+    assert all("--refresh-manifest" not in call for call in calls)
+    source = Path("tools/evidence/regenerate_identity_closure.py").read_text(
+        encoding="utf-8"
+    )
+    assert "_CUT_TIME_IDENTITY" not in source
+    assert "IDENTITY_SOURCE.write_text" not in source

@@ -1,2 +1,0 @@
-[console_scripts]
-hdctl = engine.cli.main:cli

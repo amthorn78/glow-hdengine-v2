@@ -1,11 +1,13 @@
-# Coverage Matrix — Bridge provider & evidence
+# Historical Coverage Matrix — Retired bridge provider and evidence
 
-| Scenario | DATABASE_URL | DB_BRIDGE_URL | Expected Result | Verification |
+Status: historical retained design record, not current test or operator guidance. These cases describe bridge-era coverage and must not be rerun as current transport proof.
+
+| Scenario | Direct endpoint | Retired endpoint | Historical result | Historical verification |
 | --- | --- | --- | --- | --- |
-| Primary succeeds | Reachable psycopg DSN | Optional | Adapter returns psycopg provider; bridge attempts marked `skip`. | Unit tests + adapter selection snapshot (`provider="psycopg"`). |
-| Primary fails, bridge succeeds | Invalid/timeout | HTTPS pg-bridge | Adapter selects `bridge`; harness captures `/health`, `/`, `/query`, `/introspect/*` payloads. | `scripts/db_bridge/capture_introspection.py`, adapter snapshot JSON. |
-| Both fail | Invalid | Missing/invalid | Adapter raises typed `AdapterError` (`missing_database_url`, `missing_bridge_url`, or `bridge_guard_blocked`). | Unit tests covering error codes + refusal envelope parity. |
-| Rails-open scope | Any | HTTPS pg-bridge | Keys-only log shows only `db_bridge.*` routes; `vendor_call_count: 0`. | `scripts/ops/capture_rails_open_scope.py` summary + JSONL log inspection. |
-| Env-matrix selection | Unset | HTTPS pg-bridge | Snapshot records the fallback order without attempting connectivity. | `artifacts/runtime/env_matrix.snapshot.json` + diff/prev baselines. |
+| Primary succeeded | Reachable psycopg DSN | Historical retained record, not current guidance: `DB_BRIDGE_URL` was optional. | Adapter returned psycopg. | Historical adapter snapshot. |
+| Primary failed, bridge succeeded | Invalid/timeout | Historical retired pg-bridge URL | Historical retained record, not current guidance: the adapter selected the bridge; this fallback must not be restored. | Historical retained record, not current guidance: `scripts/db_bridge/capture_introspection.py` and adapter snapshots. |
+| Both failed | Invalid | Missing/invalid | Historical typed bridge-era failure. | Historical tests only; not current support. |
+| Rails-open scope | Any | Historical retired pg-bridge URL | Historical keys-only bridge routes. | Historical scope summary only; it must not be rerun. |
+| Env-matrix selection | Unset | Historical retired pg-bridge URL | Historical retained record, not current guidance: fallback ordering. | Historical env-matrix baseline only. |
 
-Coverage keeps fallback deterministic, auditable, and LF-terminated; all governed artifacts land under `artifacts/db_bridge/`, `artifacts/db/`, `artifacts/engine/`, `artifacts/logs/`, or `artifacts/ops/` with matching `.path_proof.txt` files and Evidence Index entries.
+Historical retained evidence, not current guidance: `artifacts/db_bridge/` bytes remain frozen and auditable with their existing governed companions. Current tests prove direct-only selection, refusal-before-I/O, one attempt, and no alternate provider.

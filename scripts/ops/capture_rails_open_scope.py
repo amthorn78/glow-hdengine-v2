@@ -14,7 +14,14 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.ops.http_log import LOG_PATH_ENV
+from engine.ops.http_log import (
+    CAPTURE_LOG_ROOT,
+    LOG_PATH_ENV,
+    initialize_capture_log,
+    read_owned_text,
+    replace_owned_text,
+)
+from engine.db.adapter import retired_db_transport_keys_present
 
 REQUIRED_ENV = {
     "SAFE_MODE": "0",
@@ -29,18 +36,25 @@ HARNESS_COMMANDS: Sequence[Sequence[str]] = (
 SUMMARY_PATH = Path("artifacts/ops/rails_open_scope.txt")
 
 
-def _check_env() -> None:
-    if not (os.getenv("DATABASE_URL") or "").strip():
+def _check_env(environ=None) -> None:
+    env = os.environ if environ is None else environ
+    retired = retired_db_transport_keys_present(env)
+    if retired:
+        raise SystemExit(
+            "Retired database transport environment names are present: "
+            + ",".join(retired)
+        )
+    if not (env.get("DATABASE_URL") or "").strip():
         raise SystemExit("Missing required environment value: DATABASE_URL")
     for key, expected in REQUIRED_ENV.items():
-        actual = os.getenv(key)
+        actual = env.get(key)
         if actual != expected:
             raise SystemExit(f"Expected {key}={expected!r} but saw {actual!r}")
 
 
 def _child_log_path() -> Path:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    return Path("artifacts/ops/rails_open_scope") / f"keys_only.{os.getpid()}.{stamp}.jsonl"
+    return CAPTURE_LOG_ROOT / f"keys_only.{os.getpid()}.{stamp}.jsonl"
 
 
 def _run_command(command: Sequence[str], *, log_path: Path) -> None:
@@ -58,7 +72,7 @@ def _load_records(log_path: Path) -> Iterable[dict[str, object]]:
     if not log_path.exists():
         raise SystemExit(f"Log file {log_path} not found")
     for line_number, line in enumerate(
-        log_path.read_text(encoding="utf-8").splitlines(), start=1
+        read_owned_text(log_path).splitlines(), start=1
     ):
         if not line.strip():
             continue
@@ -82,20 +96,19 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
     vendor_count = sum(
         count for route, count in counts.items() if route.startswith("vendor.")
     )
-    SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "captured_at_utc: "
         + datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         f"safe_mode: {os.getenv('SAFE_MODE', '<unset>')}",
         f"allow_network: {os.getenv('ALLOW_NETWORK', '<unset>')}",
-        f"database_url_present: {bool((os.getenv('DATABASE_URL') or '').strip())}",
+        f"database_url_present: {'DATABASE_URL' in os.environ}",
         "provider: psycopg",
         "route_counts:",
     ]
     lines.extend(f"  {route} {counts[route]}" for route in sorted(counts))
     lines.append(f"vendor_call_count: {vendor_count}")
     text = "\n".join(lines) + "\n"
-    SUMMARY_PATH.write_text(text, encoding="utf-8")
+    replace_owned_text(SUMMARY_PATH, text)
     print(f"Wrote {SUMMARY_PATH} ({len(text)} bytes)")
     if vendor_count:
         raise SystemExit(
@@ -107,8 +120,7 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
 def main() -> int:
     _check_env()
     log_path = _child_log_path()
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_path.write_text("", encoding="utf-8")
+    initialize_capture_log(log_path)
     for command in HARNESS_COMMANDS:
         _run_command(command, log_path=log_path)
     _write_summary(_load_records(log_path))

@@ -1,21 +1,41 @@
-import hashlib, json, subprocess
+import hashlib
+import json
 from pathlib import Path
+
 import pytest
+
 from engine.runtime.identity import identity_admin
 from tools.evidence import generate_release_bindings as generator
 
-def test_release_bindings_integrity_and_check_nonwriting():
-    path = Path('artifacts/bodygraph/release_bindings.json')
-    before = path.read_bytes() if path.exists() else b''
-    subprocess.run(['python','tools/evidence/generate_release_bindings.py','--check'], check=True)
+
+def _assert_bindings(data: dict) -> None:
+    assert [row["path"] for row in data["bindings"]] == sorted(generator.INPUTS)
+    for item in data["bindings"]:
+        path = Path(item["path"])
+        assert item["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+        assert item["size_bytes"] == path.stat().st_size
+
+
+def test_release_bindings_integrity_and_check_nonwriting(monkeypatch):
+    for name, value in {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+    }.items():
+        monkeypatch.setenv(name, value)
+    path = Path("artifacts/bodygraph/release_bindings.json")
+    before = path.read_bytes()
+
+    current = json.loads(generator._expected())
+    assert current["release_id"] == identity_admin()["release_id"]
+    _assert_bindings(current)
+
+    frozen = json.loads(before)
+    assert len(frozen["release_id"]) == 64
+    _assert_bindings(frozen)
     assert path.read_bytes() == before
-    data = json.loads(path.read_text())
-    assert data['release_id'] == identity_admin()['release_id']
-    assert [row['path'] for row in data['bindings']] == sorted(generator.INPUTS)
-    for item in data['bindings']:
-        p = Path(item['path'])
-        assert item['sha256'] == hashlib.sha256(p.read_bytes()).hexdigest()
-        assert item['size_bytes'] == p.stat().st_size
 
 def test_release_bindings_fail_closed_for_missing_stale_unsorted_and_premature(tmp_path, monkeypatch):
     monkeypatch.setattr(generator, 'ROOT', tmp_path)

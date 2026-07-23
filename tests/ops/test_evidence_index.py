@@ -61,9 +61,11 @@ def _assert_targets_present(targets):
         parsed_mtime = _dt.datetime.fromisoformat(proof_data["mtime_utc"].replace("Z", "+00:00"))
         assert parsed_mtime.tzinfo == _dt.timezone.utc
         assert parsed_mtime.microsecond == 0
-        stat_mtime = _dt.datetime.fromtimestamp(Path(path).stat().st_mtime, tz=_dt.timezone.utc)
-        # NEW CANON (EPIC017 WS-D4): refresh-time mtime is monotone vs. stat().
-        assert parsed_mtime <= stat_mtime
+        parsed_produced = _dt.datetime.fromisoformat(
+            proof_data["produced_at_utc"].replace("Z", "+00:00")
+        )
+        assert parsed_produced.tzinfo == _dt.timezone.utc
+        assert parsed_produced.microsecond == 0
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     records = {}

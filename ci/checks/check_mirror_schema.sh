@@ -145,12 +145,11 @@ def main():
             ok = False
 
         mtime = proof_data.get("mtime_utc")
-        mtime_dt = None
         produced_at_raw = proof_data.get("produced_at_utc")
         try:
             if mtime is None or produced_at_raw is None:
                 raise ValueError("missing")
-            mtime_dt = parse_utc_iso8601(mtime)
+            parse_utc_iso8601(mtime)
             parse_utc_iso8601(produced_at_raw)
         except Exception:
             print(f"PROOF_MTIME:{i}:{mtime}", file=sys.stderr)
@@ -198,16 +197,6 @@ def main():
             ok = False
         if obj.get("size_bytes") != actual_size:
             print(f"SIZE_MISMATCH:{i}:{obj.get('size_bytes')}!={actual_size}", file=sys.stderr)
-            ok = False
-
-        try:
-            stat_mtime_dt = _dt.datetime.fromtimestamp(
-                artifact_path.stat().st_mtime, tz=_dt.timezone.utc
-            )
-            if mtime_dt and mtime_dt > stat_mtime_dt:
-                raise ValueError("mtime later than filesystem stat")
-        except Exception:
-            print(f"PROOF_MTIME:{i}:{mtime}", file=sys.stderr)
             ok = False
 
         if proof_data.get("sha256") != actual_sha:

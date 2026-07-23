@@ -1,16 +1,1 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "hde_epic038.ops03.env_presence.v1",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema", "run_id", "app_env", "rails", "database_url_presence", "retired_key_presence", "determinism_pins"],
-  "properties": {
-    "schema": {"const": "hde_epic038.ops03.env_presence.v1"},
-    "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{15,63}$"},
-    "app_env": {"const": "dev"},
-    "rails": {"type": "object", "additionalProperties": false, "required": ["safe_mode", "allow_network", "allow_db_write", "db_read_authorized"], "properties": {"safe_mode": {"const": "1"}, "allow_network": {"const": "0"}, "allow_db_write": {"const": "0"}, "db_read_authorized": {"const": true}}},
-    "database_url_presence": {"const": "SET_REDACTED"},
-    "retired_key_presence": {"type": "object", "additionalProperties": false, "required": ["DB_ALLOW_BRIDGE_IN_PROD", "DB_BRIDGE_URL", "DB_FORCE_BRIDGE"], "properties": {"DB_ALLOW_BRIDGE_IN_PROD": {"const": "UNSET"}, "DB_BRIDGE_URL": {"const": "UNSET"}, "DB_FORCE_BRIDGE": {"const": "UNSET"}}},
-    "determinism_pins": {"type": "object", "additionalProperties": false, "required": ["LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK"], "properties": {"LC_ALL": {"const": "C"}, "LANG": {"const": "C"}, "TZ": {"const": "UTC"}, "SAFE_MODE": {"const": "1"}, "ALLOW_NETWORK": {"const": "0"}}}
-  }
-}
+{"$id":"hde_epic038.ops03.env_presence.v1","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"app_env":{"const":"dev"},"database_url_presence":{"const":"SET_REDACTED"},"determinism_pins":{"additionalProperties":false,"properties":{"ALLOW_NETWORK":{"const":"0"},"LANG":{"const":"C"},"LC_ALL":{"const":"C"},"SAFE_MODE":{"const":"1"},"TZ":{"const":"UTC"}},"required":["LC_ALL","LANG","TZ","SAFE_MODE","ALLOW_NETWORK"],"type":"object"},"rails":{"additionalProperties":false,"properties":{"allow_db_write":{"const":"0"},"allow_network":{"const":"0"},"db_read_authorized":{"const":true},"safe_mode":{"const":"1"}},"required":["safe_mode","allow_network","allow_db_write","db_read_authorized"],"type":"object"},"retired_key_presence":{"additionalProperties":false,"properties":{"DB_ALLOW_BRIDGE_IN_PROD":{"const":"UNSET"},"DB_BRIDGE_URL":{"const":"UNSET"},"DB_FORCE_BRIDGE":{"const":"UNSET"}},"required":["DB_ALLOW_BRIDGE_IN_PROD","DB_BRIDGE_URL","DB_FORCE_BRIDGE"],"type":"object"},"run_id":{"pattern":"^[a-z0-9][a-z0-9-]{15,63}$","type":"string"},"schema":{"const":"hde_epic038.ops03.env_presence.v1"}},"required":["schema","run_id","app_env","rails","database_url_presence","retired_key_presence","determinism_pins"],"type":"object"}

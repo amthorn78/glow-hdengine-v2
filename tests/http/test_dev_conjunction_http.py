@@ -3,6 +3,7 @@ import json
 import pytest
 
 from adapter.http_reader import create_app
+from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 from engine.compat.identity import dev_compat_identity
 
 
@@ -117,3 +118,39 @@ def test_dev_writer_conjunction_invalid_input_uses_typed_error(monkeypatch):
     assert payload["ok"] is False
     assert payload["code"] == "ERR_WRITER_INVALID_INPUT"
     assert payload["type"] == "dev.writer.conjunction.error.v1"
+
+
+def test_dev_writer_conjunction_retired_db_config_uses_typed_error(monkeypatch):
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-be-used")
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("DB_BRIDGE_URL", "")
+    provider_calls = []
+    monkeypatch.setattr(
+        "engine.db.adapter.PsycopgProvider",
+        lambda _dsn: provider_calls.append("provider") or pytest.fail("provider attempted"),
+    )
+    client = _client(monkeypatch, "dev")
+
+    response = client.get(
+        "/dev/writer/conjunction",
+        query_string={"a_user_id": "left", "b_user_id": "right"},
+    )
+
+    assert response.status_code == 503
+    assert response.headers["Cache-Control"] == "no-store"
+    assert "ETag" not in response.headers
+    assert json.loads(response.data) == {
+        "schema": "v1",
+        "ok": False,
+        "code": "ERR_WRITER_RAILS_CLOSED",
+        "error": "rails are closed",
+        "details": {
+            "adapter_code": "retired_bridge_configuration",
+            "retired_keys": ["DB_BRIDGE_URL"],
+        },
+        "type": "dev.writer.conjunction.error.v1",
+    }
+    assert provider_calls == []

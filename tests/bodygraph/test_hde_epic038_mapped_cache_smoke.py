@@ -1,5 +1,6 @@
 from argparse import Namespace
 import hashlib
+from collections.abc import Mapping
 
 import pytest
 
@@ -33,6 +34,82 @@ def configure(monkeypatch, base_url):
         monkeypatch.setenv(key, value)
 
 
+class EndpointTrap(Mapping):
+    def __init__(self, values):
+        self._values = dict(values)
+        self.accessed = []
+
+    def __iter__(self):
+        return iter(self._values)
+
+    def __len__(self):
+        return len(self._values)
+
+    def __getitem__(self, key):
+        self.accessed.append(key)
+        if key == "DATABASE_URL":
+            raise AssertionError("DATABASE_URL value was read")
+        return self._values[key]
+
+
+def test_preflight_refuses_retired_membership_before_database_url_value():
+    env = EndpointTrap(
+        {
+            "SAFE_MODE": "0",
+            "ALLOW_NETWORK": "1",
+            "APP_ENV": "test",
+            "HD_API_BASE_URL": "https://fixture.invalid/v2",
+            "HD_API_KEY": "set",
+            "GEO_API_KEY": "set",
+            "DATABASE_URL": "postgresql://must-not-read",
+            "DB_BRIDGE_URL": "",
+        }
+    )
+
+    with pytest.raises(SystemExit, match="DB_BRIDGE_URL"):
+        _preflight(args(), environ=env)
+
+    assert "DATABASE_URL" not in env.accessed
+
+
+def test_main_retired_refusal_precedes_repository_provider_vendor_and_packet(
+    monkeypatch,
+):
+    configure(monkeypatch, "https://fixture.invalid/v2")
+    monkeypatch.setenv("DB_BRIDGE_URL", "")
+    calls = []
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: calls.append("repository"),
+    )
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._execute",
+        lambda *_args: calls.append("execute"),
+    )
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._write_packet",
+        lambda *_args: calls.append("packet"),
+    )
+
+    with pytest.raises(SystemExit, match="DB_BRIDGE_URL"):
+        main(
+            [
+                "--synthetic-user-id",
+                args().synthetic_user_id,
+                "--synthetic-person-uid",
+                "fixture",
+                "--birthdate",
+                "fixture",
+                "--birthtime",
+                "fixture",
+                "--location",
+                "fixture",
+            ]
+        )
+
+    assert calls == []
+
+
 def test_preflight_accepts_only_configured_v2_chart_base(monkeypatch):
     configure(monkeypatch, "https://fixture.invalid/v2")
     _preflight(args())
@@ -54,23 +131,31 @@ def test_preflight_refuses_noncanonical_uuid_before_io(monkeypatch, user_id):
         _preflight(value)
 
 
-def test_database_is_health_checked_before_vendor_fetch(monkeypatch):
+def test_database_is_health_checked_before_vendor_fetch(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     calls = []
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: {},
+    )
     class DB:
         def health(self):
             calls.append("db_health")
             raise RuntimeError("unavailable")
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", lambda **kwargs: calls.append("vendor") or None)
-    with pytest.raises(RuntimeError, match="unavailable"):
-        main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
+    assert main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"]) == 1
     assert calls == ["db_health"]
+    assert capsys.readouterr().err == "OPS_FAILED error_class=RuntimeError\n"
 
 
-def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch):
+def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     captured = {}
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: {},
+    )
 
     class DB:
         def health(self):
@@ -90,10 +175,10 @@ def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypat
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", client_from_env)
 
-    with pytest.raises(SystemExit, match="attempt count must equal one"):
-        main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
+    assert main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"]) == 1
 
     assert captured["retry"] == SINGLE_REQUEST_RETRY
+    assert capsys.readouterr().err == "OPS_FAILED error_class=RuntimeError\n"
 
 
 def test_packet_arguments_must_be_supplied_together(monkeypatch, tmp_path):

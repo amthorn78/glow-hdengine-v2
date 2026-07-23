@@ -3,8 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from tests.config.helpers import closed_rails_env
-
 ALLOWED_PF09_TASKS = {
     "HDE-CALC004",
     "HDE-CALC004.3",
@@ -17,16 +15,6 @@ ALLOWED_TOKENS = {
 }
 
 ACCEPTANCE_MAP_PATH = Path("audit/EPIC-018_config_acceptance_map.json")
-
-
-@pytest.fixture(scope="module", autouse=True)
-def _hydrate_artifacts() -> None:
-    # Ensure governed config artifacts exist before validating acceptance map references.
-    env = closed_rails_env()
-    Path("artifacts").mkdir(exist_ok=True)
-    import subprocess, sys
-
-    subprocess.run([sys.executable, "tools/config/generate_config_artifacts.py"], check=True, env=env)
 
 
 @pytest.fixture(scope="module")

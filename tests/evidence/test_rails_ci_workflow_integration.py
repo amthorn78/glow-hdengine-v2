@@ -185,10 +185,22 @@ def test_rails_keys_only_uses_dedicated_vendor_artifact_path() -> None:
 
 
 def test_fixture_backed_open_rails_tests_do_not_reach_real_network() -> None:
+    child_env = os.environ.copy()
+    for key in runner.CREDENTIAL_ENV_NAMES:
+        child_env.pop(key, None)
+    child_env.update(
+        {
+            "SAFE_MODE": "0",
+            "ALLOW_NETWORK": "1",
+            "LC_ALL": "C",
+            "LANG": "C",
+            "TZ": "UTC",
+        }
+    )
     result = subprocess.run(
         [sys.executable, "-m", "pytest", "tests/bodygraph/test_vendor_client.py", "-q"],
         cwd=ROOT,
-        env={**os.environ, "SAFE_MODE": "0", "ALLOW_NETWORK": "1", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"},
+        env=child_env,
         text=True,
         capture_output=True,
         timeout=120,
@@ -241,6 +253,6 @@ def test_open_rails_producer_check_mode_has_no_repo_residue() -> None:
     from tools.evidence import generate_open_rails_abba_proof as open_proof
 
     state_before = _repo_state()
-    open_proof.generate_fixture(check=True)
+    assert open_proof.main(["--check-current"]) == 0
     state_after = _repo_state()
     assert state_before == state_after

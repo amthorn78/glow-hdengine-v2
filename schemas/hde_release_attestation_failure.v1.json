@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hde.release_attestation.failure.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "code",
+    "stage",
+    "returncode",
+    "secret_values_recorded"
+  ],
+  "properties": {
+    "schema": {"const": "hde.release_attestation.failure.v1"},
+    "code": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+    "stage": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "returncode": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "secret_values_recorded": {"const": false}
+  }
+}

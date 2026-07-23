@@ -134,6 +134,11 @@ def _resolve_vendor(
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
     vendor_env = _vendor_config_env(env)
+    database_env = dict(vendor_env)
+    # DB selection is key-presence-sensitive; restore scoped None entries
+    # that the vendor configuration overlay intentionally treats as removal.
+    if env is not None:
+        database_env.update(env)
     try:
         route_policy = _classify_env_route_policy(vendor_env)
     except VendorError as exc:
@@ -173,12 +178,17 @@ def _resolve_vendor(
             resolver_meta,
             vendor_inputs,
             vendor_env=vendor_env,
+            database_env=database_env,
             upsert=upsert,
             dry_run=dry_run,
             route_policy=route_policy,
         )
     try:
-        outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
+        outcome = ingest_vendor_bodygraph(
+            vendor_inputs,
+            env=database_env,
+            dry_run=dry_run,
+        )
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {
@@ -207,6 +217,7 @@ def _resolve_vendor_v2_chart(
     vendor_inputs: VendorInputs,
     *,
     vendor_env: Mapping[str, object],
+    database_env: Mapping[str, object],
     upsert: bool,
     dry_run: bool,
     route_policy: Mapping[str, object],
@@ -231,7 +242,7 @@ def _resolve_vendor_v2_chart(
         )
     if not dry_run:
         try:
-            db = DBAccess.for_current_env()
+            db = DBAccess.for_current_env(environ=database_env)
         except AdapterError as exc:
             return _vendor_error(
                 VendorError("DB_WRITER_UNAVAILABLE", "mapped-cache database target unavailable", details={"code": exc.code}),

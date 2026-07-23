@@ -1,10 +1,17 @@
 import ast
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
-from engine.runtime.identity import _initialize_identity_for_tests, identity_admin, identity_meta
+from engine.runtime.identity import (
+    _initialize_identity_for_tests,
+    _manifest_release_id_from_bytes,
+    identity_admin,
+    identity_meta,
+)
+from engine.serializer import canon
 from engine.runtime.public import emit_reader_public_envelope
 from engine.cli.main import _engine_identity
 
@@ -19,6 +26,45 @@ def test_identity_shapes_and_reader_cli_shared_identity():
     assert payload["meta"] == {"engine_tag": admin["engine_tag"], "invocation_tag": admin["invocation_tag"]}
     assert payload["release_id"] == admin["release_id"]
     assert body.endswith(b"\n")
+
+
+def test_release_identity_is_derived_from_the_packaged_manifest():
+    manifest_path = Path("catalog/manifest.json")
+    raw = manifest_path.read_bytes()
+    payload = json.loads(raw.decode("utf-8"))
+    canonical = canon.sercanon(payload, sort_keys=True)
+
+    assert raw == canonical
+    assert identity_admin()["release_id"] == hashlib.sha256(canonical).hexdigest()
+    source = Path("engine/runtime/identity.py").read_text(encoding="utf-8")
+    assert "_CUT_TIME_IDENTITY" not in source
+    assert "artifacts/math/release_id.txt" not in source
+
+
+def test_runtime_manifest_identity_rejects_canonical_contract_mutations():
+    payload = json.loads(Path("catalog/manifest.json").read_bytes())
+    payload["unknown"] = True
+    with pytest.raises(ValueError, match="release_manifest_contract_invalid"):
+        _manifest_release_id_from_bytes(canon.sercanon(payload, sort_keys=True))
+
+    payload.pop("unknown")
+    payload["files"][0]["path"] = "catalog/manifest.json"
+    with pytest.raises(ValueError, match="release_manifest_contract_invalid"):
+        _manifest_release_id_from_bytes(canon.sercanon(payload, sort_keys=True))
+
+    payload = json.loads(Path("catalog/manifest.json").read_bytes())
+    payload["version"] = "01.0.0"
+    with pytest.raises(ValueError, match="release_manifest_contract_invalid"):
+        _manifest_release_id_from_bytes(canon.sercanon(payload, sort_keys=True))
+
+    payload["version"] = "1.0.0"
+    payload["built_at_utc"] = "2026-02-30T00:00:00Z"
+    with pytest.raises(ValueError, match="release_manifest_contract_invalid"):
+        _manifest_release_id_from_bytes(canon.sercanon(payload, sort_keys=True))
+
+    raw = Path("catalog/manifest.json").read_bytes().replace(b'{"built', b'{ "built', 1)
+    with pytest.raises(ValueError, match="release_manifest_not_canonical"):
+        _manifest_release_id_from_bytes(raw)
 
 def test_identity_rejects_missing_extra_and_conflicting_reinit():
     admin = identity_admin()

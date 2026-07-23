@@ -1,5 +1,5 @@
 path: artifacts/proofs/success_304.txt
 size_bytes: 237
-sha256: 56fbd87fa2afd281fac341ed363cf9ee240d4d8ed28065940ffe9dc559a5b8a0
-mtime_utc: 2026-07-21T20:54:41Z
-produced_at_utc: 2026-07-21T20:55:43Z
+sha256: 0f728bde412e41810ee95934f875ce2a1ea13ae5cb6b51271a9c5cbc5493abf4
+mtime_utc: 2026-07-23T05:13:59Z
+produced_at_utc: 2026-07-23T05:27:31Z
