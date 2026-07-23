@@ -1,5 +1,5 @@
 path: docs/adr/hde/body_graphs_adr.md
-size_bytes: 1952
-sha256: 6942a2613e4966a664580e5811c0801df74c9da46c33e89e28293b62b6b74f52
+size_bytes: 2669
+sha256: 1e7f68fbd12b499084cb2b8c649d4d7f13c166eeccc04e1019cba0bd57ebe270
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z
