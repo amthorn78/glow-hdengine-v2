@@ -449,6 +449,26 @@ def test_readonly_tx_surfaces_rollback_failure_after_success():
     assert exc.value.code == "readonly_tx_rollback_failed"
 
 
+def test_readonly_tx_rolls_back_and_closes_on_base_exception():
+    connection = Connection()
+
+    def interrupt(_sql, _params=None):
+        raise KeyboardInterrupt
+
+    connection.cursor_object.execute = interrupt
+    provider = PsycopgProvider(
+        "not-serialized",
+        connection_factory=lambda _dsn: connection,
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        provider.readonly_tx(QUERY_STATEMENTS)
+
+    assert connection.rollback_calls == 1
+    assert connection.commit_calls == 0
+    assert connection.close_calls == 1
+
+
 def test_write_smoke_deletes_only_the_inserted_row(monkeypatch):
     inserted_id = "00000000-0000-4000-8000-000000000001"
 

@@ -479,8 +479,12 @@ def get_reader_bp(emit_fn=None):
             try:
                 try:
                     DBAccess.for_current_env(psycopg_factory=_raise_primary)
-                except AdapterError as exc:
-                    details = {"adapter_code": getattr(exc, "code", "adapter_error")}
+                except AdapterError:
+                    # This diagnostic route deliberately injects the historical
+                    # forced-unavailable scenario.  Keep its public bytes stable
+                    # while the direct-only adapter normalizes the internal
+                    # provider failure to primary_connect_failed.
+                    details = {"adapter_code": "forced_db_unavailable"}
                     env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
                     resp = _emit_writer_response(env, status=503, sort_keys=False)
                 else:

@@ -245,15 +245,16 @@ class PsycopgProvider:
                         attempts=["DATABASE_URL"],
                         code="readonly_tx_failed",
                     )
-                try:
-                    conn.rollback()
-                except Exception:
-                    if failure is None:
-                        failure = TxError(
-                            "readonly_tx_rollback_failed",
-                            attempts=["DATABASE_URL"],
-                            code="readonly_tx_rollback_failed",
-                        )
+                finally:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        if failure is None:
+                            failure = TxError(
+                                "readonly_tx_rollback_failed",
+                                attempts=["DATABASE_URL"],
+                                code="readonly_tx_rollback_failed",
+                            )
         except Exception:
             if failure is None:
                 failure = TxError(
