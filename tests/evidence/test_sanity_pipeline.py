@@ -25,7 +25,7 @@ def _fake_runner(expected_returncodes: list[int]):
     return _runner
 
 
-def test_custom_pipeline_success(tmp_path, monkeypatch):
+def test_pipeline_success(tmp_path, monkeypatch):
     log_path = tmp_path / "sanity.log"
     steps = [
         run_sanity_pipeline.SanityStep("step-one", ["echo", "one"]),
