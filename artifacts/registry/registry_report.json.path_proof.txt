@@ -1,5 +1,5 @@
 path: artifacts/registry/registry_report.json
 size_bytes: 5084
-sha256: 3c6ff2cff11cc463a66732d0466f65190f2e5059821e39015c6f0bbe8fd7759c
+sha256: 323e54fee80f6bef3a6bfbf83ecab246fca552625e4f38a2df0dd42839a9adbe
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T03:26:48Z

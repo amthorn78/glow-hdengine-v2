@@ -1,5 +1,5 @@
 path: artifacts/config_bundles/fe_bundle.json
 size_bytes: 2201
-sha256: bf6d2c659ca928ff74b8b38a5c1e819ee0b87c334ce94327fa88d0b3c01cb8d4
+sha256: cacdb02875acc4ac12325c6d0c5f7f10c109e948908541a34bb71fa6998857e4
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T17:07:45Z
