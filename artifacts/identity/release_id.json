@@ -1,1 +1,1 @@
-{"manifest_path":"catalog/manifest.json","manifest_sha256":"3d02b30e5335c44391def0d1ab37e9b3940a7a9144c6beb89a45d0ababa8b684","release_id":"3d02b30e5335c44391def0d1ab37e9b3940a7a9144c6beb89a45d0ababa8b684","release_id_algorithm":"sha256(canonical_bytes(catalog/manifest.json))"}
+{"manifest_path":"catalog/manifest.json","manifest_sha256":"b25b537c6188657f236a0b76d34f59ec8bffc7c4a7e5fcae5d1a214e6ab020ce","release_id":"b25b537c6188657f236a0b76d34f59ec8bffc7c4a7e5fcae5d1a214e6ab020ce","release_id_algorithm":"sha256(canonical_bytes(catalog/manifest.json))"}

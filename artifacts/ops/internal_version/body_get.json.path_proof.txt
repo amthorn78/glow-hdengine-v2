@@ -1,5 +1,5 @@
 path: artifacts/ops/internal_version/body_get.json
 size_bytes: 347
-sha256: 06a333708645083f7dc5dc4a0bb19f3d23bc79ea72517ce39b6f91adbc006de7
+sha256: 52a1ab50ec7b6dc9b69c72d4c0456a98dd023baf0e8c1e5b12d643aa3dff419f
 mtime_utc: 2025-12-30T02:32:16Z
 produced_at_utc: 2025-12-30T02:32:16Z

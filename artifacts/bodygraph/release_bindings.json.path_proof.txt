@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/release_bindings.json
 size_bytes: 578
-sha256: 6b3e1a599b3a0bf745c84c92fcdd96782a89fc1b5499ccaa403307bb28a9cb6c
+sha256: e7746073876d20d9b06d055a115d872427b55adf47a55a522f45e4426e8120f3
 mtime_utc: 2026-07-11T14:44:36Z
 produced_at_utc: 2026-07-08T18:40:15Z
