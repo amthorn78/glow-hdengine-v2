@@ -1,5 +1,5 @@
 path: audit/gates/determinism/abba.bytes
 size_bytes: 169
-sha256: b52988b686ac1794218698a6c81a51d0696a53ff9d97ad9bffe519385b7121d9
+sha256: b3bf0b320f30c31e2a08d93eabd5625c43176f5e7aa3fa5f50f33495d08c2b33
 mtime_utc: 2026-07-13T01:49:32Z
 produced_at_utc: 2026-07-12T00:52:16Z
