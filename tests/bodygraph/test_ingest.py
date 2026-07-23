@@ -99,7 +99,9 @@ def test_ingest_idempotent(tmp_path: Path) -> None:
     assert outcome1.payload == {"ok": True}
 
 
-def test_ingest_dry_run_skips_db(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ingest_dry_run_skips_db(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     client = FakeClient()
     env = {"SAFE_MODE": "0", "ALLOW_NETWORK": "1"}
     called = False
@@ -120,6 +122,7 @@ def test_ingest_dry_run_skips_db(monkeypatch: pytest.MonkeyPatch) -> None:
         env=env,
         client=client,
         dry_run=True,
+        success_log=tmp_path / "success.log",
     )
 
     assert called is False
