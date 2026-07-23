@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from collections import ChainMap
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
 from uuid import UUID
@@ -134,6 +135,7 @@ def _resolve_vendor(
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
     vendor_env = _vendor_config_env(env)
+    database_env = ChainMap(env or {}, os.environ)
     try:
         route_policy = _classify_env_route_policy(vendor_env)
     except VendorError as exc:
@@ -173,6 +175,7 @@ def _resolve_vendor(
             resolver_meta,
             vendor_inputs,
             vendor_env=vendor_env,
+            database_env=database_env,
             upsert=upsert,
             dry_run=dry_run,
             route_policy=route_policy,
@@ -207,6 +210,7 @@ def _resolve_vendor_v2_chart(
     vendor_inputs: VendorInputs,
     *,
     vendor_env: Mapping[str, object],
+    database_env: Mapping[str, object],
     upsert: bool,
     dry_run: bool,
     route_policy: Mapping[str, object],
@@ -231,7 +235,7 @@ def _resolve_vendor_v2_chart(
         )
     if not dry_run:
         try:
-            db = DBAccess.for_current_env()
+            db = DBAccess.for_current_env(environ=database_env)
         except AdapterError as exc:
             return _vendor_error(
                 VendorError("DB_WRITER_UNAVAILABLE", "mapped-cache database target unavailable", details={"code": exc.code}),

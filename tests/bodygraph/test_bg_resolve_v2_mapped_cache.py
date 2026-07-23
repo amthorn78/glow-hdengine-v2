@@ -9,6 +9,7 @@ import pytest
 from engine.bodygraph.mapped_cache import MappedCacheError, MappedCacheResult
 from engine.bodygraph.resolver import resolve_bodygraph
 from engine.bodygraph.vendor_client import VendorRequest, VendorResult
+from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 from engine.db.errors import PrimaryUnavailable
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -89,6 +90,39 @@ def test_process_production_environment_cannot_be_overridden_for_database_write(
     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
 
 
+@pytest.mark.parametrize("retired_key", RETIRED_DB_TRANSPORT_KEYS)
+def test_scoped_empty_retired_key_refuses_before_mapped_cache_db_and_vendor_io(
+    monkeypatch, retired_key
+):
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        "engine.db.adapter.PsycopgProvider",
+        lambda _dsn: pytest.fail("direct provider constructed"),
+    )
+    monkeypatch.setattr(
+        "engine.bodygraph.resolver.HdApiClient.from_env",
+        lambda **kwargs: pytest.fail("vendor constructed"),
+    )
+
+    result = resolve_bodygraph(
+        "operator",
+        source="vendor",
+        upsert=True,
+        dry_run=False,
+        env=env(DATABASE_URL="postgresql://must-not-read", **{retired_key: ""}),
+        birthdate="2000-01-01",
+        birthtime="00:00",
+        location="Fixture",
+    )
+
+    assert result.payload["error"] == {
+        "code": "DB_WRITER_UNAVAILABLE",
+        "message": "mapped-cache database target unavailable",
+        "details": {"code": "retired_bridge_configuration"},
+    }
+
+
 def test_closed_rails_refuse_before_all_io(monkeypatch):
     monkeypatch.setattr("engine.bodygraph.resolver._classify_env_route_policy", lambda *_: pytest.fail("route classified"))
     result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(SAFE_MODE="1", ALLOW_NETWORK="0"))
@@ -112,7 +146,8 @@ def test_success_uses_mapped_cache_once_and_snapshot_none(monkeypatch):
     monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: calls.append(kwargs) or db)
     result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
     assert result.status == "ok" and client.calls == 1
-    assert calls == [{}]
+    assert len(calls) == 1
+    assert calls[0]["environ"]["APP_ENV"] == "test"
     assert captured["db"] is db and captured["cache"]["payload_posture"] == "adapter_mapped_no_raw_vendor_payload"
     assert result.payload["ingest"]["canonical_sha256"] == "b" * 64
 
