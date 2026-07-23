@@ -219,15 +219,21 @@
 * `artifacts/db_bridge/root.json` — historical; does not prove current runtime support.
 * `artifacts/db_bridge/query_select_1.json` — historical; does not prove current runtime support.
 
-## Current direct DB posture & rails-open scope
-* `artifacts/db/introspect.search_path.json`
-* `artifacts/db/introspect.grants.json`
-* `artifacts/db/introspect.fingerprint.json`
-* `artifacts/engine/db_adapter.version.json`
-* `artifacts/engine/db_adapter.search_path.json`
-* `artifacts/engine/db_adapter.fingerprint.json`
-* `artifacts/logs/keys_only.sample.jsonl`
-* `artifacts/ops/rails_open_scope.txt`
+## Historical bridge-era DB posture & rails-open scope
+* `artifacts/db/introspect.search_path.json` — historical; not current direct posture.
+* `artifacts/db/introspect.grants.json` — historical; not current direct posture.
+* `artifacts/db/introspect.fingerprint.json` — historical; not current direct posture.
+* `artifacts/engine/db_adapter.version.json` — historical bridge-era adapter capture.
+* `artifacts/engine/db_adapter.search_path.json` — historical bridge-era adapter capture.
+* `artifacts/engine/db_adapter.fingerprint.json` — historical bridge-era adapter capture.
+* `artifacts/logs/keys_only.sample.jsonl` — historical bridge HTTP log sample.
+* `artifacts/ops/rails_open_scope.txt` — historical bridge-era scope summary.
+
+The PR-06R-A current contract is direct-only tooling under
+`tools/evidence/generate_hde_epic038_direct_db_selection.py` and
+`schemas/hde_epic038_direct_db_selection.v1.json`. Its final tracked primary,
+Index/Mirror admission, and current/historical metadata switch remain downstream
+PR-06R-B work after a separately authorized OPS-03 packet.
 
 ## Env-matrix (selection-only)
 * `artifacts/runtime/env_matrix.snapshot.json`

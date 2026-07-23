@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from hashlib import sha256
 from typing import Any, Callable, List, Mapping, Sequence
 
 from ..errors import IntrospectionError, PrimaryUnavailable, SqlExecError, TxError
@@ -10,38 +11,29 @@ Params = Sequence[Any] | Mapping[str, Any] | None
 
 
 _COMMENT_MARKERS = ("--", "/*", "*/")
-_MUTATING_TOKENS = frozenset(
-    {"ALTER", "CALL", "COPY", "CREATE", "DELETE", "DO", "DROP", "GRANT",
-     "INSERT", "INTO", "LOCK", "MERGE", "REVOKE", "SHARE", "TRUNCATE", "UPDATE"}
+_OPS03_FIRST_SQL = "SET TRANSACTION READ ONLY"
+_OPS03_READONLY_SIGNATURES = (
+    # set_transaction_read_only
+    ("6c20e5345ee8028f61cc0541aeb60699e5cffa99c8f79ff7f8c62b0a8dad1837", False),
+    # set_search_path
+    ("af8da0d6f83056f8112485041890d45aaa879a91ecc9f8d6090ef64f2742fb18", False),
+    # connection_identity
+    ("65ef0b855a313d4658ff116ee5e5af3e82794b4b0ad70562e544b24d9233e0ca", True),
+    # search_path
+    ("7f61e34d59607c563d6fc7b58be362e7b9fe000e8332a2285c03ddbd5423a4bf", True),
+    # runtime_role_grants
+    ("ecb83bde8b112f6fadc5bdf5288d42b96e0fc751b80a9406eb2224bdeac0d3c0", True),
+    # ddl_columns
+    ("86b9c707f5ee72cab35081b9db934ed42728e8b862c7e0daad4d1c1241032eac", True),
+    # ddl_constraints
+    ("dd5059a30814c3af26ceddbb9398bbcf794c440e547d94f3c7f7ac9a7c4419a4", True),
+    # boundary_views
+    ("545b8ae329096bb6314830d9f3650ed7882821b761917b66634ec7a3727e3c43", True),
+    # partition_inventory
+    ("0b341af49cfce830daf0517a2573f3033030269da2e55d01dc3080afb4bbb618", True),
+    # partition_verify
+    ("e6762f64a95930487ec05bdb15f32f65522f95eb9ee1efee5f31ca03041ab7d8", True),
 )
-_SIDE_EFFECT_OR_SENSITIVE_TOKENS = frozenset(
-    {
-        "DBLINK_CONNECT",
-        "DBLINK_EXEC",
-        "LO_CREATE",
-        "LO_UNLINK",
-        "NEXTVAL",
-        "PG_ADVISORY_LOCK",
-        "PG_ADVISORY_LOCK_SHARED",
-        "PG_ADVISORY_UNLOCK",
-        "PG_ADVISORY_UNLOCK_ALL",
-        "PG_ADVISORY_UNLOCK_SHARED",
-        "PG_CANCEL_BACKEND",
-        "PG_LOGICAL_EMIT_MESSAGE",
-        "PG_LS_DIR",
-        "PG_NOTIFY",
-        "PG_READ_BINARY_FILE",
-        "PG_READ_FILE",
-        "PG_SLEEP",
-        "PG_STAT_FILE",
-        "PG_TERMINATE_BACKEND",
-        "SET_CONFIG",
-        "SETVAL",
-    }
-)
-_SQL_TOKEN_SEPARATORS = str.maketrans({char: " " for char in "()[],.=+-*/%<>!|'\""})
-_OPS_SEARCH_PATH = "SET LOCAL SEARCH_PATH TO HDE, PUBLIC"
-_MAX_READONLY_STATEMENTS = 10
 
 
 def _single_statement_sql(sql: str) -> str | None:
@@ -59,53 +51,29 @@ def _single_statement_sql(sql: str) -> str | None:
     return " ".join(stripped.split()).upper()
 
 
-def _normalized_sql(sql: str) -> str:
-    return _single_statement_sql(sql) or ""
-
-
-def _readonly_sql_allowed(sql: str, *, first: bool = False) -> bool:
-    normalized = _single_statement_sql(sql)
-    if normalized is None:
-        return False
-    if first:
-        return normalized == "SET TRANSACTION READ ONLY"
-    if normalized == _OPS_SEARCH_PATH:
-        return True
-    if normalized.startswith("SHOW "):
-        return normalized == "SHOW SEARCH_PATH"
-    if not normalized.startswith("SELECT "):
-        return False
-    words = set(normalized.translate(_SQL_TOKEN_SEPARATORS).split())
-    return words.isdisjoint(_MUTATING_TOKENS | _SIDE_EFFECT_OR_SENSITIVE_TOKENS)
+def _readonly_statement_signature(statement: Any) -> tuple[str, bool] | None:
+    normalized = _single_statement_sql(getattr(statement, "sql", ""))
+    if normalized is None or getattr(statement, "params", None) is not None:
+        return None
+    return sha256(normalized.encode("utf-8")).hexdigest(), bool(
+        getattr(statement, "fetch", False)
+    )
 
 
 def validate_readonly_statements(statements: Sequence[Any]) -> None:
     """Fail closed unless *statements* are one bounded read-only SQL batch."""
 
-    if not statements:
+    signatures = tuple(_readonly_statement_signature(stmt) for stmt in statements)
+    first_sql = (
+        _single_statement_sql(getattr(statements[0], "sql", ""))
+        if statements
+        else None
+    )
+    if first_sql != _OPS03_FIRST_SQL or signatures != _OPS03_READONLY_SIGNATURES:
         raise TxError(
-            "readonly_tx_requires_statements",
+            "readonly_tx_roster_mismatch",
             attempts=["DATABASE_URL"],
-            code="readonly_tx_requires_statements",
-        )
-    if len(statements) > _MAX_READONLY_STATEMENTS:
-        raise TxError(
-            "readonly_tx_too_many_statements",
-            attempts=["DATABASE_URL"],
-            code="readonly_tx_too_many_statements",
-        )
-    sqls = [getattr(stmt, "sql", "") for stmt in statements]
-    if not _readonly_sql_allowed(sqls[0], first=True):
-        raise TxError(
-            "readonly_tx_requires_read_only_first",
-            attempts=["DATABASE_URL"],
-            code="readonly_tx_requires_read_only_first",
-        )
-    if any(not _readonly_sql_allowed(sql) for sql in sqls[1:]):
-        raise TxError(
-            "readonly_tx_rejected_sql",
-            attempts=["DATABASE_URL"],
-            code="readonly_tx_rejected_sql",
+            code="readonly_tx_roster_mismatch",
         )
 
 
@@ -144,44 +112,54 @@ class PsycopgProvider:
                 pass
 
     def health(self) -> None:
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute("SELECT 1")
-        except Exception as exc:  # pragma: no cover - connection failure mocked in tests
+        except Exception:  # pragma: no cover - connection failure mocked in tests
+            failed = True
+        if failed:
             raise PrimaryUnavailable(
                 "primary_connect_failed",
                 attempts=["DATABASE_URL"],
                 code="primary_connect_failed",
-            ) from exc
+            ) from None
 
     def query(self, sql: str, params: Params = None) -> List[Sequence[Any]]:
+        failed = False
+        rows: Sequence[Sequence[Any]] = ()
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute(sql, params)
                     rows = cur.fetchall()
                 conn.commit()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise SqlExecError(
                 "sql_query_failed",
                 attempts=["DATABASE_URL"],
                 code="sql_query_failed",
-            ) from exc
+            ) from None
         return [tuple(row) if not isinstance(row, tuple) else row for row in rows]
 
     def exec(self, sql: str, params: Params = None) -> None:
+        failed = False
         try:
             with self._connect() as conn:
                 with conn.cursor() as cur:
                     cur.execute(sql, params)
                 conn.commit()
-        except Exception as exc:
+        except Exception:
+            failed = True
+        if failed:
             raise SqlExecError(
                 "sql_exec_failed",
                 attempts=["DATABASE_URL"],
                 code="sql_exec_failed",
-            ) from exc
+            ) from None
 
     def tx(
         self,
@@ -236,9 +214,9 @@ class PsycopgProvider:
     def readonly_tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
         validate_readonly_statements(statements)
         results: List[Sequence[Any] | None] = []
+        failure: TxError | None = None
         try:
             with self._connect() as conn:
-                transaction_failed = False
                 try:
                     with conn.cursor() as cur:
                         for stmt in statements:
@@ -251,34 +229,30 @@ class PsycopgProvider:
                                 results.append([tuple(row) if not isinstance(row, tuple) else row for row in fetched])
                             else:
                                 results.append(None)
-                except TxError:
-                    transaction_failed = True
-                    raise
-                except Exception as exc:
-                    transaction_failed = True
-                    raise TxError(
+                except Exception:
+                    failure = TxError(
                         "readonly_tx_failed",
                         attempts=["DATABASE_URL"],
                         code="readonly_tx_failed",
-                    ) from exc
-                finally:
-                    try:
-                        conn.rollback()
-                    except Exception as exc:
-                        if not transaction_failed:
-                            raise TxError(
-                                "readonly_tx_rollback_failed",
-                                attempts=["DATABASE_URL"],
-                                code="readonly_tx_rollback_failed",
-                            ) from exc
-        except TxError:
-            raise
-        except Exception as exc:
-            raise TxError(
-                "readonly_tx_failed",
-                attempts=["DATABASE_URL"],
-                code="readonly_tx_failed",
-            ) from exc
+                    )
+                try:
+                    conn.rollback()
+                except Exception:
+                    if failure is None:
+                        failure = TxError(
+                            "readonly_tx_rollback_failed",
+                            attempts=["DATABASE_URL"],
+                            code="readonly_tx_rollback_failed",
+                        )
+        except Exception:
+            if failure is None:
+                failure = TxError(
+                    "readonly_tx_failed",
+                    attempts=["DATABASE_URL"],
+                    code="readonly_tx_failed",
+                )
+        if failure is not None:
+            raise failure from None
         return results
 
     def introspect(self, kind: str) -> Any:

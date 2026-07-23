@@ -464,6 +464,71 @@ def test_ops03_schemas_standalone_reject_truncated_extra_and_reordered_vectors(
             )
 
 
+@pytest.mark.parametrize(
+    ("phase", "launch_consumed"),
+    (
+        ("pre_marker", False),
+        ("pre_provider", True),
+        ("capture", True),
+        ("receipt_validation", True),
+        ("final_validation", True),
+    ),
+)
+def test_failure_receipt_schema_accepts_phase_consistent_launch_state(
+    authorization,
+    phase,
+    launch_consumed,
+):
+    auth_path, auth, _base, _candidate = authorization
+    receipt = {
+        "schema": "hde_epic038.ops03.failure_receipt.v1",
+        "run_id": auth["run_id"],
+        "authorization_sha256": runner.sha256_path(auth_path),
+        "phase": phase,
+        "code": "fixture_failure",
+        "launch_consumed": launch_consumed,
+        "candidate_admissible": False,
+        "nonclaims": list(runner.NONCLAIMS),
+    }
+
+    _standalone_schema_validator(
+        "hde_epic038_ops03_failure_receipt.v1.json"
+    ).validate(receipt)
+
+
+@pytest.mark.parametrize(
+    ("phase", "launch_consumed"),
+    (
+        ("pre_marker", True),
+        ("pre_provider", False),
+        ("capture", False),
+        ("receipt_validation", False),
+        ("final_validation", False),
+    ),
+)
+def test_failure_receipt_schema_rejects_phase_inconsistent_launch_state(
+    authorization,
+    phase,
+    launch_consumed,
+):
+    auth_path, auth, _base, _candidate = authorization
+    receipt = {
+        "schema": "hde_epic038.ops03.failure_receipt.v1",
+        "run_id": auth["run_id"],
+        "authorization_sha256": runner.sha256_path(auth_path),
+        "phase": phase,
+        "code": "fixture_failure",
+        "launch_consumed": launch_consumed,
+        "candidate_admissible": False,
+        "nonclaims": list(runner.NONCLAIMS),
+    }
+
+    with pytest.raises(ValidationError):
+        _standalone_schema_validator(
+            "hde_epic038_ops03_failure_receipt.v1.json"
+        ).validate(receipt)
+
+
 def test_validation_receipt_schema_rejects_fail_with_all_predicates_true(
     authorization,
 ):

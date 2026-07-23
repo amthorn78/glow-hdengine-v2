@@ -2,6 +2,7 @@ import pytest
 from engine.db.adapter import Statement
 from engine.db.errors import TxError
 from engine.db.providers.psycopg_provider import PsycopgProvider
+from scripts.ops.hde_epic038_ops03 import QUERY_STATEMENTS
 
 class Cursor:
     def __init__(self, fail=False): self.executed=[]; self.fail=fail
@@ -20,8 +21,8 @@ class Conn:
 
 def test_readonly_tx_rolls_back_and_does_not_commit():
     conn=Conn(); provider=PsycopgProvider('postgresql://secret', connection_factory=lambda dsn: conn)
-    result=provider.readonly_tx([Statement('SET TRANSACTION READ ONLY'), Statement('SELECT 1', fetch=True)])
-    assert result == [None, [(1,)]]
+    result=provider.readonly_tx(QUERY_STATEMENTS)
+    assert len(result) == len(QUERY_STATEMENTS)
     assert conn.commits == 0
     assert conn.rollbacks == 1
     assert conn.closed == 1
@@ -29,7 +30,7 @@ def test_readonly_tx_rolls_back_and_does_not_commit():
 def test_readonly_tx_rolls_back_on_error():
     conn=Conn(fail=True); provider=PsycopgProvider('postgresql://secret', connection_factory=lambda dsn: conn)
     with pytest.raises(TxError):
-        provider.readonly_tx([Statement('SET TRANSACTION READ ONLY'), Statement('SELECT 1', fetch=True)])
+        provider.readonly_tx(QUERY_STATEMENTS)
     assert conn.commits == 0
     assert conn.rollbacks == 1
 

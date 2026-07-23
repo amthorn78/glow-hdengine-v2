@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -114,7 +115,33 @@ HISTORICAL_ONLY_PHRASES = (
 HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
+    "tools/evidence/run_sanity_pipeline.py",
 }
+HISTORICAL_VALIDATION_ROSTERS = {
+    "tools/evidence/run_sanity_pipeline.py": frozenset(
+        {"HISTORICAL_BRIDGE_PRIMARY_SHA256"}
+    ),
+}
+_BRIDGE_TRANSPORT_PATTERN = re.compile(
+    r"(?:^|[^a-z0-9])(?:pg[-_]?bridge|db[-_]?bridge|"
+    r"bridge[-_](?:url|uri|endpoint|host|base(?:[-_]?url)?))"
+    r"(?:$|[^a-z0-9])",
+    re.IGNORECASE,
+)
+_NETWORK_COMMAND_PATTERN = re.compile(
+    r"(?:^|[\s/])(curl|wget)(?:$|\s)", re.IGNORECASE
+)
+_PROCESS_CALLS = frozenset(
+    {
+        "os.popen",
+        "os.system",
+        "subprocess.call",
+        "subprocess.check_call",
+        "subprocess.check_output",
+        "subprocess.popen",
+        "subprocess.run",
+    }
+)
 HISTORICAL_GUIDANCE_SUFFIXES = (".md", ".txt")
 CURRENT_GUIDANCE_PREFIXES = ("docs/adr/", "docs/design/")
 MANDATORY_MARKERS = {
@@ -208,6 +235,43 @@ def _active_bridge_guidance(relative: str, line: str) -> bool:
         and any(word in lowered for word in ACTIVE_GUIDANCE_WORDS)
         and not _line_refusal_only(line)
     )
+
+
+def _assignment_target_names(node: ast.AST) -> tuple[str, ...]:
+    return tuple(name for name, _value in _assignment_bindings(node))
+
+
+def _historical_reader_path_lines(relative: str, text: str) -> frozenset[int]:
+    """Return only bridge-path literal lines owned by a historical validation roster."""
+
+    if relative not in HISTORICAL_READERS:
+        return frozenset()
+    if relative not in HISTORICAL_VALIDATION_ROSTERS:
+        # The canonical updater owns historical record classification. Preserve its
+        # existing exemption until PR-06R-B migrates those rows atomically.
+        return frozenset(range(1, len(text.splitlines()) + 1))
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return frozenset()
+    roster_names = HISTORICAL_VALIDATION_ROSTERS[relative]
+    lines: set[int] = set()
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        if not roster_names.intersection(_assignment_target_names(node)):
+            continue
+        value = node.value
+        if value is None:
+            continue
+        for child in ast.walk(value):
+            if (
+                isinstance(child, ast.Constant)
+                and isinstance(child.value, str)
+                and any(marker in child.value for marker in FORBIDDEN_ACTIVE_PATH_TEXT)
+            ):
+                lines.add(child.lineno)
+    return frozenset(lines)
 
 
 def _is_os_module(node: ast.AST, os_names: set[str]) -> bool:
@@ -659,6 +723,86 @@ def _is_http_call(node: ast.Call) -> bool:
     return owner in {"client", "http", "http_client", "session"} or owner.startswith(
         ("httpx.", "requests.")
     )
+
+
+def _contains_bridge_transport_text(value: str) -> bool:
+    return _BRIDGE_TRANSPORT_PATTERN.search(value) is not None
+
+
+def _bridge_transport_value(
+    node: ast.AST,
+    aliases: dict[str, tuple[str, ...]],
+    tainted_names: set[str],
+) -> bool:
+    """Recognize a bridge endpoint/key without treating ordinary HTTP as forbidden."""
+
+    if isinstance(node, ast.Name) and (
+        node.id in tainted_names or _contains_bridge_transport_text(node.id)
+    ):
+        return True
+    resolved = _resolve_string_values(node, aliases)
+    if resolved is not None and any(
+        _contains_bridge_transport_text(value) for value in resolved
+    ):
+        return True
+    return any(
+        _bridge_transport_value(child, aliases, tainted_names)
+        for child in ast.iter_child_nodes(node)
+    )
+
+
+def _network_command_value(
+    node: ast.AST, aliases: dict[str, tuple[str, ...]]
+) -> bool:
+    resolved = _resolve_string_values(node, aliases)
+    if resolved is not None and any(
+        _NETWORK_COMMAND_PATTERN.search(value) is not None
+        or value.lower() in {"curl", "wget"}
+        for value in resolved
+    ):
+        return True
+    return any(
+        _network_command_value(child, aliases) for child in ast.iter_child_nodes(node)
+    )
+
+
+def _python_bridge_transport_use(text: str) -> tuple[tuple[int, str], ...]:
+    """Find bridge-specific HTTP construction and executable network commands."""
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return ()
+    aliases = _constant_string_bindings(tree)
+    tainted_names: set[str] = set()
+    while True:
+        previous = set(tainted_names)
+        for node in ast.walk(tree):
+            for target_name, value in _assignment_bindings(node):
+                if _bridge_transport_value(value, aliases, tainted_names):
+                    tainted_names.add(target_name)
+        if tainted_names == previous:
+            break
+
+    violations: set[tuple[int, str]] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        values = [*node.args, *(keyword.value for keyword in node.keywords)]
+        if _is_http_call(node) and any(
+            _bridge_transport_value(value, aliases, tainted_names) for value in values
+        ):
+            violations.add((node.lineno, "bridge_http_construction"))
+        if (
+            _dotted_name(node.func).lower() in _PROCESS_CALLS
+            and any(_network_command_value(value, aliases) for value in values)
+            and any(
+                _bridge_transport_value(value, aliases, tainted_names)
+                for value in values
+            )
+        ):
+            violations.add((node.lineno, "bridge_executable_command"))
+    return tuple(sorted(violations))
 
 
 def _retired_environ_subscript(
@@ -1120,7 +1264,18 @@ def _retired_key_violations(relative: str, text: str) -> list[str]:
             out.append(f"{relative}:{line_number}:active_retired_key_consumption")
         for line_number in _python_retired_http_use(text):
             out.append(f"{relative}:{line_number}:retired_key_http_bridge_use")
+        for line_number, violation in _python_bridge_transport_use(text):
+            out.append(f"{relative}:{line_number}:{violation}")
     for line_number, line in enumerate(text.splitlines(), 1):
+        if (
+            not relative.endswith(".py")
+            and _contains_bridge_transport_text(line)
+            and not _historical_guidance_reference(relative, line)
+        ):
+            if _NETWORK_COMMAND_PATTERN.search(line):
+                out.append(f"{relative}:{line_number}:bridge_executable_command")
+            elif any(marker in line for marker in HTTP_MARKERS):
+                out.append(f"{relative}:{line_number}:bridge_http_construction")
         if not any(key in line for key in RETIRED_KEYS):
             continue
         if any(marker in line for marker in HTTP_MARKERS):
@@ -1169,12 +1324,22 @@ def scan(root: Path = ROOT) -> tuple[str, ...]:
                         violations.add(
                             f"{relative}:{line_number}:forbidden_symbol:{symbol}"
                         )
-        if relative not in HISTORICAL_READERS and relative != "ci/checks/check_direct_db_contract.py":
+        if (
+            relative not in HISTORICAL_READERS
+            and relative != "ci/checks/check_direct_db_contract.py"
+        ):
+            historical_path_lines = frozenset()
+        else:
+            historical_path_lines = _historical_reader_path_lines(relative, text)
+        if relative != "ci/checks/check_direct_db_contract.py":
             for line_number, line in enumerate(text.splitlines(), 1):
                 for marker in FORBIDDEN_ACTIVE_PATH_TEXT:
                     if marker not in line:
                         continue
-                    if not _historical_guidance_reference(relative, line):
+                    if (
+                        line_number not in historical_path_lines
+                        and not _historical_guidance_reference(relative, line)
+                    ):
                         violations.add(
                             f"{relative}:{line_number}:active_retired_path:{marker}"
                         )

@@ -42,6 +42,18 @@ HISTORICAL_OPS01_FILES = (
 HISTORICAL_OPS01_LEDGER_SHA256 = (
     "f4fd52eff5c8f2b61bbb9d97c3889a4bff2d12f581ba8e26dfb2d250ad1049d8"
 )
+HISTORICAL_BRIDGE_PRIMARY_SHA256 = {
+    "artifacts/db_bridge/adapter_selection.snapshot.json": "7b2dbb9e8b477b40cb5ad4de0a19d2c04e6590f6946fe250ee4796699e6717ed",
+    "artifacts/db_bridge/caps.snapshot.json": "83421e71641febcf3b942fd6e31c91a5c11c2a4acff61008cc5ef3215329cfb8",
+    "artifacts/db_bridge/health.json": "6489d6d7a33c5d40e18fc61eeb6c34c341279ee61816394dde5189aa4ad8fae5",
+    "artifacts/db_bridge/provider_parity.proof.json": "27bca3f1e8d7fbf1dd32abfd5fffd831d6ce3e0380bdfa371ed4683706b533e0",
+    "artifacts/db_bridge/query_select_1.json": "bd919ec13cc10567b72b81f4326a8b525d4db8a2d8914fc884b86a6530726862",
+    "artifacts/db_bridge/root.json": "c3afa09727b1dfbfb1eb831658c392b2d20ab3843a5dfd946ad2bb0c12fd8ea5",
+    "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json": "40cb7dc2a668660f641df15ed054c731432dc17294a1810ab4aeae324c59270b",
+    "artifacts/runtime/env_connectivity.nondev_failure.json": "596f7b6ac47c81b8786e49ab50f79663ba5e2c8ffbc32d954322f51eb1f81cfc",
+    "artifacts/runtime/env_connectivity.snapshot.json": "5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45",
+    "schemas/presenter_db_bridge_compare.v1.json": "33fd1bb4fdae92382f33f87fba09f2206b10e0a2b12882c920ea5ade060b469b",
+}
 OPS02_FILES = (
     "commands.txt",
     "stdout.log",
@@ -365,7 +377,63 @@ def _validate_packet_inventory(
 
 
 def validate_historical_bridge_evidence(root: Path = ROOT) -> None:
-    """Validate only frozen OPS-01 bytes; never re-derive historical success."""
+    """Validate the frozen bridge family without re-deriving historical success."""
+
+    bridge_root = root / "artifacts/db_bridge"
+    expected_bridge_entries = {
+        Path(relative).name
+        for relative in HISTORICAL_BRIDGE_PRIMARY_SHA256
+        if Path(relative).parent.as_posix() == "artifacts/db_bridge"
+    }
+    expected_bridge_entries |= {
+        f"{name}.path_proof.txt" for name in expected_bridge_entries
+    }
+    if bridge_root.is_symlink() or not bridge_root.is_dir():
+        raise ValueError("historical bridge directory is missing or unsafe")
+    actual_bridge_entries = {entry.name for entry in bridge_root.iterdir()}
+    unexpected = sorted(actual_bridge_entries - expected_bridge_entries)
+    if unexpected:
+        raise ValueError(
+            f"historical bridge directory inventory drift: {unexpected[0]}"
+        )
+
+    for relative, frozen_sha256 in HISTORICAL_BRIDGE_PRIMARY_SHA256.items():
+        primary = root / relative
+        proof = root / f"{relative}.path_proof.txt"
+        if primary.is_symlink() or not primary.is_file() or not primary.read_bytes():
+            raise ValueError(f"historical bridge primary is missing: {relative}")
+        payload = primary.read_bytes()
+        if hashlib.sha256(payload).hexdigest() != frozen_sha256:
+            raise ValueError(f"historical bridge primary drift: {relative}")
+        if validate_retained_text_safety(primary, payload):
+            raise ValueError(f"historical bridge primary is not secret-safe: {relative}")
+        if relative.endswith(".json"):
+            value = _read_json(primary)
+            if payload != (
+                json.dumps(
+                    value,
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                + "\n"
+            ).encode("utf-8"):
+                raise ValueError(f"historical bridge JSON is not canonical: {relative}")
+        if proof.is_symlink() or not proof.is_file() or not proof.read_bytes():
+            raise ValueError(f"historical bridge path proof is missing: {relative}")
+        fields: dict[str, str] = {}
+        for line in proof.read_text(encoding="utf-8").splitlines():
+            if ":" in line:
+                key, value = line.split(":", 1)
+                fields[key.strip()] = value.strip()
+        if (
+            fields.get("path") != relative
+            or fields.get("sha256") != frozen_sha256
+            or fields.get("size_bytes") != str(primary.stat().st_size)
+            or not fields.get("mtime_utc")
+            or not fields.get("produced_at_utc")
+        ):
+            raise ValueError(f"historical bridge path proof drift: {relative}")
 
     packet = _validate_packet_inventory(root, "ops-01", HISTORICAL_OPS01_FILES)
     ledger = (packet / "checksums.sha256").read_bytes()

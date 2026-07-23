@@ -125,17 +125,20 @@ class DBAccess:
             exc.selection_case = cls._failure_case(env, exc, attempts=attempts)
             raise exc
         ctor = psycopg_factory or (lambda value: PsycopgProvider(value))
+        provider_failed = False
         try:
             provider = ctor(dsn)
             if getattr(provider, "name", None) != "psycopg":
                 raise TypeError("unexpected_direct_provider")
             provider.health()
-        except Exception as exc:
+        except Exception:
+            provider_failed = True
+        if provider_failed:
             attempts.append(_canonical_attempt("psycopg", "error", reason="primary_connect_failed"))
             wrapped = PrimaryUnavailable("primary_connect_failed", attempts=["DATABASE_URL"], code="primary_connect_failed")
             wrapped.attempt_rows = [dict(row) for row in attempts]
             wrapped.selection_case = cls._failure_case(env, wrapped, attempts=attempts)
-            raise wrapped from exc
+            raise wrapped from None
         attempts.append(_canonical_attempt("psycopg", "ok", reason=None))
         selection_case: Mapping[str, object] = {
             "case": "healthy_direct",

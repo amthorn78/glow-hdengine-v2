@@ -52,6 +52,11 @@ def _packet_copy(tmp_path: Path) -> Path:
         sanity.ROOT / "artifacts/bodygraph/v2_mapped_cache",
         root / "artifacts/bodygraph/v2_mapped_cache",
     )
+    for relative in sanity.HISTORICAL_BRIDGE_PRIMARY_SHA256:
+        for path in (relative, f"{relative}.path_proof.txt"):
+            target_path = root / path
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(sanity.ROOT / path, target_path)
     return root
 
 
@@ -413,6 +418,41 @@ def test_historical_bridge_packet_is_bound_to_exact_frozen_ledger(tmp_path):
     value["status"] = "FAIL"
     _write_json_and_refresh(packet, "bridge_consistency.result.json", value)
     with pytest.raises(ValueError, match="frozen historical checksum ledger drift"):
+        sanity.validate_historical_bridge_evidence(root)
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/runtime/env_connectivity.snapshot.json",
+        "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json",
+        "schemas/presenter_db_bridge_compare.v1.json",
+    ),
+)
+def test_historical_bridge_primaries_outside_ops01_are_hash_frozen(
+    tmp_path, relative
+):
+    root = _packet_copy(tmp_path)
+    path = root / relative
+    path.write_bytes(path.read_bytes() + b" ")
+    with pytest.raises(ValueError, match="historical bridge primary drift"):
+        sanity.validate_historical_bridge_evidence(root)
+
+
+def test_historical_bridge_primary_path_proof_is_required(tmp_path):
+    root = _packet_copy(tmp_path)
+    relative = "artifacts/db_bridge/provider_parity.proof.json"
+    (root / f"{relative}.path_proof.txt").unlink()
+    with pytest.raises(ValueError, match="historical bridge path proof is missing"):
+        sanity.validate_historical_bridge_evidence(root)
+
+
+def test_historical_bridge_directory_rejects_unpinned_extra_entry(tmp_path):
+    root = _packet_copy(tmp_path)
+    (root / "artifacts/db_bridge/current-looking.json").write_bytes(b"{}\n")
+
+    with pytest.raises(ValueError, match="historical bridge directory inventory drift"):
         sanity.validate_historical_bridge_evidence(root)
 
 

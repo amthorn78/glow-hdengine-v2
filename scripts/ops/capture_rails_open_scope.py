@@ -14,7 +14,13 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.ops.http_log import LOG_PATH_ENV
+from engine.ops.http_log import (
+    CAPTURE_LOG_ROOT,
+    LOG_PATH_ENV,
+    initialize_capture_log,
+    read_owned_text,
+    replace_owned_text,
+)
 
 REQUIRED_ENV = {
     "SAFE_MODE": "0",
@@ -40,7 +46,7 @@ def _check_env() -> None:
 
 def _child_log_path() -> Path:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    return Path("artifacts/ops/rails_open_scope") / f"keys_only.{os.getpid()}.{stamp}.jsonl"
+    return CAPTURE_LOG_ROOT / f"keys_only.{os.getpid()}.{stamp}.jsonl"
 
 
 def _run_command(command: Sequence[str], *, log_path: Path) -> None:
@@ -58,7 +64,7 @@ def _load_records(log_path: Path) -> Iterable[dict[str, object]]:
     if not log_path.exists():
         raise SystemExit(f"Log file {log_path} not found")
     for line_number, line in enumerate(
-        log_path.read_text(encoding="utf-8").splitlines(), start=1
+        read_owned_text(log_path).splitlines(), start=1
     ):
         if not line.strip():
             continue
@@ -82,7 +88,6 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
     vendor_count = sum(
         count for route, count in counts.items() if route.startswith("vendor.")
     )
-    SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "captured_at_utc: "
         + datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -95,7 +100,7 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
     lines.extend(f"  {route} {counts[route]}" for route in sorted(counts))
     lines.append(f"vendor_call_count: {vendor_count}")
     text = "\n".join(lines) + "\n"
-    SUMMARY_PATH.write_text(text, encoding="utf-8")
+    replace_owned_text(SUMMARY_PATH, text)
     print(f"Wrote {SUMMARY_PATH} ({len(text)} bytes)")
     if vendor_count:
         raise SystemExit(
@@ -107,8 +112,7 @@ def _write_summary(records: Iterable[dict[str, object]]) -> int:
 def main() -> int:
     _check_env()
     log_path = _child_log_path()
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_path.write_text("", encoding="utf-8")
+    initialize_capture_log(log_path)
     for command in HARNESS_COMMANDS:
         _run_command(command, log_path=log_path)
     _write_summary(_load_records(log_path))

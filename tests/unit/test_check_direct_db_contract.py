@@ -86,6 +86,61 @@ def test_refusal_file_cannot_hide_http_bridge_construction(tmp_path):
     assert any("active_retired_key_consumption" in row or "retired_key_http_bridge_use" in row for row in violations)
 
 
+def test_literal_pg_bridge_http_construction_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import urllib.request\n"
+        "urllib.request.urlopen('https://pg-bridge.internal/health')\n",
+    )
+    assert any(
+        "scripts/current.py:2:bridge_http_construction" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_alternate_bridge_endpoint_alias_to_http_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import os, requests\n"
+        "url = os.getenv('PG_BRIDGE_ENDPOINT')\n"
+        "requests.get(url)\n",
+    )
+    assert any(
+        "scripts/current.py:3:bridge_http_construction" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_curl_pg_bridge_command_is_rejected(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import subprocess\n"
+        "subprocess.run(['curl', 'https://pg-bridge.internal/health'])\n",
+    )
+    assert any(
+        "scripts/current.py:2:bridge_executable_command" in row
+        for row in check.scan(tmp_path)
+    )
+
+
+def test_ordinary_http_and_subprocess_commands_remain_allowed(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "scripts/current.py",
+        "import requests, subprocess\n"
+        "requests.get('https://example.invalid/health')\n"
+        "subprocess.run(['curl', 'https://example.invalid/health'])\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
 def test_active_guidance_for_retired_bridge_key_is_rejected(tmp_path):
     _minimal_tree(tmp_path)
     _write(tmp_path, "docs/RUN.md", "Set DB_BRIDGE_URL to the bridge endpoint and run the server.\n")
@@ -144,7 +199,7 @@ def test_explicit_historical_adr_and_design_references_are_allowed(tmp_path):
     _write(
         tmp_path,
         "docs/design/retired_transport.md",
-        "Historical retained record, not current guidance: scripts/db_bridge/capture_introspection.py wrote artifacts/db_bridge/ captures.\n",
+        "Historical retained record, not current guidance: scripts/db_bridge/capture_introspection.py wrote artifacts/db_bridge/ captures; do not run curl https://pg-bridge.invalid.\n",
     )
     assert check.scan(tmp_path) == ()
 
@@ -275,6 +330,42 @@ def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
         "tools/evidence/run_sanity_pipeline.py:2:active_retired_key_consumption"
         in row
         for row in check.scan(tmp_path)
+    )
+
+
+def test_release_pipeline_allows_only_owned_historical_bridge_hash_roster(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "HISTORICAL_BRIDGE_PRIMARY_SHA256 = {\n"
+        "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
+        "}\n",
+    )
+    assert check.scan(tmp_path) == ()
+
+
+def test_release_pipeline_historical_allowance_does_not_hide_execution(tmp_path):
+    _minimal_tree(tmp_path)
+    _write(
+        tmp_path,
+        "tools/evidence/run_sanity_pipeline.py",
+        "from pathlib import Path\n"
+        "HISTORICAL_BRIDGE_PRIMARY_SHA256 = {\n"
+        "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
+        "}\n"
+        "def execute_bridge_artifact():\n"
+        "    return Path('artifacts/db_bridge/query_select_1.json').read_bytes()\n",
+    )
+    violations = check.scan(tmp_path)
+    assert not any(
+        "tools/evidence/run_sanity_pipeline.py:3:active_retired_path" in row
+        for row in violations
+    )
+    assert any(
+        "tools/evidence/run_sanity_pipeline.py:6:active_retired_path:artifacts/db_bridge/"
+        in row
+        for row in violations
     )
 
 
