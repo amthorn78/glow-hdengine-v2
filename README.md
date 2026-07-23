@@ -108,6 +108,7 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
 - A release cut intentionally changes only the manifest: `python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. `python scripts/release_id_recompute.py --check-manifest-only` validates the committed input and declared file hashes without reading or repairing derivatives.
 - Current release-bound evidence is built from a temporary tracked-file copy with `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. CI uploads the strict `hde.release_attestation.v1` bundle; source-tree output is refused, the child environment is secret-free and closed-rails, and the PR-A bundle records the required stage-14 downstream stop rather than release admission.
 - The checked-in EPIC022 files under `artifacts/math/` and their existing bindings remain frozen capture-time evidence pending permanent canon drainage. They are not regenerated for each new release and are not current runtime identity inputs.
+- The registry report is release-agnostic configuration evidence: catalog/manifest validity is checked while loading the registry, but manifest identity is recorded only by the external release attestation. A release cut therefore does not churn the registry report, config bundles, or their evidence-index companions.
 
 ## Quickstart (closed rails default)
 

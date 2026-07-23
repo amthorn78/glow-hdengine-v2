@@ -37,6 +37,40 @@ def test_path_proof_validation_is_independent_of_clone_mtime(
     assert proof.read_bytes() == original
 
 
+def test_unchanged_legacy_proof_is_not_retimestamped(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    rel = "artifacts/proofs/success_get.txt"
+    artifact = tmp_path / rel
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(b"bound bytes\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    kwargs = {
+        "rel": rel,
+        "sha256": digest,
+        "size_bytes": artifact.stat().st_size,
+        "mtime_utc": "2026-07-23T00:00:00Z",
+        "produced_at": "2026-07-23T00:00:01Z",
+        "default_produced_at": "2026-07-23T00:00:01Z",
+        "stat_mtime": artifact.stat().st_mtime,
+    }
+    update_evidence_index._write_path_proof(check=False, **kwargs)
+    proof = tmp_path / f"{rel}.path_proof.txt"
+    original = proof.read_bytes()
+
+    update_evidence_index._write_path_proof(
+        check=False,
+        **{
+            **kwargs,
+            "default_produced_at": "2099-01-01T00:00:00Z",
+            "stat_mtime": 4_070_908_800.0,
+        },
+    )
+    assert proof.read_bytes() == original
+
+
 def test_isolated_path_proof_uses_immutable_manifest_timestamp(
     tmp_path,
     monkeypatch,

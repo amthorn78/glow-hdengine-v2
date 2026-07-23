@@ -19,6 +19,7 @@ The content hash was not the defect. The defect was making generated attestation
 7. Direct execution of `regenerate_identity_closure.py` in the source checkout is refused.
 8. Existing checked-in EPIC022 release artifacts remain frozen capture-time records. They are not current runtime identity inputs and are not rewritten for later releases.
 9. Git does not preserve filesystem mtimes, so clone-local `stat().st_mtime` is not evidence. Path-proof validity is determined by exact path, SHA-256, size, required companion fields, and UTC timestamp shape. `mtime_utc` remains capture-time provenance and seeds newly written proofs, but a later clone or cache restore cannot invalidate content-bound evidence or trigger a proof rewrite.
+10. Non-identity artifacts must not embed the release manifest merely as incidental provenance. The registry report remains strict configuration evidence: its loader validates the manifest and catalog contract, but its emitted bytes bind only the registry catalogs. Release/source provenance belongs to the external attestation. This one-time separation prevents an otherwise unchanged config report and its bundles/index companions from churning on every release cut.
 
 The resulting dependency direction is acyclic:
 

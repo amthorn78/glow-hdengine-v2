@@ -2606,7 +2606,7 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
-FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
+LEGACY_NON_BACKDATED_ARTIFACT_RELS: set[str] = {
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -2624,12 +2624,6 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "artifacts/proofs/success_writers_errors.txt",
     "artifacts/proofs/success_encoding_invariance.txt",
     "artifacts/proofs/reader_success_get_head_304.json",
-}
-STALE_PROOF_TRIGGER_RELS: set[str] = FORCE_REFRESH_ARTIFACT_RELS - {
-    "artifacts/evidence_index.jsonl",
-    "artifacts/evidence_index.jsonl.sha256",
-    "docs/evidence/INDEX.json",
-    "docs/evidence/INDEX.sha256",
 }
 EPIC035_PR01_ARTIFACT_RELS: set[str] = {
     "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json",
@@ -2653,7 +2647,7 @@ NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC036_PR01_ARTIFACT_RELS,
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
-    *FORCE_REFRESH_ARTIFACT_RELS,
+    *LEGACY_NON_BACKDATED_ARTIFACT_RELS,
 }
 
 
@@ -2794,11 +2788,6 @@ def _write_path_proof(
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
-    if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
-        requested_produced = None
-        requested_mtime = None
-        existing_produced = None
-        existing_mtime = None
     isolated_timestamp = _isolated_release_timestamp()
     if isolated_timestamp is not None:
         requested_produced = isolated_timestamp
@@ -3434,17 +3423,6 @@ def main(argv: list[str] | None = None) -> None:
         _rebind_sanity_log_only()
         return
 
-    def _stale_proof(rel: str) -> bool:
-        proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
-        mtime_raw = proof.get("mtime_utc")
-        produced_raw = proof.get("produced_at_utc")
-        if not mtime_raw or not produced_raw:
-            return False
-        try:
-            return _parse_utc_iso8601(produced_raw) < _parse_utc_iso8601(mtime_raw)
-        except Exception:  # noqa: BLE001
-            return True
-
     epic_ids = set(args.epic_id)
 
     def _run_once(*, check: bool) -> None:
@@ -3463,11 +3441,6 @@ def main(argv: list[str] | None = None) -> None:
                 mirror_produced = None
         if mirror_produced and isolated_timestamp is None:
             produced_default = mirror_produced
-        if isolated_timestamp is None and any(
-            _stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS
-        ):
-            produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-
         entries = _load_human_index()
         if "HDE-EPIC020" in epic_ids:
             epic020_tokens = _load_epic020_tokens("HDE-EPIC020")

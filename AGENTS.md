@@ -47,6 +47,7 @@
 - Intentional cuts use `python scripts/cut_release_manifest.py --version <semver> --built-at-utc <UTC>` and change only `catalog/manifest.json`. Validate the source input with `python scripts/release_id_recompute.py --check-manifest-only`.
 - Current release-bound derivatives are generated only with `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. CI publishes that strict bundle; `regenerate_identity_closure.py` is internal to the isolated copy and refuses source-tree execution.
 - Existing checked-in EPIC022 release evidence and companions remain frozen capture-time records pending permanent canon drainage. Never hand-edit, refresh, or use those bytes as current runtime identity.
+- `artifacts/registry/registry_report.json` is configuration evidence, not release-identity evidence. Its loader still validates `catalog/manifest.json`, but the report must bind only registry catalog inputs; do not reintroduce manifest/release identity into that report or its config bundles.
 
 
 ## EPIC031 docs posture (SAFE rails Fermentation Pass 2)
