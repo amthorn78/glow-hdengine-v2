@@ -28,7 +28,7 @@ ALLOWED_ARGV = {
     "rails_closed_refusal": (("python", "-m", "pytest", "tests/bodygraph/test_resolver_vendor.py", "-q"),),
     "rails_open_conformance": (
         ("python", "-m", "pytest", "tests/bodygraph/test_vendor_client.py", "tests/evidence/test_open_rails_abba_proof.py", "-q"),
-        ("python", "tools/evidence/generate_open_rails_abba_proof.py", "--check"),
+        ("python", "tools/evidence/generate_open_rails_abba_proof.py", "--check-current"),
     ),
     "logs_keys_only_redaction": (
         ("python", "tools/evidence/generate_rails_gate_evidence.py", "--check"),
