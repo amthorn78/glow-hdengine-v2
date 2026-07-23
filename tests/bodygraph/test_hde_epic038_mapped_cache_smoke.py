@@ -134,6 +134,10 @@ def test_preflight_refuses_noncanonical_uuid_before_io(monkeypatch, user_id):
 def test_database_is_health_checked_before_vendor_fetch(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     calls = []
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: {},
+    )
     class DB:
         def health(self):
             calls.append("db_health")
@@ -148,6 +152,10 @@ def test_database_is_health_checked_before_vendor_fetch(monkeypatch, capsys):
 def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch, capsys):
     configure(monkeypatch, "https://fixture.invalid/v2")
     captured = {}
+    monkeypatch.setattr(
+        "scripts.ops.hde_epic038_mapped_cache_smoke._repository_identity",
+        lambda **_kwargs: {},
+    )
 
     class DB:
         def health(self):
