@@ -91,8 +91,9 @@ def test_process_production_environment_cannot_be_overridden_for_database_write(
 
 
 @pytest.mark.parametrize("retired_key", RETIRED_DB_TRANSPORT_KEYS)
-def test_scoped_empty_retired_key_refuses_before_mapped_cache_db_and_vendor_io(
-    monkeypatch, retired_key
+@pytest.mark.parametrize("retired_value", ["", None])
+def test_scoped_retired_key_refuses_before_mapped_cache_db_and_vendor_io(
+    monkeypatch, retired_key, retired_value
 ):
     for name in RETIRED_DB_TRANSPORT_KEYS:
         monkeypatch.delenv(name, raising=False)
@@ -110,7 +111,10 @@ def test_scoped_empty_retired_key_refuses_before_mapped_cache_db_and_vendor_io(
         source="vendor",
         upsert=True,
         dry_run=False,
-        env=env(DATABASE_URL="postgresql://must-not-read", **{retired_key: ""}),
+        env=env(
+            DATABASE_URL="postgresql://must-not-read",
+            **{retired_key: retired_value},
+        ),
         birthdate="2000-01-01",
         birthtime="00:00",
         location="Fixture",

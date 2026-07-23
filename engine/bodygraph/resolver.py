@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from collections import ChainMap
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
 from uuid import UUID
@@ -135,7 +134,11 @@ def _resolve_vendor(
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
     vendor_env = _vendor_config_env(env)
-    database_env = ChainMap(env or {}, os.environ)
+    database_env = dict(vendor_env)
+    # DB selection is key-presence-sensitive; restore scoped None entries
+    # that the vendor configuration overlay intentionally treats as removal.
+    if env is not None:
+        database_env.update(env)
     try:
         route_policy = _classify_env_route_policy(vendor_env)
     except VendorError as exc:
