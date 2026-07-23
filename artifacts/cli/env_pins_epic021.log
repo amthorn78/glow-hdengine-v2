@@ -1,1 +1,1 @@
-{"env":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"status":"success","suites":["epic021-cli"]}
+{"rails":{"ALLOW_NETWORK":0,"LANG":"C","LC_ALL":"C","SAFE_MODE":1,"TZ":"UTC"},"schema":"determinism_env_pins.v1","status":"success","suites":["epic021-cli"]}

@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -27,7 +28,11 @@ def test_env_pins_log_written(tmp_path: Path) -> None:
 
     assert recorded == log_path
     content = log_path.read_text(encoding="utf-8")
-    assert "\n" in content and content.endswith("\n")
-    assert "epic021-cli" in content
+    assert content.endswith("\n")
+    payload = json.loads(content)
+    assert payload["schema"] == "determinism_env_pins.v1"
+    assert payload["status"] == "success"
+    assert payload["suites"] == ["epic021-cli"]
     for key, value in DETERMINISM_ENV_PINS.items():
-        assert f"\"{key}\":\"{value}\"" in content
+        expected = int(value) if key in {"SAFE_MODE", "ALLOW_NETWORK"} else value
+        assert payload["rails"][key] == expected

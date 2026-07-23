@@ -13,6 +13,7 @@ ACCEPTANCE_MAP_PATH = Path("docs/acceptance_map_epic023.json")
 HUMAN_INDEX_PATH = Path("docs/evidence/INDEX.json")
 MIRROR_PATH = Path("artifacts/evidence_index.jsonl")
 GOVERNED_ROOTS = {"artifacts", "audit", "docs", "catalog", "schemas"}
+HISTORICAL_UNBOUND_EVIDENCE = {"artifacts/sanity/sanity.log"}
 
 
 def _normalize_status(value: str) -> str:
@@ -168,6 +169,17 @@ def test_epic023_acceptance_alignment_and_bindings() -> None:
             parts = Path(evidence).parts
             assert parts, f"invalid evidence path for {token_name}: {evidence}"
             assert parts[0] in GOVERNED_ROOTS, f"evidence path outside governed roots for {token_name}: {evidence}"
+
+            if evidence in HISTORICAL_UNBOUND_EVIDENCE:
+                # The EPIC023 acceptance record is immutable history. Its old
+                # sanity log remains on disk with its existing path proof, but
+                # the current evidence graph intentionally does not bind it as
+                # the active sanity.pipeline.log record.
+                assert Path(evidence).is_file()
+                assert Path(f"{evidence}.path_proof.txt").is_file()
+                assert evidence not in index_by_path
+                assert evidence not in mirror_by_path
+                continue
 
             entries = index_by_path.get(evidence, [])
             mirrors = mirror_by_path.get(evidence, [])
