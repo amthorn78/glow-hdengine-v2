@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.1  
+**Version:** v12.4.2  
 Effective Date: 2026.07.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -69,7 +69,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.18) PR-06 Remediation \- OPS-03 HDE-EPIC038  
 2.19) PR-06 Remediation \- HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary  
 2.20) PR-06 Remediation PR-06R-B HDE-EPIC038  
-2.21) PR-06 Remediation State
+2.21) PR-06 Remediation State  
+2.22) Implementation Retrospective HDE-EPIC038  
+2.23) Post Implementation Audit Triage HDE-EPIC038
 
 # 2\) Numbered Addenda
 
@@ -16571,5 +16573,854 @@ No further implementation review, OPS rerun, evidence recapture, or remediation 
 * **Exact next authorized action:** Authorize one separate PF09.6 maintenance action that applies the identified wording corrections and status changes. Permanent PF-Canon drainage and the bounded PF10 correction may proceed separately and are not prerequisites for that maintenance action.
 
 DECISION: PR-06 REMEDIATION COMPLETE; PF09 MAINTENANCE MAY PROCEED
+
+## 2.22) Implementation Retrospective HDE-EPIC038
+
+### Executive Summary
+
+This report presents evidence for Lead evaluation and makes no closure determination.
+
+#### Evidenced intent and delivery
+
+* **Planned or intended:** HDE-EPIC038 was scoped as a Distillation reliability pass spanning evidence discipline, immutable identity/provenance, release identity, environment snapshot v3, determinism/A7, reusable CI rails, DB/BodyGraph/architecture posture, bounded configured-v2 mapped-cache persistence, and one release-sanity pipeline. Public Reader expansion, new routes, production mapped-cache authorization, PF09 status movement, QA acceptance, OPS outcome claims, and closeout were outside the implementation plan’s claim boundary. **Gap in PF10/PF-Canon/Repo:** intended implementation decomposition and dependencies. **Evidence pointer:** Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Brief recap of scope` / `Execution plan` → “HDE-EPIC038 is the Distillation reliability pass” | “The epic does not add public Reader behavior, public routes” | “production mapped-cache authorization, PF09 status movement, QA PASS, OPS completion, or closeout.”  
+* **PF10-recorded:** Addenda 2.1–2.8 attribute PR-01 through PR-05 and the OPS-01/OPS-02 history to HDE-EPIC038. Addenda 2.12–2.20 record the later retirement of active bridge transport, direct-only remediation, OPS-03 capture, and PR-06R-B admission. **Evidence pointer:** PF10 — HDE Build Notes → 2.1) PR-01 HDE-EPIC038 / 2.7) PR-05 HDE-EPIC038 / 2.20) PR-06 Remediation PR-06R-B HDE-EPIC038 → “Original PR implemented the PR-01 identity, release-identity, environment-snapshot, and evidence foundations” | “Original PR implemented the bounded configured-v2 mapped-cache slice” | “PR \#367 merged the planned PR-06R-B direct-only final integration.”  
+* **Epic-attributed:** GitHub history supports a landed sequence from PR \#346 through PR \#367, with PR \#352 recorded as `merged: false`; PR \#368 is a later Epic-linked documentation reconciliation. Principal merge points include \#346 `f07ffbeb1f03c2ac9fc2d2c74217876ded844a7a`, \#347 `df662b518f0290a4bae6b26fb0332b374f28116a`, \#348 `ceefe4f52f12c0dcb57c9721639b720a539be96a`, \#349 `aba4a108e0661ababf61a2eebddcbff2b2e12042`, \#350 `472ba838110ec69218d4079e98504d0b317cfb7e`, \#351 `76a331a923cce8ba4d0601da3fab1dcb63e98270`, \#353 `2971256474f70ad62848ce58a2bfaf1ea4438f37`, \#354 `79e47867d6a4a799f49bf365cbed6d3e5e5f0d13`, \#355 `3936317d8078ea1407d7ef1b9d084f891a0ec2bc`, \#356 `01a7c200aba588f18509b9433a962602d056684e`, \#357 `4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e`, \#358 `e5f0fd67538080c10f7fc87ece36397ffab59970`, \#359 `78756e776f7fa598370235de6a72aa29fe045af9`, \#366 `6e69d7a77f539d736ffcc0596bd51fa7d0004a90`, and \#367 `4b0c1e09abc3f905a3315190576fa7339e991062`. **Evidence pointer:** Repo → GitHub PR metadata for \#346–\#367 → Epic-linked titles, refs, `merged: true`, and merge commits; PF10 — HDE Build Notes → 2.21) PR-06 Remediation State.  
+* **Repo-observed:** Current `main` is `e9422f0a16d3cb689e18e993e809a96dd14899e8`, the squash merge of PR \#368. It contains a sole active direct PostgreSQL selector, bounded mapped-cache write/read-back behavior, an updater-owned Human Index/Machine Mirror evidence graph, a nineteen-stage release-sanity definition, and current documentation aligned to those surfaces. **Evidence pointer:** Repo → repository metadata and compare `e9422f0a16d3cb689e18e993e809a96dd14899e8` to `main` → “default\_branch: main” | “status: identical” | “ahead\_by: 0; behind\_by: 0”; Repo → `engine/db/adapter.py`, `engine/bodygraph/mapped_cache.py`, `tools/evidence/update_evidence_index.py`, `tools/evidence/run_sanity_pipeline.py`.  
+* **Repo-observed:** The current Human Evidence Index and Machine Mirror each contain 94 HDE-EPIC038-related key/path pairs; the read-only comparison returned `human-only: 0` and `machine-only: 0`, and current sentinels bind both files. **Evidence pointer:** Repo → `docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256` \+ `artifacts/evidence_index.jsonl` \+ `artifacts/evidence_index.sha256`, read-only key/path comparison → “94 HDE-EPIC038-related pairs in each” | “human-only: 0” | “machine-only: 0.”  
+* **PF-Canon interpretation:** Current PF09.6 leaves the eight HDE-EPIC038-mapped Distillation rows at source statuses `Partial` for `HDE-DIST005.1`, `HDE-DIST005.2`, `HDE-DIST001.4`, `HDE-DIST001.5`, `HDE-DIST001.6`, `HDE-DIST001.9`, and `HDE-DIST001.10`, and `Optional` for `HDE-DIST001.11`. Repo presence and PF10 narrative do not alter those source statuses. **Evidence pointer:** PF09.6-Canon-HDE-Build-Checklist-Distillation, the eight exact subtask headings listed in 5.1 → observed `Subtask status` lines; PF10 — HDE Build Notes → 2.15) ADR-CANON-008 → “This addendum does not change any PF09 row status.”
+
+#### Largest evidenced wins, risks, gaps, or Unknowns
+
+* **Largest win — Repo-observed:** Current evidence separates direct-selection proof from historical bridge material, retains bounded OPS-02 mapped-cache proof, admits the OPS-03 packet through Index/Mirror ownership, and binds the nineteen-stage release log. **Evidence pointer:** Repo → `artifacts/runtime/direct_db_selection.snapshot.json`, `audit/ops/hde-epic038/ops-02/`, `audit/ops/hde-epic038/ops-03/`, `audit/gates/sanity_pipeline/sanity_pipeline.log`; PF10 — HDE Build Notes → 2.13) ADR-CANON-006 → “Historical bridge evidence MUST NOT … satisfy a current direct-only release gate.”  
+* **Largest governance risk — PF-Canon interpretation:** PF09.6 still describes bridge fallback/provider parity, carries token name `DEV_DB_BRIDGE_FALLBACK_OK`, and treats mapped-cache persistence as an optional future-epic posture, while latest PF10 and current Repo describe direct-only selection and an implemented bounded mapped cache. **Evidence pointer:** PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)` / §`Subtask HDE-DIST001.5 — BodyGraph mechanics gates` / §`Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening`; PF10 — HDE Build Notes → 2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement → “Direct PostgreSQL access through the Glow-owned psycopg provider is the sole active HDE database transport.”  
+* **Largest historical evidence conflict — Unknown:** PF10 records the PR-02 remedial checks as successful, but GitHub Actions run `29263427931` for PR \#349’s final head shows the `test` and `sanity-pipeline` jobs with `conclusion: failure`. **Evidence needed:** full run/rerun history and logs tied to head `9307c18b0d356d4f0db32e94f2cdd22849ab0c29`. **Evidence pointer:** PF10 — HDE Build Notes → 2.2) PR-02 HDE-EPIC038 → “Visible repo-host checks also completed successfully”; Repo → GitHub Actions run `29263427931` → “test: failure” | “sanity-pipeline: failure.”  
+* **Largest later-evidence gap — Unknown:** bounded GitHub searches did not identify a dedicated HDE-EPIC038 QA root, close-pack, token-evidence matrix, or acceptance map outside planning/documentation/general-index references. This does not prove nonexistence, and the implementation plan classifies later QA/closeout surfaces outside implementation execution. **Evidence needed:** exact governed artifact paths or a recursive tracked-tree result. **Search method:** searched Repo for `audit/qa/hde-epic038`, `HDE-EPIC038 close-pack`, `HDE-EPIC038 close_pack`, `HDE-EPIC038 token_evidence_matrix`, and `HDE-EPIC038 acceptance_map` (case: insensitive); scope: current GitHub-indexed tracked files; tool: GitHub code search plus manual classification; result: respectively 2, 9, 2, 13, and 13 hits, all limited to plans, CRDs, narrative/docs, updater code, session reports, or the general Machine Mirror—not a directly identified dedicated artifact. **Supplemental evidence pointer:** Gap in PF10/PF-Canon/Repo: whether those later surfaces were implementation deliverables. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Later artifacts outside implementation execution` → “They are not implementation or OPS deliverables in this plan.”
+
+### Repo Inspection Summary
+
+* **Observed repo root:** connector-backed repository `amthorn78/glow-hdengine-v2`. **Repo pointer:** Repo → repository metadata → “full\_name: amthorn78/glow-hdengine-v2” | “private: true” | “default\_branch: main.”  
+* **Observed HEAD and branch state:** current default branch `main` points to `e9422f0a16d3cb689e18e993e809a96dd14899e8`; comparison to `main` is identical. Local attached/detached state is not exposed by this connector. **Repo pointer:** Repo → recent `main` commits and compare `e9422f0a16d3cb689e18e993e809a96dd14899e8` to `main` → “docs: align HDE-EPIC038 reliability posture (\#368)” | “status: identical.”  
+* **Working-tree status before inspection — Unknown:** GitHub exposes committed server state, not a mutable checkout; dirty/clean status was not observable. **Evidence needed:** `git status --short --branch` from the exact inspected checkout. **Repo pointer:** Repo → connector access mode → committed GitHub objects only; no mutable checkout.  
+* **Primary Epic-attributed repo evidence:** Epic-linked PR metadata and PF10 jointly support PR-01 (\#346–\#347), PR-02 (\#348–\#349), PR-03 (\#350–\#351 and \#353), PR-04 (\#354–\#355), PR-05 (\#356–\#358), initial PR-06 (\#359), corrective PRs \#360–\#362, direct-only PR-06R-A PRs \#363–\#366, OPS-03 commit `e802598d583446b9eef1bee0ffa30ce63803149f`, PR-06R-B \#367, and docs PR \#368. **Repo pointer:** Repo → GitHub PR metadata \#346–\#368 and commit metadata for `e802598d583446b9eef1bee0ffa30ce63803149f`; PF10 — HDE Build Notes → 2.1–2.21.  
+* **Primary current surfaces:** `engine/runtime/identity.py`; `engine/db/adapter.py`; `engine/bodygraph/resolver.py`; `engine/bodygraph/mapped_cache.py`; `engine/cli/main.py`; `tools/evidence/update_evidence_index.py`; `tools/evidence/run_sanity_pipeline.py`; `tools/evidence/build_release_attestation.py`; current schemas, artifacts, OPS packets, tests, Human Index, Machine Mirror, and documentation described below. **Repo pointer:** Repo → current tree at `e9422f0a16d3cb689e18e993e809a96dd14899e8` → each listed path fetched/read.  
+* **Later divergence:** comparison of PR \#367 merge `4b0c1e09abc3f905a3315190576fa7339e991062` to current HEAD returns exactly eight changed paths: `AGENTS.md`, `CHANGELOG.md`, `README.md`, `docs/EVIDENCE_INDEX.md`, `docs/INDEX.md`, `docs/RUN.md`, `docs/adr/hde/release_attestation_scaling_adr.md`, and `docs/pfcanon/PF10-HDE-Build-Notes-v12.4.1.md`. This establishes documentation/PF10 divergence after PR \#367 without assigning those later bytes to its implementation. **Repo pointer:** Repo → GitHub compare `4b0c1e09abc3f905a3315190576fa7339e991062...e9422f0a16d3cb689e18e993e809a96dd14899e8` → “ahead\_by: 3” | eight-path changed-file list.  
+* **Epic-related evidence not directly identified:** no dedicated HDE-EPIC038 QA root, close-pack, token-evidence matrix, or acceptance-map artifact emerged from the bounded indexed searches. **Search method:** searched Repo for `audit/qa/hde-epic038`, `HDE-EPIC038 close-pack`, `HDE-EPIC038 close_pack`, `HDE-EPIC038 token_evidence_matrix`, and `HDE-EPIC038 acceptance_map` (case: insensitive); scope: current GitHub-indexed tracked files; tool: GitHub code search plus manual scan; result: 2, 9, 2, 13, and 13 hits, respectively, all in planning, CRD, narrative/docs, updater, session-report, or general-Mirror contexts. Connector indexing/capping leaves artifact nonexistence **Unknown**.  
+* **Attribution limitation:** commit `be179833532a210afbd7fc019f27fc5281440469` is titled `OPS-02 HDE-EPIC038` but its changed paths are under the OPS-01 packet; current OPS-02 packet provenance instead begins with `fbb1639890a89858c17ba8ac1f09af410df15d8f` (`ops(epic038): record mapped-cache smoke`). **Repo pointer:** Repo → commit metadata and changed-file lists for both commits.  
+* **Working-tree status after read-only inspection — Unknown:** no mutable checkout existed and no Repo mutation was performed. **Evidence needed:** post-inspection `git status --short --branch` from the same checkout. **Repo pointer:** Repo → connector access mode and action log → read-only fetch/search/compare operations only.
+
+### Implementation Report (What happened in the repo)
+
+#### PR/step breakdown
+
+##### PR-01 — Identity, release, environment, and evidence foundations
+
+* **Purpose:** establish immutable runtime identity, release/environment evidence, and updater ownership.  
+* **High-level changes:** PR \#346 landed the foundation; PR \#347 remediated the conjunction check so it did not persist state.  
+* **Key surfaces touched:** runtime identity, release identity, environment snapshot, evidence updater, schemas, tests.  
+* **Tests or evidence produced:** PF10 records the identity/environment/evidence foundation and follow-up validation; current Repo retains `engine/runtime/identity.py`, `catalog/manifest.json`, `artifacts/identity/service_identity.json`, and `artifacts/audit/env/env_snapshot.json`.  
+* **Historically attributable outcome:** Epic-attributed through PR \#346 merge `f07ffbeb1f03c2ac9fc2d2c74217876ded844a7a` and PR \#347 merge `df662b518f0290a4bae6b26fb0332b374f28116a`. Later Addendum 2.16 amends the original release model to manifest-derived identity and external attestation.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.1) PR-01 HDE-EPIC038 → “Original PR implemented the PR-01 identity, release-identity, environment-snapshot, and evidence foundations” | “Remedial PR … merged as `df662b…`”; Repo → GitHub PR \#346/\#347 metadata; PF10 — HDE Build Notes → 2.16) Scalable Manifest-Derived Release Identity → “`catalog/manifest.json` is the single release-identity input stored in Git.”
+
+##### PR-02 — Determinism and Catalog-driven A7 gates
+
+* **Purpose:** produce deterministic Reader/CLI proof families and bind A7 checks to a cataloged success route without adding a public route.  
+* **High-level changes:** PR \#348 landed proof producers, schemas, artifacts, tests, and endpoint-catalog support; PR \#349 addressed review gaps.  
+* **Key surfaces touched:** determinism/A7 generators, evidence artifacts, `docs/ENDPOINTS_CATALOG.json`, schemas, tests.  
+* **Tests or evidence produced:** current Repo lists only `GET /reader` under `success_endpoints`; `/internal/version` is not A7-eligible. The historical final-head CI disposition is conflicting, as recorded under Evidence gaps.  
+* **Historically attributable outcome:** Epic-attributed through PR \#348 merge `ceefe4f52f12c0dcb57c9721639b720a539be96a` and PR \#349 merge `aba4a108e0661ababf61a2eebddcbff2b2e12042`.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.2) PR-02 HDE-EPIC038 → “Original PR implemented the PR-02 deterministic Reader/CLI proof family” | “Remedial PR … addressed those gaps without adding a new public route”; Repo → GitHub PR \#348/\#349 metadata; Repo → `docs/ENDPOINTS_CATALOG.json` → sole `success_endpoints` row `GET /reader` | `/internal/version` `a7_eligible: false`.
+
+##### PR-03 — Reusable CI rails
+
+* **Purpose:** establish reusable rail-policy jobs, runner/evidence integration, and live-proof safety validation.  
+* **High-level changes:** PR \#350 landed the initial rails family; PR \#351 added open-rails AB/BA proof work; PR \#353 repaired live-proof shape and safety. PR \#352 was a temporary validation branch with observed metadata `merged: false`.  
+* **Key surfaces touched:** rails jobs/runner, evidence producers, CI integration, schemas, tests.  
+* **Tests or evidence produced:** PF10 records the three landed attempts and the final live-proof schema; current Repo retains rails-related evidence and integration tests.  
+* **Historically attributable outcome:** Epic-attributed through merges `472ba838110ec69218d4079e98504d0b317cfb7e`, `76a331a923cce8ba4d0601da3fab1dcb63e98270`, and `2971256474f70ad62848ce58a2bfaf1ea4438f37`.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.3) PR-03 HDE-EPIC038 → “Original PR created the reusable PR-03 rails gate family” | “Second Remedial PR … \[added\] a closed live-proof schema”; Repo → GitHub PR \#350–\#353 metadata; Repo → `tests/evidence/test_rails_ci_workflow_integration.py`.
+
+##### PR-04 and OPS-01 — DB, BodyGraph, architecture, and historical bridge-era posture
+
+* **Purpose:** add DB/BodyGraph/architecture evidence, source-neutral projection, source-invariance proof, and the then-authorized direct/bridge posture packet.  
+* **High-level changes:** PR \#354 landed the architecture and producer split; workflow run `29453252169` failed. PR \#355 repaired a malformed Machine Mirror row and missing runtime-token binding. OPS-01 recorded a bounded read-only direct/bridge-era packet.  
+* **Key surfaces touched:** DB/BodyGraph projectors, keys-only architecture snapshot, evidence updater/Mirror, `audit/ops/hde-epic038/ops-01/`.  
+* **Tests or evidence produced:** current `artifacts/architecture/architecture_snapshot.keys_only.json` reports schema `architecture_snapshot.keys_only.v1`, source quotation `"analyzer_verdict": "pass"`, and `unknown_count: 0`; OPS-01 remains indexed as `historical_bridge_evidence`.  
+* **Historically attributable outcome:** PR \#354 merge `79e47867d6a4a799f49bf365cbed6d3e5e5f0d13`, PR \#355 merge `3936317d8078ea1407d7ef1b9d084f891a0ec2bc`, and OPS-01 commit `cf364e2014fa37b4fff227a493f552b1a4119d29` are Epic-linked. Latest PF10 makes the OPS-01 bridge meaning historical only.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.5) PR-04 HDE-EPIC038 → “the architecture and focused producer split landed” | “restored a complete fixed point”; PF10 — HDE Build Notes → 2.6) OPS-01 HDE-EPIC038 → “one bounded, PO-executed, read-only DB and bridge posture run”; PF10 — HDE Build Notes → 2.12) bridge retirement → “The bridge-dependent HDE-EPIC038 OPS-01R lane is retired”; Repo → Actions run `29453252169`, PR \#355 metadata, and current architecture snapshot.
+
+##### PR-05 and OPS-02 — Configured-v2 mapped-cache persistence
+
+* **Purpose:** implement bounded mapped-cache persistence with explicit upsert, mapped-payload-only storage, canonical read-back, idempotence, legacy fallback, and production-like refusal.  
+* **High-level changes:** PR \#356 landed the slice; PR \#357 repaired shared-log hermeticity; PR \#358 hardened traceback/environment redaction. OPS-02 recorded one authorized configured-v2 request, one insert/read-back, and a repeat write with no second insertion.  
+* **Key surfaces touched:** `engine/bodygraph/mapped_cache.py`, `engine/bodygraph/resolver.py`, `engine/cli/main.py`, mapped-cache schemas/tests, `artifacts/bodygraph/v2_mapped_cache/manifest.json`, `audit/ops/hde-epic038/ops-02/`.  
+* **Tests or evidence produced:** the current manifest binds predicates for explicit upsert, mapped payload, canonical parity, idempotence, no raw payload, zero-I/O refusal, legacy fallback, and production refusal; current tests include `tests/bodygraph/test_v2_mapped_cache.py`.  
+* **Historically attributable outcome:** PR \#356 merge `01a7c200aba588f18509b9433a962602d056684e`, PR \#357 merge `4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e`, PR \#358 merge `e5f0fd67538080c10f7fc87ece36397ffab59970`, and the PF10-recorded OPS-02 packet support the historical attribution.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.7) PR-05 HDE-EPIC038 → “Original PR implemented the bounded configured-v2 mapped-cache slice” | “Second Remedial PR narrowly replaced that dictionary with `_EnvironmentRestoreState`”; PF10 — HDE Build Notes → 2.8) OPS-02 HDE-EPIC038 → “one mapped-cache insert, canonical read-back, and a second same-identity write that inserted zero rows”; Repo → current mapped-cache modules, manifest, OPS-02 root, and test.
+
+##### PR-06 lineage and OPS-03 — Release orchestration, direct-only remediation, and evidence admission
+
+* **Purpose:** bind the prior proof families into release validation, then resolve post-\#359 evidence/DB architecture defects and admit current direct-only evidence.  
+* **High-level changes:** PR \#359 landed the initial 17-stage release orchestrator. PRs \#360–\#362 repaired older bindings and introduced retained-evidence/DDL tooling. PF10 2.12 then retired active bridge transport. PRs \#363–\#366 established direct psycopg selection, centralized `DBAccess`, retired-key refusal, direct-contract checks, OPS-03 tooling, manifest-derived identity, and external attestation. OPS-03 captured the direct read-only posture. PR \#367 admitted the packet and direct-selection primary into the final nineteen-stage graph.  
+* **Key surfaces touched:** `engine/db/adapter.py`; direct-selection generator/schema/snapshot; OPS-03 runner, packet, operator record, and schemas; updater/Index/Mirror; release pipeline; attestation builder; CI checks/tests.  
+* **Tests or evidence produced:** current direct selection has four ordered cases; OPS-03 records zero SQL writes, zero retries, and zero alternate-provider attempts; current sanity log records nineteen stage lines, `first_failed_stage:NONE`, and source quotation `"summary:PASS"`; final-head runs for PR \#366 and \#367 concluded success.  
+* **Historically attributable outcome:** PR \#359 merge `78756e776f7fa598370235de6a72aa29fe045af9`; PF10-attributed PRs \#360–\#366; OPS-03 record commit `e802598d583446b9eef1bee0ffa30ce63803149f`; and PR \#367 merge `4b0c1e09abc3f905a3315190576fa7339e991062`.  
+* **Evidence pointers:** PF10 — HDE Build Notes → 2.17) PR-06R-A → “PR \#363 established the main implementation” | “PR \#366 closed the remaining OPS-03 isolation, filesystem, state-machine, validation-race, and release-evidence defects”; PF10 — HDE Build Notes → 2.19) OPS-03 → “executed no SQL write” | “made no retry” | “made no alternate-provider attempt”; PF10 — HDE Build Notes → 2.20) PR-06R-B → “PR \#367 merged the planned PR-06R-B direct-only final integration”; Repo → current pipeline log, direct-selection snapshot, OPS-03 packet, PR \#366/\#367 workflow runs.
+
+##### Post-integration documentation — PR \#368
+
+* **Purpose:** reconcile active repository guidance with final direct-only DB, mapped-cache, evidence, OPS, and release-attestation posture.  
+* **High-level changes:** seven documentation files changed; no implementation grouping is assigned to those bytes.  
+* **Key surfaces touched:** `AGENTS.md`, `CHANGELOG.md`, `README.md`, `docs/EVIDENCE_INDEX.md`, `docs/INDEX.md`, `docs/RUN.md`, `docs/adr/hde/release_attestation_scaling_adr.md`.  
+* **Tests or evidence produced:** final-head workflow run `30124667387` concluded success; the docs-sensitive direct-DB contract check succeeded after a final wording correction.  
+* **Historically attributable outcome:** Epic-linked docs reconciliation at PR \#368, squash merge/current HEAD `e9422f0a16d3cb689e18e993e809a96dd14899e8`; it is later than PR \#367’s implementation/evidence admission.  
+* **Evidence pointers:** Repo → PR \#368 metadata, changed-file inventory, review history, and workflow run `30124667387`; Repo → compare `4b0c1e09abc3f905a3315190576fa7339e991062...e9422f0a16d3cb689e18e993e809a96dd14899e8`.
+
+#### Major surfaces affected
+
+* **Identity/release:** Epic-attributed PR-01 created the foundation; PR-06R-A replaced the original release mechanics with canonical-manifest-derived identity and external exact-source attestation. Current Repo derives runtime `release_id` from canonical packaged `catalog/manifest.json`. **Evidence pointer:** PF10 — HDE Build Notes → 2.1 and 2.16; Repo → `engine/runtime/identity.py`, `catalog/manifest.json`, `tools/evidence/build_release_attestation.py`.  
+* **Determinism/A7:** Epic-attributed PR-02 produced the determinism/A7 family; current Repo designates only `GET /reader` as a success proof route. **Evidence pointer:** PF10 — HDE Build Notes → 2.2; Repo → `docs/ENDPOINTS_CATALOG.json`; PF17-Canon-HDE-Narratives-Guide, §`Transport posture (route-only; titles-only)` → “Success proofs run only on a cataloged JSON success route” | “`/internal/version` is ops-only and not A7-eligible.”  
+* **CI rails:** Epic-attributed PR-03 established reusable rails proof and safety validation; current Repo retains the integration test and CI checks. **Evidence pointer:** PF10 — HDE Build Notes → 2.3; Repo → `tests/evidence/test_rails_ci_workflow_integration.py` and `.github/workflows/ci.yml`.  
+* **DB/BodyGraph/architecture:** PR-04 created the posture evidence family; later PR-06R work replaced active bridge selection with a single direct psycopg provider and historical quarantine of bridge-era evidence. **Evidence pointer:** PF10 — HDE Build Notes → 2.5, 2.12, 2.13; Repo → `engine/db/adapter.py`, `artifacts/architecture/architecture_snapshot.keys_only.json`, `artifacts/runtime/direct_db_selection.snapshot.json`.  
+* **Mapped cache:** PR-05/OPS-02 implemented and captured bounded configured-v2 persistence; current Repo requires explicit upsert, stores only mapped payloads, verifies canonical read-back/idempotence, and refuses production-like execution. **Evidence pointer:** PF10 — HDE Build Notes → 2.7, 2.8, 2.15; Repo → mapped-cache modules, manifest, and OPS-02 packet.  
+* **Evidence/OPS:** PR-06R-B bound direct-selection and OPS-03 records to the updater-owned Index/Mirror graph; OPS-01 remains historical and OPS-02 remains the mapped-cache packet. **Evidence pointer:** PF10 — HDE Build Notes → 2.13–2.20; Repo → `docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`, and three OPS roots.  
+* **Documentation:** PR \#368 updated current-state guidance after the implementation/evidence merge. **Evidence pointer:** Repo → PR \#368 changed-file inventory and current HEAD.
+
+#### Evidence inventory (what exists)
+
+| Family | Concrete current evidence | Established posture | Evidence pointer |
+| ----- | ----- | ----- | ----- |
+| Identity/release | `catalog/manifest.json`; `artifacts/identity/service_identity.json`; `tools/evidence/build_release_attestation.py` | Manifest is the single tracked release-identity input; attestation is written externally. | PF10 — HDE Build Notes → 2.16; Repo → listed files. |
+| Environment/architecture/A7 | `artifacts/audit/env/env_snapshot.json`; `artifacts/architecture/architecture_snapshot.keys_only.json`; `docs/ENDPOINTS_CATALOG.json` | Env `v3`; keys-only architecture source quotation `"analyzer_verdict": "pass"`; one GET success route. | Repo → each exact file and observed fields. |
+| Direct DB | `artifacts/runtime/direct_db_selection.snapshot.json`; `schemas/hde_epic038_direct_db_selection.v1.json`; `engine/db/adapter.py` | PF10 assigns distinct current direct-only identity and bars historical bridge evidence from satisfying its gate. | PF10 — HDE Build Notes → 2.13; Repo → listed paths. |
+| Mapped cache | `artifacts/bodygraph/v2_mapped_cache/manifest.json`; seven manifest-bound primaries; two schemas; `audit/ops/hde-epic038/ops-02/` | Bounded mapped-payload persistence and retained OPS-02 support. | PF10 — HDE Build Notes → 2.7, 2.8, 2.15; Repo → manifest and OPS-02 root. |
+| OPS-01 | `audit/ops/hde-epic038/ops-01/` | Historical bridge-era evidence only. | PF10 — HDE Build Notes → 2.12–2.13; Repo → OPS-01 Index rows classified `historical_bridge_evidence`. |
+| OPS-03 | `audit/ops/hde-epic038/ops-03/{commands.txt,stdout.txt,stderr.txt,exit_code.txt,env_presence.json,db_posture_summary.json,nonclaims.json,result_summary.json,validation_receipt.json,checksums.sha256}`; seven schemas; `audit/ops/hde-epic038/ops-03-operator-record/` | Direct read-only packet and separate operator record; final admission attributed to PR \#367. | PF10 — HDE Build Notes → 2.14, 2.19, 2.20; Repo → exact roots. |
+| Index/Mirror | `docs/evidence/INDEX.json`; `docs/evidence/INDEX.sha256`; `artifacts/evidence_index.jsonl`; `artifacts/evidence_index.sha256` | Updater-owned Human Index/Machine Mirror plus sentinels; 94 Epic-related pairs in each current file. | PF10 — HDE Build Notes → 2.15; Repo → files and read-only pair comparison. |
+| Release sanity | `audit/gates/sanity_pipeline/sanity_pipeline.log`; `tools/evidence/run_sanity_pipeline.py` | Exact nineteen-stage definition and current tracked log; source quotation `"summary:PASS"`. | PF10 — HDE Build Notes → 2.15, 2.20; Repo → script and log. |
+| Documentation delta | `audit/docdeltas/hde-epic038_pf09_ops_delegation_amendment_proposal.md` | Repo labels it non-canonical. | Repo → exact path → “non-canonical.” |
+| Representative tests | `tests/runtime/test_identity.py`; `tests/evidence/test_determinism_gate_proofs.py`; `tests/evidence/test_rails_ci_workflow_integration.py`; `tests/evidence/test_architecture_snapshot.py`; `tests/bodygraph/test_v2_mapped_cache.py`; `tests/evidence/test_hde_epic038_release_sanity.py`; `tests/db/test_direct_db_pr06r.py`; `tests/ops/test_hde_epic038_ops03.py`; `tests/evidence/test_release_attestation.py`; `tests/unit/test_check_direct_db_contract.py` | Current Repo presence only; historical attribution follows the PR/PF10 pointers above. | Repo → current tree at HEAD → each exact test path. |
+
+#### Evidence gaps
+
+1. **What is missing or unclear:** the authoritative historical CI disposition for PR \#349.  
+   * **Why it matters:** PF10 and the directly observed GitHub run conflict.  
+   * **Evidence needed:** full Actions run/rerun list and failed-job logs tied to head `9307c18b0d356d4f0db32e94f2cdd22849ab0c29`, including any later successful run PF10 used.  
+   * **Expected evidence location, if known:** GitHub Actions for PR \#349/head `9307c18b0d356d4f0db32e94f2cdd22849ab0c29`.  
+   * **Search proof or Unknown:** **Unknown.** PF10 2.2 says visible checks succeeded; Repo → run `29263427931` shows `test: failure` and `sanity-pipeline: failure`.  
+2. **What is missing or unclear:** exact executed OPS-03 provisioning SQL bytes and the full role grant/default-privilege graph.  
+   * **Why it matters:** the tracked packet proves bounded capture posture but not every provisioning statement or inherited privilege edge.  
+   * **Evidence needed:** immutable executed SQL transcript plus a full grants/default-privileges inventory for the provisioned roles.  
+   * **Expected evidence location, if known:** separate authorization-bound operator evidence; no exact Repo path is established.  
+   * **Search proof or Unknown:** **Unknown.** PF10 — HDE Build Notes → 2.19) OPS-03 evidence limitations records both gaps.  
+3. **What is missing or unclear:** whether a dedicated HDE-EPIC038 QA root, close-pack, token-evidence matrix, or acceptance map exists in a governed later lane.  
+   * **Why it matters:** these are potential Lead-decision evidence, but the implementation plan placed later QA/closeout surfaces outside implementation execution.  
+   * **Evidence needed:** exact governed paths or recursive tracked-tree output.  
+   * **Expected evidence location, if known:** `audit/qa/hde-epic038/` was a searched candidate; other exact homes are **Unknown**.  
+   * **Search proof or Unknown:** **Search method:** searched Repo for `audit/qa/hde-epic038`, `HDE-EPIC038 close-pack`, `HDE-EPIC038 close_pack`, `HDE-EPIC038 token_evidence_matrix`, and `HDE-EPIC038 acceptance_map` (case: insensitive); scope: current GitHub-indexed tracked files; tool: GitHub code search/manual scan; result: 2, 9, 2, 13, and 13 hits, respectively, with no directly identified dedicated artifact. Connector-index limits leave nonexistence **Unknown**. **Supplemental evidence pointer:** Gap in PF10/PF-Canon/Repo: whether these were implementation deliverables. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Later artifacts outside implementation execution`.  
+4. **What is missing or unclear:** working-tree status at inspection time.  
+   * **Why it matters:** uncommitted bytes cannot be attributed or assessed through the committed GitHub view.  
+   * **Evidence needed:** before/after `git status --short --branch` from the exact checkout.  
+   * **Expected evidence location, if known:** local repository checkout.  
+   * **Search proof or Unknown:** **Unknown;** connector-backed inspection exposed committed server objects only.
+
+### Retrospective (Process)
+
+#### What went well
+
+* The planned dependency chain was reflected in an attributable PR sequence: identity first, determinism/A7 next, reusable rails, DB/BodyGraph posture, mapped cache, then release binding. **Evidence pointer:** Gap in PF10/PF-Canon/Repo: intended dependency order. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Execution plan`; Epic attribution → PF10 2.1–2.8 and GitHub PR \#346–\#359 metadata.  
+* PF10 recorded implementation and remediation separately, making original intent, review findings, and later state distinguishable. **Evidence pointer:** PF10 — HDE Build Notes → 2.1, 2.3, 2.5, 2.7, 2.17, 2.20.  
+* The evidence updater became a single ownership point for Human Index, Machine Mirror, and sentinels, reducing independent companion drift. **Evidence pointer:** PF10 — HDE Build Notes → 2.15) ADR-CANON-008 → updater ownership and one-run/check-only sequence; Repo → `tools/evidence/update_evidence_index.py`.  
+* Direct-only evidence and historical bridge evidence received separate identities and meanings rather than being silently reused. **Evidence pointer:** PF10 — HDE Build Notes → 2.13) ADR-CANON-006 → “MUST have separate identities, owners, meanings, and release predicates”; Repo → direct-selection snapshot and OPS-01 Index classification.  
+* Manifest-derived identity plus external attestation removed the tracked self-reference edge from release evidence. **Evidence pointer:** PF10 — HDE Build Notes → 2.16) → “No edge may point from a generated attestation back into tracked source”; Repo → `catalog/manifest.json`, attestation builder.  
+* Final docs reconciliation occurred after the implementation/evidence merge and now matches current Repo surfaces. **Evidence pointer:** Repo → PR \#368 and compare PR \#367 merge to current HEAD → exactly eight documentation/PF10 paths.
+
+#### What did not go well
+
+* Several planned PR slices required multiple remediation PRs: PR-01 used two merges; PR-03 three; PR-04 two; PR-05 three; and PR-06 expanded from \#359 through \#367 plus OPS commits. **Evidence pointer:** Repo → GitHub PR/merge metadata \#346–\#367; PF10 — HDE Build Notes → 2.1, 2.3, 2.5, 2.7, 2.17, 2.21.  
+* PR \#354’s final-head workflow failed before PR \#355 repaired malformed Mirror/runtime-token evidence. **Evidence pointer:** Repo → Actions run `29453252169` → failure; PF10 — HDE Build Notes → 2.5) → malformed Mirror/missing runtime-token finding and remediation.  
+* PR \#349 has unresolved CI provenance because PF10’s success note conflicts with Actions run `29263427931`. **Evidence pointer:** PF10 — HDE Build Notes → 2.2; Repo → run `29263427931`.  
+* The original PR-04/OPS-01/PR-06 design relied on bridge parity; PF10 later retired that active transport, producing a substantial direct-only remediation lineage. **Evidence pointer:** Gap in PF10/PF-Canon/Repo: intended PR-04/OPS-01 transport design. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → PR-04/OPS-01 intent; PF10 — HDE Build Notes → 2.9, 2.12, 2.17.  
+* PF10 2.20 needed 2.21 to correct both its tip statement and five-row PF09 inventory; current Repo has since advanced again through PF10/docs commits. **Evidence pointer:** PF10 — HDE Build Notes → 2.21) PF10 Remediation Assessment → “Its `main` tip statement is stale … and its five-row PF09 closure list is incomplete”; Repo → current HEAD and compare from `4b0c1e09…`.  
+* Historical OPS provenance contains a misleading commit title: `be179833…` says OPS-02 but changes OPS-01 paths. **Evidence pointer:** Repo → commit metadata/changed paths for `be179833532a210afbd7fc019f27fc5281440469` and `fbb1639890a89858c17ba8ac1f09af410df15d8f`.
+
+#### What we learned (Process)
+
+* A plan establishes intended decomposition, not historical execution; PR metadata/PF10/git history are required for attribution. **Evidence pointer:** supplemental gap/pointer in Executive Summary; Repo → observed PR sequence; PF10 → historical addenda.  
+* Review-success text must be reconciled with run-level Actions data, including reruns, before use as historical CI fact. **Evidence pointer:** PR \#349 conflict: PF10 2.2 versus Actions run `29263427931`.  
+* Evidence-graph changes are safer when the producer/updater owns both indexes and sentinels and the release pipeline checks rather than repairs. **Evidence pointer:** PF10 — HDE Build Notes → 2.15; Repo → updater and stage 15 check-only definition.  
+* Architecture rescoping must explicitly reclassify obsolete evidence; leaving bridge-era packets present without historical labels would confuse current transport posture. **Evidence pointer:** PF10 — HDE Build Notes → 2.12–2.13; Repo → OPS-01 historical classification.  
+* External attestation better fits exact-source proof than a tracked derivative whose bytes feed its own source identity. **Evidence pointer:** PF10 — HDE Build Notes → 2.16; Repo → attestation builder’s external-empty-directory guard.  
+* Permanent PF09 status remains a separate authority lane: implementation/evidence presence cannot move source status. **Evidence pointer:** PF09.6 current status lines; PF10 — HDE Build Notes → 2.15 no-status-change clause.
+
+### Retrospective (Application / System)
+
+#### What we learned about the system itself
+
+* The database selection boundary is concentrated in `DBAccess.for_current_env`: retired keys are rejected before `DATABASE_URL` is read, and only `PsycopgProvider` is instantiated. **Evidence pointer:** Repo → `engine/db/adapter.py` → retired-key check before `DATABASE_URL` read | `PsycopgProvider` import/constructor; PF10 — HDE Build Notes → 2.12.  
+* Runtime release identity can derive from one canonical tracked manifest while build attestation remains external to the source tree. **Evidence pointer:** Repo → `engine/runtime/identity.py`, `catalog/manifest.json`, `tools/evidence/build_release_attestation.py`; PF10 — HDE Build Notes → 2.16.  
+* The evidence graph is a coupled product: primaries, path proofs, Human Index, Machine Mirror, and sentinels must move through one updater and a check-only pipeline stage. **Evidence pointer:** PF10 — HDE Build Notes → 2.15; Repo → updater, indexes, sentinels, pipeline stage 15\.  
+* Mapped-cache safety depends on separating mapping from persistence: only explicit upsert can write, the stored body is projected HDE payload, read-back is canonicalized, and production-like contexts are refused. **Evidence pointer:** Repo → `engine/bodygraph/resolver.py`, `engine/bodygraph/mapped_cache.py`, `engine/cli/main.py`; PF10 — HDE Build Notes → 2.7–2.8.  
+* A7 proof routing is catalog-driven rather than inferred from endpoint similarity; current Repo designates `GET /reader` and excludes `/internal/version`. **Evidence pointer:** Repo → `docs/ENDPOINTS_CATALOG.json`; PF17-Canon-HDE-Narratives-Guide, §`Transport posture (route-only; titles-only)`.  
+* Historical evidence remains useful after architecture retirement only when its identity and gate meaning are quarantined. **Evidence pointer:** PF10 — HDE Build Notes → 2.13; Repo → OPS-01 historical Index rows and direct-selection primary.  
+* OPS-03 demonstrates that operational posture and evidence admission are separate: the operator packet records a direct read-only capture, while PR \#367 owns updater/Index/Mirror admission. **Evidence pointer:** PF10 — HDE Build Notes → 2.19–2.20; Repo → OPS-03 packet, operator record, and PR \#367 diff.
+
+#### Known remaining risks / debt
+
+1. **Category: Should-fix**  
+   * **Risk or debt:** PF09.6 still describes bridge fallback/provider parity and token `DEV_DB_BRIDGE_FALLBACK_OK`, while PF10/current Repo are direct-only.  
+   * **Why it matters:** permanent phase guidance can misroute future planning even though PF10 currently supersedes the exact topic.  
+   * **Evidence pointer or Unknown:** PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)` / §`Subtask HDE-DIST001.5 — BodyGraph mechanics gates`; PF10 — HDE Build Notes → 2.12; Repo → `engine/db/adapter.py`.  
+2. **Category: Should-fix**  
+   * **Risk or debt:** PF09.6 names `artifacts/proofs/sanity_pipeline.transcript.log` and a generic sequence, while PF10/current Repo use `audit/gates/sanity_pipeline/sanity_pipeline.log` and nineteen ordered stages.  
+   * **Why it matters:** evidence-path and sequence drift weakens repeatable interpretation.  
+   * **Evidence pointer or Unknown:** PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline`; PF10 — HDE Build Notes → 2.15; Repo → current pipeline script/log.  
+3. **Category: Should-fix**  
+   * **Risk or debt:** current PF10 2.21’s tip is historical-at-review (`079d4aba…`), while current Repo is `e9422f0a…`; the intervening three commits are PF10/docs changes.  
+   * **Why it matters:** live addenda should distinguish the final implementation/evidence merge from later current-state documentation.  
+   * **Evidence pointer or Unknown:** PF10 — HDE Build Notes → 2.21 → “Current tip: `079d4aba…`”; Repo → compare `4b0c1e09…` to `e9422f0a…` and current `main`.  
+4. **Category: Should-fix**  
+   * **Risk or debt:** PR \#349’s historical CI record is conflicting.  
+   * **Why it matters:** retrospective validation claims cannot be traced to one authoritative run.  
+   * **Evidence pointer or Unknown:** **Unknown:** PF10 2.2 records successful visible checks; Repo run `29263427931` records two failed jobs.  
+   * **Evidence needed, when Unknown:** full run/rerun history and logs for head `9307c18b0d356d4f0db32e94f2cdd22849ab0c29`.  
+5. **Category: Should-fix**  
+   * **Risk or debt:** OPS-03 lacks exact executed provisioning SQL bytes and a full privilege/default-privilege graph.  
+   * **Why it matters:** capture posture is evidenced, but privilege provenance remains bounded.  
+   * **Evidence pointer or Unknown:** **Unknown:** PF10 — HDE Build Notes → 2.19 evidence limitations.  
+   * **Evidence needed, when Unknown:** immutable provisioning transcript and full grants/default-privileges inventory.  
+6. **Category: Nice-to-have**  
+   * **Risk or debt:** historical OPS commit naming does not consistently match changed packet paths.  
+   * **Why it matters:** lineage reconstruction takes additional commit/path inspection.  
+   * **Evidence pointer or Unknown:** Repo → `be179833532a210afbd7fc019f27fc5281440469` title/path mismatch; `fbb1639890a89858c17ba8ac1f09af410df15d8f` introduces current OPS-02 paths.
+
+### Canon Alignment and Documentation Outcomes
+
+#### 5.1 Canon references used
+
+* **PF10 — HDE Build Notes, §0) Front Matter; §2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport; §2.13) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine; §2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership; §2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics; §2.19) PR-06 Remediation \- HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary; §2.20) PR-06 Remediation PR-06R-B HDE-EPIC038; §2.21) PR-06 Remediation State.** Front matter identifies version `v12.4.1`, status `Living`, exact-topic-only authority, and the latest-addendum rule: “If multiple addenda address the same or overlapping scope, the highest-numbered / latest addendum is the only authoritative one.” These sections governed live addenda and PF10-recorded history; they were not used to substitute for current Repo inspection. **Evidence pointer:** PF10 — HDE Build Notes → Front Matter → “Treat it as the current source of truth only for the specific items it explicitly covers” | “If a topic does not appear in the latest PF10, then PF10 has nothing to say about it.”  
+* **PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST005.1 — Canonical encodings & environment pins`; §`Subtask HDE-DIST005.2 — Global Index & Mirror discipline`; §`Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)`; §`Subtask HDE-DIST001.5 — BodyGraph mechanics gates`; §`Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline`; §`Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity`; §`Subtask HDE-DIST001.10 — Architecture snapshot (keys-only) evidence`; §`Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening`.** Governed the eight exact current source statuses and exposed permanent-canon drift; no status was inferred from Repo/PF10.  
+* **PF17-Canon-HDE-Narratives-Guide, §`Transport posture (route-only; titles-only)`; §`5.1 Reader v1 Posture — bands-only; narrative-free`.** Governed the interpretation that A7 success proof uses a cataloged JSON success route, excludes `/internal/version`, and does not imply Reader narrative expansion.
+
+#### 5.2 Proposed PF10 Addenda (contain drain targets / doc delta intents)
+
+##### Candidate: Post-PR \#368 tip distinction and eight-row Distillation drainage
+
+* **Status:** PROPOSED, not canon  
+* **Addendum title:** `HDE-EPIC038 post-documentation tip distinction and Distillation row consolidation`  
+* **Evidence basis:** PF10 2.21 records tip `079d4aba61771c020813547125c34105617374db` and corrects the inventory to eight rows; current Repo is `e9422f0a16d3cb689e18e993e809a96dd14899e8`; compare from PR \#367 returns three later commits and eight documentation/PF10 paths. PF09.6 retains bridge-era and future mapped-cache wording. **Evidence pointer:** PF10 — HDE Build Notes → 2.21; Repo → current HEAD and compare `4b0c1e09…...e9422f0a…`; PF09.6 exact eight row sections.  
+* **Why:** current PF10 exact-topic wording needs a live current-tip clarification, and current PF09.6 contains evidenced transport, evidence-path, and mapped-cache drift.  
+* **Decision, rule, or clarification:** distinguish PR \#367 merge `4b0c1e09abc3f905a3315190576fa7339e991062` as the final implementation/evidence integration point from PF10 review tip `079d4aba61771c020813547125c34105617374db` and docs-reconciled current tip `e9422f0a16d3cb689e18e993e809a96dd14899e8`; preserve all eight mapped PF09.6 rows and their source statuses; stage direct-only, nineteen-stage, and bounded mapped-cache wording for permanent drainage without claiming status movement.  
+* **Drain targets:**  
+  * **PF document title:** `PF09.6-Canon-HDE-Build-Checklist-Distillation`  
+    * **Section, only when copied verbatim:** the eight exact subtask headings listed in 5.1.  
+    * **Delta intent:** replace active bridge/provider-parity and old pipeline-path posture with direct-only/history-quarantine/current-pipeline wording; align `HDE-DIST001.11` with bounded implemented nonproduction mapped-cache behavior while leaving source-status decisions to the PF09 lane.  
+  * **PF document title:** `HDE Schemas and Artifacts`  
+    * **Delta intent:** single-home direct-selection schema/artifact identity, external-attestation/path-proof semantics, and current pipeline-log path.  
+  * **PF document title:** `HDE Mechanics Guide`  
+    * **Delta intent:** single-home direct-only selector and bounded mapped-cache runtime mechanics.  
+  * **PF document title:** `Glow QA Guide`  
+    * **Delta intent:** single-home final nineteen-stage and external-attestation validation semantics without converting evidence presence into QA acceptance.  
+  * **PF document title:** `HDE Governance`  
+    * **Delta intent:** retire bridge-token semantics, preserve evidence-owner/nonclaim boundaries, and route exact-source external-attestation governance.  
+* **Supersedes or conflicts, if applicable:** clarifies PF10 2.21’s historical-at-review tip; stages drainage for PF09.6 bridge fallback/provider parity, `DEV_DB_BRIDGE_FALLBACK_OK`, old sanity-log path, and future-only mapped-cache wording.  
+* **Implementation impact:** documentation/governance clarification; the exact post-\#367 compare returns documentation/PF10 paths only.  
+* **Uncertain drain targets, only when needed:** exact permanent sections in `HDE Schemas and Artifacts`, `HDE Mechanics Guide`, `Glow QA Guide`, and `HDE Governance` were not retrieved; titles come from PF10 2.16’s named drainage homes.
+
+#### 5.3 Token and evidence semantics
+
+##### Bridge-fallback token drift
+
+* **Observed drift:** current PF09.6 lists exact token name `DEV_DB_BRIDGE_FALLBACK_OK`, while current exact-topic PF10 retires bridge fallback and current Repo refuses retired keys before direct-provider construction. No token satisfaction is claimed.  
+* **Governing source:** PF10 — HDE Build Notes → 2.12) pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement; current Repo for implementation reality.  
+* **Evidence basis:** PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST001.5 — BodyGraph mechanics gates` → `DEV_DB_BRIDGE_FALLBACK_OK`; Repo → `engine/db/adapter.py`.  
+* **Related proposed PF10 addendum:** `HDE-EPIC038 post-documentation tip distinction and Distillation row consolidation`.  
+* **Likely drain target by title:** `PF09.6-Canon-HDE-Build-Checklist-Distillation`; `HDE Governance`.  
+* **Exact locator, only when copied verbatim:** §`Subtask HDE-DIST001.5 — BodyGraph mechanics gates`.
+
+##### Release-sanity path/sequence drift
+
+* **Observed drift:** PF09.6 names `artifacts/proofs/sanity_pipeline.transcript.log` and a generic sequence; current PF10/Repo use `audit/gates/sanity_pipeline/sanity_pipeline.log` and exactly nineteen ordered stages.  
+* **Governing source:** PF10 — HDE Build Notes → 2.15) ADR-CANON-008; Repo for current path/script.  
+* **Evidence basis:** PF09.6-Canon-HDE-Build-Checklist-Distillation, §`Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline`; Repo → `tools/evidence/run_sanity_pipeline.py`, `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+* **Related proposed PF10 addendum:** `HDE-EPIC038 post-documentation tip distinction and Distillation row consolidation`.  
+* **Likely drain target by title:** `PF09.6-Canon-HDE-Build-Checklist-Distillation`; `Glow QA Guide`; `HDE Schemas and Artifacts`.  
+* **Exact locator, only when copied verbatim:** §`Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline`.
+
+### Closure Evidence Snapshot (for Lead decision)
+
+#### 6.1 Evidence produced
+
+* **Identity/release:** `catalog/manifest.json`, `artifacts/identity/service_identity.json`, manifest-derived runtime identity code, external-attestation builder/schema/tests. **Evidence pointer:** Repo → exact paths; PF10 — HDE Build Notes → 2.16.  
+* **Determinism/A7/rails:** determinism tests/artifacts, `docs/ENDPOINTS_CATALOG.json`, rails integration test/evidence surfaces. **Evidence pointer:** PF10 — HDE Build Notes → 2.2–2.3; Repo → `tests/evidence/test_determinism_gate_proofs.py`, `tests/evidence/test_rails_ci_workflow_integration.py`, endpoint catalog.  
+* **Environment/architecture:** `artifacts/audit/env/env_snapshot.json` (`v3`) and `artifacts/architecture/architecture_snapshot.keys_only.json`. **Evidence pointer:** Repo → both artifacts and observed fields.  
+* **Direct DB:** `artifacts/runtime/direct_db_selection.snapshot.json`, its schema, direct selector, static contract check, and tests. **Evidence pointer:** PF10 — HDE Build Notes → 2.12–2.13; Repo → exact direct-DB paths.  
+* **Mapped cache/OPS-02:** `artifacts/bodygraph/v2_mapped_cache/manifest.json`, bound primaries/schemas, mapped-cache modules/tests, and `audit/ops/hde-epic038/ops-02/`. **Evidence pointer:** PF10 — HDE Build Notes → 2.7–2.8, 2.15; Repo → exact paths.  
+* **OPS-03:** ten primary packet files, seven schemas, checksums, validation receipt, and separate operator record. **Evidence pointer:** PF10 — HDE Build Notes → 2.14, 2.19–2.20; Repo → `audit/ops/hde-epic038/ops-03/` and `audit/ops/hde-epic038/ops-03-operator-record/`.  
+* **Index/Mirror:** Human Index, Machine Mirror, two sentinels, 94 HDE-EPIC038-related pairs in each current index. **Evidence pointer:** Repo → four exact files and read-only pair comparison; PF10 — HDE Build Notes → 2.15 ownership.  
+* **Release gate:** current nineteen-stage script/log, with source quotation `"summary:PASS"`, and successful final-head workflow runs for PRs \#366, \#367, and \#368. **Evidence pointer:** Repo → pipeline script/log; Actions runs `30000554815`, `30071658923`, `30124667387`.  
+* **Historical classification:** OPS-01 packet remains present and indexed as historical bridge evidence. **Evidence pointer:** PF10 — HDE Build Notes → 2.12–2.13; Repo → `audit/ops/hde-epic038/ops-01/` and Index rows.  
+* **Documentation:** current seven-file PR \#368 reconciliation and non-canonical doc-delta proposal `audit/docdeltas/hde-epic038_pf09_ops_delegation_amendment_proposal.md`. **Evidence pointer:** Repo → PR \#368 changed-file list and exact doc-delta path.
+
+#### 6.2 Evidence missing or ambiguous
+
+1. **Missing or ambiguous evidence:** PR \#349’s historical CI result.  
+   * **Why it matters:** PF10’s success statement conflicts with one directly observed failed run.  
+   * **Evidence needed:** full run/rerun history and logs for head `9307c18b0d356d4f0db32e94f2cdd22849ab0c29`.  
+   * **Expected location, if known:** GitHub Actions for PR \#349.  
+   * **Search proof or Unknown:** **Unknown;** PF10 2.2 versus run `29263427931`.  
+2. **Missing or ambiguous evidence:** exact OPS-03 provisioning SQL bytes and full grants/default-privileges graph.  
+   * **Why it matters:** tracked capture evidence does not establish every provisioning/privilege edge.  
+   * **Evidence needed:** immutable SQL transcript and full privilege inventory.  
+   * **Expected location, if known:** separate authorization-bound operator evidence; exact path **Unknown**.  
+   * **Search proof or Unknown:** **Unknown;** PF10 2.19 explicitly retains these limitations.  
+3. **Missing or ambiguous evidence:** dedicated HDE-EPIC038 QA root, close-pack, token-evidence matrix, and acceptance map.  
+   * **Why it matters:** these may be relevant only to a later Lead/QA/closeout lane; they were not implementation-plan deliverables.  
+   * **Evidence needed:** exact governed paths or recursive tree output.  
+   * **Expected location, if known:** candidate QA root `audit/qa/hde-epic038/`; other exact homes **Unknown**.  
+   * **Search proof or Unknown:** **Search method:** searched Repo for `audit/qa/hde-epic038`, `HDE-EPIC038 close-pack`, `HDE-EPIC038 close_pack`, `HDE-EPIC038 token_evidence_matrix`, and `HDE-EPIC038 acceptance_map` (case: insensitive); scope: current GitHub-indexed tracked files; tool: GitHub code search/manual scan; result: 2, 9, 2, 13, and 13 hits, respectively, without a directly identified dedicated artifact; nonexistence remains **Unknown**. **Supplemental evidence pointer:** Gap in PF10/PF-Canon/Repo: whether these were implementation deliverables. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Later artifacts outside implementation execution`.  
+4. **Missing or ambiguous evidence:** mutable working-tree state during inspection.  
+   * **Why it matters:** committed GitHub state cannot reveal uncommitted divergence.  
+   * **Evidence needed:** before/after status from the exact checkout.  
+   * **Expected location, if known:** local checkout.  
+   * **Search proof or Unknown:** **Unknown;** connector-backed inspection had no mutable checkout.
+
+#### 6.3 Open closure items / questions for the Lead
+
+1. **Question or unresolved item:** Which run or rerun should govern the historical PR \#349 CI record?  
+   * **Current evidence:** PF10 2.2 records successful visible checks; Actions run `29263427931` records failed `test` and `sanity-pipeline` jobs.  
+   * **Missing evidence or decision basis:** full PR-head Actions history and logs.  
+   * **Relevant PF document title, when canon-related:** PF10 — HDE Build Notes.  
+2. **Question or unresolved item:** How should the Lead weigh current PF10 exact-topic supersession while permanent PF09.6 still carries bridge-era token/path wording and source statuses?  
+   * **Current evidence:** PF10 2.12–2.16 supplies direct-only/current evidence semantics; PF09.6 contains the exact drift listed in 5.3.  
+   * **Missing evidence or decision basis:** the separate authority-lane decision for permanent drainage and PF09 status treatment.  
+   * **Relevant PF document title, when canon-related:** PF10 — HDE Build Notes; PF09.6-Canon-HDE-Build-Checklist-Distillation.  
+   * **Exact locator, only when copied verbatim:** the eight PF09.6 subtask headings listed in 5.1.  
+3. **Question or unresolved item:** Are the later QA/close-pack/acceptance artifacts required for the Lead’s separate determination, given that the implementation plan placed them outside implementation execution?  
+   * **Current evidence:** bounded searches identified only planning/documentation/general-index references, while implementation and OPS evidence listed in 6.1 exists. **Supplemental evidence pointer:** Gap in PF10/PF-Canon/Repo: whether those later surfaces were implementation deliverables. Artifact → `r6 Implementation Plan HDE-EPIC038.md` → `Later artifacts outside implementation execution`.  
+   * **Missing evidence or decision basis:** exact governed later-artifact requirements and paths.  
+   * **Relevant PF document title, when canon-related:** **Unknown** from the consulted sections.  
+4. **Question or unresolved item:** Do the OPS-03 provisioning-evidence limits affect how the operational packet should be weighed?  
+   * **Current evidence:** PF10 records one direct read-only capture with zero writes/retries/alternate-provider attempts and separately records missing exact provisioning SQL/full privilege graph.  
+   * **Missing evidence or decision basis:** immutable provisioning SQL and a full privilege/default-privilege inventory, or an explicit Lead decision on the bounded packet’s evidentiary scope.  
+   * **Relevant PF document title, when canon-related:** PF10 — HDE Build Notes.  
+   * **Exact locator, only when copied verbatim:** §`2.19) PR-06 Remediation - HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary`.
+
+   ## 2.23) Post Implementation Audit Triage HDE-EPIC038
+
+Audit Summary
+
+* The audit compares HDE-EPIC038’s planned architecture, runtime, evidence, determinism, vendor, DB, and emitter posture with repository reality at commit `e9422f0a16d3cb689e18e993e809a96dd14899e8`.  
+* Targeted read-only GitHub inspection confirmed that `main` remains at the same commit inspected by the Audit Report.  
+* The principal themes are split Presenter namespaces, multiple app factories, distinct Reader and compat surfaces, multi-root evidence storage, deterministic-core/effectful-seam separation, and path-case classification.  
+* Total findings: 11\.  
+* Must-act-now findings: 1\.  
+* Proposal homes: PF09.6-Canon-HDE-Build-Checklist-Distillation and PF14 — HDE Mechanics Guide.  
+* No finding was materially contradicted. PF02 and PF12 already resolve or narrow ten findings without further documentation changes.  
+* The remaining current issue is SD-02: the production `Procfile` and local launcher select `adapter.factory:create_app()`, which omits the compat blueprint mounted by the other observed factories.
+
+Repo Inspection Summary
+
+* Observed repo root: `amthorn78/glow-hdengine-v2`.  
+* Observed HEAD before and after analysis: `e9422f0a16d3cb689e18e993e809a96dd14899e8`.  
+* Branch or detached state: `main`, the repository’s default branch; detached state is not applicable to the remote GitHub view.  
+* Working-tree status before analysis: N/A — the GitHub connector exposes committed repository state, not a mutable checkout. The Audit Report separately records its checkout as branch `work`, clean, at the same immutable commit.  
+* Bounded inspection scope: repository metadata; current commit; app factories and launch configuration; Reader and compat handlers; Presenter emitters; sampler and compat computation; BodyGraph vendor, ingest, mapped-cache, and DB modules; evidence indices and companions; Endpoint Catalogs; evidence updater; CI workflow; packaging metadata; and task-relevant PF files.  
+* Inspection methods: GitHub repository metadata lookup, latest-commit lookup, repository code search, and exact-path file retrieval from `main`. Verified local artifact bytes were accepted only where `git hash-object` matched the current GitHub blob SHA.  
+* Repo: `search_commits(repository="amthorn78/glow-hdengine-v2")` → `"e9422f0a16d3cb689e18e993e809a96dd14899e8"`.  
+* Repo: `"docs/evidence/INDEX.json"` and `"artifacts/evidence_index.jsonl"` → both parsed as 548 records.  
+* Repo: `"engine/presenter/emitter.py"` → `"Canonical emitter for governed public JSON bytes."`; `"presenter/reader_v1/emitter.py"` → `"public_bytes = emitter.emit_public(final)"`.  
+* Repo: `"Procfile"` → `"adapter.factory:create_app()"`; `"adapter/factory.py"` → registers only `bp`; `"adapter/wsgi.py"` and `"adapter/http_reader.py"` → register both Reader and compat blueprints.  
+* Material findings narrowed by Repo: DA-01 and EP-01 represent layered delegation to one byte authority, not two independent serializers. ED-01 and RP-01 establish distribution but do not establish broken index, mirror, or path-proof coherence.  
+* Working-tree status after analysis: N/A — no repository mutation occurred.
+
+Findings → Doc Delta Map
+
+FND-001 — DA-01
+
+Finding: Presenter and HTTP responsibilities occupy more than one package root, while the observed byte path still converges on one emitter.
+
+Audit anchor: “Presenter functionality also exists under engine/presenter/, and HTTP compatibility handlers live under engine/http/.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “DA-01 — Directory/architecture drift.”
+
+Epic Plan linkage: The Epic Plan expressly included engine, adapter, Presenter, no-second-HTTP-home, and architecture-snapshot posture.
+
+Epic Plan anchor: Epic Plan: PF Canon Applicability Snapshot → “PF02 — HDE Architecture — Applied: engine, adapter, presenter, BodyGraph cache, Endpoint Catalog, no second HTTP home, and mapped-cache boundary posture.”
+
+Repo cross-check: Current files confirm the namespace split and a single delegated byte-emission path.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"engine/presenter/emitter.py"` → `"return canon.sercanon(envelope, sort_keys=sort_keys)"`; `"presenter/reader_v1/emitter.py"` → `"public_bytes = emitter.emit_public(final)"`; `"engine/http/compat_handler.py"` → `"from engine.presenter import emit_public"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — current PF02 already classifies the namespace split.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 — HDE Architecture, §2.1 “Components & responsibilities (single homes)” → “Wrapper envelope builders MAY live under top-level `presenter/`, while the byte-authoritative emitter entrypoint MAY live under `engine/presenter/`.” | “A namespace split becomes architecture drift only if it introduces a second independent presenter component, a second serializer home, or an alternate public-byte path.” Repo inspection found delegation, not an alternate serializer.
+
+FND-002 — DA-02
+
+Finding: Runtime DB and vendor roles are implemented beneath `engine/db/` and `engine/bodygraph/`.
+
+Audit anchor: “DB and vendor functions are nested under engine/db/ and engine/bodygraph/.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “DA-02 — Directory/architecture drift.”
+
+Epic Plan linkage: The Epic Plan assigns vendor acquisition, persistence, retrieval, and computation to the HD Engine.
+
+Epic Plan anchor: Epic Plan: Contract and Compatibility Posture → Vendor-call ownership for Glow app integration → “The HD Engine remains the default owner of vendor acquisition, persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior.”
+
+Repo cross-check: Direct inspection confirmed the runtime vendor client, ingest, mapped-cache, and DB façade beneath `engine/`. The audit’s exhaustive no-top-level-package clause was not independently re-enumerated because it does not affect disposition.
+
+Repo posture: Partially confirmed
+
+Repo evidence pointer: Repo: `"engine/bodygraph/vendor_client.py"` → `"class HdApiClient"`; `"engine/bodygraph/ingest.py"` → `"from engine.db import DBAccess, Statement"`; `"engine/db/adapter.py"` → `"class DBAccess"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF02 already authorizes this seam location.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 — HDE Architecture, §6.2 “Vendor seam (concept only)” → “The BodyGraph ingest/resolution seam MAY be implemented under `engine/bodygraph/`.” | “Architecture treats `engine/bodygraph/` as a non-core I/O seam component.” The observed location is therefore already classified.
+
+FND-003 — SD-01
+
+Finding: `/reader` and `/api/compat/v1` are distinct surface classes with separate handlers and transport semantics.
+
+Audit anchor: “/reader is Reader-like and file-path driven; /api/compat/v1 is a separate internal/admin compatibility surface.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “SD-01 — Surface drift.”
+
+Epic Plan linkage: The Epic Plan preserved existing public Reader behavior while allowing bounded internal and evidence surfaces.
+
+Epic Plan anchor: Epic Plan: Contract and Compatibility Posture → Contract changes and new surfaces → “No new public user-facing contract is planned.”
+
+Repo cross-check: The Endpoint Catalog and route decorators confirm `/reader` as a Reader success surface and `/api/compat/v1` as internal/admin.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"docs/ENDPOINTS_CATALOG.json"` → `"/api/compat/v1"` has `"classification":"internal_admin"` and `"/reader"` is the A7-eligible Reader success route; `"adapter/http_reader.py"` → `@bp.get("/reader")`; `"engine/http/compat_handler.py"` → `url_prefix="/api/compat/v1"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF02 already distinguishes the surface classes.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 — HDE Architecture, §3.8.2 “QA entrypoints (concept-only)” → “Reader-like success surfaces, compat API surfaces (for example `/api/compat/v1`), and dev/internal harness surfaces may coexist inside one adapter-mounted HTTP family without collapsing into one proof class.” No wording delta is needed.
+
+FND-004 — SD-02
+
+Finding: Multiple app factories expose different route sets, and the factory selected by both the production `Procfile` and local launcher omits the compat blueprint.
+
+Audit anchor: “The repository exposes multiple app factories… the narrow factory does not mount the compatibility blueprint.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “SD-02 — Surface drift.”
+
+Epic Plan linkage: The Epic Plan included A7 transport gates and an architecture snapshot covering public and internal surfaces.
+
+Epic Plan anchor: Epic Plan: Deliverable D11 — Architecture snapshot evidence → “Produce a keys-only architecture snapshot that reflects the Engine’s public and internal surfaces.”
+
+Repo cross-check: `adapter/wsgi.py` and `adapter/http_reader.py:create_app` mount both Reader and compat. `adapter/factory.py:create_app` mounts only Reader, while `Procfile` and `run_flask.py` select that narrower factory.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"adapter/factory.py"` → `"app.register_blueprint(bp, url_prefix=\"\")"` with no compat registration; `"Procfile"` → `"adapter.factory:create_app()"`; `"run_flask.py"` → `"from adapter.factory import create_app"`; `"adapter/wsgi.py"` → `"app.register_blueprint(reader_bp)"` and `"app.register_blueprint(compat_blueprint)"`.
+
+Must-act-now: YES
+
+Disposition: Doc delta proposed
+
+Correct home(s): PF09.6 for the current runtime remediation record; PF14 §32.1A for the missing factory-mount mechanics clarification.
+
+PF09.x task delta: YES
+
+PF09.x target: PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+PF14 mechanics delta: YES
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 already states the architecture rule, so it needs no delta. PF02 — HDE Architecture, §1.1 “Single homes” → “Multiple `create_app` implementations MAY exist for dev harnesses or wrappers, but production startup MUST delegate to one canonical adapter app factory entrypoint to avoid divergent route mounting.” PF02 — HDE Architecture, §3.8.1 “Dev/QA Reader availability” → “the harness is responsible for mounting the compat HTTP surface (`/api/compat/v1`).” PF09.6 is appropriate for current runtime work; PF14 is appropriate for the recurring service-factory mechanics gap.
+
+FND-005 — ED-01
+
+Finding: Evidence is distributed across multiple repository roots, while the governed indices bind many artifacts.
+
+Audit anchor: “Evidence is distributed across docs/, artifacts/, audit/, .audit\_src/, proofs/, goldens/, reports, catalog/freeze/narrative roots, and root-level captures.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “ED-01 — Evidence drift.”
+
+Epic Plan linkage: The Epic Plan required Human Evidence Index, hash sentinel, Machine Mirror, and path-proof coherence for governed artifacts.
+
+Epic Plan anchor: Epic Plan: Deliverable D1 — Global discipline → “the Human Evidence Index, hash sentinel, Machine Mirror, and required path proofs are updated in the same PR when artifact bytes change.”
+
+Repo cross-check: Current index, mirror, audit catalog mirror, endpoint catalog, and tooling paths confirm multi-root evidence and governed binding. Exact per-root file counts were not independently recomputed.
+
+Repo posture: Partially confirmed
+
+Repo evidence pointer: Repo: `"docs/evidence/INDEX.json"` → current Human Index; `"artifacts/evidence_index.jsonl"` → current Machine Mirror; `"artifacts/audit/ENDPOINTS_CATALOG.json"` → current governed audit mirror; `"tools/evidence/update_evidence_index.py"` → binds the Human Index and Machine Mirror paths.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF12 already defines intentional multi-root storage.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF12 — HDE-Schemas-and-Artifacts, §8.6.3.1 “Catalog governance and root discipline” → “The Evidence Catalog is intentionally multi-root.” | “Multi-root storage is not, by itself, evidence drift.” The audit did not establish an ungoverned new root or second truth home.
+
+FND-006 — ED-02
+
+Finding: The Human Evidence Index and Machine Mirror each contain 548 records and are maintained by explicit tooling and CI.
+
+Audit anchor: “docs/evidence/INDEX.json and artifacts/evidence\_index.jsonl both contain 548 records.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “ED-02 — Evidence drift.”
+
+Epic Plan linkage: Index and mirror parity was a cross-cutting HDE-EPIC038 obligation.
+
+Epic Plan anchor: Epic Plan: Deliverable D1 — Global discipline → “Enforce… Human Evidence Index updates, hash sentinel updates, Machine Mirror updates, and path-proof coherence.”
+
+Repo cross-check: Both current files were retrieved and parsed; each contains 548 records. CI invokes the updater, orientation check, hash check, and mirror-schema check.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"docs/evidence/INDEX.json"` → 548 parsed array records; `"artifacts/evidence_index.jsonl"` → 548 parsed JSONL records; `".github/workflows/ci.yml"` → `"python tools/evidence/update_evidence_index.py --check"`, `"python tools/evidence/orientation_demo.py --check"`, `"check_evidence_index_hash.sh"`, and `"check_mirror_schema.sh"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF12 already governs this exact pair.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF12 — HDE-Schemas-and-Artifacts, §Ownership → §Human Evidence Index → “Must maintain 1:1 parity with the Machine Evidence Mirror.” PF12’s existing rule matches the observed Repo posture.
+
+FND-007 — DD-01
+
+Finding: Compatibility and sampler computation are deterministic, while vendor ingestion is explicitly effectful.
+
+Audit anchor: “Compatibility and sampler compute paths use stable hashing, normalization, explicit sorting, and no observed clocks/randomness; vendor/ingest paths use clocks, network, DB, and append-only logs.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “DD-01 — Determinism drift.”
+
+Epic Plan linkage: Determinism gates and effectful BodyGraph/vendor work were separate deliverables.
+
+Epic Plan anchor: Epic Plan: Deliverable D5 — Determinism gates → “Implement and bind deterministic gates for preimage recompute, Reader to CLI parity, AB to BA coherence, two-run identity, and canonical JSON comparison.”
+
+Repo cross-check: The sampler explicitly disclaims randomness, clocks, and external state. Vendor ingestion uses network, monotonic time, DB access, and append-only logs.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"engine/sampler/core.py"` → `"No randomness, clocks, or external state are consulted."`; `"engine/bodygraph/ingest.py"` → `"start = time.monotonic()"`, `"vendor_result = client.fetch(request)"`, and `"DBAccess.for_current_env"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF02 already defines the deterministic-core/I/O-seam separation.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 — HDE Architecture, §1.1 “Single homes” → “BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam.” | “This carve-out does not relax purity requirements for deterministic compute modules.” The observed separation is aligned.
+
+FND-008 — VS-01
+
+Finding: Vendor I/O is concentrated in the BodyGraph vendor client and guarded by explicit SAFE/network rails.
+
+Audit anchor: “Vendor I/O is concentrated in engine/bodygraph/vendor\_client.py; ingest and resolver call it under explicit SAFE/network gates.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “VS-01 — Vendor seam drift.”
+
+Epic Plan linkage: The Epic Plan preserves HD Engine vendor ownership and closed-rails refusal.
+
+Epic Plan anchor: Epic Plan: Contract and Compatibility Posture → Vendor-call ownership for Glow app integration → “This epic does not authorize direct app-side HumanDesignAPI calls.”
+
+Repo cross-check: The vendor client owns HTTP behavior, and its default request path refuses unless `SAFE_MODE=0` and `ALLOW_NETWORK=1`.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"engine/bodygraph/vendor_client.py"` → `"class HdApiClient"` and `"if safe_mode != \"0\" or allow_network != \"1\": raise VendorError(\"PROVIDER_REFUSED\"…)"`; `"engine/bodygraph/ingest.py"` → `"vendor_result = client.fetch(request)"`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF02 already identifies this vendor seam and rails boundary.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF02 — HDE Architecture, §6.2 “Vendor seam (concept only)” → “The vendor seam… is the only place in the Engine/Adapter stack where live HTTP calls to the vendor may occur.” | “Rails must be explicitly open before any live HTTP is attempted.” Repo reality matches that rule.
+
+FND-009 — PC-01
+
+Finding: Code directories are lowercase, while governed filenames and identifiers may preserve uppercase characters.
+
+Audit anchor: “Active package roots and imports consistently use lowercase engine, adapter, and presenter; evidence paths preserve mixed tokens such as ENDPOINTS\_CATALOG.json.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “PC-01 — Path-case drift.”
+
+Epic Plan linkage: No explicit path-case task appears in the Epic Plan.
+
+Epic Plan anchor: N/A — Search method: searched Epic Plan for “path\[- \]case|directory case|lowercase director|mixed\[- \]case” (case: insensitive); scope: complete source; tool: rg; result: 0 hits.
+
+Repo cross-check: Current code roots are lowercase, and the governed Endpoint Catalog filename contains uppercase characters.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"engine/presenter/emitter.py"`, `"adapter/http_reader.py"`, and `"presenter/reader_v1/emitter.py"` → lowercase directory segments; `"docs/ENDPOINTS_CATALOG.json"` → uppercase filename under lowercase `docs/`.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF12 already distinguishes directory case from filename case.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF12 — HDE-Schemas-and-Artifacts, §Directory naming (lower-case ASCII) → “This rail applies to directory names only. Filenames MAY contain uppercase characters unless separately forbidden by canon.” The observed uppercase filenames are not directory-case drift.
+
+FND-010 — RP-01
+
+Finding: The audit identified 12 truth-bearing or governed-output roots, but did not establish an operational or authority defect from the count alone.
+
+Audit anchor: “12 truth-bearing/governed-output roots were observed.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “RP-01 — Root proliferation.” | “Impact: Not established from Repo evidence.”
+
+Epic Plan linkage: The Epic Plan depends on ledger-based evidence binding rather than a single physical evidence directory.
+
+Epic Plan anchor: Epic Plan: Deliverable D1 — Global discipline → “Human Evidence Index updates, hash sentinel updates, Machine Mirror updates, and path-proof coherence.”
+
+Repo cross-check: Current Repo inspection confirmed representative governed roots and current ledger surfaces. The exact 12-root census was not independently re-enumerated because no authority or coherence defect depends on the count.
+
+Repo posture: Partially confirmed
+
+Repo evidence pointer: Repo: `"docs/evidence/INDEX.json"`, `"artifacts/evidence_index.jsonl"`, `"artifacts/audit/ENDPOINTS_CATALOG.json"`, `"catalog/manifest.json"` through current indexed/searchable repository surfaces; current HEAD equals the audit’s immutable commit.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF12 states that root count and multi-root distribution alone do not trigger a canon change.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF12 — HDE-Schemas-and-Artifacts, §8.6.3.1 “Catalog governance and root discipline” → “Revisit evidence-root classification or root proliferation only when future work proposes either: a new governed root; or a second truth home for an existing governed evidence family.” | “Absent one of those proposals… \[multi-root distribution\] is not, by itself, a canon-change trigger.”
+
+FND-011 — EP-01
+
+Finding: Generic canonical emission, Reader-envelope construction, and comparison tooling occupy distinct modules with distinct responsibilities.
+
+Audit anchor: “Shared canonical emission is in engine/presenter/emitter.py; Reader shaping is in presenter/reader\_v1/emitter.py; comparison tooling is in presenter/json\_canon\_compare.py.”
+
+Audit evidence pointer: Audit Report: Drift and Reality vs Expectations → “EP-01 — Emitter posture.”
+
+Epic Plan linkage: The Epic Plan required a single canonical emitter boundary and emitter-hash evidence.
+
+Epic Plan anchor: Epic Plan: PF Canon Applicability Snapshot → “PF02 — HDE Architecture — Applied: engine, adapter, presenter… and no second HTTP home.”
+
+Repo cross-check: Reader shaping delegates final bytes to `engine.presenter.emitter`; comparison tooling is separate and does not become the runtime emitter.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: `"presenter/reader_v1/emitter.py"` → `"pre_bytes = emitter.emit_public(preimage)"` and `"public_bytes = emitter.emit_public(final)"`; `"engine/presenter/emitter.py"` → `"Canonical emitter for governed public JSON bytes."`
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): None — PF10 and PF02 already classify the single byte authority and permitted wrapper namespace.
+
+PF09.x task delta: NO
+
+PF09.x target: N/A — no build-checklist delta is established.
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A — Existing Issues List not provided.
+
+Why these are the correct homes: PF10 — HDE Build Notes, Addendum 2.4 “PR-04 HDE-EPIC038 — Approved Rescope and Canon Decisions,” §ADR-CANON-001 → “The existing Presenter remains the sole byte authority. Projected values are emitted only through `engine.presenter.emitter.emit_public`.” PF02 — HDE Architecture, §2.1 “Components & responsibilities (single homes)” → “Wrapper envelope builders MAY live under top-level `presenter/`, while the byte-authoritative emitter entrypoint MAY live under `engine/presenter/`.” No remaining canon ambiguity is established.
+
+Doc Delta Proposals — PF09.x (Tasks)
+
+PF09.x target doc: PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+Task ID: \<PF09\_TASK\_ID\_PLACEHOLDER\> — NEEDS PF09 ID ASSIGNMENT
+
+Subtask ID: N/A — no current PF09.6 subtask directly covers canonical factory route-mount parity.
+
+Status: \<PF09\_STATUS\_PLACEHOLDER\> — NEEDS STATUS ASSIGNMENT
+
+Task title: Canonical adapter factory route-mount parity
+
+Type: Repo remediation
+
+Must-act-now: YES
+
+Source finding: FND-004
+
+Evidence pointer(s): Audit Report: Drift and Reality vs Expectations → “SD-02 — Surface drift.” Epic Plan: Deliverable D11 → “Produce a keys-only architecture snapshot that reflects the Engine’s public and internal surfaces.” PF02 — HDE Architecture, §1.1 “Single homes” → “production startup MUST delegate to one canonical adapter app factory entrypoint to avoid divergent route mounting.”
+
+Repo evidence pointer(s): Repo: `"Procfile"` → `"adapter.factory:create_app()"`; `"run_flask.py"` → `"from adapter.factory import create_app"`; `"adapter/factory.py"` → mounts only `bp`; `"adapter/wsgi.py"` and `"adapter/http_reader.py"` → mount both Reader and compat blueprints.
+
+Why PF09.x is the correct home: The unresolved condition is current runtime implementation work affecting deployed and dev route availability. It belongs in a phased build checklist, not in PF02 architecture wording.
+
+Notes: Search method: searched PF09.6-Canon-HDE-Build-Checklist-Distillation for “app factor|create\_app|canonical adapter app factory|route mounting” (case: insensitive); scope: complete document; tool: rg; result: 0 hits. No existing task ID or status is claimed.
+
+Doc Delta Proposals — PF14 (Mechanics)
+
+MEC-001 —
+
+Target doc: PF14 — HDE Mechanics Guide
+
+Target section: §32.1A “Start command & service factory \[Required-Now\]”
+
+Delta: Clarify that service-factory correctness includes required route-mount parity for the factory actually selected by production and documented dev launchers. The deployed canonical factory must not omit the Reader, compat, or required internal/dev surfaces assigned to its deployment role. Mechanics evidence should record the selected factory and its mounted route inventory against the Endpoint Catalog and PF02 adapter responsibilities.
+
+Why: PF14 identifies `adapter.factory:create_app()` as the production service factory and requires “app factory correctness,” but does not connect correctness to required route mounting. Current Repo reality shows that this selected factory omits the compat blueprint mounted by the other factories.
+
+Evidence pointer(s): Audit Report: Drift and Reality vs Expectations → “Route availability depends on which factory is selected.” PF14 — HDE Mechanics Guide, §32.1A → “Prove the service initializes via the factory adapter.factory:create\_app()….” PF02 — HDE Architecture, §3.8.1 → “the harness is responsible for mounting the compat HTTP surface (`/api/compat/v1`).”
+
+Repo evidence pointer(s): Repo: `"Procfile"` → selects `adapter.factory:create_app()`; `"adapter/factory.py"` → registers only the Reader blueprint; `"adapter/wsgi.py"` and `"adapter/http_reader.py"` → also register `compat_blueprint`.
+
+PF proof excerpt: N/A — CANON SILENCE. Search method: searched PF14 — HDE Mechanics Guide for “adapter.factory.\*compat|compat.\*adapter.factory|factory.\*mount.\*compat|create\_app.\*compat|factory parity|route-set parity” (case: insensitive); scope: complete document; tool: rg; result: 0 hits.
+
+Why PF14 is the correct home: PF14 owns packaging, runtime process mechanics, service-factory correctness, and component build responsibilities. This delta clarifies the existing PF02 boundary without changing architecture ownership, public contracts, tokens, gates, or acceptance semantics.
+
+END OF AUDIT ANALYSIS
 
 \<eof\>
