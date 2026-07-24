@@ -30,33 +30,6 @@ jobs:
           python scripts/release_id_recompute.py --check-manifest-only
           python -m pytest -q tests/runtime/test_identity.py
           git diff --exit-code
-      - name: Materialize corrected PR-06R-B evidence for transfer
-        run: |
-          python tools/evidence/update_evidence_index.py
-          python tools/evidence/orientation_demo.py
-          git ls-files -z | tar --null --files-from=- -czf "$RUNNER_TEMP/pr367-generated-source.tgz"
-          passed=0
-          for attempt in 1 2 3 4 5 6; do
-            python tools/evidence/update_evidence_index.py
-            python tools/evidence/orientation_demo.py
-            if python tools/evidence/run_sanity_pipeline_gate.py; then
-              passed=1
-              break
-            fi
-          done
-          test "$passed" -eq 1
-          python tools/evidence/update_evidence_index.py --check
-          python tools/evidence/orientation_demo.py --check
-          python tools/evidence/run_sanity_pipeline_gate.py
-          git ls-files -z | tar --null --files-from=- -czf "$RUNNER_TEMP/pr367-generated-source.tgz"
-      - name: Publish corrected PR-06R-B evidence for transfer
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr367-generated-source-${{ github.sha }}
-          path: ${{ runner.temp }}/pr367-generated-source.tgz
-          if-no-files-found: error
-          retention-days: 1
       # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
       - run: python tools/cli/serializer_grep_guard.py
       - run: python tools/cli/emitter_symbol_proof.py

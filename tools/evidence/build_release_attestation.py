@@ -337,7 +337,52 @@ def _install_packaged_console_entrypoint(
     install_root: Path,
     transcript: list[str],
 ) -> Path:
-    """Install the tracked package and return its generated console-script bin."""
+    """Build and install the tracked package in an isolated runtime environment."""
+
+    wheelhouse = install_root / "wheelhouse"
+    wheelhouse.mkdir()
+    build = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            "--disable-pip-version-check",
+            "--no-index",
+            "--no-deps",
+            "--no-build-isolation",
+            "--wheel-dir",
+            str(wheelhouse),
+            str(package_source),
+        ],
+        cwd=install_root,
+        env=_clean_child_env(),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    wheels = tuple(sorted(wheelhouse.glob("*.whl")))
+    if (
+        build.returncode != 0
+        or len(wheels) != 1
+        or not wheels[0].is_file()
+        or wheels[0].is_symlink()
+    ):
+        raise AttestationBuildError(
+            "isolated_package_install_failed",
+            stage="build_package_wheel",
+            returncode=build.returncode,
+        )
+    wheel = wheels[0]
+    transcript.extend(
+        [
+            "stage=build_packaged_wheel",
+            "source=tracked_source_copy",
+            "exit_code=0",
+            "stdout_recorded=false",
+            "stderr_recorded=false",
+        ]
+    )
 
     venv = install_root / "venv"
     create = subprocess.run(
@@ -345,7 +390,6 @@ def _install_packaged_console_entrypoint(
             sys.executable,
             "-m",
             "venv",
-            "--system-site-packages",
             str(venv),
         ],
         cwd=install_root,
@@ -372,8 +416,7 @@ def _install_packaged_console_entrypoint(
             "--disable-pip-version-check",
             "--no-index",
             "--no-deps",
-            "--no-build-isolation",
-            str(package_source),
+            str(wheel),
         ],
         cwd=install_root,
         env=_clean_child_env(),

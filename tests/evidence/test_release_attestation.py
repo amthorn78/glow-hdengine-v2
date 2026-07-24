@@ -118,7 +118,11 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
     def run(argv, **_kwargs):
         command = list(argv)
         calls.append(command)
-        if command[1:4] == ["-m", "venv", "--system-site-packages"]:
+        if command[1:4] == ["-m", "pip", "wheel"]:
+            wheelhouse = Path(command[command.index("--wheel-dir") + 1])
+            wheelhouse.mkdir(parents=True)
+            (wheelhouse / "glow_hdengine-0.0.0-py3-none-any.whl").write_bytes(b"wheel")
+        elif command[1:3] == ["-m", "venv"]:
             scripts = tmp_path / "venv" / ("Scripts" if builder.os.name == "nt" else "bin")
             scripts.mkdir(parents=True)
             python = scripts / ("python.exe" if builder.os.name == "nt" else "python")
@@ -139,13 +143,17 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
         transcript,
     )
 
-    assert len(calls) == 2
-    assert calls[1][-1] == str(package_source)
-    assert "--no-index" in calls[1]
-    assert "--no-build-isolation" in calls[1]
+    assert len(calls) == 3
+    assert calls[0][-1] == str(package_source)
+    assert "--no-index" in calls[0]
+    assert "--no-build-isolation" in calls[0]
+    assert "--system-site-packages" not in calls[1]
+    assert calls[2][-1].endswith(".whl")
+    assert "--no-index" in calls[2]
     assert not (package_source / ".attestation-bin").exists()
     assert (scripts / ("hdctl.exe" if builder.os.name == "nt" else "hdctl")).is_file()
-    assert transcript[0] == "stage=install_packaged_console_entrypoint"
+    assert transcript[0] == "stage=build_packaged_wheel"
+    assert "stage=install_packaged_console_entrypoint" in transcript
 
 
 def test_console_entrypoint_path_is_platform_correct_and_bin_constrained():
