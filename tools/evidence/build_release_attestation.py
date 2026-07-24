@@ -309,6 +309,23 @@ def _generated_path_allowed(name: str) -> bool:
     return name in ATTESTATION_GENERATED_OUTPUTS
 
 
+
+def _write_isolated_console_entrypoint(scratch: Path) -> Path:
+    """Create a local hdctl wrapper for isolated exact-head console checks."""
+
+    bin_dir = scratch / ".attestation-bin"
+    bin_dir.mkdir()
+    wrapper = bin_dir / "hdctl"
+    wrapper.write_text(
+        "#!/usr/bin/env python3\n"
+        "import sys\n"
+        "from engine.cli.main import cli\n"
+        "raise SystemExit(cli())\n",
+        encoding="utf-8",
+    )
+    wrapper.chmod(0o755)
+    return bin_dir
+
 def _clean_child_env(source_root: Path | None = None) -> dict[str, str]:
     env = {
         key: value
@@ -321,6 +338,9 @@ def _clean_child_env(source_root: Path | None = None) -> dict[str, str]:
         # This is a controlled path, not a forwarded PYTHON* value. It keeps
         # installed console entrypoints bound to the isolated source copy.
         env["PYTHONPATH"] = str(source_root)
+        attestation_bin = source_root / ".attestation-bin"
+        if attestation_bin.is_dir():
+            env["HDE_ATTESTATION_BIN"] = str(attestation_bin)
     return env
 
 
@@ -506,7 +526,18 @@ def build_attestation(
             scratch.mkdir()
             _copy_tracked_source(source, scratch, tracked)
             _initialize_scratch_git(scratch)
-            baseline = _snapshot(scratch, tracked)
+            wrapper_bin = _write_isolated_console_entrypoint(scratch)
+            transcript.extend(
+                [
+                    "stage=install_console_entrypoint",
+                    f"path={wrapper_bin.relative_to(scratch).as_posix()}/hdctl",
+                    "exit_code=0",
+                    "stdout_recorded=false",
+                    "stderr_recorded=false",
+                ]
+            )
+            baseline_paths = _walk_files(scratch)
+            baseline = _snapshot(scratch, baseline_paths)
 
             closure = (
                 sys.executable,
@@ -529,7 +560,11 @@ def build_attestation(
 
             after_paths = _walk_files(scratch)
             after = _snapshot(scratch, after_paths)
-            removed = sorted(set(baseline) - set(after))
+            removed = sorted(
+                name
+                for name in set(baseline) - set(after)
+                if Path(name) in tracked
+            )
             if removed:
                 raise AttestationBuildError("isolated_producer_deleted_tracked_file")
             changed = {
