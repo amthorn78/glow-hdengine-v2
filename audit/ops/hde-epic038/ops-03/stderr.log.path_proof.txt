@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-03/stderr.log
+size_bytes: 0
+sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

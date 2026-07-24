@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import run_sanity_pipeline as sanity
+from tools.evidence import update_evidence_index
 
 
 @pytest.fixture(autouse=True)
@@ -107,6 +108,9 @@ def test_exact_19_stage_order_and_canonical_path():
 
 def test_pipeline_has_separate_direct_historical_ops02_and_ops03_validators():
     steps = sanity.default_steps()
+    assert steps[3].commands[0] == ("__validate_reader_cli_determinism__",)
+    assert steps[4].commands == (("__validate_a7_transport__",),)
+    assert steps[9].commands == (("__validate_architecture__",),)
     assert steps[6].commands[0] == ("__validate_direct_selection__",)
     assert steps[11].commands == (("__validate_historical_ops01__",),)
     assert steps[12].commands == (("__validate_ops02__",),)
@@ -137,18 +141,106 @@ def test_pre_ops_pipeline_consumes_prebuilt_artifacts_without_repairing_them():
                 assert "--check" in command or "--check-only" in command
 
 
-def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
+def test_source_pipeline_validates_manifest_without_currentizing_frozen_release_captures():
+    stage = sanity.default_steps()[1]
+    commands = set(stage.commands)
+
+    assert (
+        sanity.sys.executable,
+        "scripts/release_id_recompute.py",
+        "--check-manifest-only",
+    ) in commands
+    assert not any(
+        path in command
+        for command in commands
+        for path in (
+            "tools/evidence/generate_identity_provenance.py",
+            "tools/evidence/generate_release_bindings.py",
+            "ci/checks/check_release_identity.sh",
+        )
+    )
+    assert (
+        sanity.sys.executable,
+        "scripts/release_id_recompute.py",
+        "--check",
+    ) not in commands
+
+
+def test_current_release_validators_do_not_rewrite_frozen_captures():
+    frozen = (
+        "artifacts/architecture/architecture_snapshot.keys_only.json",
+        "artifacts/bodygraph/release_bindings.json",
+        "artifacts/identity/release_id.json",
+        "artifacts/identity/release_id_recompute.log",
+        "artifacts/identity/service_identity.json",
+        "artifacts/math/freeze_pack_manifest.json",
+        "artifacts/math/freeze_pack_manifest.json.sha256",
+        "artifacts/math/manifest_snapshot.json",
+        "artifacts/math/release_id.txt",
+        "artifacts/math/release_id.txt.sha256",
+        "artifacts/math/release_id_recompute.log",
+        "artifacts/math/release_id_recompute.log.sha256",
+        "artifacts/parity/two_run_identity.log",
+        "artifacts/proofs/reader_success_get_head_304.json",
+        "artifacts/proofs/success_304.txt",
+        "artifacts/proofs/success_encoding_invariance.txt",
+        "artifacts/proofs/success_get.txt",
+        "artifacts/proofs/success_head.txt",
+        "audit/gates/determinism/abba.bytes",
+        "audit/gates/determinism/open_rails_abba.json",
+        "audit/gates/determinism/tworun_identity.sha256",
+        "audit/gates/parity/reader_cli/ab.json",
+        "audit/gates/parity/reader_cli/ba.json",
+        "audit/gates/parity/reader_cli/summary.json",
+    )
+    before = {path: (sanity.ROOT / path).read_bytes() for path in frozen}
+
+    sanity.validate_current_reader_cli_determinism()
+    sanity.validate_current_a7_transport()
+    sanity.validate_current_architecture()
+
+    assert {path: (sanity.ROOT / path).read_bytes() for path in frozen} == before
+
+
+def test_pipeline_checks_prebuilt_evidence_without_post_seal_writes():
     commands = [command for step in sanity.default_steps() for command in step.commands]
     updater = (sanity.sys.executable, "tools/evidence/update_evidence_index.py")
     updater_check = (*updater, "--check")
     orientation = (sanity.sys.executable, "tools/evidence/orientation_demo.py")
     orientation_check = (*orientation, "--check")
-    assert commands.count(updater) == 1
+    assert commands.count(updater) == 0
     assert commands.count(updater_check) == 1
     assert commands.count(orientation) == 0
     assert commands.count(orientation_check) == 1
-    assert commands.index(updater) < commands.index(updater_check)
     assert commands.index(updater_check) < commands.index(orientation_check)
+
+
+def test_stale_evidence_graph_fails_final_pipeline_without_repair(
+    tmp_path, monkeypatch
+):
+    stage15, stage16 = sanity.default_steps()[14:16]
+    updater_check = (
+        sanity.sys.executable,
+        "tools/evidence/update_evidence_index.py",
+        "--check",
+    )
+    calls = []
+
+    def run(command):
+        calls.append(command)
+        return _result(1 if command == updater_check else 0)
+
+    monkeypatch.setattr(sanity, "_run_command", run)
+    log = tmp_path / "sanity.log"
+
+    assert sanity.run_pipeline(log_path=log, steps=[stage15, stage16]) == 1
+    assert calls == [updater_check]
+    text = log.read_text(encoding="utf-8")
+    assert f"check {stage15.name}:FAIL" in text
+    assert (
+        f"not_executed {stage16.name}:earlier_mandatory_failure={stage15.name}"
+        in text
+    )
 
 
 def test_first_failure_is_fail_closed_and_later_stages_are_recorded(
@@ -253,27 +345,19 @@ def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     )
 
 
-def test_unchanged_canonical_failure_receipt_is_not_rebound(tmp_path, monkeypatch):
+def test_final_pass_does_not_rebind_failure_receipt(tmp_path, monkeypatch):
     log = tmp_path / "sanity.log"
-    expected = _nonfinal_log()
-    log.write_bytes(expected)
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     _mock_pre_ops_success(monkeypatch)
-    monkeypatch.setattr(
-        sanity,
-        "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
-    )
+    monkeypatch.setattr(sanity, "validate_ops03_tracked_packet", lambda: None)
     monkeypatch.setattr(
         sanity,
         "_rebind_failure_log",
-        lambda: (_ for _ in ()).throw(AssertionError("unchanged receipt rebound")),
+        lambda: (_ for _ in ()).throw(AssertionError("failure receipt rebound")),
     )
 
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
-    assert log.read_bytes() == expected
+    assert sanity.run_pipeline(log_path=log) == 0
+    assert log.read_bytes() == _final_pass_log()
 
 
 def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatch):
@@ -297,7 +381,7 @@ def _mock_pre_ops_success(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sanity, "validate_ops02_package", lambda: None)
 
 
-def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
+def test_mandatory_stage14_missing_ops03_failure_stops_stages15_to19(
     tmp_path, monkeypatch
 ):
     log = tmp_path / "sanity.log"
@@ -306,13 +390,11 @@ def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
 
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log) == 1
     lines = log.read_text(encoding="utf-8").splitlines()
     assert [line for line in lines if line.startswith("check ")] == [
         f"check {name}:{'OK' if index < 13 else 'FAIL'}"
@@ -328,7 +410,7 @@ def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
     assert "summary:PASS" not in lines
 
 
-def test_pr_a_never_writes_prospective_pass_before_stage14(
+def test_stage14_failure_never_writes_prospective_pass(
     tmp_path, monkeypatch
 ):
     log = tmp_path / "sanity.log"
@@ -339,9 +421,7 @@ def test_pr_a_never_writes_prospective_pass_before_stage14(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
 
@@ -350,16 +430,16 @@ def test_pr_a_never_writes_prospective_pass_before_stage14(
         return original_write(path, results, first_failure, summary)
 
     monkeypatch.setattr(sanity, "_write_log", write)
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log) == 1
     assert summaries == ["FAIL"]
     assert b"summary:PASS" not in log.read_bytes()
 
 
 @pytest.mark.parametrize(
     ("seal_code", "expected"),
-    ((0, sanity.PR_A_NONFINAL_EXIT), (1, 1), (sanity.PR_A_NONFINAL_EXIT, 1)),
+    ((0, 1), (1, 1), (9, 9)),
 )
-def test_pr_a_nonfinal_exit_requires_successful_failure_rebind(
+def test_stage14_failure_requires_successful_failure_rebind(
     tmp_path, monkeypatch, seal_code, expected
 ):
     log = tmp_path / "sanity.log"
@@ -368,9 +448,7 @@ def test_pr_a_nonfinal_exit_requires_successful_failure_rebind(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: seal_code)
     assert sanity.run_pipeline(log_path=log) == expected
@@ -428,25 +506,23 @@ def test_pr05_proof_preflight_stops_before_generator(monkeypatch):
     assert calls == []
 
 
-def test_missing_ops03_is_reserved_nonfinal_only_at_stage14(
+def test_missing_ops03_is_an_ordinary_mandatory_stage_failure(
     tmp_path, monkeypatch
 ):
     step = sanity.default_steps()[13]
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
-    assert sanity._run_stage(step) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity._run_stage(step) == 1
 
     earlier = sanity.SanityStep("not-stage-14", (("__validate_ops03__",),))
     log = tmp_path / "earlier.log"
-    assert sanity.run_pipeline(log_path=log, steps=[earlier]) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log, steps=[earlier]) == 1
     text = log.read_text(encoding="utf-8")
     assert "check not-stage-14:FAIL" in text
-    assert "pr_a_state:nonfinal_fail_closed" not in text
+    assert "nonfinal" not in text
 
 
 def test_historical_bridge_evidence_validates_frozen_packet_without_execution(
@@ -456,6 +532,12 @@ def test_historical_bridge_evidence_validates_frozen_packet_without_execution(
         subprocess, "run", lambda *args, **kwargs: pytest.fail("historical command ran")
     )
     sanity.validate_historical_bridge_evidence()
+
+
+def test_historical_index_inventory_matches_frozen_integrity_inventory():
+    assert update_evidence_index.HISTORICAL_BRIDGE_PRIMARY_PATHS == frozenset(
+        sanity.HISTORICAL_BRIDGE_PRIMARY_SHA256
+    )
 
 
 def test_historical_bridge_packet_is_bound_to_exact_frozen_ledger(tmp_path):
@@ -472,6 +554,7 @@ def test_historical_bridge_packet_is_bound_to_exact_frozen_ledger(tmp_path):
     "relative",
     (
         "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/db/provider_parity/summary.json",
         "artifacts/runtime/env_connectivity.snapshot.json",
         "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json",
         "schemas/presenter_db_bridge_compare.v1.json",
@@ -879,12 +962,10 @@ def test_ops02_requires_exact_configured_v2_route_metadata(
 
 def test_current_commands_and_exact_proof_paths_are_wired():
     commands = [command for step in sanity.default_steps() for command in step.commands]
-    assert (sanity.sys.executable, "scripts/release_id_recompute.py", "--check") in commands
-    assert (sanity.sys.executable, "ci/checks/check_release_identity.sh") in commands
     assert (
         sanity.sys.executable,
-        "tools/evidence/generate_open_rails_abba_proof.py",
-        "--check",
+        "scripts/release_id_recompute.py",
+        "--check-manifest-only",
     ) in commands
     assert (
         sanity.sys.executable,
@@ -1270,9 +1351,7 @@ def test_tracked_ops03_fixture_is_validated_without_execution(tmp_path, monkeypa
 
 
 def test_missing_tracked_ops03_is_the_exact_downstream_condition(tmp_path):
-    with pytest.raises(
-        sanity.Ops03PacketUnavailable, match=sanity.PR_A_NONFINAL_REASON
-    ):
+    with pytest.raises(ValueError, match="tracked packet root is missing"):
         sanity.validate_ops03_tracked_packet(tmp_path)
 
 
@@ -1344,69 +1423,63 @@ def test_tracked_ops03_packet_mutations_fail_closed(
         sanity.validate_ops03_tracked_packet(root)
 
 
-def _nonfinal_log() -> bytes:
-    results = [(name, "OK") for name in sanity.STAGE_NAMES[:13]]
-    results.append((sanity.STAGE_NAMES[13], "NONFINAL_MISSING_OPS03"))
-    results.extend(
-        (name, f"NOT_EXECUTED_EARLIER_FAILURE:{sanity.STAGE_NAMES[13]}")
-        for name in sanity.STAGE_NAMES[14:]
-    )
-    return sanity._render_log(results, sanity.STAGE_NAMES[13], "FAIL")
+def _final_pass_log() -> bytes:
+    return sanity._render_log([(name, "OK") for name in sanity.STAGE_NAMES], "NONE", "PASS")
 
 
-def test_sanity_gate_accepts_only_exact_stage14_nonfinal_log(tmp_path, monkeypatch):
+def test_sanity_gate_accepts_only_exact_final_pass_log(tmp_path, monkeypatch):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
     log = tmp_path / "sanity_pipeline.log"
-    log.write_bytes(_nonfinal_log())
+    log.write_bytes(_final_pass_log())
     monkeypatch.setattr(gate, "LOG", log)
     assert gate.STAGE_NAMES == sanity.STAGE_NAMES
     assert gate._valid_log() is True
     for old, new in (
-        ("summary:FAIL", "summary:PASS"),
+        ("summary:PASS", "summary:FAIL"),
         (sanity.STAGE_NAMES[13], sanity.STAGE_NAMES[12]),
         ("stage_result:12:HISTORICAL_INTEGRITY_OK", "stage_result:12:PASS"),
         ("historical_nonclaim=true", "historical_nonclaim=false"),
     ):
-        log.write_bytes(_nonfinal_log().replace(old.encode(), new.encode(), 1))
+        log.write_bytes(_final_pass_log().replace(old.encode(), new.encode(), 1))
         assert gate._valid_log() is False
     for extra in (
         b"summary:PASS\n",
         b"stage_result:12:BRIDGE_PARITY_OK\n",
         b"unexpected:claim\n",
     ):
-        log.write_bytes(_nonfinal_log() + extra)
+        log.write_bytes(_final_pass_log() + extra)
         assert gate._valid_log() is False
 
 
-def test_sanity_gate_rejects_stale_valid_nonfinal_log(tmp_path, monkeypatch):
+def test_sanity_gate_rejects_stale_valid_final_pass_log(tmp_path, monkeypatch):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
     log = tmp_path / "sanity_pipeline.log"
-    log.write_bytes(_nonfinal_log())
+    log.write_bytes(_final_pass_log())
     monkeypatch.setattr(gate, "LOG", log)
     monkeypatch.setattr(
         gate.subprocess,
         "run",
-        lambda *args, **kwargs: _result(gate.PR_A_NONFINAL_EXIT),
+        lambda *args, **kwargs: _result(1),
     )
     assert gate._valid_log() is True
-    assert gate.main() == gate.PR_A_NONFINAL_EXIT
+    assert gate.main() == 1
 
 
-def test_sanity_gate_accepts_fresh_exact_nonfinal_log(tmp_path, monkeypatch, capsys):
+def test_sanity_gate_accepts_fresh_exact_final_pass_log(tmp_path, monkeypatch, capsys):
     from tools.evidence import run_sanity_pipeline_gate as gate
 
     log = tmp_path / "sanity_pipeline.log"
     log.write_text("stale receipt\n", encoding="utf-8")
 
     def run(*args, **kwargs):
-        log.write_bytes(_nonfinal_log())
+        log.write_bytes(_final_pass_log())
         return subprocess.CompletedProcess(
             [],
-            gate.PR_A_NONFINAL_EXIT,
+            0,
             "",
-            gate.FRESH_NONFINAL_STDERR,
+            "",
         )
 
     monkeypatch.setattr(gate, "LOG", log)
@@ -1414,20 +1487,19 @@ def test_sanity_gate_accepts_fresh_exact_nonfinal_log(tmp_path, monkeypatch, cap
     assert gate.main() == 0
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == gate.FRESH_NONFINAL_STDERR
+    assert captured.err == ""
 
 
 @pytest.mark.parametrize(
     ("returncode", "valid_log", "expected"),
     (
-        (sanity.PR_A_NONFINAL_EXIT, True, 0),
-        (sanity.PR_A_NONFINAL_EXIT, False, sanity.PR_A_NONFINAL_EXIT),
+        (0, True, 0),
+        (0, False, 1),
         (1, True, 1),
-        (0, True, 1),
         (2, True, 2),
     ),
 )
-def test_sanity_gate_only_tolerates_exact_fresh_nonfinal_receipt(
+def test_sanity_gate_only_tolerates_exact_fresh_final_pass_receipt(
     tmp_path, monkeypatch, returncode, valid_log, expected
 ):
     from tools.evidence import run_sanity_pipeline_gate as gate
@@ -1441,7 +1513,7 @@ def test_sanity_gate_only_tolerates_exact_fresh_nonfinal_receipt(
             [],
             returncode,
             "",
-            gate.FRESH_NONFINAL_STDERR if valid_log else "",
+            "",
         )
 
     monkeypatch.setattr(gate, "LOG", log)
@@ -1450,7 +1522,7 @@ def test_sanity_gate_only_tolerates_exact_fresh_nonfinal_receipt(
     assert gate.main() == expected
 
 
-def test_ci_builds_and_publishes_nonfinal_gate_in_external_attestation():
+def test_ci_builds_and_publishes_final_gate_in_external_attestation():
     workflow = (sanity.ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "run: python tools/evidence/run_sanity_pipeline.py" not in workflow
     assert "tools/evidence/regenerate_identity_closure.py" not in workflow

@@ -9,6 +9,16 @@ import pytest
 
 from tools.evidence import build_release_attestation as builder
 from tools.evidence import regenerate_identity_closure as closure
+from tools.cli import generate_cli_conformance_artifacts as cli_conformance
+
+
+def test_attestation_ci_job_is_bound_to_the_exact_pr_head():
+    workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+    job = workflow[workflow.index("  sanity-pipeline:") :]
+    exact_head = "${{ github.event.pull_request.head.sha || github.sha }}"
+
+    assert f"ref: {exact_head}" in job
+    assert f"name: hde-release-attestation-{exact_head}" in job
 
 
 def test_output_root_must_be_external_empty_directory(tmp_path):
@@ -57,7 +67,9 @@ def test_child_environment_is_closed_and_drops_sensitive_values(monkeypatch):
 
     assert {name: child[name] for name in builder.CLOSED_RAILS} == builder.CLOSED_RAILS
     assert child["HDE_ISOLATED_RELEASE_BUILD"] == "1"
-    assert child["PYTHONPATH"] == str(source)
+    assert child["HDE_ATTESTATION_BIN"] == str(source)
+    assert "PYTHONPATH" not in child
+    assert "VIRTUAL_ENV" not in child
     assert "DATABASE_URL" not in child
     assert "DB_BRIDGE_URL" not in child
     assert "HD_API_KEY" not in child
@@ -78,17 +90,92 @@ def test_success_transcript_is_names_only_and_runtime_independent(
         )
     )
     monkeypatch.setattr(builder.subprocess, "run", lambda *_args, **_kwargs: next(outputs))
-    monkeypatch.setattr(builder, "_clean_child_env", lambda _source: {})
+    monkeypatch.setattr(builder, "_clean_child_env", lambda _bin=None: {})
     first: list[str] = []
     second: list[str] = []
 
-    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), first)
-    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), second)
+    bin_dir = tmp_path / "bin"
+    builder._run_stage(
+        tmp_path,
+        "tests",
+        ("python", "-m", "pytest"),
+        first,
+        attestation_bin=bin_dir,
+    )
+    builder._run_stage(
+        tmp_path,
+        "tests",
+        ("python", "-m", "pytest"),
+        second,
+        attestation_bin=bin_dir,
+    )
 
     assert first == second
     assert "0.35" not in "\n".join(first)
     assert "0.31" not in "\n".join(second)
     assert "stdout_recorded=false" in first
+
+
+def test_isolated_console_entrypoint_is_installed_from_tracked_package(
+    tmp_path,
+    monkeypatch,
+):
+    package_source = tmp_path / "package-source"
+    package_source.mkdir()
+    calls: list[list[str]] = []
+
+    def run(argv, **_kwargs):
+        command = list(argv)
+        calls.append(command)
+        if command[1:4] == ["-m", "pip", "wheel"]:
+            wheelhouse = Path(command[command.index("--wheel-dir") + 1])
+            wheelhouse.mkdir(parents=True, exist_ok=True)
+            (wheelhouse / "glow_hdengine-0.0.0-py3-none-any.whl").write_bytes(b"wheel")
+        elif command[1:3] == ["-m", "venv"]:
+            scripts = tmp_path / "venv" / ("Scripts" if builder.os.name == "nt" else "bin")
+            scripts.mkdir(parents=True)
+            python = scripts / ("python.exe" if builder.os.name == "nt" else "python")
+            python.write_text("", encoding="utf-8")
+        else:
+            console = tmp_path / "venv" / (
+                "Scripts/hdctl.exe" if builder.os.name == "nt" else "bin/hdctl"
+            )
+            console.write_text("#!/bin/sh\n", encoding="utf-8")
+            console.chmod(0o755)
+        return subprocess.CompletedProcess(args=command, returncode=0)
+
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    transcript: list[str] = []
+    scripts = builder._install_packaged_console_entrypoint(
+        package_source,
+        tmp_path,
+        transcript,
+    )
+
+    assert len(calls) == 3
+    assert calls[0][-1] == str(package_source)
+    assert "--no-index" in calls[0]
+    assert "--no-build-isolation" in calls[0]
+    assert "--system-site-packages" not in calls[1]
+    assert calls[2][-1].endswith(".whl")
+    assert "--no-index" in calls[2]
+    assert not (package_source / ".attestation-bin").exists()
+    assert (scripts / ("hdctl.exe" if builder.os.name == "nt" else "hdctl")).is_file()
+    assert transcript[0] == "stage=build_packaged_wheel"
+    assert "stage=install_packaged_console_entrypoint" in transcript
+
+
+def test_console_entrypoint_path_is_platform_correct_and_bin_constrained():
+    env = {"HDE_ATTESTATION_BIN": "/isolated/venv/bin"}
+
+    assert cli_conformance._console_entrypoint_path(
+        env,
+        windows=False,
+    ) == Path("/isolated/venv/bin/hdctl")
+    assert cli_conformance._console_entrypoint_path(
+        env,
+        windows=True,
+    ) == Path("/isolated/venv/bin/hdctl.exe")
 
 
 def test_source_tree_digest_is_order_independent_and_names_only():
@@ -257,6 +344,26 @@ def test_tracked_source_copy_rejects_symlink_escape(tmp_path):
         )
 
 
+def test_tracked_source_copy_must_match_recorded_snapshot(tmp_path):
+    source = tmp_path / "source"
+    destination = tmp_path / "destination"
+    source.mkdir()
+    destination.mkdir()
+    tracked = (Path("tracked.txt"),)
+    (source / "tracked.txt").write_text("original\n", encoding="utf-8")
+    snapshot = builder._snapshot(source, tracked)
+
+    builder._copy_tracked_source(source, destination, tracked)
+    builder._require_exact_source_copy(destination, tracked, snapshot)
+
+    (destination / "tracked.txt").write_text("changed\n", encoding="utf-8")
+    with pytest.raises(
+        builder.AttestationBuildError,
+        match="tracked_source_copy_not_exact",
+    ):
+        builder._require_exact_source_copy(destination, tracked, snapshot)
+
+
 def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
     monkeypatch,
 ):
@@ -274,21 +381,18 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "NOT_ATTEMPTED",
-        "pipeline_stop": {
-            "stage": 14,
-            "reason": "pr_a_nonfinal_ops03_pr_b_binding_required",
-        },
+        "release_admission": "PR06R_B_FINAL_PASS",
+        "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [record],
         "omitted_files": [],
         "transcript": transcript,
         "nonclaims": [
-            "no_ops03_execution",
-            "no_live_packet",
+            "builder_executes_no_ops",
             "no_database_write",
-            "no_pr06r_b_admission",
-            "no_release_pipeline_pass_claim",
+            "no_deployment_or_migration",
+            "no_qa_pass_or_acceptance",
+            "no_pf09_status_movement",
         ],
     }
     monkeypatch.setattr(builder, "REQUIRED_EVIDENCE", (record["path"],))
@@ -302,6 +406,31 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
     payload["manifest_sha256"] = "e" * 64
     with pytest.raises(builder.AttestationBuildError, match="attestation_contract_invalid"):
         builder._validate_payload(payload)
+    payload["manifest_sha256"] = payload["release_id"]
+    payload["source_commit_exact"] = False
+    with pytest.raises(builder.AttestationBuildError, match="attestation_contract_invalid"):
+        builder._validate_payload(payload)
+
+
+def test_final_attestation_build_refuses_dirty_source(tmp_path, monkeypatch):
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "output"
+    monkeypatch.setattr(
+        builder,
+        "_git_identity",
+        lambda _source: ("b" * 40, False),
+    )
+
+    with pytest.raises(
+        builder.AttestationBuildError,
+        match="source_tree_not_clean",
+    ):
+        builder.build_attestation(output, source=source)
+
+    assert json.loads((output / "failure.json").read_text(encoding="utf-8"))[
+        "code"
+    ] == "source_tree_not_clean"
 
 
 def _write_minimal_bundle(tmp_path, monkeypatch):
@@ -321,21 +450,18 @@ def _write_minimal_bundle(tmp_path, monkeypatch):
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "NOT_ATTEMPTED",
-        "pipeline_stop": {
-            "stage": 14,
-            "reason": "pr_a_nonfinal_ops03_pr_b_binding_required",
-        },
+        "release_admission": "PR06R_B_FINAL_PASS",
+        "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [file_row],
         "omitted_files": [],
         "transcript": transcript_row,
         "nonclaims": [
-            "no_ops03_execution",
-            "no_live_packet",
+            "builder_executes_no_ops",
             "no_database_write",
-            "no_pr06r_b_admission",
-            "no_release_pipeline_pass_claim",
+            "no_deployment_or_migration",
+            "no_qa_pass_or_acceptance",
+            "no_pf09_status_movement",
         ],
     }
     raw = builder._canonical_bytes(payload)
@@ -449,5 +575,12 @@ def test_catalog_manifest_is_packaged_from_its_single_source():
 
     assert '"catalog*"' in pyproject
     assert 'catalog = ["*.json"]' in pyproject
+
+
+def test_magic10_thresholds_are_available_to_the_installed_console():
+    pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+
+    assert '"math*"' in pyproject
+    assert 'math = ["*.json"]' in pyproject
     assert Path("catalog/manifest.json").is_file()
     assert not Path("engine/runtime/catalog_manifest.json").exists()

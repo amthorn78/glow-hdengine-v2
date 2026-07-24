@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_env_presence.v1.json
+size_bytes: 1280
+sha256: 46b0de99e54c247417d469f8cf80ac3af09a9c90516b1ee15933fb27360b666c
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

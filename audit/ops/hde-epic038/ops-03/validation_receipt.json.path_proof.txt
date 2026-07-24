@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-03/validation_receipt.json
+size_bytes: 583
+sha256: a9b351bba2480d09b384dc4867e986f45d3d3ed964f457d763777dc332798d1f
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

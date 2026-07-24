@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-03/env_presence.json
+size_bytes: 446
+sha256: c9cdc9d648967d5ccede735e3bd9da97e03881f603dfa8e907eeb0ef3d33a0e6
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

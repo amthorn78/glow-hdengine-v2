@@ -91,6 +91,48 @@ def test_evidence_index_has_required_repo_artifacts():
     _assert_targets_present(REPO_TARGETS)
 
 
+def test_historical_bridge_inventory_is_nonclaiming_in_both_indexes():
+    expected_paths = update_evidence_index.HISTORICAL_BRIDGE_PRIMARY_PATHS
+    human = json.loads(Path("docs/evidence/INDEX.json").read_text(encoding="utf-8"))
+    mirror = [
+        json.loads(line)
+        for line in Path("artifacts/evidence_index.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+
+    for records in (human, mirror):
+        selected = [
+            record
+            for record in records
+            if record.get("discovered_physical_path") in expected_paths
+        ]
+        assert {record["discovered_physical_path"] for record in selected} == expected_paths
+        assert len(selected) == len(expected_paths)
+        for record in selected:
+            assert record["record_type"] == "historical_bridge_evidence"
+            assert record["notes"] == update_evidence_index.HISTORICAL_BRIDGE_NOTES
+            assert "tokens" not in record
+
+
+def test_historical_bridge_normalization_strips_current_claims():
+    normalized = update_evidence_index._normalize_index_entry(
+        {
+            "artifact_key": "bridge",
+            "discovered_physical_path": next(
+                iter(update_evidence_index.HISTORICAL_BRIDGE_PRIMARY_PATHS)
+            ),
+            "record_type": "current_bridge",
+            "tokens": ["CURRENT_BRIDGE_OK"],
+            "notes": "current provider fallback",
+        }
+    )
+
+    assert normalized["record_type"] == "historical_bridge_evidence"
+    assert normalized["notes"] == update_evidence_index.HISTORICAL_BRIDGE_NOTES
+    assert "tokens" not in normalized
+
+
 def test_write_if_changed_check_mode_fails_closed_for_missing_target(tmp_path: Path):
     target = tmp_path / "missing.sha256"
     with pytest.raises(SystemExit, match=rf"^STALE:{target}$"):

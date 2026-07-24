@@ -15,7 +15,8 @@ hdctl = "engine.cli.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["engine*", "adapter*", "presenter*", "catalog*"]
+include = ["engine*", "adapter*", "presenter*", "catalog*", "math*"]
 
 [tool.setuptools.package-data]
 catalog = ["*.json"]
+math = ["*.json"]

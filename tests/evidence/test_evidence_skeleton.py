@@ -229,7 +229,7 @@ def test_index_entries_have_mirrors_and_path_proofs():
         assert proof.get("produced_at_utc")
 
 
-def test_runtime_env_connectivity_canonical_token_binding():
+def test_runtime_env_connectivity_is_historical_only_in_current_indexes():
     target = ("runtime.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json")
     retired = {
         ("epic038.pr04.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json"),
@@ -242,8 +242,12 @@ def test_runtime_env_connectivity_canonical_token_binding():
         or (entry["artifact_key"], entry["discovered_physical_path"]) in retired
     ]
     assert [(entry["artifact_key"], entry["discovered_physical_path"]) for entry in matching_entries] == [target]
-    assert matching_entries[0].get("tokens") == ["DEV_DB_BRIDGE_FALLBACK_OK"]
+    assert matching_entries[0]["record_type"] == "historical_bridge_evidence"
+    assert "tokens" not in matching_entries[0]
+    assert "does not prove current service availability" in matching_entries[0]["notes"]
 
+    # The frozen primary retains its capture-time label, while current index
+    # metadata prevents that historical label from satisfying a current token.
     artifact = json.loads(Path(target[1]).read_text(encoding="utf-8"))
     proof_labels = artifact.get("proof_labels", [])
     assert {label.get("name") for label in proof_labels} == {"DEV_DB_BRIDGE_FALLBACK_OK"}
@@ -256,4 +260,6 @@ def test_runtime_env_connectivity_canonical_token_binding():
         or (rec["artifact_key"], rec["discovered_physical_path"]) in retired
     ]
     assert [(rec["artifact_key"], rec["discovered_physical_path"]) for rec in matching_mirror] == [target]
-    assert matching_mirror[0].get("tokens") == ["DEV_DB_BRIDGE_FALLBACK_OK"]
+    assert matching_mirror[0]["record_type"] == "historical_bridge_evidence"
+    assert "tokens" not in matching_mirror[0]
+    assert "does not prove current service availability" in matching_mirror[0]["notes"]

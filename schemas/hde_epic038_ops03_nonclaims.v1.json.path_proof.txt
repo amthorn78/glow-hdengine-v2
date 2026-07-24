@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_nonclaims.v1.json
+size_bytes: 692
+sha256: acb56785b3e49f16f60dd7ebf8203ad8d316da0fae373f69b59ece83ca7542bd
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

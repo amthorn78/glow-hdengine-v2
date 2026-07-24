@@ -22,21 +22,13 @@
   "properties": {
     "schema": {"const": "hde.release_attestation.v1"},
     "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "source_commit_exact": {"type": "boolean"},
+    "source_commit_exact": {"const": true},
     "source_tree_sha256": {"$ref": "#/$defs/sha256"},
     "release_id": {"$ref": "#/$defs/sha256"},
     "manifest_sha256": {"$ref": "#/$defs/sha256"},
     "validation_result": {"const": "PASS"},
-    "release_admission": {"const": "NOT_ATTEMPTED"},
-    "pipeline_stop": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["stage", "reason"],
-      "properties": {
-        "stage": {"const": 14},
-        "reason": {"const": "pr_a_nonfinal_ops03_pr_b_binding_required"}
-      }
-    },
+    "release_admission": {"const": "PR06R_B_FINAL_PASS"},
+    "pipeline_stop": {"type": "null"},
     "rails": {
       "type": "object",
       "additionalProperties": false,
@@ -63,11 +55,11 @@
     "nonclaims": {
       "type": "array",
       "prefixItems": [
-        {"const": "no_ops03_execution"},
-        {"const": "no_live_packet"},
+        {"const": "builder_executes_no_ops"},
         {"const": "no_database_write"},
-        {"const": "no_pr06r_b_admission"},
-        {"const": "no_release_pipeline_pass_claim"}
+        {"const": "no_deployment_or_migration"},
+        {"const": "no_qa_pass_or_acceptance"},
+        {"const": "no_pf09_status_movement"}
       ],
       "items": false,
       "minItems": 5,

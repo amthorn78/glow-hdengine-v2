@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_db_posture_summary.v1.json
+size_bytes: 6153
+sha256: 766290892d1dd5306d55bb78b5628605c3c863d24ac35a3f9243b8878a9e0366
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

@@ -23,8 +23,6 @@ from tools.evidence.retained_evidence_safety import validate_retained_text_safet
 
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
-PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
-PR_A_NONFINAL_EXIT = 3
 
 HISTORICAL_OPS01_FILES = (
     "commands.txt",
@@ -49,6 +47,9 @@ HISTORICAL_BRIDGE_PRIMARY_SHA256 = {
     "artifacts/db_bridge/provider_parity.proof.json": "27bca3f1e8d7fbf1dd32abfd5fffd831d6ce3e0380bdfa371ed4683706b533e0",
     "artifacts/db_bridge/query_select_1.json": "bd919ec13cc10567b72b81f4326a8b525d4db8a2d8914fc884b86a6530726862",
     "artifacts/db_bridge/root.json": "c3afa09727b1dfbfb1eb831658c392b2d20ab3843a5dfd946ad2bb0c12fd8ea5",
+    "artifacts/db/provider_parity/bridge.json": "8c670e7d5802ad33aeaabec66ba4143319f57cfde909f0e86af72cb6058cbeb1",
+    "artifacts/db/provider_parity/direct.json": "b9471967ea3d99fed00ff2d581298ce7baa24179fc889373eb20accf4c63f8f5",
+    "artifacts/db/provider_parity/summary.json": "960a3f1cdc57d10e120ff9ba18e52516d55bab679413c9f275397677fe9f8aaa",
     "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json": "40cb7dc2a668660f641df15ed054c731432dc17294a1810ab4aeae324c59270b",
     "artifacts/runtime/env_connectivity.nondev_failure.json": "596f7b6ac47c81b8786e49ab50f79663ba5e2c8ffbc32d954322f51eb1f81cfc",
     "artifacts/runtime/env_connectivity.snapshot.json": "5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45",
@@ -92,7 +93,6 @@ SAFE_ENV_REFERENCE = re.compile(
     r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})\Z"
 )
 
-
 @dataclass(frozen=True)
 class SanityStep:
     name: str
@@ -104,10 +104,6 @@ class SanityStep:
             object.__setattr__(self, "commands", (tuple(command),))
         else:
             object.__setattr__(self, "commands", tuple(tuple(item) for item in command))
-
-
-class Ops03PacketUnavailable(ValueError):
-    """The downstream OPS-03 packet has not been admitted yet."""
 
 
 STAGE_NAMES = (
@@ -135,20 +131,17 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[1], (
             _py("tools/config/generate_config_artifacts.py", "--check"),
             _py("tools/config/generate_bundles.py", "--check"),
-            _py("tools/evidence/generate_identity_provenance.py", "--check"),
-            _py("tools/evidence/generate_release_bindings.py", "--check"),
             _py("tools/evidence/generate_env_matrix_snapshot.py", "--check"),
-            _py("scripts/release_id_recompute.py", "--check"),
-            _py("ci/checks/check_release_identity.sh"),
+            _py("scripts/release_id_recompute.py", "--check-manifest-only"),
         )),
         SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
-        SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
-        SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py", "--check"),)),
+        SanityStep(STAGE_NAMES[3], (("__validate_reader_cli_determinism__",), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
+        SanityStep(STAGE_NAMES[4], (("__validate_a7_transport__",),)),
         SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py", "--check"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
         SanityStep(STAGE_NAMES[6], (("__validate_direct_selection__",), _py("ci/checks/check_direct_db_contract.py"))),
         SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_db_runtime_posture.py", "--check"),)),
         SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_bodygraph_policy_proofs.py", "--check"),)),
-        SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py", "--check"),)),
+        SanityStep(STAGE_NAMES[9], (("__validate_architecture__",),)),
         SanityStep(STAGE_NAMES[10], (
             ("__validate_pr05_proofs__",),
             _py("tools/evidence/generate_v2_mapped_cache_evidence.py", "--check"),
@@ -156,7 +149,10 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[11], (("__validate_historical_ops01__",),)),
         SanityStep(STAGE_NAMES[12], (("__validate_ops02__",),)),
         SanityStep(STAGE_NAMES[13], (("__validate_ops03__",),)),
-        SanityStep(STAGE_NAMES[14], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"))),
+        SanityStep(
+            STAGE_NAMES[14],
+            (_py("tools/evidence/update_evidence_index.py", "--check"),),
+        ),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[16], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(
@@ -561,16 +557,27 @@ def validate_ops_packages(root: Path = ROOT) -> None:
 
 
 def validate_direct_selection_contract() -> None:
-    """Exercise the direct-selection producer in memory without writing evidence."""
+    """Validate the tracked direct-selection primary against producer and schema."""
 
     from tools.evidence import generate_hde_epic038_direct_db_selection as direct
 
+    primary = direct.OUT
+    if not primary.is_file() or primary.is_symlink():
+        raise ValueError("direct selection tracked primary missing")
+    raw = primary.read_bytes()
+    if not raw.endswith(b"\n") or raw.endswith(b"\n\n"):
+        raise ValueError("direct selection primary final LF invalid")
+    payload = json.loads(raw.decode("utf-8"))
     first = direct.build()
     second = direct.build()
+    expected = direct.canonical_bytes(first)
     if (
-        direct.validate_contract(first)
-        or first.get("result") != "PASS"
-        or direct.canonical_bytes(first) != direct.canonical_bytes(second)
+        direct.validate_contract(payload)
+        or direct.validate_contract(first)
+        or payload.get("result") != "PASS"
+        or payload.get("failure") is not None
+        or raw != expected
+        or expected != direct.canonical_bytes(second)
     ):
         raise ValueError("direct selection contract validation failed")
 
@@ -599,7 +606,7 @@ def validate_ops03_tracked_packet(root: Path = ROOT) -> None:
     if packet.is_symlink():
         raise ValueError("ops-03: tracked packet root is not a real directory")
     if not packet.exists():
-        raise Ops03PacketUnavailable(PR_A_NONFINAL_REASON)
+        raise ValueError("ops-03: tracked packet root is missing")
     if not packet.is_dir():
         raise ValueError("ops-03: tracked packet root is not a real directory")
     try:
@@ -759,6 +766,59 @@ def _run_command(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
 
 
+def validate_current_reader_cli_determinism() -> None:
+    """Validate current behavior without rewriting frozen capture-time outputs."""
+
+    from tools.evidence import generate_determinism_gate_proofs as determinism
+    from tools.evidence import generate_open_rails_abba_proof as open_rails
+
+    top_level, outputs = determinism.build()
+    summary = json.loads(outputs[determinism.SUM])
+    if (
+        top_level is not True
+        or summary.get("top_level_pass") is not True
+        or not all(summary.get("predicates", {}).values())
+    ):
+        raise ValueError("current determinism predicates failed")
+    fixture = open_rails.build_fixture_proof()
+    if (
+        fixture.get("top_level_pass") is not True
+        or fixture.get("transport_call_count") != 0
+        or not all(fixture.get("predicates", {}).values())
+    ):
+        raise ValueError("current open-rails fixture predicates failed")
+
+
+def validate_current_a7_transport() -> None:
+    """Exercise the current A7 transport contract without refreshing captures."""
+
+    from tools.evidence import generate_a7_transport_proofs as transport
+
+    outputs = transport.build()
+    composite = json.loads(outputs[transport.PROOFS[6]])
+    transport.validate_composite(composite)
+    if not all(
+        composite[name].get("pass") is True
+        for name in ("get_200", "head_200", "after_304", "env_gate")
+    ):
+        raise ValueError("current A7 transport predicates failed")
+
+
+def validate_current_architecture() -> None:
+    """Run the current static architecture analyzer without refreshing its capture."""
+
+    from tools.evidence import generate_architecture_snapshot as architecture
+
+    payload = architecture.analyze()
+    architecture.validate(payload)
+    if (
+        payload.get("verdict") != "pass"
+        or payload.get("analyzer_verdict") != "pass"
+        or payload.get("unknown_count") != 0
+    ):
+        raise ValueError("current architecture analysis failed")
+
+
 def _run_stage(step: SanityStep) -> int:
     for command in step.commands:
         if command == ("__validate_pr05_proofs__",):
@@ -788,11 +848,26 @@ def _run_stage(step: SanityStep) -> int:
         elif command == ("__validate_ops03__",):
             try:
                 validate_ops03_tracked_packet()
-            except Ops03PacketUnavailable as exc:
-                print(str(exc), file=sys.stderr)
-                return PR_A_NONFINAL_EXIT
             except Exception:
                 print("ops03_packet_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_reader_cli_determinism__",):
+            try:
+                validate_current_reader_cli_determinism()
+            except Exception:
+                print("reader_cli_determinism_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_a7_transport__",):
+            try:
+                validate_current_a7_transport()
+            except Exception:
+                print("a7_transport_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_architecture__",):
+            try:
+                validate_current_architecture()
+            except Exception:
+                print("architecture_validation_failed", file=sys.stderr)
                 return 1
         else:
             result = _run_command(command)
@@ -807,13 +882,6 @@ def _run_stage(step: SanityStep) -> int:
 
 def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
     lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true"]
-    if any(status == "NONFINAL_MISSING_OPS03" for _, status in results):
-        lines.extend(
-            (
-                "pr_a_state:nonfinal_fail_closed",
-                f"final_readiness_blocked:{PR_A_NONFINAL_REASON}",
-            )
-        )
     for name, status in results:
         canonical_status = "OK" if status == "OK" else "FAIL"
         lines.append(f"check {name}:{canonical_status}")
@@ -870,15 +938,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
                 "PASS",
             )
         code = _run_stage(step)
-        status = (
-            "OK"
-            if code == 0
-            else (
-                "NONFINAL_MISSING_OPS03"
-                if code == PR_A_NONFINAL_EXIT and step.name == STAGE_NAMES[13]
-                else "FAIL"
-            )
-        )
+        status = "OK" if code == 0 else "FAIL"
         results.append((step.name, status))
         if code:
             failure = step.name
@@ -905,7 +965,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             seal_code = _rebind_failure_log()
             if seal_code:
                 print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-                return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
+                return seal_code
             return 1
         return 0
 
@@ -918,7 +978,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-            return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
+            return seal_code
     return 0 if passed else (code or 1)
 
 

@@ -2070,7 +2070,7 @@ def test_final_validator_rejects_each_checksum_input_mutation(authorization):
     checksum_path.write_text("\n".join(original_lines) + "\n", encoding="ascii")
 
 
-def test_pr_a_missing_ops03_stops_natural_pipeline_at_stage14(
+def test_missing_ops03_fails_final_pipeline_at_mandatory_stage14(
     tmp_path,
     monkeypatch,
 ):
@@ -2095,7 +2095,7 @@ def test_pr_a_missing_ops03_stops_natural_pipeline_at_stage14(
         sanity,
         "validate_ops03_tracked_packet",
         lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
+            RuntimeError("missing OPS-03 packet")
         ),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
@@ -2103,7 +2103,7 @@ def test_pr_a_missing_ops03_stops_natural_pipeline_at_stage14(
     steps = sanity.default_steps()
     assert len(steps) == 19
     assert steps[13].commands == (("__validate_ops03__",),)
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log) == 1
     lines = log.read_text(encoding="utf-8").splitlines()
     assert [line for line in lines if line.startswith("check ")] == [
         f"check {name}:{'OK' if index < 13 else 'FAIL'}"

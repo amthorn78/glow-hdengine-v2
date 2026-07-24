@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-03/commands.txt
+size_bytes: 918
+sha256: 3d08535a6c97433e8cd2c8af8c1b5aa9c3556601779a4747856db40122682b7a
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

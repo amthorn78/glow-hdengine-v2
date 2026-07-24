@@ -70,7 +70,12 @@ ENV_KEYS = tuple(ENV_PINS)
 def _env() -> dict[str, str]:
     env = os.environ.copy()
     scripts_dir = sysconfig.get_paths()["scripts"]
-    env["PATH"] = scripts_dir
+    attestation_bin = env.get("HDE_ATTESTATION_BIN")
+    env["PATH"] = (
+        f"{attestation_bin}{os.pathsep}{scripts_dir}"
+        if attestation_bin
+        else scripts_dir
+    )
     env.update(ENV_PINS)
     env["PIP_NO_INDEX"] = "1"
     ensure_determinism_env(environ=env)
@@ -84,6 +89,16 @@ def _run(
     stdin: bytes | None = None,
 ) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(cmd, input=stdin, capture_output=True, env=env, cwd=ROOT)
+
+
+def _console_entrypoint_path(
+    env: dict[str, str],
+    *,
+    windows: bool = os.name == "nt",
+) -> Path:
+    scripts_dir = sysconfig.get_paths()["scripts"]
+    console_root = env.get("HDE_ATTESTATION_BIN") or scripts_dir
+    return Path(console_root) / ("hdctl.exe" if windows else "hdctl")
 
 
 def _write_bytes(path: Path, data: bytes) -> None:
@@ -160,7 +175,7 @@ def _capture_outputs() -> dict[Path, bytes]:
     script_cmd = ["python", "scripts/hdctl.py"]
     script_execution_cmd = [sys.executable, *script_cmd[1:]]
 
-    console_path = str(Path(env["PATH"]) / "hdctl")
+    console_path = str(_console_entrypoint_path(env))
     console_cmd = ["hdctl"]
     console_available = Path(console_path).is_file() and os.access(
         console_path, os.X_OK

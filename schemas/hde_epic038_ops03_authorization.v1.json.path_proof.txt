@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_authorization.v1.json
+size_bytes: 4298
+sha256: 1174a9b264f3a27696442d70c75bc4316a398577496fcdcffae87360b501b7a8
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

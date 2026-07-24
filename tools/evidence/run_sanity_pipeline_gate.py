@@ -10,8 +10,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PINS = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
-PR_A_NONFINAL_EXIT = 3
-FRESH_NONFINAL_STDERR = "pr_a_nonfinal_ops03_pr_b_binding_required\n"
 STAGE_NAMES = (
     "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
     "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
@@ -27,12 +25,7 @@ STAGE_NAMES = (
 )
 
 
-def _valid_log() -> bool:
-    try:
-        data = LOG.read_bytes()
-        data.decode("utf-8")
-    except (OSError, UnicodeError):
-        return False
+def _expected_log() -> bytes:
     lines = [
         "run:sanity-pipeline",
         "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
@@ -42,19 +35,22 @@ def _valid_log() -> bool:
             "ops_evidence:retained_integrity_provenance_secret_safe_only;"
             "historical_nonclaim=true;not_rerun=true"
         ),
-        "pr_a_state:nonfinal_fail_closed",
-        "final_readiness_blocked:pr_a_nonfinal_ops03_pr_b_binding_required",
     ]
-    for index, name in enumerate(STAGE_NAMES):
-        lines.append(f"check {name}:{'OK' if index < 13 else 'FAIL'}")
-        if index == 11:
+    for name in STAGE_NAMES:
+        lines.append(f"check {name}:OK")
+        if name == STAGE_NAMES[11]:
             lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
-        if index >= 14:
-            lines.append(
-                f"not_executed {name}:earlier_mandatory_failure={STAGE_NAMES[13]}"
-            )
-    lines.extend((f"first_failed_stage:{STAGE_NAMES[13]}", "summary:FAIL"))
-    return data == ("\n".join(lines) + "\n").encode("utf-8")
+    lines.extend(("first_failed_stage:NONE", "summary:PASS"))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def _valid_log() -> bool:
+    try:
+        data = LOG.read_bytes()
+        data.decode("utf-8")
+    except (OSError, UnicodeError):
+        return False
+    return data == _expected_log()
 
 
 def main() -> int:
@@ -67,13 +63,7 @@ def main() -> int:
         capture_output=True,
         text=True,
     )
-    if (
-        result.returncode == PR_A_NONFINAL_EXIT
-        and result.stdout == ""
-        and result.stderr == FRESH_NONFINAL_STDERR
-        and _valid_log()
-    ):
-        print(FRESH_NONFINAL_STDERR, end="", file=sys.stderr)
+    if result.returncode == 0 and result.stdout == "" and result.stderr == "" and _valid_log():
         return 0
     if result.stdout:
         print(result.stdout, end="", file=sys.stdout)

@@ -266,8 +266,17 @@ def _copy_tracked_source(source: Path, destination: Path, paths: Sequence[Path])
             shutil.copy2(src, dst)
 
 
+def _require_exact_source_copy(
+    destination: Path,
+    paths: Sequence[Path],
+    source_snapshot: Mapping[str, Mapping[str, object]],
+) -> None:
+    if _snapshot(destination, paths) != source_snapshot:
+        raise AttestationBuildError("tracked_source_copy_not_exact")
+
+
 def _initialize_scratch_git(scratch: Path) -> None:
-    env = _clean_child_env(scratch)
+    env = _clean_child_env()
     env.update(
         {
             "GIT_AUTHOR_DATE": "2025-12-26T00:00:00Z",
@@ -309,19 +318,130 @@ def _generated_path_allowed(name: str) -> bool:
     return name in ATTESTATION_GENERATED_OUTPUTS
 
 
-def _clean_child_env(source_root: Path | None = None) -> dict[str, str]:
+
+def _clean_child_env(attestation_bin: Path | None = None) -> dict[str, str]:
     env = {
         key: value
         for key, value in os.environ.items()
-        if key in {"PATH", "TMPDIR", "VIRTUAL_ENV"}
+        if key in {"PATH", "TMPDIR"}
     }
     env.update(CLOSED_RAILS)
     env["HDE_ISOLATED_RELEASE_BUILD"] = "1"
-    if source_root is not None:
-        # This is a controlled path, not a forwarded PYTHON* value. It keeps
-        # installed console entrypoints bound to the isolated source copy.
-        env["PYTHONPATH"] = str(source_root)
+    if attestation_bin is not None:
+        env["HDE_ATTESTATION_BIN"] = str(attestation_bin)
     return env
+
+
+def _install_packaged_console_entrypoint(
+    package_source: Path,
+    install_root: Path,
+    transcript: list[str],
+) -> Path:
+    """Build and install the tracked package in an isolated runtime environment."""
+
+    wheelhouse = install_root / "wheelhouse"
+    wheelhouse.mkdir()
+    build = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            "--disable-pip-version-check",
+            "--no-index",
+            "--no-deps",
+            "--no-build-isolation",
+            "--wheel-dir",
+            str(wheelhouse),
+            str(package_source),
+        ],
+        cwd=install_root,
+        env=_clean_child_env(),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    wheels = tuple(sorted(wheelhouse.glob("*.whl")))
+    if (
+        build.returncode != 0
+        or len(wheels) != 1
+        or not wheels[0].is_file()
+        or wheels[0].is_symlink()
+    ):
+        raise AttestationBuildError(
+            "isolated_package_install_failed",
+            stage="build_package_wheel",
+            returncode=build.returncode,
+        )
+    wheel = wheels[0]
+    transcript.extend(
+        [
+            "stage=build_packaged_wheel",
+            "source=tracked_source_copy",
+            "exit_code=0",
+            "stdout_recorded=false",
+            "stderr_recorded=false",
+        ]
+    )
+
+    venv = install_root / "venv"
+    create = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "venv",
+            str(venv),
+        ],
+        cwd=install_root,
+        env=_clean_child_env(),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if create.returncode != 0:
+        raise AttestationBuildError(
+            "isolated_package_install_failed",
+            stage="create_venv",
+            returncode=create.returncode,
+        )
+
+    scripts = venv / ("Scripts" if os.name == "nt" else "bin")
+    python = scripts / ("python.exe" if os.name == "nt" else "python")
+    install = subprocess.run(
+        [
+            str(python),
+            "-m",
+            "pip",
+            "install",
+            "--disable-pip-version-check",
+            "--no-index",
+            "--no-deps",
+            str(wheel),
+        ],
+        cwd=install_root,
+        env=_clean_child_env(),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    console = scripts / ("hdctl.exe" if os.name == "nt" else "hdctl")
+    if install.returncode != 0 or not console.is_file() or not os.access(console, os.X_OK):
+        raise AttestationBuildError(
+            "isolated_package_install_failed",
+            stage="install_console_entrypoint",
+            returncode=install.returncode,
+        )
+    transcript.extend(
+        [
+            "stage=install_packaged_console_entrypoint",
+            "source=tracked_source_copy",
+            "entrypoint=hdctl",
+            "exit_code=0",
+            "stdout_recorded=false",
+            "stderr_recorded=false",
+        ]
+    )
+    return scripts
 
 
 def _run_stage(
@@ -329,11 +449,13 @@ def _run_stage(
     stage: str,
     argv: Sequence[str],
     log: list[str],
+    *,
+    attestation_bin: Path,
 ) -> None:
     proc = subprocess.run(
         list(argv),
         cwd=scratch,
-        env=_clean_child_env(scratch),
+        env=_clean_child_env(attestation_bin),
         check=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -496,40 +618,64 @@ def build_attestation(
     transcript: list[str] = []
     try:
         source_commit, source_clean = _git_identity(source)
-        if require_clean and not source_clean:
+        if not source_clean:
             raise AttestationBuildError("source_tree_not_clean")
         tracked = _tracked_paths(source)
         source_snapshot = _snapshot(source, tracked)
         source_tree_sha256 = _source_tree_digest(source_snapshot)
         with tempfile.TemporaryDirectory(prefix="hde-release-attestation-") as raw:
-            scratch = Path(raw) / "source"
+            isolated_root = Path(raw)
+            scratch = isolated_root / "source"
+            package_source = isolated_root / "package-source"
             scratch.mkdir()
+            package_source.mkdir()
             _copy_tracked_source(source, scratch, tracked)
+            _copy_tracked_source(source, package_source, tracked)
+            _require_exact_source_copy(scratch, tracked, source_snapshot)
+            _require_exact_source_copy(package_source, tracked, source_snapshot)
             _initialize_scratch_git(scratch)
-            baseline = _snapshot(scratch, tracked)
+            attestation_bin = _install_packaged_console_entrypoint(
+                package_source,
+                isolated_root,
+                transcript,
+            )
+            baseline_paths = _walk_files(scratch)
+            baseline = _snapshot(scratch, baseline_paths)
 
             closure = (
                 sys.executable,
                 "tools/evidence/regenerate_identity_closure.py",
                 "--in-place-isolated",
             )
-            _run_stage(scratch, "closure_write_and_check", closure, transcript)
+            _run_stage(
+                scratch,
+                "closure_write_and_check",
+                closure,
+                transcript,
+                attestation_bin=attestation_bin,
+            )
             _run_stage(
                 scratch,
                 "closure_fixed_point_check",
                 (*closure, "--check"),
                 transcript,
+                attestation_bin=attestation_bin,
             )
             _run_stage(
                 scratch,
-                "pr_a_sanity_stop",
+                "pr06r_b_final_sanity_pass",
                 (sys.executable, "tools/evidence/run_sanity_pipeline_gate.py"),
                 transcript,
+                attestation_bin=attestation_bin,
             )
 
             after_paths = _walk_files(scratch)
             after = _snapshot(scratch, after_paths)
-            removed = sorted(set(baseline) - set(after))
+            removed = sorted(
+                name
+                for name in set(baseline) - set(after)
+                if Path(name) in tracked
+            )
             if removed:
                 raise AttestationBuildError("isolated_producer_deleted_tracked_file")
             changed = {
@@ -609,8 +755,13 @@ def build_attestation(
             sanity = (
                 scratch / "audit/gates/sanity_pipeline/sanity_pipeline.log"
             ).read_text(encoding="utf-8")
-            if "pr_a_nonfinal_ops03_pr_b_binding_required" not in sanity:
-                raise AttestationBuildError("pr_a_sanity_boundary_missing")
+            expected_tail = "check 19 Final-LF validation:OK\nfirst_failed_stage:NONE\nsummary:PASS\n"
+            if (
+                "summary:FAIL" in sanity
+                or "check 14 OPS-03 direct DB posture packet validation:OK" not in sanity
+                or not sanity.endswith(expected_tail)
+            ):
+                raise AttestationBuildError("final_sanity_pass_missing")
 
             transcript_path = output / "build.log"
             transcript_path.write_text("\n".join(transcript) + "\n", encoding="utf-8")
@@ -623,26 +774,23 @@ def build_attestation(
             payload = {
                 "schema": SCHEMA,
                 "source_commit": source_commit,
-                "source_commit_exact": source_clean,
+                "source_commit_exact": True,
                 "source_tree_sha256": source_tree_sha256,
                 "release_id": release_id,
                 "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
                 "validation_result": "PASS",
-                "release_admission": "NOT_ATTEMPTED",
-                "pipeline_stop": {
-                    "stage": 14,
-                    "reason": "pr_a_nonfinal_ops03_pr_b_binding_required",
-                },
+                "release_admission": "PR06R_B_FINAL_PASS",
+                "pipeline_stop": None,
                 "rails": dict(sorted(CLOSED_RAILS.items())),
                 "files": file_rows,
                 "omitted_files": omitted_rows,
                 "transcript": transcript_row,
                 "nonclaims": [
-                    "no_ops03_execution",
-                    "no_live_packet",
+                    "builder_executes_no_ops",
                     "no_database_write",
-                    "no_pr06r_b_admission",
-                    "no_release_pipeline_pass_claim",
+                    "no_deployment_or_migration",
+                    "no_qa_pass_or_acceptance",
+                    "no_pf09_status_movement",
                 ],
             }
             _validate_payload(payload)
@@ -655,7 +803,7 @@ def build_attestation(
             )
             verify_attestation(
                 output,
-                require_exact=require_clean,
+                require_exact=True,
                 source=source,
             )
     except AttestationBuildError as exc:
