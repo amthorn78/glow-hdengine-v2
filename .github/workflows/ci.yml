@@ -225,6 +225,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -248,7 +249,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hde-release-attestation-${{ github.sha }}
+          name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ runner.temp }}/hde-release-attestation
           if-no-files-found: error
           retention-days: 30

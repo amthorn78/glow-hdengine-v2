@@ -12,6 +12,15 @@ from tools.evidence import regenerate_identity_closure as closure
 from tools.cli import generate_cli_conformance_artifacts as cli_conformance
 
 
+def test_attestation_ci_job_is_bound_to_the_exact_pr_head():
+    workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+    job = workflow[workflow.index("  sanity-pipeline:") :]
+    exact_head = "${{ github.event.pull_request.head.sha || github.sha }}"
+
+    assert f"ref: {exact_head}" in job
+    assert f"name: hde-release-attestation-{exact_head}" in job
+
+
 def test_output_root_must_be_external_empty_directory(tmp_path):
     source = tmp_path / "source"
     source.mkdir()
