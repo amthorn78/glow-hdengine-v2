@@ -522,7 +522,7 @@ def build_attestation(
             )
             _run_stage(
                 scratch,
-                "pr_a_sanity_stop",
+                "pr06r_b_final_sanity_pass",
                 (sys.executable, "tools/evidence/run_sanity_pipeline_gate.py"),
                 transcript,
             )
@@ -609,8 +609,14 @@ def build_attestation(
             sanity = (
                 scratch / "audit/gates/sanity_pipeline/sanity_pipeline.log"
             ).read_text(encoding="utf-8")
-            if "pr_a_nonfinal_ops03_pr_b_binding_required" not in sanity:
-                raise AttestationBuildError("pr_a_sanity_boundary_missing")
+            expected_tail = "check 19 Final-LF validation:OK\nfirst_failed_stage:NONE\nsummary:PASS\n"
+            if (
+                "pr_a_nonfinal_ops03_pr_b_binding_required" in sanity
+                or "summary:FAIL" in sanity
+                or "check 14 OPS-03 direct DB posture packet validation:OK" not in sanity
+                or not sanity.endswith(expected_tail)
+            ):
+                raise AttestationBuildError("final_sanity_pass_missing")
 
             transcript_path = output / "build.log"
             transcript_path.write_text("\n".join(transcript) + "\n", encoding="utf-8")
@@ -628,21 +634,18 @@ def build_attestation(
                 "release_id": release_id,
                 "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
                 "validation_result": "PASS",
-                "release_admission": "NOT_ATTEMPTED",
-                "pipeline_stop": {
-                    "stage": 14,
-                    "reason": "pr_a_nonfinal_ops03_pr_b_binding_required",
-                },
+                "release_admission": "PR06R_B_FINAL_PASS",
+                "pipeline_stop": None,
                 "rails": dict(sorted(CLOSED_RAILS.items())),
                 "files": file_rows,
                 "omitted_files": omitted_rows,
                 "transcript": transcript_row,
                 "nonclaims": [
-                    "no_ops03_execution",
-                    "no_live_packet",
+                    "builder_executes_no_ops",
                     "no_database_write",
-                    "no_pr06r_b_admission",
-                    "no_release_pipeline_pass_claim",
+                    "no_deployment_or_migration",
+                    "no_qa_pass_or_acceptance",
+                    "no_pf09_status_movement",
                 ],
             }
             _validate_payload(payload)

@@ -2539,12 +2539,84 @@ EPIC038_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr05.v2_mapped_cache.manifest_schema", "discovered_physical_path": "schemas/bodygraph_v2_mapped_cache_manifest.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_schema", "schema_version": "1.0"},
 ]
 
+HISTORICAL_BRIDGE_NOTES = (
+    "Historical bridge/OPS-01 evidence retained for integrity, provenance, readability, "
+    "secret safety, and historical nonclaims only; does not prove current service "
+    "availability, runtime support, provider parity, fallback, consistency, or token "
+    "satisfaction."
+)
+EPIC038_OPS03_PRIMARY_BINDINGS = {
+    "commands.txt": ("epic038.ops03.commands", "epic038_ops03_text"),
+    "stdout.log": ("epic038.ops03.stdout", "epic038_ops03_log"),
+    "stderr.log": ("epic038.ops03.stderr", "epic038_ops03_log"),
+    "exit_code.txt": ("epic038.ops03.exit_code", "epic038_ops03_text"),
+    "env_presence.json": ("epic038.ops03.env_presence", "epic038_ops03_env_presence"),
+    "db_posture_summary.json": ("epic038.ops03.db_posture_summary", "epic038_ops03_db_posture"),
+    "nonclaims.json": ("epic038.ops03.nonclaims", "epic038_ops03_nonclaims"),
+    "result_summary.json": ("epic038.ops03.result_summary", "epic038_ops03_result"),
+    "validation_receipt.json": ("epic038.ops03.validation_receipt", "epic038_ops03_validation"),
+    "checksums.sha256": ("epic038.ops03.checksums", "epic038_ops03_checksum"),
+}
+EPIC038_OPS03_SCHEMA_FILES = (
+    "hde_epic038_ops03_authorization.v1.json",
+    "hde_epic038_ops03_env_presence.v1.json",
+    "hde_epic038_ops03_db_posture_summary.v1.json",
+    "hde_epic038_ops03_nonclaims.v1.json",
+    "hde_epic038_ops03_result_summary.v1.json",
+    "hde_epic038_ops03_validation_receipt.v1.json",
+    "hde_epic038_ops03_failure_receipt.v1.json",
+)
 EPIC038_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
-    {"artifact_key": f"epic038.pr06.{package.replace('-', '')}.{name.replace('.', '_')}", "discovered_physical_path": f"audit/ops/hde-epic038/{package}/{name}", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr06_ops_evidence", "schema_version": "1.0", "notes": "Retained OPS evidence bound read-only; no QA, acceptance-token, PF09, deployment, or closeout claim"}
-    for package, names in {
-        "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
-        "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
-    }.items() for name in names
+    {
+        "artifact_key": "epic038.pr06r.direct_db_selection",
+        "discovered_physical_path": "artifacts/runtime/direct_db_selection.snapshot.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_pr06r_direct_db_selection",
+        "schema_version": "1.0",
+        "notes": "Deterministic local direct-selection primary; no external I/O, OPS, QA, acceptance-token, PF09, deployment, or closeout claim",
+    },
+    {
+        "artifact_key": "epic038.pr06r.direct_db_selection_schema",
+        "discovered_physical_path": "schemas/hde_epic038_direct_db_selection.v1.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_pr06r_schema",
+        "schema_version": "1.0",
+    },
+    *[
+        {
+            "artifact_key": f"epic038.pr06.{package.replace('-', '')}.{name.replace('.', '_')}",
+            "discovered_physical_path": f"audit/ops/hde-epic038/{package}/{name}",
+            "epic_id": "HDE-EPIC038",
+            "record_type": "historical_bridge_evidence" if package == "ops-01" else "epic038_pr06_ops_evidence",
+            "schema_version": "1.0",
+            "notes": HISTORICAL_BRIDGE_NOTES if package == "ops-01" else "Retained OPS-02 mapped-cache evidence bound read-only; no QA, acceptance-token, PF09, deployment, or closeout claim",
+        }
+        for package, names in {
+            "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+            "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+        }.items() for name in names
+    ],
+    *[
+        {
+            "artifact_key": key,
+            "discovered_physical_path": f"audit/ops/hde-epic038/ops-03/{name}",
+            "epic_id": "HDE-EPIC038",
+            "record_type": record_type,
+            "schema_version": "1.0",
+            "notes": "Accepted OPS-03 direct DB posture packet primary admitted read-only; no OPS rerun, QA, acceptance-token, PF09, deployment, or closeout claim",
+        }
+        for name, (key, record_type) in EPIC038_OPS03_PRIMARY_BINDINGS.items()
+    ],
+    *[
+        {
+            "artifact_key": f"epic038.ops03.schema.{name[:-5]}",
+            "discovered_physical_path": f"schemas/{name}",
+            "epic_id": "HDE-EPIC038",
+            "record_type": "epic038_ops03_schema",
+            "schema_version": "1.0",
+        }
+        for name in EPIC038_OPS03_SCHEMA_FILES
+    ],
 ]
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {

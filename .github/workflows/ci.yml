@@ -233,7 +233,7 @@ jobs:
       - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
       - run: python -m pip install pytest
-      - name: Build PR-A release attestation outside the source tree
+      - name: Build PR-06R-B release attestation outside the source tree
         run: >-
           python tools/evidence/build_release_attestation.py
           --output "$RUNNER_TEMP/hde-release-attestation"

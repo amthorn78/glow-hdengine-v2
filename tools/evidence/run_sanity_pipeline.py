@@ -23,8 +23,6 @@ from tools.evidence.retained_evidence_safety import validate_retained_text_safet
 
 SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
 PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
-PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
-PR_A_NONFINAL_EXIT = 3
 
 HISTORICAL_OPS01_FILES = (
     "commands.txt",
@@ -92,6 +90,13 @@ SAFE_ENV_REFERENCE = re.compile(
     r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})\Z"
 )
 
+class Ops03PacketUnavailable(ValueError):
+    """Compatibility alias for tests; final admission treats missing OPS-03 as failure."""
+
+
+PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
+PR_A_NONFINAL_EXIT = 1
+
 
 @dataclass(frozen=True)
 class SanityStep:
@@ -104,10 +109,6 @@ class SanityStep:
             object.__setattr__(self, "commands", (tuple(command),))
         else:
             object.__setattr__(self, "commands", tuple(tuple(item) for item in command))
-
-
-class Ops03PacketUnavailable(ValueError):
-    """The downstream OPS-03 packet has not been admitted yet."""
 
 
 STAGE_NAMES = (
@@ -561,16 +562,27 @@ def validate_ops_packages(root: Path = ROOT) -> None:
 
 
 def validate_direct_selection_contract() -> None:
-    """Exercise the direct-selection producer in memory without writing evidence."""
+    """Validate the tracked direct-selection primary against producer and schema."""
 
     from tools.evidence import generate_hde_epic038_direct_db_selection as direct
 
+    primary = direct.OUT
+    if not primary.is_file() or primary.is_symlink():
+        raise ValueError("direct selection tracked primary missing")
+    raw = primary.read_bytes()
+    if not raw.endswith(b"\n") or raw.endswith(b"\n\n"):
+        raise ValueError("direct selection primary final LF invalid")
+    payload = json.loads(raw.decode("utf-8"))
     first = direct.build()
     second = direct.build()
+    expected = direct.canonical_bytes(first)
     if (
-        direct.validate_contract(first)
-        or first.get("result") != "PASS"
-        or direct.canonical_bytes(first) != direct.canonical_bytes(second)
+        direct.validate_contract(payload)
+        or direct.validate_contract(first)
+        or payload.get("result") != "PASS"
+        or payload.get("failure") is not None
+        or raw != expected
+        or expected != direct.canonical_bytes(second)
     ):
         raise ValueError("direct selection contract validation failed")
 
@@ -599,7 +611,7 @@ def validate_ops03_tracked_packet(root: Path = ROOT) -> None:
     if packet.is_symlink():
         raise ValueError("ops-03: tracked packet root is not a real directory")
     if not packet.exists():
-        raise Ops03PacketUnavailable(PR_A_NONFINAL_REASON)
+        raise ValueError("ops-03: tracked packet root is missing")
     if not packet.is_dir():
         raise ValueError("ops-03: tracked packet root is not a real directory")
     try:
@@ -788,9 +800,6 @@ def _run_stage(step: SanityStep) -> int:
         elif command == ("__validate_ops03__",):
             try:
                 validate_ops03_tracked_packet()
-            except Ops03PacketUnavailable as exc:
-                print(str(exc), file=sys.stderr)
-                return PR_A_NONFINAL_EXIT
             except Exception:
                 print("ops03_packet_validation_failed", file=sys.stderr)
                 return 1
@@ -807,13 +816,6 @@ def _run_stage(step: SanityStep) -> int:
 
 def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
     lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true"]
-    if any(status == "NONFINAL_MISSING_OPS03" for _, status in results):
-        lines.extend(
-            (
-                "pr_a_state:nonfinal_fail_closed",
-                f"final_readiness_blocked:{PR_A_NONFINAL_REASON}",
-            )
-        )
     for name, status in results:
         canonical_status = "OK" if status == "OK" else "FAIL"
         lines.append(f"check {name}:{canonical_status}")
@@ -870,15 +872,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
                 "PASS",
             )
         code = _run_stage(step)
-        status = (
-            "OK"
-            if code == 0
-            else (
-                "NONFINAL_MISSING_OPS03"
-                if code == PR_A_NONFINAL_EXIT and step.name == STAGE_NAMES[13]
-                else "FAIL"
-            )
-        )
+        status = "OK" if code == 0 else "FAIL"
         results.append((step.name, status))
         if code:
             failure = step.name
@@ -905,7 +899,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             seal_code = _rebind_failure_log()
             if seal_code:
                 print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-                return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
+                return seal_code
             return 1
         return 0
 
@@ -918,7 +912,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
-            return 1 if seal_code == PR_A_NONFINAL_EXIT else seal_code
+            return seal_code
     return 0 if passed else (code or 1)
 
 

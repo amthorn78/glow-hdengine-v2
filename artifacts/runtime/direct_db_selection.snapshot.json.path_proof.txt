@@ -1,0 +1,5 @@
+path: artifacts/runtime/direct_db_selection.snapshot.json
+size_bytes: 1673
+sha256: d88cfaf2ff14f9657f077097422604faf833dc43bb72c2d530012fd0b0c9669b
+mtime_utc: 2026-07-24T03:21:37Z
+produced_at_utc: 2026-07-23T05:30:59Z

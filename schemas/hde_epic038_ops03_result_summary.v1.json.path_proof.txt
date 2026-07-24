@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_result_summary.v1.json
+size_bytes: 1704
+sha256: e24d64720334c96d778c92c66a485550f16cfdd0acf92568f0ecbcc000d8331f
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

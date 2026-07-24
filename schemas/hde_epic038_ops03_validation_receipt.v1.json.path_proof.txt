@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_validation_receipt.v1.json
+size_bytes: 2240
+sha256: 82c7a28a763d3e7e20317ce97cf95f84bc2ab82ba7acd76e7ae2670ea508b0e3
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

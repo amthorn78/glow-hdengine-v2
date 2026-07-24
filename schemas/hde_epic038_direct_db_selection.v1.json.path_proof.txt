@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_direct_db_selection.v1.json
+size_bytes: 8185
+sha256: 4e1247a168ee755a70414b1bb0c5fb83451a5955e597a1b4cab34e04c1183025
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z

@@ -1,0 +1,5 @@
+path: schemas/hde_epic038_ops03_failure_receipt.v1.json
+size_bytes: 1304
+sha256: f78bee41d15603a2df6f8e4d5eb262f5796ea5c567811698dff9b55be603ec36
+mtime_utc: 2026-07-24T03:18:34Z
+produced_at_utc: 2026-07-23T05:30:59Z
