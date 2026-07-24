@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.9  
+**Version:** v12.4  
 Effective Date: 2026.07.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -67,7 +67,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics  
 2.17) PR-06 Remediation HDE-EPIC038 PR-06R-A  
 2.18) PR-06 Remediation \- OPS-03 HDE-EPIC038  
-2.19) HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary
+2.19) PR-06 Remediation \- HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary  
+2.20) PR-06 Remediation PR-06R-B HDE-EPIC038
 
 # 2\) Numbered Addenda
 
@@ -14799,7 +14800,7 @@ Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`, `02-
 
 DECISION: OPS ACCEPTABLE
 
-## **2.19) HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary**
+## **2.19) PR-06 Remediation \- HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary**
 
 Timestamp: 072426 03:13  
 Details: On 2026-07-23 UTC, the Product Owner-authorized OPS-03 task completed a bounded database-role provisioning phase followed by an authorization-bound direct PostgreSQL read-only capture. Live preflight observed the existing HDE-named roles `hde_owner` and `hde_rw`, established that the dedicated target roles `hde_reader` and `hde_ops03_reader` were absent, and confirmed that the administrative connection used the elevated `postgres` identity. The task provisioned and verified the two target roles, executed one successful direct capture, and disabled the task-specific login and cleared its password. This addendum records the database-role posture, operational result, evidence limits, PF09 effect, and PR-06R-B boundary.
@@ -15112,5 +15113,987 @@ This addendum does not:
 * authorize deployment or migration;  
 * complete HDE-EPIC038; or  
 * close the Epic.
+
+  ## 2.20) PR-06 Remediation PR-06R-B HDE-EPIC038
+
+Artifact Map
+
+PR Name: PR-06R-B
+
+Merged PR Ref: 367
+
+Approved Plan: approved-rescoping-crd-hde-epic038-post-pr359-remediation-v1.4.md
+
+Optional PR Artifacts: not provided
+
+Repo root reviewed: amthorn78/glow-hdengine-v2
+
+Output: Post-Merge PR Code Review and Validation
+
+Review Summary
+
+* PR \#367 merged the planned PR-06R-B direct-only final integration. It admitted the deterministic direct-selection artifact and accepted OPS-03 packet, separated historical bridge evidence from current evidence, completed the nineteen-stage release gate, and added exact-head external attestation.  
+* The merged endpoint is current `main@4b0c1e09abc3f905a3315190576fa7339e991062`. All 46 changed-file blobs are identical between PR head `071cd67fc1eb4e02afdf86c2105142c39da130b4` and the merge commit, so merge resolution introduced no content divergence.  
+* Every changed file received a committed-state review in CFR-001 through CFR-046. The implementation follows the Approved Plan’s scope and exclusions; no implementation remediation or unsafe scope expansion was found.  
+* Exact-head CI run `30071658923` passed all seven jobs. Its main job passed 1,065 evidence/OPS tests, 250 direct PostgreSQL contract tests, and all generated-evidence, mirror, hash, final-LF, CLI, and rails checks.  
+* External artifact `8588274689` is bound to the immutable PR head, has verified digest `sha256:11724e0e957c41d6a4eb0c52316deacbae03f359f5dafd049cd46360bbc618da`, and records `PR06R_B_FINAL_PASS` with all nineteen stages passing and no pipeline stop.  
+* No acceptance or QA token satisfaction is claimed. The attestation expressly disclaims OPS execution, database writes, deployment, migration, QA PASS, acceptance, and PF09 status movement.  
+* Repo evidence now supports separate PF09 maintenance recommendations of `change to Done` for `HDE-DIST001.4`, `.6`, `.9`, `.11`, and `HDE-DIST005.2`. PF09 itself was not edited.  
+* RCA confirms that the merged change addresses the approved bridge-retirement, historical/current evidence conflation, and missing atomic final-admission causes. Permanent PF documentation drainage remains, but the Approved Plan classifies that as nonblocking documentation work.
+
+Repo Inspection
+
+* Observed Repo root: `amthorn78/glow-hdengine-v2`.  
+* Observed HEAD: `4b0c1e09abc3f905a3315190576fa7339e991062`.  
+* Branch or detached state: connected remote default branch `main`; detached state not applicable.  
+* Working-tree status before review: not applicable because the connected GitHub repository exposes committed state rather than a mutable local worktree.  
+* Resolution method for `MERGED_PR_REF`: GitHub PR metadata for [PR \#367](https://github.com/amthorn78/glow-hdengine-v2/pull/367), its base/head/merge commits, first-parent base-to-merge comparison, changed-file inventory, review threads, and Actions results.  
+* Resolved range: base `d214d951549349f68b213b369f77862fb98317d7` through PR head `071cd67fc1eb4e02afdf86c2105142c39da130b4`, merged as `4b0c1e09abc3f905a3315190576fa7339e991062`.  
+* Endpoint relationship to HEAD: the merge commit equals current `main` HEAD.  
+* Changed files reviewed: all 46 files in the merged first-parent diff.  
+* Material later committed divergence: none observed. Merge-to-current-main comparison is identical, and all 46 PR-head and merge-commit blob SHAs match.  
+* Material overlapping worktree divergence: not applicable; no mutable worktree was used.  
+* Working-tree status after validation: not applicable; review remained read-only.
+
+Changed File Review
+
+CFR-001
+
+File: `.github/workflows/ci.yml`  
+Change summary: Binds external attestation to the immutable PR-head SHA, installs offline wheel prerequisites, and applies final PR-06R-B admission expectations.  
+Risk assessment: High  
+Code review assessment: Correct. The workflow no longer attests GitHub’s synthetic merge ref and does not repair committed evidence before checking it.  
+Approved Plan linkage: Exact-head external attestation and strict final release admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: `${{ github.event.pull_request.head.sha || github.sha }}` controls checkout and artifact naming; exact-head run `30071658923` passed.  
+PF reference, if relied on: PF10 — HDE Build Notes, §2.16.
+
+CFR-002
+
+File: `artifacts/evidence_index.jsonl`  
+Change summary: Regenerates the Machine Mirror with direct-selection, OPS-03, and historical-only bridge/provider-parity bindings.  
+Risk assessment: High  
+Code review assessment: Correct canonical fixed-point output: 548 records, all 19 new keys exactly once, and 24 historical-only records without active tokens.  
+Approved Plan linkage: Governed evidence admission and current-versus-historical separation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Complete JSONL inspection found 548 canonical rows and exact direct/OPS-03 key coverage.  
+PF reference, if relied on: PF10 §§2.15–2.16; PF12 — HDE Schemas and Artifacts, §8.3.
+
+CFR-003
+
+File: `artifacts/evidence_index.jsonl.path_proof.txt`  
+Change summary: Refreshes the Machine Mirror’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct path, size, SHA-256, and UTC timestamp-shape binding.  
+Approved Plan linkage: Canonical updater-owned companion generation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof binds `artifacts/evidence_index.jsonl` and agrees with the committed mirror hash.  
+PF reference, if relied on: PF10 §2.16; PF12 §8.3.
+
+CFR-004
+
+File: `artifacts/evidence_index.jsonl.sha256`  
+Change summary: Seals the final Machine Mirror.  
+Risk assessment: High  
+Code review assessment: Correct hash sentinel.  
+Approved Plan linkage: Atomic evidence-graph convergence.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Recorded SHA-256 is `a7d2905b1f76bee98bf878835dfbfc358eece0d4006970569b27bf2ad0dc95ac`.  
+PF reference, if relied on: PF12 §8.3.
+
+CFR-005
+
+File: `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+Change summary: Adds the mirror-hash sentinel’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct and updater-owned.  
+Approved Plan linkage: Complete companion topology.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof path and primary SHA agree with the committed sentinel.  
+PF reference, if relied on: PF10 §2.16; PF12 §8.3.
+
+CFR-006
+
+File: `artifacts/runtime/direct_db_selection.snapshot.json`  
+Change summary: Adds deterministic direct-only provider-selection evidence.  
+Risk assessment: High  
+Code review assessment: Correct. It contains the four ordered cases, all six required predicates, `result=PASS`, `failure=null`, and canonical one-LF bytes.  
+Approved Plan linkage: Required PR-06R-B direct-selection primary.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Schema is `hde_epic038.direct_db_selection.v1`; SHA-256 is `d88cfaf2ff14f9657f077097422604faf833dc43bb72c2d530012fd0b0c9669b`.  
+PF reference, if relied on: PF10 §§2.12, 2.15, and 2.19.
+
+CFR-007
+
+File: `artifacts/runtime/direct_db_selection.snapshot.json.path_proof.txt`  
+Change summary: Adds the direct-selection primary’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct path/hash/size binding and portable timestamp shape.  
+Approved Plan linkage: Governed admission of the direct-selection primary.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof binds the primary to SHA-256 `d88cfaf2ff14f9657f077097422604faf833dc43bb72c2d530012fd0b0c9669b`.  
+PF reference, if relied on: PF10 §§2.15–2.16.
+
+CFR-008
+
+File: `audit/gates/sanity_pipeline/sanity_pipeline.log`  
+Change summary: Replaces transitional output with the strict final nineteen-stage PASS log.  
+Risk assessment: High  
+Code review assessment: Correct exact ordering, no skips, stage-12 historical sentinel, and final PASS.  
+Approved Plan linkage: Final PR-06R-B release pipeline.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Nineteen `check NN …:OK` rows, `first_failed_stage:NONE`, `summary:PASS`; SHA-256 `09cb8bba3449fa919ee877be0af88448922b4839e2017b1c4d2470abe688b142`.  
+PF reference, if relied on: PF10 §2.15.
+
+CFR-009
+
+File: `audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt`  
+Change summary: Refreshes the final pipeline log’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct and consistent with the committed PASS log.  
+Approved Plan linkage: Governed release-gate evidence.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof path and SHA agree with CFR-008.  
+PF reference, if relied on: PF10 §§2.15–2.16.
+
+CFR-010
+
+File: `audit/gates/topology/orientation_demo.txt`  
+Change summary: Regenerates topology orientation after final graph convergence.  
+Risk assessment: Medium  
+Code review assessment: Correct final-state orientation output.  
+Approved Plan linkage: Post-updater topology validation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: `total_artifacts: 548`, `status: ok`; SHA-256 `f53a6ccaeead44063ca5b6f060c13feb2e7d7eb3ee09f509596414abe847cdca`.  
+PF reference, if relied on: PF10 §2.15; PF12 §8.3.
+
+CFR-011
+
+File: `audit/gates/topology/orientation_demo.txt.path_proof.txt`  
+Change summary: Refreshes the topology output’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct and consistent with CFR-010.  
+Approved Plan linkage: Complete evidence topology.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof path/hash binding matches the orientation artifact.  
+PF reference, if relied on: PF10 §2.16; PF12 §8.3.
+
+CFR-012
+
+File: `audit/ops/hde-epic038/ops-03/checksums.sha256.path_proof.txt`  
+Change summary: Admits the immutable OPS-03 checksum ledger through a sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct; it preserves rather than regenerates the packet ledger.  
+Approved Plan linkage: Exact ten-primary OPS-03 admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-013
+
+File: `audit/ops/hde-epic038/ops-03/commands.txt.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 command record.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: OPS-03 primary admission without byte changes.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `3d08535a6c97433e8cd2c8af8c1b5aa9c3556601779a4747856db40122682b7a`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-014
+
+File: `audit/ops/hde-epic038/ops-03/db_posture_summary.json.path_proof.txt`  
+Change summary: Adds governed proof for current direct database-posture evidence.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Live read-only direct-posture support.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `bce8cc6fb2bb82d9f7bc6010517abbb673abdfe03f23c7fbf4e998b2f687e0ed`.  
+PF reference, if relied on: PF10 §§2.15 and 2.19.
+
+CFR-015
+
+File: `audit/ops/hde-epic038/ops-03/env_presence.json.path_proof.txt`  
+Change summary: Adds governed proof for the names-only environment-presence artifact.  
+Risk assessment: Medium  
+Code review assessment: Correct and secret-safe.  
+Approved Plan linkage: Retired-key absence and direct-connectivity evidence.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `c9cdc9d648967d5ccede735e3bd9da97e03881f603dfa8e907eeb0ef3d33a0e6`.  
+PF reference, if relied on: PF10 §§2.12 and 2.19.
+
+CFR-016
+
+File: `audit/ops/hde-epic038/ops-03/exit_code.txt.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 exit-code record.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Accepted packet admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`.  
+PF reference, if relied on: PF10 §2.19.
+
+CFR-017
+
+File: `audit/ops/hde-epic038/ops-03/nonclaims.json.path_proof.txt`  
+Change summary: Adds governed proof for OPS-03 claim boundaries.  
+Risk assessment: Medium  
+Code review assessment: Correct; it preserves separation from QA, acceptance, deployment, and PF09 movement.  
+Approved Plan linkage: Operational and evidence nonclaims.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `a7a7144c52a758c9a83b269895ca7aa6e573a015e2f64b4808a86071b33f94d9`.  
+PF reference, if relied on: PF10 §2.19.
+
+CFR-018
+
+File: `audit/ops/hde-epic038/ops-03/result_summary.json.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 PASS summary.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Mandatory stage-14 packet validation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `2946b4addd10aa35e8ec5c3adee75e31c442fec33258151dcbde6eeed3d8fae6`.  
+PF reference, if relied on: PF10 §§2.15 and 2.19.
+
+CFR-019
+
+File: `audit/ops/hde-epic038/ops-03/stderr.log.path_proof.txt`  
+Change summary: Adds governed proof for the empty OPS-03 stderr record.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Exact packet and clean-output validation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Empty-file SHA-256 is `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.  
+PF reference, if relied on: PF10 §2.19.
+
+CFR-020
+
+File: `audit/ops/hde-epic038/ops-03/stdout.log.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 success output.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Exact accepted packet admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `b2b5cec3fbe92c3554243cbad0c43042319d8be8e9574eed561e97e30ffdded9`.  
+PF reference, if relied on: PF10 §2.19.
+
+CFR-021
+
+File: `audit/ops/hde-epic038/ops-03/validation_receipt.json.path_proof.txt`  
+Change summary: Adds governed proof for the independent OPS-03 validation receipt.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Packet predicate verification.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `a9b351bba2480d09b384dc4867e986f45d3d3ed964f457d763777dc332798d1f`.  
+PF reference, if relied on: PF10 §2.19.
+
+CFR-022
+
+File: `docs/evidence/INDEX.json`  
+Change summary: Regenerates the Human Evidence Index with PR-06R-B admission and historical-only classifications.  
+Risk assessment: High  
+Code review assessment: Correct; it has 548 rows and one row for every new primary and schema.  
+Approved Plan linkage: Human Index admission and historical/current separation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Full inspection found the same 19 target identities as the Machine Mirror and 24 historical-only rows without active tokens.  
+PF reference, if relied on: PF10 §§2.15–2.16; PF12 §8.3.
+
+CFR-023
+
+File: `docs/evidence/INDEX.json.path_proof.txt`  
+Change summary: Refreshes the Human Index’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Canonical companion generation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof path/hash binding agrees with the committed Index.  
+PF reference, if relied on: PF10 §2.16; PF12 §8.3.
+
+CFR-024
+
+File: `docs/evidence/INDEX.sha256`  
+Change summary: Seals the final Human Evidence Index.  
+Risk assessment: High  
+Code review assessment: Correct hash sentinel.  
+Approved Plan linkage: Atomic evidence convergence.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Recorded SHA-256 is `9da44058890581876e0c471d20d1a2e607cd0706507302b753ca180cfefadbe0`.  
+PF reference, if relied on: PF12 §8.3.
+
+CFR-025
+
+File: `docs/evidence/INDEX.sha256.path_proof.txt`  
+Change summary: Adds the Human Index hash sentinel’s sibling proof.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Complete generated companion topology.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Proof path and primary SHA agree with CFR-024.  
+PF reference, if relied on: PF10 §2.16; PF12 §8.3.
+
+CFR-026
+
+File: `pyproject.toml`  
+Change summary: Includes `math/*.json` package data in the built distribution.  
+Risk assessment: Medium  
+Code review assessment: Correct root-cause fix; the installed wheel contains `math/thresholds.json`, enabling the real packaged `hdctl`.  
+Approved Plan linkage: Real package-installability and console-entrypoint verification.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: `math = ["*.json"]` is present under package data; the isolated attestation installed and ran the resulting wheel.  
+PF reference, if relied on: PF10 §2.16.
+
+CFR-027
+
+File: `schemas/hde_epic038_direct_db_selection.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the direct-selection schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Direct primary/schema admission pair.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary schema SHA-256 is `4e1247a168ee755a70414b1bb0c5fb83451a5955e597a1b4cab34e04c1183025`.  
+PF reference, if relied on: PF10 §2.15; PF12 §8.3.
+
+CFR-028
+
+File: `schemas/hde_epic038_ops03_authorization.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 authorization schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Seven-schema OPS-03 admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `1174a9b264f3a27696442d70c75bc4316a398577496fcdcffae87360b501b7a8`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-029
+
+File: `schemas/hde_epic038_ops03_db_posture_summary.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the DB-posture schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: OPS-03 schema admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `766290892d1dd5306d55bb78b5628605c3c863d24ac35a3f9243b8878a9e0366`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-030
+
+File: `schemas/hde_epic038_ops03_env_presence.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the environment-presence schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: OPS-03 schema admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `46b0de99e54c247417d469f8cf80ac3af09a9c90516b1ee15933fb27360b666c`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-031
+
+File: `schemas/hde_epic038_ops03_failure_receipt.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the failure-receipt schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Complete seven-schema inventory.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `f78bee41d15603a2df6f8e4d5eb262f5796ea5c567811698dff9b55be603ec36`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-032
+
+File: `schemas/hde_epic038_ops03_nonclaims.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the OPS-03 nonclaims schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: Claim-boundary preservation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `acb56785b3e49f16f60dd7ebf8203ad8d316da0fae373f69b59ece83ca7542bd`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-033
+
+File: `schemas/hde_epic038_ops03_result_summary.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the result-summary schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: OPS-03 PASS schema admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `e24d64720334c96d778c92c66a485550f16cfdd0acf92568f0ecbcc000d8331f`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-034
+
+File: `schemas/hde_epic038_ops03_validation_receipt.v1.json.path_proof.txt`  
+Change summary: Adds governed proof for the validation-receipt schema.  
+Risk assessment: Medium  
+Code review assessment: Correct.  
+Approved Plan linkage: OPS-03 validation schema admission.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Primary SHA-256 is `82c7a28a763d3e7e20317ce97cf95f84bc2ab82ba7acd76e7ae2670ea508b0e3`.  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+CFR-035
+
+File: `schemas/hde_release_attestation.v1.json`  
+Change summary: Converts the release-attestation contract from transitional PR-A nonadmission to final exact-head PR-06R-B admission.  
+Risk assessment: High  
+Code review assessment: Correct minimal schema evolution: exact source required, `PR06R_B_FINAL_PASS`, and `pipeline_stop=null`.  
+Approved Plan linkage: External exact-head final attestation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Required fields include `source_commit_exact=true`, final admission, and truthful nonclaims.  
+PF reference, if relied on: PF10 §2.16.
+
+CFR-036
+
+File: `tests/evidence/test_evidence_skeleton.py`  
+Change summary: Extends evidence-skeleton regression coverage for final generated-state integrity.  
+Risk assessment: Medium  
+Code review assessment: Adequate and fail-closed.  
+Approved Plan linkage: Fixed-point evidence graph and updater ownership.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Tests assert committed generated companions rather than silently repairing them.  
+PF reference, if relied on: Not relied on.
+
+CFR-037
+
+File: `tests/evidence/test_hde_epic038_release_sanity.py`  
+Change summary: Adds exact nineteen-stage, packet-mutation, historical/current, and direct-primary coverage.  
+Risk assessment: Medium  
+Code review assessment: Strong coverage of the highest-risk release integration.  
+Approved Plan linkage: Final release-sanity acceptance conditions.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Assertions cover mandatory stage 14, check-only stage 15, frozen historical/provider-parity bytes, and first-failure behavior.  
+PF reference, if relied on: Not relied on.
+
+CFR-038
+
+File: `tests/evidence/test_release_attestation.py`  
+Change summary: Tests clean exact source, isolated real-wheel installation, real `hdctl`, source immutability, and final admission.  
+Risk assessment: Medium  
+Code review assessment: Correctly rejects shims, system-site inheritance, dirty sources, stale logs, and missing package data.  
+Approved Plan linkage: Exact-head external attestation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Focused tests exercise wheel build/install and compare console/module outputs.  
+PF reference, if relied on: Not relied on.
+
+CFR-039
+
+File: `tests/evidence/test_sanity_pipeline.py`  
+Change summary: Updates shared pipeline expectations for final admission and historical-only semantics.  
+Risk assessment: Medium  
+Code review assessment: Correct; transitional stage-14 exceptions are removed.  
+Approved Plan linkage: Strict final gate.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Tests require final PASS and reject nonfinal or skipped-stage output.  
+PF reference, if relied on: Not relied on.
+
+CFR-040
+
+File: `tests/ops/test_evidence_index.py`  
+Change summary: Adds exact binding, uniqueness, historical classification, and frozen-byte coverage tests.  
+Risk assessment: Medium  
+Code review assessment: Correct and directly guards canonical updater behavior.  
+Approved Plan linkage: Index/Mirror admission and historical/current separation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Assertions cover direct/OPS-03 keys and enforce alignment between historical classification and frozen-primary inventory.  
+PF reference, if relied on: Not relied on.
+
+CFR-041
+
+File: `tests/ops/test_hde_epic038_ops03.py`  
+Change summary: Strengthens exact ten-file inventory, ledger, canonical JSON, schema, secret-safety, and mutation checks.  
+Risk assessment: Medium  
+Code review assessment: Correct and read-only with respect to OPS.  
+Approved Plan linkage: Admit accepted OPS-03 without rerunning it.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Tests validate packet bytes and reject missing, extra, or mutated packet members.  
+PF reference, if relied on: Not relied on.
+
+CFR-042
+
+File: `tools/cli/generate_cli_conformance_artifacts.py`  
+Change summary: Requires and executes the real installed `hdctl` entry point instead of creating a shim.  
+Risk assessment: High  
+Code review assessment: Correct root-cause fix; missing or broken package installation now fails closed.  
+Approved Plan linkage: Real packaged Reader/CLI verification.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Generator requires an executable `hdctl` and compares its help/version behavior with module execution.  
+PF reference, if relied on: PF10 §2.16.
+
+CFR-043
+
+File: `tools/evidence/build_release_attestation.py`  
+Change summary: Builds a wheel from an exact tracked copy, installs it into an isolated venv, executes final closure, and emits exact-head attestation.  
+Risk assessment: High  
+Code review assessment: Correct. Dirty sources, system-site packages, `PYTHONPATH`, disallowed writes, stale evidence, and nonfinal gates fail closed.  
+Approved Plan linkage: External exact-head release attestation and source immutability.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Artifact build log records successful wheel build, packaged `hdctl`, closure write/check, fixed-point check, and final gate.  
+PF reference, if relied on: PF10 §2.16.
+
+CFR-044
+
+File: `tools/evidence/run_sanity_pipeline.py`  
+Change summary: Implements the exact nineteen-stage final pipeline with tracked direct-primary validation, historical integrity, mandatory OPS-03 validation, and check-only convergence.  
+Risk assessment: High  
+Code review assessment: Correct stage order and fail-closed behavior. Stage 12 cannot imply current bridge support; stage 15 cannot repair stale evidence.  
+Approved Plan linkage: Core PR-06R-B release pipeline.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Observed exact stages 1–19, `HISTORICAL_INTEGRITY_OK`, mandatory OPS-03 validation, and first-failure stop behavior.  
+PF reference, if relied on: PF10 §§2.12 and 2.15.
+
+CFR-045
+
+File: `tools/evidence/run_sanity_pipeline_gate.py`  
+Change summary: Replaces the transitional stage-14 stop with strict exact-log final admission.  
+Risk assessment: High  
+Code review assessment: Correct; it rejects skipped, extra, stale, nonfinal, or failed output.  
+Approved Plan linkage: Final canonical release gate.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Gate requires the committed nineteen-stage PASS log and stage-12 historical sentinel.  
+PF reference, if relied on: PF10 §2.15.
+
+CFR-046
+
+File: `tools/evidence/update_evidence_index.py`  
+Change summary: Canonically binds the direct primary/schema and ten OPS-03 primaries/seven schemas, while normalizing bridge, OPS-01, and provider-parity evidence as historical-only.  
+Risk assessment: High  
+Code review assessment: Correct sole-writer implementation. It preserves OPS-02 as current, removes active tokens from historical rows, and generates one Human row, Machine row, and sibling proof per admitted item.  
+Approved Plan linkage: Atomic evidence admission and historical/current separation.  
+Later-state divergence: None observed; PR-head and merged blobs are identical.  
+Repo proof: Observed keys include `epic038.pr06r.direct_db_selection`, its schema key, and all exact `epic038.ops03.*` identities; generated Index and Mirror converge at 548 rows.  
+PF reference, if relied on: PF10 §§2.12, 2.15, and 2.19; PF12 §8.3.
+
+Validation Results
+
+VAL-001
+
+Purpose: Establish the exact merged-change attribution boundary.  
+Command or method: GitHub PR metadata plus first-parent comparison from `d214d951549349f68b213b369f77862fb98317d7` to `4b0c1e09abc3f905a3315190576fa7339e991062`.  
+Result: PASS  
+Key output or observation: Exactly 46 changed files were attributed to PR \#367.  
+Why it matters: Prevents later or unrelated changes from being credited to the merged PR.
+
+VAL-002
+
+Purpose: Verify merge-resolution fidelity and current-main applicability.  
+Command or method: Compared every changed file’s Git blob SHA at PR head `071cd67fc1eb4e02afdf86c2105142c39da130b4` and merge commit `4b0c1e09abc3f905a3315190576fa7339e991062`; compared merge commit to current `main`.  
+Result: PASS  
+Key output or observation: 46 of 46 blobs matched; merge commit equals current `main`.  
+Why it matters: Exact-head CI and attestation validate the bytes now merged.
+
+VAL-003
+
+Purpose: Verify hosted checks against the immutable PR head.  
+Command or method: Inspected GitHub Actions run `30071658923`.  
+Result: PASS  
+Key output or observation: Seven of seven jobs completed successfully; none was pending, stale, cancelled, or associated only with an earlier head.  
+Why it matters: Satisfies the Approved Plan’s exact-head CI requirement.
+
+VAL-004
+
+Purpose: Verify applicable implementation and evidence tests.  
+Command or method: Reviewed the main CI job’s completed step outputs.  
+Result: PASS  
+Key output or observation: 1,065 evidence/OPS tests, 250 direct PostgreSQL contract tests, 15 ordering/mechanics tests, 3 CLI guard tests, 2 QA-harness self-tests, and all updater/orientation/hash/mirror/final-LF checks passed.  
+Why it matters: Provides broad and targeted coverage without treating implementation validation as formal QA acceptance.
+
+VAL-005
+
+Purpose: Verify exact-head external release attestation.  
+Command or method: Downloaded artifact `8588274689`, compared its archive digest, and ran `sha256sum -c attestation.json.sha256`.  
+Result: PASS  
+Key output or observation: Archive digest matched `sha256:11724e0e957c41d6a4eb0c52316deacbae03f359f5dafd049cd46360bbc618da`; `attestation.json: OK`.  
+Why it matters: Independently verifies artifact integrity.
+
+VAL-006
+
+Purpose: Verify attested release semantics.  
+Command or method: Inspected `attestation.json`, `build.log`, packaged-entrypoint results, and bundled sanity log.  
+Result: PASS  
+Key output or observation: Source commit is exactly `071cd67fc1eb4e02afdf86c2105142c39da130b4`; `source_commit_exact=true`; admission is `PR06R_B_FINAL_PASS`; `pipeline_stop=null`; real wheel-installed `hdctl` succeeded; all nineteen stages passed.  
+Why it matters: Proves the final result comes from an immutable source copy and real packaged entry point.
+
+VAL-007
+
+Purpose: Verify governed evidence-graph completeness and fixed-point posture.  
+Command or method: Fully parsed `docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`, their sentinels, and all 19 new sibling proofs.  
+Result: PASS  
+Key output or observation: Index and Mirror each contain 548 rows; every direct/OPS-03 target key occurs exactly once; all proof paths/hashes agree; 24 legacy records are historical-only and token-free.  
+Why it matters: Satisfies atomic admission, uniqueness, path, hash, and historical/current requirements.
+
+VAL-008
+
+Purpose: Verify accepted OPS-03 primaries were not rewritten by the merged change.  
+Command or method: Compared the PR changed-file inventory with the exact ten primary paths and validated the committed packet ledger.  
+Result: PASS  
+Key output or observation: Only the ten sibling proofs changed; ledger SHA-256 remains `e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`, and each ledger entry validates.  
+Why it matters: Preserves accepted operational evidence exactly as required.
+
+Search method: searched Repo for "audit/ops/hde-epic038/ops-03/{checksums.sha256,commands.txt,db\_posture\_summary.json,env\_presence.json,exit\_code.txt,nonclaims.json,result\_summary.json,stderr.log,stdout.log,validation\_receipt.json}" (case: sensitive); scope: PR \#367 changed-file inventory; tool: manual scan; result: 0 hits.
+
+VAL-009
+
+Purpose: Verify review-finding closure.  
+Command or method: Inspected all PR \#367 review threads and their final state.  
+Result: PASS  
+Key output or observation: Five of five threads are substantively addressed and marked resolved.  
+Why it matters: Confirms no actionable review finding remains open.
+
+VAL-010
+
+Purpose: Record source-tree command posture for this read-only review.  
+Command or method: Local mutable-checkout command execution.  
+Result: NOT RUN  
+Key output or observation: The connected GitHub repository exposes committed state rather than a mutable executable checkout.  
+Why it matters: This does not force remediation because exact-head GitHub CI passed, all merged blobs match the validated PR head, and the external attestation was independently downloaded and verified.
+
+RCA
+
+A) Bug/Failure statement
+
+The Approved Plan identified that “Active DB posture, parity, OPS-01R, validator, CI checker, and release-sanity tools still require bridge construction or bridge evidence.”
+
+It also found that “The canonical updater and release pipeline bind the historical OPS-01 bridge packet as current PR-06 OPS evidence and derive a current bridge PASS.”
+
+B) Root cause(s)
+
+1. Retired bridge transport remained encoded as current runtime and release evidence. Evidence: Approved Plan BUG-006 and PF10 §2.12’s direct-only transport decision.  
+2. The evidence updater did not distinguish retained historical integrity from current support, so bridge/OPS-01/provider-parity rows could carry active meaning. Evidence: Approved Plan BUG-008 and CAUSE-002; CFR-002, CFR-022, and CFR-046.  
+3. Final closure required a new deterministic direct-selection primary, accepted live direct-posture evidence, and atomic admission into one fixed-point graph. Evidence: Approved Plan CAUSE-005; CFR-006 through CFR-045.
+
+C) Fix in Merged Change
+
+PR \#367 adds and validates the deterministic direct-selection primary, admits the exact OPS-03 packet and schemas through the canonical updater, classifies retained bridge evidence as historical-only, makes stage 14 mandatory, makes stage 15 check-only, and requires strict nineteen-stage final admission. It also builds and exercises the real package entry point in an isolated exact-head attestation environment.
+
+D) Fix verification
+
+VAL-003 through VAL-009 demonstrate exact-head CI success, real-wheel installation, strict nineteen-stage PASS, complete Index/Mirror/path-proof convergence, frozen OPS-03 bytes, and resolved review findings. No evidenced implementation residual risk remains.
+
+Findings
+
+Finding ID: F-001  
+Related review item: CFR-001 / CFR-026 / CFR-035 / CFR-042 / CFR-043 / VAL-003 / VAL-005 / VAL-006  
+Severity: Note  
+Observation: Exact-head CI and attestation use the real built wheel and installed `hdctl`, with clean-source and isolation requirements.  
+Why it matters: Prevents synthetic merge refs, shims, source-tree imports, or ambient packages from producing false release proof.  
+Evidence: CFR-001, CFR-026, CFR-035, CFR-042, CFR-043, VAL-003, VAL-005, and VAL-006.  
+Required action: None  
+PF reference, if relied on: PF10 §2.16.
+
+Finding ID: F-002  
+Related review item: CFR-002 / CFR-003 / CFR-004 / CFR-005 / CFR-022 / CFR-023 / CFR-024 / CFR-025 / CFR-046 / VAL-007  
+Severity: Note  
+Observation: Human Index, Machine Mirror, sentinels, and proofs form a consistent 548-row fixed point with exact new bindings and historical-only legacy records.  
+Why it matters: Prevents duplicate, orphaned, stale, or current-misclassified evidence.  
+Evidence: CFR-002 through CFR-005, CFR-022 through CFR-025, CFR-046, and VAL-007.  
+Required action: None  
+PF reference, if relied on: PF10 §§2.15–2.16; PF12 §8.3.
+
+Finding ID: F-003  
+Related review item: CFR-006 / CFR-007 / CFR-027 / VAL-004 / VAL-007  
+Severity: Note  
+Observation: The deterministic direct-selection primary and schema are governed, indexed, mirrored, and validated against their producer.  
+Why it matters: Supplies current fail-closed direct-only selection proof without external I/O or retained secrets.  
+Evidence: CFR-006, CFR-007, CFR-027, VAL-004, and VAL-007.  
+Required action: None  
+PF reference, if relied on: PF10 §§2.12 and 2.15.
+
+Finding ID: F-004  
+Related review item: CFR-008 / CFR-009 / CFR-010 / CFR-011 / CFR-044 / CFR-045 / VAL-003 / VAL-004 / VAL-006  
+Severity: Note  
+Observation: The release path requires the exact nineteen-stage PASS, preserves historical-only stage 12, requires OPS-03 at stage 14, and cannot repair stale evidence at stage 15\.  
+Why it matters: Makes final admission strict, repeatable, and fail-closed.  
+Evidence: CFR-008 through CFR-011, CFR-044, CFR-045, and VAL-003 through VAL-006.  
+Required action: None  
+PF reference, if relied on: PF10 §2.15.
+
+Finding ID: F-005  
+Related review item: CFR-012 / CFR-013 / CFR-014 / CFR-015 / CFR-016 / CFR-017 / CFR-018 / CFR-019 / CFR-020 / CFR-021 / CFR-028 / CFR-029 / CFR-030 / CFR-031 / CFR-032 / CFR-033 / CFR-034 / VAL-007 / VAL-008  
+Severity: Note  
+Observation: All ten accepted OPS-03 primaries and seven schemas have governed sibling proofs while the primary packet bytes remain unchanged.  
+Why it matters: Completes admission without rerunning OPS or altering accepted operational evidence.  
+Evidence: CFR-012 through CFR-021, CFR-028 through CFR-034, VAL-007, and VAL-008.  
+Required action: None  
+PF reference, if relied on: PF10 §2.19; PF12 §8.3.
+
+Finding ID: F-006  
+Related review item: CFR-036 / CFR-037 / CFR-038 / CFR-039 / CFR-040 / CFR-041 / VAL-003 / VAL-004 / VAL-009  
+Severity: Note  
+Observation: Focused regression tests cover graph ownership, packet mutations, historical/current separation, exact stage behavior, isolated package installation, and stale-evidence refusal.  
+Why it matters: Directly protects the failure modes found during PR review and approved rescoping.  
+Evidence: CFR-036 through CFR-041, VAL-003, VAL-004, and VAL-009.  
+Required action: None  
+PF reference, if relied on: Not relied on.
+
+PF09 Impact & Status Posture
+
+PF09 document: PF09.6 — Canon HDE Build Checklist Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.4  
+Current PF09 status: Partial  
+Status recommendation: change to Done  
+Why this status posture is supported: Direct-selection PASS, accepted live OPS-03 posture, exact role/search-path/DDL/constraint/boundary/partition predicates, secret safety, and complete governed admission now coexist at the merged state.  
+Evidence pointer(s): CFR-006–CFR-034; VAL-003–VAL-008; Finding F-003 and F-005.  
+PF proof excerpt(s), when relied on: PF09.6 records “Subtask status: Partial.” PF10 §2.15 states: “`HDE-DIST001.4`: `Partial` to `Done`.”
+
+PF09 document: PF09.6 — Canon HDE Build Checklist Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.6  
+Current PF09 status: Partial  
+Status recommendation: change to Done  
+Why this status posture is supported: The exact nineteen mandatory stages run in order with expected success results, no skips, historical/current separation, closed rails, canonical graph checks, and final PASS.  
+Evidence pointer(s): CFR-008–CFR-011, CFR-037, CFR-039, CFR-044–CFR-045; VAL-003, VAL-004, and VAL-006.  
+PF proof excerpt(s), when relied on: PF09.6 records “Subtask status: Partial.” PF10 §2.15 states: “`HDE-DIST001.6`: `Partial` to `Done`.”
+
+PF09 document: PF09.6 — Canon HDE Build Checklist Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.9  
+Current PF09 status: Partial  
+Status recommendation: change to Done  
+Why this status posture is supported: Under PF10’s amended direct-connectivity meaning, healthy selection uses direct `psycopg`, missing/unavailable access and every retired key fail closed before provider I/O, alternate attempts are zero, OPS-03 supplies current read-only posture, and bridge evidence is historical-only.  
+Evidence pointer(s): CFR-006, CFR-014–CFR-018, CFR-037, CFR-040, CFR-044, CFR-046; VAL-004, VAL-006, and VAL-007.  
+PF proof excerpt(s), when relied on: PF09.6 currently titles the row “DB–bridge parity & env connectivity” and records “Partial.” PF10 §2.15 states: “`HDE-DIST001.9`: `Partial` to `Done` under the amended title.”
+
+PF09 document: PF09.6 — Canon HDE Build Checklist Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.11  
+Current PF09 status: Optional  
+Status recommendation: change to Done  
+Why this status posture is supported: Current mapped-cache and OPS-02 validators pass; write/read-back parity, idempotence, closed-rails refusal, no raw-vendor persistence, secret safety, and complete current bindings remain proven.  
+Evidence pointer(s): CFR-008, CFR-022, CFR-037, CFR-040, CFR-044–CFR-046; VAL-003, VAL-004, and VAL-007.  
+PF proof excerpt(s), when relied on: PF09.6 records “Subtask status: Optional.” PF10 §2.15 states: “`HDE-DIST001.11`: `Optional` to `Done`.”
+
+PF09 document: PF09.6 — Canon HDE Build Checklist Distillation  
+PF09 task ID: HDE-DIST005  
+PF09 subtask ID(s): HDE-DIST005.2  
+Current PF09 status: Partial  
+Status recommendation: change to Done  
+Why this status posture is supported: Every new primary and schema has exactly one Human row, one Machine row, a matching sibling proof, and valid hash linkage; historical bytes remain frozen; path, schema, topology, hash, and final-LF checks pass.  
+Evidence pointer(s): CFR-002–CFR-005, CFR-007, CFR-009–CFR-034, CFR-040, CFR-046; VAL-004, VAL-007, and VAL-008.  
+PF proof excerpt(s), when relied on: PF09.6 records “Subtask status: Partial.” PF10 §2.15 states: “`HDE-DIST005.2`: `Partial` to `Done`.”
+
+Evidence Print
+
+A) Tokens satisfied
+
+No token satisfaction claim reviewed.
+
+B) Evidence artifacts produced or updated
+
+Path: `artifacts/runtime/direct_db_selection.snapshot.json`  
+Type: Governed deterministic direct-selection primary  
+Key proof facts observed: Exact four ordered cases, six true predicates, `result=PASS`, `failure=null`, canonical one-LF bytes, indexed and mirrored once.  
+sha256, if observed: `d88cfaf2ff14f9657f077097422604faf833dc43bb72c2d530012fd0b0c9669b`  
+Index, Mirror, or path-proof posture, if relevant: Key `epic038.pr06r.direct_db_selection`; matching Human row, Machine row, and sibling proof.
+
+Path: `audit/ops/hde-epic038/ops-03/`  
+Type: Governed ten-primary accepted operational evidence packet  
+Key proof facts observed: Exact ten-file inventory, internally valid ledger, PASS summary, exit code 0, empty stderr, validation receipt, secret-safe data, unchanged primaries.  
+sha256, if observed: Packet ledger SHA-256 `e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`  
+Index, Mirror, or path-proof posture, if relevant: Ten unique Human rows, Machine rows, and matching sibling proofs.
+
+Path: `schemas/hde_epic038_direct_db_selection.v1.json` and `schemas/hde_epic038_ops03_*.v1.json`  
+Type: Governed direct-selection and OPS-03 schema family  
+Key proof facts observed: One direct schema plus the exact seven OPS-03 schemas, preserved and admitted.  
+sha256, if observed: Direct schema `4e1247a168ee755a70414b1bb0c5fb83451a5955e597a1b4cab34e04c1183025`; individual OPS-schema hashes are bound in their sibling proofs.  
+Index, Mirror, or path-proof posture, if relevant: Eight unique Human rows, Machine rows, and sibling proofs.
+
+Path: `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and sibling proofs  
+Type: Human Evidence Index and integrity companions  
+Key proof facts observed: 548 rows, all 19 new identities exactly once, and historical bridge/provider-parity rows classified without active tokens.  
+sha256, if observed: `9da44058890581876e0c471d20d1a2e607cd0706507302b753ca180cfefadbe0`  
+Index, Mirror, or path-proof posture, if relevant: Fixed-point parity with the 548-row Machine Mirror.
+
+Path: `artifacts/evidence_index.jsonl`, `artifacts/evidence_index.jsonl.sha256`, and sibling proofs  
+Type: Machine Mirror and integrity companions  
+Key proof facts observed: 548 canonical JSONL records and complete direct/OPS-03/historical classification parity.  
+sha256, if observed: `a7d2905b1f76bee98bf878835dfbfc358eece0d4006970569b27bf2ad0dc95ac`  
+Index, Mirror, or path-proof posture, if relevant: Mirror body hash is `c03cda1b30522ad4670c794d86c9196649d4e100e78b9137bfdf6644d9cef3cf`; path proofs validate.
+
+Path: `audit/gates/sanity_pipeline/sanity_pipeline.log`  
+Type: Final release-sanity gate evidence  
+Key proof facts observed: Exact nineteen stages, stage 12 `HISTORICAL_INTEGRITY_OK`, no failed stage, and `summary:PASS`.  
+sha256, if observed: `09cb8bba3449fa919ee877be0af88448922b4839e2017b1c4d2470abe688b142`  
+Index, Mirror, or path-proof posture, if relevant: Governed, indexed, mirrored, and matched by its sibling proof.
+
+Path: `audit/gates/topology/orientation_demo.txt`  
+Type: Evidence-topology validation artifact  
+Key proof facts observed: `total_artifacts: 548` and `status: ok`.  
+sha256, if observed: `f53a6ccaeead44063ca5b6f060c13feb2e7d7eb3ee09f509596414abe847cdca`  
+Index, Mirror, or path-proof posture, if relevant: Governed and matched by its sibling proof.
+
+Path: GitHub Actions artifact `hde-release-attestation-071cd67fc1eb4e02afdf86c2105142c39da130b4`  
+Type: External exact-head release attestation  
+Key proof facts observed: Exact source commit, clean source, deterministic tracked-tree digest, real isolated wheel-installed `hdctl`, final admission, no pipeline stop, and truthful nonclaims.  
+sha256, if observed: `11724e0e957c41d6a4eb0c52316deacbae03f359f5dafd049cd46360bbc618da`  
+Index, Mirror, or path-proof posture, if relevant: External artifact; not checked into the governed Repo graph.
+
+C) Validation proof
+
+Command or method: GitHub Actions run `30071658923`  
+Result: Seven of seven jobs succeeded at exact PR head `071cd67fc1eb4e02afdf86c2105142c39da130b4`.  
+Where the result appears: PR \#367 checks and Actions run metadata.  
+Why it is sufficient: It covers the complete repository CI matrix on the immutable head whose changed-file blobs match the merge commit.
+
+Command or method: Main CI evidence/OPS and direct-contract suites  
+Result: 1,065 evidence/OPS tests and 250 direct PostgreSQL contract tests passed.  
+Where the result appears: Main test job in run `30071658923`.  
+Why it is sufficient: It directly exercises the changed admission, pipeline, packet, packaging, and graph behavior.
+
+Command or method: Canonical updater/orientation/hash/mirror/final-LF CI checks  
+Result: All passed without modifying the committed checkout.  
+Where the result appears: Main test job preflight and evidence checks.  
+Why it is sufficient: Stage 15 and CI operate in check mode, so green results prove committed fixed-point bytes rather than repaired transient output.
+
+Command or method: `sha256sum -c attestation.json.sha256` plus artifact digest comparison  
+Result: `attestation.json: OK`; archive digest matched GitHub metadata.  
+Where the result appears: Downloaded external artifact `8588274689`.  
+Why it is sufficient: Verifies independent artifact and attestation integrity.
+
+Command or method: Inspection of `attestation.json`, `build.log`, `installability_summary.json`, and bundled `sanity_pipeline.log`  
+Result: Exact head, isolated real-wheel `hdctl`, `PR06R_B_FINAL_PASS`, all nineteen stages PASS, and `pipeline_stop=null`.  
+Where the result appears: External artifact `8588274689`.  
+Why it is sufficient: Verifies the final release claim and package-installability path rather than only relying on a green job label.
+
+Command or method: Complete Index/Mirror and 19-proof inspection  
+Result: 548/548 row parity; exact one-per-target admission; matching paths, sizes, hashes, and portable timestamps.  
+Where the result appears: `docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`, sentinels, and sibling proofs.  
+Why it is sufficient: Establishes the committed evidence graph’s completeness and consistency.
+
+Doc Delta Candidates
+
+DDC-001
+
+Doc: PF07 — Glow Infrastructure  
+Section: §§4.1, 4.2, 7.0, 7.1, 8.1, and 9.2  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST001  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.9  
+PF09 status action: No status change recommended  
+Delta: Remove active `pg-bridge`, `DB_BRIDGE_URL`, bridge-host, and bridge-fallback architecture; record direct PostgreSQL as the sole active transport and bridge material as historical.  
+Why: The merged implementation and controlling PF10 decision are direct-only.  
+Repo evidence: CFR-006, CFR-014–CFR-018, CFR-044, and CFR-046.  
+Canon proof excerpt: PF07 says, “select by availability with fallback: DATABASE\_URL → DB\_BRIDGE\_URL(https) → typed error.” PF10 §2.12 makes direct PostgreSQL the sole active transport.
+
+DDC-002
+
+Doc: PF14 — HDE Mechanics Guide  
+Section: §§20.3 and 20.3.1  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST001  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.9  
+PF09 status action: No status change recommended  
+Delta: Replace current bridge-parity, `BridgeProvider`, and bridge-fallback mechanics with direct-only selection and historical-integrity semantics.  
+Why: PR-06R-B proves direct-only behavior and explicitly rejects current bridge availability/parity claims.  
+Repo evidence: CFR-006, CFR-037, CFR-040, CFR-044, and CFR-046.  
+Canon proof excerpt: PF14 says the parity family “MUST preserve DBAccess as the provider-agnostic façade.” PF10 §2.12 retires that current bridge meaning.
+
+DDC-003
+
+Doc: PF04 — HDE Governance  
+Section: §2.0, §2.0.9, and §6.3.2  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST001  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.9  
+PF09 status action: No status change recommended  
+Delta: Retire `DEV_DB_BRIDGE_FALLBACK_OK` and the associated active dev-fallback semantics. Preserve the prohibition on inferring new acceptance tokens from OPS or evidence.  
+Why: The merged direct-only runtime refuses retired keys before provider construction or I/O.  
+Repo evidence: CFR-006, CFR-037, CFR-044, and CFR-046.  
+Canon proof excerpt: PF04 says, “DEV\_DB\_BRIDGE\_FALLBACK\_OK remains the canonical bridge-fallback acceptance token.” PF10 §2.12 requires bridge-token retirement.
+
+DDC-004
+
+Doc: PF12 — HDE Schemas and Artifacts  
+Section: §8.3  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST005  
+Impacted PF09 subtask ID(s): HDE-DIST005.2  
+PF09 status action: No status change recommended  
+Delta: Remove clone-local filesystem-mtime comparison from portable sibling-proof validation; retain governed path, SHA-256, size, canonical fields, companion linkage, and UTC timestamp-shape checks.  
+Why: Clone-local `stat().st_mtime` is not portable evidence and is expressly superseded by PF10 §2.16.  
+Repo evidence: CFR-003, CFR-005, CFR-007, CFR-009, CFR-011–CFR-034.  
+Canon proof excerpt: PF12 requires `parsed_mtime <= current_fs_mtime`; PF10 §2.16 states, “Clone-local stat().st\_mtime is therefore not evidence.”
+
+DDC-005
+
+Doc: PF12 — HDE Schemas and Artifacts  
+Section: Placement not established; canon-author routing required  
+Canon basis: CANON SILENCE  
+Impacted PF09 task ID(s): HDE-DIST001, HDE-DIST005  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST005.2  
+PF09 status action: No status change recommended  
+Delta: Add the governed direct-selection, OPS-03, final release-attestation, and `historical_bridge_evidence` record families, keys, schemas, paths, and updater ownership.  
+Why: These families now exist in the Repo but are not permanently described in PF12.  
+Repo evidence: CFR-002–CFR-007, CFR-012–CFR-035, and CFR-046.
+
+Search method: searched Repo for "hde\_epic038.ops03|hde\_epic038\_ops03|hde.release\_attestation.v1|historical\_bridge\_evidence|hde-epic038/ops-03" (case: sensitive); scope: complete PF12 document; tool: rg; result: 0 hits.
+
+DDC-006
+
+Doc: PF19 — Glow QA Guide  
+Section: §4.3.1  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST005  
+Impacted PF09 subtask ID(s): HDE-DIST005.2  
+PF09 status action: No status change recommended  
+Delta: Replace clone-local monotone-mtime proof validation with portable path/hash/size/structure/timestamp-shape validation.  
+Why: The merged path-proof contract and PF10 §2.16 reject clone-local mtime as portable evidence.  
+Repo evidence: CFR-003, CFR-005, CFR-007, CFR-009, CFR-011–CFR-034.  
+Canon proof excerpt: PF19 requires `mtime_utc <= current_fs_mtime`; PF10 §2.16 states that clone-local filesystem mtime is not evidence.
+
+DDC-007
+
+Doc: PF19 — Glow QA Guide  
+Section: Placement not established; canon-author routing required  
+Canon basis: CANON SILENCE  
+Impacted PF09 task ID(s): HDE-DIST001  
+Impacted PF09 subtask ID(s): HDE-DIST001.6  
+PF09 status action: No status change recommended  
+Delta: Document exact-head external release attestation, source-tree immutability, isolated real-wheel console-entrypoint verification, and the rule that CI must detect rather than repair stale committed evidence.  
+Why: These are now material release-verification mechanics absent from PF19.  
+Repo evidence: CFR-001, CFR-026, CFR-035, CFR-038, CFR-042, and CFR-043.
+
+Search method: searched Repo for "release attestation|exact-head|console entrypoint|packaged hdctl" (case: insensitive); scope: complete PF19 document; tool: rg; result: 0 hits.
+
+DDC-008
+
+Doc: PF09.6 — Canon HDE Build Checklist Distillation  
+Section: Subtasks HDE-DIST001.4 and HDE-DIST001.9  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST001  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.9  
+PF09 status action: No status change recommended  
+Delta: Replace bridge fallback/parity language with direct database connectivity, retired-transport enforcement, current direct-posture evidence, and historical-only bridge integrity.  
+Why: PF09 still describes bridge fallback and bridge parity even though PF10 and the merged implementation retire those current obligations.  
+Repo evidence: CFR-006, CFR-014–CFR-018, CFR-037, CFR-040, CFR-044, and CFR-046.  
+Canon proof excerpt: PF09.6 titles `.9` “DB–bridge parity & env connectivity.” PF10 §2.15 requires the amended direct-connectivity meaning.
+
+DDC-009
+
+Doc: PF09.6 — Canon HDE Build Checklist Distillation  
+Section: Subtasks HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST001.11, and HDE-DIST005.2  
+Canon basis: PF09 STATUS SUPPORT  
+Impacted PF09 task ID(s): HDE-DIST001, HDE-DIST005  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST001.11, HDE-DIST005.2  
+PF09 status action: change to Done  
+Delta: In a separate human PF09 maintenance action, move the five exact subtasks to Done after applying the `.9` semantic/title amendment.  
+Why: The merged exact-head evidence satisfies PF10 §2.15’s later-status predicates for all five rows.  
+Repo evidence: VAL-003–VAL-008; Findings F-002 through F-006; the five PF09 posture items above.  
+Canon proof excerpt: PF10 §2.15 lists `.4`, `.6`, `.9`, `.11`, and `.5.2` as eligible to move to `Done` only after PR-06R-B merges and final review supports each row.
+
+DDC-010
+
+Doc: PF10 — HDE Build Notes  
+Section: §2.19, “Repository Intake and PR-06R-B Boundary”  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task ID(s): HDE-DIST001, HDE-DIST005  
+Impacted PF09 subtask ID(s): HDE-DIST001.4, HDE-DIST001.6, HDE-DIST001.9, HDE-DIST001.11, HDE-DIST005.2  
+PF09 status action: No status change recommended  
+Delta: Add a post-merge record that PR-06R-B completed governed packet admission, direct-selection binding, fixed-point evidence convergence, final nineteen-stage PASS, and exact-head external attestation. Preserve the existing historical OPS-03 acceptance record.  
+Why: §2.19 still describes PR-06R-B admission as outstanding.  
+Repo evidence: CFR-002–CFR-046 and VAL-003–VAL-008.  
+Canon proof excerpt: PF10 §2.19 currently says, “The tracked packet has not completed governed evidence admission. PR-06R-B owns:”.
+
+DECISION: MERGED CHANGE ACCEPTABLE
 
 \<eof\>
