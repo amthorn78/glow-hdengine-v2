@@ -132,13 +132,13 @@ def default_steps() -> list[SanityStep]:
             _py("scripts/release_id_recompute.py", "--check-manifest-only"),
         )),
         SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
-        SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
-        SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py", "--check"),)),
+        SanityStep(STAGE_NAMES[3], (("__validate_reader_cli_determinism__",), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
+        SanityStep(STAGE_NAMES[4], (("__validate_a7_transport__",),)),
         SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py", "--check"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
         SanityStep(STAGE_NAMES[6], (("__validate_direct_selection__",), _py("ci/checks/check_direct_db_contract.py"))),
         SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_db_runtime_posture.py", "--check"),)),
         SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_bodygraph_policy_proofs.py", "--check"),)),
-        SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py", "--check"),)),
+        SanityStep(STAGE_NAMES[9], (("__validate_architecture__",),)),
         SanityStep(STAGE_NAMES[10], (
             ("__validate_pr05_proofs__",),
             _py("tools/evidence/generate_v2_mapped_cache_evidence.py", "--check"),
@@ -760,6 +760,59 @@ def _run_command(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
 
 
+def validate_current_reader_cli_determinism() -> None:
+    """Validate current behavior without rewriting frozen capture-time outputs."""
+
+    from tools.evidence import generate_determinism_gate_proofs as determinism
+    from tools.evidence import generate_open_rails_abba_proof as open_rails
+
+    top_level, outputs = determinism.build()
+    summary = json.loads(outputs[determinism.SUM])
+    if (
+        top_level is not True
+        or summary.get("top_level_pass") is not True
+        or not all(summary.get("predicates", {}).values())
+    ):
+        raise ValueError("current determinism predicates failed")
+    fixture = open_rails.build_fixture_proof()
+    if (
+        fixture.get("top_level_pass") is not True
+        or fixture.get("transport_call_count") != 0
+        or not all(fixture.get("predicates", {}).values())
+    ):
+        raise ValueError("current open-rails fixture predicates failed")
+
+
+def validate_current_a7_transport() -> None:
+    """Exercise the current A7 transport contract without refreshing captures."""
+
+    from tools.evidence import generate_a7_transport_proofs as transport
+
+    outputs = transport.build()
+    composite = json.loads(outputs[transport.PROOFS[6]])
+    transport.validate_composite(composite)
+    if not all(
+        composite[name].get("pass") is True
+        for name in ("get_200", "head_200", "after_304", "env_gate")
+    ):
+        raise ValueError("current A7 transport predicates failed")
+
+
+def validate_current_architecture() -> None:
+    """Run the current static architecture analyzer without refreshing its capture."""
+
+    from tools.evidence import generate_architecture_snapshot as architecture
+
+    payload = architecture.analyze()
+    architecture.validate(payload)
+    if (
+        payload.get("verdict") != "pass"
+        or payload.get("analyzer_verdict") != "pass"
+        or payload.get("unknown_count") != 0
+    ):
+        raise ValueError("current architecture analysis failed")
+
+
 def _run_stage(step: SanityStep) -> int:
     for command in step.commands:
         if command == ("__validate_pr05_proofs__",):
@@ -791,6 +844,24 @@ def _run_stage(step: SanityStep) -> int:
                 validate_ops03_tracked_packet()
             except Exception:
                 print("ops03_packet_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_reader_cli_determinism__",):
+            try:
+                validate_current_reader_cli_determinism()
+            except Exception:
+                print("reader_cli_determinism_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_a7_transport__",):
+            try:
+                validate_current_a7_transport()
+            except Exception:
+                print("a7_transport_validation_failed", file=sys.stderr)
+                return 1
+        elif command == ("__validate_architecture__",):
+            try:
+                validate_current_architecture()
+            except Exception:
+                print("architecture_validation_failed", file=sys.stderr)
                 return 1
         else:
             result = _run_command(command)

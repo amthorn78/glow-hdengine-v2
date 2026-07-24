@@ -91,6 +91,16 @@ def _run(
     return subprocess.run(cmd, input=stdin, capture_output=True, env=env, cwd=ROOT)
 
 
+def _console_entrypoint_path(
+    env: dict[str, str],
+    *,
+    windows: bool = os.name == "nt",
+) -> Path:
+    scripts_dir = sysconfig.get_paths()["scripts"]
+    console_root = env.get("HDE_ATTESTATION_BIN") or scripts_dir
+    return Path(console_root) / ("hdctl.exe" if windows else "hdctl")
+
+
 def _write_bytes(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)
@@ -165,8 +175,7 @@ def _capture_outputs() -> dict[Path, bytes]:
     script_cmd = ["python", "scripts/hdctl.py"]
     script_execution_cmd = [sys.executable, *script_cmd[1:]]
 
-    console_root = attestation_bin or scripts_dir
-    console_path = str(Path(console_root) / "hdctl")
+    console_path = str(_console_entrypoint_path(env))
     console_cmd = ["hdctl"]
     console_available = Path(console_path).is_file() and os.access(
         console_path, os.X_OK

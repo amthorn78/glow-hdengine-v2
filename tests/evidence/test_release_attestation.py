@@ -9,6 +9,7 @@ import pytest
 
 from tools.evidence import build_release_attestation as builder
 from tools.evidence import regenerate_identity_closure as closure
+from tools.cli import generate_cli_conformance_artifacts as cli_conformance
 
 
 def test_output_root_must_be_external_empty_directory(tmp_path):
@@ -145,6 +146,19 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
     assert not (package_source / ".attestation-bin").exists()
     assert (scripts / ("hdctl.exe" if builder.os.name == "nt" else "hdctl")).is_file()
     assert transcript[0] == "stage=install_packaged_console_entrypoint"
+
+
+def test_console_entrypoint_path_is_platform_correct_and_bin_constrained():
+    env = {"HDE_ATTESTATION_BIN": "/isolated/venv/bin"}
+
+    assert cli_conformance._console_entrypoint_path(
+        env,
+        windows=False,
+    ) == Path("/isolated/venv/bin/hdctl")
+    assert cli_conformance._console_entrypoint_path(
+        env,
+        windows=True,
+    ) == Path("/isolated/venv/bin/hdctl.exe")
 
 
 def test_source_tree_digest_is_order_independent_and_names_only():

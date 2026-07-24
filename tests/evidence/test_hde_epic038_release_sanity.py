@@ -107,6 +107,9 @@ def test_exact_19_stage_order_and_canonical_path():
 
 def test_pipeline_has_separate_direct_historical_ops02_and_ops03_validators():
     steps = sanity.default_steps()
+    assert steps[3].commands[0] == ("__validate_reader_cli_determinism__",)
+    assert steps[4].commands == (("__validate_a7_transport__",),)
+    assert steps[9].commands == (("__validate_architecture__",),)
     assert steps[6].commands[0] == ("__validate_direct_selection__",)
     assert steps[11].commands == (("__validate_historical_ops01__",),)
     assert steps[12].commands == (("__validate_ops02__",),)
@@ -160,6 +163,42 @@ def test_source_pipeline_validates_manifest_without_currentizing_frozen_release_
         "scripts/release_id_recompute.py",
         "--check",
     ) not in commands
+
+
+def test_current_release_validators_do_not_rewrite_frozen_captures():
+    frozen = (
+        "artifacts/architecture/architecture_snapshot.keys_only.json",
+        "artifacts/bodygraph/release_bindings.json",
+        "artifacts/identity/release_id.json",
+        "artifacts/identity/release_id_recompute.log",
+        "artifacts/identity/service_identity.json",
+        "artifacts/math/freeze_pack_manifest.json",
+        "artifacts/math/freeze_pack_manifest.json.sha256",
+        "artifacts/math/manifest_snapshot.json",
+        "artifacts/math/release_id.txt",
+        "artifacts/math/release_id.txt.sha256",
+        "artifacts/math/release_id_recompute.log",
+        "artifacts/math/release_id_recompute.log.sha256",
+        "artifacts/parity/two_run_identity.log",
+        "artifacts/proofs/reader_success_get_head_304.json",
+        "artifacts/proofs/success_304.txt",
+        "artifacts/proofs/success_encoding_invariance.txt",
+        "artifacts/proofs/success_get.txt",
+        "artifacts/proofs/success_head.txt",
+        "audit/gates/determinism/abba.bytes",
+        "audit/gates/determinism/open_rails_abba.json",
+        "audit/gates/determinism/tworun_identity.sha256",
+        "audit/gates/parity/reader_cli/ab.json",
+        "audit/gates/parity/reader_cli/ba.json",
+        "audit/gates/parity/reader_cli/summary.json",
+    )
+    before = {path: (sanity.ROOT / path).read_bytes() for path in frozen}
+
+    sanity.validate_current_reader_cli_determinism()
+    sanity.validate_current_a7_transport()
+    sanity.validate_current_architecture()
+
+    assert {path: (sanity.ROOT / path).read_bytes() for path in frozen} == before
 
 
 def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
@@ -892,11 +931,6 @@ def test_current_commands_and_exact_proof_paths_are_wired():
         sanity.sys.executable,
         "scripts/release_id_recompute.py",
         "--check-manifest-only",
-    ) in commands
-    assert (
-        sanity.sys.executable,
-        "tools/evidence/generate_open_rails_abba_proof.py",
-        "--check",
     ) in commands
     assert (
         sanity.sys.executable,

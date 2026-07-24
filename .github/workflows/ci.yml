@@ -32,6 +32,9 @@ jobs:
           git diff --exit-code
       - name: Materialize corrected PR-06R-B evidence for transfer
         run: |
+          python tools/evidence/update_evidence_index.py
+          python tools/evidence/orientation_demo.py
+          git ls-files -z | tar --null --files-from=- -czf "$RUNNER_TEMP/pr367-generated-source.tgz"
           passed=0
           for attempt in 1 2 3 4 5 6; do
             python tools/evidence/update_evidence_index.py
@@ -47,6 +50,7 @@ jobs:
           python tools/evidence/run_sanity_pipeline_gate.py
           git ls-files -z | tar --null --files-from=- -czf "$RUNNER_TEMP/pr367-generated-source.tgz"
       - name: Publish corrected PR-06R-B evidence for transfer
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pr367-generated-source-${{ github.sha }}
@@ -256,6 +260,7 @@ jobs:
       - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
       - run: python -m pip install pytest
+      - run: python -m pip install 'setuptools>=68' wheel
       - name: Build PR-06R-B release attestation outside the source tree
         run: >-
           python tools/evidence/build_release_attestation.py
