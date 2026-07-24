@@ -231,13 +231,24 @@
 
 These labels describe the currently checked-in bytes and their capture-time meaning. The current source paths `scripts/db_adapter/capture_adapter_introspection.py` and `scripts/ops/capture_rails_open_scope.py` have been converted to direct psycopg only, but that source conversion does not relabel or refresh the historical bytes listed above. PR-06R-A validates the converted tooling with fixtures and does not execute an open-rails database capture.
 
-The PR-06R-A current contract is direct-only tooling under
+The HDE-EPIC038 current contract is direct-only tooling under
 `tools/evidence/generate_hde_epic038_direct_db_selection.py` and
-`schemas/hde_epic038_direct_db_selection.v1.json`. Its final tracked primary,
-Index/Mirror admission, and current/historical metadata switch remain downstream
-PR-06R-B work after a separately authorized OPS-03 packet. OPS-03 uses its own
-authorization-bound runner; the legacy-path direct diagnostics are not an OPS-03
-packet and cannot establish final admission, QA, supportability, or closeout.
+`schemas/hde_epic038_direct_db_selection.v1.json`, with the tracked primary at
+`artifacts/runtime/direct_db_selection.snapshot.json`. The admitted OPS-03 packet
+lives under `audit/ops/hde-epic038/ops-03/` and is validation-owned by
+`tools/evidence/hde_epic038_ops03.py`; it represents bounded read-only direct
+PostgreSQL posture only. These records do not establish QA PASS, PF09 movement,
+supportability by themselves, production deployment, or epic closeout.
+
+
+## HDE-EPIC038 current Distillation evidence orientation
+* `artifacts/runtime/direct_db_selection.snapshot.json` — direct-only `DATABASE_URL`/`psycopg` selection and retired-key pre-I/O refusal evidence.
+* `artifacts/audit/env/env_snapshot.json` — environment snapshot `schema: v3`; deterministic rails and config-key presence only, no secret values.
+* `artifacts/architecture/architecture_snapshot.keys_only.json` — keys-only architecture snapshot; DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.
+* `artifacts/bodygraph/v2_mapped_cache/` — bounded configured-v2 mapped-cache local evidence for explicit upsert, mapped-payload-only write/read-back, idempotence, closed-rails zero I/O, legacy fallback, and production-like refusal.
+* `audit/ops/hde-epic038/ops-02/` — retained bounded mapped-cache OPS packet; validated by release sanity without rerun.
+* `audit/ops/hde-epic038/ops-03/` — admitted bounded read-only direct PostgreSQL OPS packet; validated by release sanity without rerun.
+* `audit/gates/sanity_pipeline/sanity_pipeline.log` — current nineteen-stage release-sanity log; final attestation admission is `PR06R_B_FINAL_PASS` only when exact-source verification and all stages pass.
 
 ## Env-matrix (selection-only)
 * `artifacts/runtime/env_matrix.snapshot.json`

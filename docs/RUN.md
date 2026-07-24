@@ -1,4 +1,4 @@
-# RUN — Developer flight checks (HDE-EPIC026)
+# RUN — Developer flight checks (HDE-EPIC038)
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
@@ -10,7 +10,13 @@
 - Registry report spot-check: `python tools/generate_registry_report.py --check` to validate catalog inputs and serializer wiring.
 - Release input gate (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only`. It validates canonical `catalog/manifest.json` and its declared file hashes without writing.
 - Intentional release cut: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/cut_release_manifest.py --version <semver> --built-at-utc <YYYY-MM-DDTHH:MM:SSZ>`. This updates only the manifest; commit that input once.
-- Exact-head attestation: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. The tool uses an isolated tracked-file copy, validates a fixed point and the PR-A stage-14 stop, and emits `attestation.json`, its checksum, a names-only transcript, and generated evidence outside the Repo.
+- Exact-head attestation: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`. The tool uses an isolated tracked-file copy, validates exact source and the final nineteen-stage release-sanity posture, and emits `attestation.json`, its checksum, a names-only transcript, and generated evidence outside the Repo.
+
+
+## HDE-EPIC038 release-sanity posture
+- The current release-sanity gate is `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py`; it is an exact nineteen-stage fail-closed chain and logs to `audit/gates/sanity_pipeline/sanity_pipeline.log`. Do not run it for a docs-only PR unless specifically scoped, because it validates governed evidence and OPS packets rather than Markdown.
+- Direct DB posture is direct-only through `DATABASE_URL`; retired bridge keys `DB_ALLOW_BRIDGE_IN_PROD`, `DB_BRIDGE_URL`, and `DB_FORCE_BRIDGE` are presence-sensitive refusal keys before provider construction or I/O.
+- Configured-v2 mapped-cache non-dry-run use requires explicit `--upsert`, open rails, a non-production-like environment, and a sanctioned `DBAccess.for_current_env()` target; it persists only the projected mapped-cache payload and refuses production-like writes.
 
 ## Evidence and guard workflow
 ```bash

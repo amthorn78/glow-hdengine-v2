@@ -1,6 +1,6 @@
 # Release-attestation scaling decision
 
-Status: implementation and bounded repo-canon change authorized for PR #366 on 2026-07-23; permanent PF-Canon drainage remains downstream.
+Status: implemented and superseded by HDE-EPIC038 final external-attestation admission; permanent PF-Canon drainage remains downstream.
 
 ## Problem
 
@@ -14,7 +14,7 @@ The content hash was not the defect. The defect was making generated attestation
 2. Runtime identity derives its release ID once from that packaged canonical file. No generated release-ID source constant exists.
 3. `scripts/cut_release_manifest.py` is the only normal release-cut writer. It requires an explicit version and UTC build time, refreshes the declared file hashes, and changes only the manifest.
 4. Source validation is read-only: `scripts/release_id_recompute.py --check-manifest-only`.
-5. `tools/evidence/build_release_attestation.py` copies the tracked source into a temporary Git repository, runs the complete legacy producer closure there, proves a second read-only fixed point, and runs the PR-A sanity gate.
+5. `tools/evidence/build_release_attestation.py` copies the tracked source into a temporary Git repository, runs the release-attestation closure there, proves a read-only fixed point, and verifies the final nineteen-stage release-sanity gate for exact-source admission.
 6. The strict `hde.release_attestation.v1` bundle is written only to an explicitly external empty directory. CI verifies it and publishes it with `actions/upload-artifact`.
 7. Direct execution of `regenerate_identity_closure.py` in the source checkout is refused.
 8. Existing checked-in EPIC022 release artifacts remain frozen capture-time records. They are not current runtime identity inputs and are not rewritten for later releases.
@@ -32,7 +32,7 @@ No edge points from the external attestation back into tracked source.
 - The isolated child environment is allowlisted, closed-rails, and excludes database, bridge, vendor, and credential values.
 - Host-specific virtual-environment files are not source inputs. The legacy tracked `.venv` entries are removed from Git (the ignored local environment remains on disk), and future tracked environment roots fail source inventory.
 - The external output path must be outside the source tree and empty; existing output is never overwritten.
-- The bundle binds the exact commit, a deterministic tracked-tree digest, manifest/release digest, sorted file inventory, hashes, sizes, build transcript, and the PR-A stage-14 stop.
+- The bundle binds the exact commit, a deterministic tracked-tree digest, manifest/release digest, sorted file inventory, hashes, sizes, build transcript, and final release admission.
 - Success transcripts retain only stage, command, and exit-code facts; subprocess bytes and timing are not persisted, so repeated builds for one exact source produce an identical content tree.
 - Unknown schema fields, mutation, missing or extra files, checksum drift, noncanonical bytes, a failure receipt, and a non-exact source in CI fail closed.
 - Generated material that fails the retained secret-safety contract is omitted with names-only reason codes; its companions are omitted with it. A failed build removes partial output and emits only a names-only failure receipt.
@@ -40,15 +40,11 @@ No edge points from the external attestation back into tracked source.
 - `catalog` is package data, so installed wheels and source checkouts consume byte-identical manifest content.
 - Public Reader/CLI identity bytes remain unchanged for the current manifest.
 
-## PR-A and downstream boundary
+## Final HDE-EPIC038 attestation boundary
 
-The PR-A attestation records `release_admission=NOT_ATTEMPTED` and stops at stage 14 with `pr_a_nonfinal_ops03_pr_b_binding_required`. It does not execute OPS-03, create a live packet, write a database, perform Railway discovery, admit PR-06R-B evidence, or claim the 19-stage release pipeline passed.
+The current external attestation records final admission as `PR06R_B_FINAL_PASS` only when the source commit is exact, the tracked-tree and manifest-derived release identity verify, the wheel-installed entry point is exercised, and all nineteen release-sanity stages pass with no pipeline stop. It validates committed evidence and admitted OPS packets; it does not rerun OPS, perform Railway discovery, write a database, deploy production, move PF09 status, claim QA PASS, or close HDE-EPIC038.
 
-It also does not replace PR-06R-B's ownership of final tracked direct-selection
-and OPS-03 evidence admission, or the updater/Index/Mirror integration of those
-admitted artifacts. Release-pipeline stages 15 through 19 remain downstream in
-the approved `PR-06R-A -> OPS-03 -> PR-06R-B` order. The CI artifact's bounded
-retention makes it exact-head PR evidence, not durable release publication.
+The earlier PR-A stage-14 stop remains historical implementation context only. Current documentation and release validation should refer to the final exact-source nineteen-stage attestation rather than treating PR-A or downstream PR-06R-B wording as current workflow.
 
 Permanent PF04/PF09/PF12 release-evidence wording and historical EPIC022 canonical-path semantics require later human drainage. This implementation does not edit PF-Canon or move any status.
 

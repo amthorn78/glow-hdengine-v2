@@ -1,5 +1,16 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC038: Distillation reliability final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC038 as a docs-visible Distillation reliability slice covering direct-only PostgreSQL transport, manifest-derived release identity, updater-owned evidence graph discipline, configured-v2 mapped-cache boundaries, and the final nineteen-stage release-sanity chain.
+- Added navigation for current HDE-EPIC038 evidence anchors including `artifacts/runtime/direct_db_selection.snapshot.json`, `artifacts/audit/env/env_snapshot.json`, `artifacts/architecture/architecture_snapshot.keys_only.json`, `artifacts/bodygraph/v2_mapped_cache/`, `audit/ops/hde-epic038/ops-02/`, `audit/ops/hde-epic038/ops-03/`, and `audit/gates/sanity_pipeline/sanity_pipeline.log`.
+
+### Changed / Fixed
+- Refreshed top-level release-attestation wording from PR-A/stage-14-stop posture to the current exact-source external attestation posture with `PR06R_B_FINAL_PASS` and the nineteen-stage final gate.
+- Clarified that current DB runtime selection is direct-only through `DATABASE_URL`; `DB_ALLOW_BRIDGE_IN_PROD`, `DB_BRIDGE_URL`, and `DB_FORCE_BRIDGE` are retired presence-sensitive refusal keys, while bridge and OPS-01 artifacts remain historical integrity evidence only.
+- Corrected mapped-cache documentation to describe the bounded explicit-upsert mapped-payload write/read-back path while preserving closed-rails zero I/O, legacy fallback, no raw vendor-payload persistence, production-like write refusal, and no QA/PF09/deployment/epic-closeout claims.
+
 Unreleased — HDE-EPIC037: Fermentation Pass 8 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
