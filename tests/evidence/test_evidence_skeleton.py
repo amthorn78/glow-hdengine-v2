@@ -244,7 +244,7 @@ def test_runtime_env_connectivity_is_historical_only_in_current_indexes():
     assert [(entry["artifact_key"], entry["discovered_physical_path"]) for entry in matching_entries] == [target]
     assert matching_entries[0]["record_type"] == "historical_bridge_evidence"
     assert "tokens" not in matching_entries[0]
-    assert "do not prove current service availability" in matching_entries[0]["notes"]
+    assert "does not prove current service availability" in matching_entries[0]["notes"]
 
     # The frozen primary retains its capture-time label, while current index
     # metadata prevents that historical label from satisfying a current token.
@@ -262,4 +262,4 @@ def test_runtime_env_connectivity_is_historical_only_in_current_indexes():
     assert [(rec["artifact_key"], rec["discovered_physical_path"]) for rec in matching_mirror] == [target]
     assert matching_mirror[0]["record_type"] == "historical_bridge_evidence"
     assert "tokens" not in matching_mirror[0]
-    assert "do not prove current service availability" in matching_mirror[0]["notes"]
+    assert "does not prove current service availability" in matching_mirror[0]["notes"]

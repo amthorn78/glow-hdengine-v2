@@ -120,7 +120,7 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
         calls.append(command)
         if command[1:4] == ["-m", "pip", "wheel"]:
             wheelhouse = Path(command[command.index("--wheel-dir") + 1])
-            wheelhouse.mkdir(parents=True)
+            wheelhouse.mkdir(parents=True, exist_ok=True)
             (wheelhouse / "glow_hdengine-0.0.0-py3-none-any.whl").write_bytes(b"wheel")
         elif command[1:3] == ["-m", "venv"]:
             scripts = tmp_path / "venv" / ("Scripts" if builder.os.name == "nt" else "bin")
