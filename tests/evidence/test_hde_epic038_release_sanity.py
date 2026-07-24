@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import run_sanity_pipeline as sanity
+from tools.evidence import update_evidence_index
 
 
 @pytest.fixture(autouse=True)
@@ -201,18 +202,45 @@ def test_current_release_validators_do_not_rewrite_frozen_captures():
     assert {path: (sanity.ROOT / path).read_bytes() for path in frozen} == before
 
 
-def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
+def test_pipeline_checks_prebuilt_evidence_without_post_seal_writes():
     commands = [command for step in sanity.default_steps() for command in step.commands]
     updater = (sanity.sys.executable, "tools/evidence/update_evidence_index.py")
     updater_check = (*updater, "--check")
     orientation = (sanity.sys.executable, "tools/evidence/orientation_demo.py")
     orientation_check = (*orientation, "--check")
-    assert commands.count(updater) == 1
+    assert commands.count(updater) == 0
     assert commands.count(updater_check) == 1
     assert commands.count(orientation) == 0
     assert commands.count(orientation_check) == 1
-    assert commands.index(updater) < commands.index(updater_check)
     assert commands.index(updater_check) < commands.index(orientation_check)
+
+
+def test_stale_evidence_graph_fails_final_pipeline_without_repair(
+    tmp_path, monkeypatch
+):
+    stage15, stage16 = sanity.default_steps()[14:16]
+    updater_check = (
+        sanity.sys.executable,
+        "tools/evidence/update_evidence_index.py",
+        "--check",
+    )
+    calls = []
+
+    def run(command):
+        calls.append(command)
+        return _result(1 if command == updater_check else 0)
+
+    monkeypatch.setattr(sanity, "_run_command", run)
+    log = tmp_path / "sanity.log"
+
+    assert sanity.run_pipeline(log_path=log, steps=[stage15, stage16]) == 1
+    assert calls == [updater_check]
+    text = log.read_text(encoding="utf-8")
+    assert f"check {stage15.name}:FAIL" in text
+    assert (
+        f"not_executed {stage16.name}:earlier_mandatory_failure={stage15.name}"
+        in text
+    )
 
 
 def test_first_failure_is_fail_closed_and_later_stages_are_recorded(
@@ -506,6 +534,12 @@ def test_historical_bridge_evidence_validates_frozen_packet_without_execution(
     sanity.validate_historical_bridge_evidence()
 
 
+def test_historical_index_inventory_matches_frozen_integrity_inventory():
+    assert update_evidence_index.HISTORICAL_BRIDGE_PRIMARY_PATHS == frozenset(
+        sanity.HISTORICAL_BRIDGE_PRIMARY_SHA256
+    )
+
+
 def test_historical_bridge_packet_is_bound_to_exact_frozen_ledger(tmp_path):
     root = _packet_copy(tmp_path)
     packet = root / "audit/ops/hde-epic038/ops-01"
@@ -520,6 +554,7 @@ def test_historical_bridge_packet_is_bound_to_exact_frozen_ledger(tmp_path):
     "relative",
     (
         "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/db/provider_parity/summary.json",
         "artifacts/runtime/env_connectivity.snapshot.json",
         "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json",
         "schemas/presenter_db_bridge_compare.v1.json",

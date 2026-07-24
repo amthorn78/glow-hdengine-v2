@@ -47,6 +47,9 @@ HISTORICAL_BRIDGE_PRIMARY_SHA256 = {
     "artifacts/db_bridge/provider_parity.proof.json": "27bca3f1e8d7fbf1dd32abfd5fffd831d6ce3e0380bdfa371ed4683706b533e0",
     "artifacts/db_bridge/query_select_1.json": "bd919ec13cc10567b72b81f4326a8b525d4db8a2d8914fc884b86a6530726862",
     "artifacts/db_bridge/root.json": "c3afa09727b1dfbfb1eb831658c392b2d20ab3843a5dfd946ad2bb0c12fd8ea5",
+    "artifacts/db/provider_parity/bridge.json": "8c670e7d5802ad33aeaabec66ba4143319f57cfde909f0e86af72cb6058cbeb1",
+    "artifacts/db/provider_parity/direct.json": "b9471967ea3d99fed00ff2d581298ce7baa24179fc889373eb20accf4c63f8f5",
+    "artifacts/db/provider_parity/summary.json": "960a3f1cdc57d10e120ff9ba18e52516d55bab679413c9f275397677fe9f8aaa",
     "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json": "40cb7dc2a668660f641df15ed054c731432dc17294a1810ab4aeae324c59270b",
     "artifacts/runtime/env_connectivity.nondev_failure.json": "596f7b6ac47c81b8786e49ab50f79663ba5e2c8ffbc32d954322f51eb1f81cfc",
     "artifacts/runtime/env_connectivity.snapshot.json": "5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45",
@@ -146,7 +149,10 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[11], (("__validate_historical_ops01__",),)),
         SanityStep(STAGE_NAMES[12], (("__validate_ops02__",),)),
         SanityStep(STAGE_NAMES[13], (("__validate_ops03__",),)),
-        SanityStep(STAGE_NAMES[14], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"))),
+        SanityStep(
+            STAGE_NAMES[14],
+            (_py("tools/evidence/update_evidence_index.py", "--check"),),
+        ),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[16], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(

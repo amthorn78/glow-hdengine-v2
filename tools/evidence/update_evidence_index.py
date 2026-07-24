@@ -2542,8 +2542,8 @@ EPIC038_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 HISTORICAL_BRIDGE_NOTES = (
     "Historical bridge/OPS-01 evidence retained for integrity, provenance, readability, "
     "secret safety, and historical nonclaims only; does not prove current service "
-    "availability, runtime support, provider parity, fallback, consistency, or token "
-    "satisfaction."
+    "availability, runtime support, provider parity, fallback, consistency, a current "
+    "OPS PASS, or token satisfaction."
 )
 HISTORICAL_BRIDGE_PRIMARY_PATHS = frozenset(
     {
@@ -2553,6 +2553,9 @@ HISTORICAL_BRIDGE_PRIMARY_PATHS = frozenset(
         "artifacts/db_bridge/provider_parity.proof.json",
         "artifacts/db_bridge/query_select_1.json",
         "artifacts/db_bridge/root.json",
+        "artifacts/db/provider_parity/bridge.json",
+        "artifacts/db/provider_parity/direct.json",
+        "artifacts/db/provider_parity/summary.json",
         "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json",
         "artifacts/runtime/env_connectivity.nondev_failure.json",
         "artifacts/runtime/env_connectivity.snapshot.json",
