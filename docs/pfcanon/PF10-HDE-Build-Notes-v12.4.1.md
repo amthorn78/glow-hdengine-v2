@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4  
+**Version:** v12.4.1  
 Effective Date: 2026.07.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -68,7 +68,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.17) PR-06 Remediation HDE-EPIC038 PR-06R-A  
 2.18) PR-06 Remediation \- OPS-03 HDE-EPIC038  
 2.19) PR-06 Remediation \- HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary  
-2.20) PR-06 Remediation PR-06R-B HDE-EPIC038
+2.20) PR-06 Remediation PR-06R-B HDE-EPIC038  
+2.21) PR-06 Remediation State
 
 # 2\) Numbered Addenda
 
@@ -16095,5 +16096,480 @@ Repo evidence: CFR-002–CFR-046 and VAL-003–VAL-008.
 Canon proof excerpt: PF10 §2.19 currently says, “The tracked packet has not completed governed evidence admission. PR-06R-B owns:”.
 
 DECISION: MERGED CHANGE ACCEPTABLE
+
+## 2.21) PR-06 Remediation State
+
+### **Review Scope and Established State**
+
+This review followed the one-off IA instruction as a read-only post-merge determination. It did not treat PR \#367 or any other pull request as open or pending, and it performed no merge-readiness assessment, implementation, OPS, PF edits, PF09 edits, board updates, deployment, migration, or external mutation.
+
+**Sources inspected**
+
+* Approved Epic Plan, including the HDE-EPIC038 Distillation scope, six-PR structure, deliverables, exclusions, and PF09.6 completion intent.  
+* Approved Implementation Plan, read end-to-end, including the PF09 Completion Scope and the complete `PR-06 — Release sanity orchestration and evidence binding` unit.  
+* Current PF10 v12.4, especially Addenda 2.12 through 2.20.  
+* Current PF09.6 v1.1.2, including every row originally mapped wholly or partly to PR-06.  
+* Task-relevant permanent canon for process separation, direct-database infrastructure, governed evidence, updater ownership, release validation, and QA posture.  
+* GitHub repository `amthorn78/glow-hdengine-v2`, whose current default branch is `main`.  
+* Relevant merged pull requests, reviews, comments, checks, current files, governed evidence, and the exact-head external release-attestation artifact.
+
+Repository inspection was connector-based and read-only. No local product-repository commands were represented as having run. The downloaded GitHub Actions attestation was read locally only as an immutable review artifact.
+
+**Merged implementation and remediation lineage**
+
+| Lifecycle stage | Merged pull request and merge commit | Review disposition |
+| ----- | ----- | ----- |
+| Original PR-06 implementation | PR \#359, merged as `78756e776f7fa598370235de6a72aa29fe045af9` | Established the original fail-closed release-sanity pipeline and OPS-package admission, but retained bridge-era assumptions later invalidated by the Product Owner’s direct-only architectural decision. |
+| Initial corrective attempt A | PR \#360, merged as `2e9b1b44d4090711f007453031cfe30f62867c65` | Repaired EPIC024 bindings, retained-evidence safety, DDL projection, and initial OPS-01R tooling. |
+| Initial corrective attempt B | PR \#361, merged as `34f32bf74093ff7f93d6de1ebc258b4a591d0066` | Completed the bridge-dependent OPS-01R runner contract. |
+| Initial corrective attempt C | PR \#362, merged as `ffe67e3d2c2831cb42c12dc583340ddde77d0980` | Tightened the bridge-dependent preflight and evidence validators. |
+| Exact-topic architectural supersession | PF10 Addendum 2.12 | Retired `pg-bridge`, `DB_BRIDGE_URL`, bridge fallback, direct-versus-bridge parity, the OPS-01R lane, and the bridge-dependent PR-C lane as current requirements. Historical outputs remained historical. |
+| Direct-only remediation A1 | PR \#363, merged as `a618ba7bbfef7e5f32c847dbdb4c0b0e07f22e79` | Introduced direct-only `DBAccess`, retired-key refusal, read-only transaction mechanics, direct-selection evidence, OPS-03 tooling, and focused tests. |
+| Direct-only remediation A2 | PR \#364, merged as `43853eed0079bb555137776b82aaec89542aa44a` | Converged higher-level consumers on `DBAccess`, strengthened retired-transport scanning, and added the explicit nonfinal PR-A pipeline boundary. |
+| Direct-only remediation A3 | PR \#365, merged as `1fbf8754a8e220fd68a57aca71e9ec28a13df91e` | Proved retired-key refusal before reading the direct endpoint value and strengthened static contract checks. |
+| Final PR-06R-A convergence | PR \#366, merged as `6e69d7a77f539d736ffcc0596bd51fa7d0004a90` | Finalized the direct-only source/tooling boundary, scalable release identity, portable path-proof semantics, external attestation builder, and OPS-03 execution tooling. |
+| PO-authorized OPS-03 | Captured against source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2` | Produced the bounded direct PostgreSQL read-only packet later admitted by PR-06R-B. |
+| Final atomic integration | PR \#367, head `071cd67fc1eb4e02afdf86c2105142c39da130b4`, merged as `4b0c1e09abc3f905a3315190576fa7339e991062` | Admitted direct-selection and OPS-03 evidence, quarantined bridge history, converged the evidence graph, completed the nineteen-stage final gate, and produced exact-head external attestation. |
+
+All listed pull requests are closed and merged. No open PR is part of this review.
+
+**Current repository state**
+
+* Current reviewed branch: `main`.  
+* Current tip: `079d4aba61771c020813547125c34105617374db`.  
+* Final remediation merge: `4b0c1e09abc3f905a3315190576fa7339e991062`.  
+* `main` is one commit ahead of the final remediation merge.  
+* The only intervening file change is the PF10 update from v12.3.9 to v12.4. No code, test, schema, runtime, workflow, governed evidence, Index, Mirror, checksum, path-proof, topology, or release artifact changed after PR \#367.  
+* Therefore, the exact-head code and governed evidence validation from PR \#367 remains applicable to current repository state. The later PF10-only commit does not require current-state rerunning of implementation validation.
+
+**Historical review and validation state**
+
+* All five PR \#367 review threads were resolved against the final head.  
+* Exact-head GitHub Actions run `30071658923` completed successfully.  
+* All seven jobs passed.  
+* The external artifact `hde-release-attestation-071cd67fc1eb4e02afdf86c2105142c39da130b4` remains available and unexpired; its archive digest is `sha256:11724e0e957c41d6a4eb0c52316deacbae03f359f5dafd049cd46360bbc618da`.  
+* No indispensable source was unavailable.
+
+### **PF10 Remediation Assessment**
+
+The current PF10 assessment is **technically accurate on the remediation result**, but it contains one stale repository-state sentence and one incomplete PF09 inventory conclusion.
+
+| PF10 conclusion | Audit result | Determination |
+| ----- | ----- | ----- |
+| PR \#367 completed PR-06R-B and merged the direct-only final integration. | GitHub proves PR \#367 merged with head `071cd67...` and merge commit `4b0c1e...`; current files contain the described integration. | Supported. |
+| Direct-only selection and retired-key refusal are implemented. | Current `engine/db/adapter.py` exposes only direct `PsycopgProvider` selection and rejects `DB_BRIDGE_URL`, `DB_FORCE_BRIDGE`, and `DB_ALLOW_BRIDGE_IN_PROD` by key presence before provider construction or I/O. PR \#365 specifically hardened refusal-before-value-read behavior. | Supported. |
+| The direct-selection evidence primary is deterministic and passing. | Current `artifacts/runtime/direct_db_selection.snapshot.json` contains the required four cases, six passing predicates, `result=PASS`, and no failure; its strict schema rejects unknown structure. | Supported. |
+| OPS-03 is accepted as bounded direct read-only evidence without rerun. | The packet records PASS, a two-connection and eleven-statement bounded observation, ten posture queries, zero SQL writes, zero retries, zero alternate-provider attempts, complete nonclaims, an independent validation receipt, and a checksum ledger. | Supported. |
+| Current and historical evidence are separated. | Current direct-selection and OPS-03 rows are active. Retained bridge/provider-parity and OPS-01 evidence is hash-frozen and validated only as historical integrity; stage 12 emits `HISTORICAL_INTEGRITY_OK`, not a current bridge PASS. | Supported. |
+| The canonical updater owns Index, Mirror, hashes, and sibling proofs. | PR-06R-B moved stage 15 to check-only; final generation occurs before the gate through the canonical updater. Current orientation reports 548 coherent artifacts. | Supported. |
+| The final release pipeline has exactly nineteen stages and fails closed. | The current log contains exactly nineteen ordered `OK` stages, `first_failed_stage:NONE`, and `summary:PASS`. The pipeline code stops on first failure and does not rerun OPS or call external systems. | Supported. |
+| The final release attestation is exact-source and verifies a real packaged entry point. | The external artifact records `source_commit=071cd67...`, `source_commit_exact=true`, a deterministic tracked-tree digest, `validation_result=PASS`, `release_admission=PR06R_B_FINAL_PASS`, and `pipeline_stop=null`. Its build log records a real wheel build and installed `hdctl` entry point. | Supported. |
+| The merged endpoint is the current `main` tip `4b0c1e...`. | Current `main` is now `079d4aba...`. | Stale statement. |
+| No later material divergence exists. | The sole later change is the PF10 v12.4 documentation update. No reviewed implementation or evidence file changed. | Supported after correcting the tip statement. |
+| Five rows are supportable for later PF09 maintenance. | All five named rows are supported, but the approved Implementation Plan mapped three additional rows wholly or partly to PR-06. | Supported but incomplete. |
+| No additional post-merge repository remediation is required. | Current code, evidence, exact-head validation, and later-change inspection reveal no unresolved implementation, evidence, safety, or validation defect. | Supported. |
+
+**PF10 inventory deficiency**
+
+PF10 correctly identifies these five direct-only remediation closure candidates:
+
+* `HDE-DIST001.4`  
+* `HDE-DIST001.6`  
+* `HDE-DIST001.9`  
+* `HDE-DIST001.11`  
+* `HDE-DIST005.2`
+
+However, the approved Implementation Plan also mapped the following rows wholly or partly to PR-06:
+
+* `HDE-DIST005.1`  
+* `HDE-DIST001.5`  
+* `HDE-DIST001.10`
+
+PF10 Addendum 2.20 does not reconcile those three rows. It neither states that they are still open nor supplies an authority-based exclusion from the original PR-06 inventory.
+
+The omission does not invalidate the technical remediation. It makes PF10’s PF09 closure inventory incomplete.
+
+### **PR-06 PF09 Inventory Reconciliation**
+
+**Original PR-06 mapping extracted independently from the approved Implementation Plan**
+
+The approved PR-06 unit explicitly names all eight subtasks below. The same mappings appear in the plan’s PF09 Completion Scope.
+
+| Original PR-06-mapped PF09 row | Mapping in approved plan |
+| ----- | ----- |
+| `HDE-DIST005.1` | PR-01 / PR-06 |
+| `HDE-DIST005.2` | PR-01 / PR-06 |
+| `HDE-DIST001.4` | PR-04 / OPS-01 / PR-06 |
+| `HDE-DIST001.5` | PR-04 / PR-06 |
+| `HDE-DIST001.6` | PR-06 |
+| `HDE-DIST001.9` | PR-04 / OPS-01 / PR-06 |
+| `HDE-DIST001.10` | PR-04 / PR-06 |
+| `HDE-DIST001.11` | PR-05 / OPS-02 / PR-06 |
+
+**Current PF10 remediation closure set**
+
+PF10 Addendum 2.15 defines row-specific predicates and possible later status movement for:
+
+* `HDE-DIST001.4`  
+* `HDE-DIST001.6`  
+* `HDE-DIST001.9`  
+* `HDE-DIST001.11`  
+* `HDE-DIST005.2`
+
+PF10 Addendum 2.20 repeats the same five-row recommendation.
+
+**Reconciliation**
+
+| Row | In current PF10 five-row set | Supported disposition |
+| ----- | ----- | ----- |
+| `HDE-DIST005.1` | No | **Omitted without sufficient authority.** PF10 Addendum 2.1 expressly said this row remained shared with PR-06 and should not move on PR-01 alone. The final PR-06 pipeline now proves its remaining canonical-encoding and environment-pin obligations. It must be assessed in this review. |
+| `HDE-DIST005.2` | Yes | Direct-only PR-06R-B closure candidate. |
+| `HDE-DIST001.4` | Yes | Direct-only PR-06R-B closure candidate with amended semantics. |
+| `HDE-DIST001.5` | No | **Already completed through PR-04 and not reopened by direct-only remediation.** PR-06 remained responsible for final orchestration and current revalidation; stage 9 and exact-head CI validate the current BodyGraph evidence family. It must be assessed but is not a new direct-only remediation row. |
+| `HDE-DIST001.6` | Yes | Direct-only PR-06R-B closure candidate. |
+| `HDE-DIST001.9` | Yes | Direct-only PR-06R-B closure candidate with renamed and amended semantics. |
+| `HDE-DIST001.10` | No | **Already completed through PR-04 and not reopened by direct-only remediation.** PR-06 remained responsible for final orchestration and current revalidation; stage 10 and exact-head CI validate the current architecture snapshot. It must be assessed but is not a new direct-only remediation row. |
+| `HDE-DIST001.11` | Yes | Existing PR-05 and OPS-02 proof was preserved and rebound through PR-06R-B without rerunning OPS-02. |
+
+**Final proven set requiring this review**
+
+All eight original PR-06-mapped rows require a closure determination:
+
+1. `HDE-DIST005.1`  
+2. `HDE-DIST005.2`  
+3. `HDE-DIST001.4`  
+4. `HDE-DIST001.5`  
+5. `HDE-DIST001.6`  
+6. `HDE-DIST001.9`  
+7. `HDE-DIST001.10`  
+8. `HDE-DIST001.11`
+
+No original PR-06 row remains unaccounted for.
+
+### **Remediation Obligation Crosswalk**
+
+| Requirement | Source and exact locator | Merged-state result | Current-state result and evidence | Finding | PF09 impact |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| Direct-only runtime selection | PF10 Addendum 2.12, §Decision and effective posture; Addendum 2.15, §Decision and effective PF09 posture | PR-06R-A removed executable bridge selection and converged runtime on `DBAccess` plus psycopg. | Current `engine/db/adapter.py` selects only `PsycopgProvider`; no later code change occurred. | Satisfied. | Supports `.4` and amended `.9`. |
+| Retired-transport refusal | PF10 Addendum 2.12, §Runtime and configuration contract; Addendum 2.13, §Decision and effective evidence posture | PR-06R-A added the exact retired-key roster and refusal-before-I/O mechanics. | Current code rejects each retired key by key presence, including empty values, before direct-endpoint value access or provider construction. The direct-selection artifact records all required refusal cases as PASS. | Satisfied. | Supports `.4`, amended `.9`; requires stale bridge-token cleanup in `.5`. |
+| Current-versus-historical evidence separation | PF10 Addendum 2.13, §Historical bridge evidence quarantine; Addendum 2.15, §Current evidence binding and updater ownership | PR-06R-B reclassified retained bridge/provider-parity/OPS-01 rows as historical. | Stage 12 validates historical hashes only and emits `HISTORICAL_INTEGRITY_OK`; no current bridge token or availability claim remains. | Satisfied. | Supports `.6`, `.9`, `.5.2`. |
+| Deterministic direct-selection evidence | PF10 Addendum 2.13, §Decision and effective evidence posture | PR-06R-B added the governed direct-selection primary and schema. | Four cases and all six derived predicates pass; current sibling proof binds path, hash, and size. | Satisfied. | Supports `.4`, `.9`, `.5.2`. |
+| Accepted OPS evidence admission without rerun | PF10 Addendum 2.14, §Success packet inventory and ownership and §Validation, admission, migration, and rollback; Addendum 2.15, §Ownership and adoption sequence | PR-06R-B copied and admitted the already-captured OPS-03 packet without invoking its producer. | Current packet bytes, checksum ledger, result summary, validation receipt, nonclaims, and path proofs remain present; pipeline validation is read-only. | Satisfied. | Supports `.4`, `.9`, `.5.2`. |
+| Canonical updater ownership | PF10 Addendum 2.15, §Current evidence binding and updater ownership; PF14 — HDE Mechanics Guide, §1.3.1 Evidence jobs (single-writer tools) | PR-06R-B finalized primaries before one canonical updater run and moved stage 15 to `--check`. | Current pipeline does not write path proofs, Index, Mirror, or sentinels; no later evidence mutation occurred. | Satisfied. | Supports `.5.2`, `.6`. |
+| Human Index and Machine Mirror convergence | PF10 Addendum 2.15, §Row-specific supportability predicates; PF12 — HDE Schemas and Artifacts, §8.3 Machine Evidence Index — JSONL mirror | Final merge produced a 548-row Human/Machine fixed point with required new identities exactly once. | Current orientation reports `total_artifacts: 548` and `status: ok`; current Human Index sentinel is `9da440...`. | Satisfied. | Supports `.5.2`, `.6`, and all evidence-backed rows. |
+| Hash, checksum, path-proof, and topology coherence | PF10 Addendum 2.15, §Current evidence binding and updater ownership | Final updater/check chain passed. | Current direct-selection proof, OPS ledgers, Index/Mirror sentinels, and orientation remain unchanged and coherent. | Satisfied. | Supports `.5.2`. |
+| Portable path-proof semantics | PF10 Addendum 2.16, §Portable path-proof semantics | PR-06R-A removed clone-local filesystem mtime comparison as a correctness predicate. | Current proofs bind exact path/hash/size and preserve timestamp shape; later checkout mtime is not used to invalidate them. | Satisfied. | Supports `.5.2` and release portability. |
+| Manifest-derived release identity | PF10 Addendum 2.16, §Single release-identity source and §Acyclic release graph | PR-06R-A made canonical `catalog/manifest.json` the single tracked release-identity input. | External attestation records `release_id` equal to `manifest_sha256`; source-to-manifest-to-release-to-attestation direction remains acyclic. | Satisfied. | Supports `.6` and `.5.1`. |
+| Exact-source external attestation | PF10 Addendum 2.16, §External release attestation | Exact-head artifact was generated outside the source tree for `071cd67...`. | Artifact records exact source commit, clean tracked-tree digest, PASS, real packaged entrypoint, and no pipeline stop; artifact digest matches GitHub metadata. | Satisfied. | Supports `.6`, `.5.1`, `.5.2`. |
+| Final release-sanity orchestration | PF10 Addendum 2.15, §Canonical release-sanity stage order | PR-06R-B replaced transitional/nonfinal output with final nineteen-stage PASS. | Current log has all nineteen ordered stages, no failure, and final PASS. | Satisfied. | Supports `.6`; revalidates `.5`, `.10`, and all other mapped rows. |
+| Required stage order and fail-closed behavior | PF10 Addendum 2.15, §Canonical release-sanity stage order | Final pipeline stopped on first failure by design and required every stage. | Current source preserves exact stage roster, required success codes, no skipping, and no repair of stale evidence during gate execution. | Satisfied. | Supports `.6`. |
+| Real packaged entry-point validation | PF10 Addendum 2.16, §External release attestation | PR-06R-B resolved review findings requiring a fresh wheel-only environment and real `hdctl` executable. | Attestation build log records wheel build, isolated installation, and successful packaged-console execution. | Satisfied. | Supports `.6`. |
+| Secret and payload safety | PF10 Addenda 2.13–2.16, explicit nonclaims and validator requirements | PR-A and PR-B validators rejected raw secret/payload markers and retained names-only evidence. | OPS-03 is presence-only; direct selection contains no endpoint values; BodyGraph and mapped-cache artifacts contain no raw vendor persistence; external attestation records secret-safety omissions rather than copying unsafe files. | Satisfied. | Supports all eight rows. |
+| Preservation of explicit nonclaims | PF10 Addenda 2.14–2.20, §Explicit nonclaims | PRs and OPS records disclaim QA PASS, token satisfaction, PF09 movement, deployment, migration, and closeout. | Current packet, mapped-cache manifest, PR \#367 body, and external attestation retain those nonclaims. | Satisfied. | Prevents evidence-to-status overclaim; does not block separate PF09 maintenance. |
+| Row-specific PF09 support evidence | PF10 Addendum 2.15, §Row-specific supportability predicates | PR-06R-B included a five-row support crosswalk. | All five direct-remediation rows pass. Current final pipeline also completes the three original PR-06 rows omitted from that five-row crosswalk. | Satisfied, but PF10 inventory is incomplete. | Supports all eight reconciled rows. |
+| No duplicate, orphaned, stale, manually fabricated, or misclassified evidence | PF10 Addendum 2.15, `.5.2` predicates; PF12 §8.3 | Final updater checks, historical hash freezing, and one-row-per-identity admission passed. | Current 548-row topology remains coherent; stage 15 is check-only; no post-merge evidence change occurred. | Satisfied. | Supports `.5.2` and all evidence-dependent rows. |
+| No unintended public-contract, deployment, migration, database-write, or external-system change | Approved Implementation Plan, §PR-06 Rails posture and exclusions; PF10 Addenda 2.15–2.20 nonclaims | PR-A changed internal DB/evidence architecture; OPS-03 was bounded read-only; PR-B performed evidence admission only. | No later runtime change exists. Public Reader/CLI bytes were not expanded, no deployment or migration was performed, and PR-B made no database or vendor call. | Satisfied. | Supports the complete PR-06 boundary. |
+
+No obligation is `Not satisfied` or `Unclear`.
+
+### **Validation and Evidence Review**
+
+| Validation or evidence item | Applicable source state | Result | Current relevance | Evidence | Closure effect |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| PR \#367 review threads | Final head `071cd67...` | PASS | Current; all threads resolved before merge and no reviewed implementation file later changed. | Five review threads resolved, including real-wheel entrypoint, source isolation, NameError, and check-not-repair findings. | Does not block. |
+| Exact-head GitHub Actions | Head `071cd67...`, run `30071658923` | PASS | Current because only PF10 changed after merge. | Seven of seven jobs succeeded; PR metadata records evidence/OPS 1065/1065 and direct PostgreSQL contract 250/250. | Does not block. |
+| Environment-pin validation | Exact PR head and current unchanged evidence | PASS | Current. | GitHub Actions ran with `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`; current env-pins artifact records success. | Supports `HDE-DIST005.1`. |
+| External release attestation | Exact PR head `071cd67...` | PASS | Current. The later PF10-only commit does not alter the attested source/evidence state. | Exact source, tracked-tree digest, manifest-derived release ID, real wheel installation, `PR06R_B_FINAL_PASS`, `pipeline_stop=null`, valid self-hash. | Supports `.6`, `.5.1`, `.5.2`. |
+| Nineteen-stage current sanity log | Final merged/current evidence bytes | PASS | Current. | Exactly nineteen `OK` stages; stage 12 historical-only; no failed stage; `summary:PASS`. | Supports `.6` and revalidates all mapped rows. |
+| Direct-selection artifact and schema | Final merged/current evidence bytes | PASS | Current. | Required four cases, exact retired roster, PASS predicates, strict closed schema, sibling proof. | Supports `.4`, `.9`. |
+| OPS-03 packet and independent validation | Source-bound OPS capture plus final admission | PASS | Current; no packet primary changed during PR-B or afterward. | `capture_result=PASS`, zero SQL writes, zero retries, zero alternate-provider attempts, complete nonclaims, valid checksums and validation receipt. | Supports `.4`, `.9`. |
+| Evidence updater, Index, Mirror, sentinels, and orientation | Final merged/current evidence bytes | PASS | Current. | Updater check, path validation, Mirror schema, Index/Mirror hash checks, 548-row orientation `status: ok`. | Supports `.5.2` and all governed evidence claims. |
+| BodyGraph source and policy family | PR-04 implementation, revalidated by final stage 9 | PASS | Current; final attestation includes current artifact hashes. | Source selection closes vendor transport under closed rails; source invariance uses distinct DB/vendor representations, same normalized input, equal projection/emitted bytes, two-run stability, and a rejected negative control; TTL/SWR, rate-limit, circuit-breaker, metrics, and keys-only evidence are current. | Supports `.5`. |
+| Architecture snapshot | PR-04 implementation, revalidated by final stage 10 | PASS | Current; snapshot includes current direct-only modules and reports `analyzer_verdict=pass`. | Current governed keys-only artifact and schema, final fixed-point check, no later change. | Supports `.10`. |
+| Local mapped-cache evidence | PR-05 implementation, revalidated by final stage 11 | PASS | Current. | Manifest status PASS; mapped write/read-back parity, idempotence, no raw vendor persistence, closed-rails zero I/O, normalized single-row identity, and production-like refusal all true. | Supports `.11`. |
+| OPS-02 mapped-cache packet | Accepted historical execution, revalidated by final stage 13 | PASS | Current; not rerun, and its admitted bytes remain unchanged. | Result summary PASS; exactly one vendor request; mapped payload only; parity, idempotence, refusal, and retained-by-PO predicates true. | Supports `.11`. |
+| Current-tip divergence review | Merge `4b0c1e...` to `main@079d4...` | PASS | Current. | One intervening PF10-only file change; no code/evidence/workflow/schema/test divergence. | Historical validation is not stale. |
+
+No required validation is `FAIL`, `NOT RUN`, `INCONCLUSIVE`, or `NOT AVAILABLE`.
+
+### **PF09 Row Closure Assessment**
+
+**PF09 row: `HDE-DIST005.1`**
+
+* **Exact current title and status:** `Canonical encodings & environment pins` — `Partial`.  
+* **Original PR-06 mapping:** PR-01 / PR-06.  
+* **Applicable later PF10 amendment:** No row-specific semantic amendment. Addendum 2.15’s nineteen-stage order governs the final environment, canonical-JSON, and final-LF checks. Addendum 2.20 omitted this row from its status list.  
+* **Complete closure predicates:**  
+  1. Byte-sensitive harnesses use `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
+  2. Phase VI governed JSON is canonical.  
+  3. Text evidence is LF-terminated.  
+  4. Environment-pin validation passes.  
+  5. Canonical-JSON validation passes.  
+  6. Final-LF validation passes on the committed state.  
+* **Predicate results:** All six PASS.  
+* **Current repository evidence:** Current env-pins artifact records the required pins and success; sanity stages 1, 3, and 19 pass; exact-head CI passed canonical JSON and final-LF checks; no later evidence change occurred.  
+* **Validation support:** Exact-head CI plus external attestation and current fixed-point artifacts.  
+* **Remaining gap:** PF10’s five-row inventory omitted this shared PR-06 row. No implementation, evidence, or validation gap remains.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable now through separate PF09 maintenance`.  
+* **Required next action:** Add the status change in the authorized PF09 maintenance action and record that final PR-06 orchestration supplied the previously outstanding global confirmation.
+
+**PF09 row: `HDE-DIST005.2`**
+
+* **Exact current title and status:** `Global Index & Mirror discipline` — `Partial`.  
+* **Original PR-06 mapping:** PR-01 / PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.15 retains updater, Human Index, Machine Mirror, checksum, path-proof, and orientation discipline and defines exact completion predicates.  
+* **Complete closure predicates:**  
+  1. Each new primary and schema has exactly one Human Index row.  
+  2. Each has exactly one Machine Mirror row.  
+  3. Each has the correct sibling path proof.  
+  4. Index and Mirror hashes are coherent.  
+  5. Historical bridge primaries retain exact hashes.  
+  6. No duplicate or orphan row exists.  
+  7. No manually written updater-owned companion exists.  
+  8. No ignored required artifact or schema/path/hash failure exists.  
+  9. Updater precedes orientation, and both checks pass.  
+* **Predicate results:** All nine PASS.  
+* **Current repository evidence:** 548-row coherent orientation, exact-head updater `--check`, path validation, Mirror schema/hash checks, Index hash check, final-LF check, and preserved historical hashes.  
+* **Validation support:** Exact-head CI and current orientation artifact.  
+* **Remaining gap:** Status drainage only.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable now through separate PF09 maintenance`.  
+* **Required next action:** Update the PF09 status and notes in a separate authorized maintenance action.
+
+**PF09 row: `HDE-DIST001.4`**
+
+* **Exact current title and status:** `DB posture & runtime checks (harness for HDE-FERM004)` — `Partial`.  
+* **Original PR-06 mapping:** PR-04 / OPS-01 / PR-06.  
+* **Applicable later PF10 amendment:** Addenda 2.12 and 2.15 remove current bridge fallback and provider-parity obligations. Current completion means direct-provider selection, retired-key refusal, typed direct failure, read-only direct posture, least privilege, search path, DDL identity projection, constraints, boundary views, partition posture, and governed evidence binding.  
+* **Complete closure predicates:** Those listed in PF10 Addendum 2.15 for `.4`.  
+* **Predicate-by-predicate result:**  
+  * No executable bridge path in active source: PASS.  
+  * Retired keys refuse before provider construction or I/O: PASS.  
+  * Direct-selection primary PASS: PASS.  
+  * Direct posture primaries current and schema-valid: PASS.  
+  * OPS-03 PASS: PASS.  
+  * Grants and least-privilege observations: PASS.  
+  * Search path: PASS.  
+  * DDL projection and constraints: PASS.  
+  * Boundary-view and partition observations: PASS.  
+  * Secret values absent: PASS.  
+  * Required paths indexed and mergeable: PASS.  
+* **Current repository evidence:** Current direct-only adapter/provider; direct-selection snapshot; OPS-03 packet and receipt; final Index/Mirror bindings.  
+* **Validation support:** Direct PostgreSQL contract suite, evidence/OPS suite, stage 7, stage 8, stage 14, and final attestation.  
+* **Remaining gap:** Current PF09 text still describes bridge fallback/provider-parity as part of the semantic home and artifact posture.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable after identified permanent-canon or PF09 wording maintenance`.  
+* **Required next action:** In the same PF09 maintenance action, first replace the obsolete bridge language with the Addendum 2.15 direct-only meaning, then record `Done`.
+
+**PF09 row: `HDE-DIST001.5`**
+
+* **Exact current title and status:** `BodyGraph mechanics gates` — `Partial`.  
+* **Original PR-06 mapping:** PR-04 / PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.4 approved the source-neutral projection boundary and v2 source-invariance evidence. Direct-only PR-06 remediation did not reopen the BodyGraph contract.  
+* **Complete closure predicates:**  
+  1. Source-selection evidence is current.  
+  2. Distinct DB and vendor representations bind to the same normalized input.  
+  3. Canonical projections are equal.  
+  4. Shared Presenter bytes are equal.  
+  5. DB and vendor two-run stability holds.  
+  6. Negative source divergence is rejected.  
+  7. Unsafe fields are absent.  
+  8. Vendor transport refuses under closed rails with zero calls.  
+  9. TTL/SWR policy matches the governed snapshot.  
+  10. Rate-limit policy matches.  
+  11. Circuit-breaker policy matches.  
+  12. Metrics and keys-only evidence are present and governed.  
+* **Predicate results:** All twelve PASS.  
+* **Current repository evidence:** Current source-invariance summary has every predicate true and a successful negative receipt; source-selection, refresh-policy, metrics, and keys-only artifacts remain current and are included in the final attestation.  
+* **Validation support:** Final pipeline stage 9, current generator `--check`, BodyGraph projection/policy tests, and external attestation.  
+* **Remaining gap:** PF09’s token list still includes retired `DEV_DB_BRIDGE_FALLBACK_OK`, which PF10 Addendum 2.12 makes nonclaimable. The obsolete token should not remain attached to a newly closed row.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable after identified permanent-canon or PF09 wording maintenance`.  
+* **Required next action:** Remove the retired bridge token from the row’s token list or mark it historical, then record `Done` in the same PF09 maintenance action.
+
+**PF09 row: `HDE-DIST001.6`**
+
+* **Exact current title and status:** `One-button evidence harness & release sanity pipeline` — `Partial`.  
+* **Original PR-06 mapping:** PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.15 replaces the original seventeen-stage/bridge-dependent orchestration with the exact direct-only nineteen-stage order. Addendum 2.16 adds manifest-derived release identity and exact-source external attestation.  
+* **Complete closure predicates:** Those listed in Addendum 2.15 for `.6`.  
+* **Predicate-by-predicate result:**  
+  * Nineteen mandatory stages present: PASS.  
+  * Exact order: PASS.  
+  * No skipped required stage: PASS.  
+  * Expected success code for every stage: PASS.  
+  * Stops on first failure: PASS.  
+  * No OPS execution or external I/O: PASS.  
+  * Current and historical evidence semantics separated: PASS.  
+  * Canonical JSON: PASS.  
+  * Determinism: PASS.  
+  * Rails: PASS.  
+  * Updater check: PASS.  
+  * Evidence-path validation: PASS.  
+  * Index/Mirror hash and schema checks: PASS.  
+  * Topology: PASS.  
+  * Final LF: PASS.  
+  * Exact-source packaged-entrypoint attestation: PASS.  
+* **Current repository evidence:** Final sanity log, gate source, exact-head CI, and external attestation.  
+* **Validation support:** All seven exact-head jobs and external attestation.  
+* **Remaining gap:** PF09 still names the older transcript path and older pipeline description. The current canonical surface is `audit/gates/sanity_pipeline/sanity_pipeline.log`, with nineteen stages and exact-head external attestation.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable after identified permanent-canon or PF09 wording maintenance`.  
+* **Required next action:** Update the PF09 evidence path and current stage/dependency wording, then record `Done` in the same PF09 maintenance action.
+
+**PF09 row: `HDE-DIST001.9`**
+
+* **Exact current title and status:** `DB–bridge parity & env connectivity` — `Partial`.  
+* **Original PR-06 mapping:** PR-04 / OPS-01 / PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.15 renames and redefines the row as `Direct database connectivity & retired-transport enforcement`.  
+* **Complete closure predicates:** Those listed in Addendum 2.15 for `.9`.  
+* **Predicate-by-predicate result:**  
+  * Amended direct-connectivity wording adopted as the controlling live meaning: PASS in PF10; not yet drained into PF09.  
+  * Healthy direct selection through psycopg: PASS.  
+  * Missing direct access fails closed: PASS.  
+  * Unavailable direct access fails closed: PASS.  
+  * Each retired key, including empty value, refuses before provider attempt: PASS.  
+  * Alternate-provider attempts equal zero: PASS.  
+  * OPS-03 proves bounded direct read-only posture: PASS.  
+  * DDL claim is limited to `hde.ddl_identity_projection.v1`: PASS.  
+  * No current bridge parity/fallback claim remains: PASS.  
+  * Current local and OPS evidence is governed and indexed: PASS.  
+* **Current repository evidence:** Direct adapter/provider, direct-selection snapshot, OPS-03 packet, historical bridge classifier, final updater bindings, and stage 12/14 separation.  
+* **Validation support:** Direct-contract tests, evidence/OPS tests, exact-head CI, final attestation.  
+* **Remaining gap:** The current PF09 title and body still define the retired bridge-parity contract.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable after identified permanent-canon or PF09 wording maintenance`.  
+* **Required next action:** Rename and replace the row’s bridge-era description, artifact expectations, and tokens with the direct-only meaning, then record `Done` in the same authorized PF09 maintenance action.
+
+**PF09 row: `HDE-DIST001.10`**
+
+* **Exact current title and status:** `Architecture snapshot (keys-only) evidence` — `Partial`.  
+* **Original PR-06 mapping:** PR-04 / PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.4 corrected analyzer discovery, taxonomy, unknown handling, and verdict derivation. Direct-only remediation did not reopen this row.  
+* **Complete closure predicates:**  
+  1. Governed architecture snapshot exists.  
+  2. Snapshot is canonical JSON and one-LF.  
+  3. Snapshot is keys-only and secret/payload safe.  
+  4. Analyzer discovers current bounded loci.  
+  5. Classification and reason codes are present.  
+  6. Verdict is derived from findings and equals PASS.  
+  7. Schema and evidence bindings are current.  
+  8. Final pipeline revalidates the snapshot.  
+* **Predicate results:** All eight PASS.  
+* **Current repository evidence:** Current snapshot includes present direct-only DB modules and reports `analyzer_verdict=pass`; stage 10 and exact-head tests passed; no later artifact change occurred.  
+* **Validation support:** Architecture snapshot tests, final pipeline stage 10, updater/path checks, external attestation.  
+* **Remaining gap:** Status drainage only.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable now through separate PF09 maintenance`.  
+* **Required next action:** Record the status change and current artifact path in the separately authorized PF09 maintenance action.
+
+**PF09 row: `HDE-DIST001.11`**
+
+* **Exact current title and status:** `v2 mapped-cache persistence hardening` — `Optional`.  
+* **Original PR-06 mapping:** PR-05 / OPS-02 / PR-06.  
+* **Applicable later PF10 amendment:** Addendum 2.15 retains the configured-v2 mapped-cache meaning, preserves local and OPS-02 evidence, and replaces bridge-specific no-I/O dependencies with transport-neutral guards.  
+* **Complete closure predicates:** Those listed in Addendum 2.15 for `.11`.  
+* **Predicate-by-predicate result:**  
+  * Local mapped-cache validator PASS: PASS.  
+  * OPS-02 validator PASS: PASS.  
+  * Adapter-mapped data only: PASS.  
+  * Canonical write/read-back parity: PASS.  
+  * Idempotent repeated write: PASS.  
+  * Normalized single-row identity: PASS.  
+  * No raw vendor payload persistence: PASS.  
+  * Secret safety: PASS.  
+  * Closed-rails zero I/O: PASS.  
+  * Production-like refusal: PASS.  
+  * Local generator imports no retired provider: PASS.  
+  * Local evidence performs no live provider/vendor call: PASS.  
+  * Current evidence bindings complete: PASS.  
+* **Current repository evidence:** Current local manifest is PASS with all required predicates; OPS-02 result summary is PASS with the approved bounded authorizations and complete predicates.  
+* **Validation support:** Final stages 11 and 13, local and OPS-02 validators, exact-head CI, and attestation.  
+* **Remaining gap:** PF09 still describes the row as a future epic pending authorization and includes pre-implementation nonclaims. That record is now stale.  
+* **Status recommendation:** `change to Done`.  
+* **Closure posture:** `Closure supportable after identified permanent-canon or PF09 wording maintenance`.  
+* **Required next action:** Replace the future/pending wording with the implemented HDE-EPIC038 bounded posture, preserve the production-write nonclaim, and record `Done`.
+
+### **Remaining Work**
+
+**1\. Post-merge repository, evidence, or validation remediation**
+
+None.
+
+No current code defect, governed-evidence defect, validation deficit, stale implementation artifact, unsafe behavior, or post-merge regression requires a new remediation task.
+
+**2\. Permanent PF-Canon drainage**
+
+Permanent documentation drainage remains, but it is not a repository-remediation or PF09-closure prerequisite because PF10 explicitly governs these exact live topics until drainage.
+
+Required drainage includes:
+
+* **PF07 — Glow Infrastructure:** remove active `pg-bridge` and bridge-fallback infrastructure semantics; retain bridge references only as history.  
+* **PF14 — HDE Mechanics Guide:** replace active bridge/provider-parity mechanics with direct-only selection, retired-key refusal, current direct evidence, and historical-integrity validation.  
+* **PF04 — HDE Governance:** retire current claimability of bridge-only token semantics, including `DEV_DB_BRIDGE_FALLBACK_OK`.  
+* **PF12 — HDE Schemas and Artifacts:** record direct-selection, OPS-03, historical-bridge classifications, exact evidence families, canonical updater ownership, and portable path-proof semantics.  
+* **PF19 — Glow QA Guide:** drain exact-head external attestation, real packaged-entrypoint validation, detect-not-repair CI posture, and portable path-proof validation.  
+* Any other exact target already named by PF10 Addenda 2.12 through 2.16.
+
+**Work classification:** `Permanent PF-Canon drainage`.
+
+**3\. PF10 correction or consolidation**
+
+Two bounded corrections are warranted:
+
+1. Replace Addendum 2.20’s statement that `main@4b0c1e...` is current with the truthful distinction:  
+   * final remediation merge: `4b0c1e...`;  
+   * current `main`: `079d4aba...`;  
+   * only intervening change: PF10 v12.4 documentation.  
+2. Clarify that the five-row Addendum 2.15/2.20 set is the **direct-only remediation predicate set**, not the complete original PR-06 PF09 inventory. Record the disposition and closure support for:  
+   * `HDE-DIST005.1`;  
+   * `HDE-DIST001.5`;  
+   * `HDE-DIST001.10`.
+
+These corrections do not require implementation or evidence changes.
+
+**Work classification:** `PF10 correction or consolidation`.
+
+**4\. PF09 wording and status maintenance**
+
+A separately authorized PF09.6 maintenance action may proceed.
+
+It should:
+
+* Change `HDE-DIST005.1` to `Done`.  
+* Change `HDE-DIST005.2` to `Done`.  
+* Amend `HDE-DIST001.4` to direct-only DB posture and change it to `Done`.  
+* Remove or historicalize the retired bridge token from `HDE-DIST001.5` and change it to `Done`.  
+* Update `HDE-DIST001.6` to the canonical nineteen-stage log/attestation posture and change it to `Done`.  
+* Rename and redefine `HDE-DIST001.9` as `Direct database connectivity & retired-transport enforcement`, then change it to `Done`.  
+* Change `HDE-DIST001.10` to `Done`.  
+* Update `HDE-DIST001.11` from future/pending language to its bounded implemented posture, preserve the no-production-write boundary, and change it to `Done`.
+
+**Work classification:** `PF09 wording maintenance` and `PF09 status maintenance`.
+
+**5\. Procedural review actions**
+
+None.
+
+No further implementation review, OPS rerun, evidence recapture, or remediation review is needed before the PF09 maintenance action. The PF09 maintainer should stop and return for review only if the maintenance source differs materially from the current PF09.6 text reviewed here.
+
+### **Final Determination**
+
+* **Merged PR-06 remediation sufficiency:** The completed remediation is technically and evidentially sufficient in the current repository state. The direct-only runtime, retired-key refusal, current-versus-historical evidence separation, OPS-03 admission, canonical evidence convergence, portable path proofs, manifest-derived release identity, exact-source packaged-entrypoint attestation, and nineteen-stage fail-closed release pipeline all remain valid.  
+* **Current PF10 conclusion:** PF10’s substantive conclusion that no further post-merge repository remediation is required is accurate. Its `main` tip statement is stale after a PF10-only commit, and its five-row PF09 closure list is incomplete relative to the approved original PR-06 mapping.  
+* **PF09 rows supportable for closure:** All eight original PR-06-mapped rows are supportable for `change to Done`:  
+  * `HDE-DIST005.1`  
+  * `HDE-DIST005.2`  
+  * `HDE-DIST001.4`  
+  * `HDE-DIST001.5`  
+  * `HDE-DIST001.6`  
+  * `HDE-DIST001.9`  
+  * `HDE-DIST001.10`  
+  * `HDE-DIST001.11`  
+* **Rows not supportable:** None.  
+* **Exact next authorized action:** Authorize one separate PF09.6 maintenance action that applies the identified wording corrections and status changes. Permanent PF-Canon drainage and the bounded PF10 correction may proceed separately and are not prerequisites for that maintenance action.
+
+DECISION: PR-06 REMEDIATION COMPLETE; PF09 MAINTENANCE MAY PROCEED
 
 \<eof\>
