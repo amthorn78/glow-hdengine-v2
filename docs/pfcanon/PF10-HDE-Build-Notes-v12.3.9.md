@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.3.8  
-Effective Date: 2026.07.23  
+**Version:** v12.3.9  
+Effective Date: 2026.07.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -65,8 +65,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.14) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet  
 2.15) HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-008 Direct-Only PF09.6 Completion Semantics and PR-06R Ownership  
 2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics  
-2.17) HDE-EPIC038 PR-06R-A  
-2.18) HDE-EPIC038 OPS-03 Planning Failure: No HDE Database Roles Exist
+2.17) PR-06 Remediation HDE-EPIC038 PR-06R-A  
+2.18) PR-06 Remediation \- OPS-03 HDE-EPIC038  
+2.19) HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary
 
 # 2\) Numbered Addenda
 
@@ -13607,12 +13608,6 @@ This addendum does not revise the plan, implement PR-06R-A or PR-06R-B, approve 
 
 PR \#366 is merged, and local `main` is current at merge commit `6e69d7a77f539d736ffcc0596bd51fa7d0004a90`. No repository file was modified for the addendum.
 
-## **Proposed Addendum Index Entry**
-
-2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics
-
-## **Proposed Addendum**
-
 ## 2.16) HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics
 
 **Timestamp:** 072326 18:31
@@ -13675,7 +13670,7 @@ No edge may point from a generated attestation back into tracked source.
 
 A manifest cut is therefore the terminal tracked release-identity change. It does not require a generated Python constant, regenerated checked-in release evidence, or recursive Index/Mirror churn.
 
-## **External release attestation**
+### External release attestation
 
 Current release-bound derivatives are generated only through:
 
@@ -13712,7 +13707,7 @@ Timing, raw subprocess output, secrets, DSNs, vendor values, and database observ
 
 CI builds and independently verifies this bundle outside the source tree and publishes it with bounded retention. The CI artifact is exact-head PR evidence, not a durable governed release admission record and not a replacement for PR-06R-B.
 
-### Frozen checked-in release evidence
+#### Frozen checked-in release evidence
 
 Existing checked-in EPIC022 release evidence and its companions are frozen capture-time records.
 
@@ -13727,7 +13722,7 @@ They:
 
 Current release provenance belongs to the external attestation. Historical checked-in evidence remains historical.
 
-### Registry and configuration evidence
+#### Registry and configuration evidence
 
 `artifacts/registry/registry_report.json` is configuration evidence, not release-identity evidence.
 
@@ -13737,7 +13732,7 @@ Config bundles derived from the registry report inherit this release-agnostic po
 
 Release and source provenance belong to the external attestation.
 
-### Portable path-proof semantics
+#### Portable path-proof semantics
 
 Git does not preserve filesystem mtimes. Clone-local `stat().st_mtime` is therefore not evidence and must not determine whether a governed path proof is valid.
 
@@ -13754,7 +13749,7 @@ Path-proof correctness is established by:
 
 For this exact portability scope, this addendum supersedes conflicting clone-local mtime comparison requirements in **HDE Schemas and Artifacts**, **HDE Mechanics Guide**, and **Glow QA Guide**. Their path, hash, size, schema, ownership, canonical-generation, and no-hand-edit requirements remain unchanged.
 
-### Generated development and packaging files
+#### Generated development and packaging files
 
 Host-specific generated development files are not source.
 
@@ -13762,7 +13757,7 @@ Local `.venv` trees and generated `*.egg-info` metadata must remain ignored and 
 
 A tracked virtual-environment root or tracked generated package metadata is repository contamination and must fail source-inventory or clean-tree validation.
 
-### PR-06R-A implementation record
+#### PR-06R-A implementation record
 
 PR \#366 implemented this architecture together with the approved direct-only remediation.
 
@@ -13788,7 +13783,7 @@ Exact-head validation included:
 
 The final exact-head review reported no findings, and every inline review thread was resolved before merge.
 
-### PR-A and downstream release boundary
+#### PR-A and downstream release boundary
 
 The PR-A attestation records:
 
@@ -13810,7 +13805,7 @@ The mandatory sequence remains:
 
 The external PR-A attestation does not satisfy OPS-03, PR-06R-B, the final nineteen-stage release PASS, or any PF09 predicate by itself.
 
-### Rollback
+#### Rollback
 
 Rollback must revert the runtime manifest derivation, release-cut command, isolated attestation builder, workflow publication, schemas, and this architectural decision together.
 
@@ -13825,7 +13820,7 @@ Rollback must not restore:
 
 If external attestation publication is unavailable, the attestation job fails while tracked source and the canonical manifest remain immutable.
 
-### Permanent drainage targets
+#### Permanent drainage targets
 
 Drain this decision into:
 
@@ -13837,7 +13832,7 @@ Drain this decision into:
 
 Permanent drainage must preserve Addenda 2.12 through 2.15’s direct-only database and evidence boundaries. It causes no automatic status movement.
 
-### Explicit nonclaims
+#### Explicit nonclaims
 
 This addendum does not:
 
@@ -13856,7 +13851,7 @@ This addendum does not:
 
 All unrelated PF10 and permanent-canon requirements remain unchanged.
 
-## 2.17) HDE-EPIC038 PR-06R-A
+## 2.17) PR-06 Remediation HDE-EPIC038 PR-06R-A
 
 ### Executive Review Summary
 
@@ -14214,98 +14209,908 @@ Evidence: GitHub Repo | `audit/gates/sanity_pipeline/sanity_pipeline.log`; exact
 
 DECISION: MERGED WORK ACCEPTABLE
 
-## 2.18) HDE-EPIC038 OPS-03 Planning Failure: No HDE Database Roles Exist
+## 2.18) PR-06 Remediation \- OPS-03 HDE-EPIC038
 
-Timestamp: 072326 23:03  
-Details: The Product Owner identified and corrected a planning failure introduced by the Implementation Author in the HDE-EPIC038 OPS-03 lineage. The planning and implementation contract imposed a dedicated least-privilege database-role posture without first inspecting the live database, locating canonical proof that such roles had been established, or planning the work required to create them. The resulting OPS-03 attempt evaluated the real database against a nonexistent role model and failed. This addendum records the actual database-role posture, assigns responsibility correctly, and supersedes contrary role-existence assumptions in Addenda 2.14 through 2.17.
+Review Summary
 
-### Definitive current database-role posture
+* Ops Evidence proves completion of the Approved Plan’s two-phase operation: a bounded mutable role-provisioning phase followed by an authorization-bound direct PostgreSQL read-only capture. Railway and administrative SQL were used only for role inspection, provisioning, verification, and cleanup; the capture used direct `psycopg`, executed zero SQL writes, made no Railway CLI call, used one attempt, and made no retry. Evidence pointers: Ops Evidence | `role-provisioning/00-railway-status.txt` through `04-login-disabled.txt`; `authorization.json`; `ops-03/db_posture_summary.json`; `ops-03/validation_receipt.json`.  
+* Live preflight found `hde_owner` and `hde_rw` already present as `NOLOGIN` roles and found the dedicated target roles `hde_reader` and `hde_ops03_reader` absent. The target roles were then provisioned, verified against the seven-flag least-privilege predicate, and left with `hde_ops03_reader` login disabled and its password cleared. Evidence pointers: Ops Evidence | `role-provisioning/01-role-preflight.txt`, `02-role-provisioning.txt`, `03-reader-verification.txt`, `04-login-disabled.txt`.  
+* The capture packet is internally coherent and complete: it contains the exact ten required primaries, reports `PASS`, has exit code `0`, empty stderr, the exact success sentinel, matching canonical JSON and checksums, all eleven decisive predicates true, all eight independent-validation predicates true, and a sealed terminal control state. Evidence pointers: Ops Evidence | `ops-03/checksums.sha256`, `result_summary.json`, `validation_receipt.json`, `exit_code.txt`, `stdout.log`, `stderr.log`; `control/authorization_consumed.json`; `control/.capture.committed`.  
+* Repo validation confirms that the ten packet primaries and twelve operator records are tracked at current `main` and byte-identical to Ops Evidence. The runner, validator, and seven OPS-03 schemas are present and unchanged between the authorized source commit and current HEAD. Evidence pointer: Repo | HEAD `e802598d583446b9eef1bee0ffa30ce63803149f`; comparison from source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2`; direct path and byte checks.  
+* The direct-selection primary, OPS-03 updater bindings, Human Evidence Index rows, Machine Mirror rows, and ten sibling path proofs are not yet present. The Approved Plan assigns those admission and final-integration obligations to PR-06R-B, so their absence prevents final governed admission but does not invalidate OPS-03 or require another database run. Evidence pointers: Repo | bounded searches and exact-path checks recorded below; Approved Plan | downstream admission boundary.  
+* Exact-byte Product Owner approval, the complete rollback of an unsuccessful pre-authorization connection sequence, and certain recovery details are preserved as operator-record assertions rather than independent artifacts. These qualifications do not conflict with the directly proven final role posture, one-attempt authorization consumption, successful capture, or sealed terminal state. Evidence pointers: Ops Evidence | `ACTION_REPORT.md`, `authorization.json`, `role-provisioning/03-reader-verification.txt`, `control/authorization_consumed.json`.  
+* OPS-03 supplies live technical evidence relevant to `HDE-SEPA001.3`, `HDE-DIST001.4`, and the direct-connectivity meaning of `HDE-DIST001.9`. It creates no PF09 status movement: `HDE-SEPA001.3` remains `Done`, while `HDE-DIST001.4` and `HDE-DIST001.9` remain `Partial`. Evidence pointers: Ops Evidence | `nonclaims.json`, role evidence, capture packet; PF09.3 — Canon HDE Build Checklist Separation, §Subtask HDE-SEPA001.3; PF09.6 — Canon HDE Build Checklist Distillation, §Subtask HDE-DIST001.4 and §Subtask HDE-DIST001.9.  
+* The acceptance result is `OPS ACCEPTABLE`. No OPS-03 rerun, role rollback, administrative-role capture exception, or remedial change to the runner, validator, schemas, or tests is required.
 
-Within Glow/HDE, the definitive current fact is: **no database roles exist.**
+Repo Evidence Validation Summary
 
-There is no Glow/HDE database-role system. No project-created reader, writer, application, runtime, migration, owner, admin, service, or least-privilege database role has been defined, provisioned, granted, or verified.
+* Observed repo root: connected repository root `/` for `amthorn78/glow-hdengine-v2`.  
+* Observed HEAD: `e802598d583446b9eef1bee0ffa30ce63803149f`.  
+* Branch or detached state: `main`; connected remote branch, not detached.  
+* Working-tree status before validation: N/A. The connected Repo exposes committed remote state, not an operator-local working tree.  
+* Working-tree status after validation: N/A and unchanged. Validation was read-only.  
+* Read-only validation methods used: repository metadata inspection; source-to-HEAD commit comparison; direct file fetch; bounded exact-string search; exact-path existence checks; byte-length, Git-blob identity, and SHA-256 comparison.  
+* Repo-resident evidence paths checked: all ten OPS-03 primaries; all twelve operator records; the runner; the validator; all seven OPS-03 schemas; the evidence updater; Human Evidence Index; Machine Evidence Mirror; direct-selection target; and the ten sibling path-proof targets.  
+* Tracked or mergeable evidence confirmed: all twenty-two Ops Evidence files are tracked at current HEAD and match the bundle bytes. The runner, validator, and schemas are tracked and remained unchanged from the authorized source commit.  
+* Reported evidence not found: direct-selection primary, ten sibling path proofs, and OPS-03 bindings in the updater, Human Evidence Index, and Machine Evidence Mirror.  
+* Evidence present but ignored or unmergeable: none.  
+* Ops Evidence and Repo contradictions: none in the bundle-to-Repo byte comparison or source-identity check.  
+* Dirty-tree provenance concerns: none observable in the connected remote Repo. No assertion is made about an operator-local checkout that is not represented by committed state.
 
-The database is currently accessed through the existing `postgres` administrative identity. That identity is not an HDE role model and does not establish the existence of any planned specialized role.
+Artifact path or label:
 
-No tracked migration creates an HDE database role. The tracked PR-04 DDL contains no grant statements or default-privilege statements and generates `NO_GRANT_STATEMENTS_ESTABLISHED`. Existing introspection evidence records the elevated `postgres` identity and its privileges; it does not record a dedicated HDE reader or any other HDE role.
+* `audit/ops/hde-epic038/ops-03/checksums.sha256`  
+* `audit/ops/hde-epic038/ops-03/commands.txt`  
+* `audit/ops/hde-epic038/ops-03/db_posture_summary.json`  
+* `audit/ops/hde-epic038/ops-03/env_presence.json`  
+* `audit/ops/hde-epic038/ops-03/exit_code.txt`  
+* `audit/ops/hde-epic038/ops-03/nonclaims.json`  
+* `audit/ops/hde-epic038/ops-03/result_summary.json`  
+* `audit/ops/hde-epic038/ops-03/stderr.log`  
+* `audit/ops/hde-epic038/ops-03/stdout.log`  
+* `audit/ops/hde-epic038/ops-03/validation_receipt.json`
 
-Repository-local names such as `hde_reader` and `hde_writer`, synthetic role rows in tests, schema fields such as `runtime_role_flags`, and the predicate name `least_privilege_role` are proposed models, fixtures, or acceptance machinery. They are not proof that corresponding live database roles exist.
+Reported by Ops Evidence: Yes
 
-### Planning failure
+Required by Approved Plan: Yes
 
-The Implementation Author converted a desired future security posture into an assumed current prerequisite.
+Present in Repo: Yes
 
-Specifically:
+Tracked or mergeable: Yes
 
-* Addendum 2.14 established `runtime_role_grants` as an OPS-03 observation and required every decisive predicate to be true for PASS.  
-* Addendum 2.15 made “least-privilege” observation part of the active completion meaning for `HDE-DIST001.4` and required grants to satisfy current predicates.  
-* PR-06R-A implemented `least_privilege_role=true` as a mandatory OPS-03 success condition, requiring the effective database identity to have no superuser, create-database, create-role, replication, bypass-RLS, schema-create, ownership, or relation-write capability.  
-* Tests proved that the software would accept a synthetic all-false role fixture. They did not prove that a matching live role existed.  
-* No planning-time database inspection or canonical provisioning record established a dedicated reader role before the one-attempt OPS task was authorized.
+Allowed root: Yes
 
-The subsequent failure analysis compounded the error by describing the issue as an underspecified credential posture and suggesting that the operator should have supplied or attested to a dedicated reader. That was incorrect. The operator could not supply a role that had never been created. The failure belongs to the planning and acceptance contract, not to the Product Owner, the operator, or the supplied `DATABASE_URL`.
+Content or proof facts checked: Yes
 
-### Correct interpretation of the failed OPS-03 attempt
+Repo validation status: Repo-confirmed. All ten files are tracked and byte-identical to Ops Evidence. The candidate checksum ledger SHA-256 is `e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`.
 
-The failed attempt proves that the authorized direct PostgreSQL path reached the database, executed its bounded read-only observation sequence, and rejected the actual database posture under the imposed predicates. It does not prove that the wrong existing credential was supplied, that a dedicated reader was available but omitted, or that the operator failed a prerequisite.
+Evidence pointer: Repo | HEAD `e802598d583446b9eef1bee0ffa30ce63803149f` | exact paths above; Ops Evidence | `ops-03/checksums.sha256`.
 
-The OPS-03 success contract was unsatisfiable against the actual current role posture because it required a specialized role that did not exist.
+Artifact path or label:
 
-The consumed authorization remains consumed. No success packet was produced, no PR-06R-B admission occurred, and no repository or persistent database mutation resulted.
+* `audit/ops/hde-epic038/ops-03-operator-record/ACTION_REPORT.md`  
+* `audit/ops/hde-epic038/ops-03-operator-record/DISCOVERY_FINDINGS.md`  
+* `audit/ops/hde-epic038/ops-03-operator-record/authorization.json`  
+* `audit/ops/hde-epic038/ops-03-operator-record/control/.capture.committed`  
+* `audit/ops/hde-epic038/ops-03-operator-record/control/authorization_consumed.json`  
+* `audit/ops/hde-epic038/ops-03-operator-record/control/launch.marker`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/00-railway-status.txt`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/01-role-preflight.txt`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/02-role-provisioning.txt`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/03-reader-verification.txt`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/04-login-disabled.txt`  
+* `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/checksums.sha256`
 
-### Supersession and current planning rule
+Reported by Ops Evidence: Yes
 
-For the exact topic of database-role existence and OPS-03 role prerequisites, this addendum supersedes contrary implications or assumptions in Addenda 2.14 through 2.17.
+Required by Approved Plan: Yes, as operational authorization, control, and D1-D8 support records; repository retention of the ancillary records is supporting provenance rather than completion of governed admission.
 
-The direct-only PostgreSQL transport decision, closed-rails posture, authorization binding, read-only transaction requirement, no-write controls, secret-safety requirements, and provenance rules remain unchanged.
+Present in Repo: Yes
 
-Until explicitly authorized role-provisioning work has been completed and verified:
+Tracked or mergeable: Yes
 
-* no plan, OPS instruction, test, schema, evidence contract, or completion predicate may state or imply that an HDE reader, writer, runtime, application, migration, owner, or least-privilege role exists;  
-* no operator attestation may be requested for the existence or use of such a role;  
-* `least_privilege_role=true` cannot be treated as a satisfiable current OPS-03 PASS requirement;  
-* synthetic fixtures and desired privilege matrices must remain clearly labeled as proposed or test-only;  
-* database-role existence must be established through direct inspection and authoritative provisioning evidence, never inferred from desired architecture, PF wording, repository labels, tests, schemas, or acceptance predicates.
+Allowed root: Yes
 
-No new OPS-03 attempt may be authorized until the Product Owner approves one of two explicit paths:
+Content or proof facts checked: Yes
 
-1. rescope OPS-03 to observe and truthfully record the actual current database identity and privileges without requiring a nonexistent specialized role; or  
-2. authorize, implement, and verify explicit database-role provisioning before constructing new OPS-03 authorization bytes.
+Repo validation status: Repo-confirmed. All twelve files are tracked and byte-identical to Ops Evidence. The role-evidence checksum ledger SHA-256 is `909189ddbd0fced6937c94c58d3c4e45b74ec69bd71009a5da1d2169a766c36d`.
 
-### PF09 posture
+Evidence pointer: Repo | HEAD `e802598d583446b9eef1bee0ffa30ce63803149f` | exact paths above; Ops Evidence | `authorization.json`, `control/*`, `role-provisioning/checksums.sha256`.
 
-This addendum does not infer that an existing PF09 task created database roles. PF09 language concerning least-privilege posture, grants, or a completed status is not evidence that external database roles were provisioned.
+Artifact path or label:
 
-`HDE-SEPA001.3 — Grants / DDL least-privilege posture` is recorded as `Done`, but that recorded status and its listed artifacts do not prove that external HDE database roles were created. Its wording, evidence meaning, and status must be reviewed separately before deciding whether it requires correction, reopening, or a distinct role-provisioning task. This addendum makes none of those changes by implication.
+* `scripts/ops/hde_epic038_ops03.py`  
+* `tools/evidence/hde_epic038_ops03.py`  
+* `schemas/hde_epic038_ops03_authorization.v1.json`  
+* `schemas/hde_epic038_ops03_db_posture_summary.v1.json`  
+* `schemas/hde_epic038_ops03_env_presence.v1.json`  
+* `schemas/hde_epic038_ops03_failure_receipt.v1.json`  
+* `schemas/hde_epic038_ops03_nonclaims.v1.json`  
+* `schemas/hde_epic038_ops03_result_summary.v1.json`  
+* `schemas/hde_epic038_ops03_validation_receipt.v1.json`
 
-If the Product Owner determines that separate database roles are required, the work must be established through an explicit PF09 task or authorized PF09 amendment. That work must define, at minimum:
+Reported by Ops Evidence: Yes
 
-* the required role set and exact responsibilities;  
-* ownership and privilege boundaries;  
-* creation, grant, revoke, and default-privilege behavior;  
-* application, migration, OPS, and administrative credential use;  
-* secret storage, rotation, and recovery ownership;  
-* deployment order, rollback, and failure handling;  
-* direct live verification and admissible evidence.
+Required by Approved Plan: Yes
 
-No PF09 task ID, subtask ID, status change, reopening, completion claim, or phase placement is created by implication. Those require separate source review and Product Owner authorization.
+Present in Repo: Yes
 
-### Required downstream correction
+Tracked or mergeable: Yes
 
-Before further OPS-03 or PR-06R-B work, the active planning and implementation lineage must be reviewed for every dependency on the nonexistent role model. At minimum, the OPS-03 predicates, schemas, runner behavior, validator behavior, authorization prerequisites, failure semantics, evidence contract, and PF09 supportability language must be corrected to match the Product Owner’s selected path.
+Allowed root: Yes
 
-The correction must distinguish:
+Content or proof facts checked: Yes
 
-* actual current database state;  
-* desired future security architecture;  
-* work required to create that architecture;  
-* evidence that proves the work was completed.
+Repo validation status: Repo-confirmed. All nine source artifacts are tracked and unchanged between the authorization-bound source commit and current HEAD. Ops Evidence independently reports valid source identity, runner identity, validator identity, and schema validation.
 
-None may be substituted for another.
+Evidence pointer: Repo | comparison `043dd6b9751442d7a9329ccfff9f6483a9d4fee2...e802598d583446b9eef1bee0ffa30ce63803149f`; Ops Evidence | `authorization.json`, `ops-03/validation_receipt.json`.
 
-### Explicit nonclaims
+Artifact path or label:
 
-This addendum does not create or provision a database role, authorize database mutation, select the final role architecture, create a PF09 task, change PF09 status, revise implementation code, approve new OPS-03 authorization bytes, execute or rerun OPS-03, admit a success packet, perform PR-06R-B, create QA PASS, satisfy a token, complete HDE-EPIC038, or close the epic.
+* `tools/evidence/update_evidence_index.py`  
+* `docs/evidence/INDEX.json`  
+* `artifacts/evidence_index.jsonl`
+
+Reported by Ops Evidence: Yes, as outstanding downstream admission surfaces
+
+Required by Approved Plan: Yes, for PR-06R-B governed admission; No, for OPS-03 operational acceptance
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed files with Repo-not-found OPS-03 bindings. Bounded case-insensitive searches for `ops-03`, `ops03`, `hde_epic038_ops03`, `epic038.ops03`, and `direct_db_selection.snapshot` returned zero OPS-03 binding hits in these three files.
+
+Evidence pointer: Repo | exact paths above at HEAD `e802598d583446b9eef1bee0ffa30ce63803149f`; search method: complete-file exact-string search, case-insensitive, direct file fetch.
+
+Artifact path or label:
+
+* `artifacts/runtime/direct_db_selection.snapshot.json`
+
+Reported by Ops Evidence: Yes, as an outstanding downstream artifact
+
+Required by Approved Plan: Yes, for PR-06R-B governed admission; No, for OPS-03 operational acceptance
+
+Present in Repo: No
+
+Tracked or mergeable: No
+
+Allowed root: Yes
+
+Content or proof facts checked: No
+
+Repo validation status: Repo-not-found. Exact-path fetch returned not found; case-insensitive search for `direct_db_selection.snapshot` across the Repo returned no artifact at the required path.
+
+Evidence pointer: Repo | exact-path fetch and bounded repository search at HEAD `e802598d583446b9eef1bee0ffa30ce63803149f`.
+
+Artifact path or label:
+
+* `audit/ops/hde-epic038/ops-03/checksums.sha256.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/commands.txt.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/db_posture_summary.json.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/env_presence.json.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/exit_code.txt.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/nonclaims.json.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/result_summary.json.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/stderr.log.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/stdout.log.path_proof.txt`  
+* `audit/ops/hde-epic038/ops-03/validation_receipt.json.path_proof.txt`
+
+Reported by Ops Evidence: Yes, as outstanding downstream artifacts
+
+Required by Approved Plan: Yes, for PR-06R-B governed admission; No, for OPS-03 operational acceptance
+
+Present in Repo: No
+
+Tracked or mergeable: No
+
+Allowed root: Yes
+
+Content or proof facts checked: No
+
+Repo validation status: Repo-not-found. Exact-path fetch for the sibling path-proof family returned not found. Case-sensitive bounded search of `audit/ops/hde-epic038/ops-03/` for `path_proof` returned zero hits.
+
+Evidence pointer: Repo | exact paths above and bounded path search at HEAD `e802598d583446b9eef1bee0ffa30ce63803149f`.
+
+Findings
+
+1. Finding ID: F-001  
+   What you observed: The operation used the Approved Plan’s two distinct authority boundaries. Railway and administrative SQL were confined to target inspection, reader-role provisioning, reader verification, and terminal credential cleanup. The authorization-bound capture then used direct PostgreSQL only, executed no SQL writes, made no Railway CLI call, used one attempt, and made no retry.  
+   Evidence pointer: Ops Evidence | `role-provisioning/00-railway-status.txt` through `04-login-disabled.txt`; `authorization.json`; `ops-03/db_posture_summary.json`; `control/authorization_consumed.json`.  
+   Expected requirement from Approved Plan: Complete the bounded mutable role precursor before constructing authorization bytes, then execute the unchanged direct-only/read-only/one-attempt capture contract.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed; the supporting records and packet are tracked and byte-identical to Ops Evidence.  
+   Why it matters: It separates authorized database setup from the capture’s `sql_writes=0` claim and proves that administrative-role use did not weaken the capture predicate.  
+   Blocker for acceptance: No  
+   PF support, only if relied on: PF09.6 — Canon HDE Build Checklist Distillation, §0.2 Conventions, “Ops tasks (PO-only execution; evidence required).”  
+   Canon proof excerpt, only if PF support is used: “Ops tasks MUST be executed by the PO (human operator) only.”  
+2. Finding ID: F-002  
+   What you observed: Preflight established database `railway`, administrative identity `postgres`, PostgreSQL `17.6`, the required schemas and five relations, empty bounded PUBLIC-write findings, existing `hde_owner` and `hde_rw` `NOLOGIN` roles, and absence of `hde_reader` and `hde_ops03_reader`.  
+   Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`.  
+   Expected requirement from Approved Plan: Inspect live role and object state before any mutation; stop rather than infer database-role existence or suitability.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed retained record; external database state is proven by the captured preflight, not by Repo.  
+   Why it matters: The role decision is based on observed live state. The evidence distinguishes existing HDE-named roles from the absent task-specific reader roles.  
+   Blocker for acceptance: No  
+   PF support, only if relied on: PF09.3 — Canon HDE Build Checklist Separation, §Subtask HDE-SEPA001.3 — Grants / DDL least-privilege posture.  
+   Canon proof excerpt, only if PF support is used: “Keep DB grants and DDL artifacts current and consistent with least‑privilege posture for persistence of public payloads.”  
+3. Finding ID: F-003  
+   What you observed: Provisioning evidence shows successful creation and grant command statuses; `hde_reader` is a `NOLOGIN` capability role; `hde_ops03_reader` was created as a login with `INHERIT`, connection limit `2`, no displayed elevated cluster flags, and active membership in `hde_reader`.  
+   Evidence pointer: Ops Evidence | `role-provisioning/02-role-provisioning.txt`.  
+   Expected requirement from Approved Plan: Establish a dedicated reader identity capable of satisfying the merged least-privilege capture predicate without changing the runner, validator, schemas, tests, or evidence contract.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed retained record; the database mutation itself is external state.  
+   Why it matters: The dedicated role makes the existing acceptance predicate executable without using `postgres` for capture.  
+   Blocker for acceptance: No  
+4. Finding ID: F-004  
+   What you observed: Reader verification ran as `hde_ops03_reader` in a read-only transaction with search path `hde, public`; all seven least-privilege flags were false; required column, constraint, boundary-view, and partition metadata were visible; verification ended with `ROLLBACK`.  
+   Evidence pointer: Ops Evidence | `role-provisioning/03-reader-verification.txt`.  
+   Expected requirement from Approved Plan: Prove the exact runtime reader predicate and required metadata visibility before constructing and consuming the authorization.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed retained record; runtime database state is proven by Ops Evidence.  
+   Why it matters: This is direct evidence that the task-specific role met the capture contract while lacking elevated, schema-create, or relation-write capability.  
+   Blocker for acceptance: No  
+5. Finding ID: F-005  
+   What you observed: Canonical authorization bound run ID `ops03-rolefix-afdd3ab792724569a7c24f83`, source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2`, a two-hour UTC window, authorization SHA-256 `911cbca9d81100092605a19271fb4701f0fde332bdc9e2a3dd59f73fdfca85ae`, runner and validator identities, interpreter identity, target, rails, query order, exact counts, candidate root, three argv vectors, and the one-attempt rule. The control record proves one consumed launch and sealed terminal state. The operator record states that the exact authorization bytes were approved before launch; no separate approval artifact was retained.  
+   Evidence pointer: Ops Evidence | `authorization.json`; `control/launch.marker`; `control/authorization_consumed.json`; `ACTION_REPORT.md`.  
+   Expected requirement from Approved Plan: Use a fresh source-bound canonical authorization for exactly one capture attempt and prevent reuse or retry.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed retained authorization and control records; source artifact paths are tracked and unchanged from the bound commit.  
+   Why it matters: It binds the capture to exact code, environment, inputs, commands, and terminal one-attempt state.  
+   Blocker for acceptance: No  
+6. Finding ID: F-006  
+   What you observed: The capture selected `psycopg` once, made two direct connections, executed one health statement and ten posture statements in one read-only posture transaction, executed eleven SQL statements total, made zero SQL writes, zero retries, and zero alternate-provider attempts, and returned `PASS`. All eleven decisive predicates and all eight independent-validation predicates are true.  
+   Evidence pointer: Ops Evidence | `ops-03/db_posture_summary.json`; `result_summary.json`; `validation_receipt.json`; `commands.txt`.  
+   Expected requirement from Approved Plan: Produce the exact direct-only/read-only posture packet under closed rails, with required counts, ordered queries, role flags, predicates, and independent validation.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed; packet bytes match Ops Evidence.  
+   Why it matters: This is the acceptance-critical proof of the live direct database posture.  
+   Blocker for acceptance: No  
+7. Finding ID: F-007  
+   What you observed: The packet contains exactly ten required files. `exit_code.txt` is `0` plus LF; `stdout.log` is `OPS03_CAPTURE_PASS` plus LF; `stderr.log` is empty; no failure packet exists; canonical JSON, packet checksums, role-evidence checksums, and terminal control hashes all validate. A direct secret scan found no retained DSN credentials, passwords, private keys, unredacted `DATABASE_URL`, CR, or NUL bytes.  
+   Evidence pointer: Ops Evidence | complete bundle; `ops-03/checksums.sha256`; `role-provisioning/checksums.sha256`; `control/.capture.committed`; `control/authorization_consumed.json`.  
+   Expected requirement from Approved Plan: Produce complete, deterministic, secret-free D1-D8 evidence and seal the success packet without retry or mutation.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed; all twenty-two retained evidence files are tracked and byte-identical to the reviewed bundle.  
+   Why it matters: It establishes packet completeness, integrity, confidentiality posture, and trustworthiness.  
+   Blocker for acceptance: No  
+8. Finding ID: F-008  
+   What you observed: Final cleanup proves `hde_ops03_reader` has login disabled and its password cleared, `hde_reader` remains `NOLOGIN`, and membership is retained. The record also reports a connection-form recovery, a completed rollback before authorization, use of a pristine external checkout, and an administrative cleanup connection after Railway DNS failure. Those recovery details are narrative-only; the required final role state and successful capture are directly proven.  
+   Evidence pointer: Ops Evidence | `role-provisioning/04-login-disabled.txt`; `03-reader-verification.txt`; `ACTION_REPORT.md`; `ops-03/validation_receipt.json`.  
+   Expected requirement from Approved Plan: Disable the task login and clear its password on success or failure; preserve evidence of the final bounded posture and stop on any unverified cleanup state.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed retained cleanup evidence.  
+   Why it matters: The temporary principal cannot currently authenticate, while the reusable capability role remains non-login.  
+   Blocker for acceptance: No  
+9. Finding ID: F-009  
+   What you observed: Repo tracks byte-identical copies of the ten packet primaries and twelve supporting records. The direct-selection primary, updater bindings, Human Evidence Index rows, Machine Mirror rows, and ten sibling path proofs are not present.  
+   Evidence pointer: Repo | `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`; `tools/evidence/update_evidence_index.py`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`; exact-path and bounded-search proof above.  
+   Expected requirement from Approved Plan: Preserve the exact OPS packet for later admission; PR-06R-B owns the exact-copy admission, direct-selection primary, updater bindings, Index/Mirror convergence, path proofs, support crosswalk, and final integrated validation.  
+   Requirement coverage: Found for OPS-03 preservation; not yet due within OPS-03 for PR-06R-B admission.  
+   Repo validation status, if repo-resident: Repo-confirmed packet tracking and byte identity; Repo-not-found downstream binding state.  
+   Why it matters: OPS-03 is operationally acceptable, while final governed admission and release-sanity claims remain unavailable until PR-06R-B completes its separate scope.  
+   Blocker for acceptance: No  
+10. Finding ID: F-010  
+    What you observed: Ops Evidence explicitly disclaims PF09 movement, QA PASS, deployment, migration, acceptance-token satisfaction, Epic completion, and closeout. The evidence supports live technical posture for `HDE-SEPA001.3`, `HDE-DIST001.4`, and `HDE-DIST001.9` without completing any row.  
+    Evidence pointer: Ops Evidence | `ops-03/nonclaims.json`; role evidence; `db_posture_summary.json`; Approved Plan | PF09 and downstream ownership mapping.  
+    Expected requirement from Approved Plan: Keep OPS evidence separate from QA, acceptance, PF09 maintenance, final integration, and closeout; route later support through PR-06R-B and human PF09 maintenance.  
+    Requirement coverage: Found  
+    Repo validation status, if repo-resident: Repo-confirmed nonclaims and packet; final admission surfaces remain incomplete as recorded in F-009.  
+    Why it matters: It prevents an accepted operational capture from being overstated as an accepted release or completed Epic.  
+    Blocker for acceptance: No  
+    PF support, only if relied on: PF09.3 — Canon HDE Build Checklist Separation, §Subtask HDE-SEPA001.3; PF09.6 — Canon HDE Build Checklist Distillation, §Subtask HDE-DIST001.4 and §Subtask HDE-DIST001.9.  
+    Canon proof excerpt, only if PF support is used: PF09.3 states, “Keep DB grants and DDL artifacts current and consistent with least‑privilege posture for persistence of public payloads.” PF09.6 records `HDE-DIST001.4` as `Partial` and `HDE-DIST001.9` as `Partial`.
+
+Evidence Print (PASS PROOF; required)
+
+#### **A) Required deliverables satisfied**
+
+Deliverable name: D1 — Railway target status
+
+Evidence pointer: Ops Evidence | `role-provisioning/00-railway-status.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/00-railway-status.txt`
+
+Key proof facts: project `ample-illumination`; environment `production`; PostgreSQL service online; no credential value retained.
+
+Deliverable name: D2 — Role and object preflight
+
+Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/01-role-preflight.txt`
+
+Key proof facts: administrative identity `postgres`; required schemas and objects present; bounded PUBLIC-write findings empty; `hde_owner` and `hde_rw` observed; `hde_reader` and `hde_ops03_reader` absent.
+
+Deliverable name: D3 — Target-role provisioning result
+
+Evidence pointer: Ops Evidence | `role-provisioning/02-role-provisioning.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/02-role-provisioning.txt`
+
+Key proof facts: successful PostgreSQL command statuses; required role attributes; connection limit `2`; active membership; no password, DSN, or host value retained.
+
+Deliverable name: D4 — Dedicated reader verification
+
+Evidence pointer: Ops Evidence | `role-provisioning/03-reader-verification.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/03-reader-verification.txt`
+
+Key proof facts: effective role `hde_ops03_reader`; read-only transaction; search path `hde, public`; all seven least-privilege flags false; all four metadata-visibility checks true; `ROLLBACK`.
+
+Deliverable name: D5 — Canonical source-bound authorization
+
+Evidence pointer: Ops Evidence | `authorization.json`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/authorization.json`
+
+Key proof facts: run ID `ops03-rolefix-afdd3ab792724569a7c24f83`; source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2`; two-hour UTC window; SHA-256 `911cbca9d81100092605a19271fb4701f0fde332bdc9e2a3dd59f73fdfca85ae`; exact source, commands, target, rails, roster, counts, and one-attempt bindings.
+
+Deliverable name: D6 — Ten-file direct posture packet
+
+Evidence pointer: Ops Evidence | `ops-03/`
+
+Repo validation status, if repo-resident: Repo-confirmed, tracked, and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03/`
+
+Key proof facts: exact ten-file inventory; `PASS`; exit code `0`; exact stdout sentinel; empty stderr; all decisive and independent-validation predicates true; zero writes, retries, and alternate-provider attempts; committed sealed control state.
+
+Deliverable name: D7 — Disabled-login final state
+
+Evidence pointer: Ops Evidence | `role-provisioning/04-login-disabled.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/04-login-disabled.txt`
+
+Key proof facts: `hde_ops03_reader` login disabled; password cleared; `hde_reader` remains `NOLOGIN`; membership retained.
+
+Deliverable name: D8 — Role-evidence checksum ledger
+
+Evidence pointer: Ops Evidence | `role-provisioning/checksums.sha256`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-03-operator-record/role-provisioning/checksums.sha256`
+
+Key proof facts: ASCII-sorted SHA-256 rows for D1, D2, D3, D4, and D7; every row validates; ledger SHA-256 `909189ddbd0fced6937c94c58d3c4e45b74ec69bd71009a5da1d2169a766c36d`; no secret retained.
+
+#### **B) Commands and actions evidence**
+
+Action: Confirm the authorized Railway project, environment, and PostgreSQL service.
+
+Evidence pointer: Ops Evidence | `role-provisioning/00-railway-status.txt`
+
+Success signal: project `ample-illumination`, environment `production`, and PostgreSQL service online.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Inspect live administrative identity, schemas, required objects, PUBLIC privilege posture, and role roster.
+
+Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`
+
+Success signal: required target and objects present; bounded PUBLIC findings empty; legacy roles observed; task-specific roles absent.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Provision the capability and task-login roles and establish membership.
+
+Evidence pointer: Ops Evidence | `role-provisioning/02-role-provisioning.txt`
+
+Success signal: successful command statuses, expected target-role attributes, and active membership.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Connect as the task principal and test the merged least-privilege predicate inside a read-only transaction.
+
+Evidence pointer: Ops Evidence | `role-provisioning/03-reader-verification.txt`
+
+Success signal: exact role and search path; read-only true; seven prohibited flags false; required metadata visible; `ROLLBACK`.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Construct, validate, and consume one canonical authorization.
+
+Evidence pointer: Ops Evidence | `authorization.json`; `control/launch.marker`; `control/authorization_consumed.json`
+
+Success signal: canonical bound authorization; one consumed launch; `launch_consumed=true`; `finalized=true`; `sealed=true`.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Execute the direct posture capture and independent validator.
+
+Evidence pointer: Ops Evidence | `ops-03/commands.txt`, `db_posture_summary.json`, `result_summary.json`, `validation_receipt.json`, `stdout.log`, `stderr.log`, `exit_code.txt`
+
+Success signal: `OPS03_CAPTURE_PASS`; exit code `0`; empty stderr; capture `PASS`; independent validation `PASS`; exact counts; zero writes, retries, or alternate-provider attempts.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Disable the task login, clear its password, and verify final role state.
+
+Evidence pointer: Ops Evidence | `role-provisioning/04-login-disabled.txt`
+
+Success signal: task role `NOLOGIN`; password cleared; capability role remains `NOLOGIN`; membership retained.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+Action: Produce and verify packet and role-evidence checksum ledgers.
+
+Evidence pointer: Ops Evidence | `ops-03/checksums.sha256`; `role-provisioning/checksums.sha256`; `control/.capture.committed`
+
+Success signal: every covered hash matches; packet ledger SHA-256 `e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`; role ledger SHA-256 `909189ddbd0fced6937c94c58d3c4e45b74ec69bd71009a5da1d2169a766c36d`; terminal commit marker matches.
+
+Repo validation status for repo-resident output: Repo-confirmed and byte-identical.
+
+#### **C) Configuration or infrastructure state evidence**
+
+State claim: Authorized operational target
+
+Evidence pointer: Ops Evidence | `role-provisioning/00-railway-status.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed retained record; live service state is external.
+
+State proven: Railway project `ample-illumination`, environment `production`, PostgreSQL service online.
+
+State claim: Pre-provisioning role posture
+
+Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed retained record; live role state is external.
+
+State proven: `hde_owner` and `hde_rw` existed as `NOLOGIN`; `hde_reader` and `hde_ops03_reader` did not exist; `postgres` was the administrative identity. The evidence does not prove origin, complete memberships, complete object grants, or terminal unchanged state for the legacy roles.
+
+State claim: Verified capture principal posture
+
+Evidence pointer: Ops Evidence | `role-provisioning/03-reader-verification.txt`; `ops-03/db_posture_summary.json`
+
+Repo validation status, if repo-resident: Repo-confirmed retained records.
+
+State proven: effective role `hde_ops03_reader`; read-only transaction; exact search path; no displayed elevated, schema-create, or relation-write capability; required metadata visible.
+
+State claim: Direct capture rails
+
+Evidence pointer: Ops Evidence | `ops-03/env_presence.json`; `authorization.json`
+
+Repo validation status, if repo-resident: Repo-confirmed and byte-identical.
+
+State proven: `APP_ENV=dev`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `ALLOW_DB_WRITE=0`, DB-read authorization present, and all three retired keys absent.
+
+State claim: Terminal task-role posture
+
+Evidence pointer: Ops Evidence | `role-provisioning/04-login-disabled.txt`
+
+Repo validation status, if repo-resident: Repo-confirmed retained record.
+
+State proven: `hde_ops03_reader` cannot log in and has no password; `hde_reader` remains a non-login capability role; membership remains present.
+
+State claim: Repo preservation and downstream admission
+
+Evidence pointer: Repo | current HEAD and exact paths in the Repo Evidence Validation Summary.
+
+Repo validation status, if repo-resident: Packet and supporting records Repo-confirmed; admission companions Repo-not-found.
+
+State proven: exact Ops Evidence is tracked and mergeable; final governed admission, direct-selection, updater convergence, Index/Mirror convergence, and sibling path proofs are not complete.
+
+#### **D) PF09 later-drain support**
+
+Phased PF09 document: PF09.3 — Canon HDE Build Checklist Separation
+
+PF09 task ID: `HDE-SEPA001`
+
+PF09 subtask ID, if applicable: `HDE-SEPA001.3`
+
+Approved Plan claim: The bounded target-role provisioning and verification are relevant to the grants and least-privilege posture row but do not reopen or complete it.
+
+Supportable later-drain action: No status action. Preserve `Done`; record the task-specific role outcome only in the task-relevant PF10 addendum.
+
+Evidence basis: Ops Evidence | `role-provisioning/01-role-preflight.txt` through `04-login-disabled.txt`.
+
+Repo validation status for repo-resident evidence: Repo-confirmed retained records.
+
+Notes: The row states, “Keep DB grants and DDL artifacts current and consistent with least‑privilege posture for persistence of public payloads.” The bounded task roles do not prove a complete application, writer, owner, migration, administration, rotation, recovery, or break-glass role architecture.
+
+Phased PF09 document: PF09.6 — Canon HDE Build Checklist Distillation
+
+PF09 task ID: `HDE-DIST001`
+
+PF09 subtask ID, if applicable: `HDE-DIST001.4`
+
+Approved Plan claim: OPS-03 supplies live role, search-path, DDL-identity, constraint, boundary-view, and partition observations for later support review.
+
+Supportable later-drain action: After PR-06R-B completes governed evidence admission and final review, a human PF09 maintenance pass may evaluate the row against all remaining predicates. OPS-03 alone supports no status movement.
+
+Evidence basis: Ops Evidence | `ops-03/db_posture_summary.json`, `validation_receipt.json`, `role-provisioning/03-reader-verification.txt`.
+
+Repo validation status for repo-resident evidence: Packet and supporting records Repo-confirmed; PR-06R-B admission companions Repo-not-found.
+
+Notes: PF09.6 records the row as `Partial`.
+
+Phased PF09 document: PF09.6 — Canon HDE Build Checklist Distillation
+
+PF09 task ID: `HDE-DIST001`
+
+PF09 subtask ID, if applicable: `HDE-DIST001.9`
+
+Approved Plan claim: The current exact-topic meaning is direct database connectivity and retired-transport enforcement. OPS-03 proves direct `psycopg` connectivity, absent retired keys, zero alternate-provider attempts, and read-only live posture.
+
+Supportable later-drain action: After PR-06R-B binds the packet, direct-selection primary, updater state, Index/Mirror rows, path proofs, and final pipeline result, a human PF09 maintenance pass may evaluate the row against the complete direct-only predicate. OPS-03 alone supports no status movement.
+
+Evidence basis: Ops Evidence | `ops-03/env_presence.json`, `db_posture_summary.json`, `validation_receipt.json`, `nonclaims.json`.
+
+Repo validation status for repo-resident evidence: Packet Repo-confirmed; downstream binding state Repo-not-found.
+
+Notes: PF09.6 records the row as `Partial`. The packet does not by itself prove every source-level retired-key refusal case or complete final integration.
+
+Doc Deltas (PF-Canon only; REQUIRED in OPS ACCEPTABLE branch)
+
+Doc Delta Detection Workflow
+
+CHG ID: CHG-001
+
+Change claim: A PO-authorized mutable precursor may provision and verify a dedicated least-privilege database principal before an authorization-bound direct read-only capture, provided the phases remain separate and the capture contract is unchanged.
+
+Type: workflow steps; rails or evidence posture
+
+Evidence pointer: Ops Evidence | role-provisioning evidence, authorization, capture packet, cleanup evidence; Approved Plan | two-phase operating boundary.
+
+Canon basis: CANON SILENCE
+
+CHG ID: CHG-002
+
+Change claim: Live preflight observed `hde_owner` and `hde_rw`, while the task-specific `hde_reader` and `hde_ops03_reader` roles were absent and were then provisioned into the bounded terminal posture.
+
+Type: configuration or environment
+
+Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt` through `04-login-disabled.txt`.
+
+Canon basis: CANON SILENCE
+
+CHG ID: CHG-003
+
+Change claim: OPS-03 completed successfully and is operationally acceptable, while final governed evidence admission remains assigned to PR-06R-B.
+
+Type: governed paths or artifact families; rails or evidence posture
+
+Evidence pointer: Ops Evidence | exact packet and operator records; Repo | tracked byte-identical packet and absent downstream bindings.
+
+Canon basis: CANON ALIGNED
+
+CHG: CHG-001
+
+Doc: PF10 — HDE Build Notes
+
+Section: §2.14 “HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-007 Authorization-Bound OPS-03 Direct Read-Only Posture Packet”
+
+Canon basis: CANON SILENCE
+
+Delta: NEW CANON PROPOSAL — Add a task-specific §2.18 that defines the mutable reader-role precursor as separate from the unchanged direct/read-only capture, records the evidence-bounded role posture, and preserves the existing authorization, one-attempt, secret-safety, and zero-write capture rules.
+
+Why: The existing direct-capture unit defines the capture contract but does not define a bounded role-provisioning precursor. The new unit is required to make the authorized phase boundary and accepted operational result explicit without implying that provisioning SQL participated in the capture.
+
+Evidence pointer: Ops Evidence | `role-provisioning/00-railway-status.txt` through `04-login-disabled.txt`; `authorization.json`; `ops-03/db_posture_summary.json`; `ops-03/validation_receipt.json`.
+
+CHG: CHG-002
+
+Doc: PF10 — HDE Build Notes
+
+Section: §2.18 “HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary”
+
+Canon basis: CANON SILENCE
+
+Delta: NEW CANON PROPOSAL — Record only the directly observed role roster and bounded target-role outcome: legacy `hde_owner` and `hde_rw` existed; task-specific `hde_reader` and `hde_ops03_reader` were absent before provisioning; the task principal satisfied the seven-flag reader predicate; final login was disabled and its password cleared. Include the evidence qualifications and explicit nonclaims.
+
+Why: Repository names, fixtures, predicates, and desired architecture do not prove live database roles. The live preflight and terminal evidence establish a precise task-scoped posture that should govern future planning.
+
+Evidence pointer: Ops Evidence | `role-provisioning/01-role-preflight.txt`, `02-role-provisioning.txt`, `03-reader-verification.txt`, `04-login-disabled.txt`, `role-provisioning/checksums.sha256`.
+
+DECISION: OPS ACCEPTABLE
+
+## **2.19) HDE-EPIC038 OPS-03 — Authorized Reader-Role Provisioning, Direct Read-Only Capture, and Evidence-Admission Boundary**
+
+Timestamp: 072426 03:13  
+Details: On 2026-07-23 UTC, the Product Owner-authorized OPS-03 task completed a bounded database-role provisioning phase followed by an authorization-bound direct PostgreSQL read-only capture. Live preflight observed the existing HDE-named roles `hde_owner` and `hde_rw`, established that the dedicated target roles `hde_reader` and `hde_ops03_reader` were absent, and confirmed that the administrative connection used the elevated `postgres` identity. The task provisioned and verified the two target roles, executed one successful direct capture, and disabled the task-specific login and cleared its password. This addendum records the database-role posture, operational result, evidence limits, PF09 effect, and PR-06R-B boundary.
+
+### **Decision**
+
+**OPS-03 OPERATIONAL EXECUTION: ACCEPTABLE WITH NON-BLOCKING NOTES.**
+
+Binary disposition:
+
+**OPS ACCEPTABLE**
+
+The role evidence and direct-capture packet establish the required operational outcome. No further OPS-03 attempt, database-role rollback, administrative-role capture exception, or change to the runner, validator, schemas, tests, or ten captured primaries is required.
+
+This decision is limited to the bounded role work, cleanup, and direct capture. It does not establish final governed evidence admission, final release integration, QA PASS, PF09 status movement, acceptance-token satisfaction, deployment, migration, Epic completion, or closeout.
+
+### **Observed Pre-Provisioning Role Posture**
+
+The retained preflight evidence directly establishes:
+
+* database identity `railway`;  
+* administrative connection identity `postgres`;  
+* PostgreSQL version `17.6`;  
+* schemas `hde` and `public` present;  
+* `hde.body_graphs`, `hde.body_graphs_current`, `public.hde_body_graphs_current`, `hde.pair_evaluation`, and `hde.public_results` present;  
+* no result from the bounded query for non-`USAGE` schema privileges granted to `PUBLIC`;  
+* no result from the bounded query for non-`SELECT` table privileges granted to `PUBLIC`;  
+* `hde_owner` present as `NOLOGIN`;  
+* `hde_rw` present as `NOLOGIN`;  
+* the displayed superuser, create-database, create-role, replication, and bypass-RLS flags false for both HDE-named roles;  
+* `postgres` present as an elevated login identity; and  
+* no row for `hde_reader` or `hde_ops03_reader`.
+
+The live preflight therefore establishes that HDE-named database roles existed before OPS-03, while the two dedicated OPS-03 target roles did not.
+
+The retained preflight does not establish:
+
+* when, how, or by whom `hde_owner` and `hde_rw` were created;  
+* the complete membership graph for either legacy role;  
+* the complete object-level privilege graph for either legacy role;  
+* the detailed operational suitability of either legacy role; or  
+* a sealed post-run unchanged-state proof for either legacy role.
+
+Those unproven properties must not be inferred from role names, fixtures, schema fields, acceptance predicates, planning language, or repository content.
+
+### **Authorized Operational Boundary**
+
+OPS-03 used two separate operational phases.
+
+#### **Bounded mutable role phase**
+
+Railway and administrative PostgreSQL access were authorized to:
+
+* identify the live target and administrative identity;  
+* inspect the bounded role, schema, object, and PUBLIC privilege posture;  
+* create and configure `hde_reader` and `hde_ops03_reader`;  
+* grant the task principal membership in the reader capability role;  
+* verify the exact least-privilege reader predicate;  
+* make the task login available only for the authorized capture window; and  
+* disable the task login and clear its password after capture.
+
+Database mutations were confined to this phase and to the required terminal cleanup.
+
+#### **Direct read-only capture phase**
+
+The authorization-bound capture:
+
+* used direct PostgreSQL through `psycopg`;  
+* made no Railway CLI call;  
+* executed no SQL write;  
+* selected one provider;  
+* used one authorization for one launch;  
+* made no retry;  
+* made no alternate-provider attempt;  
+* used one read-only posture transaction;  
+* retained no database credential value; and  
+* wrote nothing to the execution source checkout.
+
+Provisioning SQL did not participate in the direct capture and does not alter the capture result `sql_writes=0`.
+
+The mutable precursor made the existing `least_privilege_role=true` predicate executable without using the elevated `postgres` identity for capture and without changing the source-bound runner, validator, schemas, tests, or evidence contract.
+
+### **Provisioned Target-Role Posture**
+
+The authorized role procedure established:
+
+* `hde_reader` as a reusable `NOLOGIN` capability role;  
+* `hde_ops03_reader` as a task-specific login role with membership in `hde_reader`;  
+* `hde_ops03_reader` with `INHERIT`;  
+* connection limit `2`;  
+* the displayed superuser, create-database, create-role, replication, and bypass-RLS flags false;  
+* role defaults for read-only transactions and search path `hde, public`; and  
+* bounded read access required for OPS-03 metadata observation.
+
+The retained provisioning evidence records successful PostgreSQL command statuses, the resulting role rows, and active membership. It does not independently preserve the exact executed SQL bytes or the complete grant and default-privilege object graph.
+
+Reader verification directly proves:
+
+* effective role `hde_ops03_reader`;  
+* transaction read-only true;  
+* exact search path `hde, public`;  
+* `rolsuper=false`;  
+* `rolcreatedb=false`;  
+* `rolcreaterole=false`;  
+* `rolreplication=false`;  
+* `rolbypassrls=false`;  
+* `schema_create=false`;  
+* `relation_write=false`;  
+* required BodyGraph column metadata visible;  
+* required BodyGraph constraint metadata visible;  
+* both boundary views visible;  
+* both expected partitioned tables visible; and  
+* verification completed with `ROLLBACK`.
+
+Post-capture cleanup directly proves:
+
+* `hde_ops03_reader` has login disabled;  
+* its password is cleared;  
+* `hde_reader` remains `NOLOGIN`; and  
+* membership of `hde_ops03_reader` in `hde_reader` remains present.
+
+The retained role model is deliberately bounded. `hde_reader` is a reusable read capability. `hde_ops03_reader` is a disabled task principal whose retained membership does not authorize current login.
+
+This posture does not establish a complete application, writer, migration, ownership, administration, deployment, credential-rotation, recovery, or break-glass role architecture.
+
+### **Authorization and Direct Capture**
+
+OPS-03 executed under:
+
+* run ID `ops03-rolefix-afdd3ab792724569a7c24f83`;  
+* source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2`;  
+* authorization window `2026-07-23T23:30:09Z` through `2026-07-24T01:30:09Z`;  
+* authorization SHA-256 `911cbca9d81100092605a19271fb4701f0fde332bdc9e2a3dd59f73fdfca85ae`;  
+* runner SHA-256 `5b49fdf4fa7eefe05fdafa7fd5dbd202a80602535c84b2481ebac4525547ea8f`;  
+* validator SHA-256 `eebb11ef5d8352deb882dd50a49dac6e08ed8cb10d0c729031fb5c11a3b69d8f`;  
+* interpreter SHA-256 `46d05ca7094b029959f0218e990a7f2737dbc87d5b2e783ecfc44e978937922a`;  
+* direct provider `psycopg`;  
+* `APP_ENV=dev`;  
+* schema `hde`;  
+* search path `hde, public`;  
+* `SAFE_MODE=1`;  
+* `ALLOW_NETWORK=0`;  
+* `ALLOW_DB_WRITE=0`; and  
+* the authorization-bound one-attempt contract.
+
+The authorization binds the exact source commit, runner hash, validator hash, interpreter path and hash, target, rails, retired-key roster, ordered query roster, expected counts, candidate root, three argv vectors, and one-attempt rule. It contains no database host, DSN, password, or role value.
+
+The ten-file packet records:
+
+* `OPS03_CAPTURE_PASS`;  
+* exit code zero;  
+* empty stderr;  
+* capture result `PASS`;  
+* independent validation result `PASS`;  
+* one provider selection;  
+* one health connection;  
+* one health SQL statement;  
+* one read-only posture transaction;  
+* ten posture SQL statements;  
+* two direct connections;  
+* eleven SQL statements total;  
+* zero SQL writes;  
+* zero retries;  
+* zero alternate-provider attempts;  
+* exact search path;  
+* least-privilege runtime posture;  
+* valid DDL identity projection;  
+* required constraint observations;  
+* read-only boundary views;  
+* expected partition posture;  
+* exact canonical inventory;  
+* valid checksums; and  
+* secret-safe retained content.
+
+All eleven decisive capture predicates and all eight independent-validation predicates are true.
+
+The terminal control state records:
+
+* `launch_consumed=true`;  
+* `finalized=true`;  
+* `sealed=true`; and  
+* no failure packet.
+
+The packet checksum ledger SHA-256 is:
+
+`e26e1b5de37755b4f276a8d8d0f7c4bcec63c2f79dfce7080f84e3be0a16bc12`
+
+The role-evidence checksum ledger SHA-256 is:
+
+`909189ddbd0fced6937c94c58d3c4e45b74ec69bd71009a5da1d2169a766c36d`
+
+The reviewed evidence bundle SHA-256 is:
+
+`53d51348949186597eb3148dcc50f9b90a30ca74ada386ba95706a9d6519aa7a`
+
+### **Evidence Qualifications**
+
+The following qualifications are non-blocking and do not invalidate the bounded role outcome or direct capture:
+
+* Exact-byte Product Owner approval is recorded in the operator record. No separate approval artifact is retained.  
+* A pre-authorization reader-connection sequence did not establish a database connection because the installed PostgreSQL client did not accept the full URI through `PGDATABASE` in the prescribed form. The operator record reports complete rollback, target-role absence, and fresh provisioning before any authorization was created or consumed. No standalone rollback transcript is retained.  
+* Successful reader verification used decomposed libpq connection fields held in memory. The retained verification file directly proves the required identity, read-only posture, search path, least-privilege flags, metadata visibility, and rollback.  
+* The shared checkout contained ignored Python bytecode. Execution used an external pristine checkout at the exact source commit and an isolated interpreter. The authorization binds that source and interpreter, and independent validation reports valid source identity.  
+* Railway DNS failed while reopening the control-plane connection for mandatory cleanup. The operator record reports use of already authorized administrative PostgreSQL connection data held in memory solely for login disablement, password clearing, and final verification. The retained cleanup evidence directly proves the required final state.  
+* Detailed suitability, complete privilege coverage, and terminal unchanged-state claims for `hde_owner` and `hde_rw` are not independently sealed.  
+* The retained provisioning output does not prove the exact executed SQL bytes or the complete grant and default-privilege graph.
+
+These qualifications limit the claims that may be made from the evidence. They do not create a basis for a capture rerun, role rollback, administrative-role exception, or source-code remediation.
+
+### **Repository Intake and PR-06R-B Boundary**
+
+The ten capture primaries are tracked at:
+
+`audit/ops/hde-epic038/ops-03/`
+
+The authorization, control, role-provisioning, action, and discovery records are tracked at:
+
+`audit/ops/hde-epic038/ops-03-operator-record/`
+
+At Repo HEAD `e802598d583446b9eef1bee0ffa30ce63803149f`:
+
+* all ten capture primaries are tracked;  
+* all twelve operator records are tracked;  
+* every tracked copy is byte-identical to the reviewed evidence bundle;  
+* the runner, validator, and seven OPS-03 schemas remain unchanged from source commit `043dd6b9751442d7a9329ccfff9f6483a9d4fee2`; and  
+* no bundle-to-Repo contradiction was found.
+
+The canonical packet root remains limited to its ten primaries and future updater-generated sibling path proofs. Supplemental records remain in the adjacent operator-record root so they do not alter the packet inventory contract.
+
+The tracked packet has not completed governed evidence admission. PR-06R-B owns:
+
+* the direct-selection primary;  
+* canonical updater bindings for the OPS-03 primaries and seven OPS-03 schemas;  
+* ten sibling path proofs for the captured primaries;  
+* Human Evidence Index rows and the updated hash sentinel;  
+* Machine Evidence Mirror rows;  
+* current-versus-historical evidence binding;  
+* final direct-only release integration;  
+* the row-specific support crosswalk; and  
+* final validation of the complete governed evidence graph.
+
+Until that work is complete, the packet cannot support final governed admission, final release-sanity PASS, or a PF09 status action. Those downstream obligations do not reverse OPS-03 acceptance and do not authorize another OPS-03 execution.
+
+The ten captured primary bytes must remain unchanged through PR-06R-B validation and admission.
+
+### **Database-Role Planning Rules**
+
+Database-role planning must keep these categories distinct:
+
+* **Observed live role state:** roles and attributes directly returned by bounded live inspection.  
+* **Target-role absence:** the dedicated identities selected for an operation are not present before provisioning.  
+* **Desired security posture:** role names, privilege matrices, tests, schemas, or predicates that describe what an implementation will accept.  
+* **Authorized mutable precursor:** bounded database changes required before a read-only operational capture can run.  
+* **Direct capture posture:** authorization-bound, direct-only, read-only observation with no SQL writes.  
+* **Provisioned bounded posture:** role and privilege outcomes directly supported by retained operational evidence.  
+* **Complete role architecture:** the separately governed application, writer, migration, owner, administration, deployment, rotation, recovery, and incident-handling model.
+
+Repository names, fixtures, schema fields, acceptance predicates, PF wording, and planned architecture do not prove that a corresponding live role exists.
+
+Before binding a one-attempt database authorization, planning must:
+
+* inspect the live role roster and effective privileges;  
+* establish whether an existing identity satisfies the exact operational predicate;  
+* obtain Product Owner authorization for any required mutable precursor;  
+* complete and verify that precursor before constructing authorization bytes;  
+* retain exact SQL or an authoritative equivalent when later claims depend on the complete grant model;  
+* preserve pre-state and post-state when claiming that existing roles remained unchanged; and  
+* exclude credential values from retained evidence.
+
+### **PF09 Posture**
+
+OPS-03 provides bounded live technical evidence relevant to:
+
+* `HDE-SEPA001.3`, for the reader-role provisioning and verification performed during this task;  
+* `HDE-DIST001.4`, for runtime role posture, read-only transaction posture, exact search path, DDL identity, constraints, boundary views, and partition observations; and  
+* `HDE-DIST001.9 — Direct database connectivity & retired-transport enforcement`, for direct `psycopg` connectivity, retired-key absence, zero alternate-provider attempts, and live read-only posture.
+
+`HDE-SEPA001.3` remains recorded as `Done`. OPS-03 does not reopen, revalidate, complete, or move it. The bounded reader-role result does not establish the complete database-role architecture or the full provenance and privilege graph of the observed HDE-named roles.
+
+`HDE-DIST001.4` and `HDE-DIST001.9` remain `Partial`. OPS-03 supplies live technical evidence, while their remaining completion predicates include governed evidence bindings and the rest of each row’s applicable scope.
+
+`HDE-DIST001.6` and `HDE-DIST005.2` remain `Partial`, and `HDE-DIST001.11` remains `Optional`. Their release-pipeline, evidence-graph, and mapped-cache meanings remain within PR-06R-B or separate PF09-maintenance boundaries.
+
+No PF09 task, subtask, reopening, status change, completion, or phase placement is created by this addendum.
+
+### **Explicit Nonclaims**
+
+This addendum does not:
+
+* claim that no HDE-named database roles existed before OPS-03;  
+* claim that only `postgres` existed;  
+* prove the creation history of `hde_owner` or `hde_rw`;  
+* prove the complete membership or object-level privilege graph of `hde_owner` or `hde_rw`;  
+* prove a sealed terminal state for the legacy roles;  
+* prove the exact executed provisioning SQL bytes;  
+* prove the complete grant or default-privilege model;  
+* prove a standalone pre-authorization rollback transcript;  
+* prove a complete HDE database-role architecture;  
+* enable `hde_ops03_reader` login;  
+* authorize any new database mutation or credential issuance;  
+* authorize or execute another OPS-03 attempt;  
+* modify the ten captured primary files;  
+* prove Railway inventory beyond the bounded target record;  
+* prove retired transport availability;  
+* complete governed evidence admission;  
+* complete PR-06R-B or the final release pipeline;  
+* establish QA PASS;  
+* satisfy an acceptance token;  
+* move PF09 status;  
+* authorize deployment or migration;  
+* complete HDE-EPIC038; or  
+* close the Epic.
 
 \<eof\>
-
