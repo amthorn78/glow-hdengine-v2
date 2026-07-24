@@ -327,6 +327,26 @@ def test_tracked_source_copy_rejects_symlink_escape(tmp_path):
         )
 
 
+def test_tracked_source_copy_must_match_recorded_snapshot(tmp_path):
+    source = tmp_path / "source"
+    destination = tmp_path / "destination"
+    source.mkdir()
+    destination.mkdir()
+    tracked = (Path("tracked.txt"),)
+    (source / "tracked.txt").write_text("original\n", encoding="utf-8")
+    snapshot = builder._snapshot(source, tracked)
+
+    builder._copy_tracked_source(source, destination, tracked)
+    builder._require_exact_source_copy(destination, tracked, snapshot)
+
+    (destination / "tracked.txt").write_text("changed\n", encoding="utf-8")
+    with pytest.raises(
+        builder.AttestationBuildError,
+        match="tracked_source_copy_not_exact",
+    ):
+        builder._require_exact_source_copy(destination, tracked, snapshot)
+
+
 def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
     monkeypatch,
 ):
@@ -538,5 +558,12 @@ def test_catalog_manifest_is_packaged_from_its_single_source():
 
     assert '"catalog*"' in pyproject
     assert 'catalog = ["*.json"]' in pyproject
+
+
+def test_magic10_thresholds_are_available_to_the_installed_console():
+    pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+
+    assert '"math*"' in pyproject
+    assert 'math = ["*.json"]' in pyproject
     assert Path("catalog/manifest.json").is_file()
     assert not Path("engine/runtime/catalog_manifest.json").exists()

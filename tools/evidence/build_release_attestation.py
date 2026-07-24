@@ -266,6 +266,15 @@ def _copy_tracked_source(source: Path, destination: Path, paths: Sequence[Path])
             shutil.copy2(src, dst)
 
 
+def _require_exact_source_copy(
+    destination: Path,
+    paths: Sequence[Path],
+    source_snapshot: Mapping[str, Mapping[str, object]],
+) -> None:
+    if _snapshot(destination, paths) != source_snapshot:
+        raise AttestationBuildError("tracked_source_copy_not_exact")
+
+
 def _initialize_scratch_git(scratch: Path) -> None:
     env = _clean_child_env()
     env.update(
@@ -579,6 +588,8 @@ def build_attestation(
             package_source.mkdir()
             _copy_tracked_source(source, scratch, tracked)
             _copy_tracked_source(source, package_source, tracked)
+            _require_exact_source_copy(scratch, tracked, source_snapshot)
+            _require_exact_source_copy(package_source, tracked, source_snapshot)
             _initialize_scratch_git(scratch)
             attestation_bin = _install_packaged_console_entrypoint(
                 package_source,

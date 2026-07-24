@@ -100,12 +100,9 @@ def test_stage14_failure_marks_all_finalization_stages_not_executed(
     monkeypatch.setattr(
         run_sanity_pipeline,
         "_run_command",
-        _fake_runner([0] * 13 + [run_sanity_pipeline.PR_A_NONFINAL_EXIT]),
+        _fake_runner([0] * 13 + [1]),
     )
-    assert (
-        run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
-        == run_sanity_pipeline.PR_A_NONFINAL_EXIT
-    )
+    assert run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps) == 1
     lines = log_path.read_text(encoding="utf-8").splitlines()
     for name in run_sanity_pipeline.STAGE_NAMES[14:]:
         assert (
