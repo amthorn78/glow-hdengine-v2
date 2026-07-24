@@ -137,6 +137,31 @@ def test_pre_ops_pipeline_consumes_prebuilt_artifacts_without_repairing_them():
                 assert "--check" in command or "--check-only" in command
 
 
+def test_source_pipeline_validates_manifest_without_currentizing_frozen_release_captures():
+    stage = sanity.default_steps()[1]
+    commands = set(stage.commands)
+
+    assert (
+        sanity.sys.executable,
+        "scripts/release_id_recompute.py",
+        "--check-manifest-only",
+    ) in commands
+    assert not any(
+        path in command
+        for command in commands
+        for path in (
+            "tools/evidence/generate_identity_provenance.py",
+            "tools/evidence/generate_release_bindings.py",
+            "ci/checks/check_release_identity.sh",
+        )
+    )
+    assert (
+        sanity.sys.executable,
+        "scripts/release_id_recompute.py",
+        "--check",
+    ) not in commands
+
+
 def test_pipeline_checks_prebuilt_orientation_without_post_seal_write():
     commands = [command for step in sanity.default_steps() for command in step.commands]
     updater = (sanity.sys.executable, "tools/evidence/update_evidence_index.py")
@@ -289,7 +314,7 @@ def _mock_pre_ops_success(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sanity, "validate_ops02_package", lambda: None)
 
 
-def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
+def test_mandatory_stage14_missing_ops03_failure_stops_stages15_to19(
     tmp_path, monkeypatch
 ):
     log = tmp_path / "sanity.log"
@@ -298,13 +323,11 @@ def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
 
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log) == 1
     lines = log.read_text(encoding="utf-8").splitlines()
     assert [line for line in lines if line.startswith("check ")] == [
         f"check {name}:{'OK' if index < 13 else 'FAIL'}"
@@ -320,7 +343,7 @@ def test_pr_a_natural_stage14_missing_ops03_failure_stops_stages15_to19(
     assert "summary:PASS" not in lines
 
 
-def test_pr_a_never_writes_prospective_pass_before_stage14(
+def test_stage14_failure_never_writes_prospective_pass(
     tmp_path, monkeypatch
 ):
     log = tmp_path / "sanity.log"
@@ -331,9 +354,7 @@ def test_pr_a_never_writes_prospective_pass_before_stage14(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
 
@@ -342,16 +363,16 @@ def test_pr_a_never_writes_prospective_pass_before_stage14(
         return original_write(path, results, first_failure, summary)
 
     monkeypatch.setattr(sanity, "_write_log", write)
-    assert sanity.run_pipeline(log_path=log) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log) == 1
     assert summaries == ["FAIL"]
     assert b"summary:PASS" not in log.read_bytes()
 
 
 @pytest.mark.parametrize(
     ("seal_code", "expected"),
-    ((0, sanity.PR_A_NONFINAL_EXIT), (1, 1), (sanity.PR_A_NONFINAL_EXIT, 1)),
+    ((0, 1), (1, 1), (9, 9)),
 )
-def test_pr_a_nonfinal_exit_requires_successful_failure_rebind(
+def test_stage14_failure_requires_successful_failure_rebind(
     tmp_path, monkeypatch, seal_code, expected
 ):
     log = tmp_path / "sanity.log"
@@ -360,9 +381,7 @@ def test_pr_a_nonfinal_exit_requires_successful_failure_rebind(
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
     monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: seal_code)
     assert sanity.run_pipeline(log_path=log) == expected
@@ -420,25 +439,23 @@ def test_pr05_proof_preflight_stops_before_generator(monkeypatch):
     assert calls == []
 
 
-def test_missing_ops03_is_reserved_nonfinal_only_at_stage14(
+def test_missing_ops03_is_an_ordinary_mandatory_stage_failure(
     tmp_path, monkeypatch
 ):
     step = sanity.default_steps()[13]
     monkeypatch.setattr(
         sanity,
         "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            sanity.Ops03PacketUnavailable(sanity.PR_A_NONFINAL_REASON)
-        ),
+        lambda: (_ for _ in ()).throw(ValueError("ops-03 packet missing")),
     )
-    assert sanity._run_stage(step) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity._run_stage(step) == 1
 
     earlier = sanity.SanityStep("not-stage-14", (("__validate_ops03__",),))
     log = tmp_path / "earlier.log"
-    assert sanity.run_pipeline(log_path=log, steps=[earlier]) == sanity.PR_A_NONFINAL_EXIT
+    assert sanity.run_pipeline(log_path=log, steps=[earlier]) == 1
     text = log.read_text(encoding="utf-8")
     assert "check not-stage-14:FAIL" in text
-    assert "pr_a_state:nonfinal_fail_closed" not in text
+    assert "nonfinal" not in text
 
 
 def test_historical_bridge_evidence_validates_frozen_packet_without_execution(
@@ -871,8 +888,11 @@ def test_ops02_requires_exact_configured_v2_route_metadata(
 
 def test_current_commands_and_exact_proof_paths_are_wired():
     commands = [command for step in sanity.default_steps() for command in step.commands]
-    assert (sanity.sys.executable, "scripts/release_id_recompute.py", "--check") in commands
-    assert (sanity.sys.executable, "ci/checks/check_release_identity.sh") in commands
+    assert (
+        sanity.sys.executable,
+        "scripts/release_id_recompute.py",
+        "--check-manifest-only",
+    ) in commands
     assert (
         sanity.sys.executable,
         "tools/evidence/generate_open_rails_abba_proof.py",

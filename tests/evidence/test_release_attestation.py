@@ -57,7 +57,9 @@ def test_child_environment_is_closed_and_drops_sensitive_values(monkeypatch):
 
     assert {name: child[name] for name in builder.CLOSED_RAILS} == builder.CLOSED_RAILS
     assert child["HDE_ISOLATED_RELEASE_BUILD"] == "1"
-    assert child["PYTHONPATH"] == str(source)
+    assert child["HDE_ATTESTATION_BIN"] == str(source)
+    assert "PYTHONPATH" not in child
+    assert "VIRTUAL_ENV" not in child
     assert "DATABASE_URL" not in child
     assert "DB_BRIDGE_URL" not in child
     assert "HD_API_KEY" not in child
@@ -78,17 +80,71 @@ def test_success_transcript_is_names_only_and_runtime_independent(
         )
     )
     monkeypatch.setattr(builder.subprocess, "run", lambda *_args, **_kwargs: next(outputs))
-    monkeypatch.setattr(builder, "_clean_child_env", lambda _source: {})
+    monkeypatch.setattr(builder, "_clean_child_env", lambda _bin=None: {})
     first: list[str] = []
     second: list[str] = []
 
-    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), first)
-    builder._run_stage(tmp_path, "tests", ("python", "-m", "pytest"), second)
+    bin_dir = tmp_path / "bin"
+    builder._run_stage(
+        tmp_path,
+        "tests",
+        ("python", "-m", "pytest"),
+        first,
+        attestation_bin=bin_dir,
+    )
+    builder._run_stage(
+        tmp_path,
+        "tests",
+        ("python", "-m", "pytest"),
+        second,
+        attestation_bin=bin_dir,
+    )
 
     assert first == second
     assert "0.35" not in "\n".join(first)
     assert "0.31" not in "\n".join(second)
     assert "stdout_recorded=false" in first
+
+
+def test_isolated_console_entrypoint_is_installed_from_tracked_package(
+    tmp_path,
+    monkeypatch,
+):
+    package_source = tmp_path / "package-source"
+    package_source.mkdir()
+    calls: list[list[str]] = []
+
+    def run(argv, **_kwargs):
+        command = list(argv)
+        calls.append(command)
+        if command[1:4] == ["-m", "venv", "--system-site-packages"]:
+            scripts = tmp_path / "venv" / ("Scripts" if builder.os.name == "nt" else "bin")
+            scripts.mkdir(parents=True)
+            python = scripts / ("python.exe" if builder.os.name == "nt" else "python")
+            python.write_text("", encoding="utf-8")
+        else:
+            console = tmp_path / "venv" / (
+                "Scripts/hdctl.exe" if builder.os.name == "nt" else "bin/hdctl"
+            )
+            console.write_text("#!/bin/sh\n", encoding="utf-8")
+            console.chmod(0o755)
+        return subprocess.CompletedProcess(args=command, returncode=0)
+
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    transcript: list[str] = []
+    scripts = builder._install_packaged_console_entrypoint(
+        package_source,
+        tmp_path,
+        transcript,
+    )
+
+    assert len(calls) == 2
+    assert calls[1][-1] == str(package_source)
+    assert "--no-index" in calls[1]
+    assert "--no-build-isolation" in calls[1]
+    assert not (package_source / ".attestation-bin").exists()
+    assert (scripts / ("hdctl.exe" if builder.os.name == "nt" else "hdctl")).is_file()
+    assert transcript[0] == "stage=install_packaged_console_entrypoint"
 
 
 def test_source_tree_digest_is_order_independent_and_names_only():
@@ -299,6 +355,31 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
     payload["manifest_sha256"] = "e" * 64
     with pytest.raises(builder.AttestationBuildError, match="attestation_contract_invalid"):
         builder._validate_payload(payload)
+    payload["manifest_sha256"] = payload["release_id"]
+    payload["source_commit_exact"] = False
+    with pytest.raises(builder.AttestationBuildError, match="attestation_contract_invalid"):
+        builder._validate_payload(payload)
+
+
+def test_final_attestation_build_refuses_dirty_source(tmp_path, monkeypatch):
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "output"
+    monkeypatch.setattr(
+        builder,
+        "_git_identity",
+        lambda _source: ("b" * 40, False),
+    )
+
+    with pytest.raises(
+        builder.AttestationBuildError,
+        match="source_tree_not_clean",
+    ):
+        builder.build_attestation(output, source=source)
+
+    assert json.loads((output / "failure.json").read_text(encoding="utf-8"))[
+        "code"
+    ] == "source_tree_not_clean"
 
 
 def _write_minimal_bundle(tmp_path, monkeypatch):

@@ -165,14 +165,8 @@ def _capture_outputs() -> dict[Path, bytes]:
     script_cmd = ["python", "scripts/hdctl.py"]
     script_execution_cmd = [sys.executable, *script_cmd[1:]]
 
-    console_path = next(
-        (
-            str(Path(part) / "hdctl")
-            for part in env["PATH"].split(os.pathsep)
-            if part and (Path(part) / "hdctl").is_file() and os.access(Path(part) / "hdctl", os.X_OK)
-        ),
-        str(Path(env["PATH"].split(os.pathsep)[0]) / "hdctl"),
-    )
+    console_root = attestation_bin or scripts_dir
+    console_path = str(Path(console_root) / "hdctl")
     console_cmd = ["hdctl"]
     console_available = Path(console_path).is_file() and os.access(
         console_path, os.X_OK

@@ -90,14 +90,6 @@ SAFE_ENV_REFERENCE = re.compile(
     r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})\Z"
 )
 
-class Ops03PacketUnavailable(ValueError):
-    """Compatibility alias for tests; final admission treats missing OPS-03 as failure."""
-
-
-PR_A_NONFINAL_REASON = "pr_a_nonfinal_ops03_pr_b_binding_required"
-PR_A_NONFINAL_EXIT = 1
-
-
 @dataclass(frozen=True)
 class SanityStep:
     name: str
@@ -136,11 +128,8 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[1], (
             _py("tools/config/generate_config_artifacts.py", "--check"),
             _py("tools/config/generate_bundles.py", "--check"),
-            _py("tools/evidence/generate_identity_provenance.py", "--check"),
-            _py("tools/evidence/generate_release_bindings.py", "--check"),
             _py("tools/evidence/generate_env_matrix_snapshot.py", "--check"),
-            _py("scripts/release_id_recompute.py", "--check"),
-            _py("ci/checks/check_release_identity.sh"),
+            _py("scripts/release_id_recompute.py", "--check-manifest-only"),
         )),
         SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
         SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),

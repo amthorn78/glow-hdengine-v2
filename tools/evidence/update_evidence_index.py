@@ -2545,6 +2545,20 @@ HISTORICAL_BRIDGE_NOTES = (
     "availability, runtime support, provider parity, fallback, consistency, or token "
     "satisfaction."
 )
+HISTORICAL_BRIDGE_PRIMARY_PATHS = frozenset(
+    {
+        "artifacts/db_bridge/adapter_selection.snapshot.json",
+        "artifacts/db_bridge/caps.snapshot.json",
+        "artifacts/db_bridge/health.json",
+        "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/db_bridge/query_select_1.json",
+        "artifacts/db_bridge/root.json",
+        "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json",
+        "artifacts/runtime/env_connectivity.nondev_failure.json",
+        "artifacts/runtime/env_connectivity.snapshot.json",
+        "schemas/presenter_db_bridge_compare.v1.json",
+    }
+)
 EPIC038_OPS03_PRIMARY_BINDINGS = {
     "commands.txt": ("epic038.ops03.commands", "epic038_ops03_text"),
     "stdout.log": ("epic038.ops03.stdout", "epic038_ops03_log"),
@@ -2995,6 +3009,10 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
                     raise ValueError(f"Invalid tokens for {key}: {value!r}")
                 value = list(value)
             normalized[field] = value
+    if path in HISTORICAL_BRIDGE_PRIMARY_PATHS:
+        normalized["record_type"] = "historical_bridge_evidence"
+        normalized["notes"] = HISTORICAL_BRIDGE_NOTES
+        normalized.pop("tokens", None)
     return normalized
 
 

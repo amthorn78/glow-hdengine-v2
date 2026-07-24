@@ -22,7 +22,7 @@
   "properties": {
     "schema": {"const": "hde.release_attestation.v1"},
     "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "source_commit_exact": {"type": "boolean"},
+    "source_commit_exact": {"const": true},
     "source_tree_sha256": {"$ref": "#/$defs/sha256"},
     "release_id": {"$ref": "#/$defs/sha256"},
     "manifest_sha256": {"$ref": "#/$defs/sha256"},
