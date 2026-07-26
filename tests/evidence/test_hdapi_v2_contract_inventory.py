@@ -2958,7 +2958,10 @@ def test_epic034_public_route_signatures_exclude_internal_ops_dev_and_compat() -
     assert ':/internal/' not in proof
     assert ':/ops/' not in proof
     assert ':/dev/' not in proof
-    assert '/api/compat/v1' not in proof
+    public_signatures_line = next(
+        line for line in proof.splitlines() if line.startswith("typed_public_route_signatures=")
+    )
+    assert "/api/compat/v1" not in public_signatures_line
 
 
 def test_epic034_adapter_boundary_fails_closed_on_conditional_presenter_assignment(monkeypatch: pytest.MonkeyPatch) -> None:

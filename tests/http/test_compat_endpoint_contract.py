@@ -135,6 +135,18 @@ def test_compat_post_is_hidden_for_normalized_production_aliases(monkeypatch, ap
     assert resp.headers["Cache-Control"] == "no-store"
 
 
+@pytest.mark.parametrize("engine_env", ["prod", "production", "live", " Production ", "LIVE"])
+def test_compat_post_is_hidden_for_normalized_engine_env_aliases(monkeypatch, engine_env):
+    monkeypatch.delenv("APP_ENV", raising=False)
+    monkeypatch.setenv("ENGINE_ENV", engine_env)
+
+    resp = _client().post("/api/compat/v1", json=_payload())
+
+    assert resp.status_code == 404
+    assert resp.get_json()["code"] == "ERR_NOT_FOUND"
+    assert resp.headers["Cache-Control"] == "no-store"
+
+
 def test_compat_get_probe_only_ignores_ids():
     client = _client()
     resp = client.get("/api/compat/v1?a_id=alice&b_id=bob")
