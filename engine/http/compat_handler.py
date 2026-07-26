@@ -2,6 +2,7 @@ from __future__ import annotations
 import os
 from typing import Dict, Any
 from flask import Blueprint, request, Response
+from adapter.env_guard import _compute_env_mode
 from engine.presenter import emit_public
 from engine.compat.errors import error_envelope
 from engine.compat.identity import dev_compat_identity
@@ -90,7 +91,7 @@ def get_ids_only():
 
 @compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
 def post_json():
-    if (os.environ.get("APP_ENV") or "").lower() == "prod":
+    if _compute_env_mode(os.environ) == "prod":
         env = error_envelope("ERR_NOT_FOUND")
         return _writer_payload(env, status=404)
     data = request.get_json(silent=True) or {}

@@ -124,6 +124,17 @@ def test_compat_post_contract_and_catalog_entry():
     assert entry.get("env_gate")
 
 
+@pytest.mark.parametrize("app_env", ["prod", "production", "live", " Production ", "LIVE"])
+def test_compat_post_is_hidden_for_normalized_production_aliases(monkeypatch, app_env):
+    monkeypatch.setenv("APP_ENV", app_env)
+
+    resp = _client().post("/api/compat/v1", json=_payload())
+
+    assert resp.status_code == 404
+    assert resp.get_json()["code"] == "ERR_NOT_FOUND"
+    assert resp.headers["Cache-Control"] == "no-store"
+
+
 def test_compat_get_probe_only_ignores_ids():
     client = _client()
     resp = client.get("/api/compat/v1?a_id=alice&b_id=bob")
