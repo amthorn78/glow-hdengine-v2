@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.2  
-Effective Date: 2026.07.24  
+**Version:** v12.4.3  
+Effective Date: 2026.07.26  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -71,7 +71,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.20) PR-06 Remediation PR-06R-B HDE-EPIC038  
 2.21) PR-06 Remediation State  
 2.22) Implementation Retrospective HDE-EPIC038  
-2.23) Post Implementation Audit Triage HDE-EPIC038
+2.23) Post Implementation Audit Triage HDE-EPIC038  
+2.24) Syntax-Origin Defects Remain Non-Blocking Regardless of Literal Execution Effect
 
 # 2\) Numbered Addenda
 
@@ -17422,5 +17423,130 @@ PF proof excerpt: N/A — CANON SILENCE. Search method: searched PF14 — HDE Me
 Why PF14 is the correct home: PF14 owns packaging, runtime process mechanics, service-factory correctness, and component build responsibilities. This delta clarifies the existing PF02 boundary without changing architecture ownership, public contracts, tokens, gates, or acceptance semantics.
 
 END OF AUDIT ANALYSIS
+
+## **2.24) Syntax-Origin Defects Remain Non-Blocking Regardless of Literal Execution Effect**
+
+Timestamp: 072626 03:20  
+Details: This addendum records an immediate Product Owner review-governance decision prompted by repeated attempts during HDE-EPIC038 Live QA Plan review to reclassify quoting, escaping, command-wrapper, and related syntax defects as substantive defects because the literal text would fail to execute. The permanent PF documents reviewed thus far already establish the intended objective-first planning and execution-time normalization posture. This addendum does not require further changes to those documents. It establishes the controlling interpretation and closes the reclassification loophole.
+
+### **Controlling rule**
+
+The causal source of a defect controls its classification. Its downstream effect does not.
+
+A defect caused by syntax, quoting, escaping, shell grammar, tokenization, command-wrapper form, heredoc form, helper-code form, variable interpolation, indentation, whitespace, Markdown rendering, code-block formatting, backslash insertion, copy-and-paste corruption, interpreter invocation form, or literal command presentation remains a syntax-origin defect.
+
+It remains a syntax-origin defect even when the literal text:
+
+* fails to parse;  
+* fails to execute;  
+* executes text different from what was intended;  
+* loses quotes, delimiters, or string literals;  
+* changes apparent command identity;  
+* invokes an incorrect apparent command form;  
+* cannot reach the intended behavior;  
+* cannot be pasted and run without correction; or  
+* would produce a different result because of the malformed representation.
+
+These downstream effects do not convert a syntax-origin defect into a substantive defect.
+
+Raw-source confirmation does not change this classification. Showing that malformed syntax exists in the source proves where the syntax issue appears. It does not make the issue substantive.
+
+### **Scope**
+
+This rule applies when reviewing or approving:
+
+* Epic Plans;  
+* Implementation Plans;  
+* Live QA Plans;  
+* QA Plan revisions and resubmissions;  
+* plan redlines;  
+* implementation-readiness reviews;  
+* QA closeout reviews;  
+* epic closure reviews; and  
+* any other review whose decision depends on the adequacy of a planning artifact.
+
+### **Prohibited review use**
+
+A syntax-origin defect MUST NOT be used as:
+
+* a Blocker;  
+* a Caveat;  
+* a required Nit;  
+* an Expected fix;  
+* a Needs revision determination;  
+* a Section Checklist revision basis;  
+* a Review Ledger finding;  
+* a readiness or approval condition;  
+* a reason to require plan revision or resubmission;  
+* a reason for `REVISE AND RESUBMIT`;  
+* a reason to withhold closure; or  
+* any other input that worsens or conditions the review decision.
+
+Reviewers MUST NOT relabel a syntax-origin defect as a substantive issue by describing it as:
+
+* changed executable meaning;  
+* changed command identity;  
+* loss of runability or runnability;  
+* literal non-executability;  
+* mechanical invalidity;  
+* wrapper corruption;  
+* failure to reach behavior;  
+* proof-command failure; or  
+* source-byte confirmation.
+
+Those descriptions identify consequences of the syntax defect. They do not establish a separate defect.
+
+A literal paste-and-run test is not a plan-approval test.
+
+### **Required review method**
+
+Reviewers MUST evaluate the syntax-normalized semantic intent of the plan.
+
+For each apparent command-form issue, the reviewer must:
+
+1. Identify the intended objective, operation, inputs, outputs, rails posture, evidence target, and PASS or FAIL predicate from the plan.  
+2. Assume a syntactically valid representation that preserves those semantics.  
+3. Determine whether the alleged defect still exists after that normalization.  
+4. Exclude the issue from the review decision if normalization removes it.  
+5. Report a substantive finding only when an independently proven non-syntax defect remains.
+
+Syntax normalization MUST NOT change scope, objectives, repo loci, dependencies, semantic inputs, required outputs, authorization, rails posture, evidence obligations, acceptance conditions, or PASS and FAIL predicates.
+
+If the reviewer cannot prove that an issue survives faithful syntax normalization, the issue is syntax-origin and non-blocking.
+
+### **Independent non-syntax defect standard**
+
+A substantive finding may affect a decision only when it:
+
+* identifies a requirement, contract, dependency, scope boundary, evidence obligation, authorization rule, or execution-context condition independent of the malformed syntax;  
+* states the syntax-normalized intended operation;  
+* proves that the defect remains after faithful syntax normalization; and  
+* relies on evidence other than the malformed command representation itself.
+
+A mixed finding MUST be separated. The syntax component must be discarded, and only the independently proven non-syntax component may be evaluated.
+
+Examples of potentially substantive defects include an omitted semantic dependency, unauthorized rails posture, missing required output, contradictory evidence contract, or impossible execution context, but only when the defect persists after syntax normalization and is proven without relying on malformed command text.
+
+### **Execution posture**
+
+Plan reviewers are not required to repair syntax before approval.
+
+During execution, an agent may normalize syntax without requiring a plan revision when the normalization preserves the plan’s semantic contract. The exact command actually executed, its exit code, and its captured output belong in the execution evidence.
+
+An initial syntax failure does not prove a behavior failure. The command may be normalized and rerun.
+
+This rule does not authorize a PASS without required behavioral evidence. If required execution evidence remains absent after normalization and execution, the independently proven absence of evidence may be evaluated separately. The syntax defect itself remains non-blocking.
+
+### **Precedence and drainage**
+
+While active, this addendum supersedes any interpretation of permanent PF language that permits a syntax-origin defect to become blocking because it changes meaning, command identity, literal execution, paste-readiness, or runability.
+
+Language stating that syntax is non-blocking “by itself” MUST NOT be interpreted to permit reclassification based solely on the downstream consequences of that syntax.
+
+The permanent PF documents reviewed thus far do not require revision solely because of this addendum. Future drainage must nevertheless preserve the complete causal-classification rule and the prohibition on downstream-effect reclassification.
+
+Drainage MUST NOT be declared complete merely because canon contains related words such as syntax, escaping, objective-first, or execution-time normalization. A drainage determination must confirm that the complete rule above remains controlling. An unsupported statement that the rule is “already in canon” is insufficient.
+
+This decision is effective immediately.
 
 \<eof\>
