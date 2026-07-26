@@ -23,6 +23,8 @@ SCHEMA = ROOT / "schemas/architecture_snapshot.keys_only.v1.json"
 CLASSES = {"allowed", "forbidden", "unknown", "out_of_scope"}
 ROUTE_METHODS = {"route", "get", "post", "put", "patch", "delete", "head", "options"}
 TS = "2026-07-14T00:00:00Z"
+SELECTED_FACTORY = "adapter/factory.py"
+SELECTED_FACTORY_BLUEPRINTS = {"bp", "compat_blueprint"}
 
 
 def cjson(payload: Any) -> bytes:
@@ -267,6 +269,13 @@ def validate(payload: dict[str, Any]) -> None:
         raise SystemExit("UNKNOWN_COUNT_MISMATCH")
     if payload["analyzer_verdict"] != derived_verdict or payload["verdict"] != derived_verdict:
         raise SystemExit("VERDICT_MISMATCH")
+    selected_factory_blueprints = {
+        row.get("blueprint_symbol")
+        for row in payload.get("registrations", [])
+        if row.get("path") == SELECTED_FACTORY and row.get("method") == "register_blueprint"
+    }
+    if not SELECTED_FACTORY_BLUEPRINTS <= selected_factory_blueprints:
+        raise SystemExit("SELECTED_FACTORY_BLUEPRINT_REGISTRATION_MISSING")
     raw = json.dumps(payload)
     if re.search(
         r"(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|birthdate|birthtime|location|Authorization|Bearer|password)",

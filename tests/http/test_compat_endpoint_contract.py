@@ -4,7 +4,7 @@ import hashlib
 import pytest
 from pathlib import Path
 
-from adapter.http_reader import create_app
+from adapter.factory import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
 
 from engine.bodygraph.ingest import resolve_db_user_id
