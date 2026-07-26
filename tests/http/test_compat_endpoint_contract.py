@@ -147,6 +147,31 @@ def test_compat_post_is_hidden_for_normalized_engine_env_aliases(monkeypatch, en
     assert resp.headers["Cache-Control"] == "no-store"
 
 
+@pytest.mark.parametrize("method", ["GET", "POST", "HEAD", "OPTIONS", "PUT"])
+def test_compat_path_is_hidden_for_every_method_in_production(monkeypatch, method):
+    monkeypatch.setenv("APP_ENV", "production")
+    kwargs = {"json": _payload()} if method == "POST" else {}
+
+    resp = _client().open("/api/compat/v1", method=method, **kwargs)
+
+    assert resp.status_code == 404
+    assert resp.headers["Cache-Control"] == "no-store"
+    if method == "HEAD":
+        assert resp.data == b""
+    else:
+        assert resp.get_json()["code"] == "ERR_NOT_FOUND"
+
+
+def test_compat_subpath_is_hidden_in_production(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "live")
+
+    resp = _client().get("/api/compat/v1/missing")
+
+    assert resp.status_code == 404
+    assert resp.get_json()["code"] == "ERR_NOT_FOUND"
+    assert resp.headers["Cache-Control"] == "no-store"
+
+
 def test_compat_get_probe_only_ignores_ids():
     client = _client()
     resp = client.get("/api/compat/v1?a_id=alice&b_id=bob")

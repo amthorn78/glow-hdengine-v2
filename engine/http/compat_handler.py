@@ -13,6 +13,12 @@ from engine.compat.ordering import UID_RE
 compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
 
 
+def is_compat_request_path(path: str) -> bool:
+    prefix = (compat_blueprint.url_prefix or "").rstrip("/")
+    normalized = path.rstrip("/")
+    return normalized == prefix or normalized.startswith(f"{prefix}/")
+
+
 def _writer_payload(env: Dict[str, Any], *, status: int) -> Response:
     payload = emit_public(env)
     resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
@@ -21,6 +27,10 @@ def _writer_payload(env: Dict[str, Any], *, status: int) -> Response:
     resp.headers.pop("Content-Encoding", None)
     resp.headers["Content-Length"] = str(len(payload))
     return resp
+
+
+def compat_error_response(status: int) -> Response:
+    return _writer_payload(error_envelope("ERR_NOT_FOUND"), status=status)
 
 
 class _WriterTransportResponse(Response):
@@ -69,7 +79,11 @@ def _collect_keys_list(body: Dict[str, Any]) -> list[str]:
 
 @compat_blueprint.before_app_request
 def _compat_writer_transport_guard():
-    if request.path.rstrip("/") != "/api/compat/v1":
+    if not is_compat_request_path(request.path):
+        return None
+    if _compute_env_mode(os.environ) == "prod":
+        return compat_error_response(404)
+    if request.path.rstrip("/") != (compat_blueprint.url_prefix or "").rstrip("/"):
         return None
     if request.method == "HEAD":
         return _writer_head_response()
@@ -91,9 +105,6 @@ def get_ids_only():
 
 @compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
 def post_json():
-    if _compute_env_mode(os.environ) == "prod":
-        env = error_envelope("ERR_NOT_FOUND")
-        return _writer_payload(env, status=404)
     data = request.get_json(silent=True) or {}
     a, b = data.get("a"), data.get("b")
     a_id, b_id = data.get("a_id"), data.get("b_id")

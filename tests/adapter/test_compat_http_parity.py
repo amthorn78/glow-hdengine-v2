@@ -74,3 +74,23 @@ def test_dev_vs_wsgi_compat_parity_minimal_valid_payload():
         assert dev_resp.headers.get("Content-Type") == response.headers.get("Content-Type")
         assert dev_resp.headers.get("Cache-Control") == response.headers.get("Cache-Control")
         assert dev_resp.data == response.data
+
+
+def test_selected_factory_compat_routing_errors_match_existing_factories():
+    clients = _clients()
+
+    for method, path in (
+        ("PUT", "/api/compat/v1"),
+        ("GET", "/api/compat/v1/missing"),
+    ):
+        selected_resp, dev_resp, wsgi_resp = (
+            client.open(path, method=method)
+            for client in clients
+        )
+
+        assert selected_resp.status_code == dev_resp.status_code == wsgi_resp.status_code
+        assert selected_resp.headers.get("Content-Type") == dev_resp.headers.get("Content-Type")
+        assert selected_resp.headers.get("Cache-Control") == dev_resp.headers.get("Cache-Control")
+        assert selected_resp.data == dev_resp.data == wsgi_resp.data
+        assert json.loads(selected_resp.data.decode("utf-8"))["code"] == "ERR_NOT_FOUND"
+
