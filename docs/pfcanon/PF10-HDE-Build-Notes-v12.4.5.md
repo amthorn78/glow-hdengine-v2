@@ -5214,9 +5214,5575 @@ All sibling path proofs, Human Evidence Index, Machine Evidence Mirror, checksum
 
 1. Land and validate the projection boundary.  
 2. Land the two v2 schemas.  
-3. Update the sole BodyGraph proof produce
-... 485066 bytes omitted ...
-he shared keys-only log. Reviewed sources prove Original PR added it, but do not prove the originating command or whether the lower HTTP request was external, intercepted locally, or monkeypatched.  
+3. Update the sole BodyGraph proof producer and consumers.  
+4. Materialize AB, BA, and summary primaries.  
+5. Refresh the release binding after the final BodyGraph primaries.  
+6. Run the canonical updater for all companions.  
+7. Run check-only, schema, duplicate-key, canonical-byte, negative-control, unsafe-field, release-binding freshness, and second-run fixed-point validation.  
+8. Update PR-06 to require the final v2 primaries.
+
+Any partial migration, v1 record, duplicate key, missing source, reused acquisition, missing negative receipt, byte mismatch, unknown field, or stale companion fails closed. The prior v1 family is not an accepted fallback.
+
+#### Permanent drainage
+
+Drain the v2 source-invariance schemas, canonical keys, decisive predicates, negative receipt, and current evidence identities into:
+
+* HDE Schemas & Artifacts, §8.6.3.9 and Appendix C; and  
+* HDE Mechanics Guide, §Source invariance and §1.3.1 Evidence jobs.
+
+Clarify the exact path/proof dependencies in HDE Build Checklist — Distillation without moving status.
+
+### ADR-CANON-003 — Dedicated PR-04 Presenter comparison and unique ownership
+
+Decision: APPROVED
+
+Canon effect: `AMENDS`
+
+Linked items: `BUG-003`, `CAUSE-003`, `RSC-003`, `REV-001`, `REV-002`
+
+#### Decision
+
+Repair the complete directly implicated writer graph. Every governed primary has exactly one active producer. All sibling path proofs, Human Index, Machine Mirror, checksum sentinels, and orientation/index companions remain solely owned by `tools/evidence/update_evidence_index.py`.
+
+The approved focused allocation is:
+
+| Surface | Sole active owner and disposition |
+| :---- | :---- |
+| Environment matrix | `tools/evidence/generate_env_matrix_snapshot.py` remains sole owner of `artifacts/runtime/env_matrix.snapshot.json`. |
+| DB posture | `tools/evidence/generate_db_runtime_posture.py` owns DB posture outputs and absorbs `artifacts/db/partition_plan.txt` and `artifacts/db/partition_verify.log`; it no longer writes either environment-connectivity primary. |
+| DB/bridge parity and connectivity | `tools/evidence/generate_db_bridge_parity.py` owns adapter selection, capabilities, provider parity, both environment-connectivity primaries, its synthetic fixture primaries, and the dedicated PR-04 Presenter receipt; it no longer writes the shared Presenter history or embeds replay constants. |
+| BodyGraph policy | `tools/evidence/generate_bodygraph_policy_proofs.py` remains sole owner of source selection, source invariance, refresh policy, metrics, and keys-only BodyGraph primaries. |
+| Rails refusal | `tools/evidence/generate_rails_gate_evidence.py` remains sole owner of `artifacts/proofs/ops_refusal_proof.txt`. |
+| Shared Presenter history | New `tools/evidence/generate_presenter_history.py` becomes sole owner of `artifacts/presenter/json_canon_compare.log` and writes no other primary. |
+| Governed companions | `tools/evidence/update_evidence_index.py` remains sole writer/checker for sibling path proofs, Human Index, hash sentinel, Machine Mirror, mirror checksum, and orientation/index companions. |
+
+#### Broad-generator retirement
+
+`tools/evidence/generate_rails_closed_phase1.py` is retired from current evidence generation. During one compatibility window its path remains only as a no-write guard:
+
+* no import-time generation;  
+* no delegation to focused producers for side effects;  
+* no file mutation;  
+* stable diagnostic `RETIRED_EVIDENCE_GENERATOR: use focused generators`; and  
+* nonzero exit.
+
+All active executable invocations and source assertions must migrate in the same change. Historical prose and captured evidence that merely name the old command remain provenance and are not rewritten. Any undiscovered active invocation fails visibly and cannot mutate governed evidence.
+
+#### Shared Presenter-history contract
+
+Retain the established primary and key:
+
+* path: `artifacts/presenter/json_canon_compare.log`  
+* canonical key: `presenter.bodygraph.json_canon_compare`
+
+Use one immutable repo source fixture:
+
+* `tools/evidence/fixtures/presenter/json_canon_compare.history.v1.json`  
+* schema: `presenter.history_source.v1`  
+* no Machine Mirror key; it is generator input, not a governed acceptance artifact
+
+The source fixture contains exactly four ordered records:
+
+1. `epic011_s10_rails_closed_match`  
+2. `epic011_s10_diff`  
+3. `epic011_live_match_a`  
+4. `epic011_live_match_b`
+
+The canonical row hashes, each including its trailing LF, are:
+
+1. `601c48f5a1d57a15e769d34fe02ae9ada830e3e46256e0c66e596cf6d4f8102a`  
+2. `44be55631c71a7717fea11cca56f18c4c389dfc661949ec20626085001d55489`  
+3. `ea2ba6b4097770b6075c9b6b905c9a227f455db1bc47c248858cd8d7d4484cc5`  
+4. `e44b9f222b34335488de917d452f21b2720f655e6545f48672085154687c0cf5`
+
+The exact four-line output is 1559 bytes with SHA-256:
+
+`64980228d042249a10ecc89ebddcff00be27aae9c79ba2330a24a28b0c59676c`
+
+Materialization must validate closed source shape, exact record count/order, unique record IDs, every payload hash, output length, and output hash before opening a destination temporary file. It emits each row only through the canonical serializer, writes through a same-directory temporary file, flushes and fsyncs, and atomically replaces the destination only after all preflight predicates pass. Failure leaves the prior destination unchanged and removes temporary residue.
+
+`--check` is read-only and rejects missing, extra, changed, noncanonical, provisional PR-04, replay-constant, wall-clock-derived, or wrong-order rows. A second materialization followed by check is a byte fixed point.
+
+Internal diagnostic comparison call sites must not default to the governed shared path. When no caller-supplied log path is given, comparison still occurs but no governed file is mutated. Tests use temporary caller-supplied paths.
+
+#### Dedicated PR-04 DB/bridge Presenter receipt
+
+Use a separate current PR-04 primary:
+
+* path: `artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json`  
+* artifact key: `epic038.pr04.presenter_db_bridge_compare`  
+* schema ID: `presenter.db_bridge_compare.v1`  
+* schema path: `schemas/presenter_db_bridge_compare.v1.json`  
+* schema key: `epic038.pr04.presenter_db_bridge_compare_schema`  
+* sole producer: `tools/evidence/generate_db_bridge_parity.py`
+
+Reuse the existing ordered deterministic case corpus exactly: `select_one`, `search_path`, `version`, and `tx_select_one`. Direct and bridge `DBAccess` façades must be invoked independently for every case, normalized separately, emitted through the shared Presenter, and compared by final bytes. The dedicated receipt is a D10 DB/bridge proof only; it is not BodyGraph source-invariance truth and is not added to the BodyGraph release binding.
+
+#### REV-001 and REV-002 resolution
+
+`REV-001` is resolved because every directly implicated primary, displaced writer, active invocation, canonical key, companion, consumer, adoption step, and rollback path is allocated explicitly, and the broad generator has one selected retirement posture.
+
+`REV-002` is resolved because the shared historical owner has a complete deterministic source and reconstruction contract: exact four records, stable order and IDs, per-row hashes, exact 1559-byte body, output digest, canonical serializer, no clock/environment/current-destination dependency, atomic write, read-only check, and fixed-point validation.
+
+No separate unresolved ownership or shared-history decision remains.
+
+#### Migration, safeguards, and rollback
+
+* Focused write-set tests must prove disjoint ownership and inspect every allowed producer permutation.  
+* Named duplicate current keys must be removed before ordinary dedupe.  
+* Active consumers migrate atomically to the dedicated PR-04 path; historical consumers remain on the shared history path.  
+* The broad generator and replay constants are never restored.  
+* The only rollback source for the shared history is the validated immutable four-row fixture.  
+* Pre-replacement failure preserves the old destination. Post-replacement failure atomically restores the exact four-row body, removes the partial dedicated family/current bindings, reconverges companions through the updater, and withholds PR-04 PASS.  
+* Unknown route forms, overlapping write sets, direct companion writes, stale active invocations, wrong history bytes, or updater divergence fail closed.
+
+#### Permanent drainage
+
+Drain this decision into:
+
+* HDE Build Checklist — Distillation, `HDE-DIST001.9`, replacing PR-04's shared Presenter dependency with the dedicated receipt and recording focused ownership without status movement;  
+* HDE Schemas & Artifacts, §8.3 and the affected catalog/key rows, recording one current path/key binding, the canonical four-row JSONL family, the dedicated receipt family, duplicate-key removal, and updater-owned companions;  
+* HDE Mechanics Guide, §1.3.1 Evidence jobs, recording the focused owner allocation, retired broad generator, selective shared-history owner, disjoint write sets, and read-only check posture; and  
+* Plan Templates, §Review guardrails, adding the bounded collision-repair example requiring transitive-writer inventory, active-invocation migration, deterministic rollback source, and final-generator currentness.
+
+### Required Implementation Plan revision
+
+Before implementation relies on this addendum, revise the HDE-EPIC038 Implementation Plan so that it incorporates every approved consequence:
+
+1. Replace PR-04's current source-invariance design with the projection boundary and closed v2 evidence contract.  
+2. Replace broad-generator execution with the focused owner set and retirement guard.  
+3. Replace PR-04's use of the shared Presenter log with the dedicated DB/bridge Presenter receipt.  
+4. Preserve the shared Presenter log solely as deterministic historical reconstruction.  
+5. Correct the architecture analyzer taxonomy/discovery/verdict logic within existing D11 scope.  
+6. Refresh BodyGraph release bindings only after final source-selection, source-invariance summary, and refresh-policy bytes.  
+7. Update PR-05 to consume `project_bodygraph()` before its later mapped-cache write while retaining all persistence and authorization work in PR-05.  
+8. Update PR-06's required-primary inventory, generation order, checks, and evidence binding for the new v2 and dedicated PR-04 surfaces.  
+9. Preserve OPS-01, OPS-02, QA, acceptance, documentation drainage, PF09 status drainage, and closeout as separate downstream lanes.
+
+The revised plan must preserve this adoption order:
+
+1. This approved PF10 staging decision.  
+2. Separately authorized Implementation Plan revision.  
+3. Separate implementation authorization.  
+4. Projection module and focused tests.  
+5. v2 source-invariance schemas, producer, independent acquisitions, negative receipt, and current consumers.  
+6. Focused producer ownership split and dedicated PR-04 receipt.  
+7. Deterministic four-row shared-history migration and broad-generator retirement guard.  
+8. Corrected architecture analyzer.  
+9. Final BodyGraph primaries, then release binding.  
+10. Canonical updater and all companions only after every primary is final.  
+11. All-order, read-only-check, schema, duplicate-key, no-partial-write, no-I/O, rollback, fixed-point, and release-sanity validation.  
+12. PR-06 handoff.  
+13. Later QA, OPS, acceptance, and closeout under their existing owners.  
+14. Permanent PF-Canon drainage after implemented truth is stable.
+
+### PF09.6 consequences
+
+No status changes are created by PO approval, IA approval, this addendum, plan revision, or documentation drainage.
+
+| Exact row | Current status | Approved consequence | Status action |
+| :---- | :---- | :---- | :---- |
+| `HDE-DIST001.4` — DB posture & runtime checks | Partial | Retain D8 meaning; assign DB and partition outputs to the focused DB-runtime producer and environment-connectivity to the focused bridge producer. | No status change |
+| `HDE-DIST001.5` — BodyGraph mechanics gates | Partial | Adopt the projection boundary and v2 source-invariance evidence in PR-04. | No status change |
+| `HDE-DIST001.7` — Vendor ingest source policy & proofs | Done | Reuse the same-input invariant and maintain current evidence without reopening or reapproving the row. | No status change |
+| `HDE-DIST001.9` — DB-bridge parity & env connectivity | Partial | Replace the PR-04 shared-Presenter dependency with the dedicated receipt; make the bridge producer sole owner of adapter/capability/provider/environment rows; retain OPS-01. | No status change |
+| `HDE-DIST001.10` — Architecture snapshot evidence | Partial | Correct analyzer discovery, taxonomy, unknown handling, and derived verdict. | No status change |
+| `HDE-DIST001.11` — v2 mapped-cache persistence hardening | Optional | Require later PR-05 to consume the projection boundary; move no persistence work into PR-04. | No status change |
+| `HDE-DIST002.5` — Release bindings evidence & indexing | Not done | Refresh the existing derived artifact and bind the v2 source-invariance summary in addition to source selection and refresh policy. | No status change |
+
+Any later PF09 status action requires implemented, validated, accepted evidence and a separate authorized status-drain action.
+
+### Permanent documentation drainage and order
+
+This addendum is the temporary live truth for its exact scope. Permanent drainage is required but is not an implementation, merge, QA, acceptance, or closeout gate by itself.
+
+After the revised plan is implemented and validated, drain in dependency order:
+
+1. HDE Architecture, §6.2 Vendor seam and §5.4 Evidence & determinism flows — record the pure source-neutral projection boundary and continued single-Presenter ownership (`EXTENDS`).  
+2. HDE Schemas & Artifacts, §8.3, §8.6.3.9, Appendix C, and affected catalog/key rows — record the v2 schemas and current keys, one current path/key binding, dedicated Presenter receipt, exact canonical four-row shared JSONL, duplicate-key removal, and updater companion ownership (`AMENDS`). Drain only after the implemented schemas, paths, keys, and updater output have converged.  
+3. HDE Mechanics Guide, §Source invariance and §1.3.1 Evidence jobs — record projection mechanics, decisive independent-acquisition predicates, focused producer allocation, retired broad generator, deterministic shared-history owner, updater-only companions, and fail-closed/check/fixed-point behavior (`AMENDS`).  
+4. HDE Build Checklist — Distillation, `HDE-DIST001.5`, `HDE-DIST001.7`, `HDE-DIST001.9`, `HDE-DIST001.10`, `HDE-DIST001.11`, and `HDE-DIST002.5` — clarify exact path, proof, and dependency wording only; make no status movement from this addendum (`AMENDS`).  
+5. Plan Templates, §Review guardrails — preserve the bounded-rescope rule and add the collision-repair example requiring transitive-writer inventory, active-invocation migration, deterministic rollback source, and final-generator currentness (`EXTENDS`). This process drainage is nonblocking and may proceed separately after the approved decision is stable.  
+6. Remove this PF10 addendum only after every overlapping decision has been completely drained to its permanent home. Partial drainage does not make the remaining undrained topics silent.
+
+### Explicit nonclaims
+
+This addendum does not:
+
+* implement code, schemas, fixtures, producers, tests, migrations, evidence, or plan changes;  
+* accept, approve, merge, or validate the provisional PR-04 implementation;  
+* edit permanent PF-Canon;  
+* move PF09 status or reopen historical rows;  
+* create QA PASS, OPS completion, token satisfaction, acceptance, deployment, persistence, database migration, production-write authorization, slice completion, epic closeout, or board closeout;  
+* authorize public Reader, CLI, compat, route, payload, serializer, transport, or vendor-contract changes;  
+* move PR-05 mapped-cache persistence into PR-04;  
+* move live DB/bridge/vendor proof out of the existing OPS lanes;  
+* reapprove, rerun, delete, or change the status of the four retained historical Presenter rows; or  
+* make permanent documentation drainage a prerequisite for plan revision or implementation authorization.
+
+### Source and evidence anchors
+
+* Approved decision source: `CRD-HDE-EPIC038-PR-04 v1.4`, especially `RSC-001` through `RSC-003`, `ADR-CANON-001` through `ADR-CANON-003`, the ownership ledger, plan-consequence matrix, PF09.6 consequences, and permanent drainage table.  
+* Technical approval source: Rescoping CRD Review for HDE-EPIC038 PR-04, review v1.3, decision `APPROVED`.  
+* Repo state inspected by the approval review: PR \#354 head `d880e54bfd8b1d689ee08f9b352694924a7ae8d0`, base `main@2971256474f70ad62848ce58a2bfaf1ea4438f37`, open and unmerged at review time.  
+* `REV-001` and `REV-002` are resolved through the complete `ADR-CANON-003` owner graph and shared-history reconstruction contract.
+
+  ##    2.5) PR-04 HDE-EPIC038
+
+Artifact Map
+
+PR Name: PR=04
+
+GitHub Repo: glow-hdengine-v2
+
+Implementation Doc: r6 Implementation Plan HDE-EPIC038.md
+
+Original Merged PR: 354
+
+Remedial Merged PR: 355
+
+Extra Evidence: provided fileciteturn150file0
+
+Output: Post-Merge Comprehensive PR Review (Original \+ Remediation)
+
+Review Summary
+
+\- Original PR intent: implement the PR-04 deterministic DB, BodyGraph, bridge, environment-connectivity, Presenter-evidence, release-binding, and keys-only architecture posture harness under closed rails, as subsequently governed for this slice by Build Notes Addendum 2.4.  
+\- Original PR result: the architecture and focused producer split landed, but its final head was red because the Machine Evidence Mirror was malformed and the canonical runtime environment-connectivity row lost \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\`.  
+\- Remedial PR result: it added the explicit canonical runtime registry row and regression test, regenerated the Human Index, Mirror, sentinels, and directly dependent path proofs, and restored a complete fixed point.  
+\- Lifecycle alignment: the Remedial PR follows the Original PR in the same \`main\` lineage; the intervening documentation commit changed planning/CRD/PF10 material, not the lifecycle code/evidence touched-file set.  
+\- Current repo support: current \`main\` is the Remedial PR merge commit and no later commit exists; direct inspection supports the pure projection boundary, v2 source-invariance truth, focused writer ownership, truthful fixture/live parity split, DB posture, architecture fail-closed analyzer, and release binding.  
+\- Validation posture: the Original PR final workflow failed; the Remedial PR head passed all seven hosted jobs, and current file-state inspection independently confirms the decisive repaired conditions.  
+\- PF09 posture: impacts are exactly mapped to PF09.6 Distillation rows; the approved Build Notes addendum requires no status movement for this PR lifecycle.  
+\- Remaining risk: no material post-merge implementation or governed-evidence blocker remains. Live direct/bridge observation, QA acceptance, PF09 drainage, permanent canon drainage, and epic closeout remain separate, explicitly unclaimed axes.
+
+GitHub / Repo Inspection
+
+\- Repository identity: \`amthorn78/glow-hdengine-v2\`; reviewed target/default branch: \`main\`.  
+\- Current reviewed branch HEAD: \`3936317d8078ea1407d7ef1b9d084f891a0ec2bc\`, the Remedial PR merge commit.  
+\- Original PR: base \`main@2971256474f70ad62848ce58a2bfaf1ea4438f37\`; head \`codex/implement-pr-04-for-hde-epic038@93fbf3478dbf1af2086bc07b25710e09e355c7b1\`; merged as \`79e47867d6a4a799f49bf365cbed6d3e5e5f0d13\`; 12 commits; 92 changed files. fileciteturn168file0L2-L14  
+\- Remedial PR: base \`main@b654f3ef26038f1ad014c0df618ec39f7ea3e469\`; head \`codex/complete-pr-04-crd-implementation-and-fix-ci@121128c1c203066c4d6ca28ba767c44d9494ecac\`; merged as \`3936317d8078ea1407d7ef1b9d084f891a0ec2bc\`; 1 commit; 23 changed files. fileciteturn169file0L2-L14  
+\- Lifecycle order and lineage: \`2971256\` baseline → \`79e4786\` Original merge → \`b654f3e\` documentation/PF10 deployment → \`3936317\` Remedial merge/current state. The commit ordering is directly visible in current GitHub history. fileciteturn170file0L1-L10  
+\- Later commits affecting reviewed files: none after the Remedial merge. The documentation commit between merges did not alter any lifecycle touched file; it supplied the active Addendum 2.4 authority assessed separately.  
+\- Original PR changed files (92): \`artifacts/architecture/architecture\_snapshot.keys\_only.json\`; \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\`; \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\`; \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\`; \`artifacts/bodygraph/keys\_only.logs.sample\`; \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\`; \`artifacts/bodygraph/metrics.snapshot.json\`; \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/refresh\_policy.snapshot.json\`; \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/release\_bindings.json\`; \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/ab.json\`; \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/ba.json\`; \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/summary.json\`; \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_selection.snapshot.json\`; \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\`; \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\`; \`artifacts/db/check\_constraints.txt\`; \`artifacts/db/check\_constraints.txt.path\_proof.txt\`; \`artifacts/db/ddl\_fingerprint.json\`; \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\`; \`artifacts/db/grants.txt\`; \`artifacts/db/grants.txt.path\_proof.txt\`; \`artifacts/db\_bridge/caps.snapshot.json\`; \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\`; \`artifacts/db\_bridge/provider\_parity.proof.json\`; \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\`; \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl\`; \`artifacts/evidence\_index.jsonl.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl.sha256\`; \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`; \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\`; \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\`; \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`; \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`; \`artifacts/proofs/success\_304.txt.path\_proof.txt\`; \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`; \`artifacts/proofs/success\_get.txt.path\_proof.txt\`; \`artifacts/proofs/success\_head.txt.path\_proof.txt\`; \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`; \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`; \`audit/gates/topology/orientation\_demo.txt\`; \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`docs/evidence/INDEX.json\`; \`docs/evidence/INDEX.json.path\_proof.txt\`; \`docs/evidence/INDEX.sha256\`; \`docs/evidence/INDEX.sha256.path\_proof.txt\`; \`docs/run/RUN\_PROD\_QA.md\`; \`engine/bodygraph/ingest.py\`; \`engine/bodygraph/projection.py\`; \`glow\_hdengine.egg-info/SOURCES.txt\`; \`presenter/json\_canon\_compare.py\`; \`schemas/architecture\_snapshot.keys\_only.v1.json\`; \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\`; \`schemas/bodygraph\_source\_invariance.run.v2.json\`; \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\`; \`schemas/bodygraph\_source\_invariance.summary.v2.json\`; \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\`; \`schemas/presenter\_db\_bridge\_compare.v1.json\`; \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\`; \`scripts/db/capture\_epic011\_posture.py\`; \`scripts/ingest/run\_vendor\_ingest.py\`; \`scripts/ops/admin\_vendor\_qa.py\`; \`tests/bodygraph/test\_projection.py\`; \`tests/evidence/test\_architecture\_snapshot.py\`; \`tests/evidence/test\_bodygraph\_policy\_proofs.py\`; \`tests/evidence/test\_db\_runtime\_posture.py\`; \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\`; \`tests/evidence/test\_presenter\_evidence\_ownership.py\`; \`tests/evidence/test\_release\_bindings.py\`; \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\`; \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\`; \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\`; \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\`; \`tools/evidence/generate\_architecture\_snapshot.py\`; \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\`; \`tools/evidence/generate\_db\_bridge\_parity.py\`; \`tools/evidence/generate\_db\_runtime\_posture.py\`; \`tools/evidence/generate\_presenter\_history.py\`; \`tools/evidence/generate\_rails\_closed\_phase1.py\`; \`tools/evidence/generate\_release\_bindings.py\`; \`tools/evidence/update\_evidence\_index.py\`.  
+\- Remedial PR changed files (23): \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl\`; \`artifacts/evidence\_index.jsonl.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl.sha256\`; \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`; \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`; \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`; \`artifacts/proofs/success\_304.txt.path\_proof.txt\`; \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`; \`artifacts/proofs/success\_get.txt.path\_proof.txt\`; \`artifacts/proofs/success\_head.txt.path\_proof.txt\`; \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`; \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`; \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`docs/evidence/INDEX.json\`; \`docs/evidence/INDEX.json.path\_proof.txt\`; \`docs/evidence/INDEX.sha256\`; \`docs/evidence/INDEX.sha256.path\_proof.txt\`; \`tests/evidence/test\_evidence\_skeleton.py\`; \`tools/evidence/update\_evidence\_index.py\`.  
+\- Lifecycle touched-file set (93): \`artifacts/architecture/architecture\_snapshot.keys\_only.json\`; \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\`; \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\`; \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\`; \`artifacts/bodygraph/keys\_only.logs.sample\`; \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\`; \`artifacts/bodygraph/metrics.snapshot.json\`; \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/refresh\_policy.snapshot.json\`; \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/release\_bindings.json\`; \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/ab.json\`; \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/ba.json\`; \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_invariance/summary.json\`; \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\`; \`artifacts/bodygraph/source\_selection.snapshot.json\`; \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\`; \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\`; \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\`; \`artifacts/db/check\_constraints.txt\`; \`artifacts/db/check\_constraints.txt.path\_proof.txt\`; \`artifacts/db/ddl\_fingerprint.json\`; \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\`; \`artifacts/db/grants.txt\`; \`artifacts/db/grants.txt.path\_proof.txt\`; \`artifacts/db\_bridge/caps.snapshot.json\`; \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\`; \`artifacts/db\_bridge/provider\_parity.proof.json\`; \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\`; \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl\`; \`artifacts/evidence\_index.jsonl.path\_proof.txt\`; \`artifacts/evidence\_index.jsonl.sha256\`; \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`; \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\`; \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\`; \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`; \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`; \`artifacts/proofs/success\_304.txt.path\_proof.txt\`; \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`; \`artifacts/proofs/success\_get.txt.path\_proof.txt\`; \`artifacts/proofs/success\_head.txt.path\_proof.txt\`; \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`; \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`; \`audit/gates/topology/orientation\_demo.txt\`; \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`; \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`; \`docs/evidence/INDEX.json\`; \`docs/evidence/INDEX.json.path\_proof.txt\`; \`docs/evidence/INDEX.sha256\`; \`docs/evidence/INDEX.sha256.path\_proof.txt\`; \`docs/run/RUN\_PROD\_QA.md\`; \`engine/bodygraph/ingest.py\`; \`engine/bodygraph/projection.py\`; \`glow\_hdengine.egg-info/SOURCES.txt\`; \`presenter/json\_canon\_compare.py\`; \`schemas/architecture\_snapshot.keys\_only.v1.json\`; \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\`; \`schemas/bodygraph\_source\_invariance.run.v2.json\`; \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\`; \`schemas/bodygraph\_source\_invariance.summary.v2.json\`; \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\`; \`schemas/presenter\_db\_bridge\_compare.v1.json\`; \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\`; \`scripts/db/capture\_epic011\_posture.py\`; \`scripts/ingest/run\_vendor\_ingest.py\`; \`scripts/ops/admin\_vendor\_qa.py\`; \`tests/bodygraph/test\_projection.py\`; \`tests/evidence/test\_architecture\_snapshot.py\`; \`tests/evidence/test\_bodygraph\_policy\_proofs.py\`; \`tests/evidence/test\_db\_runtime\_posture.py\`; \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\`; \`tests/evidence/test\_presenter\_evidence\_ownership.py\`; \`tests/evidence/test\_release\_bindings.py\`; \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\`; \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\`; \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\`; \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\`; \`tools/evidence/generate\_architecture\_snapshot.py\`; \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\`; \`tools/evidence/generate\_db\_bridge\_parity.py\`; \`tools/evidence/generate\_db\_runtime\_posture.py\`; \`tools/evidence/generate\_presenter\_history.py\`; \`tools/evidence/generate\_rails\_closed\_phase1.py\`; \`tools/evidence/generate\_release\_bindings.py\`; \`tools/evidence/update\_evidence\_index.py\`; \`tests/evidence/test\_evidence\_skeleton.py\`.  
+\- Current final-state inspection: every touched path was accounted for at current \`main\`; executable code, tests, schemas, and decisive primary artifacts were opened directly; updater-owned sidecars were checked through the current canonical Index/Mirror/proof bindings and the remedial fixed-point evidence.  
+\- Checks/CI inspected: Original final workflow run 2408 failed five jobs on the malformed Mirror; Remedial workflow run 2413 / ID 29464159150 passed all seven jobs. Extra Evidence records the full job matrix and current main state.  
+\- Governed evidence inspected: BodyGraph v2 AB/BA/summary and schemas; DB constraints, fingerprint, grants, boundary proof; DB-bridge caps/parity; dedicated Presenter receipt/schema; architecture snapshot/schema; release bindings; Human Index, sentinel, Machine Mirror, Mirror checksum, and path-proof topology.  
+\- Material GitHub Repo evidence pointer: GitHub Repo | \`engine/bodygraph/projection.py\` | pure source-neutral projection, closed keys, stable errors, no I/O. fileciteturn171file0L29-L47  
+\- Material GitHub Repo evidence pointer: GitHub Repo | \`artifacts/evidence\_index.jsonl\` | one \`runtime.env\_connectivity\` row with \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\`. fileciteturn185file0L12-L12
+
+Provenance (Original \-\> Remediation)
+
+\- Claim: Original PR implemented the source-neutral BodyGraph projection boundary.  
+  Source: Original PR  
+  Evidence pointer: Original PR | \`engine/bodygraph/projection.py\`, \`@@ \-0,0 \+1,140 @@\` | \`CanonicalBodyGraph\`, \`BodyGraphProjectionError\`, and \`project\_bodygraph()\` were added.  
+\- Claim: Original PR replaced the weak source-invariance posture with v2 DB/vendor acquisitions, same-input hashes, shared Presenter bytes, two-run stability, and a negative receipt.  
+  Source: Original PR  
+  Evidence pointer: Original PR | \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\` | AB/BA v2 runs and summary producer added.  
+\- Claim: Original PR established focused DB runtime, DB bridge, BodyGraph, architecture, shared Presenter-history, and release-binding owners.  
+  Source: Original PR  
+  Evidence pointer: Original PR | focused producer files and ownership tests | broad/shared writers were retired or redirected.  
+\- Claim: Original PR preserved live-provider unavailability as unavailable rather than converting fixture parity into a live PASS.  
+  Source: Original PR  
+  Evidence pointer: GitHub Repo | \`artifacts/db\_bridge/provider\_parity.proof.json\` | fixture parity is \`pass\`; live parity is \`unavailable\`; \`DB\_PROVIDER\_PARITY\_OK\` is \`not\_claimed\`.  
+\- Claim: Original PR final evidence skeleton was not releasable.  
+  Source: Original PR  
+  Evidence pointer: Extra Evidence | final run 2408 | malformed \`artifacts/evidence\_index.jsonl\` caused five failed jobs; runtime token binding was absent.  
+\- Claim: Remedial PR declared one canonical current runtime environment-connectivity entry.  
+  Source: Remedial PR  
+  Evidence pointer: Remedial PR | \`tools/evidence/update\_evidence\_index.py\`, \`@@ \-577,6 \+577,19 @@\` | \`runtime.env\_connectivity\` with \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\`.  
+\- Claim: Remedial PR added an exact regression for duplicate-key retirement and token coherence.  
+  Source: Remedial PR  
+  Evidence pointer: Remedial PR | \`tests/evidence/test\_evidence\_skeleton.py\` | one key/path, artifact label, and Mirror token are asserted.  
+\- Claim: Remedial PR regenerated the Human Index, Mirror, checksums, and affected proof companions through canonical tooling.  
+  Source: Remedial PR  
+  Evidence pointer: Remedial PR | governed Index/Mirror/path-proof file set | parseable fixed-point bytes replaced the malformed Original state.  
+\- Claim: The current repo equals the remedial merged state.  
+  Source: GitHub Repo  
+  Evidence pointer: GitHub Repo | \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | no later commit exists.  
+\- Claim: No formal QA PASS, live OPS completion, PF09 status movement, acceptance, persistence completion, or epic closeout is asserted.  
+  Source: Extra Evidence  
+  Evidence pointer: Extra Evidence | §13 Current state and remaining nonclaims | technical recovery is separated from governance and closure axes.
+
+Original PR Material Hunk Ledger
+
+Ledger method: each changed file is assigned one file-scoped material hunk group, every \`@@\` range in that complete per-file patch is covered by that ID, and no hunk is assigned across files. Exact \`@@\` headers are reproduced where separately retrieved; generated canonical files and proof companions are single-file groups.
+
+Hunk ID: OPR-001  
+File: \`artifacts/architecture/architecture\_snapshot.keys\_only.json\`  
+Patch and hunk header: diff \--git a/artifacts/architecture/architecture\_snapshot.keys\_only.json b/artifacts/architecture/architecture\_snapshot.keys\_only.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the governed keys-only architecture snapshot with derived analyzer verdict, closed taxonomy, discovered routes/registrations, and bounded external-I/O symbol inventory.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/architecture/architecture\_snapshot.keys\_only.json b/artifacts/architecture/architecture\_snapshot.keys\_only.json\` | "Adds the governed keys-only architecture snapshot with derived analyzer verdict, closed taxonomy, discovered routes/registrations, and bounded external-I/O symbol inventory."
+
+Hunk ID: OPR-002  
+File: \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt b/artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/architecture/architecture\_snapshot.keys\_only.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt b/artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/architecture/architecture\_snapshot.keys\_only.json."
+
+Hunk ID: OPR-003  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json."
+
+Hunk ID: OPR-004  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json.sha256."
+
+Hunk ID: OPR-005  
+File: \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json b/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the bounded synthetic DB-resolution receipt for the PR-04 pair evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json b/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\` | "Adds the bounded synthetic DB-resolution receipt for the PR-04 pair evidence."
+
+Hunk ID: OPR-006  
+File: \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt b/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt b/artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/db\_resolve.epic038\_synthetic.json."
+
+Hunk ID: OPR-007  
+File: \`artifacts/bodygraph/keys\_only.logs.sample\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/keys\_only.logs.sample b/artifacts/bodygraph/keys\_only.logs.sample || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates BodyGraph policy logs as canonical keys-only evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/keys\_only.logs.sample b/artifacts/bodygraph/keys\_only.logs.sample\` | "Regenerates BodyGraph policy logs as canonical keys-only evidence."
+
+Hunk ID: OPR-008  
+File: \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt b/artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/keys\_only.logs.sample.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt b/artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/keys\_only.logs.sample."
+
+Hunk ID: OPR-009  
+File: \`artifacts/bodygraph/metrics.snapshot.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/metrics.snapshot.json b/artifacts/bodygraph/metrics.snapshot.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates deterministic BodyGraph refresh metrics bound to policy sample counts.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/metrics.snapshot.json b/artifacts/bodygraph/metrics.snapshot.json\` | "Regenerates deterministic BodyGraph refresh metrics bound to policy sample counts."
+
+Hunk ID: OPR-010  
+File: \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt b/artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/metrics.snapshot.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt b/artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/metrics.snapshot.json."
+
+Hunk ID: OPR-011  
+File: \`artifacts/bodygraph/refresh\_policy.snapshot.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/refresh\_policy.snapshot.json b/artifacts/bodygraph/refresh\_policy.snapshot.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates TTL/SWR, rate-limit, and circuit-breaker policy evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/refresh\_policy.snapshot.json b/artifacts/bodygraph/refresh\_policy.snapshot.json\` | "Regenerates TTL/SWR, rate-limit, and circuit-breaker policy evidence."
+
+Hunk ID: OPR-012  
+File: \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt b/artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/refresh\_policy.snapshot.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt b/artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/refresh\_policy.snapshot.json."
+
+Hunk ID: OPR-013  
+File: \`artifacts/bodygraph/release\_bindings.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/release\_bindings.json b/artifacts/bodygraph/release\_bindings.json || complete per-file patch; all changed ranges for this path  
+Material effect: Binds release identity to the final BodyGraph selection, v2 source-invariance summary, and refresh-policy artifacts.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/release\_bindings.json b/artifacts/bodygraph/release\_bindings.json\` | "Binds release identity to the final BodyGraph selection, v2 source-invariance summary, and refresh-policy artifacts."
+
+Hunk ID: OPR-014  
+File: \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/release\_bindings.json.path\_proof.txt b/artifacts/bodygraph/release\_bindings.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/release\_bindings.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/release\_bindings.json.path\_proof.txt b/artifacts/bodygraph/release\_bindings.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/release\_bindings.json."
+
+Hunk ID: OPR-015  
+File: \`artifacts/bodygraph/source\_invariance/ab.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/ab.json b/artifacts/bodygraph/source\_invariance/ab.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds v2 AB-order independent DB/vendor acquisition evidence with two-run projection and Presenter hashes.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/ab.json b/artifacts/bodygraph/source\_invariance/ab.json\` | "Adds v2 AB-order independent DB/vendor acquisition evidence with two-run projection and Presenter hashes."
+
+Hunk ID: OPR-016  
+File: \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ab.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ab.json."
+
+Hunk ID: OPR-017  
+File: \`artifacts/bodygraph/source\_invariance/ba.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/ba.json b/artifacts/bodygraph/source\_invariance/ba.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds v2 BA-order independent DB/vendor acquisition evidence with reversed source order.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/ba.json b/artifacts/bodygraph/source\_invariance/ba.json\` | "Adds v2 BA-order independent DB/vendor acquisition evidence with reversed source order."
+
+Hunk ID: OPR-018  
+File: \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ba.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ba.json."
+
+Hunk ID: OPR-019  
+File: \`artifacts/bodygraph/source\_invariance/summary.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/summary.json b/artifacts/bodygraph/source\_invariance/summary.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the v2 decisive summary, cross-order/source predicates, and negative divergence receipt.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/summary.json b/artifacts/bodygraph/source\_invariance/summary.json\` | "Adds the v2 decisive summary, cross-order/source predicates, and negative divergence receipt."
+
+Hunk ID: OPR-020  
+File: \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/summary.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt b/artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/summary.json."
+
+Hunk ID: OPR-021  
+File: \`artifacts/bodygraph/source\_selection.snapshot.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_selection.snapshot.json b/artifacts/bodygraph/source\_selection.snapshot.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates closed-rails auto/db/vendor source-selection evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_selection.snapshot.json b/artifacts/bodygraph/source\_selection.snapshot.json\` | "Regenerates closed-rails auto/db/vendor source-selection evidence."
+
+Hunk ID: OPR-022  
+File: \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt b/artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_selection.snapshot.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt b/artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_selection.snapshot.json."
+
+Hunk ID: OPR-023  
+File: \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json b/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the bounded synthetic vendor-mapping receipt for the PR-04 pair evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json b/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\` | "Adds the bounded synthetic vendor-mapping receipt for the PR-04 pair evidence."
+
+Hunk ID: OPR-024  
+File: \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt b/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt b/artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json."
+
+Hunk ID: OPR-025  
+File: \`artifacts/db/check\_constraints.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db/check\_constraints.txt b/artifacts/db/check\_constraints.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Replaces empty posture evidence with deterministic constraint and NOT NULL checks derived from tracked DDL.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/check\_constraints.txt b/artifacts/db/check\_constraints.txt\` | "Replaces empty posture evidence with deterministic constraint and NOT NULL checks derived from tracked DDL."
+
+Hunk ID: OPR-026  
+File: \`artifacts/db/check\_constraints.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db/check\_constraints.txt.path\_proof.txt b/artifacts/db/check\_constraints.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/db/check\_constraints.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/check\_constraints.txt.path\_proof.txt b/artifacts/db/check\_constraints.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/check\_constraints.txt."
+
+Hunk ID: OPR-027  
+File: \`artifacts/db/ddl\_fingerprint.json\`  
+Patch and hunk header: diff \--git a/artifacts/db/ddl\_fingerprint.json b/artifacts/db/ddl\_fingerprint.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the offline normalized DDL fingerprint and exact search-path/object posture.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/ddl\_fingerprint.json b/artifacts/db/ddl\_fingerprint.json\` | "Regenerates the offline normalized DDL fingerprint and exact search-path/object posture."
+
+Hunk ID: OPR-028  
+File: \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db/ddl\_fingerprint.json.path\_proof.txt b/artifacts/db/ddl\_fingerprint.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/db/ddl\_fingerprint.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/ddl\_fingerprint.json.path\_proof.txt b/artifacts/db/ddl\_fingerprint.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/ddl\_fingerprint.json."
+
+Hunk ID: OPR-029  
+File: \`artifacts/db/grants.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db/grants.txt b/artifacts/db/grants.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Records the truthful tracked-DDL grants/default-privilege posture without assuming ideal state.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/grants.txt b/artifacts/db/grants.txt\` | "Records the truthful tracked-DDL grants/default-privilege posture without assuming ideal state."
+
+Hunk ID: OPR-030  
+File: \`artifacts/db/grants.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db/grants.txt.path\_proof.txt b/artifacts/db/grants.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/db/grants.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db/grants.txt.path\_proof.txt b/artifacts/db/grants.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/grants.txt."
+
+Hunk ID: OPR-031  
+File: \`artifacts/db\_bridge/caps.snapshot.json\`  
+Patch and hunk header: diff \--git a/artifacts/db\_bridge/caps.snapshot.json b/artifacts/db\_bridge/caps.snapshot.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds deterministic DB-bridge capability evidence.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db\_bridge/caps.snapshot.json b/artifacts/db\_bridge/caps.snapshot.json\` | "Adds deterministic DB-bridge capability evidence."
+
+Hunk ID: OPR-032  
+File: \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt b/artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/caps.snapshot.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt b/artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/caps.snapshot.json."
+
+Hunk ID: OPR-033  
+File: \`artifacts/db\_bridge/provider\_parity.proof.json\`  
+Patch and hunk header: diff \--git a/artifacts/db\_bridge/provider\_parity.proof.json b/artifacts/db\_bridge/provider\_parity.proof.json || complete per-file patch; all changed ranges for this path  
+Material effect: Separates fixture parity PASS from unavailable live-provider parity and preserves non-token proof labels.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db\_bridge/provider\_parity.proof.json b/artifacts/db\_bridge/provider\_parity.proof.json\` | "Separates fixture parity PASS from unavailable live-provider parity and preserves non-token proof labels."
+
+Hunk ID: OPR-034  
+File: \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt b/artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/provider\_parity.proof.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt b/artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/provider\_parity.proof.json."
+
+Hunk ID: OPR-035  
+File: \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/engine/order/abba\_identity.bytes.path\_proof.txt b/artifacts/engine/order/abba\_identity.bytes.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/engine/order/abba\_identity.bytes.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/engine/order/abba\_identity.bytes.path\_proof.txt b/artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/engine/order/abba\_identity.bytes."
+
+Hunk ID: OPR-036  
+File: \`artifacts/evidence\_index.jsonl\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl b/artifacts/evidence\_index.jsonl || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the Machine Evidence Mirror; the original final head accidentally committed malformed JSONL and the remedial PR replaced it with a parseable canonical fixed point.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/evidence\_index.jsonl b/artifacts/evidence\_index.jsonl\` | "Regenerates the Machine Evidence Mirror; the original final head accidentally committed malformed JSONL and the remedial PR replaced it with a parseable canonical fixed point."
+
+Hunk ID: OPR-037  
+File: \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.path\_proof.txt b/artifacts/evidence\_index.jsonl.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/evidence\_index.jsonl.path\_proof.txt b/artifacts/evidence\_index.jsonl.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl."
+
+Hunk ID: OPR-038  
+File: \`artifacts/evidence\_index.jsonl.sha256\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256 b/artifacts/evidence\_index.jsonl.sha256 || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the Machine Mirror checksum after canonical repair.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/evidence\_index.jsonl.sha256 b/artifacts/evidence\_index.jsonl.sha256\` | "Regenerates the Machine Mirror checksum after canonical repair."
+
+Hunk ID: OPR-039  
+File: \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt b/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl.sha256.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt b/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl.sha256."
+
+Hunk ID: OPR-040  
+File: \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\`  
+Patch and hunk header: diff \--git a/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json b/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the dedicated PR-04 direct/bridge Presenter-byte comparison receipt with negative control.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json b/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\` | "Adds the dedicated PR-04 direct/bridge Presenter-byte comparison receipt with negative control."
+
+Hunk ID: OPR-041  
+File: \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt b/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt b/artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json."
+
+Hunk ID: OPR-042  
+File: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/endpoints\_env\_gate\_proof.log.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/endpoints\_env\_gate\_proof.log."
+
+Hunk ID: OPR-043  
+File: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/reader\_success\_get\_head\_304.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/reader\_success\_get\_head\_304.json."
+
+Hunk ID: OPR-044  
+File: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_304.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_304.txt."
+
+Hunk ID: OPR-045  
+File: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_encoding\_invariance.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_encoding\_invariance.txt."
+
+Hunk ID: OPR-046  
+File: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_get.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_get.txt."
+
+Hunk ID: OPR-047  
+File: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_head.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_head.txt."
+
+Hunk ID: OPR-048  
+File: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_writers\_errors.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_writers\_errors.txt."
+
+Hunk ID: OPR-049  
+File: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for artifacts/reader/endpoints\_snapshot.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/reader/endpoints\_snapshot.json."
+
+Hunk ID: OPR-050  
+File: \`audit/gates/topology/orientation\_demo.txt\`  
+Patch and hunk header: diff \--git a/audit/gates/topology/orientation\_demo.txt b/audit/gates/topology/orientation\_demo.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Refreshes topology/orientation evidence after the evidence skeleton changed.  
+Risk category: High — governed evidence/artifact  
+Evidence pointer: Original PR | \`diff \--git a/audit/gates/topology/orientation\_demo.txt b/audit/gates/topology/orientation\_demo.txt\` | "Refreshes topology/orientation evidence after the evidence skeleton changed."
+
+Hunk ID: OPR-051  
+File: \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/audit/gates/topology/orientation\_demo.txt.path\_proof.txt b/audit/gates/topology/orientation\_demo.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for audit/gates/topology/orientation\_demo.txt.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/audit/gates/topology/orientation\_demo.txt.path\_proof.txt b/audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for audit/gates/topology/orientation\_demo.txt."
+
+Hunk ID: OPR-052  
+File: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json."
+
+Hunk ID: OPR-053  
+File: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json.sha256.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json.sha256."
+
+Hunk ID: OPR-054  
+File: \`docs/evidence/INDEX.json\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json b/docs/evidence/INDEX.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the Human Evidence Index and, after remediation, retains one canonical runtime.env\_connectivity binding.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Original PR | \`diff \--git a/docs/evidence/INDEX.json b/docs/evidence/INDEX.json\` | "Regenerates the Human Evidence Index and, after remediation, retains one canonical runtime.env\_connectivity binding."
+
+Hunk ID: OPR-055  
+File: \`docs/evidence/INDEX.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json.path\_proof.txt b/docs/evidence/INDEX.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/docs/evidence/INDEX.json.path\_proof.txt b/docs/evidence/INDEX.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.json."
+
+Hunk ID: OPR-056  
+File: \`docs/evidence/INDEX.sha256\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256 b/docs/evidence/INDEX.sha256 || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the Human Index hash sentinel.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Original PR | \`diff \--git a/docs/evidence/INDEX.sha256 b/docs/evidence/INDEX.sha256\` | "Regenerates the Human Index hash sentinel."
+
+Hunk ID: OPR-057  
+File: \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256.path\_proof.txt b/docs/evidence/INDEX.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.sha256.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/docs/evidence/INDEX.sha256.path\_proof.txt b/docs/evidence/INDEX.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.sha256."
+
+Hunk ID: OPR-058  
+File: \`docs/run/RUN\_PROD\_QA.md\`  
+Patch and hunk header: diff \--git a/docs/run/RUN\_PROD\_QA.md b/docs/run/RUN\_PROD\_QA.md || complete per-file patch; all changed ranges for this path  
+Material effect: Moves mutable operator parity output to a dedicated OPS log and documents fail-on-diff/stdout-only behavior.  
+Risk category: High — OPS-sensitive runbook behavior  
+Evidence pointer: Original PR | \`diff \--git a/docs/run/RUN\_PROD\_QA.md b/docs/run/RUN\_PROD\_QA.md\` | "Moves mutable operator parity output to a dedicated OPS log and documents fail-on-diff/stdout-only behavior."
+
+Hunk ID: OPR-059  
+File: \`engine/bodygraph/ingest.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/ingest.py b/engine/bodygraph/ingest.py || @@ \-131,7 \+131,7 @@; @@ \-199,16 \+199,17 @@  
+Material effect: Makes Presenter parity logging explicit and optional, removing implicit writes to the governed shared Presenter history.  
+Risk category: High — contract/interface or error-handling mechanics  
+Evidence pointer: Original PR | \`diff \--git a/engine/bodygraph/ingest.py b/engine/bodygraph/ingest.py\` | "Makes Presenter parity logging explicit and optional, removing implicit writes to the governed shared Presenter history."
+
+Hunk ID: OPR-060  
+File: \`engine/bodygraph/projection.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/projection.py b/engine/bodygraph/projection.py || @@ \-0,0 \+1,140 @@  
+Material effect: Adds the pure source-neutral CanonicalBodyGraph projection boundary with stable value-free errors and unsafe-field rejection.  
+Risk category: High — contract/interface or error-handling mechanics  
+Evidence pointer: Original PR | \`diff \--git a/engine/bodygraph/projection.py b/engine/bodygraph/projection.py\` | "Adds the pure source-neutral CanonicalBodyGraph projection boundary with stable value-free errors and unsafe-field rejection."
+
+Hunk ID: OPR-061  
+File: \`glow\_hdengine.egg-info/SOURCES.txt\`  
+Patch and hunk header: diff \--git a/glow\_hdengine.egg-info/SOURCES.txt b/glow\_hdengine.egg-info/SOURCES.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Updates package source metadata for the added implementation and test files.  
+Risk category: Low — package metadata  
+Evidence pointer: Original PR | \`diff \--git a/glow\_hdengine.egg-info/SOURCES.txt b/glow\_hdengine.egg-info/SOURCES.txt\` | "Updates package source metadata for the added implementation and test files."
+
+Hunk ID: OPR-062  
+File: \`presenter/json\_canon\_compare.py\`  
+Patch and hunk header: diff \--git a/presenter/json\_canon\_compare.py b/presenter/json\_canon\_compare.py || @@ \-12,9 \+12,6 @@; @@ \-75,8 \+72,13 @@; @@ \-104,9 \+106,9 @@  
+Material effect: Removes the implicit governed-log default and adds explicit fail-on-diff behavior.  
+Risk category: High — contract/interface or error-handling mechanics  
+Evidence pointer: Original PR | \`diff \--git a/presenter/json\_canon\_compare.py b/presenter/json\_canon\_compare.py\` | "Removes the implicit governed-log default and adds explicit fail-on-diff behavior."
+
+Hunk ID: OPR-063  
+File: \`schemas/architecture\_snapshot.keys\_only.v1.json\`  
+Patch and hunk header: diff \--git a/schemas/architecture\_snapshot.keys\_only.v1.json b/schemas/architecture\_snapshot.keys\_only.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the closed schema for the keys-only architecture snapshot.  
+Risk category: High — schema/data model  
+Evidence pointer: Original PR | \`diff \--git a/schemas/architecture\_snapshot.keys\_only.v1.json b/schemas/architecture\_snapshot.keys\_only.v1.json\` | "Adds the closed schema for the keys-only architecture snapshot."
+
+Hunk ID: OPR-064  
+File: \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt b/schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for schemas/architecture\_snapshot.keys\_only.v1.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt b/schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/architecture\_snapshot.keys\_only.v1.json."
+
+Hunk ID: OPR-065  
+File: \`schemas/bodygraph\_source\_invariance.run.v2.json\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_source\_invariance.run.v2.json b/schemas/bodygraph\_source\_invariance.run.v2.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the closed v2 per-order source-invariance run schema.  
+Risk category: High — schema/data model  
+Evidence pointer: Original PR | \`diff \--git a/schemas/bodygraph\_source\_invariance.run.v2.json b/schemas/bodygraph\_source\_invariance.run.v2.json\` | "Adds the closed v2 per-order source-invariance run schema."
+
+Hunk ID: OPR-066  
+File: \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt b/schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.run.v2.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt b/schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.run.v2.json."
+
+Hunk ID: OPR-067  
+File: \`schemas/bodygraph\_source\_invariance.summary.v2.json\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_source\_invariance.summary.v2.json b/schemas/bodygraph\_source\_invariance.summary.v2.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the closed v2 source-invariance summary and negative-receipt schema.  
+Risk category: High — schema/data model  
+Evidence pointer: Original PR | \`diff \--git a/schemas/bodygraph\_source\_invariance.summary.v2.json b/schemas/bodygraph\_source\_invariance.summary.v2.json\` | "Adds the closed v2 source-invariance summary and negative-receipt schema."
+
+Hunk ID: OPR-068  
+File: \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt b/schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.summary.v2.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt b/schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.summary.v2.json."
+
+Hunk ID: OPR-069  
+File: \`schemas/presenter\_db\_bridge\_compare.v1.json\`  
+Patch and hunk header: diff \--git a/schemas/presenter\_db\_bridge\_compare.v1.json b/schemas/presenter\_db\_bridge\_compare.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the closed dedicated PR-04 Presenter comparison schema.  
+Risk category: High — schema/data model  
+Evidence pointer: Original PR | \`diff \--git a/schemas/presenter\_db\_bridge\_compare.v1.json b/schemas/presenter\_db\_bridge\_compare.v1.json\` | "Adds the closed dedicated PR-04 Presenter comparison schema."
+
+Hunk ID: OPR-070  
+File: \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt b/schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Creates or refreshes the updater-owned sibling path proof for schemas/presenter\_db\_bridge\_compare.v1.json.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Original PR | \`diff \--git a/schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt b/schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/presenter\_db\_bridge\_compare.v1.json."
+
+Hunk ID: OPR-071  
+File: \`scripts/db/capture\_epic011\_posture.py\`  
+Patch and hunk header: diff \--git a/scripts/db/capture\_epic011\_posture.py b/scripts/db/capture\_epic011\_posture.py || @@ \-1,5 \+1,5 @@; @@ \-12,6 \+12,7 @@; @@ \-49,32 \+50,19 @@; @@ \-88,12 \+76,6 @@  
+Material effect: Moves historical live capture into a task-scoped mutable OPS root and removes direct governed path-proof writing.  
+Risk category: High — OPS-sensitive or evidence-writer behavior  
+Evidence pointer: Original PR | \`diff \--git a/scripts/db/capture\_epic011\_posture.py b/scripts/db/capture\_epic011\_posture.py\` | "Moves historical live capture into a task-scoped mutable OPS root and removes direct governed path-proof writing."
+
+Hunk ID: OPR-072  
+File: \`scripts/ingest/run\_vendor\_ingest.py\`  
+Patch and hunk header: diff \--git a/scripts/ingest/run\_vendor\_ingest.py b/scripts/ingest/run\_vendor\_ingest.py || complete per-file patch; all changed ranges for this path  
+Material effect: Updates the vendor-ingest caller to use an explicit task-scoped parity log rather than the immutable shared history.  
+Risk category: High — OPS-sensitive or evidence-writer behavior  
+Evidence pointer: Original PR | \`diff \--git a/scripts/ingest/run\_vendor\_ingest.py b/scripts/ingest/run\_vendor\_ingest.py\` | "Updates the vendor-ingest caller to use an explicit task-scoped parity log rather than the immutable shared history."
+
+Hunk ID: OPR-073  
+File: \`scripts/ops/admin\_vendor\_qa.py\`  
+Patch and hunk header: diff \--git a/scripts/ops/admin\_vendor\_qa.py b/scripts/ops/admin\_vendor\_qa.py || complete per-file patch; all changed ranges for this path  
+Material effect: Moves admin vendor QA parity output to a dedicated mutable OPS log and uses fail-on-diff.  
+Risk category: High — OPS-sensitive or evidence-writer behavior  
+Evidence pointer: Original PR | \`diff \--git a/scripts/ops/admin\_vendor\_qa.py b/scripts/ops/admin\_vendor\_qa.py\` | "Moves admin vendor QA parity output to a dedicated mutable OPS log and uses fail-on-diff."
+
+Hunk ID: OPR-074  
+File: \`tests/bodygraph/test\_projection.py\`  
+Patch and hunk header: diff \--git a/tests/bodygraph/test\_projection.py b/tests/bodygraph/test\_projection.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds exact-shape, non-mutation, stable-error, vendor/DB convergence, and no-I/O tests for the projection boundary.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/bodygraph/test\_projection.py b/tests/bodygraph/test\_projection.py\` | "Adds exact-shape, non-mutation, stable-error, vendor/DB convergence, and no-I/O tests for the projection boundary."
+
+Hunk ID: OPR-075  
+File: \`tests/evidence/test\_architecture\_snapshot.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_architecture\_snapshot.py b/tests/evidence/test\_architecture\_snapshot.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds deterministic schema/taxonomy, route-discovery, unsafe-pattern, and unknown-fail-closed tests.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_architecture\_snapshot.py b/tests/evidence/test\_architecture\_snapshot.py\` | "Adds deterministic schema/taxonomy, route-discovery, unsafe-pattern, and unknown-fail-closed tests."
+
+Hunk ID: OPR-076  
+File: \`tests/evidence/test\_bodygraph\_policy\_proofs.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_bodygraph\_policy\_proofs.py b/tests/evidence/test\_bodygraph\_policy\_proofs.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds v2 source-invariance, independent-acquisition, schema, negative-receipt, policy, and check-mode tests.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_bodygraph\_policy\_proofs.py b/tests/evidence/test\_bodygraph\_policy\_proofs.py\` | "Adds v2 source-invariance, independent-acquisition, schema, negative-receipt, policy, and check-mode tests."
+
+Hunk ID: OPR-077  
+File: \`tests/evidence/test\_db\_runtime\_posture.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_db\_runtime\_posture.py b/tests/evidence/test\_db\_runtime\_posture.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds DB posture determinism, constraint, search-path, boundary, path-proof ownership, and parity false-PASS tests.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_db\_runtime\_posture.py b/tests/evidence/test\_db\_runtime\_posture.py\` | "Adds DB posture determinism, constraint, search-path, boundary, path-proof ownership, and parity false-PASS tests."
+
+Hunk ID: OPR-078  
+File: \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_env\_matrix\_snapshot\_v3.py b/tests/evidence/test\_env\_matrix\_snapshot\_v3.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adjusts environment snapshot regression expectations for the focused producer split.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_env\_matrix\_snapshot\_v3.py b/tests/evidence/test\_env\_matrix\_snapshot\_v3.py\` | "Adjusts environment snapshot regression expectations for the focused producer split."
+
+Hunk ID: OPR-079  
+File: \`tests/evidence/test\_presenter\_evidence\_ownership.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_presenter\_evidence\_ownership.py b/tests/evidence/test\_presenter\_evidence\_ownership.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds immutable shared-history, dedicated receipt, no-implicit-log, OPS-log, atomicity, and companion-write ownership tests.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_presenter\_evidence\_ownership.py b/tests/evidence/test\_presenter\_evidence\_ownership.py\` | "Adds immutable shared-history, dedicated receipt, no-implicit-log, OPS-log, atomicity, and companion-write ownership tests."
+
+Hunk ID: OPR-080  
+File: \`tests/evidence/test\_release\_bindings.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_release\_bindings.py b/tests/evidence/test\_release\_bindings.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds release-binding integrity, missing/stale/unsorted, premature-summary, and non-writing check tests.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/evidence/test\_release\_bindings.py b/tests/evidence/test\_release\_bindings.py\` | "Adds release-binding integrity, missing/stale/unsorted, premature-summary, and non-writing check tests."
+
+Hunk ID: OPR-081  
+File: \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\`  
+Patch and hunk header: diff \--git a/tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json b/tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the canonical mapped DB-cache representation fixture.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json b/tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\` | "Adds the canonical mapped DB-cache representation fixture."
+
+Hunk ID: OPR-082  
+File: \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\`  
+Patch and hunk header: diff \--git a/tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json b/tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the canonical synthetic normalized input shared by both source acquisitions.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json b/tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\` | "Adds the canonical synthetic normalized input shared by both source acquisitions."
+
+Hunk ID: OPR-083  
+File: \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\`  
+Patch and hunk header: diff \--git a/tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json b/tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the canonical distinct vendor ChartResult representation fixture.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Original PR | \`diff \--git a/tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json b/tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\` | "Adds the canonical distinct vendor ChartResult representation fixture."
+
+Hunk ID: OPR-084  
+File: \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\`  
+Patch and hunk header: diff \--git a/tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json b/tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the immutable four-row shared Presenter-history source with row and output hashes.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json b/tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\` | "Adds the immutable four-row shared Presenter-history source with row and output hashes."
+
+Hunk ID: OPR-085  
+File: \`tools/evidence/generate\_architecture\_snapshot.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_architecture\_snapshot.py b/tools/evidence/generate\_architecture\_snapshot.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the static AST-based architecture analyzer/renderer with closed taxonomy and derived fail-closed verdict.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_architecture\_snapshot.py b/tools/evidence/generate\_architecture\_snapshot.py\` | "Adds the static AST-based architecture analyzer/renderer with closed taxonomy and derived fail-closed verdict."
+
+Hunk ID: OPR-086  
+File: \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_bodygraph\_policy\_proofs.py b/tools/evidence/generate\_bodygraph\_policy\_proofs.py || @@ \-0,0 \+1,636 @@  
+Material effect: Adds the focused BodyGraph source, v2 invariance, policy, metrics, and keys-only log producer/checker.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_bodygraph\_policy\_proofs.py b/tools/evidence/generate\_bodygraph\_policy\_proofs.py\` | "Adds the focused BodyGraph source, v2 invariance, policy, metrics, and keys-only log producer/checker."
+
+Hunk ID: OPR-087  
+File: \`tools/evidence/generate\_db\_bridge\_parity.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_db\_bridge\_parity.py b/tools/evidence/generate\_db\_bridge\_parity.py || complete per-file patch; all changed ranges for this path  
+Material effect: Generalizes bridge evidence, separates fixture/live truth, owns environment evidence, and adds the dedicated Presenter receipt.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_db\_bridge\_parity.py b/tools/evidence/generate\_db\_bridge\_parity.py\` | "Generalizes bridge evidence, separates fixture/live truth, owns environment evidence, and adds the dedicated Presenter receipt."
+
+Hunk ID: OPR-088  
+File: \`tools/evidence/generate\_db\_runtime\_posture.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_db\_runtime\_posture.py b/tools/evidence/generate\_db\_runtime\_posture.py || @@ \-0,0 \+1,101 @@  
+Material effect: Adds the focused offline DB posture producer for DDL, grants, search path, constraints, boundary, and partition posture.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_db\_runtime\_posture.py b/tools/evidence/generate\_db\_runtime\_posture.py\` | "Adds the focused offline DB posture producer for DDL, grants, search path, constraints, boundary, and partition posture."
+
+Hunk ID: OPR-089  
+File: \`tools/evidence/generate\_presenter\_history.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_presenter\_history.py b/tools/evidence/generate\_presenter\_history.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the sole immutable shared Presenter-history producer with exact four-row reconstruction and atomic writes.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_presenter\_history.py b/tools/evidence/generate\_presenter\_history.py\` | "Adds the sole immutable shared Presenter-history producer with exact four-row reconstruction and atomic writes."
+
+Hunk ID: OPR-090  
+File: \`tools/evidence/generate\_rails\_closed\_phase1.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_rails\_closed\_phase1.py b/tools/evidence/generate\_rails\_closed\_phase1.py || complete per-file patch; all changed ranges for this path  
+Material effect: Retires overlapping current evidence ownership from the broad historical generator while preserving compatibility checks.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_rails\_closed\_phase1.py b/tools/evidence/generate\_rails\_closed\_phase1.py\` | "Retires overlapping current evidence ownership from the broad historical generator while preserving compatibility checks."
+
+Hunk ID: OPR-091  
+File: \`tools/evidence/generate\_release\_bindings.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_release\_bindings.py b/tools/evidence/generate\_release\_bindings.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds final-release binding to the v2 source-invariance summary and fails closed on premature evidence.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/generate\_release\_bindings.py b/tools/evidence/generate\_release\_bindings.py\` | "Adds final-release binding to the v2 source-invariance summary and fails closed on premature evidence."
+
+Hunk ID: OPR-092  
+File: \`tools/evidence/update\_evidence\_index.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/update\_evidence\_index.py b/tools/evidence/update\_evidence\_index.py || @@ \-553,24 \+553,6 @@; @@ \-2460,6 \+2442,28 @@; @@ \-2490,6 \+2494,18 @@; @@ \-2910,6 \+2926,8 @@; @@ \-2951,6 \+2969,7 @@  
+Material effect: Migrates PR-04 evidence keys and producer ownership; the remedial PR additionally declares the sole canonical runtime.env\_connectivity row with DEV\_DB\_BRIDGE\_FALLBACK\_OK.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Original PR | \`diff \--git a/tools/evidence/update\_evidence\_index.py b/tools/evidence/update\_evidence\_index.py\` | "Migrates PR-04 evidence keys and producer ownership; the remedial PR additionally declares the sole canonical runtime.env\_connectivity row with DEV\_DB\_BRIDGE\_FALLBACK\_OK."
+
+Remedial PR Material Hunk Ledger
+
+Ledger method: each changed file is assigned one file-scoped material hunk group, every \`@@\` range in that complete per-file patch is covered by that ID, and no hunk is assigned across files. Exact \`@@\` headers are reproduced where separately retrieved; regenerated proof companions are single-file groups.
+
+Hunk ID: RPR-001  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-002  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-003  
+File: \`artifacts/evidence\_index.jsonl\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl b/artifacts/evidence\_index.jsonl || complete per-file patch; all changed ranges for this path  
+Material effect: Replaces the malformed original Mirror with canonical parseable JSONL containing the corrected runtime token row.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/evidence\_index.jsonl b/artifacts/evidence\_index.jsonl\` | "Replaces the malformed original Mirror with canonical parseable JSONL containing the corrected runtime token row."
+
+Hunk ID: RPR-004  
+File: \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.path\_proof.txt b/artifacts/evidence\_index.jsonl.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/evidence\_index.jsonl.path\_proof.txt b/artifacts/evidence\_index.jsonl.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-005  
+File: \`artifacts/evidence\_index.jsonl.sha256\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256 b/artifacts/evidence\_index.jsonl.sha256 || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed checksum after the canonical repair.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/evidence\_index.jsonl.sha256 b/artifacts/evidence\_index.jsonl.sha256\` | "Regenerates the governed checksum after the canonical repair."
+
+Hunk ID: RPR-006  
+File: \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt b/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt b/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-007  
+File: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-008  
+File: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-009  
+File: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-010  
+File: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-011  
+File: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-012  
+File: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-013  
+File: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-014  
+File: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-015  
+File: \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/audit/gates/topology/orientation\_demo.txt.path\_proof.txt b/audit/gates/topology/orientation\_demo.txt.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/audit/gates/topology/orientation\_demo.txt.path\_proof.txt b/audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-016  
+File: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-017  
+File: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-018  
+File: \`docs/evidence/INDEX.json\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json b/docs/evidence/INDEX.json || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the Human Index with one canonical runtime.env\_connectivity row and no retired duplicate keys.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/evidence/INDEX.json b/docs/evidence/INDEX.json\` | "Regenerates the Human Index with one canonical runtime.env\_connectivity row and no retired duplicate keys."
+
+Hunk ID: RPR-019  
+File: \`docs/evidence/INDEX.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json.path\_proof.txt b/docs/evidence/INDEX.json.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/evidence/INDEX.json.path\_proof.txt b/docs/evidence/INDEX.json.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-020  
+File: \`docs/evidence/INDEX.sha256\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256 b/docs/evidence/INDEX.sha256 || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed checksum after the canonical repair.  
+Risk category: High — governed evidence/index/mirror/hash sentinel  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/evidence/INDEX.sha256 b/docs/evidence/INDEX.sha256\` | "Regenerates the governed checksum after the canonical repair."
+
+Hunk ID: RPR-021  
+File: \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256.path\_proof.txt b/docs/evidence/INDEX.sha256.path\_proof.txt || complete per-file patch; all changed ranges for this path  
+Material effect: Regenerates the governed sibling proof after the canonical Mirror/Index repair.  
+Risk category: High — governed evidence/path proof  
+Evidence pointer: Remedial PR | \`diff \--git a/docs/evidence/INDEX.sha256.path\_proof.txt b/docs/evidence/INDEX.sha256.path\_proof.txt\` | "Regenerates the governed sibling proof after the canonical Mirror/Index repair."
+
+Hunk ID: RPR-022  
+File: \`tests/evidence/test\_evidence\_skeleton.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_evidence\_skeleton.py b/tests/evidence/test\_evidence\_skeleton.py || complete per-file patch; all changed ranges for this path  
+Material effect: Adds the remedial regression proving one canonical runtime.env\_connectivity key/path, matching artifact proof label, and matching Mirror token binding.  
+Risk category: High — validator/safety-check coverage  
+Evidence pointer: Remedial PR | \`diff \--git a/tests/evidence/test\_evidence\_skeleton.py b/tests/evidence/test\_evidence\_skeleton.py\` | "Adds the remedial regression proving one canonical runtime.env\_connectivity key/path, matching artifact proof label, and matching Mirror token binding."
+
+Hunk ID: RPR-023  
+File: \`tools/evidence/update\_evidence\_index.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/update\_evidence\_index.py b/tools/evidence/update\_evidence\_index.py || @@ \-577,6 \+577,19 @@; @@ \-2948,6 \+2961,7 @@  
+Material effect: Declares runtime.env\_connectivity as the sole canonical current key and binds DEV\_DB\_BRIDGE\_FALLBACK\_OK.  
+Risk category: High — evidence producer/validator ownership  
+Evidence pointer: Remedial PR | \`diff \--git a/tools/evidence/update\_evidence\_index.py b/tools/evidence/update\_evidence\_index.py\` | "Declares runtime.env\_connectivity as the sole canonical current key and binds DEV\_DB\_BRIDGE\_FALLBACK\_OK."
+
+Net Effective Diff Review
+
+NET ID: NET-001  
+File/artifact: \`artifacts/architecture/architecture\_snapshot.keys\_only.json\`  
+Covered hunks: OPR-001  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/architecture/architecture\_snapshot.keys\_only.json\` | "Adds the governed keys-only architecture snapshot with derived analyzer verdict, closed taxonomy, discovered routes/registrations, and bounded external-I/O symbol inventory."  
+GitHub Repo proof: GitHub Repo | \`artifacts/architecture/architecture\_snapshot.keys\_only.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-002  
+File/artifact: \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\`  
+Covered hunks: OPR-002  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/architecture/architecture\_snapshot.keys\_only.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/architecture/architecture\_snapshot.keys\_only.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-003  
+File/artifact: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Covered hunks: OPR-003 / RPR-001  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-004  
+File/artifact: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Covered hunks: OPR-004 / RPR-002  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/audit/ENDPOINTS\_CATALOG.json.sha256."  
+GitHub Repo proof: GitHub Repo | \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-005  
+File/artifact: \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\`  
+Covered hunks: OPR-005  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\` | "Adds the bounded synthetic DB-resolution receipt for the PR-04 pair evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-006  
+File/artifact: \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\`  
+Covered hunks: OPR-006  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/db\_resolve.epic038\_synthetic.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/db\_resolve.epic038\_synthetic.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-007  
+File/artifact: \`artifacts/bodygraph/keys\_only.logs.sample\`  
+Covered hunks: OPR-007  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/keys\_only.logs.sample\` | "Regenerates BodyGraph policy logs as canonical keys-only evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/keys\_only.logs.sample\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-008  
+File/artifact: \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\`  
+Covered hunks: OPR-008  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/keys\_only.logs.sample."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/keys\_only.logs.sample.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-009  
+File/artifact: \`artifacts/bodygraph/metrics.snapshot.json\`  
+Covered hunks: OPR-009  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/metrics.snapshot.json\` | "Regenerates deterministic BodyGraph refresh metrics bound to policy sample counts."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/metrics.snapshot.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-010  
+File/artifact: \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-010  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/metrics.snapshot.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/metrics.snapshot.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-011  
+File/artifact: \`artifacts/bodygraph/refresh\_policy.snapshot.json\`  
+Covered hunks: OPR-011  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/refresh\_policy.snapshot.json\` | "Regenerates TTL/SWR, rate-limit, and circuit-breaker policy evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/refresh\_policy.snapshot.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-012  
+File/artifact: \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-012  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/refresh\_policy.snapshot.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/refresh\_policy.snapshot.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-013  
+File/artifact: \`artifacts/bodygraph/release\_bindings.json\`  
+Covered hunks: OPR-013  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/release\_bindings.json\` | "Binds release identity to the final BodyGraph selection, v2 source-invariance summary, and refresh-policy artifacts."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/release\_bindings.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-014  
+File/artifact: \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\`  
+Covered hunks: OPR-014  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/release\_bindings.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/release\_bindings.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-015  
+File/artifact: \`artifacts/bodygraph/source\_invariance/ab.json\`  
+Covered hunks: OPR-015  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/ab.json\` | "Adds v2 AB-order independent DB/vendor acquisition evidence with two-run projection and Presenter hashes."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/ab.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-016  
+File/artifact: \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\`  
+Covered hunks: OPR-016  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ab.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/ab.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-017  
+File/artifact: \`artifacts/bodygraph/source\_invariance/ba.json\`  
+Covered hunks: OPR-017  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/ba.json\` | "Adds v2 BA-order independent DB/vendor acquisition evidence with reversed source order."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/ba.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-018  
+File/artifact: \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\`  
+Covered hunks: OPR-018  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/ba.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/ba.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-019  
+File/artifact: \`artifacts/bodygraph/source\_invariance/summary.json\`  
+Covered hunks: OPR-019  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/summary.json\` | "Adds the v2 decisive summary, cross-order/source predicates, and negative divergence receipt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/summary.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-020  
+File/artifact: \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\`  
+Covered hunks: OPR-020  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_invariance/summary.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_invariance/summary.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-021  
+File/artifact: \`artifacts/bodygraph/source\_selection.snapshot.json\`  
+Covered hunks: OPR-021  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_selection.snapshot.json\` | "Regenerates closed-rails auto/db/vendor source-selection evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_selection.snapshot.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-022  
+File/artifact: \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-022  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/source\_selection.snapshot.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/source\_selection.snapshot.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-023  
+File/artifact: \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\`  
+Covered hunks: OPR-023  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\` | "Adds the bounded synthetic vendor-mapping receipt for the PR-04 pair evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-024  
+File/artifact: \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\`  
+Covered hunks: OPR-024  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/bodygraph/vendor\_upsert.epic038\_synthetic.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-025  
+File/artifact: \`artifacts/db/check\_constraints.txt\`  
+Covered hunks: OPR-025  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/db/check\_constraints.txt\` | "Replaces empty posture evidence with deterministic constraint and NOT NULL checks derived from tracked DDL."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/check\_constraints.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-026  
+File/artifact: \`artifacts/db/check\_constraints.txt.path\_proof.txt\`  
+Covered hunks: OPR-026  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/db/check\_constraints.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/check\_constraints.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/check\_constraints.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-027  
+File/artifact: \`artifacts/db/ddl\_fingerprint.json\`  
+Covered hunks: OPR-027  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/db/ddl\_fingerprint.json\` | "Regenerates the offline normalized DDL fingerprint and exact search-path/object posture."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/ddl\_fingerprint.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-028  
+File/artifact: \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\`  
+Covered hunks: OPR-028  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/ddl\_fingerprint.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/ddl\_fingerprint.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-029  
+File/artifact: \`artifacts/db/grants.txt\`  
+Covered hunks: OPR-029  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/db/grants.txt\` | "Records the truthful tracked-DDL grants/default-privilege posture without assuming ideal state."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/grants.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-030  
+File/artifact: \`artifacts/db/grants.txt.path\_proof.txt\`  
+Covered hunks: OPR-030  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/db/grants.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db/grants.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db/grants.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-031  
+File/artifact: \`artifacts/db\_bridge/caps.snapshot.json\`  
+Covered hunks: OPR-031  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/db\_bridge/caps.snapshot.json\` | "Adds deterministic DB-bridge capability evidence."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db\_bridge/caps.snapshot.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-032  
+File/artifact: \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-032  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/caps.snapshot.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db\_bridge/caps.snapshot.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-033  
+File/artifact: \`artifacts/db\_bridge/provider\_parity.proof.json\`  
+Covered hunks: OPR-033  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/db\_bridge/provider\_parity.proof.json\` | "Separates fixture parity PASS from unavailable live-provider parity and preserves non-token proof labels."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db\_bridge/provider\_parity.proof.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-034  
+File/artifact: \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\`  
+Covered hunks: OPR-034  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/db\_bridge/provider\_parity.proof.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/db\_bridge/provider\_parity.proof.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-035  
+File/artifact: \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\`  
+Covered hunks: OPR-035  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/engine/order/abba\_identity.bytes."  
+GitHub Repo proof: GitHub Repo | \`artifacts/engine/order/abba\_identity.bytes.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-036  
+File/artifact: \`artifacts/evidence\_index.jsonl\`  
+Covered hunks: OPR-036 / RPR-003  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/index/mirror/hash sentinel was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: The original malformed Mirror was a blocker; \#355 replaced it with valid canonical JSONL, and the current Mirror parses, sorts, binds proofs, and includes the runtime token row.  
+Evidence pointer(s): Original PR | \`artifacts/evidence\_index.jsonl\` | "Regenerates the Machine Evidence Mirror; the original final head accidentally committed malformed JSONL and the remedial PR replaced it with a parseable canonical fixed point."  
+GitHub Repo proof: GitHub Repo | \`artifacts/evidence\_index.jsonl\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-037  
+File/artifact: \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+Covered hunks: OPR-037 / RPR-004  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/evidence\_index.jsonl.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl."  
+GitHub Repo proof: GitHub Repo | \`artifacts/evidence\_index.jsonl.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-038  
+File/artifact: \`artifacts/evidence\_index.jsonl.sha256\`  
+Covered hunks: OPR-038 / RPR-005  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/index/mirror/hash sentinel was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: The remedial regeneration restored Human/Machine parity, sentinels, and fixed-point coherence; current main retains those bytes.  
+Evidence pointer(s): Original PR | \`artifacts/evidence\_index.jsonl.sha256\` | "Regenerates the Machine Mirror checksum after canonical repair."  
+GitHub Repo proof: GitHub Repo | \`artifacts/evidence\_index.jsonl.sha256\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-039  
+File/artifact: \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+Covered hunks: OPR-039 / RPR-006  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/evidence\_index.jsonl.sha256."  
+GitHub Repo proof: GitHub Repo | \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-040  
+File/artifact: \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\`  
+Covered hunks: OPR-040  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\` | "Adds the dedicated PR-04 direct/bridge Presenter-byte comparison receipt with negative control."  
+GitHub Repo proof: GitHub Repo | \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-041  
+File/artifact: \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\`  
+Covered hunks: OPR-041  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-042  
+File/artifact: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Covered hunks: OPR-042 / RPR-007  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/endpoints\_env\_gate\_proof.log."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-043  
+File/artifact: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Covered hunks: OPR-043 / RPR-008  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/reader\_success\_get\_head\_304.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-044  
+File/artifact: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Covered hunks: OPR-044 / RPR-009  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/success\_304.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_304.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/success\_304.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-045  
+File/artifact: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Covered hunks: OPR-045 / RPR-010  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_encoding\_invariance.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-046  
+File/artifact: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Covered hunks: OPR-046 / RPR-011  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/success\_get.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_get.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/success\_get.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-047  
+File/artifact: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Covered hunks: OPR-047 / RPR-012  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/success\_head.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_head.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/success\_head.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-048  
+File/artifact: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Covered hunks: OPR-048 / RPR-013  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/proofs/success\_writers\_errors.txt."  
+GitHub Repo proof: GitHub Repo | \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-049  
+File/artifact: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-049 / RPR-014  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for artifacts/reader/endpoints\_snapshot.json."  
+GitHub Repo proof: GitHub Repo | \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-050  
+File/artifact: \`audit/gates/topology/orientation\_demo.txt\`  
+Covered hunks: OPR-050  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/artifact was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current governed artifact remains bound through the repaired Human Index/Machine Mirror/path-proof fixed point.  
+Evidence pointer(s): Original PR | \`audit/gates/topology/orientation\_demo.txt\` | "Refreshes topology/orientation evidence after the evidence skeleton changed."  
+GitHub Repo proof: GitHub Repo | \`audit/gates/topology/orientation\_demo.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-051  
+File/artifact: \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+Covered hunks: OPR-051 / RPR-015  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for audit/gates/topology/orientation\_demo.txt."  
+GitHub Repo proof: GitHub Repo | \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-052  
+File/artifact: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Covered hunks: OPR-052 / RPR-016  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json."  
+GitHub Repo proof: GitHub Repo | \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-053  
+File/artifact: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Covered hunks: OPR-053 / RPR-017  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/ENDPOINTS\_CATALOG.json.sha256."  
+GitHub Repo proof: GitHub Repo | \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-054  
+File/artifact: \`docs/evidence/INDEX.json\`  
+Covered hunks: OPR-054 / RPR-018  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/index/mirror/hash sentinel was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: The remedial regeneration restored Human/Machine parity, sentinels, and fixed-point coherence; current main retains those bytes.  
+Evidence pointer(s): Original PR | \`docs/evidence/INDEX.json\` | "Regenerates the Human Evidence Index and, after remediation, retains one canonical runtime.env\_connectivity binding."  
+GitHub Repo proof: GitHub Repo | \`docs/evidence/INDEX.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-055  
+File/artifact: \`docs/evidence/INDEX.json.path\_proof.txt\`  
+Covered hunks: OPR-055 / RPR-019  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`docs/evidence/INDEX.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.json."  
+GitHub Repo proof: GitHub Repo | \`docs/evidence/INDEX.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-056  
+File/artifact: \`docs/evidence/INDEX.sha256\`  
+Covered hunks: OPR-056 / RPR-020  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/index/mirror/hash sentinel was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: The remedial regeneration restored Human/Machine parity, sentinels, and fixed-point coherence; current main retains those bytes.  
+Evidence pointer(s): Original PR | \`docs/evidence/INDEX.sha256\` | "Regenerates the Human Index hash sentinel."  
+GitHub Repo proof: GitHub Repo | \`docs/evidence/INDEX.sha256\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-057  
+File/artifact: \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+Covered hunks: OPR-057 / RPR-021  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`docs/evidence/INDEX.sha256.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for docs/evidence/INDEX.sha256."  
+GitHub Repo proof: GitHub Repo | \`docs/evidence/INDEX.sha256.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-058  
+File/artifact: \`docs/run/RUN\_PROD\_QA.md\`  
+Covered hunks: OPR-058  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: OPS-sensitive runbook behavior was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current file remains at the merged reviewed state and introduces no material post-remediation drift.  
+Evidence pointer(s): Original PR | \`docs/run/RUN\_PROD\_QA.md\` | "Moves mutable operator parity output to a dedicated OPS log and documents fail-on-diff/stdout-only behavior."  
+GitHub Repo proof: GitHub Repo | \`docs/run/RUN\_PROD\_QA.md\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-059  
+File/artifact: \`engine/bodygraph/ingest.py\`  
+Covered hunks: OPR-059  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: contract/interface or error-handling mechanics was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`engine/bodygraph/ingest.py\` | "Makes Presenter parity logging explicit and optional, removing implicit writes to the governed shared Presenter history."  
+GitHub Repo proof: GitHub Repo | \`engine/bodygraph/ingest.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-060  
+File/artifact: \`engine/bodygraph/projection.py\`  
+Covered hunks: OPR-060  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: contract/interface or error-handling mechanics was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`engine/bodygraph/projection.py\` | "Adds the pure source-neutral CanonicalBodyGraph projection boundary with stable value-free errors and unsafe-field rejection."  
+GitHub Repo proof: GitHub Repo | \`engine/bodygraph/projection.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-001.
+
+NET ID: NET-061  
+File/artifact: \`glow\_hdengine.egg-info/SOURCES.txt\`  
+Covered hunks: OPR-061  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: Low  
+High-risk hunk assessment, if applicable: Not applicable.  
+Assessment: Current file remains at the merged reviewed state and introduces no material post-remediation drift.  
+Evidence pointer(s): Original PR | \`glow\_hdengine.egg-info/SOURCES.txt\` | "Updates package source metadata for the added implementation and test files."  
+GitHub Repo proof: GitHub Repo | \`glow\_hdengine.egg-info/SOURCES.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-062  
+File/artifact: \`presenter/json\_canon\_compare.py\`  
+Covered hunks: OPR-062  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: contract/interface or error-handling mechanics was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`presenter/json\_canon\_compare.py\` | "Removes the implicit governed-log default and adds explicit fail-on-diff behavior."  
+GitHub Repo proof: GitHub Repo | \`presenter/json\_canon\_compare.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-063  
+File/artifact: \`schemas/architecture\_snapshot.keys\_only.v1.json\`  
+Covered hunks: OPR-063  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: schema/data model was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current schema is closed and used by focused validation; no later commit altered it.  
+Evidence pointer(s): Original PR | \`schemas/architecture\_snapshot.keys\_only.v1.json\` | "Adds the closed schema for the keys-only architecture snapshot."  
+GitHub Repo proof: GitHub Repo | \`schemas/architecture\_snapshot.keys\_only.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-064  
+File/artifact: \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\`  
+Covered hunks: OPR-064  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/architecture\_snapshot.keys\_only.v1.json."  
+GitHub Repo proof: GitHub Repo | \`schemas/architecture\_snapshot.keys\_only.v1.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-065  
+File/artifact: \`schemas/bodygraph\_source\_invariance.run.v2.json\`  
+Covered hunks: OPR-065  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: schema/data model was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current schema is closed and used by focused validation; no later commit altered it.  
+Evidence pointer(s): Original PR | \`schemas/bodygraph\_source\_invariance.run.v2.json\` | "Adds the closed v2 per-order source-invariance run schema."  
+GitHub Repo proof: GitHub Repo | \`schemas/bodygraph\_source\_invariance.run.v2.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-066  
+File/artifact: \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\`  
+Covered hunks: OPR-066  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.run.v2.json."  
+GitHub Repo proof: GitHub Repo | \`schemas/bodygraph\_source\_invariance.run.v2.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-067  
+File/artifact: \`schemas/bodygraph\_source\_invariance.summary.v2.json\`  
+Covered hunks: OPR-067  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: schema/data model was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current schema is closed and used by focused validation; no later commit altered it.  
+Evidence pointer(s): Original PR | \`schemas/bodygraph\_source\_invariance.summary.v2.json\` | "Adds the closed v2 source-invariance summary and negative-receipt schema."  
+GitHub Repo proof: GitHub Repo | \`schemas/bodygraph\_source\_invariance.summary.v2.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-068  
+File/artifact: \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\`  
+Covered hunks: OPR-068  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/bodygraph\_source\_invariance.summary.v2.json."  
+GitHub Repo proof: GitHub Repo | \`schemas/bodygraph\_source\_invariance.summary.v2.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-069  
+File/artifact: \`schemas/presenter\_db\_bridge\_compare.v1.json\`  
+Covered hunks: OPR-069  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: schema/data model was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current schema is closed and used by focused validation; no later commit altered it.  
+Evidence pointer(s): Original PR | \`schemas/presenter\_db\_bridge\_compare.v1.json\` | "Adds the closed dedicated PR-04 Presenter comparison schema."  
+GitHub Repo proof: GitHub Repo | \`schemas/presenter\_db\_bridge\_compare.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-070  
+File/artifact: \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\`  
+Covered hunks: OPR-070  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: governed evidence/path proof was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current proof is updater-generated and was included in the remedial fixed-point regeneration where affected; no later commit changed it.  
+Evidence pointer(s): Original PR | \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\` | "Creates or refreshes the updater-owned sibling path proof for schemas/presenter\_db\_bridge\_compare.v1.json."  
+GitHub Repo proof: GitHub Repo | \`schemas/presenter\_db\_bridge\_compare.v1.json.path\_proof.txt\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-071  
+File/artifact: \`scripts/db/capture\_epic011\_posture.py\`  
+Covered hunks: OPR-071  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: OPS-sensitive or evidence-writer behavior was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`scripts/db/capture\_epic011\_posture.py\` | "Moves historical live capture into a task-scoped mutable OPS root and removes direct governed path-proof writing."  
+GitHub Repo proof: GitHub Repo | \`scripts/db/capture\_epic011\_posture.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-072  
+File/artifact: \`scripts/ingest/run\_vendor\_ingest.py\`  
+Covered hunks: OPR-072  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: OPS-sensitive or evidence-writer behavior was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`scripts/ingest/run\_vendor\_ingest.py\` | "Updates the vendor-ingest caller to use an explicit task-scoped parity log rather than the immutable shared history."  
+GitHub Repo proof: GitHub Repo | \`scripts/ingest/run\_vendor\_ingest.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-073  
+File/artifact: \`scripts/ops/admin\_vendor\_qa.py\`  
+Covered hunks: OPR-073  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: OPS-sensitive or evidence-writer behavior was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`scripts/ops/admin\_vendor\_qa.py\` | "Moves admin vendor QA parity output to a dedicated mutable OPS log and uses fail-on-diff."  
+GitHub Repo proof: GitHub Repo | \`scripts/ops/admin\_vendor\_qa.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-074  
+File/artifact: \`tests/bodygraph/test\_projection.py\`  
+Covered hunks: OPR-074  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/bodygraph/test\_projection.py\` | "Adds exact-shape, non-mutation, stable-error, vendor/DB convergence, and no-I/O tests for the projection boundary."  
+GitHub Repo proof: GitHub Repo | \`tests/bodygraph/test\_projection.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-075  
+File/artifact: \`tests/evidence/test\_architecture\_snapshot.py\`  
+Covered hunks: OPR-075  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_architecture\_snapshot.py\` | "Adds deterministic schema/taxonomy, route-discovery, unsafe-pattern, and unknown-fail-closed tests."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_architecture\_snapshot.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-076  
+File/artifact: \`tests/evidence/test\_bodygraph\_policy\_proofs.py\`  
+Covered hunks: OPR-076  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_bodygraph\_policy\_proofs.py\` | "Adds v2 source-invariance, independent-acquisition, schema, negative-receipt, policy, and check-mode tests."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_bodygraph\_policy\_proofs.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-077  
+File/artifact: \`tests/evidence/test\_db\_runtime\_posture.py\`  
+Covered hunks: OPR-077  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_db\_runtime\_posture.py\` | "Adds DB posture determinism, constraint, search-path, boundary, path-proof ownership, and parity false-PASS tests."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_db\_runtime\_posture.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-078  
+File/artifact: \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\`  
+Covered hunks: OPR-078  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\` | "Adjusts environment snapshot regression expectations for the focused producer split."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_env\_matrix\_snapshot\_v3.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-079  
+File/artifact: \`tests/evidence/test\_presenter\_evidence\_ownership.py\`  
+Covered hunks: OPR-079  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_presenter\_evidence\_ownership.py\` | "Adds immutable shared-history, dedicated receipt, no-implicit-log, OPS-log, atomicity, and companion-write ownership tests."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_presenter\_evidence\_ownership.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-080  
+File/artifact: \`tests/evidence/test\_release\_bindings.py\`  
+Covered hunks: OPR-080  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/evidence/test\_release\_bindings.py\` | "Adds release-binding integrity, missing/stale/unsorted, premature-summary, and non-writing check tests."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_release\_bindings.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-081  
+File/artifact: \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\`  
+Covered hunks: OPR-081  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\` | "Adds the canonical mapped DB-cache representation fixture."  
+GitHub Repo proof: GitHub Repo | \`tests/fixtures/bodygraph/source\_invariance/db\_cached\_payload.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-082  
+File/artifact: \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\`  
+Covered hunks: OPR-082  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\` | "Adds the canonical synthetic normalized input shared by both source acquisitions."  
+GitHub Repo proof: GitHub Repo | \`tests/fixtures/bodygraph/source\_invariance/normalized\_input.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-083  
+File/artifact: \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\`  
+Covered hunks: OPR-083  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current test remains in main and the remedial green workflow exercised the affected evidence/test suites.  
+Evidence pointer(s): Original PR | \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\` | "Adds the canonical distinct vendor ChartResult representation fixture."  
+GitHub Repo proof: GitHub Repo | \`tests/fixtures/bodygraph/source\_invariance/vendor\_chart\_result.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002.
+
+NET ID: NET-084  
+File/artifact: \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\`  
+Covered hunks: OPR-084  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\` | "Adds the immutable four-row shared Presenter-history source with row and output hashes."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/fixtures/presenter/json\_canon\_compare.history.v1.json\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-085  
+File/artifact: \`tools/evidence/generate\_architecture\_snapshot.py\`  
+Covered hunks: OPR-085  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_architecture\_snapshot.py\` | "Adds the static AST-based architecture analyzer/renderer with closed taxonomy and derived fail-closed verdict."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_architecture\_snapshot.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-086  
+File/artifact: \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\`  
+Covered hunks: OPR-086  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\` | "Adds the focused BodyGraph source, v2 invariance, policy, metrics, and keys-only log producer/checker."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_bodygraph\_policy\_proofs.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-087  
+File/artifact: \`tools/evidence/generate\_db\_bridge\_parity.py\`  
+Covered hunks: OPR-087  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_db\_bridge\_parity.py\` | "Generalizes bridge evidence, separates fixture/live truth, owns environment evidence, and adds the dedicated Presenter receipt."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_db\_bridge\_parity.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-088  
+File/artifact: \`tools/evidence/generate\_db\_runtime\_posture.py\`  
+Covered hunks: OPR-088  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_db\_runtime\_posture.py\` | "Adds the focused offline DB posture producer for DDL, grants, search path, constraints, boundary, and partition posture."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_db\_runtime\_posture.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-089  
+File/artifact: \`tools/evidence/generate\_presenter\_history.py\`  
+Covered hunks: OPR-089  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_presenter\_history.py\` | "Adds the sole immutable shared Presenter-history producer with exact four-row reconstruction and atomic writes."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_presenter\_history.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-090  
+File/artifact: \`tools/evidence/generate\_rails\_closed\_phase1.py\`  
+Covered hunks: OPR-090  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_rails\_closed\_phase1.py\` | "Retires overlapping current evidence ownership from the broad historical generator while preserving compatibility checks."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_rails\_closed\_phase1.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-091  
+File/artifact: \`tools/evidence/generate\_release\_bindings.py\`  
+Covered hunks: OPR-091  
+Combined merged state: Original PR state retained through the Remedial merge; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Current implementation remains at the merged reviewed state; direct inspection shows the approved fail-closed, closed-rails, and ownership behavior.  
+Evidence pointer(s): Original PR | \`tools/evidence/generate\_release\_bindings.py\` | "Adds final-release binding to the v2 source-invariance summary and fails closed on premature evidence."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/generate\_release\_bindings.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+NET ID: NET-092  
+File/artifact: \`tools/evidence/update\_evidence\_index.py\`  
+Covered hunks: OPR-092 / RPR-023  
+Combined merged state: Original state plus the Remedial correction/regeneration; no complete reversion.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: evidence producer/validator ownership was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: Original ownership migration plus remedial explicit runtime registry now yield one canonical current key and token binding, covered by regression test.  
+Evidence pointer(s): Original PR | \`tools/evidence/update\_evidence\_index.py\` | "Migrates PR-04 evidence keys and producer ownership; the remedial PR additionally declares the sole canonical runtime.env\_connectivity row with DEV\_DB\_BRIDGE\_FALLBACK\_OK."  
+GitHub Repo proof: GitHub Repo | \`tools/evidence/update\_evidence\_index.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003; PF12 — HDE-Schemas & Artifacts, §8.3.
+
+NET ID: NET-093  
+File/artifact: \`tests/evidence/test\_evidence\_skeleton.py\`  
+Covered hunks: RPR-022  
+Combined merged state: Added by the Remedial PR as targeted regression coverage.  
+Current final repo state: Current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` matches the combined merged state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: validator/safety-check coverage was inspected against current bytes, owner, tests, and governed bindings.  
+Assessment: The new regression closes the exact missing-token/duplicate-key failure mode.  
+Evidence pointer(s): Remedial PR | \`tests/evidence/test\_evidence\_skeleton.py\` | "Adds the remedial regression proving one canonical runtime.env\_connectivity key/path, matching artifact proof label, and matching Mirror token binding."  
+GitHub Repo proof: GitHub Repo | \`tests/evidence/test\_evidence\_skeleton.py\` at current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | "path accounted for in current lifecycle state and fixed-point review"  
+PF reference, if relied on: None.
+
+Validation & Evidence Review
+
+VAL-001  
+Purpose: Original hosted workflow health  
+Source: Original PR  
+Check/workflow/artifact/method: GitHub Actions run 2408 / final Original head  
+Result: FAIL  
+Observation: Five of seven jobs failed because the committed Machine Mirror was malformed; token binding also remained absent.  
+Evidence pointer: Original PR | final workflow matrix | \`artifacts/evidence\_index.jsonl\` JSON parse failure  
+Why it matters: This was a material Original gap and required the Remedial PR.
+
+VAL-002  
+Purpose: Remedial local generation and focused/broad validation  
+Source: Remedial PR  
+Check/workflow/artifact/method: Producer sequence, focused tests, evidence tests, updater/orientation/path/hash/LF checks  
+Result: PASS  
+Observation: The Remedial PR records successful producer regeneration, focused and broad tests, and fixed-point checks.  
+Evidence pointer: Remedial PR | PR body Testing | listed commands completed locally  
+Why it matters: Provides direct correction provenance but is not the sole acceptance basis.
+
+VAL-003  
+Purpose: Remedial hosted workflow  
+Source: Extra Evidence  
+Check/workflow/artifact/method: GitHub Actions run 2413 / ID 29464159150  
+Result: PASS  
+Observation: All seven jobs passed at the Remedial head, the first green combined lifecycle state.  
+Evidence pointer: Extra Evidence | §12.3 Green corrective CI | seven-job PASS matrix  
+Why it matters: Confirms platform execution after the two Original blockers were repaired.
+
+VAL-004  
+Purpose: BodyGraph v2 source invariance  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Producer, run/summary schemas, AB/BA/summary artifacts, focused tests  
+Result: PASS  
+Observation: Independent DB/vendor representations converge through \`project\_bodygraph()\` and the shared Presenter; all summary predicates and the negative receipt pass.  
+Evidence pointer: GitHub Repo | \`artifacts/bodygraph/source\_invariance/summary.json\` | all predicates true; top\_level\_pass true  
+Why it matters: Proves the approved source-neutral and v2 evidence decisions without persistence or live vendor claims.
+
+VAL-005  
+Purpose: DB runtime posture  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Offline producer, constraints, search path, grants, boundary proof, focused tests  
+Result: PASS  
+Observation: Tracked DDL yields deterministic fingerprint, eight meaningful constraint rows, exact \`hde, public\`, truthful grants posture, and two read-only boundary views.  
+Evidence pointer: GitHub Repo | \`artifacts/db/check\_constraints.txt\`; \`artifacts/db/boundary\_view.readonly.proof.txt\` | deterministic PASS rows and non-updatable views  
+Why it matters: Satisfies the PR-local D8 harness without privileged DB I/O.
+
+VAL-006  
+Purpose: DB bridge truthfulness and Presenter parity  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Fixture parity, live-unavailable rows, dedicated receipt, negative control  
+Result: PASS  
+Observation: Fixture parity passes, live parity remains unavailable/not claimed, and the dedicated direct/bridge Presenter receipt passes with separate acquisition IDs and negative divergence control.  
+Evidence pointer: GitHub Repo | \`artifacts/db\_bridge/provider\_parity.proof.json\`; \`artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json\`  
+Why it matters: Prevents fixture evidence from masquerading as live provider parity.
+
+VAL-007  
+Purpose: Architecture snapshot  
+Source: GitHub Repo  
+Check/workflow/artifact/method: AST analyzer, closed taxonomy/schema, current snapshot, focused tests  
+Result: PASS  
+Observation: Route discovery covers decorators and registrations; unknown or forbidden findings derive FAIL; current snapshot is keys-only with zero unknowns.  
+Evidence pointer: GitHub Repo | \`tools/evidence/generate\_architecture\_snapshot.py\`; \`tests/evidence/test\_architecture\_snapshot.py\`  
+Why it matters: Supports fail-closed architecture posture without creating a public contract.
+
+VAL-008  
+Purpose: Evidence skeleton and runtime token binding  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Human Index, Mirror, sentinels, path proofs, updater, regression test  
+Result: PASS  
+Observation: Current Mirror is parseable and canonical; exactly one runtime.env\_connectivity key/path carries DEV\_DB\_BRIDGE\_FALLBACK\_OK and matches the artifact proof label.  
+Evidence pointer: GitHub Repo | \`artifacts/evidence\_index.jsonl\`; \`tests/evidence/test\_evidence\_skeleton.py\`  
+Why it matters: Closes both final Original blockers.
+
+VAL-009  
+Purpose: Presenter writer ownership and history reconstruction  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Shared-history producer, explicit diagnostic logging, dedicated receipt, ownership tests  
+Result: PASS  
+Observation: The immutable four-row history has exact length/hash and one owner; mutable callers use explicit dedicated logs; the bridge producer does not modify shared history.  
+Evidence pointer: GitHub Repo | \`tools/evidence/generate\_presenter\_history.py\`; \`tests/evidence/test\_presenter\_evidence\_ownership.py\`  
+Why it matters: Closes the transitive writer collision and preserves historical bytes.
+
+VAL-010  
+Purpose: Closed-rails and nonclaim posture  
+Source: Implementation Doc / GitHub Repo / Extra Evidence  
+Check/workflow/artifact/method: SAFE\_MODE=1, ALLOW\_NETWORK=0 fixture/mocked producers and current evidence  
+Result: PASS  
+Observation: No live DB, bridge, or vendor call is claimed or required in the PR; live OPS and status/acceptance axes remain explicit follow-up.  
+Evidence pointer: Implementation Doc | PR-04 Rails posture; Extra Evidence | §13 remaining nonclaims  
+Why it matters: Preserves slice and operational boundaries.
+
+Requirement Satisfaction Crosswalk
+
+Requirement ID: REQ-001  
+Requirement: Provide a pure source-neutral BodyGraph convergence boundary with stable value-free failure behavior.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | projection patch; GitHub Repo | \`engine/bodygraph/projection.py\`  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.5  
+Notes, optional: Approved Addendum 2.4 ADR-CANON-001 governs this extension.
+
+Requirement ID: REQ-002  
+Requirement: Produce the in-place v2 DB/vendor source-invariance AB/BA/summary family with independent acquisitions, same normalized input, shared Presenter bytes, two-run stability, closed schemas, and negative receipt.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | v2 producer/schemas/artifacts/tests; GitHub Repo | current summary top\_level\_pass true  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.5; HDE-DIST001.7  
+Notes, optional: Approved Addendum 2.4 ADR-CANON-002 governs this amendment.
+
+Requirement ID: REQ-003  
+Requirement: Establish unique focused producer ownership, retire overlapping broad/current writers, reconstruct immutable shared Presenter history exactly, and use a dedicated PR-04 receipt.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | focused producers, history source/producer, caller changes, ownership tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.9; HDE-DIST001.10  
+Notes, optional: Approved Addendum 2.4 ADR-CANON-003 governs this amendment.
+
+Requirement ID: REQ-004  
+Requirement: Complete deterministic DB runtime posture for DDL fingerprint, grants, exact search path, meaningful constraints, read-only boundary views, and partition posture without live DB access.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): GitHub Repo | DB runtime producer, constraints artifact, boundary proof, focused tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.4  
+Notes, optional: Current posture is captured truthfully; no ideal-state or live-DB claim is inferred.
+
+Requirement ID: REQ-005  
+Requirement: Generalize DB-bridge evidence, preserve fixture parity, prevent false live PASS for missing/skipped/unavailable/error rows, and capture environment connectivity and typed non-dev failure.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): GitHub Repo | bridge producer and provider parity/current environment artifacts  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.9  
+Notes, optional: OPS-01 live observations remain separate.
+
+Requirement ID: REQ-006  
+Requirement: Complete BodyGraph source selection and policy proof outputs for closed-rails refusal, TTL/SWR, rate limit, circuit breaker, metrics, and keys-only logs.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): GitHub Repo | BodyGraph producer/artifacts/tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.5  
+Notes, optional: BG labels remain non-token proof obligations.
+
+Requirement ID: REQ-007  
+Requirement: Produce a keys-only architecture snapshot with analyzer/renderer separation, closed taxonomy, route/registration discovery, and fail-closed unknown behavior.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): GitHub Repo | architecture producer/schema/artifact/tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.10  
+Notes, optional: No public contract or route was created.
+
+Requirement ID: REQ-008  
+Requirement: Bind release identity to the final source selection, v2 source-invariance summary, and refresh policy, and fail closed on stale/missing/premature inputs.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): GitHub Repo | release-binding producer/artifact/tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST002.5  
+Notes, optional: No PF09 status movement follows automatically.
+
+Requirement ID: REQ-009  
+Requirement: Maintain updater-only ownership of path proofs, Human Index, hash sentinel, Machine Mirror, Mirror checksum, and orientation fixed point.  
+Original PR status: Not satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | malformed Mirror at final head; Remedial PR | canonical regeneration; GitHub Repo | current fixed point  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.4; HDE-DIST001.5; HDE-DIST001.9; HDE-DIST001.10  
+Notes, optional: The Remedial PR closes the Original evidence-skeleton failure.
+
+Requirement ID: REQ-010  
+Requirement: Bind the canonical runtime environment-connectivity artifact to DEV\_DB\_BRIDGE\_FALLBACK\_OK without duplicate current keys.  
+Original PR status: Not satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Remedial PR | updater registry and regression; GitHub Repo | current Mirror row/artifact proof label  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.9  
+Notes, optional: The Remedial PR closes the dropped-token failure.
+
+Requirement ID: REQ-011  
+Requirement: Run PR mechanics under closed rails with deterministic locale/time pins, no live DB/bridge/vendor calls, and no secrets/raw payloads.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Implementation Doc | Rails posture; GitHub Repo | producer inputs/artifact posture/tests  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.4; HDE-DIST001.5; HDE-DIST001.9; HDE-DIST001.10  
+Notes, optional: Live evidence remains an OPS axis.
+
+Requirement ID: REQ-012  
+Requirement: Preserve public Reader/CLI/HTTP contracts, persistence boundaries, downstream PR ownership, and historical evidence without reopening or closing later work.  
+Original PR status: Satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | bounded diff and nonclaims; Extra Evidence | lifecycle and nonclaims  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.7; HDE-DIST001.11; HDE-DIST002.5  
+Notes, optional: No mapped-cache persistence, public-route, deployment, or closeout claim was introduced.
+
+Requirement ID: REQ-013  
+Requirement: Provide focused and affected regression validation, deterministic two-run/check-mode behavior, and hosted evidence sufficient to review the final current state.  
+Original PR status: Not satisfied  
+After remediation: Satisfied  
+Evidence pointer(s): Original PR | red final workflow; Remedial PR/Extra Evidence | local and seven-job hosted PASS  
+GitHub Repo proof, if current state matters: GitHub Repo | current \`main@3936317d8078ea1407d7ef1b9d084f891a0ec2bc\` | current files and governed bindings inspected.  
+PF09 task/subtask IDs, if proven: HDE-DIST001.4; HDE-DIST001.5; HDE-DIST001.9; HDE-DIST001.10  
+Notes, optional: Current validation is sufficient for this bounded post-merge implementation review, not formal QA acceptance.
+
+RCA
+
+A) Bug/Failure statement
+
+The Original PR merged with a malformed/truncated Machine Evidence Mirror and without the canonical \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\` binding on \`artifacts/runtime/env\_connectivity.snapshot.json\`; five hosted jobs failed at the final Original head.
+
+B) Root cause(s)
+
+\- The broad evidence ownership migration regenerated and re-keyed many governed surfaces, but the final Mirror bytes were committed in an incomplete JSONL state.  
+\- Duplicate PR-specific/current keys were retired without simultaneously declaring the complete canonical replacement row and its token metadata.  
+\- Exact regression coverage for one canonical runtime key/path plus matching artifact/Mirror token binding was absent until the Remedial PR.
+
+C) Fix across PRs
+
+\- The Original PR delivered the approved architecture and focused producer split but left the two final evidence defects.  
+\- The Remedial PR added \`RUNTIME\_PRIMARY\_ARTIFACTS\`, inserted it into Human Index aggregation, added the exact binding regression, and canonically regenerated the Index, Mirror, checksums, and dependent proofs.
+
+D) Fix verification
+
+\- Current \`artifacts/evidence\_index.jsonl\` is parseable canonical JSONL and contains one \`runtime.env\_connectivity\` row with \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\`.  
+\- Current \`tests/evidence/test\_evidence\_skeleton.py\` asserts uniqueness and artifact/Mirror token coherence.  
+\- Remedial hosted workflow run 2413 passed all seven jobs, and no later commit altered the reviewed state.  
+\- Evidence pointer: Remedial PR | updater/test patches and governed regeneration | exact defects closed.
+
+PF09 Impact & Status Posture
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.4  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.4\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.4\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.4 — DB posture & runtime checks | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-025–NET-030, NET-077, NET-088
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.5  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.5\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.5\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.5 — BodyGraph mechanics gates | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-005–NET-24, NET-060, NET-074, NET-076, NET-081–NET-83, NET-086
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.7  
+Current PF09 status: Done  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.7\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.7\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.7 — Vendor ingest source policy & proofs | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-059, NET-072, NET-081–NET-83
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.9  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.9\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.9\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-031–NET-034, NET-040–NET-041, NET-070, NET-073, NET-079, NET-087, NET-092–NET-093
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.10  
+Current PF09 status: Partial  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.10\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.10\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.10 — Architecture snapshot (keys-only) evidence | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-001–NET-002, NET-063–NET-064, NET-075, NET-085
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST001  
+PF09 subtask ID(s): HDE-DIST001.11  
+Current PF09 status: Optional  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST001.11\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST001.11\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-060, NET-086; no persistence work moved into PR-04
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation  
+PF09 task ID: HDE-DIST002  
+PF09 subtask ID(s): HDE-DIST002.5  
+Current PF09 status: Not done  
+Status recommendation: No status change recommended  
+Why supported: Build Notes Addendum 2.4 explicitly records \`HDE-DIST002.5\` with no status movement; this review accepts the merged PR lifecycle only and preserves separate status drainage.  
+Evidence pointer(s): PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences | \`HDE-DIST002.5\` | current status and \`No status change\`.  
+GitHub Repo proof, if current state matters: GitHub Repo | current PR-04 implementation/evidence loci linked below | merged mechanics are present without a status write.  
+PF proof excerpt(s): PF09.6 — HDE-Build-Checklist-Distillation | §Subtask HDE-DIST002.5 — Release bindings evidence & indexing | current row inspected; PF10 preserves its recorded status.  
+Linked NET/Finding IDs: NET-013–NET-014, NET-080, NET-091
+
+Findings
+
+F-001  
+Related item: VAL-001 / RCA / Original PR  
+Severity: Note  
+Observation: The Original PR merged while its final hosted workflow was red and two evidence defects were known.  
+Why it matters: The lifecycle required a separate Remedial PR; the current acceptable decision depends on the combined change set, not on the Original PR alone.  
+Evidence: Extra Evidence | §§1, 8.8, 12.2–12.3 | Original red state and Remedial closure.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: No status change recommended.  
+PF reference, if relied on: None.
+
+F-002  
+Related item: PF09 / Other  
+Severity: Note  
+Observation: Permanent PF02/PF12/PF14/PF09.6/PF27 drainage remains outstanding after the approved Addendum 2.4 decisions.  
+Why it matters: The permanent homes should later reflect the approved architecture and evidence ownership, but documentation drainage alone is not a post-merge blocker.  
+Evidence: PF10 — HDE Build Notes, Addendum 2.4, Permanent documentation drainage and order.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: No status change recommended.  
+PF reference, if relied on: PF06 — Epic Process Guide, documentation drainage is not an execution or closeout gate.
+
+Evidence Print (PASS PROOF; merged work)
+
+A) Acceptance coverage evidence
+
+\- Evidence pointer: Implementation Doc | PR-04 Intent, D8–D11, Implementation requirements, Rails posture, and pass condition | deterministic DB/BodyGraph/bridge/architecture harness scope.  
+\- Evidence pointer: PF10 — HDE Build Notes, Addendum 2.4 | ADR-CANON-001/002/003 | approved projection, v2 invariance, focused ownership, dedicated receipt, migration, and nonclaims.  
+\- GitHub Repo proof: current projection, focused producers, schemas, artifacts, tests, and governed bindings are present at \`main@3936317...\`.
+
+B) Original gaps closed
+
+\- Malformed Mirror: closed by canonical regeneration; current JSONL is parseable and fixed-point bound.  
+\- Missing runtime token binding: closed by one explicit canonical registry row, matching artifact proof label, Mirror token, and regression test.  
+\- Evidence pointer: Remedial PR | updater/test/index/mirror changes | both final Original blockers repaired.
+
+C) Evidence and verification posture
+
+\- Human Index, hash sentinel, Machine Mirror, Mirror checksum, sibling proofs, and orientation evidence were regenerated through canonical tooling.  
+\- Source-invariance and dedicated Presenter receipts carry decisive derived predicates and negative controls.  
+\- DB and architecture evidence are deterministic, closed-rails, bounded, and secret-free.
+
+D) Token/gate evidence, only for explicitly claimed tokens or gates
+
+\- \`DEV\_DB\_BRIDGE\_FALLBACK\_OK\`: current artifact proof label and canonical Mirror token binding agree; the PR does not claim a broader token-completion sweep.  
+\- Evidence-skeleton tokens remain governed at the skeleton level; this review verifies coherent artifacts but does not perform formal acceptance adjudication.
+
+E) Test/CI proof
+
+\- Original final workflow: FAIL, correctly treated as an Original gap.  
+\- Remedial local producer/test/fixed-point suite: PASS as recorded in the Remedial PR.  
+\- Remedial hosted workflow run 2413: PASS for all seven jobs, as recorded in Extra Evidence.  
+\- Current-file inspection independently confirms the decisive repaired behaviors; CI is not used alone.
+
+F) Artifact and evidence outputs, including governed path, index, mirror, manifest, or path-proof posture when relevant
+
+\- BodyGraph: v2 AB, BA, summary, schemas, source-selection, policy, metrics, keys-only log, synthetic pair receipts, release binding, and sibling proofs.  
+\- DB/bridge: DDL fingerprint, grants, constraints, read-only boundary proof, caps/parity, environment-connectivity binding, non-dev failure posture, dedicated Presenter receipt/schema, and sibling proofs.  
+\- Architecture: keys-only snapshot/schema and sibling proof.  
+\- Evidence skeleton: Human Index/sentinel, Machine Mirror/checksum, proof anchors, and orientation fixed point.
+
+Doc Delta Candidates (PF-Canon only)
+
+DDC-001  
+Doc: PF02 — HDE Architecture  
+Section: §6.2 Vendor seam (concept only)  
+Canon basis: CANON SILENCE  
+Impacted PF09 task/subtask IDs: HDE-DIST001.5; HDE-DIST001.11  
+PF09 status action: None  
+Delta: Add the pure source-neutral \`engine/bodygraph/projection.py\` convergence boundary, \`CanonicalBodyGraph\`, \`BodyGraphFields\`, stable projection errors, and its no-I/O/no-persistence/public-byte boundary.  
+Why: Permanent architecture currently normalizes vendor responses but does not name the approved projection API; Addendum 2.4 governs until drained.  
+Evidence pointer: PF02 full-document negative search for \`CanonicalBodyGraph\`, \`project\_bodygraph\`, and \`engine/bodygraph/projection.py\`; case-sensitive; 0 hits.  
+GitHub Repo proof, if current state matters: GitHub Repo | \`engine/bodygraph/projection.py\` | current implementation exists and is covered by focused tests.  
+Canon proof excerpt, unless Canon basis is CANON SILENCE:  
+Negative-search proof: PF02 full-document negative search for \`CanonicalBodyGraph\`, \`project\_bodygraph\`, and \`engine/bodygraph/projection.py\`; case-sensitive; 0 hits.
+
+DDC-002  
+Doc: PF12 — HDE-Schemas & Artifacts  
+Section: §8.6.3.9 SBOM, registry, configuration, and BodyGraph evidence; Appendix C — Governed artifact record types (records-only)  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task/subtask IDs: HDE-DIST001.5; HDE-DIST001.9; HDE-DIST002.5  
+PF09 status action: None  
+Delta: Drain the in-place source-invariance v2 run/summary schemas and paths, dedicated PR-04 Presenter receipt/schema/key, canonical runtime.env\_connectivity key/token binding, and retired duplicate-key migration.  
+Why: The current governed repo families are authoritative under Addendum 2.4 but the permanent artifact catalog does not yet describe the complete v2/current-key result.  
+Evidence pointer: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002/003 and permanent drainage table.  
+GitHub Repo proof, if current state matters: GitHub Repo | current schemas, artifacts, updater registry, Human Index, and Mirror | final paths and keys verified.  
+Canon proof excerpt, unless Canon basis is CANON SILENCE:  
+"Human Evidence Index: Path: docs/evidence/INDEX.json."  
+"Must maintain 1:1 parity with the Machine Evidence Mirror."  
+"Each record MUST include fields sufficient for proof and reproducibility."
+
+DDC-003  
+Doc: PF14 — HDE-Mechanics Guide  
+Section: §1.3.1 Evidence jobs (single-writer tools); §Source invariance (single presenter/emitter)  
+Canon basis: CANON MISMATCH  
+Impacted PF09 task/subtask IDs: HDE-DIST001.5; HDE-DIST001.7; HDE-DIST001.9; HDE-DIST001.10  
+PF09 status action: None  
+Delta: Drain focused producer ownership, immutable four-row Presenter history reconstruction, dedicated PR-04 receipt ownership, explicit mutable diagnostic logs, and v2 independently acquired source-invariance negative controls.  
+Why: The merged mechanics refine and make executable the permanent single-writer/source-invariance rules.  
+Evidence pointer: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-002/003.  
+GitHub Repo proof, if current state matters: GitHub Repo | focused producers and \`tests/evidence/test\_presenter\_evidence\_ownership.py\` | all-order/fixed-point ownership verified.  
+Canon proof excerpt, unless Canon basis is CANON SILENCE:  
+"An evidence producer MUST have a single, bounded primary write set."  
+"For the same normalized inputs, DB-sourced and vendor-sourced bodies MUST be byte-identical when emitted via the shared presenter/emitter."
+
+DDC-004  
+Doc: PF09.6 — HDE-Build-Checklist-Distillation  
+Section: §Subtask HDE-DIST001.4; §Subtask HDE-DIST001.5; §Subtask HDE-DIST001.7; §Subtask HDE-DIST001.9; §Subtask HDE-DIST001.10; §Subtask HDE-DIST001.11; §Subtask HDE-DIST002.5  
+Canon basis: PF09 STATUS SUPPORT  
+Impacted PF09 task/subtask IDs: HDE-DIST001.4; HDE-DIST001.5; HDE-DIST001.7; HDE-DIST001.9; HDE-DIST001.10; HDE-DIST001.11; HDE-DIST002.5  
+PF09 status action: No status change recommended  
+Delta: Drain exact path, proof, dependency, focused-owner, projection, and dedicated-receipt wording while preserving every recorded status.  
+Why: Addendum 2.4 expressly mandates wording/evidence drainage only and no status movement from this lifecycle.  
+Evidence pointer: PF10 — HDE Build Notes, Addendum 2.4, PF09.6 consequences.  
+GitHub Repo proof, if current state matters: GitHub Repo | current implementation/evidence mapped in this review | mechanics present; no PF09 file edit occurred.  
+Canon proof excerpt, unless Canon basis is CANON SILENCE:  
+"PF09 tracks only tasks and subtasks that require dev or ops engagement."  
+"Evidence is recorded only as acceptance artifacts for in-scope tasks."
+
+DDC-005  
+Doc: PF27 — Plan Templates  
+Section: §Review guardrails  
+Canon basis: CANON AMBIGUITY-CONFLICT  
+Impacted PF09 task/subtask IDs: HDE-DIST001.9; HDE-DIST001.10  
+PF09 status action: None  
+Delta: Add the transitive-writer collision and shared-history reconstruction review guard: unique primary owner, complete consumer/companion migration, duplicate-key retirement, all-order validation, and fixed-point proof.  
+Why: The PR-04 rescope exposed a recurring planning/review ambiguity not fully represented by path-local collision checks alone.  
+Evidence pointer: PF10 — HDE Build Notes, Addendum 2.4, ADR-CANON-003 and permanent drainage table.  
+GitHub Repo proof, if current state matters: GitHub Repo | presenter ownership test and updater migration | transitive ownership graph implemented and verified.  
+Canon proof excerpt, unless Canon basis is CANON SILENCE:  
+"Structural template completeness is gating."  
+"Ungrounded existence claims are blocking."  
+"When a plan or review claims a PR slice is complete, it MUST account for every assigned HDE Build Checklist subtask."
+
+DECISION: MERGED WORK ACCEPTABLE
+
+## 2.6) OPS-01 HDE-EPIC038
+
+Artifact Map
+
+Ops Evidence Bundle: r2 ops-01.zip
+
+Approved Plan: r6 Implementation Plan HDE-EPIC038.md
+
+Repo root reviewed: amthorn78/glow-hdengine-v2
+
+Output: Ops Task Final Review
+
+Review Summary
+
+* Ops Evidence reports one bounded, PO-executed, read-only DB and bridge posture run under closed rails. Every operational action records `APP_ENV=dev`, `SAFE_MODE=1`, and `ALLOW_NETWORK=0`; the active corpus contains `grants`, `search_path`, `select_one`, `ddl_fingerprint`, and `bodygraph_payload_row`.  
+* The reported execution aligns with Approved Plan scope: no vendor call, SQL write, migration, grant change, schema change, deployment, raw secret persistence, raw user-data persistence, or raw BodyGraph-payload persistence is claimed. Approved Plan requires bounded DB posture and direct-versus-bridge parity with no vendor call.  
+* All eleven required deliverables are present in Ops Evidence, nonempty, checksum-valid, and present as tracked files in current Repo. Git-blob comparison establishes byte identity between each supplied member and its current `main` counterpart.  
+* Repo current state is `main@caa8070a4c7ee0e3fdf21488d8a07f507b965882`. That revision is one commit after the recorded execution baseline `be179833532a210afbd7fc019f27fc5281440469`; the intervening commit changes only the OPS-01 evidence family, and current `main` is identical to that evidence revision.  
+* DB posture is proven at the OPS-evidence level: search path is exactly `hde, public`, both boundary views are reported read-only, the BodyGraph uniqueness constraint is recorded, partition posture is `PASS`, and the observation mode is `read_only`.  
+* Provider parity is proven for all five declared rows. Every row has direct and bridge status `ok` and `parity:"match"`; the BodyGraph-derived direct and bridge outputs have identical canonical SHA-256 values, and the governed bridge checker returns `PASS`.  
+* Ops Evidence remains non-overclaiming: QA status is `NOT_CLAIMED`, acceptance tokens are `NOT_CLAIMED`, PF09 status movement is `NONE`, and epic closeout is `NOT_CLAIMED`. HDE-DIST001.4 and HDE-DIST001.9 remain Partial; OPS-01 contributes evidence only.  
+* No acceptance-relevant source conflict, missing required deliverable, unmergeable evidence item, unresolved safety issue, or unclear provenance remains. The archive container order is not plan-governed; acceptance rests on the exact member set, member bytes, checksum ledger, and current tracked Repo blobs.
+
+Repo Evidence Validation Summary
+
+Observed repo root: `amthorn78/glow-hdengine-v2`
+
+Observed HEAD: `caa8070a4c7ee0e3fdf21488d8a07f507b965882`
+
+Branch or detached state: `main`
+
+Working-tree status before validation: Not available in GitHub-only inspection mode. Repo validation inspected committed branch state and did not access a mutable local product worktree.
+
+Working-tree status after validation: Not applicable. No product Repo command or mutation was performed.
+
+Read-only validation methods used:
+
+* Repository metadata and default-branch inspection.  
+* Recent-commit inspection.  
+* Commit lineage comparison from the reported capture baseline to current `main`.  
+* Direct retrieval of every required Repo artifact.  
+* Git-blob identity comparison between Ops Evidence members and current Repo files.  
+* Checksum-ledger verification for D1 through D10.  
+* JSON parsing and canonical-byte reconstruction.  
+* Exact-one-trailing-LF and CRLF checks for all eleven files.  
+* Scoped searches for open-rails markers, vendor calls, connection URLs, secret-value patterns, private-key markers, and raw BodyGraph-payload markers.  
+* Direct inspection of the recorded producer, DB capture mechanics, canonical comparator, bridge-consistency checker, and approved synthetic identity.
+
+Repo-resident evidence paths checked:
+
+* `audit/ops/hde-epic038/ops-01/commands.txt`  
+* `audit/ops/hde-epic038/ops-01/stdout.log`  
+* `audit/ops/hde-epic038/ops-01/stderr.log`  
+* `audit/ops/hde-epic038/ops-01/exit_code.txt`  
+* `audit/ops/hde-epic038/ops-01/env_presence.json`  
+* `audit/ops/hde-epic038/ops-01/db_posture_summary.json`  
+* `audit/ops/hde-epic038/ops-01/provider_parity.proof.json`  
+* `audit/ops/hde-epic038/ops-01/bridge_consistency.result.json`  
+* `audit/ops/hde-epic038/ops-01/nonclaims.json`  
+* `audit/ops/hde-epic038/ops-01/result_summary.json`  
+* `audit/ops/hde-epic038/ops-01/checksums.sha256`
+
+Tracked or mergeable evidence confirmed: All eleven required files are tracked on current `main`.
+
+Reported evidence not found: None.
+
+Evidence present but ignored or unmergeable: None.
+
+Ops Evidence and Repo contradictions: None. All eleven supplied member bytes match their current tracked Repo blobs.
+
+Dirty-tree provenance concerns: None material. Ops Evidence records a clean pre-execution checkout at `main@be179833532a210afbd7fc019f27fc5281440469`; current Repo shows one direct child revision containing the final evidence changes and no later commit after that revision.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/commands.txt`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/commands.txt` | `"SHA-256 e52ecbddc561cc177b95d92a890226983b71791891fb91204f58e74d2922d38b"` | `"Frozen before execution and invoked exactly once"` | `"SAFE_MODE=1"` / `"ALLOW_NETWORK=0"`
+
+Evidence pointer: Repo | current `main` blob | `"4cea4f11e77cfbab0c9c6744a11b625bf83e162d"` | `"HDE-EPIC038 OPS-01 closed-rails remediation runner"` | byte-identical to Ops Evidence.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/stdout.log`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/stdout.log` | `"SHA-256 0a92596f84331377673ff9449750851851cf3370092f829c3d0492fd37339b41"` | direct and bridge derived outputs present | `"compare: FILE_EQ_CANON_BYTES_OK"`
+
+Evidence pointer: Repo | current `main` blob | `"2f258332bf7eefe1a0d07f415d1c931fa48b22ae"` | identical direct and bridge compatibility bodies | identical AB and BA SHA-256 values.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/stderr.log`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/stderr.log` | `"SHA-256 ab3ed8699f7d987c35e2b0a87a6b7f09a06acef30ed91716b750c72587ceff8b"` | five command-boundary labels | no captured error content
+
+Evidence pointer: Repo | current `main` blob | `"6fa6efbcc7b46f46cda826d282e7c3d64df97d2d"` | command boundaries retained | byte-identical to Ops Evidence.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/exit_code.txt`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/exit_code.txt` | `"SHA-256 9a271f2a916b0f3206ef074578be55d9bc94f6f3fe3ab86aa"` | `"0"`
+
+Evidence pointer: Repo | current `main` blob | `"573541ac9702dd3969c9bc859d2b91ec1f7e6e56"` | `"0"` | byte-identical to Ops Evidence.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/env_presence.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/env_presence.json` | `"DATABASE_URL":"SET:REDACTED"` | `"DB_BRIDGE_URL":"SET:REDACTED"` | every action records closed rails
+
+Evidence pointer: Repo | current `main` blob | `"0438c8310d69e58c950a4c27c3b6e5de7c6c22ce"` | `"SAFE_MODE":"1"` | `"ALLOW_NETWORK":"0"`.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/db_posture_summary.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/db_posture_summary.json` | `"search_path":"hde, public"` | `"boundary_views_readonly":true` | `"observation_mode":"read_only"`
+
+Evidence pointer: Repo | current `main` blob | `"fe121c751b5c487402082d514e07229625bf64db"` | `"partition_plan_status":"PASS"` | BodyGraph uniqueness constraint recorded.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/provider_parity.proof.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/provider_parity.proof.json` | `"claimed_row_count":5` | `"matched_row_count":5` | `"parity_status":"pass"`
+
+Evidence pointer: Repo | current `main` blob | `"7c5f66f580894eb951c0b5c3371437b3a3a35392"` | all five direct/bridge rows status `ok` and parity `match` | `"rails_open":false`.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/bridge_consistency.result.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/bridge_consistency.result.json` | `"status":"PASS"` | all five command exit codes are `0` | all declared predicates are `true`
+
+Evidence pointer: Repo | current `main` blob | `"a08a99bd1114f7bcc1bd936c7bde7f9d3f23ffae"` | governed checker executable hash matches Repo identity | canonical comparator result `FILE_EQ_CANON_BYTES_OK`.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/nonclaims.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/nonclaims.json` | `"no_vendor_call"` | `"no_qa_pass_claim"` | `"no_pf09_status_movement"`
+
+Evidence pointer: Repo | current `main` blob | `"a806f94a3e764bd72a346784fc6233f3bd6b929d"` | HDE-DIST001.4 and HDE-DIST001.9 recorded Partial | status change `none`.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/result_summary.json`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/result_summary.json` | `"ops_observation_status":"PASS"` | `"qa_status":"NOT_CLAIMED"` | `"pf09_status_movement":"NONE"`
+
+Evidence pointer: Repo | current `main` blob | `"cddf99213416dcc991e5960d6f31db16a7b24d37"` | scope is bounded DB posture and direct/bridge BodyGraph parity | acceptance and closeout not claimed.
+
+Artifact path or label: `audit/ops/hde-epic038/ops-01/checksums.sha256`
+
+Reported by Ops Evidence: Yes
+
+Required by Approved Plan: Yes
+
+Present in Repo: Yes
+
+Tracked or mergeable: Yes
+
+Allowed root: Yes
+
+Content or proof facts checked: Yes
+
+Repo validation status: Repo-confirmed tracked
+
+Evidence pointer: Ops Evidence | `ops-01/checksums.sha256` | ten D1–D10 SHA-256 bindings | all ten verified against supplied member bytes | ledger intentionally excludes itself
+
+Evidence pointer: Repo | current `main` blob | `"e40ae7ac62c9063b8a50c18c2b8ccb6d9f99fa84"` | checksum rows match current tracked bytes | byte-identical to Ops Evidence.
+
+Findings
+
+1. Finding ID: F-001  
+   What you observed: OPS-01 was executed as a bounded closed-rails DB and bridge task. The frozen runner exports `APP_ENV=dev`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`. It contains no vendor-source command and records `no_vendor_call`.  
+   Evidence pointer: Ops Evidence | `commands.txt`, `env_presence.json`, `nonclaims.json` | `"SAFE_MODE=1"` | `"ALLOW_NETWORK=0"` | `"no_vendor_call"`  
+   Search method: searched Ops Evidence for `SAFE_MODE=0|ALLOW_NETWORK=1|--source vendor|bg:resolve|vendor_reference|vendor_dry_run_reference` (case: sensitive); scope: all eleven supplied files; tool: byte scan and manual inspection; result: 0 hits.  
+   Expected requirement from Approved Plan: Capture bounded, read-only DB and bridge posture; no SQL write, migration, grant change, schema change, vendor call, or secret echo is permitted.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The earlier task-boundary risk is absent from the reviewed packet. OPS-01 now stays within its approved operational lane.  
+   Blocker for acceptance: No  
+2. Finding ID: F-002  
+   What you observed: The complete eleven-file output set required by Approved Plan is present in Ops Evidence and current Repo. Each member is nonempty, stored under the exact approved root, and byte-identical to the tracked Repo counterpart.  
+   Evidence pointer: Ops Evidence | complete `ops-01/` inventory | eleven required filenames | no required filename absent  
+   Evidence pointer: Repo | `audit/ops/hde-epic038/ops-01/` | eleven Repo-confirmed tracked files | current `main@caa8070a4c7ee0e3fdf21488d8a07f507b965882`  
+   Expected requirement from Approved Plan: Produce `commands.txt`, `stdout.log`, `stderr.log`, `exit_code.txt`, `env_presence.json`, `db_posture_summary.json`, `provider_parity.proof.json`, `bridge_consistency.result.json`, `nonclaims.json`, `result_summary.json`, and `checksums.sha256` under the approved OPS evidence root.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: Required evidence is readable, current, mergeable, and available for the later PR-06 binding step.  
+   Blocker for acceptance: No  
+   PF support, only if relied on: PF07 — PF07-Canon-Glow-Infrastructure, §Epic OPS evidence root directory (canonical pattern)  
+   Canon proof excerpt, only if PF support is used:  
+   “Ops execution evidence (PO-only, IA-guided; names-only) MUST be stored under a lowercase audit root such as:”  
+   “`audit/ops/<epic-id>/`”  
+3. Finding ID: F-003  
+   What you observed: Command provenance is complete. The frozen runner records the Repo root, execution branch, capture HEAD, staging root, synthetic selector, rails and locale pins, distinct direct and bridge commands, canonical comparison, governed checker invocation, stream redirections, individual exit-code captures, packet validation, and checksum production.  
+   Evidence pointer: Ops Evidence | `commands.txt` | `"Frozen before execution and invoked exactly once"` | direct `DB_FORCE_PG=1` and bridge `DB_FORCE_BRIDGE=1` calls | final checksum verification  
+   Evidence pointer: Repo | `presenter/json_canon_compare.py` | canonicalizes through the shared emitter | emits `FILE_EQ_CANON_BYTES_OK` | returns nonzero on a requested mismatch.  
+   Expected requirement from Approved Plan: Capture command identity, working directory, environment presence, stdout, stderr, exit code, row-level direct/bridge results, parity status, and bridge-consistency status; do not hand-edit passing rows.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The evidence is traceable from operational command through raw streams, derived summaries, predicate checks, and final packet bytes.  
+   Blocker for acceptance: No  
+4. Finding ID: F-004  
+   What you observed: DB posture evidence records the exact search path, object inventory, BodyGraph uniqueness constraint, grants, boundary-view mutability fields, partition plan, and read-only observation mode. The search path predicate and partition predicate both pass.  
+   Evidence pointer: Ops Evidence | `db_posture_summary.json` | `"search_path":"hde, public"` | `"boundary_views_readonly":true` | `"partition_plan_status":"PASS"`  
+   Evidence pointer: Repo | `scripts/db/capture_epic011_posture.py` | capability probes include search path, DDL fingerprint, grants, and `SELECT 1` | posture capture validates exact search path and expected partition objects.  
+   Expected requirement from Approved Plan: Contribute D8 DB posture evidence, with exact `hde, public` search path, current-environment posture, no mutation, and deterministic capture.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The required runtime DB facts are directly evidenced rather than inferred from implementation presence.  
+   Blocker for acceptance: No  
+   PF support, only if relied on:  
+   PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)  
+   PF14 — PF14-Canon-HDE-Mechanics-Guide, §20.1 DB posture mechanics  
+   Canon proof excerpt, only if PF support is used:  
+   “Use the Distillation harness to prove and exercise the DB runtime posture defined in Task HDE-FERM004.”  
+   “Run posture captures under deterministic env pins:”  
+   “`LC_ALL=C`, `LANG=C`, `TZ=UTC`.”  
+   “Keep posture artifacts and logs secret-free.”  
+5. Finding ID: F-005  
+   What you observed: Provider parity is explicit and fail-closed. The active corpus has exactly five named rows. Every row contains a direct observation, a bridge observation, status `ok` on both sides, and `parity:"match"`. The BodyGraph row uses the approved synthetic selector and records identical canonical hashes for direct and bridge outputs.  
+   Evidence pointer: Ops Evidence | `provider_parity.proof.json` | `"ordered_rows":["grants","search_path","select_one","ddl_fingerprint","bodygraph_payload_row"]` | `"claimed_row_count":5` | `"matched_row_count":5`  
+   Evidence pointer: Ops Evidence | `stdout.log`, `bridge_consistency.result.json` | `"compare: FILE_EQ_CANON_BYTES_OK"` | identical canonical SHA-256 values | governed checker `PASS`  
+   Evidence pointer: Repo | `scripts/db/capture_epic011_posture.py`, `_ddl_projection` and `_parity_match` | direct and bridge DDL representations are compared through the documented shared schema projection | no raw-shape mismatch is hidden.  
+   Evidence pointer: Repo | `ci/checks/check_bridge_consistency.py` | unavailable direct rows cannot coexist with parity PASS | provider, environment, and adapter selection are checked together.  
+   Expected requirement from Approved Plan: Contribute D10 direct-versus-bridge BodyGraph parity and environment-connectivity evidence; every claimed row must have both observations and record `parity=match`; missing, skipped, unavailable, or errored rows cannot be PASS.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The packet proves row-level parity and does not use provider availability, corpus omission, or fixture-only output as a substitute for live direct/bridge evidence.  
+   Blocker for acceptance: No  
+   PF support, only if relied on:  
+   PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity  
+   PF14 — PF14-Canon-HDE-Mechanics-Guide, §20.3.1 Bridge-consistency checker fallback contract  
+   Canon proof excerpt, only if PF support is used:  
+   “Prove parity between direct DB reads and bridge-mediated reads for BodyGraph, and capture the associated environment connectivity posture.”  
+   “The checker MUST reject provider-parity PASS conditions when direct rows are missing, skipped, unavailable, or errored.”  
+   “If an active row such as `ddl_fingerprint` remains in the corpus, closure MUST be based on row-level match evidence, not on silent exclusion.”  
+6. Finding ID: F-006  
+   What you observed: Evidence integrity and safety checks pass. The D1–D10 checksum ledger verifies; all JSON deliverables are compact, ASCII-key-sorted canonical JSON; every file has exactly one trailing LF and no CRLF; connection values are presence-only; no DSN, service URL, bearer value, secret value, private key, raw user record, or raw BodyGraph payload was found.  
+   Evidence pointer: Ops Evidence | `checksums.sha256` and all packet members | ten checksum records verified | canonical JSON reconstruction matched all six JSON files | one-LF checks passed for all eleven files  
+   Search method: searched Ops Evidence for `(?i)\b(?:postgres(?:ql)?|https?)://`, bearer-value patterns, password/token/key-value patterns, private-key headers, and raw-payload markers including `"activations":`, `"personality":`, `"centers":`, `"channels":`, `"gates":`, and `"planets":`; scope: all eleven files; tool: byte scan, JSON parsing, and manual inspection; result: 0 acceptance-relevant hits.  
+   Expected requirement from Approved Plan: Logs and evidence must contain no DSN, password, token, raw user data, or raw BodyGraph payload; secret values must not be echoed.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The packet is suitable for durable Repo storage and later governed binding without exposing credentials or sensitive source payloads.  
+   Blocker for acceptance: No  
+7. Finding ID: F-007  
+   What you observed: Current Repo provenance is coherent. Ops Evidence identifies execution at `main@be179833532a210afbd7fc019f27fc5281440469` with a clean pre-execution checkout. Current Repo is exactly one commit ahead at `caa8070a4c7ee0e3fdf21488d8a07f507b965882`; that child revision changes only the OPS-01 evidence family. All eleven current files match Ops Evidence member bytes.  
+   Evidence pointer: Ops Evidence | `env_presence.json`, `result_summary.json` | `"head":"be179833532a210afbd7fc019f27fc5281440469"` | `"pre_execution_worktree":"clean"` | Repo root `/workspaces/glow-hdengine-v2`  
+   Evidence pointer: Repo | compare `be179833532a210afbd7fc019f27fc5281440469...caa8070a4c7ee0e3fdf21488d8a07f507b965882` | one commit | ten modified packet files, with unchanged `exit_code.txt`  
+   Evidence pointer: Repo | compare `caa8070a4c7ee0e3fdf21488d8a07f507b965882...main` | `"status":"identical"` | no later Repo change  
+   Expected requirement from Approved Plan: The PO commits the secret-free OPS evidence under the exact approved root so that a later implementation slice can validate and bind it.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The reviewed packet is not an untracked or stale external bundle; it is an exact copy of current committed evidence, with execution state and evidence-commit state clearly distinguished.  
+   Blocker for acceptance: No  
+8. Finding ID: F-008  
+   What you observed: OPS-01 preserves its evidence-only role. HDE-DIST001, HDE-DIST001.4, and HDE-DIST001.9 are recorded Partial with no status change. QA PASS, acceptance-token satisfaction, PF09 movement, and epic closeout are expressly not claimed.  
+   Evidence pointer: Ops Evidence | `nonclaims.json`, `result_summary.json` | `"HDE-DIST001.4":"Partial"` | `"HDE-DIST001.9":"Partial"` | `"pf09_status_movement":"NONE"`  
+   Expected requirement from Approved Plan: OPS-01 contributes evidence only. PR-06 later validates the package and binds primary artifacts through the evidence ledgers without rerunning OPS.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: Accepting the OPS task does not silently convert operational evidence into full PF09 completion, QA PASS, token satisfaction, or epic closure.  
+   Blocker for acceptance: No  
+   PF support, only if relied on:  
+   PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)  
+   PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity  
+   Canon proof excerpt, only if PF support is used:  
+   “*Subtask status:* Partial”  
+   “**Subtask status:** **Partial**”  
+   “PF09 does not restate the JSON schemas for these artifacts or define DB/bridge policy values.”  
+9. Finding ID: F-009  
+   What you observed: Global path-proof and evidence-index binding is not part of this OPS packet and is not claimed complete. Approved Plan assigns that later consumption and binding to PR-06, without rerunning OPS.  
+   Evidence pointer: Approved Plan | OPS-01 Evidence commit plan | “PR-06 validates the package, binds its primary artifacts through the evidence ledgers, and states that OPS was not rerun.”  
+   Expected requirement from Approved Plan: OPS-01 produces and commits the secret-free packet; PR-06 performs checksum consumption, global evidence binding, path-proof coherence, and release-sanity integration later.  
+   Requirement coverage: Found  
+   Repo validation status, if repo-resident: Repo-confirmed tracked  
+   Why it matters: The absence of PR-06-created global bindings in the OPS packet is correct sequencing, not missing OPS evidence.  
+   Blocker for acceptance: No
+
+Evidence Print (PASS PROOF; required)
+
+A) Required deliverables satisfied
+
+Deliverable name: `commands.txt`
+
+Evidence pointer: Ops Evidence | `ops-01/commands.txt` | frozen literal closed-rails runner | exact commands and validation sequence recorded
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/commands.txt` | blob `4cea4f11e77cfbab0c9c6744a11b625bf83e162d` | byte-identical to Ops Evidence.
+
+Key proof facts: Exact Repo root, capture head, environment pins, synthetic selector, direct and bridge reads, comparator, checker, packaging, and fail-closed validations are recorded.
+
+Deliverable name: `stdout.log`
+
+Evidence pointer: Ops Evidence | `ops-01/stdout.log` | direct and bridge output sections | canonical comparison result present
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/stdout.log` | blob `2f258332bf7eefe1a0d07f415d1c931fa48b22ae` | byte-identical to Ops Evidence.
+
+Key proof facts: Both derived compatibility bodies are present and byte-equivalent after canonical emission.
+
+Deliverable name: `stderr.log`
+
+Evidence pointer: Ops Evidence | `ops-01/stderr.log` | five command-boundary sections | no captured error text
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/stderr.log` | blob `6fa6efbcc7b46f46cda826d282e7c3d64df97d2d` | byte-identical to Ops Evidence.
+
+Key proof facts: Actual stderr surfaces are retained rather than replaced with an unsupported success assertion.
+
+Deliverable name: `exit_code.txt`
+
+Evidence pointer: Ops Evidence | `ops-01/exit_code.txt` | `"0"`
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/exit_code.txt` | blob `573541ac9702dd3969c9bc859d2b91ec1f7e6e56` | `"0"`.
+
+Key proof facts: Aggregate success is recorded, while individual command exit codes are separately bound in the bridge-consistency result.
+
+Deliverable name: `env_presence.json`
+
+Evidence pointer: Ops Evidence | `ops-01/env_presence.json` | DB variables `SET:REDACTED` | all actions closed rails
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/env_presence.json` | blob `0438c8310d69e58c950a4c27c3b6e5de7c6c22ce`.
+
+Key proof facts: Required DB and bridge variables were present; secret values were not persisted.
+
+Deliverable name: `db_posture_summary.json`
+
+Evidence pointer: Ops Evidence | `ops-01/db_posture_summary.json` | search path exact | read-only views | partition posture PASS
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/db_posture_summary.json` | blob `fe121c751b5c487402082d514e07229625bf64db`.
+
+Key proof facts: D8 current-environment DB posture is machine-readable, canonical, and secret-free.
+
+Deliverable name: `provider_parity.proof.json`
+
+Evidence pointer: Ops Evidence | `ops-01/provider_parity.proof.json` | five claimed rows | five matched rows | rails closed
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/provider_parity.proof.json` | blob `7c5f66f580894eb951c0b5c3371437b3a3a35392`.
+
+Key proof facts: D10 direct and bridge observations are available and matching for every declared row.
+
+Deliverable name: `bridge_consistency.result.json`
+
+Evidence pointer: Ops Evidence | `ops-01/bridge_consistency.result.json` | governed checker PASS | comparator PASS | all exit codes zero
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/bridge_consistency.result.json` | blob `a08a99bd1114f7bcc1bd936c7bde7f9d3f23ffae`.
+
+Key proof facts: Row-level proof, provider selection, search path, BodyGraph equality, and closed-rails predicates agree.
+
+Deliverable name: `nonclaims.json`
+
+Evidence pointer: Ops Evidence | `ops-01/nonclaims.json` | no mutation/vendor/QA/token/PF09/closeout claims
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/nonclaims.json` | blob `a806f94a3e764bd72a346784fc6233f3bd6b929d`.
+
+Key proof facts: Operational evidence is not converted into broader acceptance or completion claims.
+
+Deliverable name: `result_summary.json`
+
+Evidence pointer: Ops Evidence | `ops-01/result_summary.json` | bounded scope | observation PASS | QA and closeout not claimed
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/result_summary.json` | blob `cddf99213416dcc991e5960d6f31db16a7b24d37`.
+
+Key proof facts: Final report is consistent with lower-level evidence and preserves the approved OPS boundary.
+
+Deliverable name: `checksums.sha256`
+
+Evidence pointer: Ops Evidence | `ops-01/checksums.sha256` | ten D1–D10 hashes | all entries verified
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+Repo evidence pointer, if repo-resident: Repo | `audit/ops/hde-epic038/ops-01/checksums.sha256` | blob `e40ae7ac62c9063b8a50c18c2b8ccb6d9f99fa84`.
+
+Key proof facts: The ledger excludes itself, as disclosed, and binds every substantive output file.
+
+B) Commands and actions evidence
+
+Command or action: Pre-execution identity and clean-state checks
+
+Evidence pointer: Ops Evidence | `commands.txt` preflight | Repo root `/workspaces/glow-hdengine-v2` | branch `main` | capture head `be179833532a210afbd7fc019f27fc5281440469`
+
+Success signal: All preflight `test` predicates passed before operational capture; final aggregate exit code is `0`.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Read-only DB posture capture
+
+Evidence pointer: Ops Evidence | `commands.txt` capture block | `scripts.db.capture_epic011_posture` | mutable output paths redirected to the staging root | capture exit code `0`
+
+Success signal: DB posture summary status `PASS`, exact search path, read-only observation mode, expected partition rows, and no captured stderr.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Direct DB BodyGraph-derived compatibility read
+
+Evidence pointer: Ops Evidence | `commands.txt` direct block | `DB_FORCE_PG=1` | `hdctl showcompat --conjunction ... --source db`
+
+Success signal: Exit code `0`; derived canonical compatibility output captured.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Bridge-mediated BodyGraph-derived compatibility read
+
+Evidence pointer: Ops Evidence | `commands.txt` bridge block | `DB_FORCE_BRIDGE=1` | same selector and DB-source surface
+
+Success signal: Exit code `0`; bridge-derived output captured.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Canonical BodyGraph-output comparison
+
+Evidence pointer: Ops Evidence | `commands.txt`, `stdout.log` | `python -m presenter.json_canon_compare` | `--fail-on-diff`
+
+Success signal: `FILE_EQ_CANON_BYTES_OK`; AB and BA canonical SHA-256 values are identical.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Governed bridge-consistency validation
+
+Evidence pointer: Ops Evidence | `commands.txt`, `bridge_consistency.result.json` | byte-identical staged checker | exact three captured checker inputs and hashes
+
+Success signal: Checker exit code `0`, result `PASS`, all command exit codes `0`, and all declared predicates `true`.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+Command or action: Evidence canonicalization, secret scan, scope scan, and checksum verification
+
+Evidence pointer: Ops Evidence | final validation blocks in `commands.txt` | exact eleven-file inventory | canonical JSON reconstruction | prohibited-marker scans | `sha256sum --check`
+
+Success signal: Final runner completed with aggregate exit code `0`; current supplied bytes independently satisfy the same file, canonicalization, LF, secret, scope, and checksum predicates.
+
+Repo validation status for repo-resident output: Repo-confirmed tracked
+
+C) Configuration or infrastructure state evidence
+
+State claim: Required DB access variables were present without value exposure.
+
+Evidence pointer: Ops Evidence | `env_presence.json` | `"DATABASE_URL":"SET:REDACTED"` | `"DB_BRIDGE_URL":"SET:REDACTED"` | `"secret_posture":"presence_only"`
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+State proven: Required names-only configuration was present for the run; plaintext values are not present in reviewed evidence.
+
+State claim: Execution remained in the approved development and closed-rails posture.
+
+Evidence pointer: Ops Evidence | `env_presence.json`, `provider_parity.proof.json` | `"APP_ENV":"SET:dev"` | `"SAFE_MODE":"1"` | `"ALLOW_NETWORK":"0"`
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+State proven: Every recorded action was closed; no vendor or general network action appears in the packet.
+
+State claim: The approved infrastructure target and database namespace were used.
+
+Evidence pointer: Ops Evidence | `env_presence.json`, `db_posture_summary.json` | provider `Railway` | project `ample-illumination` | database schema `hde` | bridge service `pg-bridge`
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+State proven: The names-only target posture matches Approved Plan’s infrastructure inventory without exposing connection details.
+
+State claim: Current DB and provider parity posture passed at the OPS evidence level.
+
+Evidence pointer: Ops Evidence | `db_posture_summary.json`, `provider_parity.proof.json`, `bridge_consistency.result.json` | DB posture `PASS` | five of five rows matched | bridge consistency `PASS`
+
+Repo validation status, if repo-resident: Repo-confirmed tracked
+
+State proven: The bounded operational observations required from OPS-01 are supported.
+
+D) PF09 later-drain support
+
+Phased PF09 document: PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+PF09 task ID: HDE-DIST001
+
+PF09 subtask ID, if applicable: HDE-DIST001.4
+
+Approved Plan claim: OPS-01 contributes live read-only DB posture evidence only; it does not independently complete the subtask.
+
+Supportable later-drain action: PR-06 may validate the OPS-01 package, bind its primary artifacts through the evidence ledgers, and state that OPS was not rerun. No PF09 status change is supported by OPS-01 alone.
+
+Evidence basis: Ops Evidence records exact DB posture, closed rails, checksum-valid artifacts, no status movement, and current Partial posture. Approved Plan assigns the later evidence-binding action to PR-06.
+
+Repo validation status for repo-resident evidence: All eleven packet files are Repo-confirmed tracked and byte-identical to Ops Evidence.
+
+Notes: Current PF09 status remains Partial. OPS acceptance creates no QA PASS, acceptance-token satisfaction, PF09 movement, or closeout.
+
+Phased PF09 document: PF09.6 — PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+PF09 task ID: HDE-DIST001
+
+PF09 subtask ID, if applicable: HDE-DIST001.9
+
+Approved Plan claim: OPS-01 contributes live direct/bridge availability and row-level BodyGraph parity evidence only; fixture-backed and later evidence-coherence work remain separate parts of the combined proof chain.
+
+Supportable later-drain action: PR-06 may consume the checksum-valid OPS-01 packet and bind its direct/bridge parity and environment-connectivity evidence into the combined release-sanity proof without rerunning OPS. No PF09 status change is supported by OPS-01 alone.
+
+Evidence basis: Ops Evidence records five available direct/bridge rows, five matches, canonical BodyGraph equality, environment posture, governed checker PASS, and no status movement.
+
+Repo validation status for repo-resident evidence: All parity, environment, checker, summary, transcript, and checksum files are Repo-confirmed tracked.
+
+Notes: Current PF09 status remains Partial. Full completion remains dependent on the combined implementation, OPS, and later evidence-binding posture.
+
+Doc Deltas (PF-Canon only; REQUIRED in OPS ACCEPTABLE branch)
+
+Doc Deltas: None (no PF-Canon inconsistencies or new doc requirements found)
+
+DECISION: OPS ACCEPTABLE
+
+## 2.7) PR-05 HDE-EPIC038
+
+Artifact Map
+
+PR Name: PR-05
+
+GitHub Repo: glow-hdengine-v2
+
+Implementation Doc: r6 Implementation Plan HDE-EPIC038.md
+
+Original Merged PR: 356
+
+First Remedial Merged PR: 357
+
+Second Remedial Merged PR: 358
+
+Extra Evidence: provided
+
+Output: Post-Merge Comprehensive PR Review (Original \+ First Remediation \+ Second Remediation) fileciteturn289file0 fileciteturn289file35 fileciteturn289file2
+
+Review Summary
+
+\- Original PR implemented the bounded configured-v2 mapped-cache slice: strict adapter-mapped persistence into the existing BodyGraph table, explicit upsert and non-production gates, canonical write/read-back parity, idempotence, fixture-backed governed artifacts, and a PO-only smoke harness. Its final PR-head CI was green. Original PR nonetheless left three material post-merge gaps: the fixture producer was not comprehensively hermetic, twelve A7/Endpoint Catalog path proofs carried false future \`mtime\_utc\` values, and the shared keys-only HTTP primary gained one bridge-health record outside the PR-05 evidence family. Original PR | metadata and diff | "merged=true; changed\_files=59" | "merge\_commit\_sha=01a7c200aba588f18509b9433a962602d056684e". fileciteturn180file0  
+\- First Remedial PR preserved the Product Owner disposition to retain the historical shared-log record, canonically repaired the bounded twelve-proof chronology family without modifying primaries, and introduced closed-rails environment isolation, provider/transport/logger canaries, exact shared-log byte protection, staged writes, rollback, fixed-point checks, and extensive failure-path tests. First Remedial PR | metadata | "merged=true; changed\_files=14" | "merge\_commit\_sha=4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e". fileciteturn177file0  
+\- First Remedial PR still held raw caller environment values in a plain local dictionary across the context-manager yield. A failure traceback rendered with locals could therefore expose database URLs, vendor base URLs, or credential values. The finding was material because the remediation itself introduced this failure-log exposure.  
+\- Second Remedial PR narrowly replaced that dictionary with \`\_EnvironmentRestoreState\`, gave the object a redacted representation, avoided binding raw values to traceback-visible loop locals, cleared the private mapping after restoration, and added a child-pytest \`--showlocals \--tb=long\` regression proving sentinel values do not appear. Second Remedial PR | metadata | "merged=true; changed\_files=2" | "merge\_commit\_sha=e5f0fd67538080c10f7fc87ece36397ffab59970". fileciteturn179file0  
+\- The three attempts remain within approved PR-05 product boundaries. No public Reader route or payload changed, no second HTTP or persistence home was introduced, raw vendor envelopes are not persisted, production-like mapped-cache writes remain refused, and the live vendor/DB smoke remains PO-only.  
+\- Current GitHub Repo state is \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`, exactly the Second Remedial PR merge. The intervening deployment-trigger commit after Original PR changed no files, and no commit later than Second Remedial PR affects the lifecycle.  
+\- Validation is strong and multi-layered: all three PR heads have successful seven-job GitHub Actions runs; current raw files were inspected; focused hermeticity, traceback-redaction, mapped-cache, CLI, resolver, evidence-index, mirror, path-proof, LF, and fixed-point checks are present and green. fileciteturn191file0 fileciteturn192file0 fileciteturn193file0  
+\- Governed PR-05 mapped-cache primaries and schemas remained byte-stable through both remediations. The shared log, Human Index, hash sentinel, Machine Mirror, mirror checksum, and orientation output also remained byte-stable; only the authorized twelve A7/Catalog sibling proof chronology fields changed.  
+\- PF09 impact is exactly mapped to PF09.6 task \`HDE-DIST001\`, subtask \`HDE-DIST001.11\`. Current recorded status is \`Optional\`. The reviewed implementation and governed fixture evidence support a recommendation to \`change to Partial\`, not Done, because the plan keeps OPS-02 live smoke and PR-06 aggregate binding on separate axes. fileciteturn289file31  
+\- Remaining risks are nonblocking: the retained bridge-health record's originating command and external-versus-mocked classification remain unresolved by explicit Product Owner disposition; the hermetic context is process-global and therefore intended for single-threaded CLI/test use; and some GitHub review threads remain administratively unresolved despite current code and tests addressing their substance.
+
+GitHub / Repo Inspection
+
+Repository identity:  
+GitHub Repo | repository metadata | "amthorn78/glow-hdengine-v2" | "default\_branch=main"
+
+Default or reviewed target branch:  
+GitHub Repo | repository metadata and current history | "main" | "current HEAD=e5f0fd67538080c10f7fc87ece36397ffab59970"
+
+Current reviewed branch HEAD:  
+GitHub Repo | default-branch commit history | "e5f0fd67538080c10f7fc87ece36397ffab59970" | "Harden hermetic environment traceback redaction (\#358)" fileciteturn178file0
+
+Original PR identity and merged state:  
+Original PR | API fields | "base=main; base\_sha=caa8070a4c7ee0e3fdf21488d8a07f507b965882; head\_sha=7a2c0779b5b78fac55f07650ebcb21ac5de67399" | "merged=true; merge\_commit\_sha=01a7c200aba588f18509b9433a962602d056684e; changed\_files=59; additions=1208; deletions=94" fileciteturn180file0
+
+First Remedial PR identity and merged state:  
+First Remedial PR | API fields | "base=main; base\_sha=462edd262c6c59e0548762bbd8b9f39cc7275f97; head\_sha=22dff232ca0b2cb749fc45e8bbf41ef6433e1515" | "merged=true; merge\_commit\_sha=4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e; changed\_files=14; additions=592; deletions=56" fileciteturn177file0
+
+Second Remedial PR identity and merged state:  
+Second Remedial PR | API fields | "base=main; base\_sha=4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e; head\_sha=60ebc78cbe86fcd9882b299c4eb46c92f5ff245f" | "merged=true; merge\_commit\_sha=e5f0fd67538080c10f7fc87ece36397ffab59970; changed\_files=2; additions=73; deletions=16" fileciteturn179file0
+
+Lifecycle order and lineage:  
+\- Lifecycle baseline is \`caa8070a4c7ee0e3fdf21488d8a07f507b965882\`, Original PR's base.  
+\- Original merged state is \`01a7c200aba588f18509b9433a962602d056684e\`.  
+\- Commit \`462edd262c6c59e0548762bbd8b9f39cc7275f97\` follows Original PR and changes zero files; it retriggered deployment without changing the source tree.  
+\- First Remedial PR bases on \`462edd262c6c59e0548762bbd8b9f39cc7275f97\`, which is file-identical to Original merged state, and merges as \`4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e\`.  
+\- Second Remedial PR bases exactly on \`4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e\` and merges as \`e5f0fd67538080c10f7fc87ece36397ffab59970\`.  
+\- GitHub Repo compare | \`01a7c200aba588f18509b9433a962602d056684e\` to \`462edd262c6c59e0548762bbd8b9f39cc7275f97\` | "ahead\_by=1" | "files=\[\]"  
+\- GitHub Repo compare | \`462edd262c6c59e0548762bbd8b9f39cc7275f97\` to \`4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e\` | "ahead\_by=1" | "14 files"  
+\- GitHub Repo compare | \`4b2b018c7ef2618f5ca693db47a3c5e4536a0b0e\` to \`e5f0fd67538080c10f7fc87ece36397ffab59970\` | "ahead\_by=1" | "2 files"
+
+Changed files per PR:  
+\- Original PR: 59 files.  
+\- First Remedial PR: 14 files.  
+\- Second Remedial PR: 2 files.  
+\- Lifecycle touched-file union: 59 files. Every First and Second Remedial PR file is already in Original PR's 59-file set.
+
+Lifecycle touched-file set:  
+1\. \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+2\. \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+3\. \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log\`  
+4\. \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt\`  
+5\. \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log\`  
+6\. \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt\`  
+7\. \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log\`  
+8\. \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt\`  
+9\. \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log\`  
+10\. \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt\`  
+11\. \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json\`  
+12\. \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt\`  
+13\. \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log\`  
+14\. \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt\`  
+15\. \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json\`  
+16\. \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt\`  
+17\. \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json\`  
+18\. \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt\`  
+19\. \`artifacts/evidence\_index.jsonl\`  
+20\. \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+21\. \`artifacts/evidence\_index.jsonl.sha256\`  
+22\. \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+23\. \`artifacts/logs/keys\_only.sample.jsonl\`  
+24\. \`artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt\`  
+25\. \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+26\. \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+27\. \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+28\. \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+29\. \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+30\. \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+31\. \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+32\. \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+33\. \`audit/gates/topology/orientation\_demo.txt\`  
+34\. \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+35\. \`docs/CLI\_commands.md\`  
+36\. \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+37\. \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+38\. \`docs/RUN.md\`  
+39\. \`docs/evidence/INDEX.json\`  
+40\. \`docs/evidence/INDEX.json.path\_proof.txt\`  
+41\. \`docs/evidence/INDEX.sha256\`  
+42\. \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+43\. \`engine/bodygraph/mapped\_cache.py\`  
+44\. \`engine/bodygraph/resolver.py\`  
+45\. \`engine/cli/main.py\`  
+46\. \`glow\_hdengine.egg-info/SOURCES.txt\`  
+47\. \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json\`  
+48\. \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt\`  
+49\. \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json\`  
+50\. \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt\`  
+51\. \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\`  
+52\. \`tests/bodygraph/test\_bg\_resolve\_route\_policy.py\`  
+53\. \`tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py\`  
+54\. \`tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py\`  
+55\. \`tests/bodygraph/test\_v2\_mapped\_cache.py\`  
+56\. \`tests/cli/test\_showcompat\_sources.py\`  
+57\. \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+58\. \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+59\. \`tools/evidence/update\_evidence\_index.py\`
+
+Current final state inspected:  
+\- Current raw source was inspected for the persistence owner, resolver, CLI nested mapped-payload consumer, PO-only smoke harness, final evidence producer, shared log, representative corrected path proofs, and updater-owned evidence bindings.  
+\- \`persist\_mapped\_bodygraph()\` validates exact cache keys and types, projects before persistence, uses parameterized \`INSERT INTO hde.body\_graphs with parameterized VALUES and ON CONFLICT DO NOTHING RETURNING 1\`, derives the insertion result from the transaction return, enforces one-row identity cardinality, reads back, reprojects, and byte-compares canonical output. GitHub Repo | \`engine/bodygraph/mapped\_cache.py\` | "RETURNING 1" | "if read\_back \!= canonical: raise MappedCacheError" fileciteturn188file0  
+\- Resolver current state checks both supplied and process environment for production-like values, obtains DB access before the vendor fetch for non-dry-run writes, requires explicit upsert, normalizes UUID identity consistently, preserves dry-run and legacy fallback, and returns typed mapped-cache results. fileciteturn189file0  
+\- CLI current state accepts mapped rows whose mechanics type resides under \`bodygraph.type\`, closing the DB-reader compatibility finding. fileciteturn205file0  
+\- The final hermetic producer removes ambient connection values, applies deterministic closed rails, installs exact DB/bridge/vendor/DNS/socket/HTTP canaries, snapshots the shared log, restores module state, and fails if any forbidden seam is attempted. fileciteturn218file0  
+\- The final environment restoration object exposes only \`tracked\`, \`present\`, and \`values=\<redacted\>\` in its representation and clears its private mapping after restoration. fileciteturn218file0  
+\- The shared historical bridge-health record is still present exactly once as the final line and was not modified by either remediation. GitHub Repo | \`artifacts/logs/keys\_only.sample.jsonl\` | \`"at":"2026-07-16T18:26:14.958Z"\` | \`"route":"db\_bridge.get:/health"\` fileciteturn207file0  
+\- Representative current A7 proof chronology is corrected: \`success\_304.txt.path\_proof.txt\` records \`mtime\_utc: 2026-07-16T00:08:29Z\` while retaining the original path, size, and SHA-256. fileciteturn217file0
+
+Checks and CI inspected:  
+\- Original PR final head workflow run \`29539675570\`: completed, conclusion \`success\`, all seven jobs successful. fileciteturn191file0  
+\- First Remedial PR final head workflow run \`29558415086\`: completed, conclusion \`success\`, all seven jobs successful. fileciteturn192file0  
+\- Second Remedial PR final head workflow run \`29559412525\`: completed, conclusion \`success\`, all seven jobs successful. fileciteturn193file0  
+\- Job-level inspection included committed closure, canonical JSON, Human Index and Mirror checks, path validation, final LF, evidence tests, rails gates, sanity pipeline, and compatibility lanes. fileciteturn194file0 fileciteturn195file0 fileciteturn196file0
+
+Governed evidence inspected:  
+\- All seven mapped-cache primary proof artifacts plus manifest and their sibling proofs.  
+\- Both strict JSON Schemas and their sibling proofs.  
+\- Human Evidence Index, its hash sentinel, Machine Mirror, mirror checksum, and their path proofs.  
+\- Orientation evidence and path proof.  
+\- Shared keys-only primary and proof.  
+\- The bounded twelve A7/Endpoint Catalog sibling proof chronology family.
+
+Later commits after Second Remedial PR:  
+Search method: searched GitHub Repo default-branch commit history for commits later than \`e5f0fd67538080c10f7fc87ece36397ffab59970\` (case: sensitive); scope: \`main\`; tool: GitHub API sorted by committer date; result: 0 hits. Current \`main\` is exactly Second Remedial PR's merge commit.
+
+Local-command posture:  
+This review used GitHub and complete supplied sources. It did not run local commands, tests, OPS, deployments, migrations, or external calls. Local test results cited below are provenance from Extra Evidence and are distinguished from current GitHub proof.
+
+Provenance (Original \-\> First Remediation \-\> Second Remediation)
+
+\- Claim: Original PR's approved intent was controlled configured-v2 mapped-cache persistence of adapter-mapped HDE data, not raw vendor envelopes, with canonical parity, idempotence, closed-rails refusal, explicit legacy fallback, and no production authorization.  
+  Source: Implementation Doc  
+  Evidence pointer: Implementation Doc | PR-05 intent and implementation requirements | "safe durable mapped-cache persistence of adapter-mapped HDE data" | "Keep production-like writes fail-closed"  
+\- Claim: Original PR created one persistence owner using the existing DB abstraction and existing \`hde.body\_graphs\` table, with no second persistence home.  
+  Source: Original PR  
+  Evidence pointer: Original PR | \`engine/bodygraph/mapped\_cache.py\` | \`"INSERT INTO hde.body\_graphs"\` | \`"ON CONFLICT DO NOTHING RETURNING 1"\` fileciteturn209file0  
+\- Claim: Original PR closed the review defects involving dual environment production guarding, insertion-local row counts, normalized person identity, DB-consumer compatibility, route-policy preflight, canonical UUID preflight, DB health ordering, one-attempt smoke behavior, and CLI documentation.  
+  Source: Original PR  
+  Evidence pointer: Original PR | final raw source and review threads | current resolver/CLI/smoke code contains the corrected behavior | final CI success  
+\- Claim: Original PR's fixture producer derived mapped-cache parity, idempotence, closed-rails refusal, production refusal, missing-upsert refusal, legacy fallback, and no-raw-payload predicates, but did not guard all lower transport/provider/logger seams or the shared log.  
+  Source: Original PR  
+  Evidence pointer: Original PR | \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | initial producer patched only resolver constructors | no shared-primary snapshot or lower transport canaries fileciteturn216file0  
+\- Claim: Original PR introduced one bridge-health record into the shared keys-only primary. Its originating command and live-versus-mocked classification are not established by reviewed repository provenance.  
+  Source: Original PR  
+  Evidence pointer: Original PR | \`artifacts/logs/keys\_only.sample.jsonl\` patch | one added record | current record retained exactly once  
+\- Claim: Original PR refreshed twelve A7/Endpoint Catalog sibling proofs with truthful path/hash/size but false future \`mtime\_utc\` values.  
+  Source: Original PR  
+  Evidence pointer: Original PR | twelve sibling-proof patches | \`"mtime\_utc: 2026-07-16T18:20:05Z"\` or \`18:20:06Z\` | primaries' actual mtimes were around \`2026-07-16T00:08:29Z\`  
+\- Claim: The deployment-trigger commit after Original PR changed no files and therefore did not alter the reviewed source tree.  
+  Source: GitHub Repo  
+  Evidence pointer: GitHub Repo | compare \`01a7c200aba588f18509b9433a962602d056684e\` to \`462edd262c6c59e0548762bbd8b9f39cc7275f97\` | \`"ahead\_by=1"\` | \`"files=\[\]"\`  
+\- Claim: First Remedial PR canonically repaired only the chronology field of the bounded twelve-proof family and did not rewrite any protected primary.  
+  Source: First Remedial PR  
+  Evidence pointer: First Remedial PR | sibling-proof hunks | \`"mtime\_utc: 2026-07-16T18:20:05Z"\` changed to \`"2026-07-16T00:08:29Z"\` | path, size, SHA-256, and \`produced\_at\_utc\` unchanged  
+\- Claim: First Remedial PR added a hermetic execution context around both write and check modes, removed ambient DB/bridge/vendor configuration, installed lower-seam canaries, protected the shared log, and used same-filesystem staged replacement with rollback.  
+  Source: First Remedial PR  
+  Evidence pointer: First Remedial PR | generator patch | \`\_hermetic\_execution()\` | canary map and rollback logic fileciteturn214file0  
+\- Claim: First Remedial PR tests proved ambient DB/vendor values cannot escape, the bridge logger and \`urlopen\` are never reached, failure restores environment and files, check mode is nonwriting, repeated generation is a fixed point, and the retained record and governed companions remain unchanged.  
+  Source: First Remedial PR  
+  Evidence pointer: First Remedial PR | focused test patch | hermeticity, rollback, fixed-point, retained-record, and governed-companion tests fileciteturn215file0  
+\- Claim: First Remedial PR still exposed raw restoration state to traceback-local rendering because its plain environment snapshot remained live across the context-manager yield.  
+  Source: First Remedial PR  
+  Evidence pointer: First Remedial PR | review thread | "Redact environment snapshots before assertion output" | raw DB/vendor values could appear under \`--showlocals\`  
+\- Claim: Second Remedial PR replaced the raw snapshot local with \`\_EnvironmentRestoreState\` and a redacted \`repr\`, then cleared raw state after restoration.  
+  Source: Second Remedial PR  
+  Evidence pointer: Second Remedial PR | generator patch | \`values=\<redacted\>\` | \`self.\_values.clear()\` fileciteturn220file0  
+\- Claim: Second Remedial PR added a subprocess regression that intentionally fails restoration under \`pytest \--showlocals \--tb=long\` and asserts that six sentinel URL/credential values are absent.  
+  Source: Second Remedial PR  
+  Evidence pointer: Second Remedial PR | focused test patch | \`"INJECTED\_RESTORE\_TRACEBACK\_FAILURE"\` | \`assert every sentinel value is absent from output\` fileciteturn221file0  
+\- Claim: Second Remedial PR changed no artifacts, schemas, ledgers, runtime behavior, or public contract.  
+  Source: Second Remedial PR  
+  Evidence pointer: Second Remedial PR | changed-file list | only generator and focused tests | \`changed\_files=2\`  
+\- Claim: Current acceptance posture is bounded PR acceptability only: implementation and governed fixture proof are current, while OPS-02 live smoke, QA PASS, acceptance-token satisfaction, production authorization, PF09 status movement, and epic closeout remain separate and unclaimed.  
+  Source: Implementation Doc  
+  Evidence pointer: Implementation Doc | PR-05 rails posture and nonclaims | "Contributes evidence only" | no production or QA claim
+
+Original PR Material Hunk Ledger
+
+Hunk ID: OPR-001  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh governed path proof for the mirrored Endpoint Catalog.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Refresh governed path proof for the mirrored Endpoint Catalog."
+
+Hunk ID: OPR-002  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh governed path proof for the mirrored Endpoint Catalog checksum.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Refresh governed path proof for the mirrored Endpoint Catalog checksum."
+
+Hunk ID: OPR-003  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log b/artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add PASS proof for canonical mapped-cache write/read-back parity.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log\` | "Add PASS proof for canonical mapped-cache write/read-back parity."
+
+Hunk ID: OPR-004  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for canonical parity.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt\` | "Add sibling path proof for canonical parity."
+
+Hunk ID: OPR-005  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log b/artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add closed-rails zero-I/O refusal proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log\` | "Add closed-rails zero-I/O refusal proof."
+
+Hunk ID: OPR-006  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for closed-rails refusal.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt\` | "Add sibling path proof for closed-rails refusal."
+
+Hunk ID: OPR-007  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/idempotence.log b/artifacts/bodygraph/v2\_mapped\_cache/idempotence.log || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add repeated-write idempotence proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log\` | "Add repeated-write idempotence proof."
+
+Hunk ID: OPR-008  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for idempotence.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt\` | "Add sibling path proof for idempotence."
+
+Hunk ID: OPR-009  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log b/artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add explicit legacy-fallback preservation proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log\` | "Add explicit legacy-fallback preservation proof."
+
+Hunk ID: OPR-010  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for legacy fallback.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt\` | "Add sibling path proof for legacy fallback."
+
+Hunk ID: OPR-011  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/manifest.json b/artifacts/bodygraph/v2\_mapped\_cache/manifest.json || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add closed-schema manifest binding mapped-cache primaries, schemas, predicates, fixture identity, and nonclaims.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json\` | "Add closed-schema manifest binding mapped-cache primaries, schemas, predicates, fixture identity, and nonclaims."
+
+Hunk ID: OPR-012  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for the mapped-cache manifest.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt\` | "Add sibling path proof for the mapped-cache manifest."
+
+Hunk ID: OPR-013  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log b/artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add proof that only projected keys are persisted and raw/secret fields are absent.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log\` | "Add proof that only projected keys are persisted and raw/secret fields are absent."
+
+Hunk ID: OPR-014  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for no-raw-vendor evidence.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt\` | "Add sibling path proof for no-raw-vendor evidence."
+
+Hunk ID: OPR-015  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json b/artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add canonical read-back transcript with zero second-write count and parity predicates.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json\` | "Add canonical read-back transcript with zero second-write count and parity predicates."
+
+Hunk ID: OPR-016  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for read-back transcript.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt\` | "Add sibling path proof for read-back transcript."
+
+Hunk ID: OPR-017  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json b/artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json || whole-file addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add canonical first-write transcript with projected safe payload identity.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json\` | "Add canonical first-write transcript with projected safe payload identity."
+
+Hunk ID: OPR-018  
+File: \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt b/artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt || whole-file sibling-proof addition (\`@@ \-0,0\` single hunk)  
+Material effect: Add sibling path proof for write transcript.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt\` | "Add sibling path proof for write transcript."
+
+Hunk ID: OPR-019  
+File: \`artifacts/evidence\_index.jsonl\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl b/artifacts/evidence\_index.jsonl || generated/index/document refresh hunk(s)  
+Material effect: Register mapped-cache artifacts/schemas and refresh current governed mirror records.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/evidence\_index.jsonl\` | "Register mapped-cache artifacts/schemas and refresh current governed mirror records."
+
+Hunk ID: OPR-020  
+File: \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.path\_proof.txt b/artifacts/evidence\_index.jsonl.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh Machine Mirror sibling path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/evidence\_index.jsonl.path\_proof.txt\` | "Refresh Machine Mirror sibling path proof."
+
+Hunk ID: OPR-021  
+File: \`artifacts/evidence\_index.jsonl.sha256\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256 b/artifacts/evidence\_index.jsonl.sha256 || generated/index/document refresh hunk(s)  
+Material effect: Refresh Machine Mirror checksum sidecar.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/evidence\_index.jsonl.sha256\` | "Refresh Machine Mirror checksum sidecar."
+
+Hunk ID: OPR-022  
+File: \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt b/artifacts/evidence\_index.jsonl.sha256.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh checksum sidecar sibling path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` | "Refresh checksum sidecar sibling path proof."
+
+Hunk ID: OPR-023  
+File: \`artifacts/logs/keys\_only.sample.jsonl\`  
+Patch and hunk header: diff \--git a/artifacts/logs/keys\_only.sample.jsonl b/artifacts/logs/keys\_only.sample.jsonl || append hunk adding one final JSONL record  
+Material effect: Append one keys-only bridge-health record to the shared HTTP primary.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/logs/keys\_only.sample.jsonl\` | "Append one keys-only bridge-health record to the shared HTTP primary."
+
+Hunk ID: OPR-024  
+File: \`artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt b/artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh shared HTTP primary path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt\` | "Refresh shared HTTP primary path proof."
+
+Hunk ID: OPR-025  
+File: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh A7 environment-gate proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | "Refresh A7 environment-gate proof chronology/binding."
+
+Hunk ID: OPR-026  
+File: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh composite Reader-success proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | "Refresh composite Reader-success proof chronology/binding."
+
+Hunk ID: OPR-027  
+File: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh 304 proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/success\_304.txt.path\_proof.txt\` | "Refresh 304 proof chronology/binding."
+
+Hunk ID: OPR-028  
+File: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh encoding-invariance proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | "Refresh encoding-invariance proof chronology/binding."
+
+Hunk ID: OPR-029  
+File: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh GET success proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/success\_get.txt.path\_proof.txt\` | "Refresh GET success proof chronology/binding."
+
+Hunk ID: OPR-030  
+File: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh HEAD success proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/success\_head.txt.path\_proof.txt\` | "Refresh HEAD success proof chronology/binding."
+
+Hunk ID: OPR-031  
+File: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh writer/error proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | "Refresh writer/error proof chronology/binding."
+
+Hunk ID: OPR-032  
+File: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh endpoint snapshot proof chronology/binding.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | "Refresh endpoint snapshot proof chronology/binding."
+
+Hunk ID: OPR-033  
+File: \`audit/gates/topology/orientation\_demo.txt\`  
+Patch and hunk header: diff \--git a/audit/gates/topology/orientation\_demo.txt b/audit/gates/topology/orientation\_demo.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh topology orientation artifact for the changed evidence skeleton.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`audit/gates/topology/orientation\_demo.txt\` | "Refresh topology orientation artifact for the changed evidence skeleton."
+
+Hunk ID: OPR-034  
+File: \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/audit/gates/topology/orientation\_demo.txt.path\_proof.txt b/audit/gates/topology/orientation\_demo.txt.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh orientation sibling path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` | "Refresh orientation sibling path proof."
+
+Hunk ID: OPR-035  
+File: \`docs/CLI\_commands.md\`  
+Patch and hunk header: diff \--git a/docs/CLI\_commands.md b/docs/CLI\_commands.md || generated/index/document refresh hunk(s)  
+Material effect: Document controlled configured-v2 upsert gates and production nonauthorization.  
+Risk category: documentation / operator guidance  
+Evidence pointer: Original PR | changed-file patch / \`docs/CLI\_commands.md\` | "Document controlled configured-v2 upsert gates and production nonauthorization."
+
+Hunk ID: OPR-036  
+File: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh canonical Endpoint Catalog path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Refresh canonical Endpoint Catalog path proof."
+
+Hunk ID: OPR-037  
+File: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || generated proof refresh hunk (\`@@ \-1,5 \+1,5 @@\` where exposed)  
+Material effect: Refresh canonical Endpoint Catalog checksum proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Refresh canonical Endpoint Catalog checksum proof."
+
+Hunk ID: OPR-038  
+File: \`docs/RUN.md\`  
+Patch and hunk header: diff \--git a/docs/RUN.md b/docs/RUN.md || generated/index/document refresh hunk(s)  
+Material effect: Document mapped-cache generation, checking, and operator boundaries.  
+Risk category: documentation / operator guidance  
+Evidence pointer: Original PR | changed-file patch / \`docs/RUN.md\` | "Document mapped-cache generation, checking, and operator boundaries."
+
+Hunk ID: OPR-039  
+File: \`docs/evidence/INDEX.json\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json b/docs/evidence/INDEX.json || generated/index/document refresh hunk(s)  
+Material effect: Register mapped-cache evidence and schemas in the Human Evidence Index.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/evidence/INDEX.json\` | "Register mapped-cache evidence and schemas in the Human Evidence Index."
+
+Hunk ID: OPR-040  
+File: \`docs/evidence/INDEX.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.json.path\_proof.txt b/docs/evidence/INDEX.json.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh Human Index sibling path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/evidence/INDEX.json.path\_proof.txt\` | "Refresh Human Index sibling path proof."
+
+Hunk ID: OPR-041  
+File: \`docs/evidence/INDEX.sha256\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256 b/docs/evidence/INDEX.sha256 || generated/index/document refresh hunk(s)  
+Material effect: Refresh Human Index hash sentinel.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/evidence/INDEX.sha256\` | "Refresh Human Index hash sentinel."
+
+Hunk ID: OPR-042  
+File: \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/evidence/INDEX.sha256.path\_proof.txt b/docs/evidence/INDEX.sha256.path\_proof.txt || generated/index/document refresh hunk(s)  
+Material effect: Refresh sentinel sibling path proof.  
+Risk category: governed evidence, index, mirror, manifest, or path proof  
+Evidence pointer: Original PR | changed-file patch / \`docs/evidence/INDEX.sha256.path\_proof.txt\` | "Refresh sentinel sibling path proof."
+
+Hunk ID: OPR-043  
+File: \`engine/bodygraph/mapped\_cache.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/mapped\_cache.py b/engine/bodygraph/mapped\_cache.py || \`@@ \-0,0 \+1,143 @@\`  
+Material effect: Add the sole bounded mapped-cache persistence owner with strict projection, canonicalization, parameterized insert, read-back, and typed failures.  
+Risk category: schema/data model; contract; error handling  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/mapped\_cache.py\` | "Add the sole bounded mapped-cache persistence owner with strict projection, canonicalization, parameterized insert, read-back, and typed failures."
+
+Hunk ID: OPR-044  
+File: \`engine/bodygraph/resolver.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py || \`@@ \-2,8 \+2,13 @@\`, \`@@ \-13,6 \+18,7 @@\`, \`@@ \-34,6 \+40,12 @@\`  
+Material effect: Add DB/mapped-cache imports and typed normalized identity container.  
+Risk category: contract/interface; environment/config  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/resolver.py\` | "Add DB/mapped-cache imports and typed normalized identity container."
+
+Hunk ID: OPR-045  
+File: \`engine/bodygraph/resolver.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py || \`@@ \-149,7 \+156,7 @@\`, \`@@ \-159,13 \+166,14 @@\`  
+Material effect: Normalize DB/person identity and carry explicit upsert into configured-v2 resolution.  
+Risk category: contract/interface; data identity  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/resolver.py\` | "Normalize DB/person identity and carry explicit upsert into configured-v2 resolution."
+
+Hunk ID: OPR-046  
+File: \`engine/bodygraph/resolver.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py || \`@@ \-194,24 \+202,41 @@\`  
+Material effect: Enforce upsert, requested/process production guards, and sanctioned DB preflight before vendor work.  
+Risk category: environment/config/vendor; safety/error handling  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/resolver.py\` | "Enforce upsert, requested/process production guards, and sanctioned DB preflight before vendor work."
+
+Hunk ID: OPR-047  
+File: \`engine/bodygraph/resolver.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py || \`@@ \-226,8 \+251,8 @@\`, \`@@ \-250,6 \+275,26 @@\`  
+Material effect: Project normalized identity, persist mapped cache, and return typed ingest result.  
+Risk category: contract/interface; persistence/data model  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/resolver.py\` | "Project normalized identity, persist mapped cache, and return typed ingest result."
+
+Hunk ID: OPR-048  
+File: \`engine/bodygraph/resolver.py\`  
+Patch and hunk header: diff \--git a/engine/bodygraph/resolver.py b/engine/bodygraph/resolver.py || \`@@ \-280,6 \+325,22 @@\`  
+Material effect: Add canonical UUID normalization shared by database identity and person UID seed.  
+Risk category: data identity  
+Evidence pointer: Original PR | changed-file patch / \`engine/bodygraph/resolver.py\` | "Add canonical UUID normalization shared by database identity and person UID seed."
+
+Hunk ID: OPR-049  
+File: \`engine/cli/main.py\`  
+Patch and hunk header: diff \--git a/engine/cli/main.py b/engine/cli/main.py || \`@@ \-157,7 \+157,7 @@\`  
+Material effect: Update \`--upsert\` help to controlled durability wording.  
+Risk category: CLI contract/documented behavior  
+Evidence pointer: Original PR | changed-file patch / \`engine/cli/main.py\` | "Update \`--upsert\` help to controlled durability wording."
+
+Hunk ID: OPR-050  
+File: \`engine/cli/main.py\`  
+Patch and hunk header: diff \--git a/engine/cli/main.py b/engine/cli/main.py || \`@@ \-340,7 \+340,12 @@\`  
+Material effect: Read mechanics from nested projected \`bodygraph\` for DB compatibility.  
+Risk category: contract/interface; compatibility  
+Evidence pointer: Original PR | changed-file patch / \`engine/cli/main.py\` | "Read mechanics from nested projected \`bodygraph\` for DB compatibility."
+
+Hunk ID: OPR-051  
+File: \`glow\_hdengine.egg-info/SOURCES.txt\`  
+Patch and hunk header: diff \--git a/glow\_hdengine.egg-info/SOURCES.txt b/glow\_hdengine.egg-info/SOURCES.txt || package source-list refresh hunk  
+Material effect: Include new source/tests/schemas/tooling in package source inventory.  
+Risk category: packaging  
+Evidence pointer: Original PR | changed-file patch / \`glow\_hdengine.egg-info/SOURCES.txt\` | "Include new source/tests/schemas/tooling in package source inventory."
+
+Hunk ID: OPR-052  
+File: \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json b/schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json || whole-file schema addition  
+Material effect: Add closed manifest schema for mapped-cache evidence.  
+Risk category: schema/data model  
+Evidence pointer: Original PR | changed-file patch / \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json\` | "Add closed manifest schema for mapped-cache evidence."
+
+Hunk ID: OPR-053  
+File: \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt b/schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt || whole-file path-proof addition  
+Material effect: Add schema sibling path proof.  
+Risk category: governed evidence/path proof  
+Evidence pointer: Original PR | changed-file patch / \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt\` | "Add schema sibling path proof."
+
+Hunk ID: OPR-054  
+File: \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json b/schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json || whole-file schema addition  
+Material effect: Add closed transcript schema for mapped-cache write/read-back evidence.  
+Risk category: schema/data model  
+Evidence pointer: Original PR | changed-file patch / \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json\` | "Add closed transcript schema for mapped-cache write/read-back evidence."
+
+Hunk ID: OPR-055  
+File: \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt b/schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt || whole-file path-proof addition  
+Material effect: Add transcript-schema sibling path proof.  
+Risk category: governed evidence/path proof  
+Evidence pointer: Original PR | changed-file patch / \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt\` | "Add transcript-schema sibling path proof."
+
+Hunk ID: OPR-056  
+File: \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\`  
+Patch and hunk header: diff \--git a/scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py b/scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py || whole-file operator-harness addition  
+Material effect: Add PO-only bounded configured-v2 smoke harness with preflight, one-attempt request, DB health, redaction, and idempotence checks.  
+Risk category: environment/config/vendor/OPS-sensitive behavior  
+Evidence pointer: Original PR | changed-file patch / \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\` | "Add PO-only bounded configured-v2 smoke harness with preflight, one-attempt request, DB health, redaction, and idempotence checks."
+
+Hunk ID: OPR-057  
+File: \`tests/bodygraph/test\_bg\_resolve\_route\_policy.py\`  
+Patch and hunk header: diff \--git a/tests/bodygraph/test\_bg\_resolve\_route\_policy.py b/tests/bodygraph/test\_bg\_resolve\_route\_policy.py || focused route-policy test hunks  
+Material effect: Strengthen route-policy tests for controlled configured-v2 persistence and legacy fallback.  
+Risk category: tests / safety guards  
+Evidence pointer: Original PR | changed-file patch / \`tests/bodygraph/test\_bg\_resolve\_route\_policy.py\` | "Strengthen route-policy tests for controlled configured-v2 persistence and legacy fallback."
+
+Hunk ID: OPR-058  
+File: \`tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py\`  
+Patch and hunk header: diff \--git a/tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py b/tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py || whole-file focused test addition  
+Material effect: Add resolver tests for explicit upsert, dual production guard, normalization, DB preflight, parity, and refusal paths.  
+Risk category: tests / safety guards  
+Evidence pointer: Original PR | changed-file patch / \`tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py\` | "Add resolver tests for explicit upsert, dual production guard, normalization, DB preflight, parity, and refusal paths."
+
+Hunk ID: OPR-059  
+File: \`tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py\`  
+Patch and hunk header: diff \--git a/tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py b/tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py || whole-file smoke-harness test addition  
+Material effect: Add smoke-harness tests for v2 preflight, UUID validation, DB-before-vendor ordering, and one-attempt enforcement.  
+Risk category: tests / OPS-sensitive safeguards  
+Evidence pointer: Original PR | changed-file patch / \`tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py\` | "Add smoke-harness tests for v2 preflight, UUID validation, DB-before-vendor ordering, and one-attempt enforcement."
+
+Hunk ID: OPR-060  
+File: \`tests/bodygraph/test\_v2\_mapped\_cache.py\`  
+Patch and hunk header: diff \--git a/tests/bodygraph/test\_v2\_mapped\_cache.py b/tests/bodygraph/test\_v2\_mapped\_cache.py || whole-file persistence-boundary test addition  
+Material effect: Add persistence-boundary tests for strict shape, canonical read-back, idempotence, raw/secret rejection, and one cache home.  
+Risk category: tests / schema/data safety  
+Evidence pointer: Original PR | changed-file patch / \`tests/bodygraph/test\_v2\_mapped\_cache.py\` | "Add persistence-boundary tests for strict shape, canonical read-back, idempotence, raw/secret rejection, and one cache home."
+
+Hunk ID: OPR-061  
+File: \`tests/cli/test\_showcompat\_sources.py\`  
+Patch and hunk header: diff \--git a/tests/cli/test\_showcompat\_sources.py b/tests/cli/test\_showcompat\_sources.py || DB-source compatibility test hunks  
+Material effect: Add DB compatibility-source tests for nested projected mapped-cache rows.  
+Risk category: tests / contract  
+Evidence pointer: Original PR | changed-file patch / \`tests/cli/test\_showcompat\_sources.py\` | "Add DB compatibility-source tests for nested projected mapped-cache rows."
+
+Hunk ID: OPR-062  
+File: \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_v2\_mapped\_cache\_evidence.py b/tests/evidence/test\_v2\_mapped\_cache\_evidence.py || whole-file evidence-test addition  
+Material effect: Add evidence producer inventory/schema/fixed-point/fail-closed tests.  
+Risk category: tests / governed evidence  
+Evidence pointer: Original PR | changed-file patch / \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\` | "Add evidence producer inventory/schema/fixed-point/fail-closed tests."
+
+Hunk ID: OPR-063  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py b/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py || \`@@ \-0,0 \+1,201 @@\`  
+Material effect: Add fixture-backed mapped-cache evidence producer with strict schemas, derived predicates, staged writes, and check mode.  
+Risk category: governed evidence producer; safety/error handling  
+Evidence pointer: Original PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Add fixture-backed mapped-cache evidence producer with strict schemas, derived predicates, staged writes, and check mode."
+
+Hunk ID: OPR-064  
+File: \`tools/evidence/update\_evidence\_index.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/update\_evidence\_index.py b/tools/evidence/update\_evidence\_index.py || updater registration hunks  
+Material effect: Register exact PR-05 evidence/schema families in the canonical updater.  
+Risk category: governed evidence/index single-writer  
+Evidence pointer: Original PR | changed-file patch / \`tools/evidence/update\_evidence\_index.py\` | "Register exact PR-05 evidence/schema families in the canonical updater."
+
+First Remedial PR Material Hunk Ledger
+
+Hunk ID: R1PR-001  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the mirrored Endpoint Catalog path-proof \`mtime\_utc\` to the primary's actual chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Correct the mirrored Endpoint Catalog path-proof \`mtime\_utc\` to the primary's actual chronology."
+
+Hunk ID: R1PR-002  
+File: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the mirrored Endpoint Catalog checksum proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Correct the mirrored Endpoint Catalog checksum proof chronology."
+
+Hunk ID: R1PR-003  
+File: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt b/artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the A7 env-gate proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | "Correct the A7 env-gate proof chronology."
+
+Hunk ID: R1PR-004  
+File: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt b/artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the composite Reader success proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | "Correct the composite Reader success proof chronology."
+
+Hunk ID: R1PR-005  
+File: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_304.txt.path\_proof.txt b/artifacts/proofs/success\_304.txt.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the 304 success proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/success\_304.txt.path\_proof.txt\` | "Correct the 304 success proof chronology."
+
+Hunk ID: R1PR-006  
+File: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt b/artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the encoding-invariance proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | "Correct the encoding-invariance proof chronology."
+
+Hunk ID: R1PR-007  
+File: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_get.txt.path\_proof.txt b/artifacts/proofs/success\_get.txt.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the GET success proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/success\_get.txt.path\_proof.txt\` | "Correct the GET success proof chronology."
+
+Hunk ID: R1PR-008  
+File: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_head.txt.path\_proof.txt b/artifacts/proofs/success\_head.txt.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the HEAD success proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/success\_head.txt.path\_proof.txt\` | "Correct the HEAD success proof chronology."
+
+Hunk ID: R1PR-009  
+File: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt b/artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the writer/error proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | "Correct the writer/error proof chronology."
+
+Hunk ID: R1PR-010  
+File: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt b/artifacts/reader/endpoints\_snapshot.json.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the endpoint snapshot proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | "Correct the endpoint snapshot proof chronology."
+
+Hunk ID: R1PR-011  
+File: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the canonical Endpoint Catalog proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | "Correct the canonical Endpoint Catalog proof chronology."
+
+Hunk ID: R1PR-012  
+File: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Patch and hunk header: diff \--git a/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt b/docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt || \`@@ \-1,5 \+1,5 @@\`  
+Material effect: Correct the canonical Endpoint Catalog checksum proof chronology.  
+Risk category: governed path proof / evidence chronology  
+Evidence pointer: First Remedial PR | changed-file patch / \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | "Correct the canonical Endpoint Catalog checksum proof chronology."
+
+Hunk ID: R1PR-013  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py b/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py || \`@@ \-4,23 \+4,34 @@\`  
+Material effect: Add explicit provider, transport, logging, network, determinism, and staging dependencies.  
+Risk category: security/privacy; environment/vendor  
+Evidence pointer: First Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Add explicit provider, transport, logging, network, determinism, and staging dependencies."
+
+Hunk ID: R1PR-014  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: same file || \`@@ \-40,6 \+51,129 @@\`  
+Material effect: Add hermetic environment isolation, shared-log snapshots, exact provider/transport/logger canaries, and restoration checks.  
+Risk category: security/privacy; external-I/O safeguards  
+Evidence pointer: First Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Add hermetic environment isolation, shared-log snapshots, exact provider/transport/logger canaries, and restoration checks."
+
+Hunk ID: R1PR-015  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: same file || \`@@ \-88,17 \+222,9 @@\`, \`@@ \-109,26 \+235,25 @@\`, \`@@ \-139,7 \+264,7 @@\`  
+Material effect: Run resolver predicates inside the hermetic guard and derive no-I/O call counts from canaries.  
+Risk category: governed evidence predicate truth; safety  
+Evidence pointer: First Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Run resolver predicates inside the hermetic guard and derive no-I/O call counts from canaries."
+
+Hunk ID: R1PR-016  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: same file || \`@@ \-179,23 \+304,55 @@\` and adjacent write/check hunks  
+Material effect: Wrap build/check in the hermetic boundary and make write mode staged, same-filesystem, failure-atomic, and rollback-capable.  
+Risk category: error handling; governed evidence writer  
+Evidence pointer: First Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Wrap build/check in the hermetic boundary and make write mode staged, same-filesystem, failure-atomic, and rollback-capable."
+
+Hunk ID: R1PR-017  
+File: \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_v2\_mapped\_cache\_evidence.py b/tests/evidence/test\_v2\_mapped\_cache\_evidence.py || \`@@ \-1,17 \+1,132 @@\`  
+Material effect: Add protected-file inventories, redacted assertion snapshots, command env helpers, and exact canary scaffolding.  
+Risk category: tests; security/privacy  
+Evidence pointer: First Remedial PR | changed-file patch / \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\` | "Add protected-file inventories, redacted assertion snapshots, command env helpers, and exact canary scaffolding."
+
+Hunk ID: R1PR-018  
+File: \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: same file || \`@@ \-40,25 \+155,289 @@\` and subsequent focused test hunks  
+Material effect: Add shared-log, ambient DB/vendor, logger/transport, restoration, failure-atomic, fixed-point, historical-record, and governed-companion regressions.  
+Risk category: tests; safety; governed evidence  
+Evidence pointer: First Remedial PR | changed-file patch / \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\` | "Add shared-log, ambient DB/vendor, logger/transport, restoration, failure-atomic, fixed-point, historical-record, and governed-companion regressions."
+
+Second Remedial PR Material Hunk Ledger
+
+Hunk ID: R2PR-001  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py b/tools/evidence/generate\_v2\_mapped\_cache\_evidence.py || \`@@ \-72,6 \+72,35 @@\`  
+Material effect: Replace traceback-visible raw environment dict state with a slotted restoration object whose repr is redacted and whose mapping is cleared after restore.  
+Risk category: security/privacy; secrets  
+Evidence pointer: Second Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Replace traceback-visible raw environment dict state with a slotted restoration object whose repr is redacted and whose mapping is cleared after restore."
+
+Hunk ID: R2PR-002  
+File: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: same file || \`@@ \-86,10 \+115,6 @@\`, \`@@ \-102,16 \+127,6 @@\`, \`@@ \-134,7 \+149,7 @@\`, \`@@ \-164,7 \+179,7 @@\`  
+Material effect: Remove the old raw snapshot/restore functions and use the redacted state object across the hermetic context-manager yield.  
+Risk category: security/privacy; error handling  
+Evidence pointer: Second Remedial PR | changed-file patch / \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\` | "Remove the old raw snapshot/restore functions and use the redacted state object across the hermetic context-manager yield."
+
+Hunk ID: R2PR-003  
+File: \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+Patch and hunk header: diff \--git a/tests/evidence/test\_v2\_mapped\_cache\_evidence.py b/tests/evidence/test\_v2\_mapped\_cache\_evidence.py || \`@@ \-191,6 \+191,48 @@\`  
+Material effect: Add subprocess pytest \`--showlocals \--tb=long\` regression proving synthetic secret values never appear in failure output.  
+Risk category: tests; secret-redaction safeguard  
+Evidence pointer: Second Remedial PR | changed-file patch / \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\` | "Add subprocess pytest \`--showlocals \--tb=long\` regression proving synthetic secret values never appear in failure output."
+
+Net Effective Diff Review
+
+NET ID: NET-001  
+File/artifact: \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Covered hunks: OPR-001 / R1PR-001  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh governed path proof for the mirrored Endpoint Catalog."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/audit/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-002  
+File/artifact: \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Covered hunks: OPR-002 / R1PR-002  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh governed path proof for the mirrored Endpoint Catalog checksum."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/audit/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-003  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log\`  
+Covered hunks: OPR-003  
+Original merged state: Add PASS proof for canonical mapped-cache write/read-back parity.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add PASS proof for canonical mapped-cache write/read-back parity."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-004  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt\`  
+Covered hunks: OPR-004  
+Original merged state: Add sibling path proof for canonical parity.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for canonical parity."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/canonical\_parity.log.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-005  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log\`  
+Covered hunks: OPR-005  
+Original merged state: Add closed-rails zero-I/O refusal proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add closed-rails zero-I/O refusal proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-006  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt\`  
+Covered hunks: OPR-006  
+Original merged state: Add sibling path proof for closed-rails refusal.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for closed-rails refusal."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/closed\_rails\_refusal.log.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-007  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log\`  
+Covered hunks: OPR-007  
+Original merged state: Add repeated-write idempotence proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add repeated-write idempotence proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-008  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt\`  
+Covered hunks: OPR-008  
+Original merged state: Add sibling path proof for idempotence.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for idempotence."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/idempotence.log.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-009  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log\`  
+Covered hunks: OPR-009  
+Original merged state: Add explicit legacy-fallback preservation proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add explicit legacy-fallback preservation proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-010  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt\`  
+Covered hunks: OPR-010  
+Original merged state: Add sibling path proof for legacy fallback.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for legacy fallback."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/legacy\_fallback\_preservation.log.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-011  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json\`  
+Covered hunks: OPR-011  
+Original merged state: Add closed-schema manifest binding mapped-cache primaries, schemas, predicates, fixture identity, and nonclaims.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add closed-schema manifest binding mapped-cache primaries, schemas, predicates, fixture identity, and nonclaims."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-012  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt\`  
+Covered hunks: OPR-012  
+Original merged state: Add sibling path proof for the mapped-cache manifest.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for the mapped-cache manifest."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/manifest.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-013  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log\`  
+Covered hunks: OPR-013  
+Original merged state: Add proof that only projected keys are persisted and raw/secret fields are absent.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add proof that only projected keys are persisted and raw/secret fields are absent."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-014  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt\`  
+Covered hunks: OPR-014  
+Original merged state: Add sibling path proof for no-raw-vendor evidence.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for no-raw-vendor evidence."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/no\_raw\_vendor\_payload\_persistence.log.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-015  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json\`  
+Covered hunks: OPR-015  
+Original merged state: Add canonical read-back transcript with zero second-write count and parity predicates.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add canonical read-back transcript with zero second-write count and parity predicates."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-016  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt\`  
+Covered hunks: OPR-016  
+Original merged state: Add sibling path proof for read-back transcript.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for read-back transcript."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/read\_back\_transcript.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-017  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json\`  
+Covered hunks: OPR-017  
+Original merged state: Add canonical first-write transcript with projected safe payload identity.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current primary remains byte-identical after both remediations and records the planned PASS/nonclaim posture.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add canonical first-write transcript with projected safe payload identity."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-018  
+File/artifact: \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt\`  
+Covered hunks: OPR-018  
+Original merged state: Add sibling path proof for write transcript.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current sibling proof remains coherent with its unchanged mapped-cache primary.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add sibling path proof for write transcript."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/bodygraph/v2\_mapped\_cache/write\_transcript.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-019  
+File/artifact: \`artifacts/evidence\_index.jsonl\`  
+Covered hunks: OPR-019  
+Original merged state: Register mapped-cache artifacts/schemas and refresh current governed mirror records.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Register mapped-cache artifacts/schemas and refresh current governed mirror records."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/evidence\_index.jsonl\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-020  
+File/artifact: \`artifacts/evidence\_index.jsonl.path\_proof.txt\`  
+Covered hunks: OPR-020  
+Original merged state: Refresh Machine Mirror sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh Machine Mirror sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/evidence\_index.jsonl.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-021  
+File/artifact: \`artifacts/evidence\_index.jsonl.sha256\`  
+Covered hunks: OPR-021  
+Original merged state: Refresh Machine Mirror checksum sidecar.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh Machine Mirror checksum sidecar."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/evidence\_index.jsonl.sha256\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-022  
+File/artifact: \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\`  
+Covered hunks: OPR-022  
+Original merged state: Refresh checksum sidecar sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh checksum sidecar sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/evidence\_index.jsonl.sha256.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-023  
+File/artifact: \`artifacts/logs/keys\_only.sample.jsonl\`  
+Covered hunks: OPR-023  
+Original merged state: Shared primary gained one final keys-only \`db\_bridge.get:/health\` record.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current retained shared log; historical record appears exactly once and final; no remedial byte change.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: The Original PR appended one keys-only bridge-health record outside the mapped-cache family. The PO-authorized retained disposition preserves it unchanged; both remediations prove no further shared-log mutation. Origin and external-versus-mocked classification remain unresolved but are not used as acceptance proof.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Append one keys-only bridge-health record to the shared HTTP primary."  
+GitHub Repo proof: GitHub Repo | current shared log | retained \`2026-07-16T18:26:14.958Z\` bridge-health record exactly once  
+PF reference, if relied on: None
+
+NET ID: NET-024  
+File/artifact: \`artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt\`  
+Covered hunks: OPR-024  
+Original merged state: Refresh shared HTTP primary path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: The shared-log proof was refreshed by Original PR and remained byte-identical through both remediations; protected-hash checks confirm no remedial churn.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh shared HTTP primary path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`artifacts/logs/keys\_only.sample.jsonl.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-025  
+File/artifact: \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\`  
+Covered hunks: OPR-025 / R1PR-003  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh A7 environment-gate proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/endpoints\_env\_gate\_proof.log.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-026  
+File/artifact: \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\`  
+Covered hunks: OPR-026 / R1PR-004  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh composite Reader-success proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/reader\_success\_get\_head\_304.json.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-027  
+File/artifact: \`artifacts/proofs/success\_304.txt.path\_proof.txt\`  
+Covered hunks: OPR-027 / R1PR-005  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh 304 proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/success\_304.txt.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-028  
+File/artifact: \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\`  
+Covered hunks: OPR-028 / R1PR-006  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh encoding-invariance proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/success\_encoding\_invariance.txt.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-029  
+File/artifact: \`artifacts/proofs/success\_get.txt.path\_proof.txt\`  
+Covered hunks: OPR-029 / R1PR-007  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh GET success proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/success\_get.txt.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-030  
+File/artifact: \`artifacts/proofs/success\_head.txt.path\_proof.txt\`  
+Covered hunks: OPR-030 / R1PR-008  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh HEAD success proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/success\_head.txt.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-031  
+File/artifact: \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\`  
+Covered hunks: OPR-031 / R1PR-009  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh writer/error proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/proofs/success\_writers\_errors.txt.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-032  
+File/artifact: \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\`  
+Covered hunks: OPR-032 / R1PR-010  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh endpoint snapshot proof chronology/binding."  
+GitHub Repo proof: GitHub Repo | current \`artifacts/reader/endpoints\_snapshot.json.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-033  
+File/artifact: \`audit/gates/topology/orientation\_demo.txt\`  
+Covered hunks: OPR-033  
+Original merged state: Refresh topology orientation artifact for the changed evidence skeleton.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh topology orientation artifact for the changed evidence skeleton."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`audit/gates/topology/orientation\_demo.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-034  
+File/artifact: \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\`  
+Covered hunks: OPR-034  
+Original merged state: Refresh orientation sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh orientation sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`audit/gates/topology/orientation\_demo.txt.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-035  
+File/artifact: \`docs/CLI\_commands.md\`  
+Covered hunks: OPR-035  
+Original merged state: Document controlled configured-v2 upsert gates and production nonauthorization.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: Medium  
+High-risk hunk assessment, if applicable: Current documentation/source inventory reflects the bounded implementation and preserves production/open-rails nonclaims.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Document controlled configured-v2 upsert gates and production nonauthorization."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/CLI\_commands.md\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: None
+
+NET ID: NET-036  
+File/artifact: \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\`  
+Covered hunks: OPR-036 / R1PR-011  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh canonical Endpoint Catalog path proof."  
+GitHub Repo proof: GitHub Repo | current \`docs/ENDPOINTS\_CATALOG.json.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-037  
+File/artifact: \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\`  
+Covered hunks: OPR-037 / R1PR-012  
+Original merged state: Refreshed path proof with correct path/hash/size but future-dated \`mtime\_utc\`; evidence chronology check was not clean.  
+After first remediation: Chronology repaired canonically; no primary/hash/size change.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current corrected path proof at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; monotone mtime and unchanged primary identity.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original binding fields were correct except future-dated \`mtime\_utc\`; First Remedial PR repaired chronology through the canonical writer; current proof matches path/hash/size and monotone mtime semantics.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh canonical Endpoint Catalog checksum proof."  
+GitHub Repo proof: GitHub Repo | current \`docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt\` | path/hash/size retained; \`mtime\_utc\` corrected by First Remedial PR  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-038  
+File/artifact: \`docs/RUN.md\`  
+Covered hunks: OPR-038  
+Original merged state: Document mapped-cache generation, checking, and operator boundaries.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: Medium  
+High-risk hunk assessment, if applicable: Current documentation/source inventory reflects the bounded implementation and preserves production/open-rails nonclaims.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Document mapped-cache generation, checking, and operator boundaries."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/RUN.md\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: None
+
+NET ID: NET-039  
+File/artifact: \`docs/evidence/INDEX.json\`  
+Covered hunks: OPR-039  
+Original merged state: Register mapped-cache evidence and schemas in the Human Evidence Index.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Register mapped-cache evidence and schemas in the Human Evidence Index."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/evidence/INDEX.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-040  
+File/artifact: \`docs/evidence/INDEX.json.path\_proof.txt\`  
+Covered hunks: OPR-040  
+Original merged state: Refresh Human Index sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh Human Index sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/evidence/INDEX.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-041  
+File/artifact: \`docs/evidence/INDEX.sha256\`  
+Covered hunks: OPR-041  
+Original merged state: Refresh Human Index hash sentinel.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh Human Index hash sentinel."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/evidence/INDEX.sha256\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-042  
+File/artifact: \`docs/evidence/INDEX.sha256.path\_proof.txt\`  
+Covered hunks: OPR-042  
+Original merged state: Refresh sentinel sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current canonical ledger/orientation surface remains coherent; both remediations preserved its protected hash and check-mode validation passed.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Refresh sentinel sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`docs/evidence/INDEX.sha256.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-043  
+File/artifact: \`engine/bodygraph/mapped\_cache.py\`  
+Covered hunks: OPR-043  
+Original merged state: Add the sole bounded mapped-cache persistence owner with strict projection, canonicalization, parameterized insert, read-back, and typed failures.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current owner strictly validates normalized identity and mapped shape, projects before persistence, uses parameterized \`hde.body\_graphs\` SQL, derives insert result locally, and verifies canonical read-back parity.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add the sole bounded mapped-cache persistence owner with strict projection, canonicalization, parameterized insert, read-back, and typed failures."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`engine/bodygraph/mapped\_cache.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-044  
+File/artifact: \`engine/bodygraph/resolver.py\`  
+Covered hunks: OPR-044 / OPR-045 / OPR-046 / OPR-047 / OPR-048  
+Original merged state: Wire configured-v2 persistence through explicit gates, normalized identity, sanctioned DBAccess, and typed result envelopes.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current resolver requires explicit upsert, open rails, both requested and process environments non-production-like, DB preflight, successful adapter mapping, and explicit legacy behavior; dry-run remains DB-free.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Wire configured-v2 persistence through explicit gates, normalized identity, sanctioned DBAccess, and typed result envelopes."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`engine/bodygraph/resolver.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-045  
+File/artifact: \`engine/cli/main.py\`  
+Covered hunks: OPR-049 / OPR-050  
+Original merged state: Update CLI help and DB compatibility reads for projected nested mapped-cache payloads.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current CLI documents controlled upsert and accepts projected nested mapped-cache mechanics in DB compatibility reads.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Update CLI help and DB compatibility reads for projected nested mapped-cache payloads."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`engine/cli/main.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-046  
+File/artifact: \`glow\_hdengine.egg-info/SOURCES.txt\`  
+Covered hunks: OPR-051  
+Original merged state: Include new source/tests/schemas/tooling in package source inventory.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: Medium  
+High-risk hunk assessment, if applicable: Current documentation/source inventory reflects the bounded implementation and preserves production/open-rails nonclaims.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Include new source/tests/schemas/tooling in package source inventory."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`glow\_hdengine.egg-info/SOURCES.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: None
+
+NET ID: NET-047  
+File/artifact: \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json\`  
+Covered hunks: OPR-052  
+Original merged state: Add closed manifest schema for mapped-cache evidence.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current schema is closed, canonical, and bound by the mapped-cache manifest and governed evidence system.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add closed manifest schema for mapped-cache evidence."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: None
+
+NET ID: NET-048  
+File/artifact: \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt\`  
+Covered hunks: OPR-053  
+Original merged state: Add schema sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current file remains at the Original merged content, with no first- or second-remedial modification and no later change.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add schema sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-049  
+File/artifact: \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json\`  
+Covered hunks: OPR-054  
+Original merged state: Add closed transcript schema for mapped-cache write/read-back evidence.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current schema is closed, canonical, and bound by the mapped-cache manifest and governed evidence system.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add closed transcript schema for mapped-cache write/read-back evidence."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: None
+
+NET ID: NET-050  
+File/artifact: \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt\`  
+Covered hunks: OPR-055  
+Original merged state: Add transcript-schema sibling path proof.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current file remains at the Original merged content, with no first- or second-remedial modification and no later change.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add transcript-schema sibling path proof."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json.path\_proof.txt\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+NET ID: NET-051  
+File/artifact: \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\`  
+Covered hunks: OPR-056  
+Original merged state: Add PO-only bounded configured-v2 smoke harness with preflight, one-attempt request, DB health, redaction, and idempotence checks.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current script remains PO-only and unexecuted in PR checks; it validates configured-v2 route and canonical UUID, health-checks DB before one vendor attempt, then proves mapped write/read-back/idempotence with redacted output.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add PO-only bounded configured-v2 smoke harness with preflight, one-attempt request, DB health, redaction, and idempotence checks."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-052  
+File/artifact: \`tests/bodygraph/test\_bg\_resolve\_route\_policy.py\`  
+Covered hunks: OPR-057  
+Original merged state: Strengthen route-policy tests for controlled configured-v2 persistence and legacy fallback.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current regression coverage remains present and green in the final CI matrix; no remedial regression or deletion occurred.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Strengthen route-policy tests for controlled configured-v2 persistence and legacy fallback."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tests/bodygraph/test\_bg\_resolve\_route\_policy.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-053  
+File/artifact: \`tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py\`  
+Covered hunks: OPR-058  
+Original merged state: Add resolver tests for explicit upsert, dual production guard, normalization, DB preflight, parity, and refusal paths.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current regression coverage remains present and green in the final CI matrix; no remedial regression or deletion occurred.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add resolver tests for explicit upsert, dual production guard, normalization, DB preflight, parity, and refusal paths."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tests/bodygraph/test\_bg\_resolve\_v2\_mapped\_cache.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-054  
+File/artifact: \`tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py\`  
+Covered hunks: OPR-059  
+Original merged state: Add smoke-harness tests for v2 preflight, UUID validation, DB-before-vendor ordering, and one-attempt enforcement.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current regression coverage remains present and green in the final CI matrix; no remedial regression or deletion occurred.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add smoke-harness tests for v2 preflight, UUID validation, DB-before-vendor ordering, and one-attempt enforcement."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tests/bodygraph/test\_hde\_epic038\_mapped\_cache\_smoke.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-055  
+File/artifact: \`tests/bodygraph/test\_v2\_mapped\_cache.py\`  
+Covered hunks: OPR-060  
+Original merged state: Add persistence-boundary tests for strict shape, canonical read-back, idempotence, raw/secret rejection, and one cache home.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current regression coverage remains present and green in the final CI matrix; no remedial regression or deletion occurred.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add persistence-boundary tests for strict shape, canonical read-back, idempotence, raw/secret rejection, and one cache home."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tests/bodygraph/test\_v2\_mapped\_cache.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-056  
+File/artifact: \`tests/cli/test\_showcompat\_sources.py\`  
+Covered hunks: OPR-061  
+Original merged state: Add DB compatibility-source tests for nested projected mapped-cache rows.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current regression coverage remains present and green in the final CI matrix; no remedial regression or deletion occurred.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add DB compatibility-source tests for nested projected mapped-cache rows."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tests/cli/test\_showcompat\_sources.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-057  
+File/artifact: \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`  
+Covered hunks: OPR-062 / R1PR-017 / R1PR-018 / R2PR-003  
+Original merged state: Initial 5-test evidence suite present; did not cover comprehensive hermeticity or traceback-local secret exposure.  
+After first remediation: Expanded to comprehensive hermeticity/protected-file/failure/fixed-point regressions; production generator traceback-local risk remained.  
+After second remediation: Subprocess \`--showlocals \--tb=long\` redaction regression added.  
+Current final repo state: Current 21-test focused file, including traceback-redaction and no-mutation coverage.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original focused evidence tests covered schema/predicate/fixed-point behavior. First Remedial PR added hermeticity, rollback, and protected-file regressions; Second Remedial PR added a subprocess traceback-redaction test. Current focused suite is green.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add evidence producer inventory/schema/fixed-point/fail-closed tests."  
+GitHub Repo proof: GitHub Repo | current focused tests and PR \#358 patch | traceback locals redact sentinels; hermetic/fixed-point checks retained  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-058  
+File/artifact: \`tools/evidence/generate\_v2\_mapped\_cache\_evidence.py\`  
+Covered hunks: OPR-063 / R1PR-013 / R1PR-014 / R1PR-015 / R1PR-016 / R2PR-001 / R2PR-002  
+Original merged state: Required fixture-backed producer present; generated correct mapped-cache bytes, but ambient external seams/shared-log mutation were not comprehensively canaried.  
+After first remediation: Hermetic environment, provider/transport/logger canaries, shared-log protection, staged atomic writes, and rollback added; raw env values still lived in a plain restoration dictionary across \`yield\`.  
+After second remediation: Raw environment restoration state moved to redacted slotted object and cleared after restore.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; hermetic producer with redacted restore state, exact canaries, protected shared log, derived predicates, failure-atomic write/check.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Original producer generated the required fixture-backed family but lacked complete ambient-seam/log isolation. First Remedial PR added hermetic canaries, shared-log protection, and atomic rollback; Second Remedial PR removed traceback-local raw-value exposure. Current source is fail-closed and check mode is non-writing.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Add fixture-backed mapped-cache evidence producer with strict schemas, derived predicates, staged writes, and check mode."  
+GitHub Repo proof: GitHub Repo | current raw source at \`e5f0fd67538080c10f7fc87ece36397ffab59970\` | redacted \`\_EnvironmentRestoreState\`; exact canary map; shared-log guard; staged rollback  
+PF reference, if relied on: PF14 — HDE-Mechanics Guide, §1.1 Capabilities the repo must provide
+
+NET ID: NET-059  
+File/artifact: \`tools/evidence/update\_evidence\_index.py\`  
+Covered hunks: OPR-064  
+Original merged state: Register exact PR-05 evidence/schema families in the canonical updater.  
+After first remediation: Unchanged from Original merged state.  
+After second remediation: Unchanged from First remedial merged state.  
+Current final repo state: Current \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`; content equals the latest applicable reviewed PR state.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current updater retains sole ownership of mapped-cache Index/Mirror/path-proof registration; no remedial writer split was introduced.  
+Assessment: Current state is coherent with the approved PR-05 boundary and introduces no remaining blocker.  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | per-file patches and current state | "Register exact PR-05 evidence/schema families in the canonical updater."  
+GitHub Repo proof: GitHub Repo | baseline-to-current comparison and current \`tools/evidence/update\_evidence\_index.py\` state | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`  
+PF reference, if relied on: PF12 — HDE-Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only)
+
+Validation & Evidence Review
+
+VAL-001  
+Purpose: Prove Original PR's final integrated code and evidence state passed repository CI before merge.  
+Source: Original PR  
+Check/workflow/artifact/method: GitHub Actions run \`29539675570\`, seven jobs.  
+Result: PASS  
+Observation: The final Original PR head completed all seven jobs successfully, including committed closure, canonical JSON, evidence index and mirror checks, evidence tests, rails gates, and sanity pipeline.  
+Evidence pointer: Original PR | workflow run \`29539675570\` | "status=completed" | "conclusion=success" fileciteturn191file0  
+Why it matters: It establishes broad integration coverage, though later static review still found hermeticity and chronology defects.
+
+VAL-002  
+Purpose: Prove First Remedial PR's chronology and hermeticity changes integrated cleanly.  
+Source: First Remedial PR  
+Check/workflow/artifact/method: GitHub Actions run \`29558415086\`, seven jobs.  
+Result: PASS  
+Observation: All jobs passed, including evidence-index check mode, mirror/hash/final-LF checks, repository evidence tests, rails gates, and sanity.  
+Evidence pointer: First Remedial PR | workflow run \`29558415086\` | "status=completed" | "conclusion=success" fileciteturn192file0  
+Why it matters: It proves the broad remediation did not break repository closure, while the traceback-local issue required a separate review finding.
+
+VAL-003  
+Purpose: Prove Second Remedial PR's traceback-redaction fix integrated without drift.  
+Source: Second Remedial PR  
+Check/workflow/artifact/method: GitHub Actions run \`29559412525\`, seven jobs.  
+Result: PASS  
+Observation: All jobs passed after the two-file redaction change.  
+Evidence pointer: Second Remedial PR | workflow run \`29559412525\` | "status=completed" | "conclusion=success" fileciteturn193file0  
+Why it matters: It is the final lifecycle CI state and current \`main\`.
+
+VAL-004  
+Purpose: Verify focused mapped-cache and hermeticity behavior.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: Focused \`tests/evidence/test\_v2\_mapped\_cache\_evidence.py\`.  
+Result: PASS  
+Observation: First Remedial PR progressed from 19 to 20 passing tests; Second Remedial PR completed with 21 passing tests, including traceback-local redaction.  
+Evidence pointer: Extra Evidence | focused validation | "21 passed in 2.94s" | no focused failure  
+Why it matters: It directly exercises the main remediation predicates rather than relying on CI status alone.
+
+VAL-005  
+Purpose: Verify related resolver, persistence, CLI, and smoke-harness regression coverage.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: Related BodyGraph and CLI suite.  
+Result: PASS  
+Observation: 54 related tests passed.  
+Evidence pointer: Extra Evidence | related suite | "54 passed" | mapped-cache and CLI coverage included  
+Why it matters: It checks the surrounding runtime and compatibility surfaces touched by Original PR.
+
+VAL-006  
+Purpose: Verify deterministic producer fixed point and nonwriting check mode.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: Generator write run twice followed by \`--check\`.  
+Result: PASS  
+Observation: Both generation runs and check mode returned \`V2\_MAPPED\_CACHE\_EVIDENCE\_OK\`; protected mapped-cache bytes remained stable.  
+Evidence pointer: Extra Evidence | generator fixed point | "generation run 1: V2\_MAPPED\_CACHE\_EVIDENCE\_OK" | "--check: V2\_MAPPED\_CACHE\_EVIDENCE\_OK"  
+Why it matters: It proves repeatability and check-mode behavior after hermeticity hardening.
+
+VAL-007  
+Purpose: Verify canonical evidence-index, path, mirror, hash, orientation, LF, and diff posture.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: \`update\_evidence\_index.py \--check\`; \`validate\_evidence\_paths.py\`; \`orientation\_demo.py \--check\`; mirror schema/hash; final LF; \`git diff \--check\`.  
+Result: PASS  
+Observation: Every listed governed-evidence check passed after the bounded path-proof chronology repairs.  
+Evidence pointer: Extra Evidence | governed evidence checks | all commands listed as passed | no remaining chronology failure  
+Why it matters: It proves the current governed evidence graph is coherent and fixed-point.
+
+VAL-008  
+Purpose: Verify final runtime and producer source rather than treating test outcomes as sufficient.  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Current raw-file inspection at \`e5f0fd67538080c10f7fc87ece36397ffab59970\`.  
+Result: PASS  
+Observation: Current persistence, resolver, CLI, smoke harness, generator, and tests implement the expected gates, canonicality, idempotence, hermeticity, and redaction.  
+Evidence pointer: GitHub Repo | current raw files | mapped-cache owner, resolver, CLI, generator, tests | current SHA \`e5f0fd67538080c10f7fc87ece36397ffab59970\` fileciteturn188file0 fileciteturn189file0 fileciteturn218file0  
+Why it matters: It validates final-file correctness independently of CI conclusions.
+
+VAL-009  
+Purpose: Verify protected governed bytes did not drift across remediations.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: Git blob/hash comparison from First Remedial PR base through Second Remedial PR.  
+Result: PASS  
+Observation: Shared log and proof, Human Index and checksum, Machine Mirror and checksum, orientation output, mapped-cache primaries, and both schemas remained byte-identical.  
+Evidence pointer: Extra Evidence | protected evidence review | shared log SHA-256 \`ed5c8e0d0a5743d65ede9a611868b1eb31edbaca43bc1a2c9ba072e8c71f17d8\` | mapped-cache primaries unchanged  
+Why it matters: It proves remediation did not manufacture new evidence or silently rewrite the historical record.
+
+VAL-010  
+Purpose: Verify the Product Owner's retained-record disposition.  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Current shared-log inspection and exact-record search.  
+Result: PASS  
+Observation: The bridge-health record appears exactly once as the final line and remains keys-only. Its origin and live-versus-mocked classification remain unresolved and are not used as acceptance proof.  
+Evidence pointer: GitHub Repo | \`artifacts/logs/keys\_only.sample.jsonl\` | \`"2026-07-16T18:26:14.958Z"\` | \`"db\_bridge.get:/health"\` fileciteturn207file0  
+Why it matters: It confirms the authorized preservation decision without making an unsupported provenance claim.
+
+VAL-011  
+Purpose: Verify current path-proof chronology repair.  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Representative current proof inspection plus complete First Remedial PR changed set.  
+Result: PASS  
+Observation: Current proof records path, size, primary SHA-256, corrected \`mtime\_utc\`, and unchanged \`produced\_at\_utc\`; all twelve authorized proof siblings received the same bounded treatment.  
+Evidence pointer: GitHub Repo | \`artifacts/proofs/success\_304.txt.path\_proof.txt\` | \`"mtime\_utc: 2026-07-16T00:08:29Z"\` | \`"sha256: de7beffa922242ec004b7c6fb5d3fa6acf82aca3ae7aa68a4580eeddc324c1cf"\` fileciteturn217file0  
+Why it matters: It closes the Original PR's evidence-integrity defect.
+
+VAL-012  
+Purpose: Assess aggregate local suite coverage.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: \`python \-m pytest tests/evidence tests/ops/test\_evidence\_index.py\`.  
+Result: INCONCLUSIVE  
+Observation: 549 tests collected; 540 passed; nine unrelated contract-inventory tests failed because the review container lacked the Ruby executable. All 21 mapped-cache tests passed. GitHub Actions on every reviewed PR head is green.  
+Evidence pointer: Extra Evidence | aggregate invocation | "540 passed; 9 failed" | all failures require missing \`ruby\`  
+Why it matters: Local aggregate green cannot be claimed, but the limitation does not block acceptance because current GitHub CI provides the complete repository-host validation and the failures were not behavior regressions.
+
+VAL-013  
+Purpose: Verify the PO-only live smoke boundary.  
+Source: GitHub Repo  
+Check/workflow/artifact/method: Static inspection of \`scripts/ops/hde\_epic038\_mapped\_cache\_smoke.py\`; no execution.  
+Result: NOT RUN  
+Observation: The harness preflights open rails, non-production environment, exact v2 route policy, canonical UUID, DB health before vendor request, single attempt, mapped projection, persistence, read-back, and idempotence. It was not run by any PR.  
+Evidence pointer: GitHub Repo | PO-only smoke source | "db.health()" before \`client.fetch()\` | \`VendorRetryConfig(max\_attempts=1)\` fileciteturn198file0  
+Why it matters: Not running it is correct for PR scope; it remains an OPS-02 action and is not required to accept the implementation PR.
+
+VAL-014  
+Purpose: Separate deployment recovery from source correctness.  
+Source: Extra Evidence  
+Check/workflow/artifact/method: Original merge deployment record and file-identical trigger comparison.  
+Result: PASS  
+Observation: Original merge's Railway attempt failed before build execution; file-identical trigger commit \`462edd262c6c59e0548762bbd8b9f39cc7275f97\` deployed the same tree successfully.  
+Evidence pointer: Extra Evidence | deployment recovery | no changed files and same tree | later deployment status success  
+Why it matters: The operational incident is historical evidence, not a current source defect or an additional lifecycle file change.
+
+Requirement Satisfaction Crosswalk
+
+REQ-001  
+Requirement ID: REQ-001  
+Requirement: Implement bounded configured-v2 durable mapped-cache persistence for adapter-mapped HDE data in non-production or controlled rails.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Original PR | \`engine/bodygraph/mapped\_cache.py\`; \`engine/bodygraph/resolver.py\` | exact mapped-cache owner and resolver branch  
+GitHub Repo proof, if current state matters: Original PR added the owner and resolver path; remediations did not change runtime persistence.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: Production authorization remains excluded.
+
+REQ-002  
+Requirement ID: REQ-002  
+Requirement: Validate the exact cache top-level shape, UUID-compatible user identity, integer vendor version, lowercase SHA-256 fingerprint, expected vendor, expected payload posture, and mapping payload.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current \`engine/bodygraph/mapped\_cache.py\` | exact-key and type guards | typed refusal  
+GitHub Repo proof, if current state matters: Current owner performs every validation before database work.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-003  
+Requirement ID: REQ-003  
+Requirement: Project with the approved pure projection boundary and persist only adapter-mapped HDE BodyGraph/cache bytes, never raw vendor envelopes or secret-bearing material.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current owner and no-raw proof | \`project\_bodygraph(payload)\` | stored keys \`bodygraph,person,person\_uid\`  
+GitHub Repo proof, if current state matters: Current owner calls \`project\_bodygraph()\` then \`sercanon()\`; governed evidence records only safe payload keys.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-004  
+Requirement ID: REQ-004  
+Requirement: Use the existing \`hde.body\_graphs\` store and existing DB abstraction; create no second database or persistence home.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current owner/resolver | \`INSERT INTO hde.body\_graphs\` | \`DBAccess.for\_current\_env(snapshot\_path=None)\`  
+GitHub Repo proof, if current state matters: Parameterized SQL targets \`hde.body\_graphs\`; resolver obtains \`DBAccess.for\_current\_env()\`.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-005  
+Requirement ID: REQ-005  
+Requirement: Require explicit \`--upsert\`, open rails, non-production posture, available DB target, successful adapter mapping, and no new public route or flag.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | resolver and CLI | missing-upsert typed refusal | dual environment production guard  
+GitHub Repo proof, if current state matters: Resolver enforces each gate; CLI reuses the existing \`--upsert\` flag.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-006  
+Requirement ID: REQ-006  
+Requirement: Preserve dry-run mapping and closed-rails zero-I/O typed refusal.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | resolver/generator | \`PROVIDER\_REFUSED\` | zero canary attempts  
+GitHub Repo proof, if current state matters: Resolver returns before provider construction under closed rails; final producer canaries independently prove no lower seam is reached.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-007  
+Requirement ID: REQ-007  
+Requirement: Refuse production-like mapped-cache writes using the same effective environment authority as database selection.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current resolver | requested and process \`APP\_ENV\`/\`ENGINE\_ENV\` sets | production-like refusal  
+GitHub Repo proof, if current state matters: Final resolver checks both request-supplied and process environment before DB or vendor activity.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-008  
+Requirement ID: REQ-008  
+Requirement: Use normalized identity, atomic insertion result, one-row cardinality, idempotence, read-back reprojection, and canonical equality.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current mapped-cache owner | \`rows\_written=len(inserted\_rows)\` | \`read\_back \!= canonical\` refusal  
+GitHub Repo proof, if current state matters: Current owner uses \`RETURNING 1\`, counts exactly one row, reprojects read-back, and compares canonical bytes.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-009  
+Requirement ID: REQ-009  
+Requirement: Preserve explicit legacy non-v2 fallback without treating it as configured-v2 persistence.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | final generator/resolver | \`explicit\_legacy\_fallback\` | one legacy call  
+GitHub Repo proof, if current state matters: Resolver retains route-family classification; evidence derives the legacy predicate from exercised behavior.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-010  
+Requirement ID: REQ-010  
+Requirement: Keep DB-backed \`showcompat\` compatible with the projected mapped payload shape.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current \`engine/cli/main.py\` | \`mechanics \= payload.get("mechanics") or mapped\_bodygraph\` | no missing-type failure  
+GitHub Repo proof, if current state matters: CLI reads mechanics from top-level \`mechanics\` or mapped \`bodygraph\`.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-011  
+Requirement ID: REQ-011  
+Requirement: Provide the exact deterministic PR-05 evidence producer, exact eight primary artifacts, two strict schemas, and manifest bindings.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Original PR / GitHub Repo | governed artifact family | manifest status PASS | strict schemas  
+GitHub Repo proof, if current state matters: Original PR added every named artifact and schema; remediations preserved their bytes.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-012  
+Requirement ID: REQ-012  
+Requirement: Make the fixture producer hermetic against ambient DB, bridge, vendor, DNS, socket, HTTP, and shared-log side effects.  
+After Original PR: Not satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): First Remedial PR / GitHub Repo | \`\_hermetic\_execution()\` | exact canary map and shared-log guard  
+GitHub Repo proof, if current state matters: Original producer lacked comprehensive lower-seam and shared-log guards; First Remedial PR added them; Second preserved behavior.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-013  
+Requirement ID: REQ-013  
+Requirement: Ensure write mode is failure-atomic, check mode is nonwriting, repeated generation is a fixed point, and failures leave no partial artifacts or residue.  
+After Original PR: Not satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): First Remedial PR | generator/tests | same-filesystem stage and backup | rollback and residue checks  
+GitHub Repo proof, if current state matters: Original staging did not restore already-replaced paths after mid-commit failure; First Remedial PR added backups and reverse rollback plus tests.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-014  
+Requirement ID: REQ-014  
+Requirement: Preserve the shared keys-only HTTP primary according to the explicit Product Owner disposition and prevent any new PR-05 producer mutation.  
+After Original PR: Not satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current shared log and focused tests | retained record once | before/after SHA unchanged  
+GitHub Repo proof, if current state matters: Original PR added one unrelated bridge-health row; the Product Owner chose retention. First Remedial PR locks byte identity and canaries; Second preserves it.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: The retained record is not used to prove live or mocked execution.
+
+REQ-015  
+Requirement ID: REQ-015  
+Requirement: Maintain secret-safe failure logs, including assertion output and traceback locals.  
+After Original PR: Unclear  
+After First Remedial PR: Not satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Second Remedial PR | \`\_EnvironmentRestoreState\`; subprocess traceback test | \`values=\<redacted\>\` | sentinel values absent  
+GitHub Repo proof, if current state matters: First Remedial PR redacted assertion snapshots but kept raw values in traceback-visible context state; Second Remedial PR closes the gap.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-016  
+Requirement ID: REQ-016  
+Requirement: Provide a PO-only OPS smoke harness with open-rails and non-production preflight, route validation, canonical UUID, DB health before vendor, one attempt, bounded output, and no PR execution.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | current smoke harness | \`max\_attempts=1\` | \`db.health()\` before fetch  
+GitHub Repo proof, if current state matters: Current harness contains all preflights and was not run by the PR lifecycle.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: Actual live smoke remains OPS-02.
+
+REQ-017  
+Requirement ID: REQ-017  
+Requirement: Provide focused tests for validation, parity, idempotence, refusal, production guard, legacy fallback, DB compatibility, no second home, hermeticity, rollback, and redaction.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | changed test files | current CI green  
+GitHub Repo proof, if current state matters: Original tests cover runtime; First adds broad hermeticity; Second adds traceback-local redaction.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-018  
+Requirement ID: REQ-018  
+Requirement: Keep Human Index, hash sentinel, Machine Mirror, checksum, path proofs, and orientation coherent with changed governed artifacts.  
+After Original PR: Not satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): First Remedial PR / GitHub Repo | twelve proof siblings | updater/check/path/mirror fixed point  
+GitHub Repo proof, if current state matters: Original added correct bindings but twelve unrelated proof mtimes were false-future; First canonically repaired them; current checks pass.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+REQ-019  
+Requirement ID: REQ-019  
+Requirement: Update operator/CLI documentation to describe bounded configured-v2 persistence while retaining production nonauthorization.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Original PR | docs and CLI patches | controlled upsert described | production remains closed  
+GitHub Repo proof, if current state matters: Original PR updated \`docs/CLI\_commands.md\`, \`docs/RUN.md\`, and CLI help.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: Permanent PF docs remain stale and are Doc Delta candidates.
+
+REQ-020  
+Requirement ID: REQ-020  
+Requirement: Run proportionate focused and repository-host validation and preserve evidence of commands/results.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): Original PR / First Remedial PR / Second Remedial PR | workflow runs | success  
+GitHub Repo proof, if current state matters: Each PR head has a green seven-job workflow; focused and governed checks also passed.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: Local aggregate Ruby limitation is nonblocking and disclosed.
+
+REQ-021  
+Requirement ID: REQ-021  
+Requirement: Make no QA PASS, token satisfaction, OPS completion, production authorization, deployment, PF09 movement, or closeout claim.  
+After Original PR: Satisfied  
+After First Remedial PR: Satisfied  
+After Second Remedial PR: Satisfied  
+Current state: Satisfied  
+Evidence pointer(s): GitHub Repo | mapped-cache manifest and PR descriptions | no token claim | no OPS/production authorization  
+GitHub Repo proof, if current state matters: Manifest nonclaims and reports preserve the separate axes.  
+PF09 task/subtask IDs, if proven: HDE-DIST001 / HDE-DIST001.11  
+Notes, optional: None.
+
+RCA
+
+A) Bug/Failure statement
+
+1\. Original PR's fixture-backed evidence producer could be influenced by ambient DB, bridge, and vendor configuration and did not independently block every lower transport/logger seam or protect the shared HTTP primary. During Original PR work, one bridge-health record was appended to the shared primary outside the PR-05 evidence family.  
+2\. Original PR also committed twelve A7/Endpoint Catalog sibling path proofs with false future \`mtime\_utc\` values, causing canonical proof-chronology validation to fail post-merge.  
+3\. First Remedial PR fixed those issues but retained raw caller environment values in a plain context-manager local. A pytest failure rendered with locals could expose secrets or private URLs.  
+4\. Original PR's Railway deployment initially failed before build execution; a file-identical trigger later succeeded.
+
+B) Root cause(s)
+
+\- The original producer's proof design relied on selected resolver-level patches and rail booleans rather than a complete hermetic boundary with independently counted constructor, provider, lower transport, network, and logger canaries.  
+\- The original writer staged files but did not provide full reverse rollback after partial replacement.  
+\- The shared keys-only log was not treated as a protected primary during fixture generation.  
+\- The A7/Catalog proof refresh carried generated chronology values inconsistent with the checked-out primary mtimes.  
+\- First Remedial PR's restoration mechanism optimized for exact restoration but stored raw values in a default-represented dictionary across \`yield\`, overlooking traceback-local disclosure.  
+\- The Railway failure occurred during builder scheduling or pre-build handoff, not application build or runtime.
+
+C) Fix progression across Original PR, First Remedial PR, and Second Remedial PR
+
+\- Original PR implemented the mapped-cache runtime, strict validation, canonical projection, idempotent write/read-back, production guard, DB compatibility, exact artifact family, and focused runtime tests.  
+\- First Remedial PR retained the historical shared-log record by explicit Product Owner decision, canonically repaired all twelve bounded proof chronologies, added the full hermetic context and exact canary map, protected the shared log, added transactional staged replacement with rollback, and expanded tests across success, failure, check, residue, and fixed-point paths.  
+\- Second Remedial PR replaced the raw dictionary with a redacted state object and added a real traceback-local leak regression.
+
+D) Final fix verification
+
+\- Current raw generator source contains deterministic environment isolation, exact canaries, shared-log byte/hash verification, module restoration, attempt accounting, staged rollback, and a redacted restoration object. fileciteturn218file0 fileciteturn219file0  
+\- Current tests exercise the leak path in a child pytest process with \`--showlocals \--tb=long\` and reject every sentinel value. fileciteturn221file0  
+\- All three PR heads passed their complete GitHub Actions workflows.  
+\- Current governed checks pass; protected primaries remain byte-identical; and Second Remedial PR is current \`main\`.  
+\- The deployment recovery used a file-identical commit and therefore does not alter the reviewed implementation.
+
+PF09 Impact & Status Posture
+
+PF09.x document title: PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+PF09 task ID: HDE-DIST001
+
+PF09 subtask ID(s): HDE-DIST001.11
+
+Current PF09 status: Optional
+
+Status recommendation: change to Partial
+
+Why supported:  
+\- Current repo state implements and tests the bounded non-production mapped-cache persistence slice in substance: strict adapter-mapped payload validation, existing-store writes, canonical write/read-back parity, idempotence, no raw vendor payload persistence, closed-rails refusal, legacy fallback preservation, and governed fixture evidence.  
+\- The current row cannot support Done because the Implementation Doc maps completion across PR-05, OPS-02, and PR-06. The PO-only live smoke and later aggregate binding remain separate truth axes and are not completed by this three-PR lifecycle.  
+\- The recommendation is documentation/status drainage only. This review does not edit PF09 or claim that status has already moved.
+
+Evidence pointer(s):  
+Implementation Doc | PF09 Completion Scope and PR-05 | \`HDE-DIST001.11\` | PR-05 / OPS-02 / PR-06  
+GitHub Repo | current mapped-cache owner, resolver, proof family, tests, and updater bindings | implementation and fixture evidence present | no production authorization  
+Extra Evidence | protected evidence and validation | current artifact hashes stable | focused and CI checks passed
+
+GitHub Repo proof, if current state matters:  
+GitHub Repo | current \`engine/bodygraph/mapped\_cache.py\`, \`engine/bodygraph/resolver.py\`, \`artifacts/bodygraph/v2\_mapped\_cache/\`, schemas, tests, and evidence bindings | present at \`main@e5f0fd67538080c10f7fc87ece36397ffab59970\`
+
+PF proof excerpt(s):  
+PF09.6-Canon-HDE-Build-Checklist-Distillation | §Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening |  
+"Implement and prove a durable mapped-cache persistence path for configured-v2 chart-backed BodyGraph resolution in non-prod or controlled rails before any production-facing write posture is considered."  
+"The path must write adapter-mapped HDE BodyGraph/cache payloads, not raw HumanDesignAPI v2 ChartResult envelopes."  
+"Subtask status: Optional"  
+"Epic or card: Future epic, pending PO / Lead Dev authorization." fileciteturn289file31
+
+Linked NET/Finding IDs:  
+NET-003 through NET-018; NET-043 through NET-059; F-001; F-004
+
+Findings
+
+F-001  
+Related item: NET-023 / REQ-014 / GitHub Repo  
+Lifecycle origin: Original PR  
+Severity: Note  
+Observation: The retained bridge-health record remains present exactly once in the shared keys-only log. Reviewed sources prove Original PR added it, but do not prove the originating command or whether the lower HTTP request was external, intercepted locally, or monkeypatched.  
 Why it matters: Provenance must remain truthful; the record cannot be converted into a live-call or mocked-call claim.  
 Evidence: GitHub Repo | current shared log | exact final record retained | no repository provenance resolving execution classification  
 Required action: None.  
