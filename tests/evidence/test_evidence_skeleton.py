@@ -71,6 +71,43 @@ def test_unchanged_legacy_proof_is_not_retimestamped(
     assert proof.read_bytes() == original
 
 
+def test_explicit_produced_at_change_rewrites_unchanged_proof(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    artifact = tmp_path / "current-live-proof.json"
+    artifact.write_bytes(b"bound bytes\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    common = {
+        "rel": "current-live-proof.json",
+        "sha256": digest,
+        "size_bytes": artifact.stat().st_size,
+        "default_produced_at": "2026-07-14T00:00:00Z",
+        "stat_mtime": artifact.stat().st_mtime,
+    }
+    update_evidence_index._write_path_proof(
+        check=False,
+        mtime_utc="2026-07-14T00:00:01Z",
+        produced_at="2026-07-14T00:00:00Z",
+        **common,
+    )
+
+    update_evidence_index._write_path_proof(
+        check=False,
+        mtime_utc="2026-07-27T23:38:13Z",
+        produced_at="2026-07-27T23:38:12Z",
+        **common,
+    )
+
+    proof = update_evidence_index._load_existing_proof(
+        tmp_path / "current-live-proof.json.path_proof.txt"
+    )
+    assert proof["sha256"] == digest
+    assert proof["produced_at_utc"] == "2026-07-27T23:38:12Z"
+    assert proof["mtime_utc"] == "2026-07-27T23:38:13Z"
+
+
 def test_isolated_path_proof_uses_immutable_manifest_timestamp(
     tmp_path,
     monkeypatch,

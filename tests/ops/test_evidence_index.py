@@ -133,6 +133,68 @@ def test_historical_bridge_normalization_strips_current_claims():
     assert "tokens" not in normalized
 
 
+def _write_epic038_live_proof(
+    root: Path,
+    *,
+    generated_at_utc: object = "2026-07-27T23:38:12Z",
+    top_level_pass: bool = True,
+) -> None:
+    path = root / "audit/gates/determinism/open_rails_vendor_abba.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        json.dumps(
+            {
+                "acceptance_token_satisfied": False,
+                "artifact_kind": "hde_epic038_pr03_open_rails_vendor_abba_proof",
+                "generated_at_utc": generated_at_utc,
+                "result": "pass",
+                "top_level_pass": top_level_pass,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
+def test_epic038_live_index_entry_uses_current_artifact_timestamp(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    _write_epic038_live_proof(tmp_path)
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+
+    entries = update_evidence_index._load_epic038_pr03_entries()
+    by_key = {entry["artifact_key"]: entry for entry in entries}
+
+    assert by_key["epic038.pr03.open_rails_vendor_abba"]["produced_at_utc"] == "2026-07-27T23:38:12Z"
+    assert by_key["epic038.pr03.open_rails_abba"]["produced_at_utc"] == "2026-07-14T00:00:00Z"
+
+
+@pytest.mark.parametrize(
+    "generated_at_utc,top_level_pass,expected",
+    [
+        ("2026-07-27", True, "INVALID_EPIC038_PR03_LIVE_PROOF_TIMESTAMP"),
+        ("2026-07-27T23:38:12Z", False, "INVALID_EPIC038_PR03_LIVE_PROOF_POSTURE"),
+    ],
+)
+def test_epic038_live_index_entry_rejects_invalid_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    generated_at_utc: object,
+    top_level_pass: bool,
+    expected: str,
+) -> None:
+    _write_epic038_live_proof(
+        tmp_path,
+        generated_at_utc=generated_at_utc,
+        top_level_pass=top_level_pass,
+    )
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+
+    with pytest.raises(SystemExit, match=expected):
+        update_evidence_index._load_epic038_pr03_entries()
+
+
 def test_write_if_changed_check_mode_fails_closed_for_missing_target(tmp_path: Path):
     target = tmp_path / "missing.sha256"
     with pytest.raises(SystemExit, match=rf"^STALE:{target}$"):

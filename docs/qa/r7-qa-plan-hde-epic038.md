@@ -2,7 +2,7 @@
 
 ### Front matter
 
-Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespaces Target environment: dev; one separately authorized, bounded nonproduction vendor check Plan revision: r7 Date (UTC): 2026-07-26 Operators (names-only): PO
+Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespaces Target environment: dev; one separately authorized, bounded canonical-vendor check Plan revision: r7 Date (UTC): 2026-07-26 Operators (names-only): PO
 
 #### Canon precedence statement (required)
 
@@ -53,7 +53,7 @@ This runbook independently exercises all twenty-three required proof obligations
 
 Except for the explicitly authorized bounded check `qa-08-po-008`, execution remains local, deterministic, closed-rails, and non-operational. The runbook does not start services, rerun OPS, invoke database provisioning, deploy, migrate, or remediate source code.
 
-All future outputs begin as `NOT RUN`. A pre-existing artifact never establishes current-run PASS.
+The PO-approved in-place safety correction for `qa-08-po-008` is the sole source-remediation exception: it is required before the authorized call and is limited to closing producer authorization, target, rails, input, request-bound, retained-shape, and check-mode bypasses identified during execution. All future outputs begin as `NOT RUN`. A pre-existing artifact never establishes current-run PASS.
 
 #### PF10 overrides / conflicts (if any)
 
@@ -66,18 +66,20 @@ All future outputs begin as `NOT RUN`. A pre-existing artifact never establishes
 
 ### Open-Rails Live QA Requirement for production-affecting epics
 
+* PO execution override (2026-07-27): the supplied fixed-HEAD precondition is a planning defect and is waived. QA execution records the runtime source identity for provenance, but no QA readiness, behavioral, routing, or finalization judgment depends on equality to a preplanned commit hash; future plan generation must not reintroduce a fixed-HEAD QA gate.
+* PO-approved producer correction (2026-07-27): live generation is permitted only for the exact sole canonical v2 target, a fresh event-bound PO receipt, caller-supplied open rails and canonical pins, built-in synthetic defaults, and at most two attempts. It does not self-open rails or pass the authorization receipt into the vendor client. Read-only `--live --check` remains credential-free and network-free. The sole-owner companion derives the live entry’s `produced_at_utc` from the validated current artifact instead of a historical constant. These corrections are required to prevent the same bypass and false-provenance posture from reaching production.
 Check `qa-08-po-008` is the required bounded open-rails step.
 
 * Behavior proved: two same-run vendor acquisitions using synthetic inputs, followed by AB/BA canonical Reader emission and independent validation.  
-* Target: the configured HTTPS nonproduction vendor base whose value remains unprinted.  
-* Rails: `SAFE_MODE=0`, `ALLOW_NETWORK=1`, `APP_ENV=dev`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`.  
+* Target: the exact canonical HumanDesignAPI v2 base `https://api.humandesignapi.nl/v2`; the vendor provides no separately marked staging, sandbox, development, or nonproduction base.
+* Rails: `SAFE_MODE=0`, `ALLOW_NETWORK=1`, `APP_ENV=dev`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`. `APP_ENV=dev` constrains the local application invocation; it does not classify the external canonical vendor target as development or nonproduction.
 * Bound: no more than two requests; one attempt per request; bounded timeouts; no uncontrolled retry.  
-* Authorization: fresh, one-time PO authorization is mandatory. A checked-in historical authorization note confers no current authority.  
+* Authorization: fresh, one-time PO authorization and a unique event receipt are mandatory. Only the receipt hash is retained. A checked-in historical note, proof, or receipt hash confers no current authority.
 * Secret safety: only presence is checked. No key, base URL, personal input, request body, response body, or raw vendor payload may enter the step log.  
 * Evidence: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log` and, only after a successful current run, `audit/gates/determinism/open_rails_vendor_abba.json`.  
 * It proves: the bounded current interaction, two-request limit, same-input reuse, canonical AB/BA equality, repeatability, and safe retained shape.  
-* It does not prove: broad vendor-version conformance, production behavior, recurring authorization, acceptance-token satisfaction, deployment, or closeout.  
-* If fresh authorization, required secret presence, or a repository-accepted nonproduction classification is absent, record `TOOLING_BLOCKED`; do not make a call.
+* It does not prove: broad vendor-version conformance, application production behavior, recurring authorization, acceptance-token satisfaction, deployment, or closeout.
+* If fresh authorization, required secret presence, or exact canonical-target classification is absent, record `TOOLING_BLOCKED`; do not make a call.
 
 ### PF23 anchors
 
@@ -133,17 +135,19 @@ Profile C — external release attestation:
 
 Profile D — bounded live vendor check:
 
-* Required dependencies: Profile A, fresh one-time PO authorization, `HD_API_KEY`, `GEO_API_KEY`, and `HD_API_BASE_URL` identifying an HTTPS nonproduction target; the deprecated temporary compatibility alias `HDAPI_BASE_URL` is permitted only when `HD_API_BASE_URL` is absent.  
-* Value-safe preflight, Command D1: `python -c 'import os; c_raw=os.environ.get("HD_API_BASE_URL"); a_raw=os.environ.get("HDAPI_BASE_URL"); c=(c_raw or "").strip(); a=(a_raw or "").strip(); canonical_present=c_raw is not None; conflict=bool(c and a and c != a); b=(c if canonical_present else a).lower(); marked=b.startswith("https://") and any(x in b for x in ("localhost","127.0.0.1",".test","staging","sandbox","dev","nonprod","mock")); ready=(not conflict) and marked and bool((os.environ.get("HD_API_KEY") or "").strip()) and bool((os.environ.get("GEO_API_KEY") or "").strip()); print("OPEN_RAILS_READY" if ready else "OPEN_RAILS_NOT_READY"); raise SystemExit(0 if ready else 1)'`  
+* Required dependencies: Profile A, fresh one-time PO authorization, a unique unprinted `QA08_PO_EVENT_RECEIPT`, `HD_API_KEY`, `GEO_API_KEY`, and `HD_API_BASE_URL` identifying the exact canonical HumanDesignAPI v2 base; the deprecated temporary compatibility alias `HDAPI_BASE_URL` is permitted only when `HD_API_BASE_URL` is absent.
+* PO endpoint-availability decision (2026-07-27): HumanDesignAPI provides no separately marked staging, sandbox, development, or nonproduction base. The exact canonical base is eligible only for this two-request producer after a fresh one-time PO authorization event; neither configuration presence nor a prior artifact confers recurring authority.
+* Value-safe preflight, Command D1: `SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_open_rails_abba_proof.py --live-readiness-check`
 * If packages are missing, activation action: Command A2.  
-* If authorization, secrets, or nonproduction classification are absent: none may be installed or inferred; record `TOOLING_BLOCKED`.
+* If authorization, secrets, or exact canonical-target classification are absent: none may be installed or inferred; record `TOOLING_BLOCKED`.
 
 ### PO inputs needed
 
 * Executing PO identity, names-only.  
 * Fresh one-time authorization for `qa-08-po-008`.  
+* A unique one-event `QA08_PO_EVENT_RECEIPT`, generated without printing and cleared with the confirmation immediately after invocation; only its SHA-256 digest may be retained.
 * Required open-rails secret names provisioned in the Codespace; values must never be copied into commands or logs.  
-* No production URL, live database credential, OPS authorization, or reusable login is requested.  
+* The public canonical vendor base is required; no live database credential, OPS authorization, or reusable login is requested.
 * Missing optional synthetic input variables are acceptable; the repository producer uses fabricated synthetic defaults.  
 * If a required input is missing, block only the affected check.
 
@@ -312,15 +316,22 @@ qa_run() {
       qa_activation_command="bash .devcontainer/scripts/post-create.sh"
       ;;
     C)
-qa_profile_command="command -v git >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import importlib.metadata, sys, setuptools, wheel; setuptools_major=int(importlib.metadata.version("setuptools").split(".", 1)[0]); raise SystemExit(0 if sys.version_info >= (3, 10) and setuptools_major >= 68 else 1)' && test ! -e /tmp/hde-epic038-release-attestation"
+qa_profile_command="command -v git >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import importlib.metadata, sys, setuptools, wheel; setuptools_major=int(importlib.metadata.version(\"setuptools\").split(\".\", 1)[0]); raise SystemExit(0 if sys.version_info >= (3, 10) and setuptools_major >= 68 else 1)' && test ! -e /tmp/hde-epic038-release-attestation"
       qa_activation_command=""
       ;;
     D)
       qa_profile_command="command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'"
       qa_activation_command="bash .devcontainer/scripts/post-create.sh"
-      qa_secondary_command="python -c 'import os; c_raw=os.environ.get("HD_API_BASE_URL"); a_raw=os.environ.get("HDAPI_BASE_URL"); c=(c_raw or "").strip(); a=(a_raw or "").strip(); canonical_present=c_raw is not None; conflict=bool(c and a and c != a); b=(c if canonical_present else a).lower(); marked=b.startswith("https://") and any(x in b for x in ("localhost","127.0.0.1",".test","staging","sandbox","dev","nonprod","mock")); ready=(not conflict) and marked and bool((os.environ.get("HD_API_KEY") or "").strip()) and bool((os.environ.get("GEO_API_KEY") or "").strip()); print("OPEN_RAILS_READY" if ready else "OPEN_RAILS_NOT_READY"); raise SystemExit(0 if ready else 1)'"
+      qa_secondary_command="python tools/evidence/generate_open_rails_abba_proof.py --live-readiness-check"
       ;;
   esac
+  if [ "$qa_profile" = "D" ]; then
+    case "${qa_safe}:${qa_network}" in
+      0:1) ;;
+      1:0) qa_secondary_command="" ;;
+      *) qa_secondary_command="printf '%s\\n' 'INVALID_PROFILE_D_RAILS'; exit 1" ;;
+    esac
+  fi
 
   case "$qa_id" in
     qa-00-step-0-discovery)
@@ -342,10 +353,10 @@ qa_profile_command="command -v git >/dev/null 2>&1 && command -v python >/dev/nu
       qa_path_command='test -f tools/evidence/generate_a7_transport_proofs.py && test -f tests/http/test_reader_a7_transport.py && test -f tests/http/test_endpoint_catalog.py && test -f docs/ENDPOINTS_CATALOG.json'
       ;;
     qa-06-po-006)
-      qa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/adapter/test_comqa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/http/test_compat_endpoint_contract.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'pat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'
+      qa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/http/test_compat_endpoint_contract.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'
       ;;
     qa-07-po-007)
-      qa_path_command='test -f ci/checks/run_rails_job_definitions.py && test -f ci/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml && test -f ci/jobs/logs_keys_only_redaction.yml'/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml'
+      qa_path_command='test -f ci/checks/run_rails_job_definitions.py && test -f ci/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml && test -f ci/jobs/logs_keys_only_redaction.yml'
       ;;
     qa-08-po-008)
       qa_path_command='test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tools/evidence/update_evidence_index.py'
@@ -871,17 +882,19 @@ Goal: Any live-vendor proof claim must remain expressly authorized, narrowly bou
 
 SOURCE EXCERPT (verbatim): The historical proof did not independently establish its nonproduction environment and cannot establish broad vendor-version conformance.
 
-Rails: open only for the authorized generation invocation; the independent generation check and post-route finalization run under closed rails. Required dependencies: Profile D. Preflight check: Command A1 and Command D1 before each invocation, plus explicit human confirmation of fresh authorization before generation. Path preflight: `test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tools/evidence/update_evidence_index.py` If missing, activation/install action: Command A2 for packages; none for authorization, secrets, target classification, routing provenance, or missing loci. If still unavailable: record `TOOLING_BLOCKED`; make no call. PF anchors: HDE Build Notes; Canon Plan Templates. Tokens: `[]`; `[]`.
+PO EXECUTION NOTE (2026-07-27): The PO confirmed that the exact canonical HumanDesignAPI v2 base is the only available vendor endpoint and that no separately marked staging, sandbox, development, or nonproduction endpoint exists or is expected. The PO freshly authorized this one bounded two-request generation event; this decision does not confer recurring authority. The PO also approved the narrow in-place producer/bootstrap correction recorded above and overrode the supplied fixed-HEAD precondition as a planning defect.
+
+Rails: open only for the authorized generation invocation; the independent generation check and post-route finalization run under closed rails. Required dependencies: Profile D. Generation preflight uses Command A1 and Command D1 plus explicit human confirmation of fresh authorization. Closed finalization uses Command A1 and the path preflight but skips D1, requires no endpoint or credentials, and cannot execute vendor I/O. Path preflight: `test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tools/evidence/update_evidence_index.py` If missing, activation/install action: Command A2 for packages; none for authorization, secrets, exact target classification, routing provenance, or missing loci. If still unavailable: record `TOOLING_BLOCKED`; make no call. PF anchors: HDE Build Notes; Canon Plan Templates. Tokens: `[]`; `[]`.
 
 PO actions:
 
 1. Obtain fresh one-time PO authorization.  
-2. Declare `QA08_AUTHORIZATION_CONFIRMATION=CONFIRMED` only for the current authorization event.  
+2. Declare `QA08_AUTHORIZATION_CONFIRMATION=CONFIRMED` and generate a unique unprinted `QA08_PO_EVENT_RECEIPT` only for the current authorization event.
 3. Declare `QA_NONZERO_CAUSE` as `FAIL_BEHAVIOR` or `FAIL_TOOLING` for any other nonzero result.  
 4. Leave `QA08_ROUTING_RECEIPT` and `QA08_PRE_ROUTING_RECEIPT` unset during generation.  
 5. Run the generation command once; `qa_run` captures Command A1, any permitted Command A2 activation, Command D1, the path preflight, authorization provenance, and the actual generation command.  
 6. Do not provide personal input variables; use the built-in synthetic defaults. Do not retry a failed live command in the same authorization event.  
-7. Clear `QA08_AUTHORIZATION_CONFIRMATION` immediately after the generation invocation so it cannot confer recurring authority.  
+7. Clear `QA08_AUTHORIZATION_CONFIRMATION` and `QA08_PO_EVENT_RECEIPT` immediately after the generation invocation so neither can confer recurring authority.
 8. When the producer and independent closed-rails artifact check succeed, generation records `TOOLING_BLOCKED` with routing pending. Capture a durable pre-routing receipt for that generation record before routing.  
 9. Route the current generated artifact and its required sole-owner companion refresh through the approved PR posture. No QA process remains open during that transition.  
 10. After the routed refresh is present in the execution workspace, declare `QA08_ROUTING_RECEIPT` as the approved non-`NONE` PR routing receipt and declare `QA08_PRE_ROUTING_RECEIPT` as the preserved non-`NONE` generation receipt.  
@@ -891,9 +904,9 @@ PO actions:
 
 TOOLING\_BLOCKED command: `qa_run qa-08-po-008 PO-008 1 0 dev TOOLING_BLOCKED '["HDE Build Notes","Canon Plan Templates"]' '[]' "printf '%s\n' 'FRESH_AUTHORIZATION_OR_OPEN_RAILS_READINESS_UNAVAILABLE'; exit 125"`
 
-Generation command: `qa_run qa-08-po-008 PO-008 0 1 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '[]' "qa_authorization_confirmation=\"\${QA08_AUTHORIZATION_CONFIRMATION:-}\"; if [ \"\$qa_authorization_confirmation\" != 'CONFIRMED' ]; then printf '%s\n' 'FRESH_AUTHORIZATION_UNAVAILABLE'; exit 125; fi; printf '%s\n' 'FRESH_PO_AUTHORIZATION_CONFIRMED_BY_EXECUTING_PO' 'GENERATION_PHASE=AUTHORIZED_LIVE_PRODUCER'; python tools/evidence/generate_open_rails_abba_proof.py --live || exit \$?; SAFE_MODE=1 ALLOW_NETWORK=0 python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit \$?; printf '%s\n' 'BEHAVIOR_PROOF=LIVE_PRODUCER_AND_INDEPENDENT_CHECK' 'ROUTING_STATUS=PR_PENDING'; exit 125"`
+Generation command: `qa_run qa-08-po-008 PO-008 0 1 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '[]' "qa_authorization_confirmation=\"\${QA08_AUTHORIZATION_CONFIRMATION:-}\"; qa_po_event_receipt=\"\${QA08_PO_EVENT_RECEIPT:-}\"; if [ \"\$qa_authorization_confirmation\" != 'CONFIRMED' ] || [ -z \"\$qa_po_event_receipt\" ]; then printf '%s\n' 'FRESH_AUTHORIZATION_UNAVAILABLE'; exit 125; fi; printf '%s\n' 'HEAD_PIN_OVERRIDE=QA_HEAD_INDEPENDENT' 'FRESH_PO_AUTHORIZATION_CONFIRMED_BY_EXECUTING_PO' 'GENERATION_PHASE=AUTHORIZED_LIVE_PRODUCER'; python tools/evidence/generate_open_rails_abba_proof.py --live || exit \$?; env -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u QA08_AUTHORIZATION_CONFIRMATION -u QA08_PO_EVENT_RECEIPT SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit \$?; printf '%s\n' 'BEHAVIOR_PROOF=LIVE_PRODUCER_AND_INDEPENDENT_CHECK' 'ROUTING_STATUS=PR_PENDING'; exit 125"`
 
-Finalization command: `qa_run qa-08-po-008 PO-008 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '["audit/gates/determinism/open_rails_vendor_abba.json"]' "qa_routing_receipt=\"\${QA08_ROUTING_RECEIPT:-}\"; qa_pre_routing_receipt=\"\${QA08_PRE_ROUTING_RECEIPT:-}\"; if [ -z \"\$qa_routing_receipt\" ] || [ \"\$qa_routing_receipt\" = 'NONE' ] || [ -z \"\$qa_pre_routing_receipt\" ] || [ \"\$qa_pre_routing_receipt\" = 'NONE' ]; then printf '%s\n' 'ROUTED_CURRENT_ARTIFACT_PROVENANCE_UNAVAILABLE'; exit 125; fi; printf '%s\n' 'ROUTING_TYPE=PR' \"ROUTING_PROOF=\$qa_routing_receipt\" \"PRE_ROUTING_RECEIPT=\$qa_pre_routing_receipt\"; python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit \$?; python tools/evidence/update_evidence_index.py --check || exit \$?; printf '%s\n' 'BEHAVIOR_PROOF=CLOSED_RAILS_CURRENT_ARTIFACT_AND_COMPANION_VALIDATION'"`
+Finalization command: `qa_run qa-08-po-008 PO-008 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '["audit/gates/determinism/open_rails_vendor_abba.json"]' "qa_routing_receipt=\"\${QA08_ROUTING_RECEIPT:-}\"; qa_pre_routing_receipt=\"\${QA08_PRE_ROUTING_RECEIPT:-}\"; if [ -z \"\$qa_routing_receipt\" ] || [ \"\$qa_routing_receipt\" = 'NONE' ] || [ -z \"\$qa_pre_routing_receipt\" ] || [ \"\$qa_pre_routing_receipt\" = 'NONE' ]; then printf '%s\n' 'ROUTED_CURRENT_ARTIFACT_PROVENANCE_UNAVAILABLE'; exit 125; fi; printf '%s\n' 'ROUTING_TYPE=PR' \"ROUTING_PROOF=\$qa_routing_receipt\" \"PRE_ROUTING_RECEIPT=\$qa_pre_routing_receipt\"; env -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u QA08_AUTHORIZATION_CONFIRMATION -u QA08_PO_EVENT_RECEIPT python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit \$?; env -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u QA08_AUTHORIZATION_CONFIRMATION -u QA08_PO_EVENT_RECEIPT python tools/evidence/update_evidence_index.py --check || exit \$?; printf '%s\n' 'BEHAVIOR_PROOF=CLOSED_RAILS_CURRENT_ARTIFACT_AND_COMPANION_VALIDATION'"`
 
 Evidence command: `head -n 1 audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`
 
@@ -901,7 +914,7 @@ What to look for during generation: two requests attempted and completed, bounde
 
 PASS is available only from post-route finalization: current authorization was recorded by generation, the producer and independent check succeeded, the pre-routing generation receipt is preserved, the routed current artifact and companion-refresh receipt is recorded, both closed-rails finalization checks exit `0`, and routing proof remains distinct from behavioral proof.
 
-FAIL\_BEHAVIOR: an authorized interaction or post-route validation occurs but a bound, safety, canonicalization, same-input, artifact, or companion predicate fails. FAIL\_TOOLING: execution machinery fails after readiness passed and before a behavioral conclusion can be trusted. TOOLING\_BLOCKED: authorization, safe target classification, secrets, packages, loci, pre-routing receipt, routed refresh, or routing receipt is unavailable; successful generation awaiting routing remains `TOOLING_BLOCKED`. Initial state: `NOT RUN`.
+FAIL\_BEHAVIOR: an authorized interaction or post-route validation occurs but a bound, safety, canonicalization, same-input, artifact, or companion predicate fails. FAIL\_TOOLING: execution machinery fails after readiness passed and before a behavioral conclusion can be trusted. TOOLING\_BLOCKED: authorization, exact canonical-target classification, secrets, packages, loci, pre-routing receipt, routed refresh, or routing receipt is unavailable; successful generation awaiting routing remains `TOOLING_BLOCKED`. Initial state: `NOT RUN`.
 
 #### CHECK qa-09-po-009: PO-009
 
