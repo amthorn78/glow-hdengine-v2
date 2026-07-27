@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -34,6 +35,26 @@ from engine.serializer import canon  # noqa: E402
 OPEN_ABBA_REL = "audit/gates/determinism/open_rails_abba.json"
 LIVE_ABBA_REL = "audit/gates/determinism/open_rails_vendor_abba.json"
 PRODUCED_AT = "2026-07-14T00:00:00Z"
+CANONICAL_LIVE_VENDOR_BASE = "https://api.humandesignapi.nl/v2"
+CANONICAL_LIVE_VENDOR_BASE_SHA256 = hashlib.sha256(CANONICAL_LIVE_VENDOR_BASE.encode("utf-8")).hexdigest()
+CANONICAL_LIVE_VENDOR_TARGET_ID = "humandesignapi_canonical_v2"
+CANONICAL_LIVE_VENDOR_AUTHORITY_SCOPE = "one_generation_two_requests_no_recurring_authority"
+PO_EVENT_RECEIPT_ENV = "QA08_PO_EVENT_RECEIPT"
+LIVE_GENERATED_AT_PATTERN = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z")
+LIVE_EVENT_RECEIPT_PATTERN = re.compile(r"[A-Za-z0-9._:-]{32,256}")
+
+CANONICAL_LIVE_VENDOR_REASON = "canonical live vendor base; no separately marked non-production base exists"
+CANONICAL_LIVE_VENDOR_AUTHORITY_NOTE = "HumanDesignAPI exposes only its canonical live v2 base; every live generation requires fresh one-time PO approval, remains bounded to two requests, and this artifact confers no recurring authority."
+LIVE_INPUT_ENV = (
+    "OPEN_RAILS_VENDOR_ABBA_A_USER_ID",
+    "OPEN_RAILS_VENDOR_ABBA_A_BIRTHDATE",
+    "OPEN_RAILS_VENDOR_ABBA_A_BIRTHTIME",
+    "OPEN_RAILS_VENDOR_ABBA_A_LOCATION",
+    "OPEN_RAILS_VENDOR_ABBA_B_USER_ID",
+    "OPEN_RAILS_VENDOR_ABBA_B_BIRTHDATE",
+    "OPEN_RAILS_VENDOR_ABBA_B_BIRTHTIME",
+    "OPEN_RAILS_VENDOR_ABBA_B_LOCATION",
+)
 LIVE_REQUIRED_PREDICATES = frozenset(
     {
         "abba_byte_identity",
@@ -55,6 +76,9 @@ LIVE_TOP_LEVEL_KEYS = frozenset(
         "applied_abba_contract_mode",
         "artifact_kind",
         "generated_at_utc",
+        "authority_scope",
+        "po_event_receipt_sha256",
+        "target_identity",
         "no_raw_payload_predicate",
         "no_secret_value_predicate",
         "non_production_environment",
@@ -92,6 +116,7 @@ LIVE_FORBIDDEN_KEY_PARTS = (
 LIVE_READER_HASH_KEYS = frozenset({"ab_sha256", "ab_run2_sha256", "ba_sha256", "ba_run2_sha256"})
 LIVE_REQUEST_RESULT_KEYS = frozenset({"party", "result_class", "input_fingerprint_sha256", "normalized_payload_sha256"})
 LIVE_NONPROD_KEYS = frozenset({"configured_base_url", "proven", "reason"})
+LIVE_TARGET_IDENTITY_KEYS = frozenset({"base_sha256", "identifier"})
 LIVE_SECRET_PRESENCE_KEYS = frozenset({"GEO_API_KEY", "HDAPI_BASE_URL", "HD_API_BASE_URL", "HD_API_KEY"})
 LIVE_SYNTHETIC_INPUT_NAME_KEYS = frozenset({"a", "b"})
 LIVE_PF09_KEYS = frozenset({"title", "task", "subtask", "status"})
@@ -105,6 +130,7 @@ LIVE_FORBIDDEN_STRING_PATTERNS = (
 )
 SENSITIVE_ENV = (
     "HD_API_KEY",
+    PO_EVENT_RECEIPT_ENV,
     "GEO_API_KEY",
     "HD_API_BASE_URL",
     "HDAPI_BASE_URL",
@@ -247,24 +273,39 @@ def _validate_live_shape(proof: Mapping[str, Any]) -> None:
         raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
     if proof.get("artifact_kind") != "hde_epic038_pr03_open_rails_vendor_abba_proof":
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if proof.get("generated_at_utc") != PRODUCED_AT:
+    generated_at = proof.get("generated_at_utc")
+    if not isinstance(generated_at, str) or LIVE_GENERATED_AT_PATTERN.fullmatch(generated_at) is None:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    expected_target = {
+        "base_sha256": CANONICAL_LIVE_VENDOR_BASE_SHA256,
+        "identifier": CANONICAL_LIVE_VENDOR_TARGET_ID,
+    }
+    if (
+        not _keys_exact(proof.get("target_identity"), LIVE_TARGET_IDENTITY_KEYS)
+        or proof.get("target_identity") != expected_target
+    ):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not _is_sha256(proof.get("po_event_receipt_sha256")):
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
     if proof.get("applied_abba_contract_mode") != "raw_byte_identity_after_existing_canonical_pair_normalization":
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
     if proof.get("vendor_acquisition_architecture") != "individual_bodygraph":
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if proof.get("synthetic_input_source") not in {"fabricated_synthetic_defaults", "environment"}:
+    if proof.get("synthetic_input_source") != "fabricated_synthetic_defaults":
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
 
     nonprod = proof.get("non_production_environment")
     if not _keys_exact(nonprod, LIVE_NONPROD_KEYS):
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
     configured = nonprod["configured_base_url"]
-    if configured not in {"<redacted>", "UNSET"} or not isinstance(nonprod.get("reason"), str):
+    if configured != "<redacted>":
         raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if not isinstance(nonprod.get("proven"), bool):
+    expected_nonprod = {"configured_base_url": "<redacted>", "proven": False, "reason": CANONICAL_LIVE_VENDOR_REASON}
+    if nonprod != expected_nonprod:
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if nonprod["proven"] is False and not str(proof.get("po_override_note") or "").strip():
+    if proof.get("po_override_note") != CANONICAL_LIVE_VENDOR_AUTHORITY_NOTE:
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("authority_scope") != CANONICAL_LIVE_VENDOR_AUTHORITY_SCOPE:
         raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
 
     if not _keys_exact(proof.get("pf09_mapping"), LIVE_PF09_KEYS):
@@ -301,24 +342,30 @@ def _validate_live_shape(proof: Mapping[str, Any]) -> None:
         raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
 
     route_policy = proof.get("route_policy")
-    if not _keys_exact(route_policy, LIVE_ROUTE_POLICY_KEYS):
+    expected_route_policy = {
+        "classification": "adapter_backed_v2_chart",
+        "configured_base_version": "v2",
+        "payload_family": "ChartResult",
+        "resource_path": "charts",
+        "route_family": "recommended_v2_chart",
+        "supported": True,
+    }
+    if route_policy != expected_route_policy:
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if not isinstance(route_policy.get("supported"), bool):
-        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    for key in LIVE_ROUTE_POLICY_KEYS - {"supported"}:
-        if not isinstance(route_policy.get(key), str) or not route_policy.get(key):
-            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
 
-    if not _keys_exact(proof.get("secret_presence"), LIVE_SECRET_PRESENCE_KEYS):
+    secret_presence = proof.get("secret_presence")
+    if not _keys_exact(secret_presence, LIVE_SECRET_PRESENCE_KEYS):
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if not all(isinstance(value, bool) for value in proof["secret_presence"].values()):
+    if not all(isinstance(value, bool) for value in secret_presence.values()):
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if not _keys_exact(proof.get("synthetic_input_names"), LIVE_SYNTHETIC_INPUT_NAME_KEYS):
+    if secret_presence["HD_API_KEY"] is not True or secret_presence["GEO_API_KEY"] is not True:
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-    if not all(isinstance(value, str) and value for value in proof["synthetic_input_names"].values()):
+    if secret_presence["HD_API_BASE_URL"] is secret_presence["HDAPI_BASE_URL"]:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("synthetic_input_names") != {"a": "hde-epic038-live-alpha", "b": "hde-epic038-live-bravo"}:
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
     absent = proof.get("optional_env_inputs_absent")
-    if not isinstance(absent, list) or not all(isinstance(item, str) and item for item in absent):
+    if absent != sorted(LIVE_INPUT_ENV):
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
 
     safety = _derived_live_safety(proof)
@@ -506,12 +553,111 @@ def validate_current_fixture() -> dict[str, Any]:
 
 
 def _safe_nonprod_base(base: str) -> tuple[bool, str]:
-    lower = base.lower()
-    if not base.startswith("https://"):
+    lower = base.strip().rstrip("/").lower()
+    if not lower.startswith("https://"):
         return False, "base URL is not https"
+    if lower == CANONICAL_LIVE_VENDOR_BASE:
+        return False, CANONICAL_LIVE_VENDOR_REASON
     if any(marker in lower for marker in ("localhost", "127.0.0.1", ".test", "staging", "sandbox", "dev", "nonprod", "mock")):
         return True, "base URL contains repo-accepted non-production marker"
     return False, "non-production classification not proven from configured base URL"
+
+
+def _resolved_live_target() -> tuple[str, bool]:
+    canonical_raw = os.environ.get("HD_API_BASE_URL")
+    alias_raw = os.environ.get("HDAPI_BASE_URL")
+    canonical = (canonical_raw or "").strip()
+    alias = (alias_raw or "").strip()
+    canonical_present = canonical_raw is not None
+    alias_invalid = canonical_present and bool(alias)
+    selected = canonical if canonical_present else alias
+    return selected.rstrip("/"), not alias_invalid
+
+
+def _po_event_receipt() -> str:
+    receipt = (os.environ.get(PO_EVENT_RECEIPT_ENV) or "").strip()
+    return receipt if LIVE_EVENT_RECEIPT_PATTERN.fullmatch(receipt) is not None else ""
+
+
+def _po_event_receipt_sha256() -> str:
+    receipt = _po_event_receipt()
+    return sha(receipt.encode("utf-8")) if receipt else ""
+
+
+def _live_generated_at_utc() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _live_runtime_env() -> dict[str, str]:
+    base, _ = _resolved_live_target()
+    source = {
+        key: os.environ[key]
+        for key in ("SAFE_MODE", "ALLOW_NETWORK", "APP_ENV", "LC_ALL", "LANG", "TZ", "HD_API_KEY", "GEO_API_KEY")
+    }
+    if os.environ.get("HD_API_BASE_URL") is not None:
+        source["HD_API_BASE_URL"] = base
+    else:
+        source["HDAPI_BASE_URL"] = base
+    return source
+
+
+def _po_event_is_unused() -> bool:
+    current_receipt_sha = _po_event_receipt_sha256()
+    if not current_receipt_sha:
+        return False
+    path = ROOT / LIVE_ABBA_REL
+    if not path.exists():
+        return True
+    try:
+        existing = json.loads(path.read_bytes())
+    except (OSError, json.JSONDecodeError):
+        return False
+    return (
+        isinstance(existing, Mapping)
+        and existing.get("po_event_receipt_sha256") != current_receipt_sha
+    )
+
+
+def _require_unused_po_event() -> None:
+    current_receipt_sha = _po_event_receipt_sha256()
+    if not current_receipt_sha:
+        raise SystemExit("LIVE_GENERATION_REFUSED")
+    path = ROOT / LIVE_ABBA_REL
+    if not path.exists():
+        return
+    try:
+        existing = json.loads(path.read_bytes())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit("LIVE_GENERATION_REFUSED") from exc
+    if not isinstance(existing, Mapping):
+        raise SystemExit("LIVE_GENERATION_REFUSED")
+    if existing.get("po_event_receipt_sha256") == current_receipt_sha:
+        raise SystemExit("LIVE_GENERATION_AUTHORITY_REUSED")
+
+
+def live_generation_ready() -> bool:
+    base, config_ok = _resolved_live_target()
+    return (
+        config_ok
+        and base == CANONICAL_LIVE_VENDOR_BASE
+        and os.environ.get("SAFE_MODE") == "0"
+        and os.environ.get("ALLOW_NETWORK") == "1"
+        and os.environ.get("APP_ENV") == "dev"
+        and os.environ.get("LC_ALL") == "C"
+        and os.environ.get("LANG") == "C"
+        and os.environ.get("TZ") == "UTC"
+        and os.environ.get("QA08_AUTHORIZATION_CONFIRMATION") == "CONFIRMED"
+        and bool(_po_event_receipt())
+        and bool((os.environ.get("HD_API_KEY") or "").strip())
+        and bool((os.environ.get("GEO_API_KEY") or "").strip())
+        and not any((os.environ.get(name) or "").strip() for name in LIVE_INPUT_ENV)
+        and _po_event_is_unused()
+    )
+
+
+def _require_live_generation_ready() -> None:
+    if not live_generation_ready():
+        raise SystemExit("LIVE_GENERATION_REFUSED")
 
 
 def _live_inputs_from_env() -> tuple[VendorInputs, VendorInputs, list[str], str]:
@@ -541,6 +687,7 @@ def _live_inputs_from_env() -> tuple[VendorInputs, VendorInputs, list[str], str]
 
 def _bounded_live_client(request_counter: dict[str, int]) -> HdApiClient:
     original = HdApiClient._default_request
+    _require_live_generation_ready()
 
     def counted(req, timeout):  # type: ignore[no-untyped-def]
         if request_counter["attempted"] >= 2:
@@ -552,7 +699,8 @@ def _bounded_live_client(request_counter: dict[str, int]) -> HdApiClient:
         retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
         timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
         request=counted,
-        env={**os.environ, **RAILS_OPEN},
+        env=_live_runtime_env(),
+        release_id=identity_meta()["release_id"],
     )
 
 
@@ -561,7 +709,7 @@ def build_live_proof(
     client_factory: Callable[[dict[str, int]], HdApiClient] | None = None,
     reader_emitter: Callable[[Mapping[str, Any], Mapping[str, Any]], bytes] | None = None,
 ) -> dict[str, Any]:
-    base = (os.environ.get("HD_API_BASE_URL") or os.environ.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
+    base, target_config_ok = _resolved_live_target()
     nonprod_ok, nonprod_reason = _safe_nonprod_base(base) if base else (False, "HD_API_BASE_URL/HDAPI_BASE_URL is unset")
     a_inputs, b_inputs, missing_inputs, input_source = _live_inputs_from_env()
     secret_presence = {name: bool((os.environ.get(name) or "").strip()) for name in ("HD_API_KEY", "GEO_API_KEY", "HD_API_BASE_URL", "HDAPI_BASE_URL")}
@@ -576,7 +724,7 @@ def build_live_proof(
     proof: dict[str, Any] = {
         "acceptance_token_satisfied": False,
         "artifact_kind": "hde_epic038_pr03_open_rails_vendor_abba_proof",
-        "generated_at_utc": PRODUCED_AT,
+        "generated_at_utc": _live_generated_at_utc(),
         "non_production_environment": {"proven": nonprod_ok, "reason": nonprod_reason, "configured_base_url": "<redacted>" if base else "UNSET"},
         "secret_presence": secret_presence,
         "vendor_acquisition_architecture": architecture,
@@ -594,15 +742,29 @@ def build_live_proof(
     }
     if route_policy:
         proof["route_policy"] = {k: route_policy[k] for k in sorted(route_policy) if k in {"configured_base_version", "route_family", "payload_family", "classification", "resource_path", "supported"}}
-    if not nonprod_ok:
-        proof["po_override_note"] = "PO stated the previous non-production marker gate was bad instruction and explicitly authorized this bounded vendor call for the remediation PR."
-    if not secret_presence.get("HD_API_KEY"):
-        proof["typed_result_class"] = "CONFIGURATION_INCOMPLETE"
-        if missing_inputs:
-            proof["optional_env_inputs_absent"] = sorted(missing_inputs)
-        return proof
     if missing_inputs:
         proof["optional_env_inputs_absent"] = sorted(missing_inputs)
+    if not target_config_ok or base != CANONICAL_LIVE_VENDOR_BASE:
+        proof["typed_result_class"] = "TARGET_REFUSED"
+        return proof
+    if input_source != "fabricated_synthetic_defaults" or set(missing_inputs) != set(LIVE_INPUT_ENV):
+        proof["typed_result_class"] = "INPUT_REFUSED"
+        return proof
+    proof["po_override_note"] = CANONICAL_LIVE_VENDOR_AUTHORITY_NOTE
+    proof["authority_scope"] = CANONICAL_LIVE_VENDOR_AUTHORITY_SCOPE
+    proof["po_event_receipt_sha256"] = _po_event_receipt_sha256()
+    proof["target_identity"] = {
+        "base_sha256": CANONICAL_LIVE_VENDOR_BASE_SHA256,
+        "identifier": CANONICAL_LIVE_VENDOR_TARGET_ID,
+    }
+    if not secret_presence.get("HD_API_KEY"):
+        proof["typed_result_class"] = "CONFIGURATION_INCOMPLETE"
+        return proof
+    if not secret_presence.get("GEO_API_KEY"):
+        proof["typed_result_class"] = "CONFIGURATION_INCOMPLETE"
+        return proof
+    _require_live_generation_ready()
+    _require_unused_po_event()
     counter = {"attempted": 0}
     client_factory = client_factory or _bounded_live_client
     client = client_factory(counter)
@@ -647,7 +809,7 @@ def build_live_proof(
             temp_root = Path(temp_dir)
             outcome = ingest_vendor_bodygraph(
                 inputs,
-                env={**os.environ, **RAILS_OPEN},
+                env=_live_runtime_env(),
                 dry_run=True,
                 client=client,
                 retry_log=temp_root / "retry_trace.log",
@@ -756,7 +918,12 @@ def generate_live(*, check: bool = False) -> dict[str, Any]:
         if canonical_json_bytes(proof) != data:
             raise SystemExit(f"NONCANONICAL:{LIVE_ABBA_REL}")
         return _require_passing_live_proof(proof)
-    proof = _require_passing_live_proof(build_live_proof())
+    _require_live_generation_ready()
+    _require_unused_po_event()
+    proof = build_live_proof()
+    if proof.get("po_event_receipt_sha256") != _po_event_receipt_sha256():
+        raise SystemExit("LIVE_GENERATION_AUTHORITY_MISMATCH")
+    proof = _require_passing_live_proof(proof)
     _write_primary(LIVE_ABBA_REL, canonical_json_bytes(proof), check=False)
     return proof
 
@@ -766,10 +933,15 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--check-current", action="store_true")
+    mode.add_argument("--live-readiness-check", action="store_true")
     parser.add_argument("--live", action="store_true", help="write/check the PO-authorized bounded live vendor proof")
     args = parser.parse_args(argv)
-    if args.live and args.check_current:
-        parser.error("--check-current is fixture-only")
+    if args.live and (args.check_current or args.live_readiness_check):
+        parser.error("--check-current and --live-readiness-check cannot be combined with --live")
+    if args.live_readiness_check:
+        ready = live_generation_ready()
+        print("OPEN_RAILS_READY" if ready else "OPEN_RAILS_NOT_READY")
+        return 0 if ready else 1
     if args.check_current:
         proof = validate_current_fixture()
     else:

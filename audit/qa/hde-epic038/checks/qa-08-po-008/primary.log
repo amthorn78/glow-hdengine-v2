@@ -1,0 +1,22 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T23:38:12Z", "check_id": "qa-08-po-008", "check_name": "PO-008", "status": "TOOLING_BLOCKED", "fail_status": "TOOLING_BLOCKED", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; python tools/evidence/generate_open_rails_abba_proof.py --live-readiness-check; test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tools/evidence/update_evidence_index.py; SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC qa_authorization_confirmation=\"${QA08_AUTHORIZATION_CONFIRMATION:-}\"; qa_po_event_receipt=\"${QA08_PO_EVENT_RECEIPT:-}\"; if [ \"$qa_authorization_confirmation\" != 'CONFIRMED' ] || [ -z \"$qa_po_event_receipt\" ]; then printf '%s\\n' 'FRESH_AUTHORIZATION_UNAVAILABLE'; exit 125; fi; printf '%s\\n' 'HEAD_PIN_OVERRIDE=QA_HEAD_INDEPENDENT' 'FRESH_PO_AUTHORIZATION_CONFIRMED_BY_EXECUTING_PO' 'GENERATION_PHASE=AUTHORIZED_LIVE_PRODUCER'; python tools/evidence/generate_open_rails_abba_proof.py --live || exit $?; env -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u QA08_AUTHORIZATION_CONFIRMATION -u QA08_PO_EVENT_RECEIPT SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit $?; printf '%s\\n' 'BEHAVIOR_PROOF=LIVE_PRODUCER_AND_INDEPENDENT_CHECK' 'ROUTING_STATUS=PR_PENDING'; exit 125", "command_provenance": "Copy/paste from plan", "exit_code": 125, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-08-po-008/primary.log"], "captured_env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[dependency preflight: value-safe] python tools/evidence/generate_open_rails_abba_proof.py --live-readiness-check
+OPEN_RAILS_READY
+DEPENDENCY_VALUE_SAFE_EXIT_CODE=0
+[path preflight] test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tools/evidence/update_evidence_index.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC qa_authorization_confirmation="${QA08_AUTHORIZATION_CONFIRMATION:-}"; qa_po_event_receipt="${QA08_PO_EVENT_RECEIPT:-}"; if [ "$qa_authorization_confirmation" != 'CONFIRMED' ] || [ -z "$qa_po_event_receipt" ]; then printf '%s\n' 'FRESH_AUTHORIZATION_UNAVAILABLE'; exit 125; fi; printf '%s\n' 'HEAD_PIN_OVERRIDE=QA_HEAD_INDEPENDENT' 'FRESH_PO_AUTHORIZATION_CONFIRMED_BY_EXECUTING_PO' 'GENERATION_PHASE=AUTHORIZED_LIVE_PRODUCER'; python tools/evidence/generate_open_rails_abba_proof.py --live || exit $?; env -u HD_API_KEY -u GEO_API_KEY -u HD_API_BASE_URL -u HDAPI_BASE_URL -u QA08_AUTHORIZATION_CONFIRMATION -u QA08_PO_EVENT_RECEIPT SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_open_rails_abba_proof.py --live --check || exit $?; printf '%s\n' 'BEHAVIOR_PROOF=LIVE_PRODUCER_AND_INDEPENDENT_CHECK' 'ROUTING_STATUS=PR_PENDING'; exit 125
+HEAD_PIN_OVERRIDE=QA_HEAD_INDEPENDENT
+FRESH_PO_AUTHORIZATION_CONFIRMED_BY_EXECUTING_PO
+GENERATION_PHASE=AUTHORIZED_LIVE_PRODUCER
+{"path": "audit/gates/determinism/open_rails_vendor_abba.json", "result": "pass", "status": "OK", "top_level_pass": true}
+{"path": "audit/gates/determinism/open_rails_vendor_abba.json", "result": "pass", "status": "OK", "top_level_pass": true}
+BEHAVIOR_PROOF=LIVE_PRODUCER_AND_INDEPENDENT_CHECK
+ROUTING_STATUS=PR_PENDING
+BEHAVIOR_EXIT_CODE=125

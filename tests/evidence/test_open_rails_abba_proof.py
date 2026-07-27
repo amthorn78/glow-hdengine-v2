@@ -13,6 +13,150 @@ from tools.evidence import generate_open_rails_abba_proof as proof
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _current_live_payload() -> dict[str, object]:
+    payload = json.loads((proof.ROOT / proof.LIVE_ABBA_REL).read_bytes())
+    payload["non_production_environment"]["reason"] = proof.CANONICAL_LIVE_VENDOR_REASON
+    payload["po_override_note"] = proof.CANONICAL_LIVE_VENDOR_AUTHORITY_NOTE
+    payload["authority_scope"] = proof.CANONICAL_LIVE_VENDOR_AUTHORITY_SCOPE
+    payload["po_event_receipt_sha256"] = proof.sha(b"historical-test-event-receipt-not-live-authority")
+    payload["target_identity"] = {
+        "base_sha256": proof.CANONICAL_LIVE_VENDOR_BASE_SHA256,
+        "identifier": proof.CANONICAL_LIVE_VENDOR_TARGET_ID,
+    }
+    return payload
+
+
+def _current_live_bytes() -> bytes:
+    return proof.canonical_json_bytes(_current_live_payload())
+
+
+def _configure_authorized_live_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for key in (*proof.SENSITIVE_ENV, *proof.LIVE_INPUT_ENV, "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV", "QA08_AUTHORIZATION_CONFIRMATION"):
+        monkeypatch.delenv(key, raising=False)
+    for key, value in {
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+        "HD_API_BASE_URL": proof.CANONICAL_LIVE_VENDOR_BASE,
+        "HD_API_KEY": "secret-key",
+        "GEO_API_KEY": "geo-key",
+        "QA08_AUTHORIZATION_CONFIRMATION": "CONFIRMED",
+        proof.PO_EVENT_RECEIPT_ENV: "test-event-receipt-0000000000000001",
+    }.items():
+        monkeypatch.setenv(key, value)
+
+
+def test_live_readiness_accepts_only_fresh_authorized_exact_target(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    assert proof.live_generation_ready() is True
+    assert proof.main(["--live-readiness-check"]) == 0
+    captured = capsys.readouterr()
+    assert captured.out == "OPEN_RAILS_READY\n" and captured.err == ""
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [
+        ("SAFE_MODE", "1"),
+        ("ALLOW_NETWORK", "0"),
+        ("APP_ENV", "production"),
+        ("LC_ALL", "en_US.UTF-8"),
+        ("LANG", "en_US.UTF-8"),
+        ("TZ", "Europe/Amsterdam"),
+        ("QA08_AUTHORIZATION_CONFIRMATION", ""),
+        (proof.PO_EVENT_RECEIPT_ENV, "too-short"),
+        ("HD_API_BASE_URL", "https://sandbox.vendor.test/v2"),
+        ("HD_API_KEY", ""),
+        ("GEO_API_KEY", ""),
+        ("OPEN_RAILS_VENDOR_ABBA_A_USER_ID", "personal-input"),
+    ],
+)
+def test_live_readiness_rejects_any_missing_or_widened_authority(
+    monkeypatch: pytest.MonkeyPatch,
+    key: str,
+    value: str,
+) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv(key, value)
+    assert proof.live_generation_ready() is False
+
+
+def test_live_readiness_rejects_alias_when_canonical_is_present(monkeypatch: pytest.MonkeyPatch) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv("HDAPI_BASE_URL", proof.CANONICAL_LIVE_VENDOR_BASE)
+    assert proof.live_generation_ready() is False
+
+
+def test_live_readiness_allows_exact_alias_only_when_canonical_is_absent(monkeypatch: pytest.MonkeyPatch) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.delenv("HD_API_BASE_URL")
+    monkeypatch.setenv("HDAPI_BASE_URL", proof.CANONICAL_LIVE_VENDOR_BASE)
+    assert proof.live_generation_ready() is True
+
+
+def test_live_generation_rejects_reused_event_receipt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    payload = _current_live_payload()
+    payload["po_event_receipt_sha256"] = proof._po_event_receipt_sha256()
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(proof.canonical_json_bytes(payload))
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    assert proof.live_generation_ready() is False
+    with pytest.raises(SystemExit, match="LIVE_GENERATION_AUTHORITY_REUSED"):
+        proof._require_unused_po_event()
+
+
+def test_live_write_refuses_before_proof_construction_without_fresh_authorization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.delenv("QA08_AUTHORIZATION_CONFIRMATION")
+    monkeypatch.setattr(
+        proof,
+        "build_live_proof",
+        lambda: (_ for _ in ()).throw(AssertionError("proof construction reached")),
+    )
+    with pytest.raises(SystemExit, match="LIVE_GENERATION_REFUSED"):
+        proof.generate_live(check=False)
+
+
+@pytest.mark.parametrize("mode", ["wrong_target", "personal_input"])
+def test_live_builder_refuses_before_client_creation(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    if mode == "wrong_target":
+        monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v2")
+        expected = "TARGET_REFUSED"
+    else:
+        monkeypatch.setenv("OPEN_RAILS_VENDOR_ABBA_A_USER_ID", "personal-input")
+        expected = "INPUT_REFUSED"
+
+    def forbidden_client_factory(counter: dict[str, int]):
+        raise AssertionError("client creation reached")
+
+    payload = proof.build_live_proof(client_factory=forbidden_client_factory)
+    assert payload["typed_result_class"] == expected
+    assert payload["requests_attempted"] == 0
+
+
+def test_bounded_client_refuses_closed_rails_before_client_creation(monkeypatch: pytest.MonkeyPatch) -> None:
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setattr(
+        proof.HdApiClient,
+        "from_env",
+        lambda **kwargs: (_ for _ in ()).throw(AssertionError("client creation reached")),
+    )
+    with pytest.raises(SystemExit, match="LIVE_GENERATION_REFUSED"):
+        proof._bounded_live_client({"attempted": 0})
+
+
 def test_fixture_backed_open_rails_abba_positive_matrix() -> None:
     payload = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True})
     assert payload["top_level_pass"] is True
@@ -85,22 +229,11 @@ def test_canonical_json_bytes_preserves_utf8_unicode() -> None:
 
 
 def _configure_individual_live_fake(monkeypatch: pytest.MonkeyPatch) -> list[str]:
-    for key, value in {
-        "SAFE_MODE": "0",
-        "ALLOW_NETWORK": "1",
-        "HD_API_BASE_URL": "https://sandbox.vendor.test/v1",
-        "HD_API_KEY": "secret-key",
-        "GEO_API_KEY": "geo-key",
-        "OPEN_RAILS_VENDOR_ABBA_A_USER_ID": "alpha-user",
-        "OPEN_RAILS_VENDOR_ABBA_A_BIRTHDATE": "1990-01-10",
-        "OPEN_RAILS_VENDOR_ABBA_A_BIRTHTIME": "14:05",
-        "OPEN_RAILS_VENDOR_ABBA_A_LOCATION": "Synthetic Alpha, Test",
-        "OPEN_RAILS_VENDOR_ABBA_B_USER_ID": "bravo-user",
-        "OPEN_RAILS_VENDOR_ABBA_B_BIRTHDATE": "1992-03-04",
-        "OPEN_RAILS_VENDOR_ABBA_B_BIRTHTIME": "08:15",
-        "OPEN_RAILS_VENDOR_ABBA_B_LOCATION": "Synthetic Bravo, Test",
-    }.items():
-        monkeypatch.setenv(key, value)
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
+    monkeypatch.setattr(proof, "CANONICAL_LIVE_VENDOR_BASE", "https://sandbox.vendor.test/v1")
+    for key in proof.LIVE_INPUT_ENV:
+        monkeypatch.delenv(key, raising=False)
 
     class FakeOutcome:
         def __init__(self, label: str) -> None:
@@ -140,12 +273,13 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
     assert payload["top_level_pass"] is True
     assert payload["requests_attempted"] == 2
     assert payload["requests_completed"] == 2
-    assert payload["optional_env_inputs_absent"] == []
+    assert payload["optional_env_inputs_absent"] == sorted(proof.LIVE_INPUT_ENV)
     assert payload["same_normalized_inputs_reused_for_ab_ba"] is True
     assert payload["predicates"]["distinct_input_fingerprints"] is True
     assert payload["predicates"]["distinct_normalized_payloads"] is True
     assert payload["predicates"]["normalized_payload_hashes_bound"] is True
-    assert proof._require_passing_live_proof(dict(payload)) == payload
+    with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF"):
+        proof._require_passing_live_proof(dict(payload))
     assert payload["predicates"]["two_run_ab_identity"] is True
     assert payload["predicates"]["two_run_ba_identity"] is True
     encoded = proof.canonical_json_bytes(payload).decode("utf-8")
@@ -192,14 +326,12 @@ def test_live_harness_rejects_second_reader_emission_drift(
 
 @pytest.mark.parametrize("duplicate", ["fingerprint", "payload"])
 def test_live_harness_rejects_duplicate_acquisitions(monkeypatch: pytest.MonkeyPatch, duplicate: str) -> None:
-    for key, value in {
-        "SAFE_MODE": "0",
-        "ALLOW_NETWORK": "1",
-        "HD_API_BASE_URL": "https://sandbox.vendor.test/v1",
-        "HD_API_KEY": "secret-key",
-        "GEO_API_KEY": "geo-key",
-    }.items():
-        monkeypatch.setenv(key, value)
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
+    monkeypatch.setattr(proof, "CANONICAL_LIVE_VENDOR_BASE", "https://sandbox.vendor.test/v1")
+    for key in proof.LIVE_INPUT_ENV:
+        monkeypatch.delenv(key, raising=False)
+
 
     class FakeOutcome:
         def __init__(self, label: str) -> None:
@@ -246,14 +378,7 @@ def test_live_harness_missing_config_is_inconclusive(monkeypatch: pytest.MonkeyP
 
 
 def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypatch: pytest.MonkeyPatch) -> None:
-    for key, value in {
-        "SAFE_MODE": "0",
-        "ALLOW_NETWORK": "1",
-        "HD_API_BASE_URL": "https://sandbox.vendor.test/v2",
-        "HD_API_KEY": "secret-key",
-        "GEO_API_KEY": "geo-key",
-    }.items():
-        monkeypatch.setenv(key, value)
+    _configure_authorized_live_env(monkeypatch)
     for key in [
         "OPEN_RAILS_VENDOR_ABBA_A_USER_ID",
         "OPEN_RAILS_VENDOR_ABBA_A_BIRTHDATE",
@@ -322,14 +447,11 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
 
 
 def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    for key, value in {
-        "SAFE_MODE": "0",
-        "ALLOW_NETWORK": "1",
-        "HD_API_BASE_URL": "https://sandbox.vendor.test/v1",
-        "HD_API_KEY": "secret-key",
-        "GEO_API_KEY": "geo-key",
-    }.items():
-        monkeypatch.setenv(key, value)
+    _configure_authorized_live_env(monkeypatch)
+    monkeypatch.setenv("HD_API_BASE_URL", "https://sandbox.vendor.test/v1")
+    monkeypatch.setattr(proof, "CANONICAL_LIVE_VENDOR_BASE", "https://sandbox.vendor.test/v1")
+    for key in proof.LIVE_INPUT_ENV:
+        monkeypatch.delenv(key, raising=False)
 
     class FakeRequest:
         def __init__(self, fingerprint: str) -> None:
@@ -389,14 +511,20 @@ def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatc
     assert all(not path.exists() for path in created)
 
 
-def test_live_check_mode_does_not_reexecute_vendor(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_live_check_mode_does_not_reexecute_vendor(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(_current_live_bytes())
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    for key in (*proof.SENSITIVE_ENV, "SAFE_MODE", "ALLOW_NETWORK", "APP_ENV", "QA08_AUTHORIZATION_CONFIRMATION"):
+        monkeypatch.delenv(key, raising=False)
     monkeypatch.setattr(proof, "build_live_proof", lambda: (_ for _ in ()).throw(AssertionError("live check reexecuted")))
     payload = proof.generate_live(check=True)
     assert payload["artifact_kind"] == "hde_epic038_pr03_open_rails_vendor_abba_proof"
 
 
 def test_live_check_mode_rejects_failed_or_inconclusive_artifact(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    original = _current_live_bytes()
     failed = json.loads(original)
     failed["top_level_pass"] = False
     failed["result"] = "inconclusive"
@@ -415,7 +543,7 @@ def test_live_check_mode_rejects_failed_or_inconclusive_artifact(monkeypatch: py
 
 
 def test_live_check_mode_rejects_ascii_escaped_unicode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    original = _current_live_bytes()
     payload = json.loads(original)
     escaped = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
     assert b"\\u2014" in escaped
@@ -449,7 +577,7 @@ def test_live_check_mode_recomputes_distinctness(
     tmp_path: Path,
     mutation: str,
 ) -> None:
-    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    original = _current_live_bytes()
     payload = json.loads(original)
     if mutation == "missing_predicate":
         payload["predicates"].pop("distinct_normalized_payloads")
@@ -498,7 +626,8 @@ def test_live_write_mode_rejects_nonpassing_proof_without_overwrite(
     completed: int,
     predicate: str,
 ) -> None:
-    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    _configure_authorized_live_env(monkeypatch)
+    original = _current_live_bytes()
     failed = json.loads(original)
     failed.update(
         {
@@ -511,6 +640,7 @@ def test_live_write_mode_rejects_nonpassing_proof_without_overwrite(
         }
     )
     failed["predicates"][predicate] = False
+    failed["po_event_receipt_sha256"] = proof._po_event_receipt_sha256()
     path = tmp_path / proof.LIVE_ABBA_REL
     path.parent.mkdir(parents=True)
     path.write_bytes(original)
@@ -524,8 +654,10 @@ def test_live_write_mode_rejects_nonpassing_proof_without_overwrite(
 
 
 def test_live_write_mode_accepts_passing_proof(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    _configure_authorized_live_env(monkeypatch)
+    original = _current_live_bytes()
     passing = json.loads(original)
+    passing["po_event_receipt_sha256"] = proof._po_event_receipt_sha256()
     path = tmp_path / proof.LIVE_ABBA_REL
     monkeypatch.setattr(proof, "ROOT", tmp_path)
     monkeypatch.setattr(proof, "build_live_proof", lambda: passing)
@@ -533,7 +665,7 @@ def test_live_write_mode_accepts_passing_proof(monkeypatch: pytest.MonkeyPatch, 
     payload = proof.generate_live(check=False)
 
     assert payload == passing
-    assert path.read_bytes() == original
+    assert path.read_bytes() == proof.canonical_json_bytes(passing)
 
 
 def _write_live_check_payload(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, payload: dict[str, object]) -> Path:
@@ -548,7 +680,7 @@ def test_live_check_mode_derives_abba_identity_from_first_run_hashes(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    payload = json.loads((proof.ROOT / proof.LIVE_ABBA_REL).read_bytes())
+    payload = _current_live_payload()
     different_valid_sha = "f" * 64
     assert different_valid_sha != payload["reader_hashes"]["ab_sha256"]
     payload["reader_hashes"]["ba_sha256"] = different_valid_sha
@@ -566,6 +698,10 @@ def test_live_check_mode_derives_abba_identity_from_first_run_hashes(
 @pytest.mark.parametrize(
     "mutation,expected",
     [
+        ("target_identity_drift", "INVALID_LIVE_PROOF"),
+        ("event_receipt_drift", "INVALID_LIVE_PROOF"),
+        ("authority_scope_drift", "UNSAFE_LIVE_PROOF"),
+        ("generated_at_drift", "INVALID_LIVE_PROOF"),
         ("unknown_key", "INVALID_LIVE_PROOF"),
         ("raw_vendor_payload", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
         ("raw_request", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
@@ -577,7 +713,7 @@ def test_live_check_mode_derives_abba_identity_from_first_run_hashes(
         ("unredacted_url", "UNSAFE_LIVE_PROOF"),
         ("missing_po_override", "UNSAFE_LIVE_PROOF"),
         ("inconsistent_safety_boolean", "UNSAFE_LIVE_PROOF"),
-        ("secret_value_under_allowed_key", "UNSAFE_LIVE_PROOF"),
+        ("secret_value_under_allowed_key", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
     ],
 )
 def test_live_check_mode_rejects_closed_shape_and_safety_drift(
@@ -586,8 +722,16 @@ def test_live_check_mode_rejects_closed_shape_and_safety_drift(
     mutation: str,
     expected: str,
 ) -> None:
-    payload = json.loads((proof.ROOT / proof.LIVE_ABBA_REL).read_bytes())
-    if mutation == "unknown_key":
+    payload = _current_live_payload()
+    if mutation == "target_identity_drift":
+        payload["target_identity"]["base_sha256"] = "f" * 64
+    elif mutation == "event_receipt_drift":
+        payload["po_event_receipt_sha256"] = "not-a-sha256"
+    elif mutation == "authority_scope_drift":
+        payload["authority_scope"] = "recurring"
+    elif mutation == "generated_at_drift":
+        payload["generated_at_utc"] = "2026-07-27"
+    elif mutation == "unknown_key":
         payload["unexpected"] = True
     elif mutation == "raw_vendor_payload":
         payload["raw_vendor_payload"] = {"data": True}
