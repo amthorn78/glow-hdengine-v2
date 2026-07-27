@@ -19,18 +19,22 @@ def is_compat_request_path(path: str) -> bool:
     return normalized == prefix or normalized.startswith(f"{prefix}/")
 
 
-def _writer_payload(env: Dict[str, Any], *, status: int) -> Response:
+def _writer_payload(
+    env: Dict[str, Any], *, status: int, allow: str | None = None
+) -> Response:
     payload = emit_public(env)
     resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
     resp.headers["Cache-Control"] = "no-store"
+    if allow:
+        resp.headers["Allow"] = allow
     resp.headers.pop("ETag", None)
     resp.headers.pop("Content-Encoding", None)
     resp.headers["Content-Length"] = str(len(payload))
     return resp
 
 
-def compat_error_response(status: int) -> Response:
-    return _writer_payload(error_envelope("ERR_NOT_FOUND"), status=status)
+def compat_error_response(status: int, *, allow: str | None = None) -> Response:
+    return _writer_payload(error_envelope("ERR_NOT_FOUND"), status=status, allow=allow)
 
 
 class _WriterTransportResponse(Response):
