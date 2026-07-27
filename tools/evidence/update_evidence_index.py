@@ -2509,10 +2509,48 @@ EPIC038_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC038",
         "record_type": "epic038_pr03_open_rails_vendor_abba_proof",
         "schema_version": "1.0",
-        "produced_at_utc": "2026-07-14T00:00:00Z",
-        "notes": "PO-authorized bounded live vendor-backed ABBA acquisition proof with at most two requests; acceptance_token_satisfied=false",
+        "notes": "Event-bound PO-authorized live vendor ABBA proof for the exact canonical target with at most two requests; acceptance_token_satisfied=false and no recurring authority",
     },
 ]
+
+
+def _load_epic038_pr03_entries() -> list[dict[str, object]]:
+    entries: list[dict[str, object]] = []
+    for entry in EPIC038_PR03_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if normalized["artifact_key"] == "epic038.pr03.open_rails_vendor_abba":
+            rel = str(normalized["discovered_physical_path"])
+            path = ROOT / rel
+            if not path.exists():
+                raise SystemExit(f"MISSING_EPIC038_PR03_LIVE_PROOF:{rel}")
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                produced_at = payload["generated_at_utc"]
+                if not isinstance(produced_at, str):
+                    raise TypeError("generated_at_utc must be a string")
+                parsed = _parse_utc_iso8601(produced_at)
+            except (
+                OSError,
+                UnicodeError,
+                json.JSONDecodeError,
+                KeyError,
+                TypeError,
+                ValueError,
+            ) as exc:
+                raise SystemExit("INVALID_EPIC038_PR03_LIVE_PROOF_TIMESTAMP") from exc
+            if (
+                _isoformat(parsed) != produced_at
+                or payload.get("artifact_kind")
+                != "hde_epic038_pr03_open_rails_vendor_abba_proof"
+                or payload.get("top_level_pass") is not True
+                or payload.get("result") != "pass"
+                or payload.get("acceptance_token_satisfied") is not False
+            ):
+                raise SystemExit("INVALID_EPIC038_PR03_LIVE_PROOF_POSTURE")
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 
 EPIC038_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr04.db_check_constraints", "discovered_physical_path": "artifacts/db/check_constraints.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
@@ -2887,11 +2925,15 @@ def _write_path_proof(
         except ValueError:
             existing_size_matches = False
         existing_fields_match = all(existing.get(key) == value for key, value in extra_fields.items())
+        explicit_produced_matches = (
+            requested_produced is None or existing_produced == requested_produced
+        )
         if (
             existing.get("path") == rel
             and existing.get("sha256") == sha256
             and existing_size_matches
             and existing_fields_match
+            and explicit_produced_matches
             and existing_mtime is not None
             and existing_produced is not None
         ):
@@ -3095,7 +3137,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr05_entries(),
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
-            *EPIC038_PR03_PRIMARY_ARTIFACTS,
+            *_load_epic038_pr03_entries(),
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
             *EPIC038_PR06_PRIMARY_ARTIFACTS,
