@@ -2940,14 +2940,28 @@ def good():
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
-def test_epic034_public_route_signatures_exclude_internal_ops_dev() -> None:
+def test_epic034_public_route_signatures_exclude_internal_ops_dev_and_compat() -> None:
+    assert boundary_analyzer._is_non_public_route_namespace("/api/compat/v1")
+    assert boundary_analyzer._is_non_public_route_namespace("/api/compat/v1/status")
+    assert not boundary_analyzer._is_non_public_route_namespace("/api/compat/v10")
+
     signatures = boundary_analyzer._adapter_public_route_signatures(generator.ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    assert not any(':/internal/' in item or ':/ops/' in item or ':/dev/' in item for item in signatures)
+    assert not any(
+        ':/internal/' in item
+        or ':/ops/' in item
+        or ':/dev/' in item
+        or '/api/compat/v1' in item
+        for item in signatures
+    )
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["no_public_reader_change"] is True
     assert ':/internal/' not in proof
     assert ':/ops/' not in proof
     assert ':/dev/' not in proof
+    public_signatures_line = next(
+        line for line in proof.splitlines() if line.startswith("typed_public_route_signatures=")
+    )
+    assert "/api/compat/v1" not in public_signatures_line
 
 
 def test_epic034_adapter_boundary_fails_closed_on_conditional_presenter_assignment(monkeypatch: pytest.MonkeyPatch) -> None:

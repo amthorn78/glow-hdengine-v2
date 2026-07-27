@@ -838,7 +838,9 @@ def _iter_function_defs(tree: ast.AST) -> dict[str, ast.FunctionDef | ast.AsyncF
 
 
 def _is_non_public_route_namespace(route: str) -> bool:
-    return route in {"/internal", "/ops", "/dev"} or route.startswith(("/internal/", "/ops/", "/dev/"))
+    return route in {"/internal", "/ops", "/dev", "/api/compat/v1"} or route.startswith(
+        ("/internal/", "/ops/", "/dev/", "/api/compat/v1/")
+    )
 
 
 def _join_route_prefix(prefix: str, route: str) -> str:
