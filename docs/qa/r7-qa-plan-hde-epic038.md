@@ -2,7 +2,7 @@
 
 ### Front matter
 
-Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespaces Target environment: dev; one separately authorized, bounded nonproduction vendor check Plan revision: r6 Date (UTC): 2026-07-26 Operators (names-only): PO
+Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespaces Target environment: dev; one separately authorized, bounded nonproduction vendor check Plan revision: r7 Date (UTC): 2026-07-26 Operators (names-only): PO
 
 #### Canon precedence statement (required)
 
@@ -34,6 +34,11 @@ Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespac
   * Addendum 2.21 — PR-06 Remediation State  
   * Addendum 2.22 — Implementation Retrospective HDE-EPIC038  
   * Addendum 2.23 — Post Implementation Audit Triage HDE-EPIC038  
+  * Addendum 2.24 — Syntax-Origin Defects Remain Non-Blocking Regardless of Literal Execution Effect  
+  * Addendum 2.25 — Recognize Epic Remediation Plans Pending Template Drainage  
+  * Addendum 2.26 — HDE-EPIC038 Epic Remediation PR-01 — PF09.6 HDE-DIST007 Canonical Adapter Factory Route-Mount Parity  
+  * Addendum 2.27 — HDE-EPIC038 HDE-DIST007 Post-Merge Bounded Rescope and CI Completion Authority  
+  * Addendum 2.28 — Epic Remedial PR-01 HDE-EPIC038  
 * PF04 — HDE Governance, §2.0 Acceptance Tokens (single-home roster); §9.7 Token fidelity & plan approval rails; §9.8 QA plans — step-level Deliverables (no screen-only acceptance)  
 * PF06 — Epic Process Guide, §0.4.1  
 * PF09.6 — HDE Build Checklist Distillation, §Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004); §Subtask HDE-DIST001.5 — BodyGraph mechanics gates; §Subtask HDE-DIST001.6 — One-button evidence harness & release sanity pipeline; §Subtask HDE-DIST001.9 — DB–bridge parity & env connectivity; §Subtask HDE-DIST001.10 — Architecture snapshot (keys-only) evidence; §Subtask HDE-DIST001.11 — v2 mapped-cache persistence hardening; §Subtask HDE-DIST005.1 — Canonical encodings & environment pins; §Subtask HDE-DIST005.2 — Global Index & Mirror discipline  
@@ -56,7 +61,7 @@ All future outputs begin as `NOT RUN`. A pre-existing artifact never establishes
 * `catalog/manifest.json` is the sole tracked release-identity input. External attestation is produced outside the source checkout.  
 * The integrated chain has nineteen ordered stages, stops at the first required failure, reruns no OPS, and does not repair an inconsistent evidence graph.  
 * `tools/evidence/update_evidence_index.py` is the canonical companion-artifact authority. `--check` detects drift; omitting `--check` writes.  
-* Addendum 2.23 narrows the earlier broad remediation-complete posture: the production and documented startup factory currently omits the compatibility blueprint mounted by adjacent factories.  
+* Addenda 2.26 through 2.28 record the HDE-DIST007 mapping and the completed selected-factory route-mount and hosted-CI remediation. The production and documented startup factory now mounts the existing compatibility blueprint; Live QA remains unexecuted and separate from implementation, repository, CI, release, PF09, acceptance, and closeout claims.  
 * Implementation and release evidence do not establish QA PASS, token satisfaction, deployment, migration, PF09 movement, acceptance, or closeout.
 
 ### Open-Rails Live QA Requirement for production-affecting epics
@@ -337,7 +342,7 @@ qa_profile_command="command -v git >/dev/null 2>&1 && command -v python >/dev/nu
       qa_path_command='test -f tools/evidence/generate_a7_transport_proofs.py && test -f tests/http/test_reader_a7_transport.py && test -f tests/http/test_endpoint_catalog.py && test -f docs/ENDPOINTS_CATALOG.json'
       ;;
     qa-06-po-006)
-      qa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'
+      qa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/adapter/test_comqa_path_command='test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/http/test_compat_endpoint_contract.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'pat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py'
       ;;
     qa-07-po-007)
       qa_path_command='test -f ci/checks/run_rails_job_definitions.py && test -f ci/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml && test -f ci/jobs/logs_keys_only_redaction.yml'/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml'
@@ -708,7 +713,7 @@ PASS: all three files exist, the header is valid with exit code `0`, the Doc Del
 
 #### Step-0B — Doc Delta Capture (mechanical; runbook self-honesty)
 
-Step 0 above creates or preserves the required two-surface pair. It never replaces proof-bearing content with an empty scaffold. The known entrypoint contradiction receives stable blocker ID `DOC-BLOCKER-001`.
+Step 0 above creates or preserves the required two-surface pair. It never replaces proof-bearing content with an empty scaffold. Current-run route discovery creates stable blocker ID `DOC-BLOCKER-001` only when it reports `POST /api/compat/v1` absent from the production-selected factory; otherwise Step 0 records no route blocker.
 
 No implementation Moon Loop is authorized. A command, path, or dependency defect requires a plan change; a behavior defect requires an implementation change.
 
@@ -828,23 +833,23 @@ Evidence command: `head -n 1 audit/qa/hde-epic038/checks/qa-05-po-005/primary.lo
 
 What to look for: unique `GET /reader` designation; GET, HEAD, 304, error, cache, ETag, length, identity/gzip/brotli equivalence. Required deliverable: `audit/qa/hde-epic038/checks/qa-05-po-005/primary.log`. PASS: generator check and HTTP/catalog tests pass. FAIL\_BEHAVIOR: any transport predicate or success-surface classification fails. FAIL\_TOOLING: the generator or tests fail mechanically. TOOLING\_BLOCKED: dependencies or loci remain unavailable. Initial state: `NOT RUN`.
 
-#### CHECK qa-06-po-006: PO-006
+#### **CHECK qa-06-po-006: PO-006**
 
 Goal: The canonical production and documented local application entry point must expose every existing public and internal surface assigned to that deployment role while preserving their distinct proof meanings.
 
-SOURCE EXCERPT (verbatim): This current divergence contradicts the earlier broad architecture-complete posture and does not authorize a new or public surface.
+SOURCE EXCERPT (verbatim): All implementation and remediation requirements are satisfied in the current repository state.
 
-REPO VALIDATION NOTE: `Procfile` and `scripts/start_web.sh` select `adapter.factory:create_app()`. That factory registers the primary blueprint but not the compatibility blueprint mounted by `adapter.http_reader` and `adapter.wsgi`. The compatibility prefix remains `/api/compat/v1` and is an internal surface, not a new public contract.
+REPO VALIDATION NOTE: `Procfile` and `scripts/start_web.sh` select `adapter.factory:create_app()`. Current `adapter/factory.py` registers both the primary blueprint and the existing `compat_blueprint`. The compatibility prefix remains `/api/compat/v1` and is an internal surface, not a new public contract.
 
-Rails: closed. Required dependencies: Profile A. Preflight check: Command A1. Path preflight: `test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py` If missing, activation/install action: Command A2 for packages; none for missing loci. If still unavailable: use the blocker command. PF anchors: HDE Build Notes; Canon Plan Templates; HDE User Guide. Tokens: `[]`; `[]`.
+Rails: closed. Required dependencies: Profile A. Preflight check: Command A1. Path preflight: `test -f Procfile && test -f scripts/start_web.sh && test -f adapter/factory.py && test -f adapter/http_reader.py && test -f adapter/wsgi.py && test -f engine/http/compat_handler.py && test -f tests/http/test_compat_endpoint_contract.py && test -f tests/adapter/test_compat_http_dev.py && test -f tests/adapter/test_compat_http_parity.py` If missing, activation/install action: Command A2 for packages; none for missing loci. If still unavailable: use the blocker command. PF anchors: HDE Build Notes; Canon Plan Templates; HDE User Guide. Tokens: `[]`; `[]`.
 
 TOOLING\_BLOCKED command: `qa_run qa-06-po-006 PO-006 1 0 dev TOOLING_BLOCKED '["HDE Build Notes","Canon Plan Templates","HDE User Guide"]' '[]' "printf '%s\n' 'ENTRYPOINT_PROOF_DEPENDENCY_UNAVAILABLE'; exit 125"`
 
-Behavior command: `qa_run qa-06-po-006 PO-006 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates","HDE User Guide"]' '[]' "python -c 'from adapter.factory import create_app; required={(\"/reader\",\"GET\"),(\"/internal/version\",\"GET\"),(\"/api/compat/v1\",\"POST\")}; actual={(r.rule,m) for r in create_app().url_map.iter_rules() for m in r.methods}; missing=sorted(required-actual); print({\"missing\":missing}); raise SystemExit(1 if missing else 0)' && python -m pytest -q tests/adapter/test_compat_http_dev.py tests/adapter/test_compat_http_parity.py"`
+Behavior command: `qa_run qa-06-po-006 PO-006 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates","HDE User Guide"]' '[]' "python -c 'from adapter.factory import create_app; required={(\"/reader\",\"GET\"),(\"/internal/version\",\"GET\"),(\"/api/compat/v1\",\"POST\")}; actual={(r.rule,m) for r in create_app().url_map.iter_rules() for m in r.methods}; missing=sorted(required-actual); print({\"missing\":missing}); raise SystemExit(1 if missing else 0)' && python -m pytest -q tests/http/test_compat_endpoint_contract.py tests/adapter/test_compat_http_dev.py tests/adapter/test_compat_http_parity.py"`
 
 Evidence command: `head -n 1 audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`
 
-What to look for: an empty `missing` array and passing dev/WSGI compatibility tests. Current validated source predicts `/api/compat/v1` will be reported missing from the production-selected factory. Required deliverable: `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`. PASS: the production-selected factory contains all three assigned surfaces and the compatibility tests pass. FAIL\_BEHAVIOR: the route assertion reports a missing assigned surface or parity tests fail. FAIL\_TOOLING: safe route introspection cannot execute after preflight. TOOLING\_BLOCKED: dependencies or loci are unavailable. Blocked posture: not BLOCKED; the current contradiction is executable and must adjudicate as behavior. Initial state: `NOT RUN`.
+What to look for: an empty `missing` array and a passing complete compatibility suite covering endpoint-contract, development, and parity behavior. Required deliverable: `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`. PASS: the production-selected factory contains all three assigned surfaces and all three compatibility test files pass, establishing the accepted namespace, environment, method, subpath, error-contract, development, and parity behavior. FAIL\_BEHAVIOR: the route assertion reports a missing assigned surface or any endpoint-contract, development, or parity assertion fails. FAIL\_TOOLING: safe route introspection or test execution cannot proceed after preflight. TOOLING\_BLOCKED: dependencies or loci are unavailable. A missing assigned route observed during the future QA run is `FAIL_BEHAVIOR`; no missing route is presumed before execution. Initial state: `NOT RUN`.
 
 #### CHECK qa-07-po-007: PO-007
 
@@ -926,19 +931,19 @@ Evidence command: `head -n 1 audit/qa/hde-epic038/checks/qa-10-po-010/primary.lo
 
 What to look for: deterministic core isolation, refusal, bounded retry/rate behavior, failure protection, and keys-only logging. Required deliverable: `audit/qa/hde-epic038/checks/qa-10-po-010/primary.log`. PASS: all tests and rails evidence checks pass. FAIL\_BEHAVIOR: any effect boundary or policy predicate fails. FAIL\_TOOLING: runner or checker mechanics fail. TOOLING\_BLOCKED: dependency or locus missing. Initial state: `NOT RUN`.
 
-#### CHECK qa-11-po-011: PO-011
+#### **CHECK qa-11-po-011: PO-011**
 
 Goal: Architecture proof must reflect the actual current public, internal, database, vendor, and compatibility surfaces using a closed classification vocabulary that reveals no sensitive values and rejects unknown or forbidden conditions.
 
-Rails: closed. Required dependencies: Profile A. Preflight check: Command A1. Path preflight: `test -f tests/evidence/test_architecture_snapshot.py && test -f tests/http/test_endpoint_catalog.py && test -f artifacts/architecture/architecture_snapshot.keys_only.json && test -f docs/ENDPOINTS_CATALOG.json` If missing, activation/install action: Command A2. If still unavailable: use the blocker command. PF anchors: HDE Build Notes; Canon Plan Templates. Tokens: `[]`; `[]`.
+Rails: closed. Required dependencies: Profile A. Preflight check: Command A1. Path preflight: `test -f tests/evidence/test_architecture_snapshot.py && test -f tests/evidence/test_hdapi_v2_contract_inventory.py && test -f tests/http/test_endpoint_catalog.py && test -f artifacts/architecture/architecture_snapshot.keys_only.json && test -f docs/ENDPOINTS_CATALOG.json` If missing, activation/install action: Command A2. If still unavailable: use the blocker command. PF anchors: HDE Build Notes; Canon Plan Templates. Tokens: `[]`; `[]`.
 
 TOOLING\_BLOCKED command: `qa_run qa-11-po-011 PO-011 1 0 dev TOOLING_BLOCKED '["HDE Build Notes","Canon Plan Templates"]' '[]' "printf '%s\n' 'ARCHITECTURE_PROOF_DEPENDENCY_UNAVAILABLE'; exit 125"`
 
-Behavior command: `qa_run qa-11-po-011 PO-011 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '[]' "python -m pytest -q tests/evidence/test_architecture_snapshot.py tests/http/test_endpoint_catalog.py"`
+Behavior command: `qa_run qa-11-po-011 PO-011 1 0 dev FAIL_BEHAVIOR '["HDE Build Notes","Canon Plan Templates"]' '[]' "python -m pytest -q tests/evidence/test_architecture_snapshot.py tests/evidence/test_hdapi_v2_contract_inventory.py tests/http/test_endpoint_catalog.py"`
 
 Evidence command: `head -n 1 audit/qa/hde-epic038/checks/qa-11-po-011/primary.log`
 
-What to look for: current surface inventory, closed allowed/forbidden/out-of-scope/unknown vocabulary, and no sensitive values. Required deliverable: `audit/qa/hde-epic038/checks/qa-11-po-011/primary.log`. PASS: both suites pass without unknown or unsafe classifications. FAIL\_BEHAVIOR: surface inventory, classification, or value-safety assertions fail. FAIL\_TOOLING: tests cannot execute after preflight. TOOLING\_BLOCKED: dependency or locus unavailable. Initial state: `NOT RUN`.
+What to look for: current surface inventory, closed allowed/forbidden/out-of-scope/unknown vocabulary, no sensitive values, and exact HDAPI non-public-boundary behavior: `/api/compat/v1` and its descendants are non-public while `/api/compat/v10` remains unmatched. Required deliverable: `audit/qa/hde-epic038/checks/qa-11-po-011/primary.log`. PASS: all three test files pass without unknown or unsafe classifications, and the exact compatibility-namespace inclusion and overmatch-exclusion predicates pass. FAIL\_BEHAVIOR: surface inventory, classification, value-safety, compatibility-namespace, descendant, or overmatch-exclusion assertions fail. FAIL\_TOOLING: tests cannot execute after preflight. TOOLING\_BLOCKED: dependency or locus unavailable. Initial state: `NOT RUN`.
 
 #### CHECK qa-12-po-012: PO-012
 
@@ -1794,7 +1799,7 @@ The summary is an execution deliverable, not a debugging diary. It must:
 * Do not infer acceptance from file presence, historical PASS, implementation records, release evidence, or operational captures.  
 * Do not convert the compatibility surface into a new public route.  
 * Do not classify missing dependencies as `FAIL_BEHAVIOR`.  
-* Do not classify current entrypoint divergence as tooling or an unresolved audit gap.  
+* If future QA observes a missing assigned route in the production-selected factory, classify that observation as `FAIL_BEHAVIOR`, not tooling or an unresolved audit gap.  
 * Do not substitute alternate commands, paths, tests, helpers, environment keys, or installation instructions.  
 * If a validated repository locus has moved or disappeared, record `TOOLING_BLOCKED` and require a plan change.  
 * All future artifacts remain `NOT RUN` until their owning action executes.  
