@@ -93,4 +93,7 @@ def test_selected_factory_compat_routing_errors_match_existing_factories():
         assert selected_resp.headers.get("Cache-Control") == dev_resp.headers.get("Cache-Control")
         assert selected_resp.data == dev_resp.data == wsgi_resp.data
         assert json.loads(selected_resp.data.decode("utf-8"))["code"] == "ERR_NOT_FOUND"
-
+        if method == "PUT":
+            assert {
+                item.strip() for item in selected_resp.headers["Allow"].split(",")
+            } >= {"GET", "HEAD", "OPTIONS", "POST"}
