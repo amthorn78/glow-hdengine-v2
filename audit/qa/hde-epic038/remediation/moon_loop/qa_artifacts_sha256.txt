@@ -1,0 +1,6 @@
+d14e1fad8709e9718c2c0a91dd07dc5f7d0abe39da4b8c3e5e6b1d3ebcbe24c5  audit/qa/hde-epic038/remediation/moon_loop/changed_files.txt
+92711b597f4dcdbeb1d49abd824da0b7046be84b8bdea5a7034b7032c0e41fea  audit/qa/hde-epic038/remediation/moon_loop/remediation_note.md
+918a506f4c51472801c4c33ec06c0f6f86e6d5c35fc0158e1a5821b938167981  audit/qa/hde-epic038/remediation/moon_loop/patch.diff
+f3fb795f75407d5d2ae64d13893a66f8bae38958a0284dd64dc2720ac1ab5653  audit/qa/hde-epic038/remediation/moon_loop/pre_remediation_sha256.txt
+ede383e356069e5c60a9b61cee8e443eb2791260c65c95664b0c1258432327ef  audit/qa/hde-epic038/remediation/moon_loop/qa-05-po-005.pre-remediation.log
+eedce113352005d8dc4c30d754ef3ddca2b5ab30f357794248180702cf4b9ef7  audit/qa/hde-epic038/checks/qa-05-po-005/primary.log

@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T08:38:05Z", "check_id": "qa-05-po-005", "check_name": "PO-005", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tools/evidence/generate_a7_transport_proofs.py && test -f tests/http/test_reader_a7_transport.py && test -f tests/http/test_endpoint_catalog.py && test -f docs/ENDPOINTS_CATALOG.json; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_a7_transport_proofs.py --check && python -m pytest -q tests/http/test_reader_a7_transport.py tests/http/test_endpoint_catalog.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-05-po-005/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tools/evidence/generate_a7_transport_proofs.py && test -f tests/http/test_reader_a7_transport.py && test -f tests/http/test_endpoint_catalog.py && test -f docs/ENDPOINTS_CATALOG.json
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_a7_transport_proofs.py --check && python -m pytest -q tests/http/test_reader_a7_transport.py tests/http/test_endpoint_catalog.py
+a7 transport proofs check ok
+......                                                                   [100%]
+6 passed in 0.19s
+BEHAVIOR_EXIT_CODE=0

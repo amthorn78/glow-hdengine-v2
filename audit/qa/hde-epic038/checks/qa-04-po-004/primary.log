@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T08:23:23Z", "check_id": "qa-04-po-004", "check_name": "PO-004", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tools/evidence/run_canonical_json_gate.py && test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tests/cli/test_cli_canonical_bytes.py && test -f tests/cli/test_showcompat_parity_and_identity.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py --check-only && python tools/evidence/generate_open_rails_abba_proof.py --check-current && python -m pytest -q tests/cli/test_cli_canonical_bytes.py tests/cli/test_showcompat_parity_and_identity.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-04-po-004/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tools/evidence/run_canonical_json_gate.py && test -f tools/evidence/generate_open_rails_abba_proof.py && test -f tests/cli/test_cli_canonical_bytes.py && test -f tests/cli/test_showcompat_parity_and_identity.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py --check-only && python tools/evidence/generate_open_rails_abba_proof.py --check-current && python -m pytest -q tests/cli/test_cli_canonical_bytes.py tests/cli/test_showcompat_parity_and_identity.py
+{"path": "audit/gates/determinism/open_rails_abba.json", "result": "pass", "status": "OK", "top_level_pass": true}
+.....sss...                                                              [100%]
+8 passed, 3 skipped in 0.75s
+BEHAVIOR_EXIT_CODE=0

@@ -1,0 +1,87 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T08:20:44Z", "check_id": "qa-00-step-0-discovery", "check_name": "Step-0 Discovery", "status": "PASS", "fail_status": "", "command": "command -v bash >/dev/null 2>&1 && command -v cat >/dev/null 2>&1 && command -v mkdir >/dev/null 2>&1 && command -v rm >/dev/null 2>&1 && command -v head >/dev/null 2>&1 && command -v sha256sum >/dev/null 2>&1 && command -v awk >/dev/null 2>&1 && command -v cut >/dev/null 2>&1 && command -v tail >/dev/null 2>&1 && command -v od >/dev/null 2>&1 && command -v grep >/dev/null 2>&1 && command -v tr >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test \"$(basename \"$(git rev-parse --show-toplevel)\")\" = \"glow-hdengine-v2\"; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python - <<'STEP0PY'\nimport json\nfrom pathlib import Path\nfrom adapter.factory import create_app\n\nrequired = {\n    (\"/reader\", \"GET\"),\n    (\"/internal/version\", \"GET\"),\n    (\"/api/compat/v1\", \"POST\"),\n}\nactual = {\n    (rule.rule, method)\n    for rule in create_app().url_map.iter_rules()\n    for method in rule.methods\n}\nmissing = sorted(required - actual)\n\npaths = [\n    Path(\"audit/docdeltas/hde-epic038_doc_deltas.md\"),\n    Path(\"audit/qa/hde-epic038/00_meta/doc_deltas.md\"),\n]\nexisting = [path.read_bytes() if path.exists() else b\"\" for path in paths]\nif existing[0].strip() and existing[1].strip() and existing[0] != existing[1]:\n    raise SystemExit(\"DOC_DELTA_DIVERGENCE\")\n\nretained = existing[0] if existing[0].strip() else existing[1]\nif retained.strip():\n    data = retained\n    delta_posture = \"preserved_existing\"\nelse:\n    lines = [\n        \"# HDE-EPIC038 QA Doc Deltas\",\n        \"\",\n        \"## BLOCKERS\",\n    ]\n    if (\"/api/compat/v1\", \"POST\") in missing:\n        lines.append(\n            \"- DOC-BLOCKER-001: The production and documented startup factory omits the existing internal compatibility blueprint mounted by adjacent factories. This does not authorize a new or public surface.\"\n        )\n    else:\n        lines.append(\"- None identified by Step-0 route discovery.\")\n    lines.extend(\n        [\n            \"\",\n            \"## CAVEATS\",\n            \"- DOC-CAVEAT-001: Implementation, repository, release, and operational evidence do not independently establish Live QA acceptance or epic closeout.\",\n        ]\n    )\n    data = (\"\\n\".join(lines) + \"\\n\").encode(\"utf-8\")\n    delta_posture = \"created\"\n\nfor path in paths:\n    path.parent.mkdir(parents=True, exist_ok=True)\n    if path.exists() and path.read_bytes().strip() and path.read_bytes() != data:\n        raise SystemExit(\"DOC_DELTA_OVERWRITE_REFUSED\")\n    path.write_bytes(data)\n\nif paths[0].read_bytes() != paths[1].read_bytes():\n    raise SystemExit(\"DOC_DELTA_PAIR_MISMATCH\")\n\nprint(\n    json.dumps(\n        {\n            \"epic_id\": \"HDE-EPIC038\",\n            \"qa_root\": \"audit/qa/hde-epic038/\",\n            \"repository\": \"glow-hdengine-v2\",\n            \"production_factory_required_routes\": sorted(required),\n            \"production_factory_missing_routes\": missing,\n            \"doc_delta_posture\": delta_posture,\n            \"future_check_artifacts\": \"NOT RUN\",\n        },\n        sort_keys=True,\n    )\n)\nSTEP0PY", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log", "audit/docdeltas/hde-epic038_doc_deltas.md", "audit/qa/hde-epic038/00_meta/doc_deltas.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates", "HDE User Guide"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v bash >/dev/null 2>&1 && command -v cat >/dev/null 2>&1 && command -v mkdir >/dev/null 2>&1 && command -v rm >/dev/null 2>&1 && command -v head >/dev/null 2>&1 && command -v sha256sum >/dev/null 2>&1 && command -v awk >/dev/null 2>&1 && command -v cut >/dev/null 2>&1 && command -v tail >/dev/null 2>&1 && command -v od >/dev/null 2>&1 && command -v grep >/dev/null 2>&1 && command -v tr >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v bash >/dev/null 2>&1 && command -v cat >/dev/null 2>&1 && command -v mkdir >/dev/null 2>&1 && command -v rm >/dev/null 2>&1 && command -v head >/dev/null 2>&1 && command -v sha256sum >/dev/null 2>&1 && command -v awk >/dev/null 2>&1 && command -v cut >/dev/null 2>&1 && command -v tail >/dev/null 2>&1 && command -v od >/dev/null 2>&1 && command -v grep >/dev/null 2>&1 && command -v tr >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test "$(basename "$(git rev-parse --show-toplevel)")" = "glow-hdengine-v2"
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python - <<'STEP0PY'
+import json
+from pathlib import Path
+from adapter.factory import create_app
+
+required = {
+    ("/reader", "GET"),
+    ("/internal/version", "GET"),
+    ("/api/compat/v1", "POST"),
+}
+actual = {
+    (rule.rule, method)
+    for rule in create_app().url_map.iter_rules()
+    for method in rule.methods
+}
+missing = sorted(required - actual)
+
+paths = [
+    Path("audit/docdeltas/hde-epic038_doc_deltas.md"),
+    Path("audit/qa/hde-epic038/00_meta/doc_deltas.md"),
+]
+existing = [path.read_bytes() if path.exists() else b"" for path in paths]
+if existing[0].strip() and existing[1].strip() and existing[0] != existing[1]:
+    raise SystemExit("DOC_DELTA_DIVERGENCE")
+
+retained = existing[0] if existing[0].strip() else existing[1]
+if retained.strip():
+    data = retained
+    delta_posture = "preserved_existing"
+else:
+    lines = [
+        "# HDE-EPIC038 QA Doc Deltas",
+        "",
+        "## BLOCKERS",
+    ]
+    if ("/api/compat/v1", "POST") in missing:
+        lines.append(
+            "- DOC-BLOCKER-001: The production and documented startup factory omits the existing internal compatibility blueprint mounted by adjacent factories. This does not authorize a new or public surface."
+        )
+    else:
+        lines.append("- None identified by Step-0 route discovery.")
+    lines.extend(
+        [
+            "",
+            "## CAVEATS",
+            "- DOC-CAVEAT-001: Implementation, repository, release, and operational evidence do not independently establish Live QA acceptance or epic closeout.",
+        ]
+    )
+    data = ("\n".join(lines) + "\n").encode("utf-8")
+    delta_posture = "created"
+
+for path in paths:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() and path.read_bytes().strip() and path.read_bytes() != data:
+        raise SystemExit("DOC_DELTA_OVERWRITE_REFUSED")
+    path.write_bytes(data)
+
+if paths[0].read_bytes() != paths[1].read_bytes():
+    raise SystemExit("DOC_DELTA_PAIR_MISMATCH")
+
+print(
+    json.dumps(
+        {
+            "epic_id": "HDE-EPIC038",
+            "qa_root": "audit/qa/hde-epic038/",
+            "repository": "glow-hdengine-v2",
+            "production_factory_required_routes": sorted(required),
+            "production_factory_missing_routes": missing,
+            "doc_delta_posture": delta_posture,
+            "future_check_artifacts": "NOT RUN",
+        },
+        sort_keys=True,
+    )
+)
+STEP0PY
+{"doc_delta_posture": "created", "epic_id": "HDE-EPIC038", "future_check_artifacts": "NOT RUN", "production_factory_missing_routes": [], "production_factory_required_routes": [["/api/compat/v1", "POST"], ["/internal/version", "GET"], ["/reader", "GET"]], "qa_root": "audit/qa/hde-epic038/", "repository": "glow-hdengine-v2"}
+BEHAVIOR_EXIT_CODE=0

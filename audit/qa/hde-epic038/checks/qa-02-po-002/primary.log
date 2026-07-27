@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T08:22:09Z", "check_id": "qa-02-po-002", "check_name": "PO-002", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f scripts/release_id_recompute.py && test -f tests/runtime/test_identity.py && test -f tests/cli/test_showcompat_parity_and_identity.py && test -f tests/transport/test_internal_version_contract.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only && python -m pytest -q tests/runtime/test_identity.py tests/cli/test_showcompat_parity_and_identity.py tests/transport/test_internal_version_contract.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-02-po-002/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f scripts/release_id_recompute.py && test -f tests/runtime/test_identity.py && test -f tests/cli/test_showcompat_parity_and_identity.py && test -f tests/transport/test_internal_version_contract.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check-manifest-only && python -m pytest -q tests/runtime/test_identity.py tests/cli/test_showcompat_parity_and_identity.py tests/transport/test_internal_version_contract.py
+......sss....                                                            [100%]
+10 passed, 3 skipped in 0.41s
+BEHAVIOR_EXIT_CODE=0

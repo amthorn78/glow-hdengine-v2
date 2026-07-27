@@ -1,0 +1,27 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-27T08:25:25Z", "check_id": "qa-07-po-007", "check_name": "PO-007", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f ci/checks/run_rails_job_definitions.py && test -f ci/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml && test -f ci/jobs/logs_keys_only_redaction.yml; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python ci/checks/run_rails_job_definitions.py ci/jobs/rails_closed_refusal.yml ci/jobs/rails_open_conformance.yml ci/jobs/logs_keys_only_redaction.yml", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-07-po-007/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f ci/checks/run_rails_job_definitions.py && test -f ci/jobs/rails_closed_refusal.yml && test -f ci/jobs/rails_open_conformance.yml && test -f ci/jobs/logs_keys_only_redaction.yml
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python ci/checks/run_rails_job_definitions.py ci/jobs/rails_closed_refusal.yml ci/jobs/rails_open_conformance.yml ci/jobs/logs_keys_only_redaction.yml
+RUN rails_closed_refusal: python -m pytest tests/bodygraph/test_resolver_vendor.py -q
+....                                                                     [100%]
+4 passed in 0.07s
+RUN rails_open_conformance: python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_open_rails_abba_proof.py -q
+........................................................................ [ 85%]
+............                                                             [100%]
+84 passed in 10.86s
+RUN rails_open_conformance: python tools/evidence/generate_open_rails_abba_proof.py --check-current
+{"path": "audit/gates/determinism/open_rails_abba.json", "result": "pass", "status": "OK", "top_level_pass": true}
+RUN logs_keys_only_redaction: python tools/evidence/generate_rails_gate_evidence.py --check
+RAILS_GATE_EVIDENCE_OK
+RUN logs_keys_only_redaction: python -m pytest tests/bodygraph/test_vendor_client.py tests/bodygraph/test_resolver_vendor.py -q
+.......................................                                  [100%]
+39 passed in 0.07s
+RAILS_JOB_DEFINITIONS_OK
+BEHAVIOR_EXIT_CODE=0
