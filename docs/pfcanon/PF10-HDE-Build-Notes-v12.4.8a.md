@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.7  
+**Version:** v12.4.8a  
 Effective Date: 2026.07.27  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -12,21 +12,156 @@ This file is a **working scratchpad for new, not-yet-merged documentation**. Tre
 
 ---
 
-## Precedence and versioning
+## **Precedence, versioning, and scope**
 
-**PF10 IS CANONICAL.** For any topic explicitly covered in this scratchpad, PF10 is the current authoritative source of truth and **supersedes all other PF canon** until that item is formally reviewed and drained into the relevant permanent PF document.
+### **1\. PF10 authority**
 
-**No competing canon may be used against an active PF10 entry.** While an item remains live in this scratchpad, agents must follow PF10 for that topic and must not prefer, merge, reinterpret, or reconcile conflicting language from older PF canon.
+PF10 IS CANONICAL. For any topic explicitly addressed by an applicable, active PF10 addendum, that addendum is the current authoritative source of truth and supersedes conflicting permanent PF canon until the guidance is formally reviewed and drained into the relevant permanent PF document.
 
-**Later addendum wins.** If multiple addenda address the same or overlapping scope, the **highest-numbered / latest addendum is the only authoritative one**. Earlier addenda on that scope are superseded and must not be used in parallel.
+No competing canon may be used against an applicable PF10 addendum. Agents must not prefer, merge, reinterpret, or reconcile conflicting permanent-canon language while the PF10 guidance remains active.
 
-**Only the latest PF10 file matters.** Older scratchpad files are **fully drained, obsolete, or both**. Agents must **not** read them, reuse them, compare them, reconcile them, or carry forward language from them once a newer PF10 exists.
+PF10 authority is limited to the scope actually addressed by its addenda. The presence of a topic elsewhere in a PF10 document does not make PF10 authoritative over related topics that no addendum addresses.
 
-**This file contains only live items.** Drained items are removed from the scratchpad. Therefore, the current version of PF10 contains only active, not-yet-merged guidance.
+### **2\. Scope within an individual PF10 document**
 
-**Silence means canon reverts to the permanent PF home.** If a topic does **not** appear in the latest PF10, then PF10 has nothing to say about it, and the source of truth is the relevant permanent PF-Canon document.
+An individual PF10 document is a container for multiple numbered addenda. It must not be treated as one undifferentiated rule or as blanket authority over every topic associated with the current epic.
 
-**Operational rule for agents:** use the latest PF10 first; obey it wherever it speaks; ignore older scratchpads entirely; fall back to permanent PF-Canon only where the latest PF10 is silent.
+Each addendum is an independent unit of authority with its own scope. That scope is established by the addendum’s heading and substantive content, including the decisions, requirements, exceptions, artifacts, behaviors, processes, or canon topics it explicitly addresses.
+
+Within one PF10 document:
+
+1. Every active, non-superseded addendum remains authoritative for its own stated scope.  
+2. A higher-numbered addendum does not automatically invalidate every lower-numbered addendum in the document.  
+3. Unrelated addenda remain independently authoritative and must be applied together when more than one is relevant to the current task.  
+4. An addendum must not be applied outside the scope established by its actual content.  
+5. The entire document must be searched for relevant addenda. Agents must not consult only the first, last, or highest-numbered addendum.  
+6. Document-level relevance does not establish addendum-level relevance. An agent must identify which specific addendum or addenda govern the current question.
+
+For example, if addendum `2.12` governs evidence indexing and addendum `2.18` governs compatibility routing, both remain authoritative within their separate scopes. The existence of `2.18` does not supersede `2.12` merely because `2.18` has a higher number.
+
+### **3\. Single-document and multi-document PF10 versions**
+
+An active PF10 base version may consist of either:
+
+1. One unlettered document, such as `10.x.x`; or  
+2. One multi-document lettered set, such as `10.x.xa`, `10.x.xb`, `10.x.xc`, and so forth.
+
+A lettered set may be used when an epic’s build notes exceed the practical capacity of one document and drainage before the end of the epic is not practical.
+
+All documents sharing the same base version and carrying sequential letter suffixes belong to the same PF10 version set. For example:
+
+* `10.x.xa`  
+* `10.x.xb`  
+* `10.x.xc`
+
+Together, these documents constitute the complete active `10.x.x` PF10 set.
+
+The letter suffix identifies a physical document within the set. It does not create a newer base version, determine topical scope, or give one document greater authority than another.
+
+All documents in the active lettered set are equally authoritative containers of PF10 addenda. A later lettered document extends the set. It does not replace, obsolete, drain, or supersede an earlier lettered document merely because it has a later suffix.
+
+For example, `10.x.xb` does not replace `10.x.xa`. Active, non-superseded addenda in both documents remain authoritative for their respective scopes.
+
+### **4\. Continuous addendum sequence**
+
+A lettered PF10 set must preserve one continuous addendum-number sequence across all documents in the set.
+
+Each subsequent lettered document must begin with the addendum number immediately following the final addendum in the preceding document.
+
+Example:
+
+* `10.x.xa` contains addenda through `2.28`.  
+* `10.x.xb` begins with addendum `2.29`.  
+* If `10.x.xb` ends with addendum `2.41`, `10.x.xc` begins with addendum `2.42`.
+
+The numbered addendum sequence establishes the order of PF10 guidance. The document-letter sequence identifies where that guidance is stored.
+
+### **5\. Individual-addendum supersession**
+
+Supersession operates at the individual-addendum level, not automatically at the document level.
+
+This rule applies:
+
+* Between addenda in the same individual PF10 document.  
+* Between addenda located in different documents within the same lettered PF10 set.
+
+Each addendum remains authoritative for its stated scope unless a higher-numbered addendum revises, replaces, narrows, expands, or otherwise supersedes that scope.
+
+When two or more addenda address the same or overlapping scope:
+
+1. The highest-numbered applicable addendum is the sole authority for the overlapping scope.  
+2. Conflicting or replaced language in every lower-numbered addendum is superseded and must not be applied in parallel.  
+3. A lower-numbered addendum remains authoritative for any distinct scope not superseded by the higher-numbered addendum.  
+4. If the higher-numbered addendum explicitly supersedes the earlier addendum in full, no portion of the earlier addendum remains authoritative.  
+5. Supersession applies regardless of whether the addenda appear in the same document or in different documents within the active lettered set.
+
+Example within one document:
+
+* Addendum `2.17` establishes a rule.  
+* Addendum `2.22` in the same document revises that rule.  
+* Addendum `2.22` controls the revised scope.  
+* Addendum `2.17` remains authoritative only for any distinct scope that `2.22` does not supersede.
+
+Example across a lettered set:
+
+* Addendum `2.17` appears in `10.x.xa`.  
+* Addendum `2.34` appears in `10.x.xb` and revises the same rule.  
+* Addendum `2.34` controls the overlapping scope.  
+* Addendum `2.17` must not be used as competing or parallel authority for that scope.  
+* Any distinct portion of addendum `2.17` not superseded by `2.34` remains authoritative.
+
+A later document letter alone supersedes nothing. Addendum number and addendum scope determine supersession.
+
+### **6\. Current-version rule**
+
+Only the latest active PF10 base version matters. That version may be represented by one unlettered document or by a complete lettered set.
+
+Older base versions are fully drained, obsolete, or both. Once a newer base version exists, agents must not read, reuse, compare, reconcile, or carry forward content from an older base version.
+
+This rule does not apply between documents belonging to the same active lettered set. If `10.x.xa`, `10.x.xb`, and `10.x.xc` form the active version, all three remain part of the authoritative PF10 source set.
+
+An earlier lettered document remains authoritative for every applicable addendum it contains that has not been superseded by a higher-numbered addendum. It must not be discarded merely because a later lettered document exists.
+
+### **7\. Live-content rule**
+
+The active PF10 document or complete lettered set contains the current live guidance that has not yet been drained into its permanent PF home.
+
+Drained guidance is removed when PF10 is formally revised.
+
+If a lower-numbered addendum remains physically present after a higher-numbered addendum supersedes some or all of its scope, the superseded language is no longer live authority. Physical presence does not defeat individual-addendum supersession.
+
+All unaffected, non-superseded addenda within the same document or lettered set remain live and authoritative for their respective scopes.
+
+### **8\. Silence rule**
+
+PF10 governs only through applicable, active, non-superseded addenda.
+
+PF10 is silent when no addendum in the complete active PF10 document or lettered set addresses the current topic.
+
+When PF10 is silent, authority returns to the relevant permanent PF-Canon document.
+
+PF10 silence must be determined only after checking:
+
+1. Every potentially relevant addendum within each applicable individual document.  
+2. Every document belonging to the complete active lettered set, when a lettered set exists.  
+3. Any higher-numbered addendum that may have superseded earlier guidance.
+
+### **9\. Operational rule for agents**
+
+Agents must apply PF10 in this order:
+
+1. Identify the latest active PF10 base version.  
+2. Determine whether it consists of one unlettered document or a multi-document lettered set.  
+3. If it is a lettered set, identify all documents sharing that base version, such as `10.x.xa`, `10.x.xb`, and `10.x.xc`.  
+4. Treat each document as a container of separately scoped numbered addenda.  
+5. Search every applicable document for all addenda relevant to the current topic.  
+6. Determine the actual scope of each relevant addendum from its heading and substantive content.  
+7. Compare the scopes of all relevant addenda, including addenda within the same document.  
+8. Where addendum scopes overlap, apply only the highest-numbered applicable addendum to the overlapping scope.  
+9. Continue applying lower-numbered addenda to any distinct scope not superseded by a higher-numbered addendum.  
+10. Do not infer document-level supersession from a later letter suffix.  
+11. Ignore all older PF10 base versions.  
+12. Fall back to permanent PF canon only when the complete active PF10 document or lettered set contains no applicable, active, non-superseded guidance for the topic.
 
 ## Cross-references
 
@@ -40,9 +175,8 @@ When editing or extending this file, ChatGPT sessions must:
 
 # 1\) TEMPLATE
 
-TEMPLATE Addendum Entry (do not edit/remove)
-
-##   \<number\>. \<short, action-oriented title\>
+TEMPLATE Addendum Entry (do not edit/remove)  
+ \<number\>. \<short, action-oriented title\>
 
  Timestamp: \<mmddyy hh:mm\> (autofill from system info)  
  Details: \<specific information to drain to canon, its origin, and any evidence available\>
@@ -75,8 +209,7 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.24) Syntax-Origin Defects Remain Non-Blocking Regardless of Literal Execution Effect  
 2.25) Recognize Epic Remediation Plans Pending Template Drainage  
 2.26) HDE-EPIC038 Epic Remediation PR-01 — PF09.6 HDE-DIST007 Canonical Adapter Factory Route-Mount Parity  
-2.27) HDE-EPIC038 HDE-DIST007 Post-Merge Bounded Rescope and CI Completion Authority  
-2.28) Epic Remedial PR-01 HDE-EPIC038
+2.27) HDE-EPIC038 HDE-DIST007 Post-Merge Bounded Rescope and CI Completion Authority
 
 # 2\) Numbered Addenda
 
@@ -18050,558 +18183,5 @@ Drain the separate GET-body discrepancy only through a future expressly authoriz
 * HDE Architecture, §3.1, for the separately unresolved GET-probe discrepancy.
 
 ---
-
-## 2.28) Epic Remedial PR-01 HDE-EPIC038
-
-### 1\. Artifact Map
-
-* Implementation Doc | `r2-epic-remediation-plan-hde-epic038.md` | revision `r2`, status `Approved`, 382 lines.  
-* Original PR | PR \#369, `HDE-EPIC038 PR-01: restore canonical factory compat mount` | base `bd08f166d5f29de9937e3550fa11d2a47cf09697`, head `4f92427e33454d302dfce52379ed5fca3db16cce`, merge `57db1b24030ad096e7334b419ed6fdefdb3a0920`.  
-* Remedial PR 1 | PR \#370, `ci: run full compat HTTP contract suite and set APP_ENV for compat-http-epic020` | base `43ae72f74e0807e7ba1f1a1f99eace3a889565ee`, head `63a2cb1b08a0049a7bf9e89220802e53bc2f3a37`, merge `65dca5c4c671641efdb9c870e36e2df6343197ab`.  
-* Extra Evidence | none supplied.  
-* GitHub Repo | `amthorn78/glow-hdengine-v2` | reviewed branch `main`, current HEAD `65dca5c4c671641efdb9c870e36e2df6343197ab`.  
-* PF02 \- Canon HDE Architecture | v2.3.8 | applicable architecture and compat-contract authority.  
-* PF10 \- HDE Build Notes | latest reviewed version v12.4.6 | exact-topic authority through Addenda 2.26 and 2.27.  
-* PF09.6 \- Canon HDE Build Checklist Distillation | v1.1.2 | permanent checklist inspected for `HDE-DIST007` drainage.
-
-### 2\. Review Summary
-
-* PR \#369 restored the compatibility blueprint in the selected canonical factory, aligned selected-factory behavior with adjacent factories, expanded contract and parity coverage, added fail-closed architecture validation, classified the compatibility namespace consistently, and regenerated governed evidence.  
-* PR \#369’s hosted workflow passed, but its `compat-http-epic020` job omitted `tests/http/test_compat_endpoint_contract.py` and lacked explicit `APP_ENV: dev`. Therefore, that run did not independently prove the complete selected-factory suite in the intended closed-rails lane.  
-* Intervening commit `43ae72f74e0807e7ba1f1a1f99eace3a889565ee` changed only PF10. Addendum 2.27 approved the bounded rescope, froze PR \#369’s merged behavior, separated the PF02 GET discrepancy, and authorized the workflow-only remediation.  
-* PR \#370 made exactly that workflow correction: it added `APP_ENV: dev` and invoked all three required compatibility test files.  
-* PR \#370’s hosted run executed the corrected job with the explicit rails and reported `35 passed in 0.59s`. All seven visible workflow jobs concluded successfully.  
-* No commit follows PR \#370 on current `main`. The current workflow content matches the reviewed PR \#370 content, while every PR \#369 frozen file remains unchanged after its merge.  
-* All six actionable PR \#369 review threads were resolved. PR \#370 had no review submissions, review threads, or timeline comments.  
-* The current GET body remains inconsistent with PF02 §3.1, but neither lineage PR changed `get_ids_only()`. PF10 Addendum 2.27 explicitly keeps that discrepancy separate and non-blocking.  
-* The merged implementation is technically and evidentially coherent. No further source, test, workflow, or governed-artifact remediation is supported by the reviewed evidence.
-
-### 3\. GitHub / Repo Inspection
-
-#### Repository state
-
-The ordered merge history is:
-
-1. PR \#369 base: `bd08f166d5f29de9937e3550fa11d2a47cf09697`  
-2. PR \#369 merge: `57db1b24030ad096e7334b419ed6fdefdb3a0920`  
-3. PF10 authority publication: `43ae72f74e0807e7ba1f1a1f99eace3a889565ee`  
-4. PR \#370 merge and current `main`: `65dca5c4c671641efdb9c870e36e2df6343197ab`
-
-GitHub Repo | compare `57db1b...43ae72f` | "One intervening commit; the only changed path is the PF10 v12.4.5 to v12.4.6 publication."
-
-GitHub Repo | compare `43ae72f...65dca5` | "One commit; `.github/workflows/ci.yml` is the only changed file, with 4 additions and 2 deletions."
-
-GitHub Repo | compare `65dca5...main` | "0 commits ahead, 0 commits behind, and no changed files."
-
-Search-method proof for no post-lineage changes: GitHub commit comparison from PR \#370 merge SHA `65dca5c...` to current default-branch `main`; the comparison returned identical state and an empty changed-file list.
-
-#### PR \#369
-
-* Merged 2026-07-27 at 01:44:45 UTC.  
-* 30 commits.  
-* 14 changed files.  
-* 197 additions and 31 deletions.  
-* Hosted workflow run `30227487637` completed successfully.  
-* Seven visible jobs concluded `success`.  
-* Twenty-four timeline comments and twelve review submissions were inspected.  
-* Six actionable inline review threads were found and all six were resolved.
-
-Original PR | PR \#369 review-thread query | "6 threads returned; each has `isResolved: true`; unresolved-thread filter returned 0."
-
-The resolved threads addressed:
-
-* Production-alias hiding.  
-* Hiding all methods in production.  
-* Selected-factory error parity.  
-* Preservation of the `Allow` header on 405\.  
-* Clean regeneration of the Machine Mirror.  
-* Presenter provenance for compatibility errors.
-
-#### PR \#370
-
-* Merged 2026-07-27 at 03:27:42 UTC.  
-* One commit.  
-* One changed file.  
-* Four additions and two deletions.  
-* Hosted workflow run `30234517325` completed successfully.  
-* Seven visible jobs concluded `success`.
-
-Remedial PR 1 | PR \#370 changed-file query | "1 file returned: `.github/workflows/ci.yml`."
-
-Search-method proof for absent discussion or review: the PR \#370 timeline-comment, review-submission, and review-thread API surfaces were queried independently. Each returned zero items.
-
-Remedial PR 1 | PR \#370 comments/reviews search | "0 timeline comments; 0 review submissions; 0 review threads."
-
-#### Current workflow and source state
-
-GitHub Repo | `.github/workflows/ci.yml`, `compat-http-epic020` | "The job sets `LC_ALL: C`, `LANG: C`, `TZ: UTC`, `SAFE_MODE: '1'`, `ALLOW_NETWORK: '0'`, and `APP_ENV: dev`."
-
-GitHub Repo | `.github/workflows/ci.yml`, complete compat step | "The pytest invocation names `test_compat_endpoint_contract.py`, `test_compat_http_dev.py`, and `test_compat_http_parity.py`."
-
-GitHub Repo | `.github/workflows/ci.yml`, focused lane | "`test_conjunction_identity_hash_artifact_matches_canonical_bytes` remains present independently."
-
-The workflow blob at PR \#370 head, its tested synthetic merge, and current `main` is identical: `f198d8662cb817aa29997ffe1f17276368bffe36`.
-
-Search-method proof for absence of later frozen-file changes: the changed-file comparison from PR \#369 merge `57db1b...` through current `main` returned only the intervening PF10 publication and `.github/workflows/ci.yml`. None of PR \#369’s source, analyzer, test, or governed-artifact paths appeared.
-
-### 4\. Provenance (PR Lineage)
-
-#### Original PR material-hunk ledger
-
-* OPR-001 | `adapter/factory.py` | `@@ -1,11 +1,26 @@` | Registers `compat_blueprint` in the selected factory and converts compatibility-scoped 404/405 responses through the presenter while preserving `Allow`. High risk: yes, canonical route registration and HTTP error behavior.  
-* OPR-002 | `artifacts/architecture/architecture_snapshot.keys_only.json` | `@@ -1 +1 @@` | Regenerates the governed snapshot, recording selected-factory compatibility registration and updated findings/counts. High risk: yes, governed evidence.  
-* OPR-003 | architecture snapshot path proof | `@@ -1,5 +1,5 @@` | Updates governed size and SHA-256 proof for the regenerated snapshot.  
-* OPR-004 | `artifacts/evidence_index.jsonl` | `@@ -408,7 +408,7 @@` | Updates the architecture-snapshot row to the regenerated size and digest.  
-* OPR-005 | `artifacts/evidence_index.jsonl` | `@@ -488,7 +488,7 @@` | Updates the Machine Mirror self-record body hash and production timestamp.  
-* OPR-006 | Machine Mirror path proof | `@@ -1,6 +1,6 @@` | Updates the file hash, body hash, and timestamp proof.  
-* OPR-007 | Machine Mirror checksum | `@@ -1 +1 @@` | Updates the checksum sentinel.  
-* OPR-008 | Machine Mirror checksum path proof | `@@ -1,5 +1,5 @@` | Updates the sentinel proof.  
-* OPR-009 | `engine/http/compat_handler.py` | `@@ -2,6 +2,7 @@` | Imports normalized environment-mode computation. High risk: yes, environment-dependent HTTP behavior.  
-* OPR-010 | `engine/http/compat_handler.py` | `@@ -12,16 +13,30 @@` | Adds exact namespace recognition, optional `Allow` propagation, and presenter-backed compatibility errors. High risk: yes.  
-* OPR-011 | `engine/http/compat_handler.py` | `@@ -68,7 +83,11 @@` | Applies production hiding through normalized environment handling to the exact compatibility namespace and descendants. High risk: yes.  
-* OPR-012 | `engine/http/compat_handler.py` | `@@ -90,9 +109,6 @@` | Removes the redundant raw `APP_ENV`\-only POST guard after centralizing the environment gate. High risk: yes.  
-* OPR-013 | `tests/adapter/test_compat_http_parity.py` | `@@ -1,5 +1,6 @@` | Imports the selected factory for parity testing.  
-* OPR-014 | `tests/adapter/test_compat_http_parity.py` | `@@ -15,40 +16,84 @@` | Adds selected-factory clients, route inventory checks, valid/malformed parity, presenter error parity, and 405 `Allow` checks.  
-* OPR-015 | `tests/evidence/test_architecture_snapshot.py` | `@@ -5,6 +5,7 @@` | Adds check-before-write coverage.  
-* OPR-016 | `tests/evidence/test_architecture_snapshot.py` | `@@ -18,6 +19,8 @@` | Requires the selected factory’s blueprint and compatibility registration.  
-* OPR-017 | `tests/evidence/test_architecture_snapshot.py` | `@@ -27,6 +30,20 @@` | Adds a fail-closed negative test for missing required blueprint registration. High risk: yes, architecture enforcement.  
-* OPR-018 | `tests/evidence/test_hdapi_v2_contract_inventory.py` | `@@ -2940,14 +2940,28 @@` | Tests exact compatibility-namespace classification, descendant behavior, `/v10` exclusion, and public-signature exclusion. High risk: yes, public-boundary classification.  
-* OPR-019 | `tests/http/test_compat_endpoint_contract.py` | `@@ -4,7 +4,7 @@` | Routes the contract test through `adapter.factory`.  
-* OPR-020 | `tests/http/test_compat_endpoint_contract.py` | `@@ -124,6 +124,54 @@` | Adds production aliases, `ENGINE_ENV` fallback, all-method, descendant, 404, and `no-store` checks.  
-* OPR-021 | `tools/evidence/generate_architecture_snapshot.py` | `@@ -23,6 +23,8 @@` | Defines required selected-factory blueprint registrations. High risk: yes, canonical evidence producer.  
-* OPR-022 | `tools/evidence/generate_architecture_snapshot.py` | `@@ -267,6 +269,13 @@` | Makes missing required blueprint registrations fail closed. High risk: yes.  
-* OPR-023 | `tools/evidence/hdapi_v2_boundary_analyzer.py` | `@@ -838,7 +838,9 @@` | Classifies exactly `/api/compat/v1` and its descendants as non-public while avoiding namespace overmatch. High risk: yes.
-
-#### Remedial PR 1 material-hunk ledger
-
-* R1PR-001 | `.github/workflows/ci.yml` | `@@ -146,6 +146,7 @@ jobs:` | Adds explicit `APP_ENV: dev` to `compat-http-epic020`. High risk: yes, CI environment proof.  
-* R1PR-002 | `.github/workflows/ci.yml` | `@@ -159,9 +160,10 @@ jobs:` | Renames the step to the complete contract suite, adds `-q`, and includes `tests/http/test_compat_endpoint_contract.py`. High risk: yes, completion-gate coverage.
-
-Every material hunk from both lineage PRs is represented once in the ledgers above.
-
-### 5\. Net Effective Diff Review
-
-#### NET-001 \- `adapter/factory.py`
-
-* Covered hunks: OPR-001.  
-* After Original PR: compatibility registered in the canonical selected factory; compatibility 404/405 responses use presenter semantics and preserve `Allow`.  
-* After Remedial PR 1: unchanged.  
-* Intervening impact: none.  
-* Current state: unchanged from PR \#369 merge.  
-* Risk: high because this is the production-selected route-mount boundary.  
-* Assessment: correct and covered by route-inventory, parity, production-hiding, and error-semantics tests.  
-* PF02 \- Canon HDE Architecture | §1.1, Single homes | "production startup MUST delegate to one canonical adapter app factory entrypoint to avoid divergent route mounting."  
-* PF02 \- Canon HDE Architecture | §3.8.1 | "The dev Reader harness MUST mount the compat surface and use the same Presenter/error semantics."
-
-#### NET-002 \- Architecture snapshot
-
-* Covered hunks: OPR-002.  
-* After Original PR: regenerated to record the selected-factory compatibility registration and fail-closed architecture findings.  
-* After Remedial PR 1: unchanged.  
-* Intervening/later impact: none.  
-* Current state: governed JSON remains at size `41741` with proof digest `d0498299...`.  
-* Risk: governed evidence.  
-* Assessment: coherent with its proof and indexed records.
-
-#### NET-003 \- Architecture snapshot path proof
-
-* Covered hunks: OPR-003.  
-* Lifecycle: updated with the snapshot, then unchanged through current `main`.  
-* Risk: governed path/hash proof.  
-* Assessment: matches the current snapshot’s path, size, and digest.
-
-#### NET-004 \- Machine Mirror
-
-* Covered hunks: OPR-004 and OPR-005.  
-* After Original PR: architecture row and mirror self-record were canonically regenerated.  
-* After Remedial PR 1: unchanged.  
-* Current state: 548 rows; architecture row records the current snapshot digest and size; self-record body hash is `c938...`.  
-* Risk: high because this is governed machine-readable evidence.  
-* Assessment: schema, hash, and index checks passed.
-
-#### NET-005 \- Machine Mirror path proof
-
-* Covered hunk: OPR-006.  
-* Lifecycle: regenerated with the mirror; unchanged afterward.  
-* Current state: records mirror file SHA `df30d30...` and body SHA `c938...`.  
-* Assessment: coherent with the mirror and checksum companions.
-
-#### NET-006 \- Machine Mirror checksum
-
-* Covered hunk: OPR-007.  
-* Lifecycle: regenerated once and unchanged after PR \#369.  
-* Current state: checksum sentinel contains `df30d30...`.  
-* Assessment: verified by hosted checksum validation.
-
-#### NET-007 \- Machine Mirror checksum path proof
-
-* Covered hunk: OPR-008.  
-* Lifecycle: regenerated once and unchanged afterward.  
-* Current state: proof digest `479d309...`.  
-* Assessment: coherent with the sentinel.
-
-#### NET-008 \- `engine/http/compat_handler.py`
-
-* Covered hunks: OPR-009 through OPR-012.  
-* After Original PR: exact compatibility namespace handling, normalized environment gates, presenter-backed errors, and 405 `Allow` propagation were established.  
-* After Remedial PR 1: unchanged.  
-* Current state: identical to the PR \#369 merge version.  
-* Risk: high because it changes request gating and error behavior.  
-* Assessment: accepted and frozen by PF10 Addendum 2.27; tested under production aliases, `ENGINE_ENV`, methods, descendants, malformed requests, and parity.  
-* PF02 \- Canon HDE Architecture | §3.1 | "`/api/compat/v1` is the adapter compat surface" and "GET (probe-only) ... MUST NOT include a JSON body."  
-* PF10 \- HDE Build Notes | Addendum 2.27, frozen merged behavior | "The exact PR \#369 compatibility and analyzer behavior is accepted and frozen."  
-* The current GET body discrepancy is preserved as a separate issue; no covered hunk changed `get_ids_only()`.
-
-#### NET-009 \- `tests/adapter/test_compat_http_parity.py`
-
-* Covered hunks: OPR-013 and OPR-014.  
-* After Original PR: selected-factory route, successful/malformed request, error-presentation, and `Allow` parity were added.  
-* After Remedial PR 1: the complete file was added to the corrected CI suite.  
-* Current state: unchanged from PR \#369.  
-* Assessment: material parity coverage is present and passed.
-
-#### NET-010 \- `tests/evidence/test_architecture_snapshot.py`
-
-* Covered hunks: OPR-015 through OPR-017.  
-* After Original PR: positive selected-registration and fail-closed negative coverage were added.  
-* After Remedial PR 1: unchanged.  
-* Current state: identical to PR \#369.  
-* Risk: architecture-governance enforcement.  
-* Assessment: establishes that future selected-factory divergence fails rather than silently regenerating as accepted state.
-
-#### NET-011 \- `tests/evidence/test_hdapi_v2_contract_inventory.py`
-
-* Covered hunk: OPR-018.  
-* After Original PR: exact compatibility namespace and descendant classification were tested; false `/v10` matching and public-signature inclusion were rejected.  
-* After Remedial PR 1: unchanged.  
-* Current state: identical to PR \#369.  
-* Risk: public/internal boundary classification.  
-* Assessment: consistent with the accepted analyzer behavior.
-
-#### NET-012 \- `tests/http/test_compat_endpoint_contract.py`
-
-* Covered hunks: OPR-019 and OPR-020.  
-* After Original PR: the contract suite exercised the selected factory and expanded production-hiding coverage.  
-* After Remedial PR 1: the whole file was added to `compat-http-epic020`.  
-* Current state: unchanged from PR \#369.  
-* Assessment: passed as part of the corrected 35-test CI invocation.
-
-#### NET-013 \- `tools/evidence/generate_architecture_snapshot.py`
-
-* Covered hunks: OPR-021 and OPR-022.  
-* After Original PR: the canonical producer began enforcing selected-factory blueprint requirements fail closed.  
-* After Remedial PR 1: unchanged.  
-* Current state: identical to PR \#369.  
-* Risk: high because it controls governed architecture evidence.  
-* Assessment: appropriate enforcement of the implementation plan’s route-mount invariant.
-
-#### NET-014 \- `tools/evidence/hdapi_v2_boundary_analyzer.py`
-
-* Covered hunk: OPR-023.  
-* After Original PR: exact compatibility namespace and descendants were excluded from public HDAPI classification.  
-* After Remedial PR 1: unchanged.  
-* Current state: identical to PR \#369.  
-* Risk: high because it affects boundary evidence.  
-* Assessment: precise rather than prefix-broad; corresponding negative and positive tests passed.
-
-#### NET-015 \- `.github/workflows/ci.yml`
-
-* Covered hunks: R1PR-001 and R1PR-002.  
-* After Original PR: the compatibility job ran only the two adapter test files and did not explicitly set `APP_ENV`.  
-* After Remedial PR 1: `APP_ENV: dev` and the complete three-file suite were present.  
-* Intervening impact: PF10 Addendum 2.27 authorized this exact change.  
-* Current state: current `main` has the same workflow blob as PR \#370’s head and tested synthetic merge.  
-* Risk: high because it closes the remaining validation gap.  
-* Assessment: the remediation is bounded, exact, and demonstrably executed.
-
-### 6\. Validation & Evidence Review
-
-#### VAL-001 \- PR \#369 hosted workflow
-
-Result: PASS for the checks actually configured; INCONCLUSIVE for the later-defined complete `compat-http-epic020` requirement.
-
-Original PR | workflow run `30227487637` | "Run completed successfully; all seven visible jobs concluded success."
-
-The compatibility job’s configured invocation omitted the selected-factory endpoint contract file and lacked explicit `APP_ENV: dev`. Its success therefore could not, by itself, close the later-recognized CI gap.
-
-#### VAL-002 \- PR \#370 complete compatibility suite
-
-Result: PASS.
-
-Remedial PR 1 | workflow run `30234517325`, job `89879626018` | "Environment includes `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `APP_ENV=dev`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`."
-
-Remedial PR 1 | same job, pytest command | "`python -m pytest -q tests/http/test_compat_endpoint_contract.py tests/adapter/test_compat_http_dev.py tests/adapter/test_compat_http_parity.py`."
-
-Remedial PR 1 | same job, result | "35 passed in 0.59s."
-
-No tests were weakened, selected, or excluded in the remedial patch.
-
-#### VAL-003 \- PR \#370 overall hosted checks
-
-Result: PASS.
-
-All seven visible jobs concluded `success`:
-
-* `EPIC020 compat HTTP coverage (closed rails)`  
-* `rails-policy-gates`  
-* `PR-01 compat conjunction closure independent`  
-* `sanity-pipeline`  
-* `test`  
-* `epic020 acceptance suites`  
-* `EPIC020 evidence bundles/index`
-
-#### VAL-004 \- Architecture evidence and tests
-
-Result: PASS.
-
-The hosted validation completed the architecture/evidence test surfaces successfully. Current governed data records:
-
-* Selected-factory registrations include `bp` and `compat_blueprint`.  
-* Registration count is 8\.  
-* Route count is 21\.  
-* Architecture snapshot verdict and analyzer result are passing.  
-* Snapshot proof digest and indexed architecture row agree.
-
-#### VAL-005 \- Human Index, Machine Mirror, paths, schema, hashes, orientation, and final-LF
-
-Result: PASS.
-
-The PR \#370 `test` job successfully ran the applicable check surfaces, including:
-
-* Evidence Index updater check.  
-* Orientation check.  
-* Evidence Index hash check.  
-* Machine Mirror schema check.  
-* Final-LF check.  
-* Evidence and OPS test suites.  
-* Ordering, mechanics, and CLI guards.
-
-GitHub Repo | current Human Index | "548 evidence rows; architecture snapshot, sanity log, and orientation artifact are indexed."
-
-GitHub Repo | current orientation artifact | "`total_artifacts: 548`, `status: ok`, and coherent orientation state."
-
-#### VAL-006 \- Sanity pipeline
-
-Result: PASS.
-
-GitHub Repo | current sanity artifact | "19 stage checks report `OK`; `first_failed_stage:NONE`; `summary:PASS`."
-
-The sanity artifact’s path proof and SHA companion match its current content.
-
-#### VAL-007 \- Review remediation
-
-Result: PASS.
-
-Original PR | review-thread inventory | "All 6 actionable threads resolved; 0 unresolved threads."
-
-The final PR \#369 state includes the requested production-alias, method-hiding, parity, `Allow`, presenter, and governed-evidence corrections.
-
-#### VAL-008 \- Current-state persistence
-
-Result: PASS.
-
-GitHub Repo | compare PR \#370 merge to current `main` | "Identical state; no post-lineage commits or changed files."
-
-GitHub Repo | workflow blob comparison | "PR \#370 head, tested synthetic merge, and current merge state use blob `f198d8662cb817aa29997ffe1f17276368bffe36`."
-
-#### VAL-009 \- PR-body local-validation narratives
-
-Result: INCONCLUSIVE as independent evidence.
-
-The PR descriptions contain additional local test-count and validation claims, but no independent local transcript was supplied. Those assertions were not needed to reach the result because the relevant hosted checks, job logs, current artifacts, and repository state were directly inspected.
-
-### 7\. Requirement Satisfaction Crosswalk
-
-| ID | Requirement | After Original PR | After Remedial PR 1 | Current state | Primary proof |
-| ----- | ----- | ----- | ----- | ----- | ----- |
-| REQ-001 | Selected canonical factory mounts `compat_blueprint` | Satisfied | Satisfied | Satisfied | OPR-001; current `adapter/factory.py` |
-| REQ-002 | Exact namespace, descendants, production aliases, and `ENGINE_ENV` behavior | Satisfied | Satisfied | Satisfied | OPR-009 to OPR-012; OPR-020 |
-| REQ-003 | Presenter-backed 404/405 and preserved `Allow` | Satisfied | Satisfied | Satisfied | OPR-001, OPR-010, OPR-014 |
-| REQ-004 | Selected-factory route inventory includes Reader, internal version, and compat route | Satisfied | Satisfied | Satisfied | OPR-014; hosted parity run |
-| REQ-005 | Selected-factory valid, malformed, and error parity | Satisfied | Satisfied | Satisfied | OPR-014; VAL-002 |
-| REQ-006 | Architecture registration fails closed | Satisfied | Satisfied | Satisfied | OPR-017, OPR-021, OPR-022 |
-| REQ-007 | Architecture snapshot and proof are canonically regenerated and coherent | Satisfied | Satisfied | Satisfied | OPR-002, OPR-003; VAL-004 |
-| REQ-008 | Human Index, Machine Mirror, checksums, proofs, and paths are coherent | Satisfied | Satisfied | Satisfied | OPR-004 to OPR-008; VAL-005 |
-| REQ-009 | Sanity pipeline concludes PASS | Satisfied | Satisfied | Satisfied | VAL-006 |
-| REQ-010 | `compat-http-epic020` explicitly sets `APP_ENV: dev` | Not satisfied | Satisfied | Satisfied | R1PR-001; VAL-002 |
-| REQ-011 | That job runs all three complete compatibility files | Not satisfied | Satisfied | Satisfied | R1PR-002; VAL-002 |
-| REQ-012 | Focused identity-hash lane remains supplemental | Satisfied | Satisfied | Satisfied | Current workflow identity-hash invocation |
-| REQ-013 | Exact PR \#369 behavior is accepted and frozen | Partially satisfied pending authority disposition | Satisfied through PF10 Addendum 2.27 | Satisfied | PF10 Addendum 2.27; no later frozen-file changes |
-| REQ-014 | No GET implementation or GET-test change in the remediation | Satisfied | Satisfied | Satisfied | PR \#370 one-file inventory; current diff history |
-| REQ-015 | No PF-Canon, PF09, OPS, vendor, database, deployment, or infrastructure change in PR \#370 | Satisfied | Satisfied | Satisfied | PR \#370 changed-file query returned only CI workflow |
-| REQ-016 | No later change regresses the reviewed lineage | Not yet applicable | Satisfied at merge | Satisfied | `65dca5...main` identical comparison |
-
-All implementation and remediation requirements are satisfied in the current repository state.
-
-### 8\. Root Cause Analysis
-
-#### A. Original failure mechanism
-
-The canonical selected factory did not mount the compatibility blueprint even though adjacent factory paths did. This created factory-dependent route behavior and allowed production startup to differ from dev or wrapper surfaces.
-
-Implementation Doc | Root Cause Analysis | "Factory route lists had diverged, while the available tests and generated architecture evidence did not enforce selected-factory parity."
-
-#### B. Detection and prevention gaps
-
-Four gaps allowed the divergence or initially left its remediation incompletely proven:
-
-1. Compatibility blueprint registration was maintained independently across multiple factory implementations.  
-2. Existing HTTP compatibility tests did not exercise the canonical selected factory comprehensively.  
-3. The architecture evidence producer did not fail closed when a required selected-factory blueprint was absent.  
-4. The original `compat-http-epic020` job ran only the adapter files and did not explicitly set `APP_ENV: dev`.
-
-#### C. Corrective progression
-
-* PR \#369 restored the selected-factory registration.  
-* It added selected-factory contract and parity tests.  
-* It added exact namespace, production-hiding, presenter-error, and `Allow` behavior.  
-* It made architecture registration evidence fail closed.  
-* It added precise compatibility classification to the boundary analyzer.  
-* It regenerated governed architecture and Machine Mirror evidence.  
-* Review feedback then hardened alias, method, presenter, `Allow`, parity, and evidence behavior.  
-* PF10 Addendum 2.27 accepted and froze that merged scope.  
-* PR \#370 closed the remaining CI proof gap without reopening runtime or test behavior.
-
-#### D. Final verification
-
-The corrected CI lane ran the complete three-file suite under the explicit environment rails and passed all 35 tests. All other visible hosted jobs succeeded. Current `main` retains the tested workflow and has no later commits.
-
-The preventive controls now cover both runtime parity and future regression detection:
-
-* Selected-factory route tests.  
-* Production and alias tests.  
-* Method and descendant-path tests.  
-* Malformed and valid parity tests.  
-* Presenter and `Allow` tests.  
-* Fail-closed architecture registration.  
-* Exact public-boundary classification.  
-* Complete closed-rails CI execution.
-
-### 9\. PF09 Impact & Status Posture
-
-Classification: PF09 impact proven and exactly mapped.
-
-PF10 \- HDE Build Notes | Addendum 2.26 | "Task ID: HDE-DIST007"; "Subtask: N/A"; "Canonical adapter factory route-mount parity"; "Status: Not done."
-
-PF10 \- HDE Build Notes | Addendum 2.27 | "HDE-DIST007, subtask N/A, remains Not done until the correction is validated, reviewed, merged, and determined."
-
-Those conditions are now evidenced:
-
-* Correction validated: PR \#370 full suite passed.  
-* Reviewed: this ordered-lineage post-merge review inspected all material hunks, checks, comments, current files, governed artifacts, and applicable authority.  
-* Merged: PR \#370 merge `65dca5c...` is current `main`.  
-* Determined: the merged lineage has no remaining code or evidence blocker.
-
-Recommended status posture: change `HDE-DIST007`, subtask `N/A`, from `Not done` to `Done` through controlled PF-Canon drainage.
-
-Permanent PF09 inspection found no existing `HDE-DIST007` row or exact task placement.
-
-Search-method proof: the complete current PF09.6 document was fetched and searched case-sensitively and case-insensitively for `HDE-DIST007`; both searches returned zero matches. Additional complete-file searches for `canonical adapter factory`, `route-mount`, `factory parity`, and `create_app` also returned zero matches.
-
-PF09.6 \- Canon HDE Build Checklist Distillation | complete-file exact search | "`HDE-DIST007`: 0 matches."
-
-The existing `HDE-DIST001.10 - Architecture snapshot (keys-only) evidence` entry does not own this runtime factory-parity task and should not be repurposed.
-
-### 10\. Findings
-
-#### FINDING-001 \- Review occurred after remedial merge
-
-* Severity: Concern.  
-* Blocker: No.  
-* Observation: PF10 Addendum 2.27 called for the follow-up PR to remain unmerged pending post-remediation review, but PR \#370 was merged without review submissions, review threads, or timeline comments.  
-* Impact: Governance sequencing was weaker than instructed, although the merge content, hosted validation, current tree, and absence of later changes are now fully reviewable.  
-* Evidence: Remedial PR 1 | PR \#370 state and review searches | "Merged; 0 review submissions; 0 review threads; 0 timeline comments."  
-* Required action: None. This post-merge inspection supplies the missing substantive review; no repository remediation would reverse the sequencing fact.
-
-#### FINDING-002 \- PF02 GET discrepancy remains unresolved
-
-* Severity: Note.  
-* Blocker: No.  
-* Observation: PF02 says the compatibility GET probe must not include a JSON body, while the current handler and test expect `{"ok": true, "schema": "v1"}`.  
-* Impact: A separate contract-authority decision remains necessary if the implementation and PF02 are to be reconciled.  
-* Evidence: PF02 \- Canon HDE Architecture | §3.1 | "GET (probe-only): health-only probing. It MUST NOT compute compat and MUST NOT include a JSON body."  
-* Evidence: GitHub Repo | `engine/http/compat_handler.py`, `get_ids_only()` | "Returns `jsonify({'ok': True, 'schema': 'v1'})`."  
-* Required action: None for this lineage. PF10 Addendum 2.27 explicitly makes it non-blocking and prohibits representing the bounded rescope as acceptance of that GET contract.
-
-#### FINDING-003 \- Permanent PF09 drainage remains absent
-
-* Severity: Note.  
-* Blocker: No.  
-* Observation: PF10 exactly maps `HDE-DIST007`, but the permanent PF09.6 checklist contains no corresponding entry.  
-* Impact: The completed task’s durable checklist status is not yet recorded in permanent PF09.  
-* Evidence: PF09.6 \- Canon HDE Build Checklist Distillation | complete-file search | "`HDE-DIST007`: 0 matches."  
-* Required action: None as implementation remediation. A documentation delta candidate is supplied below.
-
-### Evidence Print (PASS PROOF; merged work)
-
-#### A. Requirement evidence
-
-Implementation Doc | selected-factory outcome | "The selected canonical factory must expose the required Reader, internal version, and compatibility routes and preserve factory parity."
-
-PF10 \- HDE Build Notes | Addendum 2.27 | "Disposition A \- Bounded rescope" and "The exact PR \#369 compatibility and analyzer behavior is accepted and frozen."
-
-PF10 \- HDE Build Notes | Addendum 2.27 | "The remaining authorized edit is `.github/workflows/ci.yml`" with explicit `APP_ENV: dev` and the complete three-file suite.
-
-#### B. Code and artifact evidence
-
-GitHub Repo | current `adapter/factory.py` | "`app.register_blueprint(compat_blueprint)` is present in the selected factory."
-
-GitHub Repo | current `engine/http/compat_handler.py` | "Exact compatibility namespace matching, normalized environment handling, presenter-backed errors, and optional `Allow` propagation are present."
-
-GitHub Repo | current architecture snapshot | "Selected-factory registrations contain `bp` and `compat_blueprint`; verdict and analyzer result pass."
-
-GitHub Repo | current Machine Mirror and companions | "Architecture digest, mirror body digest, checksum sentinel, and proofs are mutually coherent."
-
-#### C. Validation evidence
-
-Remedial PR 1 | run `30234517325`, compatibility job | "`APP_ENV=dev` and all deterministic rails are present."
-
-Remedial PR 1 | same job | "Complete three-file pytest command; 35 passed in 0.59s."
-
-Remedial PR 1 | run `30234517325` | "All seven visible jobs concluded success."
-
-GitHub Repo | current sanity artifact | "`first_failed_stage:NONE`; `summary:PASS`."
-
-#### D. Token/gate evidence
-
-No acceptance token was claimed or required. The applicable gates were the complete compatibility suite, architecture and evidence checks, sanity pipeline, mirror schema, hashes, orientation, and final-LF validation; their inspected hosted results passed.
-
-#### E. Provenance and review evidence
-
-Original PR | PR \#369 | "Merged as `57db1b...`; 14 files; 23 material hunks inventoried."
-
-Original PR | review-thread query | "6 actionable threads; all resolved; 0 unresolved."
-
-Remedial PR 1 | PR \#370 | "Merged as `65dca5...`; one file; two material hunks inventoried."
-
-GitHub Repo | post-lineage comparison | "Current `main` equals PR \#370 merge; no later commits or changed files."
-
-#### F. PF impact evidence
-
-PF10 \- HDE Build Notes | Addendum 2.26 | "`HDE-DIST007`, subtask `N/A`, status `Not done`."
-
-PF10 \- HDE Build Notes | Addendum 2.27 | "Status remains Not done until correction, validation, review, merge, and determination."
-
-PF09.6 \- Canon HDE Build Checklist Distillation | complete-file search | "No permanent `HDE-DIST007` entry found."
-
-The inspected evidence supports a controlled status change to `Done`.
-
-### Doc Delta Candidates (PF-Canon only)
-
-#### DDC-001
-
-* Target PF: PF09.6 \- Canon HDE Build Checklist Distillation.  
-* Target section: Placement not established; canon-author routing required.  
-* Canon basis: CANON SILENCE in permanent PF09.6, with exact task authority supplied by PF10 Addenda 2.26 and 2.27.  
-* Impacted task: `HDE-DIST007`.  
-* Impacted subtask: `N/A`.  
-* Status action: Change from `Not done` to `Done`.  
-* Proposed delta: Add the exact `HDE-DIST007 - Canonical adapter factory route-mount parity` task to the appropriate Distillation checklist location and record completion based on PR \#369, PR \#370, successful hosted validation, and this post-merge determination.  
-* Preservation constraint: Do not repurpose or alter unrelated `HDE-DIST001.10`; do not drain the current GET JSON response as accepted canon.  
-* Negative-search proof: PF09.6 complete-file exact and case-insensitive searches for `HDE-DIST007` returned zero matches.  
-* Supporting proof: PF10 Addendum 2.26 supplies the exact task identity and initial status; Addendum 2.27 supplies the completion conditions; all conditions are now evidenced.  
-* Implementation effect: Documentation drainage only. No source, test, workflow, analyzer, architecture, evidence, OPS, vendor, database, deployment, or infrastructure change is indicated.
-
-DECISION: MERGED WORK ACCEPTABLE
 
 \<eof\>
