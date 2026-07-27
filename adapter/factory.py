@@ -17,10 +17,10 @@ def create_app():
             and resp.status_code in (404, 405)
             and resp.mimetype == "text/html"
         ):
-            compat_resp = compat_error_response(resp.status_code)
-            if resp.status_code == 405 and resp.headers.get("Allow"):
-                compat_resp.headers["Allow"] = resp.headers["Allow"]
-            return compat_resp
+            return compat_error_response(
+                resp.status_code,
+                allow=resp.headers.get("Allow") if resp.status_code == 405 else None,
+            )
         if resp.headers.get("ETag") and _req.path.startswith("/internal/"):
             resp.headers.pop("ETag", None)
         return resp
