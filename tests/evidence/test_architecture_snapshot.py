@@ -5,6 +5,7 @@ ENV={**os.environ,'SAFE_MODE':'1','ALLOW_NETWORK':'0','LC_ALL':'C','LANG':'C','T
 def run(a): return subprocess.run(['python',*a],cwd=ROOT,env=ENV,check=True,capture_output=True,text=True)
 def test_architecture_snapshot_taxonomy_schema_and_check():
     paths=['artifacts/architecture/architecture_snapshot.keys_only.json','schemas/architecture_snapshot.keys_only.v1.json']
+    run(['tools/evidence/generate_architecture_snapshot.py','--check'])
     run(['tools/evidence/generate_architecture_snapshot.py']); h1={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
     run(['tools/evidence/generate_architecture_snapshot.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
     run(['tools/evidence/generate_architecture_snapshot.py','--check']); assert h2=={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
