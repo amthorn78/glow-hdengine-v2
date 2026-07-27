@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.5  
-Effective Date: 2026.07.26  
+**Version:** v12.4.6  
+Effective Date: 2026.07.27  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -74,7 +74,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.23) Post Implementation Audit Triage HDE-EPIC038  
 2.24) Syntax-Origin Defects Remain Non-Blocking Regardless of Literal Execution Effect  
 2.25) Recognize Epic Remediation Plans Pending Template Drainage  
-2.26) HDE-EPIC038 Epic Remediation PR-01 — PF09.6 HDE-DIST007 Canonical Adapter Factory Route-Mount Parity
+2.26) HDE-EPIC038 Epic Remediation PR-01 — PF09.6 HDE-DIST007 Canonical Adapter Factory Route-Mount Parity  
+2.27) HDE-EPIC038 HDE-DIST007 Post-Merge Bounded Rescope and CI Completion Authority
 
 # 2\) Numbered Addenda
 
@@ -17764,5 +17765,289 @@ This addendum supplies the missing mapping without expanding or redesigning the 
 Drain the complete `HDE-DIST007` task above into PF09.6-Canon-HDE-Build-Checklist-Distillation.
 
 After verified implementation and evidence review, update its status only through the applicable PF09.6 drainage process.
+
+---
+
+## **2.27) HDE-EPIC038 HDE-DIST007 Post-Merge Bounded Rescope and CI Completion Authority**
+
+Timestamp: 072726 03:43  
+Details: This addendum records the Product Owner’s bounded scope approval following the post-merge review of HDE-EPIC038 Epic Remediation PR-01. It accepts the exact compatibility-safety, error-transport, test, and public-boundary-analysis changes already merged through PR \#369, authorizes the remaining CI correction and validation work, and prevents the approved scope decision from being reopened during follow-up implementation or review.
+
+### **Decision summary**
+
+The Product Owner approves **Disposition A \- Bounded rescope**.
+
+The exact compatibility and analyzer behavior already merged through PR \#369 is accepted within `HDE-DIST007`.
+
+This is a retroactive scope authorization for the exact merged implementation. It is not an authorization for further compatibility-contract expansion.
+
+No additional Product Owner scope selection, remediation-plan approval, or pre-implementation approval sentinel is required before the Implementation Agent performs the remaining work expressly authorized below.
+
+### **Repository and merge anchor**
+
+Repository: `amthorn78/glow-hdengine-v2`
+
+Merged pull request: PR \#369, **HDE-EPIC038 PR-01: restore canonical factory compat mount**
+
+PR base: `bd08f166d5f29de9937e3550fa11d2a47cf09697`
+
+PR source head: `4f92427e33454d302dfce52379ed5fca3db16cce`
+
+Merge commit and current `main` at the time of this decision: `57db1b24030ad096e7334b419ed6fdefdb3a0920`
+
+Observed merged footprint: 14 changed files, 197 insertions, and 31 deletions.
+
+The merged implementation already establishes the required selected-factory route mount and architecture invariant. The remaining defect is incomplete hosted compatibility-suite execution under the expressly required environment pins.
+
+### **Approved bounded rescope**
+
+The following behavior already present in PR \#369 is approved and may remain unchanged:
+
+* Exact `/api/compat/v1` namespace recognition, including descendants without matching unrelated prefixes such as `/api/compat/v10`.  
+* Production and production-like environment normalization through the existing `APP_ENV` and `ENGINE_ENV` handling.  
+* Namespace-wide production hiding for the compatibility surface.  
+* Existing method and unsupported-subpath handling within the compatibility namespace.  
+* Presenter-backed compatibility 404 and 405 responses.  
+* `Cache-Control: no-store` behavior associated with those compatibility error responses.  
+* Preservation and propagation of Flask’s `Allow` header for 405 responses.  
+* The selected factory’s compat-scoped 404 and 405 conversion through the existing compatibility presenter helper.  
+* Classification of `/api/compat/v1` and its descendants as non-public in the existing HDAPI boundary analyzer.  
+* Tests directly corresponding to the accepted compatibility, routing-error, production-hiding, and non-public-boundary behavior.  
+* Governed architecture and Machine Mirror changes generated from the merged implementation.
+
+The following merged primary files are accepted within this bounded rescope:
+
+* `adapter/factory.py`  
+* `engine/http/compat_handler.py`  
+* `tests/adapter/test_compat_http_parity.py`  
+* `tests/evidence/test_architecture_snapshot.py`  
+* `tests/evidence/test_hdapi_v2_contract_inventory.py`  
+* `tests/http/test_compat_endpoint_contract.py`  
+* `tools/evidence/generate_architecture_snapshot.py`  
+* `tools/evidence/hdapi_v2_boundary_analyzer.py`
+
+The corresponding generated architecture, Machine Mirror, checksum, and path-proof changes already merged through PR \#369 are also accepted.
+
+These accepted merged changes are no longer out-of-scope findings. A reviewer MUST NOT require their removal or request another Product Owner scope disposition merely because they exceeded the original five-file output list in Addendum 2.26.
+
+### **Frozen runtime boundary**
+
+The accepted merged behavior is the maximum runtime and analyzer rescope authorized by this addendum.
+
+The follow-up remediation MUST NOT add or alter:
+
+* Compatibility routes.  
+* Supported HTTP methods.  
+* Production aliases.  
+* Response fields.  
+* Status codes.  
+* Headers.  
+* Payload schemas.  
+* Presenter ownership.  
+* Public Reader behavior.  
+* Endpoint classifications beyond the exact merged compatibility-namespace classification.  
+* Factory or launcher targets.  
+* Evidence schemas.  
+* Acceptance tokens.
+
+The follow-up remediation is not authorized to make further changes to the accepted runtime, analyzer, or contract-test files merely to improve, refactor, simplify, or reinterpret the merged behavior.
+
+If a newly discovered defect independently requires such a change, that defect must be reported separately. It does not invalidate or reopen the bounded scope approval recorded here.
+
+### **Compat GET contract disposition**
+
+Current repository behavior for `GET /api/compat/v1` remains unchanged.
+
+The current handler returns:
+
+`{"ok":true,"schema":"v1"}`
+
+**HDE Architecture**, §3.1 states that the GET probe must not include a JSON body. This discrepancy is acknowledged but is not resolved by this addendum.
+
+The controlling disposition for the current remediation is:
+
+* Do not modify the GET implementation.  
+* Do not modify its existing contract assertion.  
+* Do not edit PF-Canon.  
+* Do not treat the existing repository behavior as automatically superseding permanent canon.  
+* Do not treat this addendum as canonical approval of the JSON probe body.  
+* Record the discrepancy as a separate unresolved canon-reconciliation and runtime-contract item.  
+* Do not use that separate discrepancy to block the bounded CI remediation, its pull request, or review of the route-mount work.
+
+A later bodyless GET change requires separate, explicit authority defining its status, exact body bytes, `Content-Type`, `Content-Length`, caching behavior, and Presenter applicability.
+
+### **Remaining authorized implementation**
+
+The remaining implementation is a bounded CI workflow correction.
+
+Authorized primary edit:
+
+* `.github/workflows/ci.yml`
+
+In the `compat-http-epic020` job, the Implementation Agent must explicitly establish:
+
+```
+SAFE_MODE: "1"
+ALLOW_NETWORK: "0"
+APP_ENV: dev
+LC_ALL: C
+LANG: C
+TZ: UTC
+```
+
+The job must execute the complete three-file compatibility suite:
+
+```shell
+python -m pytest -q \
+  tests/http/test_compat_endpoint_contract.py \
+  tests/adapter/test_compat_http_dev.py \
+  tests/adapter/test_compat_http_parity.py
+```
+
+The existing focused identity-hash lane may remain. It does not substitute for execution of the complete contract file.
+
+The Implementation Agent may make syntax-preserving workflow adjustments necessary to express this exact CI behavior. No broader workflow redesign, job consolidation, unrelated dependency change, or test removal is authorized.
+
+### **Validation authority**
+
+The Implementation Agent is authorized to proceed directly with implementation and validation. No additional plan submission or Product Owner approval gate is required for the exact work defined by this addendum.
+
+Before running pytest, install the repository’s development dependencies and verify pytest availability:
+
+```shell
+python -m pip install -r requirements-dev.txt
+python -m pytest --version
+```
+
+Run the compatibility suite under this explicit environment:
+
+```shell
+export SAFE_MODE=1
+export ALLOW_NETWORK=0
+export APP_ENV=dev
+export LC_ALL=C
+export LANG=C
+export TZ=UTC
+```
+
+```shell
+python -m pytest -q \
+  tests/http/test_compat_endpoint_contract.py \
+  tests/adapter/test_compat_http_dev.py \
+  tests/adapter/test_compat_http_parity.py
+```
+
+The Implementation Agent must also run the architecture, evidence, path-proof, Mirror, orientation, final-LF, and sanity checks required by the approved HDE-EPIC038 Epic Remediation Plan.
+
+Write-producing evidence generators may run when required by the established validation sequence. Generated artifacts may be committed only when their canonical producers actually change them because of the authorized source change. Checks must not create evidence churn merely because validation was repeated.
+
+Governed JSON, checksums, path proofs, Human Index rows, Machine Mirror rows, and sanity artifacts must never be hand-edited.
+
+### **Follow-up delivery authority**
+
+After successful implementation and validation, the Implementation Agent is authorized to:
+
+* Review the complete diff.  
+* Stage only authorized paths.  
+* Create a focused remediation commit.  
+* Push the working branch.  
+* Create a follow-up pull request against `main`.  
+* Include the Product Owner’s bounded-rescope approval in the pull-request description.  
+* Include complete validation results and any validation that could not be run.
+
+The follow-up pull request must not be merged under this authority. It remains subject to post-remediation review.
+
+The pull-request description must state that:
+
+* PR \#369’s exact merged compatibility and analyzer behavior is accepted under PF10 Addendum 2.27.  
+* The GET-body discrepancy remains separately unresolved.  
+* No additional compatibility-contract change was made.  
+* PF-Canon was not edited.  
+* OPS, vendor calls, databases, deployment, and infrastructure were untouched.  
+* `HDE-DIST007`, subtask `N/A`, remains `Not done` pending review of the follow-up result.
+
+### **Completion conditions**
+
+The bounded follow-up remediation is complete when:
+
+* The `compat-http-epic020` job explicitly sets `APP_ENV: dev` together with the required closed and deterministic rails.  
+* Hosted CI executes the complete three-file compatibility suite.  
+* The complete compatibility suite passes locally or in an equivalently reviewable execution environment under the explicit pins.  
+* Required architecture, evidence, sanity, Mirror, path-proof, hash, orientation, and final-LF checks pass.  
+* No accepted runtime, analyzer, or compatibility-contract behavior is expanded or altered.  
+* No PF-Canon, PF09 status, board state, OPS state, deployment, database, vendor, or infrastructure change occurs.  
+* Any changed governed artifact is produced only by its established canonical producer.  
+* The follow-up pull request is created and remains unmerged for post-remediation review.
+
+### **PF09 posture**
+
+PF09.6 target task: `HDE-DIST007`
+
+Subtask: `N/A`
+
+Current status: **Not done**
+
+This addendum expands the authorized implementation boundary but does not move task status.
+
+`HDE-DIST007` remains `Not done` until the follow-up CI correction is implemented, validated, reviewed, merged, and determined to satisfy the task’s completion conditions through the applicable PF09.6 process.
+
+### **No-repeat approval rule**
+
+For the exact merged changes and remaining CI work described here:
+
+* The bounded-rescope decision is complete.  
+* The GET disposition for this remediation is complete: leave runtime behavior unchanged and track the discrepancy separately.  
+* The Implementation Agent may proceed without another scope-selection prompt.  
+* A plan reviewer must treat the prior scope-approval gate as resolved.  
+* A post-remediation reviewer may assess whether the authorized implementation and validation succeeded, but must not reopen the already-decided scope question without identifying a materially new change or conflict outside this addendum.
+
+A request for the same Disposition A or Disposition B choice, without materially changed repository state, is contrary to this controlling decision.
+
+### **Authorization boundaries**
+
+This addendum does not authorize:
+
+* Further compatibility-runtime, analyzer, test-contract, or public-boundary expansion.  
+* A change to `GET /api/compat/v1`.  
+* PF-Canon editing.  
+* PF09 status movement.  
+* Board mutation.  
+* OPS execution.  
+* Vendor or database access.  
+* Deployment or infrastructure mutation.  
+* QA execution or a QA verdict.  
+* Acceptance or epic closure.  
+* Merge of the follow-up pull request.
+
+### **Supersession**
+
+For `HDE-DIST007`, this addendum supersedes Addendum 2.26 only where Addendum 2.26:
+
+* Limits implementation to its original five listed code, test, and tooling outputs.  
+* States that the PR may implement only the original route-wiring, regression-proof, architecture-proof, and governed-evidence scope.  
+* Would otherwise cause the exact already-merged PR \#369 compatibility-safety, error-transport, test, and analyzer changes to remain unauthorized.
+
+The PF09.6 mapping, task identity, `Not done` status, selected-factory route requirements, architecture invariant, evidence discipline, OPS prohibition, QA prohibition, and closure boundaries established by Addendum 2.26 remain controlling unless expressly modified above.
+
+Later reviewers must apply Addendum 2.27 as the controlling same-topic authority for PR \#369’s accepted scope and the remaining CI remediation.
+
+### **Drain targets**
+
+Drain the approved bounded rescope, CI completion requirement, and no-repeat approval rule into the `HDE-DIST007` entry in **HDE Build Checklist Distillation**.
+
+Drain the separate GET-body discrepancy only through a future expressly authorized canon-reconciliation process. Do not drain the current JSON body as canonical behavior merely because it was left unchanged during this remediation.
+
+### **Source basis**
+
+* Product Owner approval of the bounded PR \#369 scope change.  
+* The post-merge review of PR \#369.  
+* The approved HDE-EPIC038 Epic Remediation Plan.  
+* HDE Build Notes, Addendum 2.26.  
+* GitHub PR \#369 metadata and merged change.  
+* Current repository state at `main@57db1b24030ad096e7334b419ed6fdefdb3a0920`.  
+* Current `.github/workflows/ci.yml`, which omits `APP_ENV: dev` from `compat-http-epic020` and runs only the two adapter compatibility files in that job.  
+* HDE Architecture, §3.1, for the separately unresolved GET-probe discrepancy.
+
+---
 
 \<eof\>
