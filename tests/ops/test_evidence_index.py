@@ -170,6 +170,19 @@ def test_epic038_live_index_entry_uses_current_artifact_timestamp(
     assert by_key["epic038.pr03.open_rails_abba"]["produced_at_utc"] == "2026-07-14T00:00:00Z"
 
 
+def test_epic038_live_index_entry_is_omitted_when_conditional_artifact_absent(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+
+    entries = update_evidence_index._load_epic038_pr03_entries()
+
+    assert "epic038.pr03.open_rails_vendor_abba" not in {
+        entry["artifact_key"] for entry in entries
+    }
+
+
 @pytest.mark.parametrize(
     "generated_at_utc,top_level_pass,expected",
     [

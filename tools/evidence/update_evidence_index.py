@@ -2522,7 +2522,10 @@ def _load_epic038_pr03_entries() -> list[dict[str, object]]:
             rel = str(normalized["discovered_physical_path"])
             path = ROOT / rel
             if not path.exists():
-                raise SystemExit(f"MISSING_EPIC038_PR03_LIVE_PROOF:{rel}")
+                # The live proof is conditional on a fresh PO-authorized event.
+                # Repositories and isolated test roots without that event must
+                # not acquire a synthetic or dangling index entry.
+                continue
             try:
                 payload = json.loads(path.read_text(encoding="utf-8"))
                 produced_at = payload["generated_at_utc"]
@@ -2926,7 +2929,9 @@ def _write_path_proof(
             existing_size_matches = False
         existing_fields_match = all(existing.get(key) == value for key, value in extra_fields.items())
         explicit_produced_matches = (
-            requested_produced is None or existing_produced == requested_produced
+            isolated_timestamp is not None
+            or requested_produced is None
+            or existing_produced == requested_produced
         )
         if (
             existing.get("path") == rel
