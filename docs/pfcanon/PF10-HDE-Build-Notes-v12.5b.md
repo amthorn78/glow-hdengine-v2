@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.9b  
-Effective Date: 2026.07.28  
+**Version:** v12.5b  
+Effective Date: 2026.07.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1317,9 +1317,11 @@ This addendum establishes the permitted lettered-set model. It does not itself:
 * establish acceptance; or  
 * close an epic.
 
-## 2.31) HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority
+## **2.31) HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority**
 
 Timestamp: 072826 00:35 Details: This addendum records the Product Owner-approved extended remediation that was required to execute and close `qa-08-po-008` safely, preserve its one-time live-vendor authority boundary, correct the causal-chain and evidence-provenance defects exposed by the step, route the corrections through reviewable PR posture and merge, and continue through a second PR until hosted CI was clean. It also establishes the narrowly governed term **PO-approved Extended Moon Loop remediation** for cases in which live QA exposes functional drift or causal uncertainty that cannot be resolved inside the ordinary QA-root-only Moon Loop.
+
+**Authority status:** This addendum is published in the active HDE Build Notes lettered set. It is current PF10 authority for the scope it explicitly addresses, subject to the individual-addendum supersession rules in the HDE Build Notes front matter.
 
 ### **Decision summary**
 
@@ -1337,9 +1339,9 @@ The Product Owner makes the following decisions:
 10. The instruction to continue until CI was clean was a completion condition for the identified causal chain. It did not widen product scope, renew live-call authority, or authorize unrelated changes.  
 11. No public or application-runtime implementation under `engine/**` or `adapter/**` changed. Functional source changes were confined to the live evidence producer and canonical evidence-index owner; the remaining changes were regression tests, runbook correction, QA evidence, and canonically generated companions.
 
-### 2\. Terminology and ordinary Moon Loop boundary
+### **2\. Terminology and ordinary Moon Loop boundary**
 
-#### Functional drift
+#### **Functional drift**
 
 For this addendum, **functional drift** is a material difference between the approved proof objective and the behavior of the integrated plan, bootstrap, implementation, evidence generator, governed companion graph, or CI pipeline encountered during execution.
 
@@ -1347,7 +1349,7 @@ This event also exposed planning, tooling, evidence, conditionality, provenance,
 
 Functional drift may exist even when an isolated behavior appears correct. Examples include a proof producer that silently opens its own rails, a conditional artifact treated as globally mandatory, a current artifact indexed with a historical timestamp, an isolated release build that rewrites retained evidence outside its permitted graph, or a hosted gate evaluating stale canonical evidence.
 
-#### Causal uncertainty
+#### **Causal uncertainty**
 
 **Causal uncertainty** is uncertainty that cannot be resolved reliably at plan-review time and becomes observable only while executing the approved proof or its required integration gates. It includes uncertainty about:
 
@@ -1358,17 +1360,17 @@ Functional drift may exist even when an isolated behavior appears correct. Examp
 * whether isolated release validation preserves retained provenance; and  
 * whether the final routed source passes the hosted gates required for CI-clean completion.
 
-#### PO-approved Extended Moon Loop remediation
+#### **PO-approved Extended Moon Loop remediation**
 
 A **PO-approved Extended Moon Loop remediation** is an event-bound, repository-anchored, routed continuation of one identified QA or hosted-CI failure, blocker, or evidenced safety defect after the ordinary Moon Loop boundary has been exceeded.
 
 “Extended” describes the causal and delivery lineage: the work may span multiple focused commits, PR or merge cycles, hosted-CI reruns, and mechanically necessary canonical companion refreshes. It does not enlarge the approved proof target, runtime or product scope, rails posture, secret posture, evidence identity, acceptance posture, or nonclaims. It does not relabel source or non-QA-root remediation as ordinary Moon Loop correction.
 
-The ordinary Moon Loop defined by the Glow QA Guide, §3.4.8, “Rails posture for manual Live QA,” and the Canon Epic Process Guide, §1.1.11, “Plan review rules (content-first; blockers vs caveats),” remains controlling for ordinary minimal QA-root-only correction. A published version of this addendum would define a separate Extended Moon Loop process, but would not relabel routed work as ordinary Moon Loop correction. For each event, fresh PO approval must be recorded before the corresponding action. Only the stop-and-issue-another-plan requirement is displaced after that approval; routing, evidence ownership, safety, and final-proof requirements remain in force.
+The ordinary Moon Loop defined by the Glow QA Guide, §3.4.8, “Rails posture for manual Live QA,” and the Canon Epic Process Guide, §1.1.11, “Plan review rules (content-first; blockers vs caveats),” remains controlling for ordinary minimal QA-root-only correction. This addendum separately defines the Extended Moon Loop process. It does not relabel routed work as ordinary Moon Loop correction. For each event, fresh PO approval must be recorded before the corresponding action. Only the stop-and-issue-another-plan requirement is displaced after that approval; routing, evidence ownership, safety, and final-proof requirements remain in force.
 
-### 3\. Extended Moon Loop operating rules
+### **3\. Extended Moon Loop operating rules**
 
-#### 3.1 Invocation
+#### **3.1 Invocation**
 
 An Extended Moon Loop exists only after fresh, explicit Product Owner direction. The direction must identify or make unambiguous:
 
@@ -1386,7 +1388,7 @@ Each action class must be expressly authorized before use; an omitted action cla
 
 Required authorization must be recorded before the corresponding write, external call, publication, or merge action. Later HDE Build Notes or evidence binding records that authority; it cannot create authority retroactively. A new remediation plan is not required when the original proof identity is stable and the above facts are clear.
 
-#### 3.2 Causal-closure rule
+#### **3.2 Causal-closure rule**
 
 The loop may correct each separately evidenced root cause encountered in the required proof and CI-completion chain, plus the minimum regression tests and canonical companion refreshes needed to prevent recurrence.
 
@@ -1399,7 +1401,7 @@ A newly exposed defect remains inside the same Extended Moon Loop only when all 
 
 An independent or opportunistic defect requires a separate PO disposition.
 
-#### 3.3 No forced-replanning rule
+#### **3.3 No forced-replanning rule**
 
 When causal closure remains satisfied within a freshly authorized Extended Moon Loop event, the operator continues that remediation lineage instead of restarting discovery or issuing serial plan revisions. The execution record must absorb the new facts, decisions, receipts, and validation results.
 
@@ -1407,7 +1409,7 @@ Replanning is required only when the desired proof, product behavior, acceptance
 
 Continuation authority is never inferred from the `qa-08-po-008` record. A future event requires fresh explicit PO direction before its first write or external action. A new path, system, proof goal, public behavior, evidence family, or independent root cause requires fresh PO disposition.
 
-#### 3.4 Routing and evidence
+#### **3.4 Routing and evidence**
 
 Code, repo tests, evidence generators, and governed artifacts outside the QA root remain routed remediation. They must be carried by the applicable PR, OPS, QA plan update, or documentation update posture before they can support the affected QA step's final PASS.
 
@@ -1427,7 +1429,7 @@ Governed artifacts remain canonical-tool-only. Primary artifacts, checksums, pat
 
 For this event, `qa-08-po-008` PASS came only from its approved post-route finalization predicates. PR \#372 established a CI-clean integrated repository state; it did not create another QA PASS or retroactively alter the earlier receipt.
 
-#### 3.5 Authority limits
+#### **3.5 Authority limits**
 
 An Extended Moon Loop does not by itself authorize:
 
@@ -1439,7 +1441,7 @@ An Extended Moon Loop does not by itself authorize:
 * bypassing PR routing, canonical evidence owners, review, or hosted CI; or  
 * recurring authority derived from a previous one-time approval.
 
-#### 3.6 Completion and expiry
+#### **3.6 Completion and expiry**
 
 The loop completes only when:
 
@@ -1452,7 +1454,7 @@ The loop completes only when:
 
 Extended authority expires at completion. One-time live, OPS, merge, or deployment authorities expire according to their own narrower terms and are never extended implicitly.
 
-### 4\. Event trigger and PO authority for qa-08-po-008
+### **4\. Event trigger and PO authority for qa-08-po-008**
 
 The approved step intended to prove one bounded, same-input, independently checked live vendor acquisition event. Execution exposed planning and producer defects before the call, a companion-provenance defect during the required post-generation refresh, and integration defects when hosted CI ran.
 
@@ -1484,10 +1486,10 @@ The Product Owner then:
 
 These directions constitute the event-specific Extended Moon Loop authority. They did not authorize a second live generation event.
 
-### 5\. Repository, proof, routing, and CI map
+### **5\. Repository, proof, routing, and CI map**
 
 | Item | Receipt or identity | Meaning |
-| :---- | :---- | :---- |
+| ----- | ----- | ----- |
 | Initial inspected source | `376914bf765a9c0c1900a74f9214f5e346f790c1` | Provenance anchor only; not an execution gate |
 | Approved step | `qa-08-po-008` / `PO-008` | Original proof objective and verdict taxonomy remained unchanged |
 | Live proof generation time | `2026-07-27T23:38:09Z` | Actual event time retained in the governed proof |
@@ -1511,7 +1513,7 @@ PR references:
 * PR \#372: `https://github.com/amthorn78/glow-hdengine-v2/pull/372`  
 * Final `main` workflow: `https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30317268158`
 
-### 6\. PR \#371 — live-proof authority, safety, provenance, and finalization
+### **6\. PR \#371 — live-proof authority, safety, provenance, and finalization**
 
 PR \#371 contained three focused commits:
 
@@ -1519,7 +1521,7 @@ PR \#371 contained three focused commits:
 2. `30e93dfa2d9bd24779e35a6433a034fc996b6ae4` — proof provenance and canonical companions; and  
 3. `544e680a06eadee6214bbd8e7c5ffcc18fd87798` — post-route QA finalization.
 
-#### 6.1 Approved plan and bootstrap correction
+#### **6.1 Approved plan and bootstrap correction**
 
 Path: `docs/qa/r7-qa-plan-hde-epic038.md`
 
@@ -1544,7 +1546,7 @@ Why required:
 
 The original bootstrap could not be executed reliably, its target predicate rejected the only available vendor API base/environment target identified by the PO, and its fixed-source gate would turn normal routed change into false invalidation. More importantly, closed artifact checks should not require live credentials or retain ambient authority. These were planning and execution defects, not failures of the intended AB/BA behavior.
 
-#### 6.2 Live-proof producer correction
+#### **6.2 Live-proof producer correction**
 
 Path: `tools/evidence/generate_open_rails_abba_proof.py`
 
@@ -1575,7 +1577,7 @@ Why required:
 
 The earlier producer could satisfy open rails by overwriting the caller's environment at client construction. That design weakened the closed-default guarantee and could allow a future production path to perform network I/O despite incorrect caller posture. The producer also lacked an event-bound authority primitive, allowed personal-input substitution, exposed an injected-client bypass boundary, and attached historical provenance to a current claim. A one-time live proof is trustworthy only when the producer itself refuses every wider posture before network-client creation.
 
-#### 6.3 Producer regression tests
+#### **6.3 Producer regression tests**
 
 Path: `tests/evidence/test_open_rails_abba_proof.py`
 
@@ -1601,7 +1603,7 @@ Why required:
 
 The new restrictions are production safety properties, not one-off runbook conventions. Regression tests had to prove refusal occurs before any client can be created and that later changes cannot silently restore self-open rails, reusable authority, personal input, check-mode I/O, or self-attested proof fields.
 
-#### 6.4 Current-event provenance and canonical index ownership
+#### **6.4 Current-event provenance and canonical index ownership**
 
 Path: `tools/evidence/update_evidence_index.py`
 
@@ -1617,7 +1619,7 @@ Why required:
 
 A current live interaction indexed with a historical timestamp is false provenance. Hash equality alone cannot justify retaining an explicitly incorrect production time. The sole index owner had to derive the time from the validated artifact and correct stale companion provenance.
 
-#### 6.5 Updater and path-proof regression tests
+#### **6.5 Updater and path-proof regression tests**
 
 Paths:
 
@@ -1634,7 +1636,7 @@ Why required:
 
 These tests bind the producer's current event time to the Human Index and Machine Mirror and prevent a future fallback to the historical constant or hash-only stale provenance.
 
-#### 6.6 Governed proof and companion refresh
+#### **6.6 Governed proof and companion refresh**
 
 Primary proof:
 
@@ -1667,7 +1669,7 @@ Why required:
 
 The approved step required a current artifact and sole-owner companion refresh before finalization. Manual edits were prohibited. The current event could not support PASS while the ledgers retained historical time or stale proof bytes.
 
-#### 6.7 Final QA record
+#### **6.7 Final QA record**
 
 Path: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`
 
@@ -1683,7 +1685,7 @@ The final log records:
 
 The target, credentials, confirmation, and event receipt were unset for finalization. The log contains no credential or endpoint values, authorization-header values, personal-input values, request or response bodies, or raw vendor payload.
 
-### 7\. qa-08 execution chronology and PASS basis
+### **7\. qa-08 execution chronology and PASS basis**
 
 1. Before the call, the PO overrode fixed-HEAD equality, identified the exact canonical live v2 base as the sole available vendor API base/environment target for the event, freshly authorized one event, and approved the in-place safety correction.  
 2. At `2026-07-27T23:38:09Z`, the producer attempted and completed exactly two vendor requests using fabricated synthetic defaults, with one attempt per request and no retry.  
@@ -1698,7 +1700,7 @@ The target, credentials, confirmation, and event receipt were unset for finaliza
 
 The step's approved PASS criteria were satisfied because current authorization was recorded by generation, the producer and independent check succeeded, the pre-routing receipt was preserved, the routed current artifact and companion receipt were present, both final closed-rails checks exited `0`, and routing proof remained distinct from behavioral proof.
 
-### 8\. Hosted-CI failure after PR \#371
+### **8\. Hosted-CI failure after PR \#371**
 
 The qa-08 behavioral PASS did not establish hosted-CI cleanliness.
 
@@ -1710,13 +1712,13 @@ PR \#371's push workflow `30315572042` completed red at `2026-07-27T23:55:37Z`, 
 
 PR \#371 was merged as `870e0db41f78a7ab49a87dc56bcefd1859d53c06` despite those failures. This addendum classifies that sequence as a merge-sequencing defect. A future CI-clean completion claim must keep behavioral PASS, routing, merge, and hosted-CI state as separately evidenced predicates.
 
-### 9\. PR \#372 — CI integration closure
+### **9\. PR \#372 — CI integration closure**
 
 PR \#372's validation made no vendor call, required no vendor credential, and ran under closed rails.
 
 PR \#372 did not regenerate or alter the governed live proof, rerun `qa-08-po-008` finalization, renew either receipt, or make a second live call. It repaired only the surrounding closed-rails integration defects.
 
-#### 9.1 Conditional live-artifact semantics
+#### **9.1 Conditional live-artifact semantics**
 
 Path: `tools/evidence/update_evidence_index.py`
 
@@ -1733,7 +1735,7 @@ Regression:
 
 * `tests/ops/test_evidence_index.py` now proves omission when the conditional artifact is absent.
 
-#### 9.2 Isolated retained-provenance semantics
+#### **9.2 Isolated retained-provenance semantics**
 
 Path: `tools/evidence/update_evidence_index.py`
 
@@ -1750,7 +1752,7 @@ Regression:
 
 * `tests/evidence/test_evidence_skeleton.py` now proves an isolated build preserves unchanged retained proof bytes.
 
-#### 9.3 Architecture snapshot and canonical fixed point
+#### **9.3 Architecture snapshot and canonical fixed point**
 
 Paths:
 
@@ -1772,7 +1774,7 @@ Why required:
 
 Hosted architecture and evidence-coherence gates compare current analyzed source to current canonical bytes. A source change without its owned snapshot is incomplete, even when the changed code is correct. The mirror's self-reference requires a final fixed-point refresh after dependent bytes change.
 
-### 10\. Validation and final hosted-CI completion
+### **10\. Validation and final hosted-CI completion**
 
 The PR \#372 remediation record reports these local checks:
 
@@ -1790,7 +1792,7 @@ Hosted workflows established:
 
 The final clean-CI integrated source is therefore `b08d9dc47f31baa79101a323795237fde4e25b53`, not the earlier qa-08 PASS commit or PR \#371 merge. Clean CI does not retroactively alter, broaden, or create a second instance of the `2026-07-27T23:51:41Z` qa-08 PASS.
 
-### 11\. Complete net changed-path inventory
+### **11\. Complete net changed-path inventory**
 
 The combined base-to-final range changed 19 paths, with 671 insertions and 131 deletions:
 
@@ -1816,7 +1818,7 @@ The combined base-to-final range changed 19 paths, with 671 insertions and 131 d
 | `artifacts/architecture/architecture_snapshot.keys_only.json` | Governed architecture evidence | Current producer static analysis |
 | `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt` | Governed companion | Architecture snapshot byte binding |
 
-### 12\. Root-cause assessment
+### **12\. Root-cause assessment**
 
 The event did not have one isolated cause. It exposed a coupled proof-chain problem:
 
@@ -1833,7 +1835,7 @@ The event did not have one isolated cause. It exposed a coupled proof-chain prob
 
 Repeated replanning would have documented successive partial understandings without proving the integrated correction. The PO-approved Extended Moon Loop was necessary because each downstream gate revealed the next causal defect, while the original qa-08 proof objective and nonclaims remained unchanged.
 
-### 13\. Prevention requirements
+### **13\. Prevention requirements**
 
 Future live-proof and QA work must apply the following:
 
@@ -1854,7 +1856,7 @@ Future live-proof and QA work must apply the following:
 15. Keep QA behavioral PASS, routing, merge, and hosted-CI completion separate in evidence and claims.  
 16. Do not merge a remediation as clean when required hosted checks are red; if an exceptional merge occurs, record it and continue causal closure until the final merged source is green.
 
-### 14\. Nonclaims
+### **14\. Nonclaims**
 
 This addendum and the recorded work do not establish:
 
@@ -1871,26 +1873,26 @@ This addendum and the recorded work do not establish:
 * any retroactive alteration or broadening of the time, scope, or meaning of the `2026-07-27T23:51:41Z` qa-08 PASS from later clean CI;  
 * another live interaction or authority renewal from PR \#372 or any CI run;  
 * epic acceptance or closeout; or  
-* permanent-canon drainage merely because this candidate exists.
+* permanent-canon drainage; this addendum remains active PF10 authority unless and until its applicable scope is superseded by a higher-numbered addendum or its guidance is formally reviewed and drained into the applicable permanent PF documents.
 
-### 15\. Supersession and drain targets
+### **15\. Supersession and drain targets**
 
-If published, this addendum establishes the reusable Extended Moon Loop process definition, but it creates no standing authority to take action. It supersedes only the requirement to stop and issue a separate remediation plan after a fresh, pre-action PO approval has expressly authorized an Extended Moon Loop event. It does not supersede the ordinary Moon Loop classification boundary, the distinction between QA-root correction and routed remediation, or evidence ownership, safety, secret handling, PASS criteria, and nonclaim rules. In the absence of fresh event-specific approval, the ordinary Moon Loop stop rule remains controlling.
+This addendum establishes the reusable Extended Moon Loop process definition, but it creates no standing authority to take action. It supersedes only the requirement to stop and issue a separate remediation plan after a fresh, pre-action PO approval has expressly authorized an Extended Moon Loop event. It does not supersede the ordinary Moon Loop classification boundary, the distinction between QA-root correction and routed remediation, or evidence ownership, safety, secret handling, PASS criteria, and nonclaim rules. In the absence of fresh event-specific approval, the ordinary Moon Loop stop rule remains controlling.
 
 No other epic, QA check, agent, or later run may rely on the `qa-08-po-008` approval as authority to edit source during Live QA, make a live call, publish or merge a PR, or continue remediation. Every later use requires fresh explicit authority recorded before the corresponding write, external call, publication, or merge.
 
 HDE Build Notes, Addenda 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, and 2.30 remain applicable to their distinct syntax, remediation-plan, implementation-remediation, bounded-rescope, review, QA, and scope-model topics.
 
-If published into the active HDE-EPIC038 HDE Build Notes sequence, this addendum would be the higher-numbered same-topic authority only for the Extended Moon Loop process definition and the bounded `qa-08-po-008` / PR \#371 / PR \#372 execution, remediation, routing, and CI-cleanup history described here. As a candidate outside the active set, it is not current authority.
+This addendum is published in the active HDE Build Notes lettered set and is current PF10 authority for the scope stated here. As the highest-numbered applicable addendum, it is the sole authority for any overlapping scope concerning the Extended Moon Loop process definition and the bounded `qa-08-po-008` / PR \#371 / PR \#372 execution, remediation, routing, and CI-cleanup history described here. It does not supersede any distinct, non-overlapping scope retained by the lower-numbered addenda identified above.
 
-Proposed permanent-canon drain targets:
+Permanent-canon drain targets:
 
 * Glow QA Guide, §3.4.8, “Rails posture for manual Live QA” — add the Extended Moon Loop class, invocation conditions, causal-closure rule, receipt lineage, and completion/expiry model.  
 * Canon Epic Process Guide, §1.1.11, “Plan review rules (content-first; blockers vs caveats)” — distinguish ordinary QA-root Moon Loop from PO-approved routed Extended Moon Loop remediation.  
 * Canon Epic Process Guide, §3.5.5, “Remediation PR pattern (separate from Live QA)” — permit one recorded causal lineage to span follow-up PR and CI cycles without requiring repeated remediation-plan issuance when scope and proof identity remain stable.  
 * Canon Plan Templates — prohibit fixed-HEAD QA gates, require source identity as provenance only, and provide an Extended Moon Loop decision-record field.
 
-### 16\. Source basis
+### **16\. Source basis**
 
 This addendum is grounded in:
 
@@ -1910,3 +1912,4 @@ This addendum is grounded in:
 * PR \#371 and PR \#372 commit, routing, merge, and hosted-CI records; and  
 * the successful final `main` workflow on `b08d9dc47f31baa79101a323795237fde4e25b53`.
 
+\<eof\>  

@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.4.9a  
-Effective Date: 2026.07.28  
+**Version:** v12.5a  
+Effective Date: 2026.07.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
