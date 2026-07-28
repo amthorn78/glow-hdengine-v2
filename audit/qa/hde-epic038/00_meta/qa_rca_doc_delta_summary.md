@@ -1,7 +1,6 @@
 # HDE-EPIC038 QA RCA and Doc Delta Summary
 
 ## Live QA findings
-- qa-08-po-008: NOT RUN
 - qa-09-po-009: NOT RUN
 - qa-10-po-010: NOT RUN
 - qa-11-po-011: NOT RUN
@@ -17,7 +16,7 @@
 - qa-21-po-021: NOT RUN
 - qa-22-po-022: NOT RUN
 - qa-23-po-023: NOT RUN
-- qa_step_logs_manifest lookup: TOOLING_BLOCKED
+- epic-wide qa_step_logs_manifest lookup: TOOLING_BLOCKED
 
 ## PF-Canon mapping
 - Runtime, database, evidence, release, and operational findings: HDE Build Notes.
@@ -35,7 +34,7 @@
 | qa-05-po-005 | PASS | checks/qa-05-po-005/primary.log |
 | qa-06-po-006 | PASS | checks/qa-06-po-006/primary.log |
 | qa-07-po-007 | PASS | checks/qa-07-po-007/primary.log |
-| qa-08-po-008 | NOT RUN | Unknown |
+| qa-08-po-008 | PASS | checks/qa-08-po-008/primary.log |
 | qa-09-po-009 | NOT RUN | Unknown |
 | qa-10-po-010 | NOT RUN | Unknown |
 | qa-11-po-011 | NOT RUN | Unknown |
@@ -52,8 +51,18 @@
 | qa-22-po-022 | NOT RUN | Unknown |
 | qa-23-po-023 | NOT RUN | Unknown |
 
+## qa-08-po-008 step finalization
+- Step status: PASS.
+- Step finalization: COMPLETED.
+- Header exit code: 0.
+- Rails: SAFE_MODE=1; ALLOW_NETWORK=0.
+- Routing type: PR.
+- Routing receipt: PR#371@30e93dfa2d9bd24779e35a6433a034fc996b6ae4.
+- Pre-routing receipt: commit:5f57b049b605105cccb9c7fa4cec99a67c308846.
+- Behavioral proof: CLOSED_RAILS_CURRENT_ARTIFACT_AND_COMPANION_VALIDATION; exit code 0.
+- This completed step record is distinct from epic-wide closeout and confers no authority for another live call.
+
 ## Blocked, unexecuted, or deferred work
-- qa-08-po-008: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
 - qa-09-po-009: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
 - qa-10-po-010: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
 - qa-11-po-011: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
@@ -70,16 +79,16 @@
 - qa-22-po-022: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
 - qa-23-po-023: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
 
-## Closeout phase commands
-- Generation command: qa_closeout generation.
-- Finalization command: NOT RUN.
+## Epic-wide closeout phase commands
+- Epic-wide generation command: qa_closeout generation.
+- Epic-wide finalization command: NOT RUN.
 
-## Manifest lookup and routing proof
-- Lookup status: TOOLING_BLOCKED.
-- Lookup detail: approved PR routing and required companion refresh pending.
+## Epic-wide manifest lookup and routing proof
+- Epic-wide lookup status: TOOLING_BLOCKED.
+- Epic-wide lookup detail: approved PR routing and required companion refresh pending.
 - Required routing type: PR.
-- Routing receipt: NONE.
-- Pre-routing blocked or failed receipt: REMEDIATION_NEEDED_F-001.
+- Epic-wide routing receipt: NONE.
+- Epic-wide pre-routing blocked or failed receipt: REMEDIATION_NEEDED_F-001.
 - Routing and lookup proof do not replace any check’s behavioral proof.
 
 ## Token posture
@@ -87,7 +96,8 @@
 - Missing required evidence is Unknown and is not inferred from repository, release, or operational records.
 
 ## Moon Loop
-- No implementation Moon Loop is authorized or claimed by this runbook.
+- qa-08-po-008 used the bounded PO-approved Extended Moon Loop recorded in HDE Build Notes, Addendum 2.31.
+- No retained record confers authority for another live call or later remediation.
 
 ## Completion states
 - Repo-supported completion: NOT READY.
