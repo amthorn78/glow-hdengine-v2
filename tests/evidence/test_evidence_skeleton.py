@@ -141,6 +141,40 @@ def test_isolated_path_proof_uses_immutable_manifest_timestamp(
     assert proof["produced_at_utc"] == "2026-07-23T00:00:00Z"
 
 
+def test_isolated_build_preserves_unchanged_retained_proof_provenance(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    artifact = tmp_path / "retained-live-proof.json"
+    artifact.write_bytes(b"bound bytes\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    kwargs = {
+        "rel": "retained-live-proof.json",
+        "sha256": digest,
+        "size_bytes": artifact.stat().st_size,
+        "mtime_utc": "2026-07-27T23:38:13Z",
+        "produced_at": "2026-07-27T23:38:12Z",
+        "default_produced_at": "2026-07-27T23:38:12Z",
+        "stat_mtime": artifact.stat().st_mtime,
+    }
+    update_evidence_index._write_path_proof(check=False, **kwargs)
+    proof = tmp_path / "retained-live-proof.json.path_proof.txt"
+    original = proof.read_bytes()
+
+    monkeypatch.setenv("HDE_ISOLATED_RELEASE_BUILD", "1")
+    catalog = tmp_path / "catalog"
+    catalog.mkdir()
+    (catalog / "manifest.json").write_text(
+        json.dumps({"built_at_utc": "2026-07-23T00:00:00Z"}) + "\n",
+        encoding="utf-8",
+    )
+
+    update_evidence_index._write_path_proof(check=False, **kwargs)
+
+    assert proof.read_bytes() == original
+
+
 def test_index_canonical_and_hash_matches(tmp_path):
     entries = update_evidence_index._load_human_index()
     rendered = update_evidence_index._render_human_index(entries)
