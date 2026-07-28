@@ -1256,7 +1256,7 @@ Run Profile B preflight before closeout. After all planned checks have either ex
 5. Define Closeout Command 1 again if the terminal was replaced, then run Closeout Command 3\. Finalization reopens and validates the current manifest, path proof, generation summary, step logs, Doc Delta pair, canonical evidence updater/source, Human Evidence Index, and Machine Mirror before performing canonical lookup.  
 6. Run Closeout Commands 4 and 5 only after finalization. Missing routing provenance or generated inputs records `TOOLING_BLOCKED`; malformed generated state or mechanical validation failure records `FAIL_TOOLING`.
 
-Closeout Command 1 — define the phase runner:
+Closeout Command 1 — define the phase runner. The wrapper pins closed rails and removes live authorization, endpoint, credential, and optional acquisition-input variables before either metadata phase starts:
 
 ```
 qa_closeout() {
@@ -1265,11 +1265,34 @@ qa_closeout() {
     return 64
   fi
 
-  QA_CLOSEOUT_PHASE="$1" python - <<'CLOSEPY'
+  env \
+    -u HD_API_KEY \
+    -u GEO_API_KEY \
+    -u HD_API_BASE_URL \
+    -u HDAPI_BASE_URL \
+    -u QA08_AUTHORIZATION_CONFIRMATION \
+    -u QA08_PO_EVENT_RECEIPT \
+    -u OPEN_RAILS_VENDOR_ABBA_A_USER_ID \
+    -u OPEN_RAILS_VENDOR_ABBA_A_BIRTHDATE \
+    -u OPEN_RAILS_VENDOR_ABBA_A_BIRTHTIME \
+    -u OPEN_RAILS_VENDOR_ABBA_A_LOCATION \
+    -u OPEN_RAILS_VENDOR_ABBA_B_USER_ID \
+    -u OPEN_RAILS_VENDOR_ABBA_B_BIRTHDATE \
+    -u OPEN_RAILS_VENDOR_ABBA_B_BIRTHTIME \
+    -u OPEN_RAILS_VENDOR_ABBA_B_LOCATION \
+    SAFE_MODE=1 \
+    ALLOW_NETWORK=0 \
+    APP_ENV=dev \
+    LC_ALL=C \
+    LANG=C \
+    TZ=UTC \
+    QA_CLOSEOUT_PHASE="$1" \
+    python - <<'CLOSEPY'
 import datetime
 import hashlib
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -1280,6 +1303,12 @@ pre_routing_receipt = (
 routing_receipt = (
     os.environ.get("QA_CLOSEOUT_ROUTING_RECEIPT") or ""
 ).strip()
+approved_pr_routing_receipt = bool(
+    re.fullmatch(r"PR#[1-9][0-9]*@[0-9a-f]{40}", routing_receipt)
+)
+recorded_routing_receipt = (
+    routing_receipt if approved_pr_routing_receipt else "NONE"
+)
 
 if phase not in {"generation", "finalize"}:
     raise SystemExit("INVALID_CLOSEOUT_PHASE")
@@ -1386,7 +1415,9 @@ def write_summary(
         if status != "PASS"
     ]
     if lookup_status != "PASS":
-        findings.append(f"qa_step_logs_manifest lookup: {lookup_status}")
+        findings.append(
+            f"epic-wide qa_step_logs_manifest lookup: {lookup_status}"
+        )
 
     lines = [
         "# HDE-EPIC038 QA RCA and Doc Delta Summary",
@@ -1414,6 +1445,69 @@ def write_summary(
     for check_id, status, rel in coverage:
         evidence = rel if rel is not None else "Unknown"
         lines.append(f"| {check_id} | {status} | {evidence} |")
+
+    qa08_status, qa08_rel = next(
+        (status, rel)
+        for check_id, status, rel in coverage
+        if check_id == "qa-08-po-008"
+    )
+    lines.extend(["", "## qa-08-po-008 step finalization"])
+    qa08_finalized = False
+    if qa08_rel is None:
+        lines.extend(
+            [
+                "- Step status: NOT RUN.",
+                "- Step finalization: NOT RUN.",
+                "- This section is distinct from epic-wide closeout state.",
+            ]
+        )
+    else:
+        qa08_text = (root / qa08_rel).read_text(encoding="utf-8")
+        qa08_header = json.loads(qa08_text.splitlines()[0])
+        qa08_candidate = (
+            qa08_status == "PASS"
+            and qa08_header.get("exit_code") == 0
+        )
+
+        def qa08_marker(prefix):
+            matches = [
+                line[len(prefix) :]
+                for line in qa08_text.splitlines()
+                if line.startswith(prefix)
+            ]
+            if len(matches) != 1 or not matches[0]:
+                raise SystemExit(f"INVALID_QA08_FINALIZATION_MARKER:{prefix}")
+            return matches[0]
+
+        if qa08_candidate:
+            qa08_behavior_exit = qa08_marker("BEHAVIOR_EXIT_CODE=")
+            if qa08_behavior_exit != "0":
+                raise SystemExit("INVALID_QA08_FINALIZATION_EXIT")
+            qa08_finalized = True
+            lines.extend(
+                [
+                    f"- Step status: {qa08_status}.",
+                    "- Step finalization: COMPLETED.",
+                    f"- Header exit code: {qa08_header.get('exit_code')}.",
+                    f"- Rails: SAFE_MODE={qa08_header.get('captured_env', {}).get('SAFE_MODE')}; ALLOW_NETWORK={qa08_header.get('captured_env', {}).get('ALLOW_NETWORK')}.",
+                    f"- Routing type: {qa08_marker('ROUTING_TYPE=')}.",
+                    f"- Routing receipt: {qa08_marker('ROUTING_PROOF=')}.",
+                    f"- Pre-routing receipt: {qa08_marker('PRE_ROUTING_RECEIPT=')}.",
+                    f"- Behavioral proof: {qa08_marker('BEHAVIOR_PROOF=')}; exit code {qa08_behavior_exit}.",
+                    "- This completed step record is distinct from epic-wide closeout and confers no authority for another live call.",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    f"- Step status: {qa08_status}.",
+                    "- Step finalization: NOT COMPLETED.",
+                    f"- Header exit code: {qa08_header.get('exit_code')}.",
+                    f"- Rails: SAFE_MODE={qa08_header.get('captured_env', {}).get('SAFE_MODE')}; ALLOW_NETWORK={qa08_header.get('captured_env', {}).get('ALLOW_NETWORK')}.",
+                    "- Success-only routing and behavioral markers: NOT CLAIMED.",
+                    "- This nonpassing step record is distinct from epic-wide closeout and confers no authority for a live call.",
+                ]
+            )
 
     blocked = [
         (check_id, status, rel)
@@ -1448,20 +1542,20 @@ def write_summary(
     lines.extend(
         [
             "",
-            "## Closeout phase commands",
-            "- Generation command: qa_closeout generation.",
+            "## Epic-wide closeout phase commands",
+            "- Epic-wide generation command: qa_closeout generation.",
             (
-                "- Finalization command: qa_closeout finalize."
+                "- Epic-wide finalization command: qa_closeout finalize."
                 if finalization_ran
-                else "- Finalization command: NOT RUN."
+                else "- Epic-wide finalization command: NOT RUN."
             ),
             "",
-            "## Manifest lookup and routing proof",
-            f"- Lookup status: {lookup_status}.",
-            f"- Lookup detail: {lookup_detail}.",
+            "## Epic-wide manifest lookup and routing proof",
+            f"- Epic-wide lookup status: {lookup_status}.",
+            f"- Epic-wide lookup detail: {lookup_detail}.",
             "- Required routing type: PR.",
-            f"- Routing receipt: {recorded_routing_receipt}.",
-            f"- Pre-routing blocked or failed receipt: {pre_routing_receipt}.",
+            f"- Epic-wide routing receipt: {recorded_routing_receipt}.",
+            f"- Epic-wide pre-routing blocked or failed receipt: {pre_routing_receipt}.",
             "- Routing and lookup proof do not replace any check’s behavioral proof.",
             "",
             "## Token posture",
@@ -1469,7 +1563,12 @@ def write_summary(
             "- Missing required evidence is Unknown and is not inferred from repository, release, or operational records.",
             "",
             "## Moon Loop",
-            "- No implementation Moon Loop is authorized or claimed by this runbook.",
+            (
+                "- qa-08-po-008 used the bounded PO-approved Extended Moon Loop recorded in HDE Build Notes, Addendum 2.31."
+                if qa08_finalized
+                else "- No completed qa-08-po-008 Extended Moon Loop is claimed by this summary."
+            ),
+            "- No retained record confers authority for another live call or later remediation.",
             "",
             "## Completion states",
             (
@@ -1622,10 +1721,10 @@ if not missing_generated_inputs:
             encoding="utf-8"
         )
         required_generation_lines = {
-            "- Generation command: qa_closeout generation.",
-            "- Finalization command: NOT RUN.",
-            "- Routing receipt: NONE.",
-            f"- Pre-routing blocked or failed receipt: {pre_routing_receipt}.",
+            "- Epic-wide generation command: qa_closeout generation.",
+            "- Epic-wide finalization command: NOT RUN.",
+            "- Epic-wide routing receipt: NONE.",
+            f"- Epic-wide pre-routing blocked or failed receipt: {pre_routing_receipt}.",
         }
         if not required_generation_lines.issubset(
             set(generation_summary.splitlines())
@@ -1660,9 +1759,11 @@ lookup_hits = {}
 updater_rc = None
 updater_error = ""
 
-if not routing_receipt or routing_receipt == "NONE":
+if not approved_pr_routing_receipt:
     lookup_status = "TOOLING_BLOCKED"
-    lookup_detail = "approved PR routing receipt unavailable; lookup not run"
+    lookup_detail = (
+        "approved PR routing receipt unavailable or invalid; lookup not run"
+    )
 elif missing_generated_inputs:
     lookup_status = "TOOLING_BLOCKED"
     lookup_detail = (
@@ -1734,7 +1835,7 @@ else:
 all_pass = write_summary(
     lookup_status,
     lookup_detail,
-    routing_receipt or "NONE",
+    recorded_routing_receipt,
     True,
 )
 print(
@@ -1748,8 +1849,10 @@ print(
             "manifest_lookup_status": lookup_status,
             "manifest_lookup_detail": lookup_detail,
             "routing_type": "PR",
-            "routing_receipt": routing_receipt or "NONE",
+            "routing_receipt": recorded_routing_receipt,
             "pre_routing_receipt": pre_routing_receipt,
+            "current_state_finalized": lookup_status == "PASS",
+            "epic_closeout_ready": all_pass,
         },
         sort_keys=True,
     )
@@ -1759,7 +1862,9 @@ if lookup_status == "TOOLING_BLOCKED":
     raise SystemExit(125)
 if lookup_status == "FAIL_TOOLING":
     raise SystemExit(126)
-raise SystemExit(0 if all_pass else 1)
+# Exit zero proves only routed current-state ledger finalization. Epic-wide
+# readiness remains the separate all_pass/epic_closeout_ready value above.
+raise SystemExit(0)
 CLOSEPY
 }
 ```
@@ -1768,7 +1873,9 @@ Closeout Command 2 — generation phase: `qa_closeout generation`
 
 Closeout Command 3 — post-route finalization phase: `qa_closeout finalize`
 
-Closeout Command 4: `python -c 'import datetime,hashlib,json; from pathlib import Path; root=Path("audit/qa/hde-epic038"); m=root/"qa_step_logs_manifest.json"; manifest=json.loads(m.read_text(encoding="utf-8")); proof_lines=(root/"qa_step_logs_manifest.json.path_proof.txt").read_text(encoding="utf-8").splitlines(); keys=[line.split(": ",1)[0] for line in proof_lines]; proof=dict(line.split(": ",1) for line in proof_lines); entries_ok=isinstance(manifest,dict) and all(isinstance(entry,dict) and {"check_id","status","log_path"} <= entry.keys() and entry["check_id"]==check_id and not Path(entry["log_path"]).is_absolute() and bool(Path(entry["log_path"]).parts) and Path(entry["log_path"]).parts[0]=="checks" and (root/entry["log_path"]).is_file() and json.loads((root/entry["log_path"]).read_bytes().splitlines()[0]).get("status")==entry["status"] for check_id,entry in manifest.items()); timestamps_ok=all(proof[key].endswith("Z") and datetime.datetime.fromisoformat(proof[key].replace("Z","+00:00")).tzinfo is not None for key in ("mtime_utc","produced_at_utc")); ok=entries_ok and keys==["path","sha256","size_bytes","mtime_utc","produced_at_utc"] and proof["path"]==m.as_posix() and proof["sha256"]==hashlib.sha256(m.read_bytes()).hexdigest() and proof["size_bytes"]==str(len(m.read_bytes())) and timestamps_ok; raise SystemExit(0 if ok else 1)'`
+Closeout Command 3 exit `0` means the routed current-state ledger, path proof, updater, Human Evidence Index, and Machine Mirror finalized mechanically. It does not mean every planned check passed; epic-wide readiness remains the separate `all_pass` / `epic_closeout_ready` result and the summary's completion state.
+
+Closeout Command 4: `SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized`
 
 Closeout Command 5: `test -s audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`
 

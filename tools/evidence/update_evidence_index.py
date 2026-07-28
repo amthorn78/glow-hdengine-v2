@@ -2424,6 +2424,18 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic038.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic038/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_qa_step_logs_manifest",
+        "schema_version": "1.0",
+        "notes": "HDE-EPIC038 current-state QA step-log manifest; tokenless coverage index only, not acceptance or closeout",
+    },
+]
+
+
 EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
     {"artifact_key": "epic038.pr01.identity_release_id_recompute", "discovered_physical_path": "artifacts/identity/release_id_recompute.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
@@ -3140,6 +3152,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
+            *EPIC038_QA_PRIMARY_ARTIFACTS,
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
             *_load_epic038_pr03_entries(),

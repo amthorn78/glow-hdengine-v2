@@ -37,6 +37,7 @@ jobs:
       # attestation job below. Historical checked-in evidence remains immutable.
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
+      - run: python tools/evidence/check_hde_epic038_qa_current_state.py
       - run: python tools/evidence/orientation_demo.py --check
       - name: Run PO-006 token registry validity check + report (gated)
         run: |
