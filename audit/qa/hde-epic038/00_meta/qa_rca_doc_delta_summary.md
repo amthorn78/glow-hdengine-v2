@@ -16,7 +16,6 @@
 - qa-21-po-021: NOT RUN
 - qa-22-po-022: NOT RUN
 - qa-23-po-023: NOT RUN
-- epic-wide qa_step_logs_manifest lookup: TOOLING_BLOCKED
 
 ## PF-Canon mapping
 - Runtime, database, evidence, release, and operational findings: HDE Build Notes.
@@ -81,13 +80,13 @@
 
 ## Epic-wide closeout phase commands
 - Epic-wide generation command: qa_closeout generation.
-- Epic-wide finalization command: NOT RUN.
+- Epic-wide finalization command: qa_closeout finalize.
 
 ## Epic-wide manifest lookup and routing proof
-- Epic-wide lookup status: TOOLING_BLOCKED.
-- Epic-wide lookup detail: approved PR routing and required companion refresh pending.
+- Epic-wide lookup status: PASS.
+- Epic-wide lookup detail: updater_exit=0; lookup_hits={"Human Evidence Index": true, "Machine Mirror": true, "canonical evidence updater/source": true}.
 - Required routing type: PR.
-- Epic-wide routing receipt: NONE.
+- Epic-wide routing receipt: PR#374@a9acbc618808f78c6f922248a54363181d0806dc.
 - Epic-wide pre-routing blocked or failed receipt: REMEDIATION_NEEDED_F-001.
 - Routing and lookup proof do not replace any check’s behavioral proof.
 
