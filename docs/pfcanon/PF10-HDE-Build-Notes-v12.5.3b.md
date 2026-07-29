@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5b  
+**Version:** v12.5.3b  
 Effective Date: 2026.07.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -2407,5 +2407,60 @@ Permanent-canon and repository-documentation review targets:
 * HDE CLI/API Vendor Reference, “Mirror schema check invocation (operator note)”;  
 * Glow QA Guide, “Invocation rule (normative; operator-facing)”; and  
 * the repository Evidence Index operator documentation.
+
+## 2.34) QA Pass 3 HDE-EPIC038 
+
+### Review Summary
+
+You were right. PF19 was accessible in the repository at `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v2.6.4.md`. The complete file remains recoverable from repository history, although it was removed from current `main` by commit `f1b53a0672c4e687bb77f93c287dd15eed07f678`.
+
+I reviewed the required PF19 §§3.1, 4.4.3, 4.4.5, and 12.2. The earlier `MISSING INPUT` ruling is withdrawn.
+
+Aggregate decision for `qa-09-po-009` through `qa-23-po-023`: **PASS**.
+
+### Findings
+
+No decision-driving findings.
+
+Two non-blocking observations:
+
+* The `qa-11-po-011` preflight omitted one Plan-listed test path, but the subsequent command successfully executed that file as part of the 308 passing tests. Its availability and behavior were therefore independently proven.  
+* PF19 is absent from current `main`, and the current-main resolves to an empty blob. Complete source material remained available through repository history and the supplied PF10 artifact, so neither issue invalidates these QA deliverables.
+
+### Repo Cross-Check
+
+* All 15 required `primary.log` files are tracked.  
+* Every header is valid PF27 JSON, records `PASS`, exit code `0`, closed deterministic environment pins, empty token claims, and the correct check identity.  
+* All 15 file sizes and SHA-256 values match `qa_step_logs_manifest.json`.  
+* The manifest path proof matches the current manifest: SHA-256 `0d9e8bc65ce3d73dc8612caadc090c96080c0b1ca0caaf77789159037cad4973`, 4,784 bytes.  
+* The Human Index, Machine Mirror, and canonical updater all contain the exact manifest identity and path.  
+* `qa-20` records all nineteen stages in canonical order, `first_failed_stage:NONE`, and `summary:PASS`.  
+* `qa-21` records exact-source binding plus all three cleanliness markers as `PASS`.  
+* PRs [\#376](https://github.com/amthorn78/glow-hdengine-v2/pull/376) and [\#377](https://github.com/amthorn78/glow-hdengine-v2/pull/377) are merged, with successful associated workflows.  
+* No prohibited secrets, endpoint values, personal inputs, or raw vendor payload classes were observed in the submitted logs.
+
+### Evidence Print
+
+| Step | Recorded proof |
+| ----- | ----- |
+| qa-09 | 10 tests passed |
+| qa-10 | `RAILS_GATE_EVIDENCE_OK`; 42 passed |
+| qa-11 | 308 passed |
+| qa-12 | `DIRECT_DB_CONTRACT_OK`; 136 passed |
+| qa-13 | 3 passed |
+| qa-14 | 12 passed |
+| qa-15 | 187 passed |
+| qa-16 | `V2_MAPPED_CACHE_EVIDENCE_OK`; 41 passed |
+| qa-17 | 52 passed |
+| qa-18 | Updater check and 2 tests passed |
+| qa-19 | All six validators exited `0` |
+| qa-20 | Nineteen-stage pipeline and 125 tests passed |
+| qa-21 | Exact-source attestation and cleanliness checks passed |
+| qa-22 | 5 targeted tests passed |
+| qa-23 | `RAILS_GATE_EVIDENCE_OK`; 12 safety tests passed |
+
+### PASS
+
+Evidence is sufficient and trustworthy. Required deliverables are present and tracked, their manifest and ledger bindings are coherent, Plan-defined PASS criteria are satisfied, and no remediation or developer-escalation condition remains.
 
 \<eof\>  
