@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.5b  
+**Version:** v12.5.6b  
 Effective Date: 2026.07.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -191,7 +191,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.33) ci/checks/check\_mirror\_schema.sh Is a Python Entry Point with a Legacy Stable Path  
 2.34) QA Pass 3 HDE-EPIC038  
 2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
-2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038
+2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038  
+2.37) HDE-EPIC038 Token-Roster Correction — Mint RELEASE\_ID\_RECOMPUTE\_OK and Retire Current DEV\_DB\_BRIDGE\_FALLBACK\_OK Claimability
 
 # 2\) Numbered Addenda
 
@@ -3789,5 +3790,184 @@ Decision axis: HDE-EPIC038 QA-closeout evidence sufficiency and readiness for Pr
 * This verdict is a reviewer recommendation only. It does not perform QA, OPS, PF-document changes, PO closeout, board movement, formal acceptance, token satisfaction, formal close-pack completion, or epic closure.
 
 End of report.
+
+## **2.37) HDE-EPIC038 Token-Roster Correction — Mint `RELEASE_ID_RECOMPUTE_OK` and Retire Current `DEV_DB_BRIDGE_FALLBACK_OK` Claimability**
+
+### **Details**
+
+This addendum records the Product Owner decision to admit `RELEASE_ID_RECOMPUTE_OK` as a canonical acceptance token and correct the current HDE-EPIC038 token roster after retirement of the active database bridge.
+
+The approved Epic Plan named `RELEASE_ID_RECOMPUTE_OK` as a canonical token even though the exact name was absent from the acceptance-token registry in HDE Governance. The same plan retained `DEV_DB_BRIDGE_FALLBACK_OK` even though HDE Build Notes, Addendum 2.12, later retired the bridge, its control keys, fallback semantics, and all new bridge-token claimability.
+
+This addendum resolves those two token-governance defects. It does not infer either token’s result from implementation or QA behavior.
+
+### **Decision**
+
+1. `RELEASE_ID_RECOMPUTE_OK` is minted as a canonical acceptance token, effective when this addendum is published into the active HDE Build Notes set.  
+2. `DEV_DB_BRIDGE_FALLBACK_OK` is removed from the current HDE-EPIC038 acceptance roster.  
+3. No replacement bridge or direct-transport token is minted.  
+4. Historical bridge evidence and historical token references remain immutable historical records. They must not be relabeled as current evidence and must not be rewritten merely to remove the retired token name.  
+5. All other registry-valid tokens in the approved HDE-EPIC038 roster remain unchanged.
+
+### **Canonical semantics for `RELEASE_ID_RECOMPUTE_OK`**
+
+**Token name:** `RELEASE_ID_RECOMPUTE_OK`
+
+**Purpose:** Prove that the published release identity is deterministically derived from the canonical release manifest rather than copied, inferred, or supplied by an independent mutable source.
+
+**PASS meaning:** The canonical release-manifest bytes are validated and SHA-256 recomputation produces the exact release identity recorded by the governed release-identity artifact. The recomputed value, the artifact’s `release_id`, and its recorded manifest SHA-256 agree exactly.
+
+**Minimum governed evidence family:**
+
+* `catalog/manifest.json`  
+* `artifacts/identity/release_id.json`  
+* `artifacts/identity/release_id.json.path_proof.txt`  
+* `artifacts/identity/release_id_recompute.log`  
+* `artifacts/identity/release_id_recompute.log.path_proof.txt`
+
+**Current implementation and verification loci:**
+
+* `scripts/release_id_recompute.py`  
+* `tools/evidence/generate_identity_provenance.py`  
+* `tests/evidence/test_identity_provenance.py`
+
+**Required claim conditions:**
+
+* the canonical manifest passes its applicable structural and canonical-byte validation;  
+* the recomputation command exits successfully;  
+* the recomputation log records PASS for the exact manifest and release identity under review;  
+* the identity JSON and recomputation log agree on the manifest SHA-256 and release identity;  
+* the governed artifacts, sibling proofs, Human Evidence Index record, and Machine Mirror record are coherent at the reviewed repository state; and  
+* the final token/evidence matrix binds the token to the exact current evidence, tests, CI enforcement, and applicable QA evidence.
+
+**FAIL meaning:** Any digest mismatch, invalid manifest, missing or malformed governed artifact, stale or mismatched path proof, incoherent Index or Mirror binding, failing validator, or inability to bind the claim to the reviewed repository state.
+
+**Claim owner:** The final acceptance or closeout authority reviewing the governed token/evidence matrix and close pack.
+
+**Nonclaim rule:** Publication of this addendum registers the token. It does not record the token as PASS. Implementation existence, a historical PASS line, or a path-proof transcript alone is insufficient to claim it.
+
+### **Retirement posture for `DEV_DB_BRIDGE_FALLBACK_OK`**
+
+HDE Build Notes, Addendum 2.12, remains controlling for transport retirement. Direct PostgreSQL through the Glow-owned provider is the sole active HDE database transport. The bridge and its fallback controls are retired.
+
+Accordingly:
+
+* `DEV_DB_BRIDGE_FALLBACK_OK` must not appear in any new HDE-EPIC038 PASS roster, acceptance map, token/evidence matrix, viability log, close report, or close manifest;  
+* its absence from the current roster is not a failed token and does not require a replacement token;  
+* current direct-only transport remains a non-token implementation and evidence obligation;  
+* existing applicable database, environment, evidence-integrity, and test tokens remain available under their own registered semantics; and  
+* historical evidence may retain `DEV_DB_BRIDGE_FALLBACK_OK` only with historical meaning and no current claimability.
+
+### **Corrected HDE-EPIC038 current acceptance roster**
+
+The corrected roster contains 33 token names.
+
+#### **Baseline tokens**
+
+* `TESTS_PASS_OK`  
+* `DOC_DELTA_PRESENT_OK`  
+* `EVIDENCE_INDEX_UPDATED_OK`  
+* `MACHINE_MIRROR_UPDATED_OK`  
+* `EVIDENCE_INDEX_HASH_OK`
+
+#### **QA rail tokens**
+
+* `QA_PRECOMMIT_CHECKLIST_OK`  
+* `QA_POSTCOMMIT_CHECKLIST_OK`  
+* `ENV_RAILS_POLICY_OK`
+
+#### **Phase-specific tokens**
+
+* `PREIMAGE_RECOMPUTE_OK`  
+* `CLI_READER_PARITY_OK`  
+* `COMPOSITE_ABBA_IDENTITY_OK`  
+* `TWO_RUN_IDENTITY_OK`  
+* `JSON_CANONICAL_CHECK_OK`  
+* `A7_GET_QUOTED_ETAG_OK`  
+* `A7_HEAD_PARITY_OK`  
+* `A7_304_OMITS_CT_CL_OK`  
+* `A7_VARY_AUTH_AE_OK`  
+* `A7_ENCODING_INVARIANCE_OK`  
+* `A7_TRANSPORT_PROOF_OK`  
+* `ENDPOINTS_CATALOG_OK`  
+* `ENDPOINTS_CATALOG_ENV_GATE_OK`  
+* `ENV_LC_ALL_C_OK`  
+* `EVIDENCE_INDEX_MIRROR_OK`  
+* `EVIDENCE_PATHS_VALIDATED_OK`  
+* `DB_RUNTIME_SEARCH_PATH_OK`  
+* `DB_ROLE_OK`  
+* `DB_SCHEMA_FINGERPRINT_OK`  
+* `DB_CONN_ENV_OK`  
+* `EVIDENCE_PATH_PROOFS_OK`  
+* `CI_CHECK_MIRROR_SCHEMA_OK`  
+* `CI_CHECK_FINAL_LF_OK`  
+* `NO_EXTERNAL_IO_ON_REFUSAL_OK`  
+* `RELEASE_ID_RECOMPUTE_OK`
+
+### **Non-token obligations remain non-token obligations**
+
+This addendum does not admit the following labels as acceptance tokens:
+
+* `BG_SOURCE_SELECTION_OK`  
+* `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`  
+* `BG_SOURCE_INVARIANCE_OK`  
+* `BG_TTL_SWR_POLICY_OK`  
+* `BG_RATE_LIMIT_POLICY_OK`  
+* `BG_CIRCUIT_BREAKER_POLICY_OK`  
+* `ENV_SNAPSHOT_SINGLETON_OK`  
+* `ENV_SNAPSHOT_SCHEMA_V3_OK`  
+* `ENV_PINS_PRESENT_OK`
+
+They remain evidence obligations where applicable. They must not appear in the final PASS-token roster unless separately admitted by the governing registry.
+
+### **HDE-EPIC038 supersession**
+
+For the exact final-token-roster scope:
+
+* this addendum supersedes the approved Epic Plan’s treatment of `RELEASE_ID_RECOMPUTE_OK` as already registered;  
+* this addendum supersedes the approved Epic Plan and Implementation Plan wherever they retain `DEV_DB_BRIDGE_FALLBACK_OK` as currently claimable;  
+* HDE Build Notes, Addendum 2.12, continues to control all transport-retirement scope; and  
+* the approved Epic Plan and Implementation Plan remain unchanged for every distinct scope not addressed here.
+
+The corrected roster must be used by every later HDE-EPIC038 acceptance and closeout artifact.
+
+### **Closeout impact**
+
+This decision resolves the token-name conflict, but it does not resolve HDE-EPIC038 closeout.
+
+The following remain required:
+
+* a complete, unique token/evidence matrix for the corrected 33-token roster;  
+* evidence-backed per-token outcomes with no inferred PASS;  
+* the approved acceptance map and meaningful viability result;  
+* the canonical close report and close manifest;  
+* all required sibling path proofs and coherent governed-evidence bindings; and  
+* a truthful final binary decision.
+
+If any corrected-roster token lacks sufficient current evidence, it must remain non-PASS and the close report must record `NOT SATISFIED` with the minimum follow-up. This addendum supplies no closure override.
+
+### **Authorization and nonclaims**
+
+This addendum authorizes only the registry and roster decisions stated above.
+
+It does not:
+
+* implement or modify repository behavior;  
+* execute QA, rerun a QA check, or alter any recorded QA outcome;  
+* perform OPS, access an external system, or authorize a live request;  
+* create or refresh acceptance or close-pack artifacts;  
+* claim any token as PASS;  
+* move a PF09 status;  
+* edit the development board;  
+* perform permanent-canon drainage; or  
+* establish Product Owner acceptance or epic closure.
+
+### **Drain targets**
+
+1. **HDE Governance, acceptance-token registry:** Add the exact `RELEASE_ID_RECOMPUTE_OK` name and semantics defined here. Retain `DEV_DB_BRIDGE_FALLBACK_OK` only as deprecated or historical and make its current nonclaimability explicit.  
+2. **HDE Schemas & Artifacts, applicable evidence catalog and schema ownership:** Confirm the canonical release-identity and recomputation evidence bindings without creating a second evidence home.  
+3. **Canon Plan Templates, token-validation posture:** Preserve mechanical registry validation before plan approval and final closeout so an unregistered or retired token cannot silently enter a roster.
+
+Until those drain targets are complete, this addendum is the authority for the exact token-admission and HDE-EPIC038 roster-correction scope.
 
 \<eof\>  
