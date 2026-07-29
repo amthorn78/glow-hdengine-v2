@@ -186,7 +186,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.28) Epic Remedial PR-01 HDE-EPIC038  
 2.29) QA Pass 1 HDE-EPIC038  
 2.30) PF10 Scope Model: Independently Scoped Addenda and Lettered Multi-Document Version Sets  
-2.31) HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority
+2.31) HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority  
+2.32) QA Pass 2 HDE-EPIC038
 
 # 2\) Numbered Addenda
 
@@ -1911,5 +1912,352 @@ This addendum is grounded in:
 * the governed proof and `qa-08-po-008` primary log;  
 * PR \#371 and PR \#372 commit, routing, merge, and hosted-CI records; and  
 * the successful final `main` workflow on `b08d9dc47f31baa79101a323795237fde4e25b53`.
+
+## 2.32) QA Pass 2 HDE-EPIC038
+
+### Review Summary
+
+* QA\_STEP\_NAME: `qa-08-po-008`. Decision: **PASS**.  
+  Evidence pointer: Live QA Plan | CHECK qa-08-po-008: PO-008 | "PASS is available only from post-route finalization" | "both closed-rails finalization checks exit `0`" | "routing proof remains distinct from behavioral proof."  
+* Direct inspection of `amthorn78/glow-hdengine-v2` at `main@90718d19ee2d72a14b08aea44b5c53674055cd34` confirmed the required evidence is tracked and readable.  
+  Evidence pointer: Repo | | ""  
+* The primary log records `PASS`, exit code `0`, closed rails, distinct routing and behavioral proof, and non-`NONE` routing and pre-routing receipts.  
+  Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | ""status": "PASS"" | "ROUTING\_PROOF=PR\#371@30e93dfa2d9bd24779e35a6433a034fc996b6ae4" | "BEHAVIOR\_EXIT\_CODE=0"  
+* The manifest entry matches the current 4,021-byte primary log, the manifest path proof matches the current 1,814-byte manifest, and the shared summary records completed finalization.  
+  Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json | ""sha256":"a951cf95094797a05415bf4b46c2031e53774b390ee300227e40870437f3f856"" | ""size\_bytes":4021" | ""status":"PASS""  
+  Repeat Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/00\_meta/qa\_rca\_doc\_delta\_summary.md | "- Step status: PASS." | "- Step finalization: COMPLETED." | "- Epic-wide lookup status: PASS."  
+* Latest PF10 now authoritatively resolves the former Addendum 2.31 publication ambiguity.  
+  Evidence pointer: PF10 | HDE Build Notes, Addendum 2.31 “HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority” | "**Authority status:** This addendum is published in the active HDE Build Notes lettered set." | "It is current PF10 authority for the scope it explicitly addresses."  
+* This is a step-level PASS only. Epic-wide completion remains `NOT READY`, and no additional live call is authorized.  
+  Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/00\_meta/qa\_rca\_doc\_delta\_summary.md | "- Repo-supported completion: NOT READY." | "- Formal close-pack completion: NOT CLAIMED." | "- This completed step record is distinct from epic-wide closeout and confers no authority for another live call."
+
+### Findings
+
+#### F-001 Repo-present outside provided evidence path
+
+What you observed:
+
+The conditional governed proof is outside `audit/qa/hde-epic038`, at the exact Plan-defined path `audit/gates/determinism/open_rails_vendor_abba.json`. It is tracked and byte-bound by its sibling path proof.
+
+Evidence pointer: Live QA Plan | CHECK qa-08-po-008: PO-008 | "Conditional deliverable: `audit/gates/determinism/open_rails_vendor_abba.json` is required only after the authorized producer succeeds."
+
+Repeat Evidence pointer: Repo | | ""
+
+Why it matters:
+
+Its absence from the submitted QA root is not a provenance failure. The Plan assigns it to that governed path, and PF19 permits a different location when canon names another governed family or path.
+
+Evidence pointer: PF19 | PF19 — Glow QA Guide, §4.4.1 Epic QA root and current-state posture (normative) | "Plan-created deliverables are allowed, but they MUST live under the stable check directory for the step that creates them unless canon names a different governed family or path."
+
+Drives decision: No
+
+### Repo Cross-Check
+
+Observed repo root: `amthorn78/glow-hdengine-v2`
+
+Resolved DELIVERABLES\_REPO\_PATH: `audit/qa/hde-epic038`
+
+Observed HEAD: `90718d19ee2d72a14b08aea44b5c53674055cd34`
+
+Branch or detached state: `main`
+
+Working tree status before review: N/A, remote-only inspection.
+
+Working tree status after review: N/A, remote-only inspection; no repository mutation or QA command was executed.
+
+Evidence pointer: Repo | | ""
+
+Inspection methods:
+
+* Repository metadata and current-commit inspection.  
+* Current-ref exact-path retrieval.  
+* Repository code/path search with per-check and shared-artifact terms.  
+* Base-to-current commit comparison.  
+* Git blob retrieval for oversized PF10 v12.5a.  
+* Complete relevant-section reads of the Live QA Plan, PF10 v12.5, and PF19.  
+* JSON and JSONL parsing.  
+* UTF-8 byte-size and SHA-256 recomputation.
+
+Evidence pointer: Repo | | ""
+
+The complete current-commit comparison from `1f0f214bd6709ca77c6c4571dbed6328e76faf55` contains exactly two changed paths: the PF10 v12.5a and v12.5b documents.
+
+Evidence pointer: Repo | | ""
+
+#### Complete artifact inventory under DELIVERABLES\_REPO\_PATH
+
+1. `audit/qa/hde-epic038/00_meta/doc_deltas.md`  
+2. `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`  
+3. `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log`  
+4. `audit/qa/hde-epic038/checks/qa-01-po-001/primary.log`  
+5. `audit/qa/hde-epic038/checks/qa-02-po-002/primary.log`  
+6. `audit/qa/hde-epic038/checks/qa-03-po-003/primary.log`  
+7. `audit/qa/hde-epic038/checks/qa-04-po-004/primary.log`  
+8. `audit/qa/hde-epic038/checks/qa-05-po-005/primary.log`  
+9. `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`  
+10. `audit/qa/hde-epic038/checks/qa-07-po-007/primary.log`  
+11. `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`  
+12. `audit/qa/hde-epic038/qa_step_logs_manifest.json`  
+13. `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`  
+14. `audit/qa/hde-epic038/remediation/moon_loop/changed_files.txt`  
+15. `audit/qa/hde-epic038/remediation/moon_loop/patch.diff`  
+16. `audit/qa/hde-epic038/remediation/moon_loop/pre_remediation_sha256.txt`  
+17. `audit/qa/hde-epic038/remediation/moon_loop/qa-05-po-005.pre-remediation.log`  
+18. `audit/qa/hde-epic038/remediation/moon_loop/qa_artifacts_sha256.txt`  
+19. `audit/qa/hde-epic038/remediation/moon_loop/remediation_note.md`
+
+Evidence pointer: Repo | | ""
+
+Search method: searched Repo for `"audit/qa/hde-epic038/"` and each `qa-00` through `qa-08` identifier (case: sensitive); scope: `amthorn78/glow-hdengine-v2@90718d19ee2d72a14b08aea44b5c53674055cd34`; tool: repository code/path search plus exact-path fetch; result: 19 tracked artifacts.
+
+The non-`qa-08-po-008` check logs and PO-005 Moon Loop artifacts were inventory-confirmed but were not used as behavioral proof for this verdict.
+
+Evidence pointer: Repo | | ""
+
+### Repo-checked artifacts
+
+#### audit/qa/hde-epic038/checks/qa-08-po-008/primary.log
+
+Artifact path or label: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`  
+Within DELIVERABLES\_REPO\_PATH: Yes  
+Required by Plan/Caveats: Yes  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | ""status": "PASS"" | ""exit\_code": 0" | "BEHAVIOR\_PROOF=CLOSED\_RAILS\_CURRENT\_ARTIFACT\_AND\_COMPANION\_VALIDATION"
+
+#### audit/qa/hde-epic038/qa\_step\_logs\_manifest.json
+
+Artifact path or label: `audit/qa/hde-epic038/qa_step_logs_manifest.json`  
+Within DELIVERABLES\_REPO\_PATH: Yes  
+Required by Plan/Caveats: Yes, shared current-state surface  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json | ""log\_path":"checks/qa-08-po-008/primary.log"" | ""size\_bytes":4021" | ""status":"PASS""
+
+#### audit/qa/hde-epic038/qa\_step\_logs\_manifest.json.path\_proof.txt
+
+Artifact path or label: `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`  
+Within DELIVERABLES\_REPO\_PATH: Yes  
+Required by Plan/Caveats: Yes, shared current-state surface  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json.path\_proof.txt | "sha256: 89abc961b8f516f03ad2fc77556df349e07a6d2ba2acc9e97064b5e30fdb4713" | "size\_bytes: 1814" | "produced\_at\_utc: 2026-07-28T05:28:56Z"
+
+#### audit/qa/hde-epic038/00\_meta/qa\_rca\_doc\_delta\_summary.md
+
+Artifact path or label: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`  
+Within DELIVERABLES\_REPO\_PATH: Yes  
+Required by Plan/Caveats: Yes, shared summary  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/00\_meta/qa\_rca\_doc\_delta\_summary.md | "| qa-08-po-008 | PASS | checks/qa-08-po-008/primary.log |" | "- Step finalization: COMPLETED." | "- Epic-wide lookup status: PASS."
+
+#### audit/qa/hde-epic038/00\_meta/doc\_deltas.md
+
+Artifact path or label: `audit/qa/hde-epic038/00_meta/doc_deltas.md`  
+Within DELIVERABLES\_REPO\_PATH: Yes  
+Required by Plan/Caveats: No  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/00\_meta/doc\_deltas.md | "\#\# BLOCKERS" | "- None identified by Step-0 route discovery."
+
+#### audit/gates/determinism/open\_rails\_vendor\_abba.json
+
+Artifact path or label: `audit/gates/determinism/open_rails_vendor_abba.json`  
+Within DELIVERABLES\_REPO\_PATH: No  
+Required by Plan/Caveats: Yes, conditional after successful generation  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes, exact Plan-defined governed path  
+Content/proof facts checked: Yes  
+Evidence pointer: Repo | | ""
+
+#### audit/gates/determinism/open\_rails\_vendor\_abba.json.path\_proof.txt
+
+Artifact path or label: `audit/gates/determinism/open_rails_vendor_abba.json.path_proof.txt`  
+Within DELIVERABLES\_REPO\_PATH: No  
+Required by Plan/Caveats: No, supporting governed companion  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Repo | | ""
+
+#### docs/evidence/INDEX.json
+
+Artifact path or label: `docs/evidence/INDEX.json`  
+Within DELIVERABLES\_REPO\_PATH: No  
+Required by Plan/Caveats: No, supporting Human Index lookup  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Repo | | ""
+
+#### artifacts/evidence\_index.jsonl
+
+Artifact path or label: `artifacts/evidence_index.jsonl`  
+Within DELIVERABLES\_REPO\_PATH: No  
+Required by Plan/Caveats: No, supporting Machine Mirror lookup  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Repo | | ""
+
+#### tools/evidence/update\_evidence\_index.py
+
+Artifact path or label: `tools/evidence/update_evidence_index.py`  
+Within DELIVERABLES\_REPO\_PATH: No  
+Required by Plan/Caveats: Yes, path preflight and finalization  
+Present in repo: Yes  
+Tracked or mergeable: Yes, tracked  
+Allowed root: Yes  
+Content/proof facts checked: Yes  
+Evidence pointer: Repo | | ""
+
+Evidence claimed by an artifact under DELIVERABLES\_REPO\_PATH but not found: None. Both paths in the primary log’s `evidence_artifacts` array were located and tracked.
+
+Search method: searched Repo for `"audit/gates/determinism/open_rails_vendor_abba.json"` (case: sensitive); scope: `amthorn78/glow-hdengine-v2@90718d19ee2d72a14b08aea44b5c53674055cd34`; tool: exact-path fetch and canonical-source lookup; result: 1 tracked artifact at the exact required path.
+
+Repo/evidence-path contradictions affecting `qa-08-po-008`: None observed. The manifest contains three `qa-08-po-008` references, and the summary contains four; complete reads consistently record PASS and completed finalization.
+
+Search method: searched Deliverables Repo Path for `"qa-08-po-008"` (case: sensitive); scope: `audit/qa/hde-epic038/qa_step_logs_manifest.json`; tool: exact scan; result: 3 hits.
+
+Search method: searched Deliverables Repo Path for `"qa-08-po-008"` (case: sensitive); scope: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`; tool: exact scan; result: 4 hits.
+
+### Evidence Print
+
+#### A) Required deliverables checklist
+
+#### Required primary log
+
+Deliverable name/label, quoted from Plan/Caveats: “Required deliverable: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`.”
+
+Evidence pointer for requirement: Live QA Plan | CHECK qa-08-po-008: PO-008 | "Required deliverable: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`."
+
+Expected path: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`
+
+Present under DELIVERABLES\_REPO\_PATH: Yes
+
+Present in live repo when repo-resident: Yes
+
+Tracked or mergeable when repo-resident: Yes, tracked
+
+Evidence pointer showing presence: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | ""status": "PASS"" | ""exit\_code": 0" | "BEHAVIOR\_EXIT\_CODE=0"
+
+Alternate proof available: Yes, corroborating only
+
+Alternate proof pointer(s): The manifest binds the log to SHA-256 `a951cf95094797a05415bf4b46c2031e53774b390ee300227e40870437f3f856` and size `4021`.
+
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json | ""sha256":"a951cf95094797a05415bf4b46c2031e53774b390ee300227e40870437f3f856"" | ""size\_bytes":4021" | ""status":"PASS""
+
+#### Conditional governed proof
+
+Deliverable name/label, quoted from Plan/Caveats: “Conditional deliverable: `audit/gates/determinism/open_rails_vendor_abba.json` is required only after the authorized producer succeeds.”
+
+Evidence pointer for requirement: Live QA Plan | CHECK qa-08-po-008: PO-008 | "Conditional deliverable: `audit/gates/determinism/open_rails_vendor_abba.json` is required only after the authorized producer succeeds."
+
+Expected path: `audit/gates/determinism/open_rails_vendor_abba.json`
+
+Present under DELIVERABLES\_REPO\_PATH: No
+
+Present in live repo when repo-resident: Yes
+
+Tracked or mergeable when repo-resident: Yes, tracked
+
+Evidence pointer showing presence: Repo | | ""
+
+Alternate proof available: Yes
+
+Alternate proof pointer(s):
+
+* `audit/gates/determinism/open_rails_vendor_abba.json.path_proof.txt`  
+* `docs/evidence/INDEX.json`  
+* `artifacts/evidence_index.jsonl`
+
+The recomputed proof SHA-256 is `24068e135d24dcb7cc88c4431dfae62dbac236b708545307cba7b9e11278138b`, and its size is `3419`; both match the tracked path proof and Machine Mirror row.
+
+Evidence pointer: Repo | | ""
+
+### B) Evidence artifacts relied on
+
+Path/label: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | ""status": "PASS"" | "PRE\_ROUTING\_RECEIPT=commit:5f57b049b605105cccb9c7fa4cec99a67c308846" | "BEHAVIOR\_EXIT\_CODE=0"  
+Repo mergeability: tracked  
+Key proof facts: PASS; closed rails; non-`NONE` routing and pre-routing receipts; behavioral exit `0`.
+
+Path/label: `audit/qa/hde-epic038/qa_step_logs_manifest.json`  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json | ""log\_path":"checks/qa-08-po-008/primary.log"" | ""sha256":"a951cf95094797a05415bf4b46c2031e53774b390ee300227e40870437f3f856"" | ""status":"PASS""  
+Repo mergeability: tracked  
+Key proof facts: current qa-08 entry; exact primary-log hash and size; matching PASS status.
+
+Path/label: `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/qa\_step\_logs\_manifest.json.path\_proof.txt | "sha256: 89abc961b8f516f03ad2fc77556df349e07a6d2ba2acc9e97064b5e30fdb4713" | "size\_bytes: 1814" | "produced\_at\_utc: 2026-07-28T05:28:56Z"  
+Repo mergeability: tracked  
+Key proof facts: current manifest byte binding; recomputed hash and size matched.
+
+Path/label: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`  
+Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/00\_meta/qa\_rca\_doc\_delta\_summary.md | "- Step status: PASS." | "- Step finalization: COMPLETED." | "- Epic-wide lookup status: PASS."  
+Repo mergeability: tracked  
+Key proof facts: current step status; completed finalization; canonical lookup success.
+
+Path/label: `audit/gates/determinism/open_rails_vendor_abba.json`  
+Evidence pointer: Repo | | ""  
+Repo mergeability: tracked  
+Key proof facts: `requests_attempted=2`; `requests_completed=2`; `result=pass`; `top_level_pass=true`; no-raw-payload and no-secret-value predicates true.
+
+Path/label: `audit/gates/determinism/open_rails_vendor_abba.json.path_proof.txt`  
+Evidence pointer: Repo | | ""  
+Repo mergeability: tracked  
+Key proof facts: SHA-256 `24068e135d24dcb7cc88c4431dfae62dbac236b708545307cba7b9e11278138b`; size `3419`; produced at `2026-07-27T23:38:09Z`.
+
+Path/label: `docs/evidence/INDEX.json`  
+Evidence pointer: Repo | | ""  
+Repo mergeability: tracked  
+Key proof facts: contains `epic038.pr03.open_rails_vendor_abba` and `epic038.qa_step_logs_manifest`; records both governed paths and their non-closeout posture.
+
+Path/label: `artifacts/evidence_index.jsonl`  
+Evidence pointer: Repo | | ""  
+Repo mergeability: tracked  
+Key proof facts: valid 549-record JSONL; contains both current records; records the governed-proof and manifest hashes, sizes, and sibling proof anchors.
+
+Path/label: `tools/evidence/update_evidence_index.py`  
+Evidence pointer: Repo | | ""  
+Repo mergeability: tracked  
+Key proof facts: registers both evidence identities; treats the live proof as conditional; derives its production time from the validated artifact.
+
+### C) Tokens/gates
+
+Token/gate name, quoted from Plan/Caveats: `Tokens: []; [].`
+
+Evidence pointer for token/gate requirement: Live QA Plan | CHECK qa-08-po-008: PO-008 | "Tokens: `[]`; `[]`."
+
+Evidence pointer(s) proving it: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | ""intended\_tokens": \[\]" | ""claimed\_tokens": \[\]"
+
+### QA Verdict and Optional Follow-ups
+
+* The required primary log is present under the submitted evidence root, and the conditional governed proof is present at its exact Plan-defined tracked path.  
+  Evidence pointer: Live QA Plan | CHECK qa-08-po-008: PO-008 | "Conditional deliverable: `audit/gates/determinism/open_rails_vendor_abba.json` is required only after the authorized producer succeeds." | "Required deliverable: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`."  
+* The manifest entry, primary-log bytes, manifest path proof, and shared summary form a coherent PF19 current-state review surface.  
+  Evidence pointer: PF19 | PF19 — Glow QA Guide, §4.4.1 Epic QA root and current-state posture (normative) | "A final QA review report, closeout review, or step-cluster review that asks the reviewer to approve PASS for executed Live QA steps MUST surface the current manifest entry" | "canonical primary-log header, `captured_env`, `evidence_artifacts`, `intended_tokens`, `claimed_tokens`, and path-proof binding"  
+* The Plan-defined PASS criteria are satisfied: bounded authorized generation, two completed requests, successful independent validation, preserved pre-routing and PR receipts, and closed-rails finalization with behavioral and routing proof kept distinct.  
+  Evidence pointer: Deliverables Repo Path | audit/qa/hde-epic038/checks/qa-08-po-008/primary.log | "ROUTING\_TYPE=PR" | "ROUTING\_PROOF=PR\#371@30e93dfa2d9bd24779e35a6433a034fc996b6ae4" | "BEHAVIOR\_PROOF=CLOSED\_RAILS\_CURRENT\_ARTIFACT\_AND\_COMPANION\_VALIDATION"  
+* The proof truthfully does not classify the canonical vendor target as nonproduction. Latest PF10 explicitly records the event-grounded PO decision and the expired two-request authority.  
+  Evidence pointer: PF10 | HDE Build Notes, Addendum 2.31, Decision summary | "The base must not be described as nonproduction." | "`qa-08-po-008` received one fresh authorization for one live generation event, bounded to two vendor requests." | "That authority expired immediately after the event."  
+* Addendum 2.31 is now published, current, and authoritative. The prior candidate/publication conflict no longer exists.  
+  Evidence pointer: PF10 | HDE Build Notes, Addendum 2.31, §15 Supersession and drain targets | "This addendum is published in the active HDE Build Notes lettered set and is current PF10 authority for the scope stated here." | "As the highest-numbered applicable addendum, it is the sole authority for any overlapping scope"  
+* No further live call is authorized or needed, and this PASS does not imply epic-wide closeout.  
+  Evidence pointer: PF10 | HDE Build Notes, Addendum 2.31, §14 Nonclaims | "recurring vendor-call authority or any renewal of the completed event's authority" | "whole-plan PASS" | "epic acceptance or closeout"
 
 \<eof\>  
