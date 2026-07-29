@@ -1,0 +1,99 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:17:55Z", "check_id": "qa-21-po-021", "check_name": "PO-021", "status": "PASS", "fail_status": "", "command": "command -v git >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import importlib.metadata, sys, setuptools, wheel; setuptools_major=int(importlib.metadata.version(\"setuptools\").split(\".\", 1)[0]); raise SystemExit(0 if sys.version_info >= (3, 10) and setuptools_major >= 68 else 1)' && test ! -e /tmp/hde-epic038-release-attestation; test -f catalog/manifest.json && test -f scripts/release_id_recompute.py && test -f tools/evidence/build_release_attestation.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC qa_source_root=\"$(git rev-parse --show-toplevel)\" || exit 126\nqa_source_commit=\"$(git -C \"$qa_source_root\" rev-parse --verify 'HEAD^{commit}')\" || exit 126\nqa_isolation_root=\"$(python -c 'import tempfile; print(tempfile.mkdtemp(prefix=\"hde-epic038-clean-source-\", dir=\"/tmp\"))')\" || exit 126\nqa_clean_source=\"$qa_isolation_root/source\"\nqa_attestation_output=\"/tmp/hde-epic038-release-attestation\"\n\nqa_cleanup() {\n  python - \"$qa_isolation_root\" <<'QA21CLEANPY'\nimport pathlib\nimport shutil\nimport sys\n\npath = pathlib.Path(sys.argv[1]).resolve()\ntemp_root = pathlib.Path(\"/tmp\").resolve()\nif path.parent != temp_root or not path.name.startswith(\n    \"hde-epic038-clean-source-\"\n):\n    raise SystemExit(\"CLEAN_SOURCE_CLEANUP_REFUSED\")\nshutil.rmtree(path)\nQA21CLEANPY\n}\ntrap qa_cleanup EXIT\n\nif [ -e \"$qa_attestation_output\" ]; then\n  printf '%s\\n' 'ATTESTATION_OUTPUT_NOT_ABSENT'\n  exit 125\nfi\n\ngit clone --quiet --no-local --no-checkout \"$qa_source_root\" \"$qa_clean_source\" || exit 126\ngit -C \"$qa_clean_source\" checkout --quiet --detach \"$qa_source_commit\" || exit 126\n\nqa_source_commit_after=\"$(git -C \"$qa_source_root\" rev-parse --verify 'HEAD^{commit}')\" || exit 126\nqa_isolated_commit=\"$(git -C \"$qa_clean_source\" rev-parse --verify 'HEAD^{commit}')\" || exit 126\nif [ \"$qa_source_commit_after\" != \"$qa_source_commit\" ] || [ \"$qa_isolated_commit\" != \"$qa_source_commit\" ]; then\n  printf '%s\\n' 'EXACT_SOURCE_BINDING=FAIL'\n  exit 126\nfi\n\nqa_clean_status=\"$(git -C \"$qa_clean_source\" status --porcelain=v1 --untracked-files=all)\" || exit 126\nif [ -n \"$qa_clean_status\" ]; then\n  printf '%s\\n' 'CLEAN_SOURCE_PREFLIGHT=FAIL'\n  exit 126\nfi\n\nprintf '%s\\n' \\\n  \"ATTESTATION_SOURCE_COMMIT=$qa_source_commit\" \\\n  \"ATTESTATION_CLEAN_SOURCE=$qa_clean_source\" \\\n  'CLEAN_SOURCE_PREFLIGHT=PASS' \\\n  \"MANIFEST_CHECK_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python scripts/release_id_recompute.py --check-manifest-only)\" \\\n  \"ATTESTATION_BUILD_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --output $qa_attestation_output --require-clean)\" \\\n  \"ATTESTATION_VERIFY_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --verify $qa_attestation_output --require-clean)\"\n\n(\n  cd \"$qa_clean_source\" || exit 126\n  PYTHONDONTWRITEBYTECODE=1 python scripts/release_id_recompute.py --check-manifest-only || exit $?\n  qa_prebuilder_status=\"$(git status --porcelain=v1 --untracked-files=all)\" || exit 126\n  if [ -n \"$qa_prebuilder_status\" ]; then\n    printf '%s\\n' 'CLEAN_SOURCE_PREBUILDER=FAIL'\n    exit 1\n  fi\n  printf '%s\\n' 'CLEAN_SOURCE_PREBUILDER=PASS'\n  PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --output \"$qa_attestation_output\" --require-clean || exit $?\n  PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --verify \"$qa_attestation_output\" --require-clean || exit $?\n)\nqa21_rc=$?\nif [ \"$qa21_rc\" -ne 0 ]; then\n  exit \"$qa21_rc\"\nfi\n\nqa_post_status=\"$(git -C \"$qa_clean_source\" status --porcelain=v1 --untracked-files=all)\" || exit 126\nif [ -n \"$qa_post_status\" ]; then\n  printf '%s\\n' 'CLEAN_SOURCE_POSTCHECK=FAIL'\n  exit 1\nfi\nprintf '%s\\n' 'CLEAN_SOURCE_POSTCHECK=PASS'\n\ntrap - EXIT\nqa_cleanup || exit 126", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-21-po-021/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v git >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import importlib.metadata, sys, setuptools, wheel; setuptools_major=int(importlib.metadata.version("setuptools").split(".", 1)[0]); raise SystemExit(0 if sys.version_info >= (3, 10) and setuptools_major >= 68 else 1)' && test ! -e /tmp/hde-epic038-release-attestation
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v git >/dev/null 2>&1 && command -v python >/dev/null 2>&1 && python -c 'import importlib.metadata, sys, setuptools, wheel; setuptools_major=int(importlib.metadata.version("setuptools").split(".", 1)[0]); raise SystemExit(0 if sys.version_info >= (3, 10) and setuptools_major >= 68 else 1)' && test ! -e /tmp/hde-epic038-release-attestation
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f catalog/manifest.json && test -f scripts/release_id_recompute.py && test -f tools/evidence/build_release_attestation.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC qa_source_root="$(git rev-parse --show-toplevel)" || exit 126
+qa_source_commit="$(git -C "$qa_source_root" rev-parse --verify 'HEAD^{commit}')" || exit 126
+qa_isolation_root="$(python -c 'import tempfile; print(tempfile.mkdtemp(prefix="hde-epic038-clean-source-", dir="/tmp"))')" || exit 126
+qa_clean_source="$qa_isolation_root/source"
+qa_attestation_output="/tmp/hde-epic038-release-attestation"
+
+qa_cleanup() {
+  python - "$qa_isolation_root" <<'QA21CLEANPY'
+import pathlib
+import shutil
+import sys
+
+path = pathlib.Path(sys.argv[1]).resolve()
+temp_root = pathlib.Path("/tmp").resolve()
+if path.parent != temp_root or not path.name.startswith(
+    "hde-epic038-clean-source-"
+):
+    raise SystemExit("CLEAN_SOURCE_CLEANUP_REFUSED")
+shutil.rmtree(path)
+QA21CLEANPY
+}
+trap qa_cleanup EXIT
+
+if [ -e "$qa_attestation_output" ]; then
+  printf '%s\n' 'ATTESTATION_OUTPUT_NOT_ABSENT'
+  exit 125
+fi
+
+git clone --quiet --no-local --no-checkout "$qa_source_root" "$qa_clean_source" || exit 126
+git -C "$qa_clean_source" checkout --quiet --detach "$qa_source_commit" || exit 126
+
+qa_source_commit_after="$(git -C "$qa_source_root" rev-parse --verify 'HEAD^{commit}')" || exit 126
+qa_isolated_commit="$(git -C "$qa_clean_source" rev-parse --verify 'HEAD^{commit}')" || exit 126
+if [ "$qa_source_commit_after" != "$qa_source_commit" ] || [ "$qa_isolated_commit" != "$qa_source_commit" ]; then
+  printf '%s\n' 'EXACT_SOURCE_BINDING=FAIL'
+  exit 126
+fi
+
+qa_clean_status="$(git -C "$qa_clean_source" status --porcelain=v1 --untracked-files=all)" || exit 126
+if [ -n "$qa_clean_status" ]; then
+  printf '%s\n' 'CLEAN_SOURCE_PREFLIGHT=FAIL'
+  exit 126
+fi
+
+printf '%s\n' \
+  "ATTESTATION_SOURCE_COMMIT=$qa_source_commit" \
+  "ATTESTATION_CLEAN_SOURCE=$qa_clean_source" \
+  'CLEAN_SOURCE_PREFLIGHT=PASS' \
+  "MANIFEST_CHECK_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python scripts/release_id_recompute.py --check-manifest-only)" \
+  "ATTESTATION_BUILD_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --output $qa_attestation_output --require-clean)" \
+  "ATTESTATION_VERIFY_COMMAND=(cd $qa_clean_source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --verify $qa_attestation_output --require-clean)"
+
+(
+  cd "$qa_clean_source" || exit 126
+  PYTHONDONTWRITEBYTECODE=1 python scripts/release_id_recompute.py --check-manifest-only || exit $?
+  qa_prebuilder_status="$(git status --porcelain=v1 --untracked-files=all)" || exit 126
+  if [ -n "$qa_prebuilder_status" ]; then
+    printf '%s\n' 'CLEAN_SOURCE_PREBUILDER=FAIL'
+    exit 1
+  fi
+  printf '%s\n' 'CLEAN_SOURCE_PREBUILDER=PASS'
+  PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --output "$qa_attestation_output" --require-clean || exit $?
+  PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --verify "$qa_attestation_output" --require-clean || exit $?
+)
+qa21_rc=$?
+if [ "$qa21_rc" -ne 0 ]; then
+  exit "$qa21_rc"
+fi
+
+qa_post_status="$(git -C "$qa_clean_source" status --porcelain=v1 --untracked-files=all)" || exit 126
+if [ -n "$qa_post_status" ]; then
+  printf '%s\n' 'CLEAN_SOURCE_POSTCHECK=FAIL'
+  exit 1
+fi
+printf '%s\n' 'CLEAN_SOURCE_POSTCHECK=PASS'
+
+trap - EXIT
+qa_cleanup || exit 126
+ATTESTATION_SOURCE_COMMIT=692e1eb8ab38f35fc4c90b1c5b9a7f438223f151
+ATTESTATION_CLEAN_SOURCE=/tmp/hde-epic038-clean-source-5zpqpu1n/source
+CLEAN_SOURCE_PREFLIGHT=PASS
+MANIFEST_CHECK_COMMAND=(cd /tmp/hde-epic038-clean-source-5zpqpu1n/source && PYTHONDONTWRITEBYTECODE=1 python scripts/release_id_recompute.py --check-manifest-only)
+ATTESTATION_BUILD_COMMAND=(cd /tmp/hde-epic038-clean-source-5zpqpu1n/source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --output /tmp/hde-epic038-release-attestation --require-clean)
+ATTESTATION_VERIFY_COMMAND=(cd /tmp/hde-epic038-clean-source-5zpqpu1n/source && PYTHONDONTWRITEBYTECODE=1 python tools/evidence/build_release_attestation.py --verify /tmp/hde-epic038-release-attestation --require-clean)
+CLEAN_SOURCE_PREBUILDER=PASS
+/tmp/hde-epic038-release-attestation/attestation.json
+/tmp/hde-epic038-release-attestation/attestation.json
+CLEAN_SOURCE_POSTCHECK=PASS
+BEHAVIOR_EXIT_CODE=0

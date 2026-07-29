@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:14:12Z", "check_id": "qa-18-po-018", "check_name": "PO-018", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tools/evidence/update_evidence_index.py && test -f tests/evidence/test_hde_epic038_release_sanity.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check && python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_pipeline_checks_prebuilt_evidence_without_post_seal_writes tests/evidence/test_hde_epic038_release_sanity.py::test_stale_evidence_graph_fails_final_pipeline_without_repair", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-18-po-018/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tools/evidence/update_evidence_index.py && test -f tests/evidence/test_hde_epic038_release_sanity.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check && python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_pipeline_checks_prebuilt_evidence_without_post_seal_writes tests/evidence/test_hde_epic038_release_sanity.py::test_stale_evidence_graph_fails_final_pipeline_without_repair
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+..                                                                       [100%]
+2 passed in 0.07s
+BEHAVIOR_EXIT_CODE=0

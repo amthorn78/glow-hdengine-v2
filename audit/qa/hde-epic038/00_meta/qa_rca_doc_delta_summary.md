@@ -1,21 +1,7 @@
 # HDE-EPIC038 QA RCA and Doc Delta Summary
 
 ## Live QA findings
-- qa-09-po-009: NOT RUN
-- qa-10-po-010: NOT RUN
-- qa-11-po-011: NOT RUN
-- qa-12-po-012: NOT RUN
-- qa-13-po-013: NOT RUN
-- qa-14-po-014: NOT RUN
-- qa-15-po-015: NOT RUN
-- qa-16-po-016: NOT RUN
-- qa-17-po-017: NOT RUN
-- qa-18-po-018: NOT RUN
-- qa-19-po-019: NOT RUN
-- qa-20-po-020: NOT RUN
-- qa-21-po-021: NOT RUN
-- qa-22-po-022: NOT RUN
-- qa-23-po-023: NOT RUN
+- epic-wide qa_step_logs_manifest lookup: TOOLING_BLOCKED
 
 ## PF-Canon mapping
 - Runtime, database, evidence, release, and operational findings: HDE Build Notes.
@@ -34,21 +20,21 @@
 | qa-06-po-006 | PASS | checks/qa-06-po-006/primary.log |
 | qa-07-po-007 | PASS | checks/qa-07-po-007/primary.log |
 | qa-08-po-008 | PASS | checks/qa-08-po-008/primary.log |
-| qa-09-po-009 | NOT RUN | Unknown |
-| qa-10-po-010 | NOT RUN | Unknown |
-| qa-11-po-011 | NOT RUN | Unknown |
-| qa-12-po-012 | NOT RUN | Unknown |
-| qa-13-po-013 | NOT RUN | Unknown |
-| qa-14-po-014 | NOT RUN | Unknown |
-| qa-15-po-015 | NOT RUN | Unknown |
-| qa-16-po-016 | NOT RUN | Unknown |
-| qa-17-po-017 | NOT RUN | Unknown |
-| qa-18-po-018 | NOT RUN | Unknown |
-| qa-19-po-019 | NOT RUN | Unknown |
-| qa-20-po-020 | NOT RUN | Unknown |
-| qa-21-po-021 | NOT RUN | Unknown |
-| qa-22-po-022 | NOT RUN | Unknown |
-| qa-23-po-023 | NOT RUN | Unknown |
+| qa-09-po-009 | PASS | checks/qa-09-po-009/primary.log |
+| qa-10-po-010 | PASS | checks/qa-10-po-010/primary.log |
+| qa-11-po-011 | PASS | checks/qa-11-po-011/primary.log |
+| qa-12-po-012 | PASS | checks/qa-12-po-012/primary.log |
+| qa-13-po-013 | PASS | checks/qa-13-po-013/primary.log |
+| qa-14-po-014 | PASS | checks/qa-14-po-014/primary.log |
+| qa-15-po-015 | PASS | checks/qa-15-po-015/primary.log |
+| qa-16-po-016 | PASS | checks/qa-16-po-016/primary.log |
+| qa-17-po-017 | PASS | checks/qa-17-po-017/primary.log |
+| qa-18-po-018 | PASS | checks/qa-18-po-018/primary.log |
+| qa-19-po-019 | PASS | checks/qa-19-po-019/primary.log |
+| qa-20-po-020 | PASS | checks/qa-20-po-020/primary.log |
+| qa-21-po-021 | PASS | checks/qa-21-po-021/primary.log |
+| qa-22-po-022 | PASS | checks/qa-22-po-022/primary.log |
+| qa-23-po-023 | PASS | checks/qa-23-po-023/primary.log |
 
 ## qa-08-po-008 step finalization
 - Step status: PASS.
@@ -62,32 +48,18 @@
 - This completed step record is distinct from epic-wide closeout and confers no authority for another live call.
 
 ## Blocked, unexecuted, or deferred work
-- qa-09-po-009: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-10-po-010: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-11-po-011: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-12-po-012: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-13-po-013: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-14-po-014: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-15-po-015: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-16-po-016: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-17-po-017: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-18-po-018: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-19-po-019: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-20-po-020: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-21-po-021: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-22-po-022: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
-- qa-23-po-023: precondition or execution readiness was unmet; status NOT RUN; evidence Unknown; closeout impact: required coverage incomplete; required follow-up: plan change.
+- None.
 
 ## Epic-wide closeout phase commands
 - Epic-wide generation command: qa_closeout generation.
-- Epic-wide finalization command: qa_closeout finalize.
+- Epic-wide finalization command: NOT RUN.
 
 ## Epic-wide manifest lookup and routing proof
-- Epic-wide lookup status: PASS.
-- Epic-wide lookup detail: updater_exit=0; lookup_hits={"Human Evidence Index": true, "Machine Mirror": true, "canonical evidence updater/source": true}.
+- Epic-wide lookup status: TOOLING_BLOCKED.
+- Epic-wide lookup detail: approved PR routing and required companion refresh pending.
 - Required routing type: PR.
-- Epic-wide routing receipt: PR#374@a9acbc618808f78c6f922248a54363181d0806dc.
-- Epic-wide pre-routing blocked or failed receipt: REMEDIATION_NEEDED_F-001.
+- Epic-wide routing receipt: NONE.
+- Epic-wide pre-routing blocked or failed receipt: NONE.
 - Routing and lookup proof do not replace any check’s behavioral proof.
 
 ## Token posture
