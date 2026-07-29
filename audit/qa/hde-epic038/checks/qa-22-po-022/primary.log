@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:18:21Z", "check_id": "qa-22-po-022", "check_name": "PO-022", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tests/evidence/test_hde_epic038_release_sanity.py && test -f tests/ops/test_hde_epic038_ops03.py && test -d audit/ops/hde-epic038/ops-02 && test -d audit/ops/hde-epic038/ops-03; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_ops02_is_validated_without_executing_commands tests/evidence/test_hde_epic038_release_sanity.py::test_tracked_ops03_fixture_is_validated_without_execution tests/ops/test_hde_epic038_ops03.py::test_final_commit_rejects_post_validator_candidate_mutation tests/ops/test_hde_epic038_ops03.py::test_successful_authorization_cannot_be_reused tests/ops/test_hde_epic038_ops03.py::test_validator_binds_exact_mode_argv", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-22-po-022/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tests/evidence/test_hde_epic038_release_sanity.py && test -f tests/ops/test_hde_epic038_ops03.py && test -d audit/ops/hde-epic038/ops-02 && test -d audit/ops/hde-epic038/ops-03
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_ops02_is_validated_without_executing_commands tests/evidence/test_hde_epic038_release_sanity.py::test_tracked_ops03_fixture_is_validated_without_execution tests/ops/test_hde_epic038_ops03.py::test_final_commit_rejects_post_validator_candidate_mutation tests/ops/test_hde_epic038_ops03.py::test_successful_authorization_cannot_be_reused tests/ops/test_hde_epic038_ops03.py::test_validator_binds_exact_mode_argv
+.....                                                                    [100%]
+5 passed in 0.30s
+BEHAVIOR_EXIT_CODE=0

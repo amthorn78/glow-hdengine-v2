@@ -1,0 +1,18 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:11:48Z", "check_id": "qa-11-po-011", "check_name": "PO-011", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tests/evidence/test_architecture_snapshot.py && test -f tests/http/test_endpoint_catalog.py && test -f artifacts/architecture/architecture_snapshot.keys_only.json && test -f docs/ENDPOINTS_CATALOG.json; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_architecture_snapshot.py tests/evidence/test_hdapi_v2_contract_inventory.py tests/http/test_endpoint_catalog.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-11-po-011/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tests/evidence/test_architecture_snapshot.py && test -f tests/http/test_endpoint_catalog.py && test -f artifacts/architecture/architecture_snapshot.keys_only.json && test -f docs/ENDPOINTS_CATALOG.json
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_architecture_snapshot.py tests/evidence/test_hdapi_v2_contract_inventory.py tests/http/test_endpoint_catalog.py
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 70%]
+........................................................................ [ 93%]
+....................                                                     [100%]
+308 passed in 96.57s (0:01:36)
+BEHAVIOR_EXIT_CODE=0

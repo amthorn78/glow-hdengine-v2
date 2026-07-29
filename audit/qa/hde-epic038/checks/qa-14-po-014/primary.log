@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:11:58Z", "check_id": "qa-14-po-014", "check_name": "PO-014", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f engine/db/ddl_identity_projection.py && test -f tests/db/test_ddl_identity_projection.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/db/test_ddl_identity_projection.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-14-po-014/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f engine/db/ddl_identity_projection.py && test -f tests/db/test_ddl_identity_projection.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/db/test_ddl_identity_projection.py
+............                                                             [100%]
+12 passed in 0.03s
+BEHAVIOR_EXIT_CODE=0

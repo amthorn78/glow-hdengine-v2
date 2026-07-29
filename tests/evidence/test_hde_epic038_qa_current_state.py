@@ -97,12 +97,16 @@ def _summary_for_state(*, finalized: bool) -> str:
 
 
 def _validate_summary_text(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, text: str
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    text: str,
+    coverage: list[tuple[str, str, str | None]] | None = None,
 ) -> str:
     summary = tmp_path / "qa_rca_doc_delta_summary.md"
     summary.write_text(text, encoding="utf-8")
     monkeypatch.setattr(current, "SUMMARY_PATH", summary)
-    _, coverage = current.build_expected_manifest()
+    if coverage is None:
+        _, coverage = current.build_expected_manifest()
     return current.validate_summary(coverage)
 
 
@@ -253,9 +257,38 @@ def test_live_proof_path_proof_is_required_and_exact(tmp_path: Path):
 def test_finalized_current_state_can_remain_epic_not_ready(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
+    _, coverage = current.build_expected_manifest()
+    incomplete_check = current.CHECK_IDS[-1]
+    assert coverage[-1] == (
+        incomplete_check,
+        "PASS",
+        f"checks/{incomplete_check}/primary.log",
+    )
+    incomplete_coverage = list(coverage)
+    incomplete_coverage[-1] = (incomplete_check, "NOT RUN", None)
+
     summary = _summary_for_state(finalized=True)
+    summary = summary.replace(
+        f"| {incomplete_check} | PASS | checks/{incomplete_check}/primary.log |",
+        f"| {incomplete_check} | NOT RUN | Unknown |",
+    )
     assert "- Repo-supported completion: NOT READY." in summary
-    assert _validate_summary_text(tmp_path, monkeypatch, summary) == "PASS"
+    assert (
+        _validate_summary_text(
+            tmp_path,
+            monkeypatch,
+            summary,
+            coverage=incomplete_coverage,
+        )
+        == "PASS"
+    )
+    monkeypatch.setattr(
+        current,
+        "validate_manifest_and_proof",
+        lambda: ({}, incomplete_coverage, {}),
+    )
+    monkeypatch.setattr(current, "validate_live_proof", lambda: {})
+    monkeypatch.setattr(current, "validate_index_binding", lambda _proof: None)
     current.validate_current_state(require_finalized=True)
 
 

@@ -1,0 +1,16 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:11:56Z", "check_id": "qa-12-po-012", "check_name": "PO-012", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f ci/checks/check_direct_db_contract.py && test -f tests/db/test_direct_db_pr06r.py && test -f tests/unit/test_check_direct_db_contract.py; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python ci/checks/check_direct_db_contract.py && python -m pytest -q tests/db/test_direct_db_pr06r.py tests/unit/test_check_direct_db_contract.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-12-po-012/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f ci/checks/check_direct_db_contract.py && test -f tests/db/test_direct_db_pr06r.py && test -f tests/unit/test_check_direct_db_contract.py
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python ci/checks/check_direct_db_contract.py && python -m pytest -q tests/db/test_direct_db_pr06r.py tests/unit/test_check_direct_db_contract.py
+DIRECT_DB_CONTRACT_OK
+........................................................................ [ 52%]
+................................................................         [100%]
+136 passed in 1.12s
+BEHAVIOR_EXIT_CODE=0

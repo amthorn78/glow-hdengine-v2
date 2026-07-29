@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-29T05:11:57Z", "check_id": "qa-13-po-013", "check_name": "PO-013", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; test -f tests/evidence/test_hde_epic038_release_sanity.py && test -d audit/ops/hde-epic038/ops-01; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_historical_bridge_evidence_validates_frozen_packet_without_execution tests/evidence/test_hde_epic038_release_sanity.py::test_historical_integrity_does_not_rederive_bridge_success tests/evidence/test_hde_epic038_release_sanity.py::test_historical_packet_keeps_required_nonclaims", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic038/checks/qa-13-po-013/primary.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["HDE Build Notes", "Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+
+[dependency preflight: initial] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_INITIAL_EXIT_CODE=0
+[activation action] NONE
+[dependency preflight: final] command -v python >/dev/null 2>&1 && python -c 'import sys, pytest, flask, jsonschema, psycopg, engine; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'
+DEPENDENCY_FINAL_EXIT_CODE=0
+[path preflight] test -f tests/evidence/test_hde_epic038_release_sanity.py && test -d audit/ops/hde-epic038/ops-01
+PATH_PREFLIGHT_EXIT_CODE=0
+FINAL_READINESS=READY
+[behavior command] SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_release_sanity.py::test_historical_bridge_evidence_validates_frozen_packet_without_execution tests/evidence/test_hde_epic038_release_sanity.py::test_historical_integrity_does_not_rederive_bridge_success tests/evidence/test_hde_epic038_release_sanity.py::test_historical_packet_keeps_required_nonclaims
+...                                                                      [100%]
+3 passed in 0.12s
+BEHAVIOR_EXIT_CODE=0
