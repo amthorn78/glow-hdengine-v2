@@ -30,13 +30,16 @@ def _write_proof(root: Path, manifest: Path, proof: Path) -> None:
     )
 
 
-def _summary_for_state(*, finalized: bool) -> str:
+def _summary_for_state(*, finalized: bool, ready: bool | None = None) -> str:
     lines = current.SUMMARY_PATH.read_text(encoding="utf-8").splitlines()
     lines = [
         line
         for line in lines
         if not line.startswith("- epic-wide qa_step_logs_manifest lookup: ")
     ]
+    if ready is None:
+        ready = finalized
+    assert finalized or not ready
 
     def replace_line(prefix: str, replacement: str) -> None:
         matches = [index for index, line in enumerate(lines) if line.startswith(prefix)]
@@ -91,7 +94,27 @@ def _summary_for_state(*, finalized: bool) -> str:
         )
     replace_line(
         "- Repo-supported completion: ",
-        "- Repo-supported completion: NOT READY.",
+        (
+            "- Repo-supported completion: READY FOR CLOSEOUT REVIEW."
+            if ready
+            else "- Repo-supported completion: NOT READY."
+        ),
+    )
+    ready_recommendation = (
+        "- Proceed to closeout review using the governed evidence pointers above."
+    )
+    not_ready_recommendation = (
+        "- Do not claim QA closeout; resolve or formally disposition every "
+        "non-PASS and NOT RUN item."
+    )
+    recommendation_indexes = [
+        index
+        for index, line in enumerate(lines)
+        if line in {ready_recommendation, not_ready_recommendation}
+    ]
+    assert len(recommendation_indexes) == 1
+    lines[recommendation_indexes[0]] = (
+        ready_recommendation if ready else not_ready_recommendation
     )
     return "\n".join(lines) + "\n"
 
@@ -267,7 +290,7 @@ def test_finalized_current_state_can_remain_epic_not_ready(
     incomplete_coverage = list(coverage)
     incomplete_coverage[-1] = (incomplete_check, "NOT RUN", None)
 
-    summary = _summary_for_state(finalized=True)
+    summary = _summary_for_state(finalized=True, ready=False)
     summary = summary.replace(
         f"| {incomplete_check} | PASS | checks/{incomplete_check}/primary.log |",
         f"| {incomplete_check} | NOT RUN | Unknown |",

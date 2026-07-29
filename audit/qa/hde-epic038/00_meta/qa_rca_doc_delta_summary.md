@@ -1,7 +1,7 @@
 # HDE-EPIC038 QA RCA and Doc Delta Summary
 
 ## Live QA findings
-- epic-wide qa_step_logs_manifest lookup: TOOLING_BLOCKED
+- no new deltas found
 
 ## PF-Canon mapping
 - Runtime, database, evidence, release, and operational findings: HDE Build Notes.
@@ -52,13 +52,13 @@
 
 ## Epic-wide closeout phase commands
 - Epic-wide generation command: qa_closeout generation.
-- Epic-wide finalization command: NOT RUN.
+- Epic-wide finalization command: qa_closeout finalize.
 
 ## Epic-wide manifest lookup and routing proof
-- Epic-wide lookup status: TOOLING_BLOCKED.
-- Epic-wide lookup detail: approved PR routing and required companion refresh pending.
+- Epic-wide lookup status: PASS.
+- Epic-wide lookup detail: updater_exit=0; lookup_hits={"Human Evidence Index": true, "Machine Mirror": true, "canonical evidence updater/source": true}.
 - Required routing type: PR.
-- Epic-wide routing receipt: NONE.
+- Epic-wide routing receipt: PR#376@8d0facb8d4d166b7dbc760623d46ca6f32c9a76a.
 - Epic-wide pre-routing blocked or failed receipt: NONE.
 - Routing and lookup proof do not replace any check’s behavioral proof.
 
@@ -71,7 +71,7 @@
 - No retained record confers authority for another live call or later remediation.
 
 ## Completion states
-- Repo-supported completion: NOT READY.
+- Repo-supported completion: READY FOR CLOSEOUT REVIEW.
 - Canon-drain completion: NOT CLAIMED.
 - Formal close-pack completion: NOT CLAIMED.
 
@@ -79,4 +79,4 @@
 - Undrained documentation deltas remain follow-up work. Documentation drainage is not an independent step verdict or closeout blocker when all required QA evidence is complete and trusted.
 
 ## Readiness recommendation
-- Do not claim QA closeout; resolve or formally disposition every non-PASS and NOT RUN item.
+- Proceed to closeout review using the governed evidence pointers above.
