@@ -188,7 +188,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.30) PF10 Scope Model: Independently Scoped Addenda and Lettered Multi-Document Version Sets  
 2.31) HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority  
 2.32) QA Pass 2 HDE-EPIC038  
-2.33) ci/checks/check\_mirror\_schema.sh Is a Python Entry Point with a Legacy Stable Path
+2.33) ci/checks/check\_mirror\_schema.sh Is a Python Entry Point with a Legacy Stable Path  
+2.34) QA Pass 3 HDE-EPIC038  
+2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract
 
 # 2\) Numbered Addenda
 
@@ -2462,5 +2464,278 @@ Two non-blocking observations:
 ### PASS
 
 Evidence is sufficient and trustworthy. Required deliverables are present and tracked, their manifest and ledger bindings are coherent, Plan-defined PASS criteria are satisfied, and no remediation or developer-escalation condition remains.
+
+## **2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract**
+
+Timestamp: 072926 10:16 UTC
+
+Details: Resolves whether every epic must execute at least one QA harness run in GitHub Codespaces before closeout. Codespaces remains the canonical shared QA console, but it is no longer an unconditional per-epic proof requirement. Live QA must prove the environment facts that can affect the claimed result. Exact venue provenance is required only when the venue itself is a material proof axis.
+
+### **1\. Scope**
+
+This addendum governs:
+
+* the execution-environment requirements for HDE Live QA;  
+* the meaning of an execution-venue field in a Live QA Plan;  
+* when GitHub Codespaces execution or provenance is mandatory;  
+* the minimum environment evidence required regardless of venue;  
+* final QA closeout review of venue posture;  
+* the current venue-provenance question for HDE-EPIC038; and  
+* the permanent-canon changes required to drain this decision.
+
+This addendum applies to pending and future Live QA planning, execution review, and closeout review while it remains active.
+
+This addendum does not change:
+
+* functional-proof requirements;  
+* check-level PASS or FAIL predicates;  
+* rails, network, secret-safety, target-identity, determinism, evidence-indexing, manifest, path-proof, or artifact-integrity requirements;  
+* the requirement to execute a governed QA harness when the owning workflow requires one;  
+* any requirement to use a particular environment when the behavior under test is genuinely environment-specific; or  
+* the QA results already recorded for HDE-EPIC038.
+
+### **2\. Question litigated**
+
+The question is whether every epic must execute at least one harness run in a GitHub Codespace attached to the canonical repository, even when no claimed behavior, configuration, integration, or operational capability depends on Codespaces.
+
+Two different proof objectives must be kept separate:
+
+1. **Product or system proof:** The changed behavior was exercised under a suitable and sufficiently recorded environment, and governed evidence supports the result.  
+2. **Venue proof:** A specific provider-hosted environment, such as GitHub Codespaces, can perform the claimed operation or has a material property required by the claim.
+
+A universal Codespaces requirement treats these objectives as identical. They are not identical.
+
+Codespaces can provide a useful shared devcontainer, a repeatable operator surface, repository access, a controlled place to bind secrets, and a convenient artifact workspace. Those are legitimate operational benefits. They do not, by themselves, prove that a QA result is correct, deterministic, reproducible, or better evidenced.
+
+The label `Codespaces` also does not eliminate environment drift. The base image, devcontainer state, installed dependencies, repository source, environment variables, secrets, rails, network access, and target bindings can still differ between runs. A provider name without the material environment facts is therefore weaker evidence than a properly captured environment contract.
+
+Conversely, another approved execution environment can produce trustworthy QA evidence when it executes the same governed entrypoint against the correct source and targets under the required pins, rails, dependencies, and evidence rules.
+
+The defensible QA requirement is therefore not universal provider identity. It is proof that the execution environment satisfied every condition capable of affecting the claimed result.
+
+### **3\. Decision**
+
+The unconditional requirement that every epic execute at least one QA harness run in GitHub Codespaces before closeout is removed.
+
+Live QA may execute in:
+
+* GitHub Codespaces; or  
+* another execution environment permitted by the owning Live QA Plan or applicable QA authority, provided that it satisfies the plan's environment contract and produces governed, reproducible evidence.
+
+GitHub Codespaces remains the canonical and preferred shared HDE QA console. `Canonical` and `preferred` do not mean `exclusive` or `mandatory for every epic`.
+
+Exact Codespaces execution and venue provenance are mandatory only when Codespaces is material to the proof being claimed under the test in Section 4\.
+
+When venue is not material:
+
+* the absence of Codespaces provenance is not a QA failure;  
+* the absence of Codespaces provenance is not a closeout blocker;  
+* an otherwise supported behavior result must not be downgraded solely because the physical or hosted execution venue is unknown;  
+* the review must not infer where execution occurred; and  
+* the review must record the venue as `NOT CLAIMED`, `NOT APPLICABLE`, or `UNKNOWN - NON-MATERIAL`, as appropriate.
+
+### **4\. Venue-materiality test**
+
+Codespaces execution and governed Codespaces provenance are required when at least one of the following is expressly part of the approved proof scope:
+
+1. The epic changes or validates the repository devcontainer, Codespaces bootstrap, Codespaces base image, Codespaces-specific tool availability, or another Codespaces-specific runtime dependency.  
+2. The claim concerns Codespaces secret injection, environment provisioning, network egress, forwarded ports, repository mounting, filesystem behavior, provider identity, or another provider-specific integration.  
+3. A supported operator workflow promises that the relevant harness, command, service, or application surface works in Codespaces.  
+4. The behavior or defect under review is reasonably capable of differing in Codespaces because of the container, operating system, architecture, shell, dependency, filesystem, networking, or provider configuration.  
+5. The Live QA Plan defines a venue-specific acceptance criterion and explains why the venue can affect the result.  
+6. The closeout claim expressly asserts a Codespaces-run capability or relies on Codespaces execution as proof of operational readiness.
+
+Codespaces is not made material merely because:
+
+* a plan front-matter field names Codespaces as the intended execution venue;  
+* an infrastructure document calls Codespaces the canonical or preferred QA console;  
+* a command can be run in Codespaces;  
+* the repository contains a devcontainer or Codespaces configuration;  
+* an optional dependency-activation command uses a devcontainer script;  
+* a secret name may be provisioned in a Codespace;  
+* evidence was written under a governed QA path;  
+* a current Codespace can inspect an artifact created earlier;  
+* a path resembles a Codespaces workspace path; or  
+* a reviewer would prefer uniform provider provenance.
+
+A Live QA Plan that intends to make venue mandatory must state all four of the following:
+
+* `Venue-specific claim`  
+* `Why venue can affect the result`  
+* `Required venue evidence`  
+* `Effect of missing venue evidence`
+
+Without those four statements, the execution-venue field records the intended or preferred operator surface. It does not create a separate acceptance criterion or closeout blocker.
+
+### **5\. Minimum environment evidence contract**
+
+Every governed Live QA execution must capture the material environment facts required to interpret and reproduce its result, regardless of whether it runs in Codespaces or elsewhere.
+
+The evidence contract must include, as applicable to the check:
+
+1. The stable QA step or check identity.  
+2. The exact repository source, commit, release, manifest, or other source identity required by the plan.  
+3. The exact governed entrypoint, command, command family, endpoint, or harness invocation used.  
+4. The repository root or working locus required for correct execution.  
+5. The relevant interpreter, runtime, toolchain, and dependency readiness.  
+6. The required deterministic environment pins.  
+7. The rails and network posture.  
+8. The target environment, service, database, vendor, or other external identity when the check reaches an external surface.  
+9. Secret presence or binding posture when required, without recording secret values.  
+10. The applicable PASS or FAIL predicate.  
+11. The actual exit status and result output.  
+12. The governed evidence paths and the required manifest, index, hash, or path-proof bindings owned by the workflow.  
+13. Any accepted execution deviation that materially changed how the planned check was run.
+
+The owning plan may require additional facts when a check has environment-specific risks. It must not omit a fact that can materially change the interpretation of the result.
+
+An execution environment is not acceptable merely because it can launch the command. It must satisfy the applicable isolation, authorization, source-binding, dependency, rails, network, target, secret-safety, and evidence requirements.
+
+### **6\. Codespaces-specific proof contract**
+
+When the venue-materiality test makes Codespaces proof mandatory, at least one governed artifact must bind:
+
+* the exact QA check or governed artifact;  
+* the GitHub Codespaces venue;  
+* the canonical repository association;  
+* the source identity used for execution;  
+* the command or command family executed;  
+* the relevant Codespaces-specific property being proven; and  
+* sufficient event or chronology information to connect the execution to the resulting evidence.
+
+The artifact must remain secret-safe. It need not expose a complete Codespace name, opaque provider credentials, raw environment values, or unrestricted shell history.
+
+A present-day Codespaces session does not retroactively prove the venue of an earlier run. A newly authorized Codespaces run proves only the newly executed event and its resulting evidence.
+
+### **7\. Planning, execution, and review rules**
+
+#### **Planning**
+
+A Live QA Plan must choose an execution environment based on the proof target, risk, required tooling, rails, target access, and evidence needs.
+
+The plan may name Codespaces as the preferred venue without making venue a proof axis. If venue is material, the plan must satisfy the four-field materiality declaration in Section 4 and define the governed venue evidence.
+
+Plans must not add a Codespaces-only requirement merely to satisfy a generic template field or a universal closeout checklist.
+
+#### **Execution**
+
+Execution must use an environment permitted by the governing plan and must capture the environment evidence contract in Section 5\.
+
+Moving execution to another environment is a material plan deviation only when:
+
+* the plan makes venue a proof axis;  
+* the new environment changes a material dependency, target, rails, network, secret, or runtime condition; or  
+* the plan expressly forbids the substitution for a supported reason.
+
+Otherwise, a venue substitution is acceptable when the environment contract and all check predicates remain satisfied and the actual environment posture is recorded truthfully.
+
+#### **Review**
+
+Reviewers must evaluate whether the claimed behavior and every material environment condition are proven. They must not substitute provider identity for environment evidence.
+
+Missing venue provenance is blocking only when:
+
+1. venue was a material proof axis under Section 4; and  
+2. the required governed venue binding is absent, ambiguous, or contradictory.
+
+When venue is not material, the required-elements checklist must record the venue posture without treating it as an uncovered QA step or missing closeout element.
+
+### **8\. HDE-EPIC038 disposition**
+
+The HDE-EPIC038 Live QA Plan names Codespaces in front matter and describes Codespaces as the intended dev execution setting. It also uses a devcontainer bootstrap script as a possible dependency-remediation action and refers to secret names provisioned in the Codespace for the bounded open-rails step.
+
+Those statements identify the intended operator environment. They do not define a Codespaces-specific PASS predicate, a provider-specific behavior claim, or governed venue evidence for any HDE-EPIC038 check.
+
+The HDE-EPIC038 QA proof scope concerns the behavior, source identity, commands, dependencies, rails, target posture, results, and governed evidence produced by the approved checks. It does not claim:
+
+* devcontainer or Codespaces bootstrap conformance;  
+* Codespaces-specific secret injection;  
+* Codespaces-specific network or vendor behavior;  
+* forwarded-port behavior;  
+* Codespaces-to-production connectivity;  
+* a Codespaces-hosted service; or  
+* Codespaces operational support as an epic deliverable.
+
+Therefore:
+
+1. Historical Codespaces venue provenance is not required for HDE-EPIC038 closeout.  
+2. The absence of historical Codespaces venue provenance must be recorded as `UNKNOWN - NON-MATERIAL`, not as a QA blocker.  
+3. No retrospective claim may be made that the HDE-EPIC038 QA checks ran in Codespaces.  
+4. No new Codespaces harness run is required solely to cure the venue-provenance gap.  
+5. The proposed venue-provenance discovery task is unnecessary unless separately authorized for a purpose other than satisfying the removed universal requirement.  
+6. Any pending finding whose sole basis is the absence of Codespaces venue proof is resolved as `NOT APPLICABLE` for HDE-EPIC038.  
+7. The HDE-EPIC038 QA results and remediation histories recorded in Addenda 2.29, 2.31, 2.32, and 2.34 remain unchanged.  
+8. This disposition resolves only the venue requirement. It does not resolve the separately identified incompleteness in the governed QA RCA and Doc Delta summary.  
+9. HDE-EPIC038 must not be described as closeout-ready or closed on the basis of this addendum alone.
+
+### **9\. Supersession**
+
+For the scope stated in this addendum, this is the highest-numbered applicable HDE Build Notes authority.
+
+It supersedes:
+
+* Epic Process Guide, §3.5.2.8, only to the extent that the section requires every epic to execute at least one harness run in GitHub Codespaces regardless of venue materiality;  
+* Epic Process Guide, §6.8, only to the extent that its final QA closeout checklist treats a Codespaces harness run as an unconditional required element;  
+* Glow QA Guide, §9.2.15.6, only to the extent that its Codespaces checklist item could be read as universal when venue provenance is not part of the claimed proof;  
+* any template interpretation that treats the execution-venue field or Codespaces checklist field as a standalone acceptance criterion without the materiality declaration required by this addendum; and  
+* the HDE-EPIC038 Live QA Plan's Codespaces venue statements only to the extent that they would otherwise create a mandatory provider-provenance or per-epic Codespaces-run closeout predicate.
+
+Glow Infrastructure remains authoritative for the names-only fact that Codespaces is the canonical shared QA console and artifact workspace. Its recognition of other valid terminal surfaces remains compatible with this addendum.
+
+All non-conflicting functional-proof, harness, evidence, rails, security, determinism, environment, review, and closeout requirements remain in force.
+
+This supersession changes the current closeout predicate. It does not rewrite historical plans, commands, logs, evidence, reviews, or execution venues.
+
+### **10\. Nonclaims**
+
+This addendum does not:
+
+* prove where any historical HDE-EPIC038 QA command ran;  
+* authorize a QA run, rerun, harness invocation, vendor call, OPS action, or environment change;  
+* authorize weaker source, environment, dependency, rails, network, target, secret-safety, or evidence capture;  
+* make every local shell, CI shell, container, or remote terminal an approved QA environment;  
+* convert CI into Live QA automatically;  
+* remove a justified venue-specific requirement from a plan that satisfies the materiality test;  
+* revise HDE-EPIC038 check results or acceptance-token posture;  
+* repair or approve the HDE-EPIC038 QA RCA and Doc Delta summary;  
+* modify permanent PF documents, the Live QA Plan, repository artifacts, PF09 status, the development board, or a close pack;  
+* perform PO acceptance, formal QA closeout, canon drainage, epic closeout, or board movement; or  
+* reopen or reinterpret an already closed epic merely because its historical venue was not recorded.
+
+### **11\. Source basis**
+
+This decision is grounded in:
+
+* Glow QA Guide, §1.4, which recognizes Codespaces and other correctly configured terminals as equivalent QA surfaces;  
+* Glow QA Guide, §3.5.1, which recognizes an equivalent QA console when it can reach the same governed target;  
+* Glow QA Guide, §9.2.15.6, which connects venue provenance to the closeout claim;  
+* Glow QA Guide, §13.8, which states the venue-materiality principle for a prior closeout pattern;  
+* Glow QA Guide, §14.1, which defines Codespaces-specific conformance rather than universal provider exclusivity;  
+* Glow Infrastructure, §§2.6 and 2.7, which distinguish the canonical Codespaces console from valid terminal access and leave behavior-test placement to the QA and process homes;  
+* Epic Process Guide, §§3.5.2.8 and 6.8, whose universal Codespaces wording is narrowed by this addendum;  
+* Canon Plan Templates, the Live QA Plan front matter and closeout required-elements checklist, whose venue fields require materiality semantics; and  
+* the HDE-EPIC038 Live QA Plan, front matter, dependency profiles, Step-0C, and check matrix.
+
+### **12\. Drain targets**
+
+This guidance remains active until the following permanent homes are aligned:
+
+1. **Epic Process Guide, §3.5.2.8:** Replace the universal Codespaces harness requirement with the materiality-based execution-environment rule and retain the governed harness and evidence requirements.  
+2. **Epic Process Guide, §6.8:** Make the final closeout venue item conditional on a venue-specific claim.  
+3. **Glow QA Guide, §9.2.15.6:** State unambiguously that Codespaces proof is required only when venue is material to the claimed proof.  
+4. **Glow QA Guide, §§1.4, 3.5.1, 13.8, and 14:** Consolidate equivalent-console, venue-materiality, and Codespaces-specific conformance language into one consistent rule.  
+5. **Glow Infrastructure, §§2.6 and 2.7:** Preserve Codespaces as the canonical shared QA console while stating clearly that canonical does not mean exclusive.  
+6. **Canon Plan Templates, Live QA Plan front matter:** Add the four-field venue-materiality declaration and define the execution-venue field as descriptive unless that declaration makes it normative.  
+7. **Canon Plan Templates, final QA closeout checklist:** Replace the unconditional Codespaces item with a conditional venue-proof item and require `NOT CLAIMED`, `NOT APPLICABLE`, or `UNKNOWN - NON-MATERIAL` posture when appropriate.
+
+Drainage must preserve the distinction between:
+
+* preferred console;  
+* permitted execution environment;  
+* material environment contract;  
+* venue-specific proof; and  
+* historical venue provenance.
+
+Until drainage is complete, this addendum is the sole authority for that overlapping scope.
 
 \<eof\>  
