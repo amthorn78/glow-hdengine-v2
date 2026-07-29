@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.3b  
+**Version:** v12.5.5b  
 Effective Date: 2026.07.29  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -190,7 +190,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.32) QA Pass 2 HDE-EPIC038  
 2.33) ci/checks/check\_mirror\_schema.sh Is a Python Entry Point with a Legacy Stable Path  
 2.34) QA Pass 3 HDE-EPIC038  
-2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract
+2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
+2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038
 
 # 2\) Numbered Addenda
 
@@ -2737,5 +2738,1056 @@ Drainage must preserve the distinction between:
 * historical venue provenance.
 
 Until drainage is complete, this addendum is the sole authority for that overlapping scope.
+
+## 2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038
+
+Final QA Closeout Review \+ QA RCA
+
+QA Closeout Summary
+
+* Epic reviewed: HDE-Epic038 / Distillation pass 3\.  
+* PF10 records PASS for qa-00 through qa-07, qa-08, and qa-09 through qa-23. Its current completion posture is repo-supported readiness for closeout review, not epic closure.  
+  Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "QA\_STEP\_NAME: `qa-00-step-0-discovery qa-01-po-001 qa-02-po-002 qa-03-po-003 qa-04-po-004 qa-05-po-005 qa-06-po-006 qa-07-po-007`." | "Decision: **PASS**."  
+  Evidence pointer: PF10 | §2.32 "QA Pass 2 HDE-EPIC038" | "QA\_STEP\_NAME: `qa-08-po-008`. Decision: **PASS**."  
+  Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "Aggregate decision for `qa-09-po-009` through `qa-23-po-023`: **PASS**."  
+* PF10 §2.35 removes the unconditional per-epic Codespaces requirement and expressly resolves the HDE-EPIC038 historical venue posture as `UNKNOWN - NON-MATERIAL`. The unknown venue is not a QA failure or closeout blocker, no retrospective Codespaces claim is permitted, and no discovery task or new Codespaces run is required solely to cure that former gap.  
+  Evidence pointer: PF10 | §2.35 "Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract" | "The unconditional requirement that every epic execute at least one QA harness run in GitHub Codespaces before closeout is removed." | "The absence of historical Codespaces venue provenance must be recorded as `UNKNOWN - NON-MATERIAL`, not as a QA blocker."  
+* Reviewed coverage includes all 24 planned check IDs, Step-0B, the expressly inapplicable Step-0C intent, closeout deliverables, recorded remediation and ADR history, and current evidence posture at Repo HEAD.  
+* All closeout-material PF10-recorded repo evidence references resolved to tracked evidence. The qa-21 external attestation workspace is Not repo-resident and is supported historically only through its tracked primary log.  
+* Implementation Guide goals cover evidence discipline, identity, determinism, transport, database, BodyGraph, cache, release, and integrated-pipeline scope. PF10 indicates high-level QA coverage of those domains; the Implementation Guide is not execution proof.  
+  Evidence pointer: Implementation Guide | Brief recap of scope | "HDE-EPIC038 is the Distillation reliability pass that consolidates governed evidence discipline, immutable identity and provenance, release identity indexing, environment snapshot v3, deterministic gates, Catalog-driven A7 proofs, CI rails, DB and BodyGraph posture, DB-bridge parity, a keys-only architecture snapshot, controlled configured-v2 mapped-cache persistence, and a single release sanity pipeline." | "The epic does not add public Reader behavior, public routes, app-side HumanDesignAPI ownership, a second HTTP home, raw vendor-envelope persistence, broad HumanDesignAPI v2 conformance, performance/load scope, production mapped-cache authorization, PF09 status movement, QA PASS, OPS completion, or closeout."  
+* Primary root-cause category: Evidence-consolidation drift, resolved in this closeout record.  
+* Recommendation: `READY WITH CAVEATS` for the QA-closeout decision axis. The complete closeout record below supplies the remediation, deviation, source-of-truth, and evidence-posture accounting that the shorter repository execution summary does not contain.
+
+Canonical RCA Requirement Basis
+
+PF10 — HDE Build Notes, §2.35
+
+Evidence pointer: PF10 | §2.35 "Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract" | "Exact Codespaces execution and venue provenance are mandatory only when Codespaces is material to the proof being claimed under the test in Section 4." | "When venue is not material: the absence of Codespaces provenance is not a QA failure; the absence of Codespaces provenance is not a closeout blocker."
+
+Evidence pointer: PF10 | §2.35 "HDE-EPIC038 disposition" | "Historical Codespaces venue provenance is not required for HDE-EPIC038 closeout." | "This disposition resolves only the venue requirement. It does not resolve the separately identified incompleteness in the governed QA RCA and Doc Delta summary."
+
+Evidence pointer: PF10 | §2.35 "Supersession" | "It supersedes: Epic Process Guide, §6.8, only to the extent that its final QA closeout checklist treats a Codespaces harness run as an unconditional required element" | "Glow QA Guide, §9.2.15.6, only to the extent that its Codespaces checklist item could be read as universal when venue provenance is not part of the claimed proof."
+
+PF19 — Glow QA Guide, §3.1
+
+Evidence pointer: PF19 | §3.1 "Intent" | "Required QA completion comes first. All required QA tasks, remediation loops, runtime-functional-proof checks, and close-gate QA reviews MUST be completed before documentation drainage begins." | "If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic may be recommended as ready for closeout even when undrained documentation deltas remain."
+
+PF19 — Glow QA Guide, §3.4.8
+
+Evidence pointer: PF19 | §3.4.8 "Rails posture for manual Live QA (EPIC017 example; generalized rule)" | "Moon Loop (allowed; minimal in-session remediation to unblock QA). Live QA may include a small remediation loop when a check fails due to an execution-blocking mismatch, only to the extent required to produce a PASS-grade proof for the already-approved scope." | "Non-QA-root remediation MUST be routed through an approved work item type such as PR, OPS, QA\_PLAN\_UPDATE, or DOC\_UPDATE before it can be treated as the basis for a final PASS-grade QA run."
+
+PF19 — Glow QA Guide, §4.4.1
+
+Evidence pointer: PF19 | §4.4.1 "Epic QA root and current-state posture (normative)" | "A final QA review report, closeout review, or step-cluster review that asks the reviewer to approve PASS for executed Live QA steps MUST surface the current manifest entry, canonical primary-log header, `captured_env`, `evidence_artifacts`, `intended_tokens`, `claimed_tokens`, and path-proof binding for every executed step cluster it asks the reviewer to approve."
+
+PF19 — Glow QA Guide, §4.4.3
+
+Evidence pointer: PF19 | §4.4.3 "Per-epic QA step logs manifest (qa\_step\_logs\_manifest.json)" | "PASS requires explicit lookup proof that the current manifest is discoverable in the canonical evidence updater/source, the Human Evidence Index, and the Machine Mirror." | "Presence on disk, a refreshed `qa_step_logs_manifest.json.path_proof.txt`, or a manifest entry alone is not sufficient for this claim."
+
+PF19 — Glow QA Guide, §4.4.5
+
+Evidence pointer: PF19 | §4.4.5 "Step log header (required fields; token semantics are claims-safe)" | "Evidence trust gate (clarification): A primary.log missing a canonical JSON header (or missing required header fields) is not audit-usable evidence for PASS, even if underlying tests pass." | "Token-claim safety (normative): token claims MUST NOT be inferred."
+
+PF19 — Glow QA Guide, §9.2.15.5
+
+Evidence pointer: PF19 | §9.2.15.5 "Coverage vs QA Plan accounting (required; closeout gate)" | "The Live QA closeout record MUST include an explicit Coverage vs QA Plan accounting that is complete, step-by-step, and auditable." | "Coverage vs QA Plan accounting MUST separately identify any accepted plan-execution deviation that materially changed how a COVERED step was actually run."
+
+PF19 — Glow QA Guide, §9.2.15.6
+
+Evidence pointer: PF19 | §9.2.15.6 "Final QA closeout review required elements (required; closeout gate)" | "The final Live QA closeout review MUST include an explicit required-elements checklist that confirms the presence or absence of the following, with governed evidence pointers when present:" | "at least one Codespaces harness run, or a governed provenance artifact that truthfully binds an executed QA artifact to the Codespaces venue when venue provenance is part of the closeout claim"
+
+Current application: PF10 §2.35 controls the overlapping venue scope. For HDE-EPIC038, venue provenance is not part of the claimed proof and must be recorded as `UNKNOWN - NON-MATERIAL`, not as a missing required element.
+
+PF06 — Epic Process Guide, §0.4.1.2
+
+Evidence pointer: PF06 | §0.4.1.2 "Mandatory QA RCA & Doc Delta summary" | "Every Live QA epic MUST produce a QA RCA & Doc Delta summary as part of execution deliverables, regardless of whether large gaps are observed." | "When a Live QA Plan exists, the summary MUST include explicit Coverage vs QA Plan accounting in plan order using stable step identifiers."
+
+Evidence pointer: PF06 | §0.4.1.2 "Location (normative)" | "The QA RCA & Doc Delta summary MAY live as a section of the epic close report, or as a separate governed artifact referenced from the close report."
+
+PF06 — Epic Process Guide, §6.8
+
+Evidence pointer: PF06 | §6.8 "Final QA Closeout Review \+ QA RCA (recommended)" | "Required elements checklist. Confirm the presence or absence of the D0 Discovery artifact, runtime functional proof when required, governed current-state QA evidence under the epic QA root, the QA RCA summary, Coverage vs QA Plan accounting, a readiness recommendation, at least one Codespaces harness run, and indexed evidence." | "It MUST NOT say Complete when any required element is absent, ambiguous, or unsupported by governed evidence."
+
+Current application: PF10 §2.35 supersedes only the unconditional Codespaces portion of this checklist. PF06’s remaining closeout and completeness requirements remain in force.
+
+Required-elements checklist:
+
+* D0 Discovery artifact: Present and Repo-confirmed tracked.  
+* Functional runtime proof: Present across the planned runtime, transport, vendor, database, BodyGraph, cache, and release checks.  
+* Governed current-state QA evidence: Present under the canonical epic QA root.  
+* QA RCA and Doc Delta summary: Complete through the combined closeout record. The tracked repository execution summary supplies the generated current-state table, routing receipt, readiness posture, and no-claim boundaries. This report supplies the required remediation history, accepted deviations, source-of-truth posture, evidence-light classification, RCA, remediation-loop assessment, and Doc Deltas. PF06 expressly permits the mandatory summary to live as a section of the epic close report.  
+* Coverage vs QA Plan: Complete step-by-step in this report, including accepted deviations and final accepted evidence bases.  
+* Readiness recommendation: `READY WITH CAVEATS` for the QA-closeout decision axis.  
+* Indexed evidence: Present in the Human Evidence Index, Machine Mirror, and canonical updater.  
+* Execution venue: `UNKNOWN - NON-MATERIAL`. No historical Codespaces execution claim is made. Under PF10 §2.35, venue proof is not required for HDE-EPIC038 and its absence is not a missing closeout element.  
+* Decisive PF10 source posture: §2.29 and §2.32 contain direct evidence-pointer lines; §2.34 contains evidence-basis prose and artifact labels but no direct evidence-pointer lines.  
+* Compliance statement: Complete with caveats. Every required QA-closeout element is present or expressly non-applicable under PF10 §2.35.
+
+Missing required elements:
+
+* None for the QA-closeout decision axis.
+
+Closeout-record posture:
+
+* The tracked `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md` remains the generated execution-level summary.  
+* This report is the closeout-level QA RCA and Doc Delta summary permitted by PF06 §0.4.1.2. It expressly records the qa-05 remediation, ADR-DEV-01, qa-08 Extended Moon Loop, qa-11 preflight deviation, decisive-source evidence-light posture, source-of-truth framing, venue disposition, and permanent-canon deltas.  
+* The shorter execution summary’s omissions are therefore a documentation caveat, not an unfilled evidence or discovery requirement.
+
+Non-blocking venue posture:
+
+* Historical execution venue is unknown and must not be inferred. PF10 §2.35 classifies that unknown as non-material for HDE-EPIC038 and resolves any finding based solely on missing Codespaces proof as `NOT APPLICABLE`.
+
+Source-of-Truth Posture
+
+* PF10 role: explicit historical source for epic-specific QA outcomes, remediation loops, ADRs, routing events, evidence references, recorded closeout posture, and the current materiality-based venue policy in §2.35.  
+* Repo role: current validation source for HEAD, current tracked content, exact evidence paths, hashes, manifest bindings, merge receipts, and current source availability. Repo does not create QA history or acceptance.  
+* PF19 role: QA process, evidence trust, remediation, coverage-accounting, and closeout-review authority where PF10 is silent.  
+* PF27 used: Yes, only to locate the template drainage targets required by PF10 §2.35; not used as closeout authority.  
+* PF06 used: Yes.  
+* PF07 used: Yes, only to locate the infrastructure drainage targets required by PF10 §2.35; not used as closeout authority.  
+* Implementation Guide used: Yes, goals framing only.  
+* QA Plan used: Yes, intended-requirements framing only. Its approval record expressly states that no QA was executed by plan approval.  
+  Evidence pointer: QA Plan | Review Summary | "No QA was executed. This review establishes no QA PASS, acceptance, PF09 status movement, deployment authorization, or Epic closure."  
+* PF10-versus-QA-Plan deviations:  
+  * qa-05 used a PO-authorized artifact-only remediation loop with a preserved failing receipt.  
+  * qa-06 and qa-07 received accepted path-preflight corrections.  
+  * qa-08 replaced fixed-HEAD and impossible endpoint-classification assumptions through a PO-approved Extended Moon Loop, routing, and closed-rails finalization.  
+  * qa-11 omitted one Plan-listed path from preflight, although the behavior command executed the file successfully.  
+  * qa-21 used the approved Profile C syntax normalization.  
+  * PF10 §2.35 narrows the QA Plan’s Codespaces front-matter statement for closeout interpretation. It records an intended or preferred operator surface, not a provider-specific acceptance criterion. The historical venue posture is `UNKNOWN - NON-MATERIAL`; this is a current policy disposition, not a retrospective execution claim.  
+* Repo-versus-PF10 evidence-reference mismatches:  
+  * No material PF10 evidence path failed current tracked validation.  
+  * The repo path and supplied artifact name are `PF10-HDE-Build-Notes-v12.5.4b.md`, but that file’s internal `Version` field still reads `v12.5.3b`. Commit `7e4dcd02b246e604e4bfeded79b2b24c583f741e`, the paired `v12.5.4a` publication, and the addendum index make the intended active-set relationship traceable. The field mismatch is a non-blocking PF10 maintenance defect, not missing QA evidence.  
+  * PF10 §2.34’s statement that PF19 was absent from current `main` is stale relative to the reviewed Repo, where PF19 v2.8 is tracked.  
+  * PF10 §2.34 is evidence-light for qa-09 through qa-23: it names `primary.log` and `qa_step_logs_manifest.json`, but contains no direct `Evidence pointer:` lines.  
+* Implementation Guide mismatch: its Source posture says PF10 was silent for the epic. Current PF10 is no longer silent. Current PF10 controls.  
+  Evidence pointer: Implementation Guide | Source posture | "PF10 governs only where it explicitly speaks. It is silent for this epic."  
+* Repo-supported completion, canon-drain completion, formal close-pack completion, merge provenance, board state, PO closeout, formal OPS action, final acceptance, token satisfaction, and final epic closure remain separate axes. This report claims none of the latter actions.
+
+Repo Validation Summary
+
+* Observed repo root: `amthorn78/glow-hdengine-v2`.  
+* Observed HEAD: `7e4dcd02b246e604e4bfeded79b2b24c583f741e`.  
+* Branch or detached state: `main`; GitHub committed tree, not detached.  
+* Working tree status before review: N/A; the review used the committed GitHub tree and had no local Repo working tree.  
+* Working tree status after validation: N/A; no repository mutation or QA command occurred.  
+* Read-only validation methods: repository metadata; recent-commit resolution; exact-path retrieval at HEAD; complete UTF-8 reads; first-line JSON parsing; JSON and JSONL parsing; SHA-256 and byte-size recomputation; path-proof comparison; manifest/header comparison; code-pattern scans; PR metadata reads; and complete manual scans of relied-on files.  
+* Current manifest: 24 entries; SHA-256 `0d9e8bc65ce3d73dc8612caadc090c96080c0b1ca0caaf77789159037cad4973`; 4,784 bytes; exact path-proof match.  
+* Every manifest entry matches the associated primary log’s check ID, PASS status, byte size, and SHA-256.  
+* Every primary header records exit code `0`, closed deterministic pins, its own primary log in `evidence_artifacts`, and empty intended and claimed token arrays.  
+* PR \#376 and PR \#377 are merged. Their PR-head `ci` workflow runs `30425331164` and `30425615426` completed successfully.  
+* The comparison from PR \#377 merge `32562a88456614076309eb25a8f711f896342b7c` to reviewed HEAD contains only PF10 documentation paths and the PF10 Doc Delta staging file. No HDE-EPIC038 QA log, manifest, runtime, test, or evidence-index surface changed after finalization.  
+* Tracked or mergeable evidence confirmed: all material repo-resident evidence below is tracked.  
+* Allowed non-repo evidence confirmed: none as a currently present external artifact. The qa-21 primary log historically records external attestation build and verification; the external workspace itself is Not repo-resident.  
+* PF10-referenced evidence not found: none.  
+* PF10-referenced evidence present but not mergeable: none.
+
+Closure Registers
+
+Deliverables and current-reality register:
+
+| Evidence path or label | PF10-referenced | Present in Repo | Tracked or mergeable | Allowed root | Repo validation status | Evidence pointer |  |  |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | :---- | :---- |
+| `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-01-po-001/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-02-po-002/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-03-po-003/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-04-po-004/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-05-po-005/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-07-po-007/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-09-po-009/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-10-po-010/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-11-po-011/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-12-po-012/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-13-po-013/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-14-po-014/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-15-po-015/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-16-po-016/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-17-po-017/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-18-po-018/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-19-po-019/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-20-po-020/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-20-po-020/integrated-validation.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-21-po-021/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-22-po-022/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/checks/qa-23-po-023/primary.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/qa_step_logs_manifest.json` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/00_meta/doc_deltas.md` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/docdeltas/hde-epic038_doc_deltas.md` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/changed_files.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/patch.diff` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/pre_remediation_sha256.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/qa-05-po-005.pre-remediation.log` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/qa_artifacts_sha256.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/qa/hde-epic038/remediation/moon_loop/remediation_note.md` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/gates/determinism/open_rails_vendor_abba.json` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `audit/gates/determinism/open_rails_vendor_abba.json.path_proof.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `docs/evidence/INDEX.json` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `docs/evidence/INDEX.json.path_proof.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `docs/evidence/INDEX.sha256` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `artifacts/evidence_index.jsonl` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `artifacts/evidence_index.jsonl.path_proof.txt` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `artifacts/evidence_index.jsonl.sha256` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `tools/evidence/update_evidence_index.py` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `docs/qa/r7-qa-plan-hde-epic038.md` | Yes | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `docs/pfcanon/PF19-Canon-Glow-QA-Guide-v2.8.md` | No | Yes | Yes | Yes | Repo-confirmed tracked | Evidence pointer: Repo |  | "" |
+| `/tmp/hde-epic038-release-attestation` | No | No | N/A | N/A | Not repo-resident | Evidence pointer: Repo |  | "" |
+
+The current PF19 path is Repo-present but PF10-unreferenced evidence. It is used only to validate current source availability, not to prove that QA occurred.
+
+Closure Trace Ledger
+
+| Closure-critical slice | QA verification | Governing result | Current-reality support | Status | Why |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| qa-00 through qa-07 | Plan checks qa-00–qa-07; manifest entries; primary logs | PF10 §2.29 PASS | All eight logs and the qa-05 remediation lineage are tracked and hash-bound | Satisfied | Final accepted receipts are preserved and no unresolved non-PASS remains |
+| qa-08 | Plan check qa-08; governed vendor proof; routed finalization | PF10 §§2.31–2.32 PASS | Primary log, live proof, path proof, Index, Mirror, and routing receipts are tracked | Satisfied | The bounded event and Extended Moon Loop reached final accepted PASS without renewed authority |
+| qa-09 through qa-23 | Plan checks qa-09–qa-23; manifest entries; primary logs | PF10 §2.34 aggregate PASS | All fifteen logs are tracked and hash-bound; qa-20 and qa-21 retain their required evidence | Satisfied with caveat | PF10 §2.34 is evidence-light, but current Repo validation supplies the pointer-complete proof |
+| Epic-wide QA closeout artifacts | Closeout Commands 2–5; manifest, proof, summary, Doc Delta pair, canonical lookup | Repository summary: `READY FOR CLOSEOUT REVIEW` | PRs \#376 and \#377 are merged; the 24-log manifest is indexed and current | Satisfied | All Plan-defined closeout predicates are complete |
+| Execution venue | PF10 §2.35 materiality disposition | `UNKNOWN - NON-MATERIAL` | No venue binding found or inferred | Not applicable | Venue was not a material HDE-EPIC038 proof axis |
+
+Path and Surface Reality Ledger
+
+| Required path or surface | Proven current reality | Closure role |
+| :---- | :---- | :---- |
+| `audit/qa/hde-epic038/checks/*/primary.log` | Yes, 24 manifest-bound primary logs | Governing check results |
+| `audit/qa/hde-epic038/qa_step_logs_manifest.json` | Yes, 24 entries, 4,784 bytes | Current-state QA ledger |
+| `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt` | Yes, SHA-256 `0d9e8bc65ce3d73dc8612caadc090c96080c0b1ca0caaf77789159037cad4973` | Manifest byte and path binding |
+| `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md` | Yes | Generated execution-level closeout summary |
+| `audit/qa/hde-epic038/00_meta/doc_deltas.md` and `audit/docdeltas/hde-epic038_doc_deltas.md` | Yes | Authoritative and staging Doc Delta pair |
+| `docs/evidence/INDEX.json`, `artifacts/evidence_index.jsonl`, `tools/evidence/update_evidence_index.py` | Yes, exact manifest identity and path present | Canonical lookup and index binding |
+| `/tmp/hde-epic038-release-attestation` | Not repo-resident; historical execution only | Not a current closeout file; qa-21 primary log is the governed receipt |
+
+Proof-Class Separation
+
+* Functional and deterministic behavior proof comes from the 24 step logs and their Plan-defined outputs.  
+* The bounded live-vendor proof comes from `qa-08-po-008`, its governed proof, and its expired event-specific authority.  
+* Evidence-integrity proof comes from the manifest, path proof, Human Evidence Index, Machine Mirror, updater lookup, hashes, and PR routing.  
+* Remediation-history proof comes from the qa-05 Moon Loop files, ADR-DEV-01, and PF10 §2.31’s Extended Moon Loop lineage.  
+* QA-closeout reasoning comes from the generated execution summary plus this complete closeout-level QA RCA and Doc Delta summary.  
+* None of those proof classes performs PO closeout, board movement, PF09 drainage, permanent-canon drainage, or formal close-pack completion.
+
+PR receipts directly checked:
+
+* PR \#371: merged as `870e0db41f78a7ab49a87dc56bcefd1859d53c06`.  
+* PR \#372: merged as `b08d9dc47f31baa79101a323795237fde4e25b53`.  
+* PR \#376: merged as `8d0facb8d4d166b7dbc760623d46ca6f32c9a76a`.  
+* PR \#377: merged as `32562a88456614076309eb25a8f711f896342b7c`.  
+* These merge facts do not establish PO closeout, formal close-pack completion, or epic closure.
+
+Search method: searched Repo for each of the 35 exact current QA-root paths listed above (case: sensitive); scope: `audit/qa/hde-epic038/**` at `7e4dcd02b246e604e4bfeded79b2b24c583f741e`; tool: manual scan using complete exact-path retrieval; result: 35 hits, 0 missing.
+
+Search method: searched Repo for each material external repo evidence path listed above (case: sensitive); scope: `audit/docdeltas/**`, `audit/gates/**`, `docs/evidence/**`, `artifacts/**`, `tools/evidence/**`, and `docs/qa/**` at reviewed HEAD; tool: manual scan using exact-path retrieval; result: all listed paths resolved.
+
+Search method: searched Repo for "Codespaces" (case: insensitive); scope: all 35 current artifacts under `audit/qa/hde-epic038/**`; tool: manual scan; result: 0 hits.
+
+Search method: searched Repo for "/workspaces/" (case: sensitive); scope: all 35 current artifacts under `audit/qa/hde-epic038/**`; tool: manual scan; result: 0 hits.
+
+Search method: searched PF10 for "Codespaces" (case: insensitive); scope: §§2.29–2.34; tool: grep; result: 0 hits.
+
+Search method: reviewed PF10 §2.35 for "Codespaces" and HDE-EPIC038 venue disposition (case: sensitive where quoted); scope: complete addendum; tool: complete source read; result: materiality policy and `UNKNOWN - NON-MATERIAL` disposition found, with no retrospective claim that HDE-EPIC038 QA ran in Codespaces.
+
+Search method: searched Repo for tracked path "tmp/hde-epic038-release-attestation" (case: sensitive); scope: current committed tree; tool: manual scan using exact-path retrieval; result: 0 tracked-path hits. Text references were not treated as external-path existence.
+
+Repo-validation limits:
+
+* The GitHub committed tree has no observable dirty working tree.  
+* No QA, OPS, service, database, deployment, migration, or external-attestation command was executed.  
+* Current external `/tmp` state was not inspected.  
+* Repo can establish current files and merge receipts, but not an unrecorded execution venue. PF10 §2.35 makes that unknown venue non-material for HDE-EPIC038 closeout.  
+* PR \#376 and PR \#377 workflow success was directly confirmed on their PR head commits. Earlier workflow claims remain PF10 historical records unless otherwise identified.
+
+QA Timeline
+
+Chronology reconstruction rule: PF10 source order is retained except where PF10 explicitly records a sequence. For qa-05, the order is failure → PO-authorized artifact remediation → unchanged PASS rerun. For qa-08, the order is authorization → bounded generation → preserved pre-routing receipt → PR routing → closed-rails PASS → hosted-CI remediation. No other reordering was applied.
+
+1. qa-00-step-0-discovery
+
+Ordering cue: PF10 order \#1  
+Event type: QA Step  
+Event name or label: qa-00-step-0-discovery  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "QA\_STEP\_NAME: `qa-00-step-0-discovery qa-01-po-001 qa-02-po-002 qa-03-po-003 qa-04-po-004 qa-05-po-005 qa-06-po-006 qa-07-po-007`." | "Decision: **PASS**."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+2. qa-01-po-001
+
+Ordering cue: PF10 order \#2  
+Event type: QA Step  
+Event name or label: qa-01-po-001  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`, closed-rails environment captures" | "and empty intended and claimed token arrays."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-01-po-001/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+3. qa-02-po-002
+
+Ordering cue: PF10 order \#3  
+Event type: QA Step  
+Event name or label: qa-02-po-002  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`, closed-rails environment captures" | "and empty intended and claimed token arrays."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-02-po-002/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+4. qa-03-po-003
+
+Ordering cue: PF10 order \#4  
+Event type: QA Step  
+Event name or label: qa-03-po-003  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`, closed-rails environment captures" | "and empty intended and claimed token arrays."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-03-po-003/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+5. qa-04-po-004
+
+Ordering cue: PF10 order \#5  
+Event type: QA Step  
+Event name or label: qa-04-po-004  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`, closed-rails environment captures" | "and empty intended and claimed token arrays."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-04-po-004/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+6. qa-05 artifact remediation
+
+Ordering cue: PF10 order \#6  
+Event type: Remediation Loop  
+Event name or label: qa-05-po-005 Moon Loop  
+Outcome label if PF10 records one: failure preserved; unchanged final PASS rerun  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "The QA-05 failure, Product Owner-authorized artifact remediation, preserved failure receipt, fourteen-file artifact-only delta, and unchanged final PASS rerun are mutually consistent." | "No functional-code change appears in the recorded delta."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/remediation/moon_loop/qa-05-po-005.pre-remediation.log`; `remediation_note.md`; `changed_files.txt`; `patch.diff`; `pre_remediation_sha256.txt`; `qa_artifacts_sha256.txt`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+7. qa-05-po-005
+
+Ordering cue: PF10 order \#7  
+Event type: QA Step  
+Event name or label: qa-05-po-005  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "The tracked QA-05 remediation record establishes Product Owner authority, artifact-only scope, preservation of the original failure, and a successful unchanged rerun."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-05-po-005/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+8. qa-06-po-006
+
+Ordering cue: PF10 order \#8  
+Event type: QA Step  
+Event name or label: qa-06-po-006  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "PASS is approved for the specified qa-00 through qa-07 cluster." | "The required behavioral evidence, primary headers, current manifest entries, token posture, environment captures, artifact arrays, and manifest path-proof binding are complete and trustworthy."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+9. qa-07-po-007
+
+Ordering cue: PF10 order \#9  
+Event type: QA Step  
+Event name or label: qa-07-po-007  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "PASS is approved for the specified qa-00 through qa-07 cluster." | "The required behavioral evidence, primary headers, current manifest entries, token posture, environment captures, artifact arrays, and manifest path-proof binding are complete and trustworthy."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-07-po-007/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+10. ADR-DEV-01
+
+Ordering cue: PF10 order \#10  
+Event type: ADR  
+Event name or label: ADR-DEV-01  
+Outcome label if PF10 records one: Acceptable for this step  
+Evidence pointer: PF10 | §2.29 "ADR-DEV-01" | "What changed: The shared closeout generation phase was invoked after qa-00 through qa-07 had executed, while qa-08 through qa-23 remained `NOT RUN`" | "Decision: Acceptable for this step"  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/qa_step_logs_manifest.json`; `qa_step_logs_manifest.json.path_proof.txt`; `00_meta/qa_rca_doc_delta_summary.md`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+11. qa-08 bounded generation and routing
+
+Ordering cue: 2026-07-27T23:38:09Z  
+Event type: Remediation Loop  
+Event name or label: qa-08-po-008 PO-approved Extended Moon Loop  
+Outcome label if PF10 records one: pre-routing TOOLING\_BLOCKED; routed finalization later PASS  
+Evidence pointer: PF10 | §2.31 "qa-08 execution chronology and PASS basis" | "At `2026-07-27T23:38:09Z`, the producer attempted and completed exactly two vendor requests using fabricated synthetic defaults, with one attempt per request and no retry." | "The generation record intentionally remained `TOOLING_BLOCKED`, exit `125`, with `ROUTING_STATUS=PR_PENDING`."  
+PF10-recorded evidence reference: `audit/gates/determinism/open_rails_vendor_abba.json`; `commit:5f57b049b605105cccb9c7fa4cec99a67c308846`; `PR#371@30e93dfa2d9bd24779e35a6433a034fc996b6ae4`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked for the proof; PR receipt is Not repo-resident and was Repo-confirmed merged
+
+12. qa-08-po-008
+
+Ordering cue: 2026-07-27T23:51:41Z  
+Event type: QA Step  
+Event name or label: qa-08-po-008  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.31 "qa-08 execution chronology and PASS basis" | "Post-route finalization—meaning present in the PO-approved PR posture, not merged or CI-clean—ran exactly once under closed rails" | "and recorded PASS at `2026-07-27T23:51:41Z`."  
+PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-08-po-008/primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+13. qa-08 hosted-CI integration remediation
+
+Ordering cue: 2026-07-28T00:25:35Z merge receipt  
+Event type: Remediation Loop  
+Event name or label: PR \#372 closed-rails CI integration correction  
+Outcome label if PF10 records one: all seven jobs passed  
+Evidence pointer: PF10 | §2.31 "Validation and final hosted-CI completion" | "PR \#372 pull-request workflow `30317079532`: all seven jobs passed;" | "PR \#372 merge: `b08d9dc47f31baa79101a323795237fde4e25b53`;" | "post-merge `main` workflow `30317268158`: all seven jobs passed"  
+PF10-recorded evidence reference: `PR#372`; `b08d9dc47f31baa79101a323795237fde4e25b53`; workflow `30317268158`  
+Repo validation status for repo-resident evidence: PR and commit references are Not repo-resident; merge receipt was Repo-confirmed
+
+14. Legacy `.sh` Python-entrypoint clarification
+
+Ordering cue: 072926 05:47 UTC  
+Event type: ADR  
+Event name or label: `ci/checks/check_mirror_schema.sh` invocation clarification  
+Outcome label if PF10 records one: retained path accepted; Python invocation required  
+Evidence pointer: PF10 | §2.33 "`ci/checks/check_mirror_schema.sh` Is a Python Entry Point with a Legacy Stable Path" | "The `.sh` suffix is legacy path identity. It does not declare the current interpreter." | "The following forms are invalid: `bash ci/checks/check_mirror_schema.sh`"  
+PF10-recorded evidence reference: `ci/checks/check_mirror_schema.sh`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+15. qa-09-po-009
+
+Ordering cue: PF10 order \#15  
+Event type: QA Step  
+Event name or label: qa-09-po-009  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "Aggregate decision for `qa-09-po-009` through `qa-23-po-023`: **PASS**." | "| qa-09 | 10 tests passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+16. qa-10-po-010
+
+Ordering cue: PF10 order \#16  
+Event type: QA Step  
+Event name or label: qa-10-po-010  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-10 | `RAILS_GATE_EVIDENCE_OK`; 42 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+17. qa-11-po-011
+
+Ordering cue: PF10 order \#17  
+Event type: QA Step  
+Event name or label: qa-11-po-011  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "The `qa-11-po-011` preflight omitted one Plan-listed test path, but the subsequent command successfully executed that file as part of the 308 passing tests." | "| qa-11 | 308 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+18. qa-12-po-012
+
+Ordering cue: PF10 order \#18  
+Event type: QA Step  
+Event name or label: qa-12-po-012  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-12 | `DIRECT_DB_CONTRACT_OK`; 136 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+19. qa-13-po-013
+
+Ordering cue: PF10 order \#19  
+Event type: QA Step  
+Event name or label: qa-13-po-013  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-13 | 3 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+20. qa-14-po-014
+
+Ordering cue: PF10 order \#20  
+Event type: QA Step  
+Event name or label: qa-14-po-014  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-14 | 12 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+21. qa-15-po-015
+
+Ordering cue: PF10 order \#21  
+Event type: QA Step  
+Event name or label: qa-15-po-015  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-15 | 187 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+22. qa-16-po-016
+
+Ordering cue: PF10 order \#22  
+Event type: QA Step  
+Event name or label: qa-16-po-016  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-16 | `V2_MAPPED_CACHE_EVIDENCE_OK`; 41 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+23. qa-17-po-017
+
+Ordering cue: PF10 order \#23  
+Event type: QA Step  
+Event name or label: qa-17-po-017  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-17 | 52 passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+24. qa-18-po-018
+
+Ordering cue: PF10 order \#24  
+Event type: QA Step  
+Event name or label: qa-18-po-018  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-18 | Updater check and 2 tests passed |"  
+PF10-recorded evidence reference: `primary.log`; `qa_step_logs_manifest.json`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+25. qa-19-po-019
+
+Ordering cue: PF10 order \#25  
+Event type: QA Step  
+Event name or label: qa-19-po-019  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-19 | All six validators exited `0` |"  
+PF10-recorded evidence reference: `primary.log`; Human Index; Machine Mirror; canonical updater  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+26. qa-20-po-020
+
+Ordering cue: PF10 order \#26  
+Event type: QA Step  
+Event name or label: qa-20-po-020  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "`qa-20` records all nineteen stages in canonical order, `first_failed_stage:NONE`, and `summary:PASS`." | "| qa-20 | Nineteen-stage pipeline and 125 tests passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked; integrated validation log also Repo-confirmed tracked
+
+27. qa-21-po-021
+
+Ordering cue: PF10 order \#27  
+Event type: QA Step  
+Event name or label: qa-21-po-021  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "`qa-21` records exact-source binding plus all three cleanliness markers as `PASS`." | "| qa-21 | Exact-source attestation and cleanliness checks passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked; external attestation workspace is Not repo-resident
+
+28. qa-22-po-022
+
+Ordering cue: PF10 order \#28  
+Event type: QA Step  
+Event name or label: qa-22-po-022  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-22 | 5 targeted tests passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+29. qa-23-po-023
+
+Ordering cue: PF10 order \#29  
+Event type: QA Step  
+Event name or label: qa-23-po-023  
+Outcome label if PF10 records one: PASS  
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-23 | `RAILS_GATE_EVIDENCE_OK`; 12 safety tests passed |"  
+PF10-recorded evidence reference: `primary.log`  
+Repo validation status for repo-resident evidence: Repo-confirmed tracked
+
+30. HDE-EPIC038 execution-venue disposition
+
+Ordering cue: 072926 10:16 UTC  
+Event type: PF10 policy disposition  
+Event name or label: Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
+Outcome label if PF10 records one: `UNKNOWN - NON-MATERIAL`; sole-venue findings `NOT APPLICABLE`  
+Evidence pointer: PF10 | §2.35 "HDE-EPIC038 disposition" | "Historical Codespaces venue provenance is not required for HDE-EPIC038 closeout." | "Any pending finding whose sole basis is the absence of Codespaces venue proof is resolved as `NOT APPLICABLE` for HDE-EPIC038."  
+PF10-recorded evidence reference: PF10 §2.35; no historical venue artifact claimed  
+Repo validation status for repo-resident evidence: Not applicable; this is a PF10 policy disposition and does not modify repository evidence
+
+Coverage vs QA Plan
+
+Step-0B is accounted for once within qa-00-step-0-discovery because the QA Plan defines it as the mechanical Doc Delta component of that check. Step-0C is separately accounted for below.
+
+1. Step name as written in QA Plan: CHECK qa-00-step-0-discovery: Step-0 Discovery  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "Decision: **PASS**."  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log`; Doc Delta pair  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: Step-0B Doc Delta creation/preservation is included here; no behavior mismatch recorded.  
+   Closeout impact: non-blocker  
+2. Step name as written in QA Plan: Step-0C — Prod handshake (identity-only) when target is prod-like  
+   PF10 coverage status: not evidenced  
+   PF10 evidence pointer: Evidence pointer: none provided  
+   PF10-recorded evidence reference: none provided  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Not checked because the QA Plan expressly marks the intent not applicable.  
+   Mismatch or deviation versus QA Plan, if any: None; QA Plan states that no Codespaces-to-production handshake is claimed. PF10 §2.35 confirms that the Plan’s front-matter venue does not independently create a Codespaces acceptance criterion. Historical venue posture is `UNKNOWN - NON-MATERIAL`.  
+   Closeout impact: non-blocker  
+3. Step name as written in QA Plan: CHECK qa-01-po-001: PO-001  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`"  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-01-po-001/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: None recorded.  
+   Closeout impact: non-blocker  
+4. Step name as written in QA Plan: CHECK qa-02-po-002: PO-002  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "Decision: **PASS**."  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-02-po-002/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: None recorded.  
+   Closeout impact: non-blocker  
+5. Step name as written in QA Plan: CHECK qa-03-po-003: PO-003  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "All eight canonical primary logs have valid `pf27.step_log_header.v1` headers, status `PASS`, exit code `0`, closed-rails environment captures"  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-03-po-003/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: None recorded.  
+   Closeout impact: non-blocker  
+6. Step name as written in QA Plan: CHECK qa-04-po-004: PO-004  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "Decision: **PASS**."  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-04-po-004/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: None recorded.  
+   Closeout impact: non-blocker  
+7. Step name as written in QA Plan: CHECK qa-05-po-005: PO-005  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "The QA-05 failure, Product Owner-authorized artifact remediation, preserved failure receipt, fourteen-file artifact-only delta, and unchanged final PASS rerun are mutually consistent."  
+   PF10-recorded evidence reference: final `primary.log` plus the six Moon Loop artifacts  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: Accepted bounded Moon Loop. The original failing receipt remains tracked; the unchanged rerun is the governing PASS basis.  
+   Closeout impact: non-blocker  
+8. Step name as written in QA Plan: CHECK qa-06-po-006: PO-006  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "PASS is approved for the specified qa-00 through qa-07 cluster."  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-06-po-006/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: PF10 later records an accepted path-preflight correction in the approved in-place plan update.  
+   Closeout impact: non-blocker  
+9. Step name as written in QA Plan: CHECK qa-07-po-007: PO-007  
+   PF10 coverage status: fully evidenced  
+   PF10 evidence pointer: Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "PASS is approved for the specified qa-00 through qa-07 cluster."  
+   PF10-recorded evidence reference: `audit/qa/hde-epic038/checks/qa-07-po-007/primary.log`  
+   Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+   Mismatch or deviation versus QA Plan, if any: PF10 later records an accepted path-preflight correction in the approved in-place plan update.  
+   Closeout impact: non-blocker  
+10. Step name as written in QA Plan: CHECK qa-08-po-008: PO-008  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.31 "qa-08 execution chronology and PASS basis" | "The generation record intentionally remained `TOOLING_BLOCKED`, exit `125`, with `ROUTING_STATUS=PR_PENDING`." | "Post-route finalization...recorded PASS at `2026-07-27T23:51:41Z`."  
+    PF10-recorded evidence reference: governed proof, pre-routing receipt, PR \#371 receipt, and final primary log  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked; PR receipt Repo-confirmed merged  
+    Mismatch or deviation versus QA Plan, if any: Accepted Extended Moon Loop replaced fixed-HEAD gating, repaired bootstrap and endpoint-classification defects, introduced event-bound authority, and routed non-QA-root changes before final PASS.  
+    Closeout impact: non-blocker  
+11. Step name as written in QA Plan: CHECK qa-09-po-009: PO-009  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-09 | 10 tests passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+12. Step name as written in QA Plan: CHECK qa-10-po-010: PO-010  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-10 | `RAILS_GATE_EVIDENCE_OK`; 42 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+13. Step name as written in QA Plan: CHECK qa-11-po-011: PO-011  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "The `qa-11-po-011` preflight omitted one Plan-listed test path, but the subsequent command successfully executed that file as part of the 308 passing tests."  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: Accepted preflight omission; behavior execution independently covered the omitted path.  
+    Closeout impact: non-blocker  
+14. Step name as written in QA Plan: CHECK qa-12-po-012: PO-012  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-12 | `DIRECT_DB_CONTRACT_OK`; 136 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+15. Step name as written in QA Plan: CHECK qa-13-po-013: PO-013  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-13 | 3 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+16. Step name as written in QA Plan: CHECK qa-14-po-014: PO-014  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-14 | 12 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+17. Step name as written in QA Plan: CHECK qa-15-po-015: PO-015  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-15 | 187 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+18. Step name as written in QA Plan: CHECK qa-16-po-016: PO-016  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-16 | `V2_MAPPED_CACHE_EVIDENCE_OK`; 41 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+19. Step name as written in QA Plan: CHECK qa-17-po-017: PO-017  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-17 | 52 passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+20. Step name as written in QA Plan: CHECK qa-18-po-018: PO-018  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-18 | Updater check and 2 tests passed |"  
+    PF10-recorded evidence reference: `primary.log`; `qa_step_logs_manifest.json`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+21. Step name as written in QA Plan: CHECK qa-19-po-019: PO-019  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-19 | All six validators exited `0` |"  
+    PF10-recorded evidence reference: `primary.log`; Human Index; Machine Mirror; canonical updater  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: The legacy `.sh` path was correctly treated as a Python entrypoint.  
+    Closeout impact: non-blocker  
+22. Step name as written in QA Plan: CHECK qa-20-po-020: PO-020  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "`qa-20` records all nineteen stages in canonical order, `first_failed_stage:NONE`, and `summary:PASS`."  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked; integrated validation log Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+23. Step name as written in QA Plan: CHECK qa-21-po-021: PO-021  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "`qa-21` records exact-source binding plus all three cleanliness markers as `PASS`."  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: primary log Repo-confirmed tracked; external workspace Not repo-resident  
+    Mismatch or deviation versus QA Plan, if any: Accepted Profile C syntax normalization; no change to proof scope or PASS criteria.  
+    Closeout impact: non-blocker  
+24. Step name as written in QA Plan: CHECK qa-22-po-022: PO-022  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-22 | 5 targeted tests passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+25. Step name as written in QA Plan: CHECK qa-23-po-023: PO-023  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "| qa-23 | `RAILS_GATE_EVIDENCE_OK`; 12 safety tests passed |"  
+    PF10-recorded evidence reference: `primary.log`  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: None recorded.  
+    Closeout impact: non-blocker  
+26. Step name as written in QA Plan: Close-out deliverables  
+    PF10 coverage status: fully evidenced  
+    PF10 evidence pointer: Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "The manifest path proof matches the current manifest: SHA-256 `0d9e8bc65ce3d73dc8612caadc090c96080c0b1ca0caaf77789159037cad4973`, 4,784 bytes." | "The Human Index, Machine Mirror, and canonical updater all contain the exact manifest identity and path."  
+    PF10-recorded evidence reference: `qa_step_logs_manifest.json`; manifest path proof; Human Index; Machine Mirror; canonical updater; `primary.log` files  
+    Repo validation status for PF10-referenced evidence, if repo-resident: Repo-confirmed tracked  
+    Mismatch or deviation versus QA Plan, if any: Early partial-cluster generation was accepted by ADR-DEV-01; final generation and finalization later completed. The tracked execution summary is shorter than the closeout-level accounting required by PF19 and PF06, but this report supplies the complete accepted-deviation, remediation, source-of-truth, and decisive-source evidence-posture accounting. PF10 §2.35 makes historical Codespaces venue proof non-applicable to this closeout.  
+    Closeout impact: non-blocker
+
+Findings
+
+FND-001
+
+Disposition: RESOLVED — NOT APPLICABLE
+
+What happened: The QA Plan names Codespaces as the execution venue, but neither PF10’s execution history nor any of the 35 governed QA artifacts binds an executed check to Codespaces. PF10 §2.35 now expressly determines that Codespaces was not a material proof axis for HDE-EPIC038 and requires the historical venue posture to be recorded as `UNKNOWN - NON-MATERIAL`.
+
+Why it matters: The historical venue remains unknown and must not be inferred. Under PF10 §2.35, however, that unknown is neither a QA failure nor a closeout blocker. No venue-discovery task or new Codespaces run is required solely to cure the former finding.
+
+Classification: Resolved evidence-posture finding / non-material venue
+
+PF touchpoints: PF10 — HDE Build Notes, §2.35, Sections 3, 4, 8, and 9
+
+Evidence pointer: QA Plan | Front matter | "Epic ID: HDE-EPIC038 Plan type: Live QA Plan / Runbook Execution venue: Codespaces Target environment: dev; one separately authorized, bounded nonproduction vendor check"
+
+Evidence pointer: PF10 | §2.35 "Decision" | "When venue is not material: the absence of Codespaces provenance is not a QA failure; the absence of Codespaces provenance is not a closeout blocker."
+
+Evidence pointer: PF10 | §2.35 "HDE-EPIC038 disposition" | "The absence of historical Codespaces venue provenance must be recorded as `UNKNOWN - NON-MATERIAL`, not as a QA blocker." | "Any pending finding whose sole basis is the absence of Codespaces venue proof is resolved as `NOT APPLICABLE` for HDE-EPIC038."
+
+Repo validation pointer, if applicable: Evidence pointer: Repo | | ""
+
+Search method: searched PF10 execution history for "Codespaces" (case: insensitive); scope: §§2.29–2.34; tool: grep; result: 0 hits.
+
+Search method: reviewed PF10 §2.35 completely; result: current policy disposition found, with no retrospective historical-execution claim.
+
+Search method: searched Repo for "Codespaces" (case: insensitive); scope: all 35 current artifacts under `audit/qa/hde-epic038/**`; tool: manual scan; result: 0 hits. This establishes only that current governed QA artifacts do not bind venue; under PF10 §2.35 that fact is non-material.
+
+FND-002
+
+Disposition: RESOLVED IN THIS CLOSEOUT RECORD — EXECUTION SUMMARY REMAINS MINIMAL
+
+What happened: The governed current QA RCA summary records a PASS table, qa-08 Extended Moon Loop, and readiness posture, but omits the qa-05 remediation receipt, ADR-DEV-01, qa-11 preflight deviation, explicit primary-source framing, and decisive-source evidence-light classification.
+
+Why it matters: PF19 and PF06 require accepted deviations, source posture, remediation history, and evidence-pointer posture to be surfaced in the closeout RCA. PF06 also expressly permits the mandatory QA RCA and Doc Delta summary to live as a section of the epic close report. This report supplies every omitted dimension, so the tracked execution summary’s brevity no longer leaves an uncovered closeout requirement.
+
+Classification: Resolved evidence-consolidation gap / non-blocking documentation caveat
+
+PF touchpoints: PF19 — Glow QA Guide, §9.2.15.5; PF19 — Glow QA Guide, §9.2.15.6; PF06 — Epic Process Guide, §0.4.1.2
+
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "The QA-05 failure, Product Owner-authorized artifact remediation, preserved failure receipt, fourteen-file artifact-only delta, and unchanged final PASS rerun are mutually consistent."
+
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "The `qa-11-po-011` preflight omitted one Plan-listed test path"
+
+Evidence pointer: PF06 | §0.4.1.2 "Location (normative)" | "The QA RCA & Doc Delta summary MAY live as a section of the epic close report, or as a separate governed artifact referenced from the close report."
+
+Resolution basis: This report’s Source-of-Truth Posture, Coverage vs QA Plan, Findings, Root Cause Analysis, Remediation Loop Assessment, Evidence Hygiene Assessment, Doc Deltas, and QA Verdict collectively form the complete closeout-level QA RCA and Doc Delta summary.
+
+Repo validation pointer, if applicable: Evidence pointer: Repo | | ""
+
+Search method: searched Repo for "qa-05-po-005.pre-remediation.log" (case: sensitive); scope: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`; tool: manual scan; result: 0 hits.
+
+Search method: searched Repo for "ADR-DEV-01" (case: sensitive); scope: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`; tool: manual scan; result: 0 hits.
+
+Search method: searched Repo for "preflight omitted" (case: sensitive); scope: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`; tool: manual scan; result: 0 hits.
+
+Search method: searched Repo for "Source-of-Truth" (case: sensitive); scope: `audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md`; tool: manual scan; result: 0 hits.
+
+FND-003
+
+What happened: PF10 §2.34 is decisive for qa-09 through qa-23 and records evidence-basis prose, result rows, `primary.log`, and `qa_step_logs_manifest.json`, but contains no direct evidence-pointer lines.
+
+Why it matters: PF19 requires the closeout review to identify this posture explicitly and treat it as an auditability caveat. Repo validation supplies current proof, but does not convert PF10 prose into historical evidence-pointer lines.
+
+Classification: Evidence posture gap
+
+PF touchpoints: PF19 — Glow QA Guide, §9.2.15.6
+
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "Aggregate decision for `qa-09-po-009` through `qa-23-po-023`: **PASS**." | "All 15 required `primary.log` files are tracked." | "All 15 file sizes and SHA-256 values match `qa_step_logs_manifest.json`."
+
+Repo validation pointer, if applicable: Evidence pointer: Repo | | ""
+
+Search method: searched PF10 for "Evidence pointer:" (case: sensitive); scope: §2.34; tool: grep; result: 0 hits.
+
+FND-004
+
+What happened: PF10 §2.34 states that PF19 was absent from current `main`, while current Repo contains tracked PF19 v2.8. The adjacent statement that “the current-main resolves to an empty blob” lacks an identified object and is not reliable as a current-state assertion.
+
+Why it matters: PF10 remains authoritative for the historical review event, but Repo governs current file reality. The stale/malformed statement reduces current-state traceability and must not control source availability.
+
+Classification: SoT internal mismatch
+
+PF touchpoints: None needed beyond the governing source roles.
+
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "PF19 is absent from current `main`, and the current-main resolves to an empty blob."
+
+Repo validation pointer, if applicable: Evidence pointer: Repo | | ""
+
+FND-005
+
+Disposition: RESOLVED FOR CURRENT REVIEW — PERMANENT-CANON DRAIN OUTSTANDING
+
+What happened: PF19 frames Codespaces proof as a harness run or applicable venue-binding artifact, while PF06’s closeout template lists at least one Codespaces harness run without the same qualifier. PF10 §2.35 resolves the current conflict by replacing universal provider identity with a venue-materiality test and explicitly superseding the overlapping universal language.
+
+Why it matters: The wording difference no longer creates a current HDE-EPIC038 blocker. Permanent PF19, PF06, PF07, and PF27 language still requires drainage so future plans and reviews do not recreate the superseded universal interpretation.
+
+Classification: Resolved plan-guidance ambiguity / canon-drain delta
+
+PF touchpoints: PF10 — HDE Build Notes, §2.35, Sections 3, 9, and 12; PF19 — Glow QA Guide, §9.2.15.6; PF06 — Epic Process Guide, §§3.5.2.8 and 6.8
+
+Evidence pointer: PF19 | §9.2.15.6 "Final QA closeout review required elements (required; closeout gate)" | "at least one Codespaces harness run, or a governed provenance artifact that truthfully binds an executed QA artifact to the Codespaces venue when venue provenance is part of the closeout claim"
+
+Evidence pointer: PF06 | §6.8 "Final QA Closeout Review \+ QA RCA (recommended)" | "Required elements checklist. Confirm the presence or absence of...at least one Codespaces harness run"
+
+Evidence pointer: PF10 | §2.35 "Supersession" | "It supersedes: Epic Process Guide, §6.8, only to the extent that its final QA closeout checklist treats a Codespaces harness run as an unconditional required element" | "Glow QA Guide, §9.2.15.6, only to the extent that its Codespaces checklist item could be read as universal when venue provenance is not part of the claimed proof."
+
+FND-006
+
+What happened: Implementation Guide states that PF10 is silent for the epic, but current PF10 contains extensive epic-specific implementation, remediation, QA, and closeout-review history.
+
+Why it matters: The Implementation Guide remains useful for original goals, but its source-posture statement is stale and cannot govern current closeout interpretation.
+
+Classification: Plan-guidance ambiguity
+
+Evidence pointer: Implementation Guide | Source posture | "PF10 governs only where it explicitly speaks. It is silent for this epic."
+
+Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "Aggregate decision for `qa-09-po-009` through `qa-23-po-023`: **PASS**."
+
+Root Cause Analysis
+
+Primary root cause: QA execution accumulated across a partial-cluster closeout generation, an ordinary qa-05 Moon Loop, a routed qa-08 Extended Moon Loop, later qa-09–qa-23 execution, and separate finalization. The generated repository summary remained intentionally compact and did not consolidate every remediation, deviation, source-of-truth, and decisive-source evidence-posture dimension required at final closeout. This created evidence-consolidation drift, not a product-behavior or artifact-integrity failure. The drift is resolved in this closeout record, which performs the complete cross-source accounting permitted by PF06 §0.4.1.2.
+
+Evidence pointer: PF10 | §2.29 "ADR-DEV-01" | "The shared closeout generation phase was invoked after qa-00 through qa-07 had executed, while qa-08 through qa-23 remained `NOT RUN`"
+
+Evidence pointer: PF10 | §2.31 "qa-08 execution chronology and PASS basis" | "The generation record intentionally remained `TOOLING_BLOCKED`, exit `125`, with `ROUTING_STATUS=PR_PENDING`." | "Post-route finalization...recorded PASS"
+
+Evidence pointer: PF06 | §0.4.1.2 "Mandatory QA RCA & Doc Delta summary" | "When a Live QA Plan exists, the summary MUST include explicit Coverage vs QA Plan accounting in plan order using stable step identifiers." | "Coverage vs QA Plan MUST separately surface any accepted plan-execution deviation"
+
+Contributing factors:
+
+* Partial-cluster evidence generation was needed before the Plan’s original all-checks generation point, creating ADR-DEV-01.  
+  Evidence pointer: PF10 | §2.29 "ADR-DEV-01" | "The manifest and proof are valid for the eight executed checks." | "Decision: Acceptable for this step"  
+* qa-08 exposed planning, authority, producer, provenance, and hosted-CI defects across a longer routed lineage than the ordinary Moon Loop supports.  
+  Evidence pointer: PF10 | §2.31 "Event trigger and PO authority for qa-08-po-008" | "The approved step intended to prove one bounded, same-input, independently checked live vendor acquisition event." | "Execution exposed planning and producer defects before the call"  
+* The final qa-09–qa-23 PF10 review recorded strong result prose without direct evidence-pointer lines.  
+  Evidence pointer: PF10 | §2.34 "QA Pass 3 HDE-EPIC038" | "Evidence is sufficient and trustworthy." | "Required deliverables are present and tracked"  
+* The current execution summary’s “no new deltas found” line does not preserve PF10’s permanent-canon drain targets or the full deviation history; this closeout record now supplies that accounting.  
+  Evidence pointer: PF10 | §2.31 "Supersession and drain targets" | "Permanent-canon drain targets:" | "Glow QA Guide, §3.4.8, “Rails posture for manual Live QA” — add the Extended Moon Loop class"
+
+Policy reassessment:
+
+PF10 §2.35 removes historical Codespaces venue provenance from this root-cause account. The prior treatment of missing venue proof as a blocker arose from permanent-canon and template wording that PF10 now supersedes for the overlapping scope. It was not a supported defect in HDE-EPIC038 QA behavior or evidence integrity.
+
+Evidence pointer: PF10 | §2.35 "HDE-EPIC038 disposition" | "This disposition resolves only the venue requirement. It does not resolve the separately identified incompleteness in the governed QA RCA and Doc Delta summary."
+
+Hard to detect earlier, if applicable:
+
+The manifest, path proof, primary headers, hashes, Human Index, Machine Mirror, updater lookup, and integrated pipeline are internally coherent. Those validators prove artifact integrity and QA-result binding, but they do not themselves narrate every accepted remediation, deviation, source distinction, and evidence-posture caveat. That narrative had to be reconstructed from PF10 and governed Repo evidence.
+
+Evidence pointer: PF19 | §4.4.3 "Per-epic QA step logs manifest (qa\_step\_logs\_manifest.json)" | "Purpose: a machine-readable index of all per-check “primary logs” under the epic’s QA root"
+
+Hard to close confidently, if applicable:
+
+The required RCA details are distributed across PF10 execution history, remediation receipts, current Repo artifacts, and source-posture findings. A bounded PF10/Repo synthesis was required because no external or privileged discovery could improve those already governed facts. This report performs that synthesis and identifies the final accepted evidence bases. Historical venue discovery or a new Codespaces run would add no material closeout information and is not required by PF10 §2.35.
+
+Evidence pointer: PF06 | §6.8 "Final QA Closeout Review \+ QA RCA (recommended)" | "It MUST NOT say Complete when any required element is absent, ambiguous, or unsupported by governed evidence."
+
+Evidence pointer: PF10 | §2.35 "HDE-EPIC038 disposition" | "No new Codespaces harness run is required solely to cure the venue-provenance gap."
+
+Root cause does not authorize implementation or remediation execution.
+
+Remediation Loop Assessment
+
+1. qa-05 ordinary Moon Loop
+
+PF10 records a failing receipt, PO-authorized artifact-only remediation, a fourteen-file artifact delta, and an unchanged PASS rerun. The loop reduced uncertainty: it preserved the failed state, bounded the change to evidence surfaces, and established a final governing receipt without changing functional code.
+
+Evidence pointer: PF10 | §2.29 "QA Pass 1 HDE-EPIC038" | "The QA-05 failure, Product Owner-authorized artifact remediation, preserved failure receipt, fourteen-file artifact-only delta, and unchanged final PASS rerun are mutually consistent." | "No functional-code change appears in the recorded delta."
+
+Repo validation status for repo-resident evidence references: Repo-confirmed tracked.
+
+2. ADR-DEV-01 partial-cluster generation
+
+The deviation reduced immediate review uncertainty by producing a manifest and path proof for qa-00 through qa-07, but it introduced procedural churn because the original Plan offered no partial-cluster generation route. Later epic-wide generation and finalization superseded the intermediate posture without erasing it.
+
+Evidence pointer: PF10 | §2.29 "ADR-DEV-01" | "The shared closeout generation phase was invoked after qa-00 through qa-07 had executed, while qa-08 through qa-23 remained `NOT RUN`" | "Decision: Acceptable for this step"
+
+Repo validation status for repo-resident evidence references: Repo-confirmed tracked.
+
+3. qa-08 PO-approved Extended Moon Loop
+
+The loop reduced uncertainty despite a long causal chain. It corrected fixed-HEAD, bootstrap, target-classification, authority, producer, evidence-provenance, and hosted-CI integration defects; preserved the pre-routing TOOLING\_BLOCKED receipt; routed non-QA-root changes; and retained one final PASS event without authorizing another call.
+
+Evidence pointer: PF10 | §2.31 "qa-08 execution chronology and PASS basis" | "The generation record intentionally remained `TOOLING_BLOCKED`, exit `125`, with `ROUTING_STATUS=PR_PENDING`." | "Post-route finalization...recorded PASS at `2026-07-27T23:51:41Z`."
+
+Evidence pointer: PF10 | §2.31 "PR \#372 — CI integration closure" | "PR \#372 did not regenerate or alter the governed live proof, rerun `qa-08-po-008` finalization, renew either receipt, or make a second live call."
+
+Repo validation status for repo-resident evidence references: Repo-confirmed tracked for the proof, primary log, and companion evidence; PR receipts were Repo-confirmed merged.
+
+4. Legacy `.sh` invocation clarification
+
+PF10 §2.33 reduced tooling ambiguity by identifying the file as Python despite its stable `.sh` path. It avoided misclassifying shell-parser failure as schema behavior and supported the qa-19 invocation posture. It did not create a new QA event or authorize a source change.
+
+Evidence pointer: PF10 | §2.33 "`ci/checks/check_mirror_schema.sh` Is a Python Entry Point with a Legacy Stable Path" | "Shell-parser output from `bash ci/checks/check_mirror_schema.sh` or `sh ci/checks/check_mirror_schema.sh` is an invocation or tooling defect, not a Machine Mirror schema finding."
+
+Repo validation status for repo-resident evidence references: Repo-confirmed tracked.
+
+The remediation loops were productive and bounded in their final recorded form. No unresolved remediation behavior, evidence-integrity defect, venue-provenance requirement, or QA-closeout blocker remains in the reviewed evidence.
+
+Evidence Hygiene Assessment
+
+Strong evidence families:
+
+* The 24 primary logs are tracked, header-valid, PASS/exit-`0`, closed-rails, tokenless, self-referencing, and exactly bound by manifest size and SHA-256.  
+* The manifest is path-proven and discoverable in the canonical updater, Human Evidence Index, and Machine Mirror.  
+* The qa-05 failed receipt and artifact-only remediation lineage are preserved rather than overwritten.  
+* The qa-08 live proof separates behavioral proof, pre-routing receipt, routing receipt, finalization, and expired authority.  
+* PR \#376 and PR \#377 preserve the generation-to-routing-to-finalization sequence, and both PR-head CI workflows completed successfully.
+
+Residual evidence caveats:
+
+* PF10 §2.34 uses evidence-basis prose rather than direct evidence-pointer lines for qa-09 through qa-23. Current Repo validation supplies the auditable proof, but does not rewrite the historical PF10 sourcing.  
+* PF10 §2.34’s statement about PF19 absence is stale relative to current Repo reality.  
+* The `v12.5.4b` file retains an internal `Version: v12.5.3b` field; this should be corrected during PF10 maintenance.  
+* The generated execution summary is intentionally shorter than this closeout-level synthesis.  
+* Historical execution venue remains `UNKNOWN - NON-MATERIAL` and must not be inferred.
+
+Recurrence prevention:
+
+* Drain the Extended Moon Loop, partial-cluster generation, venue-materiality, and closeout-template deltas identified below.  
+* Future generated summaries should include structured accepted-deviation and source-posture fields when they are intended to serve as the sole closeout-level RCA.
+
+Implementation Gaps and Proposed Fixes
+
+No implementation gaps supported by PF10 or validated repo evidence.
+
+Doc Deltas (PF-Canon only; excluding PF10)
+
+A) PF19 doc deltas (targeted)
+
+Doc: PF19 — Glow QA Guide  
+Section: §3.4.8 "Rails posture for manual Live QA (EPIC017 example; generalized rule)"  
+Source finding(s): FND-002; qa-08 Extended Moon Loop assessment  
+Evidence pointer(s): Evidence pointer: PF10 | §2.31 "Supersession and drain targets" | "Glow QA Guide, §3.4.8, “Rails posture for manual Live QA” — add the Extended Moon Loop class, invocation conditions, causal-closure rule, receipt lineage, and completion/expiry model."  
+Delta: Define a PO-approved Extended Moon Loop as a separately authorized, event-bound routed remediation lineage. Require pre-action authority, preserved failed and pre-routing receipts, explicit causal closure, final accepted receipt, routed non-QA-root changes, and independent authority expiry.  
+Tag: NEW CANON PROPOSAL  
+Why PF19 is the correct home: PF19 owns Live QA rails, Moon Loop boundaries, failure classification, and PASS-grade evidence posture.
+
+Doc: PF19 — Glow QA Guide  
+Section: §9.2.15.6 "Final QA closeout review required elements (required; closeout gate)"  
+Source finding(s): FND-001 (resolved); FND-005 (resolved for current review; drainage outstanding)  
+Evidence pointer(s): Evidence pointer: PF10 | §2.35 "Decision" | "Exact Codespaces execution and venue provenance are mandatory only when Codespaces is material to the proof being claimed under the test in Section 4."  
+Evidence pointer: PF10 | §2.35 "Drain targets" | "Glow QA Guide, §9.2.15.6: State unambiguously that Codespaces proof is required only when venue is material to the claimed proof."  
+Delta: Replace any universal or ambiguous Codespaces checklist interpretation with a conditional venue-proof item. Require the venue-materiality test and the four-field declaration (`Venue-specific claim`, `Why venue can affect the result`, `Required venue evidence`, and `Effect of missing venue evidence`) when venue is normative. When venue is non-material, require `NOT CLAIMED`, `NOT APPLICABLE`, or `UNKNOWN - NON-MATERIAL` and prohibit venue absence from blocking otherwise supported QA.  
+Tag: PF10 DRAIN TARGET  
+Why PF19 is the correct home: PF19 owns Live QA evidence trust and closeout required-element interpretation.
+
+Doc: PF19 — Glow QA Guide  
+Section: §4.4.3 "Per-epic QA step logs manifest (qa\_step\_logs\_manifest.json)"  
+Source finding(s): FND-002; ADR-DEV-01  
+Evidence pointer(s): Evidence pointer: PF10 | §2.29 "ADR-DEV-01" | "The shared closeout generation phase was invoked after qa-00 through qa-07 had executed, while qa-08 through qa-23 remained `NOT RUN`"  
+Delta: Define an explicit partial-cluster manifest-generation posture for bounded step-cluster review. Require unexecuted checks to remain explicitly outside the cluster and prohibit partial-cluster generation from implying finalization, whole-plan PASS, or closeout readiness.  
+Tag: NEW CANON PROPOSAL  
+Why PF19 is the correct home: PF19 owns current-state QA manifests and final step-cluster review sufficiency.
+
+B) Optional other PF doc deltas, maximum 5
+
+Doc: PF06 — Epic Process Guide  
+Section: §3.5.2.8 "Live QA via harness (required for epic closeout)" and §6.8 "Final QA Closeout Review \+ QA RCA (recommended)"  
+Source finding(s): FND-005 (resolved for current review; drainage outstanding)  
+Evidence pointer(s): Evidence pointer: PF10 | §2.35 "Supersession" | "It supersedes: Epic Process Guide, §3.5.2.8, only to the extent that the section requires every epic to execute at least one harness run in GitHub Codespaces regardless of venue materiality" | "Epic Process Guide, §6.8, only to the extent that its final QA closeout checklist treats a Codespaces harness run as an unconditional required element."  
+Evidence pointer: PF10 | §2.35 "Drain targets" | "Epic Process Guide, §3.5.2.8: Replace the universal Codespaces harness requirement with the materiality-based execution-environment rule" | "Epic Process Guide, §6.8: Make the final closeout venue item conditional on a venue-specific claim."  
+Delta: Preserve the governed-harness and environment-evidence requirements while replacing the universal Codespaces rule with the venue-materiality test. Make the §6.8 checklist require venue proof only when an approved venue-specific claim exists; otherwise require a truthful non-material venue posture without blocking closeout.  
+Why PF19 is not the correct home: PF19 owns the QA-process rule separately; PF06 owns its epic-close harness requirement and closure-review checklist wording.
+
+Doc: PF07 — Glow Infrastructure  
+Section: §2.6 "Prod on Railway, QA via Codespaces (names-only)" and §2.7 "Terminal CLI access as admin surface (names-only, pre-Glow)"  
+Source finding(s): FND-005 (resolved for current review; drainage outstanding)  
+Evidence pointer(s): Evidence pointer: PF10 | §2.35 "Drain targets" | "Glow Infrastructure, §§2.6 and 2.7: Preserve Codespaces as the canonical shared QA console while stating clearly that canonical does not mean exclusive."  
+Delta: Preserve Codespaces as the canonical shared QA console and artifact workspace while stating explicitly that canonical does not mean exclusive or mandatory for every epic. Retain the existing recognition that another correctly configured terminal can be a valid console and continue routing behavior-test placement to the QA and epic-process authorities.  
+Why PF19 is not the correct home: PF07 owns provider, console, and terminal-surface inventory language; it does not own the detailed QA materiality test.
+
+Doc: PF27 — Canon Plan Templates  
+Section: "A) HDE Templates" → "1) Live QA Plan" → "Front matter"; §9 "Final QA Closeout Review \+ QA RCA (Template; REVIEW mode only)" → "Checklist of required RCA/closeout elements"  
+Source finding(s): FND-001 (resolved); FND-005 (resolved for current review; drainage outstanding)  
+Evidence pointer(s): Evidence pointer: PF10 | §2.35 "Drain targets" | "Canon Plan Templates, Live QA Plan front matter: Add the four-field venue-materiality declaration and define the execution-venue field as descriptive unless that declaration makes it normative." | "Canon Plan Templates, final QA closeout checklist: Replace the unconditional Codespaces item with a conditional venue-proof item."  
+Delta: Add the four venue-materiality fields to Live QA Plan front matter. Define `Execution venue` as descriptive or preferred unless those fields make it normative. Replace `Codespaces harness execution at least once` in the closeout template with a conditional venue-proof item and the allowed non-material postures `NOT CLAIMED`, `NOT APPLICABLE`, and `UNKNOWN - NON-MATERIAL`.  
+Why PF19 is not the correct home: PF19 owns the substantive QA rule; PF27 owns the plan and review template fields that currently encode the superseded universal posture.
+
+QA Verdict and Recommendation
+
+Verdict: READY WITH CAVEATS
+
+Decision axis: HDE-EPIC038 QA-closeout evidence sufficiency and readiness for Product Owner closure review.
+
+* PF10 strongly supports PASS for all three QA clusters: qa-00–qa-07, qa-08, and qa-09–qa-23. The qa-05 and qa-08 remediation lineages are preserved and their final governing receipts are coherent.  
+* All closeout-material repo evidence references checked in this review are present and Repo-confirmed tracked. The 24-log manifest, path proof, Human Index, Machine Mirror, updater lookup, qa-08 proof, and qa-20 integrated log are mutually consistent.  
+* PF10 §2.35 resolves the former Codespaces blocker as `NOT APPLICABLE`. Historical execution venue remains `UNKNOWN - NON-MATERIAL`; no retrospective venue claim is made, and no venue discovery or new Codespaces run is required solely for HDE-EPIC038 closeout.  
+* The tracked execution summary remains compact, but PF06 §0.4.1.2 permits the mandatory QA RCA and Doc Delta summary to live inside the epic close report. This report now supplies the complete remediation, accepted-deviation, source-of-truth, evidence-light-source, RCA, remediation-loop, and Doc Delta accounting. FND-002 is therefore resolved in this closeout record.  
+* PF10 §2.34’s evidence-light posture and stale current-PF19 observation are auditability caveats; Repo validation corroborates the QA artifacts but cannot rewrite PF10’s historical sourcing.  
+* The proposed Doc Deltas may reduce recurrence by defining Extended Moon Loop governance, the materiality-based execution-environment contract, partial-cluster manifest posture, and consistent PF06, PF07, PF19, and PF27 wording.  
+* Optional non-blocking follow-up: expand the generated repository summary so a future reviewer does not need the same PF10/Repo synthesis. No rerun or OPS discovery is required.  
+* OPS venue-provenance discovery is not required for this closeout and should not be pursued solely to satisfy the removed universal rule.  
+* No `OPS-04` discovery task is created because the bounded pass resolved every material fact from existing PF10 and governed Repo evidence.  
+* This verdict is a reviewer recommendation only. It does not perform QA, OPS, PF-document changes, PO closeout, board movement, formal acceptance, token satisfaction, formal close-pack completion, or epic closure.
+
+End of report.
 
 \<eof\>  
