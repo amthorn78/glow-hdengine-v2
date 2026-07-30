@@ -6,11 +6,17 @@ import argparse
 import difflib
 import hashlib
 import json
+import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from engine.presenter import emitter
+
 OUTPUT = Path("audit/qa/hde-epic038/token_evidence_matrix.md")
 EPIC_ID = "HDE-EPIC038"
 CI_JOB = "test (.github/workflows/ci.yml)"
@@ -90,6 +96,8 @@ QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
 QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
 PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
 PREIMAGE_KEY = "epic038.pr02.reader_cli_summary"
+PREIMAGE_SOURCE_PATH = "audit/gates/parity/reader_cli/ab.json"
+PREIMAGE_SOURCE_KEY = "epic038.pr02.reader_cli_ab"
 FINAL_LF_CHECK_ID = "qa-19-po-019"
 FINAL_LF_LOG_PATH = (
     "audit/qa/hde-epic038/checks/qa-19-po-019/primary.log"
@@ -220,15 +228,23 @@ def build_rows() -> tuple[Row, ...]:
         "artifacts/runtime/env_matrix.snapshot.json",
         "epic038.pr01.env_matrix_snapshot_v3",
     )
-    bind(
-        ("PREIMAGE_RECOMPUTE_OK",),
-        (
-            "tests/evidence/test_determinism_gate_proofs.py; "
-            "tests/evidence/test_hde_epic038_closeout.py"
+    rows["PREIMAGE_RECOMPUTE_OK"] = replace(
+        _row(
+            "PREIMAGE_RECOMPUTE_OK",
+            (
+                "tests/evidence/test_determinism_gate_proofs.py; "
+                "tests/evidence/test_hde_epic038_closeout.py"
+            ),
+            "qa-04-po-004",
+            PREIMAGE_PATH,
+            PREIMAGE_KEY,
         ),
-        "qa-04-po-004",
-        PREIMAGE_PATH,
-        PREIMAGE_KEY,
+        primary_evidence=(PREIMAGE_PATH, PREIMAGE_SOURCE_PATH),
+        artifact_keys=(PREIMAGE_KEY, PREIMAGE_SOURCE_KEY),
+        proof_anchors=(
+            f"{PREIMAGE_PATH}.path_proof.txt",
+            f"{PREIMAGE_SOURCE_PATH}.path_proof.txt",
+        ),
     )
     rows["PREIMAGE_RECOMPUTE_OK"] = replace(
         rows["PREIMAGE_RECOMPUTE_OK"],
@@ -528,16 +544,31 @@ def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> No
         raise ValueError("closed-rails refusal binding mismatch")
 
 
-def validate_preimage_payload(payload: Mapping[str, object]) -> None:
+def validate_preimage_payload(
+    payload: Mapping[str, object],
+    source_bytes: bytes,
+) -> None:
     hashes = payload.get("idempotence_hash")
+    artifact_hashes = payload.get("hashes")
     predicates = payload.get("predicates")
     if (
         payload.get("artifact_kind") != "hde_epic038_pr02_determinism_proof"
         or payload.get("acceptance_token_satisfied") is not False
         or not isinstance(hashes, dict)
+        or not isinstance(artifact_hashes, dict)
         or not isinstance(predicates, dict)
     ):
         raise ValueError("preimage recompute evidence shape mismatch")
+    try:
+        source = json.loads(source_bytes)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("preimage recompute source mismatch") from exc
+    if not isinstance(source, dict):
+        raise ValueError("preimage recompute source mismatch")
+    preimage = dict(source)
+    source_stored = preimage.pop("idempotence_hash", None)
+    source_recomputed = hashlib.sha256(emitter.emit_public(preimage)).hexdigest()
+    source_sha256 = hashlib.sha256(source_bytes).hexdigest()
     stored = hashes.get("stored")
     recomputed = hashes.get("recomputed")
     if (
@@ -548,6 +579,9 @@ def validate_preimage_payload(payload: Mapping[str, object]) -> None:
         or any(character not in "0123456789abcdef" for character in stored)
         or any(character not in "0123456789abcdef" for character in recomputed)
         or stored != recomputed
+        or stored != source_stored
+        or recomputed != source_recomputed
+        or artifact_hashes.get("ab_sha256") != source_sha256
         or predicates.get("preimage_hash_match") is not True
     ):
         raise ValueError("preimage recompute predicate mismatch")
@@ -674,9 +708,13 @@ def _validate_special_semantics(row: Row) -> None:
         )
     elif row.token == "PREIMAGE_RECOMPUTE_OK":
         if (
-            row.primary_evidence != (PREIMAGE_PATH,)
-            or row.artifact_keys != (PREIMAGE_KEY,)
-            or row.proof_anchors != (f"{PREIMAGE_PATH}.path_proof.txt",)
+            row.primary_evidence != (PREIMAGE_PATH, PREIMAGE_SOURCE_PATH)
+            or row.artifact_keys != (PREIMAGE_KEY, PREIMAGE_SOURCE_KEY)
+            or row.proof_anchors
+            != (
+                f"{PREIMAGE_PATH}.path_proof.txt",
+                f"{PREIMAGE_SOURCE_PATH}.path_proof.txt",
+            )
             or set(row.test_binding.split("; "))
             != {
                 "tests/evidence/test_determinism_gate_proofs.py",
@@ -686,7 +724,8 @@ def _validate_special_semantics(row: Row) -> None:
         ):
             raise ValueError("preimage recompute evidence binding mismatch")
         validate_preimage_payload(
-            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8"))
+            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8")),
+            (ROOT / PREIMAGE_SOURCE_PATH).read_bytes(),
         )
     elif row.token == "RELEASE_ID_RECOMPUTE_OK":
         if (
