@@ -139,10 +139,10 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Test/stable identifier: `tests/evidence/test_determinism_gate_proofs.py; tests/evidence/test_hde_epic038_closeout.py`
 - Closed-rails CI binding: `test (.github/workflows/ci.yml)`
 - Live QA: `qa-04-po-004`
-- Primary governed evidence: `audit/gates/parity/reader_cli/summary.json`
-- Human Index / Machine Mirror artifact keys: `epic038.pr02.reader_cli_summary`
+- Primary governed evidence: `audit/gates/parity/reader_cli/summary.json; audit/gates/parity/reader_cli/ab.json`
+- Human Index / Machine Mirror artifact keys: `epic038.pr02.reader_cli_summary; epic038.pr02.reader_cli_ab`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `audit/gates/parity/reader_cli/summary.json.path_proof.txt`
+- Proof anchors: `audit/gates/parity/reader_cli/summary.json.path_proof.txt; audit/gates/parity/reader_cli/ab.json.path_proof.txt`
 - Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
