@@ -186,6 +186,47 @@ def test_database_posture_regressions_fail_closed(token, mutation) -> None:
         closeout.validate_db_posture_payload(token, payload)
 
 
+def test_preimage_row_binds_idempotence_recompute_evidence() -> None:
+    row = next(
+        row
+        for row in closeout.validate_rows(closeout.build_rows())
+        if row.token == "PREIMAGE_RECOMPUTE_OK"
+    )
+    assert row.primary_evidence == (closeout.PREIMAGE_PATH,)
+    assert row.artifact_keys == (closeout.PREIMAGE_KEY,)
+    assert row.proof_anchors == (f"{closeout.PREIMAGE_PATH}.path_proof.txt",)
+    assert set(row.test_binding.split("; ")) == {
+        "tests/evidence/test_determinism_gate_proofs.py",
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert row.live_qa == "qa-04-po-004"
+    assert "UNCLAIMED" in row.posture
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda payload: payload["idempotence_hash"].__setitem__(
+            "recomputed", "0" * 64
+        ),
+        lambda payload: payload["predicates"].__setitem__(
+            "preimage_hash_match", False
+        ),
+        lambda payload: payload.__setitem__(
+            "acceptance_token_satisfied", True
+        ),
+        lambda payload: payload.__setitem__("idempotence_hash", {}),
+    ],
+)
+def test_preimage_recompute_regressions_fail_closed(mutation) -> None:
+    payload = json.loads(
+        (ROOT / closeout.PREIMAGE_PATH).read_text(encoding="utf-8")
+    )
+    mutation(payload)
+    with pytest.raises(ValueError, match="preimage recompute"):
+        closeout.validate_preimage_payload(payload)
+
+
 def test_no_io_row_binds_explicit_zero_call_log_and_manifest() -> None:
     row = next(
         row
@@ -292,6 +333,59 @@ def test_final_lf_evidence_regressions_fail_closed(
         log_text = log_mutation(log_text)
     with pytest.raises(ValueError, match="final-LF"):
         closeout.validate_final_lf_evidence(manifest, log_text)
+
+
+def test_final_lf_script_covers_current_and_planned_closeout_outputs() -> None:
+    script_text = (ROOT / closeout.FINAL_LF_SCRIPT_PATH).read_text(
+        encoding="utf-8"
+    )
+    closeout.validate_final_lf_script(script_text)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "audit/qa/hde-epic038/token_evidence_matrix.md",
+        "audit/EPIC-038_close_report.md",
+        "audit/EPIC-038_MANIFEST.json",
+    ],
+)
+def test_final_lf_script_rejects_missing_target_coverage(path: str) -> None:
+    script_text = (ROOT / closeout.FINAL_LF_SCRIPT_PATH).read_text(
+        encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="final-LF target coverage"):
+        closeout.validate_final_lf_script(script_text.replace(f"  {path}\n", ""))
+
+
+def test_final_lf_gate_checks_each_present_planned_output(tmp_path) -> None:
+    for relative_path in closeout.FINAL_LF_REQUIRED_PATHS:
+        target = tmp_path / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"required\n")
+
+    command = ["bash", str(ROOT / closeout.FINAL_LF_SCRIPT_PATH)]
+    initial = subprocess.run(
+        command,
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert initial.returncode == 0, initial.stdout + initial.stderr
+
+    planned = tmp_path / closeout.FINAL_LF_PLANNED_PATHS[0]
+    planned.parent.mkdir(parents=True, exist_ok=True)
+    planned.write_bytes(b"missing-final-lf")
+    rejected = subprocess.run(
+        command,
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert rejected.returncode == 1
+    assert f"MISSING_FINAL_LF: {closeout.FINAL_LF_PLANNED_PATHS[0]}" in (
+        rejected.stderr
+    )
 
 
 def _release_attestation(
