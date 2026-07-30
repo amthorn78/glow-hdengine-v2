@@ -253,6 +253,45 @@ def test_preimage_recompute_rejects_matching_forged_hash_pair() -> None:
         )
 
 
+def test_cli_reader_parity_row_binds_actual_reader_dump_checks() -> None:
+    row = next(
+        row
+        for row in closeout.validate_rows(closeout.build_rows())
+        if row.token == "CLI_READER_PARITY_OK"
+    )
+    assert row.primary_evidence == (closeout.PREIMAGE_PATH,)
+    assert row.artifact_keys == (closeout.PREIMAGE_KEY,)
+    assert row.proof_anchors == (f"{closeout.PREIMAGE_PATH}.path_proof.txt",)
+    assert set(row.test_binding.split("; ")) == {
+        "tests/evidence/test_determinism_gate_proofs.py",
+        "tests/cli/test_showcompat_parity_and_identity.py",
+    }
+    assert row.live_qa == "qa-04-po-004"
+    assert "reader-dump/runtime comparison" in row.future_claim
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda payload: payload["predicates"].__setitem__(
+            "reader_cli_byte_identity", False
+        ),
+        lambda payload: payload["hashes"].__setitem__("cli_sha256", "0" * 64),
+        lambda payload: payload.__setitem__("acceptance_token_satisfied", True),
+        lambda payload: payload["sources"].__setitem__(
+            "cli", "python -m engine.cli showcompat"
+        ),
+    ],
+)
+def test_cli_reader_parity_regressions_fail_closed(mutation) -> None:
+    payload = json.loads(
+        (ROOT / closeout.PREIMAGE_PATH).read_text(encoding="utf-8")
+    )
+    mutation(payload)
+    with pytest.raises(ValueError, match="CLI/Reader parity"):
+        closeout.validate_cli_reader_parity_payload(payload)
+
+
 def test_no_io_row_binds_explicit_zero_call_log_and_manifest() -> None:
     row = next(
         row
