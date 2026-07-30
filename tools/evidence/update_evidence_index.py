@@ -2426,6 +2426,14 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
 
 EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
+        "artifact_key": "epic038.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic038/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_token_matrix",
+        "schema_version": "1.0",
+        "notes": "Deterministic DEV-01 nonclaiming token binding matrix; independent Gate B review required",
+    },
+    {
         "artifact_key": "epic038.qa_step_logs_manifest",
         "discovered_physical_path": "audit/qa/hde-epic038/qa_step_logs_manifest.json",
         "epic_id": "HDE-EPIC038",
