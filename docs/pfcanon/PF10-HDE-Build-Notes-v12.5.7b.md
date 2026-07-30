@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.6b  
-Effective Date: 2026.07.29  
+**Version:** v12.5.7b  
+Effective Date: 2026.07.30  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -192,7 +192,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.34) QA Pass 3 HDE-EPIC038  
 2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
 2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038  
-2.37) HDE-EPIC038 Token-Roster Correction — Mint RELEASE\_ID\_RECOMPUTE\_OK and Retire Current DEV\_DB\_BRIDGE\_FALLBACK\_OK Claimability
+2.37) HDE-EPIC038 Token-Roster Correction — Mint RELEASE\_ID\_RECOMPUTE\_OK and Retire Current DEV\_DB\_BRIDGE\_FALLBACK\_OK Claimability  
+2.38) HDE-EPIC038 Epic Remediation Plan — Resolve Token/Evidence-Matrix Approval Checkpoint
 
 # 2\) Numbered Addenda
 
@@ -3969,5 +3970,121 @@ It does not:
 3. **Canon Plan Templates, token-validation posture:** Preserve mechanical registry validation before plan approval and final closeout so an unregistered or retired token cannot silently enter a roster.
 
 Until those drain targets are complete, this addendum is the authority for the exact token-admission and HDE-EPIC038 roster-correction scope.
+
+## **2.38) HDE-EPIC038 Epic Remediation Plan — Resolve Token/Evidence-Matrix Approval Checkpoint**
+
+Timestamp: \<autofill at publication\>
+
+### **Details**
+
+This addendum resolves a direct approval-checkpoint conflict between **HDE Governance**, §9.7.1–§9.7.2, and **Epic Process Guide**, §1.1.9.3–§1.1.9.4, for the HDE-EPIC038 Epic Remediation Plan titled **Formal Close-Pack and Acceptance-Ledger Completion**.
+
+**HDE Governance** separates plan approval from QA-ledger completion. It permits plan approval before the standalone token/evidence matrix exists when the plan identifies the matrix location and preserves a hard later completeness gate.
+
+**Epic Process Guide** also describes separate checkpoints but requires every in-scope matrix row to be complete before plan approval.
+
+Those rules cannot both control the same approval event. The conflict determines whether DEV-01 may begin only after full-plan approval or must instead receive separate pre-approval authorization. This addendum supplies the bounded live rule for this exact remediation plan pending permanent-canon reconciliation.
+
+### **Decision**
+
+For the HDE-EPIC038 Epic Remediation Plan titled **Formal Close-Pack and Acceptance-Ledger Completion**:
+
+1. Full-plan approval may occur before the standalone token/evidence matrix exists.  
+2. At approval, the plan must contain the exact corrected 33-token roster established by Addendum 2.37 and the exact matrix pointer `audit/qa/hde-epic038/token_evidence_matrix.md`.  
+3. DEV-01 must be the first post-approval execution task and must construct and validate the standalone matrix under closed rails without claiming any token result.  
+4. The plan-specific Gate B must pass before DEV-02, acceptance-map generation, close-pack generation, any token claim, or any assertion of token completeness.  
+5. No second full-plan approval is required after Gate B when the work remains within the already approved scope, rails, and authorization.  
+6. Plan approval, DEV-01 authorization, matrix creation, matrix validation, and Gate B completion do not by themselves mark any token PASS or establish epic acceptance or closure.
+
+### **Approval-time requirements**
+
+The plan may request full-plan approval before matrix construction only when it includes all of the following:
+
+* the exact corrected 33-token roster from Addendum 2.37;  
+* the exact matrix path `audit/qa/hde-epic038/token_evidence_matrix.md`;  
+* the exact DEV-01 task that will create and validate the standalone matrix;  
+* an explicit closed-rails and nonclaiming posture for matrix construction;  
+* a hard Gate B that prevents DEV-02, token claims, and closeout work until matrix completeness is independently verified; and  
+* an explicit stop requiring plan or authority revision whenever execution would change the approved scope, rails, or authorization.
+
+If any approval-time requirement above is absent or ambiguous, this addendum does not permit full-plan approval.
+
+### **Gate B requirements**
+
+Gate B passes only when the standalone matrix satisfies every applicable non-timing requirement in **HDE Governance**, §9.7.2 and §9.7.11, and **Epic Process Guide**, §1.1.9.4, including:
+
+* exactly one row for each token in the corrected 33-token roster;  
+* no duplicate, retired, unregistered, placeholder, guessed, wildcard-only, or implicit binding;  
+* every required schema field completed with an exact existing or plan-approved planned path, identifier, job, step, artifact key, or proof anchor as applicable;  
+* existing or reused evidence distinguished from planned-new evidence;  
+* current token posture recorded truthfully without inferring PASS from a name, path, planned binding, or artifact existence; and  
+* independent verification of matrix completeness before DEV-02 begins.
+
+An exact planned binding may identify work already authorized by the approved remediation plan, but it is not evidence that the planned work exists, ran, passed, or satisfied a token.
+
+If any row cannot be completed without guessing, execution must stop before DEV-02. The affected token remains non-PASS, the exact gap must be recorded, and an approved token must not be removed merely to make Gate B pass.
+
+### **Plan effect**
+
+After this addendum is published:
+
+* DEV-01 is the first task authorized by full-plan approval;  
+* separate pre-approval authorization for DEV-01 is not required;  
+* Gate B remains a mandatory checkpoint between DEV-01 and DEV-02;  
+* no second approval is required after Gate B unless scope, rails, or authorization changes;  
+* the plan must identify this addendum in its authority table;  
+* the plan must record the exact repository commit containing this published addendum;  
+* Gate A must verify publication of Addenda 2.37 and 2.38 at that exact repository baseline; and  
+* every plan statement that currently treats Addendum 2.38 as already active must be revised to identify it as published authority and must use the post-publication repository baseline.
+
+This addendum does not itself approve the remediation plan, authorize work outside an approved plan, create the matrix, make Gate B pass, or establish a token result.
+
+### **Scope**
+
+This addendum applies only to the HDE-EPIC038 Epic Remediation Plan titled **Formal Close-Pack and Acceptance-Ledger Completion** and later revisions that preserve its bounded repository-only scope, closed rails, corrected 33-token roster, DEV-01-first sequence, and Gate B stop.
+
+It does not establish a general approval checkpoint for another epic, plan type, implementation lineage, QA plan, or closeout process.
+
+### **Supersession**
+
+For this exact plan’s approval checkpoint, this addendum supersedes only the conflicting requirement in **Epic Process Guide**, §1.1.9.3–§1.1.9.4, that the complete standalone token/evidence matrix exist before full-plan approval.
+
+It does not supersede:
+
+* Addendum 2.25 or Addendum 2.37;  
+* the corrected HDE-EPIC038 token roster or any token semantics;  
+* the standalone-matrix requirement;  
+* the applicable matrix schema, uniqueness rule, or no-placeholder rule;  
+* evidence-existence requirements for a PASS claim;  
+* Stage B token-fidelity, evidence-wiring, and closeout requirements;  
+* OPS, QA, PF09, evidence, acceptance, or closeout boundaries; or  
+* the requirement for a truthful, evidence-derived binary close-report decision.
+
+### **Authorization and nonclaims**
+
+Publication of this addendum:
+
+* resolves only the approval-checkpoint conflict stated above;  
+* does not approve the remediation plan;  
+* does not implement DEV-01 or any later task;  
+* does not execute QA or OPS;  
+* does not authorize external access or runtime-behavior changes;  
+* does not create, validate, or accept any evidence artifact;  
+* does not claim any token as PASS;  
+* does not move PF09 or development-board status; and  
+* does not establish Product Owner acceptance or epic closure.
+
+### **Evidence and source basis**
+
+Source basis: the HDE-EPIC038 Epic Remediation Plan titled **Formal Close-Pack and Acceptance-Ledger Completion**; **HDE Governance**, §9.7.1–§9.7.2 and §9.7.11; **Epic Process Guide**, §1.1.9.3–§1.1.9.4; and HDE Build Notes Addendum 2.37.
+
+At the remediation plan’s recorded pre-publication baseline, `main@b89b9ccba5a8e24c7aa3a9b754584b743c4a74f8`, Addendum 2.37 is recorded as published, the standalone matrix is recorded as absent, and the active HDE Build Notes set ends at Addendum 2.37. The remediation plan must replace that baseline with the exact post-publication commit before requesting approval under this addendum.
+
+### **Drain targets**
+
+1. **Epic Process Guide, §1.1.9.3–§1.1.9.4:** Reconcile the approval-time matrix rule with the Stage A plan-approval and Stage B QA-ledger model in **HDE Governance**, while preserving complete, non-placeholder evidence wiring before token claims or closeout.  
+2. **Canon Plan Templates:** Distinguish approval-time token-roster and matrix-pointer requirements from post-approval standalone-ledger completion gates when an Epic Remediation Plan template is added.
+
+Until those drain targets are complete, this addendum is the live authority only for the exact HDE-EPIC038 remediation-plan checkpoint defined above.
 
 \<eof\>  
