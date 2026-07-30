@@ -488,17 +488,17 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `CI_CHECK_FINAL_LF_OK`
 - Acceptance-map token: `CI_CHECK_FINAL_LF_OK`
 - Manifest token: `CI_CHECK_FINAL_LF_OK`
-- Test/stable identifier: `tests/ops/test_evidence_index.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Test/stable identifier: `ci/checks/check_final_lf.sh; tests/evidence/test_hde_epic038_closeout.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Run ci/checks/check_final_lf.sh`
 - Live QA: `qa-19-po-019`
-- Primary governed evidence: `audit/gates/topology/orientation_demo.txt`
-- Human Index / Machine Mirror artifact keys: `topology.orientation_demo`
+- Primary governed evidence: `audit/qa/hde-epic038/qa_step_logs_manifest.json`
+- Human Index / Machine Mirror artifact keys: `epic038.qa_step_logs_manifest`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `audit/gates/topology/orientation_demo.txt.path_proof.txt`
-- Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
+- Proof anchors: `audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`
+- Current posture: UNCLAIMED: the governed QA-19 manifest hash-binds a closed-rails execution log for the repository-wide final-LF gate; historical PASS text and current file presence are not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head `Run ci/checks/check_final_lf.sh` workflow step succeeds, the QA-19 manifest and hash-bound execution log remain coherent, and independent Gate B records PASS against that same exact head.
 
 ## 32. `NO_EXTERNAL_IO_ON_REFUSAL_OK`
 - Canonical governance token: `NO_EXTERNAL_IO_ON_REFUSAL_OK`
