@@ -88,9 +88,33 @@ RELEASE_MANIFEST_PATH = "catalog/manifest.json"
 RELEASE_MANIFEST_KEY = "epic038.release.catalog_manifest"
 QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
 QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
+PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
+PREIMAGE_KEY = "epic038.pr02.reader_cli_summary"
 FINAL_LF_CHECK_ID = "qa-19-po-019"
 FINAL_LF_LOG_PATH = (
     "audit/qa/hde-epic038/checks/qa-19-po-019/primary.log"
+)
+FINAL_LF_SCRIPT_PATH = "ci/checks/check_final_lf.sh"
+FINAL_LF_REQUIRED_PATHS = (
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/runtime/env_matrix.snapshot.json",
+    "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
+    "audit/qa/hde-epic038/token_evidence_matrix.md",
+    "audit/qa/hde-epic038/token_evidence_matrix.md.path_proof.txt",
+)
+FINAL_LF_PLANNED_PATHS = (
+    "audit/EPIC-038_close_report.md",
+    "audit/EPIC-038_close_report.md.path_proof.txt",
+    "audit/EPIC-038_MANIFEST.json",
+    "audit/EPIC-038_MANIFEST.json.path_proof.txt",
+    "docs/acceptance_map_epic038.json",
+    "docs/acceptance_map_epic038.json.path_proof.txt",
+    "audit/qa/hde-epic038/acceptance_map_viability.log",
+    "audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt",
 )
 
 
@@ -198,10 +222,24 @@ def build_rows() -> tuple[Row, ...]:
     )
     bind(
         ("PREIMAGE_RECOMPUTE_OK",),
-        "tests/evidence/test_identity_provenance.py",
-        "qa-02-po-002",
-        "artifacts/identity/release_id_recompute.log",
-        "epic038.pr01.identity_release_id_recompute",
+        (
+            "tests/evidence/test_determinism_gate_proofs.py; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        "qa-04-po-004",
+        PREIMAGE_PATH,
+        PREIMAGE_KEY,
+    )
+    rows["PREIMAGE_RECOMPUTE_OK"] = replace(
+        rows["PREIMAGE_RECOMPUTE_OK"],
+        future_claim=(
+            "Future status may become CLAIMED only after "
+            "`tools.evidence.run_sanity_pipeline.validate_current_reader_cli_determinism` "
+            "recomputes the canonical preimage with `idempotence_hash` removed, "
+            "the governed summary records equal 64-hex stored/recomputed hashes "
+            "and `preimage_hash_match=true`, the exact-head `test` job succeeds, "
+            "and post-generation Gate D derives the result from finalized outputs."
+        ),
     )
     bind(
         ("CLI_READER_PARITY_OK",),
@@ -306,9 +344,11 @@ def build_rows() -> tuple[Row, ...]:
         ),
         future_claim=(
             "Future status may become CLAIMED only after the exact-head "
-            "`Run ci/checks/check_final_lf.sh` workflow step succeeds, the "
-            "QA-19 manifest and hash-bound execution log remain coherent, and "
-            "independent Gate B records PASS against that same exact head."
+            "`Run ci/checks/check_final_lf.sh` workflow step succeeds with the "
+            "current matrix and proof plus every present approved planned closeout "
+            "output covered, the QA-19 manifest and hash-bound execution log "
+            "remain coherent, and independent Gate B records PASS against that "
+            "same exact head."
         ),
     )
     bind(
@@ -488,6 +528,31 @@ def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> No
         raise ValueError("closed-rails refusal binding mismatch")
 
 
+def validate_preimage_payload(payload: Mapping[str, object]) -> None:
+    hashes = payload.get("idempotence_hash")
+    predicates = payload.get("predicates")
+    if (
+        payload.get("artifact_kind") != "hde_epic038_pr02_determinism_proof"
+        or payload.get("acceptance_token_satisfied") is not False
+        or not isinstance(hashes, dict)
+        or not isinstance(predicates, dict)
+    ):
+        raise ValueError("preimage recompute evidence shape mismatch")
+    stored = hashes.get("stored")
+    recomputed = hashes.get("recomputed")
+    if (
+        not isinstance(stored, str)
+        or not isinstance(recomputed, str)
+        or len(stored) != 64
+        or len(recomputed) != 64
+        or any(character not in "0123456789abcdef" for character in stored)
+        or any(character not in "0123456789abcdef" for character in recomputed)
+        or stored != recomputed
+        or predicates.get("preimage_hash_match") is not True
+    ):
+        raise ValueError("preimage recompute predicate mismatch")
+
+
 def validate_release_attestation_payload(
     payload: Mapping[str, object],
     *,
@@ -553,6 +618,40 @@ def validate_final_lf_evidence(
         raise ValueError("final-LF execution predicate mismatch")
 
 
+def _shell_array(script_text: str, name: str) -> tuple[str, ...]:
+    lines = script_text.splitlines()
+    try:
+        start = lines.index(f"{name}=(")
+        end = lines.index(")", start + 1)
+    except ValueError as exc:
+        raise ValueError(f"final-LF array missing: {name}") from exc
+    values = tuple(line.strip() for line in lines[start + 1 : end] if line.strip())
+    if not values:
+        raise ValueError(f"final-LF array empty: {name}")
+    return values
+
+
+def validate_final_lf_script(script_text: str) -> None:
+    required = _shell_array(script_text, "required_files")
+    planned = _shell_array(script_text, "planned_files")
+    if required != FINAL_LF_REQUIRED_PATHS or planned != FINAL_LF_PLANNED_PATHS:
+        raise ValueError("final-LF target coverage mismatch")
+    required_loop = (
+        'for f in "${required_files[@]}"; do\n'
+        '  check_file "$f"\n'
+        "done"
+    )
+    planned_loop = (
+        'for f in "${planned_files[@]}"; do\n'
+        '  if [[ -f "$f" ]]; then\n'
+        '    check_file "$f"\n'
+        "  fi\n"
+        "done"
+    )
+    if required_loop not in script_text or planned_loop not in script_text:
+        raise ValueError("final-LF loop coverage mismatch")
+
+
 def _validate_special_semantics(row: Row) -> None:
     if row.token in {
         "DB_RUNTIME_SEARCH_PATH_OK",
@@ -572,6 +671,22 @@ def _validate_special_semantics(row: Row) -> None:
         validate_no_io_payloads(
             (ROOT / REFUSAL_PATH).read_text(encoding="utf-8"),
             json.loads((ROOT / REFUSAL_MANIFEST_PATH).read_text(encoding="utf-8")),
+        )
+    elif row.token == "PREIMAGE_RECOMPUTE_OK":
+        if (
+            row.primary_evidence != (PREIMAGE_PATH,)
+            or row.artifact_keys != (PREIMAGE_KEY,)
+            or row.proof_anchors != (f"{PREIMAGE_PATH}.path_proof.txt",)
+            or set(row.test_binding.split("; "))
+            != {
+                "tests/evidence/test_determinism_gate_proofs.py",
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.live_qa != "qa-04-po-004"
+        ):
+            raise ValueError("preimage recompute evidence binding mismatch")
+        validate_preimage_payload(
+            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8"))
         )
     elif row.token == "RELEASE_ID_RECOMPUTE_OK":
         if (
@@ -618,6 +733,9 @@ def _validate_special_semantics(row: Row) -> None:
         validate_final_lf_evidence(
             json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
             (ROOT / FINAL_LF_LOG_PATH).read_text(encoding="utf-8"),
+        )
+        validate_final_lf_script(
+            (ROOT / FINAL_LF_SCRIPT_PATH).read_text(encoding="utf-8")
         )
 
 
