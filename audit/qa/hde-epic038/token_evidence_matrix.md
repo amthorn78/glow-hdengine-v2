@@ -152,9 +152,9 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `CLI_READER_PARITY_OK`
 - Acceptance-map token: `CLI_READER_PARITY_OK`
 - Manifest token: `CLI_READER_PARITY_OK`
-- Test/stable identifier: `tests/adapter/test_compat_http_parity.py`
+- Test/stable identifier: `tests/evidence/test_determinism_gate_proofs.py; tests/cli/test_showcompat_parity_and_identity.py`
 - Closed-rails CI binding: `test (.github/workflows/ci.yml)`
-- Live QA: `qa-06-po-006`
+- Live QA: `qa-04-po-004`
 - Primary governed evidence: `audit/gates/parity/reader_cli/summary.json`
 - Human Index / Machine Mirror artifact keys: `epic038.pr02.reader_cli_summary`
 - Epic: `epic_id=HDE-EPIC038`
@@ -162,7 +162,7 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head closed-rails determinism producer and canonical-output QA check `qa-04-po-004` re-run the CLI reader-dump/runtime comparison, the governed summary records equal reader/CLI hashes and `reader_cli_byte_identity=true`, post-generation Gate D derives the result from finalized outputs, and independent Gate B passes.
 
 ## 11. `COMPOSITE_ABBA_IDENTITY_OK`
 - Canonical governance token: `COMPOSITE_ABBA_IDENTITY_OK`
