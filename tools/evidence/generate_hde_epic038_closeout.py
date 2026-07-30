@@ -20,6 +20,9 @@ RELEASE_CI_JOB = (
     "Run canonical JSON gate (closed rails); "
     "Publish exact-head release attestation"
 )
+FINAL_LF_CI_JOB = (
+    "test (.github/workflows/ci.yml): Run ci/checks/check_final_lf.sh"
+)
 PLANNED_COMMANDS = (
     "python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized; "
     "python tools/evidence/generate_hde_epic038_closeout.py --check; "
@@ -83,6 +86,12 @@ REFUSAL_MANIFEST_PATH = "artifacts/bodygraph/v2_mapped_cache/manifest.json"
 REFUSAL_MANIFEST_KEY = "epic038.pr05.v2_mapped_cache.manifest"
 RELEASE_MANIFEST_PATH = "catalog/manifest.json"
 RELEASE_MANIFEST_KEY = "epic038.release.catalog_manifest"
+QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
+QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
+FINAL_LF_CHECK_ID = "qa-19-po-019"
+FINAL_LF_LOG_PATH = (
+    "audit/qa/hde-epic038/checks/qa-19-po-019/primary.log"
+)
 
 
 @dataclass(frozen=True)
@@ -279,10 +288,28 @@ def build_rows() -> tuple[Row, ...]:
     )
     bind(
         ("CI_CHECK_FINAL_LF_OK",),
-        "tests/ops/test_evidence_index.py",
-        "qa-19-po-019",
-        "audit/gates/topology/orientation_demo.txt",
-        "topology.orientation_demo",
+        (
+            "ci/checks/check_final_lf.sh; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        FINAL_LF_CHECK_ID,
+        QA_MANIFEST_PATH,
+        QA_MANIFEST_KEY,
+    )
+    rows["CI_CHECK_FINAL_LF_OK"] = replace(
+        rows["CI_CHECK_FINAL_LF_OK"],
+        ci_binding=FINAL_LF_CI_JOB,
+        posture=(
+            "UNCLAIMED: the governed QA-19 manifest hash-binds a closed-rails "
+            "execution log for the repository-wide final-LF gate; historical "
+            "PASS text and current file presence are not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head "
+            "`Run ci/checks/check_final_lf.sh` workflow step succeeds, the "
+            "QA-19 manifest and hash-bound execution log remain coherent, and "
+            "independent Gate B records PASS against that same exact head."
+        ),
     )
     bind(
         (
@@ -482,6 +509,50 @@ def validate_release_attestation_payload(
             raise ValueError(f"release attestation mismatch: {key}")
 
 
+def validate_final_lf_evidence(
+    manifest: Mapping[str, object], log_text: str
+) -> None:
+    record = manifest.get(FINAL_LF_CHECK_ID)
+    if not isinstance(record, dict):
+        raise ValueError("final-LF QA manifest record missing")
+    expected_relative_log = "checks/qa-19-po-019/primary.log"
+    log_bytes = log_text.encode("utf-8")
+    if (
+        record.get("log_path") != expected_relative_log
+        or record.get("status") != "PASS"
+        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or record.get("size_bytes") != len(log_bytes)
+    ):
+        raise ValueError("final-LF QA manifest binding mismatch")
+    lines = log_text.splitlines()
+    if not lines:
+        raise ValueError("final-LF execution log missing")
+    try:
+        header = json.loads(lines[0])
+    except json.JSONDecodeError as exc:
+        raise ValueError("final-LF execution header invalid") from exc
+    required_rails = {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+    }
+    if (
+        not isinstance(header, dict)
+        or header.get("check_id") != FINAL_LF_CHECK_ID
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or "bash ci/checks/check_final_lf.sh" not in header.get("command", "")
+        or header.get("captured_env") != required_rails
+        or header.get("intended_tokens") != []
+        or header.get("claimed_tokens") != []
+        or "BEHAVIOR_EXIT_CODE=0" not in lines
+    ):
+        raise ValueError("final-LF execution predicate mismatch")
+
+
 def _validate_special_semantics(row: Row) -> None:
     if row.token in {
         "DB_RUNTIME_SEARCH_PATH_OK",
@@ -530,6 +601,24 @@ def _validate_special_semantics(row: Row) -> None:
             raise ValueError("release validator binding mismatch")
         if row.ci_binding != RELEASE_CI_JOB or row.live_qa != "qa-21-po-021":
             raise ValueError("release execution binding mismatch")
+    elif row.token == "CI_CHECK_FINAL_LF_OK":
+        if (
+            row.primary_evidence != (QA_MANIFEST_PATH,)
+            or row.artifact_keys != (QA_MANIFEST_KEY,)
+            or row.proof_anchors != (f"{QA_MANIFEST_PATH}.path_proof.txt",)
+            or set(row.test_binding.split("; "))
+            != {
+                "ci/checks/check_final_lf.sh",
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != FINAL_LF_CI_JOB
+            or row.live_qa != FINAL_LF_CHECK_ID
+        ):
+            raise ValueError("final-LF evidence binding mismatch")
+        validate_final_lf_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / FINAL_LF_LOG_PATH).read_text(encoding="utf-8"),
+        )
 
 
 def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
