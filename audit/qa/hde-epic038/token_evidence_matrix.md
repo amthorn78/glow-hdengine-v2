@@ -136,17 +136,17 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `PREIMAGE_RECOMPUTE_OK`
 - Acceptance-map token: `PREIMAGE_RECOMPUTE_OK`
 - Manifest token: `PREIMAGE_RECOMPUTE_OK`
-- Test/stable identifier: `tests/evidence/test_identity_provenance.py`
+- Test/stable identifier: `tests/evidence/test_determinism_gate_proofs.py; tests/evidence/test_hde_epic038_closeout.py`
 - Closed-rails CI binding: `test (.github/workflows/ci.yml)`
-- Live QA: `qa-02-po-002`
-- Primary governed evidence: `artifacts/identity/release_id_recompute.log`
-- Human Index / Machine Mirror artifact keys: `epic038.pr01.identity_release_id_recompute`
+- Live QA: `qa-04-po-004`
+- Primary governed evidence: `audit/gates/parity/reader_cli/summary.json`
+- Human Index / Machine Mirror artifact keys: `epic038.pr02.reader_cli_summary`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `artifacts/identity/release_id_recompute.log.path_proof.txt`
+- Proof anchors: `audit/gates/parity/reader_cli/summary.json.path_proof.txt`
 - Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after `tools.evidence.run_sanity_pipeline.validate_current_reader_cli_determinism` recomputes the canonical preimage with `idempotence_hash` removed, the governed summary records equal 64-hex stored/recomputed hashes and `preimage_hash_match=true`, the exact-head `test` job succeeds, and post-generation Gate D derives the result from finalized outputs.
 
 ## 10. `CLI_READER_PARITY_OK`
 - Canonical governance token: `CLI_READER_PARITY_OK`
@@ -498,7 +498,7 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Current posture: UNCLAIMED: the governed QA-19 manifest hash-binds a closed-rails execution log for the repository-wide final-LF gate; historical PASS text and current file presence are not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head `Run ci/checks/check_final_lf.sh` workflow step succeeds, the QA-19 manifest and hash-bound execution log remain coherent, and independent Gate B records PASS against that same exact head.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head `Run ci/checks/check_final_lf.sh` workflow step succeeds with the current matrix and proof plus every present approved planned closeout output covered, the QA-19 manifest and hash-bound execution log remain coherent, and independent Gate B records PASS against that same exact head.
 
 ## 32. `NO_EXTERNAL_IO_ON_REFUSAL_OK`
 - Canonical governance token: `NO_EXTERNAL_IO_ON_REFUSAL_OK`
