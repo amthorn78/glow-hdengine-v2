@@ -229,6 +229,71 @@ def test_no_io_regressions_fail_closed(log_mutation, manifest_mutation) -> None:
         closeout.validate_no_io_payloads(log_text, manifest)
 
 
+def test_final_lf_row_binds_hash_bound_qa19_gate_execution() -> None:
+    row = next(
+        row
+        for row in closeout.validate_rows(closeout.build_rows())
+        if row.token == "CI_CHECK_FINAL_LF_OK"
+    )
+    assert row.primary_evidence == (closeout.QA_MANIFEST_PATH,)
+    assert row.artifact_keys == (closeout.QA_MANIFEST_KEY,)
+    assert row.proof_anchors == (
+        f"{closeout.QA_MANIFEST_PATH}.path_proof.txt",
+    )
+    assert set(row.test_binding.split("; ")) == {
+        "ci/checks/check_final_lf.sh",
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert row.ci_binding == closeout.FINAL_LF_CI_JOB
+    assert row.live_qa == closeout.FINAL_LF_CHECK_ID
+    assert "UNCLAIMED" in row.posture
+
+
+@pytest.mark.parametrize(
+    "manifest_mutation,log_mutation",
+    [
+        (
+            lambda manifest: manifest[closeout.FINAL_LF_CHECK_ID].__setitem__(
+                "sha256", "0" * 64
+            ),
+            None,
+        ),
+        (
+            None,
+            lambda text: text.replace(
+                '"exit_code": 0', '"exit_code": 1', 1
+            ),
+        ),
+        (
+            None,
+            lambda text: text.replace(
+                "bash ci/checks/check_final_lf.sh",
+                "bash ci/checks/check_mirror_schema.sh",
+            ),
+        ),
+        (
+            None,
+            lambda text: text.replace(
+                "BEHAVIOR_EXIT_CODE=0", "BEHAVIOR_EXIT_CODE=1"
+            ),
+        ),
+    ],
+)
+def test_final_lf_evidence_regressions_fail_closed(
+    manifest_mutation, log_mutation
+) -> None:
+    manifest = json.loads(
+        (ROOT / closeout.QA_MANIFEST_PATH).read_text(encoding="utf-8")
+    )
+    log_text = (ROOT / closeout.FINAL_LF_LOG_PATH).read_text(encoding="utf-8")
+    if manifest_mutation is not None:
+        manifest_mutation(manifest)
+    if log_mutation is not None:
+        log_text = log_mutation(log_text)
+    with pytest.raises(ValueError, match="final-LF"):
+        closeout.validate_final_lf_evidence(manifest, log_text)
+
+
 def _release_attestation(
     source_commit: str, manifest_sha256: str
 ) -> dict[str, object]:
