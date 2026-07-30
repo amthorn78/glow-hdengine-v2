@@ -259,10 +259,24 @@ def build_rows() -> tuple[Row, ...]:
     )
     bind(
         ("CLI_READER_PARITY_OK",),
-        "tests/adapter/test_compat_http_parity.py",
-        "qa-06-po-006",
+        (
+            "tests/evidence/test_determinism_gate_proofs.py; "
+            "tests/cli/test_showcompat_parity_and_identity.py"
+        ),
+        "qa-04-po-004",
         "audit/gates/parity/reader_cli/summary.json",
         "epic038.pr02.reader_cli_summary",
+    )
+    rows["CLI_READER_PARITY_OK"] = replace(
+        rows["CLI_READER_PARITY_OK"],
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head closed-rails "
+            "determinism producer and canonical-output QA check `qa-04-po-004` "
+            "re-run the CLI reader-dump/runtime comparison, the governed summary "
+            "records equal reader/CLI hashes and `reader_cli_byte_identity=true`, "
+            "post-generation Gate D derives the result from finalized outputs, "
+            "and independent Gate B passes."
+        ),
     )
     bind(
         ("COMPOSITE_ABBA_IDENTITY_OK",),
@@ -587,6 +601,37 @@ def validate_preimage_payload(
         raise ValueError("preimage recompute predicate mismatch")
 
 
+def validate_cli_reader_parity_payload(payload: Mapping[str, object]) -> None:
+    hashes = payload.get("hashes")
+    predicates = payload.get("predicates")
+    sources = payload.get("sources")
+    if (
+        payload.get("artifact_kind") != "hde_epic038_pr02_determinism_proof"
+        or payload.get("acceptance_token_satisfied") is not False
+        or not isinstance(hashes, dict)
+        or not isinstance(predicates, dict)
+        or sources
+        != {
+            "runtime": "engine.runtime.public.emit_reader_public_envelope",
+            "cli": "python -m engine.cli showcompat --dump-reader",
+        }
+    ):
+        raise ValueError("CLI/Reader parity evidence shape mismatch")
+    reader_hash = hashes.get("reader_sha256")
+    cli_hash = hashes.get("cli_sha256")
+    if (
+        not isinstance(reader_hash, str)
+        or not isinstance(cli_hash, str)
+        or len(reader_hash) != 64
+        or len(cli_hash) != 64
+        or any(character not in "0123456789abcdef" for character in reader_hash)
+        or any(character not in "0123456789abcdef" for character in cli_hash)
+        or reader_hash != cli_hash
+        or predicates.get("reader_cli_byte_identity") is not True
+    ):
+        raise ValueError("CLI/Reader parity predicate mismatch")
+
+
 def validate_release_attestation_payload(
     payload: Mapping[str, object],
     *,
@@ -726,6 +771,22 @@ def _validate_special_semantics(row: Row) -> None:
         validate_preimage_payload(
             json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8")),
             (ROOT / PREIMAGE_SOURCE_PATH).read_bytes(),
+        )
+    elif row.token == "CLI_READER_PARITY_OK":
+        if (
+            row.primary_evidence != (PREIMAGE_PATH,)
+            or row.artifact_keys != (PREIMAGE_KEY,)
+            or row.proof_anchors != (f"{PREIMAGE_PATH}.path_proof.txt",)
+            or set(row.test_binding.split("; "))
+            != {
+                "tests/evidence/test_determinism_gate_proofs.py",
+                "tests/cli/test_showcompat_parity_and_identity.py",
+            }
+            or row.live_qa != "qa-04-po-004"
+        ):
+            raise ValueError("CLI/Reader parity evidence binding mismatch")
+        validate_cli_reader_parity_payload(
+            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8"))
         )
     elif row.token == "RELEASE_ID_RECOMPUTE_OK":
         if (
