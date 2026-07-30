@@ -192,9 +192,18 @@ def test_preimage_row_binds_idempotence_recompute_evidence() -> None:
         for row in closeout.validate_rows(closeout.build_rows())
         if row.token == "PREIMAGE_RECOMPUTE_OK"
     )
-    assert row.primary_evidence == (closeout.PREIMAGE_PATH,)
-    assert row.artifact_keys == (closeout.PREIMAGE_KEY,)
-    assert row.proof_anchors == (f"{closeout.PREIMAGE_PATH}.path_proof.txt",)
+    assert row.primary_evidence == (
+        closeout.PREIMAGE_PATH,
+        closeout.PREIMAGE_SOURCE_PATH,
+    )
+    assert row.artifact_keys == (
+        closeout.PREIMAGE_KEY,
+        closeout.PREIMAGE_SOURCE_KEY,
+    )
+    assert row.proof_anchors == (
+        f"{closeout.PREIMAGE_PATH}.path_proof.txt",
+        f"{closeout.PREIMAGE_SOURCE_PATH}.path_proof.txt",
+    )
     assert set(row.test_binding.split("; ")) == {
         "tests/evidence/test_determinism_gate_proofs.py",
         "tests/evidence/test_hde_epic038_closeout.py",
@@ -224,7 +233,24 @@ def test_preimage_recompute_regressions_fail_closed(mutation) -> None:
     )
     mutation(payload)
     with pytest.raises(ValueError, match="preimage recompute"):
-        closeout.validate_preimage_payload(payload)
+        closeout.validate_preimage_payload(
+            payload,
+            (ROOT / closeout.PREIMAGE_SOURCE_PATH).read_bytes(),
+        )
+
+
+def test_preimage_recompute_rejects_matching_forged_hash_pair() -> None:
+    payload = json.loads(
+        (ROOT / closeout.PREIMAGE_PATH).read_text(encoding="utf-8")
+    )
+    payload["idempotence_hash"]["stored"] = "0" * 64
+    payload["idempotence_hash"]["recomputed"] = "0" * 64
+    payload["predicates"]["preimage_hash_match"] = True
+    with pytest.raises(ValueError, match="preimage recompute predicate mismatch"):
+        closeout.validate_preimage_payload(
+            payload,
+            (ROOT / closeout.PREIMAGE_SOURCE_PATH).read_bytes(),
+        )
 
 
 def test_no_io_row_binds_explicit_zero_call_log_and_manifest() -> None:
