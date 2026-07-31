@@ -191,6 +191,9 @@ DOC_DELTA_CHECK_COMMAND = (
 DOC_DELTA_CI_JOB = (
     "test (.github/workflows/ci.yml): Check HDE-EPIC038 DEV-01 doc-delta pair"
 )
+DEV_REQUIREMENTS_SHA256 = (
+    "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"
+)
 QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
 QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
 PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
@@ -590,6 +593,14 @@ def check_doc_delta_pair() -> None:
 
 def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
     """Require one unsuppressed read-only check in the exact ``test`` job."""
+    requirements_path = ROOT / "requirements-dev.txt"
+    if (
+        requirements_path.is_symlink()
+        or not requirements_path.is_file()
+        or hashlib.sha256(requirements_path.read_bytes()).hexdigest()
+        != DEV_REQUIREMENTS_SHA256
+    ):
+        raise ValueError("doc-delta CI command binding mismatch")
     text = (
         (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         if workflow_text is None
@@ -716,13 +727,6 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "        shell: bash",
         f"        run: {DOC_DELTA_CHECK_COMMAND}",
     )
-    check_prefix: tuple[str, ...] = ()
-    if len(test_steps_starts) == 1 and len(step_starts) == 1:
-        check_prefix = raw_lines[
-            test_steps_starts[0] + 1 : step_starts[0]
-            + len(expected_step_block)
-            + 4
-        ]
     expected_check_prefix = (
         "      - uses: actions/checkout@v4",
         "        with:",
@@ -731,11 +735,21 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "        with:",
         "          python-version: '3.12'",
         *expected_step_block,
-        "      - run: python -m pip install pytest",
         "      - name: Run HDE-EPIC038 DEV-01 focused tests",
-        "        run: python -m pytest -q tests/evidence/test_hde_epic038_closeout.py",
+        "        shell: bash",
+        "        run: |",
+        "          set -euo pipefail",
+        "          python -m pip install -r requirements-dev.txt",
+        "          python -m pytest --version",
+        "          python -m pytest -q tests/evidence/test_hde_epic038_closeout.py",
         "      - run: python -m pip install -U pip",
     )
+    check_prefix: tuple[str, ...] = ()
+    if len(test_steps_starts) == 1 and len(step_starts) == 1:
+        prefix_start = test_steps_starts[0] + 1
+        check_prefix = raw_lines[
+            prefix_start : prefix_start + len(expected_check_prefix)
+        ]
     if (
         step_block != expected_step_block
         or check_prefix != expected_check_prefix
