@@ -377,7 +377,6 @@ def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:
     rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
     assert set(closeout.PLANNED_BINDINGS) == {
         "TESTS_PASS_OK",
-        "DOC_DELTA_PRESENT_OK",
         "QA_PRECOMMIT_CHECKLIST_OK",
         "QA_POSTCOMMIT_CHECKLIST_OK",
     }
@@ -394,6 +393,27 @@ def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:
         assert not (ROOT / path).exists()
         assert not (ROOT / f"{path}.path_proof.txt").exists()
 
+    assert closeout.PLANNED_BINDINGS["QA_PRECOMMIT_CHECKLIST_OK"] == (
+        "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
+        "epic038.qa_precommit_checklist",
+        "DEV-03",
+    )
+    assert closeout.PLANNED_BINDINGS["QA_POSTCOMMIT_CHECKLIST_OK"] == (
+        "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
+        "epic038.qa_postcommit_checklist",
+        "DEV-03",
+    )
+    for token in ("QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"):
+        row = rows[token]
+        assert set(row.test_binding.split("; ")) == {
+            "tools/evidence/generate_hde_epic038_closeout.py",
+            "tests/evidence/test_hde_epic038_closeout.py",
+        }
+        assert "DEV-02 implements deterministic `--closeout` production" in (
+            row.future_claim
+        )
+        assert "read-only `--check`" in row.future_claim
+
 
 def test_rejects_inexact_planned_binding() -> None:
     rows = closeout.build_rows()
@@ -404,6 +424,313 @@ def test_rejects_inexact_planned_binding() -> None:
     )
     with pytest.raises(ValueError, match="inexact planned binding"):
         closeout.validate_rows((changed,) + rows[1:])
+
+
+@pytest.mark.parametrize(
+    "token,path,key",
+    [
+        (
+            "QA_PRECOMMIT_CHECKLIST_OK",
+            "audit/qa/hde-epic038/acceptance_map_viability.log",
+            "epic038.acceptance_map_viability",
+        ),
+        (
+            "QA_POSTCOMMIT_CHECKLIST_OK",
+            "audit/EPIC-038_MANIFEST.json",
+            "epic038.manifest",
+        ),
+    ],
+)
+def test_checklist_rows_reject_pr379_substitutions(token, path, key) -> None:
+    rows = closeout.build_rows()
+    index = next(index for index, row in enumerate(rows) if row.token == token)
+    changed = replace(
+        rows[index],
+        primary_evidence=(path,),
+        artifact_keys=(key,),
+        proof_anchors=(f"{path}.path_proof.txt",),
+    )
+    with pytest.raises(ValueError, match="inexact planned binding"):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+
+
+def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
+    primary_path = "audit/docdeltas/hde-epic038_doc_deltas.md"
+    primary_key = "epic038.doc_deltas"
+    capture_path = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
+    capture_key = "epic038.qa_meta_doc_deltas"
+    producer_check = "qa-00-step-0-discovery"
+    producer_log = (
+        "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
+    )
+    row = next(
+        row
+        for row in closeout.validate_rows(closeout.build_rows())
+        if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    assert row.classification == "existing/reused"
+    assert row.primary_evidence == (primary_path,)
+    assert row.artifact_keys == (primary_key,)
+    assert row.proof_anchors == (f"{primary_path}.path_proof.txt",)
+    assert capture_path not in row.primary_evidence
+    assert capture_path in row.posture
+    assert capture_key in row.posture
+    assert producer_log in row.posture
+    assert row.live_qa == producer_check
+
+    records = closeout._mirror_records()
+    assert (
+        primary_key,
+        primary_path,
+        f"{primary_path}.path_proof.txt",
+    ) in records
+    assert (
+        capture_key,
+        capture_path,
+        f"{capture_path}.path_proof.txt",
+    ) in records
+    closeout.validate_doc_delta_evidence()
+
+
+def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
+    primary = (ROOT / "audit/docdeltas/hde-epic038_doc_deltas.md").read_bytes()
+    capture = (
+        ROOT / "audit/qa/hde-epic038/00_meta/doc_deltas.md"
+    ).read_bytes()
+    manifest = json.loads(
+        (ROOT / "audit/qa/hde-epic038/qa_step_logs_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    producer_log_bytes = (
+        ROOT
+        / "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
+    ).read_bytes()
+    assert hashlib.sha256(producer_log_bytes).hexdigest() == (
+        "db9e7ac48e168f7fac380f294271110bbf5e88b0874a1e6d5591cb868d6eecbe"
+    )
+    assert len(producer_log_bytes) == 8248
+    producer_log = producer_log_bytes.decode("utf-8")
+    assert hashlib.sha256(primary).hexdigest() == (
+        "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
+    )
+
+    with pytest.raises(ValueError, match="staging/capture pair mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture + b"drift\n",
+            qa_manifest=manifest,
+            producer_log=producer_log,
+        )
+
+    with pytest.raises(ValueError, match="staging/capture pair mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=b"unbound replacement\n",
+            capture_bytes=b"unbound replacement\n",
+            qa_manifest=manifest,
+            producer_log=producer_log,
+        )
+
+    changed_manifest = json.loads(json.dumps(manifest))
+    changed_manifest["qa-00-step-0-discovery"]["sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="producer manifest binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=changed_manifest,
+            producer_log=producer_log,
+        )
+
+    changed_log = producer_log.replace(
+        '"doc_delta_posture": "created"',
+        '"doc_delta_posture": "preserved_existing"',
+    )
+    assert changed_log != producer_log
+    changed_log_manifest = json.loads(json.dumps(manifest))
+    changed_log_bytes = changed_log.encode("utf-8")
+    changed_log_manifest["qa-00-step-0-discovery"]["sha256"] = hashlib.sha256(
+        changed_log_bytes
+    ).hexdigest()
+    changed_log_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        changed_log_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=changed_log_manifest,
+            producer_log=changed_log,
+        )
+
+    open_rails_lines = producer_log.splitlines()
+    open_rails_header = json.loads(open_rails_lines[0])
+    open_rails_header["captured_env"]["SAFE_MODE"] = "0"
+    open_rails_header["captured_env"]["ALLOW_NETWORK"] = "1"
+    open_rails_lines[0] = json.dumps(open_rails_header, sort_keys=True)
+    open_rails_log = "\n".join(open_rails_lines) + "\n"
+    open_rails_bytes = open_rails_log.encode("utf-8")
+    open_rails_manifest = json.loads(json.dumps(manifest))
+    open_rails_manifest["qa-00-step-0-discovery"]["sha256"] = hashlib.sha256(
+        open_rails_bytes
+    ).hexdigest()
+    open_rails_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        open_rails_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=open_rails_manifest,
+            producer_log=open_rails_log,
+        )
+
+    duplicate_artifact_lines = producer_log.splitlines()
+    duplicate_artifact_header = json.loads(duplicate_artifact_lines[0])
+    duplicate_artifact_header["evidence_artifacts"].append(
+        "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
+    )
+    duplicate_artifact_lines[0] = json.dumps(
+        duplicate_artifact_header,
+        sort_keys=True,
+    )
+    duplicate_artifact_log = "\n".join(duplicate_artifact_lines) + "\n"
+    duplicate_artifact_bytes = duplicate_artifact_log.encode("utf-8")
+    duplicate_artifact_manifest = json.loads(json.dumps(manifest))
+    duplicate_artifact_manifest["qa-00-step-0-discovery"]["sha256"] = (
+        hashlib.sha256(duplicate_artifact_bytes).hexdigest()
+    )
+    duplicate_artifact_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        duplicate_artifact_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=duplicate_artifact_manifest,
+            producer_log=duplicate_artifact_log,
+        )
+
+    failed_behavior_log = producer_log.replace(
+        "BEHAVIOR_EXIT_CODE=0",
+        "BEHAVIOR_EXIT_CODE=1",
+        1,
+    )
+    assert failed_behavior_log != producer_log
+    failed_behavior_bytes = failed_behavior_log.encode("utf-8")
+    failed_behavior_manifest = json.loads(json.dumps(manifest))
+    failed_behavior_manifest["qa-00-step-0-discovery"]["sha256"] = (
+        hashlib.sha256(failed_behavior_bytes).hexdigest()
+    )
+    failed_behavior_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        failed_behavior_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=failed_behavior_manifest,
+            producer_log=failed_behavior_log,
+        )
+
+    contradictory_receipt_log = producer_log + "BEHAVIOR_EXIT_CODE=1\n"
+    contradictory_receipt_bytes = contradictory_receipt_log.encode("utf-8")
+    contradictory_receipt_manifest = json.loads(json.dumps(manifest))
+    contradictory_receipt_manifest["qa-00-step-0-discovery"]["sha256"] = (
+        hashlib.sha256(contradictory_receipt_bytes).hexdigest()
+    )
+    contradictory_receipt_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        contradictory_receipt_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=contradictory_receipt_manifest,
+            producer_log=contradictory_receipt_log,
+        )
+
+    duplicate_result_log = producer_log + json.dumps(
+        {
+            "doc_delta_posture": "created",
+            "epic_id": "HDE-EPIC038",
+            "future_check_artifacts": "NOT RUN",
+            "production_factory_missing_routes": [],
+            "production_factory_required_routes": [],
+            "qa_root": "audit/qa/hde-epic038/",
+            "repository": "glow-hdengine-v2",
+        },
+        sort_keys=True,
+    ) + "\n"
+    duplicate_result_bytes = duplicate_result_log.encode("utf-8")
+    duplicate_result_manifest = json.loads(json.dumps(manifest))
+    duplicate_result_manifest["qa-00-step-0-discovery"]["sha256"] = (
+        hashlib.sha256(duplicate_result_bytes).hexdigest()
+    )
+    duplicate_result_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        duplicate_result_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest binding|log shape) mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=duplicate_result_manifest,
+            producer_log=duplicate_result_log,
+        )
+
+    contradictory_result_log = producer_log.replace(
+        '"production_factory_missing_routes": []',
+        '"production_factory_missing_routes": [["/api/compat/v1", "POST"]]',
+        1,
+    )
+    assert contradictory_result_log != producer_log
+    contradictory_result_bytes = contradictory_result_log.encode("utf-8")
+    contradictory_result_manifest = json.loads(json.dumps(manifest))
+    contradictory_result_manifest["qa-00-step-0-discovery"]["sha256"] = (
+        hashlib.sha256(contradictory_result_bytes).hexdigest()
+    )
+    contradictory_result_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
+        contradictory_result_bytes
+    )
+    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+            qa_manifest=contradictory_result_manifest,
+            producer_log=contradictory_result_log,
+        )
+
+
+@pytest.mark.parametrize(
+    "path,key",
+    [
+        (
+            "audit/qa/hde-epic038/00_meta/doc_deltas.md",
+            "epic038.qa_meta_doc_deltas",
+        ),
+        (
+            "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+            "epic038.closeout_remediation_ledger",
+        ),
+    ],
+)
+def test_doc_delta_row_rejects_capture_or_ledger_as_primary(path, key) -> None:
+    rows = closeout.build_rows()
+    index = next(
+        index
+        for index, row in enumerate(rows)
+        if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    row = rows[index]
+    changed = replace(
+        row,
+        primary_evidence=(path,),
+        artifact_keys=(key,),
+        proof_anchors=(f"{path}.path_proof.txt",),
+    )
+    with pytest.raises(ValueError, match="doc-delta evidence binding mismatch"):
+        closeout._validate_special_semantics(changed)
+    with pytest.raises(ValueError):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_database_tokens_bind_admitted_ops03_posture_semantics() -> None:
@@ -737,29 +1064,97 @@ def _release_attestation(
     }
 
 
-def test_release_identity_binding_uses_current_source_and_external_attestation() -> None:
+def test_release_identity_binding_uses_complete_governed_family() -> None:
     row = next(
         row
         for row in closeout.validate_rows(closeout.build_rows())
         if row.token == "RELEASE_ID_RECOMPUTE_OK"
     )
-    manifest_sha256 = hashlib.sha256(
-        (ROOT / closeout.RELEASE_MANIFEST_PATH).read_bytes()
-    ).hexdigest()
-    assert row.primary_evidence == (closeout.RELEASE_MANIFEST_PATH,)
-    assert row.artifact_keys == (closeout.RELEASE_MANIFEST_KEY,)
+    manifest_sha256, captured_release_id = (
+        closeout.validate_release_identity_family()
+    )
+    assert row.primary_evidence == (
+        "catalog/manifest.json",
+        "artifacts/identity/release_id.json",
+        "artifacts/identity/release_id_recompute.log",
+    )
+    assert row.artifact_keys == (
+        "epic038.release.catalog_manifest",
+        "epic038.pr01.identity_release_id",
+        "epic038.pr01.identity_release_id_recompute",
+    )
     assert row.proof_anchors == (
-        f"{closeout.RELEASE_MANIFEST_PATH}.path_proof.txt",
+        "catalog/manifest.json.path_proof.txt",
+        "artifacts/identity/release_id.json.path_proof.txt",
+        "artifacts/identity/release_id_recompute.log.path_proof.txt",
     )
-    assert not any(
-        path.startswith("artifacts/identity/") for path in row.primary_evidence
-    )
-    assert "tools/evidence/build_release_attestation.py" in row.test_binding
-    assert "tests/evidence/test_release_attestation.py" in row.test_binding
+    assert set(row.test_binding.split("; ")) == {
+        "scripts/release_id_recompute.py",
+        "tools/evidence/generate_identity_provenance.py",
+        "tests/evidence/test_identity_provenance.py",
+        "tools/evidence/build_release_attestation.py",
+        "tests/evidence/test_release_manifest_content_binding.py",
+        "tests/evidence/test_release_attestation.py",
+    }
     assert row.ci_binding == closeout.RELEASE_CI_JOB
     assert row.live_qa == "qa-21-po-021"
     assert f"`manifest_sha256={manifest_sha256}`" in row.future_claim
+    assert f"digest `{manifest_sha256}`" in row.posture
+    assert f"capture digest `{captured_release_id}`" in row.posture
+    assert manifest_sha256 != captured_release_id
     assert row.posture.startswith("UNCLAIMED:")
+
+
+def test_release_identity_family_rejects_incoherent_capture() -> None:
+    release_bytes = (ROOT / "artifacts/identity/release_id.json").read_bytes()
+    release_payload = json.loads(release_bytes)
+    recompute_text = (
+        ROOT / "artifacts/identity/release_id_recompute.log"
+    ).read_text(encoding="utf-8")
+    release_payload["release_id"] = "0" * 64
+    with pytest.raises(ValueError, match="release identity JSON binding mismatch"):
+        closeout.validate_release_identity_family(
+            release_payload=release_payload,
+            recompute_text=recompute_text,
+        )
+
+    duplicate_field_log = recompute_text.replace(
+        "release_id=",
+        f"release_id={'0' * 64}\nrelease_id=",
+        1,
+    )
+    with pytest.raises(ValueError, match="recomputation log shape mismatch"):
+        closeout.validate_release_identity_family(
+            recompute_text=duplicate_field_log,
+        )
+
+    duplicate_key_bytes = release_bytes.replace(
+        b'"release_id":',
+        b'"release_id":"' + (b"0" * 64) + b'","release_id":',
+        1,
+    )
+    assert duplicate_key_bytes != release_bytes
+    with pytest.raises(ValueError, match="release identity JSON binding mismatch"):
+        closeout.validate_release_identity_family(
+            release_bytes=duplicate_key_bytes,
+        )
+
+
+def test_release_row_rejects_manifest_only_substitution() -> None:
+    rows = closeout.build_rows()
+    index = next(
+        index
+        for index, row in enumerate(rows)
+        if row.token == "RELEASE_ID_RECOMPUTE_OK"
+    )
+    changed = replace(
+        rows[index],
+        primary_evidence=("catalog/manifest.json",),
+        artifact_keys=("epic038.release.catalog_manifest",),
+        proof_anchors=("catalog/manifest.json.path_proof.txt",),
+    )
+    with pytest.raises(ValueError, match="release identity source binding mismatch"):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 @pytest.mark.parametrize(

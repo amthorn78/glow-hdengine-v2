@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic038/token_evidence_matrix.md
-size_bytes: 38665
-sha256: ad49fe5b96a027ddb4fb50199081f71a7c3fb218057b66982610bf78985387ee
+size_bytes: 39788
+sha256: 4e27d7c1f55737529195cb3a47160a4264ac0ecb3d8326a656636e158fff0d0b
 mtime_utc: 2026-07-30T12:11:35Z
 produced_at_utc: 2026-07-26T22:42:05Z

@@ -2426,6 +2426,22 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
 
 EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
+        "artifact_key": "epic038.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic038_doc_deltas.md",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_doc_delta",
+        "schema_version": "1.0",
+        "notes": "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; governed presence is nonclaiming",
+    },
+    {
+        "artifact_key": "epic038.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic038/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_doc_delta_capture",
+        "schema_version": "1.0",
+        "notes": "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not the primary token surface and not a token claim",
+    },
+    {
         "artifact_key": "epic038.release.catalog_manifest",
         "discovered_physical_path": "catalog/manifest.json",
         "epic_id": "HDE-EPIC038",

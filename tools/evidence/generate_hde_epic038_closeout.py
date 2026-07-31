@@ -43,6 +43,10 @@ EVIDENCE_PATH_PROOFS_CI_JOB = (
     "test (.github/workflows/ci.yml): Run ci/checks/check_mirror_schema.sh"
 )
 RELEASE_CI_JOB = (
+    "test (.github/workflows/ci.yml): Verify immutable release input without "
+    "derived-tree writes; Run HDE-EPIC038 DEV-01 focused tests; "
+    "python -m pytest tests/evidence tests/ops/test_evidence_index.py "
+    "tests/ops/test_hde_epic038_ops03.py; "
     "sanity-pipeline (.github/workflows/ci.yml): "
     "Build PR-06R-B release attestation outside the source tree; "
     "Run canonical JSON gate (closed rails); "
@@ -83,12 +87,12 @@ PROHIBITED = frozenset({
 # cannot redefine its own accepted baseline.
 NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
     "TESTS_PASS_OK": "f895c4d36bffea6a1e5740efeeef85389f581041a63c89fa92686884388ccb63",
-    "DOC_DELTA_PRESENT_OK": "3c7c0cbdee33f4ac25cbe09e3d0275e7dd4056289001a942fe7dd25bba7f6151",
+    "DOC_DELTA_PRESENT_OK": "880dd72e44d5bd97ad15bdfa8190ea604e89cde3be6a32fff6574c507baa3316",
     "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
-    "QA_PRECOMMIT_CHECKLIST_OK": "0e0c9905c6e3a86a0d3a5ec91f848e4059098edffaecc20f163742248077f137",
-    "QA_POSTCOMMIT_CHECKLIST_OK": "38c978d3cc5250fcb9214eb9154dbb77b533cd699fa6066dc8e3a92566475bb1",
+    "QA_PRECOMMIT_CHECKLIST_OK": "8a361aa5a6549a69c91171f4aeba2b78702b3d025486984ca1c43afde0179f72",
+    "QA_POSTCOMMIT_CHECKLIST_OK": "15026253bdc47e05cae46f0abad1fbe35527dded6d112e9343bb8a4aba43f271",
     "ENV_RAILS_POLICY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "PREIMAGE_RECOMPUTE_OK": "a82f1ccfa039a408ac8d3b84f46eb7d850f554dbf49b938056cafaa22fa3472d",
     "CLI_READER_PARITY_OK": "c19b41956747816771a6ec95fc95c070a2e4e2c9d8afd4e8241ba6855c921682",
@@ -114,7 +118,7 @@ NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
     "CI_CHECK_MIRROR_SCHEMA_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "CI_CHECK_FINAL_LF_OK": "9ec6f302f7624cad060ea1699e5a699f99638324423508379939581a55bd4b52",
     "NO_EXTERNAL_IO_ON_REFUSAL_OK": "973ea977d8666b0acdfe96f78b443dcd6426f62d021441a92c78a479ab0d3a9f",
-    "RELEASE_ID_RECOMPUTE_OK": "40cee37b8da6b481dcf3bba92769c74084482773e2498de17144d3bd4d53b909",
+    "RELEASE_ID_RECOMPUTE_OK": "f44e5bc7fffa26a946bf62d9fc1e004ff6594295a921258ebf353efd5b0f8e0a",
 }
 PLANNED_BINDINGS: Mapping[str, tuple[str, str, str]] = {
     "TESTS_PASS_OK": (
@@ -122,19 +126,14 @@ PLANNED_BINDINGS: Mapping[str, tuple[str, str, str]] = {
         "epic038.close_report",
         "DEV-03",
     ),
-    "DOC_DELTA_PRESENT_OK": (
-        "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
-        "epic038.closeout_remediation_ledger",
-        "DEV-02",
-    ),
     "QA_PRECOMMIT_CHECKLIST_OK": (
-        "audit/qa/hde-epic038/acceptance_map_viability.log",
-        "epic038.acceptance_map_viability",
+        "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
+        "epic038.qa_precommit_checklist",
         "DEV-03",
     ),
     "QA_POSTCOMMIT_CHECKLIST_OK": (
-        "audit/EPIC-038_MANIFEST.json",
-        "epic038.manifest",
+        "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
+        "epic038.qa_postcommit_checklist",
         "DEV-03",
     ),
 }
@@ -152,6 +151,25 @@ REFUSAL_MANIFEST_PATH = "artifacts/bodygraph/v2_mapped_cache/manifest.json"
 REFUSAL_MANIFEST_KEY = "epic038.pr05.v2_mapped_cache.manifest"
 RELEASE_MANIFEST_PATH = "catalog/manifest.json"
 RELEASE_MANIFEST_KEY = "epic038.release.catalog_manifest"
+RELEASE_ID_PATH = "artifacts/identity/release_id.json"
+RELEASE_ID_KEY = "epic038.pr01.identity_release_id"
+RELEASE_RECOMPUTE_PATH = "artifacts/identity/release_id_recompute.log"
+RELEASE_RECOMPUTE_KEY = "epic038.pr01.identity_release_id_recompute"
+DOC_DELTA_PRIMARY_PATH = "audit/docdeltas/hde-epic038_doc_deltas.md"
+DOC_DELTA_PRIMARY_KEY = "epic038.doc_deltas"
+DOC_DELTA_CAPTURE_PATH = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
+DOC_DELTA_CAPTURE_KEY = "epic038.qa_meta_doc_deltas"
+DOC_DELTA_RETAINED_SHA256 = (
+    "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
+)
+DOC_DELTA_PRODUCER_CHECK_ID = "qa-00-step-0-discovery"
+DOC_DELTA_PRODUCER_LOG_PATH = (
+    "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
+)
+DOC_DELTA_PRODUCER_LOG_SHA256 = (
+    "db9e7ac48e168f7fac380f294271110bbf5e88b0874a1e6d5591cb868d6eecbe"
+)
+DOC_DELTA_PRODUCER_LOG_SIZE_BYTES = 8248
 QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
 QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
 PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
@@ -232,15 +250,278 @@ def _row(token: str, test: str, qa: str, path: str, key: str) -> Row:
     )
 
 
-def _release_row() -> Row:
-    manifest_sha256 = hashlib.sha256(
+def _hex64(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def validate_release_identity_family(
+    manifest_bytes: bytes | None = None,
+    release_payload: Mapping[str, object] | None = None,
+    release_bytes: bytes | None = None,
+    recompute_text: str | None = None,
+) -> tuple[str, str]:
+    raw = (
         (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
-    ).hexdigest()
+        if manifest_bytes is None
+        else manifest_bytes
+    )
+    try:
+        manifest = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("release manifest JSON mismatch") from exc
+    canonical = (
+        json.dumps(manifest, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
+        + "\n"
+    ).encode("utf-8")
+    if raw != canonical:
+        raise ValueError("release manifest is not canonical")
+    manifest_sha256 = hashlib.sha256(raw).hexdigest()
+
+    if release_payload is not None and release_bytes is not None:
+        raise ValueError("release identity JSON binding mismatch")
+    if release_payload is None:
+        raw_release = (
+            (ROOT / RELEASE_ID_PATH).read_bytes()
+            if release_bytes is None
+            else release_bytes
+        )
+        try:
+            loaded = json.loads(
+                raw_release,
+                object_pairs_hook=_unique_json_object,
+            )
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+            raise ValueError("release identity JSON binding mismatch") from exc
+        if not isinstance(loaded, dict):
+            raise ValueError("release identity JSON shape mismatch")
+        canonical_release = (
+            json.dumps(
+                loaded,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+            + "\n"
+        ).encode("utf-8")
+        if raw_release != canonical_release:
+            raise ValueError("release identity JSON binding mismatch")
+        release_payload = loaded
+    required_release = {
+        "manifest_path",
+        "manifest_sha256",
+        "release_id",
+        "release_id_algorithm",
+    }
+    captured_release_id = release_payload.get("release_id")
+    if (
+        set(release_payload) != required_release
+        or release_payload.get("manifest_path") != RELEASE_MANIFEST_PATH
+        or release_payload.get("manifest_sha256") != captured_release_id
+        or not _hex64(captured_release_id)
+        or release_payload.get("release_id_algorithm")
+        != "sha256(canonical_bytes(catalog/manifest.json))"
+    ):
+        raise ValueError("release identity JSON binding mismatch")
+
+    text = (
+        (ROOT / RELEASE_RECOMPUTE_PATH).read_text(encoding="utf-8")
+        if recompute_text is None
+        else recompute_text
+    )
+    lines = text.splitlines()
+    if not lines or lines[0] != "identity_release_id_recompute":
+        raise ValueError("release recomputation log shape mismatch")
+    field_lines = [line for line in lines[1:] if line]
+    if len(field_lines) != 3 or any("=" not in line for line in field_lines):
+        raise ValueError("release recomputation log shape mismatch")
+    pairs = [line.split("=", 1) for line in field_lines]
+    if len({key for key, _value in pairs}) != len(pairs):
+        raise ValueError("release recomputation log shape mismatch")
+    fields = dict(pairs)
+    if (
+        set(fields) != {"manifest_sha256", "release_id", "status"}
+        or fields.get("manifest_sha256") != captured_release_id
+        or fields.get("release_id") != captured_release_id
+        or fields.get("status") != "PASS"
+    ):
+        raise ValueError("release recomputation log binding mismatch")
+    return manifest_sha256, str(captured_release_id)
+
+
+def validate_doc_delta_evidence(
+    primary_bytes: bytes | None = None,
+    capture_bytes: bytes | None = None,
+    qa_manifest: Mapping[str, object] | None = None,
+    producer_log: str | None = None,
+) -> None:
+    primary = (
+        (ROOT / DOC_DELTA_PRIMARY_PATH).read_bytes()
+        if primary_bytes is None
+        else primary_bytes
+    )
+    capture = (
+        (ROOT / DOC_DELTA_CAPTURE_PATH).read_bytes()
+        if capture_bytes is None
+        else capture_bytes
+    )
+    if (
+        not primary.strip()
+        or primary != capture
+        or hashlib.sha256(primary).hexdigest() != DOC_DELTA_RETAINED_SHA256
+    ):
+        raise ValueError("doc-delta staging/capture pair mismatch")
+
+    manifest = (
+        json.loads(
+            (ROOT / QA_MANIFEST_PATH).read_bytes(),
+            object_pairs_hook=_unique_json_object,
+        )
+        if qa_manifest is None
+        else qa_manifest
+    )
+    if not isinstance(manifest, Mapping):
+        raise ValueError("doc-delta producer manifest binding mismatch")
+    record = manifest.get(DOC_DELTA_PRODUCER_CHECK_ID)
+    text = (
+        (ROOT / DOC_DELTA_PRODUCER_LOG_PATH).read_text(encoding="utf-8")
+        if producer_log is None
+        else producer_log
+    )
+    log_bytes = text.encode("utf-8")
+    if (
+        not isinstance(record, dict)
+        or record.get("check_id") != DOC_DELTA_PRODUCER_CHECK_ID
+        or record.get("log_path")
+        != "checks/qa-00-step-0-discovery/primary.log"
+        or record.get("status") != "PASS"
+        or record.get("sha256") != DOC_DELTA_PRODUCER_LOG_SHA256
+        or record.get("size_bytes") != DOC_DELTA_PRODUCER_LOG_SIZE_BYTES
+        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or record.get("size_bytes") != len(log_bytes)
+    ):
+        raise ValueError("doc-delta producer manifest binding mismatch")
+
+    lines = text.splitlines()
+    try:
+        header = json.loads(lines[0], object_pairs_hook=_unique_json_object)
+    except (IndexError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("doc-delta producer log shape mismatch") from exc
+    results: list[Mapping[str, object]] = []
+    for line in lines[1:]:
+        try:
+            candidate = json.loads(line, object_pairs_hook=_unique_json_object)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(candidate, dict) and "doc_delta_posture" in candidate:
+            results.append(candidate)
+    if not isinstance(header, dict) or len(results) != 1:
+        raise ValueError("doc-delta producer log shape mismatch")
+    result = results[0]
+    expected_artifacts = [
+        DOC_DELTA_PRODUCER_LOG_PATH,
+        DOC_DELTA_PRIMARY_PATH,
+        DOC_DELTA_CAPTURE_PATH,
+    ]
+    command = header.get("command")
+    evidence_artifacts = header.get("evidence_artifacts")
+    required_receipts = {
+        "DEPENDENCY_INITIAL_EXIT_CODE=": "DEPENDENCY_INITIAL_EXIT_CODE=0",
+        "DEPENDENCY_FINAL_EXIT_CODE=": "DEPENDENCY_FINAL_EXIT_CODE=0",
+        "PATH_PREFLIGHT_EXIT_CODE=": "PATH_PREFLIGHT_EXIT_CODE=0",
+        "FINAL_READINESS=": "FINAL_READINESS=READY",
+        "BEHAVIOR_EXIT_CODE=": "BEHAVIOR_EXIT_CODE=0",
+    }
+    if (
+        header.get("check_id") != DOC_DELTA_PRODUCER_CHECK_ID
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or not isinstance(evidence_artifacts, list)
+        or evidence_artifacts != expected_artifacts
+        or header.get("intended_tokens") != []
+        or header.get("claimed_tokens") != []
+        or header.get("captured_env")
+        != {
+            "SAFE_MODE": "1",
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "LC_ALL": "C",
+            "LANG": "C",
+            "TZ": "UTC",
+        }
+        or any(
+            [line for line in lines if line.startswith(prefix)] != [expected]
+            for prefix, expected in required_receipts.items()
+        )
+        or not isinstance(command, str)
+        or DOC_DELTA_PRIMARY_PATH not in command
+        or DOC_DELTA_CAPTURE_PATH not in command
+        or "DOC_DELTA_PAIR_MISMATCH" not in command
+        or set(result)
+        != {
+            "doc_delta_posture",
+            "epic_id",
+            "future_check_artifacts",
+            "production_factory_missing_routes",
+            "production_factory_required_routes",
+            "qa_root",
+            "repository",
+        }
+        or result.get("epic_id") != EPIC_ID
+        or result.get("doc_delta_posture") != "created"
+        or result.get("future_check_artifacts") != "NOT RUN"
+        or result.get("production_factory_missing_routes") != []
+        or result.get("production_factory_required_routes")
+        != [
+            ["/api/compat/v1", "POST"],
+            ["/internal/version", "GET"],
+            ["/reader", "GET"],
+        ]
+        or result.get("qa_root") != "audit/qa/hde-epic038/"
+        or result.get("repository") != "glow-hdengine-v2"
+    ):
+        raise ValueError("doc-delta producer log binding mismatch")
+
+    records = _mirror_records()
+    expected_records = {
+        (
+            DOC_DELTA_PRIMARY_KEY,
+            DOC_DELTA_PRIMARY_PATH,
+            f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",
+        ),
+        (
+            DOC_DELTA_CAPTURE_KEY,
+            DOC_DELTA_CAPTURE_PATH,
+            f"{DOC_DELTA_CAPTURE_PATH}.path_proof.txt",
+        ),
+    }
+    if not expected_records.issubset(records):
+        raise ValueError("doc-delta Index/Mirror binding mismatch")
+    for _key, path, proof in expected_records:
+        _validate_proof(path, proof)
+
+
+def _release_row() -> Row:
+    manifest_sha256, captured_release_id = validate_release_identity_family()
     row = _row(
         "RELEASE_ID_RECOMPUTE_OK",
         (
             "scripts/release_id_recompute.py; "
+            "tools/evidence/generate_identity_provenance.py; "
             "tools/evidence/build_release_attestation.py; "
+            "tests/evidence/test_identity_provenance.py; "
             "tests/evidence/test_release_manifest_content_binding.py; "
             "tests/evidence/test_release_attestation.py"
         ),
@@ -251,19 +532,64 @@ def _release_row() -> Row:
     return replace(
         row,
         ci_binding=RELEASE_CI_JOB,
+        primary_evidence=(
+            RELEASE_MANIFEST_PATH,
+            RELEASE_ID_PATH,
+            RELEASE_RECOMPUTE_PATH,
+        ),
+        artifact_keys=(
+            RELEASE_MANIFEST_KEY,
+            RELEASE_ID_KEY,
+            RELEASE_RECOMPUTE_KEY,
+        ),
+        proof_anchors=(
+            f"{RELEASE_MANIFEST_PATH}.path_proof.txt",
+            f"{RELEASE_ID_PATH}.path_proof.txt",
+            f"{RELEASE_RECOMPUTE_PATH}.path_proof.txt",
+        ),
         posture=(
-            "UNCLAIMED: the canonical manifest is the exact current source input; "
-            "frozen capture-time identity artifacts and historical PASS text are "
-            "not current release evidence."
+            "UNCLAIMED: the complete governed release family is bound, but the "
+            f"current manifest digest `{manifest_sha256}` differs from retained "
+            f"capture digest `{captured_release_id}`; frozen PASS text and artifact "
+            "presence do not establish current recomputation."
         ),
         future_claim=(
-            "Future status may become CLAIMED only when the workflow artifact "
+            "Future status may become CLAIMED only when the canonical manifest, "
+            "release-identity JSON, and recomputation log agree on the exact current "
+            f"digest `{manifest_sha256}`, the workflow artifact "
             "`hde-release-attestation-${{ github.event.pull_request.head.sha || "
             "github.sha }}/attestation.json` verifies `source_commit_exact=true`, "
             f"`manifest_sha256={manifest_sha256}`, `release_id=manifest_sha256`, "
             "`validation_result=PASS`, `release_admission=PR06R_B_FINAL_PASS`, "
             "`pipeline_stop=null`, closed rails, and independent Gate B PASS "
             "against that same exact head."
+        ),
+    )
+
+
+def _doc_delta_row() -> Row:
+    row = _row(
+        "DOC_DELTA_PRESENT_OK",
+        "tests/evidence/test_hde_epic038_closeout.py",
+        DOC_DELTA_PRODUCER_CHECK_ID,
+        DOC_DELTA_PRIMARY_PATH,
+        DOC_DELTA_PRIMARY_KEY,
+    )
+    return replace(
+        row,
+        posture=(
+            "UNCLAIMED: the draft/staging surface is the primary token binding; "
+            f"the matching capture `{DOC_DELTA_CAPTURE_PATH}` with key "
+            f"`{DOC_DELTA_CAPTURE_KEY}` and retained producer log "
+            f"`{DOC_DELTA_PRODUCER_LOG_PATH}` establish mechanical provenance, "
+            "not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head focused "
+            "test verifies the byte-identical governed staging/capture pair, both "
+            "Index/Mirror records and proofs, and the hash-bound tokenless "
+            f"`{DOC_DELTA_PRODUCER_CHECK_ID}` producer record; finalized acceptance "
+            "outputs must derive the result and independent Gate B must record PASS."
         ),
     )
 
@@ -583,6 +909,7 @@ def build_rows() -> tuple[Row, ...]:
         ),
     )
     rows["RELEASE_ID_RECOMPUTE_OK"] = _release_row()
+    rows["DOC_DELTA_PRESENT_OK"] = _doc_delta_row()
 
     for token, (path, key, owner) in PLANNED_BINDINGS.items():
         row = rows[token]
@@ -608,6 +935,23 @@ def build_rows() -> tuple[Row, ...]:
                 f"produces `{path}` and `{path}.path_proof.txt`, registers exact "
                 f"artifact key `{key}`, the planned commands execute successfully "
                 "on the exact head, and independent Gate B records PASS."
+            ),
+        )
+    for token in ("QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"):
+        path, key, owner = PLANNED_BINDINGS[token]
+        rows[token] = replace(
+            rows[token],
+            test_binding=(
+                "tools/evidence/generate_hde_epic038_closeout.py; "
+                "tests/evidence/test_hde_epic038_closeout.py"
+            ),
+            future_claim=(
+                "Future status may become CLAIMED only after DEV-02 implements "
+                "deterministic `--closeout` production and read-only `--check` in "
+                "`tools/evidence/generate_hde_epic038_closeout.py`, then "
+                f"{owner} produces `{path}`, registers exact key `{key}` and its "
+                "updater-owned proof, the planned exact-head `test` job commands "
+                "succeed, and independent Gate B records PASS."
             ),
         )
     return tuple(rows[token] for token in TOKENS)
@@ -1240,27 +1584,72 @@ def _validate_special_semantics(row: Row) -> None:
         validate_cli_reader_parity_payload(
             json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8"))
         )
+    elif row.token == "DOC_DELTA_PRESENT_OK":
+        if (
+            row.primary_evidence != (DOC_DELTA_PRIMARY_PATH,)
+            or row.artifact_keys != (DOC_DELTA_PRIMARY_KEY,)
+            or row.proof_anchors
+            != (f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",)
+            or row.test_binding
+            != "tests/evidence/test_hde_epic038_closeout.py"
+            or row.live_qa != DOC_DELTA_PRODUCER_CHECK_ID
+            or DOC_DELTA_CAPTURE_PATH not in row.posture
+            or DOC_DELTA_CAPTURE_KEY not in row.posture
+            or DOC_DELTA_PRODUCER_LOG_PATH not in row.posture
+        ):
+            raise ValueError("doc-delta evidence binding mismatch")
+        validate_doc_delta_evidence()
+    elif row.token in {
+        "QA_PRECOMMIT_CHECKLIST_OK",
+        "QA_POSTCOMMIT_CHECKLIST_OK",
+    }:
+        if (
+            row.test_binding
+            != (
+                "tools/evidence/generate_hde_epic038_closeout.py; "
+                "tests/evidence/test_hde_epic038_closeout.py"
+            )
+            or row.owner_task != "DEV-03"
+            or row.classification != "planned-new"
+            or "DEV-02 implements deterministic `--closeout` production"
+            not in row.future_claim
+            or "read-only `--check`" not in row.future_claim
+        ):
+            raise ValueError(f"checklist planned binding mismatch: {row.token}")
     elif row.token == "RELEASE_ID_RECOMPUTE_OK":
         if (
-            row.primary_evidence != (RELEASE_MANIFEST_PATH,)
-            or row.artifact_keys != (RELEASE_MANIFEST_KEY,)
-            or any(path.startswith("artifacts/identity/") for path in row.primary_evidence)
+            row.primary_evidence
+            != (
+                RELEASE_MANIFEST_PATH,
+                RELEASE_ID_PATH,
+                RELEASE_RECOMPUTE_PATH,
+            )
+            or row.artifact_keys
+            != (
+                RELEASE_MANIFEST_KEY,
+                RELEASE_ID_KEY,
+                RELEASE_RECOMPUTE_KEY,
+            )
+            or row.proof_anchors
+            != (
+                f"{RELEASE_MANIFEST_PATH}.path_proof.txt",
+                f"{RELEASE_ID_PATH}.path_proof.txt",
+                f"{RELEASE_RECOMPUTE_PATH}.path_proof.txt",
+            )
         ):
             raise ValueError("release identity source binding mismatch")
-        raw = (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
-        payload = json.loads(raw)
-        canonical = (
-            json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
-            + "\n"
-        ).encode("utf-8")
-        if raw != canonical:
-            raise ValueError("release manifest is not canonical")
-        digest = hashlib.sha256(raw).hexdigest()
-        if f"`manifest_sha256={digest}`" not in row.future_claim:
-            raise ValueError("release manifest digest binding mismatch")
+        digest, captured_release_id = validate_release_identity_family()
+        if (
+            f"`manifest_sha256={digest}`" not in row.future_claim
+            or f"digest `{digest}`" not in row.posture
+            or f"capture digest `{captured_release_id}`" not in row.posture
+        ):
+            raise ValueError("release identity digest disclosure mismatch")
         required_bindings = {
             "scripts/release_id_recompute.py",
+            "tools/evidence/generate_identity_provenance.py",
             "tools/evidence/build_release_attestation.py",
+            "tests/evidence/test_identity_provenance.py",
             "tests/evidence/test_release_manifest_content_binding.py",
             "tests/evidence/test_release_attestation.py",
         }
