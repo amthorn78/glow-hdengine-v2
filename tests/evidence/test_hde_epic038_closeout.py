@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import runpy
 import subprocess
 import sys
 from dataclasses import replace
@@ -10,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import generate_hde_epic038_closeout as closeout
+from tools.evidence import update_evidence_index as updater
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -113,6 +115,13 @@ def test_every_row_has_the_positive_nonclaiming_contract() -> None:
             f"{row.posture}\0{row.future_claim}".encode("utf-8")
         ).hexdigest()
         assert digest == closeout.NONCLAIMING_TEXT_SHA256[row.token]
+    row_contract = json.dumps(
+        [vars(row) for row in closeout.build_rows()],
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    assert hashlib.sha256(row_contract).hexdigest() == closeout.ROW_CONTRACT_SHA256
 
 
 @pytest.mark.parametrize("row_index", [0, 7], ids=["planned-new", "existing-reused"])
@@ -146,6 +155,24 @@ def test_generic_affirmative_claim_language_fails_closed(
     changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
     monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
     with pytest.raises(ValueError, match="nonclaiming posture contract"):
+        closeout.validate_rows(closeout.build_rows())
+
+
+@pytest.mark.parametrize("row_index", [0, 7], ids=["planned-new", "existing-reused"])
+def test_generic_claim_in_other_rendered_field_fails_closed(
+    monkeypatch, row_index
+) -> None:
+    rows = closeout.build_rows()
+    row = rows[row_index]
+    changed = replace(
+        row,
+        ci_binding=(
+            f"{row.ci_binding} Current status is CLAIMED and acceptance is complete."
+        ),
+    )
+    changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
+    monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
+    with pytest.raises(ValueError, match="independent row contract drift"):
         closeout.validate_rows(closeout.build_rows())
 
 
@@ -297,6 +324,44 @@ def test_every_mirror_record_and_proof_anchor_is_validated() -> None:
         closeout.validate_all_mirror_proofs((*items, items[0]))
 
 
+def test_duplicate_and_extra_proof_fields_fail_closed(tmp_path) -> None:
+    proof = tmp_path / "artifact.path_proof.txt"
+    proof.write_text(
+        "path: ../outside\n"
+        "path: artifact\n"
+        "size_bytes: 1\n"
+        f"sha256: {'0' * 64}\n"
+        "mtime_utc: 2026-07-31T00:00:00Z\n"
+        "produced_at_utc: 2026-07-31T00:00:00Z\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="duplicate"):
+        closeout._proof_fields(proof)
+    with pytest.raises(SystemExit, match="PROOF_DUPLICATE_FIELD"):
+        updater._load_existing_proof(proof)
+    mirror_checker = runpy.run_path(
+        str(ROOT / "ci/checks/check_mirror_schema.sh"),
+        run_name="hde_epic038_mirror_checker_test",
+    )
+    with pytest.raises(ValueError, match="duplicate"):
+        mirror_checker["load_proof"](proof)
+
+    proof.write_text(
+        "path: artifact\n"
+        "size_bytes: 1\n"
+        f"sha256: {'0' * 64}\n"
+        "mtime_utc: 2026-07-31T00:00:00Z\n"
+        "produced_at_utc: 2026-07-31T00:00:00Z\n"
+        "unexpected: contradiction\n",
+        encoding="utf-8",
+    )
+    expected = frozenset(
+        {"path", "size_bytes", "sha256", "mtime_utc", "produced_at_utc"}
+    )
+    with pytest.raises(ValueError, match="roster mismatch"):
+        closeout._proof_fields(proof, expected)
+
+
 def test_integrity_qa19_rejects_missing_path_validator_execution() -> None:
     manifest = json.loads(
         (ROOT / closeout.QA_MANIFEST_PATH).read_text(encoding="utf-8")
@@ -313,6 +378,53 @@ def test_integrity_qa19_rejects_missing_path_validator_execution() -> None:
     record["size_bytes"] = len(changed_log.encode("utf-8"))
     with pytest.raises(ValueError, match="execution predicate mismatch"):
         closeout.validate_integrity_qa19_evidence(manifest, changed_log)
+
+
+@pytest.mark.parametrize(
+    "validator",
+    [closeout.validate_integrity_qa19_evidence, closeout.validate_final_lf_evidence],
+    ids=["integrity", "final-lf"],
+)
+def test_qa19_rejects_command_name_substitution_and_duplicate_receipts(
+    validator,
+) -> None:
+    manifest_bytes = (ROOT / closeout.QA_MANIFEST_PATH).read_text(encoding="utf-8")
+    original_lines = (
+        ROOT / closeout.EVIDENCE_INTEGRITY_LOG_PATH
+    ).read_text(encoding="utf-8").splitlines()
+    header = json.loads(original_lines[0])
+    header["command"] = (
+        "printf '%s' 'python tools/evidence/update_evidence_index.py --check "
+        "python tools/evidence/validate_evidence_paths.py "
+        "python ci/checks/check_mirror_schema.sh bash ci/checks/check_final_lf.sh'; "
+        "true"
+    )
+    substituted_lines = [json.dumps(header), *original_lines[1:]]
+    behavior_index = next(
+        index
+        for index, line in enumerate(substituted_lines)
+        if line.startswith("[behavior command] ")
+    )
+    substituted_lines[behavior_index] = "[behavior command] true"
+
+    duplicate_receipt_lines = [*original_lines, "BEHAVIOR_EXIT_CODE=0"]
+    duplicate_header_lines = [*original_lines]
+    duplicate_header_lines[0] = duplicate_header_lines[0].replace(
+        '"command":', '"command":"true","command":', 1
+    )
+
+    for changed_lines in (
+        substituted_lines,
+        duplicate_receipt_lines,
+        duplicate_header_lines,
+    ):
+        changed_log = "\n".join(changed_lines) + "\n"
+        manifest = json.loads(manifest_bytes)
+        record = manifest[closeout.EVIDENCE_INTEGRITY_CHECK_ID]
+        record["sha256"] = hashlib.sha256(changed_log.encode("utf-8")).hexdigest()
+        record["size_bytes"] = len(changed_log.encode("utf-8"))
+        with pytest.raises(ValueError, match="execution (header invalid|predicate mismatch)"):
+            validator(manifest, changed_log)
 
 
 @pytest.mark.parametrize(
@@ -910,6 +1022,7 @@ def test_no_io_row_binds_explicit_zero_call_log_and_manifest() -> None:
     [
         (lambda text: text.replace("vendor_calls=0", "vendor_calls=1"), None),
         (lambda text: text.replace("db_calls=0", "db_calls=1"), None),
+        (lambda text: text + "vendor_calls=1 db_calls=1\n", None),
         (
             None,
             lambda payload: payload["predicates"].__setitem__(

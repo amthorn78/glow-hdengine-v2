@@ -37,12 +37,16 @@ def sha256(path: Path) -> str:
 def load_proof(path: Path):
     data = {}
     for line in path.read_text().splitlines():
-        if not line.strip():
+        if not line:
             continue
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        data[key.strip()] = value.strip()
+        if ": " not in line:
+            raise ValueError(f"proof format mismatch: {path}")
+        key, value = line.split(": ", 1)
+        if not key or not value:
+            raise ValueError(f"proof field empty: {path}: {key}")
+        if key in data:
+            raise ValueError(f"proof field duplicate: {path}: {key}")
+        data[key] = value
     return data
 
 
@@ -135,7 +139,28 @@ def main():
             ok = False
             continue
 
-        proof_data = load_proof(proof_path)
+        try:
+            proof_data = load_proof(proof_path)
+        except (OSError, UnicodeError, ValueError) as exc:
+            print(f"PROOF_PARSE:{i}:{proof_path}:{exc}", file=sys.stderr)
+            ok = False
+            continue
+        required_proof_fields = {
+            "path",
+            "size_bytes",
+            "sha256",
+            "mtime_utc",
+            "produced_at_utc",
+        }
+        if artifact_path == index_path:
+            required_proof_fields.add("mirror_body_sha256")
+        if set(proof_data) != required_proof_fields:
+            print(
+                f"PROOF_FIELDS:{i}:{sorted(proof_data)}"
+                f"!={sorted(required_proof_fields)}",
+                file=sys.stderr,
+            )
+            ok = False
         if proof_data.get("path") != artifact_path.as_posix():
             print(f"PROOF_PATH:{i}:{proof_data.get('path')}!={artifact_path.as_posix()}", file=sys.stderr)
             ok = False

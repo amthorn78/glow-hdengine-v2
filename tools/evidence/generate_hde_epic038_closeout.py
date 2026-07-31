@@ -24,6 +24,9 @@ FUTURE_CLAIM_PREFIXES = (
     "Future status may become CLAIMED only after ",
     "Future status may become CLAIMED only when ",
 )
+ROW_CONTRACT_SHA256 = (
+    "3b453a15859cd5071761067a227272770cc9f12518a9e0ef2e43478698bbbab0"
+)
 CI_JOB = "test (.github/workflows/ci.yml)"
 HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
 HUMAN_INDEX_KEY = "index.human_index"
@@ -182,6 +185,36 @@ FINAL_LF_LOG_PATH = (
 )
 EVIDENCE_INTEGRITY_CHECK_ID = "qa-19-po-019"
 EVIDENCE_INTEGRITY_LOG_PATH = FINAL_LF_LOG_PATH
+QA19_HEADER_COMMAND_SHA256 = (
+    "242f24210d3058ca48775c8492a95103968987e60ddede5ba11936156cb9eda8"
+)
+QA19_BEHAVIOR_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python tools/evidence/update_evidence_index.py --check && "
+    "python tools/evidence/validate_evidence_paths.py && "
+    "python ci/checks/check_mirror_schema.sh && "
+    "bash ci/checks/check_evidence_index_hash.sh && "
+    "python tools/evidence/orientation_demo.py --check && "
+    "bash ci/checks/check_final_lf.sh"
+)
+QA19_HEADER_FIELDS = frozenset(
+    {
+        "captured_env",
+        "check_id",
+        "check_name",
+        "claimed_tokens",
+        "command",
+        "command_provenance",
+        "evidence_artifacts",
+        "exit_code",
+        "fail_status",
+        "intended_tokens",
+        "pf_refs",
+        "schema_version",
+        "status",
+        "timestamp_utc",
+    }
+)
 FINAL_LF_SCRIPT_PATH = "ci/checks/check_final_lf.sh"
 FINAL_LF_REQUIRED_PATHS = (
     "docs/evidence/INDEX.json",
@@ -1133,18 +1166,37 @@ def validate_all_mirror_proofs(
         )
 
 
-def _proof_fields(path: Path) -> dict[str, str]:
+def _proof_fields(
+    path: Path,
+    expected_fields: frozenset[str] | None = None,
+) -> dict[str, str]:
     fields: dict[str, str] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
-        if ": " in line:
-            key, value = line.split(": ", 1)
-            fields[key] = value
+        if not line:
+            continue
+        if ": " not in line:
+            raise ValueError(f"proof field format mismatch: {path}")
+        key, value = line.split(": ", 1)
+        if not key or not value or key in fields:
+            raise ValueError(f"proof field duplicate or empty: {path}: {key}")
+        fields[key] = value
+    if expected_fields is not None and set(fields) != expected_fields:
+        raise ValueError(f"proof field roster mismatch: {path}")
     return fields
 
 
 def _validate_proof(primary: str, proof: str) -> None:
     primary_path = ROOT / primary
-    fields = _proof_fields(ROOT / proof)
+    expected_fields = {
+        "path",
+        "size_bytes",
+        "sha256",
+        "mtime_utc",
+        "produced_at_utc",
+    }
+    if primary == MACHINE_MIRROR_PATH:
+        expected_fields.add("mirror_body_sha256")
+    fields = _proof_fields(ROOT / proof, frozenset(expected_fields))
     body = primary_path.read_bytes()
     if fields.get("path") != primary:
         raise ValueError(f"proof path mismatch: {primary}")
@@ -1188,14 +1240,11 @@ def validate_db_posture_payload(token: str, payload: Mapping[str, object]) -> No
 
 
 def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> None:
-    required_log_fields = (
-        "code=PROVIDER_REFUSED",
-        "safe_mode=1",
-        "allow_network=0",
-        "vendor_calls=0",
-        "db_calls=0",
+    expected_log = (
+        "PASS code=PROVIDER_REFUSED safe_mode=1 allow_network=0 "
+        "vendor_calls=0 db_calls=0\n"
     )
-    if not all(field in log_text.split() for field in required_log_fields):
+    if log_text != expected_log:
         raise ValueError("closed-rails refusal counters mismatch")
     predicates = manifest.get("predicates")
     if (
@@ -1206,7 +1255,6 @@ def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> No
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list):
         raise ValueError("closed-rails manifest artifacts missing")
-    log_path = ROOT / REFUSAL_PATH
     matches = [
         item
         for item in artifacts
@@ -1215,7 +1263,7 @@ def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> No
     if len(matches) != 1:
         raise ValueError("closed-rails refusal binding missing")
     match = matches[0]
-    log_bytes = log_path.read_bytes()
+    log_bytes = log_text.encode("utf-8")
     if (
         match.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
         or match.get("size") != len(log_bytes)
@@ -1318,12 +1366,15 @@ def validate_release_attestation_payload(
             raise ValueError(f"release attestation mismatch: {key}")
 
 
-def validate_final_lf_evidence(
-    manifest: Mapping[str, object], log_text: str
+def _validate_qa19_execution(
+    manifest: Mapping[str, object],
+    log_text: str,
+    *,
+    error_prefix: str,
 ) -> None:
-    record = manifest.get(FINAL_LF_CHECK_ID)
+    record = manifest.get(EVIDENCE_INTEGRITY_CHECK_ID)
     if not isinstance(record, dict):
-        raise ValueError("final-LF QA manifest record missing")
+        raise ValueError(f"{error_prefix} QA manifest record missing")
     expected_relative_log = "checks/qa-19-po-019/primary.log"
     log_bytes = log_text.encode("utf-8")
     if (
@@ -1332,14 +1383,14 @@ def validate_final_lf_evidence(
         or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
         or record.get("size_bytes") != len(log_bytes)
     ):
-        raise ValueError("final-LF QA manifest binding mismatch")
+        raise ValueError(f"{error_prefix} QA manifest binding mismatch")
     lines = log_text.splitlines()
     if not lines:
-        raise ValueError("final-LF execution log missing")
+        raise ValueError(f"{error_prefix} execution log missing")
     try:
-        header = json.loads(lines[0])
-    except json.JSONDecodeError as exc:
-        raise ValueError("final-LF execution header invalid") from exc
+        header = json.loads(lines[0], object_pairs_hook=_unique_json_object)
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"{error_prefix} execution header invalid") from exc
     required_rails = {
         "SAFE_MODE": "1",
         "ALLOW_NETWORK": "0",
@@ -1348,68 +1399,49 @@ def validate_final_lf_evidence(
         "LANG": "C",
         "TZ": "UTC",
     }
+    command = header.get("command") if isinstance(header, dict) else None
+    behavior_receipts = [
+        line for line in lines if line.startswith("[behavior command] ")
+    ]
+    exit_receipts = [line for line in lines if line.startswith("BEHAVIOR_EXIT_CODE=")]
     if (
         not isinstance(header, dict)
+        or set(header) != QA19_HEADER_FIELDS
         or header.get("check_id") != FINAL_LF_CHECK_ID
         or header.get("status") != "PASS"
         or header.get("exit_code") != 0
-        or "bash ci/checks/check_final_lf.sh" not in header.get("command", "")
+        or not isinstance(command, str)
+        or hashlib.sha256(command.encode("utf-8")).hexdigest()
+        != QA19_HEADER_COMMAND_SHA256
+        or not command.endswith(f"; {QA19_BEHAVIOR_COMMAND}")
+        or behavior_receipts != [f"[behavior command] {QA19_BEHAVIOR_COMMAND}"]
+        or exit_receipts != ["BEHAVIOR_EXIT_CODE=0"]
         or header.get("captured_env") != required_rails
         or header.get("intended_tokens") != []
         or header.get("claimed_tokens") != []
-        or "BEHAVIOR_EXIT_CODE=0" not in lines
     ):
-        raise ValueError("final-LF execution predicate mismatch")
+        raise ValueError(f"{error_prefix} execution predicate mismatch")
+
+
+def validate_final_lf_evidence(
+    manifest: Mapping[str, object], log_text: str
+) -> None:
+    _validate_qa19_execution(
+        manifest,
+        log_text,
+        error_prefix="final-LF",
+    )
 
 
 def validate_integrity_qa19_evidence(
     manifest: Mapping[str, object],
     log_text: str,
 ) -> None:
-    record = manifest.get(EVIDENCE_INTEGRITY_CHECK_ID)
-    if not isinstance(record, dict):
-        raise ValueError("evidence-integrity QA manifest record missing")
-    log_bytes = log_text.encode("utf-8")
-    if (
-        record.get("log_path") != "checks/qa-19-po-019/primary.log"
-        or record.get("status") != "PASS"
-        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
-        or record.get("size_bytes") != len(log_bytes)
-    ):
-        raise ValueError("evidence-integrity QA manifest binding mismatch")
-    lines = log_text.splitlines()
-    if not lines:
-        raise ValueError("evidence-integrity execution log missing")
-    try:
-        header = json.loads(lines[0])
-    except json.JSONDecodeError as exc:
-        raise ValueError("evidence-integrity execution header invalid") from exc
-    command = header.get("command") if isinstance(header, dict) else None
-    required_commands = (
-        "python tools/evidence/update_evidence_index.py --check",
-        "python tools/evidence/validate_evidence_paths.py",
-        "python ci/checks/check_mirror_schema.sh",
+    _validate_qa19_execution(
+        manifest,
+        log_text,
+        error_prefix="evidence-integrity",
     )
-    required_rails = {
-        "SAFE_MODE": "1",
-        "ALLOW_NETWORK": "0",
-        "APP_ENV": "dev",
-        "LC_ALL": "C",
-        "LANG": "C",
-        "TZ": "UTC",
-    }
-    if (
-        not isinstance(command, str)
-        or any(required not in command for required in required_commands)
-        or header.get("check_id") != EVIDENCE_INTEGRITY_CHECK_ID
-        or header.get("status") != "PASS"
-        or header.get("exit_code") != 0
-        or header.get("captured_env") != required_rails
-        or header.get("intended_tokens") != []
-        or header.get("claimed_tokens") != []
-        or "BEHAVIOR_EXIT_CODE=0" not in lines
-    ):
-        raise ValueError("evidence-integrity execution predicate mismatch")
 
 
 def _shell_array(script_text: str, name: str) -> tuple[str, ...]:
@@ -1840,6 +1872,14 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
                 raise ValueError(f"planned evidence claim: {row.token}")
 
         _validate_special_semantics(row)
+    row_contract = json.dumps(
+        [vars(row) for row in rows],
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    if hashlib.sha256(row_contract).hexdigest() != ROW_CONTRACT_SHA256:
+        raise ValueError("independent row contract drift")
     return rows
 
 
