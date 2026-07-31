@@ -31,10 +31,10 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Human Index / Machine Mirror artifact keys: `epic038.doc_deltas`
 - Epic: `epic_id=HDE-EPIC038`
 - Proof anchors: `audit/docdeltas/hde-epic038_doc_deltas.md.path_proof.txt`
-- Current posture: UNCLAIMED: the draft/staging surface is the primary token binding; the matching capture `audit/qa/hde-epic038/00_meta/doc_deltas.md` with key `epic038.qa_meta_doc_deltas` and retained producer log `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` establish mechanical provenance, not acceptance.
+- Current posture: UNCLAIMED: the draft/staging surface is the primary token binding; the stable capture `audit/qa/hde-epic038/00_meta/doc_deltas.md` with key `epic038.qa_meta_doc_deltas` explicitly names the staging path and carries its discovered blockers and caveats. Refreshed proofs and Index/Mirror rows bind the normalized surfaces, while retained log `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` preserves original mechanical Step-0 creation/discovery provenance; none establish acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head focused test verifies the byte-identical governed staging/capture pair, both Index/Mirror records and proofs, and the hash-bound tokenless `qa-00-step-0-discovery` producer record; finalized acceptance outputs must derive the result and independent Gate B must record PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head focused test independently verifies each governed surface's role, exact staging reference, blockers/caveats, Index/Mirror record, and proof; the approved r7/PF19 pair-identity check must also pass as execution provenance rather than substitute for those semantics, alongside the hash-bound tokenless `qa-00-step-0-discovery` producer record; finalized acceptance outputs must derive the result and independent Gate B must record PASS.
 
 ## 3. `EVIDENCE_INDEX_UPDATED_OK`
 - Canonical governance token: `EVIDENCE_INDEX_UPDATED_OK`
