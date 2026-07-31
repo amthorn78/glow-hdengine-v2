@@ -75,6 +75,22 @@ EXPECTED_DOC_DELTA_WRITE_COMMAND = (
 EXPECTED_DOC_DELTA_CHECK_COMMAND = (
     "python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas"
 )
+EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND = (
+    "python -m pip install -r requirements-dev.txt"
+)
+EXPECTED_PYTEST_READINESS_COMMAND = "python -m pytest --version"
+EXPECTED_DEV_REQUIREMENTS_BYTES = (
+    b"# Test-only deps\n"
+    b"jsonschema==4.23.0\n"
+    b"\n"
+    b"# Testing framework\n"
+    b"pytest>=7.4,<9.0\n"
+    b"pytest-cov>=4.1,<5.0\n"
+    b"pytest-mock>=3.12,<4.0\n"
+)
+EXPECTED_DEV_REQUIREMENTS_SHA256 = (
+    "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"
+)
 EXPECTED_DOC_DELTA_CURRENT_SHA256 = (
     "322db8191bcadf82df5231697d32b66d615e7a9ed88813c596c887d31ae55c4a"
 )
@@ -961,16 +977,53 @@ def test_doc_delta_check_helper_is_read_only_and_rejects_either_side_drift(
 def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     closeout.validate_doc_delta_ci(workflow)
-    assert workflow.count(f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}") == 1
+    test_job = workflow[
+        workflow.index("  test:\n") : workflow.index(
+            "\n  compat-conj-pr01-closure:", workflow.index("  test:\n")
+        )
+    ]
+    assert test_job.count(f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}") == 1
+    assert test_job.count(f"          {EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND}\n") == 1
+    assert test_job.count(f"          {EXPECTED_PYTEST_READINESS_COMMAND}\n") == 1
     assert EXPECTED_DOC_DELTA_WRITE_COMMAND not in workflow
+    requirements_path = ROOT / "requirements-dev.txt"
+    assert not requirements_path.is_symlink()
+    assert requirements_path.read_bytes() == EXPECTED_DEV_REQUIREMENTS_BYTES
+    assert (
+        hashlib.sha256(EXPECTED_DEV_REQUIREMENTS_BYTES).hexdigest()
+        == EXPECTED_DEV_REQUIREMENTS_SHA256
+        == closeout.DEV_REQUIREMENTS_SHA256
+    )
     check_line = f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}"
     step_name = "      - name: Check HDE-EPIC038 DEV-01 doc-delta pair"
     indented_check = f"        {check_line}"
     explicit_shell = "        shell: bash"
+    focused_step_name = "      - name: Run HDE-EPIC038 DEV-01 focused tests"
+    strict_shell = "          set -euo pipefail"
+    dev_install = f"          {EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND}"
+    pytest_readiness = f"          {EXPECTED_PYTEST_READINESS_COMMAND}"
     focused_run = (
-        "        run: python -m pytest -q "
+        "          python -m pytest -q "
         "tests/evidence/test_hde_epic038_closeout.py"
     )
+    focused_step = "\n".join(
+        (
+            focused_step_name,
+            explicit_shell,
+            "        run: |",
+            strict_shell,
+            dev_install,
+            pytest_readiness,
+            focused_run,
+        )
+    )
+    assert test_job.index(dev_install) < test_job.index(pytest_readiness)
+    assert test_job.index(pytest_readiness) < test_job.index(focused_run)
+    assert "      - run: python -m pip install pytest\n" not in test_job
+    assert (
+        "test -f requirements-dev.txt && python -m pip install "
+        "-r requirements-dev.txt || true"
+    ) not in test_job
     job_anchor = "  test:\n"
     mutations = (
         workflow.replace(check_line, check_line + "; echo appended"),
@@ -1014,6 +1067,120 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
         workflow.replace(
             focused_run,
             focused_run + "\n        env:\n          PYTEST_ADDOPTS: --collect-only",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            "          python -m pip install pytest",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            "          test -f requirements-dev.txt && "
+            + EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND
+            + " || true",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            "          python -m pip install -r requirements.txt",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            dev_install + " --no-deps",
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness,
+            "          python -m pytest --help",
+            1,
+        ),
+        workflow.replace(
+            dev_install + "\n" + pytest_readiness + "\n" + focused_run,
+            dev_install + "\n" + focused_run + "\n" + pytest_readiness,
+            1,
+        ),
+        workflow.replace(
+            focused_step,
+            focused_step.replace(strict_shell + "\n", "", 1),
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            dev_install + "\n          echo /tmp/pr382-shim >> \"$GITHUB_PATH\"",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            dev_install + "\n          export PATH=/tmp/pr382-shim:$PATH",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            dev_install + "\n          alias python=true",
+            1,
+        ),
+        workflow.replace(
+            dev_install,
+            dev_install + "\n          python() { :; }",
+            1,
+        ),
+        workflow.replace(
+            focused_step,
+            focused_step.replace(
+                dev_install, dev_install + " || true", 1
+            ),
+            1,
+        ),
+        workflow.replace(
+            focused_step,
+            focused_step.replace(
+                dev_install, dev_install + "; true", 1
+            ),
+            1,
+        ),
+        workflow.replace(
+            focused_step,
+            focused_step.replace(
+                pytest_readiness,
+                "          pytest --version",
+                1,
+            ),
+            1,
+        ),
+        workflow.replace(
+            focused_step,
+            focused_step.replace(
+                explicit_shell,
+                "        shell: /usr/bin/true {0}",
+                1,
+            ),
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness + "\n" + focused_run,
+            focused_run + "\n" + pytest_readiness,
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness,
+            pytest_readiness + " || true",
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness,
+            pytest_readiness + "\n        if: ${{ false }}",
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness,
+            pytest_readiness + "\n        continue-on-error: true",
+            1,
+        ),
+        workflow.replace(
+            pytest_readiness,
+            pytest_readiness + "\n        shell: /usr/bin/true {0}",
             1,
         ),
         workflow.replace(
@@ -1124,8 +1291,44 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
         ),
     )
     for changed in mutations:
+        assert changed != workflow
         with pytest.raises(ValueError, match="CI command binding mismatch"):
             closeout.validate_doc_delta_ci(changed)
+
+
+def test_doc_delta_ci_freezes_regular_dev_requirements_file(
+    tmp_path, monkeypatch
+) -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    requirements_path = tmp_path / "requirements-dev.txt"
+    requirements_path.write_bytes(EXPECTED_DEV_REQUIREMENTS_BYTES)
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    closeout.validate_doc_delta_ci(workflow)
+
+    mutations = (
+        EXPECTED_DEV_REQUIREMENTS_BYTES.replace(
+            b"pytest>=7.4,<9.0", b"pytest", 1
+        ),
+        EXPECTED_DEV_REQUIREMENTS_BYTES.replace(
+            b"jsonschema==4.23.0", b"jsonschema", 1
+        ),
+        EXPECTED_DEV_REQUIREMENTS_BYTES + b"-r other-requirements.txt\n",
+        EXPECTED_DEV_REQUIREMENTS_BYTES.removesuffix(b"\n"),
+    )
+    for changed in mutations:
+        requirements_path.write_bytes(changed)
+        with pytest.raises(ValueError, match="CI command binding mismatch"):
+            closeout.validate_doc_delta_ci(workflow)
+
+    requirements_path.unlink()
+    with pytest.raises(ValueError, match="CI command binding mismatch"):
+        closeout.validate_doc_delta_ci(workflow)
+
+    source = tmp_path / "requirements-source.txt"
+    source.write_bytes(EXPECTED_DEV_REQUIREMENTS_BYTES)
+    requirements_path.symlink_to(source)
+    with pytest.raises(ValueError, match="CI command binding mismatch"):
+        closeout.validate_doc_delta_ci(workflow)
 
 
 def test_doc_delta_renderer_cannot_redefine_its_frozen_test_or_index_baseline(
