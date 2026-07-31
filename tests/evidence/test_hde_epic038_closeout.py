@@ -58,6 +58,29 @@ EXPECTED_DOC_DELTA_BYTES = (
     b"evidence do not independently establish Live QA acceptance or epic "
     b"closeout.\n"
 )
+EXPECTED_HISTORICAL_DOC_DELTA_BYTES = (
+    b"# HDE-EPIC038 QA Doc Deltas\n"
+    b"\n"
+    b"## BLOCKERS\n"
+    b"- None identified by Step-0 route discovery.\n"
+    b"\n"
+    b"## CAVEATS\n"
+    b"- DOC-CAVEAT-001: Implementation, repository, release, and operational "
+    b"evidence do not independently establish Live QA acceptance or epic "
+    b"closeout.\n"
+)
+EXPECTED_DOC_DELTA_WRITE_COMMAND = (
+    "python tools/evidence/generate_hde_epic038_closeout.py --doc-deltas"
+)
+EXPECTED_DOC_DELTA_CHECK_COMMAND = (
+    "python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas"
+)
+EXPECTED_DOC_DELTA_CURRENT_SHA256 = (
+    "322db8191bcadf82df5231697d32b66d615e7a9ed88813c596c887d31ae55c4a"
+)
+EXPECTED_DOC_DELTA_HISTORICAL_SHA256 = (
+    "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
+)
 EXPECTED_DOC_DELTA_INDEX_ROLES = {
     "epic038.doc_deltas": (
         "audit/docdeltas/hde-epic038_doc_deltas.md",
@@ -746,8 +769,8 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
     primary_key = "epic038.doc_deltas"
     capture_path = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
     capture_key = "epic038.qa_meta_doc_deltas"
-    producer_check = "qa-00-step-0-discovery"
-    producer_log = (
+    historical_check = "qa-00-step-0-discovery"
+    historical_log = (
         "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
     )
     row = next(
@@ -762,16 +785,34 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
     assert capture_path not in row.primary_evidence
     assert capture_path in row.posture
     assert capture_key in row.posture
-    assert producer_log in row.posture
+    assert historical_log in row.posture
     assert "explicitly names the staging path" in row.posture
-    assert "original mechanical Step-0 creation/discovery provenance" in row.posture
-    assert "pair-identity check" in row.future_claim
-    assert "rather than substitute for those semantics" in row.future_claim
-    assert row.live_qa == producer_check
+    assert EXPECTED_DOC_DELTA_WRITE_COMMAND in row.posture
+    assert EXPECTED_DOC_DELTA_CHECK_COMMAND in row.posture
+    assert EXPECTED_DOC_DELTA_CURRENT_SHA256 in row.posture
+    assert EXPECTED_DOC_DELTA_HISTORICAL_SHA256 in row.posture
+    assert "it did not produce the current normalized bytes" in row.posture
+    assert "pair-identity predicate" in row.future_claim
+    assert "never current-byte production" in row.future_claim
+    assert row.live_qa == historical_check
+    assert set(row.test_binding.split("; ")) == {
+        "tools/evidence/generate_hde_epic038_closeout.py",
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert row.ci_binding == (
+        "test (.github/workflows/ci.yml): "
+        "Check HDE-EPIC038 DEV-01 doc-delta pair"
+    )
 
     primary = (ROOT / primary_path).read_bytes()
     capture = (ROOT / capture_path).read_bytes()
     assert primary == capture == EXPECTED_DOC_DELTA_BYTES
+    assert closeout.render_doc_delta_pair() == EXPECTED_DOC_DELTA_BYTES
+    assert (
+        closeout.render_historical_doc_delta_pair()
+        == EXPECTED_HISTORICAL_DOC_DELTA_BYTES
+    )
+    assert EXPECTED_HISTORICAL_DOC_DELTA_BYTES != EXPECTED_DOC_DELTA_BYTES
     closeout.validate_doc_delta_surface(primary, surface="staging")
     closeout.validate_doc_delta_surface(capture, surface="capture")
     closeout.validate_doc_delta_pair_identity(primary, capture)
@@ -804,6 +845,329 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
     closeout.validate_doc_delta_evidence()
 
 
+def test_doc_delta_writer_is_exact_bounded_and_byte_idempotent(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    historical_validations = []
+    monkeypatch.setattr(
+        closeout,
+        "validate_doc_delta_historical_origin",
+        lambda: historical_validations.append(True),
+    )
+    staging = tmp_path / closeout.DOC_DELTA_PRIMARY_PATH
+    capture = tmp_path / closeout.DOC_DELTA_CAPTURE_PATH
+    historical_log = tmp_path / closeout.DOC_DELTA_HISTORICAL_LOG_PATH
+    unrelated = tmp_path / "audit/qa/hde-epic038/00_meta/unrelated.txt"
+    for path, data in (
+        (staging, b"stale staging\n"),
+        (capture, b"stale capture\n"),
+        (historical_log, b"immutable historical receipt\n"),
+        (unrelated, b"unrelated\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    protected_before = {
+        path: path.read_bytes() for path in (historical_log, unrelated)
+    }
+
+    closeout.write_doc_delta_pair()
+    first = (staging.read_bytes(), capture.read_bytes())
+    closeout.write_doc_delta_pair()
+    second = (staging.read_bytes(), capture.read_bytes())
+
+    assert first == second == (EXPECTED_DOC_DELTA_BYTES,) * 2
+    assert historical_validations == [True, True]
+    assert protected_before == {
+        path: path.read_bytes() for path in (historical_log, unrelated)
+    }
+    assert sorted(
+        str(path.relative_to(tmp_path))
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    ) == sorted(
+        (
+            closeout.DOC_DELTA_PRIMARY_PATH,
+            closeout.DOC_DELTA_CAPTURE_PATH,
+            closeout.DOC_DELTA_HISTORICAL_LOG_PATH,
+            "audit/qa/hde-epic038/00_meta/unrelated.txt",
+        )
+    )
+
+
+@pytest.mark.parametrize("failed_replace", (1, 2), ids=("first", "second"))
+def test_doc_delta_writer_restores_both_originals_after_replace_failure(
+    tmp_path, monkeypatch, failed_replace
+) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        closeout,
+        "validate_doc_delta_historical_origin",
+        lambda: None,
+    )
+    targets = [
+        tmp_path / closeout.DOC_DELTA_PRIMARY_PATH,
+        tmp_path / closeout.DOC_DELTA_CAPTURE_PATH,
+    ]
+    originals = (b"original staging\n", b"original capture\n")
+    for target, data in zip(targets, originals):
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+
+    real_replace = closeout.Path.replace
+    replace_count = 0
+
+    def fail_one_replace(source, destination):
+        nonlocal replace_count
+        replace_count += 1
+        if replace_count == failed_replace:
+            raise OSError("injected replace failure")
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(closeout.Path, "replace", fail_one_replace)
+    with pytest.raises(OSError, match="injected replace failure"):
+        closeout.write_doc_delta_pair()
+
+    assert tuple(target.read_bytes() for target in targets) == originals
+    assert not tuple(tmp_path.rglob("*.tmp"))
+
+
+def test_doc_delta_check_helper_is_read_only_and_rejects_either_side_drift(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    paths = [
+        tmp_path / closeout.DOC_DELTA_PRIMARY_PATH,
+        tmp_path / closeout.DOC_DELTA_CAPTURE_PATH,
+    ]
+    for path in paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(EXPECTED_DOC_DELTA_BYTES)
+    before = {
+        path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths
+    }
+    closeout.check_doc_delta_pair()
+    assert before == {
+        path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths
+    }
+
+    for path in paths:
+        path.write_bytes(EXPECTED_DOC_DELTA_BYTES + b"drift\n")
+        with pytest.raises(ValueError, match="current producer drift"):
+            closeout.check_doc_delta_pair()
+        path.write_bytes(EXPECTED_DOC_DELTA_BYTES)
+
+
+def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    closeout.validate_doc_delta_ci(workflow)
+    assert workflow.count(f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}") == 1
+    assert EXPECTED_DOC_DELTA_WRITE_COMMAND not in workflow
+    check_line = f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}"
+    step_name = "      - name: Check HDE-EPIC038 DEV-01 doc-delta pair"
+    indented_check = f"        {check_line}"
+    explicit_shell = "        shell: bash"
+    focused_run = (
+        "        run: python -m pytest -q "
+        "tests/evidence/test_hde_epic038_closeout.py"
+    )
+    job_anchor = "  test:\n"
+    mutations = (
+        workflow.replace(check_line, check_line + "; echo appended"),
+        workflow + (
+            "\nrun: python tools/evidence/generate_hde_epic038_closeout.py  "
+            "--doc-deltas\n"
+        ),
+        workflow + (
+            "\nrun: python ./tools/evidence/generate_hde_epic038_closeout.py "
+            "--doc-deltas\n"
+        ),
+        workflow + (
+            "\nrun: python -m tools.evidence.generate_hde_epic038_closeout "
+            "--doc-deltas\n"
+        ),
+        workflow + (
+            "\nrun: |\n  python tools/evidence/"
+            "generate_hde_epic038_closeout.py \\\n    --doc-deltas\n"
+        ),
+        workflow.replace(step_name, f"      # {step_name.strip()}", 1),
+        workflow.replace(
+            indented_check,
+            "        if: ${{ false }}\n" + indented_check,
+            1,
+        ),
+        workflow.replace(
+            focused_run,
+            focused_run + "\n        if: ${{ false }}",
+            1,
+        ),
+        workflow.replace(
+            focused_run,
+            focused_run + "\n        continue-on-error: true",
+            1,
+        ),
+        workflow.replace(
+            focused_run,
+            focused_run + "\n        shell: /usr/bin/true {0}",
+            1,
+        ),
+        workflow.replace(
+            focused_run,
+            focused_run + "\n        env:\n          PYTEST_ADDOPTS: --collect-only",
+            1,
+        ),
+        workflow.replace(
+            indented_check,
+            "        continue-on-error: true\n" + indented_check,
+            1,
+        ),
+        workflow.replace(
+            explicit_shell,
+            "        shell: /usr/bin/true {0}",
+            1,
+        ),
+        workflow.replace(job_anchor, job_anchor + "    if: ${{ false }}\n", 1),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    continue-on-error: true\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    \"if\": ${{ false }}\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    'if': ${{ false }}\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    if : ${{ false }}\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    \"continue-on-error\": true\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    continue-on-error : true\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + '    "\\u0069f": ${{ false }}\n',
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + '    "\\x69f": ${{ false }}\n',
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor + "    <<: *suppress\n",
+            1,
+        ),
+        workflow.replace(
+            job_anchor,
+            job_anchor
+            + "    defaults:\n"
+            + "      run:\n"
+            + "        shell: /usr/bin/true {0}\n",
+            1,
+        ),
+        workflow.replace(
+            "jobs:\n",
+            "defaults:\n"
+            + "  run:\n"
+            + "    shell: /usr/bin/true {0}\n"
+            + "jobs:\n",
+            1,
+        ),
+        workflow.replace(
+            "on: [push, pull_request]",
+            "on: workflow_dispatch",
+            1,
+        ),
+        workflow.replace("jobs:\n", "jobs: {}\n", 1),
+        workflow + "\n  test :\n    runs-on: ubuntu-latest\n    steps: []\n",
+        workflow + "\n  'test':\n    runs-on: ubuntu-latest\n    steps: []\n",
+        workflow + '\n  "test":\n    runs-on: ubuntu-latest\n    steps: []\n',
+        workflow + '\n  "\\u0074est":\n    runs-on: ubuntu-latest\n    steps: []\n',
+        workflow.replace(
+            step_name,
+            "      - name: Shadow Python before the governed check\n"
+            + "        shell: bash\n"
+            + "        run: |\n"
+            + "          mkdir -p /tmp/pr382-shim\n"
+            + "          printf '#!/bin/sh\\nexit 0\\n' > /tmp/pr382-shim/python\n"
+            + "          chmod +x /tmp/pr382-shim/python\n"
+            + "          echo /tmp/pr382-shim >> \"$GITHUB_PATH\"\n"
+            + step_name,
+            1,
+        ),
+        workflow.replace(
+            indented_check,
+            indented_check
+            + "\n      - name: Shadow Python after the implementation check\n"
+            + "        shell: bash\n"
+            + "        run: |\n"
+            + "          mkdir -p /tmp/pr382-shim\n"
+            + "          printf '#!/bin/sh\\nexit 0\\n' > /tmp/pr382-shim/python\n"
+            + "          chmod +x /tmp/pr382-shim/python\n"
+            + "          echo /tmp/pr382-shim >> \"$GITHUB_PATH\"",
+            1,
+        ),
+    )
+    for changed in mutations:
+        with pytest.raises(ValueError, match="CI command binding mismatch"):
+            closeout.validate_doc_delta_ci(changed)
+
+
+def test_doc_delta_renderer_cannot_redefine_its_frozen_test_or_index_baseline(
+    monkeypatch,
+) -> None:
+    changed_lines = tuple(
+        "- changed" if line.startswith("- None identified") else line
+        for line in closeout._doc_delta_required_nonempty_lines()
+    )
+    monkeypatch.setattr(
+        closeout,
+        "_doc_delta_required_nonempty_lines",
+        lambda: changed_lines,
+    )
+    changed = (
+        "\n".join(
+            (
+                changed_lines[0],
+                "",
+                *changed_lines[1:4],
+                "",
+                *changed_lines[4:6],
+                "",
+                *changed_lines[6:],
+                "",
+            )
+        )
+    ).encode("utf-8")
+    monkeypatch.setattr(
+        closeout,
+        "DOC_DELTA_CURRENT_PAIR_SHA256",
+        hashlib.sha256(changed).hexdigest(),
+    )
+    assert closeout.render_doc_delta_pair() == changed
+    assert changed != EXPECTED_DOC_DELTA_BYTES
+    with pytest.raises(ValueError, match="injected/disk byte mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=changed,
+            capture_bytes=changed,
+        )
+
+
 def test_doc_delta_semantics_do_not_use_pair_identity_as_a_substitute() -> None:
     primary = EXPECTED_DOC_DELTA_BYTES
     # An extra blank line changes bytes without changing any governed semantic
@@ -818,6 +1182,19 @@ def test_doc_delta_semantics_do_not_use_pair_identity_as_a_substitute() -> None:
     with pytest.raises(ValueError, match="QA-plan pair identity mismatch"):
         closeout.validate_doc_delta_pair_identity(primary, capture)
     with pytest.raises(ValueError, match="capture canonical layout mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+        )
+
+
+@pytest.mark.parametrize(
+    "primary,capture",
+    ((EXPECTED_DOC_DELTA_BYTES, None), (None, EXPECTED_DOC_DELTA_BYTES)),
+    ids=("primary-only", "capture-only"),
+)
+def test_doc_delta_evidence_rejects_partial_injected_pair(primary, capture) -> None:
+    with pytest.raises(ValueError, match="partial byte injection"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
@@ -947,7 +1324,7 @@ def test_doc_delta_equal_noncanonical_pair_fails_closed(deficient, match) -> Non
         )
 
 
-def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
+def test_doc_delta_pair_and_historical_origin_regressions_fail_closed() -> None:
     primary = (ROOT / "audit/docdeltas/hde-epic038_doc_deltas.md").read_bytes()
     capture = (
         ROOT / "audit/qa/hde-epic038/00_meta/doc_deltas.md"
@@ -957,23 +1334,36 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
             encoding="utf-8"
         )
     )
-    producer_log_bytes = (
+    historical_log_bytes = (
         ROOT
         / "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
     ).read_bytes()
-    assert hashlib.sha256(producer_log_bytes).hexdigest() == (
+    assert hashlib.sha256(historical_log_bytes).hexdigest() == (
         "db9e7ac48e168f7fac380f294271110bbf5e88b0874a1e6d5591cb868d6eecbe"
     )
-    assert len(producer_log_bytes) == 8248
-    producer_log = producer_log_bytes.decode("utf-8")
+    assert len(historical_log_bytes) == 8248
+    historical_log = historical_log_bytes.decode("utf-8")
     assert primary == capture == EXPECTED_DOC_DELTA_BYTES
+    assert (
+        hashlib.sha256(EXPECTED_HISTORICAL_DOC_DELTA_BYTES).hexdigest()
+        == EXPECTED_DOC_DELTA_HISTORICAL_SHA256
+    )
+    assert closeout.render_historical_doc_delta_pair() == (
+        EXPECTED_HISTORICAL_DOC_DELTA_BYTES
+    )
+    header = json.loads(historical_log.splitlines()[0])
+    historical_command = header["command"]
+    assert "## SURFACE BINDING" not in historical_command
+    assert EXPECTED_DOC_DELTA_WRITE_COMMAND not in historical_command
+    assert EXPECTED_DOC_DELTA_CHECK_COMMAND not in historical_command
+    closeout.validate_doc_delta_historical_origin(manifest, historical_log)
 
     with pytest.raises(ValueError, match="capture semantic contract mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture + b"drift\n",
             qa_manifest=manifest,
-            producer_log=producer_log,
+            historical_log=historical_log,
         )
 
     with pytest.raises(ValueError, match="staging semantic contract mismatch"):
@@ -981,24 +1371,24 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
             primary_bytes=b"unbound replacement\n",
             capture_bytes=b"unbound replacement\n",
             qa_manifest=manifest,
-            producer_log=producer_log,
+            historical_log=historical_log,
         )
 
     changed_manifest = json.loads(json.dumps(manifest))
     changed_manifest["qa-00-step-0-discovery"]["sha256"] = "0" * 64
-    with pytest.raises(ValueError, match="producer manifest binding mismatch"):
+    with pytest.raises(ValueError, match="historical manifest binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=changed_manifest,
-            producer_log=producer_log,
+            historical_log=historical_log,
         )
 
-    changed_log = producer_log.replace(
+    changed_log = historical_log.replace(
         '"doc_delta_posture": "created"',
         '"doc_delta_posture": "preserved_existing"',
     )
-    assert changed_log != producer_log
+    assert changed_log != historical_log
     changed_log_manifest = json.loads(json.dumps(manifest))
     changed_log_bytes = changed_log.encode("utf-8")
     changed_log_manifest["qa-00-step-0-discovery"]["sha256"] = hashlib.sha256(
@@ -1007,15 +1397,15 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     changed_log_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         changed_log_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=changed_log_manifest,
-            producer_log=changed_log,
+            historical_log=changed_log,
         )
 
-    open_rails_lines = producer_log.splitlines()
+    open_rails_lines = historical_log.splitlines()
     open_rails_header = json.loads(open_rails_lines[0])
     open_rails_header["captured_env"]["SAFE_MODE"] = "0"
     open_rails_header["captured_env"]["ALLOW_NETWORK"] = "1"
@@ -1029,15 +1419,15 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     open_rails_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         open_rails_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=open_rails_manifest,
-            producer_log=open_rails_log,
+            historical_log=open_rails_log,
         )
 
-    duplicate_artifact_lines = producer_log.splitlines()
+    duplicate_artifact_lines = historical_log.splitlines()
     duplicate_artifact_header = json.loads(duplicate_artifact_lines[0])
     duplicate_artifact_header["evidence_artifacts"].append(
         "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
@@ -1055,20 +1445,20 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     duplicate_artifact_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         duplicate_artifact_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=duplicate_artifact_manifest,
-            producer_log=duplicate_artifact_log,
+            historical_log=duplicate_artifact_log,
         )
 
-    failed_behavior_log = producer_log.replace(
+    failed_behavior_log = historical_log.replace(
         "BEHAVIOR_EXIT_CODE=0",
         "BEHAVIOR_EXIT_CODE=1",
         1,
     )
-    assert failed_behavior_log != producer_log
+    assert failed_behavior_log != historical_log
     failed_behavior_bytes = failed_behavior_log.encode("utf-8")
     failed_behavior_manifest = json.loads(json.dumps(manifest))
     failed_behavior_manifest["qa-00-step-0-discovery"]["sha256"] = (
@@ -1077,15 +1467,15 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     failed_behavior_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         failed_behavior_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=failed_behavior_manifest,
-            producer_log=failed_behavior_log,
+            historical_log=failed_behavior_log,
         )
 
-    contradictory_receipt_log = producer_log + "BEHAVIOR_EXIT_CODE=1\n"
+    contradictory_receipt_log = historical_log + "BEHAVIOR_EXIT_CODE=1\n"
     contradictory_receipt_bytes = contradictory_receipt_log.encode("utf-8")
     contradictory_receipt_manifest = json.loads(json.dumps(manifest))
     contradictory_receipt_manifest["qa-00-step-0-discovery"]["sha256"] = (
@@ -1094,15 +1484,15 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     contradictory_receipt_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         contradictory_receipt_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=contradictory_receipt_manifest,
-            producer_log=contradictory_receipt_log,
+            historical_log=contradictory_receipt_log,
         )
 
-    duplicate_result_log = producer_log + json.dumps(
+    duplicate_result_log = historical_log + json.dumps(
         {
             "doc_delta_posture": "created",
             "epic_id": "HDE-EPIC038",
@@ -1122,20 +1512,20 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     duplicate_result_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         duplicate_result_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest binding|log shape) mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest binding|log shape) mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=duplicate_result_manifest,
-            producer_log=duplicate_result_log,
+            historical_log=duplicate_result_log,
         )
 
-    contradictory_result_log = producer_log.replace(
+    contradictory_result_log = historical_log.replace(
         '"production_factory_missing_routes": []',
         '"production_factory_missing_routes": [["/api/compat/v1", "POST"]]',
         1,
     )
-    assert contradictory_result_log != producer_log
+    assert contradictory_result_log != historical_log
     contradictory_result_bytes = contradictory_result_log.encode("utf-8")
     contradictory_result_manifest = json.loads(json.dumps(manifest))
     contradictory_result_manifest["qa-00-step-0-discovery"]["sha256"] = (
@@ -1144,12 +1534,70 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     contradictory_result_manifest["qa-00-step-0-discovery"]["size_bytes"] = len(
         contradictory_result_bytes
     )
-    with pytest.raises(ValueError, match="producer (?:manifest|log) binding mismatch"):
+    with pytest.raises(ValueError, match="historical (?:manifest|origin) binding mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture,
             qa_manifest=contradictory_result_manifest,
-            producer_log=contradictory_result_log,
+            historical_log=contradictory_result_log,
+        )
+
+
+@pytest.mark.parametrize(
+    "current_marker",
+    (
+        EXPECTED_DOC_DELTA_WRITE_COMMAND,
+        "python ./tools/evidence/generate_hde_epic038_closeout.py --doc-deltas",
+        "python -m tools.evidence.generate_hde_epic038_closeout --check-doc-deltas",
+        (
+            "python -c 'from tools.evidence.generate_hde_epic038_closeout "
+            "import write_doc_delta_pair; write_doc_delta_pair()'"
+        ),
+        "python -c \"print('SURFACE BINDING')\"",
+    ),
+    ids=(
+        "exact-writer",
+        "alternate-writer",
+        "module-check",
+        "imported-writer",
+        "single-quoted-marker",
+    ),
+)
+def test_historical_receipt_cannot_be_correlated_into_current_producer(
+    monkeypatch, current_marker
+) -> None:
+    manifest = json.loads(
+        (ROOT / closeout.QA_MANIFEST_PATH).read_text(encoding="utf-8")
+    )
+    lines = (
+        ROOT / closeout.DOC_DELTA_HISTORICAL_LOG_PATH
+    ).read_text(encoding="utf-8").splitlines()
+    header = json.loads(lines[0])
+    header["command"] += f"; {current_marker}"
+    lines[0] = json.dumps(header, sort_keys=True)
+    changed_log = "\n".join(lines) + "\n"
+    changed_bytes = changed_log.encode("utf-8")
+    changed_manifest = json.loads(json.dumps(manifest))
+    changed_manifest[closeout.DOC_DELTA_HISTORICAL_CHECK_ID]["sha256"] = (
+        hashlib.sha256(changed_bytes).hexdigest()
+    )
+    changed_manifest[closeout.DOC_DELTA_HISTORICAL_CHECK_ID]["size_bytes"] = len(
+        changed_bytes
+    )
+    monkeypatch.setattr(
+        closeout,
+        "DOC_DELTA_HISTORICAL_LOG_SHA256",
+        hashlib.sha256(changed_bytes).hexdigest(),
+    )
+    monkeypatch.setattr(
+        closeout,
+        "DOC_DELTA_HISTORICAL_LOG_SIZE_BYTES",
+        len(changed_bytes),
+    )
+    with pytest.raises(ValueError, match="historical origin binding mismatch"):
+        closeout.validate_doc_delta_historical_origin(
+            changed_manifest,
+            changed_log,
         )
 
 
@@ -1193,6 +1641,79 @@ def test_doc_delta_stale_mirror_record_fails_closed(field, value) -> None:
     items[index] = changed
     with pytest.raises(ValueError, match="Index/Mirror record binding mismatch"):
         closeout.validate_doc_delta_index_bindings(human, items)
+
+
+def test_human_index_rejects_duplicate_governed_fields(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    target = tmp_path / closeout.HUMAN_INDEX_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        '[{"artifact_key":"first","artifact_key":"last",'
+        '"discovered_physical_path":"audit/docdeltas/first.md",'
+        '"discovered_physical_path":"audit/docdeltas/last.md"}]\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="Human Index shape mismatch"):
+        closeout._human_items()
+
+
+def test_machine_mirror_rejects_duplicate_governed_fields(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    target = tmp_path / closeout.MACHINE_MIRROR_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        '{"artifact_key":"epic038.doc_deltas",'
+        '"sha256":"first","sha256":"last",'
+        '"proof_anchor":"first","proof_anchor":"last"}\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="Machine Mirror record shape mismatch: 1"):
+        closeout._mirror_items()
+
+
+@pytest.mark.parametrize("surface", ("human", "mirror"))
+@pytest.mark.parametrize(
+    "key",
+    ("epic038.doc_deltas", "epic038.qa_meta_doc_deltas"),
+)
+def test_doc_delta_index_records_reject_token_claim_fields(surface, key) -> None:
+    human = [dict(item) for item in closeout._human_items()]
+    mirror = [dict(item) for item in closeout._mirror_items()]
+    items = human if surface == "human" else mirror
+    record = next(item for item in items if item.get("artifact_key") == key)
+    record["tokens"] = ["DOC_DELTA_PRESENT_OK"]
+    with pytest.raises(ValueError, match="Index/Mirror family binding mismatch"):
+        closeout.validate_doc_delta_index_bindings(human, mirror)
+
+
+@pytest.mark.parametrize("surface", ("human", "mirror"))
+@pytest.mark.parametrize(
+    "alias_kind",
+    ("same-path-new-key", "same-key-other-path"),
+)
+def test_doc_delta_index_family_rejects_claiming_aliases(
+    surface, alias_kind
+) -> None:
+    human = [dict(item) for item in closeout._human_items()]
+    mirror = [dict(item) for item in closeout._mirror_items()]
+    items = human if surface == "human" else mirror
+    primary = next(
+        item for item in items if item.get("artifact_key") == "epic038.doc_deltas"
+    )
+    alias = dict(primary)
+    if alias_kind == "same-path-new-key":
+        alias["artifact_key"] = "epic038.doc_deltas.claiming_alias"
+        alias["discovered_physical_path"] = (
+            "./" + closeout.DOC_DELTA_PRIMARY_PATH
+        )
+    else:
+        alias["discovered_physical_path"] = closeout.DOC_DELTA_CAPTURE_PATH
+    alias["tokens"] = ["DOC_DELTA_PRESENT_OK"]
+    items.append(alias)
+    with pytest.raises(ValueError, match="Index/Mirror family binding mismatch"):
+        closeout.validate_doc_delta_index_bindings(human, mirror)
 
 
 @pytest.mark.parametrize("field", ["record_type", "notes"])
@@ -1736,4 +2257,70 @@ def test_check_mode_is_read_only_for_matrix_and_unrelated_file() -> None:
     assert result.returncode == 0, result.stdout + result.stderr
     assert before == {
         path: hashlib.sha256(path.read_bytes()).digest() for path in watched
+    }
+
+
+def test_doc_delta_cli_check_mode_is_read_only_for_pair_history_and_ledgers() -> None:
+    watched = [
+        ROOT / closeout.DOC_DELTA_PRIMARY_PATH,
+        ROOT / closeout.DOC_DELTA_CAPTURE_PATH,
+        ROOT / closeout.DOC_DELTA_HISTORICAL_LOG_PATH,
+        ROOT / closeout.QA_MANIFEST_PATH,
+        ROOT / closeout.HUMAN_INDEX_PATH,
+        ROOT / closeout.MACHINE_MIRROR_PATH,
+    ]
+    before = {
+        path: (hashlib.sha256(path.read_bytes()).digest(), path.stat().st_mtime_ns)
+        for path in watched
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "tools/evidence/generate_hde_epic038_closeout.py"),
+            "--check-doc-deltas",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "DOC_DELTA_PAIR_OK" in result.stdout
+    assert before == {
+        path: (hashlib.sha256(path.read_bytes()).digest(), path.stat().st_mtime_ns)
+        for path in watched
+    }
+
+
+@pytest.mark.parametrize(
+    "abbreviation",
+    ("--doc", "--doc-d", "--check-doc", "--token", "--check-token"),
+)
+def test_doc_delta_cli_rejects_abbreviated_modes_without_writes(
+    abbreviation: str,
+) -> None:
+    watched = [
+        ROOT / closeout.OUTPUT,
+        ROOT / closeout.DOC_DELTA_PRIMARY_PATH,
+        ROOT / closeout.DOC_DELTA_CAPTURE_PATH,
+        ROOT / closeout.DOC_DELTA_HISTORICAL_LOG_PATH,
+    ]
+    before = {
+        path: (hashlib.sha256(path.read_bytes()).digest(), path.stat().st_mtime_ns)
+        for path in watched
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "tools/evidence/generate_hde_epic038_closeout.py"),
+            abbreviation,
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "WROTE" not in result.stdout
+    assert before == {
+        path: (hashlib.sha256(path.read_bytes()).digest(), path.stat().st_mtime_ns)
+        for path in watched
     }
