@@ -2426,6 +2426,22 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
 
 EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
+        "artifact_key": "epic038.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic038_doc_deltas.md",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_doc_delta",
+        "schema_version": "1.0",
+        "notes": "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; governed presence is nonclaiming",
+    },
+    {
+        "artifact_key": "epic038.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic038/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_doc_delta_capture",
+        "schema_version": "1.0",
+        "notes": "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not the primary token surface and not a token claim",
+    },
+    {
         "artifact_key": "epic038.release.catalog_manifest",
         "discovered_physical_path": "catalog/manifest.json",
         "epic_id": "HDE-EPIC038",
@@ -2899,10 +2915,16 @@ def _load_existing_proof(proof_path: Path) -> dict[str, str]:
         return {}
     data: dict[str, str] = {}
     for line in proof_path.read_text(encoding="utf-8").splitlines():
-        if not line.strip() or ":" not in line:
+        if not line:
             continue
-        key, value = line.split(":", 1)
-        data[key.strip()] = value.strip()
+        if ": " not in line:
+            raise SystemExit(f"PROOF_FORMAT:{proof_path}")
+        key, value = line.split(": ", 1)
+        if not key or not value:
+            raise SystemExit(f"PROOF_FIELD_EMPTY:{proof_path}:{key}")
+        if key in data:
+            raise SystemExit(f"PROOF_DUPLICATE_FIELD:{proof_path}:{key}")
+        data[key] = value
     return data
 
 
@@ -2939,9 +2961,17 @@ def _write_path_proof(
             return None
         return raw
 
-    existing = _load_existing_proof(proof_path)
     stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
     extra_fields = dict(extra_fields or {})
+    expected_field_names = {
+        "path",
+        "size_bytes",
+        "sha256",
+        "mtime_utc",
+        "produced_at_utc",
+        *extra_fields,
+    }
+    existing = _load_existing_proof(proof_path)
     existing_produced = _normalize_utc(existing.get("produced_at_utc"))
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
@@ -2955,7 +2985,10 @@ def _write_path_proof(
             existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
         except ValueError:
             existing_size_matches = False
-        existing_fields_match = all(existing.get(key) == value for key, value in extra_fields.items())
+        existing_fields_match = (
+            set(existing) == expected_field_names
+            and all(existing.get(key) == value for key, value in extra_fields.items())
+        )
         explicit_produced_matches = (
             isolated_timestamp is not None
             or requested_produced is None
@@ -2989,6 +3022,8 @@ def _write_path_proof(
         if not proof_path.exists():
             raise SystemExit(f"MISSING_PROOF:{proof_rel}")
         proof = existing
+        if set(proof) != expected_field_names:
+            raise SystemExit(f"PROOF_FIELDS:{proof_rel}")
         if proof.get("path") != rel:
             raise SystemExit(f"PROOF_PATH:{proof_rel}")
         if proof.get("sha256") != sha256:

@@ -25,16 +25,16 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Acceptance-map token: `DOC_DELTA_PRESENT_OK`
 - Manifest token: `DOC_DELTA_PRESENT_OK`
 - Test/stable identifier: `tests/evidence/test_hde_epic038_closeout.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml); planned commands: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized; python tools/evidence/generate_hde_epic038_closeout.py --check; python -m pytest -q tests/evidence/test_hde_epic038_closeout.py`
-- Live QA: `N/A: the planned closeout artifact is repository-local DEV evidence and no Live QA execution is authorized.`
-- Primary governed evidence: `audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md`
-- Human Index / Machine Mirror artifact keys: `epic038.closeout_remediation_ledger`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Live QA: `qa-00-step-0-discovery`
+- Primary governed evidence: `audit/docdeltas/hde-epic038_doc_deltas.md`
+- Human Index / Machine Mirror artifact keys: `epic038.doc_deltas`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt`
-- Current posture: UNCLAIMED: planned-new evidence owned by DEV-02 does not exist and has not been executed; DEV-01 makes no token claim.
-- Classification: `planned-new`
-- Owning task: `DEV-02`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 canonically produces `audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md` and `audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt`, registers exact artifact key `epic038.closeout_remediation_ledger`, the planned commands execute successfully on the exact head, and independent Gate B records PASS.
+- Proof anchors: `audit/docdeltas/hde-epic038_doc_deltas.md.path_proof.txt`
+- Current posture: UNCLAIMED: the draft/staging surface is the primary token binding; the matching capture `audit/qa/hde-epic038/00_meta/doc_deltas.md` with key `epic038.qa_meta_doc_deltas` and retained producer log `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` establish mechanical provenance, not acceptance.
+- Classification: `existing/reused`
+- Owning task: `N/A: existing/reused evidence`
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head focused test verifies the byte-identical governed staging/capture pair, both Index/Mirror records and proofs, and the hash-bound tokenless `qa-00-step-0-discovery` producer record; finalized acceptance outputs must derive the result and independent Gate B must record PASS.
 
 ## 3. `EVIDENCE_INDEX_UPDATED_OK`
 - Canonical governance token: `EVIDENCE_INDEX_UPDATED_OK`
@@ -88,33 +88,33 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `QA_PRECOMMIT_CHECKLIST_OK`
 - Acceptance-map token: `QA_PRECOMMIT_CHECKLIST_OK`
 - Manifest token: `QA_PRECOMMIT_CHECKLIST_OK`
-- Test/stable identifier: `tests/evidence/test_hde_epic038_closeout.py`
+- Test/stable identifier: `tools/evidence/generate_hde_epic038_closeout.py; tests/evidence/test_hde_epic038_closeout.py`
 - Closed-rails CI binding: `test (.github/workflows/ci.yml); planned commands: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized; python tools/evidence/generate_hde_epic038_closeout.py --check; python -m pytest -q tests/evidence/test_hde_epic038_closeout.py`
 - Live QA: `N/A: the planned closeout artifact is repository-local DEV evidence and no Live QA execution is authorized.`
-- Primary governed evidence: `audit/qa/hde-epic038/acceptance_map_viability.log`
-- Human Index / Machine Mirror artifact keys: `epic038.acceptance_map_viability`
+- Primary governed evidence: `audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log`
+- Human Index / Machine Mirror artifact keys: `epic038.qa_precommit_checklist`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt`
+- Proof anchors: `audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log.path_proof.txt`
 - Current posture: UNCLAIMED: planned-new evidence owned by DEV-03 does not exist and has not been executed; DEV-01 makes no token claim.
 - Classification: `planned-new`
 - Owning task: `DEV-03`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-03 canonically produces `audit/qa/hde-epic038/acceptance_map_viability.log` and `audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt`, registers exact artifact key `epic038.acceptance_map_viability`, the planned commands execute successfully on the exact head, and independent Gate B records PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements deterministic `--closeout` production and read-only `--check` in `tools/evidence/generate_hde_epic038_closeout.py`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log`, registers exact key `epic038.qa_precommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
 
 ## 7. `QA_POSTCOMMIT_CHECKLIST_OK`
 - Canonical governance token: `QA_POSTCOMMIT_CHECKLIST_OK`
 - Acceptance-map token: `QA_POSTCOMMIT_CHECKLIST_OK`
 - Manifest token: `QA_POSTCOMMIT_CHECKLIST_OK`
-- Test/stable identifier: `tests/evidence/test_hde_epic038_closeout.py`
+- Test/stable identifier: `tools/evidence/generate_hde_epic038_closeout.py; tests/evidence/test_hde_epic038_closeout.py`
 - Closed-rails CI binding: `test (.github/workflows/ci.yml); planned commands: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized; python tools/evidence/generate_hde_epic038_closeout.py --check; python -m pytest -q tests/evidence/test_hde_epic038_closeout.py`
 - Live QA: `N/A: the planned closeout artifact is repository-local DEV evidence and no Live QA execution is authorized.`
-- Primary governed evidence: `audit/EPIC-038_MANIFEST.json`
-- Human Index / Machine Mirror artifact keys: `epic038.manifest`
+- Primary governed evidence: `audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log`
+- Human Index / Machine Mirror artifact keys: `epic038.qa_postcommit_checklist`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `audit/EPIC-038_MANIFEST.json.path_proof.txt`
+- Proof anchors: `audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log.path_proof.txt`
 - Current posture: UNCLAIMED: planned-new evidence owned by DEV-03 does not exist and has not been executed; DEV-01 makes no token claim.
 - Classification: `planned-new`
 - Owning task: `DEV-03`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-03 canonically produces `audit/EPIC-038_MANIFEST.json` and `audit/EPIC-038_MANIFEST.json.path_proof.txt`, registers exact artifact key `epic038.manifest`, the planned commands execute successfully on the exact head, and independent Gate B records PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements deterministic `--closeout` production and read-only `--check` in `tools/evidence/generate_hde_epic038_closeout.py`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log`, registers exact key `epic038.qa_postcommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
 
 ## 8. `ENV_RAILS_POLICY_OK`
 - Canonical governance token: `ENV_RAILS_POLICY_OK`
@@ -520,14 +520,14 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `RELEASE_ID_RECOMPUTE_OK`
 - Acceptance-map token: `RELEASE_ID_RECOMPUTE_OK`
 - Manifest token: `RELEASE_ID_RECOMPUTE_OK`
-- Test/stable identifier: `scripts/release_id_recompute.py; tools/evidence/build_release_attestation.py; tests/evidence/test_release_manifest_content_binding.py; tests/evidence/test_release_attestation.py`
-- Closed-rails CI binding: `sanity-pipeline (.github/workflows/ci.yml): Build PR-06R-B release attestation outside the source tree; Run canonical JSON gate (closed rails); Publish exact-head release attestation`
+- Test/stable identifier: `scripts/release_id_recompute.py; tools/evidence/generate_identity_provenance.py; tools/evidence/build_release_attestation.py; tests/evidence/test_identity_provenance.py; tests/evidence/test_release_manifest_content_binding.py; tests/evidence/test_release_attestation.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Verify immutable release input without derived-tree writes; Run HDE-EPIC038 DEV-01 focused tests; python -m pytest tests/evidence tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py; sanity-pipeline (.github/workflows/ci.yml): Build PR-06R-B release attestation outside the source tree; Run canonical JSON gate (closed rails); Publish exact-head release attestation`
 - Live QA: `qa-21-po-021`
-- Primary governed evidence: `catalog/manifest.json`
-- Human Index / Machine Mirror artifact keys: `epic038.release.catalog_manifest`
+- Primary governed evidence: `catalog/manifest.json; artifacts/identity/release_id.json; artifacts/identity/release_id_recompute.log`
+- Human Index / Machine Mirror artifact keys: `epic038.release.catalog_manifest; epic038.pr01.identity_release_id; epic038.pr01.identity_release_id_recompute`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `catalog/manifest.json.path_proof.txt`
-- Current posture: UNCLAIMED: the canonical manifest is the exact current source input; frozen capture-time identity artifacts and historical PASS text are not current release evidence.
+- Proof anchors: `catalog/manifest.json.path_proof.txt; artifacts/identity/release_id.json.path_proof.txt; artifacts/identity/release_id_recompute.log.path_proof.txt`
+- Current posture: UNCLAIMED: the complete governed release family is bound, but the current manifest digest `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f` differs from retained capture digest `12523fec11d4f0ff375bbc7e0d88352a6f3beb07f3a74cecfae901307bbb6e5c`; frozen PASS text and artifact presence do not establish current recomputation.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only when the workflow artifact `hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}/attestation.json` verifies `source_commit_exact=true`, `manifest_sha256=0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`, `release_id=manifest_sha256`, `validation_result=PASS`, `release_admission=PR06R_B_FINAL_PASS`, `pipeline_stop=null`, closed rails, and independent Gate B PASS against that same exact head.
+- Intended future claim and prerequisite: Future status may become CLAIMED only when the canonical manifest, release-identity JSON, and recomputation log agree on the exact current digest `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`, the workflow artifact `hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}/attestation.json` verifies `source_commit_exact=true`, `manifest_sha256=0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`, `release_id=manifest_sha256`, `validation_result=PASS`, `release_admission=PR06R_B_FINAL_PASS`, `pipeline_stop=null`, closed rails, and independent Gate B PASS against that same exact head.
