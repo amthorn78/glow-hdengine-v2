@@ -98,7 +98,7 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Current posture: UNCLAIMED: planned-new evidence owned by DEV-03 does not exist and has not been executed; DEV-01 makes no token claim.
 - Classification: `planned-new`
 - Owning task: `DEV-03`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements deterministic `--closeout` production and read-only `--check` in `tools/evidence/generate_hde_epic038_closeout.py`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log`, registers exact key `epic038.qa_precommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements the plan-authorized deterministic default write invocation `SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py` and read-only check invocation `SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log`, registers exact key `epic038.qa_precommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
 
 ## 7. `QA_POSTCOMMIT_CHECKLIST_OK`
 - Canonical governance token: `QA_POSTCOMMIT_CHECKLIST_OK`
@@ -114,7 +114,7 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Current posture: UNCLAIMED: planned-new evidence owned by DEV-03 does not exist and has not been executed; DEV-01 makes no token claim.
 - Classification: `planned-new`
 - Owning task: `DEV-03`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements deterministic `--closeout` production and read-only `--check` in `tools/evidence/generate_hde_epic038_closeout.py`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log`, registers exact key `epic038.qa_postcommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after DEV-02 implements the plan-authorized deterministic default write invocation `SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py` and read-only check invocation `SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check`, then DEV-03 produces `audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log`, registers exact key `epic038.qa_postcommit_checklist` and its updater-owned proof, the planned exact-head `test` job commands succeed, and independent Gate B records PASS.
 
 ## 8. `ENV_RAILS_POLICY_OK`
 - Canonical governance token: `ENV_RAILS_POLICY_OK`
