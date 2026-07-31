@@ -104,6 +104,44 @@ def test_rejects_every_evidence_binding_count_mismatch(field, value) -> None:
         closeout.validate_rows(rows[:7] + (changed,) + rows[8:])
 
 
+def test_every_row_has_the_positive_nonclaiming_contract() -> None:
+    for row in closeout.build_rows():
+        assert row.posture.startswith(closeout.CURRENT_POSTURE_PREFIX)
+        assert row.future_claim.startswith(closeout.FUTURE_CLAIM_PREFIXES)
+
+
+@pytest.mark.parametrize("row_index", [0, 7], ids=["planned-new", "existing-reused"])
+@pytest.mark.parametrize(
+    "field,mutation",
+    [
+        pytest.param("posture", lambda _value: "CLAIMED", id="claimed-posture"),
+        pytest.param(
+            "posture",
+            lambda value: f"{value} Current status is CLAIMED.",
+            id="appended-posture-claim",
+        ),
+        pytest.param(
+            "future_claim",
+            lambda _value: "Acceptance is complete.",
+            id="affirmative-future-field",
+        ),
+        pytest.param(
+            "future_claim",
+            lambda value: f"{value} Current status is CLAIMED.",
+            id="appended-future-claim",
+        ),
+    ],
+)
+def test_generic_affirmative_claim_language_fails_closed(
+    row_index, field, mutation
+) -> None:
+    rows = closeout.build_rows()
+    row = rows[row_index]
+    changed = replace(row, **{field: mutation(getattr(row, field))})
+    with pytest.raises(ValueError, match="nonclaiming posture contract"):
+        closeout.validate_rows(rows[:row_index] + (changed,) + rows[row_index + 1 :])
+
+
 def test_evidence_integrity_rows_bind_actual_surfaces_and_enforcement() -> None:
     rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
 

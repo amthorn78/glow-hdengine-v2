@@ -19,6 +19,11 @@ from engine.presenter import emitter
 
 OUTPUT = Path("audit/qa/hde-epic038/token_evidence_matrix.md")
 EPIC_ID = "HDE-EPIC038"
+CURRENT_POSTURE_PREFIX = "UNCLAIMED: "
+FUTURE_CLAIM_PREFIXES = (
+    "Future status may become CLAIMED only after ",
+    "Future status may become CLAIMED only when ",
+)
 CI_JOB = "test (.github/workflows/ci.yml)"
 HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
 HUMAN_INDEX_KEY = "index.human_index"
@@ -1285,6 +1290,9 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
         "future_claim",
     )
     structured_fields = ("primary_evidence", "artifact_keys", "proof_anchors")
+    canonical_nonclaiming = {
+        row.token: (row.posture, row.future_claim) for row in build_rows()
+    }
 
     for row in rows:
         if any(
@@ -1331,6 +1339,12 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
             or row.classification not in {"existing/reused", "planned-new"}
         ):
             raise ValueError(f"invalid binding: {row.token}")
+        if (
+            not row.posture.startswith(CURRENT_POSTURE_PREFIX)
+            or not row.future_claim.startswith(FUTURE_CLAIM_PREFIXES)
+            or (row.posture, row.future_claim) != canonical_nonclaiming[row.token]
+        ):
+            raise ValueError(f"nonclaiming posture contract: {row.token}")
         if any(
             marker in joined
             for marker in ("PASS conclusion", "status=PASS", "CLAIMED: PASS")
