@@ -78,6 +78,44 @@ PROHIBITED = frozenset({
     "BG_CIRCUIT_BREAKER_POLICY_OK", "ENV_SNAPSHOT_SINGLETON_OK",
     "ENV_SNAPSHOT_SCHEMA_V3_OK", "ENV_PINS_PRESENT_OK",
 })
+# Independent review allowlist for the exact nonclaiming prose pair on each row.
+# This mapping is intentionally not derived from build_rows(): generator prose
+# cannot redefine its own accepted baseline.
+NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
+    "TESTS_PASS_OK": "f895c4d36bffea6a1e5740efeeef85389f581041a63c89fa92686884388ccb63",
+    "DOC_DELTA_PRESENT_OK": "3c7c0cbdee33f4ac25cbe09e3d0275e7dd4056289001a942fe7dd25bba7f6151",
+    "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "QA_PRECOMMIT_CHECKLIST_OK": "0e0c9905c6e3a86a0d3a5ec91f848e4059098edffaecc20f163742248077f137",
+    "QA_POSTCOMMIT_CHECKLIST_OK": "38c978d3cc5250fcb9214eb9154dbb77b533cd699fa6066dc8e3a92566475bb1",
+    "ENV_RAILS_POLICY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "PREIMAGE_RECOMPUTE_OK": "a82f1ccfa039a408ac8d3b84f46eb7d850f554dbf49b938056cafaa22fa3472d",
+    "CLI_READER_PARITY_OK": "c19b41956747816771a6ec95fc95c070a2e4e2c9d8afd4e8241ba6855c921682",
+    "COMPOSITE_ABBA_IDENTITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "TWO_RUN_IDENTITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "JSON_CANONICAL_CHECK_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_GET_QUOTED_ETAG_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_HEAD_PARITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_304_OMITS_CT_CL_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_VARY_AUTH_AE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_ENCODING_INVARIANCE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_TRANSPORT_PROOF_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENDPOINTS_CATALOG_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENDPOINTS_CATALOG_ENV_GATE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENV_LC_ALL_C_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_INDEX_MIRROR_OK": "70d309c2037a02bf786fed90bb380d629444fc8ee42ffbb2ad5a5c2c98d988e3",
+    "EVIDENCE_PATHS_VALIDATED_OK": "e584407305119230e7f869263ea9453540d3f892ed45d81407e04c4133f82402",
+    "DB_RUNTIME_SEARCH_PATH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_ROLE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_SCHEMA_FINGERPRINT_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_CONN_ENV_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_PATH_PROOFS_OK": "1fa9682d8c7391fce99ab778733bb707e0a1564d97a7eaa240cd20a559359ee2",
+    "CI_CHECK_MIRROR_SCHEMA_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "CI_CHECK_FINAL_LF_OK": "9ec6f302f7624cad060ea1699e5a699f99638324423508379939581a55bd4b52",
+    "NO_EXTERNAL_IO_ON_REFUSAL_OK": "973ea977d8666b0acdfe96f78b443dcd6426f62d021441a92c78a479ab0d3a9f",
+    "RELEASE_ID_RECOMPUTE_OK": "40cee37b8da6b481dcf3bba92769c74084482773e2498de17144d3bd4d53b909",
+}
 PLANNED_BINDINGS: Mapping[str, tuple[str, str, str]] = {
     "TESTS_PASS_OK": (
         "audit/EPIC-038_close_report.md",
@@ -1290,9 +1328,8 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
         "future_claim",
     )
     structured_fields = ("primary_evidence", "artifact_keys", "proof_anchors")
-    canonical_nonclaiming = {
-        row.token: (row.posture, row.future_claim) for row in build_rows()
-    }
+    if set(NONCLAIMING_TEXT_SHA256) != set(TOKENS):
+        raise ValueError("nonclaiming allowlist token mismatch")
 
     for row in rows:
         if any(
@@ -1339,10 +1376,13 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
             or row.classification not in {"existing/reused", "planned-new"}
         ):
             raise ValueError(f"invalid binding: {row.token}")
+        nonclaiming_digest = hashlib.sha256(
+            f"{row.posture}\0{row.future_claim}".encode("utf-8")
+        ).hexdigest()
         if (
             not row.posture.startswith(CURRENT_POSTURE_PREFIX)
             or not row.future_claim.startswith(FUTURE_CLAIM_PREFIXES)
-            or (row.posture, row.future_claim) != canonical_nonclaiming[row.token]
+            or nonclaiming_digest != NONCLAIMING_TEXT_SHA256[row.token]
         ):
             raise ValueError(f"nonclaiming posture contract: {row.token}")
         if any(

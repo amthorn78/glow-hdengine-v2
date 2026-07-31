@@ -105,9 +105,14 @@ def test_rejects_every_evidence_binding_count_mismatch(field, value) -> None:
 
 
 def test_every_row_has_the_positive_nonclaiming_contract() -> None:
+    assert set(closeout.NONCLAIMING_TEXT_SHA256) == set(closeout.TOKENS)
     for row in closeout.build_rows():
         assert row.posture.startswith(closeout.CURRENT_POSTURE_PREFIX)
         assert row.future_claim.startswith(closeout.FUTURE_CLAIM_PREFIXES)
+        digest = hashlib.sha256(
+            f"{row.posture}\0{row.future_claim}".encode("utf-8")
+        ).hexdigest()
+        assert digest == closeout.NONCLAIMING_TEXT_SHA256[row.token]
 
 
 @pytest.mark.parametrize("row_index", [0, 7], ids=["planned-new", "existing-reused"])
@@ -133,13 +138,15 @@ def test_every_row_has_the_positive_nonclaiming_contract() -> None:
     ],
 )
 def test_generic_affirmative_claim_language_fails_closed(
-    row_index, field, mutation
+    monkeypatch, row_index, field, mutation
 ) -> None:
     rows = closeout.build_rows()
     row = rows[row_index]
     changed = replace(row, **{field: mutation(getattr(row, field))})
+    changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
+    monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
     with pytest.raises(ValueError, match="nonclaiming posture contract"):
-        closeout.validate_rows(rows[:row_index] + (changed,) + rows[row_index + 1 :])
+        closeout.validate_rows(closeout.build_rows())
 
 
 def test_evidence_integrity_rows_bind_actual_surfaces_and_enforcement() -> None:
