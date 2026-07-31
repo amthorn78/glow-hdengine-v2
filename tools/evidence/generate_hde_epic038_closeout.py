@@ -1,0 +1,1528 @@
+#!/usr/bin/env python3
+"""Generate the deterministic, nonclaiming HDE-EPIC038 DEV-01 token matrix."""
+from __future__ import annotations
+
+import argparse
+import difflib
+import hashlib
+import json
+import sys
+from dataclasses import dataclass, replace
+from pathlib import Path
+from typing import Iterable, Mapping
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from engine.presenter import emitter
+
+OUTPUT = Path("audit/qa/hde-epic038/token_evidence_matrix.md")
+EPIC_ID = "HDE-EPIC038"
+CURRENT_POSTURE_PREFIX = "UNCLAIMED: "
+FUTURE_CLAIM_PREFIXES = (
+    "Future status may become CLAIMED only after ",
+    "Future status may become CLAIMED only when ",
+)
+CI_JOB = "test (.github/workflows/ci.yml)"
+HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
+HUMAN_INDEX_KEY = "index.human_index"
+MACHINE_MIRROR_PATH = "artifacts/evidence_index.jsonl"
+MACHINE_MIRROR_KEY = "index.machine_mirror"
+EVIDENCE_PATH_VALIDATOR_PATH = "tools/evidence/validate_evidence_paths.py"
+MIRROR_SCHEMA_VALIDATOR_PATH = "ci/checks/check_mirror_schema.sh"
+EVIDENCE_INDEX_MIRROR_CI_JOB = (
+    "test (.github/workflows/ci.yml): "
+    "Run python tools/evidence/update_evidence_index.py --check; "
+    "Run ci/checks/check_mirror_schema.sh"
+)
+EVIDENCE_PATHS_CI_JOB = (
+    "test (.github/workflows/ci.yml): Validate governed evidence paths"
+)
+EVIDENCE_PATH_PROOFS_CI_JOB = (
+    "test (.github/workflows/ci.yml): Run ci/checks/check_mirror_schema.sh"
+)
+RELEASE_CI_JOB = (
+    "sanity-pipeline (.github/workflows/ci.yml): "
+    "Build PR-06R-B release attestation outside the source tree; "
+    "Run canonical JSON gate (closed rails); "
+    "Publish exact-head release attestation"
+)
+FINAL_LF_CI_JOB = (
+    "test (.github/workflows/ci.yml): Run ci/checks/check_final_lf.sh"
+)
+PLANNED_COMMANDS = (
+    "python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized; "
+    "python tools/evidence/generate_hde_epic038_closeout.py --check; "
+    "python -m pytest -q tests/evidence/test_hde_epic038_closeout.py"
+)
+TOKENS = (
+    "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK", "EVIDENCE_INDEX_UPDATED_OK",
+    "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK",
+    "QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK",
+    "ENV_RAILS_POLICY_OK", "PREIMAGE_RECOMPUTE_OK", "CLI_READER_PARITY_OK",
+    "COMPOSITE_ABBA_IDENTITY_OK", "TWO_RUN_IDENTITY_OK", "JSON_CANONICAL_CHECK_OK",
+    "A7_GET_QUOTED_ETAG_OK", "A7_HEAD_PARITY_OK", "A7_304_OMITS_CT_CL_OK",
+    "A7_VARY_AUTH_AE_OK", "A7_ENCODING_INVARIANCE_OK", "A7_TRANSPORT_PROOF_OK",
+    "ENDPOINTS_CATALOG_OK", "ENDPOINTS_CATALOG_ENV_GATE_OK", "ENV_LC_ALL_C_OK",
+    "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATHS_VALIDATED_OK",
+    "DB_RUNTIME_SEARCH_PATH_OK", "DB_ROLE_OK", "DB_SCHEMA_FINGERPRINT_OK",
+    "DB_CONN_ENV_OK", "EVIDENCE_PATH_PROOFS_OK", "CI_CHECK_MIRROR_SCHEMA_OK",
+    "CI_CHECK_FINAL_LF_OK", "NO_EXTERNAL_IO_ON_REFUSAL_OK",
+    "RELEASE_ID_RECOMPUTE_OK",
+)
+PROHIBITED = frozenset({
+    "DEV_DB_BRIDGE_FALLBACK_OK", "BG_SOURCE_SELECTION_OK",
+    "BG_VENDOR_CALLS_DISABLED_IN_PROD_OK", "BG_SOURCE_INVARIANCE_OK",
+    "BG_TTL_SWR_POLICY_OK", "BG_RATE_LIMIT_POLICY_OK",
+    "BG_CIRCUIT_BREAKER_POLICY_OK", "ENV_SNAPSHOT_SINGLETON_OK",
+    "ENV_SNAPSHOT_SCHEMA_V3_OK", "ENV_PINS_PRESENT_OK",
+})
+# Independent review allowlist for the exact nonclaiming prose pair on each row.
+# This mapping is intentionally not derived from build_rows(): generator prose
+# cannot redefine its own accepted baseline.
+NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
+    "TESTS_PASS_OK": "f895c4d36bffea6a1e5740efeeef85389f581041a63c89fa92686884388ccb63",
+    "DOC_DELTA_PRESENT_OK": "3c7c0cbdee33f4ac25cbe09e3d0275e7dd4056289001a942fe7dd25bba7f6151",
+    "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "QA_PRECOMMIT_CHECKLIST_OK": "0e0c9905c6e3a86a0d3a5ec91f848e4059098edffaecc20f163742248077f137",
+    "QA_POSTCOMMIT_CHECKLIST_OK": "38c978d3cc5250fcb9214eb9154dbb77b533cd699fa6066dc8e3a92566475bb1",
+    "ENV_RAILS_POLICY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "PREIMAGE_RECOMPUTE_OK": "a82f1ccfa039a408ac8d3b84f46eb7d850f554dbf49b938056cafaa22fa3472d",
+    "CLI_READER_PARITY_OK": "c19b41956747816771a6ec95fc95c070a2e4e2c9d8afd4e8241ba6855c921682",
+    "COMPOSITE_ABBA_IDENTITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "TWO_RUN_IDENTITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "JSON_CANONICAL_CHECK_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_GET_QUOTED_ETAG_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_HEAD_PARITY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_304_OMITS_CT_CL_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_VARY_AUTH_AE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_ENCODING_INVARIANCE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "A7_TRANSPORT_PROOF_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENDPOINTS_CATALOG_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENDPOINTS_CATALOG_ENV_GATE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "ENV_LC_ALL_C_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_INDEX_MIRROR_OK": "70d309c2037a02bf786fed90bb380d629444fc8ee42ffbb2ad5a5c2c98d988e3",
+    "EVIDENCE_PATHS_VALIDATED_OK": "e584407305119230e7f869263ea9453540d3f892ed45d81407e04c4133f82402",
+    "DB_RUNTIME_SEARCH_PATH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_ROLE_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_SCHEMA_FINGERPRINT_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "DB_CONN_ENV_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "EVIDENCE_PATH_PROOFS_OK": "1fa9682d8c7391fce99ab778733bb707e0a1564d97a7eaa240cd20a559359ee2",
+    "CI_CHECK_MIRROR_SCHEMA_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
+    "CI_CHECK_FINAL_LF_OK": "9ec6f302f7624cad060ea1699e5a699f99638324423508379939581a55bd4b52",
+    "NO_EXTERNAL_IO_ON_REFUSAL_OK": "973ea977d8666b0acdfe96f78b443dcd6426f62d021441a92c78a479ab0d3a9f",
+    "RELEASE_ID_RECOMPUTE_OK": "40cee37b8da6b481dcf3bba92769c74084482773e2498de17144d3bd4d53b909",
+}
+PLANNED_BINDINGS: Mapping[str, tuple[str, str, str]] = {
+    "TESTS_PASS_OK": (
+        "audit/EPIC-038_close_report.md",
+        "epic038.close_report",
+        "DEV-03",
+    ),
+    "DOC_DELTA_PRESENT_OK": (
+        "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+        "epic038.closeout_remediation_ledger",
+        "DEV-02",
+    ),
+    "QA_PRECOMMIT_CHECKLIST_OK": (
+        "audit/qa/hde-epic038/acceptance_map_viability.log",
+        "epic038.acceptance_map_viability",
+        "DEV-03",
+    ),
+    "QA_POSTCOMMIT_CHECKLIST_OK": (
+        "audit/EPIC-038_MANIFEST.json",
+        "epic038.manifest",
+        "DEV-03",
+    ),
+}
+PLANNED_PATHS = frozenset(
+    path
+    for primary, _key, _owner in PLANNED_BINDINGS.values()
+    for path in (primary, f"{primary}.path_proof.txt")
+)
+PLANNED_KEYS = frozenset(key for _path, key, _owner in PLANNED_BINDINGS.values())
+DB_POSTURE_PATH = "audit/ops/hde-epic038/ops-03/db_posture_summary.json"
+DB_POSTURE_KEY = "epic038.ops03.db_posture_summary"
+REFUSAL_PATH = "artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log"
+REFUSAL_KEY = "epic038.pr05.v2_mapped_cache.closed_rails_refusal"
+REFUSAL_MANIFEST_PATH = "artifacts/bodygraph/v2_mapped_cache/manifest.json"
+REFUSAL_MANIFEST_KEY = "epic038.pr05.v2_mapped_cache.manifest"
+RELEASE_MANIFEST_PATH = "catalog/manifest.json"
+RELEASE_MANIFEST_KEY = "epic038.release.catalog_manifest"
+QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
+QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
+PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
+PREIMAGE_KEY = "epic038.pr02.reader_cli_summary"
+PREIMAGE_SOURCE_PATH = "audit/gates/parity/reader_cli/ab.json"
+PREIMAGE_SOURCE_KEY = "epic038.pr02.reader_cli_ab"
+FINAL_LF_CHECK_ID = "qa-19-po-019"
+FINAL_LF_LOG_PATH = (
+    "audit/qa/hde-epic038/checks/qa-19-po-019/primary.log"
+)
+EVIDENCE_INTEGRITY_CHECK_ID = "qa-19-po-019"
+EVIDENCE_INTEGRITY_LOG_PATH = FINAL_LF_LOG_PATH
+FINAL_LF_SCRIPT_PATH = "ci/checks/check_final_lf.sh"
+FINAL_LF_REQUIRED_PATHS = (
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/runtime/env_matrix.snapshot.json",
+    "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
+    "audit/qa/hde-epic038/token_evidence_matrix.md",
+    "audit/qa/hde-epic038/token_evidence_matrix.md.path_proof.txt",
+)
+FINAL_LF_PLANNED_PATHS = (
+    "audit/EPIC-038_close_report.md",
+    "audit/EPIC-038_close_report.md.path_proof.txt",
+    "audit/EPIC-038_MANIFEST.json",
+    "audit/EPIC-038_MANIFEST.json.path_proof.txt",
+    "docs/acceptance_map_epic038.json",
+    "docs/acceptance_map_epic038.json.path_proof.txt",
+    "audit/qa/hde-epic038/acceptance_map_viability.log",
+    "audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt",
+)
+
+
+@dataclass(frozen=True)
+class Row:
+    token: str
+    acceptance_token: str
+    manifest_token: str
+    test_binding: str
+    ci_binding: str
+    live_qa: str
+    primary_evidence: tuple[str, ...]
+    artifact_keys: tuple[str, ...]
+    epic_id: str
+    proof_anchors: tuple[str, ...]
+    posture: str
+    classification: str
+    owner_task: str
+    future_claim: str
+
+
+def _row(token: str, test: str, qa: str, path: str, key: str) -> Row:
+    return Row(
+        token,
+        token,
+        token,
+        test,
+        CI_JOB,
+        qa,
+        (path,),
+        (key,),
+        EPIC_ID,
+        (path + ".path_proof.txt",),
+        (
+            "UNCLAIMED: retained evidence is a binding candidate only; "
+            "presence or historical PASS text is not acceptance."
+        ),
+        "existing/reused",
+        "N/A: existing/reused evidence",
+        (
+            "Future status may become CLAIMED only after exact-head closed-rails "
+            "execution, finalized acceptance-map and manifest derivation, and "
+            "independent Gate B PASS."
+        ),
+    )
+
+
+def _release_row() -> Row:
+    manifest_sha256 = hashlib.sha256(
+        (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
+    ).hexdigest()
+    row = _row(
+        "RELEASE_ID_RECOMPUTE_OK",
+        (
+            "scripts/release_id_recompute.py; "
+            "tools/evidence/build_release_attestation.py; "
+            "tests/evidence/test_release_manifest_content_binding.py; "
+            "tests/evidence/test_release_attestation.py"
+        ),
+        "qa-21-po-021",
+        RELEASE_MANIFEST_PATH,
+        RELEASE_MANIFEST_KEY,
+    )
+    return replace(
+        row,
+        ci_binding=RELEASE_CI_JOB,
+        posture=(
+            "UNCLAIMED: the canonical manifest is the exact current source input; "
+            "frozen capture-time identity artifacts and historical PASS text are "
+            "not current release evidence."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only when the workflow artifact "
+            "`hde-release-attestation-${{ github.event.pull_request.head.sha || "
+            "github.sha }}/attestation.json` verifies `source_commit_exact=true`, "
+            f"`manifest_sha256={manifest_sha256}`, `release_id=manifest_sha256`, "
+            "`validation_result=PASS`, `release_admission=PR06R_B_FINAL_PASS`, "
+            "`pipeline_stop=null`, closed rails, and independent Gate B PASS "
+            "against that same exact head."
+        ),
+    )
+
+
+def build_rows() -> tuple[Row, ...]:
+    default = (
+        "tests/evidence/test_hde_epic038_release_sanity.py",
+        "qa-20-po-020",
+        "audit/qa/hde-epic038/qa_step_logs_manifest.json",
+        "epic038.qa_step_logs_manifest",
+    )
+    rows = {token: _row(token, *default) for token in TOKENS}
+
+    def bind(
+        tokens: Iterable[str], test: str, qa: str, path: str, key: str
+    ) -> None:
+        for token in tokens:
+            rows[token] = _row(token, test, qa, path, key)
+
+    bind(
+        ("ENV_RAILS_POLICY_OK", "ENV_LC_ALL_C_OK"),
+        "tests/invariance/test_determinism_env_helper.py",
+        "qa-03-po-003",
+        "artifacts/runtime/env_matrix.snapshot.json",
+        "epic038.pr01.env_matrix_snapshot_v3",
+    )
+    rows["PREIMAGE_RECOMPUTE_OK"] = replace(
+        _row(
+            "PREIMAGE_RECOMPUTE_OK",
+            (
+                "tests/evidence/test_determinism_gate_proofs.py; "
+                "tests/evidence/test_hde_epic038_closeout.py"
+            ),
+            "qa-04-po-004",
+            PREIMAGE_PATH,
+            PREIMAGE_KEY,
+        ),
+        primary_evidence=(PREIMAGE_PATH, PREIMAGE_SOURCE_PATH),
+        artifact_keys=(PREIMAGE_KEY, PREIMAGE_SOURCE_KEY),
+        proof_anchors=(
+            f"{PREIMAGE_PATH}.path_proof.txt",
+            f"{PREIMAGE_SOURCE_PATH}.path_proof.txt",
+        ),
+    )
+    rows["PREIMAGE_RECOMPUTE_OK"] = replace(
+        rows["PREIMAGE_RECOMPUTE_OK"],
+        future_claim=(
+            "Future status may become CLAIMED only after "
+            "`tools.evidence.run_sanity_pipeline.validate_current_reader_cli_determinism` "
+            "recomputes the canonical preimage with `idempotence_hash` removed, "
+            "the governed summary records equal 64-hex stored/recomputed hashes "
+            "and `preimage_hash_match=true`, the exact-head `test` job succeeds, "
+            "and post-generation Gate D derives the result from finalized outputs."
+        ),
+    )
+    bind(
+        ("CLI_READER_PARITY_OK",),
+        (
+            "tests/evidence/test_determinism_gate_proofs.py; "
+            "tests/cli/test_showcompat_parity_and_identity.py"
+        ),
+        "qa-04-po-004",
+        "audit/gates/parity/reader_cli/summary.json",
+        "epic038.pr02.reader_cli_summary",
+    )
+    rows["CLI_READER_PARITY_OK"] = replace(
+        rows["CLI_READER_PARITY_OK"],
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head closed-rails "
+            "determinism producer and canonical-output QA check `qa-04-po-004` "
+            "re-run the CLI reader-dump/runtime comparison, the governed summary "
+            "records equal reader/CLI hashes and `reader_cli_byte_identity=true`, "
+            "post-generation Gate D derives the result from finalized outputs, "
+            "and independent Gate B passes."
+        ),
+    )
+    bind(
+        ("COMPOSITE_ABBA_IDENTITY_OK",),
+        "tests/cli/test_showcompat_parity_and_identity.py",
+        "qa-04-po-004",
+        "audit/gates/determinism/abba.bytes",
+        "epic038.pr02.abba_bytes",
+    )
+    bind(
+        ("TWO_RUN_IDENTITY_OK",),
+        "tests/cli/test_showcompat_parity_and_identity.py",
+        "qa-04-po-004",
+        "audit/gates/determinism/tworun_identity.sha256",
+        "epic038.pr02.tworun_identity",
+    )
+    bind(
+        ("JSON_CANONICAL_CHECK_OK",),
+        "tests/cli/test_cli_canonical_bytes.py",
+        "qa-04-po-004",
+        "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+        "audit.gates.json_gate.canonical.json_gate_structured_record.json",
+    )
+    a7 = (
+        "A7_GET_QUOTED_ETAG_OK",
+        "A7_HEAD_PARITY_OK",
+        "A7_304_OMITS_CT_CL_OK",
+        "A7_VARY_AUTH_AE_OK",
+        "A7_ENCODING_INVARIANCE_OK",
+        "A7_TRANSPORT_PROOF_OK",
+    )
+    bind(
+        a7,
+        "tests/http/test_reader_a7_transport.py",
+        "qa-05-po-005",
+        "artifacts/proofs/reader_success_get_head_304.json",
+        "epic038.pr02.a7_reader_success_composite",
+    )
+    bind(
+        ("ENDPOINTS_CATALOG_OK",),
+        "tests/http/test_endpoint_catalog.py",
+        "qa-05-po-005",
+        "docs/ENDPOINTS_CATALOG.json",
+        "epic038.pr02.endpoint_catalog",
+    )
+    bind(
+        ("ENDPOINTS_CATALOG_ENV_GATE_OK",),
+        "tests/http/test_endpoint_catalog.py",
+        "qa-05-po-005",
+        "artifacts/proofs/endpoints_env_gate_proof.log",
+        "epic038.pr02.a7_env_gate",
+    )
+    bind(
+        ("EVIDENCE_INDEX_UPDATED_OK",),
+        "tests/ops/test_evidence_index.py",
+        "qa-19-po-019",
+        HUMAN_INDEX_PATH,
+        HUMAN_INDEX_KEY,
+    )
+    bind(
+        ("MACHINE_MIRROR_UPDATED_OK", "CI_CHECK_MIRROR_SCHEMA_OK"),
+        "tests/ops/test_evidence_index.py",
+        "qa-19-po-019",
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    index_mirror = _row(
+        "EVIDENCE_INDEX_MIRROR_OK",
+        (
+            "tools/evidence/update_evidence_index.py; "
+            "ci/checks/check_mirror_schema.sh; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        HUMAN_INDEX_PATH,
+        HUMAN_INDEX_KEY,
+    )
+    rows[index_mirror.token] = replace(
+        index_mirror,
+        ci_binding=EVIDENCE_INDEX_MIRROR_CI_JOB,
+        primary_evidence=(
+            HUMAN_INDEX_PATH,
+            MACHINE_MIRROR_PATH,
+            QA_MANIFEST_PATH,
+        ),
+        artifact_keys=(
+            HUMAN_INDEX_KEY,
+            MACHINE_MIRROR_KEY,
+            QA_MANIFEST_KEY,
+        ),
+        proof_anchors=(
+            f"{HUMAN_INDEX_PATH}.path_proof.txt",
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: the governed Human Index and Machine Mirror currently "
+            "have equal ordered artifact-key/path topology, and the QA-19 "
+            "manifest hash-binds their closed-rails integrity check; this is "
+            "not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head updater "
+            "check and Mirror schema workflow steps succeed, whole-surface "
+            "Human/Mirror topology remains equal, finalized acceptance outputs "
+            "derive the result, and independent Gate B records PASS."
+        ),
+    )
+    paths_validated = _row(
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        (
+            f"{EVIDENCE_PATH_VALIDATOR_PATH}; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    rows[paths_validated.token] = replace(
+        paths_validated,
+        ci_binding=EVIDENCE_PATHS_CI_JOB,
+        primary_evidence=(MACHINE_MIRROR_PATH, QA_MANIFEST_PATH),
+        artifact_keys=(MACHINE_MIRROR_KEY, QA_MANIFEST_KEY),
+        proof_anchors=(
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: every current Machine Mirror artifact path resolves "
+            "inside the repository, and the QA-19 manifest hash-binds the "
+            "closed-rails path-validator run; this is not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head "
+            "`Validate governed evidence paths` workflow step validates every "
+            "Machine Mirror path, finalized acceptance outputs derive the "
+            "result, and independent Gate B records PASS."
+        ),
+    )
+    path_proofs = _row(
+        "EVIDENCE_PATH_PROOFS_OK",
+        (
+            f"{MIRROR_SCHEMA_VALIDATOR_PATH}; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    rows[path_proofs.token] = replace(
+        path_proofs,
+        ci_binding=EVIDENCE_PATH_PROOFS_CI_JOB,
+        primary_evidence=(MACHINE_MIRROR_PATH, QA_MANIFEST_PATH),
+        artifact_keys=(MACHINE_MIRROR_KEY, QA_MANIFEST_KEY),
+        proof_anchors=(
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: every current Machine Mirror record and declared proof "
+            "anchor has coherent path/hash/size binding, and the QA-19 manifest "
+            "hash-binds the closed-rails Mirror schema run; this is not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head Mirror "
+            "schema workflow step validates every record and proof anchor, "
+            "finalized acceptance outputs derive the result, and independent "
+            "Gate B records PASS."
+        ),
+    )
+    bind(
+        ("EVIDENCE_INDEX_HASH_OK",),
+        "tests/ops/test_evidence_index.py",
+        "qa-19-po-019",
+        "docs/evidence/INDEX.sha256",
+        "docs.evidence.INDEX.sha256",
+    )
+    bind(
+        ("CI_CHECK_FINAL_LF_OK",),
+        (
+            "ci/checks/check_final_lf.sh; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        FINAL_LF_CHECK_ID,
+        QA_MANIFEST_PATH,
+        QA_MANIFEST_KEY,
+    )
+    rows["CI_CHECK_FINAL_LF_OK"] = replace(
+        rows["CI_CHECK_FINAL_LF_OK"],
+        ci_binding=FINAL_LF_CI_JOB,
+        posture=(
+            "UNCLAIMED: the governed QA-19 manifest hash-binds a closed-rails "
+            "execution log for the repository-wide final-LF gate; historical "
+            "PASS text and current file presence are not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head "
+            "`Run ci/checks/check_final_lf.sh` workflow step succeeds with the "
+            "current matrix and proof plus every present approved planned closeout "
+            "output covered, the QA-19 manifest and hash-bound execution log "
+            "remain coherent, and independent Gate B records PASS against that "
+            "same exact head."
+        ),
+    )
+    bind(
+        (
+            "DB_RUNTIME_SEARCH_PATH_OK",
+            "DB_ROLE_OK",
+            "DB_SCHEMA_FINGERPRINT_OK",
+        ),
+        "tests/ops/test_hde_epic038_ops03.py",
+        "qa-22-po-022",
+        DB_POSTURE_PATH,
+        DB_POSTURE_KEY,
+    )
+    bind(
+        ("DB_CONN_ENV_OK",),
+        "tests/db/test_direct_db_pr06r.py",
+        "qa-12-po-012",
+        "artifacts/runtime/direct_db_selection.snapshot.json",
+        "epic038.pr06r.direct_db_selection",
+    )
+
+    refusal = _row(
+        "NO_EXTERNAL_IO_ON_REFUSAL_OK",
+        "tests/evidence/test_v2_mapped_cache_evidence.py",
+        "qa-16-po-016",
+        REFUSAL_PATH,
+        REFUSAL_KEY,
+    )
+    rows[refusal.token] = replace(
+        refusal,
+        primary_evidence=(REFUSAL_PATH, REFUSAL_MANIFEST_PATH),
+        artifact_keys=(REFUSAL_KEY, REFUSAL_MANIFEST_KEY),
+        proof_anchors=(
+            f"{REFUSAL_PATH}.path_proof.txt",
+            f"{REFUSAL_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: indexed closed-rails evidence records zero vendor and "
+            "database calls and a bound zero-external-I/O predicate; evidence "
+            "presence and historical PASS text are not acceptance."
+        ),
+    )
+    rows["RELEASE_ID_RECOMPUTE_OK"] = _release_row()
+
+    for token, (path, key, owner) in PLANNED_BINDINGS.items():
+        row = rows[token]
+        rows[token] = replace(
+            row,
+            test_binding="tests/evidence/test_hde_epic038_closeout.py",
+            ci_binding=f"{CI_JOB}; planned commands: {PLANNED_COMMANDS}",
+            live_qa=(
+                "N/A: the planned closeout artifact is repository-local DEV "
+                "evidence and no Live QA execution is authorized."
+            ),
+            primary_evidence=(path,),
+            artifact_keys=(key,),
+            proof_anchors=(f"{path}.path_proof.txt",),
+            posture=(
+                f"UNCLAIMED: planned-new evidence owned by {owner} does not "
+                "exist and has not been executed; DEV-01 makes no token claim."
+            ),
+            classification="planned-new",
+            owner_task=owner,
+            future_claim=(
+                f"Future status may become CLAIMED only after {owner} canonically "
+                f"produces `{path}` and `{path}.path_proof.txt`, registers exact "
+                f"artifact key `{key}`, the planned commands execute successfully "
+                "on the exact head, and independent Gate B records PASS."
+            ),
+        )
+    return tuple(rows[token] for token in TOKENS)
+
+
+def _human_items() -> tuple[Mapping[str, object], ...]:
+    payload = json.loads((ROOT / HUMAN_INDEX_PATH).read_text(encoding="utf-8"))
+    if not isinstance(payload, list) or not payload:
+        raise ValueError("Human Index shape mismatch")
+    if any(not isinstance(item, dict) for item in payload):
+        raise ValueError("Human Index record shape mismatch")
+    return tuple(payload)
+
+
+def _mirror_items() -> tuple[Mapping[str, object], ...]:
+    items: list[Mapping[str, object]] = []
+    for line_number, line in enumerate(
+        (ROOT / MACHINE_MIRROR_PATH).read_text(encoding="utf-8").splitlines(),
+        1,
+    ):
+        if not line:
+            raise ValueError(f"Machine Mirror empty line: {line_number}")
+        item = json.loads(line)
+        if not isinstance(item, dict):
+            raise ValueError(f"Machine Mirror record shape mismatch: {line_number}")
+        items.append(item)
+    if not items:
+        raise ValueError("Machine Mirror shape mismatch")
+    return tuple(items)
+
+
+def _record_text(
+    item: Mapping[str, object],
+    field: str,
+    surface: str,
+) -> str:
+    value = item.get(field)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{surface} field mismatch: {field}")
+    return value
+
+
+def _mirror_records() -> set[tuple[str, str, str]]:
+    return {
+        (
+            _record_text(item, "artifact_key", "Machine Mirror"),
+            _record_text(item, "discovered_physical_path", "Machine Mirror"),
+            _record_text(item, "proof_anchor", "Machine Mirror"),
+        )
+        for item in _mirror_items()
+    }
+
+
+def validate_index_mirror_topology(
+    human_items: Iterable[Mapping[str, object]] | None = None,
+    mirror_items: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    human = tuple(_human_items() if human_items is None else human_items)
+    mirror = tuple(_mirror_items() if mirror_items is None else mirror_items)
+    if not human or not mirror:
+        raise ValueError("evidence index/mirror topology empty")
+
+    def pairs(
+        items: tuple[Mapping[str, object], ...],
+        surface: str,
+    ) -> tuple[tuple[str, str], ...]:
+        result = tuple(
+            (
+                _record_text(item, "artifact_key", surface),
+                _record_text(item, "discovered_physical_path", surface),
+            )
+            for item in items
+        )
+        if len(result) != len(set(result)):
+            raise ValueError(f"evidence index/mirror duplicate pair: {surface}")
+        return result
+
+    human_pairs = pairs(human, "Human Index")
+    mirror_pairs = pairs(mirror, "Machine Mirror")
+    if human_pairs != mirror_pairs:
+        raise ValueError("evidence index/mirror topology mismatch")
+
+
+def _resolved_repo_file(raw_path: str, surface: str) -> Path:
+    candidate = Path(raw_path)
+    if candidate.is_absolute():
+        raise ValueError(f"{surface} absolute path: {raw_path}")
+    if ".." in candidate.parts:
+        raise ValueError(f"{surface} path traversal: {raw_path}")
+    root = ROOT.resolve()
+    resolved = (ROOT / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"{surface} path outside repository: {raw_path}") from exc
+    if not resolved.is_file():
+        raise ValueError(f"{surface} missing file: {raw_path}")
+    return resolved
+
+
+def validate_mirror_paths(
+    records: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    items = tuple(_mirror_items() if records is None else records)
+    if not items:
+        raise ValueError("Machine Mirror path roster empty")
+    for item in items:
+        path = _record_text(
+            item,
+            "discovered_physical_path",
+            "Machine Mirror",
+        )
+        _resolved_repo_file(path, "Machine Mirror artifact")
+
+
+def _mirror_body_sha256() -> str:
+    lines = (
+        ROOT / MACHINE_MIRROR_PATH
+    ).read_text(encoding="utf-8").splitlines(keepends=True)
+    body: list[str] = []
+    self_count = 0
+    for line in lines:
+        item = json.loads(line)
+        if (
+            item.get("artifact_key") == MACHINE_MIRROR_KEY
+            and item.get("discovered_physical_path") == MACHINE_MIRROR_PATH
+        ):
+            self_count += 1
+        else:
+            body.append(line)
+    if self_count != 1:
+        raise ValueError(f"Machine Mirror self-record count mismatch: {self_count}")
+    return hashlib.sha256("".join(body).encode("utf-8")).hexdigest()
+
+
+def validate_all_mirror_proofs(
+    records: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    items = tuple(_mirror_items() if records is None else records)
+    validate_mirror_paths(items)
+    pairs: set[tuple[str, str]] = set()
+    self_records = 0
+    mirror_body_sha256 = _mirror_body_sha256()
+    for item in items:
+        key = _record_text(item, "artifact_key", "Machine Mirror")
+        primary = _record_text(
+            item,
+            "discovered_physical_path",
+            "Machine Mirror",
+        )
+        proof = _record_text(item, "proof_anchor", "Machine Mirror")
+        pair = (key, primary)
+        if pair in pairs:
+            raise ValueError(f"Machine Mirror duplicate pair: {key} -> {primary}")
+        pairs.add(pair)
+        if not proof.endswith(".path_proof.txt"):
+            raise ValueError(f"Machine Mirror proof suffix mismatch: {proof}")
+        primary_path = _resolved_repo_file(
+            primary,
+            "Machine Mirror artifact",
+        )
+        _resolved_repo_file(proof, "Machine Mirror proof")
+        _validate_proof(primary, proof)
+        body = primary_path.read_bytes()
+        expected_sha256 = hashlib.sha256(body).hexdigest()
+        if primary == MACHINE_MIRROR_PATH:
+            self_records += 1
+            expected_sha256 = mirror_body_sha256
+            if item.get("role") != "self_record":
+                raise ValueError("Machine Mirror self-record role mismatch")
+        if (
+            item.get("sha256") != expected_sha256
+            or item.get("size_bytes") != len(body)
+        ):
+            raise ValueError(f"Machine Mirror record binding mismatch: {primary}")
+    if self_records != 1:
+        raise ValueError(
+            f"Machine Mirror self-record count mismatch: {self_records}"
+        )
+
+
+def _proof_fields(path: Path) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if ": " in line:
+            key, value = line.split(": ", 1)
+            fields[key] = value
+    return fields
+
+
+def _validate_proof(primary: str, proof: str) -> None:
+    primary_path = ROOT / primary
+    fields = _proof_fields(ROOT / proof)
+    body = primary_path.read_bytes()
+    if fields.get("path") != primary:
+        raise ValueError(f"proof path mismatch: {primary}")
+    if fields.get("sha256") != hashlib.sha256(body).hexdigest():
+        raise ValueError(f"proof sha mismatch: {primary}")
+    if fields.get("size_bytes") != str(len(body)):
+        raise ValueError(f"proof size mismatch: {primary}")
+
+
+def validate_db_posture_payload(token: str, payload: Mapping[str, object]) -> None:
+    observations = payload.get("observations")
+    predicates = payload.get("predicates")
+    if not isinstance(observations, dict) or not isinstance(predicates, dict):
+        raise ValueError(f"database posture shape: {token}")
+    if token == "DB_RUNTIME_SEARCH_PATH_OK":
+        valid = (
+            predicates.get("search_path_exact") is True
+            and observations.get("search_path") == ["hde", "public"]
+        )
+    elif token == "DB_ROLE_OK":
+        flags = observations.get("runtime_role_flags")
+        valid = (
+            predicates.get("least_privilege_role") is True
+            and isinstance(flags, dict)
+            and flags
+            and all(value is False for value in flags.values())
+        )
+    elif token == "DB_SCHEMA_FINGERPRINT_OK":
+        identity = observations.get("ddl_identity")
+        valid = (
+            predicates.get("ddl_identity_valid") is True
+            and isinstance(identity, dict)
+            and identity.get("schema") == "hde.ddl_identity_projection.v1"
+            and isinstance(identity.get("canonical_sha256"), str)
+            and len(identity["canonical_sha256"]) == 64
+        )
+    else:
+        raise ValueError(f"unexpected database posture token: {token}")
+    if not valid:
+        raise ValueError(f"database posture predicate mismatch: {token}")
+
+
+def validate_no_io_payloads(log_text: str, manifest: Mapping[str, object]) -> None:
+    required_log_fields = (
+        "code=PROVIDER_REFUSED",
+        "safe_mode=1",
+        "allow_network=0",
+        "vendor_calls=0",
+        "db_calls=0",
+    )
+    if not all(field in log_text.split() for field in required_log_fields):
+        raise ValueError("closed-rails refusal counters mismatch")
+    predicates = manifest.get("predicates")
+    if (
+        not isinstance(predicates, dict)
+        or predicates.get("closed_rails_zero_io") is not True
+    ):
+        raise ValueError("closed-rails external I/O predicate mismatch")
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise ValueError("closed-rails manifest artifacts missing")
+    log_path = ROOT / REFUSAL_PATH
+    matches = [
+        item
+        for item in artifacts
+        if isinstance(item, dict) and item.get("path") == REFUSAL_PATH
+    ]
+    if len(matches) != 1:
+        raise ValueError("closed-rails refusal binding missing")
+    match = matches[0]
+    log_bytes = log_path.read_bytes()
+    if (
+        match.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or match.get("size") != len(log_bytes)
+    ):
+        raise ValueError("closed-rails refusal binding mismatch")
+
+
+def validate_preimage_payload(
+    payload: Mapping[str, object],
+    source_bytes: bytes,
+) -> None:
+    hashes = payload.get("idempotence_hash")
+    artifact_hashes = payload.get("hashes")
+    predicates = payload.get("predicates")
+    if (
+        payload.get("artifact_kind") != "hde_epic038_pr02_determinism_proof"
+        or payload.get("acceptance_token_satisfied") is not False
+        or not isinstance(hashes, dict)
+        or not isinstance(artifact_hashes, dict)
+        or not isinstance(predicates, dict)
+    ):
+        raise ValueError("preimage recompute evidence shape mismatch")
+    try:
+        source = json.loads(source_bytes)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("preimage recompute source mismatch") from exc
+    if not isinstance(source, dict):
+        raise ValueError("preimage recompute source mismatch")
+    preimage = dict(source)
+    source_stored = preimage.pop("idempotence_hash", None)
+    source_recomputed = hashlib.sha256(emitter.emit_public(preimage)).hexdigest()
+    source_sha256 = hashlib.sha256(source_bytes).hexdigest()
+    stored = hashes.get("stored")
+    recomputed = hashes.get("recomputed")
+    if (
+        not isinstance(stored, str)
+        or not isinstance(recomputed, str)
+        or len(stored) != 64
+        or len(recomputed) != 64
+        or any(character not in "0123456789abcdef" for character in stored)
+        or any(character not in "0123456789abcdef" for character in recomputed)
+        or stored != recomputed
+        or stored != source_stored
+        or recomputed != source_recomputed
+        or artifact_hashes.get("ab_sha256") != source_sha256
+        or predicates.get("preimage_hash_match") is not True
+    ):
+        raise ValueError("preimage recompute predicate mismatch")
+
+
+def validate_cli_reader_parity_payload(payload: Mapping[str, object]) -> None:
+    hashes = payload.get("hashes")
+    predicates = payload.get("predicates")
+    sources = payload.get("sources")
+    if (
+        payload.get("artifact_kind") != "hde_epic038_pr02_determinism_proof"
+        or payload.get("acceptance_token_satisfied") is not False
+        or not isinstance(hashes, dict)
+        or not isinstance(predicates, dict)
+        or sources
+        != {
+            "runtime": "engine.runtime.public.emit_reader_public_envelope",
+            "cli": "python -m engine.cli showcompat --dump-reader",
+        }
+    ):
+        raise ValueError("CLI/Reader parity evidence shape mismatch")
+    reader_hash = hashes.get("reader_sha256")
+    cli_hash = hashes.get("cli_sha256")
+    if (
+        not isinstance(reader_hash, str)
+        or not isinstance(cli_hash, str)
+        or len(reader_hash) != 64
+        or len(cli_hash) != 64
+        or any(character not in "0123456789abcdef" for character in reader_hash)
+        or any(character not in "0123456789abcdef" for character in cli_hash)
+        or reader_hash != cli_hash
+        or predicates.get("reader_cli_byte_identity") is not True
+    ):
+        raise ValueError("CLI/Reader parity predicate mismatch")
+
+
+def validate_release_attestation_payload(
+    payload: Mapping[str, object],
+    *,
+    expected_source_commit: str,
+    manifest_sha256: str,
+) -> None:
+    required = {
+        "schema": "hde.release_attestation.v1",
+        "source_commit": expected_source_commit,
+        "source_commit_exact": True,
+        "manifest_sha256": manifest_sha256,
+        "release_id": manifest_sha256,
+        "validation_result": "PASS",
+        "release_admission": "PR06R_B_FINAL_PASS",
+        "pipeline_stop": None,
+    }
+    for key, expected in required.items():
+        if payload.get(key) != expected:
+            raise ValueError(f"release attestation mismatch: {key}")
+
+
+def validate_final_lf_evidence(
+    manifest: Mapping[str, object], log_text: str
+) -> None:
+    record = manifest.get(FINAL_LF_CHECK_ID)
+    if not isinstance(record, dict):
+        raise ValueError("final-LF QA manifest record missing")
+    expected_relative_log = "checks/qa-19-po-019/primary.log"
+    log_bytes = log_text.encode("utf-8")
+    if (
+        record.get("log_path") != expected_relative_log
+        or record.get("status") != "PASS"
+        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or record.get("size_bytes") != len(log_bytes)
+    ):
+        raise ValueError("final-LF QA manifest binding mismatch")
+    lines = log_text.splitlines()
+    if not lines:
+        raise ValueError("final-LF execution log missing")
+    try:
+        header = json.loads(lines[0])
+    except json.JSONDecodeError as exc:
+        raise ValueError("final-LF execution header invalid") from exc
+    required_rails = {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+    }
+    if (
+        not isinstance(header, dict)
+        or header.get("check_id") != FINAL_LF_CHECK_ID
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or "bash ci/checks/check_final_lf.sh" not in header.get("command", "")
+        or header.get("captured_env") != required_rails
+        or header.get("intended_tokens") != []
+        or header.get("claimed_tokens") != []
+        or "BEHAVIOR_EXIT_CODE=0" not in lines
+    ):
+        raise ValueError("final-LF execution predicate mismatch")
+
+
+def validate_integrity_qa19_evidence(
+    manifest: Mapping[str, object],
+    log_text: str,
+) -> None:
+    record = manifest.get(EVIDENCE_INTEGRITY_CHECK_ID)
+    if not isinstance(record, dict):
+        raise ValueError("evidence-integrity QA manifest record missing")
+    log_bytes = log_text.encode("utf-8")
+    if (
+        record.get("log_path") != "checks/qa-19-po-019/primary.log"
+        or record.get("status") != "PASS"
+        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or record.get("size_bytes") != len(log_bytes)
+    ):
+        raise ValueError("evidence-integrity QA manifest binding mismatch")
+    lines = log_text.splitlines()
+    if not lines:
+        raise ValueError("evidence-integrity execution log missing")
+    try:
+        header = json.loads(lines[0])
+    except json.JSONDecodeError as exc:
+        raise ValueError("evidence-integrity execution header invalid") from exc
+    command = header.get("command") if isinstance(header, dict) else None
+    required_commands = (
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/validate_evidence_paths.py",
+        "python ci/checks/check_mirror_schema.sh",
+    )
+    required_rails = {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+    }
+    if (
+        not isinstance(command, str)
+        or any(required not in command for required in required_commands)
+        or header.get("check_id") != EVIDENCE_INTEGRITY_CHECK_ID
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or header.get("captured_env") != required_rails
+        or header.get("intended_tokens") != []
+        or header.get("claimed_tokens") != []
+        or "BEHAVIOR_EXIT_CODE=0" not in lines
+    ):
+        raise ValueError("evidence-integrity execution predicate mismatch")
+
+
+def _shell_array(script_text: str, name: str) -> tuple[str, ...]:
+    lines = script_text.splitlines()
+    try:
+        start = lines.index(f"{name}=(")
+        end = lines.index(")", start + 1)
+    except ValueError as exc:
+        raise ValueError(f"final-LF array missing: {name}") from exc
+    values = tuple(line.strip() for line in lines[start + 1 : end] if line.strip())
+    if not values:
+        raise ValueError(f"final-LF array empty: {name}")
+    return values
+
+
+def validate_final_lf_script(script_text: str) -> None:
+    required = _shell_array(script_text, "required_files")
+    planned = _shell_array(script_text, "planned_files")
+    if required != FINAL_LF_REQUIRED_PATHS or planned != FINAL_LF_PLANNED_PATHS:
+        raise ValueError("final-LF target coverage mismatch")
+    required_loop = (
+        'for f in "${required_files[@]}"; do\n'
+        '  check_file "$f"\n'
+        "done"
+    )
+    planned_loop = (
+        'for f in "${planned_files[@]}"; do\n'
+        '  if [[ -f "$f" ]]; then\n'
+        '    check_file "$f"\n'
+        "  fi\n"
+        "done"
+    )
+    if required_loop not in script_text or planned_loop not in script_text:
+        raise ValueError("final-LF loop coverage mismatch")
+
+
+def _validate_special_semantics(row: Row) -> None:
+    if row.token == "EVIDENCE_INDEX_MIRROR_OK":
+        if (
+            row.primary_evidence
+            != (
+                HUMAN_INDEX_PATH,
+                MACHINE_MIRROR_PATH,
+                QA_MANIFEST_PATH,
+            )
+            or row.artifact_keys
+            != (
+                HUMAN_INDEX_KEY,
+                MACHINE_MIRROR_KEY,
+                QA_MANIFEST_KEY,
+            )
+            or row.proof_anchors
+            != (
+                f"{HUMAN_INDEX_PATH}.path_proof.txt",
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                "tools/evidence/update_evidence_index.py",
+                MIRROR_SCHEMA_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_INDEX_MIRROR_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence index/mirror binding mismatch")
+        validate_index_mirror_topology()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token == "EVIDENCE_PATHS_VALIDATED_OK":
+        if (
+            row.primary_evidence != (MACHINE_MIRROR_PATH, QA_MANIFEST_PATH)
+            or row.artifact_keys != (MACHINE_MIRROR_KEY, QA_MANIFEST_KEY)
+            or row.proof_anchors
+            != (
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                EVIDENCE_PATH_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_PATHS_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence path-validation binding mismatch")
+        validate_mirror_paths()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token == "EVIDENCE_PATH_PROOFS_OK":
+        if (
+            row.primary_evidence != (MACHINE_MIRROR_PATH, QA_MANIFEST_PATH)
+            or row.artifact_keys != (MACHINE_MIRROR_KEY, QA_MANIFEST_KEY)
+            or row.proof_anchors
+            != (
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                MIRROR_SCHEMA_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_PATH_PROOFS_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence path-proof binding mismatch")
+        validate_all_mirror_proofs()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token in {
+        "DB_RUNTIME_SEARCH_PATH_OK",
+        "DB_ROLE_OK",
+        "DB_SCHEMA_FINGERPRINT_OK",
+    }:
+        if (
+            row.primary_evidence != (DB_POSTURE_PATH,)
+            or row.artifact_keys != (DB_POSTURE_KEY,)
+        ):
+            raise ValueError(f"database posture binding mismatch: {row.token}")
+        payload = json.loads((ROOT / DB_POSTURE_PATH).read_text(encoding="utf-8"))
+        validate_db_posture_payload(row.token, payload)
+    elif row.token == "NO_EXTERNAL_IO_ON_REFUSAL_OK":
+        if row.primary_evidence != (REFUSAL_PATH, REFUSAL_MANIFEST_PATH):
+            raise ValueError("closed-rails refusal binding mismatch")
+        validate_no_io_payloads(
+            (ROOT / REFUSAL_PATH).read_text(encoding="utf-8"),
+            json.loads((ROOT / REFUSAL_MANIFEST_PATH).read_text(encoding="utf-8")),
+        )
+    elif row.token == "PREIMAGE_RECOMPUTE_OK":
+        if (
+            row.primary_evidence != (PREIMAGE_PATH, PREIMAGE_SOURCE_PATH)
+            or row.artifact_keys != (PREIMAGE_KEY, PREIMAGE_SOURCE_KEY)
+            or row.proof_anchors
+            != (
+                f"{PREIMAGE_PATH}.path_proof.txt",
+                f"{PREIMAGE_SOURCE_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                "tests/evidence/test_determinism_gate_proofs.py",
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.live_qa != "qa-04-po-004"
+        ):
+            raise ValueError("preimage recompute evidence binding mismatch")
+        validate_preimage_payload(
+            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8")),
+            (ROOT / PREIMAGE_SOURCE_PATH).read_bytes(),
+        )
+    elif row.token == "CLI_READER_PARITY_OK":
+        if (
+            row.primary_evidence != (PREIMAGE_PATH,)
+            or row.artifact_keys != (PREIMAGE_KEY,)
+            or row.proof_anchors != (f"{PREIMAGE_PATH}.path_proof.txt",)
+            or set(row.test_binding.split("; "))
+            != {
+                "tests/evidence/test_determinism_gate_proofs.py",
+                "tests/cli/test_showcompat_parity_and_identity.py",
+            }
+            or row.live_qa != "qa-04-po-004"
+        ):
+            raise ValueError("CLI/Reader parity evidence binding mismatch")
+        validate_cli_reader_parity_payload(
+            json.loads((ROOT / PREIMAGE_PATH).read_text(encoding="utf-8"))
+        )
+    elif row.token == "RELEASE_ID_RECOMPUTE_OK":
+        if (
+            row.primary_evidence != (RELEASE_MANIFEST_PATH,)
+            or row.artifact_keys != (RELEASE_MANIFEST_KEY,)
+            or any(path.startswith("artifacts/identity/") for path in row.primary_evidence)
+        ):
+            raise ValueError("release identity source binding mismatch")
+        raw = (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
+        payload = json.loads(raw)
+        canonical = (
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
+            + "\n"
+        ).encode("utf-8")
+        if raw != canonical:
+            raise ValueError("release manifest is not canonical")
+        digest = hashlib.sha256(raw).hexdigest()
+        if f"`manifest_sha256={digest}`" not in row.future_claim:
+            raise ValueError("release manifest digest binding mismatch")
+        required_bindings = {
+            "scripts/release_id_recompute.py",
+            "tools/evidence/build_release_attestation.py",
+            "tests/evidence/test_release_manifest_content_binding.py",
+            "tests/evidence/test_release_attestation.py",
+        }
+        if set(row.test_binding.split("; ")) != required_bindings:
+            raise ValueError("release validator binding mismatch")
+        if row.ci_binding != RELEASE_CI_JOB or row.live_qa != "qa-21-po-021":
+            raise ValueError("release execution binding mismatch")
+    elif row.token == "CI_CHECK_FINAL_LF_OK":
+        if (
+            row.primary_evidence != (QA_MANIFEST_PATH,)
+            or row.artifact_keys != (QA_MANIFEST_KEY,)
+            or row.proof_anchors != (f"{QA_MANIFEST_PATH}.path_proof.txt",)
+            or set(row.test_binding.split("; "))
+            != {
+                "ci/checks/check_final_lf.sh",
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != FINAL_LF_CI_JOB
+            or row.live_qa != FINAL_LF_CHECK_ID
+        ):
+            raise ValueError("final-LF evidence binding mismatch")
+        validate_final_lf_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / FINAL_LF_LOG_PATH).read_text(encoding="utf-8"),
+        )
+        validate_final_lf_script(
+            (ROOT / FINAL_LF_SCRIPT_PATH).read_text(encoding="utf-8")
+        )
+
+
+def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
+    rows = tuple(rows)
+    names = [row.token for row in rows]
+    if len(names) != len(set(names)):
+        raise ValueError("duplicate token")
+    if set(names) != set(TOKENS):
+        raise ValueError(
+            "token set mismatch: "
+            f"missing={sorted(set(TOKENS) - set(names))}; "
+            f"unexpected={sorted(set(names) - set(TOKENS))}"
+        )
+    if tuple(names) != TOKENS:
+        raise ValueError("token order mismatch")
+    if any(name in PROHIBITED for name in names):
+        raise ValueError("prohibited token or non-token label")
+
+    records = _mirror_records()
+    current_keys = {key for key, _path, _proof in records}
+    qa_manifest = json.loads(
+        (ROOT / "audit/qa/hde-epic038/qa_step_logs_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    scalar_fields = (
+        "token",
+        "acceptance_token",
+        "manifest_token",
+        "test_binding",
+        "ci_binding",
+        "live_qa",
+        "epic_id",
+        "posture",
+        "classification",
+        "owner_task",
+        "future_claim",
+    )
+    structured_fields = ("primary_evidence", "artifact_keys", "proof_anchors")
+    if set(NONCLAIMING_TEXT_SHA256) != set(TOKENS):
+        raise ValueError("nonclaiming allowlist token mismatch")
+
+    for row in rows:
+        if any(
+            not isinstance(getattr(row, field), str)
+            or not getattr(row, field).strip()
+            for field in scalar_fields
+        ):
+            raise ValueError(f"empty field: {row.token}")
+        for field in structured_fields:
+            values = getattr(row, field)
+            if (
+                not isinstance(values, (tuple, list))
+                or not values
+                or any(not isinstance(value, str) or not value.strip() for value in values)
+            ):
+                raise ValueError(f"empty structured field: {row.token}: {field}")
+        if not (
+            len(row.primary_evidence)
+            == len(row.artifact_keys)
+            == len(row.proof_anchors)
+        ):
+            raise ValueError(f"evidence binding count mismatch: {row.token}")
+
+        values = [
+            *(getattr(row, field) for field in scalar_fields),
+            *row.primary_evidence,
+            *row.artifact_keys,
+            *row.proof_anchors,
+        ]
+        joined = " ".join(values)
+        if "*" in joined:
+            raise ValueError(
+                f"missing existing path or wildcard-only binding: {row.token}"
+            )
+        if any(marker in joined for marker in ("TBD", "e.g.", "??")):
+            raise ValueError(f"placeholder: {row.token}")
+        if (
+            row.acceptance_token != row.token
+            or row.manifest_token != row.token
+        ):
+            raise ValueError(f"token alias: {row.token}")
+        if (
+            row.epic_id != EPIC_ID
+            or row.classification not in {"existing/reused", "planned-new"}
+        ):
+            raise ValueError(f"invalid binding: {row.token}")
+        nonclaiming_digest = hashlib.sha256(
+            f"{row.posture}\0{row.future_claim}".encode("utf-8")
+        ).hexdigest()
+        if (
+            not row.posture.startswith(CURRENT_POSTURE_PREFIX)
+            or not row.future_claim.startswith(FUTURE_CLAIM_PREFIXES)
+            or nonclaiming_digest != NONCLAIMING_TEXT_SHA256[row.token]
+        ):
+            raise ValueError(f"nonclaiming posture contract: {row.token}")
+        if any(
+            marker in joined
+            for marker in ("PASS conclusion", "status=PASS", "CLAIMED: PASS")
+        ):
+            raise ValueError(f"acceptance inference: {row.token}")
+        if ".github/workflows/ci.yml" not in row.ci_binding:
+            raise ValueError(f"inexact CI binding: {row.token}")
+
+        for test_path in row.test_binding.split("; "):
+            if not (ROOT / test_path).is_file():
+                raise ValueError(
+                    f"missing existing test path: {row.token}: {test_path}"
+                )
+        if row.live_qa.startswith("N/A:"):
+            if len(row.live_qa.removeprefix("N/A:").strip()) < 20:
+                raise ValueError(f"insubstantive Live QA N/A: {row.token}")
+        else:
+            for check_id in row.live_qa.split("; "):
+                if check_id not in qa_manifest:
+                    raise ValueError(
+                        f"unregistered Live QA check ID: {row.token}: {check_id}"
+                    )
+
+        if row.classification == "existing/reused":
+            if row.owner_task != "N/A: existing/reused evidence":
+                raise ValueError(f"invalid existing owner: {row.token}")
+            for path in (*row.primary_evidence, *row.proof_anchors):
+                if "*" in path or not (ROOT / path).is_file():
+                    raise ValueError(f"missing existing path: {row.token}: {path}")
+            for key, path, proof in zip(
+                row.artifact_keys, row.primary_evidence, row.proof_anchors
+            ):
+                if (key, path, proof) not in records:
+                    raise ValueError(
+                        f"unregistered artifact key: {row.token}: {key} -> {path}"
+                    )
+                _validate_proof(path, proof)
+        else:
+            expected = PLANNED_BINDINGS.get(row.token)
+            if expected is None:
+                raise ValueError(f"unauthorized planned token: {row.token}")
+            path, key, owner = expected
+            if (
+                row.primary_evidence != (path,)
+                or row.artifact_keys != (key,)
+                or row.proof_anchors != (f"{path}.path_proof.txt",)
+                or row.owner_task != owner
+            ):
+                raise ValueError(f"inexact planned binding: {row.token}")
+            for planned_path in (*row.primary_evidence, *row.proof_anchors):
+                if planned_path not in PLANNED_PATHS:
+                    raise ValueError(
+                        f"unauthorized planned path: {row.token}: {planned_path}"
+                    )
+                if (ROOT / planned_path).exists():
+                    raise ValueError(
+                        f"planned path unexpectedly exists: {row.token}: {planned_path}"
+                    )
+            if key not in PLANNED_KEYS or key in current_keys:
+                raise ValueError(f"invalid planned artifact key: {row.token}: {key}")
+            if PLANNED_COMMANDS not in row.ci_binding:
+                raise ValueError(f"inexact planned command: {row.token}")
+            if "UNCLAIMED" not in row.posture or "has not been executed" not in row.posture:
+                raise ValueError(f"planned evidence claim: {row.token}")
+
+        _validate_special_semantics(row)
+    return rows
+
+
+def render(rows: Iterable[Row] | None = None) -> bytes:
+    rows = validate_rows(build_rows() if rows is None else rows)
+    lines = [
+        "# HDE-EPIC038 DEV-01 Token Evidence Matrix",
+        "",
+        (
+            "> Nonclaim: all 33 tokens are UNCLAIMED. Matrix construction, "
+            "artifact presence, historical PASS text, validation, PR creation, "
+            "and Gate B review do not satisfy an acceptance token."
+        ),
+        "",
+        "Each numbered row is canonical; semicolon-separated values are exact bindings.",
+        "",
+    ]
+    for index, row in enumerate(rows, 1):
+        lines += [
+            f"## {index}. `{row.token}`",
+            f"- Canonical governance token: `{row.token}`",
+            f"- Acceptance-map token: `{row.acceptance_token}`",
+            f"- Manifest token: `{row.manifest_token}`",
+            f"- Test/stable identifier: `{row.test_binding}`",
+            f"- Closed-rails CI binding: `{row.ci_binding}`",
+            f"- Live QA: `{row.live_qa}`",
+            f"- Primary governed evidence: `{'; '.join(row.primary_evidence)}`",
+            (
+                "- Human Index / Machine Mirror artifact keys: "
+                f"`{'; '.join(row.artifact_keys)}`"
+            ),
+            f"- Epic: `epic_id={row.epic_id}`",
+            f"- Proof anchors: `{'; '.join(row.proof_anchors)}`",
+            f"- Current posture: {row.posture}",
+            f"- Classification: `{row.classification}`",
+            f"- Owning task: `{row.owner_task}`",
+            (
+                "- Intended future claim and prerequisite: "
+                f"{row.future_claim}"
+            ),
+            "",
+        ]
+    return ("\n".join(lines).rstrip("\n") + "\n").encode("utf-8")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--token-matrix", action="store_true")
+    mode.add_argument("--check-token-matrix", action="store_true")
+    args = parser.parse_args()
+    expected = render()
+    target = ROOT / OUTPUT
+    if args.token_matrix:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(expected)
+        print(f"WROTE {OUTPUT}")
+        return 0
+    actual = target.read_bytes() if target.is_file() else b""
+    if actual != expected:
+        diff = difflib.unified_diff(
+            actual.decode("utf-8", "replace").splitlines(),
+            expected.decode().splitlines(),
+            fromfile=str(OUTPUT),
+            tofile="expected",
+            lineterm="",
+        )
+        print("TOKEN_MATRIX_DRIFT\n" + "\n".join(diff))
+        return 1
+    print("TOKEN_MATRIX_OK rows=33 unique=33 claimed=0")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
