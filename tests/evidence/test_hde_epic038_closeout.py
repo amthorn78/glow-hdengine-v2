@@ -99,9 +99,233 @@ def test_rejects_incomplete_placeholder_wildcard_alias_guesses_and_empty_tuples(
 )
 def test_rejects_every_evidence_binding_count_mismatch(field, value) -> None:
     rows = closeout.build_rows()
-    changed = replace(rows[23], **{field: value})
+    changed = replace(rows[7], **{field: value})
     with pytest.raises(ValueError, match="evidence binding count mismatch"):
-        closeout.validate_rows(rows[:23] + (changed,) + rows[24:])
+        closeout.validate_rows(rows[:7] + (changed,) + rows[8:])
+
+
+def test_evidence_integrity_rows_bind_actual_surfaces_and_enforcement() -> None:
+    rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
+
+    mirror = rows["EVIDENCE_INDEX_MIRROR_OK"]
+    assert mirror.primary_evidence == (
+        closeout.HUMAN_INDEX_PATH,
+        closeout.MACHINE_MIRROR_PATH,
+        closeout.QA_MANIFEST_PATH,
+    )
+    assert mirror.artifact_keys == (
+        closeout.HUMAN_INDEX_KEY,
+        closeout.MACHINE_MIRROR_KEY,
+        closeout.QA_MANIFEST_KEY,
+    )
+    assert set(mirror.test_binding.split("; ")) == {
+        "tools/evidence/update_evidence_index.py",
+        closeout.MIRROR_SCHEMA_VALIDATOR_PATH,
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert mirror.ci_binding == closeout.EVIDENCE_INDEX_MIRROR_CI_JOB
+
+    paths = rows["EVIDENCE_PATHS_VALIDATED_OK"]
+    assert paths.primary_evidence == (
+        closeout.MACHINE_MIRROR_PATH,
+        closeout.QA_MANIFEST_PATH,
+    )
+    assert paths.artifact_keys == (
+        closeout.MACHINE_MIRROR_KEY,
+        closeout.QA_MANIFEST_KEY,
+    )
+    assert set(paths.test_binding.split("; ")) == {
+        closeout.EVIDENCE_PATH_VALIDATOR_PATH,
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert paths.ci_binding == closeout.EVIDENCE_PATHS_CI_JOB
+
+    proofs = rows["EVIDENCE_PATH_PROOFS_OK"]
+    assert proofs.primary_evidence == (
+        closeout.MACHINE_MIRROR_PATH,
+        closeout.QA_MANIFEST_PATH,
+    )
+    assert proofs.artifact_keys == (
+        closeout.MACHINE_MIRROR_KEY,
+        closeout.QA_MANIFEST_KEY,
+    )
+    assert set(proofs.test_binding.split("; ")) == {
+        closeout.MIRROR_SCHEMA_VALIDATOR_PATH,
+        "tests/evidence/test_hde_epic038_closeout.py",
+    }
+    assert proofs.ci_binding == closeout.EVIDENCE_PATH_PROOFS_CI_JOB
+
+    for row in (mirror, paths, proofs):
+        assert row.live_qa == closeout.EVIDENCE_INTEGRITY_CHECK_ID
+        assert "UNCLAIMED" in row.posture
+
+
+@pytest.mark.parametrize(
+    "surface,mutation,match",
+    [
+        (
+            "human",
+            lambda items: items[:-1],
+            "topology mismatch",
+        ),
+        (
+            "mirror",
+            lambda items: items + (items[0],),
+            "duplicate pair",
+        ),
+        (
+            "mirror",
+            lambda items: (items[1], items[0], *items[2:]),
+            "topology mismatch",
+        ),
+    ],
+)
+def test_index_mirror_topology_regressions_fail_closed(
+    surface, mutation, match: str
+) -> None:
+    human = closeout._human_items()
+    mirror = closeout._mirror_items()
+    if surface == "human":
+        human = mutation(human)
+    else:
+        mirror = mutation(mirror)
+    with pytest.raises(ValueError, match=match):
+        closeout.validate_index_mirror_topology(human, mirror)
+
+
+@pytest.mark.parametrize(
+    "path,match",
+    [
+        ("/tmp/outside", "absolute path"),
+        ("../outside", "path traversal"),
+        ("missing/evidence.json", "missing file"),
+    ],
+)
+def test_whole_mirror_path_validation_rejects_unsafe_or_missing_paths(
+    path: str, match: str
+) -> None:
+    record = dict(closeout._mirror_items()[0])
+    record["discovered_physical_path"] = path
+    with pytest.raises(ValueError, match=match):
+        closeout.validate_mirror_paths((record,))
+
+
+def test_whole_mirror_path_validation_rejects_symlink_escape(
+    tmp_path, monkeypatch
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    outside = tmp_path / "outside"
+    outside.write_text("outside\n", encoding="utf-8")
+    (repo / "escape").symlink_to(outside)
+    monkeypatch.setattr(closeout, "ROOT", repo)
+    with pytest.raises(ValueError, match="outside repository"):
+        closeout.validate_mirror_paths(
+            ({"discovered_physical_path": "escape"},)
+        )
+
+
+def test_every_mirror_record_and_proof_anchor_is_validated() -> None:
+    closeout.validate_all_mirror_proofs()
+    items = list(closeout._mirror_items())
+    first = dict(items[0])
+    second = items[1]
+
+    wrong_proof = dict(first)
+    wrong_proof["proof_anchor"] = second["proof_anchor"]
+    with pytest.raises(ValueError, match="proof path mismatch"):
+        closeout.validate_all_mirror_proofs(
+            (wrong_proof, *items[1:])
+        )
+
+    wrong_sha = dict(first)
+    wrong_sha["sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="record binding mismatch"):
+        closeout.validate_all_mirror_proofs((wrong_sha, *items[1:]))
+
+    wrong_size = dict(first)
+    wrong_size["size_bytes"] = int(first["size_bytes"]) + 1
+    with pytest.raises(ValueError, match="record binding mismatch"):
+        closeout.validate_all_mirror_proofs((wrong_size, *items[1:]))
+
+    with pytest.raises(ValueError, match="duplicate pair"):
+        closeout.validate_all_mirror_proofs((*items, items[0]))
+
+
+def test_integrity_qa19_rejects_missing_path_validator_execution() -> None:
+    manifest = json.loads(
+        (ROOT / closeout.QA_MANIFEST_PATH).read_text(encoding="utf-8")
+    )
+    log_text = (
+        ROOT / closeout.EVIDENCE_INTEGRITY_LOG_PATH
+    ).read_text(encoding="utf-8")
+    changed_log = log_text.replace(
+        "python tools/evidence/validate_evidence_paths.py",
+        "python tools/evidence/orientation_demo.py --check",
+    )
+    record = manifest[closeout.EVIDENCE_INTEGRITY_CHECK_ID]
+    record["sha256"] = hashlib.sha256(changed_log.encode("utf-8")).hexdigest()
+    record["size_bytes"] = len(changed_log.encode("utf-8"))
+    with pytest.raises(ValueError, match="execution predicate mismatch"):
+        closeout.validate_integrity_qa19_evidence(manifest, changed_log)
+
+
+@pytest.mark.parametrize(
+    "token,primary,keys,proofs,match",
+    [
+        (
+            "EVIDENCE_INDEX_MIRROR_OK",
+            (closeout.HUMAN_INDEX_PATH,),
+            (closeout.HUMAN_INDEX_KEY,),
+            (f"{closeout.HUMAN_INDEX_PATH}.path_proof.txt",),
+            "index/mirror binding mismatch",
+        ),
+        (
+            "EVIDENCE_PATHS_VALIDATED_OK",
+            (closeout.HUMAN_INDEX_PATH, closeout.QA_MANIFEST_PATH),
+            (closeout.HUMAN_INDEX_KEY, closeout.QA_MANIFEST_KEY),
+            (
+                f"{closeout.HUMAN_INDEX_PATH}.path_proof.txt",
+                f"{closeout.QA_MANIFEST_PATH}.path_proof.txt",
+            ),
+            "path-validation binding mismatch",
+        ),
+        (
+            "EVIDENCE_PATH_PROOFS_OK",
+            (closeout.HUMAN_INDEX_PATH, closeout.QA_MANIFEST_PATH),
+            (closeout.HUMAN_INDEX_KEY, closeout.QA_MANIFEST_KEY),
+            (
+                f"{closeout.HUMAN_INDEX_PATH}.path_proof.txt",
+                f"{closeout.QA_MANIFEST_PATH}.path_proof.txt",
+            ),
+            "path-proof binding mismatch",
+        ),
+    ],
+)
+def test_evidence_integrity_rows_reject_human_index_only_bindings(
+    token, primary, keys, proofs, match: str
+) -> None:
+    rows = closeout.build_rows()
+    index = next(i for i, row in enumerate(rows) if row.token == token)
+    changed = replace(
+        rows[index],
+        primary_evidence=primary,
+        artifact_keys=keys,
+        proof_anchors=proofs,
+    )
+    with pytest.raises(ValueError, match=match):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+
+
+def test_ci_runs_canonical_path_validator_before_mirror_schema() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    path_step = (
+        "- name: Validate governed evidence paths\n"
+        "        run: python tools/evidence/validate_evidence_paths.py"
+    )
+    mirror_step = "- run: ci/checks/check_mirror_schema.sh"
+    assert path_step in workflow
+    assert workflow.index(path_step) < workflow.index(mirror_step)
 
 
 def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:

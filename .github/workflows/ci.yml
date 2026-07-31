@@ -9,6 +9,7 @@ jobs:
       TZ: UTC
       SAFE_MODE: "1"
       ALLOW_NETWORK: "0"
+      APP_ENV: dev
     # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +38,11 @@ jobs:
       # attestation job below. Historical checked-in evidence remains immutable.
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
-      - run: python tools/evidence/check_hde_epic038_qa_current_state.py
+      - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
+      - name: Check HDE-EPIC038 DEV-01 token matrix
+        run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
+      - name: Run HDE-EPIC038 DEV-01 focused tests
+        run: python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
       - run: python tools/evidence/orientation_demo.py --check
       - name: Run PO-006 token registry validity check + report (gated)
         run: |
@@ -68,6 +73,8 @@ jobs:
             tests/bodygraph/test_ingest.py \
             tests/ops/test_capture_rails_open_scope.py \
             tests/ops/test_http_logging.py
+      - name: Validate governed evidence paths
+        run: python tools/evidence/validate_evidence_paths.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
       - name: Run EPIC021 QA harness entrypoint self-test (closed rails)
@@ -202,6 +209,7 @@ jobs:
       TZ: UTC
       SAFE_MODE: "1"
       ALLOW_NETWORK: "0"
+      APP_ENV: dev
     steps:
       - uses: actions/checkout@v4
         with:
@@ -224,6 +232,7 @@ jobs:
       TZ: UTC
       SAFE_MODE: "1"
       ALLOW_NETWORK: "0"
+      APP_ENV: dev
     steps:
       - uses: actions/checkout@v4
         with:

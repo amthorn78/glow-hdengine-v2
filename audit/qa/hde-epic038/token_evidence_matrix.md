@@ -360,33 +360,33 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `EVIDENCE_INDEX_MIRROR_OK`
 - Acceptance-map token: `EVIDENCE_INDEX_MIRROR_OK`
 - Manifest token: `EVIDENCE_INDEX_MIRROR_OK`
-- Test/stable identifier: `tests/ops/test_evidence_index.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Test/stable identifier: `tools/evidence/update_evidence_index.py; ci/checks/check_mirror_schema.sh; tests/evidence/test_hde_epic038_closeout.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Run python tools/evidence/update_evidence_index.py --check; Run ci/checks/check_mirror_schema.sh`
 - Live QA: `qa-19-po-019`
-- Primary governed evidence: `docs/evidence/INDEX.json`
-- Human Index / Machine Mirror artifact keys: `index.human_index`
+- Primary governed evidence: `docs/evidence/INDEX.json; artifacts/evidence_index.jsonl; audit/qa/hde-epic038/qa_step_logs_manifest.json`
+- Human Index / Machine Mirror artifact keys: `index.human_index; index.machine_mirror; epic038.qa_step_logs_manifest`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `docs/evidence/INDEX.json.path_proof.txt`
-- Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
+- Proof anchors: `docs/evidence/INDEX.json.path_proof.txt; artifacts/evidence_index.jsonl.path_proof.txt; audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`
+- Current posture: UNCLAIMED: the governed Human Index and Machine Mirror currently have equal ordered artifact-key/path topology, and the QA-19 manifest hash-binds their closed-rails integrity check; this is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head updater check and Mirror schema workflow steps succeed, whole-surface Human/Mirror topology remains equal, finalized acceptance outputs derive the result, and independent Gate B records PASS.
 
 ## 24. `EVIDENCE_PATHS_VALIDATED_OK`
 - Canonical governance token: `EVIDENCE_PATHS_VALIDATED_OK`
 - Acceptance-map token: `EVIDENCE_PATHS_VALIDATED_OK`
 - Manifest token: `EVIDENCE_PATHS_VALIDATED_OK`
-- Test/stable identifier: `tests/ops/test_evidence_index.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Test/stable identifier: `tools/evidence/validate_evidence_paths.py; tests/evidence/test_hde_epic038_closeout.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Validate governed evidence paths`
 - Live QA: `qa-19-po-019`
-- Primary governed evidence: `docs/evidence/INDEX.json`
-- Human Index / Machine Mirror artifact keys: `index.human_index`
+- Primary governed evidence: `artifacts/evidence_index.jsonl; audit/qa/hde-epic038/qa_step_logs_manifest.json`
+- Human Index / Machine Mirror artifact keys: `index.machine_mirror; epic038.qa_step_logs_manifest`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `docs/evidence/INDEX.json.path_proof.txt`
-- Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
+- Proof anchors: `artifacts/evidence_index.jsonl.path_proof.txt; audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`
+- Current posture: UNCLAIMED: every current Machine Mirror artifact path resolves inside the repository, and the QA-19 manifest hash-binds the closed-rails path-validator run; this is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head `Validate governed evidence paths` workflow step validates every Machine Mirror path, finalized acceptance outputs derive the result, and independent Gate B records PASS.
 
 ## 25. `DB_RUNTIME_SEARCH_PATH_OK`
 - Canonical governance token: `DB_RUNTIME_SEARCH_PATH_OK`
@@ -456,17 +456,17 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `EVIDENCE_PATH_PROOFS_OK`
 - Acceptance-map token: `EVIDENCE_PATH_PROOFS_OK`
 - Manifest token: `EVIDENCE_PATH_PROOFS_OK`
-- Test/stable identifier: `tests/ops/test_evidence_index.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Test/stable identifier: `ci/checks/check_mirror_schema.sh; tests/evidence/test_hde_epic038_closeout.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Run ci/checks/check_mirror_schema.sh`
 - Live QA: `qa-19-po-019`
-- Primary governed evidence: `docs/evidence/INDEX.json`
-- Human Index / Machine Mirror artifact keys: `index.human_index`
+- Primary governed evidence: `artifacts/evidence_index.jsonl; audit/qa/hde-epic038/qa_step_logs_manifest.json`
+- Human Index / Machine Mirror artifact keys: `index.machine_mirror; epic038.qa_step_logs_manifest`
 - Epic: `epic_id=HDE-EPIC038`
-- Proof anchors: `docs/evidence/INDEX.json.path_proof.txt`
-- Current posture: UNCLAIMED: retained evidence is a binding candidate only; presence or historical PASS text is not acceptance.
+- Proof anchors: `artifacts/evidence_index.jsonl.path_proof.txt; audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt`
+- Current posture: UNCLAIMED: every current Machine Mirror record and declared proof anchor has coherent path/hash/size binding, and the QA-19 manifest hash-binds the closed-rails Mirror schema run; this is not acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after exact-head closed-rails execution, finalized acceptance-map and manifest derivation, and independent Gate B PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head Mirror schema workflow step validates every record and proof anchor, finalized acceptance outputs derive the result, and independent Gate B records PASS.
 
 ## 30. `CI_CHECK_MIRROR_SCHEMA_OK`
 - Canonical governance token: `CI_CHECK_MIRROR_SCHEMA_OK`

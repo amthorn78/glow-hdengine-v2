@@ -20,6 +20,23 @@ from engine.presenter import emitter
 OUTPUT = Path("audit/qa/hde-epic038/token_evidence_matrix.md")
 EPIC_ID = "HDE-EPIC038"
 CI_JOB = "test (.github/workflows/ci.yml)"
+HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
+HUMAN_INDEX_KEY = "index.human_index"
+MACHINE_MIRROR_PATH = "artifacts/evidence_index.jsonl"
+MACHINE_MIRROR_KEY = "index.machine_mirror"
+EVIDENCE_PATH_VALIDATOR_PATH = "tools/evidence/validate_evidence_paths.py"
+MIRROR_SCHEMA_VALIDATOR_PATH = "ci/checks/check_mirror_schema.sh"
+EVIDENCE_INDEX_MIRROR_CI_JOB = (
+    "test (.github/workflows/ci.yml): "
+    "Run python tools/evidence/update_evidence_index.py --check; "
+    "Run ci/checks/check_mirror_schema.sh"
+)
+EVIDENCE_PATHS_CI_JOB = (
+    "test (.github/workflows/ci.yml): Validate governed evidence paths"
+)
+EVIDENCE_PATH_PROOFS_CI_JOB = (
+    "test (.github/workflows/ci.yml): Run ci/checks/check_mirror_schema.sh"
+)
 RELEASE_CI_JOB = (
     "sanity-pipeline (.github/workflows/ci.yml): "
     "Build PR-06R-B release attestation outside the source tree; "
@@ -102,6 +119,8 @@ FINAL_LF_CHECK_ID = "qa-19-po-019"
 FINAL_LF_LOG_PATH = (
     "audit/qa/hde-epic038/checks/qa-19-po-019/primary.log"
 )
+EVIDENCE_INTEGRITY_CHECK_ID = "qa-19-po-019"
+EVIDENCE_INTEGRITY_LOG_PATH = FINAL_LF_LOG_PATH
 FINAL_LF_SCRIPT_PATH = "ci/checks/check_final_lf.sh"
 FINAL_LF_REQUIRED_PATHS = (
     "docs/evidence/INDEX.json",
@@ -329,23 +348,122 @@ def build_rows() -> tuple[Row, ...]:
         "epic038.pr02.a7_env_gate",
     )
     bind(
-        (
-            "EVIDENCE_INDEX_UPDATED_OK",
-            "EVIDENCE_INDEX_MIRROR_OK",
-            "EVIDENCE_PATHS_VALIDATED_OK",
-            "EVIDENCE_PATH_PROOFS_OK",
-        ),
+        ("EVIDENCE_INDEX_UPDATED_OK",),
         "tests/ops/test_evidence_index.py",
         "qa-19-po-019",
-        "docs/evidence/INDEX.json",
-        "index.human_index",
+        HUMAN_INDEX_PATH,
+        HUMAN_INDEX_KEY,
     )
     bind(
         ("MACHINE_MIRROR_UPDATED_OK", "CI_CHECK_MIRROR_SCHEMA_OK"),
         "tests/ops/test_evidence_index.py",
         "qa-19-po-019",
-        "artifacts/evidence_index.jsonl",
-        "index.machine_mirror",
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    index_mirror = _row(
+        "EVIDENCE_INDEX_MIRROR_OK",
+        (
+            "tools/evidence/update_evidence_index.py; "
+            "ci/checks/check_mirror_schema.sh; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        HUMAN_INDEX_PATH,
+        HUMAN_INDEX_KEY,
+    )
+    rows[index_mirror.token] = replace(
+        index_mirror,
+        ci_binding=EVIDENCE_INDEX_MIRROR_CI_JOB,
+        primary_evidence=(
+            HUMAN_INDEX_PATH,
+            MACHINE_MIRROR_PATH,
+            QA_MANIFEST_PATH,
+        ),
+        artifact_keys=(
+            HUMAN_INDEX_KEY,
+            MACHINE_MIRROR_KEY,
+            QA_MANIFEST_KEY,
+        ),
+        proof_anchors=(
+            f"{HUMAN_INDEX_PATH}.path_proof.txt",
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: the governed Human Index and Machine Mirror currently "
+            "have equal ordered artifact-key/path topology, and the QA-19 "
+            "manifest hash-binds their closed-rails integrity check; this is "
+            "not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head updater "
+            "check and Mirror schema workflow steps succeed, whole-surface "
+            "Human/Mirror topology remains equal, finalized acceptance outputs "
+            "derive the result, and independent Gate B records PASS."
+        ),
+    )
+    paths_validated = _row(
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        (
+            f"{EVIDENCE_PATH_VALIDATOR_PATH}; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    rows[paths_validated.token] = replace(
+        paths_validated,
+        ci_binding=EVIDENCE_PATHS_CI_JOB,
+        primary_evidence=(MACHINE_MIRROR_PATH, QA_MANIFEST_PATH),
+        artifact_keys=(MACHINE_MIRROR_KEY, QA_MANIFEST_KEY),
+        proof_anchors=(
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: every current Machine Mirror artifact path resolves "
+            "inside the repository, and the QA-19 manifest hash-binds the "
+            "closed-rails path-validator run; this is not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head "
+            "`Validate governed evidence paths` workflow step validates every "
+            "Machine Mirror path, finalized acceptance outputs derive the "
+            "result, and independent Gate B records PASS."
+        ),
+    )
+    path_proofs = _row(
+        "EVIDENCE_PATH_PROOFS_OK",
+        (
+            f"{MIRROR_SCHEMA_VALIDATOR_PATH}; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        EVIDENCE_INTEGRITY_CHECK_ID,
+        MACHINE_MIRROR_PATH,
+        MACHINE_MIRROR_KEY,
+    )
+    rows[path_proofs.token] = replace(
+        path_proofs,
+        ci_binding=EVIDENCE_PATH_PROOFS_CI_JOB,
+        primary_evidence=(MACHINE_MIRROR_PATH, QA_MANIFEST_PATH),
+        artifact_keys=(MACHINE_MIRROR_KEY, QA_MANIFEST_KEY),
+        proof_anchors=(
+            f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+            f"{QA_MANIFEST_PATH}.path_proof.txt",
+        ),
+        posture=(
+            "UNCLAIMED: every current Machine Mirror record and declared proof "
+            "anchor has coherent path/hash/size binding, and the QA-19 manifest "
+            "hash-binds the closed-rails Mirror schema run; this is not acceptance."
+        ),
+        future_claim=(
+            "Future status may become CLAIMED only after the exact-head Mirror "
+            "schema workflow step validates every record and proof anchor, "
+            "finalized acceptance outputs derive the result, and independent "
+            "Gate B records PASS."
+        ),
     )
     bind(
         ("EVIDENCE_INDEX_HASH_OK",),
@@ -452,20 +570,180 @@ def build_rows() -> tuple[Row, ...]:
     return tuple(rows[token] for token in TOKENS)
 
 
-def _mirror_records() -> set[tuple[str, str, str]]:
-    records = set()
-    for line in (
-        ROOT / "artifacts/evidence_index.jsonl"
-    ).read_text(encoding="utf-8").splitlines():
+def _human_items() -> tuple[Mapping[str, object], ...]:
+    payload = json.loads((ROOT / HUMAN_INDEX_PATH).read_text(encoding="utf-8"))
+    if not isinstance(payload, list) or not payload:
+        raise ValueError("Human Index shape mismatch")
+    if any(not isinstance(item, dict) for item in payload):
+        raise ValueError("Human Index record shape mismatch")
+    return tuple(payload)
+
+
+def _mirror_items() -> tuple[Mapping[str, object], ...]:
+    items: list[Mapping[str, object]] = []
+    for line_number, line in enumerate(
+        (ROOT / MACHINE_MIRROR_PATH).read_text(encoding="utf-8").splitlines(),
+        1,
+    ):
+        if not line:
+            raise ValueError(f"Machine Mirror empty line: {line_number}")
         item = json.loads(line)
-        records.add(
-            (
-                item["artifact_key"],
-                item["discovered_physical_path"],
-                item["proof_anchor"],
-            )
+        if not isinstance(item, dict):
+            raise ValueError(f"Machine Mirror record shape mismatch: {line_number}")
+        items.append(item)
+    if not items:
+        raise ValueError("Machine Mirror shape mismatch")
+    return tuple(items)
+
+
+def _record_text(
+    item: Mapping[str, object],
+    field: str,
+    surface: str,
+) -> str:
+    value = item.get(field)
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{surface} field mismatch: {field}")
+    return value
+
+
+def _mirror_records() -> set[tuple[str, str, str]]:
+    return {
+        (
+            _record_text(item, "artifact_key", "Machine Mirror"),
+            _record_text(item, "discovered_physical_path", "Machine Mirror"),
+            _record_text(item, "proof_anchor", "Machine Mirror"),
         )
-    return records
+        for item in _mirror_items()
+    }
+
+
+def validate_index_mirror_topology(
+    human_items: Iterable[Mapping[str, object]] | None = None,
+    mirror_items: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    human = tuple(_human_items() if human_items is None else human_items)
+    mirror = tuple(_mirror_items() if mirror_items is None else mirror_items)
+    if not human or not mirror:
+        raise ValueError("evidence index/mirror topology empty")
+
+    def pairs(
+        items: tuple[Mapping[str, object], ...],
+        surface: str,
+    ) -> tuple[tuple[str, str], ...]:
+        result = tuple(
+            (
+                _record_text(item, "artifact_key", surface),
+                _record_text(item, "discovered_physical_path", surface),
+            )
+            for item in items
+        )
+        if len(result) != len(set(result)):
+            raise ValueError(f"evidence index/mirror duplicate pair: {surface}")
+        return result
+
+    human_pairs = pairs(human, "Human Index")
+    mirror_pairs = pairs(mirror, "Machine Mirror")
+    if human_pairs != mirror_pairs:
+        raise ValueError("evidence index/mirror topology mismatch")
+
+
+def _resolved_repo_file(raw_path: str, surface: str) -> Path:
+    candidate = Path(raw_path)
+    if candidate.is_absolute():
+        raise ValueError(f"{surface} absolute path: {raw_path}")
+    if ".." in candidate.parts:
+        raise ValueError(f"{surface} path traversal: {raw_path}")
+    root = ROOT.resolve()
+    resolved = (ROOT / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"{surface} path outside repository: {raw_path}") from exc
+    if not resolved.is_file():
+        raise ValueError(f"{surface} missing file: {raw_path}")
+    return resolved
+
+
+def validate_mirror_paths(
+    records: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    items = tuple(_mirror_items() if records is None else records)
+    if not items:
+        raise ValueError("Machine Mirror path roster empty")
+    for item in items:
+        path = _record_text(
+            item,
+            "discovered_physical_path",
+            "Machine Mirror",
+        )
+        _resolved_repo_file(path, "Machine Mirror artifact")
+
+
+def _mirror_body_sha256() -> str:
+    lines = (
+        ROOT / MACHINE_MIRROR_PATH
+    ).read_text(encoding="utf-8").splitlines(keepends=True)
+    body: list[str] = []
+    self_count = 0
+    for line in lines:
+        item = json.loads(line)
+        if (
+            item.get("artifact_key") == MACHINE_MIRROR_KEY
+            and item.get("discovered_physical_path") == MACHINE_MIRROR_PATH
+        ):
+            self_count += 1
+        else:
+            body.append(line)
+    if self_count != 1:
+        raise ValueError(f"Machine Mirror self-record count mismatch: {self_count}")
+    return hashlib.sha256("".join(body).encode("utf-8")).hexdigest()
+
+
+def validate_all_mirror_proofs(
+    records: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    items = tuple(_mirror_items() if records is None else records)
+    validate_mirror_paths(items)
+    pairs: set[tuple[str, str]] = set()
+    self_records = 0
+    mirror_body_sha256 = _mirror_body_sha256()
+    for item in items:
+        key = _record_text(item, "artifact_key", "Machine Mirror")
+        primary = _record_text(
+            item,
+            "discovered_physical_path",
+            "Machine Mirror",
+        )
+        proof = _record_text(item, "proof_anchor", "Machine Mirror")
+        pair = (key, primary)
+        if pair in pairs:
+            raise ValueError(f"Machine Mirror duplicate pair: {key} -> {primary}")
+        pairs.add(pair)
+        if not proof.endswith(".path_proof.txt"):
+            raise ValueError(f"Machine Mirror proof suffix mismatch: {proof}")
+        primary_path = _resolved_repo_file(
+            primary,
+            "Machine Mirror artifact",
+        )
+        _resolved_repo_file(proof, "Machine Mirror proof")
+        _validate_proof(primary, proof)
+        body = primary_path.read_bytes()
+        expected_sha256 = hashlib.sha256(body).hexdigest()
+        if primary == MACHINE_MIRROR_PATH:
+            self_records += 1
+            expected_sha256 = mirror_body_sha256
+            if item.get("role") != "self_record":
+                raise ValueError("Machine Mirror self-record role mismatch")
+        if (
+            item.get("sha256") != expected_sha256
+            or item.get("size_bytes") != len(body)
+        ):
+            raise ValueError(f"Machine Mirror record binding mismatch: {primary}")
+    if self_records != 1:
+        raise ValueError(
+            f"Machine Mirror self-record count mismatch: {self_records}"
+        )
 
 
 def _proof_fields(path: Path) -> dict[str, str]:
@@ -697,6 +975,56 @@ def validate_final_lf_evidence(
         raise ValueError("final-LF execution predicate mismatch")
 
 
+def validate_integrity_qa19_evidence(
+    manifest: Mapping[str, object],
+    log_text: str,
+) -> None:
+    record = manifest.get(EVIDENCE_INTEGRITY_CHECK_ID)
+    if not isinstance(record, dict):
+        raise ValueError("evidence-integrity QA manifest record missing")
+    log_bytes = log_text.encode("utf-8")
+    if (
+        record.get("log_path") != "checks/qa-19-po-019/primary.log"
+        or record.get("status") != "PASS"
+        or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
+        or record.get("size_bytes") != len(log_bytes)
+    ):
+        raise ValueError("evidence-integrity QA manifest binding mismatch")
+    lines = log_text.splitlines()
+    if not lines:
+        raise ValueError("evidence-integrity execution log missing")
+    try:
+        header = json.loads(lines[0])
+    except json.JSONDecodeError as exc:
+        raise ValueError("evidence-integrity execution header invalid") from exc
+    command = header.get("command") if isinstance(header, dict) else None
+    required_commands = (
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/validate_evidence_paths.py",
+        "python ci/checks/check_mirror_schema.sh",
+    )
+    required_rails = {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC",
+    }
+    if (
+        not isinstance(command, str)
+        or any(required not in command for required in required_commands)
+        or header.get("check_id") != EVIDENCE_INTEGRITY_CHECK_ID
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or header.get("captured_env") != required_rails
+        or header.get("intended_tokens") != []
+        or header.get("claimed_tokens") != []
+        or "BEHAVIOR_EXIT_CODE=0" not in lines
+    ):
+        raise ValueError("evidence-integrity execution predicate mismatch")
+
+
 def _shell_array(script_text: str, name: str) -> tuple[str, ...]:
     lines = script_text.splitlines()
     try:
@@ -732,7 +1060,88 @@ def validate_final_lf_script(script_text: str) -> None:
 
 
 def _validate_special_semantics(row: Row) -> None:
-    if row.token in {
+    if row.token == "EVIDENCE_INDEX_MIRROR_OK":
+        if (
+            row.primary_evidence
+            != (
+                HUMAN_INDEX_PATH,
+                MACHINE_MIRROR_PATH,
+                QA_MANIFEST_PATH,
+            )
+            or row.artifact_keys
+            != (
+                HUMAN_INDEX_KEY,
+                MACHINE_MIRROR_KEY,
+                QA_MANIFEST_KEY,
+            )
+            or row.proof_anchors
+            != (
+                f"{HUMAN_INDEX_PATH}.path_proof.txt",
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                "tools/evidence/update_evidence_index.py",
+                MIRROR_SCHEMA_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_INDEX_MIRROR_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence index/mirror binding mismatch")
+        validate_index_mirror_topology()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token == "EVIDENCE_PATHS_VALIDATED_OK":
+        if (
+            row.primary_evidence != (MACHINE_MIRROR_PATH, QA_MANIFEST_PATH)
+            or row.artifact_keys != (MACHINE_MIRROR_KEY, QA_MANIFEST_KEY)
+            or row.proof_anchors
+            != (
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                EVIDENCE_PATH_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_PATHS_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence path-validation binding mismatch")
+        validate_mirror_paths()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token == "EVIDENCE_PATH_PROOFS_OK":
+        if (
+            row.primary_evidence != (MACHINE_MIRROR_PATH, QA_MANIFEST_PATH)
+            or row.artifact_keys != (MACHINE_MIRROR_KEY, QA_MANIFEST_KEY)
+            or row.proof_anchors
+            != (
+                f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+                f"{QA_MANIFEST_PATH}.path_proof.txt",
+            )
+            or set(row.test_binding.split("; "))
+            != {
+                MIRROR_SCHEMA_VALIDATOR_PATH,
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != EVIDENCE_PATH_PROOFS_CI_JOB
+            or row.live_qa != EVIDENCE_INTEGRITY_CHECK_ID
+        ):
+            raise ValueError("evidence path-proof binding mismatch")
+        validate_all_mirror_proofs()
+        validate_integrity_qa19_evidence(
+            json.loads((ROOT / QA_MANIFEST_PATH).read_text(encoding="utf-8")),
+            (ROOT / EVIDENCE_INTEGRITY_LOG_PATH).read_text(encoding="utf-8"),
+        )
+    elif row.token in {
         "DB_RUNTIME_SEARCH_PATH_OK",
         "DB_ROLE_OK",
         "DB_SCHEMA_FINGERPRINT_OK",
