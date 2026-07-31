@@ -14,6 +14,33 @@ from tools.evidence import generate_hde_epic038_closeout as closeout
 from tools.evidence import update_evidence_index as updater
 
 ROOT = Path(__file__).resolve().parents[2]
+EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python tools/evidence/generate_hde_epic038_closeout.py"
+)
+EXPECTED_PLAN_CLOSEOUT_CHECK_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python tools/evidence/generate_hde_epic038_closeout.py --check"
+)
+EXPECTED_PLANNED_CI_BINDING = (
+    "test (.github/workflows/ci.yml); planned commands: "
+    "python tools/evidence/check_hde_epic038_qa_current_state.py "
+    "--require-finalized; "
+    "python tools/evidence/generate_hde_epic038_closeout.py --check; "
+    "python -m pytest -q tests/evidence/test_hde_epic038_closeout.py"
+)
+EXPECTED_CHECKLIST_BINDINGS = {
+    "QA_PRECOMMIT_CHECKLIST_OK": (
+        "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
+        "epic038.qa_precommit_checklist",
+        "DEV-03",
+    ),
+    "QA_POSTCOMMIT_CHECKLIST_OK": (
+        "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
+        "epic038.qa_postcommit_checklist",
+        "DEV-03",
+    ),
+}
 
 
 def test_roster_is_exact_unique_and_ordered() -> None:
@@ -158,9 +185,13 @@ def test_generic_affirmative_claim_language_fails_closed(
         closeout.validate_rows(closeout.build_rows())
 
 
-@pytest.mark.parametrize("row_index", [0, 7], ids=["planned-new", "existing-reused"])
+@pytest.mark.parametrize(
+    "row_index,match",
+    [(0, "inexact planned command"), (7, "independent row contract drift")],
+    ids=["planned-new", "existing-reused"],
+)
 def test_generic_claim_in_other_rendered_field_fails_closed(
-    monkeypatch, row_index
+    monkeypatch, row_index, match
 ) -> None:
     rows = closeout.build_rows()
     row = rows[row_index]
@@ -172,7 +203,7 @@ def test_generic_claim_in_other_rendered_field_fails_closed(
     )
     changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
     monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
-    with pytest.raises(ValueError, match="independent row contract drift"):
+    with pytest.raises(ValueError, match=match):
         closeout.validate_rows(closeout.build_rows())
 
 
@@ -515,16 +546,125 @@ def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:
         "epic038.qa_postcommit_checklist",
         "DEV-03",
     )
+    assert (
+        closeout.PLAN_CLOSEOUT_WRITE_COMMAND
+        == EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND
+    )
+    assert (
+        closeout.PLAN_CLOSEOUT_CHECK_COMMAND
+        == EXPECTED_PLAN_CLOSEOUT_CHECK_COMMAND
+    )
+    assert closeout.PLANNED_CI_BINDING == EXPECTED_PLANNED_CI_BINDING
+    assert {
+        token: closeout.PLANNED_BINDINGS[token]
+        for token in EXPECTED_CHECKLIST_BINDINGS
+    } == EXPECTED_CHECKLIST_BINDINGS
     for token in ("QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"):
         row = rows[token]
+        path, key, owner = EXPECTED_CHECKLIST_BINDINGS[token]
+        expected_future_claim = (
+            "Future status may become CLAIMED only after DEV-02 implements "
+            "the plan-authorized deterministic default write invocation "
+            f"`{EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND}` and read-only check "
+            f"invocation `{EXPECTED_PLAN_CLOSEOUT_CHECK_COMMAND}`, then "
+            f"{owner} produces `{path}`, registers exact key `{key}` and its "
+            "updater-owned proof, the planned exact-head `test` job commands "
+            "succeed, and independent Gate B records PASS."
+        )
         assert set(row.test_binding.split("; ")) == {
             "tools/evidence/generate_hde_epic038_closeout.py",
             "tests/evidence/test_hde_epic038_closeout.py",
         }
-        assert "DEV-02 implements deterministic `--closeout` production" in (
-            row.future_claim
-        )
-        assert "read-only `--check`" in row.future_claim
+        assert row.ci_binding == EXPECTED_PLANNED_CI_BINDING
+        assert row.future_claim == expected_future_claim
+        assert "--closeout" not in row.future_claim
+
+
+@pytest.mark.parametrize(
+    "token",
+    ("QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"),
+)
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        pytest.param(
+            lambda text: text.replace(
+                f"`{EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND}`",
+                f"`{EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND} --closeout`",
+            ),
+            id="unapproved-closeout-mode",
+        ),
+        pytest.param(
+            lambda text: text.replace(
+                f"`{EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND}`",
+                "`python tools/evidence/generate_hde_epic038_closeout.py`",
+            ),
+            id="write-command-missing-rails",
+        ),
+        pytest.param(
+            lambda text: text.replace(
+                f"`{EXPECTED_PLAN_CLOSEOUT_CHECK_COMMAND}`",
+                (
+                    "`SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C "
+                    "TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py "
+                    "--check-token-matrix`"
+                ),
+            ),
+            id="wrong-read-only-mode",
+        ),
+        pytest.param(
+            lambda text: text.replace(
+                "read-only check invocation",
+                "check invocation",
+            ),
+            id="missing-read-only-contract",
+        ),
+        pytest.param(
+            lambda text: text.replace(
+                "plan-authorized deterministic default write invocation",
+                "read-only check invocation",
+            ),
+            id="swapped-write-label",
+        ),
+        pytest.param(
+            lambda text: f"{text} The future mode is `--closeout`.",
+            id="appended-unapproved-mode",
+        ),
+        pytest.param(
+            lambda text: f"{text} The future mode is `--future-write`.",
+            id="appended-extra-mode",
+        ),
+    ],
+)
+def test_checklist_rows_reject_inexact_future_command_contract(
+    token, mutation
+) -> None:
+    row = next(row for row in closeout.build_rows() if row.token == token)
+    changed = replace(row, future_claim=mutation(row.future_claim))
+    assert changed.future_claim != row.future_claim
+    with pytest.raises(ValueError, match="checklist planned binding mismatch"):
+        closeout._validate_special_semantics(changed)
+    rows = closeout.build_rows()
+    index = next(index for index, row in enumerate(rows) if row.token == token)
+    with pytest.raises(ValueError):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+
+
+@pytest.mark.parametrize(
+    "token",
+    ("TESTS_PASS_OK", "QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"),
+)
+def test_planned_rows_reject_appended_write_command_in_ci_binding(token) -> None:
+    rows = closeout.build_rows()
+    index = next(index for index, row in enumerate(rows) if row.token == token)
+    changed = replace(
+        rows[index],
+        ci_binding=(
+            f"{rows[index].ci_binding}; {EXPECTED_PLAN_CLOSEOUT_WRITE_COMMAND}"
+        ),
+    )
+    with pytest.raises(ValueError, match="inexact planned command"):
+        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_rejects_inexact_planned_binding() -> None:

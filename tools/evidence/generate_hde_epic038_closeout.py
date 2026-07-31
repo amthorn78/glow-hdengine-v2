@@ -25,7 +25,7 @@ FUTURE_CLAIM_PREFIXES = (
     "Future status may become CLAIMED only when ",
 )
 ROW_CONTRACT_SHA256 = (
-    "3b453a15859cd5071761067a227272770cc9f12518a9e0ef2e43478698bbbab0"
+    "b00f426507baddb12779897eab75b1aa48ea43aec96ebdaba7f874c9baf22419"
 )
 CI_JOB = "test (.github/workflows/ci.yml)"
 HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
@@ -63,6 +63,12 @@ PLANNED_COMMANDS = (
     "python tools/evidence/generate_hde_epic038_closeout.py --check; "
     "python -m pytest -q tests/evidence/test_hde_epic038_closeout.py"
 )
+PLANNED_CI_BINDING = f"{CI_JOB}; planned commands: {PLANNED_COMMANDS}"
+PLAN_CLOSEOUT_WRITE_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python tools/evidence/generate_hde_epic038_closeout.py"
+)
+PLAN_CLOSEOUT_CHECK_COMMAND = f"{PLAN_CLOSEOUT_WRITE_COMMAND} --check"
 TOKENS = (
     "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK", "EVIDENCE_INDEX_UPDATED_OK",
     "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK",
@@ -94,8 +100,8 @@ NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
     "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
-    "QA_PRECOMMIT_CHECKLIST_OK": "8a361aa5a6549a69c91171f4aeba2b78702b3d025486984ca1c43afde0179f72",
-    "QA_POSTCOMMIT_CHECKLIST_OK": "15026253bdc47e05cae46f0abad1fbe35527dded6d112e9343bb8a4aba43f271",
+    "QA_PRECOMMIT_CHECKLIST_OK": "2d4d18c138e01d3616df8ab01d5009d9a30b76aff5d6335eed1c193338678426",
+    "QA_POSTCOMMIT_CHECKLIST_OK": "e36486d4c1b7d35f3d2904d4c082955e11c44ab5972cd58fb552056638d16ebd",
     "ENV_RAILS_POLICY_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "PREIMAGE_RECOMPUTE_OK": "a82f1ccfa039a408ac8d3b84f46eb7d850f554dbf49b938056cafaa22fa3472d",
     "CLI_READER_PARITY_OK": "c19b41956747816771a6ec95fc95c070a2e4e2c9d8afd4e8241ba6855c921682",
@@ -627,6 +633,18 @@ def _doc_delta_row() -> Row:
     )
 
 
+def _checklist_future_claim(path: str, key: str, owner: str) -> str:
+    return (
+        "Future status may become CLAIMED only after DEV-02 implements "
+        "the plan-authorized deterministic default write invocation "
+        f"`{PLAN_CLOSEOUT_WRITE_COMMAND}` and read-only check invocation "
+        f"`{PLAN_CLOSEOUT_CHECK_COMMAND}`, then "
+        f"{owner} produces `{path}`, registers exact key `{key}` and its "
+        "updater-owned proof, the planned exact-head `test` job commands "
+        "succeed, and independent Gate B records PASS."
+    )
+
+
 def build_rows() -> tuple[Row, ...]:
     default = (
         "tests/evidence/test_hde_epic038_release_sanity.py",
@@ -949,7 +967,7 @@ def build_rows() -> tuple[Row, ...]:
         rows[token] = replace(
             row,
             test_binding="tests/evidence/test_hde_epic038_closeout.py",
-            ci_binding=f"{CI_JOB}; planned commands: {PLANNED_COMMANDS}",
+            ci_binding=PLANNED_CI_BINDING,
             live_qa=(
                 "N/A: the planned closeout artifact is repository-local DEV "
                 "evidence and no Live QA execution is authorized."
@@ -978,14 +996,7 @@ def build_rows() -> tuple[Row, ...]:
                 "tools/evidence/generate_hde_epic038_closeout.py; "
                 "tests/evidence/test_hde_epic038_closeout.py"
             ),
-            future_claim=(
-                "Future status may become CLAIMED only after DEV-02 implements "
-                "deterministic `--closeout` production and read-only `--check` in "
-                "`tools/evidence/generate_hde_epic038_closeout.py`, then "
-                f"{owner} produces `{path}`, registers exact key `{key}` and its "
-                "updater-owned proof, the planned exact-head `test` job commands "
-                "succeed, and independent Gate B records PASS."
-            ),
+            future_claim=_checklist_future_claim(path, key, owner),
         )
     return tuple(rows[token] for token in TOKENS)
 
@@ -1635,6 +1646,7 @@ def _validate_special_semantics(row: Row) -> None:
         "QA_PRECOMMIT_CHECKLIST_OK",
         "QA_POSTCOMMIT_CHECKLIST_OK",
     }:
+        path, key, owner = PLANNED_BINDINGS[row.token]
         if (
             row.test_binding
             != (
@@ -1643,9 +1655,8 @@ def _validate_special_semantics(row: Row) -> None:
             )
             or row.owner_task != "DEV-03"
             or row.classification != "planned-new"
-            or "DEV-02 implements deterministic `--closeout` production"
-            not in row.future_claim
-            or "read-only `--check`" not in row.future_claim
+            or row.future_claim != _checklist_future_claim(path, key, owner)
+            or "--closeout" in row.future_claim
         ):
             raise ValueError(f"checklist planned binding mismatch: {row.token}")
     elif row.token == "RELEASE_ID_RECOMPUTE_OK":
@@ -1866,7 +1877,7 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
                     )
             if key not in PLANNED_KEYS or key in current_keys:
                 raise ValueError(f"invalid planned artifact key: {row.token}: {key}")
-            if PLANNED_COMMANDS not in row.ci_binding:
+            if row.ci_binding != PLANNED_CI_BINDING:
                 raise ValueError(f"inexact planned command: {row.token}")
             if "UNCLAIMED" not in row.posture or "has not been executed" not in row.posture:
                 raise ValueError(f"planned evidence claim: {row.token}")
