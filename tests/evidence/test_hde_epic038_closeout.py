@@ -41,6 +41,41 @@ EXPECTED_CHECKLIST_BINDINGS = {
         "DEV-03",
     ),
 }
+EXPECTED_DOC_DELTA_BYTES = (
+    b"# HDE-EPIC038 QA Doc Deltas\n"
+    b"\n"
+    b"## SURFACE BINDING\n"
+    b"- Draft/staging surface (primary token-evidence binding): "
+    b"`audit/docdeltas/hde-epic038_doc_deltas.md`\n"
+    b"- Epic-scoped capture surface (stable QA record): "
+    b"`audit/qa/hde-epic038/00_meta/doc_deltas.md`\n"
+    b"\n"
+    b"## BLOCKERS\n"
+    b"- None identified by Step-0 route discovery.\n"
+    b"\n"
+    b"## CAVEATS\n"
+    b"- DOC-CAVEAT-001: Implementation, repository, release, and operational "
+    b"evidence do not independently establish Live QA acceptance or epic "
+    b"closeout.\n"
+)
+EXPECTED_DOC_DELTA_INDEX_ROLES = {
+    "epic038.doc_deltas": (
+        "audit/docdeltas/hde-epic038_doc_deltas.md",
+        "epic038_doc_delta",
+        (
+            "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; governed "
+            "presence is nonclaiming"
+        ),
+    ),
+    "epic038.qa_meta_doc_deltas": (
+        "audit/qa/hde-epic038/00_meta/doc_deltas.md",
+        "epic038_doc_delta_capture",
+        (
+            "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not the "
+            "primary token surface and not a token claim"
+        ),
+    ),
+}
 
 
 def test_roster_is_exact_unique_and_ordered() -> None:
@@ -728,7 +763,18 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
     assert capture_path in row.posture
     assert capture_key in row.posture
     assert producer_log in row.posture
+    assert "explicitly names the staging path" in row.posture
+    assert "original mechanical Step-0 creation/discovery provenance" in row.posture
+    assert "pair-identity check" in row.future_claim
+    assert "rather than substitute for those semantics" in row.future_claim
     assert row.live_qa == producer_check
+
+    primary = (ROOT / primary_path).read_bytes()
+    capture = (ROOT / capture_path).read_bytes()
+    assert primary == capture == EXPECTED_DOC_DELTA_BYTES
+    closeout.validate_doc_delta_surface(primary, surface="staging")
+    closeout.validate_doc_delta_surface(capture, surface="capture")
+    closeout.validate_doc_delta_pair_identity(primary, capture)
 
     records = closeout._mirror_records()
     assert (
@@ -741,7 +787,164 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
         capture_path,
         f"{capture_path}.path_proof.txt",
     ) in records
+    for items, is_mirror in (
+        (closeout._human_items(), False),
+        (closeout._mirror_items(), True),
+    ):
+        for key, (path, record_type, notes) in EXPECTED_DOC_DELTA_INDEX_ROLES.items():
+            record = next(item for item in items if item.get("artifact_key") == key)
+            assert record["discovered_physical_path"] == path
+            assert record["epic_id"] == "HDE-EPIC038"
+            assert record["record_type"] == record_type
+            assert record["schema_version"] == "1.0"
+            assert record["notes"] == notes
+            if is_mirror:
+                assert record["role"] == "snapshot"
+                assert record["proof_anchor"] == f"{path}.path_proof.txt"
     closeout.validate_doc_delta_evidence()
+
+
+def test_doc_delta_semantics_do_not_use_pair_identity_as_a_substitute() -> None:
+    primary = EXPECTED_DOC_DELTA_BYTES
+    # An extra blank line changes bytes without changing any governed semantic
+    # line. The PF04/PF27 layer accepts both surfaces independently.
+    capture = primary.replace(b"\n## BLOCKERS", b"\n\n## BLOCKERS", 1)
+    assert capture != primary
+    closeout.validate_doc_delta_semantics(primary, surface="staging")
+    closeout.validate_doc_delta_semantics(capture, surface="capture")
+    closeout.validate_doc_delta_surface(primary, surface="staging")
+    with pytest.raises(ValueError, match="capture canonical layout mismatch"):
+        closeout.validate_doc_delta_surface(capture, surface="capture")
+    with pytest.raises(ValueError, match="QA-plan pair identity mismatch"):
+        closeout.validate_doc_delta_pair_identity(primary, capture)
+    with pytest.raises(ValueError, match="capture canonical layout mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=primary,
+            capture_bytes=capture,
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda data: data.replace(
+            b"- Draft/staging surface (primary token-evidence binding): "
+            b"`audit/docdeltas/hde-epic038_doc_deltas.md`\n",
+            b"",
+        ),
+        lambda data: data.replace(
+            b"audit/docdeltas/hde-epic038_doc_deltas.md",
+            b"audit/docdeltas/wrong.md",
+        ),
+        lambda data: data.replace(
+            b"audit/docdeltas/hde-epic038_doc_deltas.md",
+            b"__STAGING_PATH__",
+        )
+        .replace(
+            b"audit/qa/hde-epic038/00_meta/doc_deltas.md",
+            b"audit/docdeltas/hde-epic038_doc_deltas.md",
+        )
+        .replace(
+            b"__STAGING_PATH__",
+            b"audit/qa/hde-epic038/00_meta/doc_deltas.md",
+        ),
+        lambda data: data.replace(b"## BLOCKERS\n", b""),
+        lambda data: data.replace(b"## CAVEATS\n", b""),
+        lambda data: data.replace(
+            b"- DOC-CAVEAT-001: Implementation, repository, release, and "
+            b"operational evidence do not independently establish Live QA "
+            b"acceptance or epic closeout.\n",
+            b"",
+        ),
+        lambda data: data.replace(
+            b"## BLOCKERS\n",
+            b"## BLOCKERS\n## SURFACE BINDING\n",
+        ),
+        lambda data: data.replace(
+            b"- Draft/staging surface (primary token-evidence binding): "
+            b"`audit/docdeltas/hde-epic038_doc_deltas.md`\n",
+            b"- Draft/staging surface (primary token-evidence binding): "
+            b"`audit/docdeltas/hde-epic038_doc_deltas.md`\n"
+            b"- Draft/staging surface (primary token-evidence binding): "
+            b"`audit/docdeltas/hde-epic038_doc_deltas.md`\n",
+        ),
+    ],
+    ids=(
+        "missing-staging-reference",
+        "wrong-staging-reference",
+        "reversed-roles",
+        "missing-blockers-section",
+        "missing-caveats-section",
+        "missing-stable-caveat",
+        "duplicate-binding",
+        "duplicate-staging-reference",
+    ),
+)
+def test_doc_delta_identical_semantic_defects_fail_closed(mutation) -> None:
+    deficient = mutation(EXPECTED_DOC_DELTA_BYTES)
+    assert deficient != EXPECTED_DOC_DELTA_BYTES
+    # Equality alone is intentionally insufficient: both deficient inputs fail
+    # before the separate r7/PF19 pair-identity predicate is considered.
+    with pytest.raises(ValueError, match="staging semantic contract mismatch"):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=deficient,
+            capture_bytes=deficient,
+        )
+    with pytest.raises(ValueError, match="capture semantic contract mismatch"):
+        closeout.validate_doc_delta_surface(deficient, surface="capture")
+
+
+@pytest.mark.parametrize(
+    "deficient",
+    [
+        EXPECTED_DOC_DELTA_BYTES.removesuffix(b"\n"),
+        b"\xef\xbb\xbf" + EXPECTED_DOC_DELTA_BYTES,
+        EXPECTED_DOC_DELTA_BYTES.replace(b"\n", b"\r\n"),
+        EXPECTED_DOC_DELTA_BYTES + b"\xff",
+    ],
+    ids=("missing-final-lf", "utf8-bom", "crlf", "invalid-utf8"),
+)
+def test_doc_delta_encoding_and_lf_contract_fails_closed(deficient) -> None:
+    with pytest.raises(ValueError, match="capture semantic contract mismatch"):
+        closeout.validate_doc_delta_surface(deficient, surface="capture")
+
+
+@pytest.mark.parametrize(
+    "deficient,match",
+    [
+        (
+            EXPECTED_DOC_DELTA_BYTES.replace(
+                b"\n## BLOCKERS", b"\n\n## BLOCKERS", 1
+            ),
+            "staging canonical layout mismatch",
+        ),
+        (
+            EXPECTED_DOC_DELTA_BYTES.replace(
+                b"## BLOCKERS", "## BLOCKERS\u2028".encode("utf-8"), 1
+            ),
+            "staging semantic contract mismatch",
+        ),
+        (
+            EXPECTED_DOC_DELTA_BYTES.replace(
+                b"## BLOCKERS", b"## BLOCKERS\x0b", 1
+            ),
+            "staging semantic contract mismatch",
+        ),
+        (
+            EXPECTED_DOC_DELTA_BYTES.replace(
+                b"## BLOCKERS", b"## BLOCKERS\x0c", 1
+            ),
+            "staging semantic contract mismatch",
+        ),
+    ],
+    ids=("extra-blank-line", "unicode-line-separator", "vertical-tab", "form-feed"),
+)
+def test_doc_delta_equal_noncanonical_pair_fails_closed(deficient, match) -> None:
+    with pytest.raises(ValueError, match=match):
+        closeout.validate_doc_delta_evidence(
+            primary_bytes=deficient,
+            capture_bytes=deficient,
+        )
 
 
 def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
@@ -763,11 +966,9 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
     )
     assert len(producer_log_bytes) == 8248
     producer_log = producer_log_bytes.decode("utf-8")
-    assert hashlib.sha256(primary).hexdigest() == (
-        "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
-    )
+    assert primary == capture == EXPECTED_DOC_DELTA_BYTES
 
-    with pytest.raises(ValueError, match="staging/capture pair mismatch"):
+    with pytest.raises(ValueError, match="capture semantic contract mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=primary,
             capture_bytes=capture + b"drift\n",
@@ -775,7 +976,7 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
             producer_log=producer_log,
         )
 
-    with pytest.raises(ValueError, match="staging/capture pair mismatch"):
+    with pytest.raises(ValueError, match="staging semantic contract mismatch"):
         closeout.validate_doc_delta_evidence(
             primary_bytes=b"unbound replacement\n",
             capture_bytes=b"unbound replacement\n",
@@ -950,6 +1151,63 @@ def test_doc_delta_pair_and_producer_regressions_fail_closed() -> None:
             qa_manifest=contradictory_result_manifest,
             producer_log=contradictory_result_log,
         )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "audit/docdeltas/hde-epic038_doc_deltas.md",
+        "audit/qa/hde-epic038/00_meta/doc_deltas.md",
+    ],
+    ids=("staging", "capture"),
+)
+def test_doc_delta_stale_path_proof_fails_closed(tmp_path, monkeypatch, path) -> None:
+    target = tmp_path / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(EXPECTED_DOC_DELTA_BYTES)
+    proof_path = tmp_path / f"{path}.path_proof.txt"
+    proof_path.write_text(
+        f"path: {path}\n"
+        f"size_bytes: {len(EXPECTED_DOC_DELTA_BYTES)}\n"
+        f"sha256: {'0' * 64}\n"
+        "mtime_utc: 2026-07-31T00:00:00Z\n"
+        "produced_at_utc: 2026-07-31T00:00:00Z\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    with pytest.raises(ValueError, match="proof sha mismatch"):
+        closeout._validate_proof(path, f"{path}.path_proof.txt")
+
+
+@pytest.mark.parametrize("field,value", [("sha256", "0" * 64), ("size_bytes", 0)])
+def test_doc_delta_stale_mirror_record_fails_closed(field, value) -> None:
+    human = closeout._human_items()
+    items = list(closeout._mirror_items())
+    index = next(
+        index
+        for index, item in enumerate(items)
+        if item["artifact_key"] == "epic038.qa_meta_doc_deltas"
+    )
+    changed = dict(items[index])
+    changed[field] = value
+    items[index] = changed
+    with pytest.raises(ValueError, match="Index/Mirror record binding mismatch"):
+        closeout.validate_doc_delta_index_bindings(human, items)
+
+
+@pytest.mark.parametrize("field", ["record_type", "notes"])
+def test_doc_delta_swapped_index_role_metadata_fails_closed(field) -> None:
+    human = [dict(item) for item in closeout._human_items()]
+    mirror = [dict(item) for item in closeout._mirror_items()]
+    keys = ("epic038.doc_deltas", "epic038.qa_meta_doc_deltas")
+    for items in (human, mirror):
+        records = [
+            next(item for item in items if item.get("artifact_key") == key)
+            for key in keys
+        ]
+        records[0][field], records[1][field] = records[1][field], records[0][field]
+    with pytest.raises(ValueError, match="Index/Mirror record binding mismatch"):
+        closeout.validate_doc_delta_index_bindings(human, mirror)
 
 
 @pytest.mark.parametrize(
