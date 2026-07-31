@@ -25,7 +25,7 @@ FUTURE_CLAIM_PREFIXES = (
     "Future status may become CLAIMED only when ",
 )
 ROW_CONTRACT_SHA256 = (
-    "b00f426507baddb12779897eab75b1aa48ea43aec96ebdaba7f874c9baf22419"
+    "89a7bf3456ccff183366a59efced5a1791d986cdec117aa498e780c6e1dd8389"
 )
 CI_JOB = "test (.github/workflows/ci.yml)"
 HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
@@ -96,7 +96,7 @@ PROHIBITED = frozenset({
 # cannot redefine its own accepted baseline.
 NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
     "TESTS_PASS_OK": "f895c4d36bffea6a1e5740efeeef85389f581041a63c89fa92686884388ccb63",
-    "DOC_DELTA_PRESENT_OK": "880dd72e44d5bd97ad15bdfa8190ea604e89cde3be6a32fff6574c507baa3316",
+    "DOC_DELTA_PRESENT_OK": "1bd1870ad6a3faac558efd1e863eb541bf9eb7e9e3faef7bde45c20502da93e0",
     "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
@@ -168,9 +168,6 @@ DOC_DELTA_PRIMARY_PATH = "audit/docdeltas/hde-epic038_doc_deltas.md"
 DOC_DELTA_PRIMARY_KEY = "epic038.doc_deltas"
 DOC_DELTA_CAPTURE_PATH = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
 DOC_DELTA_CAPTURE_KEY = "epic038.qa_meta_doc_deltas"
-DOC_DELTA_RETAINED_SHA256 = (
-    "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
-)
 DOC_DELTA_PRODUCER_CHECK_ID = "qa-00-step-0-discovery"
 DOC_DELTA_PRODUCER_LOG_PATH = (
     "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
@@ -400,6 +397,138 @@ def validate_release_identity_family(
     return manifest_sha256, str(captured_release_id)
 
 
+def _doc_delta_required_nonempty_lines() -> tuple[str, ...]:
+    return (
+        "# HDE-EPIC038 QA Doc Deltas",
+        "## SURFACE BINDING",
+        (
+            "- Draft/staging surface (primary token-evidence binding): "
+            f"`{DOC_DELTA_PRIMARY_PATH}`"
+        ),
+        (
+            "- Epic-scoped capture surface (stable QA record): "
+            f"`{DOC_DELTA_CAPTURE_PATH}`"
+        ),
+        "## BLOCKERS",
+        "- None identified by Step-0 route discovery.",
+        "## CAVEATS",
+        (
+            "- DOC-CAVEAT-001: Implementation, repository, release, and "
+            "operational evidence do not independently establish Live QA "
+            "acceptance or epic closeout."
+        ),
+    )
+
+
+def validate_doc_delta_semantics(data: bytes, *, surface: str) -> str:
+    """Validate PF04/PF27 roles and content without consulting the peer."""
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"doc-delta {surface} semantic contract mismatch") from exc
+    # Split only on the canonical ASCII LF. str.splitlines() would silently
+    # normalize VT, FF, and Unicode line separators into accepted structure.
+    nonempty_lines = tuple(line for line in text.split("\n") if line)
+    if (
+        not data
+        or data.startswith(b"\xef\xbb\xbf")
+        or b"\r" in data
+        or not data.endswith(b"\n")
+        or nonempty_lines != _doc_delta_required_nonempty_lines()
+    ):
+        raise ValueError(f"doc-delta {surface} semantic contract mismatch")
+    return text
+
+
+def validate_doc_delta_surface(data: bytes, *, surface: str) -> None:
+    """Validate one surface's semantics and exact canonical layout."""
+    text = validate_doc_delta_semantics(data, surface=surface)
+    required = _doc_delta_required_nonempty_lines()
+    canonical_text = "\n".join(
+        (
+            required[0],
+            "",
+            *required[1:4],
+            "",
+            *required[4:6],
+            "",
+            *required[6:],
+            "",
+        )
+    )
+    if text != canonical_text:
+        raise ValueError(f"doc-delta {surface} canonical layout mismatch")
+
+
+def validate_doc_delta_pair_identity(primary: bytes, capture: bytes) -> None:
+    """Retain the approved r7/PF19 execution-provenance equality predicate."""
+    if primary != capture:
+        raise ValueError("doc-delta QA-plan pair identity mismatch")
+
+
+def validate_doc_delta_index_bindings(
+    human_items: Iterable[Mapping[str, object]] | None = None,
+    mirror_items: Iterable[Mapping[str, object]] | None = None,
+) -> None:
+    """Bind both doc-delta roles to unique current Index/Mirror records."""
+    human = tuple(_human_items() if human_items is None else human_items)
+    mirror = tuple(_mirror_items() if mirror_items is None else mirror_items)
+    expected = (
+        (
+            DOC_DELTA_PRIMARY_KEY,
+            DOC_DELTA_PRIMARY_PATH,
+            f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",
+            "epic038_doc_delta",
+            (
+                "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; "
+                "governed presence is nonclaiming"
+            ),
+        ),
+        (
+            DOC_DELTA_CAPTURE_KEY,
+            DOC_DELTA_CAPTURE_PATH,
+            f"{DOC_DELTA_CAPTURE_PATH}.path_proof.txt",
+            "epic038_doc_delta_capture",
+            (
+                "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not "
+                "the primary token surface and not a token claim"
+            ),
+        ),
+    )
+    for key, path, proof, record_type, notes in expected:
+        human_matches = [
+            item
+            for item in human
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        ]
+        mirror_matches = [
+            item
+            for item in mirror
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        ]
+        body = (ROOT / path).read_bytes()
+        if (
+            len(human_matches) != 1
+            or len(mirror_matches) != 1
+            or any(
+                item.get("epic_id") != EPIC_ID
+                or item.get("record_type") != record_type
+                or item.get("schema_version") != "1.0"
+                or item.get("notes") != notes
+                for item in (*human_matches, *mirror_matches)
+            )
+            or mirror_matches[0].get("role") != "snapshot"
+            or mirror_matches[0].get("proof_anchor") != proof
+            or mirror_matches[0].get("sha256")
+            != hashlib.sha256(body).hexdigest()
+            or mirror_matches[0].get("size_bytes") != len(body)
+        ):
+            raise ValueError("doc-delta Index/Mirror record binding mismatch")
+        _validate_proof(path, proof)
+
+
 def validate_doc_delta_evidence(
     primary_bytes: bytes | None = None,
     capture_bytes: bytes | None = None,
@@ -416,12 +545,11 @@ def validate_doc_delta_evidence(
         if capture_bytes is None
         else capture_bytes
     )
-    if (
-        not primary.strip()
-        or primary != capture
-        or hashlib.sha256(primary).hexdigest() != DOC_DELTA_RETAINED_SHA256
-    ):
-        raise ValueError("doc-delta staging/capture pair mismatch")
+    # PF04 semantics are decisive: validate the two named roles and the explicit
+    # staging reference before applying the separate r7/PF19 pair-identity rule.
+    validate_doc_delta_surface(primary, surface="staging")
+    validate_doc_delta_surface(capture, surface="capture")
+    validate_doc_delta_pair_identity(primary, capture)
 
     manifest = (
         json.loads(
@@ -533,23 +661,7 @@ def validate_doc_delta_evidence(
     ):
         raise ValueError("doc-delta producer log binding mismatch")
 
-    records = _mirror_records()
-    expected_records = {
-        (
-            DOC_DELTA_PRIMARY_KEY,
-            DOC_DELTA_PRIMARY_PATH,
-            f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",
-        ),
-        (
-            DOC_DELTA_CAPTURE_KEY,
-            DOC_DELTA_CAPTURE_PATH,
-            f"{DOC_DELTA_CAPTURE_PATH}.path_proof.txt",
-        ),
-    }
-    if not expected_records.issubset(records):
-        raise ValueError("doc-delta Index/Mirror binding mismatch")
-    for _key, path, proof in expected_records:
-        _validate_proof(path, proof)
+    validate_doc_delta_index_bindings()
 
 
 def _release_row() -> Row:
@@ -618,15 +730,20 @@ def _doc_delta_row() -> Row:
         row,
         posture=(
             "UNCLAIMED: the draft/staging surface is the primary token binding; "
-            f"the matching capture `{DOC_DELTA_CAPTURE_PATH}` with key "
-            f"`{DOC_DELTA_CAPTURE_KEY}` and retained producer log "
-            f"`{DOC_DELTA_PRODUCER_LOG_PATH}` establish mechanical provenance, "
-            "not acceptance."
+            f"the stable capture `{DOC_DELTA_CAPTURE_PATH}` with key "
+            f"`{DOC_DELTA_CAPTURE_KEY}` explicitly names the staging path and "
+            "carries its discovered blockers and caveats. Refreshed proofs and "
+            "Index/Mirror rows bind the normalized surfaces, while retained log "
+            f"`{DOC_DELTA_PRODUCER_LOG_PATH}` preserves original mechanical "
+            "Step-0 creation/discovery provenance; none establish acceptance."
         ),
         future_claim=(
             "Future status may become CLAIMED only after the exact-head focused "
-            "test verifies the byte-identical governed staging/capture pair, both "
-            "Index/Mirror records and proofs, and the hash-bound tokenless "
+            "test independently verifies each governed surface's role, exact "
+            "staging reference, blockers/caveats, Index/Mirror record, and proof; "
+            "the approved r7/PF19 pair-identity check must also pass as execution "
+            "provenance rather than substitute for those semantics, alongside the "
+            "hash-bound tokenless "
             f"`{DOC_DELTA_PRODUCER_CHECK_ID}` producer record; finalized acceptance "
             "outputs must derive the result and independent Gate B must record PASS."
         ),
