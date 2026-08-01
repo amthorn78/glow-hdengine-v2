@@ -2818,6 +2818,98 @@ def test_dev02_updater_rejects_structurally_invalid_package_before_mutation(
     assert _tree_state(dev02_repo) == before
 
 
+def test_dev02_updater_rolls_back_after_reused_semantic_primary_drift(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+        )
+    )
+    assert all(
+        (dev02_repo / path).is_file()
+        for path in closeout.PACKAGE_ACTIVATION_PATHS
+    )
+    closeout_proofs = {
+        proof for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    }
+    assert not any((dev02_repo / proof).exists() for proof in closeout_proofs)
+    closeout_keys = set(closeout.CLOSEOUT_PRIMARY_BINDINGS)
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._human_items()
+    }
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._mirror_items()
+    }
+
+    reused_path = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
+    assert reused_path not in closeout.PACKAGE_PATHS
+    assert reused_path in {
+        path
+        for row in closeout.build_rows()
+        for path in row.primary_evidence
+    }
+    target = dev02_repo / reused_path
+    payload = json.loads(target.read_bytes())
+    record = payload["qa-00-step-0-discovery"]
+    assert record["status"] == "PASS"
+    record["status"] = "FAIL"
+    _replace_json(target, payload)
+    before = _tree_state(dev02_repo)
+
+    result = _run_repo_tool(
+        dev02_repo,
+        "tools/evidence/update_evidence_index.py",
+    )
+    assert result.returncode != 0
+    assert "INVALID_EPIC038_CLOSEOUT_PACKAGE" in result.stdout + result.stderr
+    assert _tree_state(dev02_repo) == before
+    assert not any((dev02_repo / proof).exists() for proof in closeout_proofs)
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._human_items()
+    }
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._mirror_items()
+    }
+
+
+def test_dev02_updater_rejects_parent_traversal_before_transaction(
+    dev02_repo: Path,
+) -> None:
+    external = dev02_repo.parent / "transaction-scope-probe.json"
+    external.write_bytes(b'{"sentinel":"unchanged"}\n')
+    external_mode = external.stat().st_mode
+    external_mtime_ns = external.stat().st_mtime_ns
+    external_proof = external.with_name(f"{external.name}.path_proof.txt")
+    assert not external_proof.exists()
+
+    index_path = dev02_repo / "docs/evidence/INDEX.json"
+    index = json.loads(index_path.read_bytes())
+    index.append(
+        {
+            "artifact_key": "transaction.scope.probe",
+            "discovered_physical_path": "../transaction-scope-probe.json",
+            "record_type": "audit",
+            "schema_version": "1.0",
+        }
+    )
+    _replace_json(index_path, index)
+    before = _tree_state(dev02_repo)
+
+    result = _run_repo_tool(
+        dev02_repo,
+        "tools/evidence/update_evidence_index.py",
+    )
+    assert result.returncode != 0
+    assert "Invalid discovered_physical_path" in result.stdout + result.stderr
+    assert _tree_state(dev02_repo) == before
+    assert external.read_bytes() == b'{"sentinel":"unchanged"}\n'
+    assert external.stat().st_mode == external_mode
+    assert external.stat().st_mtime_ns == external_mtime_ns
+    assert not external_proof.exists()
+
+
 def _token_result(snapshot: object, token: str) -> object:
     matches = [result for result in snapshot.token_results if result.token == token]
     assert len(matches) == 1

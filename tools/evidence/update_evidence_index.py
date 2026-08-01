@@ -17,6 +17,7 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import stat as _stat
 import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
@@ -35,6 +36,151 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+
+
+class _WriteTransaction:
+    """Restore every updater-owned write when convergence or validation fails."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+        self.files: dict[Path, tuple[bytes, int, int, int] | None] = {}
+        self.directories: dict[Path, tuple[int, int, int] | None] = {}
+
+    def __enter__(self) -> "_WriteTransaction":
+        global _ACTIVE_WRITE_TRANSACTION
+        if _ACTIVE_WRITE_TRANSACTION is not None:
+            raise RuntimeError("nested evidence-index write transaction")
+        _ACTIVE_WRITE_TRANSACTION = self
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        global _ACTIVE_WRITE_TRANSACTION
+        _ACTIVE_WRITE_TRANSACTION = None
+        if exc_value is None:
+            return False
+        try:
+            self.rollback()
+        except BaseException as rollback_error:  # noqa: BLE001
+            failure = RuntimeError("EVIDENCE_INDEX_TRANSACTION_ROLLBACK_FAILED")
+            failure.add_note(f"rollback error: {rollback_error}")
+            raise failure from exc_value
+        return False
+
+    def _assert_scoped(self, path: Path) -> None:
+        try:
+            relative = path.relative_to(self.root)
+        except ValueError as exc:
+            raise RuntimeError(f"transaction path escapes repository: {path}") from exc
+        if ".." in relative.parts:
+            raise RuntimeError(f"transaction path escapes repository: {path}")
+
+    def _capture_directory_chain(self, path: Path) -> None:
+        chain: list[Path] = []
+        current = path.parent
+        while True:
+            self._assert_scoped(current)
+            chain.append(current)
+            if current == self.root:
+                break
+            current = current.parent
+        for directory in reversed(chain):
+            if directory in self.directories:
+                continue
+            if directory.is_symlink():
+                raise SystemExit(f"ALIASED_TRANSACTION_DIRECTORY:{directory}")
+            if not directory.exists():
+                self.directories[directory] = None
+                continue
+            if not directory.is_dir():
+                raise SystemExit(f"NON_DIRECTORY_TRANSACTION_PARENT:{directory}")
+            metadata = directory.stat()
+            self.directories[directory] = (
+                _stat.S_IMODE(metadata.st_mode),
+                metadata.st_atime_ns,
+                metadata.st_mtime_ns,
+            )
+
+    def capture(self, path: Path) -> None:
+        self._assert_scoped(path)
+        if path in self.files:
+            return
+        self._capture_directory_chain(path)
+        if path.is_symlink():
+            raise SystemExit(f"ALIASED_TRANSACTION_FILE:{path}")
+        if not path.exists():
+            self.files[path] = None
+            return
+        if not path.is_file():
+            raise SystemExit(f"NON_FILE_TRANSACTION_TARGET:{path}")
+        metadata = path.stat()
+        self.files[path] = (
+            path.read_bytes(),
+            _stat.S_IMODE(metadata.st_mode),
+            metadata.st_atime_ns,
+            metadata.st_mtime_ns,
+        )
+
+    def rollback(self) -> None:
+        for path, preimage in self.files.items():
+            if preimage is None:
+                if path.is_symlink() or path.is_file():
+                    path.unlink()
+                elif path.exists():
+                    raise RuntimeError(f"transaction target became non-file: {path}")
+                continue
+            body, mode, atime_ns, mtime_ns = preimage
+            if path.is_symlink() or (path.exists() and not path.is_file()):
+                raise RuntimeError(f"transaction target changed type: {path}")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+            os.chmod(path, mode, follow_symlinks=False)
+            os.utime(
+                path,
+                ns=(atime_ns, mtime_ns),
+                follow_symlinks=False,
+            )
+
+        missing_directories = sorted(
+            (
+                path
+                for path, preimage in self.directories.items()
+                if preimage is None
+            ),
+            key=lambda path: len(path.parts),
+            reverse=True,
+        )
+        for directory in missing_directories:
+            if directory.exists():
+                directory.rmdir()
+
+        existing_directories = sorted(
+            (
+                (path, preimage)
+                for path, preimage in self.directories.items()
+                if preimage is not None
+            ),
+            key=lambda item: len(item[0].parts),
+            reverse=True,
+        )
+        for directory, preimage in existing_directories:
+            assert preimage is not None
+            mode, atime_ns, mtime_ns = preimage
+            os.chmod(directory, mode, follow_symlinks=False)
+            os.utime(
+                directory,
+                ns=(atime_ns, mtime_ns),
+                follow_symlinks=False,
+            )
+
+
+_ACTIVE_WRITE_TRANSACTION: _WriteTransaction | None = None
+
+
+def _capture_transaction_preimage(path: Path) -> None:
+    if _ACTIVE_WRITE_TRANSACTION is not None:
+        _ACTIVE_WRITE_TRANSACTION.capture(path)
+
+
 BASELINE_ENTRIES: list[dict[str, object]] = [
     {
         "artifact_key": "registry.registry_report",
@@ -3183,7 +3329,6 @@ def _write_path_proof(
 
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
-    proof_path.parent.mkdir(parents=True, exist_ok=True)
 
     def _normalize_utc(raw: str | None) -> str | None:
         if not raw:
@@ -3305,6 +3450,8 @@ def _write_path_proof(
         existing_text = proof_path.read_text(encoding="utf-8")
         if existing_text == proof_text:
             return proof_rel, produced
+    _capture_transaction_preimage(proof_path)
+    proof_path.parent.mkdir(parents=True, exist_ok=True)
     proof_path.write_text(proof_text, encoding="utf-8")
     return proof_rel, produced
 
@@ -3329,6 +3476,9 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
     path = entry.get("discovered_physical_path") or entry.get("path")
     if not isinstance(key, str) or not isinstance(path, str):
         raise ValueError(f"Invalid entry: {entry!r}")
+    candidate_path = Path(path)
+    if candidate_path.is_absolute() or ".." in candidate_path.parts:
+        raise ValueError(f"Invalid discovered_physical_path for {key}: {path!r}")
 
     if "audit/qa/hde-epic024/checks/" in path:
         parts = path.split("/")
@@ -3657,6 +3807,7 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
             raise SystemExit(f"STALE:{path}")
     elif check:
         raise SystemExit(f"STALE:{path}")
+    _capture_transaction_preimage(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
 
@@ -3939,20 +4090,22 @@ def main(argv: list[str] | None = None) -> None:
     # Mirror rendering depends on artifacts written by this same updater
     # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
     # so a single rewrite is not always sufficient.
-    max_passes = 6
-    last_error: SystemExit | None = None
-    for _ in range(max_passes):
-        _run_once(check=False)
-        _validate_epic038_closeout_package()
-        try:
-            _run_once(check=True)
-            last_error = None
-            break
-        except SystemExit as exc:
-            last_error = exc
+    with _WriteTransaction(ROOT):
+        max_passes = 6
+        last_error: SystemExit | None = None
+        for _ in range(max_passes):
+            _run_once(check=False)
+            _validate_epic038_closeout_package()
+            try:
+                _run_once(check=True)
+                last_error = None
+                break
+            except SystemExit as exc:
+                last_error = exc
 
-    if last_error is not None:
-        raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+        if last_error is not None:
+            raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+        _validate_epic038_closeout_package()
 
 
 if __name__ == "__main__":
