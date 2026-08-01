@@ -49,6 +49,36 @@ jobs:
       - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
       - name: Check HDE-EPIC038 DEV-01 token matrix
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
+      - name: Check conditional HDE-EPIC038 DEV-03 closeout family
+        shell: bash
+        run: |
+          set -euo pipefail
+          primaries=(
+            audit/EPIC-038_close_report.md
+            audit/EPIC-038_MANIFEST.json
+            docs/acceptance_map_epic038.json
+            audit/qa/hde-epic038/acceptance_map_viability.log
+            audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
+            audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
+            audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log
+          )
+          present=0
+          missing=()
+          for path in "${primaries[@]}"; do
+            if [[ -f "$path" ]]; then
+              present=$((present + 1))
+            else
+              missing+=("$path")
+            fi
+          done
+          if (( present == 0 )); then
+            echo "HDE-EPIC038 DEV-03 closeout family absent; read-only package check not yet applicable."
+          elif (( present != ${#primaries[@]} )); then
+            printf 'INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:%s\n' "$(IFS=,; echo "${missing[*]}")"
+            exit 1
+          else
+            python tools/evidence/generate_hde_epic038_closeout.py --check
+          fi
       - run: python tools/evidence/orientation_demo.py --check
       - name: Run PO-006 token registry validity check + report (gated)
         run: |

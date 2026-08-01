@@ -23,6 +23,10 @@ planned_files=(
   audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt
   audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
   audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt
+  audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
+  audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log.path_proof.txt
+  audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log
+  audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log.path_proof.txt
 )
 
 check_file() {

@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import runpy
+import shutil
 import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
+from typing import Callable, Mapping
 
 import pytest
 
@@ -2529,107 +2532,1316 @@ def test_doc_delta_cli_rejects_abbreviated_modes_without_writes(
     }
 
 
-def _dev02_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    rows = closeout.build_rows()
-    monkeypatch.setattr(closeout, "ROOT", tmp_path)
-    monkeypatch.setattr(closeout, "build_rows", lambda: rows)
-    matrix = tmp_path / closeout.OUTPUT
-    matrix.parent.mkdir(parents=True)
-    matrix.write_bytes((ROOT / closeout.OUTPUT).read_bytes())
-    qa = tmp_path / closeout.QA_RCA_PATH
-    qa.parent.mkdir(parents=True, exist_ok=True)
-    qa.write_bytes((ROOT / closeout.QA_RCA_PATH).read_bytes())
-    return tmp_path
+DEV02_ENV = {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "SAFE_MODE": "1",
+    "TZ": "UTC",
+}
+DEV02_COPY_IGNORES = shutil.ignore_patterns(
+    ".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "__pycache__"
+)
 
 
-def test_dev02_complete_satisfied_package_is_deterministic(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    first = closeout.build_package([], closeout._empty_ledger())
-    second = closeout.build_package([], closeout._empty_ledger())
-    assert first == second
+def _clone_repo(source: Path, target: Path) -> Path:
+    shutil.copytree(
+        source,
+        target,
+        # Canonical producers may update an existing file in place. Real copies
+        # are required here: hard links would let an isolated DEV-03 simulation
+        # mutate the source checkout through the shared inode.
+        copy_function=shutil.copy2,
+        ignore=DEV02_COPY_IGNORES,
+    )
+    return target
+
+
+def _run_repo_tool(root: Path, relative_tool: str, *arguments: str) -> subprocess.CompletedProcess[str]:
+    env = os.environ.copy()
+    env.update(DEV02_ENV)
+    return subprocess.run(
+        [sys.executable, str(root / relative_tool), *arguments],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _assert_success(result: subprocess.CompletedProcess[str]) -> None:
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def _replace_bytes(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.unlink(missing_ok=True)
+    path.write_bytes(data)
+
+
+def _replace_json(path: Path, payload: object) -> None:
+    _replace_bytes(path, closeout._canonical_json(payload))
+
+
+def _package_at(root: Path) -> dict[str, bytes]:
+    return {relative: (root / relative).read_bytes() for relative in closeout.PACKAGE_PATHS}
+
+
+def _mutate_package_json(
+    package: Mapping[str, bytes],
+    relative: str,
+    mutation: Callable[[dict[str, object]], None],
+) -> dict[str, bytes]:
+    changed = dict(package)
+    payload = json.loads(changed[relative], object_pairs_hook=closeout._unique_json_object)
+    assert isinstance(payload, dict)
+    mutation(payload)
+    changed[relative] = closeout._canonical_json(payload)
+    return changed
+
+
+def _tree_state(root: Path) -> dict[str, tuple[object, ...]]:
+    state: dict[str, tuple[object, ...]] = {}
+    for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root).as_posix()
+        stat_result = path.lstat()
+        if path.is_symlink():
+            state[relative] = (
+                "symlink",
+                path.readlink().as_posix(),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+        elif path.is_file():
+            body = path.read_bytes()
+            state[relative] = (
+                "file",
+                hashlib.sha256(body).hexdigest(),
+                len(body),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+        elif path.is_dir():
+            state[relative] = (
+                "directory",
+                tuple(sorted(child.name for child in path.iterdir())),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+    return state
+
+
+@pytest.fixture(scope="session")
+def dev02_source_tree(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    root = _clone_repo(
+        ROOT, tmp_path_factory.mktemp("hde-epic038-dev02-source") / "repo"
+    )
+    # Establish a complete current reused-evidence baseline through canonical
+    # producers only. This prevents a stale checkout companion from turning all
+    # 33 predicates into the same synthetic matrix-level failure and creating a
+    # false negative fixture.
+    for _ in range(2):
+        _assert_success(
+            _run_repo_tool(root, "tools/evidence/update_evidence_index.py")
+        )
+        _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
+        _assert_success(
+            _run_repo_tool(root, "tools/evidence/update_evidence_index.py")
+        )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/update_evidence_index.py", "--check")
+    )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/orientation_demo.py", "--check")
+    )
+    return root
+
+
+@pytest.fixture(scope="session")
+def dev02_fixed_point_tree(
+    dev02_source_tree: Path, tmp_path_factory: pytest.TempPathFactory
+) -> Path:
+    root = _clone_repo(
+        dev02_source_tree,
+        tmp_path_factory.mktemp("hde-epic038-dev02-fixed") / "repo",
+    )
+    # Exercise the exact approved DEV-03 producer order in the isolated tree:
+    # one atomic primary-package write, updater, orientation, then the second
+    # updater. No extra generator pass may silently revise the decision after
+    # companion evidence appears.
+    planned_proofs = tuple(
+        proof for _path, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    )
+    assert not any((root / proof).exists() for proof in planned_proofs)
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/generate_hde_epic038_closeout.py")
+    )
+    assert not any((root / proof).exists() for proof in planned_proofs)
+    generated_primaries = _package_at(root)
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+    assert _package_at(root) == generated_primaries
+    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+    assert _package_at(root) == generated_primaries
+    _assert_success(
+        _run_repo_tool(
+            root, "tools/evidence/generate_hde_epic038_closeout.py", "--check"
+        )
+    )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/update_evidence_index.py", "--check")
+    )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/orientation_demo.py", "--check")
+    )
+    return root
+
+
+@pytest.fixture
+def dev02_repo(
+    dev02_source_tree: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Path:
+    root = _clone_repo(dev02_source_tree, tmp_path / "repo")
+    monkeypatch.setattr(closeout, "ROOT", root)
+    monkeypatch.setattr(updater, "ROOT", root)
+    return root
+
+
+@pytest.fixture
+def dev02_fixed_repo(
+    dev02_fixed_point_tree: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Path:
+    root = _clone_repo(dev02_fixed_point_tree, tmp_path / "repo")
+    monkeypatch.setattr(closeout, "ROOT", root)
+    monkeypatch.setattr(updater, "ROOT", root)
+    return root
+
+
+@pytest.fixture
+def dev02_valid_package(dev02_fixed_repo: Path) -> dict[str, bytes]:
+    package = _package_at(dev02_fixed_repo)
+    closeout.validate_package(package)
+    return package
+
+
+def test_dev02_updater_repairs_orientation_producer_stale_proof_before_full_validation(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo, "tools/evidence/generate_hde_epic038_closeout.py"
+        )
+    )
+    _assert_success(
+        _run_repo_tool(dev02_repo, "tools/evidence/update_evidence_index.py")
+    )
+
+    orientation = dev02_repo / "audit/gates/topology/orientation_demo.txt"
+    proof = dev02_repo / "audit/gates/topology/orientation_demo.txt.path_proof.txt"
+    before = orientation.read_bytes()
+    _assert_success(
+        _run_repo_tool(dev02_repo, "tools/evidence/orientation_demo.py")
+    )
+    after = orientation.read_bytes()
+    assert after != before
+    assert closeout._proof_fields(proof)["sha256"] != hashlib.sha256(after).hexdigest()
+
+    _assert_success(
+        _run_repo_tool(dev02_repo, "tools/evidence/update_evidence_index.py")
+    )
+    assert closeout._proof_fields(proof)["sha256"] == hashlib.sha256(after).hexdigest()
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo, "tools/evidence/update_evidence_index.py", "--check"
+        )
+    )
+
+
+def test_dev02_updater_rejects_structurally_invalid_package_before_mutation(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo, "tools/evidence/generate_hde_epic038_closeout.py"
+        )
+    )
+    manifest_path = dev02_repo / closeout.CLOSE_MANIFEST_PATH
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["pf09_scope"].pop()
+    _replace_json(manifest_path, manifest)
+    before = _tree_state(dev02_repo)
+
+    result = _run_repo_tool(
+        dev02_repo, "tools/evidence/update_evidence_index.py"
+    )
+    assert result.returncode != 0
+    assert (
+        "INVALID_EPIC038_CLOSEOUT_PACKAGE_STRUCTURE"
+        in result.stdout + result.stderr
+    )
+    assert _tree_state(dev02_repo) == before
+
+
+def _token_result(snapshot: object, token: str) -> object:
+    matches = [result for result in snapshot.token_results if result.token == token]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _snapshot_text(snapshot: object) -> str:
+    return json.dumps(
+        {
+            "blockers": list(snapshot.blockers),
+            "obligations": list(snapshot.obligations),
+            "proof_families": list(snapshot.proof_families),
+            "token_results": [result.as_dict() for result in snapshot.token_results],
+        },
+        default=str,
+        sort_keys=True,
+    )
+
+
+def test_dev02_complete_positive_fixture_is_material_and_evidence_derived(
+    dev02_fixed_repo: Path,
+) -> None:
+    snapshot = closeout.evaluate_closeout()
+    assert tuple(result.token for result in snapshot.token_results) == closeout.TOKENS
+    assert all(result.status == "PASS" for result in snapshot.token_results)
+    assert not snapshot.blockers
+    assert len(snapshot.proof_families) == sum(
+        len(row.primary_evidence) for row in closeout.build_rows()
+    )
+    accounting = _snapshot_text(snapshot)
+    for required in (
+        *closeout.PF09_SCOPE,
+        *closeout.PF09_EXCLUSIONS,
+        *closeout.TRACKED_ISSUES,
+        *(record["label"] for record in closeout.ADR_RECORDS),
+        closeout.QA_RCA_PATH,
+    ):
+        assert str(required) in accounting
+    assert len(snapshot.fingerprint) == 64
+    int(snapshot.fingerprint, 16)
+
+    first = closeout.build_package()
+    second = closeout.build_package()
+    assert first == second == _package_at(dev02_fixed_repo)
     manifest = json.loads(first[closeout.CLOSE_MANIFEST_PATH])
     assert manifest["decision"] == "SATISFIED"
     assert isinstance(manifest["key_outputs"], dict)
     assert tuple(manifest["token_roster"]) == closeout.TOKENS
 
 
-def test_dev02_not_satisfied_package_is_complete_and_has_follow_up(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    blocker = closeout._descriptor("fixture.false", "CHECK", "fixture", "fixture is false",
-        [{"kind": "CHECK", "value": "fixture"}], "internal:fixture",
-        "REGISTRY_OR_WIRING_DEFECT", ["tools/evidence/generate_hde_epic038_closeout.py"],
-        "Correct the fixture and rerun its registered validator.", ["closeout_package_in_memory"])
-    package = closeout.build_package([blocker], closeout._empty_ledger())
+def test_dev02_legacy_empty_blocker_override_is_not_an_api() -> None:
+    with pytest.raises(TypeError):
+        closeout.build_package([], closeout._empty_ledger())
+
+
+def test_dev02_empty_or_unevaluated_snapshot_cannot_force_satisfied(
+    dev02_fixed_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    empty = closeout.EvaluationSnapshot((), (), (), (), "0" * 64)
+    with pytest.raises(ValueError, match="snapshot|token|evaluation|roster"):
+        closeout.build_package(evaluation_snapshot=empty)
+
+    monkeypatch.setattr(closeout, "evaluate_closeout", lambda: empty)
+    with pytest.raises(ValueError, match="snapshot|token|evaluation|roster"):
+        closeout.build_package()
+
+
+def test_dev02_pre_generation_source_stays_unclaimed_in_provisional_candidate(
+    dev02_repo: Path,
+) -> None:
+    snapshot = closeout.evaluate_closeout()
+    planned = {
+        result.token: result
+        for result in snapshot.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    }
+    reused = {
+        result.token: result
+        for result in snapshot.token_results
+        if result.token not in closeout.PLANNED_BINDINGS
+    }
+    assert planned
+    assert reused
+    assert not snapshot.blockers
+    assert all(result.status == "PASS" for result in reused.values())
+    assert all(result.status == "UNCLAIMED" for result in planned.values())
+    package = closeout.build_package(evaluation_snapshot=snapshot)
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "SATISFIED"
+    assert all(
+        manifest["source_token_status"][token] == "UNCLAIMED" for token in planned
+    )
+    assert all(manifest["token_status"][token] == "PASS" for token in planned)
+    assert not manifest["minimum_follow_up"]
+    report = package[closeout.CLOSE_REPORT_PATH].decode("utf-8")
+    assert "provisional" in report.lower() or "candidate" in report.lower()
+    assert "Source-tree planned tokens remain UNCLAIMED" in report
+
+
+def test_dev02_missing_token_evaluator_cannot_default_to_pass(
+    dev02_fixed_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry = dict(closeout.TOKEN_EVALUATOR_REGISTRY)
+    registry.pop(closeout.TOKENS[-1])
+    monkeypatch.setattr(closeout, "TOKEN_EVALUATOR_REGISTRY", registry)
+    with pytest.raises(ValueError, match="evaluator registry|roster|approved"):
+        closeout.evaluate_closeout()
+
+
+def test_dev02_positive_evaluation_executes_every_token_specific_evaluator(
+    dev02_fixed_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+    wrapped: dict[str, Callable[[object], str]] = {}
+    for token, evaluator in closeout.TOKEN_EVALUATOR_REGISTRY.items():
+        def observe(
+            row: object,
+            *,
+            observed_token: str = token,
+            observed_evaluator: Callable[[object], str] = evaluator,
+        ) -> str:
+            calls.append(observed_token)
+            return observed_evaluator(row)
+
+        wrapped[token] = observe
+    monkeypatch.setattr(closeout, "TOKEN_EVALUATOR_REGISTRY", wrapped)
+    snapshot = closeout.evaluate_closeout()
+    assert calls == list(closeout.TOKENS)
+    assert all(result.status == "PASS" for result in snapshot.token_results)
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        (lambda rows: rows + (rows[0],), "duplicate token"),
+        (lambda rows: rows[:-1], "token set mismatch"),
+        (
+            lambda rows: (replace(rows[0], token="UNEXPECTED_TOKEN_OK"), *rows[1:]),
+            "token set mismatch",
+        ),
+        (
+            lambda rows: (
+                replace(rows[0], token="DEV_DB_BRIDGE_FALLBACK_OK"),
+                *rows[1:],
+            ),
+            "token set mismatch|prohibited",
+        ),
+        (
+            lambda rows: (replace(rows[0], token="UNREGISTERED_TOKEN_OK"), *rows[1:]),
+            "token set mismatch|unregistered",
+        ),
+    ],
+    ids=(
+        "duplicate-token-row",
+        "missing-corrected-roster-token",
+        "unexpected-token",
+        "retired-bridge-token",
+        "unregistered-token",
+    ),
+)
+def test_dev02_required_matrix_identity_negatives(
+    dev02_repo: Path,
+    mutation: Callable[[tuple[object, ...]], tuple[object, ...]],
+    match: str,
+) -> None:
+    rows = closeout.build_rows()
+    with pytest.raises(ValueError, match=match):
+        closeout.validate_rows(mutation(rows), planned_mode="allow-current")
+
+
+def test_dev02_retired_token_in_current_acceptance_artifact_fails(
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    def mutation(payload: dict[str, object]) -> None:
+        records = payload["records"]
+        assert isinstance(records, list) and isinstance(records[0], dict)
+        records[0]["token"] = "DEV_DB_BRIDGE_FALLBACK_OK"
+
+    broken = _mutate_package_json(
+        dev02_valid_package, closeout.ACCEPTANCE_MAP_PATH, mutation
+    )
+    with pytest.raises(ValueError, match="roster|token|retired|prohibited"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_p1_reused_evidence_is_revalidated_after_planned_materializes(
+    dev02_fixed_repo: Path,
+) -> None:
+    row = next(
+        row for row in closeout.build_rows() if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    assert all((dev02_fixed_repo / path).is_file() for path in closeout.PACKAGE_PATHS)
+    (dev02_fixed_repo / row.primary_evidence[0]).unlink()
+    snapshot = closeout.evaluate_closeout()
+    assert _token_result(snapshot, row.token).status != "PASS"
+    assert snapshot.blockers
+    assert row.primary_evidence[0] in _snapshot_text(snapshot)
+
+
+@pytest.mark.parametrize("posture", ("missing", "mismatched"))
+def test_dev02_missing_or_mismatched_path_proof_fails_current_evaluation(
+    dev02_fixed_repo: Path,
+    posture: str,
+) -> None:
+    row = next(
+        row for row in closeout.build_rows() if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    proof = dev02_fixed_repo / row.proof_anchors[0]
+    if posture == "missing":
+        proof.unlink()
+    else:
+        text = proof.read_text(encoding="utf-8")
+        _replace_bytes(proof, text.replace("sha256: ", "sha256: 0", 1).encode())
+    snapshot = closeout.evaluate_closeout()
+    assert _token_result(snapshot, row.token).status != "PASS"
+    assert row.proof_anchors[0] in _snapshot_text(snapshot)
+
+
+@pytest.mark.parametrize("surface", ("human", "mirror"))
+def test_dev02_nonexistent_or_mismatched_index_mirror_key_fails_current_evaluation(
+    dev02_fixed_repo: Path,
+    surface: str,
+) -> None:
+    row = next(
+        row for row in closeout.build_rows() if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    key, path = row.artifact_keys[0], row.primary_evidence[0]
+    if surface == "human":
+        target = dev02_fixed_repo / closeout.HUMAN_INDEX_PATH
+        payload = json.loads(target.read_text(encoding="utf-8"))
+        match = next(
+            item
+            for item in payload
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        )
+        match["artifact_key"] = "nonexistent.current.key"
+        _replace_json(target, payload)
+    else:
+        target = dev02_fixed_repo / closeout.MACHINE_MIRROR_PATH
+        records = [json.loads(line) for line in target.read_text(encoding="utf-8").splitlines()]
+        match = next(
+            item
+            for item in records
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        )
+        match["artifact_key"] = "nonexistent.current.key"
+        body = b"".join(closeout._canonical_json(item) for item in records)
+        _replace_bytes(target, body)
+    snapshot = closeout.evaluate_closeout()
+    assert _token_result(snapshot, row.token).status != "PASS"
+    assert key in _snapshot_text(snapshot)
+
+
+def test_dev02_stale_qa_current_state_fails_closed(dev02_fixed_repo: Path) -> None:
+    manifest_path = dev02_fixed_repo / closeout.QA_MANIFEST_PATH
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["qa-23-po-023"]["status"] = "FAIL"
+    _replace_json(manifest_path, manifest)
+    snapshot = closeout.evaluate_closeout()
+    assert snapshot.blockers
+    assert not all(result.status == "PASS" for result in snapshot.token_results)
+    assert "qa-23-po-023" in _snapshot_text(snapshot)
+
+
+@pytest.mark.parametrize(
+    "missing_path",
+    (
+        closeout.QA_MANIFEST_PATH,
+        f"{closeout.QA_MANIFEST_PATH}.path_proof.txt",
+        closeout.HUMAN_INDEX_PATH,
+        closeout.MACHINE_MIRROR_PATH,
+    ),
+)
+def test_dev02_positive_evaluation_refuses_incomplete_source_fixture(
+    dev02_fixed_repo: Path,
+    missing_path: str,
+) -> None:
+    (dev02_fixed_repo / missing_path).unlink()
+    snapshot = closeout.evaluate_closeout()
+    assert snapshot.blockers
+    assert not all(result.status == "PASS" for result in snapshot.token_results)
+
+
+@pytest.mark.parametrize("label", closeout.NON_TOKEN_OBLIGATIONS)
+def test_dev02_every_non_token_close_obligation_is_directly_revalidated(
+    dev02_fixed_repo: Path,
+    label: str,
+) -> None:
+    _key, path, _proof = closeout.NON_TOKEN_BINDINGS[label]
+    (dev02_fixed_repo / path).unlink()
+    snapshot = closeout.evaluate_closeout()
+    matches = [
+        obligation
+        for obligation in snapshot.obligations
+        if obligation.get("label") == label
+    ]
+    assert len(matches) == 1
+    assert matches[0]["status"] == "FAIL"
+    assert any(
+        blocker["predicate_key"]
+        == f"non_token.{label}.current_governed_result"
+        for blocker in snapshot.blockers
+    )
+
+
+def test_dev02_reduced_proof_family_roster_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    def mutation(payload: dict[str, object]) -> None:
+        proof_families = payload["proof_family_roster"]
+        assert isinstance(proof_families, list) and proof_families
+        proof_families.pop()
+
+    broken = _mutate_package_json(
+        dev02_valid_package, closeout.ACCEPTANCE_MAP_PATH, mutation
+    )
+    with pytest.raises(ValueError, match="proof-family|proof family|roster|reduced"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_pointer_only_qa_rca_close_report_is_rejected(
+    dev02_fixed_repo: Path,
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    source = (dev02_fixed_repo / closeout.QA_RCA_PATH).read_text(encoding="utf-8").rstrip()
+    report = dev02_valid_package[closeout.CLOSE_REPORT_PATH].decode("utf-8")
+    assert source in report
+    pointer_only = report.replace(
+        source,
+        f"See preserved execution-level source evidence `{closeout.QA_RCA_PATH}`.",
+        1,
+    )
+    broken = dict(dev02_valid_package)
+    broken[closeout.CLOSE_REPORT_PATH] = pointer_only.encode("utf-8")
+    with pytest.raises(ValueError, match="QA RCA|Doc Delta|embedded|report"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_missing_pf09_scope_item_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    missing = closeout.PF09_SCOPE[-1]
+
+    def mutation(payload: dict[str, object]) -> None:
+        scope = payload["pf09_scope"]
+        assert isinstance(scope, list)
+        scope.remove(missing)
+
+    broken = _mutate_package_json(
+        dev02_valid_package, closeout.CLOSE_MANIFEST_PATH, mutation
+    )
+    with pytest.raises(ValueError, match="PF09|scope|package"):
+        closeout.validate_package(broken)
+
+
+@pytest.mark.parametrize("issue", tuple(closeout.TRACKED_ISSUES))
+def test_dev02_missing_tracked_issue_disposition_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+    issue: str,
+) -> None:
+    report = dev02_valid_package[closeout.CLOSE_REPORT_PATH].decode("utf-8")
+    assert issue in report
+    broken = dict(dev02_valid_package)
+    broken[closeout.CLOSE_REPORT_PATH] = report.replace(
+        issue, "OMITTED-TRACKED-ISSUE"
+    ).encode("utf-8")
+    with pytest.raises(ValueError, match="tracked|issue|report|incomplete"):
+        closeout.validate_package(broken)
+
+
+@pytest.mark.parametrize(
+    "adr", tuple(str(record["label"]) for record in closeout.ADR_RECORDS)
+)
+def test_dev02_missing_or_incomplete_adr_block_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+    adr: str,
+) -> None:
+    report = dev02_valid_package[closeout.CLOSE_REPORT_PATH].decode("utf-8")
+    assert adr in report
+    broken = dict(dev02_valid_package)
+    broken[closeout.CLOSE_REPORT_PATH] = report.replace(
+        adr, "OMITTED-ADR-RECORD"
+    ).encode("utf-8")
+    with pytest.raises(ValueError, match="ADR|report|incomplete"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_manifest_key_outputs_list_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    def mutation(payload: dict[str, object]) -> None:
+        key_outputs = payload["key_outputs"]
+        assert isinstance(key_outputs, dict)
+        payload["key_outputs"] = list(key_outputs.values())
+
+    broken = _mutate_package_json(
+        dev02_valid_package, closeout.CLOSE_MANIFEST_PATH, mutation
+    )
+    with pytest.raises(ValueError, match="key_outputs|object"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_close_report_manifest_decision_mismatch_is_rejected(
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    def mutation(payload: dict[str, object]) -> None:
+        payload["decision"] = "NOT SATISFIED"
+
+    broken = _mutate_package_json(
+        dev02_valid_package, closeout.CLOSE_MANIFEST_PATH, mutation
+    )
+    with pytest.raises(ValueError, match="decision|mismatch"):
+        closeout.validate_package(broken)
+
+
+@pytest.fixture
+def dev02_blocked_package(dev02_fixed_repo: Path) -> dict[str, bytes]:
+    row = next(
+        row for row in closeout.build_rows() if row.token == "DOC_DELTA_PRESENT_OK"
+    )
+    (dev02_fixed_repo / row.primary_evidence[0]).unlink()
+    package = closeout.build_package()
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert manifest["minimum_follow_up"]
     assert set(package) == set(closeout.PACKAGE_PATHS)
-    assert b"Final decision: NOT SATISFIED" in package[closeout.CLOSE_REPORT_PATH]
-    assert b"Minimum follow-up" in package[closeout.CLOSE_REPORT_PATH]
+    return package
 
 
-def test_dev02_atomic_write_is_idempotent(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    package = closeout.build_package([], closeout._empty_ledger())
-    closeout._write_package(package)
-    before = {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
-    closeout._write_package(package)
-    assert before == {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+def test_dev02_forced_satisfied_with_false_predicate_is_rejected(
+    dev02_blocked_package: Mapping[str, bytes],
+) -> None:
+    broken = dict(dev02_blocked_package)
+    for relative in (closeout.CLOSE_MANIFEST_PATH, closeout.ACCEPTANCE_MAP_PATH):
+        payload = json.loads(broken[relative])
+        payload["decision"] = "SATISFIED"
+        if isinstance(payload.get("token_status"), dict):
+            payload["token_status"] = {token: "PASS" for token in closeout.TOKENS}
+        if isinstance(payload.get("records"), list):
+            for record in payload["records"]:
+                if isinstance(record, dict) and "status" in record:
+                    record["status"] = "PASS"
+        broken[relative] = closeout._canonical_json(payload)
+    broken[closeout.CLOSE_REPORT_PATH] = broken[closeout.CLOSE_REPORT_PATH].replace(
+        b"NOT SATISFIED", b"SATISFIED"
+    )
+    broken[closeout.VIABILITY_PATH] = broken[closeout.VIABILITY_PATH].replace(
+        b"NOT SATISFIED", b"SATISFIED"
+    )
+    with pytest.raises(
+        ValueError,
+        match="forced|blocker|SATISFIED|predicate|evaluation|token-status",
+    ):
+        closeout.validate_package(broken)
 
 
-def test_dev02_atomic_write_rolls_back_every_replacement(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    package = closeout.build_package([], closeout._empty_ledger())
-    closeout._write_package(package)
-    before = {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
-    changed = dict(package); changed[closeout.CLOSE_REPORT_PATH] += b"changed\n"
-    real_replace = closeout.os.replace; calls = 0
-    def fail_once(source, target):
+def test_dev02_not_satisfied_without_exact_minimum_follow_up_is_rejected(
+    dev02_blocked_package: Mapping[str, bytes],
+) -> None:
+    broken = dict(dev02_blocked_package)
+    for relative in (closeout.CLOSE_MANIFEST_PATH, closeout.ACCEPTANCE_MAP_PATH):
+        payload = json.loads(broken[relative])
+        payload["minimum_follow_up"] = []
+        broken[relative] = closeout._canonical_json(payload)
+    report = broken[closeout.CLOSE_REPORT_PATH].decode("utf-8")
+    marker = "## Minimum follow-up"
+    assert marker in report
+    broken[closeout.CLOSE_REPORT_PATH] = report.split(marker, 1)[0].rstrip().encode() + b"\n"
+    with pytest.raises(ValueError, match="follow-up|follow up|NOT SATISFIED"):
+        closeout.validate_package(broken)
+
+
+@pytest.mark.parametrize(
+    "suppressed", (closeout.CLOSE_REPORT_PATH, closeout.CLOSE_MANIFEST_PATH)
+)
+def test_dev02_blocker_cannot_suppress_or_partially_emit_binary_outputs(
+    dev02_blocked_package: Mapping[str, bytes],
+    suppressed: str,
+) -> None:
+    broken = dict(dev02_blocked_package)
+    del broken[suppressed]
+    with pytest.raises(ValueError, match="incomplete|package|path"):
+        closeout.validate_package(broken)
+
+
+def test_dev02_write_revalidates_package_before_staging(
+    dev02_fixed_repo: Path,
+    dev02_valid_package: Mapping[str, bytes],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    broken = dict(dev02_valid_package)
+    del broken[closeout.CLOSE_MANIFEST_PATH]
+    before = _tree_state(dev02_fixed_repo)
+
+    def forbidden_stage(_target: Path, _data: bytes, _mode: int) -> Path:
+        pytest.fail("invalid package reached staging")
+
+    monkeypatch.setattr(closeout, "_stage_atomic_bytes", forbidden_stage)
+    with pytest.raises(ValueError, match="incomplete|package|path"):
+        closeout._write_package(broken)
+    assert _tree_state(dev02_fixed_repo) == before
+
+
+@pytest.mark.parametrize("failed_stage", range(1, len(closeout.PACKAGE_PATHS) + 1))
+def test_dev02_atomic_write_leaves_no_partial_package_after_staging_failure(
+    dev02_fixed_repo: Path,
+    dev02_valid_package: Mapping[str, bytes],
+    monkeypatch: pytest.MonkeyPatch,
+    failed_stage: int,
+) -> None:
+    before = _package_at(dev02_fixed_repo)
+    before_entries = {
+        (dev02_fixed_repo / relative).parent: tuple(
+            sorted(path.name for path in (dev02_fixed_repo / relative).parent.iterdir())
+        )
+        for relative in closeout.PACKAGE_PATHS
+    }
+    changed = {
+        relative: body + b"INJECTED-TRANSACTION-CANDIDATE\n"
+        for relative, body in dev02_valid_package.items()
+    }
+    real_stage = closeout._stage_atomic_bytes
+    calls = 0
+
+    def fail_once(target: Path, data: bytes, mode: int) -> Path:
         nonlocal calls
         calls += 1
-        if calls == 3: raise OSError("injected replacement failure")
-        return real_replace(source, target)
-    monkeypatch.setattr(closeout.os, "replace", fail_once)
-    with pytest.raises(OSError, match="injected"):
+        if calls == failed_stage:
+            raise OSError("injected staging failure")
+        return real_stage(target, data, mode)
+
+    monkeypatch.setattr(closeout, "validate_package", lambda _package: None)
+    monkeypatch.setattr(closeout, "_stage_atomic_bytes", fail_once)
+    with pytest.raises(OSError, match="injected staging failure"):
         closeout._write_package(changed)
-    assert before == {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+    assert _package_at(dev02_fixed_repo) == before
+    assert {
+        parent: tuple(sorted(path.name for path in parent.iterdir()))
+        for parent in before_entries
+    } == before_entries
 
 
-def test_dev02_ledger_ids_recur_without_reopening_closed_history(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    blocker = closeout._descriptor("fixture.false", "CHECK", "fixture", "false",
-        [{"kind": "DETAIL", "value": "false"}], "internal:fixture",
-        "REGISTRY_OR_WIRING_DEFECT", [], "fix it", [])
-    first = closeout.record_blockers(closeout._empty_ledger(), [blocker])
-    assert first == closeout.record_blockers(first, [blocker])
-    first["entries"][0].update({"status": "CLOSED", "reviewer_disposition": "CLOSURE_VALIDATED",
-        "correction_performed": "Normalized correction", "after_outcome": {"detail": "pass", "result": "PASS"},
-        "tests_and_validators": [{"command": "internal:fixture", "exit_code": 0, "id": "fixture", "result": "PASS"}]})
-    second = closeout.record_blockers(first, [blocker])
-    assert [entry["blocker_id"][-4:] for entry in second["entries"]] == ["0001", "0002"]
+def test_dev02_atomic_write_is_byte_idempotent(
+    dev02_fixed_repo: Path,
+    dev02_valid_package: Mapping[str, bytes],
+) -> None:
+    closeout._write_package(dev02_valid_package)
+    first = _package_at(dev02_fixed_repo)
+    closeout._write_package(dev02_valid_package)
+    assert _package_at(dev02_fixed_repo) == first == dict(dev02_valid_package)
 
 
-@pytest.mark.parametrize("argument", ["--pre", "--rec", "--close-b"])
-def test_dev02_cli_abbreviations_are_rejected(argument: str) -> None:
-    result = subprocess.run([sys.executable, str(ROOT / "tools/evidence/generate_hde_epic038_closeout.py"), argument], cwd=ROOT, capture_output=True, text=True)
+@pytest.mark.parametrize("failed_replace", range(1, len(closeout.PACKAGE_PATHS) + 1))
+def test_dev02_atomic_write_restores_every_target_after_replacement_failure(
+    dev02_fixed_repo: Path,
+    dev02_valid_package: Mapping[str, bytes],
+    monkeypatch: pytest.MonkeyPatch,
+    failed_replace: int,
+) -> None:
+    before = _package_at(dev02_fixed_repo)
+    changed = {
+        relative: body + b"INJECTED-TRANSACTION-CANDIDATE\n"
+        for relative, body in dev02_valid_package.items()
+    }
+    real_replace = closeout.os.replace
+    calls = 0
+
+    def fail_once(source: object, target: object) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == failed_replace:
+            raise OSError("injected replacement failure")
+        real_replace(source, target)
+
+    monkeypatch.setattr(closeout, "validate_package", lambda _package: None)
+    monkeypatch.setattr(closeout.os, "replace", fail_once)
+    with pytest.raises(OSError, match="injected replacement failure"):
+        closeout._write_package(changed)
+    assert _package_at(dev02_fixed_repo) == before
+
+
+def test_dev02_preflight_is_fully_read_only(dev02_repo: Path) -> None:
+    before = _tree_state(dev02_repo)
+    result = _run_repo_tool(
+        dev02_repo, "tools/evidence/generate_hde_epic038_closeout.py", "--preflight"
+    )
+    _assert_success(result)
+    assert "PREFLIGHT" in result.stdout
+    assert _tree_state(dev02_repo) == before
+
+
+def test_dev02_check_is_fully_read_only(dev02_fixed_repo: Path) -> None:
+    before = _tree_state(dev02_fixed_repo)
+    result = _run_repo_tool(
+        dev02_fixed_repo,
+        "tools/evidence/generate_hde_epic038_closeout.py",
+        "--check",
+    )
+    _assert_success(result)
+    assert "CLOSEOUT_PACKAGE_OK" in result.stdout
+    assert _tree_state(dev02_fixed_repo) == before
+
+
+def test_dev02_check_never_dispatches_the_package_writer(
+    dev02_fixed_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def forbidden_write(_package: Mapping[str, bytes]) -> None:
+        pytest.fail("--check attempted to dispatch the package writer")
+
+    monkeypatch.setattr(closeout, "_write_package", forbidden_write)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["generate_hde_epic038_closeout.py", "--check"],
+    )
+    assert closeout.main() == 0
+
+
+@pytest.mark.parametrize("argument", ("--pre", "--rec", "--close-b"))
+def test_dev02_cli_abbreviations_are_rejected_without_writes(
+    dev02_repo: Path,
+    argument: str,
+) -> None:
+    before = _tree_state(dev02_repo)
+    result = _run_repo_tool(
+        dev02_repo, "tools/evidence/generate_hde_epic038_closeout.py", argument
+    )
     assert result.returncode == 2
+    assert "WROTE" not in result.stdout
+    assert _tree_state(dev02_repo) == before
 
 
-def test_dev02_updater_family_is_conditional_and_partial_fails(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr(updater, "ROOT", tmp_path)
+def test_dev02_updater_family_is_inactive_when_no_primary_exists(
+    dev02_repo: Path,
+) -> None:
+    family_paths = tuple(
+        str(record["discovered_physical_path"])
+        for record in updater.EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
+    )
+    assert not any((dev02_repo / path).exists() for path in family_paths)
+    before = _tree_state(dev02_repo)
     assert updater._load_epic038_closeout_entries() == []
-    path = tmp_path / "audit/EPIC-038_close_report.md"
-    path.parent.mkdir(parents=True); path.write_text("partial\n", encoding="utf-8")
+    assert _tree_state(dev02_repo) == before
+
+
+@pytest.mark.parametrize(
+    "present_index",
+    range(len(updater.EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS)),
+)
+def test_dev02_updater_rejects_every_partial_primary_family(
+    dev02_repo: Path,
+    present_index: int,
+) -> None:
+    record = updater.EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS[present_index]
+    path = dev02_repo / str(record["discovered_physical_path"])
+    _replace_bytes(path, b"partial DEV-03 family\n")
     with pytest.raises(SystemExit, match="INCOMPLETE_EPIC038_CLOSEOUT_FAMILY"):
         updater._load_epic038_closeout_entries()
 
 
-def test_dev02_manifest_list_and_decision_mismatch_fail_closed(tmp_path, monkeypatch) -> None:
-    _dev02_root(tmp_path, monkeypatch)
-    package = closeout.build_package([], closeout._empty_ledger())
-    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
-    manifest["key_outputs"] = list(manifest["key_outputs"].values())
-    broken = dict(package); broken[closeout.CLOSE_MANIFEST_PATH] = closeout._canonical_json(manifest)
-    with pytest.raises(ValueError, match="key_outputs"):
-        closeout.validate_package(broken)
-    manifest["key_outputs"] = closeout.KEY_OUTPUTS; manifest["decision"] = "NOT SATISFIED"
-    broken[closeout.CLOSE_MANIFEST_PATH] = closeout._canonical_json(manifest)
-    with pytest.raises(ValueError, match="decision mismatch"):
-        closeout.validate_package(broken)
+@pytest.mark.parametrize(
+    "field,replacement",
+    (
+        ("epic_id", "HDE-EPIC999"),
+        ("schema_version", "9.9"),
+        ("key_outputs", {"reduced": "audit/EPIC-038_close_report.md"}),
+    ),
+    ids=("epic-identity", "schema", "key-output-bindings"),
+)
+def test_dev02_updater_rejects_mismatched_manifest_bindings(
+    dev02_fixed_repo: Path,
+    field: str,
+    replacement: object,
+) -> None:
+    manifest_path = dev02_fixed_repo / closeout.CLOSE_MANIFEST_PATH
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest[field] = replacement
+    _replace_json(manifest_path, manifest)
+    with pytest.raises(SystemExit, match="INVALID_EPIC038_CLOSEOUT"):
+        updater._load_epic038_closeout_entries()
+
+
+def test_dev02_generation_preserves_dev01_bytes_and_nonclaiming_contract(
+    dev02_repo: Path,
+) -> None:
+    matrix_path = dev02_repo / closeout.OUTPUT
+    before = matrix_path.read_bytes()
+    before_rows = tuple(
+        (row.token, row.posture, row.future_claim) for row in closeout.build_rows()
+    )
+    assert hashlib.sha256(before).hexdigest() == closeout.TOKEN_MATRIX_SHA256
+    assert before == closeout.render(planned_mode="require-absent")
+    assert all("UNCLAIMED" in posture for _token, posture, _claim in before_rows)
+
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+        )
+    )
+
+    assert matrix_path.read_bytes() == before
+    assert hashlib.sha256(matrix_path.read_bytes()).hexdigest() == (
+        closeout.TOKEN_MATRIX_SHA256
+    )
+    after_rows = closeout.validate_rows(
+        closeout.build_rows(), planned_mode="allow-current"
+    )
+    assert tuple(
+        (row.token, row.posture, row.future_claim) for row in after_rows
+    ) == before_rows
+
+
+def _dev02_blocker_descriptor(
+    token: str = "TESTS_PASS_OK",
+    *,
+    predicate_key: str | None = None,
+    external_action_posture: str = "NONE_REQUIRED",
+) -> dict[str, object]:
+    row = next(row for row in closeout.build_rows() if row.token == token)
+    return closeout._descriptor(
+        predicate_key or f"token.{token}.current_governed_result",
+        "TOKEN",
+        token,
+        f"fixture records a directly re-evaluable failing predicate for {token}",
+        [
+            {"kind": "ARTIFACT_PATH", "value": row.primary_evidence[0]},
+            {"kind": "ARTIFACT_KEY", "value": row.artifact_keys[0]},
+        ],
+        closeout.PLAN_CLOSEOUT_CHECK_COMMAND,
+        "GOVERNED_ARTIFACT_DRIFT",
+        [row.primary_evidence[0]],
+        f"Re-establish and directly validate the current predicate for {token}.",
+        ["closeout_package_in_memory", "epic038_current_state"],
+        external_action_posture,
+    )
+
+
+def _dev02_close_request(
+    blocker_id: str,
+    *,
+    regenerated_artifacts: tuple[str, ...] = (),
+    external_action_posture: str = "NONE_REQUIRED",
+) -> str:
+    return closeout._canonical_json(
+        {
+            "blocker_id": blocker_id,
+            "correction_performed": "Restored the exact governed predicate bytes.",
+            "external_action_posture": external_action_posture,
+            "historical_evidence_rewritten": False,
+            "regenerated_artifacts": list(regenerated_artifacts),
+            "schema": closeout.CLOSE_REQUEST_SCHEMA,
+        }
+    ).decode("utf-8")
+
+
+def _dev02_closed_ledger(
+    open_ledger: Mapping[str, object],
+) -> dict[str, object]:
+    closed = json.loads(json.dumps(open_ledger))
+    entry = closed["entries"][0]
+    entry.update(
+        {
+            "after_outcome": {
+                "detail": "original predicate and validators directly pass",
+                "result": "PASS",
+            },
+            "correction_performed": "Restored exact governed bytes.",
+            "regenerated_artifacts": [],
+            "reviewer_disposition": "CLOSURE_VALIDATED",
+            "status": "CLOSED",
+            "tests_and_validators": [
+                {
+                    "command": "internal:validate_package",
+                    "exit_code": 0,
+                    "id": "closeout_package_in_memory",
+                    "result": "PASS",
+                },
+                {
+                    "command": (
+                        "python tools/evidence/"
+                        "check_hde_epic038_qa_current_state.py --require-finalized"
+                    ),
+                    "exit_code": 0,
+                    "id": "epic038_current_state",
+                    "result": "PASS",
+                },
+            ],
+        }
+    )
+    closeout.validate_ledger(closed)
+    return closed
+
+
+def test_dev02_ledger_record_is_idempotent_for_identical_open_blocker(
+    dev02_repo: Path,
+) -> None:
+    descriptor = _dev02_blocker_descriptor()
+    first = closeout.record_blockers(closeout._empty_ledger(), [descriptor])
+    second = closeout.record_blockers(first, [descriptor])
+    assert second == first
+    assert len(second["entries"]) == 1
+    closeout.validate_ledger(second)
+
+
+def test_dev02_ledger_recurrence_preserves_closed_history_and_increments_id(
+    dev02_repo: Path,
+) -> None:
+    descriptor = _dev02_blocker_descriptor()
+    first = closeout.record_blockers(closeout._empty_ledger(), [descriptor])
+    closed = _dev02_closed_ledger(first)
+    recurrent = closeout.record_blockers(closed, [descriptor])
+    assert len(recurrent["entries"]) == 2
+    assert recurrent["entries"][0] == closed["entries"][0]
+    assert [entry["status"] for entry in recurrent["entries"]] == [
+        "CLOSED",
+        "OPEN",
+    ]
+    first_id, second_id = [entry["blocker_id"] for entry in recurrent["entries"]]
+    assert first_id[:-4] == second_id[:-4]
+    assert first_id.endswith("0001")
+    assert second_id.endswith("0002")
+
+
+def test_dev02_ledger_rejects_normalized_identity_digest_collisions(
+    dev02_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def colliding_id(
+        _predicate_key: str,
+        _subject: Mapping[str, str],
+        occurrence: int = 1,
+    ) -> str:
+        return f"HDE-EPIC038-BLK-deadbeefdeadbeef-{occurrence:04d}"
+
+    monkeypatch.setattr(closeout, "_blocker_id", colliding_id)
+    blockers = [
+        _dev02_blocker_descriptor("TESTS_PASS_OK"),
+        _dev02_blocker_descriptor("DOC_DELTA_PRESENT_OK"),
+    ]
+    with pytest.raises(ValueError, match="collision"):
+        closeout.record_blockers(closeout._empty_ledger(), blockers)
+
+
+@pytest.mark.parametrize(
+    "raw,match",
+    (
+        ("{}", "close request|schema|canonical"),
+        ('{"blocker_id":"x","blocker_id":"y"}\n', "duplicate|invalid"),
+        ("not-json\n", "JSON"),
+        (
+            '{"blocker_id":"x","correction_performed":"x",'
+            '"external_action_posture":"NONE_REQUIRED",'
+            '"historical_evidence_rewritten":false,'
+            '"regenerated_artifacts":[],"schema":'
+            f'"{closeout.CLOSE_REQUEST_SCHEMA}"}}',
+            "canonical",
+        ),
+    ),
+    ids=("empty-object", "duplicate-key", "invalid-json", "missing-final-lf"),
+)
+def test_dev02_close_rejects_malformed_or_noncanonical_requests(
+    dev02_repo: Path,
+    raw: str,
+    match: str,
+) -> None:
+    with pytest.raises(ValueError, match=match):
+        closeout.close_blocker(raw)
+
+
+def test_dev02_close_rejects_historical_evidence_rewrite_request(
+    dev02_repo: Path,
+) -> None:
+    raw = closeout._canonical_json(
+        {
+            "blocker_id": "HDE-EPIC038-BLK-0000000000000000-0001",
+            "correction_performed": "Attempted an impermissible history rewrite.",
+            "external_action_posture": "NONE_REQUIRED",
+            "historical_evidence_rewritten": True,
+            "regenerated_artifacts": [],
+            "schema": closeout.CLOSE_REQUEST_SCHEMA,
+        }
+    ).decode("utf-8")
+    with pytest.raises(ValueError, match="historical evidence rewrite"):
+        closeout.close_blocker(raw)
+
+
+def test_dev02_close_rejects_unknown_blocker_identity(
+    dev02_repo: Path,
+) -> None:
+    request = _dev02_close_request(
+        "HDE-EPIC038-BLK-0000000000000000-0001"
+    )
+    with pytest.raises(RuntimeError, match="exactly one OPEN|unknown"):
+        closeout.close_blocker(request)
+
+
+def test_dev02_ledger_parser_rejects_noncanonical_serialization(
+    dev02_repo: Path,
+) -> None:
+    canonical = closeout.render_ledger(closeout._empty_ledger())
+    for malformed in (
+        canonical.removesuffix(b"\n"),
+        canonical.replace(b"  \"entries\"", b" \"entries\"", 1),
+        canonical.replace(b"\n", b"\r\n"),
+    ):
+        with pytest.raises(ValueError, match="ledger|template|canonical"):
+            closeout.parse_ledger(malformed)
+
+
+@pytest.fixture(scope="session")
+def dev02_open_ledger_tree(
+    dev02_fixed_point_tree: Path,
+    tmp_path_factory: pytest.TempPathFactory,
+) -> tuple[Path, str]:
+    root = _clone_repo(
+        dev02_fixed_point_tree,
+        tmp_path_factory.mktemp("hde-epic038-dev02-open-ledger") / "repo",
+    )
+    previous_root = closeout.ROOT
+    closeout.ROOT = root
+    try:
+        descriptor = _dev02_blocker_descriptor()
+        ledger = closeout.record_blockers(closeout._empty_ledger(), [descriptor])
+        package = closeout.build_package(ledger=ledger)
+        closeout._write_package(package)
+    finally:
+        closeout.ROOT = previous_root
+    primaries = _package_at(root)
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+    assert _package_at(root) == primaries
+    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+    assert _package_at(root) == primaries
+    entry = closeout.parse_ledger(package[closeout.LEDGER_PATH])["entries"][0]
+    assert entry["status"] == "OPEN"
+    return root, str(entry["blocker_id"])
+
+
+@pytest.fixture
+def dev02_open_ledger_repo(
+    dev02_open_ledger_tree: tuple[Path, str],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[Path, str]:
+    source, blocker_id = dev02_open_ledger_tree
+    root = _clone_repo(source, tmp_path / "repo")
+    monkeypatch.setattr(closeout, "ROOT", root)
+    monkeypatch.setattr(updater, "ROOT", root)
+    return root, blocker_id
+
+
+def test_dev02_close_executes_real_predicate_and_all_registered_validators(
+    dev02_open_ledger_repo: tuple[Path, str],
+) -> None:
+    _root, blocker_id = dev02_open_ledger_repo
+    package = closeout.close_blocker(_dev02_close_request(blocker_id))
+    closeout.validate_package(package)
+    ledger = closeout.parse_ledger(package[closeout.LEDGER_PATH])
+    entry = ledger["entries"][0]
+    assert entry["status"] == "CLOSED"
+    assert entry["after_outcome"]["result"] == "PASS"
+    assert [result["id"] for result in entry["tests_and_validators"]] == [
+        "closeout_package_in_memory",
+        "epic038_current_state",
+    ]
+    assert all(
+        result["result"] == "PASS" and result["exit_code"] == 0
+        for result in entry["tests_and_validators"]
+    )
+
+
+def test_dev02_close_rejects_already_closed_identity(
+    dev02_open_ledger_repo: tuple[Path, str],
+) -> None:
+    _root, blocker_id = dev02_open_ledger_repo
+    request = _dev02_close_request(blocker_id)
+    closed_package = closeout.close_blocker(request)
+    closeout._write_package(closed_package)
+    before = _tree_state(closeout.ROOT)
+    with pytest.raises(RuntimeError, match="OPEN|closed|exactly one"):
+        closeout.close_blocker(request)
+    assert _tree_state(closeout.ROOT) == before
+
+
+def test_dev02_close_rejects_out_of_scope_regenerated_artifact(
+    dev02_open_ledger_repo: tuple[Path, str],
+) -> None:
+    _root, blocker_id = dev02_open_ledger_repo
+    request = _dev02_close_request(
+        blocker_id, regenerated_artifacts=("pyproject.toml",)
+    )
+    before = _tree_state(closeout.ROOT)
+    with pytest.raises(RuntimeError, match="permitted|scope"):
+        closeout.close_blocker(request)
+    assert _tree_state(closeout.ROOT) == before
+
+
+def test_dev02_close_rejects_validator_failure_without_persistence(
+    dev02_open_ledger_repo: tuple[Path, str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _root, blocker_id = dev02_open_ledger_repo
+
+    def fail_validator(
+        validator_id: str,
+        package: Mapping[str, bytes] | None = None,
+    ) -> dict[str, object]:
+        raise ValueError(f"validator failed: {validator_id}")
+
+    monkeypatch.setattr(closeout, "run_registered_validator", fail_validator)
+    before = _tree_state(closeout.ROOT)
+    with pytest.raises(ValueError, match="validator failed"):
+        closeout.close_blocker(_dev02_close_request(blocker_id))
+    assert _tree_state(closeout.ROOT) == before
+
+
+@pytest.mark.parametrize(
+    "posture", ("PO_AUTHORIZATION_REQUIRED", "PO_AUTHORIZED_EVIDENCE_BOUND")
+)
+def test_dev02_close_rejects_unauthorized_external_posture(
+    dev02_open_ledger_repo: tuple[Path, str],
+    posture: str,
+) -> None:
+    _root, blocker_id = dev02_open_ledger_repo
+    before = _tree_state(closeout.ROOT)
+    with pytest.raises(RuntimeError, match="authorization|external|posture"):
+        closeout.close_blocker(
+            _dev02_close_request(
+                blocker_id, external_action_posture=posture
+            )
+        )
+    assert _tree_state(closeout.ROOT) == before
+
+
+def test_dev02_in_memory_validator_really_calls_package_validation(
+    dev02_valid_package: Mapping[str, bytes],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[Mapping[str, bytes]] = []
+
+    def observe(package: Mapping[str, bytes]) -> None:
+        calls.append(package)
+        raise ValueError("injected real package validation failure")
+
+    monkeypatch.setattr(closeout, "validate_package", observe)
+    with pytest.raises(ValueError, match="real package validation failure"):
+        closeout.run_registered_validator(
+            "closeout_package_in_memory", package=dev02_valid_package
+        )
+    assert calls == [dev02_valid_package]

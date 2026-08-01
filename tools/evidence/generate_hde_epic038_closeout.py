@@ -12,7 +12,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Callable, Iterable, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -645,6 +645,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         f"run: {DOC_DELTA_CHECK_COMMAND}",
         "run: python tools/evidence/generate_hde_epic038_closeout.py "
         "--check-token-matrix",
+        "python tools/evidence/generate_hde_epic038_closeout.py --check",
     )
     job_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == "  test:"
@@ -753,6 +754,56 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         check_prefix = raw_lines[
             prefix_start : prefix_start + len(expected_check_prefix)
         ]
+    closeout_step_name = (
+        "      - name: Check conditional HDE-EPIC038 DEV-03 closeout family"
+    )
+    closeout_step_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == closeout_step_name
+    )
+    closeout_step_block: tuple[str, ...] = ()
+    if len(closeout_step_starts) == 1:
+        closeout_start = closeout_step_starts[0]
+        closeout_end = next(
+            (
+                index
+                for index in range(closeout_start + 1, len(raw_lines))
+                if raw_lines[index].startswith("      - ")
+            ),
+            len(raw_lines),
+        )
+        closeout_step_block = raw_lines[closeout_start:closeout_end]
+    expected_closeout_step_block = (
+        closeout_step_name,
+        "        shell: bash",
+        "        run: |",
+        "          set -euo pipefail",
+        "          primaries=(",
+        "            audit/EPIC-038_close_report.md",
+        "            audit/EPIC-038_MANIFEST.json",
+        "            docs/acceptance_map_epic038.json",
+        "            audit/qa/hde-epic038/acceptance_map_viability.log",
+        "            audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+        "            audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
+        "            audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
+        "          )",
+        "          present=0",
+        "          missing=()",
+        '          for path in "${primaries[@]}"; do',
+        '            if [[ -f "$path" ]]; then',
+        "              present=$((present + 1))",
+        "            else",
+        '              missing+=("$path")',
+        "            fi",
+        "          done",
+        "          if (( present == 0 )); then",
+        '            echo "HDE-EPIC038 DEV-03 closeout family absent; read-only package check not yet applicable."',
+        "          elif (( present != ${#primaries[@]} )); then",
+        "            printf 'INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:%s\\n' \"$(IFS=,; echo \"${missing[*]}\")\"",
+        "            exit 1",
+        "          else",
+        "            python tools/evidence/generate_hde_epic038_closeout.py --check",
+        "          fi",
+    )
     if (
         step_block != expected_step_block
         or check_prefix != expected_check_prefix
@@ -767,6 +818,8 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or not (job_start < step_starts[0] < job_end)
         or step_starts[0] <= test_steps_starts[0]
         or generator_invocations != expected_invocations
+        or closeout_step_block != expected_closeout_step_block
+        or not (job_start < closeout_step_starts[0] < job_end)
         or "--doc-deltas" in text
     ):
         raise ValueError("doc-delta CI command binding mismatch")
@@ -2264,7 +2317,11 @@ def _validate_special_semantics(row: Row) -> None:
         )
 
 
-def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
+def validate_rows(
+    rows: Iterable[Row], *, planned_mode: str = "require-absent"
+) -> tuple[Row, ...]:
+    if planned_mode not in {"require-absent", "allow-current"}:
+        raise ValueError(f"invalid planned validation mode: {planned_mode}")
     rows = tuple(rows)
     names = [row.token for row in rows]
     if len(names) != len(set(names)):
@@ -2412,11 +2469,16 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
                     raise ValueError(
                         f"unauthorized planned path: {row.token}: {planned_path}"
                     )
-                if (ROOT / planned_path).exists():
+                if (
+                    planned_mode == "require-absent"
+                    and (ROOT / planned_path).exists()
+                ):
                     raise ValueError(
                         f"planned path unexpectedly exists: {row.token}: {planned_path}"
                     )
-            if key not in PLANNED_KEYS or key in current_keys:
+            if key not in PLANNED_KEYS or (
+                planned_mode == "require-absent" and key in current_keys
+            ):
                 raise ValueError(f"invalid planned artifact key: {row.token}: {key}")
             if row.ci_binding != PLANNED_CI_BINDING:
                 raise ValueError(f"inexact planned command: {row.token}")
@@ -2435,8 +2497,12 @@ def validate_rows(rows: Iterable[Row]) -> tuple[Row, ...]:
     return rows
 
 
-def render(rows: Iterable[Row] | None = None) -> bytes:
-    rows = validate_rows(build_rows() if rows is None else rows)
+def render(
+    rows: Iterable[Row] | None = None, *, planned_mode: str = "require-absent"
+) -> bytes:
+    rows = validate_rows(
+        build_rows() if rows is None else rows, planned_mode=planned_mode
+    )
     lines = [
         "# HDE-EPIC038 DEV-01 Token Evidence Matrix",
         "",
@@ -2723,7 +2789,8 @@ def build_package(blockers: list[dict[str, object]] | None = None, ledger: Mappi
     validate_package(package); return package
 
 
-def validate_package(package: Mapping[str, bytes]) -> None:
+def validate_package_structure(package: Mapping[str, bytes]) -> None:
+    """Validate package bytes and cross-surfaces without current proof/index state."""
     if set(package) != set(PACKAGE_PATHS) or any(not b or not b.endswith(b"\n") or b"\r" in b for b in package.values()): raise ValueError("incomplete or noncanonical package")
     manifest = json.loads(package[CLOSE_MANIFEST_PATH], object_pairs_hook=_unique_json_object)
     amap = json.loads(package[ACCEPTANCE_MAP_PATH], object_pairs_hook=_unique_json_object)
@@ -2840,6 +2907,2681 @@ def close_blocker(raw_request: str) -> dict[str, bytes]:
     return build_package(blockers, updated)
 
 
+# DEV-02 authoritative evaluator and package implementation.  These definitions
+# deliberately replace the provisional implementation above while leaving the
+# independently approved DEV-01 matrix implementation and bytes intact.
+PRECOMMIT_CHECKLIST_PATH = (
+    "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log"
+)
+POSTCOMMIT_CHECKLIST_PATH = (
+    "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log"
+)
+PRECOMMIT_CHECKLIST_KEY = "epic038.qa_precommit_checklist"
+POSTCOMMIT_CHECKLIST_KEY = "epic038.qa_postcommit_checklist"
+PACKAGE_PATHS = (
+    CLOSE_REPORT_PATH,
+    CLOSE_MANIFEST_PATH,
+    ACCEPTANCE_MAP_PATH,
+    OUTPUT.as_posix(),
+    VIABILITY_PATH,
+    LEDGER_PATH,
+    PRECOMMIT_CHECKLIST_PATH,
+    POSTCOMMIT_CHECKLIST_PATH,
+)
+PACKAGE_ACTIVATION_PATHS = (
+    CLOSE_REPORT_PATH,
+    CLOSE_MANIFEST_PATH,
+    ACCEPTANCE_MAP_PATH,
+    VIABILITY_PATH,
+    LEDGER_PATH,
+    PRECOMMIT_CHECKLIST_PATH,
+    POSTCOMMIT_CHECKLIST_PATH,
+)
+KEY_OUTPUTS = {
+    "acceptance_map": ACCEPTANCE_MAP_PATH,
+    "acceptance_map_viability": VIABILITY_PATH,
+    "close_manifest": CLOSE_MANIFEST_PATH,
+    "close_report": CLOSE_REPORT_PATH,
+    "closeout_remediation_ledger": LEDGER_PATH,
+    "qa_postcommit_checklist": POSTCOMMIT_CHECKLIST_PATH,
+    "qa_precommit_checklist": PRECOMMIT_CHECKLIST_PATH,
+    "token_matrix": OUTPUT.as_posix(),
+}
+CLOSEOUT_PRIMARY_BINDINGS: Mapping[str, tuple[str, str]] = {
+    "epic038.close_report": (CLOSE_REPORT_PATH, f"{CLOSE_REPORT_PATH}.path_proof.txt"),
+    "epic038.manifest": (CLOSE_MANIFEST_PATH, f"{CLOSE_MANIFEST_PATH}.path_proof.txt"),
+    "epic038.acceptance_map": (ACCEPTANCE_MAP_PATH, f"{ACCEPTANCE_MAP_PATH}.path_proof.txt"),
+    "epic038.acceptance_map_viability": (VIABILITY_PATH, f"{VIABILITY_PATH}.path_proof.txt"),
+    LEDGER_KEY: (LEDGER_PATH, f"{LEDGER_PATH}.path_proof.txt"),
+    PRECOMMIT_CHECKLIST_KEY: (
+        PRECOMMIT_CHECKLIST_PATH,
+        f"{PRECOMMIT_CHECKLIST_PATH}.path_proof.txt",
+    ),
+    POSTCOMMIT_CHECKLIST_KEY: (
+        POSTCOMMIT_CHECKLIST_PATH,
+        f"{POSTCOMMIT_CHECKLIST_PATH}.path_proof.txt",
+    ),
+}
+FINAL_LF_PLANNED_PATHS = (
+    "audit/EPIC-038_close_report.md",
+    "audit/EPIC-038_close_report.md.path_proof.txt",
+    "audit/EPIC-038_MANIFEST.json",
+    "audit/EPIC-038_MANIFEST.json.path_proof.txt",
+    "docs/acceptance_map_epic038.json",
+    "docs/acceptance_map_epic038.json.path_proof.txt",
+    "audit/qa/hde-epic038/acceptance_map_viability.log",
+    "audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+    "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt",
+    PRECOMMIT_CHECKLIST_PATH,
+    f"{PRECOMMIT_CHECKLIST_PATH}.path_proof.txt",
+    POSTCOMMIT_CHECKLIST_PATH,
+    f"{POSTCOMMIT_CHECKLIST_PATH}.path_proof.txt",
+)
+
+QA_CHECK_IDS = (
+    "qa-00-step-0-discovery",
+    "qa-01-po-001",
+    "qa-02-po-002",
+    "qa-03-po-003",
+    "qa-04-po-004",
+    "qa-05-po-005",
+    "qa-06-po-006",
+    "qa-07-po-007",
+    "qa-08-po-008",
+    "qa-09-po-009",
+    "qa-10-po-010",
+    "qa-11-po-011",
+    "qa-12-po-012",
+    "qa-13-po-013",
+    "qa-14-po-014",
+    "qa-15-po-015",
+    "qa-16-po-016",
+    "qa-17-po-017",
+    "qa-18-po-018",
+    "qa-19-po-019",
+    "qa-20-po-020",
+    "qa-21-po-021",
+    "qa-22-po-022",
+    "qa-23-po-023",
+)
+PLAN_PATH = "docs/plans/r5-Epic-Remediation-Plan-HDE-EPIC038-Closeout-Completion.md"
+APPROVED_PLAN_SHA256 = "3846232f0a8fd1e7a1bc8ab1723107cce40c26c9622a8379e4ac212c215bffbf"
+NON_TOKEN_OBLIGATIONS = (
+    "BG_SOURCE_SELECTION_OK",
+    "BG_VENDOR_CALLS_DISABLED_IN_PROD_OK",
+    "BG_SOURCE_INVARIANCE_OK",
+    "BG_TTL_SWR_POLICY_OK",
+    "BG_RATE_LIMIT_POLICY_OK",
+    "BG_CIRCUIT_BREAKER_POLICY_OK",
+    "ENV_SNAPSHOT_SINGLETON_OK",
+    "ENV_SNAPSHOT_SCHEMA_V3_OK",
+    "ENV_PINS_PRESENT_OK",
+)
+NON_TOKEN_BINDINGS: Mapping[str, tuple[str, str, str]] = {
+    "BG_SOURCE_SELECTION_OK": (
+        "bodygraph.source_selection",
+        "artifacts/bodygraph/source_selection.snapshot.json",
+        "artifacts/bodygraph/source_selection.snapshot.json.path_proof.txt",
+    ),
+    "BG_VENDOR_CALLS_DISABLED_IN_PROD_OK": (
+        "bodygraph.source_selection",
+        "artifacts/bodygraph/source_selection.snapshot.json",
+        "artifacts/bodygraph/source_selection.snapshot.json.path_proof.txt",
+    ),
+    "BG_SOURCE_INVARIANCE_OK": (
+        "bodygraph.source_invariance.summary",
+        "artifacts/bodygraph/source_invariance/summary.json",
+        "artifacts/bodygraph/source_invariance/summary.json.path_proof.txt",
+    ),
+    "BG_TTL_SWR_POLICY_OK": (
+        "bodygraph.refresh_policy.snapshot",
+        "artifacts/bodygraph/refresh_policy.snapshot.json",
+        "artifacts/bodygraph/refresh_policy.snapshot.json.path_proof.txt",
+    ),
+    "BG_RATE_LIMIT_POLICY_OK": (
+        "bodygraph.refresh_policy.snapshot",
+        "artifacts/bodygraph/refresh_policy.snapshot.json",
+        "artifacts/bodygraph/refresh_policy.snapshot.json.path_proof.txt",
+    ),
+    "BG_CIRCUIT_BREAKER_POLICY_OK": (
+        "bodygraph.refresh_policy.snapshot",
+        "artifacts/bodygraph/refresh_policy.snapshot.json",
+        "artifacts/bodygraph/refresh_policy.snapshot.json.path_proof.txt",
+    ),
+    "ENV_SNAPSHOT_SINGLETON_OK": (
+        "epic038.pr01.env_matrix_snapshot_v3",
+        "artifacts/runtime/env_matrix.snapshot.json",
+        "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
+    ),
+    "ENV_SNAPSHOT_SCHEMA_V3_OK": (
+        "epic038.pr01.env_matrix_snapshot_v3",
+        "artifacts/runtime/env_matrix.snapshot.json",
+        "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
+    ),
+    "ENV_PINS_PRESENT_OK": (
+        "epic038.pr01.env_matrix_snapshot_v3",
+        "artifacts/runtime/env_matrix.snapshot.json",
+        "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
+    ),
+}
+
+TRACKED_ISSUES: Mapping[str, Mapping[str, str]] = {
+    "TI-001": {
+        "disposition": "RETAINED_AND_ACCOUNTED",
+        "detail": (
+            "RELEASE_ID_RECOMPUTE_OK is admitted; retired "
+            "DEV_DB_BRIDGE_FALLBACK_OK is excluded from every current acceptance "
+            "surface; nine prohibited PF09 labels remain non-token obligations."
+        ),
+    },
+    "TI-R1-001": {
+        "disposition": "MATRIX_CHECKPOINT_ONLY",
+        "detail": "The landed DEV-01 matrix and Gate B make no token claim.",
+    },
+    "TI-R1-002": {
+        "disposition": "DEV03_FIXED_POINT_REQUIRED",
+        "detail": "Final acceptance outputs require DEV-03 governed generation.",
+    },
+    "TI-R1-003": {
+        "disposition": "EXACT_HEAD_VALIDATION_REQUIRED",
+        "detail": "Formal completion continues through exact-head validation and Gate D.",
+    },
+    "TI-R1-004": {
+        "disposition": "LEDGER_UNTIL_CLOSED",
+        "detail": "Every blocker remains OPEN and NOT SATISFIED until directly revalidated.",
+    },
+    "TI-R1-005": {
+        "disposition": "SEQUENCING_PRESERVED",
+        "detail": "DEV-02 follows landed Gate B and does not perform DEV-03 or acceptance.",
+    },
+}
+
+ADR_RECORDS: tuple[Mapping[str, object], ...] = (
+    {
+        "label": "ADR-R1-001",
+        "decision_point": "Execution lineage and rails",
+        "options": [
+            "One bounded closed-rails DEV lineage with no OPS or Live QA",
+            "Broaden execution into OPS or Live QA",
+        ],
+        "governing_canon": ["PF06 §3.5", "PF10 Addendum 2.36"],
+        "final_decision": "Use one bounded closed-rails DEV lineage; no OPS or Live QA.",
+        "disposition": "EPIC_SPECIFIC",
+        "drain_targets": ["PF06 close-gate rules"],
+    },
+    {
+        "label": "ADR-R1-002",
+        "decision_point": "Binary closeout decision",
+        "options": [
+            "Derive SATISFIED from affirmative evidence",
+            "Infer SATISFIED from missing blockers or path presence",
+        ],
+        "governing_canon": ["PF06 §3.5.4", "PF10 Addendum 2.36"],
+        "final_decision": (
+            "Derive SATISFIED only from affirmative evidence; otherwise emit the "
+            "complete NOT SATISFIED package with exact follow-up."
+        ),
+        "disposition": "EPIC_SPECIFIC",
+        "drain_targets": ["PF06 close-gate rules"],
+    },
+    {
+        "label": "ADR-R1-003",
+        "decision_point": "Retired bridge-token history",
+        "options": [
+            "Exclude the retired token from current claims while preserving history",
+            "Rewrite historical evidence or restore the retired token",
+        ],
+        "governing_canon": ["PF04 governance", "PF10 Addendum 2.37"],
+        "final_decision": (
+            "Exclude the retired bridge token from current claims and preserve "
+            "historical evidence unchanged."
+        ),
+        "disposition": "EPIC_SPECIFIC",
+        "drain_targets": ["PF04 governance"],
+    },
+    {
+        "label": "ADR-R1-004",
+        "decision_point": "Checklist ownership",
+        "options": [
+            "Keep close mechanics in PF06 and updater discipline in HDE-DIST005.2",
+            "Invent a new PF09 task or token",
+        ],
+        "governing_canon": ["PF06 §3.5", "PF09.6 HDE-DIST005.2"],
+        "final_decision": (
+            "Create no new PF09 task; PF06 owns close mechanics and "
+            "HDE-DIST005.2 owns updater discipline."
+        ),
+        "disposition": "EPIC_SPECIFIC",
+        "drain_targets": ["PF06 §3.5", "PF09.6 HDE-DIST005.2"],
+    },
+    {
+        "label": "ADR-R1-005",
+        "decision_point": "Sequencing authority",
+        "options": [
+            "Run DEV-01 after approval and DEV-02 after Gate B",
+            "Advance without the required gate or silently revise authority",
+        ],
+        "governing_canon": ["Approved r5 plan", "Product Owner authorization"],
+        "final_decision": (
+            "DEV-01 follows approval and DEV-02 follows Gate B; changed authority "
+            "requires a stop and explicit reauthorization."
+        ),
+        "disposition": "EPIC_SPECIFIC",
+        "drain_targets": ["PF06 close-gate rules"],
+    },
+)
+
+QA_CLOSEOUT_ACCOUNTING: Mapping[str, object] = {
+    "accepted_deviations": [
+        "qa-05 bounded remediation",
+        "ADR-DEV-01 partial-cluster generation",
+        "qa-08 Product-Owner-approved Extended Moon Loop",
+        "qa-11 preflight deviation",
+        "legacy .sh Python entrypoint naming is historical, not shell execution",
+    ],
+    "coverage": list(QA_CHECK_IDS),
+    "doc_delta": (
+        "Source-of-truth, accepted-deviation, evidence-light-source, root-cause, "
+        "remediation-loop, evidence-hygiene, and Doc Delta dimensions follow "
+        "PF10 HDE Build Notes Addendum 2.36."
+    ),
+    "evidence_light_source": (
+        "PF10 §2.34 is evidence-light; its historical PF19-availability statement "
+        "is stale against the current repository and permanent-canon drainage is "
+        "a non-blocking follow-up."
+    ),
+    "historical_execution_venue": "UNKNOWN - NON-MATERIAL",
+    "remediation_loop": (
+        "Every execution-phase blocker remains in the canonical remediation "
+        "ledger until the original predicate and all registered validators pass."
+    ),
+    "source_of_truth": (
+        "The current matrix, QA manifest and logs, governed artifacts and proofs, "
+        "Human Index, Machine Mirror, r5 scope, PF09 mapping, issues, and ADRs."
+    ),
+    "superseded_readiness": (
+        "Execution-level READY FOR CLOSEOUT REVIEW and closeout-review READY WITH "
+        "CAVEATS are superseded interim postures and do not mean SATISFIED."
+    ),
+}
+
+
+@dataclass(frozen=True)
+class TokenResult:
+    token: str
+    status: str
+    predicate_key: str
+    detail: str
+    decisive_evidence: tuple[tuple[str, str], ...]
+    minimum_follow_up: str
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "decisive_evidence": [
+                {"kind": kind, "value": value}
+                for kind, value in self.decisive_evidence
+            ],
+            "detail": self.detail,
+            "minimum_follow_up": self.minimum_follow_up,
+            "predicate_key": self.predicate_key,
+            "status": self.status,
+            "token": self.token,
+        }
+
+
+@dataclass(frozen=True)
+class EvaluationSnapshot:
+    token_results: tuple[TokenResult, ...]
+    proof_families: tuple[Mapping[str, object], ...]
+    blockers: tuple[Mapping[str, object], ...]
+    obligations: tuple[Mapping[str, object], ...]
+    fingerprint: str
+
+
+def _json_object(path: str) -> dict[str, object]:
+    try:
+        value = json.loads(
+            (ROOT / path).read_text(encoding="utf-8"),
+            object_pairs_hook=_unique_json_object,
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"invalid JSON artifact: {path}") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"JSON artifact must be an object: {path}")
+    return value
+
+
+def _qa_manifest() -> dict[str, object]:
+    payload = _json_object(QA_MANIFEST_PATH)
+    if tuple(payload) != QA_CHECK_IDS:
+        raise ValueError("QA manifest roster/order mismatch")
+    raw = (ROOT / QA_MANIFEST_PATH).read_bytes()
+    if raw != _canonical_json(payload):
+        raise ValueError("QA manifest is not canonical JSON")
+    return payload
+
+
+def _validate_qa_receipt(check_id: str) -> None:
+    manifest = _qa_manifest()
+    record = manifest.get(check_id)
+    expected_path = f"checks/{check_id}/primary.log"
+    if (
+        not isinstance(record, dict)
+        or set(record) != {"check_id", "log_path", "sha256", "size_bytes", "status"}
+        or record.get("check_id") != check_id
+        or record.get("log_path") != expected_path
+        or record.get("status") != "PASS"
+    ):
+        raise ValueError(f"QA receipt metadata mismatch: {check_id}")
+    path = ROOT / "audit/qa/hde-epic038" / expected_path
+    try:
+        raw = path.read_bytes()
+        header = json.loads(raw.splitlines()[0], object_pairs_hook=_unique_json_object)
+    except (OSError, IndexError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"QA receipt unavailable: {check_id}") from exc
+    if (
+        record.get("sha256") != hashlib.sha256(raw).hexdigest()
+        or record.get("size_bytes") != len(raw)
+        or not isinstance(header, dict)
+        or header.get("check_id") != check_id
+        or header.get("status") != "PASS"
+        or header.get("exit_code") != 0
+        or header.get("claimed_tokens") != []
+    ):
+        raise ValueError(f"QA receipt current-state mismatch: {check_id}")
+
+
+def _validate_finalized_qa_state() -> None:
+    manifest = _qa_manifest()
+    for check_id in QA_CHECK_IDS:
+        _validate_qa_receipt(check_id)
+    _validate_proof(QA_MANIFEST_PATH, f"{QA_MANIFEST_PATH}.path_proof.txt")
+    records = _mirror_records()
+    if (
+        QA_MANIFEST_KEY,
+        QA_MANIFEST_PATH,
+        f"{QA_MANIFEST_PATH}.path_proof.txt",
+    ) not in records:
+        raise ValueError("QA manifest missing exact Machine Mirror binding")
+    human = _human_items()
+    matches = [
+        item
+        for item in human
+        if item.get("artifact_key") == QA_MANIFEST_KEY
+        and item.get("discovered_physical_path") == QA_MANIFEST_PATH
+    ]
+    if len(matches) != 1:
+        raise ValueError("QA manifest missing exact Human Index binding")
+    summary = (ROOT / QA_RCA_PATH).read_text(encoding="utf-8")
+    required = (
+        "# HDE-EPIC038 QA RCA and Doc Delta Summary",
+        "## Coverage versus QA Plan",
+        "qa-00-step-0-discovery",
+        "qa-23-po-023",
+        "READY FOR CLOSEOUT REVIEW",
+        "Formal close-pack completion: NOT CLAIMED",
+    )
+    if any(item not in summary for item in required):
+        raise ValueError("QA RCA/current-state summary is stale or incomplete")
+
+
+def _validate_row_bindings(row: Row) -> None:
+    mirror = tuple(_mirror_items())
+    human = tuple(_human_items())
+    for key, path, proof in zip(
+        row.artifact_keys, row.primary_evidence, row.proof_anchors
+    ):
+        if not (ROOT / path).is_file() or not (ROOT / proof).is_file():
+            raise ValueError(f"missing governed evidence family: {row.token}: {path}")
+        _validate_proof(path, proof)
+        mirror_matches = [
+            item
+            for item in mirror
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+            and item.get("proof_anchor") == proof
+        ]
+        human_matches = [
+            item
+            for item in human
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        ]
+        if len(mirror_matches) != 1 or len(human_matches) != 1:
+            raise ValueError(
+                f"missing or duplicate Human Index/Machine Mirror binding: "
+                f"{row.token}: {key}"
+            )
+        body = (ROOT / path).read_bytes()
+        expected_sha = (
+            _mirror_body_sha256()
+            if path == MACHINE_MIRROR_PATH
+            else hashlib.sha256(body).hexdigest()
+        )
+        expected = (expected_sha, len(body))
+        match = mirror_matches[0]
+        if match.get("sha256") != expected[0] or match.get("size_bytes") != expected[1]:
+            raise ValueError(f"stale Machine Mirror binding: {row.token}: {key}")
+
+
+def _proof_family_records(rows: Sequence[Row]) -> tuple[Mapping[str, object], ...]:
+    result: list[Mapping[str, object]] = []
+    for row in rows:
+        for key, path, proof in zip(
+            row.artifact_keys, row.primary_evidence, row.proof_anchors
+        ):
+            result.append(
+                {
+                    "artifact_key": key,
+                    "classification": row.classification,
+                    "epic_id": row.epic_id,
+                    "primary_evidence": path,
+                    "proof_anchor": proof,
+                    "token": row.token,
+                }
+            )
+    expected_count = sum(len(row.primary_evidence) for row in rows)
+    identities = [
+        (item["token"], item["artifact_key"], item["primary_evidence"], item["proof_anchor"])
+        for item in result
+    ]
+    if len(result) != expected_count or len(identities) != len(set(identities)):
+        raise ValueError("reduced or duplicate proof-family roster")
+    return tuple(result)
+
+
+def _validate_live_qa(row: Row) -> None:
+    if row.live_qa.startswith("N/A:"):
+        if len(row.live_qa.removeprefix("N/A:").strip()) < 20:
+            raise ValueError(f"insubstantive Live QA N/A: {row.token}")
+        return
+    for check_id in row.live_qa.split("; "):
+        _validate_qa_receipt(check_id)
+
+
+def _semantic_doc_delta(_row: Row) -> str:
+    validate_doc_delta_evidence()
+    return "current canonical Doc Delta pair and historical provenance validate"
+
+
+def _semantic_human_index(_row: Row) -> str:
+    validate_index_mirror_topology()
+    return "current Human Index topology validates against the Machine Mirror"
+
+
+def _semantic_machine_mirror(_row: Row) -> str:
+    validate_index_mirror_topology()
+    validate_all_mirror_proofs()
+    return "current Machine Mirror topology, paths, digests, and proofs validate"
+
+
+def _semantic_index_hash(_row: Row) -> str:
+    index_bytes = (ROOT / HUMAN_INDEX_PATH).read_bytes()
+    expected = (
+        f"{hashlib.sha256(index_bytes).hexdigest()}  {HUMAN_INDEX_PATH}\n".encode()
+    )
+    if (ROOT / "docs/evidence/INDEX.sha256").read_bytes() != expected:
+        raise ValueError("Human Index hash sentinel mismatch")
+    return "current Human Index hash sentinel validates"
+
+
+def _semantic_env(row: Row) -> str:
+    payload = _json_object("artifacts/runtime/env_matrix.snapshot.json")
+    rails = payload.get("default_rails")
+    pins = payload.get("determinism_pins")
+    if (
+        payload.get("schema_version") != 3
+        or not isinstance(rails, dict)
+        or rails.get("dev") != {"ALLOW_NETWORK": "0", "SAFE_MODE": "1"}
+        or rails.get("stage") != {"ALLOW_NETWORK": "0", "SAFE_MODE": "1"}
+        or rails.get("CI") != {"ALLOW_NETWORK": "0", "SAFE_MODE": "1"}
+        or rails.get("prod") != {"ALLOW_NETWORK": "1", "SAFE_MODE": "0"}
+        or pins != {"LANG": "C", "LC_ALL": "C", "TZ": "UTC"}
+    ):
+        raise ValueError(f"environment predicate mismatch: {row.token}")
+    predicate = (
+        "closed-rails environment policy validates"
+        if row.token == "ENV_RAILS_POLICY_OK"
+        else "LC_ALL=C determinism pin validates"
+    )
+    return predicate
+
+
+def _semantic_preimage(_row: Row) -> str:
+    validate_preimage_payload(
+        _json_object(PREIMAGE_PATH), (ROOT / PREIMAGE_SOURCE_PATH).read_bytes()
+    )
+    return "stored and recomputed canonical preimage hashes are identical"
+
+
+def _semantic_cli_reader(_row: Row) -> str:
+    validate_cli_reader_parity_payload(_json_object(PREIMAGE_PATH))
+    return "current CLI and Reader canonical bytes are identical"
+
+
+def _key_value_lines(path: str, keys: tuple[str, ...]) -> dict[str, str]:
+    lines = (ROOT / path).read_text(encoding="utf-8").splitlines()
+    if len(lines) != len(keys) or any("=" not in line for line in lines):
+        raise ValueError(f"structured log shape mismatch: {path}")
+    result = dict(line.split("=", 1) for line in lines)
+    if tuple(result) != keys:
+        raise ValueError(f"structured log field order mismatch: {path}")
+    return result
+
+
+def _semantic_abba(_row: Row) -> str:
+    payload = _key_value_lines(
+        "audit/gates/determinism/abba.bytes",
+        ("ab_sha256", "ba_sha256", "byte_identity"),
+    )
+    if (
+        not _hex64(payload["ab_sha256"])
+        or payload["ab_sha256"] != payload["ba_sha256"]
+        or payload["byte_identity"] != "true"
+    ):
+        raise ValueError("ABBA identity predicate mismatch")
+    return "current AB and BA canonical byte hashes are identical"
+
+
+def _semantic_two_run(_row: Row) -> str:
+    payload = _key_value_lines(
+        "audit/gates/determinism/tworun_identity.sha256",
+        ("run1_sha256", "run2_sha256", "byte_identity"),
+    )
+    if (
+        not _hex64(payload["run1_sha256"])
+        or payload["run1_sha256"] != payload["run2_sha256"]
+        or payload["byte_identity"] != "true"
+    ):
+        raise ValueError("two-run identity predicate mismatch")
+    return "current repeated-run canonical byte hashes are identical"
+
+
+def _semantic_json_gate(_row: Row) -> str:
+    payload = _json_object(
+        "audit/gates/json_gate/canonical/json_gate_structured_record.json"
+    )
+    if (
+        payload.get("schema") != "canonical_json.gate.v1"
+        or payload.get("status") != "pass"
+        or payload.get("failures") != []
+        or payload.get("env")
+        != {
+            "ALLOW_NETWORK": "0",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "SAFE_MODE": "1",
+            "TZ": "UTC",
+        }
+    ):
+        raise ValueError("canonical JSON gate predicate mismatch")
+    return "current canonical JSON gate structured record validates"
+
+
+def _a7_payload() -> dict[str, object]:
+    return _json_object("artifacts/proofs/reader_success_get_head_304.json")
+
+
+def _semantic_a7(row: Row) -> str:
+    payload = _a7_payload()
+    get = payload.get("get_200")
+    head = payload.get("head_200")
+    after = payload.get("after_304")
+    encodings = payload.get("tested_encodings")
+    flags = payload.get("vary_flags")
+    if not all(isinstance(item, dict) for item in (get, head, after, flags)):
+        raise ValueError("A7 composite proof shape mismatch")
+    etag = payload.get("etag")
+    quoted = (
+        isinstance(etag, str)
+        and len(etag) == 66
+        and etag.startswith('"')
+        and etag.endswith('"')
+        and _hex64(etag[1:-1])
+    )
+    predicates: Mapping[str, bool] = {
+        "A7_GET_QUOTED_ETAG_OK": bool(
+            quoted
+            and get.get("pass") is True
+            and get.get("status") == 200
+            and get.get("etag") == etag
+            and get.get("body_sha256") == etag[1:-1]
+        ),
+        "A7_HEAD_PARITY_OK": bool(
+            head.get("pass") is True
+            and head.get("status") == 200
+            and head.get("body_empty") is True
+            and head.get("etag") == get.get("etag")
+            and head.get("content_length") == get.get("content_length")
+            and head.get("content_type") == get.get("content_type")
+        ),
+        "A7_304_OMITS_CT_CL_OK": bool(
+            after.get("pass") is True
+            and after.get("status") == 304
+            and after.get("body_empty") is True
+            and after.get("content_type_absent") is True
+            and after.get("content_length_absent") is True
+            and after.get("entity_headers_absent") is True
+        ),
+        "A7_VARY_AUTH_AE_OK": bool(
+            flags == {"accept_encoding": True, "authorization": True}
+            and get.get("vary") == "Authorization, Accept-Encoding"
+            and head.get("vary") == get.get("vary")
+            and after.get("vary") == get.get("vary")
+        ),
+        "A7_ENCODING_INVARIANCE_OK": bool(
+            isinstance(encodings, list)
+            and [item.get("accept_encoding") for item in encodings]
+            == ["identity", "gzip", "br"]
+            and all(
+                isinstance(item, dict)
+                and item.get("content_encoding") == "identity"
+                and item.get("etag") == etag
+                and item.get("head_identity_length") == get.get("content_length")
+                for item in encodings
+            )
+        ),
+        "A7_TRANSPORT_PROOF_OK": bool(
+            payload.get("route_path") == "/reader"
+            and get.get("pass") is True
+            and head.get("pass") is True
+            and after.get("pass") is True
+            and quoted
+        ),
+    }
+    if predicates.get(row.token) is not True:
+        raise ValueError(f"A7 token-specific predicate mismatch: {row.token}")
+    return f"current A7 composite predicate validates for {row.token}"
+
+
+def _semantic_endpoint_catalog(_row: Row) -> str:
+    payload = _json_object("docs/ENDPOINTS_CATALOG.json")
+    endpoints = payload.get("endpoints")
+    if not isinstance(endpoints, list) or not endpoints:
+        raise ValueError("endpoint catalog is empty")
+    identities = [
+        (item.get("method"), item.get("path"))
+        for item in endpoints
+        if isinstance(item, dict)
+    ]
+    reader = [
+        item
+        for item in endpoints
+        if isinstance(item, dict) and item.get("path") == "/reader"
+    ]
+    if (
+        len(identities) != len(endpoints)
+        or len(identities) != len(set(identities))
+        or {(item.get("method"), item.get("env_gate"), item.get("a7_eligible")) for item in reader}
+        != {("GET", "APP_ENV=dev", True), ("HEAD", "APP_ENV=dev", True)}
+        or payload.get("success_endpoints") != [{"method": "GET", "path": "/reader"}]
+    ):
+        raise ValueError("endpoint catalog predicate mismatch")
+    return "current endpoint catalog has exact unique reader bindings"
+
+
+def _semantic_endpoint_env_gate(_row: Row) -> str:
+    expected = (
+        "APP_ENV=prod\n"
+        "/reader_success_unreachable=true\n"
+        "cache_control=no-store\n"
+        "etag_absent=true\n"
+    )
+    if (ROOT / "artifacts/proofs/endpoints_env_gate_proof.log").read_text(
+        encoding="utf-8"
+    ) != expected:
+        raise ValueError("endpoint environment-gate proof mismatch")
+    return "current production environment-gate refusal proof validates"
+
+
+def _semantic_index_mirror(_row: Row) -> str:
+    validate_index_mirror_topology()
+    _validate_finalized_qa_state()
+    return "current Human Index/Machine Mirror topology and QA binding validate"
+
+
+def _semantic_paths(_row: Row) -> str:
+    validate_mirror_paths()
+    _validate_finalized_qa_state()
+    return "every current Machine Mirror physical path resolves inside the repository"
+
+
+def _semantic_db(row: Row) -> str:
+    validate_db_posture_payload(row.token, _json_object(DB_POSTURE_PATH))
+    return f"current database posture predicate validates for {row.token}"
+
+
+def _semantic_db_connection(_row: Row) -> str:
+    payload = _json_object("artifacts/runtime/direct_db_selection.snapshot.json")
+    predicates = payload.get("predicates")
+    cases = payload.get("cases")
+    required = {
+        "alternate_transport_attempts_zero",
+        "direct_only_provider",
+        "missing_direct_fails_closed",
+        "retired_keys_fail_before_provider_attempt",
+        "secret_values_absent",
+        "unavailable_direct_fails_closed",
+    }
+    if (
+        payload.get("schema") != "hde_epic038.direct_db_selection.v1"
+        or payload.get("result") != "PASS"
+        or payload.get("failure") is not None
+        or not isinstance(predicates, dict)
+        or set(predicates) != required
+        or any(value is not True for value in predicates.values())
+        or not isinstance(cases, list)
+        or len(cases) != 4
+        or any(not isinstance(item, dict) or item.get("result") != "PASS" for item in cases)
+    ):
+        raise ValueError("direct database selection predicate mismatch")
+    return "current direct-only database selection and fail-closed cases validate"
+
+
+def _semantic_all_proofs(_row: Row) -> str:
+    validate_all_mirror_proofs()
+    _validate_finalized_qa_state()
+    return "every current Machine Mirror proof family validates"
+
+
+def _semantic_mirror_schema(_row: Row) -> str:
+    validate_index_mirror_topology()
+    validate_all_mirror_proofs()
+    return "current mirror schema topology and record bindings validate"
+
+
+def _semantic_final_lf(_row: Row) -> str:
+    manifest = _qa_manifest()
+    validate_final_lf_evidence(
+        manifest, (ROOT / FINAL_LF_LOG_PATH).read_text(encoding="utf-8")
+    )
+    validate_final_lf_script((ROOT / FINAL_LF_SCRIPT_PATH).read_text(encoding="utf-8"))
+    return "current final-LF execution receipt and target coverage validate"
+
+
+def _semantic_no_io(_row: Row) -> str:
+    validate_no_io_payloads(
+        (ROOT / REFUSAL_PATH).read_text(encoding="utf-8"),
+        _json_object(REFUSAL_MANIFEST_PATH),
+    )
+    return "current closed-rails refusal proves zero vendor and database calls"
+
+
+def _semantic_release(_row: Row) -> str:
+    manifest_digest, captured_digest = validate_release_identity_family()
+    if not (_hex64(manifest_digest) and _hex64(captured_digest)):
+        raise ValueError("release identity digest shape mismatch")
+    return (
+        "current canonical release manifest validates and the immutable retained "
+        f"capture is internally coherent (manifest={manifest_digest}; "
+        f"retained_capture={captured_digest})"
+    )
+
+
+def _validate_checklist_payload(row: Row) -> str:
+    path, key, _owner = PLANNED_BINDINGS[row.token]
+    raw = (ROOT / path).read_bytes()
+    try:
+        payload = json.loads(raw, object_pairs_hook=_unique_json_object)
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"invalid planned checklist JSON: {row.token}") from exc
+    phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
+    if (
+        not isinstance(payload, dict)
+        or raw != _canonical_json(payload)
+        or set(payload)
+        != {
+            "artifact_key",
+            "closed_rails",
+            "epic_id",
+            "phase",
+            "result",
+            "schema",
+            "token_roster",
+            "validation_commands",
+        }
+        or payload.get("schema") != "hde.epic038.closeout_checklist.v1"
+        or payload.get("artifact_key") != key
+        or payload.get("epic_id") != EPIC_ID
+        or payload.get("phase") != phase
+        or payload.get("result") != "PASS"
+        or payload.get("token_roster") != list(TOKENS)
+        or payload.get("closed_rails")
+        != {
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "SAFE_MODE": "1",
+            "TZ": "UTC",
+        }
+        or payload.get("validation_commands")
+        != [PLAN_CLOSEOUT_CHECK_COMMAND, PLANNED_COMMANDS]
+    ):
+        raise ValueError(f"planned checklist semantic mismatch: {row.token}")
+    return f"current {phase.lower()} checklist is canonical and records PASS"
+
+
+def _validate_close_report_primary(_row: Row) -> str:
+    raw = (ROOT / CLOSE_REPORT_PATH).read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeError as exc:
+        raise ValueError("close report is not UTF-8") from exc
+    required = (
+        "# HDE-EPIC038 Close Report",
+        "## Final decision:",
+        "## Exact package pointers",
+        "## Token outcomes",
+        "## Embedded complete QA RCA and Doc Delta accounting",
+        "## Tracked issues",
+        "## PF06 §3.5.4 ADR records",
+        "## Reused proof disclosure",
+        "## Nonclaims",
+        "DEV-02 in-memory package validation: PASS",
+    )
+    if not raw.endswith(b"\n") or b"\r" in raw or any(item not in text for item in required):
+        raise ValueError("close report semantic contract mismatch")
+    if any(token not in text for token in TOKENS):
+        raise ValueError("close report token roster is incomplete")
+    return "current governed close report is complete and in-memory validated"
+
+
+TOKEN_EVALUATOR_REGISTRY: Mapping[str, Callable[[Row], str]] = {
+    "TESTS_PASS_OK": _validate_close_report_primary,
+    "DOC_DELTA_PRESENT_OK": _semantic_doc_delta,
+    "EVIDENCE_INDEX_UPDATED_OK": _semantic_human_index,
+    "MACHINE_MIRROR_UPDATED_OK": _semantic_machine_mirror,
+    "EVIDENCE_INDEX_HASH_OK": _semantic_index_hash,
+    "QA_PRECOMMIT_CHECKLIST_OK": _validate_checklist_payload,
+    "QA_POSTCOMMIT_CHECKLIST_OK": _validate_checklist_payload,
+    "ENV_RAILS_POLICY_OK": _semantic_env,
+    "PREIMAGE_RECOMPUTE_OK": _semantic_preimage,
+    "CLI_READER_PARITY_OK": _semantic_cli_reader,
+    "COMPOSITE_ABBA_IDENTITY_OK": _semantic_abba,
+    "TWO_RUN_IDENTITY_OK": _semantic_two_run,
+    "JSON_CANONICAL_CHECK_OK": _semantic_json_gate,
+    "A7_GET_QUOTED_ETAG_OK": _semantic_a7,
+    "A7_HEAD_PARITY_OK": _semantic_a7,
+    "A7_304_OMITS_CT_CL_OK": _semantic_a7,
+    "A7_VARY_AUTH_AE_OK": _semantic_a7,
+    "A7_ENCODING_INVARIANCE_OK": _semantic_a7,
+    "A7_TRANSPORT_PROOF_OK": _semantic_a7,
+    "ENDPOINTS_CATALOG_OK": _semantic_endpoint_catalog,
+    "ENDPOINTS_CATALOG_ENV_GATE_OK": _semantic_endpoint_env_gate,
+    "ENV_LC_ALL_C_OK": _semantic_env,
+    "EVIDENCE_INDEX_MIRROR_OK": _semantic_index_mirror,
+    "EVIDENCE_PATHS_VALIDATED_OK": _semantic_paths,
+    "DB_RUNTIME_SEARCH_PATH_OK": _semantic_db,
+    "DB_ROLE_OK": _semantic_db,
+    "DB_SCHEMA_FINGERPRINT_OK": _semantic_db,
+    "DB_CONN_ENV_OK": _semantic_db_connection,
+    "EVIDENCE_PATH_PROOFS_OK": _semantic_all_proofs,
+    "CI_CHECK_MIRROR_SCHEMA_OK": _semantic_mirror_schema,
+    "CI_CHECK_FINAL_LF_OK": _semantic_final_lf,
+    "NO_EXTERNAL_IO_ON_REFUSAL_OK": _semantic_no_io,
+    "RELEASE_ID_RECOMPUTE_OK": _semantic_release,
+}
+
+
+def _planned_result(row: Row) -> TokenResult:
+    path, key, _owner = PLANNED_BINDINGS[row.token]
+    proof = f"{path}.path_proof.txt"
+    primary_is_file = (ROOT / path).is_file()
+    proof_is_file = (ROOT / proof).is_file()
+    evidence = (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key))
+    follow_up = (
+        f"DEV-03 must canonically produce {path}, run the canonical evidence "
+        "updater, and establish the exact proof and Human Index/Machine Mirror binding."
+    )
+    try:
+        mirror_matches = [
+            item
+            for item in _mirror_items()
+            if item.get("artifact_key") == key
+            or item.get("discovered_physical_path") == path
+        ]
+        human_matches = [
+            item
+            for item in _human_items()
+            if item.get("artifact_key") == key
+            or item.get("discovered_physical_path") == path
+        ]
+    except (OSError, UnicodeError, ValueError) as exc:
+        return TokenResult(
+            row.token,
+            "FAIL",
+            f"token.{row.token}.planned_binding",
+            str(exc),
+            evidence,
+            follow_up,
+        )
+    companion_registered = proof_is_file or bool(mirror_matches) or bool(human_matches)
+    if not companion_registered:
+        if (
+            (ROOT / path).exists() and not primary_is_file
+        ) or (ROOT / proof).exists():
+            return TokenResult(
+                row.token,
+                "FAIL",
+                f"token.{row.token}.planned_binding",
+                "planned binding conflicts with a non-file repository entry",
+                evidence,
+                follow_up,
+            )
+        # Both the pre-generation state (no primary) and the exact DEV-03
+        # transition (primary written, updater companions not written yet) are
+        # nonclaiming.  Once any proof or Index/Mirror companion is registered,
+        # the complete family is mandatory and is validated below.
+        return _unclaimed_planned_result(row)
+    if not primary_is_file or not proof_is_file:
+        return TokenResult(
+            row.token,
+            "FAIL",
+            f"token.{row.token}.planned_binding",
+            "planned evidence family is partial",
+            evidence,
+            follow_up,
+        )
+    try:
+        _validate_row_bindings(row)
+        detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return TokenResult(
+            row.token,
+            "FAIL",
+            f"token.{row.token}.planned_binding",
+            str(exc),
+            evidence,
+            follow_up,
+        )
+    return _planned_pass_result(row, detail=detail)
+
+
+def _planned_pass_result(row: Row, *, detail: str | None = None) -> TokenResult:
+    """Return the one canonical final result for a validated planned binding."""
+    path, key, _owner = PLANNED_BINDINGS[row.token]
+    if detail is None:
+        if row.token == "TESTS_PASS_OK":
+            detail = "current governed close report is complete and in-memory validated"
+        else:
+            phase = (
+                "precommit"
+                if row.token == "QA_PRECOMMIT_CHECKLIST_OK"
+                else "postcommit"
+            )
+            detail = f"current {phase} checklist is canonical and records PASS"
+    return TokenResult(
+        row.token,
+        "PASS",
+        f"token.{row.token}.current_governed_result",
+        detail,
+        (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key)),
+        "NONE",
+    )
+
+
+def _current_result(row: Row) -> TokenResult:
+    evidence = tuple(
+        ("ARTIFACT_PATH", path) for path in row.primary_evidence
+    ) + tuple(("ARTIFACT_KEY", key) for key in row.artifact_keys)
+    follow_up = (
+        f"Correct or canonically regenerate the exact governed evidence family for "
+        f"{row.token}, then rerun its registered validators."
+    )
+    try:
+        _validate_row_bindings(row)
+        _validate_live_qa(row)
+        detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+    except (OSError, UnicodeError, ValueError) as exc:
+        return TokenResult(
+            row.token,
+            "FAIL",
+            f"token.{row.token}.current_governed_result",
+            str(exc),
+            evidence,
+            follow_up,
+        )
+    return TokenResult(
+        row.token,
+        "PASS",
+        f"token.{row.token}.current_governed_result",
+        detail,
+        evidence,
+        "NONE",
+    )
+
+
+def _token_blocker(result: TokenResult) -> Mapping[str, object]:
+    row = {item.token: item for item in build_rows()}[result.token]
+    permitted = [
+        path
+        for path in row.primary_evidence
+        if not path.startswith(("audit/ops/", "audit/qa/hde-epic038/checks/"))
+    ]
+    return _descriptor(
+        result.predicate_key,
+        "TOKEN",
+        result.token,
+        result.detail,
+        [
+            {"kind": kind, "value": value}
+            for kind, value in result.decisive_evidence
+        ],
+        PLAN_CLOSEOUT_CHECK_COMMAND,
+        "GOVERNED_ARTIFACT_DRIFT",
+        permitted,
+        result.minimum_follow_up,
+        ["closeout_package_in_memory", "epic038_current_state"],
+    )
+
+
+def _plan_authority() -> dict[str, object]:
+    try:
+        raw = (ROOT / PLAN_PATH).read_bytes()
+        text = raw.decode("utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise ValueError(f"approved r5 source unavailable: {PLAN_PATH}") from exc
+    if not raw.endswith(b"\n") or b"\r" in raw:
+        raise ValueError("approved r5 source byte format mismatch")
+    if hashlib.sha256(raw).hexdigest() != APPROVED_PLAN_SHA256:
+        raise ValueError("approved r5 complete-source digest mismatch")
+    try:
+        pf09_section = text.split("## 6. PF09 accountability\n", 1)[1].split(
+            "\n## 7. Corrected token scope", 1
+        )[0]
+        decisions_section = text.split(
+            "## 12. Tracked issues and decision records\n", 1
+        )[1].split("\n## 13. Canon and drainage dispositions", 1)[0]
+    except IndexError as exc:
+        raise ValueError("approved r5 required section topology mismatch") from exc
+    bullet_ids = tuple(re.findall(r"^\* `([^`]+)`", pf09_section, re.MULTILINE))
+    expected_ids = tuple(
+        value.removesuffix(" (subtask N/A)") for value in PF09_SCOPE
+    ) + PF09_EXCLUSIONS
+    if bullet_ids != expected_ids:
+        raise ValueError("approved r5 PF09 scope/exclusion mismatch")
+    issue_labels = tuple(re.findall(r"^### (TI(?:-R1)?-[0-9]{3}) —", decisions_section, re.MULTILINE))
+    adr_labels = tuple(re.findall(r"^### (ADR-R1-[0-9]{3}) —", decisions_section, re.MULTILINE))
+    if issue_labels != tuple(TRACKED_ISSUES) or adr_labels != tuple(
+        item["label"] for item in ADR_RECORDS
+    ):
+        raise ValueError("approved r5 issue/ADR roster mismatch")
+    required_decisions = (
+        "RELEASE_ID_RECOMPUTE_OK` is admitted",
+        "Assigned to DEV-01",
+        "Assigned to DEV-02 and DEV-03",
+        "Assigned to DEV-02 through DEV-04",
+        "Assigned to DEV-R1",
+        "Resolved by published PF10 Addendum 2.38",
+        "Use one bounded DEV remediation lineage",
+        "only at evidence-derived `SATISFIED`",
+        "Remove the bridge token only from current claim surfaces",
+        "Create no new task in that phased document",
+        "DEV-02 begins only after the matrix is complete",
+    )
+    if any(value not in decisions_section for value in required_decisions):
+        raise ValueError("approved r5 issue/ADR disposition mismatch")
+    return {
+        "adr_records": [dict(item) for item in ADR_RECORDS],
+        "pf09_exclusions": list(PF09_EXCLUSIONS),
+        "pf09_scope": list(PF09_SCOPE),
+        "plan_path": PLAN_PATH,
+        "plan_sha256": APPROVED_PLAN_SHA256,
+        "tracked_issues": {
+            key: dict(value) for key, value in TRACKED_ISSUES.items()
+        },
+    }
+
+
+def _validate_non_token_family(label: str) -> str:
+    if tuple(NON_TOKEN_BINDINGS) != NON_TOKEN_OBLIGATIONS:
+        raise ValueError("non-token evaluator registry mismatch")
+    key, path, proof = NON_TOKEN_BINDINGS[label]
+    if not (ROOT / path).is_file() or not (ROOT / proof).is_file():
+        raise ValueError(f"missing non-token proof family: {label}")
+    _validate_proof(path, proof)
+    mirror = [
+        item
+        for item in _mirror_items()
+        if item.get("artifact_key") == key
+        and item.get("discovered_physical_path") == path
+        and item.get("proof_anchor") == proof
+    ]
+    human = [
+        item
+        for item in _human_items()
+        if item.get("artifact_key") == key
+        and item.get("discovered_physical_path") == path
+    ]
+    if len(mirror) != 1 or len(human) != 1:
+        raise ValueError(f"non-token Index/Mirror binding mismatch: {label}")
+    body = (ROOT / path).read_bytes()
+    if (
+        mirror[0].get("sha256") != hashlib.sha256(body).hexdigest()
+        or mirror[0].get("size_bytes") != len(body)
+    ):
+        raise ValueError(f"stale non-token Machine Mirror binding: {label}")
+    payload = _json_object(path)
+    proof_labels = payload.get("proof_labels")
+    actual_labels = (
+        tuple(
+            item.get("name")
+            for item in proof_labels
+            if isinstance(item, dict) and item.get("type") == "non_token"
+        )
+        if isinstance(proof_labels, list)
+        else ()
+    )
+    if label.startswith("BG_") and label not in actual_labels:
+        raise ValueError(f"non-token proof label mismatch: {label}")
+    if label in {
+        "BG_SOURCE_SELECTION_OK",
+        "BG_VENDOR_CALLS_DISABLED_IN_PROD_OK",
+    }:
+        scenarios = payload.get("scenarios")
+        if (
+            payload.get("schema") != "v1"
+            or actual_labels
+            != ("BG_SOURCE_SELECTION_OK", "BG_VENDOR_CALLS_DISABLED_IN_PROD_OK")
+            or not isinstance(scenarios, list)
+            or len(scenarios) != 3
+            or any(
+                not isinstance(item, dict) or item.get("transport_calls") != 0
+                for item in scenarios
+            )
+            or not any(
+                isinstance(item, dict)
+                and item.get("requested_source") == "vendor"
+                and item.get("reason") == "PROVIDER_REFUSED"
+                and item.get("status") == "error"
+                for item in scenarios
+            )
+        ):
+            raise ValueError(f"source-selection non-token predicate mismatch: {label}")
+    elif label == "BG_SOURCE_INVARIANCE_OK":
+        predicates = payload.get("predicates")
+        if (
+            payload.get("schema") != "bodygraph.source_invariance.summary.v2"
+            or actual_labels != (label,)
+            or payload.get("top_level_pass") is not True
+            or not isinstance(predicates, dict)
+            or not predicates
+            or any(value is not True for value in predicates.values())
+        ):
+            raise ValueError("source-invariance non-token predicate mismatch")
+    elif label.startswith("BG_"):
+        circuit = payload.get("circuit_breaker")
+        rate = payload.get("rate_limit")
+        if (
+            payload.get("schema") != "v1"
+            or actual_labels
+            != (
+                "BG_TTL_SWR_POLICY_OK",
+                "BG_RATE_LIMIT_POLICY_OK",
+                "BG_CIRCUIT_BREAKER_POLICY_OK",
+            )
+            or not isinstance(payload.get("ttl_s"), int)
+            or not isinstance(payload.get("swr_s"), int)
+            or payload["ttl_s"] <= payload["swr_s"]
+            or payload["swr_s"] <= 0
+            or not isinstance(rate, dict)
+            or any(not isinstance(rate.get(name), int) or rate[name] <= 0 for name in ("requests_per_window", "window_s"))
+            or not isinstance(circuit, dict)
+            or any(not isinstance(circuit.get(name), int) or circuit[name] <= 0 for name in ("cooldown_s", "fail_threshold", "window_s"))
+        ):
+            raise ValueError(f"refresh-policy non-token predicate mismatch: {label}")
+    else:
+        rails = payload.get("default_rails")
+        pins = payload.get("determinism_pins")
+        predicates = {
+            "ENV_SNAPSHOT_SINGLETON_OK": bool(
+                {
+                    item.get("artifact_key")
+                    for item in _mirror_items()
+                    if item.get("discovered_physical_path") == path
+                }
+                == {
+                    "epic038.pr01.env_matrix_snapshot_v3",
+                    "runtime.env_matrix.snapshot",
+                }
+            ),
+            "ENV_SNAPSHOT_SCHEMA_V3_OK": payload.get("schema_version") == 3,
+            "ENV_PINS_PRESENT_OK": pins == {"LANG": "C", "LC_ALL": "C", "TZ": "UTC"},
+        }
+        closed = {"ALLOW_NETWORK": "0", "SAFE_MODE": "1"}
+        if (
+            predicates[label] is not True
+            or not isinstance(rails, dict)
+            or any(rails.get(name) != closed for name in ("dev", "stage", "CI"))
+        ):
+            raise ValueError(f"environment non-token predicate mismatch: {label}")
+    return "affirmative current non-token predicate validates"
+
+
+def _obligation_results() -> tuple[Mapping[str, object], ...]:
+    obligations: list[Mapping[str, object]] = []
+    checks: tuple[tuple[str, Callable[[], None], list[dict[str, str]], str], ...] = (
+        (
+            "qa.finalized_current_state",
+            _validate_finalized_qa_state,
+            [
+                {"kind": "ARTIFACT_PATH", "value": QA_MANIFEST_PATH},
+                {"kind": "ARTIFACT_PATH", "value": QA_RCA_PATH},
+            ],
+            "Restore the finalized 24-check QA current-state fixed point through its owning process.",
+        ),
+        (
+            "evidence.full_index_mirror_topology",
+            lambda: (validate_index_mirror_topology(), validate_all_mirror_proofs()),
+            [
+                {"kind": "ARTIFACT_PATH", "value": HUMAN_INDEX_PATH},
+                {"kind": "ARTIFACT_PATH", "value": MACHINE_MIRROR_PATH},
+            ],
+            "Run the canonical evidence updater and all companion validators.",
+        ),
+    )
+    for key, validator, evidence, follow_up in checks:
+        try:
+            validator()
+            obligations.append(
+                {
+                    "detail": "affirmative current predicate validates",
+                    "predicate_key": key,
+                    "status": "PASS",
+                }
+            )
+        except (OSError, UnicodeError, ValueError) as exc:
+            obligations.append(
+                {
+                    "blocker": _descriptor(
+                        key,
+                        "CHECK",
+                        key,
+                        str(exc),
+                        evidence,
+                        PLAN_CLOSEOUT_CHECK_COMMAND,
+                        "GOVERNED_ARTIFACT_DRIFT",
+                        [],
+                        follow_up,
+                        ["closeout_package_in_memory", "epic038_current_state"],
+                    ),
+                    "detail": str(exc),
+                    "predicate_key": key,
+                    "status": "FAIL",
+                }
+            )
+    try:
+        authority = _plan_authority()
+        obligations.append(
+            {
+                "detail": f"approved r5 source validates at {authority['plan_sha256']}",
+                "predicate_key": "authority.approved_r5_source",
+                "status": "PASS",
+            }
+        )
+        obligations.extend(
+            {
+                "detail": "approved r5 PF09 scope item validates",
+                "item": item,
+                "predicate_key": f"authority.pf09_scope.{item}",
+                "status": "PASS",
+            }
+            for item in PF09_SCOPE
+        )
+        obligations.extend(
+            {
+                "detail": "approved r5 PF09 exclusion validates",
+                "item": item,
+                "predicate_key": f"authority.pf09_exclusion.{item}",
+                "status": "PASS",
+            }
+            for item in PF09_EXCLUSIONS
+        )
+        obligations.extend(
+            {
+                "detail": "approved r5 tracked-issue disposition validates",
+                "item": issue,
+                "predicate_key": f"authority.tracked_issue.{issue}",
+                "status": "PASS",
+            }
+            for issue in TRACKED_ISSUES
+        )
+        obligations.extend(
+            {
+                "detail": "approved r5 ADR disposition validates",
+                "item": str(record["label"]),
+                "predicate_key": f"authority.adr.{record['label']}",
+                "status": "PASS",
+            }
+            for record in ADR_RECORDS
+        )
+        obligations.append(
+            {
+                "detail": "preserved execution-level QA RCA source is consumed",
+                "item": QA_RCA_PATH,
+                "predicate_key": "authority.qa_rca_source",
+                "status": "PASS",
+            }
+        )
+    except (OSError, UnicodeError, ValueError) as exc:
+        obligations.append(
+            {
+                "blocker": _descriptor(
+                    "authority.approved_r5_source",
+                    "AUTHORITY",
+                    PLAN_PATH,
+                    str(exc),
+                    [{"kind": "ARTIFACT_PATH", "value": PLAN_PATH}],
+                    "internal:validate-approved-r5-source",
+                    "SOURCE_AUTHORITY_CONFLICT",
+                    [],
+                    "Restore or reconcile the complete approved r5 authority before continuing.",
+                    ["closeout_package_in_memory"],
+                    "PO_AUTHORIZATION_REQUIRED",
+                ),
+                "detail": str(exc),
+                "predicate_key": "authority.approved_r5_source",
+                "status": "FAIL",
+            }
+        )
+    for label in NON_TOKEN_OBLIGATIONS:
+        key, path, _proof = NON_TOKEN_BINDINGS[label]
+        predicate_key = f"non_token.{label}.current_governed_result"
+        try:
+            detail = _validate_non_token_family(label)
+            obligations.append(
+                {
+                    "artifact_key": key,
+                    "detail": detail,
+                    "label": label,
+                    "path": path,
+                    "predicate_key": predicate_key,
+                    "status": "PASS",
+                }
+            )
+        except (OSError, UnicodeError, ValueError) as exc:
+            follow_up = (
+                f"Correct or canonically regenerate the exact governed non-token "
+                f"proof family for {label}, then rerun all companion validators."
+            )
+            obligations.append(
+                {
+                    "artifact_key": key,
+                    "blocker": _descriptor(
+                        predicate_key,
+                        "CHECK",
+                        label,
+                        str(exc),
+                        [
+                            {"kind": "ARTIFACT_PATH", "value": path},
+                            {"kind": "ARTIFACT_KEY", "value": key},
+                        ],
+                        PLAN_CLOSEOUT_CHECK_COMMAND,
+                        "GOVERNED_ARTIFACT_DRIFT",
+                        [path],
+                        follow_up,
+                        ["closeout_package_in_memory", "epic038_current_state"],
+                    ),
+                    "detail": str(exc),
+                    "label": label,
+                    "path": path,
+                    "predicate_key": predicate_key,
+                    "status": "FAIL",
+                }
+            )
+    observed_non_tokens = tuple(
+        item.get("label") for item in obligations if "label" in item
+    )
+    if observed_non_tokens != NON_TOKEN_OBLIGATIONS:
+        raise ValueError("non-token obligation roster/order mismatch")
+    return tuple(obligations)
+
+
+def _make_snapshot(
+    results: Sequence[TokenResult],
+    families: Sequence[Mapping[str, object]],
+    blockers: Sequence[Mapping[str, object]],
+    obligations: Sequence[Mapping[str, object]],
+) -> EvaluationSnapshot:
+    snapshot_payload = {
+        "blockers": list(blockers),
+        "obligations": [
+            {key: value for key, value in item.items() if key != "blocker"}
+            for item in obligations
+        ],
+        "proof_families": list(families),
+        "token_results": [item.as_dict() for item in results],
+    }
+    fingerprint = hashlib.sha256(_canonical_json(snapshot_payload)).hexdigest()
+    return EvaluationSnapshot(
+        tuple(results),
+        tuple(families),
+        tuple(blockers),
+        tuple(obligations),
+        fingerprint,
+    )
+
+
+def _unclaimed_planned_result(row: Row) -> TokenResult:
+    path, key, _owner = PLANNED_BINDINGS[row.token]
+    return TokenResult(
+        row.token,
+        "UNCLAIMED",
+        f"token.{row.token}.current_governed_result",
+        "exact planned-new binding is computable and not yet produced",
+        (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key)),
+        (
+            f"DEV-03 must canonically produce {path}, run the canonical evidence "
+            "updater, and establish the exact proof and Human Index/Machine Mirror binding."
+        ),
+    )
+
+
+def evaluate_closeout() -> EvaluationSnapshot:
+    if tuple(TOKEN_EVALUATOR_REGISTRY) != TOKENS:
+        raise ValueError("token evaluator registry must equal the approved roster/order")
+    raw_rows = tuple(build_rows())
+    try:
+        rows = validate_rows(raw_rows, planned_mode="allow-current")
+        expected_matrix = render(rows, planned_mode="allow-current")
+        actual_matrix = _matrix_bytes()
+        if (
+            actual_matrix != expected_matrix
+            or hashlib.sha256(actual_matrix).hexdigest() != TOKEN_MATRIX_SHA256
+        ):
+            raise ValueError("DEV-01 token matrix byte contract drift")
+    except (OSError, UnicodeError, ValueError) as exc:
+        if tuple(row.token for row in raw_rows) != TOKENS:
+            raise ValueError(f"invalid DEV-01 row contract: {exc}") from exc
+        rows = raw_rows
+        detail = f"complete DEV-01 row validation failed: {exc}"
+        results = tuple(
+            TokenResult(
+                row.token,
+                "FAIL",
+                f"token.{row.token}.current_governed_result",
+                detail,
+                tuple(("ARTIFACT_PATH", path) for path in row.primary_evidence),
+                "Restore the approved DEV-01 matrix and every declared evidence family.",
+            )
+            for row in rows
+        )
+    else:
+        results = tuple(
+            _planned_result(row)
+            if row.classification == "planned-new"
+            else _current_result(row)
+            for row in rows
+        )
+    if tuple(item.token for item in results) != TOKENS:
+        raise ValueError("token result roster/order mismatch")
+    if any(item.status not in {"PASS", "UNCLAIMED", "FAIL"} for item in results):
+        raise ValueError("invalid token result status")
+    families = _proof_family_records(rows)
+    obligations = _obligation_results()
+    blockers: list[Mapping[str, object]] = [
+        _token_blocker(item) for item in results if item.status == "FAIL"
+    ]
+    blockers.extend(
+        item["blocker"]
+        for item in obligations
+        if item.get("status") == "FAIL" and isinstance(item.get("blocker"), dict)
+    )
+    blockers.sort(
+        key=lambda item: (
+            str(item["predicate_key"]),
+            json.dumps(item["subject"], sort_keys=True),
+        )
+    )
+    return _make_snapshot(results, families, blockers, obligations)
+
+
+def derive_blockers(
+    snapshot: EvaluationSnapshot | None = None,
+) -> list[dict[str, object]]:
+    current = evaluate_closeout()
+    if snapshot is not None and snapshot != current:
+        raise ValueError("stale or caller-forged evaluation snapshot")
+    return [dict(item) for item in current.blockers]
+
+
+def _validate_snapshot_contract(snapshot: EvaluationSnapshot) -> None:
+    if tuple(item.token for item in snapshot.token_results) != TOKENS:
+        raise ValueError("evaluation snapshot token roster/order mismatch")
+    if any(
+        item.status not in {"PASS", "UNCLAIMED", "FAIL"}
+        or not item.predicate_key
+        or not item.detail
+        or not item.decisive_evidence
+        or (item.status == "PASS" and item.minimum_follow_up != "NONE")
+        for item in snapshot.token_results
+    ):
+        raise ValueError("evaluation snapshot token result mismatch")
+    expected_families = _proof_family_records(tuple(build_rows()))
+    if snapshot.proof_families != expected_families:
+        raise ValueError("evaluation snapshot proof-family roster mismatch")
+    labels = tuple(
+        item.get("label") for item in snapshot.obligations if "label" in item
+    )
+    if labels != NON_TOKEN_OBLIGATIONS:
+        raise ValueError("evaluation snapshot non-token obligation roster mismatch")
+    rebuilt = _make_snapshot(
+        snapshot.token_results,
+        snapshot.proof_families,
+        snapshot.blockers,
+        snapshot.obligations,
+    )
+    if rebuilt != snapshot:
+        raise ValueError("evaluation snapshot fingerprint or structure mismatch")
+
+
+def _canonical_source_snapshot(snapshot: EvaluationSnapshot) -> EvaluationSnapshot:
+    """Normalize final planned PASS results to their pre-generation source state.
+
+    ``source_*`` surfaces describe Gate D's pre-generation evaluation.  They
+    therefore remain stable across the DEV-03 fixed point even after the three
+    planned families become current governed PASS evidence.
+    """
+    rows = {row.token: row for row in build_rows()}
+    normalized = tuple(
+        _unclaimed_planned_result(rows[item.token])
+        if item.token in PLANNED_BINDINGS and item.status == "PASS"
+        else item
+        for item in snapshot.token_results
+    )
+    if normalized == snapshot.token_results:
+        return snapshot
+    return _make_snapshot(
+        normalized,
+        snapshot.proof_families,
+        snapshot.blockers,
+        snapshot.obligations,
+    )
+
+
+def _projected_candidate_results(
+    snapshot: EvaluationSnapshot,
+) -> tuple[TokenResult, ...]:
+    planned_tokens = set(PLANNED_BINDINGS)
+    eligible = (
+        not snapshot.blockers
+        and all(item.get("status") == "PASS" for item in snapshot.obligations)
+        and all(
+            item.status == "PASS"
+            for item in snapshot.token_results
+            if item.token not in planned_tokens
+        )
+        and all(
+            item.status in {"PASS", "UNCLAIMED"}
+            for item in snapshot.token_results
+            if item.token in planned_tokens
+        )
+    )
+    if not eligible:
+        return snapshot.token_results
+    rows = {row.token: row for row in build_rows()}
+    return tuple(
+        _planned_pass_result(rows[item.token])
+        if item.token in planned_tokens
+        else item
+        for item in snapshot.token_results
+    )
+
+
+def _validate_candidate_primary_bytes(
+    row: Row, package: Mapping[str, bytes]
+) -> None:
+    path, _key, _owner = PLANNED_BINDINGS[row.token]
+    try:
+        raw = package[path]
+    except KeyError as exc:
+        raise ValueError(f"candidate lacks planned primary: {path}") from exc
+    if not isinstance(raw, bytes) or not raw or not raw.endswith(b"\n") or b"\r" in raw:
+        raise ValueError(f"candidate planned primary is not canonical LF: {path}")
+    if row.token == "TESTS_PASS_OK":
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeError as exc:
+            raise ValueError("candidate close report is not UTF-8") from exc
+        required = (
+            "# HDE-EPIC038 Close Report",
+            "## Final decision: SATISFIED",
+            "DEV-02 in-memory package validation: PASS",
+            "## Exact package pointers",
+            "## Token outcomes",
+            "## Embedded complete QA RCA and Doc Delta accounting",
+            "## Tracked issues",
+            "## PF06 §3.5.4 ADR records",
+            "## Reused proof disclosure",
+            "## Nonclaims",
+        )
+        if any(value not in text for value in required) or any(
+            f"- {token}: PASS;" not in text for token in TOKENS
+        ):
+            raise ValueError("candidate close report semantic contract mismatch")
+        return
+    phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
+    if raw != _render_checklist(phase, result="PASS"):
+        raise ValueError(f"candidate checklist semantic mismatch: {row.token}")
+
+
+def _candidate_token_results(
+    snapshot: EvaluationSnapshot, package: Mapping[str, bytes]
+) -> tuple[TokenResult, ...]:
+    """Promote only a clean projected candidate whose actual primaries validate."""
+    projected = _projected_candidate_results(snapshot)
+    promoted = [
+        item
+        for before, item in zip(snapshot.token_results, projected)
+        if before.status == "UNCLAIMED" and item.status == "PASS"
+    ]
+    rows = {row.token: row for row in build_rows()}
+    for item in promoted:
+        _validate_candidate_primary_bytes(rows[item.token], package)
+    return projected
+
+
+def _minimum_follow_up(
+    results: Sequence[TokenResult], ledger: Mapping[str, object]
+) -> list[str]:
+    values = {
+        item.minimum_follow_up
+        for item in results
+        if item.status != "PASS" and item.minimum_follow_up != "NONE"
+    }
+    for entry in ledger["entries"]:  # type: ignore[index]
+        if entry["status"] == "OPEN":
+            values.add(str(entry["minimum_follow_up"]))
+    return sorted(values)
+
+
+def _render_checklist(
+    phase: str, *, result: str
+) -> bytes:
+    if phase not in {"PRECOMMIT", "POSTCOMMIT"} or result not in {"PASS", "FAIL"}:
+        raise ValueError("invalid checklist render state")
+    key = (
+        PRECOMMIT_CHECKLIST_KEY if phase == "PRECOMMIT" else POSTCOMMIT_CHECKLIST_KEY
+    )
+    payload = {
+        "artifact_key": key,
+        "closed_rails": {
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "SAFE_MODE": "1",
+            "TZ": "UTC",
+        },
+        "epic_id": EPIC_ID,
+        "phase": phase,
+        "result": result,
+        "schema": "hde.epic038.closeout_checklist.v1",
+        "token_roster": list(TOKENS),
+        "validation_commands": [PLAN_CLOSEOUT_CHECK_COMMAND, PLANNED_COMMANDS],
+    }
+    return _canonical_json(payload)
+
+
+def _acceptance_payload(
+    snapshot: EvaluationSnapshot,
+    results: Sequence[TokenResult],
+    decision: str,
+    minimum: Sequence[str],
+) -> dict[str, object]:
+    result_by_token = {item.token: item for item in results}
+    rows = tuple(build_rows())
+    if tuple(row.token for row in rows) != TOKENS:
+        raise ValueError("acceptance-map row roster/order mismatch")
+    families_by_token: dict[str, list[Mapping[str, object]]] = {
+        token: [] for token in TOKENS
+    }
+    for family in snapshot.proof_families:
+        families_by_token[str(family["token"])].append(dict(family))
+    records = []
+    for row in rows:
+        token_result = result_by_token[row.token]
+        records.append(
+            {
+                "acceptance_token": row.acceptance_token,
+                "artifact_keys": list(row.artifact_keys),
+                "ci_binding": row.ci_binding,
+                "classification": row.classification,
+                "current_posture": row.posture,
+                "epic_id": row.epic_id,
+                "future_claim_prerequisite": row.future_claim,
+                "live_qa": row.live_qa,
+                "manifest_token": row.manifest_token,
+                "owner_task": row.owner_task,
+                "primary_evidence": list(row.primary_evidence),
+                "proof_anchors": list(row.proof_anchors),
+                "proof_families": families_by_token[row.token],
+                "result": token_result.as_dict(),
+                "status": token_result.status,
+                "test_binding": row.test_binding,
+                "token": row.token,
+            }
+        )
+    non_tokens = [
+        {key: value for key, value in item.items() if key != "blocker"}
+        for item in snapshot.obligations
+        if item.get("label") in NON_TOKEN_OBLIGATIONS
+    ]
+    if tuple(item.get("label") for item in non_tokens) != NON_TOKEN_OBLIGATIONS:
+        raise ValueError("acceptance non-token roster mismatch")
+    return {
+        "artifact_key": "epic038.acceptance_map",
+        "close_obligation_families": [
+            {
+                "artifact_key": key,
+                "epic_id": EPIC_ID,
+                "primary_evidence": path,
+                "proof_anchor": proof,
+            }
+            for key, (path, proof) in CLOSEOUT_PRIMARY_BINDINGS.items()
+        ],
+        "decision": decision,
+        "epic_id": EPIC_ID,
+        "minimum_follow_up": list(minimum),
+        "non_token_obligations": non_tokens,
+        "pf09_exclusions": list(PF09_EXCLUSIONS),
+        "pf09_scope": list(PF09_SCOPE),
+        "proof_family_roster": [dict(item) for item in snapshot.proof_families],
+        "records": records,
+        "schema": "hde.epic038.acceptance_map.v1",
+        "schema_version": "1.0",
+        "source_evaluation_fingerprint": snapshot.fingerprint,
+    }
+
+
+def _viability_bytes(
+    snapshot: EvaluationSnapshot,
+    results: Sequence[TokenResult],
+    decision: str,
+    minimum: Sequence[str],
+) -> bytes:
+    lines = [
+        "HDE-EPIC038 ACCEPTANCE MAP VIABILITY",
+        f"DECISION: {decision}",
+        f"SOURCE_EVALUATION_FINGERPRINT: {snapshot.fingerprint}",
+    ]
+    for item in results:
+        lines.append(
+            f"TOKEN {item.token}: {item.status} | PREDICATE: {item.predicate_key} | DETAIL: {item.detail}"
+        )
+    lines.append(f"PROOF_FAMILY_COUNT: {len(snapshot.proof_families)}")
+    for family in snapshot.proof_families:
+        lines.append(
+            "PROOF_FAMILY "
+            f"{family['token']} | {family['artifact_key']} | "
+            f"{family['primary_evidence']} | {family['proof_anchor']} | "
+            f"{family['classification']}"
+        )
+    for item in snapshot.obligations:
+        if item.get("label") in NON_TOKEN_OBLIGATIONS:
+            lines.append(
+                f"NON_TOKEN {item['label']}: {item['status']} | "
+                f"PREDICATE: {item['predicate_key']} | DETAIL: {item['detail']}"
+            )
+    for item in snapshot.obligations:
+        if item.get("label") not in NON_TOKEN_OBLIGATIONS:
+            lines.append(
+                f"OBLIGATION {item['predicate_key']}: {item['status']} | DETAIL: {item['detail']}"
+            )
+    for value in minimum:
+        lines.append(f"MINIMUM_FOLLOW_UP: {value}")
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def _report_bytes(
+    snapshot: EvaluationSnapshot,
+    results: Sequence[TokenResult],
+    decision: str,
+    minimum: Sequence[str],
+) -> bytes:
+    authority = _plan_authority()
+    qa_source = (ROOT / QA_RCA_PATH).read_text(encoding="utf-8")
+    lines = [
+        "# HDE-EPIC038 Close Report",
+        "",
+        f"## Final decision: {decision}",
+        "",
+        "DEV-02 in-memory package validation: PASS",
+        (
+            "Source-tree planned tokens remain UNCLAIMED at the Gate D "
+            "pre-generation boundary. This provisional candidate promotes them only "
+            "after every reused and non-token predicate passes and the actual generated "
+            "primary bytes validate; DEV-03 must still establish their governed proofs "
+            "and Human Index/Machine Mirror bindings."
+        ),
+        "",
+        "## Exact package pointers",
+    ]
+    lines.extend(f"- {key}: {path}" for key, path in KEY_OUTPUTS.items())
+    lines.extend(["", "## Token outcomes"])
+    lines.extend(
+        f"- {item.token}: {item.status}; predicate={item.predicate_key}; detail={item.detail}"
+        for item in results
+    )
+    lines.extend(["", "## Full intended proof-family roster"])
+    lines.extend(
+        f"- {item['token']} | {item['artifact_key']} | {item['primary_evidence']} | {item['proof_anchor']} | {item['classification']}"
+        for item in snapshot.proof_families
+    )
+    lines.extend(["", "## Required non-token proof obligations"])
+    for item in snapshot.obligations:
+        if item.get("label") in NON_TOKEN_OBLIGATIONS:
+            lines.append(
+                f"- {item['label']}: {item['status']}; {item['artifact_key']} -> {item['path']}; {item['detail']}"
+            )
+    lines.extend(["", "## PF09 scope"])
+    lines.extend(f"- {item}" for item in authority["pf09_scope"])
+    lines.extend(["", "## Explicit PF09 exclusions"])
+    lines.extend(f"- {item}" for item in authority["pf09_exclusions"])
+    lines.extend(
+        [
+            "",
+            "## Embedded complete QA RCA and Doc Delta accounting",
+            (
+                f"Preserved execution-level source evidence: {QA_RCA_PATH}. This is "
+                "not the canonical standalone closeout-summary path."
+            ),
+            "",
+            qa_source.rstrip("\n"),
+            "",
+            "### Closeout-level accounting derived from approved r5",
+            json.dumps(QA_CLOSEOUT_ACCOUNTING, ensure_ascii=False, sort_keys=True),
+            "",
+            "## Tracked issues",
+        ]
+    )
+    for label, record in authority["tracked_issues"].items():
+        lines.extend(
+            [
+                f"### {label}",
+                f"- Disposition: {record['disposition']}",
+                f"- Detail: {record['detail']}",
+            ]
+        )
+    lines.extend(["", "## PF06 §3.5.4 ADR records"])
+    for record in authority["adr_records"]:
+        lines.extend(
+            [
+                f"### {record['label']}",
+                f"- Decision point: {record['decision_point']}",
+                "- Options:",
+                *(f"  - {option}" for option in record["options"]),
+                f"- Governing canon: {'; '.join(record['governing_canon'])}",
+                f"- Final decision: {record['final_decision']}",
+                f"- Disposition: {record['disposition']}",
+                f"- Drain targets: {'; '.join(record['drain_targets'])}",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            "## Superseded interim-readiness posture",
+            str(QA_CLOSEOUT_ACCOUNTING["superseded_readiness"]),
+            "",
+            "## Reused proof disclosure",
+            (
+                "Every existing proof family is reused and revalidated against current "
+                "bytes. No historical primary, proof, Index, Mirror, orientation, or "
+                "checksum artifact is described as newly implemented or refreshed."
+            ),
+            "",
+            "## Nonclaims",
+            *(f"- No {item}." for item in NONCLAIMS),
+        ]
+    )
+    if decision == "NOT SATISFIED":
+        lines.extend(["", "## Minimum follow-up"])
+        lines.extend(f"- {item}" for item in minimum)
+    return ("\n".join(lines).rstrip("\n") + "\n").encode("utf-8")
+
+
+def _construct_package(
+    snapshot: EvaluationSnapshot, ledger: Mapping[str, object]
+) -> dict[str, bytes]:
+    validate_ledger(ledger)
+    snapshot = _canonical_source_snapshot(snapshot)
+    open_entries = [
+        entry for entry in ledger["entries"] if entry["status"] == "OPEN"  # type: ignore[index]
+    ]
+    results = (
+        snapshot.token_results
+        if open_entries
+        else _projected_candidate_results(snapshot)
+    )
+    decision = (
+        "SATISFIED"
+        if all(item.status == "PASS" for item in results)
+        and not snapshot.blockers
+        and not open_entries
+        else "NOT SATISFIED"
+    )
+    minimum = _minimum_follow_up(results, ledger)
+    if decision == "NOT SATISFIED" and not minimum:
+        minimum = [
+            "Resolve every non-PASS predicate and OPEN remediation entry, then rerun the complete fixed-point suite."
+        ]
+    authority = _plan_authority()
+    acceptance = _acceptance_payload(snapshot, results, decision, minimum)
+    statuses = {item.token: item.status for item in results}
+    source_statuses = {item.token: item.status for item in snapshot.token_results}
+    manifest = {
+        "adr_records": authority["adr_records"],
+        "decision": decision,
+        "epic_id": EPIC_ID,
+        "evaluations": [item.as_dict() for item in results],
+        "key_outputs": dict(KEY_OUTPUTS),
+        "minimum_follow_up": minimum,
+        "non_token_obligations": acceptance["non_token_obligations"],
+        "nonclaims": list(NONCLAIMS),
+        "pf09_exclusions": authority["pf09_exclusions"],
+        "pf09_scope": authority["pf09_scope"],
+        "plan_path": authority["plan_path"],
+        "plan_sha256": authority["plan_sha256"],
+        "proof_family_roster": [dict(item) for item in snapshot.proof_families],
+        "qa_rca_source_path": QA_RCA_PATH,
+        "qa_rca_source_sha256": hashlib.sha256(
+            (ROOT / QA_RCA_PATH).read_bytes()
+        ).hexdigest(),
+        "schema": "hde.epic038.close_manifest.v1",
+        "schema_version": "1.0",
+        "source_evaluation_fingerprint": snapshot.fingerprint,
+        "source_token_status": source_statuses,
+        "token_roster": list(TOKENS),
+        "token_status": statuses,
+        "tracked_issues": authority["tracked_issues"],
+    }
+    checklist_result = "PASS" if not snapshot.blockers else "FAIL"
+    package = {
+        CLOSE_REPORT_PATH: _report_bytes(snapshot, results, decision, minimum),
+        CLOSE_MANIFEST_PATH: _canonical_json(manifest),
+        ACCEPTANCE_MAP_PATH: _canonical_json(acceptance),
+        OUTPUT.as_posix(): _matrix_bytes(),
+        VIABILITY_PATH: _viability_bytes(snapshot, results, decision, minimum),
+        LEDGER_PATH: render_ledger(ledger),
+        PRECOMMIT_CHECKLIST_PATH: _render_checklist(
+            "PRECOMMIT", result=checklist_result
+        ),
+        POSTCOMMIT_CHECKLIST_PATH: _render_checklist(
+            "POSTCOMMIT", result=checklist_result
+        ),
+    }
+    validated_results = (
+        snapshot.token_results
+        if open_entries
+        else _candidate_token_results(snapshot, package)
+    )
+    if validated_results != results:
+        raise ValueError("candidate result projection changed after primary-byte validation")
+    return package
+
+
+def build_package(
+    *,
+    ledger: Mapping[str, object] | None = None,
+    evaluation_snapshot: EvaluationSnapshot | None = None,
+) -> dict[str, bytes]:
+    current = evaluate_closeout()
+    if evaluation_snapshot is not None and evaluation_snapshot != current:
+        raise ValueError("stale or caller-forged evaluation snapshot")
+    selected = current
+    _validate_snapshot_contract(selected)
+    source_ledger = _load_ledger() if ledger is None else ledger
+    validate_ledger(source_ledger)
+    recorded = record_blockers(source_ledger, [dict(item) for item in selected.blockers])
+    package = _construct_package(selected, recorded)
+    validate_package(package)
+    return package
+
+
+def _load_canonical_object(data: bytes, label: str) -> dict[str, object]:
+    try:
+        payload = json.loads(data, object_pairs_hook=_unique_json_object)
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"invalid canonical JSON: {label}") from exc
+    if not isinstance(payload, dict) or data != _canonical_json(payload):
+        raise ValueError(f"invalid canonical JSON: {label}")
+    return payload
+
+
+def _bootstrap_snapshot(
+    current: EvaluationSnapshot, package: Mapping[str, bytes]
+) -> EvaluationSnapshot | None:
+    if (
+        any(
+            not (ROOT / path).is_file()
+            or (ROOT / path).read_bytes() != package[path]
+            for path in PACKAGE_ACTIVATION_PATHS
+        )
+        or any(item.get("status") != "PASS" for item in current.obligations)
+    ):
+        return None
+    planned_tokens = set(PLANNED_BINDINGS)
+    if any(
+        item.status != "PASS"
+        for item in current.token_results
+        if item.token not in planned_tokens
+    ):
+        return None
+    if any(
+        not (
+            isinstance(blocker.get("subject"), dict)
+            and blocker["subject"].get("kind") == "TOKEN"
+            and blocker["subject"].get("value") in planned_tokens
+            and str(blocker.get("predicate_key", "")).endswith(".planned_binding")
+        )
+        for blocker in current.blockers
+    ):
+        return None
+    try:
+        manifest = _load_canonical_object(
+            package[CLOSE_MANIFEST_PATH], "bootstrap close manifest"
+        )
+    except (KeyError, ValueError):
+        return None
+    source_status = manifest.get("source_token_status")
+    raw_evaluations = manifest.get("evaluations")
+    if not isinstance(source_status, dict) or not isinstance(raw_evaluations, list):
+        return None
+    embedded: dict[str, TokenResult] = {}
+    for raw in raw_evaluations:
+        if not isinstance(raw, dict) or raw.get("token") not in planned_tokens:
+            continue
+        evidence = raw.get("decisive_evidence")
+        if (
+            raw.get("status") not in {"UNCLAIMED", "PASS"}
+            or not isinstance(evidence, list)
+            or any(
+                not isinstance(item, dict)
+                or set(item) != {"kind", "value"}
+                or not isinstance(item["kind"], str)
+                or not isinstance(item["value"], str)
+                for item in evidence
+            )
+        ):
+            return None
+        token = str(raw["token"])
+        if source_status.get(token) != raw.get("status"):
+            return None
+        embedded[token] = TokenResult(
+            token,
+            str(raw["status"]),
+            str(raw.get("predicate_key", "")),
+            str(raw.get("detail", "")),
+            tuple((str(item["kind"]), str(item["value"])) for item in evidence),
+            str(raw.get("minimum_follow_up", "")),
+        )
+    if set(embedded) != planned_tokens:
+        return None
+    normalized = tuple(
+        embedded[item.token] if item.token in planned_tokens else item
+        for item in current.token_results
+    )
+    result = _make_snapshot(
+        normalized, current.proof_families, (), current.obligations
+    )
+    if result.fingerprint != manifest.get("source_evaluation_fingerprint"):
+        return None
+    return result
+
+
+def validate_package_structure(package: Mapping[str, bytes]) -> None:
+    if set(package) != set(PACKAGE_PATHS):
+        raise ValueError("incomplete, partial, or unexpected package family")
+    if any(
+        not isinstance(value, bytes)
+        or not value
+        or not value.endswith(b"\n")
+        or b"\r" in value
+        for value in package.values()
+    ):
+        raise ValueError("package bytes are not canonical UTF-8/LF outputs")
+    manifest = _load_canonical_object(package[CLOSE_MANIFEST_PATH], "close manifest")
+    acceptance = _load_canonical_object(package[ACCEPTANCE_MAP_PATH], "acceptance map")
+    pre = _load_canonical_object(package[PRECOMMIT_CHECKLIST_PATH], "precommit checklist")
+    post = _load_canonical_object(package[POSTCOMMIT_CHECKLIST_PATH], "postcommit checklist")
+    ledger = parse_ledger(package[LEDGER_PATH])
+    if not isinstance(manifest.get("key_outputs"), dict):
+        raise ValueError("manifest key_outputs must be a named object")
+    if manifest.get("key_outputs") != KEY_OUTPUTS:
+        raise ValueError("manifest key_outputs mismatch")
+    if manifest.get("token_roster") != list(TOKENS):
+        raise ValueError("manifest corrected-roster mismatch")
+    if manifest.get("schema_version") != "1.0":
+        raise ValueError("manifest schema-version mismatch")
+    if set(manifest.get("token_status", {})) != set(TOKENS):
+        raise ValueError("manifest token-status roster/order mismatch")
+    if manifest.get("pf09_scope") != list(PF09_SCOPE) or manifest.get(
+        "pf09_exclusions"
+    ) != list(PF09_EXCLUSIONS):
+        raise ValueError("manifest PF09 scope/exclusion mismatch")
+    if set(manifest.get("tracked_issues", {})) != set(TRACKED_ISSUES):
+        raise ValueError("manifest tracked-issue disposition mismatch")
+    adrs = manifest.get("adr_records")
+    if (
+        not isinstance(adrs, list)
+        or tuple(item.get("label") for item in adrs if isinstance(item, dict))
+        != tuple(item["label"] for item in ADR_RECORDS)
+        or any(
+            not isinstance(item, dict)
+            or not isinstance(item.get("options"), list)
+            or len(item["options"]) < 2
+            for item in adrs
+        )
+    ):
+        raise ValueError("manifest PF06 §3.5.4 ADR block mismatch")
+    evaluations = manifest.get("evaluations")
+    if (
+        not isinstance(evaluations, list)
+        or tuple(item.get("token") for item in evaluations if isinstance(item, dict))
+        != TOKENS
+        or any(
+            not isinstance(item, dict)
+            or set(item)
+            != {
+                "decisive_evidence",
+                "detail",
+                "minimum_follow_up",
+                "predicate_key",
+                "status",
+                "token",
+            }
+            or item.get("status") not in {"PASS", "UNCLAIMED", "FAIL"}
+            or not item.get("detail")
+            or not item.get("decisive_evidence")
+            or (
+                item.get("status") == "PASS"
+                and item.get("minimum_follow_up") != "NONE"
+            )
+            for item in evaluations
+        )
+    ):
+        raise ValueError("manifest affirmative evaluation roster mismatch")
+    evaluation_by_token = {
+        str(item["token"]): item for item in evaluations if isinstance(item, dict)
+    }
+    if manifest.get("token_status") != {
+        token: evaluation_by_token[token]["status"] for token in TOKENS
+    }:
+        raise ValueError("forced SATISFIED or manifest token-status/evaluation mismatch")
+    source_status = manifest.get("source_token_status")
+    if (
+        not isinstance(source_status, dict)
+        or set(source_status) != set(TOKENS)
+        or any(value not in {"PASS", "UNCLAIMED", "FAIL"} for value in source_status.values())
+        or any(
+            not (
+                source_status[token] == evaluation_by_token[token]["status"]
+                or (
+                    token in PLANNED_BINDINGS
+                    and source_status[token] == "UNCLAIMED"
+                    and evaluation_by_token[token]["status"] == "PASS"
+                )
+            )
+            for token in TOKENS
+        )
+    ):
+        raise ValueError("manifest canonical source-token status mismatch")
+    decision = manifest.get("decision")
+    if decision not in {"SATISFIED", "NOT SATISFIED"}:
+        raise ValueError("invalid binary closeout decision")
+    token_status = manifest["token_status"]
+    open_entries = any(entry["status"] == "OPEN" for entry in ledger["entries"])
+    expected_decision = (
+        "SATISFIED"
+        if all(token_status[token] == "PASS" for token in TOKENS)
+        and not open_entries
+        else "NOT SATISFIED"
+    )
+    if decision != expected_decision:
+        raise ValueError("forced SATISFIED or close-report/manifest decision mismatch")
+    minimum = manifest.get("minimum_follow_up")
+    if (
+        not isinstance(minimum, list)
+        or minimum != sorted(set(minimum))
+        or (decision == "NOT SATISFIED" and not minimum)
+        or (decision == "SATISFIED" and minimum)
+    ):
+        raise ValueError("NOT SATISFIED minimum follow-up mismatch")
+    if acceptance.get("decision") != decision:
+        raise ValueError("close-report and manifest decision mismatch")
+    if acceptance.get("schema_version") != "1.0":
+        raise ValueError("acceptance-map schema-version mismatch")
+    if acceptance.get("pf09_scope") != list(PF09_SCOPE):
+        raise ValueError("acceptance map PF09 scope mismatch")
+    if tuple(
+        item.get("token")
+        for item in acceptance.get("records", [])
+        if isinstance(item, dict)
+    ) != TOKENS:
+        raise ValueError("acceptance map reduced proof-family roster")
+    acceptance_records = acceptance.get("records", [])
+    if any(
+        not isinstance(item, dict)
+        or item.get("status") != manifest["token_status"].get(item.get("token"))
+        or item.get("result") != evaluation_by_token.get(str(item.get("token")))
+        for item in acceptance_records
+    ):
+        raise ValueError("acceptance map token-result mismatch")
+    if acceptance.get("proof_family_roster") != manifest.get("proof_family_roster"):
+        raise ValueError("acceptance map reduced proof-family roster")
+    if tuple(
+        item.get("label")
+        for item in acceptance.get("non_token_obligations", [])
+        if isinstance(item, dict)
+    ) != NON_TOKEN_OBLIGATIONS:
+        raise ValueError("acceptance map non-token obligation roster mismatch")
+    report = package[CLOSE_REPORT_PATH].decode("utf-8")
+    qa_source = (ROOT / QA_RCA_PATH).read_text(encoding="utf-8").rstrip("\n")
+    if qa_source not in report:
+        raise ValueError("close report does not embed the complete QA RCA/Doc Delta source")
+    if any(item not in report for item in PF09_SCOPE):
+        raise ValueError("close report PF09 scope mismatch")
+    if any(item not in report for item in TRACKED_ISSUES):
+        raise ValueError("close report tracked-issue disposition mismatch")
+    if any(str(item["label"]) not in report for item in ADR_RECORDS):
+        raise ValueError("close report PF06 §3.5.4 ADR block mismatch")
+    if f"## Final decision: {decision}" not in report:
+        raise ValueError("close-report and manifest decision mismatch")
+    if decision == "NOT SATISFIED" and "## Minimum follow-up" not in report:
+        raise ValueError("NOT SATISFIED without minimum follow-up")
+    checklist_result = pre.get("result")
+    if checklist_result not in {"PASS", "FAIL"} or post.get("result") != checklist_result:
+        raise ValueError("checklist result mismatch")
+    if pre != json.loads(_render_checklist("PRECOMMIT", result=checklist_result)):
+        raise ValueError("precommit checklist mismatch")
+    if post != json.loads(_render_checklist("POSTCOMMIT", result=checklist_result)):
+        raise ValueError("postcommit checklist mismatch")
+
+
+def validate_package(package: Mapping[str, bytes]) -> None:
+    validate_package_structure(package)
+    ledger = parse_ledger(package[LEDGER_PATH])
+    snapshot = evaluate_closeout()
+    recorded = record_blockers(ledger, [dict(item) for item in snapshot.blockers])
+    if recorded != ledger:
+        raise ValueError("package ledger suppresses a current blocker")
+    expected = _construct_package(snapshot, ledger)
+    drift = [path for path in PACKAGE_PATHS if package[path] != expected[path]]
+    if drift:
+        raise ValueError("package cross-surface mismatch: " + ",".join(drift))
+
+
+_provisional_validate_ledger = validate_ledger
+
+
+def validate_ledger(payload: Mapping[str, object]) -> None:
+    _provisional_validate_ledger(payload)
+    entries = payload["entries"]
+    by_identity: dict[tuple[str, str, str], list[Mapping[str, object]]] = {}
+    for raw_entry in entries:  # type: ignore[assignment]
+        entry = raw_entry
+        subject = entry["subject"]
+        identity = (
+            str(entry["predicate_key"]),
+            str(subject["kind"]),
+            str(subject["value"]),
+        )
+        by_identity.setdefault(identity, []).append(entry)
+        if entry["failure_class"] not in FAILURE_OWNERS:
+            raise ValueError("invalid ledger failure class")
+        if entry["permitted_files"] != sorted(set(entry["permitted_files"])):
+            raise ValueError("ledger permitted-files ordering mismatch")
+        if entry["regenerated_artifacts"] != sorted(
+            set(entry["regenerated_artifacts"])
+        ):
+            raise ValueError("ledger regenerated-artifact ordering mismatch")
+        validators = entry["required_validator_ids"]
+        if validators != sorted(set(validators)):
+            raise ValueError("ledger validator roster ordering mismatch")
+        evidence_identities = [
+            (item["kind"], item["value"]) for item in entry["decisive_evidence"]
+        ]
+        if len(evidence_identities) != len(set(evidence_identities)):
+            raise ValueError("ledger decisive evidence is duplicated")
+        if entry["status"] == "CLOSED":
+            results = entry["tests_and_validators"]
+            if [item["id"] for item in results] != validators:
+                raise ValueError("ledger closure validator roster mismatch")
+    for identity, occurrences in by_identity.items():
+        suffixes = [int(str(entry["blocker_id"])[-4:]) for entry in occurrences]
+        if suffixes != list(range(1, len(occurrences) + 1)):
+            raise ValueError(f"ledger recurrence sequence mismatch: {identity}")
+        if sum(entry["status"] == "OPEN" for entry in occurrences) > 1:
+            raise ValueError(f"ledger identity has multiple OPEN entries: {identity}")
+
+
+def _validate_descriptor_payload(descriptor: Mapping[str, object]) -> None:
+    fields = {
+        "decisive_command",
+        "decisive_evidence",
+        "external_action_posture",
+        "failing_predicate",
+        "failure_class",
+        "minimum_follow_up",
+        "owner",
+        "permitted_files",
+        "predicate_key",
+        "required_validator_ids",
+        "subject",
+    }
+    if set(descriptor) != fields:
+        raise ValueError("invalid blocker descriptor fields")
+    rebuilt = _descriptor(
+        str(descriptor["predicate_key"]),
+        str(descriptor["subject"]["kind"]),  # type: ignore[index]
+        str(descriptor["subject"]["value"]),  # type: ignore[index]
+        str(descriptor["failing_predicate"]),
+        list(descriptor["decisive_evidence"]),  # type: ignore[arg-type]
+        str(descriptor["decisive_command"]),
+        str(descriptor["failure_class"]),
+        list(descriptor["permitted_files"]),  # type: ignore[arg-type]
+        str(descriptor["minimum_follow_up"]),
+        list(descriptor["required_validator_ids"]),  # type: ignore[arg-type]
+        str(descriptor["external_action_posture"]),
+    )
+    if rebuilt != descriptor:
+        raise ValueError("noncanonical blocker descriptor")
+
+
+def record_blockers(
+    ledger: Mapping[str, object], blockers: list[dict[str, object]]
+) -> dict[str, object]:
+    validate_ledger(ledger)
+    entries = [dict(entry) for entry in ledger["entries"]]  # type: ignore[index]
+    ordered = sorted(
+        blockers,
+        key=lambda item: (
+            str(item["predicate_key"]),
+            json.dumps(item["subject"], sort_keys=True),
+        ),
+    )
+    descriptor_fields = {
+        "decisive_command",
+        "decisive_evidence",
+        "external_action_posture",
+        "failing_predicate",
+        "failure_class",
+        "minimum_follow_up",
+        "owner",
+        "permitted_files",
+        "predicate_key",
+        "required_validator_ids",
+        "subject",
+    }
+    for descriptor in ordered:
+        _validate_descriptor_payload(descriptor)
+        matching = [
+            entry
+            for entry in entries
+            if entry["predicate_key"] == descriptor["predicate_key"]
+            and entry["subject"] == descriptor["subject"]
+        ]
+        open_matches = [entry for entry in matching if entry["status"] == "OPEN"]
+        if open_matches:
+            immutable = {
+                key: open_matches[0][key] for key in descriptor_fields
+            }
+            if immutable != descriptor:
+                raise ValueError("OPEN blocker descriptor changed without closure")
+            continue
+        occurrence = len(matching) + 1
+        entry = dict(descriptor)
+        entry.update(
+            {
+                "after_outcome": None,
+                "before_outcome": {
+                    "detail": descriptor["failing_predicate"],
+                    "result": "FAIL",
+                },
+                "blocker_id": _blocker_id(
+                    str(descriptor["predicate_key"]),
+                    descriptor["subject"],  # type: ignore[arg-type]
+                    occurrence,
+                ),
+                "correction_performed": None,
+                "historical_evidence_rewritten": False,
+                "regenerated_artifacts": [],
+                "reviewer_disposition": "PENDING_REVIEW",
+                "status": "OPEN",
+                "tests_and_validators": [],
+            }
+        )
+        entries.append(entry)
+    result = _empty_ledger()
+    result["entries"] = sorted(entries, key=lambda item: item["blocker_id"])
+    validate_ledger(result)
+    return result
+
+
+def _matrix_bytes() -> bytes:
+    path = ROOT / OUTPUT
+    if not path.is_file():
+        raise ValueError(f"missing approved DEV-01 token matrix: {OUTPUT}")
+    return path.read_bytes()
+
+
+def evaluate_registered_predicate(entry: Mapping[str, object]) -> tuple[bool, str]:
+    subject = entry.get("subject")
+    if not isinstance(subject, dict):
+        return False, "registered predicate subject is malformed"
+    predicate_key = str(entry.get("predicate_key", ""))
+    value = str(subject.get("value", ""))
+    if subject.get("kind") == "TOKEN" and value in TOKENS:
+        result = {item.token: item for item in evaluate_closeout().token_results}[value]
+        if predicate_key.endswith(".planned_binding"):
+            passed = result.status in {"UNCLAIMED", "PASS"}
+        else:
+            passed = result.status == "PASS"
+        return passed, result.detail
+    if value in NON_TOKEN_OBLIGATIONS:
+        try:
+            detail = _validate_non_token_family(value)
+        except (OSError, UnicodeError, ValueError) as exc:
+            return False, str(exc)
+        return True, detail
+    validators: Mapping[str, Callable[[], None]] = {
+        "qa.finalized_current_state": _validate_finalized_qa_state,
+        "evidence.full_index_mirror_topology": lambda: (
+            validate_index_mirror_topology(),
+            validate_all_mirror_proofs(),
+        ),
+        "authority.approved_r5_source": lambda: _plan_authority() and None,
+    }
+    validator = validators.get(predicate_key)
+    if validator is None:
+        return False, "predicate has no source-controlled closure evaluator"
+    try:
+        validator()
+    except (OSError, UnicodeError, ValueError) as exc:
+        return False, str(exc)
+    return True, "registered current predicate validates"
+
+
+def run_registered_validator(
+    validator_id: str, *, package: Mapping[str, bytes] | None = None
+) -> dict[str, object]:
+    if validator_id == "closeout_package_in_memory":
+        if package is None:
+            raise ValueError("in-memory package bytes are required")
+        validate_package(package)
+        return {
+            "command": "internal:validate_package(actual package bytes)",
+            "exit_code": 0,
+            "id": validator_id,
+            "result": "PASS",
+        }
+    if validator_id == "epic038_current_state":
+        command = [
+            sys.executable,
+            str(ROOT / "tools/evidence/check_hde_epic038_qa_current_state.py"),
+            "--require-finalized",
+        ]
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            env={
+                **os.environ,
+                "SAFE_MODE": "1",
+                "ALLOW_NETWORK": "0",
+                "APP_ENV": "dev",
+                "LC_ALL": "C",
+                "LANG": "C",
+                "TZ": "UTC",
+            },
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            detail = (result.stdout + result.stderr).strip()
+            raise ValueError(
+                f"validator failed: {validator_id}: {detail or result.returncode}"
+            )
+        return {
+            "command": (
+                "python tools/evidence/check_hde_epic038_qa_current_state.py "
+                "--require-finalized"
+            ),
+            "exit_code": 0,
+            "id": validator_id,
+            "result": "PASS",
+        }
+    raise ValueError(f"unknown registered validator: {validator_id}")
+
+
+def close_blocker(raw_request: str) -> dict[str, bytes]:
+    request = _parse_close_request(raw_request)
+    ledger = _load_ledger()
+    validate_ledger(ledger)
+    entries = [dict(entry) for entry in ledger["entries"]]  # type: ignore[index]
+    matches = [
+        entry
+        for entry in entries
+        if entry["blocker_id"] == request["blocker_id"]
+        and entry["status"] == "OPEN"
+    ]
+    if len(matches) != 1:
+        raise RuntimeError("close request does not identify exactly one OPEN entry")
+    entry = matches[0]
+    if entry["external_action_posture"] != "NONE_REQUIRED" or request[
+        "external_action_posture"
+    ] != "NONE_REQUIRED":
+        raise RuntimeError(
+            "Product Owner authorization and separately bound evidence are required"
+        )
+    regenerated = set(request["regenerated_artifacts"])
+    if not regenerated.issubset(set(entry["permitted_files"])):
+        raise RuntimeError("regenerated artifacts exceed the recorded permitted scope")
+    passed, detail = evaluate_registered_predicate(entry)
+    if not passed:
+        raise RuntimeError(detail)
+    validator_ids = list(entry["required_validator_ids"])
+    results: list[dict[str, object]] = []
+    package_receipt = {
+        "command": "internal:validate_package(actual package bytes)",
+        "exit_code": 0,
+        "id": "closeout_package_in_memory",
+        "result": "PASS",
+    }
+    for validator_id in validator_ids:
+        if validator_id == "closeout_package_in_memory":
+            results.append(dict(package_receipt))
+        else:
+            results.append(run_registered_validator(str(validator_id)))
+    entry.update(
+        {
+            "after_outcome": {"detail": detail, "result": "PASS"},
+            "correction_performed": request["correction_performed"],
+            "external_action_posture": request["external_action_posture"],
+            "regenerated_artifacts": request["regenerated_artifacts"],
+            "reviewer_disposition": "CLOSURE_VALIDATED",
+            "status": "CLOSED",
+            "tests_and_validators": results,
+        }
+    )
+    updated = _empty_ledger()
+    updated["entries"] = sorted(entries, key=lambda item: item["blocker_id"])
+    validate_ledger(updated)
+    snapshot = evaluate_closeout()
+    remaining = [dict(item) for item in snapshot.blockers]
+    recorded = record_blockers(updated, remaining)
+    package = _construct_package(snapshot, recorded)
+    if "closeout_package_in_memory" in validator_ids:
+        actual = run_registered_validator(
+            "closeout_package_in_memory", package=package
+        )
+        if actual != package_receipt:
+            raise RuntimeError("in-memory validator receipt mismatch")
+    else:
+        validate_package(package)
+    return package
+
+
+def _write_package(package: Mapping[str, bytes]) -> None:
+    validate_package(package)
+    changed = [
+        rel
+        for rel in PACKAGE_PATHS
+        if not (ROOT / rel).is_file() or (ROOT / rel).read_bytes() != package[rel]
+    ]
+    if not changed:
+        return
+    staged: dict[Path, Path] = {}
+    originals: dict[Path, bytes | None] = {}
+    modes: dict[Path, int] = {}
+    created_dirs: list[Path] = []
+    replaced: list[Path] = []
+    try:
+        for rel in changed:
+            target = ROOT / rel
+            missing_parents: list[Path] = []
+            parent = target.parent
+            while parent != ROOT and not parent.exists():
+                missing_parents.append(parent)
+                parent = parent.parent
+            for directory in reversed(missing_parents):
+                directory.mkdir()
+                created_dirs.append(directory)
+            originals[target] = target.read_bytes() if target.is_file() else None
+            modes[target] = target.stat().st_mode & 0o777 if target.exists() else 0o644
+            staged[target] = _stage_atomic_bytes(target, package[rel], modes[target])
+            if staged[target].read_bytes() != package[rel]:
+                raise OSError(f"staged package byte mismatch: {rel}")
+        for rel in changed:
+            target = ROOT / rel
+            os.replace(staged[target], target)
+            replaced.append(target)
+    except BaseException:
+        rollback_error: BaseException | None = None
+        for target in reversed(replaced):
+            try:
+                prior = originals[target]
+                if prior is None:
+                    target.unlink(missing_ok=True)
+                else:
+                    rollback = _stage_atomic_bytes(target, prior, modes[target])
+                    os.replace(rollback, target)
+            except BaseException as exc:
+                rollback_error = exc
+        if rollback_error is not None:
+            raise RuntimeError("package replacement and rollback both failed") from rollback_error
+        raise
+    finally:
+        for path in staged.values():
+            path.unlink(missing_ok=True)
+        for directory in reversed(created_dirs):
+            try:
+                directory.rmdir()
+            except OSError:
+                pass
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(allow_abbrev=False)
     mode = parser.add_mutually_exclusive_group(required=False)
@@ -2875,16 +5617,35 @@ def main() -> int:
         )
         return 0
     if args.preflight:
-        try: blockers = derive_blockers()
+        try:
+            snapshot = evaluate_closeout()
+            blockers = [dict(item) for item in snapshot.blockers]
+            ledger = _load_ledger()
+            projected = record_blockers(ledger, blockers)
         except ValueError as exc:
-            print(f"PREFLIGHT_BLOCKER: {exc}"); return 1
-        ledger = _load_ledger()
-        projected = record_blockers(ledger, blockers)
-        by_identity = {(e["predicate_key"], json.dumps(e["subject"], sort_keys=True)): e["blocker_id"] for e in projected["entries"]}
+            print(f"PREFLIGHT_BLOCKER: {exc}")
+            return 1
+        by_identity = {
+            (entry["predicate_key"], json.dumps(entry["subject"], sort_keys=True)): entry["blocker_id"]
+            for entry in projected["entries"]
+        }
         for blocker in blockers:
-            item = dict(blocker); item["blocker_id"] = by_identity[(blocker["predicate_key"], json.dumps(blocker["subject"], sort_keys=True))]
+            item = dict(blocker)
+            item["blocker_id"] = by_identity[
+                (
+                    blocker["predicate_key"],
+                    json.dumps(blocker["subject"], sort_keys=True),
+                )
+            ]
             print(_canonical_json(item).decode(), end="")
-        print(f"PREFLIGHT {'OK' if not blockers else 'BLOCKED'} blockers={len(blockers)}")
+        pending = sum(
+            item.status == "UNCLAIMED" for item in snapshot.token_results
+        )
+        print(
+            f"PREFLIGHT {'OK' if not blockers else 'BLOCKED'} "
+            f"blockers={len(blockers)} planned_unclaimed={pending} "
+            f"fingerprint={snapshot.fingerprint}"
+        )
         return 0 if not blockers else 1
     if args.close_blocker is not None:
         try: package = close_blocker(args.close_blocker)
@@ -2902,7 +5663,7 @@ def main() -> int:
             if drift: print("CLOSEOUT_PACKAGE_DRIFT: " + ",".join(drift)); return 1
             print("CLOSEOUT_PACKAGE_OK"); return 0
         _write_package(package); print("WROTE COMPLETE HDE-EPIC038 PACKAGE"); return 0
-    expected = render()
+    expected = render(planned_mode="allow-current")
     target = ROOT / OUTPUT
     if args.token_matrix:
         target.parent.mkdir(parents=True, exist_ok=True)
