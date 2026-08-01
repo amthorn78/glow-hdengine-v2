@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.7b  
-Effective Date: 2026.07.30  
+**Version:** v12.5.8b  
+Effective Date: 2026.08.01  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -4086,5 +4086,1614 @@ At the remediation plan’s recorded pre-publication baseline, `main@b89b9ccba5a
 2. **Canon Plan Templates:** Distinguish approval-time token-roster and matrix-pointer requirements from post-approval standalone-ledger completion gates when an Epic Remediation Plan template is added.
 
 Until those drain targets are complete, this addendum is the live authority only for the exact HDE-EPIC038 remediation-plan checkpoint defined above.
+
+## 2.39) DEV-01 Closeout remediation HDE-EPIC038
+
+### Review Summary
+
+* Original PR established the deterministic 33-row matrix, generator, focused suite, CI checks, and a 551-record evidence fixed point, but retained semantic misbindings: four planned-new rows, an incomplete release family, and an incorrect doc-delta posture. Evidence: [Original PR](https://github.com/amthorn78/glow-hdengine-v2/pull/379), NET-001 through NET-026.  
+* Remedial PR 1 corrected the release family, reduced planned-new rows to three, governed both doc-delta surfaces, strengthened proof parsing, and produced a 553-record fixed point. It nevertheless introduced an unapproved `--closeout` checklist contract and treated doc-delta byte identity as sufficient without validating the explicit staging reference. Evidence: [Remedial PR 1](https://github.com/amthorn78/glow-hdengine-v2/pull/380), RCA.  
+* Remedial PR 2 replaced `--closeout` with the exact plan-authorized default-write and read-only `--check` commands. It did not correct the doc-delta semantic defect. Evidence: [Remedial PR 2](https://github.com/amthorn78/glow-hdengine-v2/pull/381), NET-015, NET-024, NET-025.  
+* Remedial PR 3 corrected the two-surface doc-delta contract, preserved PF19-required byte identity, separated the historical Step-0 receipt from current-byte production, added deterministic write/read-only modes, and fixed clean-runner dependency/readiness ordering. Both P1 threads are resolved. Evidence: [Remedial PR 3](https://github.com/amthorn78/glow-hdengine-v2/pull/382), F-001, F-002.  
+* The lineage is four directly adjacent squash merges from lifecycle baseline `b6e793bc…` to current `main` at `611ffa77…`. All 26 lifecycle-touched files were inspected at current HEAD; no intervening or later commit changes the reviewed state.  
+* Current validation establishes 33 unique rows, 30 existing/reused, three planned-new, 33 unclaimed, zero claimed; 553 Human Index and 553 Machine Mirror records with identical ordered key/path topology; and a conforming 463-byte doc-delta pair. Remedial PR 3’s exact-head Actions run passed all seven jobs, including 172 focused and 1,294 broad evidence/OPS tests.  
+* PF09.6 task HDE-DIST005 remains `Not done (treated as an ongoing global requirement)` and subtask HDE-DIST005.2 remains `Partial`. No status change is supported or authorized.  
+* Remaining risk is bounded to future execution: the matrix records bindings but claims no acceptance token, does not complete DEV-02/DEV-03, and does not establish Live QA, acceptance, or epic closeout.
+
+### GitHub / Repo Inspection
+
+* Repository identity: private repository [`amthorn78/glow-hdengine-v2`](https://github.com/amthorn78/glow-hdengine-v2), default branch `main`.  
+* Reviewed branch: `main`, selected because all four lineage PRs targeted `main` and current `main` equals the final lineage merge.  
+* Current reviewed HEAD: [`611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd`](https://github.com/amthorn78/glow-hdengine-v2/commit/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd).  
+* Lifecycle baseline: [`b6e793bcb135b8c8dd0d5c39cdcd1ffe0d4ec01e`](https://github.com/amthorn78/glow-hdengine-v2/commit/b6e793bcb135b8c8dd0d5c39cdcd1ffe0d4ec01e).  
+* Original PR — \#379: base `b6e793bc…`; head `91396e1979fdd3e98c1c762efdb5f7841d79df29`; merged; merge/stage endpoint `3ff692b4e4ea2ddf0333efd0501d0a38b397304d`; 21 changed files.  
+* Remedial PR 1 — \#380: base `3ff692b4…`; head `a68590d0a096e38629f083e988306de1e3a48686`; merged; merge/stage endpoint `3ecced2469ccef426624ae0abfd8cff13a819481`; 19 changed files.  
+* Remedial PR 2 — \#381: base `3ecced24…`; head `9ed4420867937603b756d3c09fb44f51b16d84ad`; merged; merge/stage endpoint `4358efabe5e8315785c637af7f63d2a416072bb9`; eight changed files.  
+* Remedial PR 3 — \#382: base `4358efab…`; head `ff5e362dd35b2a7e386ef531ec8b5596828ca9d1`; merged; merge/stage endpoint `611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd`; 13 changed files.  
+* Merge order and ancestry: `b6e793bc → 3ff692b4 → 3ecced24 → 4358efab → 611ffa77`. Each adjacent compare reports one commit ahead and zero behind; there are no intervening non-lineage commits.  
+* Original PR changed: `.github/workflows/ci.yml`, `AGENTS.md`, architecture snapshot/proof, Machine Mirror/checksum/proofs, orientation/proof, token matrix/proof, manifest proof, final-LF checker, Human Index/checksum/proofs, focused tests, generator, and updater.  
+* Remedial PR 1 changed: `AGENTS.md`, Machine Mirror family, both doc-delta proofs, orientation/proof, matrix/proof, Mirror schema checker, Human Index family, focused tests, generator, and updater.  
+* Remedial PR 2 changed: Machine Mirror family, matrix/proof, focused tests, and generator.  
+* Remedial PR 3 changed: workflow, Machine Mirror family, both doc-delta surfaces/proofs, matrix/proof, focused tests, and generator.  
+* Lifecycle touched-file set: 26 files—the union represented by NET-001 through NET-026.  
+* Current final state: all 26 paths exist and were fetched at `611ffa77…`. The 13 Remedial PR 3 file blob SHAs exactly match its reviewed head `ff5e362d…`.  
+* Checks inspected:  
+  * Original PR: [run 30604877059](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30604877059), seven successful jobs, 88 focused tests, 1,210 broad tests.  
+  * Remedial PR 1: [run 30637739563](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30637739563), seven successful jobs, 102 focused tests, 1,224 broad tests.  
+  * Remedial PR 2: [run 30648474263](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30648474263), seven successful jobs, 119 focused tests, 1,241 broad tests.  
+  * Remedial PR 3: [run 30663742410](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30663742410), seven successful jobs, pytest 8.4.2, 172 focused tests, 1,294 broad evidence/OPS tests.  
+* Governed evidence inspected: both doc-delta surfaces and proofs, matrix and proof, Human Index/checksum/proofs, Machine Mirror/checksum/proofs, orientation/proof, manifest proof, updater, Mirror/final-LF checks, generator, tests, and workflow.  
+* Review threads: Original PR 14/14 resolved; Remedial PR 1 1/1 resolved; Remedial PR 2 none; Remedial PR 3 2/2 resolved. No unresolved thread remains.  
+* Material intervening non-lineage commits: None. Search method: compared each adjacent lifecycle endpoint through the GitHub compare API; each was directly one commit ahead.  
+* Material post-lineage commits: None. Search method: inspected current `main` history and HEAD; current HEAD is the final merge.  
+* Local working-tree inspection: `git rev-parse --is-inside-work-tree` returned “not a git repository”; no local checkout or repository test execution was available.
+
+### Provenance (PR Lineage)
+
+* Claim: Original PR created the initial DEV-01 matrix system and 551-record governed topology.  
+  Source: Original PR.  
+  Evidence pointer: [Original PR files](https://github.com/amthorn78/glow-hdengine-v2/pull/379/files), exact-head Gate B comment `5139378534`, workflow run `30604877059`.  
+* Claim: Remedial PR 1 corrected most semantic bindings and expanded the topology to 553 records, while retaining a doc-delta semantic defect.  
+  Source: Remedial PR 1\.  
+  Evidence pointer: [Remedial PR 1 files](https://github.com/amthorn78/glow-hdengine-v2/pull/380/files), review thread `PRRT_kwDOP103ks6VdX6F`.  
+* Claim: Remedial PR 2 fully corrected the checklist command contract.  
+  Source: Remedial PR 2\.  
+  Evidence pointer: [Remedial PR 2 files](https://github.com/amthorn78/glow-hdengine-v2/pull/381/files), Gate B comment `5145375872`.  
+* Claim: Remedial PR 3 closed the remaining semantic, provenance, and CI-readiness defects without claiming a token or moving PF09.  
+  Source: Remedial PR 3\.  
+  Evidence pointer: [Remedial PR 3 files](https://github.com/amthorn78/glow-hdengine-v2/pull/382/files), Gate B comment `5147356543`.  
+* Claim: Current `main` preserves the reviewed final bytes and contains no later change.  
+  Source: GitHub Repo.  
+  Evidence pointer: current commit `611ffa77…`; all 13 Remedial PR 3 head/current blob comparisons matched.
+
+#### Original PR Material Hunk Ledger
+
+Hunk ID: OPR-001; File: `.github/workflows/ci.yml`; Patch and hunk header: `@@ -9,6 +9,7 @@ jobs:`; Material effect: added `APP_ENV=dev` to the main test rails; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-002; File: `.github/workflows/ci.yml`; Patch and hunk header: `@@ -37,7 +38,11 @@ jobs:`; Material effect: required finalized current-state checking, read-only matrix checking, and focused tests; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-003; File: `.github/workflows/ci.yml`; Patch and hunk header: `@@ -68,6 +73,8 @@ jobs:`; Material effect: added governed evidence-path validation; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-004; File: `.github/workflows/ci.yml`; Patch and hunk header: `@@ -202,6 +209,7 @@ jobs:`; Material effect: added `APP_ENV=dev` to compatibility closure rails; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-005; File: `.github/workflows/ci.yml`; Patch and hunk header: `@@ -224,6 +232,7 @@ jobs:`; Material effect: added `APP_ENV=dev` to PostgreSQL contract rails; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-006; File: `AGENTS.md`; Patch and hunk header: `@@ -2,6 +2,7 @@`; Material effect: recorded a task-local four-planned-row authority interpretation, later corrected; Risk category: Medium; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-007; File: `artifacts/architecture/architecture_snapshot.keys_only.json`; Patch and hunk header: `@@ -1 +1 @@`; Material effect: regenerated the architecture snapshot for new generator/updater paths; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-008; File: architecture snapshot proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed size and digest binding; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-009; File: `artifacts/evidence_index.jsonl`; Patch and hunk header: `@@ -186,7 +186,7 @@`; Material effect: refreshed the Human Index checksum record; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-010; File: `artifacts/evidence_index.jsonl`; Patch and hunk header: `@@ -408,7 +408,7 @@`; Material effect: refreshed architecture snapshot metadata; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-011; File: `artifacts/evidence_index.jsonl`; Patch and hunk header: `@@ -453,6 +453,8 @@`; Material effect: registered manifest-source and token-matrix records; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-012; File: `artifacts/evidence_index.jsonl`; Patch and hunk header: `@@ -488,8 +490,8 @@`; Material effect: refreshed Human Index and Mirror self-records; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-013; File: `artifacts/evidence_index.jsonl`; Patch and hunk header: `@@ -542,7 +544,7 @@`; Material effect: refreshed orientation metadata for 551 artifacts; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-014; File: Machine Mirror proof; Patch and hunk header: `@@ -1,6 +1,6 @@`; Material effect: refreshed size, full SHA, and mirror-body SHA; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-015; File: Machine Mirror checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed the checksum sentinel; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-016; File: Machine Mirror checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed its proof digest; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-017; File: `audit/gates/topology/orientation_demo.txt`; Patch and hunk header: `@@ -1,4 +1,4 @@`; Material effect: advanced total artifacts from 549 to 551; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-018; File: orientation proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed orientation digest; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-019; File: token matrix; Patch and hunk header: `@@ -0,0 +1,533 @@`; Material effect: created the deterministic 33-row nonclaiming matrix; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-020; File: token matrix proof; Patch and hunk header: `@@ -0,0 +1,5 @@`; Material effect: created the matrix path proof; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-021; File: `catalog/manifest.json.path_proof.txt`; Patch and hunk header: `@@ -0,0 +1,5 @@`; Material effect: bound current manifest bytes; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-022; File: `ci/checks/check_final_lf.sh`; Patch and hunk header: `@@ -2,27 +2,54 @@`; Material effect: required matrix/proof LF and checked future paths only when present; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-023; File: `docs/evidence/INDEX.json`; Patch and hunk header: API patch omitted; complete base/endpoint blobs recovered; Material effect: registered manifest and matrix, producing 551 records; Risk category: High; Evidence pointer: Original PR complete blobs.
+
+Hunk ID: OPR-024; File: Human Index proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed size and digest; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-025; File: Human Index checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed checksum; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-026; File: Human Index checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed proof digest; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-027; File: focused tests; Patch and hunk header: `@@ -0,0 +1,833 @@`; Material effect: created 88 focused roster, binding, topology, proof, nonclaim, and read-only regressions; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-028; File: generator; Patch and hunk header: `@@ -0,0 +1,1528 @@`; Material effect: created deterministic generation/checking and fail-closed binding validation; Risk category: High; Evidence pointer: Original PR diff.
+
+Hunk ID: OPR-029; File: updater; Patch and hunk header: `@@ -2425,6 +2425,22 @@`; Material effect: registered the manifest and matrix with the canonical producer; Risk category: High; Evidence pointer: Original PR diff.
+
+#### Remedial PR 1 Material Hunk Ledger
+
+Hunk ID: R1PR-001; File: `AGENTS.md`; Patch and hunk header: `@@ -2,7 +2,7 @@`; Material effect: replaced the four-planned-row interpretation with current-repository and PF semantics; Risk category: Medium; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-002; File: Machine Mirror; Patch and hunk header: `@@ -186,7 +186,7 @@`; Material effect: refreshed Human Index checksum metadata; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-003; File: Machine Mirror; Patch and hunk header: `@@ -362,6 +362,7 @@`; Material effect: registered the primary staging doc-delta artifact; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-004; File: Machine Mirror; Patch and hunk header: `@@ -452,9 +453,10 @@`; Material effect: registered the stable capture and refreshed matrix metadata; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-005; File: Machine Mirror; Patch and hunk header: `@@ -490,8 +492,8 @@`; Material effect: refreshed Index and Mirror self-records; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-006; File: Machine Mirror; Patch and hunk header: `@@ -544,7 +546,7 @@`; Material effect: refreshed orientation metadata for 553 artifacts; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-007; File: Machine Mirror proof; Patch and hunk header: `@@ -1,6 +1,6 @@`; Material effect: refreshed Mirror proof fields; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-008; File: Machine Mirror checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed checksum; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-009; File: Machine Mirror checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed proof digest; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-010; File: staging doc-delta proof; Patch and hunk header: `@@ -0,0 +1,5 @@`; Material effect: added the original 246-byte staging proof; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-011; File: stable-capture proof; Patch and hunk header: `@@ -0,0 +1,5 @@`; Material effect: added the original 246-byte capture proof; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-012; File: orientation; Patch and hunk header: `@@ -1,4 +1,4 @@`; Material effect: advanced total artifacts from 551 to 553; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-013; File: orientation proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed orientation digest; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-014; File: matrix; Patch and hunk header: `@@ -25,16 +25,16 @@`; Material effect: reclassified `DOC_DELTA_PRESENT_OK` as existing/reused and bound staging/capture; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-015; File: matrix; Patch and hunk header: `@@ -88,33 +88,33 @@`; Material effect: corrected checklist paths/keys but introduced `--closeout`; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-016; File: matrix; Patch and hunk header: `@@ -520,14 +520,14 @@`; Material effect: expanded the release row to the complete governed family; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-017; File: matrix proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed the matrix proof; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-018; File: Mirror schema checker; Patch and hunk header: `@@ -37,12 +37,16 @@`; Material effect: rejected malformed, empty, and duplicate proof fields; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-019; File: Mirror schema checker; Patch and hunk header: `@@ -135,7 +139,28 @@`; Material effect: enforced exact allowed proof schemas and fail-closed parse errors; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-020; File: Human Index; Patch and hunk header: API patch omitted; complete base/endpoint blobs recovered; Material effect: registered both doc-delta records, reaching 553 records; Risk category: High; Evidence pointer: Remedial PR 1 complete blobs.
+
+Hunk ID: R1PR-021; File: Human Index proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed size and digest; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-022; File: Human Index checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed checksum; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-023; File: Human Index checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed proof digest; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-024; File: focused tests; Patch and hunk header: `@@ -2,6 +2,7 @@`; Material effect: added run-path testing support; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-025; File: focused tests; Patch and hunk header: `@@ -10,6 +11,7 @@`; Material effect: imported the canonical updater for fixed-point tests; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-026; File: focused tests; Patch and hunk header: `@@ -113,6 +115,13 @@`; Material effect: froze the complete row contract hash; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-027; File: focused tests; Patch and hunk header: `@@ -149,6 +158,24 @@`; Material effect: rejected claim language outside posture fields; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-028; File: focused tests; Patch and hunk header: `@@ -297,6 +324,44 @@`; Material effect: added duplicate/extra proof-field regressions; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-029; File: focused tests; Patch and hunk header: `@@ -315,6 +380,53 @@`; Material effect: added command substitution and duplicate receipt regressions; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-030; File: focused tests; Patch and hunk header: `@@ -377,7 +489,6 @@`; Material effect: removed doc delta from the planned-new set; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-031; File: focused tests; Patch and hunk header: `@@ -394,6 +505,27 @@`; Material effect: froze exact checklist paths and keys, while codifying the later-corrected command drift; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-032; File: focused tests; Patch and hunk header: `@@ -406,6 +538,313 @@`; Material effect: added extensive release, doc-delta, proof, topology, and receipt tests but treated doc-delta equality as governing semantics; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-033; File: focused tests; Patch and hunk header: `@@ -583,6 +1022,7 @@`; Material effect: strengthened zero-external-I/O mutation coverage; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-034; File: focused tests; Patch and hunk header: `@@ -737,31 +1177,99 @@`; Material effect: tested the complete release-identity family; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-035; File: generator; Patch and hunk header: `@@ -24,6 +24,9 @@`; Material effect: introduced independent row-contract hashing; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-036; File: generator; Patch and hunk header: `@@ -43,6 +46,10 @@`; Material effect: expanded exact CI binding requirements; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-037; File: generator; Patch and hunk header: `@@ -83,12 +90,12 @@`; Material effect: refreshed token-specific nonclaiming hashes; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-038; File: generator; Patch and hunk header: `@@ -114,27 +121,22 @@`; Material effect: reduced planned-new bindings to three and corrected exact checklist paths; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-039; File: generator; Patch and hunk header: `@@ -152,6 +154,25 @@`; Material effect: added exact release-family and doc-delta constants; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-040; File: generator; Patch and hunk header: `@@ -164,6 +185,36 @@`; Material effect: froze QA-19 command and receipt contracts; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-041; File: generator; Patch and hunk header: `@@ -232,15 +283,278 @@`; Material effect: added strict JSON, release, doc-delta, proof, and receipt validators; it also made pair equality sufficient; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-042; File: generator; Patch and hunk header: `@@ -251,13 +565,31 @@`; Material effect: bound the complete release family; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-043; File: generator; Patch and hunk header: `@@ -268,6 +600,33 @@`; Material effect: created the existing/reused doc-delta row with the later-corrected equality contract; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-044; File: generator; Patch and hunk header: `@@ -583,6 +942,7 @@`; Material effect: inserted the doc-delta row into the canonical roster; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-045; File: generator; Patch and hunk header: `@@ -610,6 +970,23 @@`; Material effect: generated checklist prerequisites containing unapproved `--closeout`; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-046; File: generator; Patch and hunk header: `@@ -789,18 +1166,37 @@`; Material effect: enforced exact proof schemas and duplicate rejection; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-047; File: generator; Patch and hunk header: `@@ -844,14 +1240,11 @@`; Material effect: made refusal-log validation exact; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-048; File: generator; Patch and hunk header: `@@ -862,7 +1255,6 @@`; Material effect: removed unnecessary disk-path coupling from injected no-I/O validation; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-049; File: generator; Patch and hunk header: `@@ -871,7 +1263,7 @@`; Material effect: hashed the injected refusal-log bytes; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-050; File: generator; Patch and hunk header: `@@ -974,12 +1366,15 @@`; Material effect: generalized strict QA-19 execution validation; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-051; File: generator; Patch and hunk header: `@@ -988,14 +1383,14 @@`; Material effect: added unique-field JSON parsing and explicit error classes; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-052; File: generator; Patch and hunk header: `@@ -1004,68 +1399,49 @@`; Material effect: enforced exact header, command, behavior, and exit receipts; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-053; File: generator; Patch and hunk header: `@@ -1240,27 +1616,72 @@`; Material effect: added special semantic enforcement for doc-delta and other high-risk rows; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-054; File: generator; Patch and hunk header: `@@ -1451,6 +1872,14 @@`; Material effect: rejected independent row-contract drift; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-055; File: updater; Patch and hunk header: `@@ -2425,6 +2425,22 @@`; Material effect: registered both doc-delta records; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-056; File: updater; Patch and hunk header: `@@ -2899,10 +2915,16 @@`; Material effect: rejected malformed, empty, or duplicate proof fields; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-057; File: updater; Patch and hunk header: `@@ -2939,9 +2961,17 @@`; Material effect: constructed exact expected proof-field sets; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-058; File: updater; Patch and hunk header: `@@ -2955,7 +2985,10 @@`; Material effect: required exact existing proof schemas before reuse; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+Hunk ID: R1PR-059; File: updater; Patch and hunk header: `@@ -2989,6 +3022,8 @@`; Material effect: enforced exact proof fields during checking; Risk category: High; Evidence pointer: Remedial PR 1 diff.
+
+#### Remedial PR 2 Material Hunk Ledger
+
+Hunk ID: R2PR-001; File: Machine Mirror; Patch and hunk header: `@@ -456,7 +456,7 @@`; Material effect: refreshed matrix record after command correction; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-002; File: Machine Mirror; Patch and hunk header: `@@ -493,7 +493,7 @@`; Material effect: refreshed Mirror self-record; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-003; File: Mirror proof; Patch and hunk header: `@@ -1,6 +1,6 @@`; Material effect: refreshed Mirror digests; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-004; File: Mirror checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed checksum; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-005; File: Mirror checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed proof digest; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-006; File: matrix; Patch and hunk header: `@@ -98,7 +98,7 @@`; Material effect: corrected the precommit checklist future command contract; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-007; File: matrix; Patch and hunk header: `@@ -114,7 +114,7 @@`; Material effect: corrected the postcommit checklist future command contract; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-008; File: matrix proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed matrix proof; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-009; File: focused tests; Patch and hunk header: `@@ -14,6 +14,33 @@`; Material effect: froze exact plan-authorized write/check and CI commands; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-010; File: focused tests; Patch and hunk header: `@@ -158,9 +185,13 @@`; Material effect: distinguished planned-command drift from row-hash drift; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-011; File: focused tests; Patch and hunk header: `@@ -172,7 +203,7 @@`; Material effect: asserted the exact expected failure class; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-012; File: focused tests; Patch and hunk header: `@@ -515,16 +546,125 @@`; Material effect: added exact command, ownership, negative `--closeout`, and mutation coverage; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-013; File: generator; Patch and hunk header: `@@ -25,7 +25,7 @@`; Material effect: refreshed the row-contract hash; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-014; File: generator; Patch and hunk header: `@@ -63,6 +63,12 @@`; Material effect: introduced exact plan write/check and CI constants; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-015; File: generator; Patch and hunk header: `@@ -94,8 +100,8 @@`; Material effect: refreshed checklist nonclaim hashes; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-016; File: generator; Patch and hunk header: `@@ -627,6 +633,18 @@`; Material effect: generated exact checklist future prerequisites; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-017; File: generator; Patch and hunk header: `@@ -949,7 +967,7 @@`; Material effect: bound checklist rows to the exact CI contract; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-018; File: generator; Patch and hunk header: `@@ -978,14 +996,7 @@`; Material effect: replaced `--closeout` prose with canonical command generation; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-019; File: generator; Patch and hunk header: `@@ -1635,6 +1646,7 @@`; Material effect: loaded exact planned binding fields for semantic checking; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-020; File: generator; Patch and hunk header: `@@ -1643,9 +1655,8 @@`; Material effect: required exact future text and prohibited `--closeout`; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+Hunk ID: R2PR-021; File: generator; Patch and hunk header: `@@ -1866,7 +1877,7 @@`; Material effect: required exact planned CI binding; Risk category: High; Evidence pointer: Remedial PR 2 diff.
+
+#### Remedial PR 3 Material Hunk Ledger
+
+Hunk ID: R3PR-001; File: workflow; Patch and hunk header: `@@ -18,11 +18,19 @@ jobs:`; Material effect: added early read-only doc-delta checking and strict declared-dependency/readiness/focused testing; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-002; File: workflow; Patch and hunk header: `@@ -41,8 +49,6 @@ jobs:`; Material effect: removed the later duplicate focused-test step; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-003; File: Machine Mirror; Patch and hunk header: `@@ -362,7 +362,7 @@`; Material effect: refreshed staging size and SHA to the 463-byte pair; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-004; File: Machine Mirror; Patch and hunk header: `@@ -453,10 +453,10 @@`; Material effect: refreshed capture and matrix metadata; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-005; File: Machine Mirror; Patch and hunk header: `@@ -493,7 +493,7 @@`; Material effect: refreshed the Mirror self-record; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-006; File: Mirror proof; Patch and hunk header: `@@ -1,6 +1,6 @@`; Material effect: refreshed full and body digests; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-007; File: Mirror checksum; Patch and hunk header: `@@ -1 +1 @@`; Material effect: refreshed checksum to `14dceda2…`; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-008; File: Mirror checksum proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed proof digest; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-009; File: staging doc delta; Patch and hunk header: `@@ -1,5 +1,9 @@`; Material effect: added explicit two-surface binding while preserving blockers/caveats; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-010; File: staging proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: bound 463 bytes at SHA-256 `322db819…`; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-011; File: stable capture; Patch and hunk header: `@@ -1,5 +1,9 @@`; Material effect: explicitly listed the staging filename and caveat; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-012; File: capture proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: bound 463 bytes at SHA-256 `322db819…`; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-013; File: matrix; Patch and hunk header: `@@ -24,17 +24,17 @@`; Material effect: replaced the identity-only prerequisite with explicit roles, current producer, historical-only provenance, and PF19 identity posture; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-014; File: matrix proof; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: refreshed size and SHA; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-015; File: focused tests; Patch and hunk header: `@@ -41,6 +41,80 @@`; Material effect: froze current and historical doc-delta bytes, commands, identities, roles, and dependency-manifest bytes; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-016; File: focused tests; Patch and hunk header: `@@ -711,8 +785,8 @@`; Material effect: relabeled the Step-0 receipt as historical rather than current producer; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-017; File: focused tests; Patch and hunk header: `@@ -727,8 +801,37 @@`; Material effect: asserted staging reference, commands, current/historical digests, CI binding, and nonclaim posture; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-018; File: focused tests; Patch and hunk header: `@@ -741,10 +844,690 @@`; Material effect: added semantic-positive and adversarial tests for both surfaces, Index/Mirror roles, atomic/idempotent writing, aliases, proof drift, and current checking; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-019; File: focused tests; Patch and hunk header: `@@ -754,50 +1537,61 @@`; Material effect: separated historical reconstruction from current deterministic output; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-020; File: focused tests; Patch and hunk header: `@@ -806,15 +1600,15 @@`; Material effect: updated manifest/log failures to historical-origin semantics; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-021; File: focused tests; Patch and hunk header: `@@ -828,15 +1622,15 @@`; Material effect: preserved open-rails historical receipt rejection; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-022; File: focused tests; Patch and hunk header: `@@ -854,20 +1648,20 @@`; Material effect: preserved duplicate historical artifact rejection; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-023; File: focused tests; Patch and hunk header: `@@ -876,15 +1670,15 @@`; Material effect: preserved failed historical behavior rejection; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-024; File: focused tests; Patch and hunk header: `@@ -893,15 +1687,15 @@`; Material effect: preserved contradictory historical exit rejection; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-025; File: focused tests; Patch and hunk header: `@@ -921,20 +1715,20 @@`; Material effect: preserved duplicate/contradictory historical result rejection; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-026; File: focused tests; Patch and hunk header: `@@ -943,13 +1737,201 @@`; Material effect: added current-producer and CI mutation guards, including indirect writers and suppressed/no-op checks; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-027; File: focused tests; Patch and hunk header: `@@ -1479,3 +2461,69 @@`; Material effect: proved the doc-delta check mode read-only across pair, history, manifest, Index, and Mirror; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-028; File: generator; Patch and hunk header: `@@ -1,5 +1,5 @@`; Material effect: broadened the generator’s declared matrix/doc-delta responsibility; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-029; File: generator; Patch and hunk header: `@@ -25,7 +25,7 @@`; Material effect: refreshed the row-contract hash; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-030; File: generator; Patch and hunk header: `@@ -96,7 +96,7 @@`; Material effect: refreshed the doc-delta nonclaim hash; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-031; File: generator; Patch and hunk header: `@@ -168,17 +168,32 @@`; Material effect: separated historical/current identities and defined exact write/check commands; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-032; File: generator; Patch and hunk header: `@@ -400,29 +415,476 @@`; Material effect: implemented canonical rendering, per-surface semantics, PF19 identity, atomic writing, read-only checking, CI validation, and governed-role checks; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-033; File: generator; Patch and hunk header: `@@ -432,32 +894,32 @@`; Material effect: reclassified the retained Step-0 log as historical origin; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-034; File: generator; Patch and hunk header: `@@ -467,10 +929,10 @@`; Material effect: updated historical log-shape validation; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-035; File: generator; Patch and hunk header: `@@ -483,8 +945,13 @@`; Material effect: reconstructed exact historical pair literals; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-036; File: generator; Patch and hunk header: `@@ -508,6 +975,12 @@`; Material effect: prohibited current generator commands and surface-binding bytes from historical provenance; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-037; File: generator; Patch and hunk header: `@@ -531,25 +1004,48 @@`; Material effect: validated current pair and exact Human Index/Mirror role records independently of historical origin; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-038; File: generator; Patch and hunk header: `@@ -609,26 +1105,42 @@`; Material effect: generated the truthful current/historical doc-delta row; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-039; File: generator; Patch and hunk header: `@@ -1002,7 +1514,13 @@`; Material effect: rejected duplicate or malformed Human Index JSON fields; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-040; File: generator; Patch and hunk header: `@@ -1018,7 +1536,12 @@`; Material effect: rejected duplicate or malformed Mirror JSON fields; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-041; File: generator; Patch and hunk header: `@@ -1118,7 +1641,7 @@`; Material effect: applied duplicate-field rejection to Mirror-body hashing; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-042; File: generator; Patch and hunk header: `@@ -1196,7 +1719,11 @@`; Material effect: allowed proof validation against injected candidate bytes; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-043; File: generator; Patch and hunk header: `@@ -1208,7 +1735,7 @@`; Material effect: selected disk or injected bytes explicitly; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-044; File: generator; Patch and hunk header: `@@ -1633,12 +2160,23 @@`; Material effect: enforced exact current commands, CI job, identities, and historical-only wording in the row; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+Hunk ID: R3PR-045; File: generator; Patch and hunk header: `@@ -1937,11 +2475,35 @@`; Material effect: added non-abbreviated mutually exclusive `--doc-deltas` and `--check-doc-deltas` modes; Risk category: High; Evidence pointer: Remedial PR 3 diff.
+
+### Net Effective Diff Review
+
+#### NET-001
+
+NET ID: NET-001  
+File/artifact: `.github/workflows/ci.yml`  
+Covered hunks: OPR-001 through OPR-005, R3PR-001 through R3PR-002  
+Lifecycle state progression:
+
+* After Original PR: Matrix/focused/path checks and closed-rails environment added.  
+* After Remedial PR 1: Not touched at this stage.  
+* After Remedial PR 2: Not touched at this stage.  
+* After Remedial PR 3: Early read-only doc check and strict declared-dependency/readiness/focused gate added.
+
+Intervening-change impact: None  
+Final lineage merged state: Fail-closed early DEV-01 evidence gate.  
+Current final repo state: Same exact blob as Remedial PR 3 head.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: The workflow checks rather than writes doc deltas; install, readiness, and focused pytest run in one `set -euo pipefail` shell.  
+Assessment: Coherent.  
+Evidence pointer(s): Remedial PR 3 run `30663742410`.  
+GitHub Repo proof: [current workflow](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/.github/workflows/ci.yml).  
+PF reference, if relied on: PF10, `### **Gate B requirements**`.
+
+#### NET-002
+
+NET ID: NET-002  
+File/artifact: `AGENTS.md`  
+Covered hunks: OPR-006, R1PR-001  
+Lifecycle state progression:
+
+* After Original PR: Four planned-new rows asserted.  
+* After Remedial PR 1: Replaced with current repository/PF semantics and exact remediation authority.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Three exact planned-new rows; no later-phase authorization.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: Medium  
+High-risk hunk assessment, if applicable: Not applicable.  
+Assessment: Corrected authority note does not override PF canon or authorize execution.  
+Evidence pointer(s): Original and Remedial PR 1 diffs.  
+GitHub Repo proof: [current AGENTS.md](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/AGENTS.md).  
+PF reference, if relied on: None.
+
+#### NET-003
+
+NET ID: NET-003  
+File/artifact: architecture snapshot  
+Covered hunks: OPR-007  
+Lifecycle state progression:
+
+* After Original PR: Regenerated for generator/updater additions.  
+* After Remedial PR 1: Not touched.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Snapshot retained.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Generated keys-only evidence; no runtime implementation change.  
+Assessment: Coherent and validated in exact-head CI.  
+Evidence pointer(s): Remedial PR 3 body reports architecture check passed.  
+GitHub Repo proof: [current snapshot](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/architecture/architecture_snapshot.keys_only.json).  
+PF reference, if relied on: None.
+
+#### NET-004
+
+NET ID: NET-004  
+File/artifact: architecture snapshot proof  
+Covered hunks: OPR-008  
+Lifecycle state progression:
+
+* After Original PR: Proof refreshed.  
+* After Remedial PR 1: Not touched.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Current proof retained.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Proof binds the retained snapshot.  
+Assessment: Coherent.  
+Evidence pointer(s): Exact-head architecture validation.  
+GitHub Repo proof: [current proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt).  
+PF reference, if relied on: None.
+
+#### NET-005
+
+NET ID: NET-005  
+File/artifact: `artifacts/evidence_index.jsonl`  
+Covered hunks: OPR-009 through OPR-013, R1PR-002 through R1PR-006, R2PR-001 through R2PR-002, R3PR-003 through R3PR-005  
+Lifecycle state progression:
+
+* After Original PR: 551-record Mirror with manifest/matrix records.  
+* After Remedial PR 1: 553 records after both doc-delta records.  
+* After Remedial PR 2: Matrix/self-record digests refreshed.  
+* After Remedial PR 3: Staging, capture, matrix, and self-record digests refreshed.
+
+Intervening-change impact: None  
+Final lineage merged state: 553-record current Mirror.  
+Current final repo state: 553 parsed records, zero duplicate key/path pairs, ordered topology equal to Human Index.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Every lifecycle update was regenerated companion data; current doc and matrix sizes/hashes match proofs.  
+Assessment: Coherent.  
+Evidence pointer(s): VAL-008 through VAL-010.  
+GitHub Repo proof: [current Mirror](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/evidence_index.jsonl), SHA-256 `14dceda2…`.  
+PF reference, if relied on: PF09.6, `### Subtask HDE-DIST005.2 — Global Index & Mirror discipline`.
+
+#### NET-006
+
+NET ID: NET-006  
+File/artifact: Machine Mirror proof  
+Covered hunks: OPR-014, R1PR-007, R2PR-003, R3PR-006  
+Lifecycle state progression:
+
+* After Original PR: 551-record proof.  
+* After Remedial PR 1: 553-record proof.  
+* After Remedial PR 2: Refreshed for command-contract bytes.  
+* After Remedial PR 3: Refreshed for final doc/matrix bytes.
+
+Intervening-change impact: None  
+Final lineage merged state: `size_bytes: 267013`, SHA `14dceda2…`, body SHA `846aa58d…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Full and body hashes are distinct and exact.  
+Assessment: Coherent.  
+Evidence pointer(s): current proof parse.  
+GitHub Repo proof: [Mirror proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/evidence_index.jsonl.path_proof.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-007
+
+NET ID: NET-007  
+File/artifact: Machine Mirror checksum  
+Covered hunks: OPR-015, R1PR-008, R2PR-004, R3PR-007  
+Lifecycle state progression:
+
+* After Original PR: Refreshed.  
+* After Remedial PR 1: Refreshed.  
+* After Remedial PR 2: Refreshed.  
+* After Remedial PR 3: Refreshed to final Mirror.
+
+Intervening-change impact: None  
+Final lineage merged state: `14dceda2b8821091a60e7262ddb735ef4b835c1c9d4f6d430f3a63ed216f174d`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Sentinel matches current Mirror proof.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head Index hash check.  
+GitHub Repo proof: [Mirror checksum](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/evidence_index.jsonl.sha256).  
+PF reference, if relied on: PF09.6.
+
+#### NET-008
+
+NET ID: NET-008  
+File/artifact: Machine Mirror checksum proof  
+Covered hunks: OPR-016, R1PR-009, R2PR-005, R3PR-008  
+Lifecycle state progression:
+
+* After Original PR: Refreshed.  
+* After Remedial PR 1: Refreshed.  
+* After Remedial PR 2: Refreshed.  
+* After Remedial PR 3: Refreshed.
+
+Intervening-change impact: None  
+Final lineage merged state: Proof SHA `faf4463c…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Proof targets the exact checksum sentinel.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head proof validation.  
+GitHub Repo proof: [checksum proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/artifacts/evidence_index.jsonl.sha256.path_proof.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-009
+
+NET ID: NET-009  
+File/artifact: `audit/docdeltas/hde-epic038_doc_deltas.md`  
+Covered hunks: R3PR-009  
+Lifecycle state progression:
+
+* After Original PR: Not touched at this stage.  
+* After Remedial PR 1: Not touched at this stage.  
+* After Remedial PR 2: Not touched at this stage.  
+* After Remedial PR 3: Canonical 463-byte semantic pair content produced.
+
+Intervening-change impact: None  
+Final lineage merged state: Primary staging surface explicitly identifies both roles, blockers, and caveat.  
+Current final repo state: Same exact blob as Remedial PR 3 head.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: It remains the primary token surface and is mechanically rendered.  
+Assessment: Conforming.  
+Evidence pointer(s): VAL-009.  
+GitHub Repo proof: [staging surface](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/docdeltas/hde-epic038_doc_deltas.md).  
+PF reference, if relied on: PF04 §2.0.13; PF19 §14.6; PF27 `Step-0B — Doc Delta Capture`.
+
+#### NET-010
+
+NET ID: NET-010  
+File/artifact: staging doc-delta proof  
+Covered hunks: R1PR-010, R3PR-010  
+Lifecycle state progression:
+
+* After Original PR: Not touched.  
+* After Remedial PR 1: Added for the 246-byte historical pair.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Refreshed for 463 current bytes.
+
+Intervening-change impact: None  
+Final lineage merged state: Size 463, SHA `322db819…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Target, size, and digest match current staging bytes.  
+Assessment: Coherent.  
+Evidence pointer(s): current proof parse.  
+GitHub Repo proof: [staging proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/docdeltas/hde-epic038_doc_deltas.md.path_proof.txt).  
+PF reference, if relied on: PF04 §2.0.13.
+
+#### NET-011
+
+NET ID: NET-011  
+File/artifact: orientation output  
+Covered hunks: OPR-017, R1PR-012  
+Lifecycle state progression:
+
+* After Original PR: 551 artifacts.  
+* After Remedial PR 1: 553 artifacts.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: `total_artifacts: 553`, `status: ok`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current ordered topology parse independently confirms 553/553.  
+Assessment: Coherent.  
+Evidence pointer(s): VAL-010.  
+GitHub Repo proof: [orientation](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/gates/topology/orientation_demo.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-012
+
+NET ID: NET-012  
+File/artifact: orientation proof  
+Covered hunks: OPR-018, R1PR-013  
+Lifecycle state progression:
+
+* After Original PR: Refreshed for 551\.  
+* After Remedial PR 1: Refreshed for 553\.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Size 115, SHA `d53be0cb…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Proof binds the current orientation output.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head orientation check.  
+GitHub Repo proof: [orientation proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/gates/topology/orientation_demo.txt.path_proof.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-013
+
+NET ID: NET-013  
+File/artifact: `audit/qa/hde-epic038/00_meta/doc_deltas.md`  
+Covered hunks: R3PR-011  
+Lifecycle state progression:
+
+* After Original PR: Not touched.  
+* After Remedial PR 1: Not touched.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Stable capture normalized to list the staging path and caveat.
+
+Intervening-change impact: None  
+Final lineage merged state: Conforming 463-byte stable QA record.  
+Current final repo state: Same exact blob as staging and Remedial PR 3 head.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: It explicitly lists `audit/docdeltas/hde-epic038_doc_deltas.md`, contains blockers/caveats, and preserves PF19 byte identity.  
+Assessment: Conforming.  
+Evidence pointer(s): VAL-009.  
+GitHub Repo proof: [stable capture](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/qa/hde-epic038/00_meta/doc_deltas.md).  
+PF reference, if relied on: PF04 §2.0.13; PF19 §14.6; PF27 Step-0B.
+
+#### NET-014
+
+NET ID: NET-014  
+File/artifact: stable-capture proof  
+Covered hunks: R1PR-011, R3PR-012  
+Lifecycle state progression:
+
+* After Original PR: Not touched.  
+* After Remedial PR 1: Added for historical 246 bytes.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Refreshed for current 463 bytes.
+
+Intervening-change impact: None  
+Final lineage merged state: Size 463, SHA `322db819…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Path-specific proof targets the stable surface.  
+Assessment: Coherent.  
+Evidence pointer(s): current proof parse.  
+GitHub Repo proof: [capture proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/qa/hde-epic038/00_meta/doc_deltas.md.path_proof.txt).  
+PF reference, if relied on: PF04 §2.0.13.
+
+#### NET-015
+
+NET ID: NET-015  
+File/artifact: token matrix  
+Covered hunks: OPR-019, R1PR-014 through R1PR-016, R2PR-006 through R2PR-007, R3PR-013  
+Lifecycle state progression:
+
+* After Original PR: 33 unclaimed rows, four planned-new, several semantic gaps.  
+* After Remedial PR 1: Three planned-new and corrected release/doc/checklist paths; doc and command defects remained.  
+* After Remedial PR 2: Exact checklist commands corrected.  
+* After Remedial PR 3: Doc-delta semantics, producer, history, and CI binding corrected.
+
+Intervening-change impact: None  
+Final lineage merged state: 33 unique rows, 30 existing/reused, three planned-new, 33 unclaimed, zero claimed.  
+Current final repo state: Same; all required fields parse as present.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current rows express exact paths, keys, proofs, commands, and truthful nonclaim prerequisites.  
+Assessment: Conforming.  
+Evidence pointer(s): VAL-007, VAL-011.  
+GitHub Repo proof: [current matrix](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/qa/hde-epic038/token_evidence_matrix.md).  
+PF reference, if relied on: PF10 `### **Gate B requirements**`.
+
+#### NET-016
+
+NET ID: NET-016  
+File/artifact: matrix proof  
+Covered hunks: OPR-020, R1PR-017, R2PR-008, R3PR-014  
+Lifecycle state progression:
+
+* After Original PR: Created.  
+* After Remedial PR 1: Refreshed.  
+* After Remedial PR 2: Refreshed.  
+* After Remedial PR 3: Refreshed.
+
+Intervening-change impact: None  
+Final lineage merged state: Size 41,247, SHA `40918fdf…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Proof matches final matrix bytes.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head matrix check.  
+GitHub Repo proof: [matrix proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/qa/hde-epic038/token_evidence_matrix.md.path_proof.txt).  
+PF reference, if relied on: PF10 Gate B requirements.
+
+#### NET-017
+
+NET ID: NET-017  
+File/artifact: manifest proof  
+Covered hunks: OPR-021  
+Lifecycle state progression:
+
+* After Original PR: Added.  
+* After Remedial PR 1: Not touched.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Current manifest source proof retained.  
+Current final repo state: SHA `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current release row also binds release ID, recompute log, generator/tests, and proofs; the token remains unclaimed.  
+Assessment: Coherent.  
+Evidence pointer(s): current matrix release row.  
+GitHub Repo proof: [manifest proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/catalog/manifest.json.path_proof.txt).  
+PF reference, if relied on: PF10 §2.37.
+
+#### NET-018
+
+NET ID: NET-018  
+File/artifact: final-LF checker  
+Covered hunks: OPR-022  
+Lifecycle state progression:
+
+* After Original PR: Matrix/proof required; future artifacts checked when present.  
+* After Remedial PR 1: Not touched.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Original bounded checker retained.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: It neither creates future artifacts nor infers token PASS.  
+Assessment: Proportionate and passing.  
+Evidence pointer(s): Remedial PR 3 exact-head final-LF check.  
+GitHub Repo proof: [current checker](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/ci/checks/check_final_lf.sh).  
+PF reference, if relied on: None.
+
+#### NET-019
+
+NET ID: NET-019  
+File/artifact: Mirror schema checker  
+Covered hunks: R1PR-018 through R1PR-019  
+Lifecycle state progression:
+
+* After Original PR: Not touched.  
+* After Remedial PR 1: Strict proof parser and exact schemas added.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Fail-closed parser retained.  
+Current final repo state: Same and passing.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Rejects malformed, duplicate, empty, extra, or missing proof fields.  
+Assessment: Coherent.  
+Evidence pointer(s): Remedial PR 3 exact-head Mirror-schema check.  
+GitHub Repo proof: [current checker](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/ci/checks/check_mirror_schema.sh).  
+PF reference, if relied on: None.
+
+#### NET-020
+
+NET ID: NET-020  
+File/artifact: Human Index  
+Covered hunks: OPR-023, R1PR-020  
+Lifecycle state progression:
+
+* After Original PR: 551 records.  
+* After Remedial PR 1: 553 records.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched; artifact identities and roles remained stable.
+
+Intervening-change impact: None  
+Final lineage merged state: 553-record Human Index.  
+Current final repo state: 553 records, zero duplicate key/path pairs, ordered parity with Mirror.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Both doc-delta records and matrix record remain present exactly once.  
+Assessment: Coherent.  
+Evidence pointer(s): VAL-010.  
+GitHub Repo proof: [Human Index](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/docs/evidence/INDEX.json).  
+PF reference, if relied on: PF09.6 HDE-DIST005.2.
+
+#### NET-021
+
+NET ID: NET-021  
+File/artifact: Human Index proof  
+Covered hunks: OPR-024, R1PR-021  
+Lifecycle state progression:
+
+* After Original PR: Refreshed for 551 records.  
+* After Remedial PR 1: Refreshed for 553 records.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Size 149,798, SHA `0e933c51…`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Proof matches current Human Index.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head updater/hash checks.  
+GitHub Repo proof: [Index proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/docs/evidence/INDEX.json.path_proof.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-022
+
+NET ID: NET-022  
+File/artifact: Human Index checksum  
+Covered hunks: OPR-025, R1PR-022  
+Lifecycle state progression:
+
+* After Original PR: Refreshed.  
+* After Remedial PR 1: Refreshed for 553 records.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: `0e933c51dff5ae61a70498b093f1c428c03b0e4618c6328c3b495403c8c85821`.  
+Current final repo state: Same.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Sentinel matches Index proof.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head Index hash check.  
+GitHub Repo proof: [Index checksum](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/docs/evidence/INDEX.sha256).  
+PF reference, if relied on: PF09.6.
+
+#### NET-023
+
+NET ID: NET-023  
+File/artifact: Human Index checksum proof  
+Covered hunks: OPR-026, R1PR-023  
+Lifecycle state progression:
+
+* After Original PR: Refreshed.  
+* After Remedial PR 1: Refreshed.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched.
+
+Intervening-change impact: None  
+Final lineage merged state: Current checksum proof retained.  
+Current final repo state: Size 91, target proof SHA `ba9a03f0…`.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Exact target and proof schema retained.  
+Assessment: Coherent.  
+Evidence pointer(s): exact-head proof checks.  
+GitHub Repo proof: [checksum proof](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/docs/evidence/INDEX.sha256.path_proof.txt).  
+PF reference, if relied on: PF09.6.
+
+#### NET-024
+
+NET ID: NET-024  
+File/artifact: focused tests  
+Covered hunks: OPR-027, R1PR-024 through R1PR-034, R2PR-009 through R2PR-012, R3PR-015 through R3PR-027  
+Lifecycle state progression:
+
+* After Original PR: 88 focused tests with initial semantic gaps.  
+* After Remedial PR 1: 102 tests; strengthened proofs/receipts but codified two defects.  
+* After Remedial PR 2: 119 tests; checklist command defect closed.  
+* After Remedial PR 3: 172 tests; doc semantics, provenance, writer/checker, aliases, CI dependencies, and readiness covered.
+
+Intervening-change impact: None  
+Final lineage merged state: Comprehensive fail-closed suite.  
+Current final repo state: Same exact blob as reviewed head.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Includes positive compliant pair and negatives for missing/wrong reference, missing caveat, pair divergence, stale proof, provenance drift, duplicate JSON fields, aliases, writer exposure, and CI suppression.  
+Assessment: Sufficient.  
+Evidence pointer(s): Remedial PR 3 exact-head result `172 passed`.  
+GitHub Repo proof: [current focused tests](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/tests/evidence/test_hde_epic038_closeout.py).  
+PF reference, if relied on: PF04 §2.0.13; PF19 §14.6; PF10 Gate B.
+
+#### NET-025
+
+NET ID: NET-025  
+File/artifact: generator  
+Covered hunks: OPR-028, R1PR-035 through R1PR-054, R2PR-013 through R2PR-021, R3PR-028 through R3PR-045  
+Lifecycle state progression:
+
+* After Original PR: Deterministic matrix generator/checker with semantic gaps.  
+* After Remedial PR 1: Stronger release/proof/receipt validation; equality and `--closeout` defects present.  
+* After Remedial PR 2: Checklist commands corrected.  
+* After Remedial PR 3: Canonical current doc producer, read-only check, independent role semantics, PF19 identity, historical-only provenance, transactional rollback, strict CI validation, and non-abbreviated modes added.
+
+Intervening-change impact: None  
+Final lineage merged state: Deterministic, fail closed, and canon-conforming for DEV-01.  
+Current final repo state: Same exact blob as reviewed head.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Current semantic validation no longer substitutes equality for role/reference checks; identity is applied separately because PF19 requires it.  
+Assessment: Correct.  
+Evidence pointer(s): VAL-009, VAL-011, VAL-012.  
+GitHub Repo proof: [current generator](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/tools/evidence/generate_hde_epic038_closeout.py).  
+PF reference, if relied on: PF04 §2.0.13; PF19 §14.6; PF27 Step-0B; PF10 Gate B.
+
+#### NET-026
+
+NET ID: NET-026  
+File/artifact: updater  
+Covered hunks: OPR-029, R1PR-055 through R1PR-059  
+Lifecycle state progression:
+
+* After Original PR: Manifest and matrix registrations added.  
+* After Remedial PR 1: Both doc-delta records registered and proof handling made fail closed.  
+* After Remedial PR 2: Not touched.  
+* After Remedial PR 3: Not touched; stable record identities remained exact.
+
+Intervening-change impact: None  
+Final lineage merged state: Canonical producer recognizes all current DEV-01 governed records.  
+Current final repo state: Same and passing `--check`.  
+Later-change impact: None  
+Risk: High  
+High-risk hunk assessment, if applicable: Exact schemas prevent silent reuse of malformed proof files.  
+Assessment: Coherent.  
+Evidence pointer(s): Remedial PR 3 exact-head updater check.  
+GitHub Repo proof: [current updater](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/tools/evidence/update_evidence_index.py).  
+PF reference, if relied on: PF09.6 HDE-DIST005.2.
+
+### Validation & Evidence Review
+
+#### VAL-001
+
+Purpose: Establish one attributable merged lifecycle.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Compare lifecycle baseline and all four merge endpoints.  
+Result: PASS.  
+Observation: Four directly adjacent squash merges; current `main` equals the fourth.  
+Evidence pointer: adjacent compare results each `ahead_by=1`, `behind_by=0`.  
+Why it matters: Excludes hidden intervening and later changes.
+
+#### VAL-002
+
+Purpose: Inspect current reality for every lifecycle-touched file.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Fetch all 26 paths at current HEAD.  
+Result: PASS.  
+Observation: All 26 recovered; none deleted. API-omitted Human Index patch bodies were recovered through complete before/after blobs.  
+Evidence pointer: NET-001 through NET-026.  
+Why it matters: Current state controls the decision.
+
+#### VAL-003
+
+Purpose: Verify Original PR exact-head checks.  
+Source: Original PR.  
+Check/workflow/artifact/method: Actions run `30604877059`.  
+Result: PASS.  
+Observation: Seven jobs succeeded; 88 focused and 1,210 broad tests passed; matrix reported 33 unique and zero claimed.  
+Evidence pointer: [workflow run](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30604877059).  
+Why it matters: Establishes the mechanically reproducible initial stage.
+
+#### VAL-004
+
+Purpose: Verify Remedial PR 1 exact-head checks.  
+Source: Remedial PR 1\.  
+Check/workflow/artifact/method: Actions run `30637739563`.  
+Result: PASS.  
+Observation: Seven jobs succeeded; 102 focused and 1,224 broad tests passed.  
+Evidence pointer: [workflow run](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30637739563).  
+Why it matters: Confirms internal consistency at that stage, notwithstanding later external-contract findings.
+
+#### VAL-005
+
+Purpose: Verify Remedial PR 2 exact-head checks.  
+Source: Remedial PR 2\.  
+Check/workflow/artifact/method: Actions run `30648474263`.  
+Result: PASS.  
+Observation: Seven jobs succeeded; 119 focused and 1,241 broad tests passed; 33 rows, zero claims.  
+Evidence pointer: [workflow run](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30648474263).  
+Why it matters: Confirms the corrected checklist command contract.
+
+#### VAL-006
+
+Purpose: Verify Remedial PR 3 exact-head checks.  
+Source: Remedial PR 3\.  
+Check/workflow/artifact/method: Actions run `30663742410` and PR validation summary.  
+Result: PASS.  
+Observation: Seven jobs succeeded; pytest 8.4.2 readiness; 172 focused, 1,294 evidence/OPS, 250 PostgreSQL-contract, and additional 6/2/15/3 suites passed. Matrix, updater, orientation, paths, Mirror schema, Index hash, final LF, architecture, current-state, compilation, and diff checks passed.  
+Evidence pointer: [workflow run](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30663742410).  
+Why it matters: These exact reviewed bytes are the current bytes.
+
+#### VAL-007
+
+Purpose: Verify roster, classifications, completeness, and nonclaim posture.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Complete current matrix parse.  
+Result: PASS.  
+Observation: 33 rows, 33 unique tokens, 30 existing/reused, three planned-new (`TESTS_PASS_OK`, `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`), 33 unclaimed, zero claimed, no missing required fields, no retired token or PF09 label.  
+Evidence pointer: current matrix and proof SHA `40918fdf…`.  
+Why it matters: Satisfies the core Gate B matrix contract.
+
+#### VAL-008
+
+Purpose: Verify governed evidence topology.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Parse and compare complete Human Index and Mirror.  
+Result: PASS.  
+Observation: 553 records each; zero duplicate key/path pairs; identical ordered artifact-key/path topology; staging, capture, and matrix records appear once in each.  
+Evidence pointer: NET-005 and NET-020.  
+Why it matters: Proves the fixed-point topology.
+
+#### VAL-009
+
+Purpose: Verify the doc-delta two-surface contract.  
+Source: GitHub Repo and PF04/PF19/PF27.  
+Check/workflow/artifact/method: Compare both current surfaces and generator checks to permanent canon.  
+Result: PASS.  
+Observation: The stable capture lists the exact staging filename and caveat; each surface is independently validated for role and structure; the pair is then required to be byte-identical as PF19 mandates.  
+Evidence pointer: both surfaces are 463 bytes at SHA `322db819…`.  
+Why it matters: Closes the sole blocker from the prior lifecycle review.
+
+PF04 locator: `### **2.0.13 Registry, ordering & doc-delta harness (EPIC017)**`
+
+> `DOC_DELTA_PRESENT_OK` requires a two-surface pair with concrete filenames and explicit binding.  
+> The epic-scoped capture is the stable QA record surface.  
+> It must list the draft/staging filename(s) and any discovered doc-delta requirements/caveats.
+
+PF19 locator: `## **14.6 Ownership and maintenance**`
+
+> The Doc Delta Capture step MUST produce two artifacts.  
+> The two files MUST be byte-identical.  
+> Both artifacts MUST be names-only.
+
+#### VAL-010
+
+Purpose: Verify doc-delta producer and provenance truth.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Inspect generator, tests, current pair, historical receipt contract, and row text.  
+Result: PASS.  
+Observation: Current bytes are deterministic output of `--doc-deltas`; `--check-doc-deltas` is read-only; the unchanged Step-0 receipt proves only the historical 246-byte pair and is rejected as current-byte provenance.  
+Evidence pointer: current pair SHA `322db819…`; historical pair SHA `7372dcd1…`; historical log SHA `db9e7ac4…`.  
+Why it matters: Prevents rewritten history or false producer attribution.
+
+#### VAL-011
+
+Purpose: Verify exact checklist command bindings.  
+Source: Implementation Doc and GitHub Repo.  
+Check/workflow/artifact/method: Compare plan commands to current matrix, generator, and tests.  
+Result: PASS.  
+Observation: Default write and read-only `--check` are exact; `--closeout` appears only in negative guards.  
+Evidence pointer: NET-015, NET-024, NET-025.  
+Why it matters: Confirms Remedial PR 2’s correction survived Remedial PR 3\.
+
+#### VAL-012
+
+Purpose: Verify CI dependency and readiness ordering.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Inspect current workflow, generator validator, dependency manifest contract, and exact-head receipt.  
+Result: PASS.  
+Observation: The workflow checks docs using stdlib, then in one strict shell installs `requirements-dev.txt`, runs `python -m pytest --version`, and runs the focused suite. Bare/unbounded pytest and fail-open dev installation were removed.  
+Evidence pointer: review thread `PRRT_kwDOP103ks6Vhv6A`, resolved; exact-head pytest 8.4.2 and 172 passed.  
+Why it matters: Closes the clean-runner P1.
+
+#### VAL-013
+
+Purpose: Verify release-family and nonclaim semantics.  
+Source: GitHub Repo and PF10.  
+Check/workflow/artifact/method: Inspect current release row and semantic validators.  
+Result: PASS.  
+Observation: The complete governed release family is bound, but no PASS is inferred because the present evidence does not establish an exact-head acceptance claim.  
+Evidence pointer: current matrix row 33 and manifest proof SHA `0ace4954…`.  
+Why it matters: Preserves truthful Gate B posture.
+
+#### VAL-014
+
+Purpose: Verify independent Gate B review events and current thread closure.  
+Source: all lineage PRs.  
+Check/workflow/artifact/method: Inspect exact-head Gate B comments and review-thread state.  
+Result: PASS.  
+Observation: Gate B PASS records exist for all four exact heads; all 17 review threads across the lineage are resolved; no change request remains.  
+Evidence pointer: comments `5139378534`, `5143897946`, `5145375872`, `5147356543`.  
+Why it matters: Establishes independent review, with the final exact-head result superseding earlier stages.
+
+#### VAL-015
+
+Purpose: Verify scope and safety rails.  
+Source: GitHub Repo.  
+Check/workflow/artifact/method: Complete 26-file union and patch scan.  
+Result: PASS.  
+Observation: No runtime implementation, PF-Canon edit, board/status mutation, OPS or Live QA execution, deployment, token claim, acceptance, closeout, or DEV-02/DEV-03 implementation landed.  
+Evidence pointer: changed-file inventories for all four lineage PRs.  
+Search method: searched all lifecycle filenames and complete patches for runtime, PF, OPS-output, Live-QA-output, deployment, board, status, acceptance, and token-claim changes; result: zero affected paths or mutations.  
+Why it matters: Confirms bounded repository-only remediation.
+
+#### VAL-016
+
+Purpose: Perform additional local repository execution.  
+Source: Local environment.  
+Check/workflow/artifact/method: `git rev-parse --is-inside-work-tree`.  
+Result: NOT RUN.  
+Observation: No local repository checkout exists. Review used complete connector-returned committed blobs and exact-head Actions evidence.  
+Evidence pointer: local diagnostic returned “not a git repository.”  
+Why it matters: No local tests were independently rerun, but exact-head CI and current blob equality provide the required current-state proof; this does not block acceptance.
+
+### Requirement Satisfaction Crosswalk
+
+#### REQ-001
+
+Requirement ID: REQ-001  
+Requirement: Resolve every token to exact existing or approved planned tests, CI, QA checks, governed artifacts, keys, and proofs.  
+Applicability basis: Implementation Doc DEV-01 Action 1\.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Not satisfied  
+* After Remedial PR 2: Not satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007, VAL-009, NET-015.  
+GitHub Repo proof, if Current state matters: current matrix at `611ffa77…`.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-002
+
+Requirement ID: REQ-002  
+Requirement: Provide deterministic `--token-matrix` and read-only `--check-token-matrix` modes.  
+Applicability basis: DEV-01 Action 2\.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): NET-025, all exact-head workflow runs.  
+GitHub Repo proof, if Current state matters: current generator.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-003
+
+Requirement ID: REQ-003  
+Requirement: Generate one unique non-placeholder row per canonical token.  
+Applicability basis: DEV-01 Action 3\.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007.  
+GitHub Repo proof, if Current state matters: 33 rows and 33 unique.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-004
+
+Requirement ID: REQ-004  
+Requirement: Classify every binding as existing/reused or exact planned-new.  
+Applicability basis: DEV-01 Action 4\.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007.  
+GitHub Repo proof, if Current state matters: 30 existing/reused and three planned-new.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-005
+
+Requirement ID: REQ-005  
+Requirement: Bind `RELEASE_ID_RECOMPUTE_OK` to the complete canonical release family.  
+Applicability basis: DEV-01 Action 5 and PF10 §2.37.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): NET-017, VAL-013.  
+GitHub Repo proof, if Current state matters: current matrix release row.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-006
+
+Requirement ID: REQ-006  
+Requirement: Exclude `DEV_DB_BRIDGE_FALLBACK_OK` and non-token PF09 labels.  
+Applicability basis: DEV-01 Action 6\.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): complete current matrix parse; zero prohibited rows.  
+GitHub Repo proof, if Current state matters: current token headings.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-007
+
+Requirement ID: REQ-007  
+Requirement: Preserve an unclaimed posture and record exact prerequisites where evidence is insufficient.  
+Applicability basis: DEV-01 Action 7\.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Not satisfied  
+* After Remedial PR 2: Not satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): current doc-delta row, 33 unclaimed/zero claimed parse.  
+GitHub Repo proof, if Current state matters: NET-015.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-008
+
+Requirement ID: REQ-008  
+Requirement: Establish updater, orientation, updater fixed point, and both read-only checks.  
+Applicability basis: DEV-01 Action 8\.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-006, VAL-008, NET-026.  
+GitHub Repo proof, if Current state matters: 553/553 topology and `status: ok`.  
+PF09 task/subtask IDs, if proven: HDE-DIST005; HDE-DIST005.2.
+
+#### REQ-009
+
+Requirement ID: REQ-009  
+Requirement: Run focused tests and read-only matrix checking after generation.  
+Applicability basis: DEV-01 Action 9\.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-003 through VAL-006.  
+GitHub Repo proof, if Current state matters: Remedial PR 3 exact-head `172 passed`, matrix check success.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-010
+
+Requirement ID: REQ-010  
+Requirement: Deliver corrections through bounded PRs and obtain exact-head independent Gate B records.  
+Applicability basis: DEV-01 Actions 10–11.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-014.  
+GitHub Repo proof, if Current state matters: final Gate B comment `5147356543`.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-011
+
+Requirement ID: REQ-011  
+Requirement: Produce exactly 33 unique rows with corrected-roster set equality.  
+Applicability basis: DEV-01 Verification.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007.  
+GitHub Repo proof, if Current state matters: 33/33 set and uniqueness.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-012
+
+Requirement ID: REQ-012  
+Requirement: Complete required fields and resolve existing paths, keys, and proof anchors.  
+Applicability basis: DEV-01 Verification.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007 through VAL-010.  
+GitHub Repo proof, if Current state matters: current Matrix, Index, Mirror, and proof records.  
+PF09 task/subtask IDs, if proven: HDE-DIST005.2.
+
+#### REQ-013
+
+Requirement ID: REQ-013  
+Requirement: Ensure every planned-new path, key, test, and workflow step is exact, task-owned, nonexistent, and explicitly unexecuted.  
+Applicability basis: DEV-01 Verification.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Not satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007, VAL-011.  
+GitHub Repo proof, if Current state matters: exact three planned rows; zero `--closeout` in positive matrix bindings.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-014
+
+Requirement ID: REQ-014  
+Requirement: Never infer token PASS from a row, artifact, path, or historical PASS text.  
+Applicability basis: DEV-01 Verification and PF10 Gate B.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007, current nonclaim hash contract.  
+GitHub Repo proof, if Current state matters: 33 unclaimed, zero claimed.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-015
+
+Requirement ID: REQ-015  
+Requirement: Gate B passes only without placeholders, guessed/implicit bindings, or canon-inexact prerequisites.  
+Applicability basis: DEV-01 Success/Failure and PF10 Gate B.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Not satisfied  
+* After Remedial PR 2: Not satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-007, VAL-009, VAL-014.  
+GitHub Repo proof, if Current state matters: final exact-head Gate B PASS and zero unresolved threads.  
+PF09 task/subtask IDs, if proven: None.
+
+#### REQ-016
+
+Requirement ID: REQ-016  
+Requirement: Remain inside repository-only DEV-01 rails and avoid runtime, OPS, Live QA, PF, board, deployment, acceptance, closeout, and later-phase execution.  
+Applicability basis: DEV-01 rails and exclusions.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-015.  
+GitHub Repo proof, if Current state matters: complete 26-file union.  
+PF09 task/subtask IDs, if proven: HDE-DIST005.2.
+
+#### REQ-017
+
+Requirement ID: REQ-017  
+Requirement: Update Human Index, checksums, Machine Mirror, proofs, and orientation coherently without moving PF09 status.  
+Applicability basis: DEV-01 Action 8 and PF09.6 accountability.  
+Lifecycle progression:
+
+* After Original PR: Satisfied  
+* After Remedial PR 1: Satisfied  
+* After Remedial PR 2: Satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): NET-005 through NET-012 and NET-020 through NET-023.  
+GitHub Repo proof, if Current state matters: 553 ordered pairs, matching hashes/proofs, `status: ok`.  
+PF09 task/subtask IDs, if proven: HDE-DIST005; HDE-DIST005.2.
+
+#### REQ-018
+
+Requirement ID: REQ-018  
+Requirement: Bind `DOC_DELTA_PRESENT_OK` to a two-surface pair whose capture lists the staging filename and caveats, whose roles are independently validated, and whose bytes satisfy PF19 identity.  
+Applicability basis: DEV-01 exact-binding requirements; PF04 §2.0.13; PF19 §14.6; PF27 Step-0B.  
+Lifecycle progression:
+
+* After Original PR: Not satisfied  
+* After Remedial PR 1: Not satisfied  
+* After Remedial PR 2: Not satisfied  
+* After Remedial PR 3: Satisfied
+
+Current state: Satisfied  
+Evidence pointer(s): VAL-009, VAL-010, NET-009 through NET-014.  
+GitHub Repo proof, if Current state matters: current 463-byte pair at SHA `322db819…`.  
+PF09 task/subtask IDs, if proven: None.
+
+### RCA
+
+#### A) Bug/Failure statement
+
+Original PR delivered the structural DEV-01 system with semantic misbindings. Remedial PR 1 fixed most rows but conflated PF19 byte identity with the complete PF04/PF27 semantic contract and introduced `--closeout`. Remedial PR 2 fixed the checklist commands but retained the doc-delta defect. Remedial PR 3 closed the remaining defect.
+
+#### B) Root cause(s)
+
+1. Original implementation used task-local substitutions before reconciling every row with current repository evidence and permanent canon.  
+2. Remedial PR 1 treated byte identity as sufficient evidence, although PF04/PF27 assign explicit roles and require the capture to name staging.  
+3. Exact hashes and byte-equality tests reinforced internal consistency while failing to detect the missing external semantic predicate.  
+4. The first Remedial PR 3 head initially misattributed the historical Step-0 receipt to current bytes and ran focused pytest before the declared dependency/readiness contract; exact-head follow-ups corrected both before merge.
+
+#### C) Fix progression across every Lineage PR, in supplied order
+
+* Original PR: created matrix, generator, checker, CI, tests, and 551-record fixed point.  
+* Remedial PR 1: corrected release, classifications, proof handling, and 553-record topology; introduced the checklist and doc-delta defects.  
+* Remedial PR 2: removed checklist command drift.  
+* Remedial PR 3: added semantic-positive doc-delta validation plus separate identity checking, truthful historical/current provenance, atomic producer/checker modes, adversarial tests, and strict clean-runner CI ordering.
+
+#### D) Final fix verification
+
+Current `main` contains the exact reviewed Remedial PR 3 blobs. The current pair satisfies PF04, PF19, and PF27 simultaneously; current matrix posture is 33 unique, three planned-new, 33 unclaimed, zero claimed; topology is 553/553; all seven exact-head jobs and final Gate B passed; no unresolved review thread or later change remains.
+
+### PF09 Impact & Status Posture
+
+PF09.x document title: PF09.6 — Canon-HDE-Build-Checklist-Distillation
+
+PF09 task ID: HDE-DIST005
+
+PF09 subtask ID(s): HDE-DIST005.2
+
+Current PF09 status: Task: `Not done (treated as an ongoing global requirement)`; subtask: `Partial`
+
+Status recommendation: No status change recommended
+
+Why supported: The lineage correctly advances recurring Index/Mirror/proof discipline, but the Implementation Doc explicitly states DEV-01 moves no PF09 status. The global requirement remains ongoing.
+
+Evidence pointer(s): Implementation Doc DEV-01 PF09.6 accountability; VAL-008; REQ-017.
+
+GitHub Repo proof, if Current state matters: 553-record Human Index/Mirror fixed point at current `main`.
+
+PF proof excerpt(s):
+
+Exact locator: `## Task HDE-DIST005 — Global discipline (Phase VI)` and `### Subtask HDE-DIST005.2 — Global Index & Mirror discipline`
+
+> **Task status:** **Not done** (treated as an ongoing global requirement)  
+> Enforce that every artifact addition, move, or removal is reflected in both Human Index and Machine Mirror in the same PR.  
+> Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR.  
+> **Subtask status:** Partial
+
+Linked NET/Finding IDs: NET-005 through NET-012, NET-020 through NET-023, NET-026, F-003.
+
+### Findings
+
+#### F-001
+
+Related item: NET-009 through NET-016 / NET-024 / NET-025 / VAL-009 / VAL-010 / REQ-018 / RCA  
+Lifecycle origin: Remedial PR 3  
+Severity: Note  
+Observation: The previous doc-delta blocker is closed: the stable capture names staging and caveats; semantic roles and PF19 identity are separately validated; historical and current production are distinguished.  
+Why it matters: The final merged state now satisfies all applicable permanent canon simultaneously.  
+Evidence: Current 463-byte pair; resolved threads `PRRT_kwDOP103ks6VdX6F` and `PRRT_kwDOP103ks6Vg5UZ`.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: No status change.  
+PF reference, if relied on: PF04 §2.0.13; PF19 §14.6; PF27 Step-0B.
+
+#### F-002
+
+Related item: NET-001 / NET-024 / NET-025 / VAL-012  
+Lifecycle origin: Remedial PR 3  
+Severity: Note  
+Observation: Declared test dependencies and pytest readiness now precede the focused suite in one strict shell.  
+Why it matters: The clean-runner P1 is closed without a fail-open or unbounded pytest path.  
+Evidence: Resolved thread `PRRT_kwDOP103ks6Vhv6A`; pytest 8.4.2 and 172 passed at exact head.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: None.  
+PF reference, if relied on: None.
+
+#### F-003
+
+Related item: NET-005 through NET-012 / NET-020 through NET-023 / NET-026 / VAL-008 / PF09  
+Lifecycle origin: Cross-lifecycle  
+Severity: Note  
+Observation: Current Human Index, Machine Mirror, checksums, proofs, and orientation form a coherent 553-record fixed point.  
+Why it matters: The governed topology is reproducible and internally complete.  
+Evidence: 553/553 ordered parity, zero duplicate pairs, orientation `status: ok`.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: HDE-DIST005.2 remains `Partial`.  
+PF reference, if relied on: PF09.6 HDE-DIST005.2.
+
+#### F-004
+
+Related item: GitHub Repo / VAL-001 / VAL-015  
+Lifecycle origin: Cross-lifecycle  
+Severity: Note  
+Observation: The supplied lineage is contiguous, current `main` equals the final merge, and no excluded-scope or later change was found.  
+Why it matters: The acceptance decision applies to current repository reality.  
+Evidence: Four adjacent compare results; complete 26-file inventory.  
+Required action: None.  
+Blocker: No  
+PF09 impact/status, if proven: None.  
+PF reference, if relied on: None.
+
+### Evidence Print (PASS PROOF; merged work)
+
+#### A) Acceptance coverage evidence
+
+All 18 applicable DEV-01 requirements are satisfied in current state. The final matrix contains exactly 33 canonical unique rows, all required fields, three exact planned-new rows, 33 unclaimed rows, zero claimed rows, and no retired or non-token labels. GitHub Repo proof: [current matrix](https://github.com/amthorn78/glow-hdengine-v2/blob/611ffa7741a3d7d2b39a976f9b576af2bfbbcfdd/audit/qa/hde-epic038/token_evidence_matrix.md), proof SHA `40918fdf…`.
+
+#### B) Per-PR lifecycle proof
+
+1. Original PR materially contributed the generator, matrix, test suite, CI enforcement, updater registrations, manifest proof, and initial 551-record fixed point. Its later-discovered semantic gaps are not present in current state. Evidence: Original PR files and run `30604877059`.  
+2. Remedial PR 1 materially corrected release, classification, evidence-family, and proof-parser gaps and established the 553-record topology. Its doc-delta and checklist drift was superseded by later remedial stages. Evidence: Remedial PR 1 files, run `30637739563`.  
+3. Remedial PR 2 materially corrected the exact checklist command contract. Current matrix/generator/tests retain that correction and reject `--closeout`. Evidence: Remedial PR 2 files, run `30648474263`, VAL-011.  
+4. Remedial PR 3 materially corrected doc-delta semantics, current/historical provenance, writer/checker behavior, CI dependency/readiness ordering, and adversarial coverage. Its exact reviewed blobs equal current blobs, with no unacceptable final drift. Evidence: Remedial PR 3 files, run `30663742410`, 13/13 blob-SHA matches.
+
+#### C) Evidence and verification posture
+
+The review parsed the complete current Matrix, Human Index, and Mirror and inspected all 26 lifecycle-touched files. Current topology is 553/553 with no duplicate pairs; Matrix classification is 30 existing/reused and three planned-new; all rows are unclaimed. Exact-head CI, current blob identity, proof companions, and resolved review threads provide mutually consistent verification.
+
+#### D) Token/gate evidence
+
+No acceptance token is claimed. Gate B is explicitly recorded as PASS for exact head `ff5e362dd35b2a7e386ef531ec8b5596828ca9d1` in [comment 5147356543](https://github.com/amthorn78/glow-hdengine-v2/pull/382#issuecomment-5147356543). The Gate B record states 33 unique, three planned-new, 33 unclaimed, zero claimed, 553/553 topology, seven successful jobs, and no remaining P0/P1/P2.
+
+#### E) Test/CI proof
+
+Remedial PR 3 exact-head proof:
+
+* All seven Actions jobs passed: [run 30663742410](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30663742410).  
+* Declared dependency manifest installed; pytest readiness: 8.4.2.  
+* Focused suite: 172 passed.  
+* Evidence/OPS aggregate: 1,294 passed.  
+* Direct PostgreSQL contracts: 250 passed.  
+* Additional suites: 6, 2, 15, and 3 passed.  
+* Doc-delta check, matrix check, updater check, orientation check, evidence-path validation, Mirror schema, Index hash, final LF, architecture, current-state, compilation, and diff checks passed.
+
+#### F) Artifact and evidence outputs
+
+* Staging doc delta: 463 bytes, SHA `322db8191bcadf82df5231697d32b66d615e7a9ed88813c596c887d31ae55c4a`.  
+* Stable capture: 463 bytes, same SHA; explicitly lists staging and caveat.  
+* Matrix: 41,247 bytes, SHA `40918fdf7c2c2e7cb475faa0d0d335ae4641ab25165ec8471491d7029ae73a4c`.  
+* Human Index: 553 records, 149,798 bytes, SHA `0e933c51dff5ae61a70498b093f1c428c03b0e4618c6328c3b495403c8c85821`.  
+* Machine Mirror: 553 records, 267,013 bytes, SHA `14dceda2b8821091a60e7262ddb735ef4b835c1c9d4f6d430f3a63ed216f174d`.  
+* Orientation: `total_artifacts: 553`, `status: ok`.  
+* Manifest proof: current manifest SHA `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`.  
+* All current staging, capture, matrix, Index, Mirror, checksum, and orientation proof targets resolve and match their governed metadata.
 
 \<eof\>  
