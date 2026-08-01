@@ -3720,47 +3720,27 @@ def _semantic_release(_row: Row) -> str:
     )
 
 
-def _validate_checklist_payload(row: Row) -> str:
-    path, key, _owner = PLANNED_BINDINGS[row.token]
+def _checklist_payload_result(row: Row) -> str:
+    path, _key, _owner = PLANNED_BINDINGS[row.token]
     raw = (ROOT / path).read_bytes()
     try:
         payload = json.loads(raw, object_pairs_hook=_unique_json_object)
     except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
         raise ValueError(f"invalid planned checklist JSON: {row.token}") from exc
     phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
-    if (
-        not isinstance(payload, dict)
-        or raw != _canonical_json(payload)
-        or set(payload)
-        != {
-            "artifact_key",
-            "closed_rails",
-            "epic_id",
-            "phase",
-            "result",
-            "schema",
-            "token_roster",
-            "validation_commands",
-        }
-        or payload.get("schema") != "hde.epic038.closeout_checklist.v1"
-        or payload.get("artifact_key") != key
-        or payload.get("epic_id") != EPIC_ID
-        or payload.get("phase") != phase
-        or payload.get("result") != "PASS"
-        or payload.get("token_roster") != list(TOKENS)
-        or payload.get("closed_rails")
-        != {
-            "ALLOW_NETWORK": "0",
-            "APP_ENV": "dev",
-            "LANG": "C",
-            "LC_ALL": "C",
-            "SAFE_MODE": "1",
-            "TZ": "UTC",
-        }
-        or payload.get("validation_commands")
-        != [PLAN_CLOSEOUT_CHECK_COMMAND, PLANNED_COMMANDS]
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if result not in {"PASS", "FAIL"} or raw != _render_checklist(
+        phase, result=result
     ):
         raise ValueError(f"planned checklist semantic mismatch: {row.token}")
+    return result
+
+
+def _validate_checklist_payload(row: Row) -> str:
+    result = _checklist_payload_result(row)
+    phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
+    if result != "PASS":
+        raise ValueError(f"planned checklist does not record PASS: {row.token}")
     return f"current {phase.lower()} checklist is canonical and records PASS"
 
 
@@ -3887,6 +3867,26 @@ def _planned_result(row: Row) -> TokenResult:
         )
     try:
         _validate_row_bindings(row)
+        if (
+            row.token
+            in {"QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"}
+            and _checklist_payload_result(row) == "FAIL"
+        ):
+            return TokenResult(
+                row.token,
+                "UNCLAIMED",
+                f"token.{row.token}.current_governed_result",
+                (
+                    "current governed checklist canonically records FAIL from a "
+                    "truthful NOT SATISFIED package; it remains nonclaiming and "
+                    "regenerable after the originating blockers close"
+                ),
+                evidence,
+                (
+                    "Correct and close the originating package blocker, regenerate "
+                    f"{path}, and re-establish its canonical updater fixed point."
+                ),
+            )
         detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
     except (OSError, UnicodeError, ValueError) as exc:
         return TokenResult(
@@ -4479,16 +4479,18 @@ def _validate_snapshot_contract(snapshot: EvaluationSnapshot) -> None:
 
 
 def _canonical_source_snapshot(snapshot: EvaluationSnapshot) -> EvaluationSnapshot:
-    """Normalize final planned PASS results to their pre-generation source state.
+    """Normalize every nonfailing planned state to pre-generation UNCLAIMED.
 
     ``source_*`` surfaces describe Gate D's pre-generation evaluation.  They
-    therefore remain stable across the DEV-03 fixed point even after the three
-    planned families become current governed PASS evidence.
+    therefore remain stable across the DEV-03 fixed point when a planned family
+    is either derived UNCLAIMED (including a truthful FAIL checklist transition)
+    or current governed PASS evidence.  Actual planned FAIL states remain FAIL.
     """
     rows = {row.token: row for row in build_rows()}
     normalized = tuple(
         _unclaimed_planned_result(rows[item.token])
-        if item.token in PLANNED_BINDINGS and item.status == "PASS"
+        if item.token in PLANNED_BINDINGS
+        and item.status in {"PASS", "UNCLAIMED"}
         else item
         for item in snapshot.token_results
     )
@@ -4898,7 +4900,9 @@ def _construct_package(
         "token_status": statuses,
         "tracked_issues": authority["tracked_issues"],
     }
-    checklist_result = "PASS" if not snapshot.blockers else "FAIL"
+    checklist_result = (
+        "PASS" if not snapshot.blockers and not open_entries else "FAIL"
+    )
     package = {
         CLOSE_REPORT_PATH: _report_bytes(snapshot, results, decision, minimum),
         CLOSE_MANIFEST_PATH: _canonical_json(manifest),
@@ -5642,12 +5646,16 @@ def main() -> int:
         pending = sum(
             item.status == "UNCLAIMED" for item in snapshot.token_results
         )
+        open_ledger = sum(
+            entry["status"] == "OPEN" for entry in projected["entries"]
+        )
         print(
-            f"PREFLIGHT {'OK' if not blockers else 'BLOCKED'} "
-            f"blockers={len(blockers)} planned_unclaimed={pending} "
+            f"PREFLIGHT {'OK' if not blockers and not open_ledger else 'BLOCKED'} "
+            f"blockers={len(blockers)} open_ledger={open_ledger} "
+            f"planned_unclaimed={pending} "
             f"fingerprint={snapshot.fingerprint}"
         )
-        return 0 if not blockers else 1
+        return 0 if not blockers and not open_ledger else 1
     if args.close_blocker is not None:
         try: package = close_blocker(args.close_blocker)
         except ValueError as exc:

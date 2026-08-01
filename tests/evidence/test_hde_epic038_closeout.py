@@ -3252,6 +3252,21 @@ def dev02_blocked_package(dev02_fixed_repo: Path) -> dict[str, bytes]:
     return package
 
 
+def test_dev02_real_false_predicate_emits_complete_not_satisfied_package(
+    dev02_blocked_package: Mapping[str, bytes],
+) -> None:
+    manifest = json.loads(dev02_blocked_package[closeout.CLOSE_MANIFEST_PATH])
+    assert set(dev02_blocked_package) == set(closeout.PACKAGE_PATHS)
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert {
+        json.loads(dev02_blocked_package[path])["result"]
+        for path in (
+            closeout.PRECOMMIT_CHECKLIST_PATH,
+            closeout.POSTCOMMIT_CHECKLIST_PATH,
+        )
+    } == {"FAIL"}
+
+
 def test_dev02_forced_satisfied_with_false_predicate_is_rejected(
     dev02_blocked_package: Mapping[str, bytes],
 ) -> None:
@@ -3734,6 +3749,12 @@ def test_dev02_ledger_parser_rejects_noncanonical_serialization(
             closeout.parse_ledger(malformed)
 
 
+def _converge_dev02_evidence_graph(root: Path) -> None:
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
+    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
+
+
 @pytest.fixture(scope="session")
 def dev02_open_ledger_tree(
     dev02_fixed_point_tree: Path,
@@ -3746,9 +3767,18 @@ def dev02_open_ledger_tree(
     previous_root = closeout.ROOT
     closeout.ROOT = root
     try:
-        descriptor = _dev02_blocker_descriptor()
+        descriptor = _dev02_blocker_descriptor("DOC_DELTA_PRESENT_OK")
         ledger = closeout.record_blockers(closeout._empty_ledger(), [descriptor])
         package = closeout.build_package(ledger=ledger)
+        manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+        assert manifest["decision"] == "NOT SATISFIED"
+        assert {
+            json.loads(package[path])["result"]
+            for path in (
+                closeout.PRECOMMIT_CHECKLIST_PATH,
+                closeout.POSTCOMMIT_CHECKLIST_PATH,
+            )
+        } == {"FAIL"}
         closeout._write_package(package)
     finally:
         closeout.ROOT = previous_root
@@ -3779,7 +3809,77 @@ def dev02_open_ledger_repo(
 def test_dev02_close_executes_real_predicate_and_all_registered_validators(
     dev02_open_ledger_repo: tuple[Path, str],
 ) -> None:
-    _root, blocker_id = dev02_open_ledger_repo
+    root, blocker_id = dev02_open_ledger_repo
+    governed_paths = {
+        *closeout.PACKAGE_PATHS,
+        *(
+            proof
+            for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+        ),
+        closeout.HUMAN_INDEX_PATH,
+        f"{closeout.HUMAN_INDEX_PATH}.path_proof.txt",
+        "docs/evidence/INDEX.sha256",
+        "docs/evidence/INDEX.sha256.path_proof.txt",
+        closeout.MACHINE_MIRROR_PATH,
+        f"{closeout.MACHINE_MIRROR_PATH}.path_proof.txt",
+        "artifacts/evidence_index.jsonl.sha256",
+        "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+    }
+
+    def assert_governed_state_present() -> None:
+        missing = sorted(path for path in governed_paths if not (root / path).is_file())
+        assert not missing
+
+    assert_governed_state_present()
+    open_package = _package_at(root)
+    open_manifest = json.loads(open_package[closeout.CLOSE_MANIFEST_PATH])
+    open_ledger = closeout.parse_ledger(open_package[closeout.LEDGER_PATH])
+    assert open_manifest["decision"] == "NOT SATISFIED"
+    assert {
+        json.loads(open_package[path])["result"]
+        for path in (
+            closeout.PRECOMMIT_CHECKLIST_PATH,
+            closeout.POSTCOMMIT_CHECKLIST_PATH,
+        )
+    } == {"FAIL"}
+    assert [
+        entry["blocker_id"]
+        for entry in open_ledger["entries"]
+        if entry["status"] == "OPEN"
+    ] == [blocker_id]
+    assert not any(
+        entry["status"] == "OPEN"
+        and entry["subject"]["value"] in closeout.PLANNED_BINDINGS
+        for entry in open_ledger["entries"]
+    )
+
+    materialized = closeout.evaluate_closeout()
+    assert not materialized.blockers
+    assert {
+        result.status
+        for result in materialized.token_results
+        if result.token
+        in {"QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"}
+    } == {"UNCLAIMED"}
+    assert all(
+        result.status != "FAIL"
+        for result in materialized.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    )
+    assert closeout.build_package(evaluation_snapshot=materialized) == open_package
+
+    before_preflight = _tree_state(root)
+    preflight = _run_repo_tool(
+        root,
+        "tools/evidence/generate_hde_epic038_closeout.py",
+        "--preflight",
+    )
+    assert preflight.returncode != 0, preflight.stdout + preflight.stderr
+    assert "PREFLIGHT BLOCKED" in preflight.stdout
+    assert "blockers=0" in preflight.stdout
+    assert "open_ledger=1" in preflight.stdout
+    assert _tree_state(root) == before_preflight
+
     package = closeout.close_blocker(_dev02_close_request(blocker_id))
     closeout.validate_package(package)
     ledger = closeout.parse_ledger(package[closeout.LEDGER_PATH])
@@ -3793,6 +3893,35 @@ def test_dev02_close_executes_real_predicate_and_all_registered_validators(
     assert all(
         result["result"] == "PASS" and result["exit_code"] == 0
         for result in entry["tests_and_validators"]
+    )
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "SATISFIED"
+    assert all(manifest["token_status"][token] == "PASS" for token in closeout.TOKENS)
+    assert {
+        json.loads(package[path])["result"]
+        for path in (
+            closeout.PRECOMMIT_CHECKLIST_PATH,
+            closeout.POSTCOMMIT_CHECKLIST_PATH,
+        )
+    } == {"PASS"}
+
+    closeout._write_package(package)
+    _converge_dev02_evidence_graph(root)
+    assert_governed_state_present()
+    assert _package_at(root) == package
+    assert closeout.build_package() == package
+    _assert_success(
+        _run_repo_tool(
+            root,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+            "--check",
+        )
+    )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/update_evidence_index.py", "--check")
+    )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/orientation_demo.py", "--check")
     )
 
 
