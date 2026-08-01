@@ -24,17 +24,17 @@ Each numbered row is canonical; semicolon-separated values are exact bindings.
 - Canonical governance token: `DOC_DELTA_PRESENT_OK`
 - Acceptance-map token: `DOC_DELTA_PRESENT_OK`
 - Manifest token: `DOC_DELTA_PRESENT_OK`
-- Test/stable identifier: `tests/evidence/test_hde_epic038_closeout.py`
-- Closed-rails CI binding: `test (.github/workflows/ci.yml)`
+- Test/stable identifier: `tools/evidence/generate_hde_epic038_closeout.py; tests/evidence/test_hde_epic038_closeout.py`
+- Closed-rails CI binding: `test (.github/workflows/ci.yml): Check HDE-EPIC038 DEV-01 doc-delta pair`
 - Live QA: `qa-00-step-0-discovery`
 - Primary governed evidence: `audit/docdeltas/hde-epic038_doc_deltas.md`
 - Human Index / Machine Mirror artifact keys: `epic038.doc_deltas`
 - Epic: `epic_id=HDE-EPIC038`
 - Proof anchors: `audit/docdeltas/hde-epic038_doc_deltas.md.path_proof.txt`
-- Current posture: UNCLAIMED: the draft/staging surface is the primary token binding; the matching capture `audit/qa/hde-epic038/00_meta/doc_deltas.md` with key `epic038.qa_meta_doc_deltas` and retained producer log `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` establish mechanical provenance, not acceptance.
+- Current posture: UNCLAIMED: the draft/staging surface is the primary token binding; the stable capture `audit/qa/hde-epic038/00_meta/doc_deltas.md` with key `epic038.qa_meta_doc_deltas` explicitly names the staging path and carries its discovered blockers and caveats. The current identical pair is deterministic output of `python tools/evidence/generate_hde_epic038_closeout.py --doc-deltas` at SHA-256 `322db8191bcadf82df5231697d32b66d615e7a9ed88813c596c887d31ae55c4a` and is checked read-only by `python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas`. Retained log `audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log` proves only the original 246-byte Step-0 discovery pair at SHA-256 `7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde`; it did not produce the current normalized bytes. Refreshed proofs and Index/Mirror rows bind the current surfaces; none establish acceptance.
 - Classification: `existing/reused`
 - Owning task: `N/A: existing/reused evidence`
-- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head focused test verifies the byte-identical governed staging/capture pair, both Index/Mirror records and proofs, and the hash-bound tokenless `qa-00-step-0-discovery` producer record; finalized acceptance outputs must derive the result and independent Gate B must record PASS.
+- Intended future claim and prerequisite: Future status may become CLAIMED only after the exact-head focused `python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas` and focused test independently verify each governed surface's role, exact staging reference, blockers and caveats, deterministic current producer bytes, Index/Mirror record, and proof. The separate r7/PF19 pair-identity predicate must pass without substituting for PF04 semantics. The hash-bound tokenless `qa-00-step-0-discovery` record may support only the unchanged discovery facts, never current-byte production; finalized acceptance outputs must derive the result and independent Gate B must record PASS.
 
 ## 3. `EVIDENCE_INDEX_UPDATED_OK`
 - Canonical governance token: `EVIDENCE_INDEX_UPDATED_OK`

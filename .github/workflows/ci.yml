@@ -18,11 +18,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check HDE-EPIC038 DEV-01 doc-delta pair
+        shell: bash
+        run: python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas
+      - name: Run HDE-EPIC038 DEV-01 focused tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements-dev.txt
+          python -m pytest --version
+          python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
       - run: python -m pip install -U pip
       - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
-      - run: python -m pip install pytest
       - run: ci/checks/check_env_pins.sh
       - run: ci/checks/check_cli_help.sh
       - name: Verify immutable release input without derived-tree writes
@@ -41,8 +49,6 @@ jobs:
       - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
       - name: Check HDE-EPIC038 DEV-01 token matrix
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
-      - name: Run HDE-EPIC038 DEV-01 focused tests
-        run: python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
       - run: python tools/evidence/orientation_demo.py --check
       - name: Run PO-006 token registry validity check + report (gated)
         run: |

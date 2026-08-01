@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the deterministic, nonclaiming HDE-EPIC038 DEV-01 token matrix."""
+"""Generate/check HDE-EPIC038 DEV-01 matrix and doc-delta evidence."""
 from __future__ import annotations
 
 import argparse
@@ -25,7 +25,7 @@ FUTURE_CLAIM_PREFIXES = (
     "Future status may become CLAIMED only when ",
 )
 ROW_CONTRACT_SHA256 = (
-    "b00f426507baddb12779897eab75b1aa48ea43aec96ebdaba7f874c9baf22419"
+    "7749ddc57c5a7e1e8624e193d9219d91b0601af169daac8f4ee34f5d501b1a32"
 )
 CI_JOB = "test (.github/workflows/ci.yml)"
 HUMAN_INDEX_PATH = "docs/evidence/INDEX.json"
@@ -96,7 +96,7 @@ PROHIBITED = frozenset({
 # cannot redefine its own accepted baseline.
 NONCLAIMING_TEXT_SHA256: Mapping[str, str] = {
     "TESTS_PASS_OK": "f895c4d36bffea6a1e5740efeeef85389f581041a63c89fa92686884388ccb63",
-    "DOC_DELTA_PRESENT_OK": "880dd72e44d5bd97ad15bdfa8190ea604e89cde3be6a32fff6574c507baa3316",
+    "DOC_DELTA_PRESENT_OK": "71ae70bd1df89a4c8a38413cc436ac4e39fb087eade6f846abee044cc12e2e50",
     "EVIDENCE_INDEX_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "MACHINE_MIRROR_UPDATED_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
     "EVIDENCE_INDEX_HASH_OK": "7029081103413c34b0df96d0fcad69542faa4fb76a02eef8af430dcc6775cff3",
@@ -168,17 +168,32 @@ DOC_DELTA_PRIMARY_PATH = "audit/docdeltas/hde-epic038_doc_deltas.md"
 DOC_DELTA_PRIMARY_KEY = "epic038.doc_deltas"
 DOC_DELTA_CAPTURE_PATH = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
 DOC_DELTA_CAPTURE_KEY = "epic038.qa_meta_doc_deltas"
-DOC_DELTA_RETAINED_SHA256 = (
-    "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
-)
-DOC_DELTA_PRODUCER_CHECK_ID = "qa-00-step-0-discovery"
-DOC_DELTA_PRODUCER_LOG_PATH = (
+DOC_DELTA_HISTORICAL_CHECK_ID = "qa-00-step-0-discovery"
+DOC_DELTA_HISTORICAL_LOG_PATH = (
     "audit/qa/hde-epic038/checks/qa-00-step-0-discovery/primary.log"
 )
-DOC_DELTA_PRODUCER_LOG_SHA256 = (
+DOC_DELTA_HISTORICAL_LOG_SHA256 = (
     "db9e7ac48e168f7fac380f294271110bbf5e88b0874a1e6d5591cb868d6eecbe"
 )
-DOC_DELTA_PRODUCER_LOG_SIZE_BYTES = 8248
+DOC_DELTA_HISTORICAL_LOG_SIZE_BYTES = 8248
+DOC_DELTA_HISTORICAL_PAIR_SHA256 = (
+    "7372dcd1d04e7762a0b826d505c43530578e654bd9fc7a51db5a217685d4bdde"
+)
+DOC_DELTA_CURRENT_PAIR_SHA256 = (
+    "322db8191bcadf82df5231697d32b66d615e7a9ed88813c596c887d31ae55c4a"
+)
+DOC_DELTA_WRITE_COMMAND = (
+    "python tools/evidence/generate_hde_epic038_closeout.py --doc-deltas"
+)
+DOC_DELTA_CHECK_COMMAND = (
+    "python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas"
+)
+DOC_DELTA_CI_JOB = (
+    "test (.github/workflows/ci.yml): Check HDE-EPIC038 DEV-01 doc-delta pair"
+)
+DEV_REQUIREMENTS_SHA256 = (
+    "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"
+)
 QA_MANIFEST_PATH = "audit/qa/hde-epic038/qa_step_logs_manifest.json"
 QA_MANIFEST_KEY = "epic038.qa_step_logs_manifest"
 PREIMAGE_PATH = "audit/gates/parity/reader_cli/summary.json"
@@ -400,29 +415,476 @@ def validate_release_identity_family(
     return manifest_sha256, str(captured_release_id)
 
 
-def validate_doc_delta_evidence(
-    primary_bytes: bytes | None = None,
-    capture_bytes: bytes | None = None,
-    qa_manifest: Mapping[str, object] | None = None,
-    producer_log: str | None = None,
-) -> None:
-    primary = (
-        (ROOT / DOC_DELTA_PRIMARY_PATH).read_bytes()
-        if primary_bytes is None
-        else primary_bytes
+def _doc_delta_required_nonempty_lines() -> tuple[str, ...]:
+    return (
+        "# HDE-EPIC038 QA Doc Deltas",
+        "## SURFACE BINDING",
+        (
+            "- Draft/staging surface (primary token-evidence binding): "
+            f"`{DOC_DELTA_PRIMARY_PATH}`"
+        ),
+        (
+            "- Epic-scoped capture surface (stable QA record): "
+            f"`{DOC_DELTA_CAPTURE_PATH}`"
+        ),
+        "## BLOCKERS",
+        "- None identified by Step-0 route discovery.",
+        "## CAVEATS",
+        (
+            "- DOC-CAVEAT-001: Implementation, repository, release, and "
+            "operational evidence do not independently establish Live QA "
+            "acceptance or epic closeout."
+        ),
     )
-    capture = (
-        (ROOT / DOC_DELTA_CAPTURE_PATH).read_bytes()
-        if capture_bytes is None
-        else capture_bytes
-    )
-    if (
-        not primary.strip()
-        or primary != capture
-        or hashlib.sha256(primary).hexdigest() != DOC_DELTA_RETAINED_SHA256
-    ):
-        raise ValueError("doc-delta staging/capture pair mismatch")
 
+
+def render_doc_delta_pair() -> bytes:
+    """Render the exact current PF04/r7-compatible two-surface bytes."""
+    required = _doc_delta_required_nonempty_lines()
+    data = (
+        "\n".join(
+            (
+                required[0],
+                "",
+                *required[1:4],
+                "",
+                *required[4:6],
+                "",
+                *required[6:],
+                "",
+            )
+        )
+    ).encode("utf-8")
+    if hashlib.sha256(data).hexdigest() != DOC_DELTA_CURRENT_PAIR_SHA256:
+        raise ValueError("doc-delta current renderer contract drift")
+    return data
+
+
+def render_historical_doc_delta_pair() -> bytes:
+    """Render only the immutable body created by the retained Step-0 log."""
+    data = (
+        "# HDE-EPIC038 QA Doc Deltas\n"
+        "\n"
+        "## BLOCKERS\n"
+        "- None identified by Step-0 route discovery.\n"
+        "\n"
+        "## CAVEATS\n"
+        "- DOC-CAVEAT-001: Implementation, repository, release, and "
+        "operational evidence do not independently establish Live QA "
+        "acceptance or epic closeout.\n"
+    ).encode("utf-8")
+    if hashlib.sha256(data).hexdigest() != DOC_DELTA_HISTORICAL_PAIR_SHA256:
+        raise ValueError("doc-delta historical renderer contract drift")
+    return data
+
+
+def validate_doc_delta_semantics(data: bytes, *, surface: str) -> str:
+    """Validate PF04/PF27 roles and content without consulting the peer."""
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"doc-delta {surface} semantic contract mismatch") from exc
+    # Split only on the canonical ASCII LF. str.splitlines() would silently
+    # normalize VT, FF, and Unicode line separators into accepted structure.
+    nonempty_lines = tuple(line for line in text.split("\n") if line)
+    if (
+        not data
+        or data.startswith(b"\xef\xbb\xbf")
+        or b"\r" in data
+        or not data.endswith(b"\n")
+        or nonempty_lines != _doc_delta_required_nonempty_lines()
+    ):
+        raise ValueError(f"doc-delta {surface} semantic contract mismatch")
+    return text
+
+
+def validate_doc_delta_surface(data: bytes, *, surface: str) -> None:
+    """Validate one surface's semantics and exact canonical layout."""
+    validate_doc_delta_semantics(data, surface=surface)
+    if data != render_doc_delta_pair():
+        raise ValueError(f"doc-delta {surface} canonical layout mismatch")
+
+
+def validate_doc_delta_pair_identity(primary: bytes, capture: bytes) -> None:
+    """Apply r7/PF19 equality only after independent PF04 role checks."""
+    if primary != capture:
+        raise ValueError("doc-delta QA-plan pair identity mismatch")
+
+
+def _stage_atomic_bytes(target: Path, data: bytes, mode: int) -> Path:
+    """Stage bytes beside ``target`` so the final replace stays on one FS."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    staged = target.with_name(f".{target.name}.hde-epic038.tmp")
+    stream = staged.open("xb")
+    try:
+        with stream:
+            stream.write(data)
+            stream.flush()
+        staged.chmod(mode)
+        return staged
+    except BaseException:
+        staged.unlink(missing_ok=True)
+        raise
+
+
+def write_doc_delta_pair() -> None:
+    """Write the pair transactionally; restore both originals on failure."""
+    validate_doc_delta_historical_origin()
+    data = render_doc_delta_pair()
+    targets = tuple(
+        ROOT / path
+        for path in (DOC_DELTA_PRIMARY_PATH, DOC_DELTA_CAPTURE_PATH)
+    )
+    originals: dict[Path, tuple[bytes | None, int]] = {}
+    staged: dict[Path, Path] = {}
+    committed: list[Path] = []
+    for target in targets:
+        exists = target.is_file()
+        originals[target] = (
+            target.read_bytes() if exists else None,
+            target.stat().st_mode & 0o777 if exists else 0o644,
+        )
+    try:
+        for target in targets:
+            staged[target] = _stage_atomic_bytes(
+                target,
+                data,
+                originals[target][1],
+            )
+        for target in targets:
+            staged[target].replace(target)
+            committed.append(target)
+        if any(target.read_bytes() != data for target in targets):
+            raise ValueError("doc-delta deterministic write verification failed")
+    except BaseException as exc:
+        rollback_errors: list[OSError] = []
+        for target in reversed(committed):
+            original, mode = originals[target]
+            try:
+                if original is None:
+                    target.unlink(missing_ok=True)
+                else:
+                    rollback = _stage_atomic_bytes(target, original, mode)
+                    try:
+                        rollback.replace(target)
+                    finally:
+                        rollback.unlink(missing_ok=True)
+            except OSError as rollback_exc:
+                rollback_errors.append(rollback_exc)
+        if rollback_errors:
+            raise RuntimeError(
+                "doc-delta write failed and original-pair rollback failed"
+            ) from exc
+        raise
+    finally:
+        for path in staged.values():
+            path.unlink(missing_ok=True)
+
+
+def check_doc_delta_pair() -> None:
+    """Read-only exact-byte check for the current deterministic pair."""
+    expected = render_doc_delta_pair()
+    for path in (DOC_DELTA_PRIMARY_PATH, DOC_DELTA_CAPTURE_PATH):
+        target = ROOT / path
+        actual = target.read_bytes() if target.is_file() else b""
+        if actual != expected:
+            raise ValueError(f"doc-delta current producer drift: {path}")
+
+
+def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
+    """Require one unsuppressed read-only check in the exact ``test`` job."""
+    requirements_path = ROOT / "requirements-dev.txt"
+    if (
+        requirements_path.is_symlink()
+        or not requirements_path.is_file()
+        or hashlib.sha256(requirements_path.read_bytes()).hexdigest()
+        != DEV_REQUIREMENTS_SHA256
+    ):
+        raise ValueError("doc-delta CI command binding mismatch")
+    text = (
+        (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        if workflow_text is None
+        else workflow_text
+    )
+    raw_lines = tuple(text.splitlines())
+    lines = tuple(line.strip() for line in raw_lines)
+    direct_workflow_lines = tuple(
+        line
+        for line in raw_lines
+        if line and not line[0].isspace() and not line.lstrip().startswith("#")
+    )
+    expected_direct_workflow_lines = (
+        "name: ci",
+        "on: [push, pull_request]",
+        "jobs:",
+    )
+    direct_job_headers = tuple(
+        line
+        for line in raw_lines
+        if line.startswith("  ")
+        and not line.startswith("   ")
+        and line[2:].strip()
+        and not line[2:].lstrip().startswith("#")
+    )
+    expected_direct_job_headers = (
+        "  test:",
+        "  compat-conj-pr01-closure:",
+        "  epic020:",
+        "  compat-http-epic020:",
+        "  epic020-evidence-bundles:",
+        "  rails-policy-gates:",
+        "  sanity-pipeline:",
+    )
+    generator_invocations = tuple(
+        line for line in lines if "generate_hde_epic038_closeout" in line
+    )
+    expected_invocations = (
+        f"run: {DOC_DELTA_CHECK_COMMAND}",
+        "run: python tools/evidence/generate_hde_epic038_closeout.py "
+        "--check-token-matrix",
+    )
+    job_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == "  test:"
+    )
+    job_start = job_starts[0] if len(job_starts) == 1 else -1
+    job_end = (
+        next(
+            (
+                index
+                for index in range(job_start + 1, len(raw_lines))
+                if raw_lines[index].startswith("  ")
+                and not raw_lines[index].startswith("    ")
+                and raw_lines[index].rstrip().endswith(":")
+            ),
+            len(raw_lines),
+        )
+        if job_start >= 0
+        else -1
+    )
+    job_block = raw_lines[job_start:job_end] if job_start >= 0 else ()
+    direct_job_lines = tuple(
+        line
+        for line in job_block[1:]
+        if line.startswith("    ")
+        and not line.startswith("     ")
+        and line[4:].strip()
+        and not line[4:].lstrip().startswith("#")
+    )
+    direct_job_keys = tuple(
+        "".join(
+            char
+            for char in line[4:].split(":", 1)[0]
+            if char not in " \t'\""
+        ).lower()
+        for line in direct_job_lines
+    )
+    expected_direct_job_keys = ("runs-on", "env", "steps")
+    expected_env_block = (
+        "      LC_ALL: C",
+        "      LANG: C",
+        "      TZ: UTC",
+        '      SAFE_MODE: "1"',
+        '      ALLOW_NETWORK: "0"',
+        "      APP_ENV: dev",
+    )
+    steps_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == "    steps:"
+    )
+    test_steps_starts = tuple(
+        index for index in steps_starts if job_start < index < job_end
+    )
+    env_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == "    env:"
+    )
+    test_env_starts = tuple(
+        index for index in env_starts if job_start < index < job_end
+    )
+    env_block: tuple[str, ...] = ()
+    if len(test_env_starts) == 1 and len(test_steps_starts) == 1:
+        env_block = tuple(
+            line
+            for line in raw_lines[test_env_starts[0] + 1 : test_steps_starts[0]]
+            if line.strip() and not line.lstrip().startswith("#")
+        )
+    step_name = "      - name: Check HDE-EPIC038 DEV-01 doc-delta pair"
+    step_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == step_name
+    )
+    step_block: tuple[str, ...] = ()
+    if len(step_starts) == 1:
+        start = step_starts[0]
+        end = next(
+            (
+                index
+                for index in range(start + 1, len(raw_lines))
+                if raw_lines[index].startswith("      - ")
+            ),
+            len(raw_lines),
+        )
+        step_block = raw_lines[start:end]
+    expected_step_block = (
+        step_name,
+        "        shell: bash",
+        f"        run: {DOC_DELTA_CHECK_COMMAND}",
+    )
+    expected_check_prefix = (
+        "      - uses: actions/checkout@v4",
+        "        with:",
+        "          fetch-depth: 0",
+        "      - uses: actions/setup-python@v5",
+        "        with:",
+        "          python-version: '3.12'",
+        *expected_step_block,
+        "      - name: Run HDE-EPIC038 DEV-01 focused tests",
+        "        shell: bash",
+        "        run: |",
+        "          set -euo pipefail",
+        "          python -m pip install -r requirements-dev.txt",
+        "          python -m pytest --version",
+        "          python -m pytest -q tests/evidence/test_hde_epic038_closeout.py",
+        "      - run: python -m pip install -U pip",
+    )
+    check_prefix: tuple[str, ...] = ()
+    if len(test_steps_starts) == 1 and len(step_starts) == 1:
+        prefix_start = test_steps_starts[0] + 1
+        check_prefix = raw_lines[
+            prefix_start : prefix_start + len(expected_check_prefix)
+        ]
+    if (
+        step_block != expected_step_block
+        or check_prefix != expected_check_prefix
+        or direct_workflow_lines != expected_direct_workflow_lines
+        or direct_job_headers != expected_direct_job_headers
+        or len(job_starts) != 1
+        or direct_job_keys != expected_direct_job_keys
+        or job_block.count("    runs-on: ubuntu-latest") != 1
+        or len(test_steps_starts) != 1
+        or len(test_env_starts) != 1
+        or env_block != expected_env_block
+        or not (job_start < step_starts[0] < job_end)
+        or step_starts[0] <= test_steps_starts[0]
+        or generator_invocations != expected_invocations
+        or "--doc-deltas" in text
+    ):
+        raise ValueError("doc-delta CI command binding mismatch")
+
+
+def validate_doc_delta_index_bindings(
+    human_items: Iterable[Mapping[str, object]] | None = None,
+    mirror_items: Iterable[Mapping[str, object]] | None = None,
+    bodies: Mapping[str, bytes] | None = None,
+) -> None:
+    """Bind both doc-delta roles to unique current Index/Mirror records."""
+    human = tuple(_human_items() if human_items is None else human_items)
+    mirror = tuple(_mirror_items() if mirror_items is None else mirror_items)
+    expected = (
+        (
+            DOC_DELTA_PRIMARY_KEY,
+            DOC_DELTA_PRIMARY_PATH,
+            f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",
+            "epic038_doc_delta",
+            (
+                "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; "
+                "governed presence is nonclaiming"
+            ),
+        ),
+        (
+            DOC_DELTA_CAPTURE_KEY,
+            DOC_DELTA_CAPTURE_PATH,
+            f"{DOC_DELTA_CAPTURE_PATH}.path_proof.txt",
+            "epic038_doc_delta_capture",
+            (
+                "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not "
+                "the primary token surface and not a token claim"
+            ),
+        ),
+    )
+    governed_keys = frozenset(item[0] for item in expected)
+    governed_paths = frozenset(item[1] for item in expected)
+    governed_targets = {
+        path: _resolved_repo_file(path, "doc-delta governed artifact")
+        for path in governed_paths
+    }
+    for surface, items in (("Human Index", human), ("Machine Mirror", mirror)):
+        resolved_items = tuple(
+            (
+                item,
+                _resolved_repo_file(
+                    _record_text(item, "discovered_physical_path", surface),
+                    f"{surface} artifact",
+                ),
+            )
+            for item in items
+        )
+        family_records = tuple(
+            (item, resolved)
+            for item, resolved in resolved_items
+            if item.get("artifact_key") in governed_keys
+            or resolved in governed_targets.values()
+        )
+        family = tuple(item for item, _resolved in family_records)
+        if (
+            any("tokens" in item for item in family)
+            or any(
+                sum(item.get("artifact_key") == key for item in family) != 1
+                for key in governed_keys
+            )
+            or any(
+                sum(
+                    resolved == target
+                    for _item, resolved in family_records
+                )
+                != 1
+                for target in governed_targets.values()
+            )
+        ):
+            raise ValueError("doc-delta Index/Mirror family binding mismatch")
+    for key, path, proof, record_type, notes in expected:
+        human_matches = [
+            item
+            for item in human
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        ]
+        mirror_matches = [
+            item
+            for item in mirror
+            if item.get("artifact_key") == key
+            and item.get("discovered_physical_path") == path
+        ]
+        body = (
+            (ROOT / path).read_bytes()
+            if bodies is None
+            else bodies.get(path, b"")
+        )
+        if (
+            len(human_matches) != 1
+            or len(mirror_matches) != 1
+            or any(
+                item.get("epic_id") != EPIC_ID
+                or item.get("record_type") != record_type
+                or item.get("schema_version") != "1.0"
+                or item.get("notes") != notes
+                for item in (*human_matches, *mirror_matches)
+            )
+            or mirror_matches[0].get("role") != "snapshot"
+            or mirror_matches[0].get("proof_anchor") != proof
+            or mirror_matches[0].get("sha256")
+            != hashlib.sha256(body).hexdigest()
+            or mirror_matches[0].get("size_bytes") != len(body)
+        ):
+            raise ValueError("doc-delta Index/Mirror record binding mismatch")
+        _validate_proof(path, proof, body)
+
+
+def validate_doc_delta_historical_origin(
+    qa_manifest: Mapping[str, object] | None = None,
+    historical_log: str | None = None,
+) -> None:
+    """Validate immutable Step-0 discovery, never current-byte production."""
+    historical_pair = render_historical_doc_delta_pair()
+    if historical_pair == render_doc_delta_pair():
+        raise ValueError("doc-delta historical/current provenance collapse")
     manifest = (
         json.loads(
             (ROOT / QA_MANIFEST_PATH).read_bytes(),
@@ -432,32 +894,32 @@ def validate_doc_delta_evidence(
         else qa_manifest
     )
     if not isinstance(manifest, Mapping):
-        raise ValueError("doc-delta producer manifest binding mismatch")
-    record = manifest.get(DOC_DELTA_PRODUCER_CHECK_ID)
+        raise ValueError("doc-delta historical manifest binding mismatch")
+    record = manifest.get(DOC_DELTA_HISTORICAL_CHECK_ID)
     text = (
-        (ROOT / DOC_DELTA_PRODUCER_LOG_PATH).read_text(encoding="utf-8")
-        if producer_log is None
-        else producer_log
+        (ROOT / DOC_DELTA_HISTORICAL_LOG_PATH).read_text(encoding="utf-8")
+        if historical_log is None
+        else historical_log
     )
     log_bytes = text.encode("utf-8")
     if (
         not isinstance(record, dict)
-        or record.get("check_id") != DOC_DELTA_PRODUCER_CHECK_ID
+        or record.get("check_id") != DOC_DELTA_HISTORICAL_CHECK_ID
         or record.get("log_path")
         != "checks/qa-00-step-0-discovery/primary.log"
         or record.get("status") != "PASS"
-        or record.get("sha256") != DOC_DELTA_PRODUCER_LOG_SHA256
-        or record.get("size_bytes") != DOC_DELTA_PRODUCER_LOG_SIZE_BYTES
+        or record.get("sha256") != DOC_DELTA_HISTORICAL_LOG_SHA256
+        or record.get("size_bytes") != DOC_DELTA_HISTORICAL_LOG_SIZE_BYTES
         or record.get("sha256") != hashlib.sha256(log_bytes).hexdigest()
         or record.get("size_bytes") != len(log_bytes)
     ):
-        raise ValueError("doc-delta producer manifest binding mismatch")
+        raise ValueError("doc-delta historical manifest binding mismatch")
 
     lines = text.splitlines()
     try:
         header = json.loads(lines[0], object_pairs_hook=_unique_json_object)
     except (IndexError, json.JSONDecodeError, ValueError) as exc:
-        raise ValueError("doc-delta producer log shape mismatch") from exc
+        raise ValueError("doc-delta historical log shape mismatch") from exc
     results: list[Mapping[str, object]] = []
     for line in lines[1:]:
         try:
@@ -467,10 +929,10 @@ def validate_doc_delta_evidence(
         if isinstance(candidate, dict) and "doc_delta_posture" in candidate:
             results.append(candidate)
     if not isinstance(header, dict) or len(results) != 1:
-        raise ValueError("doc-delta producer log shape mismatch")
+        raise ValueError("doc-delta historical log shape mismatch")
     result = results[0]
     expected_artifacts = [
-        DOC_DELTA_PRODUCER_LOG_PATH,
+        DOC_DELTA_HISTORICAL_LOG_PATH,
         DOC_DELTA_PRIMARY_PATH,
         DOC_DELTA_CAPTURE_PATH,
     ]
@@ -483,8 +945,13 @@ def validate_doc_delta_evidence(
         "FINAL_READINESS=": "FINAL_READINESS=READY",
         "BEHAVIOR_EXIT_CODE=": "BEHAVIOR_EXIT_CODE=0",
     }
+    historical_literals = tuple(
+        line
+        for line in historical_pair.decode("utf-8").split("\n")
+        if line
+    )
     if (
-        header.get("check_id") != DOC_DELTA_PRODUCER_CHECK_ID
+        header.get("check_id") != DOC_DELTA_HISTORICAL_CHECK_ID
         or header.get("status") != "PASS"
         or header.get("exit_code") != 0
         or not isinstance(evidence_artifacts, list)
@@ -508,6 +975,12 @@ def validate_doc_delta_evidence(
         or DOC_DELTA_PRIMARY_PATH not in command
         or DOC_DELTA_CAPTURE_PATH not in command
         or "DOC_DELTA_PAIR_MISMATCH" not in command
+        or any(json.dumps(line) not in command for line in historical_literals)
+        or "SURFACE BINDING" in command
+        or "--doc-deltas" in command
+        or "--check-doc-deltas" in command
+        or "generate_hde_epic038_closeout" in command
+        or "write_doc_delta_pair" in command
         or set(result)
         != {
             "doc_delta_posture",
@@ -531,25 +1004,48 @@ def validate_doc_delta_evidence(
         or result.get("qa_root") != "audit/qa/hde-epic038/"
         or result.get("repository") != "glow-hdengine-v2"
     ):
-        raise ValueError("doc-delta producer log binding mismatch")
+        raise ValueError("doc-delta historical origin binding mismatch")
 
-    records = _mirror_records()
-    expected_records = {
-        (
-            DOC_DELTA_PRIMARY_KEY,
-            DOC_DELTA_PRIMARY_PATH,
-            f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",
-        ),
-        (
-            DOC_DELTA_CAPTURE_KEY,
-            DOC_DELTA_CAPTURE_PATH,
-            f"{DOC_DELTA_CAPTURE_PATH}.path_proof.txt",
-        ),
-    }
-    if not expected_records.issubset(records):
-        raise ValueError("doc-delta Index/Mirror binding mismatch")
-    for _key, path, proof in expected_records:
-        _validate_proof(path, proof)
+
+def validate_doc_delta_evidence(
+    primary_bytes: bytes | None = None,
+    capture_bytes: bytes | None = None,
+    qa_manifest: Mapping[str, object] | None = None,
+    historical_log: str | None = None,
+) -> None:
+    if (primary_bytes is None) != (capture_bytes is None):
+        raise ValueError("doc-delta partial byte injection")
+    injected = primary_bytes is not None
+    primary = (
+        (ROOT / DOC_DELTA_PRIMARY_PATH).read_bytes()
+        if primary_bytes is None
+        else primary_bytes
+    )
+    capture = (
+        (ROOT / DOC_DELTA_CAPTURE_PATH).read_bytes()
+        if capture_bytes is None
+        else capture_bytes
+    )
+    # PF04 role/reference semantics govern first. r7/PF19 byte identity is a
+    # separate current-pair predicate, not evidence that historical Step-0
+    # produced the normalized bytes.
+    validate_doc_delta_surface(primary, surface="staging")
+    validate_doc_delta_surface(capture, surface="capture")
+    validate_doc_delta_pair_identity(primary, capture)
+    validate_doc_delta_historical_origin(qa_manifest, historical_log)
+    validate_doc_delta_ci()
+    if injected and (
+        (ROOT / DOC_DELTA_PRIMARY_PATH).read_bytes() != primary
+        or (ROOT / DOC_DELTA_CAPTURE_PATH).read_bytes() != capture
+    ):
+        raise ValueError("doc-delta injected/disk byte mismatch")
+
+    validate_doc_delta_index_bindings(
+        bodies={
+            DOC_DELTA_PRIMARY_PATH: primary,
+            DOC_DELTA_CAPTURE_PATH: capture,
+        }
+    )
 
 
 def _release_row() -> Row:
@@ -609,26 +1105,42 @@ def _release_row() -> Row:
 def _doc_delta_row() -> Row:
     row = _row(
         "DOC_DELTA_PRESENT_OK",
-        "tests/evidence/test_hde_epic038_closeout.py",
-        DOC_DELTA_PRODUCER_CHECK_ID,
+        (
+            "tools/evidence/generate_hde_epic038_closeout.py; "
+            "tests/evidence/test_hde_epic038_closeout.py"
+        ),
+        DOC_DELTA_HISTORICAL_CHECK_ID,
         DOC_DELTA_PRIMARY_PATH,
         DOC_DELTA_PRIMARY_KEY,
     )
     return replace(
         row,
+        ci_binding=DOC_DELTA_CI_JOB,
         posture=(
             "UNCLAIMED: the draft/staging surface is the primary token binding; "
-            f"the matching capture `{DOC_DELTA_CAPTURE_PATH}` with key "
-            f"`{DOC_DELTA_CAPTURE_KEY}` and retained producer log "
-            f"`{DOC_DELTA_PRODUCER_LOG_PATH}` establish mechanical provenance, "
-            "not acceptance."
+            f"the stable capture `{DOC_DELTA_CAPTURE_PATH}` with key "
+            f"`{DOC_DELTA_CAPTURE_KEY}` explicitly names the staging path and "
+            "carries its discovered blockers and caveats. The current identical "
+            f"pair is deterministic output of `{DOC_DELTA_WRITE_COMMAND}` at "
+            f"SHA-256 `{DOC_DELTA_CURRENT_PAIR_SHA256}` and is checked read-only "
+            f"by `{DOC_DELTA_CHECK_COMMAND}`. Retained log "
+            f"`{DOC_DELTA_HISTORICAL_LOG_PATH}` proves only the original "
+            f"{len(render_historical_doc_delta_pair())}-byte Step-0 discovery pair "
+            f"at SHA-256 `{DOC_DELTA_HISTORICAL_PAIR_SHA256}`; it did not produce "
+            "the current normalized bytes. Refreshed proofs and Index/Mirror rows "
+            "bind the current surfaces; none establish acceptance."
         ),
         future_claim=(
             "Future status may become CLAIMED only after the exact-head focused "
-            "test verifies the byte-identical governed staging/capture pair, both "
-            "Index/Mirror records and proofs, and the hash-bound tokenless "
-            f"`{DOC_DELTA_PRODUCER_CHECK_ID}` producer record; finalized acceptance "
-            "outputs must derive the result and independent Gate B must record PASS."
+            f"`{DOC_DELTA_CHECK_COMMAND}` and focused test independently verify "
+            "each governed surface's role, exact staging reference, blockers and "
+            "caveats, deterministic current producer bytes, Index/Mirror record, "
+            "and proof. The separate r7/PF19 pair-identity predicate must pass "
+            "without substituting for PF04 semantics. The hash-bound tokenless "
+            f"`{DOC_DELTA_HISTORICAL_CHECK_ID}` record may support only the "
+            "unchanged discovery facts, never current-byte production; finalized "
+            "acceptance outputs must derive the result and independent Gate B must "
+            "record PASS."
         ),
     )
 
@@ -1002,7 +1514,13 @@ def build_rows() -> tuple[Row, ...]:
 
 
 def _human_items() -> tuple[Mapping[str, object], ...]:
-    payload = json.loads((ROOT / HUMAN_INDEX_PATH).read_text(encoding="utf-8"))
+    try:
+        payload = json.loads(
+            (ROOT / HUMAN_INDEX_PATH).read_text(encoding="utf-8"),
+            object_pairs_hook=_unique_json_object,
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("Human Index shape mismatch") from exc
     if not isinstance(payload, list) or not payload:
         raise ValueError("Human Index shape mismatch")
     if any(not isinstance(item, dict) for item in payload):
@@ -1018,7 +1536,12 @@ def _mirror_items() -> tuple[Mapping[str, object], ...]:
     ):
         if not line:
             raise ValueError(f"Machine Mirror empty line: {line_number}")
-        item = json.loads(line)
+        try:
+            item = json.loads(line, object_pairs_hook=_unique_json_object)
+        except (json.JSONDecodeError, ValueError) as exc:
+            raise ValueError(
+                f"Machine Mirror record shape mismatch: {line_number}"
+            ) from exc
         if not isinstance(item, dict):
             raise ValueError(f"Machine Mirror record shape mismatch: {line_number}")
         items.append(item)
@@ -1118,7 +1641,7 @@ def _mirror_body_sha256() -> str:
     body: list[str] = []
     self_count = 0
     for line in lines:
-        item = json.loads(line)
+        item = json.loads(line, object_pairs_hook=_unique_json_object)
         if (
             item.get("artifact_key") == MACHINE_MIRROR_KEY
             and item.get("discovered_physical_path") == MACHINE_MIRROR_PATH
@@ -1196,7 +1719,11 @@ def _proof_fields(
     return fields
 
 
-def _validate_proof(primary: str, proof: str) -> None:
+def _validate_proof(
+    primary: str,
+    proof: str,
+    primary_bytes: bytes | None = None,
+) -> None:
     primary_path = ROOT / primary
     expected_fields = {
         "path",
@@ -1208,7 +1735,7 @@ def _validate_proof(primary: str, proof: str) -> None:
     if primary == MACHINE_MIRROR_PATH:
         expected_fields.add("mirror_body_sha256")
     fields = _proof_fields(ROOT / proof, frozenset(expected_fields))
-    body = primary_path.read_bytes()
+    body = primary_path.read_bytes() if primary_bytes is None else primary_bytes
     if fields.get("path") != primary:
         raise ValueError(f"proof path mismatch: {primary}")
     if fields.get("sha256") != hashlib.sha256(body).hexdigest():
@@ -1633,12 +2160,23 @@ def _validate_special_semantics(row: Row) -> None:
             or row.artifact_keys != (DOC_DELTA_PRIMARY_KEY,)
             or row.proof_anchors
             != (f"{DOC_DELTA_PRIMARY_PATH}.path_proof.txt",)
-            or row.test_binding
-            != "tests/evidence/test_hde_epic038_closeout.py"
-            or row.live_qa != DOC_DELTA_PRODUCER_CHECK_ID
+            or set(row.test_binding.split("; "))
+            != {
+                "tools/evidence/generate_hde_epic038_closeout.py",
+                "tests/evidence/test_hde_epic038_closeout.py",
+            }
+            or row.ci_binding != DOC_DELTA_CI_JOB
+            or row.live_qa != DOC_DELTA_HISTORICAL_CHECK_ID
             or DOC_DELTA_CAPTURE_PATH not in row.posture
             or DOC_DELTA_CAPTURE_KEY not in row.posture
-            or DOC_DELTA_PRODUCER_LOG_PATH not in row.posture
+            or DOC_DELTA_HISTORICAL_LOG_PATH not in row.posture
+            or DOC_DELTA_WRITE_COMMAND not in row.posture
+            or DOC_DELTA_CHECK_COMMAND not in row.posture
+            or DOC_DELTA_CURRENT_PAIR_SHA256 not in row.posture
+            or DOC_DELTA_HISTORICAL_PAIR_SHA256 not in row.posture
+            or "it did not produce the current normalized bytes" not in row.posture
+            or DOC_DELTA_CHECK_COMMAND not in row.future_claim
+            or "never current-byte production" not in row.future_claim
         ):
             raise ValueError("doc-delta evidence binding mismatch")
         validate_doc_delta_evidence()
@@ -1937,11 +2475,35 @@ def render(rows: Iterable[Row] | None = None) -> bytes:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(allow_abbrev=False)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--token-matrix", action="store_true")
     mode.add_argument("--check-token-matrix", action="store_true")
+    mode.add_argument("--doc-deltas", action="store_true")
+    mode.add_argument("--check-doc-deltas", action="store_true")
     args = parser.parse_args()
+    if args.doc_deltas:
+        write_doc_delta_pair()
+        print(
+            "WROTE DOC_DELTA_PAIR "
+            f"sha256={DOC_DELTA_CURRENT_PAIR_SHA256} size_bytes="
+            f"{len(render_doc_delta_pair())}"
+        )
+        return 0
+    if args.check_doc_deltas:
+        try:
+            check_doc_delta_pair()
+            validate_doc_delta_evidence()
+        except ValueError as exc:
+            print(f"DOC_DELTA_PAIR_DRIFT: {exc}")
+            return 1
+        print(
+            "DOC_DELTA_PAIR_OK "
+            f"sha256={DOC_DELTA_CURRENT_PAIR_SHA256} size_bytes="
+            f"{len(render_doc_delta_pair())} historical_origin_only="
+            f"{DOC_DELTA_HISTORICAL_PAIR_SHA256}"
+        )
+        return 0
     expected = render()
     target = ROOT / OUTPUT
     if args.token_matrix:
