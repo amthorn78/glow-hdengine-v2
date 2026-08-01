@@ -744,6 +744,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "        run: |",
         "          set -euo pipefail",
         "          python -m pip install -r requirements-dev.txt",
+        "          python -m pip install -r requirements.txt",
         "          python -m pytest --version",
         "          python -m pytest -q tests/evidence/test_hde_epic038_closeout.py",
         "      - run: python -m pip install -U pip",

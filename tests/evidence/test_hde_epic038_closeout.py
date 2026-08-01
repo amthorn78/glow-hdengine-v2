@@ -81,6 +81,9 @@ EXPECTED_DOC_DELTA_CHECK_COMMAND = (
 EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND = (
     "python -m pip install -r requirements-dev.txt"
 )
+EXPECTED_RUNTIME_REQUIREMENTS_INSTALL_COMMAND = (
+    "python -m pip install -r requirements.txt"
+)
 EXPECTED_PYTEST_READINESS_COMMAND = "python -m pytest --version"
 EXPECTED_DEV_REQUIREMENTS_BYTES = (
     b"# Test-only deps\n"
@@ -987,6 +990,12 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
     ]
     assert test_job.count(f"run: {EXPECTED_DOC_DELTA_CHECK_COMMAND}") == 1
     assert test_job.count(f"          {EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND}\n") == 1
+    assert (
+        test_job.count(
+            f"          {EXPECTED_RUNTIME_REQUIREMENTS_INSTALL_COMMAND}\n"
+        )
+        == 1
+    )
     assert test_job.count(f"          {EXPECTED_PYTEST_READINESS_COMMAND}\n") == 1
     assert EXPECTED_DOC_DELTA_WRITE_COMMAND not in workflow
     requirements_path = ROOT / "requirements-dev.txt"
@@ -1004,6 +1013,7 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
     focused_step_name = "      - name: Run HDE-EPIC038 DEV-01 focused tests"
     strict_shell = "          set -euo pipefail"
     dev_install = f"          {EXPECTED_DEV_REQUIREMENTS_INSTALL_COMMAND}"
+    runtime_install = f"          {EXPECTED_RUNTIME_REQUIREMENTS_INSTALL_COMMAND}"
     pytest_readiness = f"          {EXPECTED_PYTEST_READINESS_COMMAND}"
     focused_run = (
         "          python -m pytest -q "
@@ -1016,11 +1026,14 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
             "        run: |",
             strict_shell,
             dev_install,
+            runtime_install,
             pytest_readiness,
             focused_run,
         )
     )
     assert test_job.index(dev_install) < test_job.index(pytest_readiness)
+    assert test_job.index(dev_install) < test_job.index(runtime_install)
+    assert test_job.index(runtime_install) < test_job.index(pytest_readiness)
     assert test_job.index(pytest_readiness) < test_job.index(focused_run)
     assert "      - run: python -m pip install pytest\n" not in test_job
     assert (
@@ -1095,13 +1108,30 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
             1,
         ),
         workflow.replace(
+            focused_step,
+            focused_step.replace(runtime_install + "\n", "", 1),
+            1,
+        ),
+        workflow.replace(
             pytest_readiness,
             "          python -m pytest --help",
             1,
         ),
         workflow.replace(
-            dev_install + "\n" + pytest_readiness + "\n" + focused_run,
-            dev_install + "\n" + focused_run + "\n" + pytest_readiness,
+            dev_install
+            + "\n"
+            + runtime_install
+            + "\n"
+            + pytest_readiness
+            + "\n"
+            + focused_run,
+            dev_install
+            + "\n"
+            + runtime_install
+            + "\n"
+            + focused_run
+            + "\n"
+            + pytest_readiness,
             1,
         ),
         workflow.replace(
