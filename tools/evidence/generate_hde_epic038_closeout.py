@@ -3806,65 +3806,165 @@ TOKEN_EVALUATOR_REGISTRY: Mapping[str, Callable[[Row], str]] = {
 }
 
 
-def _planned_result(row: Row) -> TokenResult:
+def _planned_family_state() -> tuple[str, str]:
+    """Classify the seven-primary closeout family as one atomic lifecycle state."""
+    primary_paths = tuple(PACKAGE_ACTIVATION_PATHS)
+    primary_nodes = tuple(ROOT / path for path in primary_paths)
+    observed_primaries = tuple(
+        path
+        for path, node in zip(primary_paths, primary_nodes)
+        if node.exists() or node.is_symlink()
+    )
+    aliased_primaries = tuple(
+        path
+        for path, node in zip(primary_paths, primary_nodes)
+        if node.is_symlink()
+    )
+    nonfile_primaries = tuple(
+        path
+        for path, node in zip(primary_paths, primary_nodes)
+        if (node.exists() or node.is_symlink()) and not node.is_file()
+    )
+    if aliased_primaries or nonfile_primaries:
+        invalid = sorted(set((*aliased_primaries, *nonfile_primaries)))
+        return "FAIL", "closeout primary is aliased or not a regular file: " + ",".join(invalid)
+    if observed_primaries and len(observed_primaries) != len(primary_paths):
+        missing = sorted(set(primary_paths) - set(observed_primaries))
+        return "FAIL", "partial closeout primary family; missing: " + ",".join(missing)
+
+    expected_human = {
+        (key, path)
+        for key, (path, _proof) in CLOSEOUT_PRIMARY_BINDINGS.items()
+    }
+    expected_mirror = {
+        (key, path, proof)
+        for key, (path, proof) in CLOSEOUT_PRIMARY_BINDINGS.items()
+    }
+    proof_paths = {proof for _path, proof in CLOSEOUT_PRIMARY_BINDINGS.values()}
+    closeout_keys = set(CLOSEOUT_PRIMARY_BINDINGS)
+    closeout_paths = set(primary_paths)
+    if (
+        len(primary_paths) != 7
+        or len(CLOSEOUT_PRIMARY_BINDINGS) != 7
+        or len(expected_human) != 7
+        or len(expected_mirror) != 7
+        or len(proof_paths) != 7
+        or {path for path, _proof in CLOSEOUT_PRIMARY_BINDINGS.values()}
+        != closeout_paths
+    ):
+        return "FAIL", "closeout primary/companion registry is not the exact seven-family roster"
+    try:
+        human_related = tuple(
+            (
+                item.get("artifact_key"),
+                item.get("discovered_physical_path"),
+            )
+            for item in _human_items()
+            if item.get("artifact_key") in closeout_keys
+            or item.get("discovered_physical_path") in closeout_paths
+        )
+        mirror_related = tuple(
+            (
+                item.get("artifact_key"),
+                item.get("discovered_physical_path"),
+                item.get("proof_anchor"),
+            )
+            for item in _mirror_items()
+            if item.get("artifact_key") in closeout_keys
+            or item.get("discovered_physical_path") in closeout_paths
+            or item.get("proof_anchor") in proof_paths
+        )
+    except (OSError, UnicodeError, ValueError) as exc:
+        return "FAIL", f"closeout Index/Mirror companion state is invalid: {exc}"
+    proof_nodes = tuple((proof, ROOT / proof) for proof in sorted(proof_paths))
+    observed_proofs = tuple(
+        proof
+        for proof, node in proof_nodes
+        if node.exists() or node.is_symlink()
+    )
+    companion_seen = bool(observed_proofs or human_related or mirror_related)
+
+    if not observed_primaries:
+        if companion_seen:
+            return "FAIL", "closeout companions exist without the atomic primary family"
+        return "ABSENT", "no closeout primary or companion family exists"
+
+    try:
+        actual_package = {
+            path: (ROOT / path).read_bytes() for path in PACKAGE_PATHS
+        }
+        validate_package_structure(actual_package)
+    except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
+        return "FAIL", f"closeout primary package structure is invalid: {exc}"
+
+    if not companion_seen:
+        return (
+            "PRIMARY_ONLY",
+            "complete atomic closeout primary package is structurally valid and awaits canonical companions",
+        )
+
+    if any(node.is_symlink() or not node.is_file() for _proof, node in proof_nodes):
+        return "FAIL", "closeout proof companion roster is partial, aliased, or non-file"
+    if (
+        len(human_related) != len(expected_human)
+        or set(human_related) != expected_human
+        or len(mirror_related) != len(expected_mirror)
+        or set(mirror_related) != expected_mirror
+    ):
+        return "FAIL", "closeout Human Index/Machine Mirror companion roster is not exact"
+    try:
+        mirror_items = tuple(_mirror_items())
+        for key, (path, proof) in CLOSEOUT_PRIMARY_BINDINGS.items():
+            _validate_proof(path, proof)
+            body = (ROOT / path).read_bytes()
+            matches = [
+                item
+                for item in mirror_items
+                if item.get("artifact_key") == key
+                and item.get("discovered_physical_path") == path
+                and item.get("proof_anchor") == proof
+            ]
+            if (
+                len(matches) != 1
+                or matches[0].get("sha256") != hashlib.sha256(body).hexdigest()
+                or matches[0].get("size_bytes") != len(body)
+            ):
+                raise ValueError(f"stale closeout companion binding: {key}")
+    except (OSError, UnicodeError, ValueError) as exc:
+        return "FAIL", f"closeout registered companion validation failed: {exc}"
+    return "REGISTERED", "complete closeout primary and companion families validate"
+
+
+def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
     path, key, _owner = PLANNED_BINDINGS[row.token]
-    proof = f"{path}.path_proof.txt"
-    primary_is_file = (ROOT / path).is_file()
-    proof_is_file = (ROOT / proof).is_file()
     evidence = (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key))
     follow_up = (
         f"DEV-03 must canonically produce {path}, run the canonical evidence "
         "updater, and establish the exact proof and Human Index/Machine Mirror binding."
     )
-    try:
-        mirror_matches = [
-            item
-            for item in _mirror_items()
-            if item.get("artifact_key") == key
-            or item.get("discovered_physical_path") == path
-        ]
-        human_matches = [
-            item
-            for item in _human_items()
-            if item.get("artifact_key") == key
-            or item.get("discovered_physical_path") == path
-        ]
-    except (OSError, UnicodeError, ValueError) as exc:
+    state, state_detail = family_state
+    if state == "FAIL":
         return TokenResult(
             row.token,
             "FAIL",
             f"token.{row.token}.planned_binding",
-            str(exc),
+            state_detail,
             evidence,
             follow_up,
         )
-    companion_registered = proof_is_file or bool(mirror_matches) or bool(human_matches)
-    if not companion_registered:
-        if (
-            (ROOT / path).exists() and not primary_is_file
-        ) or (ROOT / proof).exists():
-            return TokenResult(
-                row.token,
-                "FAIL",
-                f"token.{row.token}.planned_binding",
-                "planned binding conflicts with a non-file repository entry",
-                evidence,
-                follow_up,
-            )
-        # Both the pre-generation state (no primary) and the exact DEV-03
-        # transition (primary written, updater companions not written yet) are
-        # nonclaiming.  Once any proof or Index/Mirror companion is registered,
-        # the complete family is mandatory and is validated below.
+    if state == "ABSENT":
         return _unclaimed_planned_result(row)
-    if not primary_is_file or not proof_is_file:
+    if state == "PRIMARY_ONLY":
         return TokenResult(
             row.token,
-            "FAIL",
-            f"token.{row.token}.planned_binding",
-            "planned evidence family is partial",
+            "UNCLAIMED",
+            f"token.{row.token}.current_governed_result",
+            state_detail,
             evidence,
             follow_up,
         )
+    if state != "REGISTERED":
+        raise ValueError(f"unknown planned family state: {state}")
     try:
         _validate_row_bindings(row)
         if (
@@ -4365,6 +4465,223 @@ def _make_snapshot(
     )
 
 
+def _source_results_for_fingerprint(
+    results: Sequence[TokenResult], source_status: Mapping[str, object]
+) -> tuple[TokenResult, ...]:
+    """Rebuild the canonical pre-generation token results from package bytes."""
+    rows = {row.token: row for row in build_rows()}
+    rebuilt: list[TokenResult] = []
+    for result in results:
+        status = source_status.get(result.token)
+        if result.token in PLANNED_BINDINGS:
+            if status == "UNCLAIMED" and result.status in {"UNCLAIMED", "PASS"}:
+                rebuilt.append(_unclaimed_planned_result(rows[result.token]))
+                continue
+            if status == "FAIL" and result.status == "FAIL":
+                rebuilt.append(result)
+                continue
+            raise ValueError("manifest canonical planned source-token status mismatch")
+        if result.status not in {"PASS", "FAIL"} or status != result.status:
+            raise ValueError("manifest canonical reused source-token status mismatch")
+        rebuilt.append(result)
+    return tuple(rebuilt)
+
+
+def _fingerprint_obligations(
+    obligations: Sequence[Mapping[str, object]],
+) -> tuple[Mapping[str, object], ...]:
+    """Restore fields omitted by the viability rendering but bound by the hash."""
+    canonical_pass_details = {
+        "qa.finalized_current_state": "affirmative current predicate validates",
+        "evidence.full_index_mirror_topology": "affirmative current predicate validates",
+        "authority.approved_r5_source": (
+            f"approved r5 source validates at {APPROVED_PLAN_SHA256}"
+        ),
+        **{
+            f"authority.pf09_scope.{value}": "approved r5 PF09 scope item validates"
+            for value in PF09_SCOPE
+        },
+        **{
+            f"authority.pf09_exclusion.{value}": "approved r5 PF09 exclusion validates"
+            for value in PF09_EXCLUSIONS
+        },
+        **{
+            f"authority.tracked_issue.{value}": "approved r5 tracked-issue disposition validates"
+            for value in TRACKED_ISSUES
+        },
+        **{
+            f"authority.adr.{record['label']}": "approved r5 ADR disposition validates"
+            for record in ADR_RECORDS
+        },
+        "authority.qa_rca_source": (
+            "preserved execution-level QA RCA source is consumed"
+        ),
+    }
+    dynamically_failing = {
+        "qa.finalized_current_state",
+        "evidence.full_index_mirror_topology",
+    }
+    rebuilt: list[Mapping[str, object]] = []
+    for obligation in obligations:
+        item = dict(obligation)
+        predicate_key = str(item.get("predicate_key", ""))
+        status = item.get("status")
+        detail = item.get("detail")
+        label = item.get("label")
+        if label is not None:
+            if label not in NON_TOKEN_OBLIGATIONS:
+                raise ValueError("fingerprint non-token obligation label mismatch")
+            key, path, _proof = NON_TOKEN_BINDINGS[str(label)]
+            if item != {
+                "artifact_key": key,
+                "detail": detail,
+                "label": label,
+                "path": path,
+                "predicate_key": (
+                    f"non_token.{label}.current_governed_result"
+                ),
+                "status": status,
+            }:
+                raise ValueError("fingerprint non-token obligation payload mismatch")
+            if status == "PASS" and detail != (
+                "affirmative current non-token predicate validates"
+            ):
+                raise ValueError("fingerprint non-token PASS detail mismatch")
+            if status not in {"PASS", "FAIL"}:
+                raise ValueError("fingerprint non-token status mismatch")
+            rebuilt.append(item)
+            continue
+        if predicate_key not in canonical_pass_details:
+            raise ValueError("fingerprint structural obligation mismatch")
+        if status == "PASS":
+            if detail != canonical_pass_details[predicate_key]:
+                raise ValueError("fingerprint structural PASS detail mismatch")
+        elif status != "FAIL" or predicate_key not in dynamically_failing:
+            raise ValueError("fingerprint structural obligation status mismatch")
+        if predicate_key.startswith("authority.pf09_scope."):
+            value = predicate_key.removeprefix("authority.pf09_scope.")
+            if value not in PF09_SCOPE:
+                raise ValueError("fingerprint PF09 scope obligation mismatch")
+            item["item"] = value
+        elif predicate_key.startswith("authority.pf09_exclusion."):
+            value = predicate_key.removeprefix("authority.pf09_exclusion.")
+            if value not in PF09_EXCLUSIONS:
+                raise ValueError("fingerprint PF09 exclusion obligation mismatch")
+            item["item"] = value
+        elif predicate_key.startswith("authority.tracked_issue."):
+            value = predicate_key.removeprefix("authority.tracked_issue.")
+            if value not in TRACKED_ISSUES:
+                raise ValueError("fingerprint tracked-issue obligation mismatch")
+            item["item"] = value
+        elif predicate_key.startswith("authority.adr."):
+            value = predicate_key.removeprefix("authority.adr.")
+            if value not in {str(record["label"]) for record in ADR_RECORDS}:
+                raise ValueError("fingerprint ADR obligation mismatch")
+            item["item"] = value
+        elif predicate_key == "authority.qa_rca_source":
+            item["item"] = QA_RCA_PATH
+        rebuilt.append(item)
+    return tuple(rebuilt)
+
+
+def _fingerprint_blockers(
+    results: Sequence[TokenResult],
+    obligations: Sequence[Mapping[str, object]],
+) -> tuple[Mapping[str, object], ...]:
+    """Rebuild source blockers without evaluating repository companion state."""
+    blockers: list[Mapping[str, object]] = [
+        _token_blocker(result) for result in results if result.status == "FAIL"
+    ]
+    structural = {
+        "qa.finalized_current_state": (
+            [
+                {"kind": "ARTIFACT_PATH", "value": QA_MANIFEST_PATH},
+                {"kind": "ARTIFACT_PATH", "value": QA_RCA_PATH},
+            ],
+            "Restore the finalized 24-check QA current-state fixed point through its owning process.",
+        ),
+        "evidence.full_index_mirror_topology": (
+            [
+                {"kind": "ARTIFACT_PATH", "value": HUMAN_INDEX_PATH},
+                {"kind": "ARTIFACT_PATH", "value": MACHINE_MIRROR_PATH},
+            ],
+            "Run the canonical evidence updater and all companion validators.",
+        ),
+    }
+    for obligation in obligations:
+        if obligation.get("status") != "FAIL":
+            continue
+        predicate_key = str(obligation.get("predicate_key", ""))
+        detail = str(obligation.get("detail", ""))
+        if predicate_key in structural:
+            evidence, follow_up = structural[predicate_key]
+            blockers.append(
+                _descriptor(
+                    predicate_key,
+                    "CHECK",
+                    predicate_key,
+                    detail,
+                    evidence,
+                    PLAN_CLOSEOUT_CHECK_COMMAND,
+                    "GOVERNED_ARTIFACT_DRIFT",
+                    [],
+                    follow_up,
+                    ["closeout_package_in_memory", "epic038_current_state"],
+                )
+            )
+            continue
+        if predicate_key == "authority.approved_r5_source":
+            blockers.append(
+                _descriptor(
+                    predicate_key,
+                    "AUTHORITY",
+                    PLAN_PATH,
+                    detail,
+                    [{"kind": "ARTIFACT_PATH", "value": PLAN_PATH}],
+                    "internal:validate-approved-r5-source",
+                    "SOURCE_AUTHORITY_CONFLICT",
+                    [],
+                    "Restore or reconcile the complete approved r5 authority before continuing.",
+                    ["closeout_package_in_memory"],
+                    "PO_AUTHORIZATION_REQUIRED",
+                )
+            )
+            continue
+        label = obligation.get("label")
+        if label in NON_TOKEN_OBLIGATIONS:
+            key, path, _proof = NON_TOKEN_BINDINGS[str(label)]
+            blockers.append(
+                _descriptor(
+                    predicate_key,
+                    "CHECK",
+                    str(label),
+                    detail,
+                    [
+                        {"kind": "ARTIFACT_PATH", "value": path},
+                        {"kind": "ARTIFACT_KEY", "value": key},
+                    ],
+                    PLAN_CLOSEOUT_CHECK_COMMAND,
+                    "GOVERNED_ARTIFACT_DRIFT",
+                    [path],
+                    (
+                        "Correct or canonically regenerate the exact governed "
+                        f"non-token proof family for {label}, then rerun all "
+                        "companion validators."
+                    ),
+                    ["closeout_package_in_memory", "epic038_current_state"],
+                )
+            )
+            continue
+        raise ValueError(f"unsupported failing fingerprint obligation: {predicate_key}")
+    blockers.sort(
+        key=lambda item: (
+            str(item["predicate_key"]),
+            json.dumps(item["subject"], sort_keys=True),
+        )
+    )
+    return tuple(blockers)
+
+
 def _unclaimed_planned_result(row: Row) -> TokenResult:
     path, key, _owner = PLANNED_BINDINGS[row.token]
     return TokenResult(
@@ -4410,8 +4727,9 @@ def evaluate_closeout() -> EvaluationSnapshot:
             for row in rows
         )
     else:
+        planned_family_state = _planned_family_state()
         results = tuple(
-            _planned_result(row)
+            _planned_result(row, planned_family_state)
             if row.classification == "planned-new"
             else _current_result(row)
             for row in rows
@@ -5047,11 +5365,40 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
         for value in package.values()
     ):
         raise ValueError("package bytes are not canonical UTF-8/LF outputs")
+    if hashlib.sha256(package[OUTPUT.as_posix()]).hexdigest() != TOKEN_MATRIX_SHA256:
+        raise ValueError("package DEV-01 token matrix bytes mismatch")
     manifest = _load_canonical_object(package[CLOSE_MANIFEST_PATH], "close manifest")
     acceptance = _load_canonical_object(package[ACCEPTANCE_MAP_PATH], "acceptance map")
     pre = _load_canonical_object(package[PRECOMMIT_CHECKLIST_PATH], "precommit checklist")
     post = _load_canonical_object(package[POSTCOMMIT_CHECKLIST_PATH], "postcommit checklist")
     ledger = parse_ledger(package[LEDGER_PATH])
+    authority = _plan_authority()
+    try:
+        qa_rca_source_bytes = (ROOT / QA_RCA_PATH).read_bytes()
+    except OSError as exc:
+        raise ValueError(f"QA RCA source unavailable: {QA_RCA_PATH}") from exc
+    if (
+        manifest.get("epic_id") != EPIC_ID
+        or manifest.get("schema") != "hde.epic038.close_manifest.v1"
+    ):
+        raise ValueError("manifest epic/schema identity mismatch")
+    if (
+        manifest.get("plan_path") != authority["plan_path"]
+        or manifest.get("plan_sha256") != authority["plan_sha256"]
+    ):
+        raise ValueError("manifest approved-plan authority mismatch")
+    if (
+        manifest.get("qa_rca_source_path") != QA_RCA_PATH
+        or manifest.get("qa_rca_source_sha256")
+        != hashlib.sha256(qa_rca_source_bytes).hexdigest()
+    ):
+        raise ValueError("manifest QA RCA source authority mismatch")
+    if manifest.get("tracked_issues") != authority["tracked_issues"]:
+        raise ValueError("manifest tracked-issue disposition mismatch")
+    if manifest.get("adr_records") != authority["adr_records"]:
+        raise ValueError("manifest PF06 §3.5.4 ADR block mismatch")
+    if manifest.get("nonclaims") != list(NONCLAIMS):
+        raise ValueError("manifest nonclaim roster mismatch")
     if not isinstance(manifest.get("key_outputs"), dict):
         raise ValueError("manifest key_outputs must be a named object")
     if manifest.get("key_outputs") != KEY_OUTPUTS:
@@ -5099,7 +5446,17 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
             }
             or item.get("status") not in {"PASS", "UNCLAIMED", "FAIL"}
             or not item.get("detail")
+            or not isinstance(item.get("decisive_evidence"), list)
             or not item.get("decisive_evidence")
+            or any(
+                not isinstance(evidence, dict)
+                or set(evidence) != {"kind", "value"}
+                or not isinstance(evidence.get("kind"), str)
+                or not evidence.get("kind")
+                or not isinstance(evidence.get("value"), str)
+                or not evidence.get("value")
+                for evidence in item.get("decisive_evidence", [])
+            )
             or (
                 item.get("status") == "PASS"
                 and item.get("minimum_follow_up") != "NONE"
@@ -5182,6 +5539,178 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
         if isinstance(item, dict)
     ) != NON_TOKEN_OBLIGATIONS:
         raise ValueError("acceptance map non-token obligation roster mismatch")
+    proof_roster = manifest.get("proof_family_roster")
+    expected_proof_roster = [
+        dict(item) for item in _proof_family_records(tuple(build_rows()))
+    ]
+    if proof_roster != expected_proof_roster:
+        raise ValueError("manifest proof-family roster mismatch")
+    non_token_obligations = acceptance.get("non_token_obligations")
+    if (
+        not isinstance(non_token_obligations, list)
+        or manifest.get("non_token_obligations") != non_token_obligations
+        or any(
+            not isinstance(item, dict)
+            or set(item)
+            != {
+                "artifact_key",
+                "detail",
+                "label",
+                "path",
+                "predicate_key",
+                "status",
+            }
+            or item.get("status") not in {"PASS", "FAIL"}
+            or not isinstance(item.get("detail"), str)
+            or not item.get("detail")
+            for item in non_token_obligations
+        )
+    ):
+        raise ValueError("manifest non-token obligation payload mismatch")
+    source_fingerprint = manifest.get("source_evaluation_fingerprint")
+    if not isinstance(source_fingerprint, str) or not _hex64(source_fingerprint):
+        raise ValueError("manifest source-evaluation fingerprint mismatch")
+    token_results = tuple(
+        TokenResult(
+            str(item["token"]),
+            str(item["status"]),
+            str(item["predicate_key"]),
+            str(item["detail"]),
+            tuple(
+                (str(evidence["kind"]), str(evidence["value"]))
+                for evidence in item["decisive_evidence"]
+            ),
+            str(item["minimum_follow_up"]),
+        )
+        for item in evaluations
+    )
+    obligation_keys = (
+        "qa.finalized_current_state",
+        "evidence.full_index_mirror_topology",
+        "authority.approved_r5_source",
+        *(f"authority.pf09_scope.{item}" for item in PF09_SCOPE),
+        *(f"authority.pf09_exclusion.{item}" for item in PF09_EXCLUSIONS),
+        *(f"authority.tracked_issue.{item}" for item in TRACKED_ISSUES),
+        *(f"authority.adr.{item['label']}" for item in ADR_RECORDS),
+        "authority.qa_rca_source",
+    )
+    try:
+        viability_lines = package[VIABILITY_PATH].decode("utf-8").splitlines()
+    except UnicodeError as exc:
+        raise ValueError("viability log is not UTF-8") from exc
+    cursor = 0
+
+    def require_viability_line(expected: str) -> None:
+        nonlocal cursor
+        if cursor >= len(viability_lines) or viability_lines[cursor] != expected:
+            raise ValueError(f"viability log canonical line mismatch: {expected}")
+        cursor += 1
+
+    require_viability_line("HDE-EPIC038 ACCEPTANCE MAP VIABILITY")
+    require_viability_line(f"DECISION: {decision}")
+    require_viability_line(f"SOURCE_EVALUATION_FINGERPRINT: {source_fingerprint}")
+    for item in token_results:
+        require_viability_line(
+            f"TOKEN {item.token}: {item.status} | PREDICATE: "
+            f"{item.predicate_key} | DETAIL: {item.detail}"
+        )
+    require_viability_line(f"PROOF_FAMILY_COUNT: {len(proof_roster)}")
+    for family in proof_roster:
+        require_viability_line(
+            "PROOF_FAMILY "
+            f"{family['token']} | {family['artifact_key']} | "
+            f"{family['primary_evidence']} | {family['proof_anchor']} | "
+            f"{family['classification']}"
+        )
+    for item in non_token_obligations:
+        require_viability_line(
+            f"NON_TOKEN {item['label']}: {item['status']} | "
+            f"PREDICATE: {item['predicate_key']} | DETAIL: {item['detail']}"
+        )
+    structural_obligations: list[Mapping[str, object]] = []
+    for predicate_key in obligation_keys:
+        prefix = f"OBLIGATION {predicate_key}: "
+        if cursor >= len(viability_lines) or not viability_lines[cursor].startswith(prefix):
+            raise ValueError(f"viability obligation roster mismatch: {predicate_key}")
+        rendered = viability_lines[cursor][len(prefix) :]
+        status, separator, detail = rendered.partition(" | DETAIL: ")
+        if separator != " | DETAIL: " or status not in {"PASS", "FAIL"} or not detail:
+            raise ValueError(f"viability obligation payload mismatch: {predicate_key}")
+        structural_obligations.append(
+            {
+                "detail": detail,
+                "predicate_key": predicate_key,
+                "status": status,
+            }
+        )
+        cursor += 1
+    for follow_up in minimum:
+        require_viability_line(f"MINIMUM_FOLLOW_UP: {follow_up}")
+    if cursor != len(viability_lines):
+        raise ValueError("viability log has unexpected trailing or duplicate lines")
+    fingerprint_obligations = _fingerprint_obligations(
+        (*structural_obligations, *non_token_obligations)
+    )
+    source_results = _source_results_for_fingerprint(token_results, source_status)
+    source_blockers = _fingerprint_blockers(
+        source_results, fingerprint_obligations
+    )
+    recomputed_source = _make_snapshot(
+        source_results,
+        tuple(proof_roster),
+        source_blockers,
+        fingerprint_obligations,
+    )
+    if recomputed_source.fingerprint != source_fingerprint:
+        raise ValueError("source-evaluation fingerprint payload mismatch")
+    structural_snapshot = EvaluationSnapshot(
+        token_results,
+        tuple(proof_roster),
+        (),
+        fingerprint_obligations,
+        source_fingerprint,
+    )
+    expected_manifest = {
+        "adr_records": authority["adr_records"],
+        "decision": decision,
+        "epic_id": EPIC_ID,
+        "evaluations": [item.as_dict() for item in token_results],
+        "key_outputs": dict(KEY_OUTPUTS),
+        "minimum_follow_up": minimum,
+        "non_token_obligations": non_token_obligations,
+        "nonclaims": list(NONCLAIMS),
+        "pf09_exclusions": authority["pf09_exclusions"],
+        "pf09_scope": authority["pf09_scope"],
+        "plan_path": authority["plan_path"],
+        "plan_sha256": authority["plan_sha256"],
+        "proof_family_roster": [dict(item) for item in proof_roster],
+        "qa_rca_source_path": QA_RCA_PATH,
+        "qa_rca_source_sha256": hashlib.sha256(qa_rca_source_bytes).hexdigest(),
+        "schema": "hde.epic038.close_manifest.v1",
+        "schema_version": "1.0",
+        "source_evaluation_fingerprint": source_fingerprint,
+        "source_token_status": dict(source_status),
+        "token_roster": list(TOKENS),
+        "token_status": {
+            item.token: item.status for item in token_results
+        },
+        "tracked_issues": authority["tracked_issues"],
+    }
+    if manifest != expected_manifest:
+        raise ValueError("close manifest canonical payload mismatch")
+    if package[VIABILITY_PATH] != _viability_bytes(
+        structural_snapshot, token_results, decision, minimum
+    ):
+        raise ValueError("viability log canonical bytes mismatch")
+    expected_acceptance = _acceptance_payload(
+        structural_snapshot, token_results, decision, minimum
+    )
+    if acceptance != expected_acceptance:
+        raise ValueError("acceptance map canonical bytes mismatch")
+    if package[CLOSE_REPORT_PATH] != _report_bytes(
+        structural_snapshot, token_results, decision, minimum
+    ):
+        raise ValueError("close report canonical bytes mismatch")
     report = package[CLOSE_REPORT_PATH].decode("utf-8")
     qa_source = (ROOT / QA_RCA_PATH).read_text(encoding="utf-8").rstrip("\n")
     if qa_source not in report:
@@ -5203,6 +5732,17 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
         raise ValueError("precommit checklist mismatch")
     if post != json.loads(_render_checklist("POSTCOMMIT", result=checklist_result)):
         raise ValueError("postcommit checklist mismatch")
+    recorded = record_blockers(
+        ledger, [dict(blocker) for blocker in source_blockers]
+    )
+    if recorded != ledger:
+        raise ValueError("remediation ledger omits a canonical source blocker")
+    reconstructed_package = _construct_package(recomputed_source, ledger)
+    if any(
+        reconstructed_package[path] != package[path]
+        for path in PACKAGE_PATHS
+    ):
+        raise ValueError("closeout package canonical reconstruction mismatch")
 
 
 def validate_package(package: Mapping[str, bytes]) -> None:

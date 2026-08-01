@@ -3499,6 +3499,399 @@ def test_dev02_updater_rejects_every_partial_primary_family(
         updater._load_epic038_closeout_entries()
 
 
+def _assert_dev02_planned_family_fails_closed(
+    snapshot: closeout.EvaluationSnapshot,
+) -> None:
+    planned_tokens = set(closeout.PLANNED_BINDINGS)
+    planned_results = [
+        result
+        for result in snapshot.token_results
+        if result.token in planned_tokens
+    ]
+    assert {result.token for result in planned_results} == planned_tokens
+    assert {result.status for result in planned_results} == {"FAIL"}
+    assert all(
+        result.predicate_key.endswith(".planned_binding")
+        for result in planned_results
+    )
+    assert len({result.detail for result in planned_results}) == 1
+    assert {
+        blocker["subject"]["value"] for blocker in snapshot.blockers
+    } == planned_tokens
+    assert all(
+        result.status == "PASS"
+        for result in snapshot.token_results
+        if result.token not in planned_tokens
+    )
+    assert all(
+        obligation.get("status") == "PASS"
+        for obligation in snapshot.obligations
+    )
+
+
+def _dev02_atomic_family_watch_paths() -> set[str]:
+    paths = {
+        *closeout.PACKAGE_PATHS,
+        *(
+            proof
+            for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+        ),
+        closeout.HUMAN_INDEX_PATH,
+        f"{closeout.HUMAN_INDEX_PATH}.path_proof.txt",
+        "docs/evidence/INDEX.sha256",
+        "docs/evidence/INDEX.sha256.path_proof.txt",
+        closeout.MACHINE_MIRROR_PATH,
+        f"{closeout.MACHINE_MIRROR_PATH}.path_proof.txt",
+        "artifacts/evidence_index.jsonl.sha256",
+        "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+    }
+    for relative in tuple(paths):
+        parent = Path(relative).parent
+        while parent != Path("."):
+            paths.add(parent.as_posix())
+            parent = parent.parent
+    return paths
+
+
+def _dev02_atomic_family_watch_state(root: Path) -> dict[str, tuple[object, ...]]:
+    state: dict[str, tuple[object, ...]] = {}
+    for relative in sorted(_dev02_atomic_family_watch_paths()):
+        path = root / relative
+        if not path.exists() and not path.is_symlink():
+            state[relative] = ("missing",)
+            continue
+        stat_result = path.lstat()
+        if path.is_symlink():
+            state[relative] = (
+                "symlink",
+                path.readlink().as_posix(),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+        elif path.is_file():
+            body = path.read_bytes()
+            state[relative] = (
+                "file",
+                hashlib.sha256(body).hexdigest(),
+                len(body),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+        elif path.is_dir():
+            state[relative] = (
+                "directory",
+                tuple(sorted(child.name for child in path.iterdir())),
+                stat_result.st_mode,
+                stat_result.st_mtime_ns,
+            )
+    return state
+
+
+def _dev02_nonfamily_tree_state(root: Path) -> dict[str, tuple[object, ...]]:
+    excluded = _dev02_atomic_family_watch_paths()
+    return {
+        relative: value
+        for relative, value in _tree_state(root).items()
+        if relative not in excluded
+    }
+
+
+def _assert_dev02_blocked_preflight(
+    root: Path,
+    *,
+    allow_structural_error: bool = False,
+) -> None:
+    result = _run_repo_tool(
+        root,
+        "tools/evidence/generate_hde_epic038_closeout.py",
+        "--preflight",
+    )
+    assert result.returncode != 0, result.stdout + result.stderr
+    if "PREFLIGHT BLOCKED" in result.stdout:
+        assert f"blockers={len(closeout.PLANNED_BINDINGS)}" in result.stdout
+    else:
+        assert allow_structural_error
+        assert "PREFLIGHT_BLOCKER:" in result.stdout
+        assert "invalid ledger template" in result.stdout
+    assert "WROTE" not in result.stdout
+
+
+def _assert_dev02_blocked_preflight_in_process(
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["generate_hde_epic038_closeout.py", "--preflight"],
+    )
+    assert closeout.main() == 1
+    captured = capsys.readouterr()
+    assert not captured.err
+    assert "PREFLIGHT BLOCKED" in captured.out
+    assert f"blockers={len(closeout.PLANNED_BINDINGS)}" in captured.out
+    assert "WROTE" not in captured.out
+
+
+def test_dev02_evaluate_and_preflight_reject_every_partial_atomic_primary_family(
+    dev02_repo: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    primary_paths = tuple(closeout.PACKAGE_ACTIVATION_PATHS)
+    assert len(primary_paths) == 7
+    assert closeout.CLOSE_REPORT_PATH in primary_paths
+    assert not any((dev02_repo / path).exists() for path in primary_paths)
+    assert all((dev02_repo / path).parent.is_dir() for path in primary_paths)
+    baseline = closeout.evaluate_closeout()
+    assert not baseline.blockers
+    assert {
+        result.status
+        for result in baseline.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    } == {"UNCLAIMED"}
+    canonical = closeout.build_package(evaluation_snapshot=baseline)
+    proper_masks = range(1, (1 << len(primary_paths)) - 1)
+    assert len(proper_masks) == 126
+    before_all_subsets = _dev02_nonfamily_tree_state(dev02_repo)
+
+    for mask in proper_masks:
+        subset = tuple(
+            path
+            for index, path in enumerate(primary_paths)
+            if mask & (1 << index)
+        )
+        try:
+            for path in subset:
+                _replace_bytes(dev02_repo / path, canonical[path])
+            before_evaluate = _dev02_atomic_family_watch_state(dev02_repo)
+            snapshot = closeout.evaluate_closeout()
+            _assert_dev02_planned_family_fails_closed(snapshot)
+            _assert_dev02_blocked_preflight_in_process(capsys, monkeypatch)
+            assert (
+                _dev02_atomic_family_watch_state(dev02_repo) == before_evaluate
+            ), subset
+        finally:
+            for path in subset:
+                (dev02_repo / path).unlink(missing_ok=True)
+
+    assert not any((dev02_repo / path).exists() for path in primary_paths)
+    assert _dev02_nonfamily_tree_state(dev02_repo) == before_all_subsets
+
+
+def test_dev02_arbitrary_isolated_close_report_fails_closed_and_read_only(
+    dev02_repo: Path,
+) -> None:
+    primary_paths = tuple(closeout.PACKAGE_ACTIVATION_PATHS)
+    close_report = dev02_repo / closeout.CLOSE_REPORT_PATH
+    _replace_bytes(
+        close_report,
+        b"# Arbitrary incomplete HDE-EPIC038 close report\n",
+    )
+    assert {
+        path for path in primary_paths if (dev02_repo / path).is_file()
+    } == {closeout.CLOSE_REPORT_PATH}
+
+    before_evaluate = _tree_state(dev02_repo)
+    snapshot = closeout.evaluate_closeout()
+    _assert_dev02_planned_family_fails_closed(snapshot)
+    assert _tree_state(dev02_repo) == before_evaluate
+    before_preflight = _tree_state(dev02_repo)
+    _assert_dev02_blocked_preflight(dev02_repo)
+    assert _tree_state(dev02_repo) == before_preflight
+
+
+def test_dev02_complete_canonical_primary_only_transition_converges(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+        )
+    )
+    primary_paths = tuple(closeout.PACKAGE_ACTIVATION_PATHS)
+    primary_package = _package_at(dev02_repo)
+    assert all((dev02_repo / path).is_file() for path in primary_paths)
+    assert not any(
+        (dev02_repo / proof).exists()
+        for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    )
+
+    transition = closeout.evaluate_closeout()
+    assert not transition.blockers
+    assert {
+        result.status
+        for result in transition.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    } == {"UNCLAIMED"}
+    assert closeout.build_package(evaluation_snapshot=transition) == primary_package
+    before_preflight = _tree_state(dev02_repo)
+    preflight = _run_repo_tool(
+        dev02_repo,
+        "tools/evidence/generate_hde_epic038_closeout.py",
+        "--preflight",
+    )
+    _assert_success(preflight)
+    assert "PREFLIGHT OK" in preflight.stdout
+    assert f"planned_unclaimed={len(closeout.PLANNED_BINDINGS)}" in preflight.stdout
+    assert _tree_state(dev02_repo) == before_preflight
+
+    _converge_dev02_evidence_graph(dev02_repo)
+    assert _package_at(dev02_repo) == primary_package
+    converged = closeout.evaluate_closeout()
+    assert not converged.blockers
+    assert {
+        result.status
+        for result in converged.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    } == {"PASS"}
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+            "--check",
+        )
+    )
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/update_evidence_index.py",
+            "--check",
+        )
+    )
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/orientation_demo.py",
+            "--check",
+        )
+    )
+
+
+def test_dev02_evaluate_and_preflight_reject_each_tampered_complete_primary_family(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+        )
+    )
+    primary_paths = tuple(closeout.PACKAGE_ACTIVATION_PATHS)
+    canonical = _package_at(dev02_repo)
+    before_all_tampering = _dev02_nonfamily_tree_state(dev02_repo)
+
+    for tampered_path in primary_paths:
+        target = dev02_repo / tampered_path
+        _replace_bytes(target, canonical[tampered_path] + b"TAMPERED\n")
+        try:
+            before_evaluate = _dev02_atomic_family_watch_state(dev02_repo)
+            snapshot = closeout.evaluate_closeout()
+            _assert_dev02_planned_family_fails_closed(snapshot)
+            _assert_dev02_blocked_preflight(
+                dev02_repo,
+                allow_structural_error=tampered_path == closeout.LEDGER_PATH,
+            )
+            assert (
+                _dev02_atomic_family_watch_state(dev02_repo) == before_evaluate
+            ), tampered_path
+        finally:
+            _replace_bytes(target, canonical[tampered_path])
+
+    assert _dev02_nonfamily_tree_state(dev02_repo) == before_all_tampering
+
+
+def test_dev02_coordinated_source_fingerprint_tamper_fails_closed_and_read_only(
+    dev02_repo: Path,
+) -> None:
+    _assert_success(
+        _run_repo_tool(
+            dev02_repo,
+            "tools/evidence/generate_hde_epic038_closeout.py",
+        )
+    )
+    assert all(
+        (dev02_repo / path).is_file()
+        for path in closeout.PACKAGE_ACTIVATION_PATHS
+    )
+    assert not any(
+        (dev02_repo / proof).exists()
+        for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    )
+    closeout_keys = set(closeout.CLOSEOUT_PRIMARY_BINDINGS)
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._human_items()
+    }
+    assert not closeout_keys & {
+        str(item.get("artifact_key")) for item in closeout._mirror_items()
+    }
+    transition = closeout.evaluate_closeout()
+    assert not transition.blockers
+    assert {
+        result.status
+        for result in transition.token_results
+        if result.token in closeout.PLANNED_BINDINGS
+    } == {"UNCLAIMED"}
+
+    canonical = _package_at(dev02_repo)
+    manifest = json.loads(canonical[closeout.CLOSE_MANIFEST_PATH])
+    original_fingerprint = manifest["source_evaluation_fingerprint"]
+    assert isinstance(original_fingerprint, str)
+    assert len(original_fingerprint) == 64
+    tampered_fingerprint = "0" * 64
+    if tampered_fingerprint == original_fingerprint:
+        tampered_fingerprint = "1" * 64
+
+    tampered = _mutate_package_json(
+        canonical,
+        closeout.CLOSE_MANIFEST_PATH,
+        lambda payload: payload.__setitem__(
+            "source_evaluation_fingerprint", tampered_fingerprint
+        ),
+    )
+    tampered = _mutate_package_json(
+        tampered,
+        closeout.ACCEPTANCE_MAP_PATH,
+        lambda payload: payload.__setitem__(
+            "source_evaluation_fingerprint", tampered_fingerprint
+        ),
+    )
+    fingerprint_line = (
+        f"SOURCE_EVALUATION_FINGERPRINT: {original_fingerprint}\n".encode()
+    )
+    tampered_line = (
+        f"SOURCE_EVALUATION_FINGERPRINT: {tampered_fingerprint}\n".encode()
+    )
+    assert canonical[closeout.VIABILITY_PATH].count(fingerprint_line) == 1
+    tampered[closeout.VIABILITY_PATH] = canonical[
+        closeout.VIABILITY_PATH
+    ].replace(fingerprint_line, tampered_line)
+    assert original_fingerprint.encode() not in canonical[closeout.CLOSE_REPORT_PATH]
+
+    before_validation = _tree_state(dev02_repo)
+    with pytest.raises(ValueError, match="fingerprint|snapshot|structure"):
+        closeout.validate_package_structure(tampered)
+    assert _tree_state(dev02_repo) == before_validation
+    with pytest.raises(ValueError, match="fingerprint|snapshot|cross-surface"):
+        closeout.validate_package(tampered)
+    assert _tree_state(dev02_repo) == before_validation
+
+    for path in (
+        closeout.CLOSE_MANIFEST_PATH,
+        closeout.ACCEPTANCE_MAP_PATH,
+        closeout.VIABILITY_PATH,
+    ):
+        _replace_bytes(dev02_repo / path, tampered[path])
+    before_evaluate = _tree_state(dev02_repo)
+    snapshot = closeout.evaluate_closeout()
+    _assert_dev02_planned_family_fails_closed(snapshot)
+    assert _tree_state(dev02_repo) == before_evaluate
+    before_preflight = _tree_state(dev02_repo)
+    _assert_dev02_blocked_preflight(dev02_repo)
+    assert _tree_state(dev02_repo) == before_preflight
+
+
 @pytest.mark.parametrize(
     "field,replacement",
     (
