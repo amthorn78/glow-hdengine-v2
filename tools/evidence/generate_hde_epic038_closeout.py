@@ -6,6 +6,9 @@ import argparse
 import difflib
 import hashlib
 import json
+import os
+import re
+import subprocess
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -2474,13 +2477,380 @@ def render(rows: Iterable[Row] | None = None) -> bytes:
     return ("\n".join(lines).rstrip("\n") + "\n").encode("utf-8")
 
 
+# DEV-02 close-package contract.  The matrix renderer above intentionally remains
+# byte-for-byte the independently reviewed DEV-01 implementation.
+CLOSE_REPORT_PATH = "audit/EPIC-038_close_report.md"
+CLOSE_MANIFEST_PATH = "audit/EPIC-038_MANIFEST.json"
+ACCEPTANCE_MAP_PATH = "docs/acceptance_map_epic038.json"
+VIABILITY_PATH = "audit/qa/hde-epic038/acceptance_map_viability.log"
+LEDGER_PATH = "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md"
+QA_RCA_PATH = "audit/qa/hde-epic038/00_meta/qa_rca_doc_delta_summary.md"
+PACKAGE_PATHS = (CLOSE_REPORT_PATH, CLOSE_MANIFEST_PATH, ACCEPTANCE_MAP_PATH,
+                 OUTPUT.as_posix(), VIABILITY_PATH, LEDGER_PATH)
+PF09_SCOPE = ("HDE-DIST005.1", "HDE-DIST005.2", "HDE-DIST006.1",
+              "HDE-DIST006.2", "HDE-DIST006.3", "HDE-DIST002.4",
+              "HDE-DIST002.5", "HDE-DIST003.1", "HDE-DIST003.4",
+              "HDE-DIST001.1", "HDE-DIST001.2", "HDE-DIST001.3",
+              "HDE-DIST001.4", "HDE-DIST001.5", "HDE-DIST001.9",
+              "HDE-DIST001.10", "HDE-DIST001.11", "HDE-DIST001.6",
+              "HDE-DIST007 (subtask N/A)")
+PF09_EXCLUSIONS = tuple(f"HDE-DIST004.{n}" for n in range(1, 5))
+NONCLAIMS = ("OPS execution", "Live QA rerun", "deployment", "PF09 movement",
+             "board movement", "Product Owner acceptance", "merge", "epic closure")
+LEDGER_SCHEMA = "hde.epic038.closeout_remediation_ledger.v1"
+CLOSE_REQUEST_SCHEMA = "hde.epic038.closeout_remediation_ledger.close_request.v1"
+LEDGER_KEY = "epic038.closeout_remediation_ledger"
+TOKEN_MATRIX_SHA256 = "40918fdf7c2c2e7cb475faa0d0d335ae4641ab25165ec8471491d7029ae73a4c"
+SUBJECT_KINDS = frozenset({"TOKEN", "ARTIFACT_PATH", "ARTIFACT_KEY", "CHECK", "PACKAGE", "AUTHORITY"})
+FAILURE_OWNERS = {"REGISTRY_OR_WIRING_DEFECT": "CodEx", "EVIDENCE_PRODUCER_OR_VALIDATOR_DEFECT": "CodEx",
+                  "GOVERNED_ARTIFACT_DRIFT": "CodEx", "EXISTING_BEHAVIOR_REGRESSION": "Product Owner",
+                  "SOURCE_AUTHORITY_CONFLICT": "Product Owner", "EXTERNAL_ONLY_PROOF_GAP": "Product Owner"}
+KEY_OUTPUTS = {"acceptance_map": ACCEPTANCE_MAP_PATH, "acceptance_map_viability": VIABILITY_PATH,
+               "close_manifest": CLOSE_MANIFEST_PATH, "close_report": CLOSE_REPORT_PATH,
+               "closeout_remediation_ledger": LEDGER_PATH, "token_matrix": OUTPUT.as_posix()}
+
+
+def _canonical_json(value: object, *, pretty: bool = False) -> bytes:
+    options = {"ensure_ascii": False, "sort_keys": True}
+    if pretty:
+        options["indent"] = 2
+    else:
+        options["separators"] = (",", ":")
+    return (json.dumps(value, **options) + "\n").encode("utf-8")
+
+
+def _blocker_id(predicate_key: str, subject: Mapping[str, str], occurrence: int = 1) -> str:
+    identity = {"epic_id": EPIC_ID, "predicate_key": predicate_key, "subject": dict(subject)}
+    digest = hashlib.sha256(_canonical_json(identity)).hexdigest()[:16]
+    return f"HDE-EPIC038-BLK-{digest}-{occurrence:04d}"
+
+
+def _normalized_paths(values: object, *, must_exist: bool = False) -> list[str]:
+    if not isinstance(values, list) or any(not isinstance(v, str) for v in values):
+        raise ValueError("paths must be an array of strings")
+    if values != sorted(set(values)):
+        raise ValueError("paths must be ASCII-sorted and duplicate-free")
+    for value in values:
+        path = Path(value)
+        if (not value or path.is_absolute() or ".." in path.parts or "*" in value or "?" in value
+                or value.endswith("/") or (ROOT / value).is_dir()):
+            raise ValueError(f"invalid repository-relative file path: {value}")
+        if value.startswith(("audit/ops/", "audit/qa/hde-epic038/checks/")):
+            raise ValueError(f"historical evidence path is not writable: {value}")
+        if must_exist and not (ROOT / value).is_file():
+            raise ValueError(f"missing regenerated artifact: {value}")
+    return values
+
+
+def _descriptor(predicate_key: str, kind: str, value: str, predicate: str,
+                evidence: list[dict[str, str]], command: str, failure_class: str,
+                permitted: list[str], follow_up: str, validators: list[str],
+                external: str = "NONE_REQUIRED") -> dict[str, object]:
+    if kind not in SUBJECT_KINDS or FAILURE_OWNERS.get(failure_class) is None:
+        raise ValueError("invalid registered blocker descriptor")
+    permitted = _normalized_paths(sorted(permitted))
+    return {"predicate_key": predicate_key, "subject": {"kind": kind, "value": value},
+            "failing_predicate": predicate, "decisive_evidence": evidence,
+            "decisive_command": command, "failure_class": failure_class,
+            "owner": FAILURE_OWNERS[failure_class], "permitted_files": permitted,
+            "minimum_follow_up": follow_up, "required_validator_ids": validators,
+            "external_action_posture": external}
+
+
+def derive_blockers() -> list[dict[str, object]]:
+    """Evaluate registered predicates; artifact presence alone is never PASS."""
+    if not any((ROOT / path).exists() for path in PLANNED_PATHS):
+        validate_rows(build_rows())
+    elif hashlib.sha256(_matrix_bytes()).hexdigest() != TOKEN_MATRIX_SHA256:
+        raise ValueError("DEV-01 token matrix drift")
+    blockers: list[dict[str, object]] = []
+    for token in ("TESTS_PASS_OK", "QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"):
+        path, key, _owner = PLANNED_BINDINGS[token]
+        descriptor = _descriptor(
+            f"token.{token}.current_governed_result", "TOKEN", token,
+            f"{token} lacks an exact current governed PASS receipt",
+            [{"kind": "ARTIFACT_PATH", "value": path}, {"kind": "ARTIFACT_KEY", "value": key}],
+            PLAN_CLOSEOUT_CHECK_COMMAND if token == "TESTS_PASS_OK" else PLANNED_COMMANDS,
+            "GOVERNED_ARTIFACT_DRIFT", [path],
+            f"DEV-03 must produce, register, prove, and validate the exact current evidence for {token}.",
+            ["closeout_package_in_memory", "epic038_current_state"]
+        )
+        passed, _detail = evaluate_registered_predicate(descriptor)
+        if not passed:
+            blockers.append(descriptor)
+    return sorted(blockers, key=lambda d: (str(d["predicate_key"]), json.dumps(d["subject"], sort_keys=True)))
+
+
+def _empty_ledger() -> dict[str, object]:
+    return {"artifact_key": LEDGER_KEY, "entries": [], "epic_id": EPIC_ID, "schema": LEDGER_SCHEMA}
+
+
+def render_ledger(payload: Mapping[str, object]) -> bytes:
+    validate_ledger(payload)
+    body = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2)
+    return f"# HDE-EPIC038 Closeout Remediation Ledger\n\n```json\n{body}\n```\n".encode()
+
+
+def parse_ledger(data: bytes) -> dict[str, object]:
+    prefix, suffix = b"# HDE-EPIC038 Closeout Remediation Ledger\n\n```json\n", b"\n```\n"
+    if not data.startswith(prefix) or not data.endswith(suffix):
+        raise ValueError("invalid ledger template")
+    payload = json.loads(data[len(prefix):-len(suffix)], object_pairs_hook=_unique_json_object)
+    if render_ledger(payload) != data:
+        raise ValueError("noncanonical remediation ledger")
+    return payload
+
+
+def validate_ledger(payload: Mapping[str, object]) -> None:
+    if set(payload) != {"artifact_key", "entries", "epic_id", "schema"} or payload.get("artifact_key") != LEDGER_KEY or payload.get("epic_id") != EPIC_ID or payload.get("schema") != LEDGER_SCHEMA:
+        raise ValueError("invalid remediation ledger identity")
+    entries = payload.get("entries")
+    if not isinstance(entries, list): raise ValueError("invalid remediation ledger entries")
+    ids: list[str] = []
+    exact = {"after_outcome", "before_outcome", "blocker_id", "correction_performed", "decisive_command", "decisive_evidence", "external_action_posture", "failing_predicate", "failure_class", "historical_evidence_rewritten", "minimum_follow_up", "owner", "permitted_files", "predicate_key", "regenerated_artifacts", "required_validator_ids", "reviewer_disposition", "status", "subject", "tests_and_validators"}
+    identities: dict[str, tuple[str, str, str]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict) or set(entry) != exact: raise ValueError("invalid ledger entry fields")
+        subject = entry["subject"]
+        if not isinstance(subject, dict) or set(subject) != {"kind", "value"} or subject["kind"] not in SUBJECT_KINDS: raise ValueError("invalid ledger subject")
+        match = re.fullmatch(r"HDE-EPIC038-BLK-([0-9a-f]{16})-([0-9]{4})", str(entry["blocker_id"]))
+        if not match or match.group(1) != _blocker_id(str(entry["predicate_key"]), subject).split("-")[-2]: raise ValueError("invalid blocker id")
+        identity = (str(entry["predicate_key"]), str(subject["kind"]), str(subject["value"]))
+        if match.group(1) in identities and identities[match.group(1)] != identity: raise ValueError("blocker digest collision")
+        identities[match.group(1)] = identity; ids.append(str(entry["blocker_id"]))
+        if entry["owner"] != FAILURE_OWNERS.get(str(entry["failure_class"])): raise ValueError("invalid failure owner")
+        if not isinstance(entry["predicate_key"], str) or not entry["predicate_key"] or not isinstance(entry["failing_predicate"], str) or not entry["failing_predicate"]:
+            raise ValueError("invalid ledger predicate")
+        if not isinstance(entry["decisive_command"], str) or not entry["decisive_command"]:
+            raise ValueError("invalid decisive command")
+        evidence = entry["decisive_evidence"]
+        if not isinstance(evidence, list) or not evidence or any(not isinstance(item, dict) or set(item) != {"kind", "value"} or item["kind"] not in {"ARTIFACT_PATH", "ARTIFACT_KEY", "CHECK", "DIGEST", "DETAIL"} or not isinstance(item["value"], str) or not item["value"] for item in evidence):
+            raise ValueError("invalid decisive evidence")
+        if entry["external_action_posture"] not in {"NONE_REQUIRED", "PO_AUTHORIZATION_REQUIRED", "PO_AUTHORIZED_EVIDENCE_BOUND"}:
+            raise ValueError("invalid external action posture")
+        if not isinstance(entry["minimum_follow_up"], str) or not entry["minimum_follow_up"]:
+            raise ValueError("invalid minimum follow-up")
+        if not isinstance(entry["required_validator_ids"], list) or any(not isinstance(v, str) or not v for v in entry["required_validator_ids"]):
+            raise ValueError("invalid validator roster")
+        before = entry["before_outcome"]
+        if not isinstance(before, dict) or set(before) != {"detail", "result"} or before["result"] != "FAIL" or not isinstance(before["detail"], str) or not before["detail"]:
+            raise ValueError("invalid before outcome")
+        _normalized_paths(entry["permitted_files"]); _normalized_paths(entry["regenerated_artifacts"])
+        if entry["historical_evidence_rewritten"] is not False: raise ValueError("historical evidence rewrite")
+        if entry["status"] == "OPEN":
+            if entry["reviewer_disposition"] != "PENDING_REVIEW" or entry["after_outcome"] is not None or entry["correction_performed"] is not None or entry["tests_and_validators"] or entry["regenerated_artifacts"]: raise ValueError("invalid OPEN entry")
+        elif entry["status"] == "CLOSED":
+            if entry["reviewer_disposition"] != "CLOSURE_VALIDATED" or not entry["correction_performed"] or not entry["tests_and_validators"] or entry["after_outcome"] is None: raise ValueError("invalid CLOSED entry")
+            after = entry["after_outcome"]
+            if not isinstance(after, dict) or set(after) != {"detail", "result"} or after["result"] != "PASS" or not isinstance(after["detail"], str) or not after["detail"]:
+                raise ValueError("invalid after outcome")
+            if any(not isinstance(item, dict) or set(item) != {"command", "exit_code", "id", "result"} or item["exit_code"] != 0 or item["result"] != "PASS" or not item["command"] or not item["id"] for item in entry["tests_and_validators"]):
+                raise ValueError("invalid closure validator result")
+        else: raise ValueError("invalid ledger status")
+    if ids != sorted(set(ids)): raise ValueError("ledger entries not sorted or unique")
+
+
+def _load_ledger() -> dict[str, object]:
+    path = ROOT / LEDGER_PATH
+    return parse_ledger(path.read_bytes()) if path.is_file() else _empty_ledger()
+
+
+def record_blockers(ledger: Mapping[str, object], blockers: list[dict[str, object]]) -> dict[str, object]:
+    entries = [dict(e) for e in ledger["entries"]]  # type: ignore[index]
+    for descriptor in blockers:
+        subject = descriptor["subject"]
+        matching = [e for e in entries if e["predicate_key"] == descriptor["predicate_key"] and e["subject"] == subject]
+        if any(e["status"] == "OPEN" for e in matching): continue
+        occurrence = max([int(str(e["blocker_id"])[-4:]) for e in matching] or [0]) + 1
+        entry = dict(descriptor)
+        entry.update({"blocker_id": _blocker_id(str(descriptor["predicate_key"]), subject, occurrence),
+                      "before_outcome": {"detail": descriptor["failing_predicate"], "result": "FAIL"},
+                      "after_outcome": None, "correction_performed": None,
+                      "regenerated_artifacts": [], "historical_evidence_rewritten": False,
+                      "reviewer_disposition": "PENDING_REVIEW", "status": "OPEN", "tests_and_validators": []})
+        entries.append(entry)
+    result = _empty_ledger(); result["entries"] = sorted(entries, key=lambda e: e["blocker_id"])
+    validate_ledger(result); return result
+
+
+def _matrix_bytes() -> bytes:
+    path = ROOT / OUTPUT
+    if path.is_file(): return path.read_bytes()
+    return render()
+
+
+def build_package(blockers: list[dict[str, object]] | None = None, ledger: Mapping[str, object] | None = None) -> dict[str, bytes]:
+    blockers = derive_blockers() if blockers is None else blockers
+    ledger = record_blockers(_load_ledger() if ledger is None else ledger, blockers)
+    open_ids = [e["blocker_id"] for e in ledger["entries"] if e["status"] == "OPEN"]  # type: ignore[index]
+    decision = "NOT SATISFIED" if blockers or open_ids else "SATISFIED"
+    blocker_tokens = {d["subject"]["value"] for d in blockers if d["subject"]["kind"] == "TOKEN"}
+    statuses = {token: ("NOT PASS" if token in blocker_tokens else "PASS") for token in TOKENS}
+    minimum = [str(d["minimum_follow_up"]) for d in blockers]
+    acceptance = {"artifact_key": "epic038.acceptance_map", "decision": decision, "epic_id": EPIC_ID,
+                  "pf09_scope": list(PF09_SCOPE), "pf09_exclusions": list(PF09_EXCLUSIONS),
+                  "records": [{"token": row.token, "status": statuses[row.token], "test_binding": row.test_binding,
+                               "ci_binding": row.ci_binding, "live_qa": row.live_qa, "primary_evidence": list(row.primary_evidence),
+                               "artifact_keys": list(row.artifact_keys), "proof_anchors": list(row.proof_anchors),
+                               "classification": row.classification, "claim_prerequisite": row.future_claim} for row in build_rows()],
+                  "minimum_follow_up": minimum, "schema_version": "1.0"}
+    viability_lines = ["HDE-EPIC038 ACCEPTANCE MAP VIABILITY", f"DECISION: {decision}"]
+    for token in TOKENS: viability_lines.append(f"TOKEN {token}: {statuses[token]}")
+    for d in blockers: viability_lines.append(f"BLOCKER {_blocker_id(str(d['predicate_key']), d['subject'])}: {d['failing_predicate']} | MINIMUM FOLLOW-UP: {d['minimum_follow_up']}")
+    viability = ("\n".join(viability_lines) + "\n").encode()
+    qapath = ROOT / QA_RCA_PATH
+    qa = qapath.read_text(encoding="utf-8") if qapath.is_file() else "SOURCE UNAVAILABLE"
+    report = ["# HDE-EPIC038 Close Report", "", f"## Final decision: {decision}", "",
+              "## Exact package pointers"] + [f"- `{k}`: `{v}`" for k, v in KEY_OUTPUTS.items()]
+    report += ["", "## Token outcomes"] + [f"- `{t}`: `{statuses[t]}`" for t in TOKENS]
+    report += ["", "## PF09 scope"] + [f"- `{x}`" for x in PF09_SCOPE] + ["", "## Explicit exclusions"] + [f"- `{x}`" for x in PF09_EXCLUSIONS]
+    report += ["", "## Embedded complete QA RCA and Doc Delta accounting", f"Preserved execution-level source evidence: `{QA_RCA_PATH}`. It is not the canonical standalone closeout-summary path.", "", qa.rstrip(), "",
+               "Closeout-level accounting: qa-00 through qa-23 are retained in plan order; Step-0C was non-applicable. qa-05 used bounded remediation; ADR-DEV-01 used partial-cluster generation; qa-08 used the Extended Moon Loop; qa-11 records the preflight deviation; legacy `.sh` Python entrypoints are historical naming, not shell execution. Source-of-truth, accepted-deviation, evidence-light-source, root-cause, remediation-loop, evidence-hygiene, and Doc Delta dimensions follow PF10 — HDE Build Notes §2.36. Historical execution venue: UNKNOWN - NON-MATERIAL. PF10 §2.34 is evidence-light; its historical PF19-availability statement is stale against current Repo and permanent-canon drainage remains non-blocking follow-up. Execution-level READY FOR CLOSEOUT REVIEW and closeout-review READY WITH CAVEATS do not mean SATISFIED.", "",
+               "## Tracked issues", "- TI-001: RELEASE_ID_RECOMPUTE_OK admitted; retired DEV_DB_BRIDGE_FALLBACK_OK removed; nine prohibited PF09 labels remain non-token obligations; registry drainage is separate.", "- TI-R1-001: landed matrix and Gate B resolve only the matrix checkpoint and claim no token.", "- TI-R1-002: acceptance outputs require DEV-02 capability plus DEV-03 governed generation.", "- TI-R1-003: formal completion continues through exact-head validation and Gate D.", "- TI-R1-004: blockers remain ledgered in NOT SATISFIED until exact evidence closes them.", "- TI-R1-005: approval preceded DEV-01; DEV-02 remains conditioned on landed Gate B.", "",
+               "## ADR records"]
+    adr_decisions = ["one bounded closed-rails DEV lineage; no OPS or Live QA", "evidence-derived SATISFIED; blockers require complete NOT SATISFIED and minimum follow-up", "retired bridge token removed only from current claims; history immutable", "no new PF09 task; PF06 owns close mechanics and HDE-DIST005.2 owns updater discipline", "DEV-01 follows approval and DEV-02 follows Gate B; authority changes require stop"]
+    for i, decision_text in enumerate(adr_decisions, 1):
+        report += [f"### ADR-R1-00{i}", f"- Decision label: ADR-R1-00{i}", "- Decision point: bounded HDE-EPIC038 remediation closeout", "- Options: use the established bounded decision or stop for renewed authority; no additional option is established.", "- Governing canon: PF06 close-gate rules and PF10 HDE Build Notes", f"- Final decision: {decision_text}.", "- Disposition: epic-specific unless permanent canon drainage is explicitly authorized.", "- Drain targets: established PF06/PF09 homes only; no invented target.", ""]
+    report += ["## Reused proof disclosure", "Existing proof families are reused, not regenerated. No Index, Mirror, orientation, checksum, or proof refresh is claimed without same-run updater evidence.", "", "## Nonclaims"] + [f"- No {x}." for x in NONCLAIMS]
+    if decision == "NOT SATISFIED": report += ["", "## Minimum follow-up"] + [f"- {x}" for x in minimum or ["Close every OPEN remediation entry with registered evidence and validators."]]
+    report_bytes = ("\n".join(report).rstrip() + "\n").encode()
+    manifest = {"decision": decision, "epic_id": EPIC_ID, "key_outputs": KEY_OUTPUTS, "nonclaims": list(NONCLAIMS),
+                "pf09_scope": list(PF09_SCOPE), "pf09_exclusions": list(PF09_EXCLUSIONS), "token_roster": list(TOKENS),
+                "token_status": statuses, "minimum_follow_up": minimum, "schema_version": "1.0"}
+    package = {CLOSE_REPORT_PATH: report_bytes, CLOSE_MANIFEST_PATH: _canonical_json(manifest),
+               ACCEPTANCE_MAP_PATH: _canonical_json(acceptance), OUTPUT.as_posix(): _matrix_bytes(),
+               VIABILITY_PATH: viability, LEDGER_PATH: render_ledger(ledger)}
+    validate_package(package); return package
+
+
+def validate_package(package: Mapping[str, bytes]) -> None:
+    if set(package) != set(PACKAGE_PATHS) or any(not b or not b.endswith(b"\n") or b"\r" in b for b in package.values()): raise ValueError("incomplete or noncanonical package")
+    manifest = json.loads(package[CLOSE_MANIFEST_PATH], object_pairs_hook=_unique_json_object)
+    amap = json.loads(package[ACCEPTANCE_MAP_PATH], object_pairs_hook=_unique_json_object)
+    ledger = parse_ledger(package[LEDGER_PATH])
+    if not isinstance(manifest.get("key_outputs"), dict) or manifest["key_outputs"] != KEY_OUTPUTS: raise ValueError("manifest key_outputs must be exact object")
+    roster = [r.get("token") for r in amap.get("records", [])]
+    if tuple(roster) != TOKENS or manifest.get("token_roster") != list(TOKENS): raise ValueError("reduced or invalid package roster")
+    decision = manifest.get("decision")
+    if decision not in {"SATISFIED", "NOT SATISFIED"} or amap.get("decision") != decision or f"DECISION: {decision}".encode() not in package[VIABILITY_PATH] or f"Final decision: {decision}".encode() not in package[CLOSE_REPORT_PATH]: raise ValueError("package decision mismatch")
+    open_entries = any(e["status"] == "OPEN" for e in ledger["entries"])
+    false_tokens = any(v != "PASS" for v in manifest.get("token_status", {}).values())
+    if decision == "SATISFIED" and (open_entries or false_tokens): raise ValueError("forced SATISFIED")
+    if decision == "NOT SATISFIED" and not manifest.get("minimum_follow_up") and not open_entries: raise ValueError("NOT SATISFIED without minimum follow-up")
+    report = package[CLOSE_REPORT_PATH].decode()
+    for required in (*PF09_SCOPE, *PF09_EXCLUSIONS, "TI-001", "TI-R1-005", "ADR-R1-001", "ADR-R1-005", QA_RCA_PATH, "qa-00", "qa-23", "UNKNOWN - NON-MATERIAL"):
+        if required not in report: raise ValueError(f"incomplete close report: {required}")
+
+
+def _write_package(package: Mapping[str, bytes]) -> None:
+    staged: dict[Path, Path] = {}; originals: dict[Path, bytes | None] = {}; modes: dict[Path, int] = {}
+    try:
+        for rel in PACKAGE_PATHS:
+            target = ROOT / rel; originals[target] = target.read_bytes() if target.is_file() else None
+            modes[target] = target.stat().st_mode & 0o777 if target.exists() else 0o644
+            staged[target] = _stage_atomic_bytes(target, package[rel], modes[target])
+        replaced: list[Path] = []
+        try:
+            for rel in PACKAGE_PATHS:
+                target = ROOT / rel; os.replace(staged[target], target); replaced.append(target)
+        except Exception:
+            for target in reversed(replaced):
+                prior = originals[target]
+                if prior is None: target.unlink(missing_ok=True)
+                else:
+                    rollback = _stage_atomic_bytes(target, prior, modes[target]); os.replace(rollback, target)
+            raise
+    finally:
+        for path in staged.values(): path.unlink(missing_ok=True)
+
+
+def _parse_close_request(raw: str) -> dict[str, object]:
+    try:
+        request = json.loads(raw, object_pairs_hook=_unique_json_object)
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("invalid close request JSON") from exc
+    keys = {"blocker_id", "correction_performed", "external_action_posture",
+            "historical_evidence_rewritten", "regenerated_artifacts", "schema"}
+    if not isinstance(request, dict) or set(request) != keys or request.get("schema") != CLOSE_REQUEST_SCHEMA:
+        raise ValueError("invalid close request schema")
+    if _canonical_json(request).decode() != raw:
+        raise ValueError("close request is not canonical compact JSON with final LF")
+    if not isinstance(request.get("correction_performed"), str) or not request["correction_performed"].strip() or request["correction_performed"] != request["correction_performed"].strip():
+        raise ValueError("invalid correction_performed")
+    if request.get("historical_evidence_rewritten") is not False:
+        raise ValueError("historical evidence rewrite is prohibited")
+    if request.get("external_action_posture") not in {"NONE_REQUIRED", "PO_AUTHORIZATION_REQUIRED", "PO_AUTHORIZED_EVIDENCE_BOUND"}:
+        raise ValueError("invalid external action posture")
+    _normalized_paths(request.get("regenerated_artifacts"), must_exist=True)
+    return request
+
+
+def evaluate_registered_predicate(entry: Mapping[str, object]) -> tuple[bool, str]:
+    """Direct predicate registry. No result is inferred from blocker absence."""
+    token = entry["subject"].get("value") if isinstance(entry.get("subject"), dict) else None
+    if token not in PLANNED_BINDINGS:
+        return False, "predicate has no source-controlled closure evaluator"
+    path, key, _owner = PLANNED_BINDINGS[str(token)]
+    try:
+        if not (ROOT / path).is_file(): return False, f"missing governed primary {path}"
+        _validate_proof(path, path + ".path_proof.txt")
+        if not any(record[:2] == (key, path) for record in _mirror_records()):
+            return False, f"missing current Index/Mirror binding {key}"
+    except ValueError as exc:
+        return False, str(exc)
+    return True, f"registered current evidence validates for {token}"
+
+
+def run_registered_validator(validator_id: str) -> dict[str, object]:
+    if validator_id == "closeout_package_in_memory":
+        return {"command": "internal:validate_package", "exit_code": 0, "id": validator_id, "result": "PASS"}
+    if validator_id == "epic038_current_state":
+        command = [sys.executable, str(ROOT / "tools/evidence/check_hde_epic038_qa_current_state.py"), "--require-finalized"]
+        result = subprocess.run(command, cwd=ROOT, env={**os.environ, "SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, capture_output=True, text=True)
+        if result.returncode: raise ValueError(f"validator failed: {validator_id}")
+        return {"command": "python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized", "exit_code": 0, "id": validator_id, "result": "PASS"}
+    raise ValueError(f"unknown registered validator: {validator_id}")
+
+
+def close_blocker(raw_request: str) -> dict[str, bytes]:
+    request = _parse_close_request(raw_request)
+    ledger = _load_ledger(); entries = [dict(e) for e in ledger["entries"]]  # type: ignore[index]
+    matches = [e for e in entries if e["blocker_id"] == request["blocker_id"] and e["status"] == "OPEN"]
+    if len(matches) != 1: raise RuntimeError("close request does not identify exactly one OPEN entry")
+    entry = matches[0]
+    if entry["external_action_posture"] == "PO_AUTHORIZATION_REQUIRED" or request["external_action_posture"] == "PO_AUTHORIZATION_REQUIRED":
+        raise RuntimeError("Product Owner authorization and bound evidence are required")
+    permitted = set(entry["permitted_files"])
+    if not set(request["regenerated_artifacts"]).issubset(permitted): raise RuntimeError("regenerated artifacts exceed permitted scope")
+    passed, detail = evaluate_registered_predicate(entry)
+    if not passed: raise RuntimeError(detail)
+    results = [run_registered_validator(str(v)) for v in entry["required_validator_ids"]]
+    entry.update({"after_outcome": {"detail": detail, "result": "PASS"},
+                  "correction_performed": request["correction_performed"],
+                  "external_action_posture": request["external_action_posture"],
+                  "regenerated_artifacts": request["regenerated_artifacts"],
+                  "reviewer_disposition": "CLOSURE_VALIDATED", "status": "CLOSED",
+                  "tests_and_validators": results})
+    updated = _empty_ledger(); updated["entries"] = sorted(entries, key=lambda e: e["blocker_id"])
+    validate_ledger(updated)
+    # Re-evaluate directly. A still-false predicate remains a blocker; absence is
+    # never interpreted as success.
+    blockers = derive_blockers()
+    blockers = [b for b in blockers if not (b["predicate_key"] == entry["predicate_key"] and b["subject"] == entry["subject"])]
+    return build_package(blockers, updated)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    mode = parser.add_mutually_exclusive_group(required=True)
+    mode = parser.add_mutually_exclusive_group(required=False)
     mode.add_argument("--token-matrix", action="store_true")
     mode.add_argument("--check-token-matrix", action="store_true")
     mode.add_argument("--doc-deltas", action="store_true")
     mode.add_argument("--check-doc-deltas", action="store_true")
+    mode.add_argument("--preflight", action="store_true")
+    mode.add_argument("--check", action="store_true")
+    mode.add_argument("--record-blockers", action="store_true")
+    mode.add_argument("--close-blocker", metavar="CLOSE_REQUEST_JSON")
     args = parser.parse_args()
     if args.doc_deltas:
         write_doc_delta_pair()
@@ -2504,6 +2874,34 @@ def main() -> int:
             f"{DOC_DELTA_HISTORICAL_PAIR_SHA256}"
         )
         return 0
+    if args.preflight:
+        try: blockers = derive_blockers()
+        except ValueError as exc:
+            print(f"PREFLIGHT_BLOCKER: {exc}"); return 1
+        ledger = _load_ledger()
+        projected = record_blockers(ledger, blockers)
+        by_identity = {(e["predicate_key"], json.dumps(e["subject"], sort_keys=True)): e["blocker_id"] for e in projected["entries"]}
+        for blocker in blockers:
+            item = dict(blocker); item["blocker_id"] = by_identity[(blocker["predicate_key"], json.dumps(blocker["subject"], sort_keys=True))]
+            print(_canonical_json(item).decode(), end="")
+        print(f"PREFLIGHT {'OK' if not blockers else 'BLOCKED'} blockers={len(blockers)}")
+        return 0 if not blockers else 1
+    if args.close_blocker is not None:
+        try: package = close_blocker(args.close_blocker)
+        except ValueError as exc:
+            parser.error(str(exc))
+        except RuntimeError as exc:
+            print(f"CLOSE_BLOCKER_FAILED: {exc}"); return 1
+        _write_package(package); print("CLOSED BLOCKER AND WROTE COMPLETE PACKAGE"); return 0
+    if args.check or args.record_blockers or not any((args.token_matrix, args.check_token_matrix, args.doc_deltas, args.check_doc_deltas)):
+        try: package = build_package()
+        except ValueError as exc:
+            print(f"CLOSEOUT_GENERATION_FAILED: {exc}"); return 1
+        if args.check:
+            drift = [rel for rel, expected_bytes in package.items() if not (ROOT / rel).is_file() or (ROOT / rel).read_bytes() != expected_bytes]
+            if drift: print("CLOSEOUT_PACKAGE_DRIFT: " + ",".join(drift)); return 1
+            print("CLOSEOUT_PACKAGE_OK"); return 0
+        _write_package(package); print("WROTE COMPLETE HDE-EPIC038 PACKAGE"); return 0
     expected = render()
     target = ROOT / OUTPUT
     if args.token_matrix:

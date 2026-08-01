@@ -2467,6 +2467,40 @@ EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "epic038.close_report", "discovered_physical_path": "audit/EPIC-038_close_report.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_report", "schema_version": "1.0"},
+    {"artifact_key": "epic038.manifest", "discovered_physical_path": "audit/EPIC-038_MANIFEST.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_manifest", "schema_version": "1.0"},
+    {"artifact_key": "epic038.acceptance_map", "discovered_physical_path": "docs/acceptance_map_epic038.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map", "schema_version": "1.0"},
+    {"artifact_key": "epic038.acceptance_map_viability", "discovered_physical_path": "audit/qa/hde-epic038/acceptance_map_viability.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map_viability", "schema_version": "1.0"},
+    {"artifact_key": "epic038.closeout_remediation_ledger", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_closeout_remediation_ledger", "schema_version": "1.0"},
+]
+
+
+def _load_epic038_closeout_entries() -> list[dict[str, object]]:
+    """Activate the DEV-03 family as a unit; a partial family is never valid."""
+    paths = [ROOT / str(e["discovered_physical_path"]) for e in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
+    present = [path.is_file() for path in paths]
+    if not any(present):
+        return []
+    if not all(present):
+        missing = [str(e["discovered_physical_path"]) for e, exists in zip(EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS, present) if not exists]
+        raise SystemExit("INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:" + ",".join(missing))
+    try:
+        manifest = json.loads((ROOT / "audit/EPIC-038_MANIFEST.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit("INVALID_EPIC038_CLOSE_MANIFEST") from exc
+    expected_outputs = {
+        "acceptance_map": "docs/acceptance_map_epic038.json",
+        "acceptance_map_viability": "audit/qa/hde-epic038/acceptance_map_viability.log",
+        "close_manifest": "audit/EPIC-038_MANIFEST.json",
+        "close_report": "audit/EPIC-038_close_report.md",
+        "closeout_remediation_ledger": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+        "token_matrix": "audit/qa/hde-epic038/token_evidence_matrix.md",
+    }
+    if manifest.get("epic_id") != "HDE-EPIC038" or manifest.get("key_outputs") != expected_outputs:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_BINDINGS")
+    return [dict(entry) for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
+
 
 EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
@@ -3203,6 +3237,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
+            *_load_epic038_closeout_entries(),
             *EPIC038_QA_PRIMARY_ARTIFACTS,
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,

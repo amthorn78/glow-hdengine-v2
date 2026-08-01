@@ -2527,3 +2527,109 @@ def test_doc_delta_cli_rejects_abbreviated_modes_without_writes(
         path: (hashlib.sha256(path.read_bytes()).digest(), path.stat().st_mtime_ns)
         for path in watched
     }
+
+
+def _dev02_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    rows = closeout.build_rows()
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+    monkeypatch.setattr(closeout, "build_rows", lambda: rows)
+    matrix = tmp_path / closeout.OUTPUT
+    matrix.parent.mkdir(parents=True)
+    matrix.write_bytes((ROOT / closeout.OUTPUT).read_bytes())
+    qa = tmp_path / closeout.QA_RCA_PATH
+    qa.parent.mkdir(parents=True, exist_ok=True)
+    qa.write_bytes((ROOT / closeout.QA_RCA_PATH).read_bytes())
+    return tmp_path
+
+
+def test_dev02_complete_satisfied_package_is_deterministic(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    first = closeout.build_package([], closeout._empty_ledger())
+    second = closeout.build_package([], closeout._empty_ledger())
+    assert first == second
+    manifest = json.loads(first[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "SATISFIED"
+    assert isinstance(manifest["key_outputs"], dict)
+    assert tuple(manifest["token_roster"]) == closeout.TOKENS
+
+
+def test_dev02_not_satisfied_package_is_complete_and_has_follow_up(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    blocker = closeout._descriptor("fixture.false", "CHECK", "fixture", "fixture is false",
+        [{"kind": "CHECK", "value": "fixture"}], "internal:fixture",
+        "REGISTRY_OR_WIRING_DEFECT", ["tools/evidence/generate_hde_epic038_closeout.py"],
+        "Correct the fixture and rerun its registered validator.", ["closeout_package_in_memory"])
+    package = closeout.build_package([blocker], closeout._empty_ledger())
+    assert set(package) == set(closeout.PACKAGE_PATHS)
+    assert b"Final decision: NOT SATISFIED" in package[closeout.CLOSE_REPORT_PATH]
+    assert b"Minimum follow-up" in package[closeout.CLOSE_REPORT_PATH]
+
+
+def test_dev02_atomic_write_is_idempotent(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    package = closeout.build_package([], closeout._empty_ledger())
+    closeout._write_package(package)
+    before = {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+    closeout._write_package(package)
+    assert before == {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+
+
+def test_dev02_atomic_write_rolls_back_every_replacement(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    package = closeout.build_package([], closeout._empty_ledger())
+    closeout._write_package(package)
+    before = {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+    changed = dict(package); changed[closeout.CLOSE_REPORT_PATH] += b"changed\n"
+    real_replace = closeout.os.replace; calls = 0
+    def fail_once(source, target):
+        nonlocal calls
+        calls += 1
+        if calls == 3: raise OSError("injected replacement failure")
+        return real_replace(source, target)
+    monkeypatch.setattr(closeout.os, "replace", fail_once)
+    with pytest.raises(OSError, match="injected"):
+        closeout._write_package(changed)
+    assert before == {p: (tmp_path / p).read_bytes() for p in closeout.PACKAGE_PATHS}
+
+
+def test_dev02_ledger_ids_recur_without_reopening_closed_history(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    blocker = closeout._descriptor("fixture.false", "CHECK", "fixture", "false",
+        [{"kind": "DETAIL", "value": "false"}], "internal:fixture",
+        "REGISTRY_OR_WIRING_DEFECT", [], "fix it", [])
+    first = closeout.record_blockers(closeout._empty_ledger(), [blocker])
+    assert first == closeout.record_blockers(first, [blocker])
+    first["entries"][0].update({"status": "CLOSED", "reviewer_disposition": "CLOSURE_VALIDATED",
+        "correction_performed": "Normalized correction", "after_outcome": {"detail": "pass", "result": "PASS"},
+        "tests_and_validators": [{"command": "internal:fixture", "exit_code": 0, "id": "fixture", "result": "PASS"}]})
+    second = closeout.record_blockers(first, [blocker])
+    assert [entry["blocker_id"][-4:] for entry in second["entries"]] == ["0001", "0002"]
+
+
+@pytest.mark.parametrize("argument", ["--pre", "--rec", "--close-b"])
+def test_dev02_cli_abbreviations_are_rejected(argument: str) -> None:
+    result = subprocess.run([sys.executable, str(ROOT / "tools/evidence/generate_hde_epic038_closeout.py"), argument], cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode == 2
+
+
+def test_dev02_updater_family_is_conditional_and_partial_fails(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(updater, "ROOT", tmp_path)
+    assert updater._load_epic038_closeout_entries() == []
+    path = tmp_path / "audit/EPIC-038_close_report.md"
+    path.parent.mkdir(parents=True); path.write_text("partial\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="INCOMPLETE_EPIC038_CLOSEOUT_FAMILY"):
+        updater._load_epic038_closeout_entries()
+
+
+def test_dev02_manifest_list_and_decision_mismatch_fail_closed(tmp_path, monkeypatch) -> None:
+    _dev02_root(tmp_path, monkeypatch)
+    package = closeout.build_package([], closeout._empty_ledger())
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    manifest["key_outputs"] = list(manifest["key_outputs"].values())
+    broken = dict(package); broken[closeout.CLOSE_MANIFEST_PATH] = closeout._canonical_json(manifest)
+    with pytest.raises(ValueError, match="key_outputs"):
+        closeout.validate_package(broken)
+    manifest["key_outputs"] = closeout.KEY_OUTPUTS; manifest["decision"] = "NOT SATISFIED"
+    broken[closeout.CLOSE_MANIFEST_PATH] = closeout._canonical_json(manifest)
+    with pytest.raises(ValueError, match="decision mismatch"):
+        closeout.validate_package(broken)
