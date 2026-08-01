@@ -2324,11 +2324,13 @@ def _release_attestation(
         "schema": "hde.release_attestation.v1",
         "source_commit": source_commit,
         "source_commit_exact": True,
+        "source_tree_sha256": "c" * 64,
         "manifest_sha256": manifest_sha256,
         "release_id": manifest_sha256,
         "validation_result": "PASS",
         "release_admission": "PR06R_B_FINAL_PASS",
         "pipeline_stop": None,
+        "rails": dict(sorted(closeout.RELEASE_ATTESTATION_RAILS.items())),
     }
 
 
@@ -2444,6 +2446,26 @@ def test_release_row_rejects_manifest_only_substitution() -> None:
             lambda payload: payload.__setitem__("manifest_sha256", "e" * 64),
             "manifest_sha256",
         ),
+        (
+            lambda payload: payload.__setitem__("source_tree_sha256", "bad"),
+            "source_tree_sha256",
+        ),
+        (
+            lambda payload: payload.__setitem__("validation_result", "FAIL"),
+            "validation_result",
+        ),
+        (
+            lambda payload: payload.__setitem__("release_admission", "DENIED"),
+            "release_admission",
+        ),
+        (
+            lambda payload: payload.__setitem__("pipeline_stop", "release"),
+            "pipeline_stop",
+        ),
+        (
+            lambda payload: payload["rails"].__setitem__("ALLOW_NETWORK", "1"),
+            "rails",
+        ),
     ],
 )
 def test_release_attestation_rejects_stale_or_source_mismatched_identity(
@@ -2459,6 +2481,16 @@ def test_release_attestation_rejects_stale_or_source_mismatched_identity(
             expected_source_commit=source_commit,
             manifest_sha256=manifest_sha256,
         )
+
+
+def test_release_attestation_core_payload_accepts_current_closed_rails() -> None:
+    source_commit = "a" * 40
+    manifest_sha256 = "d" * 64
+    closeout.validate_release_attestation_payload(
+        _release_attestation(source_commit, manifest_sha256),
+        expected_source_commit=source_commit,
+        manifest_sha256=manifest_sha256,
+    )
 
 
 def test_render_is_deterministic_lf_terminated_and_never_claims_pass() -> None:
@@ -2760,6 +2792,44 @@ def dev02_valid_package(dev02_fixed_repo: Path) -> dict[str, bytes]:
     return package
 
 
+def test_dev02_release_token_stays_unclaimed_without_current_attestation(
+    dev02_repo: Path,
+) -> None:
+    result = _token_result(
+        closeout.evaluate_closeout(), "RELEASE_ID_RECOMPUTE_OK"
+    )
+    assert result.status == "UNCLAIMED"
+    assert "external exact-source release attestation" in result.detail
+    assert "retained identity captures remain historical" in result.detail
+
+
+def test_dev02_release_semantic_rejects_canonical_manifest_content_drift(
+    dev02_repo: Path,
+) -> None:
+    manifest_path = dev02_repo / closeout.RELEASE_MANIFEST_PATH
+    payload = json.loads(manifest_path.read_bytes())
+    payload["files"][0]["sha256"] = "0" * 64
+    _replace_json(manifest_path, payload)
+    problems = closeout.manifest_only_problems(manifest_path)
+    assert any("manifest_file_audit:BAD" in problem for problem in problems)
+    row = next(
+        row
+        for row in closeout.build_rows()
+        if row.token == "RELEASE_ID_RECOMPUTE_OK"
+    )
+    with pytest.raises(ValueError, match="manifest content validation failed"):
+        closeout._semantic_release(row)
+    snapshot = closeout.evaluate_closeout()
+    assert _token_result(snapshot, "RELEASE_ID_RECOMPUTE_OK").status == "FAIL"
+    blocker = next(
+        item
+        for item in snapshot.blockers
+        if item["subject"]["value"] == "RELEASE_ID_RECOMPUTE_OK"
+    )
+    assert blocker["failure_class"] == "EVIDENCE_PRODUCER_OR_VALIDATOR_DEFECT"
+    assert blocker["permitted_files"] == []
+
+
 def test_dev02_updater_repairs_orientation_producer_stale_proof_before_full_validation(
     dev02_repo: Path,
 ) -> None:
@@ -2929,12 +2999,25 @@ def _snapshot_text(snapshot: object) -> str:
     )
 
 
-def test_dev02_complete_positive_fixture_is_material_and_evidence_derived(
+def test_dev02_complete_registered_fixture_remains_truthfully_nonclaiming(
     dev02_fixed_repo: Path,
 ) -> None:
     snapshot = closeout.evaluate_closeout()
     assert tuple(result.token for result in snapshot.token_results) == closeout.TOKENS
-    assert all(result.status == "PASS" for result in snapshot.token_results)
+    pending = {
+        result.token
+        for result in snapshot.token_results
+        if result.status == "UNCLAIMED"
+    }
+    assert pending == {
+        *closeout.PLANNED_BINDINGS,
+        "RELEASE_ID_RECOMPUTE_OK",
+    }
+    assert all(
+        result.status == "PASS"
+        for result in snapshot.token_results
+        if result.token not in pending
+    )
     assert not snapshot.blockers
     assert len(snapshot.proof_families) == sum(
         len(row.primary_evidence) for row in closeout.build_rows()
@@ -2955,7 +3038,8 @@ def test_dev02_complete_positive_fixture_is_material_and_evidence_derived(
     second = closeout.build_package()
     assert first == second == _package_at(dev02_fixed_repo)
     manifest = json.loads(first[closeout.CLOSE_MANIFEST_PATH])
-    assert manifest["decision"] == "SATISFIED"
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert manifest["minimum_follow_up"]
     assert isinstance(manifest["key_outputs"], dict)
     assert tuple(manifest["token_roster"]) == closeout.TOKENS
 
@@ -2995,19 +3079,53 @@ def test_dev02_pre_generation_source_stays_unclaimed_in_provisional_candidate(
     assert planned
     assert reused
     assert not snapshot.blockers
-    assert all(result.status == "PASS" for result in reused.values())
+    assert reused["RELEASE_ID_RECOMPUTE_OK"].status == "UNCLAIMED"
+    assert all(
+        result.status == "PASS"
+        for token, result in reused.items()
+        if token != "RELEASE_ID_RECOMPUTE_OK"
+    )
     assert all(result.status == "UNCLAIMED" for result in planned.values())
     package = closeout.build_package(evaluation_snapshot=snapshot)
     manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
-    assert manifest["decision"] == "SATISFIED"
+    assert manifest["decision"] == "NOT SATISFIED"
     assert all(
         manifest["source_token_status"][token] == "UNCLAIMED" for token in planned
     )
-    assert all(manifest["token_status"][token] == "PASS" for token in planned)
-    assert not manifest["minimum_follow_up"]
+    assert all(manifest["token_status"][token] == "UNCLAIMED" for token in planned)
+    assert manifest["token_status"]["RELEASE_ID_RECOMPUTE_OK"] == "UNCLAIMED"
+    assert manifest["minimum_follow_up"]
+    assert {
+        json.loads(package[path])["result"]
+        for path in (
+            closeout.PRECOMMIT_CHECKLIST_PATH,
+            closeout.POSTCOMMIT_CHECKLIST_PATH,
+        )
+    } == {"FAIL"}
     report = package[closeout.CLOSE_REPORT_PATH].decode("utf-8")
-    assert "provisional" in report.lower() or "candidate" in report.lower()
     assert "Source-tree planned tokens remain UNCLAIMED" in report
+
+
+@pytest.mark.parametrize("token", tuple(closeout.PLANNED_BINDINGS))
+def test_dev02_pass_shaped_planned_primary_without_execution_receipt_is_unclaimed(
+    token: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    row = next(row for row in closeout.build_rows() if row.token == token)
+    monkeypatch.setattr(closeout, "_validate_row_bindings", lambda _row: None)
+    monkeypatch.setattr(closeout, "_checklist_payload_result", lambda _row: "PASS")
+    evaluators = dict(closeout.TOKEN_EVALUATOR_REGISTRY)
+    evaluators[token] = lambda _row: "PASS-shaped primary semantics validate"
+    monkeypatch.setattr(closeout, "TOKEN_EVALUATOR_REGISTRY", evaluators)
+
+    result = closeout._planned_result(
+        row,
+        ("REGISTERED", "complete primary and companion family validates"),
+    )
+
+    assert result.status == "UNCLAIMED"
+    assert "do not prove" in result.detail
+    assert "execution evidence" in result.minimum_follow_up
 
 
 def test_dev02_missing_token_evaluator_cannot_default_to_pass(
@@ -3040,8 +3158,18 @@ def test_dev02_positive_evaluation_executes_every_token_specific_evaluator(
         wrapped[token] = observe
     monkeypatch.setattr(closeout, "TOKEN_EVALUATOR_REGISTRY", wrapped)
     snapshot = closeout.evaluate_closeout()
-    assert calls == list(closeout.TOKENS)
-    assert all(result.status == "PASS" for result in snapshot.token_results)
+    assert calls == [
+        token
+        for token in closeout.TOKENS
+        if token
+        not in {"QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"}
+    ]
+    assert all(
+        result.status == "PASS"
+        for result in snapshot.token_results
+        if result.token
+        not in {*closeout.PLANNED_BINDINGS, "RELEASE_ID_RECOMPUTE_OK"}
+    )
 
 
 @pytest.mark.parametrize(
@@ -3321,7 +3449,7 @@ def test_dev02_close_report_manifest_decision_mismatch_is_rejected(
     dev02_valid_package: Mapping[str, bytes],
 ) -> None:
     def mutation(payload: dict[str, object]) -> None:
-        payload["decision"] = "NOT SATISFIED"
+        payload["decision"] = "SATISFIED"
 
     broken = _mutate_package_json(
         dev02_valid_package, closeout.CLOSE_MANIFEST_PATH, mutation
@@ -3613,8 +3741,10 @@ def _assert_dev02_planned_family_fails_closed(
     assert all(
         result.status == "PASS"
         for result in snapshot.token_results
-        if result.token not in planned_tokens
+        if result.token
+        not in {*planned_tokens, "RELEASE_ID_RECOMPUTE_OK"}
     )
+    assert _token_result(snapshot, "RELEASE_ID_RECOMPUTE_OK").status == "UNCLAIMED"
     assert all(
         obligation.get("status") == "PASS"
         for obligation in snapshot.obligations
@@ -3837,7 +3967,7 @@ def test_dev02_complete_canonical_primary_only_transition_converges(
         result.status
         for result in converged.token_results
         if result.token in closeout.PLANNED_BINDINGS
-    } == {"PASS"}
+    } == {"UNCLAIMED"}
     _assert_success(
         _run_repo_tool(
             dev02_repo,
@@ -4380,15 +4510,19 @@ def test_dev02_close_executes_real_predicate_and_all_registered_validators(
         for result in entry["tests_and_validators"]
     )
     manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
-    assert manifest["decision"] == "SATISFIED"
-    assert all(manifest["token_status"][token] == "PASS" for token in closeout.TOKENS)
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert {
+        token
+        for token, status in manifest["token_status"].items()
+        if status == "UNCLAIMED"
+    } == {*closeout.PLANNED_BINDINGS, "RELEASE_ID_RECOMPUTE_OK"}
     assert {
         json.loads(package[path])["result"]
         for path in (
             closeout.PRECOMMIT_CHECKLIST_PATH,
             closeout.POSTCOMMIT_CHECKLIST_PATH,
         )
-    } == {"PASS"}
+    } == {"FAIL"}
 
     closeout._write_package(package)
     _converge_dev02_evidence_graph(root)

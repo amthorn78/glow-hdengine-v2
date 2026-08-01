@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.presenter import emitter
+from scripts.release_id_recompute import manifest_only_problems
 
 OUTPUT = Path("audit/qa/hde-epic038/token_evidence_matrix.md")
 EPIC_ID = "HDE-EPIC038"
@@ -167,6 +168,14 @@ RELEASE_ID_PATH = "artifacts/identity/release_id.json"
 RELEASE_ID_KEY = "epic038.pr01.identity_release_id"
 RELEASE_RECOMPUTE_PATH = "artifacts/identity/release_id_recompute.log"
 RELEASE_RECOMPUTE_KEY = "epic038.pr01.identity_release_id_recompute"
+RELEASE_ATTESTATION_RAILS: Mapping[str, str] = {
+    "ALLOW_NETWORK": "0",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "PIP_NO_INDEX": "1",
+    "SAFE_MODE": "1",
+    "TZ": "UTC",
+}
 DOC_DELTA_PRIMARY_PATH = "audit/docdeltas/hde-epic038_doc_deltas.md"
 DOC_DELTA_PRIMARY_KEY = "epic038.doc_deltas"
 DOC_DELTA_CAPTURE_PATH = "audit/qa/hde-epic038/00_meta/doc_deltas.md"
@@ -1955,10 +1964,17 @@ def validate_release_attestation_payload(
         "validation_result": "PASS",
         "release_admission": "PR06R_B_FINAL_PASS",
         "pipeline_stop": None,
+        "rails": dict(sorted(RELEASE_ATTESTATION_RAILS.items())),
     }
     for key, expected in required.items():
         if payload.get(key) != expected:
             raise ValueError(f"release attestation mismatch: {key}")
+    if not _hex64(payload.get("source_tree_sha256")):
+        raise ValueError("release attestation mismatch: source_tree_sha256")
+
+
+class EvidencePending(Exception):
+    """A decisive current proof is not available and must remain unclaimed."""
 
 
 def _validate_qa19_execution(
@@ -3710,14 +3726,16 @@ def _semantic_no_io(_row: Row) -> str:
 
 
 def _semantic_release(_row: Row) -> str:
+    problems = manifest_only_problems(ROOT / RELEASE_MANIFEST_PATH)
+    if problems:
+        raise ValueError(
+            "current release manifest content validation failed: "
+            + "; ".join(problems)
+        )
     manifest_digest, captured_digest = validate_release_identity_family()
     if not (_hex64(manifest_digest) and _hex64(captured_digest)):
         raise ValueError("release identity digest shape mismatch")
-    return (
-        "current canonical release manifest validates and the immutable retained "
-        f"capture is internally coherent (manifest={manifest_digest}; "
-        f"retained_capture={captured_digest})"
-    )
+    raise EvidencePending
 
 
 def _checklist_payload_result(row: Row) -> str:
@@ -3940,7 +3958,9 @@ def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
     evidence = (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key))
     follow_up = (
         f"DEV-03 must canonically produce {path}, run the canonical evidence "
-        "updater, and establish the exact proof and Human Index/Machine Mirror binding."
+        "updater, establish the exact proof and Human Index/Machine Mirror binding, "
+        "and retain successful execution evidence for every exact planned command "
+        "before this token may pass."
     )
     state, state_detail = family_state
     if state == "FAIL":
@@ -3983,8 +4003,9 @@ def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
                 ),
                 evidence,
                 (
-                    "Correct and close the originating package blocker, regenerate "
-                    f"{path}, and re-establish its canonical updater fixed point."
+                    "Regenerate the governed package after every originating blocker "
+                    "closes, re-establish its canonical updater fixed point, and "
+                    "retain successful execution evidence for every exact planned command."
                 ),
             )
         detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
@@ -3997,29 +4018,16 @@ def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
             evidence,
             follow_up,
         )
-    return _planned_pass_result(row, detail=detail)
-
-
-def _planned_pass_result(row: Row, *, detail: str | None = None) -> TokenResult:
-    """Return the one canonical final result for a validated planned binding."""
-    path, key, _owner = PLANNED_BINDINGS[row.token]
-    if detail is None:
-        if row.token == "TESTS_PASS_OK":
-            detail = "current governed close report is complete and in-memory validated"
-        else:
-            phase = (
-                "precommit"
-                if row.token == "QA_PRECOMMIT_CHECKLIST_OK"
-                else "postcommit"
-            )
-            detail = f"current {phase} checklist is canonical and records PASS"
     return TokenResult(
         row.token,
-        "PASS",
+        "UNCLAIMED",
         f"token.{row.token}.current_governed_result",
-        detail,
-        (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key)),
-        "NONE",
+        (
+            f"{detail}; current primary and companion bytes are necessary but do "
+            "not prove that the exact planned commands executed successfully"
+        ),
+        evidence,
+        follow_up,
     )
 
 
@@ -4035,6 +4043,12 @@ def _current_result(row: Row) -> TokenResult:
         _validate_row_bindings(row)
         _validate_live_qa(row)
         detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+    except EvidencePending as exc:
+        if row.token != "RELEASE_ID_RECOMPUTE_OK":
+            raise ValueError(
+                f"unsupported pending-evidence token: {row.token}"
+            ) from exc
+        return _unclaimed_release_result(row)
     except (OSError, UnicodeError, ValueError) as exc:
         return TokenResult(
             row.token,
@@ -4054,8 +4068,58 @@ def _current_result(row: Row) -> TokenResult:
     )
 
 
+def _unclaimed_release_result(
+    row: Row, *, detail: str | None = None
+) -> TokenResult:
+    if row.token != "RELEASE_ID_RECOMPUTE_OK":
+        raise ValueError("release pending result used for another token")
+    if detail is None:
+        manifest_digest, captured_digest = validate_release_identity_family()
+        detail = (
+            "current manifest content validates, but no verified external "
+            "exact-source release attestation was supplied; retained identity "
+            "captures remain historical "
+            f"(manifest={manifest_digest}; retained_capture={captured_digest})"
+        )
+    evidence = tuple(
+        ("ARTIFACT_PATH", path) for path in row.primary_evidence
+    ) + tuple(("ARTIFACT_KEY", key) for key in row.artifact_keys)
+    return TokenResult(
+        row.token,
+        "UNCLAIMED",
+        f"token.{row.token}.current_governed_result",
+        detail,
+        evidence,
+        (
+            "Validate the current canonical manifest contents and supply the "
+            "canonical external exact-source release attestation for this source "
+            "head before RELEASE_ID_RECOMPUTE_OK may pass."
+        ),
+    )
+
+
 def _token_blocker(result: TokenResult) -> Mapping[str, object]:
     row = {item.token: item for item in build_rows()}[result.token]
+    if result.token == "RELEASE_ID_RECOMPUTE_OK":
+        return _descriptor(
+            result.predicate_key,
+            "TOKEN",
+            result.token,
+            result.detail,
+            [
+                {"kind": kind, "value": value}
+                for kind, value in result.decisive_evidence
+            ],
+            (
+                "python scripts/release_id_recompute.py --check-manifest-only; "
+                "python tools/evidence/build_release_attestation.py --verify "
+                '"$RUNNER_TEMP/hde-release-attestation" --require-clean'
+            ),
+            "EVIDENCE_PRODUCER_OR_VALIDATOR_DEFECT",
+            [],
+            result.minimum_follow_up,
+            ["closeout_package_in_memory", "epic038_current_state"],
+        )
     permitted = [
         path
         for path in row.primary_evidence
@@ -4474,13 +4538,21 @@ def _source_results_for_fingerprint(
     for result in results:
         status = source_status.get(result.token)
         if result.token in PLANNED_BINDINGS:
-            if status == "UNCLAIMED" and result.status in {"UNCLAIMED", "PASS"}:
+            if status == "UNCLAIMED" and result.status == "UNCLAIMED":
                 rebuilt.append(_unclaimed_planned_result(rows[result.token]))
                 continue
             if status == "FAIL" and result.status == "FAIL":
                 rebuilt.append(result)
                 continue
             raise ValueError("manifest canonical planned source-token status mismatch")
+        if result.token == "RELEASE_ID_RECOMPUTE_OK":
+            if status == "UNCLAIMED" and result.status == "UNCLAIMED":
+                rebuilt.append(_unclaimed_release_result(rows[result.token]))
+                continue
+            if status == result.status and result.status in {"PASS", "FAIL"}:
+                rebuilt.append(result)
+                continue
+            raise ValueError("manifest canonical release source-token status mismatch")
         if result.status not in {"PASS", "FAIL"} or status != result.status:
             raise ValueError("manifest canonical reused source-token status mismatch")
         rebuilt.append(result)
@@ -4692,7 +4764,9 @@ def _unclaimed_planned_result(row: Row) -> TokenResult:
         (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key)),
         (
             f"DEV-03 must canonically produce {path}, run the canonical evidence "
-            "updater, and establish the exact proof and Human Index/Machine Mirror binding."
+            "updater, establish the exact proof and Human Index/Machine Mirror "
+            "binding, and retain successful execution evidence for every exact "
+            "planned command before this token may pass."
         ),
     )
 
@@ -4797,18 +4871,20 @@ def _validate_snapshot_contract(snapshot: EvaluationSnapshot) -> None:
 
 
 def _canonical_source_snapshot(snapshot: EvaluationSnapshot) -> EvaluationSnapshot:
-    """Normalize every nonfailing planned state to pre-generation UNCLAIMED.
+    """Normalize nonclaiming planned lifecycle details without promotion."""
 
-    ``source_*`` surfaces describe Gate D's pre-generation evaluation.  They
-    therefore remain stable across the DEV-03 fixed point when a planned family
-    is either derived UNCLAIMED (including a truthful FAIL checklist transition)
-    or current governed PASS evidence.  Actual planned FAIL states remain FAIL.
-    """
+    if any(
+        item.token in PLANNED_BINDINGS and item.status == "PASS"
+        for item in snapshot.token_results
+    ):
+        raise ValueError(
+            "planned token PASS requires governed execution evidence that this "
+            "DEV-02 evaluator does not consume"
+        )
     rows = {row.token: row for row in build_rows()}
     normalized = tuple(
         _unclaimed_planned_result(rows[item.token])
-        if item.token in PLANNED_BINDINGS
-        and item.status in {"PASS", "UNCLAIMED"}
+        if item.token in PLANNED_BINDINGS and item.status == "UNCLAIMED"
         else item
         for item in snapshot.token_results
     )
@@ -4822,37 +4898,8 @@ def _canonical_source_snapshot(snapshot: EvaluationSnapshot) -> EvaluationSnapsh
     )
 
 
-def _projected_candidate_results(
-    snapshot: EvaluationSnapshot,
-) -> tuple[TokenResult, ...]:
-    planned_tokens = set(PLANNED_BINDINGS)
-    eligible = (
-        not snapshot.blockers
-        and all(item.get("status") == "PASS" for item in snapshot.obligations)
-        and all(
-            item.status == "PASS"
-            for item in snapshot.token_results
-            if item.token not in planned_tokens
-        )
-        and all(
-            item.status in {"PASS", "UNCLAIMED"}
-            for item in snapshot.token_results
-            if item.token in planned_tokens
-        )
-    )
-    if not eligible:
-        return snapshot.token_results
-    rows = {row.token: row for row in build_rows()}
-    return tuple(
-        _planned_pass_result(rows[item.token])
-        if item.token in planned_tokens
-        else item
-        for item in snapshot.token_results
-    )
-
-
 def _validate_candidate_primary_bytes(
-    row: Row, package: Mapping[str, bytes]
+    row: Row, result: TokenResult, package: Mapping[str, bytes]
 ) -> None:
     path, _key, _owner = PLANNED_BINDINGS[row.token]
     try:
@@ -4868,7 +4915,7 @@ def _validate_candidate_primary_bytes(
             raise ValueError("candidate close report is not UTF-8") from exc
         required = (
             "# HDE-EPIC038 Close Report",
-            "## Final decision: SATISFIED",
+            "## Final decision: NOT SATISFIED",
             "DEV-02 in-memory package validation: PASS",
             "## Exact package pointers",
             "## Token outcomes",
@@ -4878,30 +4925,25 @@ def _validate_candidate_primary_bytes(
             "## Reused proof disclosure",
             "## Nonclaims",
         )
-        if any(value not in text for value in required) or any(
-            f"- {token}: PASS;" not in text for token in TOKENS
+        if any(value not in text for value in required) or (
+            f"- {row.token}: {result.status};" not in text
         ):
             raise ValueError("candidate close report semantic contract mismatch")
         return
     phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
-    if raw != _render_checklist(phase, result="PASS"):
+    if raw != _render_checklist(phase, result="FAIL"):
         raise ValueError(f"candidate checklist semantic mismatch: {row.token}")
 
 
 def _candidate_token_results(
     snapshot: EvaluationSnapshot, package: Mapping[str, bytes]
 ) -> tuple[TokenResult, ...]:
-    """Promote only a clean projected candidate whose actual primaries validate."""
-    projected = _projected_candidate_results(snapshot)
-    promoted = [
-        item
-        for before, item in zip(snapshot.token_results, projected)
-        if before.status == "UNCLAIMED" and item.status == "PASS"
-    ]
+    """Validate planned primaries without converting their evidence posture."""
     rows = {row.token: row for row in build_rows()}
-    for item in promoted:
-        _validate_candidate_primary_bytes(rows[item.token], package)
-    return projected
+    for item in snapshot.token_results:
+        if item.token in PLANNED_BINDINGS:
+            _validate_candidate_primary_bytes(rows[item.token], item, package)
+    return snapshot.token_results
 
 
 def _minimum_follow_up(
@@ -5171,11 +5213,7 @@ def _construct_package(
     open_entries = [
         entry for entry in ledger["entries"] if entry["status"] == "OPEN"  # type: ignore[index]
     ]
-    results = (
-        snapshot.token_results
-        if open_entries
-        else _projected_candidate_results(snapshot)
-    )
+    results = snapshot.token_results
     decision = (
         "SATISFIED"
         if all(item.status == "PASS" for item in results)
@@ -5219,7 +5257,13 @@ def _construct_package(
         "tracked_issues": authority["tracked_issues"],
     }
     checklist_result = (
-        "PASS" if not snapshot.blockers and not open_entries else "FAIL"
+        "PASS"
+        if not snapshot.blockers
+        and not open_entries
+        and all(
+            statuses[token] == "PASS" for token in PLANNED_BINDINGS
+        )
+        else "FAIL"
     )
     package = {
         CLOSE_REPORT_PATH: _report_bytes(snapshot, results, decision, minimum),
@@ -5235,11 +5279,7 @@ def _construct_package(
             "POSTCOMMIT", result=checklist_result
         ),
     }
-    validated_results = (
-        snapshot.token_results
-        if open_entries
-        else _candidate_token_results(snapshot, package)
-    )
+    validated_results = _candidate_token_results(snapshot, package)
     if validated_results != results:
         raise ValueError("candidate result projection changed after primary-byte validation")
     return package
@@ -5318,7 +5358,7 @@ def _bootstrap_snapshot(
             continue
         evidence = raw.get("decisive_evidence")
         if (
-            raw.get("status") not in {"UNCLAIMED", "PASS"}
+            raw.get("status") != "UNCLAIMED"
             or not isinstance(evidence, list)
             or any(
                 not isinstance(item, dict)
@@ -5478,14 +5518,7 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
         or set(source_status) != set(TOKENS)
         or any(value not in {"PASS", "UNCLAIMED", "FAIL"} for value in source_status.values())
         or any(
-            not (
-                source_status[token] == evaluation_by_token[token]["status"]
-                or (
-                    token in PLANNED_BINDINGS
-                    and source_status[token] == "UNCLAIMED"
-                    and evaluation_by_token[token]["status"] == "PASS"
-                )
-            )
+            source_status[token] != evaluation_by_token[token]["status"]
             for token in TOKENS
         )
     ):
@@ -5728,6 +5761,14 @@ def validate_package_structure(package: Mapping[str, bytes]) -> None:
     checklist_result = pre.get("result")
     if checklist_result not in {"PASS", "FAIL"} or post.get("result") != checklist_result:
         raise ValueError("checklist result mismatch")
+    expected_checklist_result = (
+        "PASS"
+        if all(token_status[token] == "PASS" for token in PLANNED_BINDINGS)
+        and not open_entries
+        else "FAIL"
+    )
+    if checklist_result != expected_checklist_result:
+        raise ValueError("checklist result lacks execution-derived token support")
     if pre != json.loads(_render_checklist("PRECOMMIT", result=checklist_result)):
         raise ValueError("precommit checklist mismatch")
     if post != json.loads(_render_checklist("POSTCOMMIT", result=checklist_result)):
@@ -6184,7 +6225,8 @@ def main() -> int:
             ]
             print(_canonical_json(item).decode(), end="")
         pending = sum(
-            item.status == "UNCLAIMED" for item in snapshot.token_results
+            item.token in PLANNED_BINDINGS and item.status == "UNCLAIMED"
+            for item in snapshot.token_results
         )
         open_ledger = sum(
             entry["status"] == "OPEN" for entry in projected["entries"]

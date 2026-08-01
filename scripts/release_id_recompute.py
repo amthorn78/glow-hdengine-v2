@@ -319,10 +319,15 @@ def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
     ]
 
 
-def check_manifest_only(
+def manifest_only_problems(
     manifest_path: Path | str = Path("catalog/manifest.json"),
-) -> int:
-    """Validate the immutable release input without reading derived evidence."""
+) -> tuple[str, ...]:
+    """Return every current immutable-manifest validation problem.
+
+    This is the shared read-only predicate behind both the release CLI gate and
+    token-specific consumers.  It deliberately audits the bytes and sizes of
+    every declared source file; canonical JSON shape alone is not admission.
+    """
 
     require_closed_rails()
     path = Path(manifest_path)
@@ -336,7 +341,16 @@ def check_manifest_only(
         ):
             if not audit_line.startswith("PASS "):
                 problems.append(f"manifest_file_audit:{audit_line}")
-    for problem in sorted(set(problems)):
+    return tuple(sorted(set(problems)))
+
+
+def check_manifest_only(
+    manifest_path: Path | str = Path("catalog/manifest.json"),
+) -> int:
+    """Validate the immutable release input without reading derived evidence."""
+
+    problems = manifest_only_problems(manifest_path)
+    for problem in problems:
         print(f"MANIFEST_ERROR:{problem}", file=sys.stderr)
     return 0 if not problems else 1
 
