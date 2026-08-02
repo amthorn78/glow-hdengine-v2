@@ -978,6 +978,47 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             block = raw_lines[start:end]
         return starts, block
 
+    legacy_evidence_step_name = (
+        "      - name: Run legacy EPIC020/021 evidence tests in isolated exact-head worktree"
+    )
+    legacy_evidence_step_starts, legacy_evidence_step_block = exact_step_block(
+        legacy_evidence_step_name
+    )
+    expected_legacy_evidence_step_block = (
+        legacy_evidence_step_name,
+        "        shell: bash",
+        "        run: |",
+        "          set -euo pipefail",
+        '          legacy_source="$RUNNER_TEMP/hde-legacy-evidence-tests"',
+        "          cleanup() {",
+        '            git worktree remove --force "$legacy_source" >/dev/null 2>&1 || true',
+        "          }",
+        "          trap cleanup EXIT",
+        '          git worktree add --detach "$legacy_source" "$(git rev-parse HEAD)"',
+        "          (",
+        '            cd "$legacy_source"',
+        (
+            "            unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ROOT "
+            "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+            "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
+        ),
+        (
+            "            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 "
+            "ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1"
+        ),
+        '            export PYTHONPATH="$legacy_source"',
+        (
+            "            EPIC021_QA_RUN_ID=ci-selftest-epic021 python -m pytest "
+            "tests/qa/test_epic021_harness_entrypoint.py"
+        ),
+        (
+            "            python -m pytest tests/evidence "
+            "tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py"
+        ),
+        "          )",
+        "          cleanup",
+        "          trap - EXIT",
+    )
     receipt_free_step_name = (
         "      - name: Confirm receipt-free exact-head tree is clean"
     )
@@ -1113,6 +1154,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or step_starts[0] <= test_steps_starts[0]
         or generator_invocations != expected_invocations
         or closeout_step_block != expected_closeout_step_block
+        or legacy_evidence_step_block != expected_legacy_evidence_step_block
         or receipt_free_step_block != expected_receipt_free_step_block
         or upload_step_block != expected_upload_step_block
         or authenticated_step_block != expected_authenticated_step_block
@@ -1122,6 +1164,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or not (job_start < closeout_step_starts[0] < job_end)
         or not (
             closeout_step_starts[0]
+            < legacy_evidence_step_starts[0]
             < receipt_free_step_starts[0]
             < upload_step_starts[0]
             < authenticated_step_starts[0]

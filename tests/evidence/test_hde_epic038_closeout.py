@@ -1396,14 +1396,46 @@ def test_private_receipt_ci_is_exact_head_external_and_authenticated() -> None:
     receipt_free_clean = test_job.index(
         "      - name: Confirm receipt-free exact-head tree is clean"
     )
-    full_repo_tests = test_job.index(
-        "      - run: python -m pytest tests/evidence "
+    legacy_evidence_tests = test_job.index(
+        "      - name: Run legacy EPIC020/021 evidence tests in isolated exact-head worktree"
+    )
+    legacy_evidence_step = test_job[legacy_evidence_tests:receipt_free_clean]
+    epic021_tests = legacy_evidence_step.index(
+        "            EPIC021_QA_RUN_ID=ci-selftest-epic021 python -m pytest "
+        "tests/qa/test_epic021_harness_entrypoint.py"
+    )
+    full_repo_tests = legacy_evidence_step.index(
+        "            python -m pytest tests/evidence "
         "tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py"
     )
+    assert legacy_evidence_step.count("git worktree add --detach") == 1
+    assert legacy_evidence_step.count("git worktree remove --force") == 1
+    assert legacy_evidence_step.count("trap cleanup EXIT") == 1
+    assert legacy_evidence_step.count("trap - EXIT") == 1
+    assert (
+        'git worktree add --detach "$legacy_source" "$(git rev-parse HEAD)"'
+        in legacy_evidence_step
+    )
+    assert '            cd "$legacy_source"\n' in legacy_evidence_step
+    assert (
+        "            unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ROOT "
+        "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+        "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST\n"
+        in legacy_evidence_step
+    )
+    assert (
+        "            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 "
+        "ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1\n"
+        in legacy_evidence_step
+    )
+    assert '            export PYTHONPATH="$legacy_source"\n' in legacy_evidence_step
+    assert "      - name: Run EPIC021 QA harness entrypoint self-test" not in test_job
+    assert "      - run: python -m pytest tests/evidence " not in test_job
     upload = test_job.index(
         "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
     )
-    assert full_repo_tests < receipt_free_clean < upload
+    assert 0 <= epic021_tests < full_repo_tests
+    assert legacy_evidence_tests < receipt_free_clean < upload
     upload_block = test_job[
         upload : test_job.index(
             "      - name: Authenticate and consume private HDE-EPIC038 execution artifact"
@@ -1508,6 +1540,11 @@ def test_private_receipt_ci_is_exact_head_external_and_authenticated() -> None:
         workflow.replace(
             "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
             "          path: audit/hde-epic038-private-receipt",
+            1,
+        ),
+        workflow.replace(
+            '          git worktree add --detach "$legacy_source" "$(git rev-parse HEAD)"',
+            '          git worktree add --detach "$legacy_source" main',
             1,
         ),
         workflow.replace(
