@@ -1,0 +1,129 @@
+HDE-EPIC038 ACCEPTANCE MAP VIABILITY
+DECISION: NOT SATISFIED
+SOURCE_EVALUATION_FINGERPRINT: 4618f79c6f51600c9523f596c184a32ce3d289617b580d81e1e95a53cff3d4d4
+TOKEN TESTS_PASS_OK: UNCLAIMED | PREDICATE: token.TESTS_PASS_OK.current_governed_result | DETAIL: exact planned-new binding is computable and not yet produced
+TOKEN DOC_DELTA_PRESENT_OK: PASS | PREDICATE: token.DOC_DELTA_PRESENT_OK.current_governed_result | DETAIL: current canonical Doc Delta pair and historical provenance validate
+TOKEN EVIDENCE_INDEX_UPDATED_OK: PASS | PREDICATE: token.EVIDENCE_INDEX_UPDATED_OK.current_governed_result | DETAIL: current Human Index topology validates against the Machine Mirror
+TOKEN MACHINE_MIRROR_UPDATED_OK: PASS | PREDICATE: token.MACHINE_MIRROR_UPDATED_OK.current_governed_result | DETAIL: current Machine Mirror topology, paths, digests, and proofs validate
+TOKEN EVIDENCE_INDEX_HASH_OK: PASS | PREDICATE: token.EVIDENCE_INDEX_HASH_OK.current_governed_result | DETAIL: current Human Index hash sentinel validates
+TOKEN QA_PRECOMMIT_CHECKLIST_OK: UNCLAIMED | PREDICATE: token.QA_PRECOMMIT_CHECKLIST_OK.current_governed_result | DETAIL: exact planned-new binding is computable and not yet produced
+TOKEN QA_POSTCOMMIT_CHECKLIST_OK: UNCLAIMED | PREDICATE: token.QA_POSTCOMMIT_CHECKLIST_OK.current_governed_result | DETAIL: exact planned-new binding is computable and not yet produced
+TOKEN ENV_RAILS_POLICY_OK: PASS | PREDICATE: token.ENV_RAILS_POLICY_OK.current_governed_result | DETAIL: closed-rails environment policy validates
+TOKEN PREIMAGE_RECOMPUTE_OK: PASS | PREDICATE: token.PREIMAGE_RECOMPUTE_OK.current_governed_result | DETAIL: stored and recomputed canonical preimage hashes are identical
+TOKEN CLI_READER_PARITY_OK: PASS | PREDICATE: token.CLI_READER_PARITY_OK.current_governed_result | DETAIL: current CLI and Reader canonical bytes are identical
+TOKEN COMPOSITE_ABBA_IDENTITY_OK: PASS | PREDICATE: token.COMPOSITE_ABBA_IDENTITY_OK.current_governed_result | DETAIL: current AB and BA canonical byte hashes are identical
+TOKEN TWO_RUN_IDENTITY_OK: PASS | PREDICATE: token.TWO_RUN_IDENTITY_OK.current_governed_result | DETAIL: current repeated-run canonical byte hashes are identical
+TOKEN JSON_CANONICAL_CHECK_OK: PASS | PREDICATE: token.JSON_CANONICAL_CHECK_OK.current_governed_result | DETAIL: current canonical JSON gate structured record validates
+TOKEN A7_GET_QUOTED_ETAG_OK: PASS | PREDICATE: token.A7_GET_QUOTED_ETAG_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_GET_QUOTED_ETAG_OK
+TOKEN A7_HEAD_PARITY_OK: PASS | PREDICATE: token.A7_HEAD_PARITY_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_HEAD_PARITY_OK
+TOKEN A7_304_OMITS_CT_CL_OK: PASS | PREDICATE: token.A7_304_OMITS_CT_CL_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_304_OMITS_CT_CL_OK
+TOKEN A7_VARY_AUTH_AE_OK: PASS | PREDICATE: token.A7_VARY_AUTH_AE_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_VARY_AUTH_AE_OK
+TOKEN A7_ENCODING_INVARIANCE_OK: PASS | PREDICATE: token.A7_ENCODING_INVARIANCE_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_ENCODING_INVARIANCE_OK
+TOKEN A7_TRANSPORT_PROOF_OK: PASS | PREDICATE: token.A7_TRANSPORT_PROOF_OK.current_governed_result | DETAIL: current A7 composite predicate validates for A7_TRANSPORT_PROOF_OK
+TOKEN ENDPOINTS_CATALOG_OK: PASS | PREDICATE: token.ENDPOINTS_CATALOG_OK.current_governed_result | DETAIL: current endpoint catalog has exact unique reader bindings
+TOKEN ENDPOINTS_CATALOG_ENV_GATE_OK: PASS | PREDICATE: token.ENDPOINTS_CATALOG_ENV_GATE_OK.current_governed_result | DETAIL: current production environment-gate refusal proof validates
+TOKEN ENV_LC_ALL_C_OK: PASS | PREDICATE: token.ENV_LC_ALL_C_OK.current_governed_result | DETAIL: LC_ALL=C determinism pin validates
+TOKEN EVIDENCE_INDEX_MIRROR_OK: PASS | PREDICATE: token.EVIDENCE_INDEX_MIRROR_OK.current_governed_result | DETAIL: current Human Index/Machine Mirror topology and QA binding validate
+TOKEN EVIDENCE_PATHS_VALIDATED_OK: PASS | PREDICATE: token.EVIDENCE_PATHS_VALIDATED_OK.current_governed_result | DETAIL: every current Machine Mirror physical path resolves inside the repository
+TOKEN DB_RUNTIME_SEARCH_PATH_OK: PASS | PREDICATE: token.DB_RUNTIME_SEARCH_PATH_OK.current_governed_result | DETAIL: current database posture predicate validates for DB_RUNTIME_SEARCH_PATH_OK
+TOKEN DB_ROLE_OK: PASS | PREDICATE: token.DB_ROLE_OK.current_governed_result | DETAIL: current database posture predicate validates for DB_ROLE_OK
+TOKEN DB_SCHEMA_FINGERPRINT_OK: PASS | PREDICATE: token.DB_SCHEMA_FINGERPRINT_OK.current_governed_result | DETAIL: current database posture predicate validates for DB_SCHEMA_FINGERPRINT_OK
+TOKEN DB_CONN_ENV_OK: PASS | PREDICATE: token.DB_CONN_ENV_OK.current_governed_result | DETAIL: current direct-only database selection and fail-closed cases validate
+TOKEN EVIDENCE_PATH_PROOFS_OK: PASS | PREDICATE: token.EVIDENCE_PATH_PROOFS_OK.current_governed_result | DETAIL: every current Machine Mirror proof family validates
+TOKEN CI_CHECK_MIRROR_SCHEMA_OK: PASS | PREDICATE: token.CI_CHECK_MIRROR_SCHEMA_OK.current_governed_result | DETAIL: current mirror schema topology and record bindings validate
+TOKEN CI_CHECK_FINAL_LF_OK: PASS | PREDICATE: token.CI_CHECK_FINAL_LF_OK.current_governed_result | DETAIL: current final-LF execution receipt and target coverage validate
+TOKEN NO_EXTERNAL_IO_ON_REFUSAL_OK: PASS | PREDICATE: token.NO_EXTERNAL_IO_ON_REFUSAL_OK.current_governed_result | DETAIL: current closed-rails refusal proves zero vendor and database calls
+TOKEN RELEASE_ID_RECOMPUTE_OK: UNCLAIMED | PREDICATE: token.RELEASE_ID_RECOMPUTE_OK.current_governed_result | DETAIL: current manifest content validates, but no verified external exact-source release attestation was supplied; retained identity captures remain historical (manifest=0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f; retained_capture=12523fec11d4f0ff375bbc7e0d88352a6f3beb07f3a74cecfae901307bbb6e5c)
+PROOF_FAMILY_COUNT: 41
+PROOF_FAMILY TESTS_PASS_OK | epic038.close_report | audit/EPIC-038_close_report.md | audit/EPIC-038_close_report.md.path_proof.txt | planned-new
+PROOF_FAMILY DOC_DELTA_PRESENT_OK | epic038.doc_deltas | audit/docdeltas/hde-epic038_doc_deltas.md | audit/docdeltas/hde-epic038_doc_deltas.md.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_INDEX_UPDATED_OK | index.human_index | docs/evidence/INDEX.json | docs/evidence/INDEX.json.path_proof.txt | existing/reused
+PROOF_FAMILY MACHINE_MIRROR_UPDATED_OK | index.machine_mirror | artifacts/evidence_index.jsonl | artifacts/evidence_index.jsonl.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_INDEX_HASH_OK | docs.evidence.INDEX.sha256 | docs/evidence/INDEX.sha256 | docs/evidence/INDEX.sha256.path_proof.txt | existing/reused
+PROOF_FAMILY QA_PRECOMMIT_CHECKLIST_OK | epic038.qa_precommit_checklist | audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log | audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log.path_proof.txt | planned-new
+PROOF_FAMILY QA_POSTCOMMIT_CHECKLIST_OK | epic038.qa_postcommit_checklist | audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log | audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log.path_proof.txt | planned-new
+PROOF_FAMILY ENV_RAILS_POLICY_OK | epic038.pr01.env_matrix_snapshot_v3 | artifacts/runtime/env_matrix.snapshot.json | artifacts/runtime/env_matrix.snapshot.json.path_proof.txt | existing/reused
+PROOF_FAMILY PREIMAGE_RECOMPUTE_OK | epic038.pr02.reader_cli_summary | audit/gates/parity/reader_cli/summary.json | audit/gates/parity/reader_cli/summary.json.path_proof.txt | existing/reused
+PROOF_FAMILY PREIMAGE_RECOMPUTE_OK | epic038.pr02.reader_cli_ab | audit/gates/parity/reader_cli/ab.json | audit/gates/parity/reader_cli/ab.json.path_proof.txt | existing/reused
+PROOF_FAMILY CLI_READER_PARITY_OK | epic038.pr02.reader_cli_summary | audit/gates/parity/reader_cli/summary.json | audit/gates/parity/reader_cli/summary.json.path_proof.txt | existing/reused
+PROOF_FAMILY COMPOSITE_ABBA_IDENTITY_OK | epic038.pr02.abba_bytes | audit/gates/determinism/abba.bytes | audit/gates/determinism/abba.bytes.path_proof.txt | existing/reused
+PROOF_FAMILY TWO_RUN_IDENTITY_OK | epic038.pr02.tworun_identity | audit/gates/determinism/tworun_identity.sha256 | audit/gates/determinism/tworun_identity.sha256.path_proof.txt | existing/reused
+PROOF_FAMILY JSON_CANONICAL_CHECK_OK | audit.gates.json_gate.canonical.json_gate_structured_record.json | audit/gates/json_gate/canonical/json_gate_structured_record.json | audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_GET_QUOTED_ETAG_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_HEAD_PARITY_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_304_OMITS_CT_CL_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_VARY_AUTH_AE_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_ENCODING_INVARIANCE_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY A7_TRANSPORT_PROOF_OK | epic038.pr02.a7_reader_success_composite | artifacts/proofs/reader_success_get_head_304.json | artifacts/proofs/reader_success_get_head_304.json.path_proof.txt | existing/reused
+PROOF_FAMILY ENDPOINTS_CATALOG_OK | epic038.pr02.endpoint_catalog | docs/ENDPOINTS_CATALOG.json | docs/ENDPOINTS_CATALOG.json.path_proof.txt | existing/reused
+PROOF_FAMILY ENDPOINTS_CATALOG_ENV_GATE_OK | epic038.pr02.a7_env_gate | artifacts/proofs/endpoints_env_gate_proof.log | artifacts/proofs/endpoints_env_gate_proof.log.path_proof.txt | existing/reused
+PROOF_FAMILY ENV_LC_ALL_C_OK | epic038.pr01.env_matrix_snapshot_v3 | artifacts/runtime/env_matrix.snapshot.json | artifacts/runtime/env_matrix.snapshot.json.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_INDEX_MIRROR_OK | index.human_index | docs/evidence/INDEX.json | docs/evidence/INDEX.json.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_INDEX_MIRROR_OK | index.machine_mirror | artifacts/evidence_index.jsonl | artifacts/evidence_index.jsonl.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_INDEX_MIRROR_OK | epic038.qa_step_logs_manifest | audit/qa/hde-epic038/qa_step_logs_manifest.json | audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_PATHS_VALIDATED_OK | index.machine_mirror | artifacts/evidence_index.jsonl | artifacts/evidence_index.jsonl.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_PATHS_VALIDATED_OK | epic038.qa_step_logs_manifest | audit/qa/hde-epic038/qa_step_logs_manifest.json | audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY DB_RUNTIME_SEARCH_PATH_OK | epic038.ops03.db_posture_summary | audit/ops/hde-epic038/ops-03/db_posture_summary.json | audit/ops/hde-epic038/ops-03/db_posture_summary.json.path_proof.txt | existing/reused
+PROOF_FAMILY DB_ROLE_OK | epic038.ops03.db_posture_summary | audit/ops/hde-epic038/ops-03/db_posture_summary.json | audit/ops/hde-epic038/ops-03/db_posture_summary.json.path_proof.txt | existing/reused
+PROOF_FAMILY DB_SCHEMA_FINGERPRINT_OK | epic038.ops03.db_posture_summary | audit/ops/hde-epic038/ops-03/db_posture_summary.json | audit/ops/hde-epic038/ops-03/db_posture_summary.json.path_proof.txt | existing/reused
+PROOF_FAMILY DB_CONN_ENV_OK | epic038.pr06r.direct_db_selection | artifacts/runtime/direct_db_selection.snapshot.json | artifacts/runtime/direct_db_selection.snapshot.json.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_PATH_PROOFS_OK | index.machine_mirror | artifacts/evidence_index.jsonl | artifacts/evidence_index.jsonl.path_proof.txt | existing/reused
+PROOF_FAMILY EVIDENCE_PATH_PROOFS_OK | epic038.qa_step_logs_manifest | audit/qa/hde-epic038/qa_step_logs_manifest.json | audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY CI_CHECK_MIRROR_SCHEMA_OK | index.machine_mirror | artifacts/evidence_index.jsonl | artifacts/evidence_index.jsonl.path_proof.txt | existing/reused
+PROOF_FAMILY CI_CHECK_FINAL_LF_OK | epic038.qa_step_logs_manifest | audit/qa/hde-epic038/qa_step_logs_manifest.json | audit/qa/hde-epic038/qa_step_logs_manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY NO_EXTERNAL_IO_ON_REFUSAL_OK | epic038.pr05.v2_mapped_cache.closed_rails_refusal | artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log | artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log.path_proof.txt | existing/reused
+PROOF_FAMILY NO_EXTERNAL_IO_ON_REFUSAL_OK | epic038.pr05.v2_mapped_cache.manifest | artifacts/bodygraph/v2_mapped_cache/manifest.json | artifacts/bodygraph/v2_mapped_cache/manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY RELEASE_ID_RECOMPUTE_OK | epic038.release.catalog_manifest | catalog/manifest.json | catalog/manifest.json.path_proof.txt | existing/reused
+PROOF_FAMILY RELEASE_ID_RECOMPUTE_OK | epic038.pr01.identity_release_id | artifacts/identity/release_id.json | artifacts/identity/release_id.json.path_proof.txt | existing/reused
+PROOF_FAMILY RELEASE_ID_RECOMPUTE_OK | epic038.pr01.identity_release_id_recompute | artifacts/identity/release_id_recompute.log | artifacts/identity/release_id_recompute.log.path_proof.txt | existing/reused
+NON_TOKEN BG_SOURCE_SELECTION_OK: PASS | PREDICATE: non_token.BG_SOURCE_SELECTION_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN BG_VENDOR_CALLS_DISABLED_IN_PROD_OK: PASS | PREDICATE: non_token.BG_VENDOR_CALLS_DISABLED_IN_PROD_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN BG_SOURCE_INVARIANCE_OK: PASS | PREDICATE: non_token.BG_SOURCE_INVARIANCE_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN BG_TTL_SWR_POLICY_OK: PASS | PREDICATE: non_token.BG_TTL_SWR_POLICY_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN BG_RATE_LIMIT_POLICY_OK: PASS | PREDICATE: non_token.BG_RATE_LIMIT_POLICY_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN BG_CIRCUIT_BREAKER_POLICY_OK: PASS | PREDICATE: non_token.BG_CIRCUIT_BREAKER_POLICY_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN ENV_SNAPSHOT_SINGLETON_OK: PASS | PREDICATE: non_token.ENV_SNAPSHOT_SINGLETON_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN ENV_SNAPSHOT_SCHEMA_V3_OK: PASS | PREDICATE: non_token.ENV_SNAPSHOT_SCHEMA_V3_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+NON_TOKEN ENV_PINS_PRESENT_OK: PASS | PREDICATE: non_token.ENV_PINS_PRESENT_OK.current_governed_result | DETAIL: affirmative current non-token predicate validates
+OBLIGATION qa.finalized_current_state: PASS | DETAIL: affirmative current predicate validates
+OBLIGATION evidence.full_index_mirror_topology: PASS | DETAIL: affirmative current predicate validates
+OBLIGATION authority.approved_r5_source: PASS | DETAIL: approved r5 source validates at 3846232f0a8fd1e7a1bc8ab1723107cce40c26c9622a8379e4ac212c215bffbf
+OBLIGATION authority.pf09_scope.HDE-DIST005.1: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST005.2: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST006.1: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST006.2: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST006.3: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST002.4: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST002.5: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST003.1: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST003.4: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.1: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.2: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.3: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.4: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.5: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.9: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.10: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.11: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST001.6: PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_scope.HDE-DIST007 (subtask N/A): PASS | DETAIL: approved r5 PF09 scope item validates
+OBLIGATION authority.pf09_exclusion.HDE-DIST004.1: PASS | DETAIL: approved r5 PF09 exclusion validates
+OBLIGATION authority.pf09_exclusion.HDE-DIST004.2: PASS | DETAIL: approved r5 PF09 exclusion validates
+OBLIGATION authority.pf09_exclusion.HDE-DIST004.3: PASS | DETAIL: approved r5 PF09 exclusion validates
+OBLIGATION authority.pf09_exclusion.HDE-DIST004.4: PASS | DETAIL: approved r5 PF09 exclusion validates
+OBLIGATION authority.tracked_issue.TI-001: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.tracked_issue.TI-R1-001: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.tracked_issue.TI-R1-002: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.tracked_issue.TI-R1-003: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.tracked_issue.TI-R1-004: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.tracked_issue.TI-R1-005: PASS | DETAIL: approved r5 tracked-issue disposition validates
+OBLIGATION authority.adr.ADR-R1-001: PASS | DETAIL: approved r5 ADR disposition validates
+OBLIGATION authority.adr.ADR-R1-002: PASS | DETAIL: approved r5 ADR disposition validates
+OBLIGATION authority.adr.ADR-R1-003: PASS | DETAIL: approved r5 ADR disposition validates
+OBLIGATION authority.adr.ADR-R1-004: PASS | DETAIL: approved r5 ADR disposition validates
+OBLIGATION authority.adr.ADR-R1-005: PASS | DETAIL: approved r5 ADR disposition validates
+OBLIGATION authority.qa_rca_source: PASS | DETAIL: preserved execution-level QA RCA source is consumed
+MINIMUM_FOLLOW_UP: DEV-03 must canonically produce audit/EPIC-038_close_report.md, run the canonical evidence updater, establish the exact proof and Human Index/Machine Mirror binding, and retain successful execution evidence for every exact planned command before this token may pass.
+MINIMUM_FOLLOW_UP: DEV-03 must canonically produce audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log, run the canonical evidence updater, establish the exact proof and Human Index/Machine Mirror binding, and retain successful execution evidence for every exact planned command before this token may pass.
+MINIMUM_FOLLOW_UP: DEV-03 must canonically produce audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log, run the canonical evidence updater, establish the exact proof and Human Index/Machine Mirror binding, and retain successful execution evidence for every exact planned command before this token may pass.
+MINIMUM_FOLLOW_UP: Validate the current canonical manifest contents and supply the canonical external exact-source release attestation and exact-command CI receipt for this source head before RELEASE_ID_RECOMPUTE_OK may pass.

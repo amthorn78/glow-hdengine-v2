@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
+size_bytes: 218
+sha256: 12c206c6d2820beda1caa0b80bf32e2c5ef9a68094496412972c66ce249588aa
+mtime_utc: 2026-08-02T16:10:26Z
+produced_at_utc: 2026-07-26T22:42:05Z

@@ -126,8 +126,15 @@ EXPECTED_DOC_DELTA_INDEX_ROLES = {
 }
 
 
+def _validate_rows_for_contract(rows=None):
+    return closeout.validate_rows(
+        closeout.build_rows() if rows is None else rows,
+        planned_mode="allow-current",
+    )
+
+
 def test_roster_is_exact_unique_and_ordered() -> None:
-    rows = closeout.validate_rows(closeout.build_rows())
+    rows = _validate_rows_for_contract(closeout.build_rows())
     assert len(rows) == len({row.token for row in rows}) == 33
     assert tuple(row.token for row in rows) == closeout.TOKENS
     assert not ({row.token for row in rows} & closeout.PROHIBITED)
@@ -159,7 +166,7 @@ def test_rejects_missing_duplicate_unexpected_retired_near_match_and_reordering(
     mutation, match: str
 ) -> None:
     with pytest.raises(ValueError, match=match):
-        closeout.validate_rows(mutation(closeout.build_rows()))
+        _validate_rows_for_contract(mutation(closeout.build_rows()))
 
 
 @pytest.mark.parametrize(
@@ -169,7 +176,7 @@ def test_rejects_missing_duplicate_unexpected_retired_near_match_and_reordering(
 def test_rejects_every_non_token_proof_label(label: str) -> None:
     rows = closeout.build_rows()
     with pytest.raises(ValueError, match="token set mismatch"):
-        closeout.validate_rows((replace(rows[0], token=label),) + rows[1:])
+        _validate_rows_for_contract((replace(rows[0], token=label),) + rows[1:])
 
 
 @pytest.mark.parametrize(
@@ -192,7 +199,7 @@ def test_rejects_incomplete_placeholder_wildcard_alias_guesses_and_empty_tuples(
     rows = closeout.build_rows()
     changed = replace(rows[7], **{field: value})
     with pytest.raises(ValueError, match=match):
-        closeout.validate_rows(rows[:7] + (changed,) + rows[8:])
+        _validate_rows_for_contract(rows[:7] + (changed,) + rows[8:])
 
 
 @pytest.mark.parametrize(
@@ -213,7 +220,7 @@ def test_rejects_every_evidence_binding_count_mismatch(field, value) -> None:
     rows = closeout.build_rows()
     changed = replace(rows[7], **{field: value})
     with pytest.raises(ValueError, match="evidence binding count mismatch"):
-        closeout.validate_rows(rows[:7] + (changed,) + rows[8:])
+        _validate_rows_for_contract(rows[:7] + (changed,) + rows[8:])
 
 
 def test_every_row_has_the_positive_nonclaiming_contract() -> None:
@@ -265,7 +272,7 @@ def test_generic_affirmative_claim_language_fails_closed(
     changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
     monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
     with pytest.raises(ValueError, match="nonclaiming posture contract"):
-        closeout.validate_rows(closeout.build_rows())
+        _validate_rows_for_contract(closeout.build_rows())
 
 
 @pytest.mark.parametrize(
@@ -287,11 +294,11 @@ def test_generic_claim_in_other_rendered_field_fails_closed(
     changed_rows = rows[:row_index] + (changed,) + rows[row_index + 1 :]
     monkeypatch.setattr(closeout, "build_rows", lambda: changed_rows)
     with pytest.raises(ValueError, match=match):
-        closeout.validate_rows(closeout.build_rows())
+        _validate_rows_for_contract(closeout.build_rows())
 
 
 def test_evidence_integrity_rows_bind_actual_surfaces_and_enforcement() -> None:
-    rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
+    rows = {row.token: row for row in _validate_rows_for_contract(closeout.build_rows())}
 
     mirror = rows["EVIDENCE_INDEX_MIRROR_OK"]
     assert mirror.primary_evidence == (
@@ -585,7 +592,7 @@ def test_evidence_integrity_rows_reject_human_index_only_bindings(
         proof_anchors=proofs,
     )
     with pytest.raises(ValueError, match=match):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_ci_runs_canonical_path_validator_before_mirror_schema() -> None:
@@ -600,7 +607,7 @@ def test_ci_runs_canonical_path_validator_before_mirror_schema() -> None:
 
 
 def test_planned_rows_are_exact_owned_and_source_contract_stays_unclaimed() -> None:
-    rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
+    rows = {row.token: row for row in _validate_rows_for_contract(closeout.build_rows())}
     assert set(closeout.PLANNED_BINDINGS) == {
         "TESTS_PASS_OK",
         "QA_PRECOMMIT_CHECKLIST_OK",
@@ -728,7 +735,7 @@ def test_checklist_rows_reject_inexact_future_command_contract(
     rows = closeout.build_rows()
     index = next(index for index, row in enumerate(rows) if row.token == token)
     with pytest.raises(ValueError):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 @pytest.mark.parametrize(
@@ -745,7 +752,7 @@ def test_planned_rows_reject_appended_write_command_in_ci_binding(token) -> None
         ),
     )
     with pytest.raises(ValueError, match="inexact planned command"):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_rejects_inexact_planned_binding() -> None:
@@ -756,7 +763,7 @@ def test_rejects_inexact_planned_binding() -> None:
         proof_anchors=("audit/EPIC-038-close-report.md.path_proof.txt",),
     )
     with pytest.raises(ValueError, match="inexact planned binding"):
-        closeout.validate_rows((changed,) + rows[1:])
+        _validate_rows_for_contract((changed,) + rows[1:])
 
 
 @pytest.mark.parametrize(
@@ -784,7 +791,7 @@ def test_checklist_rows_reject_pr379_substitutions(token, path, key) -> None:
         proof_anchors=(f"{path}.path_proof.txt",),
     )
     with pytest.raises(ValueError, match="inexact planned binding"):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
@@ -798,7 +805,7 @@ def test_doc_delta_row_binds_primary_staging_and_supporting_capture() -> None:
     )
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "DOC_DELTA_PRESENT_OK"
     )
     assert row.classification == "existing/reused"
@@ -2232,11 +2239,11 @@ def test_doc_delta_row_rejects_capture_or_ledger_as_primary(path, key) -> None:
     with pytest.raises(ValueError, match="doc-delta evidence binding mismatch"):
         closeout._validate_special_semantics(changed)
     with pytest.raises(ValueError):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 def test_database_tokens_bind_admitted_ops03_posture_semantics() -> None:
-    rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
+    rows = {row.token: row for row in _validate_rows_for_contract(closeout.build_rows())}
     for token in (
         "DB_RUNTIME_SEARCH_PATH_OK",
         "DB_ROLE_OK",
@@ -2287,7 +2294,7 @@ def test_database_posture_regressions_fail_closed(token, mutation) -> None:
 def test_preimage_row_binds_idempotence_recompute_evidence() -> None:
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "PREIMAGE_RECOMPUTE_OK"
     )
     assert row.primary_evidence == (
@@ -2354,7 +2361,7 @@ def test_preimage_recompute_rejects_matching_forged_hash_pair() -> None:
 def test_cli_reader_parity_row_binds_actual_reader_dump_checks() -> None:
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "CLI_READER_PARITY_OK"
     )
     assert row.primary_evidence == (closeout.PREIMAGE_PATH,)
@@ -2393,7 +2400,7 @@ def test_cli_reader_parity_regressions_fail_closed(mutation) -> None:
 def test_no_io_row_binds_explicit_zero_call_log_and_manifest() -> None:
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "NO_EXTERNAL_IO_ON_REFUSAL_OK"
     )
     assert row.primary_evidence == (
@@ -2437,7 +2444,7 @@ def test_no_io_regressions_fail_closed(log_mutation, manifest_mutation) -> None:
 def test_final_lf_row_binds_hash_bound_qa19_gate_execution() -> None:
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "CI_CHECK_FINAL_LF_OK"
     )
     assert row.primary_evidence == (closeout.QA_MANIFEST_PATH,)
@@ -2717,7 +2724,7 @@ def _configure_private_ci_artifact_environment(
 def test_release_identity_binding_uses_complete_governed_family() -> None:
     row = next(
         row
-        for row in closeout.validate_rows(closeout.build_rows())
+        for row in _validate_rows_for_contract(closeout.build_rows())
         if row.token == "RELEASE_ID_RECOMPUTE_OK"
     )
     manifest_sha256, captured_release_id = (
@@ -2804,7 +2811,7 @@ def test_release_row_rejects_manifest_only_substitution() -> None:
         proof_anchors=("catalog/manifest.json.path_proof.txt",),
     )
     with pytest.raises(ValueError, match="release identity source binding mismatch"):
-        closeout.validate_rows(rows[:index] + (changed,) + rows[index + 1 :])
+        _validate_rows_for_contract(rows[:index] + (changed,) + rows[index + 1 :])
 
 
 @pytest.mark.parametrize(
@@ -3474,8 +3481,8 @@ def test_private_ci_writer_rejects_open_or_missing_execution_rail(
 
 
 def test_render_is_deterministic_lf_terminated_and_never_claims_pass() -> None:
-    first = closeout.render()
-    second = closeout.render()
+    first = closeout.render(planned_mode="allow-current")
+    second = closeout.render(planned_mode="allow-current")
     assert first == second and first.endswith(b"\n") and b"\r" not in first
     assert first.count(b"- Canonical governance token:") == 33
     assert first.count(b"- Owning task:") == 33

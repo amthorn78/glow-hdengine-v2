@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
+size_bytes: 1452
+sha256: 9ad58a31dcc9cdf29585f099e73584fb2520e888d58258d0870df28c56c6ebe7
+mtime_utc: 2026-08-02T16:10:26Z
+produced_at_utc: 2026-07-26T22:42:05Z
