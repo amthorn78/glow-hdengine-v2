@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.9b  
+**Version:** v12.6b  
 Effective Date: 2026.08.02  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -193,7 +193,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.35) Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
 2.36) Final QA Closeout Review \+ QA RCA HDE-Epic038  
 2.37) HDE-EPIC038 Token-Roster Correction — Mint RELEASE\_ID\_RECOMPUTE\_OK and Retire Current DEV\_DB\_BRIDGE\_FALLBACK\_OK Claimability  
-2.38) HDE-EPIC038 Epic Remediation Plan — Resolve Token/Evidence-Matrix Approval Checkpoint
+2.38) HDE-EPIC038 Epic Remediation Plan — Resolve Token/Evidence-Matrix Approval Checkpoint  
+2.39) DEV-01 Closeout remediation HDE-EPIC038  
+2.40) DEV-02 Closeout remediation HDE-EPIC038  
+2.41) Evidence Brief: DEV-R1
 
 # 2\) Numbered Addenda
 
@@ -5696,8 +5699,6 @@ Remedial PR 3 exact-head proof:
 * Manifest proof: current manifest SHA `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`.  
 * All current staging, capture, matrix, Index, Mirror, checksum, and orientation proof targets resolve and match their governed metadata.
 
-\<eof\>
-
 ## 2.40) DEV-02 Closeout remediation HDE-EPIC038
 
 Review Summary
@@ -6321,4 +6322,40 @@ Repo evidence: `.github/workflows/ci.yml` lines 191–230; generator constants `
 Search method: searched PF10 — HDE Build Notes for "hde-epic038-private-ci-execution-receipt|\_HDE\_EPIC038\_PRIVATE\_CI\_ARTIFACT\_ID|artifact-digest" (case: sensitive); scope: complete current PF10 document and HDE-EPIC038 addenda through §2.39; tool: rg; result: 0 hits.
 
 DECISION: MERGED CHANGE ACCEPTABLE
+
+## 2.41) Evidence Brief: DEV-R1
+
+**Decision: DEV-R1 does not need to run now.**
+
+**Current posture:** Conditional standby, not invoked.
+
+| Evidence | Result |
+| ----- | ----- |
+| Approved r5 plan, §3.5 | DEV-R1 is a “required conditional loop; not invoked.” It begins only after a concrete matrix, preflight, test, validator, or exact-head CI predicate fails. |
+| Approved r5 plan, §10 DEV-R1 | Its dependency is an actual failed or unsupported result after the applicable check has run. No speculative remediation is authorized. |
+| PF10 Addendum 2.40 | DEV-02 was accepted as complete. The exact-head workflow passed all seven jobs, the focused suite reported `363 passed`, and all nine review threads were resolved. |
+| Token posture | `TOKEN_MATRIX_OK rows=33 unique=33 claimed=0`. The absence of token claims is intentional before DEV-03, not a DEV-R1 failure. |
+| DEV-03 family | The family was absent, so the production receipt path correctly remained inactive. PF10 classifies this as future DEV-03 activation risk, not a current remediation gap. |
+| Current repository state | Current `main` is `0fa8a27f805e4a690d43f57a82989ddb56e9a674`. It is one commit beyond the DEV-02 squash commit, `dbd7487d93738c2a7e894ea049693e5019992825`. |
+| Post-DEV-02 divergence | The only later commit updated the two PF10 documents. No generator, test, CI, updater, artifact, or application file changed. |
+| GitHub work state | No open DEV-R1 or DEV-03 pull request was found. |
+
+Key repository evidence:
+
+* [DEV-02 PR \#383](https://github.com/amthorn78/glow-hdengine-v2/pull/383)  
+* [DEV-02 squash commit](https://github.com/amthorn78/glow-hdengine-v2/commit/dbd7487d93738c2a7e894ea049693e5019992825)  
+* [Exact-head successful workflow](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30744149677)  
+* [Current main commit](https://github.com/amthorn78/glow-hdengine-v2/commit/0fa8a27f805e4a690d43f57a82989ddb56e9a674)
+
+### **Invocation trigger**
+
+DEV-R1 becomes necessary only if subsequent Gate C, DEV-03, generator preflight, package generation, focused validation, updater validation, or exact-head CI produces a concrete failing or unsupported predicate.
+
+At that point, DEV-R1 must remediate the exact recorded blocker. Until then, creating a DEV-R1 PR would be artificial and unsupported.
+
+### **Nonclaims**
+
+* This does not establish Gate D, token satisfaction, package `SATISFIED`, Product Owner acceptance, PF09 movement, board movement, or epic closure.  
+* `HDE-DIST005` remains an ongoing `Not done` requirement, and `HDE-DIST005.2` remains `Partial`.  
+* The authenticated execution-receipt path remains subject to its first real DEV-03 activation. Its successful isolated coverage does not claim that production activation has already occurred.
 
