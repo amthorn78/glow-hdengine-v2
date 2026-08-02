@@ -1,5 +1,11 @@
 # AGENTS.md — Glow HD Engine (agent rules)
 
+## Codex reasoning and execution posture
+- For every complex task, use the most capable reasoning model available and the highest reasoning-effort setting available (for example, `model_reasoning_effort: high`). Never reduce reasoning effort for a complex task to optimize latency or cost.
+- Treat implementation, debugging, architecture, security, data migration, release, evidence, and multi-file work as complex unless it is clearly mechanical and low risk.
+- Low reasoning effort is permitted only for clearly trivial work such as formatting, typo fixes, or minor mechanical cleanup that requires no substantive judgment.
+- Prefer a pragmatic execution style: prioritize correct, clean, reviewable diffs and appropriate verification over verbose process narration.
+
 ## Scope and hierarchy
 - This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — HDE-Build Notes (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
 - **HDE-EPIC038 DEV-01 authority:** the Product Owner's task authorization, the complete approved `r5-Epic-Remediation-Plan-HDE-EPIC038-Closeout-Completion.md`, and later explicit Product Owner remediation clarifications control over this file. Bind each matrix row to current repository and PF semantics plus any exact approved path/key clarification; do not treat PR #379's four `planned-new` substitutions as plan-mandated. This authority does not authorize DEV-02 or DEV-03 implementation, acceptance, closeout, OPS or Live QA execution, token claims, PF09 or board movement, merge, or historical-evidence rewrites.
