@@ -196,7 +196,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.38) HDE-EPIC038 Epic Remediation Plan — Resolve Token/Evidence-Matrix Approval Checkpoint  
 2.39) DEV-01 Closeout remediation HDE-EPIC038  
 2.40) DEV-02 Closeout remediation HDE-EPIC038  
-2.41) Evidence Brief: DEV-R1
+2.41) Evidence Brief: DEV-R1  
+2.42) HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is
 
 # 2\) Numbered Addenda
 
@@ -6358,4 +6359,153 @@ At that point, DEV-R1 must remediate the exact recorded blocker. Until then, cre
 * This does not establish Gate D, token satisfaction, package `SATISFIED`, Product Owner acceptance, PF09 movement, board movement, or epic closure.  
 * `HDE-DIST005` remains an ongoing `Not done` requirement, and `HDE-DIST005.2` remains `Partial`.  
 * The authenticated execution-receipt path remains subject to its first real DEV-03 activation. Its successful isolated coverage does not claim that production activation has already occurred.
+
+## **2.42) HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is**
+
+**Timestamp:** 080226 22:25
+
+### **Details**
+
+This addendum records the Lead Developer decision requested by the HDE-EPIC038 formal-closeout remediation RCA. It uses current repository reality at `main@f4180b6fc049fdddd88c422bb4ec4bc08f4588b7`, the active HDE Build Notes set through Addendum 2.41, the approved HDE-EPIC038 plans for intended scope only, and the governed QA and release-sanity evidence already present on `main`.
+
+The r5 remediation failed to reach its required terminal state. That failure is confined to the added acceptance and formal-closeout architecture. It does not invalidate the substantive HDE-EPIC038 reliability implementation or the completed QA record.
+
+### **Decision**
+
+**Lead Developer decision: `RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS`.**
+
+1. The r5 Epic Remediation Plan titled **Formal Close-Pack and Acceptance-Ledger Completion** is withdrawn as an executable plan.  
+2. DEV-03, DEV-04, and DEV-R1 are stopped under r5. No additional remediation PR, provisional close package, emergency token weakening, frozen-evidence refresh, CI self-commit path, or manual hosted-artifact transfer is authorized.  
+3. PR [\#385](https://github.com/amthorn78/glow-hdengine-v2/pull/385) remains closed and unmerged. Its branch artifacts are failure evidence only and do not govern current `main`.  
+4. The Product Owner should accept the substantive implementation and completed QA evidence as the delivered business outcome of HDE-EPIC038 and close the epic with explicit caveats through an HDE-EPIC038-specific exception or authority correction.  
+5. Formal close-pack completion was not achieved. Gate D `PASS`, 33-of-33 token satisfaction, a tracked `SATISFIED` close report, a tracked close manifest, and a merged close PR are not claimed.  
+6. Remaining closeout-architecture, token-semantics, canon, and subsystem-cleanup defects are carried into separately scoped future work. This addendum does not authorize that future implementation.
+
+This is a Lead Developer recommendation and r5 stop decision. Product Owner closeout remains the next separate decision; this addendum does not perform it.
+
+### **Current repository reality**
+
+| Locus | Observed current state | Decision effect |
+| ----- | ----- | ----- |
+| Default branch | [`main@f4180b6fc049fdddd88c422bb4ec4bc08f4588b7`](https://github.com/amthorn78/glow-hdengine-v2/commit/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7) | Governing repository snapshot for this decision. |
+| Runtime release identity | [`engine/runtime/identity.py`](https://github.com/amthorn78/glow-hdengine-v2/blob/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7/engine/runtime/identity.py) derives release identity from packaged canonical-manifest bytes. | Substantive implementation present. |
+| Database posture | [`engine/db/adapter.py`](https://github.com/amthorn78/glow-hdengine-v2/blob/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7/engine/db/adapter.py) rejects retired bridge keys and selects direct PostgreSQL. | Substantive implementation present. |
+| Mapped cache | [`engine/bodygraph/mapped_cache.py`](https://github.com/amthorn78/glow-hdengine-v2/blob/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7/engine/bodygraph/mapped_cache.py) preserves bounded mapped-data write/read parity and idempotence. | Substantive implementation present within its approved scope. |
+| Release sanity | [`audit/gates/sanity_pipeline/sanity_pipeline.log`](https://github.com/amthorn78/glow-hdengine-v2/blob/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7/audit/gates/sanity_pipeline/sanity_pipeline.log) records 19 stages `OK`, `first_failed_stage:NONE`, and `summary:PASS`. | Core reliability gate remains valid. |
+| Governed QA | [`audit/qa/hde-epic038/qa_step_logs_manifest.json`](https://github.com/amthorn78/glow-hdengine-v2/blob/f4180b6fc049fdddd88c422bb4ec4bc08f4588b7/audit/qa/hde-epic038/qa_step_logs_manifest.json) contains qa-00 through qa-23, all recorded `PASS`. | Supports Product Owner closure review through Addendum 2.36. |
+| Formal close package on `main` | `audit/EPIC-038_close_report.md`, `audit/EPIC-038_MANIFEST.json`, and `docs/acceptance_map_epic038.json` are absent. | Formal close-pack completion is not claimable. |
+| DEV-03 branch | PR \#385 is closed and unmerged. Its candidate records 29 `PASS`, 4 `UNCLAIMED`, 0 `FAIL`, `NOT SATISFIED`, and both closeout checklists `FAIL`. | The failed candidate must not be merged or represented as closure. |
+| Exact-head workflow | [Run 30760520344](https://github.com/amthorn78/glow-hdengine-v2/actions/runs/30760520344) failed during release-attestation construction at `closure_write_and_check`; the dependent test job was skipped. | Gate D did not pass. |
+| Merged remediation subsystem | PRs [\#379](https://github.com/amthorn78/glow-hdengine-v2/pull/379), [\#380](https://github.com/amthorn78/glow-hdengine-v2/pull/380), [\#381](https://github.com/amthorn78/glow-hdengine-v2/pull/381), [\#382](https://github.com/amthorn78/glow-hdengine-v2/pull/382), and [\#383](https://github.com/amthorn78/glow-hdengine-v2/pull/383) are merged. | Their merged bytes remain current repository history, but they supply no authority to continue r5. |
+| Development-board input | The supplied bundle is dated 2026-07-10 and contains no HDE-EPIC038 identifier. | No current board-state or board-movement claim is made. |
+
+### **Root-cause decision basis**
+
+#### **1\. Release-identity authority was contradictory**
+
+HDE Build Notes Addendum 2.16 establishes `catalog/manifest.json` as the single tracked release-identity input, places current release provenance in external attestation, and freezes checked-in EPIC022 identity evidence as historical capture-time records that must not be refreshed merely because the manifest changes.
+
+HDE Build Notes Addendum 2.37 later requires `RELEASE_ID_RECOMPUTE_OK` to prove equality between the current manifest computation and the governed historical `artifacts/identity/release_id.json` and `artifacts/identity/release_id_recompute.log` family.
+
+At the reviewed repository state, the values are different:
+
+* current canonical-manifest SHA-256: `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`;  
+* retained historical release capture: `12523fec11d4f0ff375bbc7e0d88352a6f3beb07f3a74cecfae901307bbb6e5c`.
+
+Refreshing the historical family would violate Addendum 2.16. Keeping it frozen makes Addendum 2.37's exact current-equality predicate unreachable. This is an authority defect, not a missing repository patch.
+
+#### **2\. The r5 terminal transition was not reachable**
+
+r5 required tracked candidate bytes to contain all-token `PASS` and `SATISFIED` before exact-head hosted CI supplied some of the decisive evidence. It prohibited inference and fabrication but defined no compliant feedback-free transition from provisional tracked bytes to a final tracked state.
+
+DEV-02 attempted to bridge that causal gap with an authenticated external receipt and a disposable-worktree promotion. That design validates promoted bytes that do not persist in the tracked branch. It also introduced authenticated `ALLOW_NETWORK=1` generator calls after r5 had required closed rails and plan revision for a rails or authorization change.
+
+PR \#385 was the first production activation of that path. Its failure confirmed that the missing transition was architectural and authority-bound, not suitable for another bounded DEV-R1 patch loop.
+
+#### **3\. The remediation became disproportionate**
+
+The original epic was a bounded internal reliability pass. The formal closeout overlay added five merged remediation PRs, a sixth unmerged PR, a 33-token projection, generators, validators, workflow receipt handling, fixed-point machinery, and substantial CI cost without changing the public business behavior. Continuing that lineage would add risk and cost without a credible terminal path.
+
+### **Supersession and contradiction resolution**
+
+For the exact HDE-EPIC038 remediation, release-token, and closeout scope, this addendum is the highest-numbered applicable HDE Build Notes authority.
+
+| Earlier authority | Addendum 2.42 effect |
+| :---- | :---- |
+| Addendum 2.16 | **PRESERVED AND CONTROLLING** for release identity, the acyclic tracked-source-to-external-attestation graph, and frozen historical checked-in evidence. |
+| Addendum 2.36 | **PRESERVED** for the `READY WITH CAVEATS` QA-evidence-sufficiency recommendation. It does not establish formal close-pack completion or epic closure. |
+| Addendum 2.37 | **PARTIALLY SUPERSEDED.** Its requirement to use the frozen historical identity family as current-equality evidence is superseded. `RELEASE_ID_RECOMPUTE_OK` must not be claimed from that family. Its mandatory 33-token roster no longer gates the recommended exceptional closure of HDE-EPIC038. This addendum does not mark the token `PASS` or `FAIL`, remove it from the registry, or decide whether it should be redefined, replaced, or retired for future work. |
+| Addendum 2.38 | **SUPERSEDED IN FULL** for the r5 approval checkpoint and execution sequence because r5 is withdrawn. |
+| Addendum 2.39 | **PRESERVED AS HISTORICAL MERGED-CHANGE REVIEW.** DEV-01's landed facts remain recorded. Any implication that they authorize or require continued r5 execution is superseded. |
+| Addendum 2.40 | **PRESERVED AS HISTORICAL MERGED-CHANGE REVIEW.** DEV-02's landed facts remain recorded. Its forward treatment of the unactivated receipt path as ordinary future DEV-03 risk, and its authority to continue that lifecycle, are superseded. |
+| Addendum 2.41 | **SUPERSEDED FOR THE OBSERVED DEV-03 TRIGGER.** A concrete failing predicate now exists, but DEV-R1 must not run because the blocker is a contradictory authority and unreachable lifecycle, not a bounded owner defect. |
+| r5 Epic Remediation Plan | **WITHDRAWN.** It is not an executable plan, approval basis, or source of future task authority. |
+
+The release-token contradiction is therefore resolved for current action as follows:
+
+1. Addendum 2.16 governs current release identity.  
+2. Frozen historical identity artifacts remain historical and must not be refreshed or relabeled as current.  
+3. Addendum 2.37's conflicting current-equality use of those artifacts must not be applied.  
+4. `RELEASE_ID_RECOMPUTE_OK` supplies no HDE-EPIC038 closure claim and is not a blocker to the recommended epic-specific Product Owner exception.  
+5. Any future token meaning requires a separate canonical decision before another epic or closeout process may rely on it.
+
+### **Product Owner closure-review posture**
+
+If the Product Owner accepts this recommendation, the closure record must state all of the following without dilution:
+
+* the substantive implementation and completed governed QA evidence are accepted as the delivered HDE-EPIC038 business outcome;  
+* the r5 formal-closeout remediation failed and is withdrawn;  
+* PR \#385 remains closed and unmerged;  
+* the repository does not contain the HDE-EPIC038 canonical close report, close manifest, or acceptance map;  
+* Gate D `PASS`, 33-of-33 token satisfaction, tracked `SATISFIED`, formal close-pack completion, and ordinary Close Gate completion are not claimed;  
+* closure proceeds only through an explicit HDE-EPIC038-specific Product Owner exception or authority correction; and  
+* the exception does not establish a reusable default for another epic.
+
+### **Carried future work**
+
+The following debt remains visible and must receive a separately authorized carrier before implementation:
+
+1. Reconcile Addenda 2.16 and 2.37 in permanent token and release-identity authority.  
+2. Decide whether `RELEASE_ID_RECOMPUTE_OK` is redefined around the current external-attestation model, replaced, or retired.  
+3. Define and prove a feedback-free closeout lifecycle in which repository-local inputs produce all tracked candidate bytes and hosted CI validates those exact bytes without writing canonical results back into source.  
+4. Require a token-by-token reachability proof and a small end-to-end feasibility proof before approving another closeout implementation.  
+5. Audit the merged DEV-01 and DEV-02 subsystem to retain, simplify, generalize, disable, or remove it; remove avoidable CI cost after that decision.  
+6. Drain or expressly supersede stale release-identity wording in HDE-Build Checklist Distillation and related permanent canon.  
+7. Preserve the historical PR \#349 CI discrepancy and limited OPS-03 provisioning provenance as non-blocking caveats unless future business scope makes them material.
+
+Until a named future carrier exists, these items remain unresolved debt. They do not reopen r5 and do not authorize repository work.
+
+### **PF09, board, and phase-exit boundary**
+
+* This addendum makes no HDE-Build Checklist status change. `HDE-DIST005` remains `Not done` as an ongoing global requirement, and `HDE-DIST005.2` remains `Partial`.  
+* No development-board movement is authorized or claimed from the stale supplied board bundle.  
+* Any PF09 or board maintenance occurs only after the Product Owner records the actual closure decision and must state that formal close-pack completion was not achieved.  
+* An exceptional Product Owner closure of HDE-EPIC038 does not establish Distillation phase-exit readiness. The phase-exit close-out-epic and governed-close-pack requirements remain unsatisfied unless separately revised or fulfilled by another qualifying epic.
+
+### **Authorization and nonclaims**
+
+This addendum records the Lead Developer recommendation, withdraws r5 from future execution, stops its remaining tasks, and resolves the overlapping HDE Build Notes authority needed for the Product Owner's next decision.
+
+It does not:
+
+* merge, reopen, or modify a pull request;  
+* modify repository code, evidence, workflow, or governed artifacts;  
+* execute QA or OPS;  
+* claim any acceptance token as `PASS`;  
+* create a canonical close report, close manifest, or acceptance map;  
+* perform the Product Owner closure decision;  
+* move HDE-Build Checklist or development-board status;  
+* establish ordinary Close Gate completion;  
+* establish Distillation phase exit; or  
+* authorize the carried future work.
+
+### **Drain targets**
+
+1. **HDE Governance, acceptance-token registry:** reconcile `RELEASE_ID_RECOMPUTE_OK` with the current manifest-derived, external-attestation release model and choose redefine, replace, or retire.  
+2. **Epic Process Guide, Close Gate and closure override:** define a feedback-free terminal lifecycle and an explicit exceptional-closure record that does not require impossible CI-to-source feedback.  
+3. **HDE Schemas & Artifacts, release and closeout evidence:** keep current external attestation separate from frozen historical checked-in evidence and define any future closeout artifact lifecycle without a back-edge into tracked source.  
+4. **HDE-Build Checklist Distillation, release-identity rows:** remove or supersede stale identity-artifact and recomputation wording while preserving truthful historical facts.  
+5. **Canon Plan Templates:** require terminal-state reachability, execution-surface feasibility, rails consistency, and an end-to-end proof before approving a closeout-remediation implementation.
+
+Until these targets are drained, this addendum is the controlling temporary authority for the exact HDE-EPIC038 remediation-failure decision, r5 withdrawal, release-token contradiction, and close-as-is recommendation.
 
