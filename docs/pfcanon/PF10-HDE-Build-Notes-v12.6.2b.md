@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.6b  
+**Version:** v12.6.2b  
 Effective Date: 2026.08.02  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -197,7 +197,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.39) DEV-01 Closeout remediation HDE-EPIC038  
 2.40) DEV-02 Closeout remediation HDE-EPIC038  
 2.41) Evidence Brief: DEV-R1  
-2.42) HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is
+2.42) HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is  
+2.43) Epic Closure Evidence Review: HDE-EPIC038  
+2.44) Lead Dev Epic Retrospective: HDE-EPIC038
 
 # 2\) Numbered Addenda
 
@@ -6508,4 +6510,409 @@ It does not:
 5. **Canon Plan Templates:** require terminal-state reachability, execution-surface feasibility, rails consistency, and an end-to-end proof before approving a closeout-remediation implementation.
 
 Until these targets are drained, this addendum is the controlling temporary authority for the exact HDE-EPIC038 remediation-failure decision, r5 withdrawal, release-token contradiction, and close-as-is recommendation.
+
+## 2.43) Epic Closure Evidence Review: HDE-EPIC038
+
+### 1.1 Review boundary, authority, and source coverage
+
+Review posture: pre-PF10-drainage, read-only closure evidence review  
+Complete active PF10 set resolved: Yes  
+Complete active PF10 set read end-to-end: Yes  
+PF10 addendum scope and supersession resolved: Yes  
+Authoritative epic name and phase derived: Yes  
+Current approved plans identified: Yes  
+Applicable PF09 source verified: Yes  
+Complete in-scope PF09 region retrieved: Yes  
+Executable closure baseline established: Yes  
+Repo validation performed: Yes  
+Repo inspection mode: Connected GitHub, remote-only  
+Applicable QA baseline identified: Yes  
+Final QA closeout artifact identified: Yes, PF10 Addendum 2.36  
+Claim-triggered canon consulted: Governance, epic process, Distillation checklist, evidence schemas, QA, plan templates, architecture, mechanics, CLI/API/vendor, and infrastructure  
+Source limitations: no local working tree was inspected; local-only status is `N/A - remote-only inspection`. The applicable evidence canon was recovered completely from repository history because its current path is absent from `main`. The second active PF10 volume retains an internal `v12.6b` version field despite its current `v12.6.1b` repository identity. Neither limitation changes the epic evidence result.
+
+The current Product Owner instruction controls the final decision. PF10 controls the epic-specific history and exceptional-closure correction. PF09 controls recorded checklist text and status. PF04 controls token semantics, subject to the explicit HDE-EPIC038-specific PF10 supersession. PF12 controls governed artifact integrity. PF19 controls QA evidence trust. Repo controls current implementation and artifact reality.
+
+Evidence pointer: Current Product Owner instruction | current request | "the closure decision is final"
+
+Evidence pointer: PF10 | Addendum 2.42, Decision | "RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS" | "Formal close-pack completion was not achieved."
+
+Evidence pointer: PF06 | §0.2 Policy and principles | "Closure axes remain separate." | "PO closeout is a PO-owned process action."
+
+#### Source coverage
+
+| Source role | Scope used | Retrieval status | Authority or limitation |
+| ----- | ----- | ----- | ----- |
+| Current Product Owner instruction | Final closure authority | Complete | Finalizes the previously recommended HDE-EPIC038-specific exception |
+| PF10 | Addenda 2.1 through 2.42 | Complete active lettered set | Primary epic history and exceptional-closure authority |
+| Epic Plan | Identity, phase, D1-D13 scope, exclusions, PF09 mappings | Complete | Intended scope, not execution proof |
+| Implementation Plan | PR-01 through PR-06, OPS-01/02, PF09 crosswalk | Complete | Approved implementation baseline; later PF10 decisions amend it |
+| QA Plan | qa-00 through qa-23 and closeout obligations | Complete | Intended QA coverage |
+| PF09 phase source | Exact Distillation rows and recorded statuses | Complete | Controls status text, not pre-drain closure by itself |
+| PF04 | Registered tokens and token authority | Complete relevant sections | Token claims cannot be inferred |
+| PF06 | Process separation, closure, drainage, ownership | Complete relevant sections | Drainage is not an execution or closeout gate |
+| PF12 | Index, Mirror, manifests, proofs, close-pack structures | Complete relevant sections | Recovered from repository history |
+| PF19 | QA evidence and closeout rules | Complete relevant sections | PF10 2.35 supersedes only universal venue treatment |
+| PF27 | Review, evidence, and planning semantics | Complete relevant sections | Template authority only |
+| Repo | Current code, artifacts, PRs, commits, CI | Confirmed at resolved HEAD | Remote-only; no local status claim |
+| Development board | Board-state check | Complete supplied bundle | Dated 2026-07-10 and contains no HDE-EPIC038 entry |
+| QA RCA | Historical remediation context | Complete | Not used as independent closure proof |
+
+#### Completion axes
+
+| Axis | Claimed | Not claimed, deferred, or not applicable | Evidence basis |
+| ----- | ----- | ----- | ----- |
+| Implementation | Substantive D1-D13 reliability slice delivered | No public Reader or product-scope expansion | PF10 implementation lineage; current Repo |
+| Verification | Current 19-stage sanity result is PASS | No rerun performed by this review | Tracked sanity log |
+| QA | qa-00 through qa-23 PASS; final QA `READY WITH CAVEATS` | No new QA execution | PF10 2.29-2.36; current QA manifest |
+| Evidence integrity | QA manifest, path proof, Index, and Mirror coherent | Ordinary close-pack family absent | PF12 validation and current Repo |
+| Governance | Exceptional closure authorized without token overclaim | Gate D and 33-of-33 token satisfaction not claimed | PF10 2.42 plus current Product Owner instruction |
+| OPS | OPS-01 historical; OPS-02 and OPS-03 supported within bounded claims | No new OPS or production authorization | PF10 and tracked OPS evidence |
+| Merge provenance | Core implementation and QA lineages merged | PR \#385 remains closed and unmerged | GitHub metadata |
+| PF09 substantive completion | Epic-scoped work supported in substance | Recorded statuses remain undrained | PF10 combined evidence; QA; Repo |
+| Formal close pack | Not applicable to exceptional closure | Not completed or claimed | PF10 2.42 and Repo absence |
+| PF10/PF-Canon drainage | Supportable | Not performed | Separate administrative axis |
+| Board movement | None | Remains separate | Stale board bundle |
+| Product Owner closure | Finalized by current instruction | This report does not itself mutate records | Current instruction plus PF10 2.42 |
+| Distillation phase exit | Not established | Separate phase-level decision | PF10 2.42 |
+
+### 1.2 PF10 epic event and decision record
+
+Event ordering follows addendum sequence for authority, with recorded dates, PR chronology, and explicit supersession used where source order differs from execution chronology. Addendum 2.42 controls overlapping remediation and closeout scope. The current Product Owner instruction follows that addendum and finalizes its recommended exception.
+
+| Event ID | Type and sequence | PF10 claim, outcome, and references | Supersession or ordering | PF10 support and evidence pointer |
+| ----- | ----- | ----- | ----- | ----- |
+| EVT-001 | Implementation / PR-01 | Identity, release identity, environment snapshot, and evidence foundations; PRs \#346-347 | Later release-identity mechanics amended by 2.16 | Pointer present. Evidence pointer: PF10 | Addendum 2.1 | "Original PR implemented the PR-01 identity, release-identity, environment-snapshot, and evidence foundations" |
+| EVT-002 | Implementation / PR-02 | Determinism and Catalog-driven A7 family; PRs \#348-349 | Current QA supersedes the intermediate-run evidentiary importance | Pointer present. Evidence pointer: PF10 | Addendum 2.2 | "Original PR implemented the PR-02 deterministic Reader/CLI proof family" |
+| EVT-003 | Implementation / PR-03 | Reusable closed/open rails family; PRs \#350, \#351, \#353; \#352 validation-only | Preserved | Pointer present. Evidence pointer: PF10 | Addendum 2.3 | "Original PR created the reusable PR-03 rails gate family" |
+| EVT-004 | Implementation / OPS / PR-04 | DB, BodyGraph, architecture, and OPS-01 bridge-era packet; PRs \#354-355 | Bridge meaning later made historical by 2.12-2.13 | Pointer present. Evidence pointer: PF10 | Addenda 2.5-2.6 | "one bounded, PO-executed, read-only DB and bridge posture run" |
+| EVT-005 | Implementation / OPS / PR-05 | Configured-v2 mapped-cache implementation and OPS-02; PRs \#356-358 | Preserved within bounded nonproduction scope | Pointer present. Evidence pointer: PF10 | Addenda 2.7-2.8 | "one mapped-cache insert, canonical read-back, and a second same-identity write that inserted zero rows" |
+| EVT-006 | Remediation / PR-06 | Initial PR-06 and bridge-dependent corrective attempts; PRs \#359-362 | Active bridge architecture superseded by 2.12 | Explicit proof-bearing text. Evidence pointer: PF10 | Addenda 2.9-2.12 | "Direct PostgreSQL access through the Glow-owned psycopg provider is the sole active HDE database transport." |
+| EVT-007 | Decision / ADR | Direct-only evidence identity, OPS-03, amended PF09 semantics, manifest-derived identity, portable proofs | 2.12-2.16 control overlapping earlier design | Pointer present. Evidence pointer: PF10 | Addendum 2.16 | "`catalog/manifest.json` is the single release-identity input stored in Git." |
+| EVT-008 | Implementation / OPS / merge | PRs \#363-367 plus OPS-03 established and admitted final direct-only integration | Preserved | Pointer present. Evidence pointer: PF10 | Addendum 2.20 | "PR \#367 merged the planned PR-06R-B direct-only final integration." |
+| EVT-009 | Verification / PF09 supportability | Post-merge review found direct-only implementation, evidence graph, OPS packet, and 19-stage gate supported | Later QA adds independent coverage | Pointer present. Evidence pointer: PF10 | Addendum 2.21 | "No additional post-merge repository remediation is required." |
+| EVT-010 | Retrospective / governance | Implementation retrospective, audit triage, syntax-materiality rule, and remediation-plan recognition | Historical/process context; no closure action | Explicit proof-bearing text. Evidence pointer: PF10 | Addendum 2.22 | "This report presents evidence for Lead evaluation and makes no closure determination." |
+| EVT-011 | Remediation / HDE-DIST007 | PRs \#369-370 restored canonical factory compatibility and corrected CI coverage; 35 tests and all seven jobs passed | PF02 GET discrepancy kept separate | Pointer present. Evidence pointer: PF10 | Addendum 2.28 | "The merged implementation is technically and evidentially coherent." |
+| EVT-012 | QA Pass 1 | qa-00 through qa-07 PASS; failed and remediated receipts preserved | Preserved by 2.36 | Pointer present. Evidence pointer: PF10 | Addendum 2.29 | "Decision: PASS." |
+| EVT-013 | QA / Extended Moon Loop | qa-08 received one bounded authorization, two vendor requests, and final CI completion through PRs \#371-372 | Authority expired after the event | Pointer present. Evidence pointer: PF10 | Addendum 2.31 | "`qa-08-po-008` received one fresh authorization for one live generation event" |
+| EVT-014 | QA Pass 2/3 and venue decision | qa-08 and qa-09 through qa-23 PASS; legacy `.sh` path interpreted correctly; venue `UNKNOWN - NON-MATERIAL` | 2.35 supersedes universal Codespaces treatment only | Pointer present. Evidence pointer: PF10 | Addenda 2.32-2.35 | "The absence of historical Codespaces venue provenance must be recorded as `UNKNOWN - NON-MATERIAL`" |
+| EVT-015 | Final QA closeout | All 24 planned checks accounted; final QA recommendation `READY WITH CAVEATS` | Preserved by 2.42 | Pointer present. Evidence pointer: PF10 | Addendum 2.36 | "Recommendation: `READY WITH CAVEATS` for the QA-closeout decision axis." |
+| EVT-016 | Governance / token correction | 33-token roster created, including `RELEASE_ID_RECOMPUTE_OK`; current equality requirement later found contradictory | 2.42 partially supersedes 2.37 | Pointer present. Evidence pointer: PF10 | Addendum 2.42, supersession table | "Its mandatory 33-token roster no longer gates the recommended exceptional closure" |
+| EVT-017 | Remediation / DEV-01 | PRs \#379-382 landed matrix and evidence-subsystem work; 33 rows remained `UNCLAIMED` | Historical merge facts preserved; forward authority superseded | Pointer present. Evidence pointer: PF10 | Addendum 2.39 | "33 unique rows, 30 existing/reused, three planned-new, 33 unclaimed, zero claimed" |
+| EVT-018 | Remediation / DEV-02 and DEV-R1 | PR \#383 landed generator/lifecycle support; DEV-R1 remained conditional until DEV-03 failure | Forward execution authority superseded by 2.42 | Pointer present. Evidence pointer: PF10 | Addenda 2.40-2.41 | "A concrete failing predicate now exists, but DEV-R1 must not run" |
+| EVT-019 | Closure-related decision | r5 withdrawn; DEV-03/04/R1 stopped; PR \#385 closed and unmerged; close-as-is recommended | Highest-numbered PF10 authority for overlapping scope | Pointer present. Evidence pointer: PF10 | Addendum 2.42, Decision | "The Product Owner should accept the substantive implementation and completed QA evidence" |
+| EVT-020 | Final Product Owner decision | The exceptional closure decision is final | Follows and completes EVT-019; no reusable default created | Explicit current authority. Evidence pointer: Current Product Owner instruction | current request | "the closure decision is final" |
+
+### 1.3 Evidence inventory and verification
+
+| Evidence ID | Related events / obligations | Evidence and expected proof | Availability and Repo posture | Coherence, PF12, QA, and proof status | Evidence pointer |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| EVD-001 | EVT-001, EVT-007; OBL-003-005 | `engine/runtime/identity.py`, canonical manifest, identity/environment artifacts; proves immutable identity and manifest-derived release identity | Current; Repo-confirmed tracked; inspected | Coherence confirmed; PF12 confirmed for indexed artifacts; supports claim | Evidence pointer: Repo | `main@fa9b6c5`, `engine/runtime/identity.py` | "release identity is derived from canonical packaged manifest bytes" |
+| EVD-002 | EVT-002-003; OBL-006-008 | Determinism, A7, and rails proof families and tests | Current; Repo-confirmed tracked; inspected | QA manifest covers associated checks; supports required result | Evidence pointer: PF10 | Addendum 2.36 | "PF10 records PASS for qa-00 through qa-07, qa-08, and qa-09 through qa-23." |
+| EVD-003 | EVT-004, EVT-006-009; OBL-009-011 | Direct-selection snapshot, architecture snapshot, DB adapter; proves direct-only posture, retired-key rejection, and keys-only architecture | Current; Repo-confirmed tracked; inspected | PF12 binding confirmed; QA supports result | Evidence pointer: Repo | `main@fa9b6c5`, `engine/db/adapter.py` | "direct PostgreSQL selected; retired bridge keys rejected before provider construction" |
+| EVD-004 | EVT-005; OBL-012 | Mapped-cache implementation, manifest, tests, OPS-02 | Current; Repo-confirmed tracked; inspected | Governed family coherent; supports bounded mapped-only persistence | Evidence pointer: Repo | `main@fa9b6c5`, `engine/bodygraph/mapped_cache.py` | "mapped payload parity and idempotent write/read-back retained" |
+| EVD-005 | EVT-004, EVT-007; OBL-022 | OPS-01 bridge-era packet | Current; Repo-confirmed tracked; inspected | Coherent historical family; not current direct-transport proof | Evidence pointer: PF10 | Addendum 2.21 | "OPS-01 evidence is hash-frozen and validated only as historical integrity" |
+| EVD-006 | EVT-007-009; OBL-009, OBL-022 | OPS-03 commands, summaries, nonclaims, validation receipt, checksums | Current; Repo-confirmed tracked; inspected | PF12 confirmed; supports bounded direct read-only outcome | Evidence pointer: PF10 | Addendum 2.21 | "zero SQL writes, zero retries, zero alternate-provider attempts" |
+| EVD-007 | EVT-008-009; OBL-013 | `audit/gates/sanity_pipeline/sanity_pipeline.log` | Current; Repo-confirmed tracked; inspected | Coherent; QA supports required result; claim supported | Evidence pointer: Repo | `main@fa9b6c5`, exact path | "19 stages OK" | "first\_failed\_stage:NONE" | "summary:PASS" |
+| EVD-008 | EVT-012-015; OBL-020-021 | `audit/qa/hde-epic038/qa_step_logs_manifest.json`, path proof, and 24 primary logs | Current; Repo-confirmed tracked; inspected | Governed coherence confirmed; PF12 confirmed; QA supports all planned checks | Evidence pointer: Repo | `main@fa9b6c5`, exact manifest | "24 entries" | "all statuses PASS" | "SHA-256 0d9e8bc65ce3d73dc8612caadc090c96080c0b1ca0caaf77789159037cad4973" |
+| EVD-009 | EVT-009, EVT-015, EVT-017; OBL-002, OBL-021 | Human Index and Machine Mirror | Current; Repo-confirmed tracked; inspected | 553/553 records, identical ordered key/path topology; PF12 confirmed | Evidence pointer: Repo | `main@fa9b6c5`, `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` | "553 Human Index entries" | "553 Machine Mirror records" |
+| EVD-010 | EVT-011; OBL-019 | HDE-DIST007 implementation and CI evidence | Current; Repo-confirmed tracked; inspected through PF10 and GitHub | QA/CI supports result; no permanent PF09 row | Evidence pointer: PF10 | Addendum 2.28 | "35 passed in 0.59s" | "All seven visible workflow jobs concluded successfully." |
+| EVD-011 | EVT-015; OBL-020-021 | Final QA closeout review | Repo-confirmed tracked in PF10; inspected | PF19-required accounting present; supports `READY WITH CAVEATS` | Evidence pointer: PF10 | Addendum 2.36 | "Current manifest: 24 entries" | "Every manifest entry matches the associated primary log" |
+| EVD-012 | EVT-016-018; OBL-024 | `audit/qa/hde-epic038/token_evidence_matrix.md` | Current; Repo-confirmed tracked; inspected | PF12 structure confirmed; does not support token satisfaction | Evidence pointer: Repo | `main@fa9b6c5`, exact matrix | "33 rows" | "33 UNCLAIMED" | "0 claimed" |
+| EVD-013 | EVT-019; OBL-024-025 | PR \#385 candidate report, review, and workflow failure | Tracked on PR head only; absent from `main`; inspected | Does not support Gate D, token satisfaction, or close-pack completion | Evidence pointer: Repo | PR \#385 head `bdf25d80ea410bd96d88a54b6b30481d22e2957e` | "closed and unmerged" | "workflow run 30760520344: failure" |
+| EVD-014 | EVT-019; OBL-025 | Ordinary close report, close manifest, and acceptance map | Repo-not-found on current `main`; inspected by exact-path retrieval and search | PF12 not applicable because the family is not produced or claimed under the exception | Evidence pointer: Repo | `main@fa9b6c5` | "`audit/EPIC-038_close_report.md`: absent" | "`audit/EPIC-038_MANIFEST.json`: absent" | "`docs/acceptance_map_epic038.json`: absent" |
+| EVD-015 | EVT-019-020; OBL-024-029 | Exceptional-closure authority record | PF10 tracked; current instruction not repo-resident | Supports exception and final closure; does not manufacture ordinary close-pack facts | Evidence pointer: PF10 | Addendum 2.42 | "closure proceeds only through an explicit HDE-EPIC038-specific Product Owner exception or authority correction" |
+
+Search method: searched Repo for the three ordinary close-pack paths (case: sensitive); scope: `main@fa9b6c5802f907ea260c4f4b8aaa4b112e97000f`; tool: GitHub search plus exact-path retrieval; result: 0 current governed files and three exact-path not-found results.
+
+### 1.4 Repo truth ledger
+
+| Repo validation ID | Surface or identifier | Claim and inspection | Observed result | Status / posture / impact | Evidence pointer |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| RV-001 | Repository and HEAD | Resolve current default branch and drift from 2.42 decision head | `main@fa9b6c5`; one commit after `f4180b6`; only the two PF10 volumes changed | Confirmed; remote-only; supports | Evidence pointer: Repo | compare `f4180b6...fa9b6c5` | "ahead\_by: 1" | "two PF10 paths changed" |
+| RV-002 | Core PR lineage | Validate merged implementation lineage | PR-01 through PR-06 remediation merges remain in history; \#352 was not merged | Confirmed; supports | Evidence pointer: Repo | GitHub PR metadata for \#346-\#367 | "merged implementation lineage preserved" |
+| RV-003 | `engine/runtime/identity.py` | Validate manifest-derived release identity | Current code uses canonical packaged manifest bytes and fails closed | Confirmed; tracked; supports | Evidence pointer: Repo | `main@fa9b6c5`, exact path | "canonical manifest is the release-identity input" |
+| RV-004 | `engine/db/adapter.py` | Validate direct-only transport | Retired bridge variables rejected; psycopg is sole active provider | Confirmed; tracked; supports | Evidence pointer: Repo | `main@fa9b6c5`, exact path | "no active bridge selector" |
+| RV-005 | `engine/bodygraph/mapped_cache.py` | Validate bounded mapped-cache behavior | Mapped payload only, canonical parity, idempotence | Confirmed; tracked; supports | Evidence pointer: Repo | `main@fa9b6c5`, exact path | "no raw vendor payload persisted" |
+| RV-006 | Sanity log and runner | Validate final integrated gate | Exactly 19 ordered stages; PASS; no failed stage | Confirmed; tracked; supports | Evidence pointer: Repo | exact log and `tools/evidence/run_sanity_pipeline.py` | "summary:PASS" |
+| RV-007 | QA manifest family | Validate QA result and integrity | 24 checks, qa-00 through qa-23, all PASS; proof hash/size match | Confirmed; tracked; supports | Evidence pointer: Repo | exact QA manifest and sibling proof | "4,784 bytes" | "24 PASS entries" |
+| RV-008 | Index and Mirror | Validate governed evidence topology | 553 Human entries and 553 Mirror records with matching order/key/path pairs | Confirmed; tracked; supports | Evidence pointer: Repo | exact Index and Mirror paths | "identical ordered key/path topology" |
+| RV-009 | HDE-DIST007 | Validate compatibility remediation | PRs \#369-370 merged; complete compat lane passed 35 tests and seven jobs | Confirmed; supports | Evidence pointer: Repo | PR \#370 and workflow run `30234517325` | "35 passed" | "7 jobs success" |
+| RV-010 | QA remediation lineage | Validate later QA merges | PRs \#371-372 and \#376-377 merged; governed QA remains unchanged afterward except PF10 | Confirmed; supports | Evidence pointer: PF10 | Addendum 2.36 | "PR \#376 and PR \#377 are merged." |
+| RV-011 | r5 subsystem | Validate landed but nonauthorizing remediation bytes | PRs \#379-383 merged; matrix remains unclaimed | Confirmed; tracked; non-blocking caveat | Evidence pointer: PF10 | Addenda 2.39-2.40 | "33 unclaimed, zero claimed" |
+| RV-012 | PR \#385 | Validate final r5 outcome | Closed, unmerged, unresolved P1 review thread; exact-head workflow failed | Confirmed; blocks ordinary r5 close only, not exceptional closure | Evidence pointer: Repo | PR \#385 and run `30760520344` | "RELEASE\_ATTESTATION\_FAILED:isolated\_stage\_failed" |
+| RV-013 | Ordinary close-pack paths | Validate claimed absence | All three paths absent from current `main` | Not found; Repo-not-found; not applicable under exception | Evidence pointer: Repo | exact-path inspection at `main@fa9b6c5` | "three paths absent" |
+| RV-014 | Current PF09 record | Validate statuses | Mapped rows remain `Partial`, `Not done`, or `Optional`; HDE-DIST005 remains ongoing | Confirmed; tracked; status drainage separate | Evidence pointer: PF09 phase source | Task HDE-DIST005 | "Not done (treated as an ongoing global requirement)" |
+| RV-015 | Development board | Validate board state | No HDE-EPIC038 identifier in supplied dated bundle | Not repo-verifiable; not closure-critical | Evidence pointer: Development board | complete supplied bundle | "dated 2026-07-10; no HDE-EPIC038 identifier" |
+
+Search method: searched Development board for `HDE-EPIC038` (case: insensitive); scope: complete supplied bundle; tool: `rg`; result: 0 hits.
+
+### 1.5 Closure obligation and trace ledger
+
+Axis shorthand: H \= historical implementation; V \= verification; Q \= QA; A \= PF12 integrity; G \= governance/token; O \= OPS; R \= current Repo. `S` means supported; `N/A` means not applicable; `NC` means truthfully not claimed.
+
+| Obligation ID | Obligation and authoritative anchor | PF09 status / substantive burden | Trace and support axes | Drain posture / conflicts / status / why |
+| ----- | ----- | ----- | ----- | ----- |
+| OBL-001 | Preserve bounded Distillation scope and exclusions. Epic Plan, Scope boundaries. Quote: "User-facing behavior is not expanded in this epic." | Not applicable | EVT-001-011; EVD-001-010; RV-002-009. H/V/Q/A/R: S; G/O: as separately mapped | N/A; no conflict; **Satisfied**. Delivery remained internal reliability work |
+| OBL-002 | HDE-DIST005.1, canonical encodings and pins. Implementation Plan PF09 scope. Quote: "Disposition for this plan: Complete in this epic" | `Partial`; prove canonical encoding and locale pins | EVT-001, EVT-008-009, EVT-015; EVD-007-009; RV-006-008. H/V/Q/A/R: S; G/O: NC/N/A | Supportable subtask drainage; task remains ongoing; **Satisfied** |
+| OBL-003 | HDE-DIST005.2, Index and Mirror discipline | `Partial`; prove same-change Index/Mirror/proof coherence | EVT-001, EVT-008-009, EVT-015; EVD-009; RV-008. H/V/Q/A/R: S | Supportable subtask drainage; **Satisfied** |
+| OBL-004 | HDE-DIST006.1, identity field set and immutability | `Partial`; immutable single-source identity | EVT-001, EVT-007; EVD-001; RV-003. H/V/Q/R: S; A: S | Supportable; **Satisfied** |
+| OBL-005 | HDE-DIST006.2, identity helpers and parity | `Not done`; shared Reader/CLI/admin helpers | EVT-001-002; EVD-001-002; RV-002-003. H/V/Q/R: S | Status undrained; **Satisfied** in substance |
+| OBL-006 | HDE-DIST006.3, identity hashes and Mirror records | `Partial`; identity artifacts indexed 1:1 | EVT-001, EVT-009; EVD-001, EVD-009; RV-007-008. H/V/Q/A/R: S | Supportable; **Satisfied** |
+| OBL-007 | HDE-DIST002.4, pack/manifest identity indexing | `Partial`; canonical manifest and governed indexing | EVT-001, EVT-007-009; EVD-001, EVD-009; RV-003, RV-008. H/V/Q/A/R: S | Addendum 2.16 controls current semantics; **Satisfied** |
+| OBL-008 | HDE-DIST002.5, release bindings evidence | `Not done`; bind release identity and policy evidence | EVT-001, EVT-007-009; EVD-001, EVD-009; RV-003, RV-008. H/V/Q/A/R: S | PF09 wording requires later reconciliation with external-attestation model; **Satisfied** in substance |
+| OBL-009 | HDE-DIST003.1, environment snapshot v3 singleton | `Partial`; v3 canonical environment snapshot | EVT-001, EVT-015; EVD-001, EVD-008; RV-007. H/V/Q/A/R: S | Supportable; **Satisfied** |
+| OBL-010 | HDE-DIST003.4, environment/observability indexing | `Partial`; Index/Mirror binding | EVT-001, EVT-009, EVT-015; EVD-009; RV-008. H/V/Q/A/R: S | Supportable; **Satisfied** |
+| OBL-011 | HDE-DIST001.1, determinism and parity gates | `Partial`; deterministic, canonical, AB/BA, two-run proof | EVT-002, EVT-015; EVD-002, EVD-008; RV-007. H/V/Q/R: S | Supportable; **Satisfied** |
+| OBL-012 | HDE-DIST001.2, A7 and Catalog transport proofs | `Partial`; A7 matrix on eligible catalog route | EVT-002, EVT-015; EVD-002, EVD-008; RV-007. H/V/Q/R: S | Supportable; **Satisfied** |
+| OBL-013 | HDE-DIST001.3, CI rails | `Partial`; closed/open rails enforcement and evidence | EVT-003, EVT-015; EVD-002, EVD-008; RV-007. H/V/Q/R: S | Supportable; **Satisfied** |
+| OBL-014 | HDE-DIST001.4, DB posture | `Partial`; current direct-only DB posture under PF10 amendment | EVT-004, EVT-006-009; EVD-003, EVD-006-007; RV-004, RV-006. H/V/Q/A/O/R: S | PF09 bridge-era wording conflicts but PF10 resolves scope; **Satisfied** |
+| OBL-015 | HDE-DIST001.5, BodyGraph mechanics | `Partial`; source/policy and runtime proof | EVT-004-005, EVT-009, EVT-015; EVD-003-004, EVD-008; RV-005, RV-007. H/V/Q/R: S | Supportable; **Satisfied** |
+| OBL-016 | HDE-DIST001.9, recorded DB-bridge row as amended to direct-only connectivity | `Partial`; prove direct connectivity and retired-transport refusal | EVT-006-009; EVD-003, EVD-006; RV-004. H/V/Q/O/R: S | PF10 2.12-2.15 controls amended meaning; **Satisfied** |
+| OBL-017 | HDE-DIST001.10, keys-only architecture snapshot | `Partial`; canonical secret-free indexed snapshot | EVT-004, EVT-009, EVT-015; EVD-003, EVD-009; RV-008. H/V/Q/A/R: S | Supportable; **Satisfied** |
+| OBL-018 | HDE-DIST001.11, v2 mapped-cache hardening | `Optional`; mapped-only persistence, parity, idempotence, refusal | EVT-005, EVT-015; EVD-004, EVD-008; RV-005, RV-007. H/V/Q/A/O/R: S | Implementation completed despite optional recorded status; **Satisfied** |
+| OBL-019 | HDE-DIST001.6, one-button release sanity | `Partial`; integrated fail-closed pipeline | EVT-008-009, EVT-015; EVD-007-008; RV-006-007. H/V/Q/A/R: S | Supportable; **Satisfied** |
+| OBL-020 | HDE-DIST007 compatibility remediation | No PF09 row; restore selected-factory compat and complete CI lane | EVT-011; EVD-010; RV-009. H/V/Q/R: S | PF09 gap requires Product Owner assignment if drained; **Satisfied** technically |
+| OBL-021 | Complete QA Plan coverage | Not applicable; qa-00 through qa-23 in plan order | EVT-012-015; EVD-008, EVD-011; RV-007, RV-010. Q/A/R: S | N/A; **Satisfied**, 24/24 PASS |
+| OBL-022 | Final QA closeout and QA RCA accounting | Not applicable | EVT-015; EVD-011; RV-007. Q/A/R: S | PF10 2.35 resolves venue caveat; **Satisfied** |
+| OBL-023 | OPS-01/02/03 truth separation | HDE-DIST001.4/.9/.11 | EVT-004-008; EVD-004-006; RV-004-005. O/A/R: S | OPS-01 historical only; OPS-02/03 bounded current proof; **Satisfied** |
+| OBL-024 | Applicable governance/token posture | Ordinary 33-token overlay explicitly non-gating under exception | EVT-016-020; EVD-012-015; RV-011-013. G: S for exception boundary; token satisfaction: NC | 2.42 supersedes conflicting HDE-EPIC038 use; **Satisfied** without claiming tokens |
+| OBL-025 | PF12-governed QA evidence integrity | QA manifest, proof, Index, Mirror coherent | EVT-015; EVD-008-009; RV-007-008. A/Q/R: S | **Satisfied** |
+| OBL-026 | Ordinary formal close-pack posture | Not applicable under exceptional closure; ordinary pack absent | EVT-019-020; EVD-013-015; RV-012-013. A/G: N/A for exception; ordinary completion: NC | No conflict after exception; **Satisfied** as a truthful nonclaim |
+| OBL-027 | PF09 and canon drainage separation | Current status text must remain unchanged until drainage | EVT-019-020; RV-014. H/R: S; drainage not executed | Supportable separately; **Satisfied** |
+| OBL-028 | Product Owner closure authority | PF10 recommends explicit exception; current instruction makes decision final | EVT-019-020; EVD-015. G: S | No remaining decision dependency; **Satisfied** |
+| OBL-029 | Phase-exit boundary | Exceptional epic closure must not imply Distillation exit | EVT-019-020; EVD-015. G: S | Phase exit remains separate; **Satisfied** as nonclaim |
+
+Evidence pointer: PF09 phase source | Task HDE-DIST005 | "Task status: Not done (treated as an ongoing global requirement)"
+
+Evidence pointer: PF12 | §Close-pack artifacts (deterministic path-of-record; baseline artifacts) | "The close-pack baseline artifacts MUST be located under audit/"
+
+Evidence pointer: PF04 | §2.0 Acceptance Tokens (single-home roster) \[Required-Now\] | "Token names and semantics are owned here." | "Token claims MUST NOT be inferred."
+
+### 1.6 Conflicts, gaps, and minimal follow-ups
+
+No closure-critical Blocked or Ambiguous obligation remains under the final HDE-EPIC038-specific exception.
+
+| Gap ID | Affected obligations | Gap type and unresolved matter | Requirement and evidence | Closure impact | Minimum outcome / accountability |
+| ----- | ----- | ----- | ----- | ----- | ----- |
+| GAP-001 | OBL-024, OBL-026 | Governance or token gap: Gate D, 33-token satisfaction, tracked `SATISFIED`, close manifest, and merged close PR were not achieved | PF10 2.42 and PR \#385 | Non-blocking under the final exception | Preserve the nonclaims; no current-epic remediation. PF09 accountability: Documentation/status drainage only |
+| GAP-002 | OBL-007-008, OBL-024 | Canon ambiguity or conflict: frozen historical identity evidence cannot prove current-manifest equality | Addendum 2.16 versus 2.37; current values differ | Non-blocking because 2.42 resolves current action | Redefine, replace, or retire the token before future reliance. PF09 accountability: PF09 gap \- Product Owner assignment required |
+| GAP-003 | OBL-024, OBL-026 | Canon ambiguity: r5 lacked a feedback-free tracked-source to hosted-CI terminal transition | PR \#385 failure and PF10 2.42 | Non-blocking for closed epic; blocking to reuse of that lifecycle | A future carrier must define a reachable lifecycle. PF09 accountability: PF09 gap \- Product Owner assignment required |
+| GAP-004 | OBL-024 | Repo-validation debt: merged DEV-01/DEV-02 subsystem remains on `main` although r5 is withdrawn | PRs \#379-383 remain merged | Non-blocking | Decide retain, simplify, disable, generalize, or remove under separate authority. PF09 accountability: PF09 gap \- Product Owner assignment required |
+| GAP-005 | OBL-002-020, OBL-027 | PF09 status-drain follow-up: exact rows remain `Partial`, `Not done`, or `Optional`; HDE-DIST007 has no row | Current phase source and PF10 2.42 | Non-blocking | Drain only after recording exceptional closure, without claiming formal close-pack or phase exit. PF09 accountability: Documentation/status drainage only |
+| GAP-006 | OBL-024-027 | Documentation-status drainage: second PF10 volume has stale internal version text; applicable PF12 source is absent from current `main` | Current document headers and repository history | Non-blocking | Correct document identity/discoverability during canon maintenance. PF09 accountability: Documentation/status drainage only |
+| GAP-007 | OBL-027-029 | Documentation-status drainage: supplied board is stale and contains no epic row | Complete board search | Non-blocking | Any board record must reflect exceptional closure and ordinary-close nonclaims. PF09 accountability: Documentation/status drainage only |
+| GAP-008 | OBL-012, OBL-023 | Historical result gap: PR \#349 has a PF10/Actions discrepancy; OPS-03 does not preserve every provisioning SQL byte | PF10 retrospective and evidence limitations | Non-blocking because later full QA and current integrated proof supersede their closure materiality | Preserve as caveats unless future scope makes them material. PF09 accountability: HDE-DIST001.4 / HDE-DIST001.9 |
+| GAP-009 | OBL-029 | Scope boundary: Distillation phase exit remains unestablished | PF10 2.42 | Non-blocking for this epic | Treat phase exit as separately authorized work. PF09 accountability: PF09 gap \- Product Owner assignment required |
+
+Evidence pointer: PF10 | Addendum 2.42, Supersession and contradiction resolution | "`RELEASE_ID_RECOMPUTE_OK` supplies no HDE-EPIC038 closure claim and is not a blocker"
+
+Evidence pointer: PF10 | Addendum 2.42, PF09, board, and phase-exit boundary | "An exceptional Product Owner closure of HDE-EPIC038 does not establish Distillation phase-exit readiness."
+
+### 1.7 Closure decision
+
+Epic closure decision: HDE-EPIC038 is SATISFIED
+
+* The complete epic-scoped implementation burden is supported in substance. PF09 statuses remain undrained and are not represented as changed.  
+* PF10 provides a complete event history through Addendum 2.42, and the current Product Owner instruction makes the exceptional close-as-is decision final.  
+* Current `main@fa9b6c5` preserves the substantive implementation, 19-stage `PASS`, governed 24-of-24 QA record, and coherent Index/Mirror evidence.  
+* Final QA remains `READY WITH CAVEATS`; the venue caveat is expressly `UNKNOWN - NON-MATERIAL`.  
+* Applicable QA evidence integrity is confirmed under PF12. The ordinary close-pack family is absent and is not claimed.  
+* No acceptance token, Gate D result, 33-of-33 roster, merged close PR, PF09 movement, board movement, or Distillation exit is inferred.  
+* There are no remaining closure-critical Blocked or Ambiguous obligations after applying the HDE-EPIC038-specific Product Owner exception.  
+* Evidence supports PF10 and later documentation/status drainage. The report records the final decision; it performs no repository, PF10, PF09, canon, or board mutation.
+
+## 2.44) Lead Dev Epic Retrospective: HDE-EPIC038
+
+### 2.1 Executive Summary
+
+* HDE-EPIC038 delivered a substantial Distillation reliability pass: identity, deterministic gates, A7 proofs, CI rails, DB and BodyGraph evidence, architecture posture, mapped-cache persistence, and integrated release sanity.  
+* The architecture converged on canonical-manifest-derived identity, direct PostgreSQL, historical quarantine of bridge evidence, and updater-owned evidence bindings.  
+* The current repository retains a 19-stage PASS and a complete 24-check QA manifest with all checks PASS.  
+* No public Reader expansion, new public route, production mapped-cache authorization, or broad v2 conformance claim was introduced.  
+* HDE-DIST007 later repaired selected-factory compatibility and its CI lane without reopening broader architecture scope.  
+* The largest win was the final coherent implementation and QA evidence graph.  
+* The largest failure was the disproportionate formal-closeout overlay, whose token and CI feedback model could not reach its required terminal state.  
+* The closure succeeds through an explicit epic-specific exception, not through ordinary Gate D, token, or close-pack completion.
+
+### 2.2 Implementation Report
+
+| Slice | Purpose, changes, and surfaces | PF09 / verification / outcome | Current posture and ledger trace |
+| ----- | ----- | ----- | ----- |
+| PR-01, PRs \#346-347 | Immutable identity, release/environment foundations, canonical evidence updater | HDE-DIST005.1/.2, HDE-DIST006.1-.3, HDE-DIST002.4/.5, HDE-DIST003.1/.4; merged and later revalidated | Current identity and evidence surfaces remain. EVT-001; EVD-001/EVD-009; RV-003/RV-008; OBL-002-010. Evidence pointer: PF10 | Addendum 2.1 | "identity, release-identity, environment-snapshot, and evidence foundations" |
+| PR-02, PRs \#348-349 | Determinism, Reader/CLI parity, A7 on Catalog route | HDE-DIST001.1/.2; historical CI discrepancy superseded in materiality by later 24-check QA | Current proof/test surfaces remain. EVT-002; EVD-002/EVD-008; OBL-011-012. Evidence pointer: PF10 | Addendum 2.2 | "without adding a new public route" |
+| PR-03, PRs \#350, \#351, \#353 | Reusable CI rails and safe open/closed proof family | HDE-DIST001.3; \#352 validation-only, not merged | Current CI/test surfaces remain. EVT-003; EVD-002; OBL-013. Evidence pointer: PF10 | Addendum 2.3 | "reusable PR-03 rails gate family" |
+| PR-04 and OPS-01, PRs \#354-355 | DB, BodyGraph, architecture, and original bridge-era posture | HDE-DIST001.4/.5/.9/.10; OPS-01 accepted historically | Implementation survives; bridge meaning is historical only. EVT-004/EVT-007; EVD-003/EVD-005; OBL-014-017/OBL-023 |
+| PR-05 and OPS-02, PRs \#356-358 | Configured-v2 mapped-cache write/read-back, mapped-only storage, idempotence | HDE-DIST001.11; bounded OPS-02 proof | Current mapped-cache module and evidence remain. EVT-005; EVD-004; RV-005; OBL-018/OBL-023 |
+| PR-06 lineage and OPS-03, PRs \#359-367 | Initial sanity pipeline, later direct-only convergence, OPS-03, release attestation, 19-stage final gate | HDE-DIST001.4/.5/.6/.9/.10/.11 and HDE-DIST005.1/.2; final exact-head validation passed | Core implementation remains current. EVT-006-009; EVD-003/EVD-006/EVD-007; RV-004/RV-006; OBL-014-019/OBL-023 |
+| Documentation reconciliation, PR \#368 | Align repository guidance with direct-only and external-attestation posture | Documentation only | Preserved as historical documentation merge. EVT-010 |
+| HDE-DIST007, PRs \#369-370 | Restore compatibility blueprint and complete the intended CI test lane | No permanent PF09 row; 35 tests and seven jobs passed | Current and accepted. EVT-011; EVD-010; RV-009; OBL-020 |
+| QA remediation, PRs \#371-372 | Complete qa-08 through one bounded Extended Moon Loop and corrected CI | QA Plan qa-08 | Merged; authority expired after event. EVT-013; EVD-008; OBL-021-022 |
+| QA finalization, PRs \#376-377 | Finalize governed 24-check evidence and closeout review posture | qa-00 through qa-23 all PASS | Current evidence unchanged. EVT-012-015; EVD-008/EVD-011; RV-007/RV-010 |
+| r5 DEV-01, PRs \#379-382 | Build 33-row token matrix and evidence bindings | 33 rows, all unclaimed | Merged history only; no closure authority. EVT-017; EVD-012; RV-011; OBL-024 |
+| r5 DEV-02, PR \#383 | Generator, fail-closed evaluation, receipt/lifecycle machinery | Focused CI passed before activation | Merged subsystem retained, but forward r5 authority withdrawn. EVT-018; GAP-004 |
+| r5 DEV-03, PR \#385 | Attempt ordinary close-pack generation and exact-head validation | Exact-head workflow failed; candidate remained `NOT SATISFIED` | Closed and unmerged. EVT-019; EVD-013; RV-012; GAP-001/GAP-003 |
+
+Major surfaces affected: runtime identity, canonical manifest, deterministic proofs, endpoint catalog, rails CI, DB adapter, BodyGraph resolver and cache, architecture snapshot, OPS evidence, evidence updater, Human Index, Machine Mirror, release-sanity pipeline, QA manifest, and supporting tests.
+
+Cross-slice allocation: early PRs established independent proof families; PR-06 bound them into a direct-only release gate; QA then exercised the complete planned surface. The later r5 subsystem added formal closeout machinery but did not alter the substantive delivered business behavior.
+
+Evidence inventory summary: current core implementation, 19-stage PASS, 24-check QA PASS, OPS-02/03, Index/Mirror parity, and HDE-DIST007 proof are supported. Ordinary close-pack and acceptance-token satisfaction are not supported or claimed.
+
+### 2.3 Retrospective: Process
+
+#### What went well
+
+* The planned dependency order was substantially preserved: identity, determinism/A7, rails, DB/BodyGraph, mapped cache, then integrated release validation.  
+* PF10 kept original implementations, remediation, OPS, QA, and later decisions separable.  
+* The evidence updater became the single owner for Index, Mirror, sentinels, and proofs.  
+* Failed and remediated QA receipts were preserved rather than overwritten.  
+* Direct-only current evidence and historical bridge evidence were assigned different meanings.  
+* QA finished with complete plan-order accounting and governed current-state artifacts.
+
+#### What did not go well
+
+* Most planned slices required multiple remediation PRs.  
+* The active transport architecture changed materially after the bridge-era implementation, producing a long PR-06 remediation lineage.  
+* PR \#349 retains a historical CI/PF10 discrepancy.  
+* The r5 remediation added five merged PRs and a sixth unmerged PR without a reachable terminal state.  
+* The closeout architecture attempted to bind hosted-CI facts into already-tracked final bytes, creating an unsolved causal back-edge.  
+* Formal acceptance machinery became disproportionate to an epic whose substantive business effect was internal reliability.
+
+#### What we learned
+
+* Closeout-state reachability needs proof before building a generator and workflow around it.  
+* Historical evidence should not be silently reinterpreted as current proof.  
+* Token rosters must be checked for semantic reachability against the current evidence model.  
+* A small end-to-end feasibility proof would have exposed the r5 lifecycle problem before five remediation PRs landed.  
+* The supplied RCA’s over-scope observation is consistent with independently verified PR and CI evidence, but the RCA is retained as historical context rather than treated as closure proof.
+
+### 2.4 Retrospective: Application / System
+
+| Category | Observation and why it matters | Current-epic closure relevance | Repo validation / accountability / ledgers | Evidence pointer |
+| ----- | ----- | ----- | ----- | ----- |
+| Must-fix | `RELEASE_ID_RECOMPUTE_OK` must be redefined, replaced, or retired before future reliance; its former current-equality predicate conflicts with frozen historical evidence | Non-blocking | Confirmed conflict; PF09 gap \- Product Owner assignment required; GAP-002 | Evidence pointer: PF10 | Addendum 2.42 | "Refreshing the historical family would violate Addendum 2.16." |
+| Must-fix | Any reused formal-close lifecycle must be feedback-free and terminally reachable | Outside current scope | PR \#385 confirms failure; PF09 gap \- Product Owner assignment required; GAP-003 | Evidence pointer: Repo | run `30760520344` | "RELEASE\_ATTESTATION\_FAILED:isolated\_stage\_failed" |
+| Should-fix | Audit the merged DEV-01/DEV-02 subsystem for retention or removal to avoid unnecessary CI and maintenance cost | Non-blocking | PRs \#379-383 remain current; PF09 gap \- Product Owner assignment required; GAP-004 | Evidence pointer: PF10 | Addendum 2.42 | "audit the merged DEV-01 and DEV-02 subsystem" |
+| Should-fix | Drain stale bridge and release-identity language from the Distillation checklist | Non-blocking | Current phase source confirmed stale; Documentation/status drainage only; GAP-005 | Evidence pointer: PF10 | Addendum 2.42 | "remove or supersede stale identity-artifact and recomputation wording" |
+| Should-fix | Preserve OPS-03’s bounded proof limits if later scope requires privilege or provisioning claims | Outside current scope | Current packet confirmed; HDE-DIST001.4 / HDE-DIST001.9; GAP-008 | Evidence pointer: PF10 | Addendum 2.42 | "limited OPS-03 provisioning provenance as non-blocking caveats" |
+| Nice-to-have | Correct PF10 internal version metadata and restore clear PF12 discoverability | Non-blocking | Repo/document metadata confirmed; Documentation/status drainage only; GAP-006 | Evidence pointer: Repo | current PF10 and historical PF12 headers | "document identity maintenance only" |
+
+### 2.5 ADRs and Ambiguity Resolution
+
+| Decision point or ADR | Options and constraints | Recorded or supported decision / authority | Canonical future rule | Evidence pointer |
+| ----- | ----- | ----- | ----- | ----- |
+| Active DB transport | Bridge parity, hybrid fallback, or direct-only; runtime and evidence had to be unambiguous | Direct PostgreSQL through the Glow-owned provider is the sole active transport. Authority: PF10 2.12-2.15 | Yes. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.12 | "sole active HDE database transport" |
+| Release identity | Tracked self-referential evidence or manifest-derived identity with external attestation | Canonical manifest is the sole tracked release-identity input; current attestation remains external. Authority: PF10 2.16 | Yes. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.16 | "single release-identity input stored in Git" |
+| Historical bridge evidence | Reuse as current proof or quarantine | Historical integrity only; it cannot satisfy current direct-only gates. Authority: PF10 2.13 | Yes. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.13 | "Historical bridge evidence MUST NOT satisfy a current direct-only release gate." |
+| Bounded OPS-03 | Rerun, broad privilege proof, or bounded read-only packet | One authorization-bound, direct read-only capture with explicit nonclaims. Authority: Product Owner and PF10 2.14/2.19 | No, execution-specific |  |
+| Extended Moon Loop | Reject qa-08, rerun entire plan, or authorize one bounded event | One event and two vendor requests, with authority expiring afterward. Authority: Product Owner and PF10 2.31 | Yes. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.31 | "That authority expired immediately after the event." |
+| Venue materiality | Universal Codespaces evidence or proof-specific venue requirement | Venue is mandatory only when material; HDE-EPIC038 is `UNKNOWN - NON-MATERIAL`. Authority: PF10 2.35 | Yes. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.35 | "not a QA failure" | "not a closeout blocker" |
+| r5 terminal state | Continue DEV-R1, weaken tokens, or stop the lineage | r5 withdrawn; DEV-03/04/R1 stopped; PR \#385 remains unmerged. Authority: PF10 2.42 | Yes for lifecycle design, not for the epic-specific exception. ADR \- NEW CANON PROPOSAL | Evidence pointer: PF10 | Addendum 2.42 | "The r5 Epic Remediation Plan ... is withdrawn as an executable plan." |
+| Epic closure | Ordinary close-pack or explicit exception | Close HDE-EPIC038 as-is with explicit caveats. Authority: final Product Owner instruction | No, epic-specific and not a reusable default | Evidence pointer: Current Product Owner instruction | current request | "the closure decision is final" |
+
+### 2.6 Pre-drainage PF-Canon candidates
+
+#### CAN-001
+
+PF10 decision or rule requiring consideration: Resolve the contradictory future meaning of `RELEASE_ID_RECOMPUTE_OK`.  
+Why reusable: Future epics must know whether the token proves current manifest computation, external attestation, or something else.  
+Proposed owning document: PF04 \- PF04-Canon-HDE-Governance  
+Owning-topic rationale: PF04 owns token names and semantics.  
+Exact existing parent section: §2.0 Acceptance Tokens (single-home roster) \[Required-Now\]  
+Candidate classification: CANON AMBIGUITY OR CONFLICT  
+Delta intent: Redefine, replace, or retire the token without reclassifying frozen historical evidence.  
+Closure impact: Non-blocking  
+Evidence pointer: PF04 | §2.0 | "Token names and semantics are owned here."  
+Evidence pointer: PF10 | Addendum 2.42 | "`RELEASE_ID_RECOMPUTE_OK` must not be claimed from that family."
+
+#### CAN-002
+
+PF10 decision or rule requiring consideration: Define a feedback-free terminal lifecycle and an explicit exceptional-closure record.  
+Why reusable: The lifecycle applies to any future close-pack validated by hosted CI.  
+Proposed owning document: PF06 \- PF06-Canon-Epic-Process-Guide  
+Owning-topic rationale: PF06 owns Close Gate process and Product Owner action boundaries.  
+Exact existing parent section: Unknown \- locator verification required  
+Candidate classification: CANON AMBIGUITY OR CONFLICT  
+Delta intent: Require tracked candidate bytes to be complete before hosted validation, with no CI-to-source back-edge; define the nonclaim fields for an authorized exception.  
+Closure impact: Non-blocking  
+Evidence pointer: PF10 | Addendum 2.42, Drain targets | "define a feedback-free terminal lifecycle and an explicit exceptional-closure record"
+
+#### CAN-003
+
+PF10 decision or rule requiring consideration: Separate current external attestation from frozen historical checked-in evidence and future close-pack binding.  
+Why reusable: Release evidence structure is cross-epic.  
+Proposed owning document: PF12 \- PF12-Canon-HDE-Schemas-and-Artifacts  
+Owning-topic rationale: PF12 owns release evidence, manifests, hashes, paths, and close-pack structures.  
+Exact existing parent section: §Close-pack artifacts (deterministic path-of-record; baseline artifacts) and §Release identity (freeze-pack)  
+Candidate classification: CANON AMBIGUITY OR CONFLICT  
+Delta intent: Define an acyclic release-to-attestation-to-close-pack structure without treating historical captures as current equality evidence.  
+Closure impact: Non-blocking  
+Evidence pointer: PF12 | §Release identity (freeze-pack) | "release\_id \= sha256(canonical\_manifest\_bytes)"  
+Evidence pointer: PF10 | Addendum 2.42 | "define any future closeout artifact lifecycle without a back-edge into tracked source"
+
+#### CAN-004
+
+PF10 decision or rule requiring consideration: Drain direct-only DB semantics and current release-identity posture into the Distillation checklist.  
+Why reusable: The existing rows still describe retired bridge and historical-identity assumptions.  
+Proposed owning document: PF09.6 \- PF09.6-Canon-HDE-Build-Checklist-Distillation  
+Owning-topic rationale: PF09.6 owns Distillation task text and recorded status.  
+Exact existing parent section: HDE-DIST001.4, HDE-DIST001.9, HDE-DIST002.4, HDE-DIST002.5  
+Candidate classification: CANON MISMATCH  
+Delta intent: Replace active bridge wording with direct-only semantics and align identity rows with the external-attestation model, preserving historical facts.  
+Closure impact: Non-blocking  
+Evidence pointer: PF10 | Addendum 2.42, Drain targets | "remove or supersede stale identity-artifact and recomputation wording"
+
+#### CAN-005
+
+PF10 decision or rule requiring consideration: Adopt venue materiality and bounded Extended Moon Loop rules.  
+Why reusable: Both govern future Live QA, independent of this epic.  
+Proposed owning document: PF19 \- PF19-Canon-Glow-QA-Guide  
+Owning-topic rationale: PF19 owns QA evidence, remediation loops, and closeout rules.  
+Exact existing parent section: §3.4 and §9.2.15.6  
+Candidate classification: CANON MISMATCH  
+Delta intent: Make venue proof mandatory only when venue is part of the claimed fact, and preserve bounded one-event remediation authority.  
+Closure impact: Non-blocking  
+Evidence pointer: PF10 | Addenda 2.31 and 2.35 | "one fresh authorization for one live generation event" | "absence of Codespaces provenance is not a closeout blocker"
+
+#### CAN-006
+
+PF10 decision or rule requiring consideration: Require terminal-state reachability and a small end-to-end feasibility proof before closeout-remediation approval.  
+Why reusable: It prevents plan approval when the proposed terminal state cannot be produced without circular evidence flow.  
+Proposed owning document: PF27 \- PF27-Canon-Plan-Templates  
+Owning-topic rationale: PF27 owns plan structure, review guards, and approval semantics.  
+Exact existing parent section: §Materiality-based blocker discipline (required for Epic Plan and Implementation Plan review)  
+Candidate classification: CANON SILENCE  
+Delta intent: Add explicit lifecycle reachability, execution-surface feasibility, and end-to-end proof fields.  
+Closure impact: Non-blocking  
+Evidence pointer: PF10 | Addendum 2.42, Drain targets | "require terminal-state reachability, execution-surface feasibility, rails consistency, and an end-to-end proof"
+
+Search method: searched PF27 for `terminal-state reachability|feedback-free|reachability proof|execution-surface feasibility` (case: insensitive); scope: complete document; tool: `rg`; result: 0 hits.
+
+### 2.7 Build improvements and future work
+
+| Recommendation | Evidence basis | Current-epic status | PF09 accountability destination | Where it should live / PF references / dependency |
+| ----- | ----- | ----- | ----- | ----- |
+| Resolve future release-token semantics | GAP-002; current identity values cannot meet the withdrawn predicate | Non-blocking | PF09 gap \- Product Owner assignment required | Future epic or card; PF04, PF12, PF09.6; depends on current manifest/external-attestation model |
+| Define and prove a feedback-free close lifecycle | GAP-003 and PR \#385 failure | Outside scope | PF09 gap \- Product Owner assignment required | Future epic or card; PF06, PF12, PF27; depends on hosted CI validation model |
+| Audit the merged DEV-01/DEV-02 subsystem | GAP-004 | Non-blocking | PF09 gap \- Product Owner assignment required | Future epic or card; PF06/PF12 as applicable; depends on PRs \#379-383 |
+| Drain PF09 release, bridge, and status wording | GAP-005 | Non-blocking | Documentation/status drainage only | Documentation-status drainage only; PF09.6 and PF10 |
+| Correct PF10 metadata and PF12 discoverability | GAP-006 | Non-blocking | Documentation/status drainage only | Documentation-status drainage only |
+| Record board closure with ordinary-close nonclaims | GAP-007 | Non-blocking | Documentation/status drainage only | Documentation-status drainage only |
+| Preserve PR \#349 and OPS-03 limitations if future scope relies on them | GAP-008 | Outside scope | HDE-DIST001.4 / HDE-DIST001.9 | Future card only if material; PF19 and owning technical canon |
+| Keep Distillation phase exit separate | GAP-009 | Outside scope | PF09 gap \- Product Owner assignment required | Future phase-exit work; PF09.6 and PF06 |
+
+No PF23 dependency is created by these recommendations.
+
+### 2.8 Recommendation only
+
+* Record the final exceptional closure in PF10 and proceed with the separate documentation/status drainage.  
+* Do not reopen r5, PR \#385, DEV-03, DEV-04, or DEV-R1.  
+* Treat the implementation, 19-stage sanity PASS, 24-check QA PASS, evidence integrity, and bounded OPS results as the delivered HDE-EPIC038 outcome.  
+* Preserve the explicit nonclaims for Gate D, 33-of-33 tokens, ordinary close-pack completion, merged close PR, PF09 movement, board movement, and Distillation exit.  
+* Route release-token semantics, close-lifecycle design, and the DEV-01/DEV-02 subsystem audit into separately authorized future work.  
+* No hard requirement remains before HDE-EPIC038 closure because the Product Owner has finalized the epic-specific exception.  
+* PF09 status drainage, PF-Canon drainage, board maintenance, and phase-exit adjudication remain separate actions.
+
+Implementation posture recommendation: READY WITH CAVEATS
 
