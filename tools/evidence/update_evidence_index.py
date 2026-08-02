@@ -2805,7 +2805,9 @@ def _validate_epic038_closeout_package() -> None:
     previous_root = closeout.ROOT
     closeout.ROOT = ROOT
     try:
-        closeout.validate_package(_epic038_closeout_package_bytes())
+        closeout._validate_package_for_canonical_updater(
+            _epic038_closeout_package_bytes()
+        )
     except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
         raise SystemExit("INVALID_EPIC038_CLOSEOUT_PACKAGE") from exc
     finally:

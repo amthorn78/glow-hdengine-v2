@@ -596,7 +596,7 @@ def test_ci_runs_canonical_path_validator_before_mirror_schema() -> None:
     assert workflow.index(path_step) < workflow.index(mirror_step)
 
 
-def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:
+def test_planned_rows_are_exact_owned_and_source_contract_stays_unclaimed() -> None:
     rows = {row.token: row for row in closeout.validate_rows(closeout.build_rows())}
     assert set(closeout.PLANNED_BINDINGS) == {
         "TESTS_PASS_OK",
@@ -613,8 +613,6 @@ def test_planned_rows_are_exact_owned_absent_and_unclaimed() -> None:
         assert row.live_qa.startswith("N/A:")
         assert "UNCLAIMED" in row.posture
         assert "has not been executed" in row.posture
-        assert not (ROOT / path).exists()
-        assert not (ROOT / f"{path}.path_proof.txt").exists()
 
     assert closeout.PLANNED_BINDINGS["QA_PRECOMMIT_CHECKLIST_OK"] == (
         "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
@@ -1320,6 +1318,131 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
             + "          printf '#!/bin/sh\\nexit 0\\n' > /tmp/pr382-shim/python\n"
             + "          chmod +x /tmp/pr382-shim/python\n"
             + "          echo /tmp/pr382-shim >> \"$GITHUB_PATH\"",
+            1,
+        ),
+    )
+    for changed in mutations:
+        assert changed != workflow
+        with pytest.raises(ValueError, match="CI command binding mismatch"):
+            closeout.validate_doc_delta_ci(changed)
+
+
+def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    closeout.validate_doc_delta_ci(workflow)
+    test_job = workflow[
+        workflow.index("  test:\n") : workflow.index(
+            "\n  compat-conj-pr01-closure:", workflow.index("  test:\n")
+        )
+    ]
+    expected_needs = (
+        "    needs:\n"
+        "      - compat-conj-pr01-closure\n"
+        "      - epic020\n"
+        "      - compat-http-epic020\n"
+        "      - epic020-evidence-bundles\n"
+        "      - rails-policy-gates\n"
+        "      - sanity-pipeline\n"
+    )
+    assert expected_needs in test_job
+    assert '      PYTHONDONTWRITEBYTECODE: "1"\n' in test_job
+    assert (
+        "          ref: ${{ github.event.pull_request.head.sha || github.sha }}\n"
+        in test_job
+    )
+    assert (
+        "name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}"
+        in test_job
+    )
+    assert (
+        "name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}"
+        in test_job
+    )
+    assert "path: ${{ runner.temp }}/hde-epic038-private-receipt" in test_job
+    assert f"audit/{closeout.PRIVATE_CI_RECEIPT_NAME}" not in workflow
+    receipt_step = test_job[
+        test_job.index(
+            "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
+        ) : test_job.index(
+            "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+        )
+    ]
+    receipt_start = test_job.index(
+        "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
+    )
+    assert (
+        "      - run: python tools/evidence/update_evidence_index.py --check\n"
+        not in test_job[:receipt_start]
+    )
+    assert (
+        "            python tools/evidence/update_evidence_index.py --check\n"
+        in receipt_step
+    )
+    positions = [receipt_step.index(f"              {command}") for command in closeout.PRIVATE_CI_COMMANDS]
+    assert positions == sorted(positions)
+    writer = receipt_step.index("closeout._write_private_ci_receipt()")
+    assert positions[-1] < writer
+    assert receipt_step.count("git worktree add --detach") == 2
+    final_write = receipt_step.rindex(
+        f"            {closeout.PLAN_CLOSEOUT_WRITE_COMMAND}\n"
+    )
+    final_check = receipt_step.rindex(
+        f"            {closeout.PLAN_CLOSEOUT_CHECK_COMMAND}\n"
+    )
+    final_updater_check = receipt_step.rindex(
+        "            SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+        "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check\n"
+    )
+    assert writer < final_write < final_check < final_updater_check
+    final_diff = test_job.index("git diff --exit-code", final_check)
+    upload = test_job.index(
+        "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+    )
+    assert final_diff > final_check
+    assert upload > final_diff
+
+    mutations = (
+        workflow.replace(
+            "      - compat-conj-pr01-closure\n", "", 1
+        ),
+        workflow.replace('      PYTHONDONTWRITEBYTECODE: "1"\n', "", 1),
+        workflow.replace(
+            "      - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized\n",
+            "      - run: python tools/evidence/update_evidence_index.py --check\n"
+            "      - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized\n",
+            1,
+        ),
+        workflow.replace(
+            "          ref: ${{ github.event.pull_request.head.sha || github.sha }}",
+            "          ref: main",
+            1,
+        ),
+        workflow.replace(
+            "              unset _HDE_EPIC038_PRIVATE_CI_ROOT\n", "", 1
+        ),
+        workflow.replace(
+            f"              {closeout.PLAN_CLOSEOUT_PREFLIGHT_COMMAND}",
+            f"              {closeout.PLAN_CLOSEOUT_PREFLIGHT_COMMAND} || true",
+            1,
+        ),
+        workflow.replace(
+            "        if: steps.epic038_receipt.outputs.produced == 'true'",
+            "        if: always()",
+            1,
+        ),
+        workflow.replace(
+            "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
+            "          path: audit/hde-epic038-private-receipt",
+            1,
+        ),
+        workflow.replace(
+            "      - name: Confirm exact-head receipt fixed point is clean\n"
+            "        run: |\n"
+            "          git diff --check\n"
+            "          git diff --exit-code\n",
+            "      - name: Confirm exact-head receipt fixed point is clean\n"
+            "        run: |\n"
+            "          git diff --check\n",
             1,
         ),
     )
@@ -2334,6 +2457,56 @@ def _release_attestation(
     }
 
 
+def _configure_private_ci_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    include_receipt: bool = True,
+    run_id: str = "424242",
+) -> tuple[Path, dict[str, object], dict[str, object]]:
+    source_commit = "a" * 40
+    manifest_sha256 = hashlib.sha256(
+        (closeout.ROOT / closeout.RELEASE_MANIFEST_PATH).read_bytes()
+    ).hexdigest()
+    attestation = _release_attestation(source_commit, manifest_sha256)
+    attestation_bytes = closeout._canonical_json(attestation)
+    root = tmp_path / f"private-ci-{run_id}"
+    attestation_root = root / closeout.PRIVATE_CI_ATTESTATION_DIR
+    attestation_root.mkdir(parents=True)
+    (attestation_root / "attestation.json").write_bytes(attestation_bytes)
+    receipt = closeout._private_execution_receipt_payload(
+        attestation,
+        attestation_bytes,
+        event_name="pull_request",
+        run_id=run_id,
+        run_attempt="1",
+        source_commit=source_commit,
+    )
+    if include_receipt:
+        (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+            closeout._canonical_json(receipt)
+        )
+    monkeypatch.setattr(
+        closeout,
+        "_verify_private_release_attestation_bundle",
+        lambda _root: None,
+    )
+    monkeypatch.setattr(closeout, "_current_source_commit", lambda: source_commit)
+    exact_source_tree_sha256 = str(attestation["source_tree_sha256"])
+    monkeypatch.setattr(
+        closeout,
+        "_current_source_tree_sha256",
+        lambda: exact_source_tree_sha256,
+    )
+    monkeypatch.setattr(
+        closeout,
+        "_validate_private_source_worktree",
+        lambda *, allow_generated: None,
+    )
+    monkeypatch.setenv(closeout.PRIVATE_CI_ROOT_ENV, str(root))
+    return root, receipt, attestation
+
+
 def test_release_identity_binding_uses_complete_governed_family() -> None:
     row = next(
         row
@@ -2491,6 +2664,359 @@ def test_release_attestation_core_payload_accepts_current_closed_rails() -> None
         expected_source_commit=source_commit,
         manifest_sha256=manifest_sha256,
     )
+
+
+def test_private_ci_receipt_is_external_exact_and_token_agnostic(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch
+    )
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "PASS"
+    assert outcome.planned_state == "PASS"
+    assert receipt["command_results"] == [
+        {"command": command, "exit_code": 0, "result": "PASS"}
+        for command in closeout.PRIVATE_CI_COMMANDS
+    ]
+    assert tuple(
+        item["command"] for item in receipt["command_results"]
+    ) == closeout.PRIVATE_CI_COMMANDS
+    serialized = (root / closeout.PRIVATE_CI_RECEIPT_NAME).read_text(
+        encoding="utf-8"
+    )
+    assert "artifact_key" not in serialized
+    assert all(token not in serialized for token in closeout.TOKENS)
+    assert str(root) not in serialized
+
+
+def test_private_ci_attestation_without_execution_receipt_promotes_no_token(
+    dev02_fixed_repo: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _configure_private_ci_evidence(
+        tmp_path, monkeypatch, include_receipt=False
+    )
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "ATTESTED"
+    assert outcome.planned_state == "ABSENT"
+    snapshot = closeout.evaluate_closeout()
+    affected = {
+        *closeout.PLANNED_BINDINGS,
+        "RELEASE_ID_RECOMPUTE_OK",
+    }
+    assert {
+        result.status
+        for result in snapshot.token_results
+        if result.token in affected
+    } == {"UNCLAIMED"}
+    package = closeout.build_package(evaluation_snapshot=snapshot)
+    assert json.loads(package[closeout.CLOSE_MANIFEST_PATH])["decision"] == (
+        "NOT SATISFIED"
+    )
+
+
+def test_private_ci_attestation_must_match_exact_head_tree_digest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, receipt, attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch
+    )
+    attestation["source_tree_sha256"] = "b" * 64
+    attestation_bytes = closeout._canonical_json(attestation)
+    (
+        root
+        / closeout.PRIVATE_CI_ATTESTATION_DIR
+        / "attestation.json"
+    ).write_bytes(attestation_bytes)
+    receipt["source_tree_sha256"] = "b" * 64
+    receipt["release_attestation_sha256"] = hashlib.sha256(
+        attestation_bytes
+    ).hexdigest()
+    (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+        closeout._canonical_json(receipt)
+    )
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "FAIL"
+    assert outcome.planned_state == "FAIL"
+
+
+def test_exact_head_tree_digest_ignores_dirty_worktree_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "source"
+    repository.mkdir()
+    (repository / "alpha.txt").write_bytes(b"alpha\n")
+    (repository / "nested").mkdir()
+    (repository / "nested/beta.txt").write_bytes(b"beta\n")
+    subprocess.run(["git", "init", "-q", str(repository)], check=True)
+    subprocess.run(["git", "-C", str(repository), "add", "."], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "-c",
+            "user.name=Receipt Test",
+            "-c",
+            "user.email=receipt@example.invalid",
+            "commit",
+            "-qm",
+            "fixture",
+        ],
+        check=True,
+    )
+    rows = [
+        {
+            "path": path,
+            "sha256": hashlib.sha256(body).hexdigest(),
+            "size": len(body),
+        }
+        for path, body in (
+            ("alpha.txt", b"alpha\n"),
+            ("nested/beta.txt", b"beta\n"),
+        )
+    ]
+    expected = hashlib.sha256(closeout._canonical_json(rows)).hexdigest()
+    monkeypatch.setattr(closeout, "ROOT", repository)
+    assert closeout._current_source_tree_sha256() == expected
+    (repository / "alpha.txt").write_bytes(b"dirty\n")
+    assert closeout._current_source_tree_sha256() == expected
+
+
+def test_private_source_worktree_rejects_unrelated_drift_and_only_allows_outputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "source"
+    repository.mkdir()
+    (repository / "alpha.txt").write_bytes(b"alpha\n")
+    subprocess.run(["git", "init", "-q", str(repository)], check=True)
+    subprocess.run(["git", "-C", str(repository), "add", "."], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "-c",
+            "user.name=Receipt Test",
+            "-c",
+            "user.email=receipt@example.invalid",
+            "commit",
+            "-qm",
+            "fixture",
+        ],
+        check=True,
+    )
+    monkeypatch.setattr(closeout, "ROOT", repository)
+    closeout._validate_private_source_worktree(allow_generated=False)
+
+    (repository / "alpha.txt").write_bytes(b"dirty\n")
+    with pytest.raises(ValueError, match="unrelated tracked or untracked drift"):
+        closeout._validate_private_source_worktree(allow_generated=True)
+
+    (repository / "alpha.txt").write_bytes(b"alpha\n")
+    generated = repository / closeout.CLOSE_REPORT_PATH
+    generated.parent.mkdir(parents=True)
+    generated.write_bytes(b"generated\n")
+    closeout._validate_private_source_worktree(allow_generated=True)
+    with pytest.raises(ValueError, match="unrelated tracked or untracked drift"):
+        closeout._validate_private_source_worktree(allow_generated=False)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        pytest.param(
+            lambda payload: payload["command_results"].pop(),
+            id="missing-command",
+        ),
+        pytest.param(
+            lambda payload: payload["command_results"].reverse(),
+            id="reordered-commands",
+        ),
+        pytest.param(
+            lambda payload: payload["command_results"].append(
+                dict(payload["command_results"][-1])
+            ),
+            id="duplicated-command",
+        ),
+        pytest.param(
+            lambda payload: payload["command_results"][0].__setitem__(
+                "command", "python -m pytest"
+            ),
+            id="substituted-command",
+        ),
+        pytest.param(
+            lambda payload: payload["command_results"][2].__setitem__(
+                "exit_code", 1
+            ),
+            id="nonzero-exit",
+        ),
+        pytest.param(
+            lambda payload: payload["closed_rails"].__setitem__(
+                "ALLOW_NETWORK", "1"
+            ),
+            id="opened-rails",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("source_commit", "b" * 40),
+            id="stale-head",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("manifest_sha256", "b" * 64),
+            id="wrong-manifest",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__(
+                "release_attestation_sha256", "b" * 64
+            ),
+            id="wrong-attestation-digest",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("source_tree_sha256", "b" * 64),
+            id="wrong-source-tree",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("repository", "someone/else"),
+            id="wrong-repository",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("workflow_path", "other.yml"),
+            id="wrong-workflow",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("job", "other"),
+            id="wrong-job",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("event_name", "workflow_dispatch"),
+            id="wrong-event",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("run_id", "0"),
+            id="invalid-run",
+        ),
+        pytest.param(
+            lambda payload: payload.__setitem__("unexpected", True),
+            id="extra-field",
+        ),
+    ],
+)
+def test_private_ci_receipt_tamper_blocks_every_affected_token(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: Callable[[dict[str, object]], None],
+) -> None:
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch
+    )
+    mutation(receipt)
+    (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+        closeout._canonical_json(receipt)
+    )
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "FAIL"
+    assert outcome.planned_state == "FAIL"
+
+
+@pytest.mark.parametrize("encoding", ["pretty", "duplicate-key", "symlink"])
+def test_private_ci_receipt_rejects_noncanonical_or_aliased_bytes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    encoding: str,
+) -> None:
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch
+    )
+    path = root / closeout.PRIVATE_CI_RECEIPT_NAME
+    if encoding == "pretty":
+        path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    elif encoding == "duplicate-key":
+        raw = closeout._canonical_json(receipt)
+        path.write_bytes(raw.replace(b"{", b'{"contract":"duplicate",', 1))
+    else:
+        target = tmp_path / "aliased-receipt.json"
+        target.write_bytes(closeout._canonical_json(receipt))
+        path.unlink()
+        path.symlink_to(target)
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "FAIL"
+    assert outcome.planned_state == "FAIL"
+
+
+def test_private_ci_root_must_be_absolute_external_and_nonaliased(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    inside = repository / "receipt"
+    (inside / closeout.PRIVATE_CI_ATTESTATION_DIR).mkdir(parents=True)
+    monkeypatch.setattr(closeout, "ROOT", repository)
+    with pytest.raises(ValueError, match="external"):
+        closeout._private_ci_root(str(inside))
+    with pytest.raises(ValueError, match="absolute"):
+        closeout._private_ci_root("relative/receipt")
+
+    external = tmp_path / "external"
+    (external / closeout.PRIVATE_CI_ATTESTATION_DIR).mkdir(parents=True)
+    alias = tmp_path / "alias"
+    alias.symlink_to(external, target_is_directory=True)
+    with pytest.raises(ValueError, match="non-symlink"):
+        closeout._private_ci_root(str(alias))
+
+
+def test_private_ci_writer_requires_github_test_job_and_writes_mode_0600(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, _receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch, include_receipt=False
+    )
+    environment = {
+        **closeout.PRIVATE_CI_EXECUTION_RAILS,
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_JOB": closeout.PRIVATE_CI_JOB,
+        "GITHUB_REPOSITORY": closeout.PRIVATE_CI_REPOSITORY,
+        "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_RUN_ID": "424242",
+        "GITHUB_WORKFLOW": "ci",
+    }
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
+    written = closeout._write_private_ci_receipt()
+    assert written == root / closeout.PRIVATE_CI_RECEIPT_NAME
+    assert written.stat().st_mode & 0o077 == 0
+    assert closeout._private_ci_evidence().planned_state == "PASS"
+    with pytest.raises(ValueError, match="empty receipt destination"):
+        closeout._write_private_ci_receipt()
+
+
+@pytest.mark.parametrize("rail", sorted(closeout.PRIVATE_CI_EXECUTION_RAILS))
+def test_private_ci_writer_rejects_open_or_missing_execution_rail(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    rail: str,
+) -> None:
+    root, _receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch, include_receipt=False
+    )
+    environment = {
+        **closeout.PRIVATE_CI_EXECUTION_RAILS,
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_JOB": closeout.PRIVATE_CI_JOB,
+        "GITHUB_REPOSITORY": closeout.PRIVATE_CI_REPOSITORY,
+        "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_RUN_ID": "424242",
+        "GITHUB_WORKFLOW": "ci",
+    }
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv(rail)
+    with pytest.raises(ValueError, match="producer rails mismatch"):
+        closeout._write_private_ci_receipt()
+    assert not (root / closeout.PRIVATE_CI_RECEIPT_NAME).exists()
 
 
 def test_render_is_deterministic_lf_terminated_and_never_claims_pass() -> None:
@@ -2700,6 +3226,18 @@ def dev02_source_tree(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = _clone_repo(
         ROOT, tmp_path_factory.mktemp("hde-epic038-dev02-source") / "repo"
     )
+    # Keep this fixture at the DEV-02 pre-generation boundary even when the
+    # exact head already contains a complete DEV-03 package.  The deletion is
+    # isolated to the temporary copy; the canonical updater below removes the
+    # corresponding generated companions and reconstructs the approved baseline.
+    for relative in (
+        *closeout.PACKAGE_ACTIVATION_PATHS,
+        *(
+            proof
+            for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+        ),
+    ):
+        (root / relative).unlink(missing_ok=True)
     # Establish a complete current reused-evidence baseline through canonical
     # producers only. This prevents a stale checkout companion from turning all
     # 33 predicates into the same synthetic matrix-level failure and creating a
@@ -3044,6 +3582,216 @@ def test_dev02_complete_registered_fixture_remains_truthfully_nonclaiming(
     assert tuple(manifest["token_roster"]) == closeout.TOKENS
 
 
+def test_private_receipt_promotes_only_four_tokens_and_reaches_stable_satisfied(
+    dev02_fixed_repo: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    baseline = closeout.evaluate_closeout()
+    baseline_by_token = {item.token: item for item in baseline.token_results}
+    assert {
+        token
+        for token, result in baseline_by_token.items()
+        if result.status == "UNCLAIMED"
+    } == {*closeout.PLANNED_BINDINGS, "RELEASE_ID_RECOMPUTE_OK"}
+
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch, run_id="424242"
+    )
+    admitted = closeout.evaluate_closeout()
+    admitted_by_token = {item.token: item for item in admitted.token_results}
+    changed = {
+        token
+        for token in closeout.TOKENS
+        if admitted_by_token[token].status != baseline_by_token[token].status
+    }
+    assert changed == {
+        *closeout.PLANNED_BINDINGS,
+        "RELEASE_ID_RECOMPUTE_OK",
+    }
+    assert all(item.status == "PASS" for item in admitted.token_results)
+    assert not admitted.blockers
+
+    first = closeout.build_package(evaluation_snapshot=admitted)
+    closeout.validate_package(first)
+    manifest = json.loads(first[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "SATISFIED"
+    assert not manifest["minimum_follow_up"]
+    assert set(manifest["token_status"].values()) == {"PASS"}
+    assert {
+        json.loads(first[path])["result"]
+        for path in (
+            closeout.PRECOMMIT_CHECKLIST_PATH,
+            closeout.POSTCOMMIT_CHECKLIST_PATH,
+        )
+    } == {"PASS"}
+
+    receipt["run_id"] = "434343"
+    (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+        closeout._canonical_json(receipt)
+    )
+    second = closeout.build_package()
+    assert second == first
+    combined = b"".join(first[path] for path in closeout.PACKAGE_PATHS)
+    assert b"424242" not in combined
+    assert b"434343" not in combined
+    assert str(root).encode("utf-8") not in combined
+
+
+def test_invalid_private_receipt_keeps_package_not_satisfied(
+    dev02_fixed_repo: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path, monkeypatch
+    )
+    receipt["command_results"][0]["exit_code"] = 1
+    (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+        closeout._canonical_json(receipt)
+    )
+    snapshot = closeout.evaluate_closeout()
+    results = {item.token: item for item in snapshot.token_results}
+    assert results["RELEASE_ID_RECOMPUTE_OK"].status == "FAIL"
+    assert {
+        results[token].status for token in closeout.PLANNED_BINDINGS
+    } == {"FAIL"}
+    assert all(
+        results[token].status == "PASS"
+        for token in closeout.TOKENS
+        if token not in {*closeout.PLANNED_BINDINGS, "RELEASE_ID_RECOMPUTE_OK"}
+    )
+    package = closeout.build_package(evaluation_snapshot=snapshot)
+    closeout.validate_package(package)
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert manifest["minimum_follow_up"]
+
+
+def _private_projection(state: str) -> closeout._PrivateCiEvidence:
+    if state == "ABSENT":
+        return closeout._PrivateCiEvidence(
+            "ABSENT",
+            "no private external exact-source release attestation was supplied",
+            "ABSENT",
+            "no private external exact-command CI receipt was supplied",
+        )
+    if state == "FAIL":
+        return closeout._PrivateCiEvidence(
+            "FAIL",
+            closeout.PRIVATE_CI_INVALID_DETAIL,
+            "FAIL",
+            closeout.PRIVATE_CI_INVALID_DETAIL,
+        )
+    if state == "PASS":
+        return closeout._PrivateCiEvidence(
+            "PASS",
+            closeout.PRIVATE_CI_ATTESTATION_PASS_DETAIL,
+            "PASS",
+            closeout.PRIVATE_CI_RECEIPT_PASS_DETAIL,
+        )
+    raise AssertionError(state)
+
+
+def _package_for_private_projection(
+    private_evidence: closeout._PrivateCiEvidence,
+) -> dict[str, bytes]:
+    snapshot = closeout._evaluate_closeout(private_evidence)
+    ledger = closeout.record_blockers(
+        closeout._load_ledger(), [dict(item) for item in snapshot.blockers]
+    )
+    return closeout._construct_package(snapshot, ledger)
+
+
+def test_canonical_updater_accepts_receipt_satisfied_projection_without_receipt(
+    dev02_fixed_repo: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    package = _package_for_private_projection(_private_projection("PASS"))
+    assert json.loads(package[closeout.CLOSE_MANIFEST_PATH])["decision"] == "SATISFIED"
+    closeout._validate_package_for_canonical_updater(package)
+    for relative, body in package.items():
+        _replace_bytes(dev02_fixed_repo / relative, body)
+    primaries = _package_at(dev02_fixed_repo)
+
+    _assert_success(
+        _run_repo_tool(dev02_fixed_repo, "tools/evidence/update_evidence_index.py")
+    )
+    assert _package_at(dev02_fixed_repo) == primaries
+    _assert_success(
+        _run_repo_tool(dev02_fixed_repo, "tools/evidence/orientation_demo.py")
+    )
+    _assert_success(
+        _run_repo_tool(dev02_fixed_repo, "tools/evidence/update_evidence_index.py")
+    )
+    assert _package_at(dev02_fixed_repo) == primaries
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo,
+            "tools/evidence/update_evidence_index.py",
+            "--check",
+        )
+    )
+    monkeypatch.setattr(
+        closeout,
+        "_private_ci_evidence",
+        lambda: _private_projection("PASS"),
+    )
+    closeout.validate_package(_package_at(dev02_fixed_repo))
+
+
+def test_canonical_updater_rejects_mixed_external_gate_projection(
+    dev02_fixed_repo: Path,
+) -> None:
+    absent = closeout._evaluate_closeout(_private_projection("ABSENT"))
+    admitted = closeout._evaluate_closeout(_private_projection("PASS"))
+    admitted_by_token = {item.token: item for item in admitted.token_results}
+    mixed_results = tuple(
+        admitted_by_token[item.token]
+        if item.token == "RELEASE_ID_RECOMPUTE_OK"
+        else item
+        for item in absent.token_results
+    )
+    mixed = closeout._make_snapshot(
+        mixed_results,
+        absent.proof_families,
+        (),
+        absent.obligations,
+    )
+    package = closeout._construct_package(mixed, closeout._load_ledger())
+    closeout.validate_package_structure(package)
+    with pytest.raises(ValueError, match="complete canonical external-gate projection"):
+        closeout._validate_package_for_canonical_updater(package)
+
+
+def test_canonical_updater_recomputes_ungated_predicates_under_satisfied_projection(
+    dev02_fixed_repo: Path,
+) -> None:
+    package = _package_for_private_projection(_private_projection("PASS"))
+    source = dev02_fixed_repo / closeout.DOC_DELTA_PRIMARY_PATH
+    source.write_bytes(source.read_bytes() + b"drift\n")
+    before = _tree_state(dev02_fixed_repo)
+    with pytest.raises(ValueError, match="complete canonical external-gate projection"):
+        closeout._validate_package_for_canonical_updater(package)
+    assert _tree_state(dev02_fixed_repo) == before
+
+
+def test_canonical_updater_accepts_complete_invalid_external_gate_projection(
+    dev02_fixed_repo: Path,
+) -> None:
+    package = _package_for_private_projection(_private_projection("FAIL"))
+    manifest = json.loads(package[closeout.CLOSE_MANIFEST_PATH])
+    assert manifest["decision"] == "NOT SATISFIED"
+    assert {
+        manifest["token_status"][token]
+        for token in {
+            *closeout.PLANNED_BINDINGS,
+            "RELEASE_ID_RECOMPUTE_OK",
+        }
+    } == {"FAIL"}
+    closeout._validate_package_for_canonical_updater(package)
+
+
 def test_dev02_legacy_empty_blocker_override_is_not_an_api() -> None:
     with pytest.raises(TypeError):
         closeout.build_package([], closeout._empty_ledger())
@@ -3157,6 +3905,16 @@ def test_dev02_positive_evaluation_executes_every_token_specific_evaluator(
 
         wrapped[token] = observe
     monkeypatch.setattr(closeout, "TOKEN_EVALUATOR_REGISTRY", wrapped)
+    release_evaluator = closeout._semantic_release
+
+    def observe_release(
+        row: object,
+        private_evidence: closeout._PrivateCiEvidence | None = None,
+    ) -> str:
+        calls.append("RELEASE_ID_RECOMPUTE_OK")
+        return release_evaluator(row, private_evidence)
+
+    monkeypatch.setattr(closeout, "_semantic_release", observe_release)
     snapshot = closeout.evaluate_closeout()
     assert calls == [
         token

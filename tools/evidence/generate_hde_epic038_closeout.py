@@ -73,6 +73,48 @@ PLAN_CLOSEOUT_WRITE_COMMAND = (
     "python tools/evidence/generate_hde_epic038_closeout.py"
 )
 PLAN_CLOSEOUT_CHECK_COMMAND = f"{PLAN_CLOSEOUT_WRITE_COMMAND} --check"
+PLAN_CLOSEOUT_PREFLIGHT_COMMAND = f"{PLAN_CLOSEOUT_WRITE_COMMAND} --preflight"
+PLAN_CURRENT_STATE_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python tools/evidence/check_hde_epic038_qa_current_state.py "
+    "--require-finalized"
+)
+PLAN_FOCUSED_TEST_COMMAND = (
+    "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC "
+    "python -m pytest -q tests/evidence/test_hde_epic038_closeout.py"
+)
+PRIVATE_CI_ROOT_ENV = "_HDE_EPIC038_PRIVATE_CI_ROOT"
+PRIVATE_CI_CONTRACT = "hde-epic038-private-ci-execution-receipt"
+PRIVATE_CI_REPOSITORY = "amthorn78/glow-hdengine-v2"
+PRIVATE_CI_WORKFLOW_PATH = ".github/workflows/ci.yml"
+PRIVATE_CI_JOB = "test"
+PRIVATE_CI_RECEIPT_NAME = "execution-receipt.json"
+PRIVATE_CI_ATTESTATION_DIR = "release-attestation"
+PRIVATE_CI_ATTESTATION_PASS_DETAIL = (
+    "private external exact-source release attestation validates"
+)
+PRIVATE_CI_RECEIPT_PASS_DETAIL = (
+    "private external exact-command CI receipt validates"
+)
+PRIVATE_CI_INVALID_DETAIL = (
+    "private exact-source attestation and exact-command CI receipt do not "
+    "jointly validate"
+)
+PRIVATE_CI_EXECUTION_RAILS: Mapping[str, str] = {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC",
+}
+PRIVATE_CI_COMMANDS = (
+    PLAN_CURRENT_STATE_COMMAND,
+    PLAN_CLOSEOUT_PREFLIGHT_COMMAND,
+    PLAN_CLOSEOUT_WRITE_COMMAND,
+    PLAN_CLOSEOUT_CHECK_COMMAND,
+    PLAN_FOCUSED_TEST_COMMAND,
+)
 TOKENS = (
     "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK", "EVIDENCE_INDEX_UPDATED_OK",
     "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK",
@@ -654,7 +696,16 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         f"run: {DOC_DELTA_CHECK_COMMAND}",
         "run: python tools/evidence/generate_hde_epic038_closeout.py "
         "--check-token-matrix",
-        "python tools/evidence/generate_hde_epic038_closeout.py --check",
+        PLAN_CLOSEOUT_PREFLIGHT_COMMAND,
+        PLAN_CLOSEOUT_WRITE_COMMAND,
+        PLAN_CLOSEOUT_CHECK_COMMAND,
+        (
+            '_HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root" python -c '
+            "'from tools.evidence import generate_hde_epic038_closeout as "
+            "closeout; closeout._write_private_ci_receipt()'"
+        ),
+        PLAN_CLOSEOUT_WRITE_COMMAND,
+        PLAN_CLOSEOUT_CHECK_COMMAND,
     )
     job_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == "  test:"
@@ -691,7 +742,18 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         ).lower()
         for line in direct_job_lines
     )
-    expected_direct_job_keys = ("runs-on", "env", "steps")
+    expected_direct_job_keys = ("needs", "runs-on", "env", "steps")
+    expected_test_job_prefix = (
+        "  test:",
+        "    needs:",
+        "      - compat-conj-pr01-closure",
+        "      - epic020",
+        "      - compat-http-epic020",
+        "      - epic020-evidence-bundles",
+        "      - rails-policy-gates",
+        "      - sanity-pipeline",
+        "    runs-on: ubuntu-latest",
+    )
     expected_env_block = (
         "      LC_ALL: C",
         "      LANG: C",
@@ -699,6 +761,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         '      SAFE_MODE: "1"',
         '      ALLOW_NETWORK: "0"',
         "      APP_ENV: dev",
+        '      PYTHONDONTWRITEBYTECODE: "1"',
     )
     steps_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == "    steps:"
@@ -744,9 +807,15 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "      - uses: actions/checkout@v4",
         "        with:",
         "          fetch-depth: 0",
+        "          ref: ${{ github.event.pull_request.head.sha || github.sha }}",
         "      - uses: actions/setup-python@v5",
         "        with:",
         "          python-version: '3.12'",
+        "      - name: Download exact-head release attestation",
+        "        uses: actions/download-artifact@v4",
+        "        with:",
+        "          name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}",
+        "          path: ${{ runner.temp }}/hde-epic038-private-receipt/release-attestation",
         *expected_step_block,
         "      - name: Run HDE-EPIC038 DEV-01 focused tests",
         "        shell: bash",
@@ -756,6 +825,16 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "          python -m pip install -r requirements.txt",
         "          python -m pytest --version",
         "          python -m pytest -q tests/evidence/test_hde_epic038_closeout.py",
+        "      - name: Verify downloaded exact-source release attestation",
+        "        shell: bash",
+        "        run: |",
+        "          set -euo pipefail",
+        '          chmod 700 "$RUNNER_TEMP/hde-epic038-private-receipt"',
+        (
+            "          python tools/evidence/build_release_attestation.py --verify "
+            '"$RUNNER_TEMP/hde-epic038-private-receipt/release-attestation" '
+            "--require-clean"
+        ),
         "      - run: python -m pip install -U pip",
     )
     check_prefix: tuple[str, ...] = ()
@@ -765,7 +844,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             prefix_start : prefix_start + len(expected_check_prefix)
         ]
     closeout_step_name = (
-        "      - name: Check conditional HDE-EPIC038 DEV-03 closeout family"
+        "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
     )
     closeout_step_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == closeout_step_name
@@ -784,6 +863,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         closeout_step_block = raw_lines[closeout_start:closeout_end]
     expected_closeout_step_block = (
         closeout_step_name,
+        "        id: epic038_receipt",
         "        shell: bash",
         "        run: |",
         "          set -euo pipefail",
@@ -806,13 +886,143 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "            fi",
         "          done",
         "          if (( present == 0 )); then",
-        '            echo "HDE-EPIC038 DEV-03 closeout family absent; read-only package check not yet applicable."',
+        '            echo "HDE-EPIC038 DEV-03 closeout family absent; private execution receipt not applicable."',
+        "            python tools/evidence/update_evidence_index.py --check",
         "          elif (( present != ${#primaries[@]} )); then",
         "            printf 'INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:%s\\n' \"$(IFS=,; echo \"${missing[*]}\")\"",
         "            exit 1",
         "          else",
-        "            python tools/evidence/generate_hde_epic038_closeout.py --check",
+        '            receipt_root="$RUNNER_TEMP/hde-epic038-private-receipt"',
+        '            receipt_source="$RUNNER_TEMP/hde-epic038-receipt-source"',
+        "            cleanup() {",
+        '              git worktree remove --force "$receipt_source" >/dev/null 2>&1 || true',
+        "            }",
+        "            trap cleanup EXIT",
+        '            git worktree add --detach "$receipt_source" "$(git rev-parse HEAD)"',
+        "            (",
+        '              cd "$receipt_source"',
+        "              unset _HDE_EPIC038_PRIVATE_CI_ROOT",
+        f"              {PLAN_CURRENT_STATE_COMMAND}",
+        f"              {PLAN_CLOSEOUT_PREFLIGHT_COMMAND}",
+        f"              {PLAN_CLOSEOUT_WRITE_COMMAND}",
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
+        ),
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/orientation_demo.py"
+        ),
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
+        ),
+        f"              {PLAN_CLOSEOUT_CHECK_COMMAND}",
+        f"              {PLAN_FOCUSED_TEST_COMMAND}",
+        "            )",
+        (
+            '            _HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root" python -c '
+            "'from tools.evidence import generate_hde_epic038_closeout as "
+            "closeout; closeout._write_private_ci_receipt()'"
+        ),
+        "            cleanup",
+        '            git worktree add --detach "$receipt_source" "$(git rev-parse HEAD)"',
+        "            (",
+        '              cd "$receipt_source"',
+        '              export _HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root"',
+        f"              {PLAN_CLOSEOUT_WRITE_COMMAND}",
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
+        ),
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/orientation_demo.py"
+        ),
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
+        ),
+        f"              {PLAN_CLOSEOUT_CHECK_COMMAND}",
+        (
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check"
+        ),
+        "            )",
+        "            cleanup",
+        "            trap - EXIT",
+        '            echo "produced=true" >> "$GITHUB_OUTPUT"',
         "          fi",
+    )
+    upload_step_name = (
+        "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+    )
+    upload_step_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == upload_step_name
+    )
+    upload_step_block: tuple[str, ...] = ()
+    if len(upload_step_starts) == 1:
+        upload_start = upload_step_starts[0]
+        upload_end = next(
+            (
+                index
+                for index in range(upload_start + 1, len(raw_lines))
+                if raw_lines[index].startswith("      - ")
+                or (
+                    raw_lines[index].startswith("  ")
+                    and not raw_lines[index].startswith("    ")
+                )
+            ),
+            len(raw_lines),
+        )
+        upload_step_block = raw_lines[upload_start:upload_end]
+    expected_upload_step_block = (
+        upload_step_name,
+        "        if: steps.epic038_receipt.outputs.produced == 'true'",
+        "        uses: actions/upload-artifact@v4",
+        "        with:",
+        "          name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}",
+        "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
+        "          if-no-files-found: error",
+        "          retention-days: 30",
+    )
+    fixed_point_step_name = (
+        "      - name: Confirm exact-head receipt fixed point is clean"
+    )
+    fixed_point_step_starts = tuple(
+        index for index, line in enumerate(raw_lines) if line == fixed_point_step_name
+    )
+    fixed_point_step_block: tuple[str, ...] = ()
+    if len(fixed_point_step_starts) == 1:
+        fixed_point_start = fixed_point_step_starts[0]
+        fixed_point_end = next(
+            (
+                index
+                for index in range(fixed_point_start + 1, len(raw_lines))
+                if raw_lines[index].startswith("      - ")
+                or (
+                    raw_lines[index].startswith("  ")
+                    and not raw_lines[index].startswith("    ")
+                )
+            ),
+            len(raw_lines),
+        )
+        fixed_point_step_block = raw_lines[fixed_point_start:fixed_point_end]
+    expected_fixed_point_step_block = (
+        fixed_point_step_name,
+        "        run: |",
+        "          git diff --check",
+        "          git diff --exit-code",
+    )
+    updater_check_lines = tuple(
+        line
+        for line in job_block
+        if "python tools/evidence/update_evidence_index.py --check" in line
+    )
+    pre_receipt_updater_checks = tuple(
+        line
+        for line in raw_lines[job_start : closeout_step_starts[0]]
+        if "python tools/evidence/update_evidence_index.py --check" in line
     )
     if (
         step_block != expected_step_block
@@ -820,7 +1030,10 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or direct_workflow_lines != expected_direct_workflow_lines
         or direct_job_headers != expected_direct_job_headers
         or len(job_starts) != 1
+        or tuple(job_block[: len(expected_test_job_prefix)])
+        != expected_test_job_prefix
         or direct_job_keys != expected_direct_job_keys
+        or job_block.count("    needs:") != 1
         or job_block.count("    runs-on: ubuntu-latest") != 1
         or len(test_steps_starts) != 1
         or len(test_env_starts) != 1
@@ -829,7 +1042,17 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or step_starts[0] <= test_steps_starts[0]
         or generator_invocations != expected_invocations
         or closeout_step_block != expected_closeout_step_block
+        or upload_step_block != expected_upload_step_block
+        or fixed_point_step_block != expected_fixed_point_step_block
+        or len(updater_check_lines) != 2
+        or pre_receipt_updater_checks
         or not (job_start < closeout_step_starts[0] < job_end)
+        or not (
+            closeout_step_starts[0]
+            < fixed_point_step_starts[0]
+            < upload_step_starts[0]
+            < job_end
+        )
         or "--doc-deltas" in text
     ):
         raise ValueError("doc-delta CI command binding mismatch")
@@ -2996,6 +3219,22 @@ FINAL_LF_PLANNED_PATHS = (
     f"{POSTCOMMIT_CHECKLIST_PATH}.path_proof.txt",
 )
 
+_PRIVATE_CI_ALLOWED_GENERATED_PATHS = frozenset(
+    {
+        *FINAL_LF_PLANNED_PATHS,
+        HUMAN_INDEX_PATH,
+        f"{HUMAN_INDEX_PATH}.path_proof.txt",
+        "docs/evidence/INDEX.sha256",
+        "docs/evidence/INDEX.sha256.path_proof.txt",
+        MACHINE_MIRROR_PATH,
+        f"{MACHINE_MIRROR_PATH}.path_proof.txt",
+        "artifacts/evidence_index.jsonl.sha256",
+        "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+        "audit/gates/topology/orientation_demo.txt",
+        "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+    }
+)
+
 QA_CHECK_IDS = (
     "qa-00-step-0-discovery",
     "qa-01-po-001",
@@ -3254,6 +3493,492 @@ class EvaluationSnapshot:
     blockers: tuple[Mapping[str, object], ...]
     obligations: tuple[Mapping[str, object], ...]
     fingerprint: str
+
+
+@dataclass(frozen=True)
+class _PrivateCiEvidence:
+    release_state: str
+    release_detail: str
+    planned_state: str
+    planned_detail: str
+
+
+def _current_source_commit() -> str:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError as exc:
+        raise ValueError("exact source commit is unavailable") from exc
+    value = result.stdout.strip()
+    if (
+        result.returncode != 0
+        or len(value) != 40
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
+        raise ValueError("exact source commit is unavailable")
+    return value
+
+
+def _current_source_tree_sha256() -> str:
+    try:
+        inventory = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-tree", "-rz", "--full-tree", "HEAD"],
+            check=False,
+            capture_output=True,
+        )
+    except OSError as exc:
+        raise ValueError("exact source tree is unavailable") from exc
+    if inventory.returncode != 0:
+        raise ValueError("exact source tree is unavailable")
+    entries: list[tuple[str, bytes]] = []
+    try:
+        for raw in inventory.stdout.split(b"\0"):
+            if not raw:
+                continue
+            metadata, encoded_path = raw.split(b"\t", 1)
+            _mode, object_type, object_id = metadata.split(b" ", 2)
+            if object_type != b"blob":
+                continue
+            path = encoded_path.decode("utf-8")
+            relative = Path(path)
+            if (
+                not path
+                or relative.is_absolute()
+                or ".." in relative.parts
+                or relative.as_posix() != path
+                or len(object_id) != 40
+                or any(character not in b"0123456789abcdef" for character in object_id)
+            ):
+                raise ValueError
+            entries.append((path, object_id))
+    except (UnicodeError, ValueError) as exc:
+        raise ValueError("exact source tree inventory is malformed") from exc
+    entries.sort(key=lambda item: item[0])
+    try:
+        objects = subprocess.run(
+            ["git", "-C", str(ROOT), "cat-file", "--batch"],
+            input=b"".join(object_id + b"\n" for _path, object_id in entries),
+            check=False,
+            capture_output=True,
+        )
+    except OSError as exc:
+        raise ValueError("exact source tree objects are unavailable") from exc
+    if objects.returncode != 0:
+        raise ValueError("exact source tree objects are unavailable")
+    cursor = 0
+    rows: list[dict[str, object]] = []
+    try:
+        for path, expected_object_id in entries:
+            header_end = objects.stdout.index(b"\n", cursor)
+            header = objects.stdout[cursor:header_end].split(b" ")
+            if (
+                len(header) != 3
+                or header[0] != expected_object_id
+                or header[1] != b"blob"
+            ):
+                raise ValueError
+            size = int(header[2])
+            if size < 0:
+                raise ValueError
+            body_start = header_end + 1
+            body_end = body_start + size
+            if body_end >= len(objects.stdout) or objects.stdout[body_end] != 10:
+                raise ValueError
+            body = objects.stdout[body_start:body_end]
+            rows.append(
+                {
+                    "path": path,
+                    "sha256": hashlib.sha256(body).hexdigest(),
+                    "size": len(body),
+                }
+            )
+            cursor = body_end + 1
+    except (IndexError, ValueError) as exc:
+        raise ValueError("exact source tree object stream is malformed") from exc
+    if cursor != len(objects.stdout):
+        raise ValueError("exact source tree object stream has trailing data")
+    return hashlib.sha256(_canonical_json(rows)).hexdigest()
+
+
+def _private_source_worktree_paths(*arguments: str) -> frozenset[str]:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), *arguments],
+            check=False,
+            capture_output=True,
+        )
+    except OSError as exc:
+        raise ValueError("exact source worktree inventory is unavailable") from exc
+    if result.returncode != 0:
+        raise ValueError("exact source worktree inventory is unavailable")
+    paths: set[str] = set()
+    try:
+        for encoded in result.stdout.split(b"\0"):
+            if not encoded:
+                continue
+            value = encoded.decode("utf-8")
+            relative = Path(value)
+            if (
+                relative.is_absolute()
+                or ".." in relative.parts
+                or relative.as_posix() != value
+            ):
+                raise ValueError
+            paths.add(value)
+    except (UnicodeError, ValueError) as exc:
+        raise ValueError("exact source worktree inventory is malformed") from exc
+    return frozenset(paths)
+
+
+def _validate_private_source_worktree(*, allow_generated: bool) -> None:
+    changed = _private_source_worktree_paths(
+        "diff",
+        "--name-only",
+        "-z",
+        "--no-ext-diff",
+        "--diff-filter=ACDMRTUXB",
+        "HEAD",
+        "--",
+    ) | _private_source_worktree_paths(
+        "ls-files", "--others", "--exclude-standard", "-z"
+    )
+    permitted = _PRIVATE_CI_ALLOWED_GENERATED_PATHS if allow_generated else frozenset()
+    if not changed.issubset(permitted):
+        raise ValueError("exact source worktree has unrelated tracked or untracked drift")
+
+
+def _private_ci_root(configured: str) -> Path:
+    if not configured or "\x00" in configured:
+        raise ValueError("private CI root is empty or malformed")
+    raw = Path(configured)
+    if not raw.is_absolute() or raw.is_symlink():
+        raise ValueError("private CI root must be an absolute non-symlink directory")
+    try:
+        resolved = raw.resolve(strict=True)
+        repository_root = ROOT.resolve(strict=True)
+    except OSError as exc:
+        raise ValueError("private CI root is unavailable") from exc
+    if resolved != raw or not resolved.is_dir():
+        raise ValueError("private CI root must be a canonical directory path")
+    if resolved == repository_root or repository_root in resolved.parents:
+        raise ValueError("private CI root must be external to the repository")
+    expected = {PRIVATE_CI_ATTESTATION_DIR, PRIVATE_CI_RECEIPT_NAME}
+    try:
+        children = tuple(resolved.iterdir())
+    except OSError as exc:
+        raise ValueError("private CI root inventory is unavailable") from exc
+    names = {child.name for child in children}
+    if (
+        PRIVATE_CI_ATTESTATION_DIR not in names
+        or not names.issubset(expected)
+        or len(names) != len(children)
+    ):
+        raise ValueError("private CI root inventory is invalid")
+    attestation_root = resolved / PRIVATE_CI_ATTESTATION_DIR
+    if attestation_root.is_symlink() or not attestation_root.is_dir():
+        raise ValueError("private release attestation root is invalid")
+    return resolved
+
+
+def _read_private_json(path: Path, label: str, *, limit: int) -> tuple[dict[str, object], bytes]:
+    try:
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"{label} is not a regular file")
+        size = path.stat().st_size
+        if size <= 0 or size > limit:
+            raise ValueError(f"{label} size is invalid")
+        raw = path.read_bytes()
+        payload = json.loads(raw, object_pairs_hook=_unique_json_object)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        if isinstance(exc, ValueError) and str(exc).startswith(label):
+            raise
+        raise ValueError(f"{label} is unreadable or noncanonical") from exc
+    if not isinstance(payload, dict) or raw != _canonical_json(payload):
+        raise ValueError(f"{label} is unreadable or noncanonical")
+    return payload, raw
+
+
+def _verify_private_release_attestation_bundle(attestation_root: Path) -> None:
+    try:
+        from tools.evidence.build_release_attestation import (
+            AttestationBuildError,
+            verify_attestation,
+        )
+    except ImportError as exc:
+        raise ValueError("private release attestation bundle is unverifiable") from exc
+    try:
+        verify_attestation(attestation_root, require_exact=False, source=ROOT)
+    except AttestationBuildError as exc:
+        raise ValueError(
+            f"private release attestation bundle invalid: {exc.code}"
+        ) from exc
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise ValueError("private release attestation bundle is unverifiable") from exc
+
+
+def _private_execution_receipt_payload(
+    attestation: Mapping[str, object],
+    attestation_bytes: bytes,
+    *,
+    event_name: str,
+    run_id: str,
+    run_attempt: str,
+    source_commit: str,
+) -> dict[str, object]:
+    return {
+        "closed_rails": dict(sorted(PRIVATE_CI_EXECUTION_RAILS.items())),
+        "command_results": [
+            {"command": command, "exit_code": 0, "result": "PASS"}
+            for command in PRIVATE_CI_COMMANDS
+        ],
+        "contract": PRIVATE_CI_CONTRACT,
+        "epic_id": EPIC_ID,
+        "event_name": event_name,
+        "job": PRIVATE_CI_JOB,
+        "manifest_sha256": attestation.get("manifest_sha256"),
+        "provider": "github-actions",
+        "release_attestation_sha256": hashlib.sha256(attestation_bytes).hexdigest(),
+        "repository": PRIVATE_CI_REPOSITORY,
+        "result": "PASS",
+        "run_attempt": run_attempt,
+        "run_id": run_id,
+        "source_commit": source_commit,
+        "source_commit_exact": True,
+        "source_tree_sha256": attestation.get("source_tree_sha256"),
+        "version": 1,
+        "workflow_path": PRIVATE_CI_WORKFLOW_PATH,
+    }
+
+
+def _positive_decimal(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and value.isascii()
+        and value.isdecimal()
+        and str(int(value)) == value
+        and int(value) > 0
+    )
+
+
+def _validate_private_execution_receipt(
+    payload: Mapping[str, object],
+    *,
+    attestation: Mapping[str, object],
+    attestation_bytes: bytes,
+    source_commit: str,
+    manifest_sha256: str,
+) -> None:
+    expected_fields = {
+        "closed_rails",
+        "command_results",
+        "contract",
+        "epic_id",
+        "event_name",
+        "job",
+        "manifest_sha256",
+        "provider",
+        "release_attestation_sha256",
+        "repository",
+        "result",
+        "run_attempt",
+        "run_id",
+        "source_commit",
+        "source_commit_exact",
+        "source_tree_sha256",
+        "version",
+        "workflow_path",
+    }
+    expected_commands = [
+        {"command": command, "exit_code": 0, "result": "PASS"}
+        for command in PRIVATE_CI_COMMANDS
+    ]
+    if set(payload) != expected_fields:
+        raise ValueError("private execution receipt field roster mismatch")
+    required = {
+        "closed_rails": dict(sorted(PRIVATE_CI_EXECUTION_RAILS.items())),
+        "command_results": expected_commands,
+        "contract": PRIVATE_CI_CONTRACT,
+        "epic_id": EPIC_ID,
+        "job": PRIVATE_CI_JOB,
+        "manifest_sha256": manifest_sha256,
+        "provider": "github-actions",
+        "release_attestation_sha256": hashlib.sha256(attestation_bytes).hexdigest(),
+        "repository": PRIVATE_CI_REPOSITORY,
+        "result": "PASS",
+        "source_commit": source_commit,
+        "source_commit_exact": True,
+        "source_tree_sha256": attestation.get("source_tree_sha256"),
+        "version": 1,
+        "workflow_path": PRIVATE_CI_WORKFLOW_PATH,
+    }
+    for key, expected in required.items():
+        if payload.get(key) != expected:
+            raise ValueError(f"private execution receipt mismatch: {key}")
+    if payload.get("event_name") not in {"pull_request", "push"}:
+        raise ValueError("private execution receipt mismatch: event_name")
+    if not _positive_decimal(payload.get("run_id")) or not _positive_decimal(
+        payload.get("run_attempt")
+    ):
+        raise ValueError("private execution receipt run identity mismatch")
+    if not _hex64(payload.get("source_tree_sha256")):
+        raise ValueError("private execution receipt mismatch: source_tree_sha256")
+
+
+def _private_ci_evidence() -> _PrivateCiEvidence:
+    configured = os.environ.get(PRIVATE_CI_ROOT_ENV)
+    if configured is None:
+        return _PrivateCiEvidence(
+            "ABSENT",
+            "no private external exact-source release attestation was supplied",
+            "ABSENT",
+            "no private external exact-command CI receipt was supplied",
+        )
+    try:
+        root = _private_ci_root(configured)
+        attestation_root = root / PRIVATE_CI_ATTESTATION_DIR
+        _validate_private_source_worktree(allow_generated=True)
+        _verify_private_release_attestation_bundle(attestation_root)
+        attestation, attestation_bytes = _read_private_json(
+            attestation_root / "attestation.json",
+            "private release attestation",
+            limit=1024 * 1024,
+        )
+        source_commit = _current_source_commit()
+        source_tree_sha256 = _current_source_tree_sha256()
+        manifest_bytes = (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
+        manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
+        validate_release_attestation_payload(
+            attestation,
+            expected_source_commit=source_commit,
+            manifest_sha256=manifest_sha256,
+        )
+        if attestation.get("source_tree_sha256") != source_tree_sha256:
+            raise ValueError("release attestation mismatch: source_tree_sha256")
+    except (OSError, UnicodeError, ValueError):
+        return _PrivateCiEvidence(
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+        )
+    receipt_path = root / PRIVATE_CI_RECEIPT_NAME
+    if not receipt_path.exists() and not receipt_path.is_symlink():
+        return _PrivateCiEvidence(
+            "ATTESTED",
+            PRIVATE_CI_ATTESTATION_PASS_DETAIL,
+            "ABSENT",
+            "no private external exact-command CI receipt was supplied",
+        )
+    try:
+        receipt, _receipt_bytes = _read_private_json(
+            receipt_path,
+            "private execution receipt",
+            limit=128 * 1024,
+        )
+        _validate_private_execution_receipt(
+            receipt,
+            attestation=attestation,
+            attestation_bytes=attestation_bytes,
+            source_commit=source_commit,
+            manifest_sha256=manifest_sha256,
+        )
+    except (OSError, UnicodeError, ValueError):
+        return _PrivateCiEvidence(
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+        )
+    return _PrivateCiEvidence(
+        "PASS",
+        PRIVATE_CI_ATTESTATION_PASS_DETAIL,
+        "PASS",
+        PRIVATE_CI_RECEIPT_PASS_DETAIL,
+    )
+
+
+def _write_private_ci_receipt() -> Path:
+    configured = os.environ.get(PRIVATE_CI_ROOT_ENV)
+    if configured is None:
+        raise ValueError("private CI root was not supplied")
+    root = _private_ci_root(configured)
+    receipt_path = root / PRIVATE_CI_RECEIPT_NAME
+    if receipt_path.exists() or {path.name for path in root.iterdir()} != {
+        PRIVATE_CI_ATTESTATION_DIR
+    }:
+        raise ValueError("private CI root is not an empty receipt destination")
+    if (
+        os.environ.get("GITHUB_ACTIONS") != "true"
+        or os.environ.get("GITHUB_REPOSITORY") != PRIVATE_CI_REPOSITORY
+        or os.environ.get("GITHUB_WORKFLOW") != "ci"
+        or os.environ.get("GITHUB_JOB") != PRIVATE_CI_JOB
+    ):
+        raise ValueError("private execution receipt producer identity mismatch")
+    event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+    run_id = os.environ.get("GITHUB_RUN_ID", "")
+    run_attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "")
+    if event_name not in {"pull_request", "push"} or not _positive_decimal(
+        run_id
+    ) or not _positive_decimal(run_attempt):
+        raise ValueError("private execution receipt run identity mismatch")
+    if any(
+        os.environ.get(key) != value
+        for key, value in PRIVATE_CI_EXECUTION_RAILS.items()
+    ):
+        raise ValueError("private execution receipt producer rails mismatch")
+    _validate_private_source_worktree(allow_generated=False)
+    evidence = _private_ci_evidence()
+    if evidence.release_state != "ATTESTED" or evidence.planned_state != "ABSENT":
+        raise ValueError("private exact-source attestation is not ready for receipt production")
+    attestation, attestation_bytes = _read_private_json(
+        root / PRIVATE_CI_ATTESTATION_DIR / "attestation.json",
+        "private release attestation",
+        limit=1024 * 1024,
+    )
+    source_commit = _current_source_commit()
+    payload = _private_execution_receipt_payload(
+        attestation,
+        attestation_bytes,
+        event_name=event_name,
+        run_id=run_id,
+        run_attempt=run_attempt,
+        source_commit=source_commit,
+    )
+    manifest_sha256 = hashlib.sha256(
+        (ROOT / RELEASE_MANIFEST_PATH).read_bytes()
+    ).hexdigest()
+    _validate_private_execution_receipt(
+        payload,
+        attestation=attestation,
+        attestation_bytes=attestation_bytes,
+        source_commit=source_commit,
+        manifest_sha256=manifest_sha256,
+    )
+    raw = _canonical_json(payload)
+    descriptor: int | None = None
+    try:
+        descriptor = os.open(
+            receipt_path,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600,
+        )
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = None
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+        if receipt_path.read_bytes() != raw or receipt_path.stat().st_mode & 0o077:
+            raise OSError("private receipt write verification failed")
+    except BaseException:
+        if descriptor is not None:
+            os.close(descriptor)
+        receipt_path.unlink(missing_ok=True)
+        raise
+    return receipt_path
 
 
 def _json_object(path: str) -> dict[str, object]:
@@ -3725,7 +4450,9 @@ def _semantic_no_io(_row: Row) -> str:
     return "current closed-rails refusal proves zero vendor and database calls"
 
 
-def _semantic_release(_row: Row) -> str:
+def _semantic_release(
+    _row: Row, private_evidence: _PrivateCiEvidence | None = None
+) -> str:
     problems = manifest_only_problems(ROOT / RELEASE_MANIFEST_PATH)
     if problems:
         raise ValueError(
@@ -3735,7 +4462,21 @@ def _semantic_release(_row: Row) -> str:
     manifest_digest, captured_digest = validate_release_identity_family()
     if not (_hex64(manifest_digest) and _hex64(captured_digest)):
         raise ValueError("release identity digest shape mismatch")
-    raise EvidencePending
+    evidence = _private_ci_evidence() if private_evidence is None else private_evidence
+    if evidence.release_state == "ABSENT":
+        raise EvidencePending
+    if evidence.release_state == "ATTESTED":
+        raise EvidencePending
+    if evidence.release_state == "FAIL":
+        raise ValueError(evidence.release_detail)
+    if evidence.release_state != "PASS":
+        raise ValueError("unknown private release-attestation state")
+    return (
+        "current manifest contents and retained release family validate; "
+        + evidence.release_detail
+        + "; "
+        + evidence.planned_detail
+    )
 
 
 def _checklist_payload_result(row: Row) -> str:
@@ -3953,7 +4694,11 @@ def _planned_family_state() -> tuple[str, str]:
     return "REGISTERED", "complete closeout primary and companion families validate"
 
 
-def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
+def _planned_result(
+    row: Row,
+    family_state: tuple[str, str],
+    private_evidence: _PrivateCiEvidence | None = None,
+) -> TokenResult:
     path, key, _owner = PLANNED_BINDINGS[row.token]
     evidence = (("ARTIFACT_PATH", path), ("ARTIFACT_KEY", key))
     follow_up = (
@@ -3985,30 +4730,45 @@ def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
         )
     if state != "REGISTERED":
         raise ValueError(f"unknown planned family state: {state}")
+    private = _private_ci_evidence() if private_evidence is None else private_evidence
     try:
         _validate_row_bindings(row)
-        if (
-            row.token
-            in {"QA_PRECOMMIT_CHECKLIST_OK", "QA_POSTCOMMIT_CHECKLIST_OK"}
-            and _checklist_payload_result(row) == "FAIL"
-        ):
+        if row.token in {
+            "QA_PRECOMMIT_CHECKLIST_OK",
+            "QA_POSTCOMMIT_CHECKLIST_OK",
+        }:
+            checklist_result = _checklist_payload_result(row)
+            phase = (
+                "precommit"
+                if row.token == "QA_PRECOMMIT_CHECKLIST_OK"
+                else "postcommit"
+            )
+            projected_result = (
+                "PASS" if private.planned_state == "PASS" else checklist_result
+            )
+            detail = (
+                f"current {phase} checklist is canonical and records "
+                f"{projected_result}"
+            )
+        else:
+            detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+        if private.planned_state == "FAIL":
+            raise ValueError(private.planned_detail)
+        if private.planned_state == "ABSENT":
             return TokenResult(
                 row.token,
                 "UNCLAIMED",
                 f"token.{row.token}.current_governed_result",
                 (
-                    "current governed checklist canonically records FAIL from a "
-                    "truthful NOT SATISFIED package; it remains nonclaiming and "
-                    "regenerable after the originating blockers close"
+                    f"{detail}; current primary and companion bytes are necessary "
+                    "but do not prove that the exact planned commands executed "
+                    "successfully"
                 ),
                 evidence,
-                (
-                    "Regenerate the governed package after every originating blocker "
-                    "closes, re-establish its canonical updater fixed point, and "
-                    "retain successful execution evidence for every exact planned command."
-                ),
+                follow_up,
             )
-        detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+        if private.planned_state != "PASS":
+            raise ValueError("unknown private execution-receipt state")
     except (OSError, UnicodeError, ValueError) as exc:
         return TokenResult(
             row.token,
@@ -4020,18 +4780,17 @@ def _planned_result(row: Row, family_state: tuple[str, str]) -> TokenResult:
         )
     return TokenResult(
         row.token,
-        "UNCLAIMED",
+        "PASS",
         f"token.{row.token}.current_governed_result",
-        (
-            f"{detail}; current primary and companion bytes are necessary but do "
-            "not prove that the exact planned commands executed successfully"
-        ),
+        f"{detail}; {private.planned_detail}",
         evidence,
-        follow_up,
+        "NONE",
     )
 
 
-def _current_result(row: Row) -> TokenResult:
+def _current_result(
+    row: Row, private_evidence: _PrivateCiEvidence | None = None
+) -> TokenResult:
     evidence = tuple(
         ("ARTIFACT_PATH", path) for path in row.primary_evidence
     ) + tuple(("ARTIFACT_KEY", key) for key in row.artifact_keys)
@@ -4042,7 +4801,11 @@ def _current_result(row: Row) -> TokenResult:
     try:
         _validate_row_bindings(row)
         _validate_live_qa(row)
-        detail = TOKEN_EVALUATOR_REGISTRY[row.token](row)
+        detail = (
+            _semantic_release(row, private_evidence)
+            if row.token == "RELEASE_ID_RECOMPUTE_OK"
+            else TOKEN_EVALUATOR_REGISTRY[row.token](row)
+        )
     except EvidencePending as exc:
         if row.token != "RELEASE_ID_RECOMPUTE_OK":
             raise ValueError(
@@ -4092,8 +4855,8 @@ def _unclaimed_release_result(
         evidence,
         (
             "Validate the current canonical manifest contents and supply the "
-            "canonical external exact-source release attestation for this source "
-            "head before RELEASE_ID_RECOMPUTE_OK may pass."
+            "canonical external exact-source release attestation and exact-command "
+            "CI receipt for this source head before RELEASE_ID_RECOMPUTE_OK may pass."
         ),
     )
 
@@ -4541,7 +5304,7 @@ def _source_results_for_fingerprint(
             if status == "UNCLAIMED" and result.status == "UNCLAIMED":
                 rebuilt.append(_unclaimed_planned_result(rows[result.token]))
                 continue
-            if status == "FAIL" and result.status == "FAIL":
+            if status == result.status and result.status in {"PASS", "FAIL"}:
                 rebuilt.append(result)
                 continue
             raise ValueError("manifest canonical planned source-token status mismatch")
@@ -4771,7 +5534,7 @@ def _unclaimed_planned_result(row: Row) -> TokenResult:
     )
 
 
-def evaluate_closeout() -> EvaluationSnapshot:
+def _evaluate_closeout(private_evidence: _PrivateCiEvidence) -> EvaluationSnapshot:
     if tuple(TOKEN_EVALUATOR_REGISTRY) != TOKENS:
         raise ValueError("token evaluator registry must equal the approved roster/order")
     raw_rows = tuple(build_rows())
@@ -4803,9 +5566,9 @@ def evaluate_closeout() -> EvaluationSnapshot:
     else:
         planned_family_state = _planned_family_state()
         results = tuple(
-            _planned_result(row, planned_family_state)
+            _planned_result(row, planned_family_state, private_evidence)
             if row.classification == "planned-new"
-            else _current_result(row)
+            else _current_result(row, private_evidence)
             for row in rows
         )
     if tuple(item.token for item in results) != TOKENS:
@@ -4829,6 +5592,10 @@ def evaluate_closeout() -> EvaluationSnapshot:
         )
     )
     return _make_snapshot(results, families, blockers, obligations)
+
+
+def evaluate_closeout() -> EvaluationSnapshot:
+    return _evaluate_closeout(_private_ci_evidence())
 
 
 def derive_blockers(
@@ -4871,16 +5638,8 @@ def _validate_snapshot_contract(snapshot: EvaluationSnapshot) -> None:
 
 
 def _canonical_source_snapshot(snapshot: EvaluationSnapshot) -> EvaluationSnapshot:
-    """Normalize nonclaiming planned lifecycle details without promotion."""
+    """Normalize only the receipt-absent planned lifecycle details."""
 
-    if any(
-        item.token in PLANNED_BINDINGS and item.status == "PASS"
-        for item in snapshot.token_results
-    ):
-        raise ValueError(
-            "planned token PASS requires governed execution evidence that this "
-            "DEV-02 evaluator does not consume"
-        )
     rows = {row.token: row for row in build_rows()}
     normalized = tuple(
         _unclaimed_planned_result(rows[item.token])
@@ -4913,9 +5672,19 @@ def _validate_candidate_primary_bytes(
             text = raw.decode("utf-8")
         except UnicodeError as exc:
             raise ValueError("candidate close report is not UTF-8") from exc
+        try:
+            manifest = json.loads(
+                package[CLOSE_MANIFEST_PATH],
+                object_pairs_hook=_unique_json_object,
+            )
+        except (KeyError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+            raise ValueError("candidate close manifest is invalid") from exc
+        decision = manifest.get("decision") if isinstance(manifest, dict) else None
+        if decision not in {"SATISFIED", "NOT SATISFIED"}:
+            raise ValueError("candidate close manifest decision is invalid")
         required = (
             "# HDE-EPIC038 Close Report",
-            "## Final decision: NOT SATISFIED",
+            f"## Final decision: {decision}",
             "DEV-02 in-memory package validation: PASS",
             "## Exact package pointers",
             "## Token outcomes",
@@ -4931,7 +5700,14 @@ def _validate_candidate_primary_bytes(
             raise ValueError("candidate close report semantic contract mismatch")
         return
     phase = "PRECOMMIT" if row.token == "QA_PRECOMMIT_CHECKLIST_OK" else "POSTCOMMIT"
-    if raw != _render_checklist(phase, result="FAIL"):
+    try:
+        payload = json.loads(raw, object_pairs_hook=_unique_json_object)
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"candidate checklist is invalid: {row.token}") from exc
+    checklist_result = payload.get("result") if isinstance(payload, dict) else None
+    if checklist_result not in {"PASS", "FAIL"} or raw != _render_checklist(
+        phase, result=str(checklist_result)
+    ):
         raise ValueError(f"candidate checklist semantic mismatch: {row.token}")
 
 
@@ -5258,8 +6034,7 @@ def _construct_package(
     }
     checklist_result = (
         "PASS"
-        if not snapshot.blockers
-        and not open_entries
+        if not open_entries
         and all(
             statuses[token] == "PASS" for token in PLANNED_BINDINGS
         )
@@ -5797,6 +6572,46 @@ def validate_package(package: Mapping[str, bytes]) -> None:
     drift = [path for path in PACKAGE_PATHS if package[path] != expected[path]]
     if drift:
         raise ValueError("package cross-surface mismatch: " + ",".join(drift))
+
+
+def _validate_package_for_canonical_updater(
+    package: Mapping[str, bytes],
+) -> None:
+    """Validate one whole canonical projection without consuming private CI files."""
+
+    validate_package_structure(package)
+    ledger = parse_ledger(package[LEDGER_PATH])
+    projections = (
+        _PrivateCiEvidence(
+            "ABSENT",
+            "no private external exact-source release attestation was supplied",
+            "ABSENT",
+            "no private external exact-command CI receipt was supplied",
+        ),
+        _PrivateCiEvidence(
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+        ),
+        _PrivateCiEvidence(
+            "PASS",
+            PRIVATE_CI_ATTESTATION_PASS_DETAIL,
+            "PASS",
+            PRIVATE_CI_RECEIPT_PASS_DETAIL,
+        ),
+    )
+    for private_evidence in projections:
+        snapshot = _evaluate_closeout(private_evidence)
+        recorded = record_blockers(
+            ledger, [dict(item) for item in snapshot.blockers]
+        )
+        if recorded != ledger:
+            continue
+        expected = _construct_package(snapshot, ledger)
+        if all(package[path] == expected[path] for path in PACKAGE_PATHS):
+            return
+    raise ValueError("package is not one complete canonical external-gate projection")
 
 
 _provisional_validate_ledger = validate_ledger
