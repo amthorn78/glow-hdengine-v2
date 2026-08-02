@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import runpy
 import shutil
+import stat
 import subprocess
 import sys
+import zipfile
 from dataclasses import replace
 from pathlib import Path
 from typing import Callable, Mapping
@@ -1327,7 +1330,7 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
             closeout.validate_doc_delta_ci(changed)
 
 
-def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
+def test_private_receipt_ci_is_exact_head_external_and_authenticated() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     closeout.validate_doc_delta_ci(workflow)
     test_job = workflow[
@@ -1345,6 +1348,7 @@ def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
         "      - sanity-pipeline\n"
     )
     assert expected_needs in test_job
+    assert "    permissions:\n      actions: read\n      contents: read\n" in test_job
     assert '      PYTHONDONTWRITEBYTECODE: "1"\n' in test_job
     assert (
         "          ref: ${{ github.event.pull_request.head.sha || github.sha }}\n"
@@ -1355,20 +1359,22 @@ def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
         in test_job
     )
     assert (
-        "name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}"
+        "name: hde-epic038-execution-receipt-"
+        "${{ github.event.pull_request.head.sha || github.sha }}-"
+        "${{ github.run_id }}-${{ github.run_attempt }}"
         in test_job
     )
     assert "path: ${{ runner.temp }}/hde-epic038-private-receipt" in test_job
     assert f"audit/{closeout.PRIVATE_CI_RECEIPT_NAME}" not in workflow
-    receipt_step = test_job[
+    producer_step = test_job[
         test_job.index(
-            "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
+            "      - name: Produce conditional private HDE-EPIC038 execution receipt"
         ) : test_job.index(
-            "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+            "      - run: python tools/evidence/orientation_demo.py --check"
         )
     ]
     receipt_start = test_job.index(
-        "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
+        "      - name: Produce conditional private HDE-EPIC038 execution receipt"
     )
     assert (
         "      - run: python tools/evidence/update_evidence_index.py --check\n"
@@ -1376,30 +1382,73 @@ def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
     )
     assert (
         "            python tools/evidence/update_evidence_index.py --check\n"
-        in receipt_step
+        in producer_step
     )
-    positions = [receipt_step.index(f"              {command}") for command in closeout.PRIVATE_CI_COMMANDS]
+    positions = [
+        producer_step.index(f"              {command}")
+        for command in closeout.PRIVATE_CI_COMMANDS
+    ]
     assert positions == sorted(positions)
-    writer = receipt_step.index("closeout._write_private_ci_receipt()")
+    writer = producer_step.index("closeout._write_private_ci_receipt()")
     assert positions[-1] < writer
-    assert receipt_step.count("git worktree add --detach") == 2
-    final_write = receipt_step.rindex(
-        f"            {closeout.PLAN_CLOSEOUT_WRITE_COMMAND}\n"
+    assert producer_step.count("git worktree add --detach") == 1
+
+    receipt_free_clean = test_job.index(
+        "      - name: Confirm receipt-free exact-head tree is clean"
     )
-    final_check = receipt_step.rindex(
-        f"            {closeout.PLAN_CLOSEOUT_CHECK_COMMAND}\n"
+    full_repo_tests = test_job.index(
+        "      - run: python -m pytest tests/evidence "
+        "tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py"
     )
-    final_updater_check = receipt_step.rindex(
-        "            SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
-        "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check\n"
-    )
-    assert writer < final_write < final_check < final_updater_check
-    final_diff = test_job.index("git diff --exit-code", final_check)
     upload = test_job.index(
         "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
     )
-    assert final_diff > final_check
-    assert upload > final_diff
+    assert full_repo_tests < receipt_free_clean < upload
+    upload_block = test_job[
+        upload : test_job.index(
+            "      - name: Authenticate and consume private HDE-EPIC038 execution artifact"
+        )
+    ]
+    assert "        id: epic038_receipt_artifact\n" in upload_block
+    assert "          overwrite: false\n" in upload_block
+    assert "if: always()" not in upload_block
+
+    consumer = test_job.index(
+        "      - name: Authenticate and consume private HDE-EPIC038 execution artifact"
+    )
+    final_clean = test_job.index(
+        "      - name: Confirm authenticated exact-head receipt fixed point is clean"
+    )
+    consumer_step = test_job[consumer:final_clean]
+    assert upload < consumer < final_clean
+    assert "          GH_TOKEN: ${{ github.token }}\n" in consumer_step
+    assert (
+        "${{ steps.epic038_receipt_artifact.outputs.artifact-id }}" in consumer_step
+    )
+    assert (
+        "${{ steps.epic038_receipt_artifact.outputs.artifact-digest }}"
+        in consumer_step
+    )
+    assert '          ALLOW_NETWORK: "1"\n' not in consumer_step
+    assert consumer_step.count("git worktree add --detach") == 1
+    assert consumer_step.count("ALLOW_NETWORK=1") == 2
+    assert consumer_step.count("ALLOW_NETWORK=0") == 4
+    assert consumer_step.count(
+        "unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+        "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
+    ) == 2
+    control_plane_write = consumer_step.index(
+        f"            {closeout.PRIVATE_CI_CONTROL_PLANE_WRITE_COMMAND}\n"
+    )
+    control_plane_check = consumer_step.index(
+        f"            {closeout.PRIVATE_CI_CONTROL_PLANE_CHECK_COMMAND}\n"
+    )
+    updater_check = consumer_step.index(
+        "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+        "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check\n"
+    )
+    assert control_plane_write < control_plane_check < updater_check
+    assert test_job.index("git diff --exit-code", final_clean) > final_clean
 
     mutations = (
         workflow.replace(
@@ -1430,17 +1479,43 @@ def test_private_receipt_ci_is_exact_head_external_and_two_phase() -> None:
             "        if: always()",
             1,
         ),
+        workflow.replace("      actions: read\n", "      actions: write\n", 1),
+        workflow.replace("          overwrite: false\n", "          overwrite: true\n", 1),
+        workflow.replace(
+            "${{ steps.epic038_receipt_artifact.outputs.artifact-id }}",
+            "777777",
+            1,
+        ),
+        workflow.replace(
+            "${{ steps.epic038_receipt_artifact.outputs.artifact-digest }}",
+            "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            1,
+        ),
+        workflow.replace("          GH_TOKEN: ${{ github.token }}\n", "", 1),
+        workflow.replace(
+            "              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+            "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST\n",
+            "",
+            1,
+        ),
+        workflow.replace(
+            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py\n",
+            "              SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C "
+            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py\n",
+            1,
+        ),
         workflow.replace(
             "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
             "          path: audit/hde-epic038-private-receipt",
             1,
         ),
         workflow.replace(
-            "      - name: Confirm exact-head receipt fixed point is clean\n"
+            "      - name: Confirm authenticated exact-head receipt fixed point is clean\n"
             "        run: |\n"
             "          git diff --check\n"
             "          git diff --exit-code\n",
-            "      - name: Confirm exact-head receipt fixed point is clean\n"
+            "      - name: Confirm authenticated exact-head receipt fixed point is clean\n"
             "        run: |\n"
             "          git diff --check\n",
             1,
@@ -2462,6 +2537,7 @@ def _configure_private_ci_evidence(
     monkeypatch: pytest.MonkeyPatch,
     *,
     include_receipt: bool = True,
+    authenticate_receipt: bool | None = None,
     run_id: str = "424242",
 ) -> tuple[Path, dict[str, object], dict[str, object]]:
     source_commit = "a" * 40
@@ -2503,8 +2579,102 @@ def _configure_private_ci_evidence(
         "_validate_private_source_worktree",
         lambda *, allow_generated: None,
     )
-    monkeypatch.setenv(closeout.PRIVATE_CI_ROOT_ENV, str(root))
+    if authenticate_receipt is None:
+        authenticate_receipt = include_receipt
+    if authenticate_receipt:
+        monkeypatch.delenv(closeout.PRIVATE_CI_ROOT_ENV, raising=False)
+        monkeypatch.setenv(closeout.PRIVATE_CI_ARTIFACT_ID_ENV, "777777")
+        monkeypatch.setenv(closeout.PRIVATE_CI_ARTIFACT_DIGEST_ENV, "d" * 64)
+
+        def authenticated_files() -> dict[str, bytes]:
+            return {
+                path.relative_to(root).as_posix(): path.read_bytes()
+                for path in sorted(root.rglob("*"))
+                if path.is_file() and not path.is_symlink()
+            }
+
+        monkeypatch.setattr(
+            closeout,
+            "_authenticated_private_ci_files",
+            authenticated_files,
+        )
+    else:
+        monkeypatch.delenv(closeout.PRIVATE_CI_ARTIFACT_ID_ENV, raising=False)
+        monkeypatch.delenv(closeout.PRIVATE_CI_ARTIFACT_DIGEST_ENV, raising=False)
+        monkeypatch.setenv(closeout.PRIVATE_CI_ROOT_ENV, str(root))
     return root, receipt, attestation
+
+
+def _private_ci_archive(root: Path) -> bytes:
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in sorted(root.rglob("*")):
+            if path.is_file():
+                archive.writestr(path.relative_to(root).as_posix(), path.read_bytes())
+    return stream.getvalue()
+
+
+def _private_ci_api_payloads(
+    *, source_commit: str, archive: bytes, run_id: str = "424242"
+) -> tuple[dict[str, object], dict[str, object]]:
+    digest = hashlib.sha256(archive).hexdigest()
+    head_sha = source_commit
+    metadata = {
+        "id": 777777,
+        "name": (
+            f"{closeout.PRIVATE_CI_ARTIFACT_PREFIX}-{source_commit}-"
+            f"{run_id}-1"
+        ),
+        "expired": False,
+        "digest": f"sha256:{digest}",
+        "size_in_bytes": len(archive),
+        "workflow_run": {
+            "id": int(run_id),
+            "repository_id": closeout.PRIVATE_CI_REPOSITORY_ID,
+            "head_repository_id": closeout.PRIVATE_CI_REPOSITORY_ID,
+            "head_branch": "codex/implement-dev-02-closeout-tooling",
+            "head_sha": head_sha,
+        },
+    }
+    attempt = {
+        "id": int(run_id),
+        "run_attempt": 1,
+        "event": "pull_request",
+        "path": f"{closeout.PRIVATE_CI_WORKFLOW_PATH}@main",
+        "head_branch": metadata["workflow_run"]["head_branch"],
+        "head_sha": head_sha,
+        "repository": {
+            "id": closeout.PRIVATE_CI_REPOSITORY_ID,
+            "full_name": closeout.PRIVATE_CI_REPOSITORY,
+        },
+        "head_repository": {
+            "id": closeout.PRIVATE_CI_REPOSITORY_ID,
+            "full_name": closeout.PRIVATE_CI_REPOSITORY,
+        },
+    }
+    return metadata, attempt
+
+
+def _configure_private_ci_artifact_environment(
+    monkeypatch: pytest.MonkeyPatch, *, digest: str, run_id: str = "424242"
+) -> None:
+    environment = {
+        **closeout.PRIVATE_CI_EXECUTION_RAILS,
+        "ALLOW_NETWORK": "1",
+        "GH_TOKEN": "github-actions-token-value",
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_JOB": closeout.PRIVATE_CI_JOB,
+        "GITHUB_REPOSITORY": closeout.PRIVATE_CI_REPOSITORY,
+        "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_RUN_ID": run_id,
+        "GITHUB_WORKFLOW": "ci",
+        closeout.PRIVATE_CI_ARTIFACT_ID_ENV: "777777",
+        closeout.PRIVATE_CI_ARTIFACT_DIGEST_ENV: digest,
+    }
+    monkeypatch.delenv(closeout.PRIVATE_CI_ROOT_ENV, raising=False)
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
 
 
 def test_release_identity_binding_uses_complete_governed_family() -> None:
@@ -2688,6 +2858,237 @@ def test_private_ci_receipt_is_external_exact_and_token_agnostic(
     assert "artifact_key" not in serialized
     assert all(token not in serialized for token in closeout.TOKENS)
     assert str(root) not in serialized
+
+
+def test_synthetic_private_root_and_spoofed_actions_environment_promote_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _root, _receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path,
+        monkeypatch,
+        authenticate_receipt=False,
+    )
+    environment = {
+        **closeout.PRIVATE_CI_EXECUTION_RAILS,
+        "GITHUB_ACTIONS": "true",
+        "GITHUB_EVENT_NAME": "pull_request",
+        "GITHUB_JOB": closeout.PRIVATE_CI_JOB,
+        "GITHUB_REPOSITORY": closeout.PRIVATE_CI_REPOSITORY,
+        "GITHUB_RUN_ATTEMPT": "1",
+        "GITHUB_RUN_ID": "424242",
+        "GITHUB_WORKFLOW": "ci",
+    }
+    for key, value in environment.items():
+        monkeypatch.setenv(key, value)
+    outcome = closeout._private_ci_evidence()
+    assert outcome.release_state == "FAIL"
+    assert outcome.planned_state == "FAIL"
+
+
+def test_authenticated_private_artifact_binds_server_run_and_archive(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, _receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path,
+        monkeypatch,
+        authenticate_receipt=False,
+    )
+    source_commit = "a" * 40
+    archive = _private_ci_archive(root)
+    digest = hashlib.sha256(archive).hexdigest()
+    metadata, attempt = _private_ci_api_payloads(
+        source_commit=source_commit,
+        archive=archive,
+    )
+    _configure_private_ci_artifact_environment(monkeypatch, digest=digest)
+    monkeypatch.setattr(closeout, "_current_source_commit", lambda: source_commit)
+
+    def api_bytes(
+        endpoint: str, *, accept: str, limit: int, allow_redirect: bool
+    ) -> bytes:
+        assert accept == "application/vnd.github+json"
+        assert limit > 0
+        if endpoint.endswith("/zip"):
+            assert allow_redirect is True
+            return archive
+        assert allow_redirect is False
+        if "/attempts/" in endpoint:
+            return json.dumps(attempt, separators=(",", ":")).encode()
+        return json.dumps(metadata, separators=(",", ":")).encode()
+
+    monkeypatch.setattr(closeout, "_github_api_bytes", api_bytes)
+    files = closeout._authenticated_private_ci_files()
+    assert files[closeout.PRIVATE_CI_RECEIPT_NAME] == (
+        root / closeout.PRIVATE_CI_RECEIPT_NAME
+    ).read_bytes()
+    assert closeout._private_ci_evidence().planned_state == "PASS"
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "artifact-id",
+        "artifact-name",
+        "expired",
+        "server-digest",
+        "server-size",
+        "artifact-run",
+        "artifact-repository",
+        "artifact-head-repository",
+        "attempt-number",
+        "attempt-event",
+        "attempt-workflow",
+        "attempt-repository",
+        "attempt-head",
+        "receipt-run",
+        "receipt-attempt",
+        "receipt-event",
+        "archive-bytes",
+    ],
+)
+def test_authenticated_private_artifact_rejects_provenance_or_archive_tamper(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    case: str,
+) -> None:
+    root, receipt, _attestation = _configure_private_ci_evidence(
+        tmp_path,
+        monkeypatch,
+        authenticate_receipt=False,
+    )
+    source_commit = "a" * 40
+    if case == "receipt-run":
+        receipt["run_id"] = "424243"
+    elif case == "receipt-attempt":
+        receipt["run_attempt"] = "2"
+    elif case == "receipt-event":
+        receipt["event_name"] = "push"
+    if case.startswith("receipt-"):
+        (root / closeout.PRIVATE_CI_RECEIPT_NAME).write_bytes(
+            closeout._canonical_json(receipt)
+        )
+    archive = _private_ci_archive(root)
+    digest = hashlib.sha256(archive).hexdigest()
+    metadata, attempt = _private_ci_api_payloads(
+        source_commit=source_commit,
+        archive=archive,
+    )
+    if case == "artifact-id":
+        metadata["id"] = 888888
+    elif case == "artifact-name":
+        metadata["name"] = "synthetic-receipt"
+    elif case == "expired":
+        metadata["expired"] = True
+    elif case == "server-digest":
+        metadata["digest"] = f"sha256:{'e' * 64}"
+    elif case == "server-size":
+        metadata["size_in_bytes"] = len(archive) + 1
+    elif case == "artifact-run":
+        metadata["workflow_run"]["id"] = 424243
+    elif case == "artifact-repository":
+        metadata["workflow_run"]["repository_id"] = 1
+    elif case == "artifact-head-repository":
+        metadata["workflow_run"]["head_repository_id"] = 1
+    elif case == "attempt-number":
+        attempt["run_attempt"] = 2
+    elif case == "attempt-event":
+        attempt["event"] = "push"
+    elif case == "attempt-workflow":
+        attempt["path"] = ".github/workflows/other.yml"
+    elif case == "attempt-repository":
+        attempt["repository"]["id"] = 1
+    elif case == "attempt-head":
+        attempt["head_sha"] = "c" * 40
+    elif case == "archive-bytes":
+        archive += b"tamper"
+    _configure_private_ci_artifact_environment(monkeypatch, digest=digest)
+    monkeypatch.setattr(closeout, "_current_source_commit", lambda: source_commit)
+
+    def api_bytes(
+        endpoint: str, *, accept: str, limit: int, allow_redirect: bool
+    ) -> bytes:
+        if endpoint.endswith("/zip"):
+            return archive
+        if "/attempts/" in endpoint:
+            return json.dumps(attempt, separators=(",", ":")).encode()
+        return json.dumps(metadata, separators=(",", ":")).encode()
+
+    monkeypatch.setattr(closeout, "_github_api_bytes", api_bytes)
+    with pytest.raises(ValueError):
+        closeout._authenticated_private_ci_files()
+
+
+@pytest.mark.parametrize(
+    ("name", "mode"),
+    [
+        ("../execution-receipt.json", None),
+        ("/execution-receipt.json", None),
+        ("release-attestation\\attestation.json", None),
+        ("unexpected.json", None),
+        ("linked-receipt.json", stat.S_IFLNK | 0o777),
+    ],
+)
+def test_private_ci_artifact_archive_rejects_unsafe_or_extra_members(
+    tmp_path: Path,
+    name: str,
+    mode: int | None,
+) -> None:
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(closeout.PRIVATE_CI_RECEIPT_NAME, b"{}\n")
+        archive.writestr(
+            f"{closeout.PRIVATE_CI_ATTESTATION_DIR}/attestation.json",
+            b"{}\n",
+        )
+        info = zipfile.ZipInfo(name)
+        if mode is not None:
+            info.create_system = 3
+            info.external_attr = mode << 16
+        archive.writestr(info, b"unsafe\n")
+    with pytest.raises(ValueError):
+        closeout._private_ci_archive_files(stream.getvalue())
+
+
+def test_private_ci_artifact_archive_accepts_bounded_production_shape() -> None:
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(closeout.PRIVATE_CI_RECEIPT_NAME, b"{}\n")
+        archive.writestr(
+            f"{closeout.PRIVATE_CI_ATTESTATION_DIR}/attestation.json",
+            b"{}\n",
+        )
+        for index in range(184):
+            archive.writestr(
+                f"{closeout.PRIVATE_CI_ATTESTATION_DIR}/evidence/{index:03d}.txt",
+                b"bounded\n",
+            )
+    files = closeout._private_ci_archive_files(stream.getvalue())
+    assert len(files) == 186
+
+
+def test_private_ci_artifact_archive_rejects_entry_count_above_bound() -> None:
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for index in range(closeout.PRIVATE_CI_ARCHIVE_ENTRY_LIMIT + 1):
+            archive.writestr(
+                f"{closeout.PRIVATE_CI_ATTESTATION_DIR}/evidence/{index:03d}.txt",
+                b"bounded\n",
+            )
+    with pytest.raises(ValueError, match="inventory is invalid"):
+        closeout._private_ci_archive_files(stream.getvalue())
+
+
+def test_private_github_api_requires_nonforwarded_step_scoped_credential(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("GH_TOKEN", raising=False)
+    with pytest.raises(ValueError, match="credential is unavailable"):
+        closeout._github_api_bytes(
+            f"/repos/{closeout.PRIVATE_CI_REPOSITORY}/actions/artifacts/777777",
+            accept="application/vnd.github+json",
+            limit=1024,
+            allow_redirect=False,
+        )
 
 
 def test_private_ci_attestation_without_execution_receipt_promotes_no_token(
@@ -2987,7 +3388,23 @@ def test_private_ci_writer_requires_github_test_job_and_writes_mode_0600(
     written = closeout._write_private_ci_receipt()
     assert written == root / closeout.PRIVATE_CI_RECEIPT_NAME
     assert written.stat().st_mode & 0o077 == 0
+    assert closeout._private_ci_evidence().planned_state == "FAIL"
+    monkeypatch.delenv(closeout.PRIVATE_CI_ROOT_ENV)
+    monkeypatch.setenv(closeout.PRIVATE_CI_ARTIFACT_ID_ENV, "777777")
+    monkeypatch.setenv(closeout.PRIVATE_CI_ARTIFACT_DIGEST_ENV, "d" * 64)
+    monkeypatch.setattr(
+        closeout,
+        "_authenticated_private_ci_files",
+        lambda: {
+            path.relative_to(root).as_posix(): path.read_bytes()
+            for path in sorted(root.rglob("*"))
+            if path.is_file()
+        },
+    )
     assert closeout._private_ci_evidence().planned_state == "PASS"
+    monkeypatch.delenv(closeout.PRIVATE_CI_ARTIFACT_ID_ENV)
+    monkeypatch.delenv(closeout.PRIVATE_CI_ARTIFACT_DIGEST_ENV)
+    monkeypatch.setenv(closeout.PRIVATE_CI_ROOT_ENV, str(root))
     with pytest.raises(ValueError, match="empty receipt destination"):
         closeout._write_private_ci_receipt()
 

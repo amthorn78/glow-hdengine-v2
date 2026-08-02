@@ -1,5 +1,5 @@
 path: artifacts/architecture/architecture_snapshot.keys_only.json
-size_bytes: 42346
-sha256: 235042c8af06e72c5c68051d7596fa057a0a9e773b1b22e77ca66b9574ebeb09
+size_bytes: 42397
+sha256: 8a5287dc5339e1278a1f0ab693e54212cc5b78d8fec53715ee28269cd4f05975
 mtime_utc: 2026-07-14T22:19:27Z
 produced_at_utc: 2026-07-14T16:55:30Z

@@ -5,11 +5,18 @@ from __future__ import annotations
 import argparse
 import difflib
 import hashlib
+import io
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
+import tempfile
+import urllib.error
+import urllib.parse
+import urllib.request
+import zipfile
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
@@ -84,12 +91,22 @@ PLAN_FOCUSED_TEST_COMMAND = (
     "python -m pytest -q tests/evidence/test_hde_epic038_closeout.py"
 )
 PRIVATE_CI_ROOT_ENV = "_HDE_EPIC038_PRIVATE_CI_ROOT"
+PRIVATE_CI_ARTIFACT_ID_ENV = "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID"
+PRIVATE_CI_ARTIFACT_DIGEST_ENV = "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
 PRIVATE_CI_CONTRACT = "hde-epic038-private-ci-execution-receipt"
 PRIVATE_CI_REPOSITORY = "amthorn78/glow-hdengine-v2"
+PRIVATE_CI_REPOSITORY_ID = 1063073682
 PRIVATE_CI_WORKFLOW_PATH = ".github/workflows/ci.yml"
 PRIVATE_CI_JOB = "test"
 PRIVATE_CI_RECEIPT_NAME = "execution-receipt.json"
 PRIVATE_CI_ATTESTATION_DIR = "release-attestation"
+PRIVATE_CI_ARTIFACT_PREFIX = "hde-epic038-execution-receipt"
+PRIVATE_CI_API_ORIGIN = "https://api.github.com"
+PRIVATE_CI_API_VERSION = "2022-11-28"
+PRIVATE_CI_ARCHIVE_LIMIT = 16 * 1024 * 1024
+PRIVATE_CI_ARCHIVE_ENTRY_LIMIT = 256
+PRIVATE_CI_ARCHIVE_FILE_LIMIT = 4 * 1024 * 1024
+PRIVATE_CI_ARCHIVE_TOTAL_LIMIT = 12 * 1024 * 1024
 PRIVATE_CI_ATTESTATION_PASS_DETAIL = (
     "private external exact-source release attestation validates"
 )
@@ -114,6 +131,12 @@ PRIVATE_CI_COMMANDS = (
     PLAN_CLOSEOUT_WRITE_COMMAND,
     PLAN_CLOSEOUT_CHECK_COMMAND,
     PLAN_FOCUSED_TEST_COMMAND,
+)
+PRIVATE_CI_CONTROL_PLANE_WRITE_COMMAND = PLAN_CLOSEOUT_WRITE_COMMAND.replace(
+    "ALLOW_NETWORK=0", "ALLOW_NETWORK=1"
+)
+PRIVATE_CI_CONTROL_PLANE_CHECK_COMMAND = PLAN_CLOSEOUT_CHECK_COMMAND.replace(
+    "ALLOW_NETWORK=0", "ALLOW_NETWORK=1"
 )
 TOKENS = (
     "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK", "EVIDENCE_INDEX_UPDATED_OK",
@@ -704,8 +727,8 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             "'from tools.evidence import generate_hde_epic038_closeout as "
             "closeout; closeout._write_private_ci_receipt()'"
         ),
-        PLAN_CLOSEOUT_WRITE_COMMAND,
-        PLAN_CLOSEOUT_CHECK_COMMAND,
+        PRIVATE_CI_CONTROL_PLANE_WRITE_COMMAND,
+        PRIVATE_CI_CONTROL_PLANE_CHECK_COMMAND,
     )
     job_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == "  test:"
@@ -742,7 +765,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         ).lower()
         for line in direct_job_lines
     )
-    expected_direct_job_keys = ("needs", "runs-on", "env", "steps")
+    expected_direct_job_keys = ("needs", "runs-on", "permissions", "env", "steps")
     expected_test_job_prefix = (
         "  test:",
         "    needs:",
@@ -753,6 +776,9 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         "      - rails-policy-gates",
         "      - sanity-pipeline",
         "    runs-on: ubuntu-latest",
+        "    permissions:",
+        "      actions: read",
+        "      contents: read",
     )
     expected_env_block = (
         "      LC_ALL: C",
@@ -844,7 +870,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             prefix_start : prefix_start + len(expected_check_prefix)
         ]
     closeout_step_name = (
-        "      - name: Produce and consume conditional private HDE-EPIC038 execution receipt"
+        "      - name: Produce conditional private HDE-EPIC038 execution receipt"
     )
     closeout_step_starts = tuple(
         index for index, line in enumerate(raw_lines) if line == closeout_step_name
@@ -926,11 +952,101 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             "closeout; closeout._write_private_ci_receipt()'"
         ),
         "            cleanup",
-        '            git worktree add --detach "$receipt_source" "$(git rev-parse HEAD)"',
+        "            trap - EXIT",
+        '            echo "produced=true" >> "$GITHUB_OUTPUT"',
+        "          fi",
+    )
+    def exact_step_block(step_name: str) -> tuple[tuple[int, ...], tuple[str, ...]]:
+        starts = tuple(
+            index for index, line in enumerate(raw_lines) if line == step_name
+        )
+        block: tuple[str, ...] = ()
+        if len(starts) == 1:
+            start = starts[0]
+            end = next(
+                (
+                    index
+                    for index in range(start + 1, len(raw_lines))
+                    if raw_lines[index].startswith("      - ")
+                    or (
+                        raw_lines[index].startswith("  ")
+                        and not raw_lines[index].startswith("    ")
+                    )
+                ),
+                len(raw_lines),
+            )
+            block = raw_lines[start:end]
+        return starts, block
+
+    receipt_free_step_name = (
+        "      - name: Confirm receipt-free exact-head tree is clean"
+    )
+    receipt_free_step_starts, receipt_free_step_block = exact_step_block(
+        receipt_free_step_name
+    )
+    expected_receipt_free_step_block = (
+        receipt_free_step_name,
+        "        run: |",
+        "          git diff --check",
+        "          git diff --exit-code",
+    )
+    upload_step_name = (
+        "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+    )
+    upload_step_starts, upload_step_block = exact_step_block(upload_step_name)
+    expected_upload_step_block = (
+        upload_step_name,
+        "        id: epic038_receipt_artifact",
+        "        if: steps.epic038_receipt.outputs.produced == 'true'",
+        "        uses: actions/upload-artifact@v4",
+        "        with:",
+        (
+            "          name: hde-epic038-execution-receipt-"
+            "${{ github.event.pull_request.head.sha || github.sha }}-"
+            "${{ github.run_id }}-${{ github.run_attempt }}"
+        ),
+        "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
+        "          if-no-files-found: error",
+        "          retention-days: 30",
+        "          overwrite: false",
+    )
+    authenticated_step_name = (
+        "      - name: Authenticate and consume private HDE-EPIC038 execution artifact"
+    )
+    authenticated_step_starts, authenticated_step_block = exact_step_block(
+        authenticated_step_name
+    )
+    expected_authenticated_step_block = (
+        authenticated_step_name,
+        "        if: steps.epic038_receipt.outputs.produced == 'true'",
+        "        shell: bash",
+        "        env:",
+        "          GH_TOKEN: ${{ github.token }}",
+        (
+            "          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID: "
+            "${{ steps.epic038_receipt_artifact.outputs.artifact-id }}"
+        ),
+        (
+            "          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST: "
+            "${{ steps.epic038_receipt_artifact.outputs.artifact-digest }}"
+        ),
+        "        run: |",
+        "          set -euo pipefail",
+        '          authenticated_source="$RUNNER_TEMP/hde-epic038-authenticated-source"',
+        "          cleanup() {",
+        '            git worktree remove --force "$authenticated_source" >/dev/null 2>&1 || true',
+        "          }",
+        "          trap cleanup EXIT",
+        '          git worktree add --detach "$authenticated_source" "$(git rev-parse HEAD)"',
+        "          (",
+        '            cd "$authenticated_source"',
+        "            unset _HDE_EPIC038_PRIVATE_CI_ROOT",
+        f"            {PRIVATE_CI_CONTROL_PLANE_WRITE_COMMAND}",
         "            (",
-        '              cd "$receipt_source"',
-        '              export _HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root"',
-        f"              {PLAN_CLOSEOUT_WRITE_COMMAND}",
+        (
+            "              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+            "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
+        ),
         (
             "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
             "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
@@ -943,73 +1059,28 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
             "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
         ),
-        f"              {PLAN_CLOSEOUT_CHECK_COMMAND}",
+        "            )",
+        f"            {PRIVATE_CI_CONTROL_PLANE_CHECK_COMMAND}",
+        "            (",
+        (
+            "              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
+            "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
+        ),
         (
             "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
             "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check"
         ),
         "            )",
-        "            cleanup",
-        "            trap - EXIT",
-        '            echo "produced=true" >> "$GITHUB_OUTPUT"',
-        "          fi",
+        "          )",
+        "          cleanup",
+        "          trap - EXIT",
     )
-    upload_step_name = (
-        "      - name: Publish private exact-head HDE-EPIC038 execution receipt"
+    final_step_name = (
+        "      - name: Confirm authenticated exact-head receipt fixed point is clean"
     )
-    upload_step_starts = tuple(
-        index for index, line in enumerate(raw_lines) if line == upload_step_name
-    )
-    upload_step_block: tuple[str, ...] = ()
-    if len(upload_step_starts) == 1:
-        upload_start = upload_step_starts[0]
-        upload_end = next(
-            (
-                index
-                for index in range(upload_start + 1, len(raw_lines))
-                if raw_lines[index].startswith("      - ")
-                or (
-                    raw_lines[index].startswith("  ")
-                    and not raw_lines[index].startswith("    ")
-                )
-            ),
-            len(raw_lines),
-        )
-        upload_step_block = raw_lines[upload_start:upload_end]
-    expected_upload_step_block = (
-        upload_step_name,
-        "        if: steps.epic038_receipt.outputs.produced == 'true'",
-        "        uses: actions/upload-artifact@v4",
-        "        with:",
-        "          name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}",
-        "          path: ${{ runner.temp }}/hde-epic038-private-receipt",
-        "          if-no-files-found: error",
-        "          retention-days: 30",
-    )
-    fixed_point_step_name = (
-        "      - name: Confirm exact-head receipt fixed point is clean"
-    )
-    fixed_point_step_starts = tuple(
-        index for index, line in enumerate(raw_lines) if line == fixed_point_step_name
-    )
-    fixed_point_step_block: tuple[str, ...] = ()
-    if len(fixed_point_step_starts) == 1:
-        fixed_point_start = fixed_point_step_starts[0]
-        fixed_point_end = next(
-            (
-                index
-                for index in range(fixed_point_start + 1, len(raw_lines))
-                if raw_lines[index].startswith("      - ")
-                or (
-                    raw_lines[index].startswith("  ")
-                    and not raw_lines[index].startswith("    ")
-                )
-            ),
-            len(raw_lines),
-        )
-        fixed_point_step_block = raw_lines[fixed_point_start:fixed_point_end]
-    expected_fixed_point_step_block = (
-        fixed_point_step_name,
+    final_step_starts, final_step_block = exact_step_block(final_step_name)
+    expected_final_step_block = (
+        final_step_name,
         "        run: |",
         "          git diff --check",
         "          git diff --exit-code",
@@ -1042,15 +1113,19 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         or step_starts[0] <= test_steps_starts[0]
         or generator_invocations != expected_invocations
         or closeout_step_block != expected_closeout_step_block
+        or receipt_free_step_block != expected_receipt_free_step_block
         or upload_step_block != expected_upload_step_block
-        or fixed_point_step_block != expected_fixed_point_step_block
+        or authenticated_step_block != expected_authenticated_step_block
+        or final_step_block != expected_final_step_block
         or len(updater_check_lines) != 2
         or pre_receipt_updater_checks
         or not (job_start < closeout_step_starts[0] < job_end)
         or not (
             closeout_step_starts[0]
-            < fixed_point_step_starts[0]
+            < receipt_free_step_starts[0]
             < upload_step_starts[0]
+            < authenticated_step_starts[0]
+            < final_step_starts[0]
             < job_end
         )
         or "--doc-deltas" in text
@@ -3828,17 +3903,298 @@ def _validate_private_execution_receipt(
         raise ValueError("private execution receipt mismatch: source_tree_sha256")
 
 
-def _private_ci_evidence() -> _PrivateCiEvidence:
-    configured = os.environ.get(PRIVATE_CI_ROOT_ENV)
-    if configured is None:
-        return _PrivateCiEvidence(
-            "ABSENT",
-            "no private external exact-source release attestation was supplied",
-            "ABSENT",
-            "no private external exact-command CI receipt was supplied",
-        )
+def _github_api_bytes(
+    endpoint: str,
+    *,
+    accept: str,
+    limit: int,
+    allow_redirect: bool,
+) -> bytes:
+    prefix = f"/repos/{PRIVATE_CI_REPOSITORY}/actions/"
+    if (
+        not endpoint.startswith(prefix)
+        or "\x00" in endpoint
+        or "?" in endpoint
+        or "#" in endpoint
+        or limit <= 0
+    ):
+        raise ValueError("private GitHub API endpoint is invalid")
+    token = os.environ.get("GH_TOKEN", "")
+    if (
+        len(token) < 20
+        or len(token) > 4096
+        or any(character.isspace() for character in token)
+        or "\x00" in token
+    ):
+        raise ValueError("private GitHub API credential is unavailable")
+    url = f"{PRIVATE_CI_API_ORIGIN}{endpoint}"
+    request = urllib.request.Request(url, method="GET")
+    # This header is deliberately not forwarded to the artifact-storage
+    # redirect target. The signed redirect authenticates the archive download.
+    request.add_unredirected_header("Authorization", f"Bearer {token}")
+    request.add_header("Accept", accept)
+    request.add_header("X-GitHub-Api-Version", PRIVATE_CI_API_VERSION)
+    request.add_header("User-Agent", "glow-hde-epic038-private-ci-verifier")
     try:
-        root = _private_ci_root(configured)
+        with urllib.request.urlopen(request, timeout=30) as response:
+            status = response.getcode()
+            final_url = response.geturl()
+            raw = response.read(limit + 1)
+    except (OSError, TimeoutError, urllib.error.URLError) as exc:
+        raise ValueError("private GitHub API request failed") from exc
+    parsed = urllib.parse.urlsplit(final_url)
+    if (
+        status != 200
+        or parsed.scheme != "https"
+        or not parsed.hostname
+        or (not allow_redirect and final_url != url)
+        or len(raw) == 0
+        or len(raw) > limit
+    ):
+        raise ValueError("private GitHub API response is invalid")
+    return raw
+
+
+def _github_api_json(endpoint: str, *, limit: int) -> dict[str, object]:
+    raw = _github_api_bytes(
+        endpoint,
+        accept="application/vnd.github+json",
+        limit=limit,
+        allow_redirect=False,
+    )
+    try:
+        payload = json.loads(raw, object_pairs_hook=_unique_json_object)
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("private GitHub API JSON is malformed") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("private GitHub API JSON is malformed")
+    return payload
+
+
+def _private_ci_archive_files(raw: bytes) -> dict[str, bytes]:
+    if not raw or len(raw) > PRIVATE_CI_ARCHIVE_LIMIT:
+        raise ValueError("private execution artifact archive size is invalid")
+    files: dict[str, bytes] = {}
+    names: set[str] = set()
+    total_size = 0
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw), mode="r") as archive:
+            infos = archive.infolist()
+            if not infos or len(infos) > PRIVATE_CI_ARCHIVE_ENTRY_LIMIT:
+                raise ValueError("private execution artifact inventory is invalid")
+            for info in infos:
+                name = info.filename
+                if name in names:
+                    raise ValueError("private execution artifact has duplicate paths")
+                names.add(name)
+                if info.is_dir():
+                    if name != f"{PRIVATE_CI_ATTESTATION_DIR}/":
+                        raise ValueError("private execution artifact directory is invalid")
+                    continue
+                relative = Path(name)
+                if (
+                    not name
+                    or "\x00" in name
+                    or "\\" in name
+                    or relative.is_absolute()
+                    or ".." in relative.parts
+                    or relative.as_posix() != name
+                    or not (
+                        name == PRIVATE_CI_RECEIPT_NAME
+                        or (
+                            len(relative.parts) > 1
+                            and relative.parts[0] == PRIVATE_CI_ATTESTATION_DIR
+                        )
+                    )
+                ):
+                    raise ValueError("private execution artifact path is invalid")
+                mode = (info.external_attr >> 16) & 0xFFFF
+                if (
+                    info.flag_bits & 0x1
+                    or stat.S_ISLNK(mode)
+                    or stat.S_IFMT(mode) not in {0, stat.S_IFREG}
+                    or info.file_size < 0
+                    or info.file_size > PRIVATE_CI_ARCHIVE_FILE_LIMIT
+                    or info.compress_size < 0
+                    or (
+                        info.file_size > 0
+                        and (
+                            info.compress_size == 0
+                            or info.file_size > info.compress_size * 1000
+                        )
+                    )
+                ):
+                    raise ValueError("private execution artifact member is invalid")
+                total_size += info.file_size
+                if total_size > PRIVATE_CI_ARCHIVE_TOTAL_LIMIT:
+                    raise ValueError("private execution artifact expansion is invalid")
+                body = archive.read(info)
+                if len(body) != info.file_size:
+                    raise ValueError("private execution artifact member is truncated")
+                files[name] = body
+    except (OSError, RuntimeError, zipfile.BadZipFile) as exc:
+        raise ValueError("private execution artifact archive is invalid") from exc
+    if (
+        PRIVATE_CI_RECEIPT_NAME not in files
+        or f"{PRIVATE_CI_ATTESTATION_DIR}/attestation.json" not in files
+    ):
+        raise ValueError("private execution artifact required files are missing")
+    return files
+
+
+def _authenticated_private_ci_files() -> dict[str, bytes]:
+    artifact_id = os.environ.get(PRIVATE_CI_ARTIFACT_ID_ENV, "")
+    artifact_digest = os.environ.get(PRIVATE_CI_ARTIFACT_DIGEST_ENV, "")
+    run_id = os.environ.get("GITHUB_RUN_ID", "")
+    run_attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "")
+    event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+    if (
+        os.environ.get("GITHUB_ACTIONS") != "true"
+        or os.environ.get("GITHUB_REPOSITORY") != PRIVATE_CI_REPOSITORY
+        or os.environ.get("GITHUB_WORKFLOW") != "ci"
+        or os.environ.get("GITHUB_JOB") != PRIVATE_CI_JOB
+        or event_name not in {"pull_request", "push"}
+        or not _positive_decimal(artifact_id)
+        or not _hex64(artifact_digest)
+        or not _positive_decimal(run_id)
+        or not _positive_decimal(run_attempt)
+        or os.environ.get("SAFE_MODE") != "1"
+        or os.environ.get("ALLOW_NETWORK") != "1"
+        or any(
+            os.environ.get(key) != value
+            for key, value in PRIVATE_CI_EXECUTION_RAILS.items()
+            if key not in {"ALLOW_NETWORK"}
+        )
+    ):
+        raise ValueError("private execution artifact consumer identity mismatch")
+    source_commit = _current_source_commit()
+    artifact_name = (
+        f"{PRIVATE_CI_ARTIFACT_PREFIX}-{source_commit}-{run_id}-{run_attempt}"
+    )
+    artifact_endpoint = (
+        f"/repos/{PRIVATE_CI_REPOSITORY}/actions/artifacts/{artifact_id}"
+    )
+    metadata = _github_api_json(artifact_endpoint, limit=1024 * 1024)
+    workflow_run = metadata.get("workflow_run")
+    expected_server_digest = f"sha256:{artifact_digest}"
+    if (
+        metadata.get("id") != int(artifact_id)
+        or metadata.get("name") != artifact_name
+        or metadata.get("expired") is not False
+        or metadata.get("digest") != expected_server_digest
+        or not isinstance(metadata.get("size_in_bytes"), int)
+        or isinstance(metadata.get("size_in_bytes"), bool)
+        or not 0 < int(metadata["size_in_bytes"]) <= PRIVATE_CI_ARCHIVE_LIMIT
+        or not isinstance(workflow_run, dict)
+        or workflow_run.get("id") != int(run_id)
+        or workflow_run.get("repository_id") != PRIVATE_CI_REPOSITORY_ID
+        or workflow_run.get("head_repository_id") != PRIVATE_CI_REPOSITORY_ID
+        or not isinstance(workflow_run.get("head_branch"), str)
+        or not workflow_run.get("head_branch")
+        or workflow_run.get("head_sha") != source_commit
+        or not (
+            isinstance(workflow_run.get("head_sha"), str)
+            and len(str(workflow_run["head_sha"])) == 40
+            and all(
+                character in "0123456789abcdef"
+                for character in str(workflow_run["head_sha"])
+            )
+        )
+    ):
+        raise ValueError("private execution artifact metadata mismatch")
+    attempt_endpoint = (
+        f"/repos/{PRIVATE_CI_REPOSITORY}/actions/runs/{run_id}/attempts/"
+        f"{run_attempt}"
+    )
+    attempt = _github_api_json(attempt_endpoint, limit=2 * 1024 * 1024)
+    repository = attempt.get("repository")
+    head_repository = attempt.get("head_repository")
+    workflow_path = attempt.get("path")
+    workflow_path_matches = workflow_path == PRIVATE_CI_WORKFLOW_PATH
+    if isinstance(workflow_path, str) and workflow_path.startswith(
+        f"{PRIVATE_CI_WORKFLOW_PATH}@"
+    ):
+        workflow_ref = workflow_path.removeprefix(
+            f"{PRIVATE_CI_WORKFLOW_PATH}@"
+        )
+        workflow_path_matches = bool(
+            workflow_ref
+            and len(workflow_ref) <= 255
+            and re.fullmatch(r"[A-Za-z0-9._/-]+", workflow_ref)
+            and ".." not in workflow_ref
+            and "//" not in workflow_ref
+            and not workflow_ref.startswith(('/', '.'))
+            and not workflow_ref.endswith(('/', '.', '.lock'))
+        )
+    if (
+        attempt.get("id") != int(run_id)
+        or attempt.get("run_attempt") != int(run_attempt)
+        or attempt.get("event") != event_name
+        or not workflow_path_matches
+        or attempt.get("head_sha") != workflow_run.get("head_sha")
+        or attempt.get("head_branch") != workflow_run.get("head_branch")
+        or not isinstance(repository, dict)
+        or repository.get("id") != PRIVATE_CI_REPOSITORY_ID
+        or repository.get("full_name") != PRIVATE_CI_REPOSITORY
+        or not isinstance(head_repository, dict)
+        or head_repository.get("id") != PRIVATE_CI_REPOSITORY_ID
+        or head_repository.get("full_name") != PRIVATE_CI_REPOSITORY
+    ):
+        raise ValueError("private execution workflow-run attempt mismatch")
+    archive = _github_api_bytes(
+        f"{artifact_endpoint}/zip",
+        accept="application/vnd.github+json",
+        limit=PRIVATE_CI_ARCHIVE_LIMIT,
+        allow_redirect=True,
+    )
+    if (
+        len(archive) != metadata["size_in_bytes"]
+        or hashlib.sha256(archive).hexdigest() != artifact_digest
+    ):
+        raise ValueError("private execution artifact archive digest mismatch")
+    files = _private_ci_archive_files(archive)
+    receipt_bytes = files[PRIVATE_CI_RECEIPT_NAME]
+    try:
+        receipt = json.loads(
+            receipt_bytes, object_pairs_hook=_unique_json_object
+        )
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("private execution artifact receipt is malformed") from exc
+    if (
+        not isinstance(receipt, dict)
+        or receipt_bytes != _canonical_json(receipt)
+        or receipt.get("run_id") != run_id
+        or receipt.get("run_attempt") != run_attempt
+        or receipt.get("event_name") != event_name
+    ):
+        raise ValueError("private execution artifact receipt run mismatch")
+    return files
+
+
+def _materialize_private_ci_files(files: Mapping[str, bytes], root: Path) -> None:
+    for name, body in sorted(files.items()):
+        target = root / name
+        target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        descriptor: int | None = None
+        try:
+            descriptor = os.open(
+                target,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                0o600,
+            )
+            with os.fdopen(descriptor, "wb") as stream:
+                descriptor = None
+                stream.write(body)
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+
+
+def _private_ci_evidence_from_root(
+    root: Path, *, authenticated_receipt: bool
+) -> _PrivateCiEvidence:
+    try:
+        root = _private_ci_root(str(root))
         attestation_root = root / PRIVATE_CI_ATTESTATION_DIR
         _validate_private_source_worktree(allow_generated=True)
         _verify_private_release_attestation_bundle(attestation_root)
@@ -3873,6 +4229,13 @@ def _private_ci_evidence() -> _PrivateCiEvidence:
             "ABSENT",
             "no private external exact-command CI receipt was supplied",
         )
+    if not authenticated_receipt:
+        return _PrivateCiEvidence(
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+            "FAIL",
+            PRIVATE_CI_INVALID_DETAIL,
+        )
     try:
         receipt, _receipt_bytes = _read_private_json(
             receipt_path,
@@ -3898,6 +4261,55 @@ def _private_ci_evidence() -> _PrivateCiEvidence:
         PRIVATE_CI_ATTESTATION_PASS_DETAIL,
         "PASS",
         PRIVATE_CI_RECEIPT_PASS_DETAIL,
+    )
+
+
+def _private_ci_evidence() -> _PrivateCiEvidence:
+    configured = os.environ.get(PRIVATE_CI_ROOT_ENV)
+    artifact_configuration = (
+        os.environ.get(PRIVATE_CI_ARTIFACT_ID_ENV),
+        os.environ.get(PRIVATE_CI_ARTIFACT_DIGEST_ENV),
+    )
+    if any(value is not None for value in artifact_configuration):
+        if configured is not None or not all(artifact_configuration):
+            return _PrivateCiEvidence(
+                "FAIL",
+                PRIVATE_CI_INVALID_DETAIL,
+                "FAIL",
+                PRIVATE_CI_INVALID_DETAIL,
+            )
+        try:
+            files = _authenticated_private_ci_files()
+            if (
+                PRIVATE_CI_RECEIPT_NAME not in files
+                or f"{PRIVATE_CI_ATTESTATION_DIR}/attestation.json" not in files
+            ):
+                raise ValueError("authenticated private artifact is incomplete")
+            with tempfile.TemporaryDirectory(
+                prefix="hde-epic038-authenticated-receipt-"
+            ) as temporary:
+                root = Path(temporary)
+                os.chmod(root, 0o700)
+                _materialize_private_ci_files(files, root)
+                return _private_ci_evidence_from_root(
+                    root, authenticated_receipt=True
+                )
+        except (OSError, UnicodeError, ValueError):
+            return _PrivateCiEvidence(
+                "FAIL",
+                PRIVATE_CI_INVALID_DETAIL,
+                "FAIL",
+                PRIVATE_CI_INVALID_DETAIL,
+            )
+    if configured is None:
+        return _PrivateCiEvidence(
+            "ABSENT",
+            "no private external exact-source release attestation was supplied",
+            "ABSENT",
+            "no private external exact-command CI receipt was supplied",
+        )
+    return _private_ci_evidence_from_root(
+        Path(configured), authenticated_receipt=False
     )
 
 
