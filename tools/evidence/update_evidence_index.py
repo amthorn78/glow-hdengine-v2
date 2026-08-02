@@ -17,6 +17,7 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import stat as _stat
 import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
@@ -35,6 +36,151 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+
+
+class _WriteTransaction:
+    """Restore every updater-owned write when convergence or validation fails."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+        self.files: dict[Path, tuple[bytes, int, int, int] | None] = {}
+        self.directories: dict[Path, tuple[int, int, int] | None] = {}
+
+    def __enter__(self) -> "_WriteTransaction":
+        global _ACTIVE_WRITE_TRANSACTION
+        if _ACTIVE_WRITE_TRANSACTION is not None:
+            raise RuntimeError("nested evidence-index write transaction")
+        _ACTIVE_WRITE_TRANSACTION = self
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        global _ACTIVE_WRITE_TRANSACTION
+        _ACTIVE_WRITE_TRANSACTION = None
+        if exc_value is None:
+            return False
+        try:
+            self.rollback()
+        except BaseException as rollback_error:  # noqa: BLE001
+            failure = RuntimeError("EVIDENCE_INDEX_TRANSACTION_ROLLBACK_FAILED")
+            failure.add_note(f"rollback error: {rollback_error}")
+            raise failure from exc_value
+        return False
+
+    def _assert_scoped(self, path: Path) -> None:
+        try:
+            relative = path.relative_to(self.root)
+        except ValueError as exc:
+            raise RuntimeError(f"transaction path escapes repository: {path}") from exc
+        if ".." in relative.parts:
+            raise RuntimeError(f"transaction path escapes repository: {path}")
+
+    def _capture_directory_chain(self, path: Path) -> None:
+        chain: list[Path] = []
+        current = path.parent
+        while True:
+            self._assert_scoped(current)
+            chain.append(current)
+            if current == self.root:
+                break
+            current = current.parent
+        for directory in reversed(chain):
+            if directory in self.directories:
+                continue
+            if directory.is_symlink():
+                raise SystemExit(f"ALIASED_TRANSACTION_DIRECTORY:{directory}")
+            if not directory.exists():
+                self.directories[directory] = None
+                continue
+            if not directory.is_dir():
+                raise SystemExit(f"NON_DIRECTORY_TRANSACTION_PARENT:{directory}")
+            metadata = directory.stat()
+            self.directories[directory] = (
+                _stat.S_IMODE(metadata.st_mode),
+                metadata.st_atime_ns,
+                metadata.st_mtime_ns,
+            )
+
+    def capture(self, path: Path) -> None:
+        self._assert_scoped(path)
+        if path in self.files:
+            return
+        self._capture_directory_chain(path)
+        if path.is_symlink():
+            raise SystemExit(f"ALIASED_TRANSACTION_FILE:{path}")
+        if not path.exists():
+            self.files[path] = None
+            return
+        if not path.is_file():
+            raise SystemExit(f"NON_FILE_TRANSACTION_TARGET:{path}")
+        metadata = path.stat()
+        self.files[path] = (
+            path.read_bytes(),
+            _stat.S_IMODE(metadata.st_mode),
+            metadata.st_atime_ns,
+            metadata.st_mtime_ns,
+        )
+
+    def rollback(self) -> None:
+        for path, preimage in self.files.items():
+            if preimage is None:
+                if path.is_symlink() or path.is_file():
+                    path.unlink()
+                elif path.exists():
+                    raise RuntimeError(f"transaction target became non-file: {path}")
+                continue
+            body, mode, atime_ns, mtime_ns = preimage
+            if path.is_symlink() or (path.exists() and not path.is_file()):
+                raise RuntimeError(f"transaction target changed type: {path}")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+            os.chmod(path, mode, follow_symlinks=False)
+            os.utime(
+                path,
+                ns=(atime_ns, mtime_ns),
+                follow_symlinks=False,
+            )
+
+        missing_directories = sorted(
+            (
+                path
+                for path, preimage in self.directories.items()
+                if preimage is None
+            ),
+            key=lambda path: len(path.parts),
+            reverse=True,
+        )
+        for directory in missing_directories:
+            if directory.exists():
+                directory.rmdir()
+
+        existing_directories = sorted(
+            (
+                (path, preimage)
+                for path, preimage in self.directories.items()
+                if preimage is not None
+            ),
+            key=lambda item: len(item[0].parts),
+            reverse=True,
+        )
+        for directory, preimage in existing_directories:
+            assert preimage is not None
+            mode, atime_ns, mtime_ns = preimage
+            os.chmod(directory, mode, follow_symlinks=False)
+            os.utime(
+                directory,
+                ns=(atime_ns, mtime_ns),
+                follow_symlinks=False,
+            )
+
+
+_ACTIVE_WRITE_TRANSACTION: _WriteTransaction | None = None
+
+
+def _capture_transaction_preimage(path: Path) -> None:
+    if _ACTIVE_WRITE_TRANSACTION is not None:
+        _ACTIVE_WRITE_TRANSACTION.capture(path)
+
+
 BASELINE_ENTRIES: list[dict[str, object]] = [
     {
         "artifact_key": "registry.registry_report",
@@ -2467,6 +2613,241 @@ EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "epic038.close_report", "discovered_physical_path": "audit/EPIC-038_close_report.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_report", "schema_version": "1.0", "tokens": ["TESTS_PASS_OK"]},
+    {"artifact_key": "epic038.manifest", "discovered_physical_path": "audit/EPIC-038_MANIFEST.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_manifest", "schema_version": "1.0"},
+    {"artifact_key": "epic038.acceptance_map", "discovered_physical_path": "docs/acceptance_map_epic038.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map", "schema_version": "1.0"},
+    {"artifact_key": "epic038.acceptance_map_viability", "discovered_physical_path": "audit/qa/hde-epic038/acceptance_map_viability.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map_viability", "schema_version": "1.0"},
+    {"artifact_key": "epic038.closeout_remediation_ledger", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_closeout_remediation_ledger", "schema_version": "1.0"},
+    {"artifact_key": "epic038.qa_precommit_checklist", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_qa_precommit_checklist", "schema_version": "1.0", "tokens": ["QA_PRECOMMIT_CHECKLIST_OK"]},
+    {"artifact_key": "epic038.qa_postcommit_checklist", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_qa_postcommit_checklist", "schema_version": "1.0", "tokens": ["QA_POSTCOMMIT_CHECKLIST_OK"]},
+]
+
+EPIC038_CLOSEOUT_KEY_OUTPUTS = {
+    "acceptance_map": "docs/acceptance_map_epic038.json",
+    "acceptance_map_viability": "audit/qa/hde-epic038/acceptance_map_viability.log",
+    "close_manifest": "audit/EPIC-038_MANIFEST.json",
+    "close_report": "audit/EPIC-038_close_report.md",
+    "closeout_remediation_ledger": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
+    "qa_postcommit_checklist": "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
+    "qa_precommit_checklist": "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
+    "token_matrix": "audit/qa/hde-epic038/token_evidence_matrix.md",
+}
+
+EPIC038_CLOSEOUT_FAMILY_KEYS = frozenset(
+    str(entry["artifact_key"]) for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
+)
+EPIC038_CLOSEOUT_FAMILY_PATHS = frozenset(
+    str(entry["discovered_physical_path"])
+    for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
+)
+
+
+def _load_epic038_json(path: Path, *, label: str) -> dict[str, object]:
+    def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    try:
+        payload = json.loads(
+            path.read_text(encoding="utf-8"), object_pairs_hook=_unique_object
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise SystemExit(f"INVALID_EPIC038_{label}") from exc
+    if not isinstance(payload, dict):
+        raise SystemExit(f"INVALID_EPIC038_{label}")
+    return payload
+
+
+def _epic038_closeout_package_bytes() -> dict[str, bytes]:
+    from tools.evidence import generate_hde_epic038_closeout as closeout
+
+    if dict(closeout.KEY_OUTPUTS) != EPIC038_CLOSEOUT_KEY_OUTPUTS:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_KEY_OUTPUT_CONTRACT")
+    package: dict[str, bytes] = {}
+    try:
+        for package_path in closeout.PACKAGE_PATHS:
+            relative = (
+                package_path.as_posix()
+                if isinstance(package_path, Path)
+                else str(package_path)
+            )
+            package[relative] = (ROOT / relative).read_bytes()
+    except OSError as exc:
+        raise SystemExit("INCOMPLETE_EPIC038_CLOSEOUT_PACKAGE") from exc
+    return package
+
+
+def _validate_epic038_closeout_bindings() -> None:
+    manifest = _load_epic038_json(
+        ROOT / "audit/EPIC-038_MANIFEST.json", label="CLOSE_MANIFEST"
+    )
+    acceptance_map = _load_epic038_json(
+        ROOT / "docs/acceptance_map_epic038.json", label="ACCEPTANCE_MAP"
+    )
+    if (
+        manifest.get("epic_id") != "HDE-EPIC038"
+        or manifest.get("schema_version") != "1.0"
+        or manifest.get("key_outputs") != EPIC038_CLOSEOUT_KEY_OUTPUTS
+    ):
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_BINDINGS")
+    if (
+        acceptance_map.get("artifact_key") != "epic038.acceptance_map"
+        or acceptance_map.get("epic_id") != "HDE-EPIC038"
+        or acceptance_map.get("schema_version") != "1.0"
+    ):
+        raise SystemExit("INVALID_EPIC038_ACCEPTANCE_MAP_BINDINGS")
+
+    decision = manifest.get("decision")
+    if decision not in {"SATISFIED", "NOT SATISFIED"}:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION")
+    if acceptance_map.get("decision") != decision:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION_COHERENCE")
+
+    roster = manifest.get("token_roster")
+    token_status = manifest.get("token_status")
+    records = acceptance_map.get("records")
+    if (
+        not isinstance(roster, list)
+        or not roster
+        or any(not isinstance(token, str) or not token for token in roster)
+        or len(roster) != len(set(roster))
+        or not isinstance(token_status, dict)
+        or set(token_status) != set(roster)
+        or not isinstance(records, list)
+        or [record.get("token") for record in records if isinstance(record, dict)]
+        != roster
+        or any(not isinstance(record, dict) for record in records)
+        or any(
+            record.get("status") != token_status.get(record.get("token"))
+            for record in records
+            if isinstance(record, dict)
+        )
+        or acceptance_map.get("minimum_follow_up")
+        != manifest.get("minimum_follow_up")
+    ):
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_ROSTER_COHERENCE")
+
+    for output_path in EPIC038_CLOSEOUT_KEY_OUTPUTS.values():
+        if not (ROOT / output_path).is_file():
+            raise SystemExit(f"MISSING_EPIC038_CLOSEOUT_OUTPUT:{output_path}")
+
+    try:
+        report = (ROOT / "audit/EPIC-038_close_report.md").read_text(
+            encoding="utf-8"
+        )
+        viability = (
+            ROOT / "audit/qa/hde-epic038/acceptance_map_viability.log"
+        ).read_text(encoding="utf-8")
+        ledger = (
+            ROOT
+            / "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md"
+        ).read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_TEXT_ARTIFACT") from exc
+    if (
+        f"Final decision: {decision}" not in report
+        or f"DECISION: {decision}" not in viability
+    ):
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION_COHERENCE")
+
+    ledger_prefix = "# HDE-EPIC038 Closeout Remediation Ledger\n\n```json\n"
+    ledger_suffix = "\n```\n"
+    if not ledger.startswith(ledger_prefix) or not ledger.endswith(ledger_suffix):
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER")
+    try:
+        ledger_payload = json.loads(
+            ledger[len(ledger_prefix) : -len(ledger_suffix)]
+        )
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER") from exc
+    if (
+        not isinstance(ledger_payload, dict)
+        or ledger_payload.get("artifact_key")
+        != "epic038.closeout_remediation_ledger"
+        or ledger_payload.get("epic_id") != "HDE-EPIC038"
+        or ledger_payload.get("schema")
+        != "hde.epic038.closeout_remediation_ledger.v1"
+        or not isinstance(ledger_payload.get("entries"), list)
+    ):
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER")
+
+    # Keep the updater and producer on one exact package-surface contract.
+    # Full current-byte validation runs after updater-owned proofs and indexes
+    # have been refreshed; doing it here would prevent canonical self-repair.
+    from tools.evidence import generate_hde_epic038_closeout as closeout
+
+    previous_root = closeout.ROOT
+    closeout.ROOT = ROOT
+    try:
+        closeout.validate_package_structure(_epic038_closeout_package_bytes())
+    except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_PACKAGE_STRUCTURE") from exc
+    finally:
+        closeout.ROOT = previous_root
+
+
+def _validate_epic038_closeout_package() -> None:
+    """Validate the complete package after canonical updater convergence work."""
+    activation_paths = [
+        ROOT / str(entry["discovered_physical_path"])
+        for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
+    ]
+    if not any(path.is_file() or path.is_symlink() for path in activation_paths):
+        return
+
+    from tools.evidence import generate_hde_epic038_closeout as closeout
+
+    previous_root = closeout.ROOT
+    closeout.ROOT = ROOT
+    try:
+        closeout._validate_package_for_canonical_updater(
+            _epic038_closeout_package_bytes()
+        )
+    except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
+        raise SystemExit("INVALID_EPIC038_CLOSEOUT_PACKAGE") from exc
+    finally:
+        closeout.ROOT = previous_root
+
+
+def _load_epic038_closeout_entries() -> list[dict[str, object]]:
+    """Activate the DEV-03 family as a unit; a partial family is never valid."""
+    paths = [ROOT / str(e["discovered_physical_path"]) for e in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
+    present = [path.is_file() for path in paths]
+    proof_paths = [
+        ROOT / f"{entry['discovered_physical_path']}.path_proof.txt"
+        for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
+    ]
+    aliased = [
+        path.relative_to(ROOT).as_posix()
+        for path in (*paths, *proof_paths)
+        if path.is_symlink()
+    ]
+    if aliased:
+        raise SystemExit("ALIASED_EPIC038_CLOSEOUT_FAMILY:" + ",".join(aliased))
+    proof_present = [path.is_file() for path in proof_paths]
+    if not any(present) and not any(proof_present):
+        return []
+    if not all(present):
+        missing = [str(e["discovered_physical_path"]) for e, exists in zip(EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS, present) if not exists]
+        raise SystemExit("INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:" + ",".join(missing))
+    if any(proof_present) and not all(proof_present):
+        missing_proofs = [
+            path.relative_to(ROOT).as_posix()
+            for path, exists in zip(proof_paths, proof_present)
+            if not exists
+        ]
+        raise SystemExit(
+            "INCOMPLETE_EPIC038_CLOSEOUT_PROOF_FAMILY:"
+            + ",".join(missing_proofs)
+        )
+    _validate_epic038_closeout_bindings()
+    return [dict(entry) for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
+
 
 EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
@@ -2950,7 +3331,6 @@ def _write_path_proof(
 
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
-    proof_path.parent.mkdir(parents=True, exist_ok=True)
 
     def _normalize_utc(raw: str | None) -> str | None:
         if not raw:
@@ -3072,6 +3452,8 @@ def _write_path_proof(
         existing_text = proof_path.read_text(encoding="utf-8")
         if existing_text == proof_text:
             return proof_rel, produced
+    _capture_transaction_preimage(proof_path)
+    proof_path.parent.mkdir(parents=True, exist_ok=True)
     proof_path.write_text(proof_text, encoding="utf-8")
     return proof_rel, produced
 
@@ -3096,6 +3478,9 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
     path = entry.get("discovered_physical_path") or entry.get("path")
     if not isinstance(key, str) or not isinstance(path, str):
         raise ValueError(f"Invalid entry: {entry!r}")
+    candidate_path = Path(path)
+    if candidate_path.is_absolute() or ".." in candidate_path.parts:
+        raise ValueError(f"Invalid discovered_physical_path for {key}: {path!r}")
 
     if "audit/qa/hde-epic024/checks/" in path:
         parts = path.split("/")
@@ -3142,7 +3527,10 @@ def _load_human_index() -> list[dict[str, object]]:
     payload = [
         entry
         for entry in payload
-        if (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        if entry.get("artifact_key") not in EPIC038_CLOSEOUT_FAMILY_KEYS
+        and entry.get("discovered_physical_path")
+        not in EPIC038_CLOSEOUT_FAMILY_PATHS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC032_PR03_SUPERSEDED_INDEX_KEYS
@@ -3203,6 +3591,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
+            *_load_epic038_closeout_entries(),
             *EPIC038_QA_PRIMARY_ARTIFACTS,
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
@@ -3420,6 +3809,7 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
             raise SystemExit(f"STALE:{path}")
     elif check:
         raise SystemExit(f"STALE:{path}")
+    _capture_transaction_preimage(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
 
@@ -3695,25 +4085,29 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.check:
         _run_once(check=True)
+        _validate_epic038_closeout_package()
         return
 
     # Converge in one invocation with a bounded fixed-point loop.
     # Mirror rendering depends on artifacts written by this same updater
     # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
     # so a single rewrite is not always sufficient.
-    max_passes = 6
-    last_error: SystemExit | None = None
-    for _ in range(max_passes):
-        _run_once(check=False)
-        try:
-            _run_once(check=True)
-            last_error = None
-            break
-        except SystemExit as exc:
-            last_error = exc
+    with _WriteTransaction(ROOT):
+        max_passes = 6
+        last_error: SystemExit | None = None
+        for _ in range(max_passes):
+            _run_once(check=False)
+            _validate_epic038_closeout_package()
+            try:
+                _run_once(check=True)
+                last_error = None
+                break
+            except SystemExit as exc:
+                last_error = exc
 
-    if last_error is not None:
-        raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+        if last_error is not None:
+            raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+        _validate_epic038_closeout_package()
 
 
 if __name__ == "__main__":

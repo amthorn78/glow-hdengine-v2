@@ -2,7 +2,17 @@ name: ci
 on: [push, pull_request]
 jobs:
   test:
+    needs:
+      - compat-conj-pr01-closure
+      - epic020
+      - compat-http-epic020
+      - epic020-evidence-bundles
+      - rails-policy-gates
+      - sanity-pipeline
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
     env:
       LC_ALL: C
       LANG: C
@@ -10,14 +20,21 @@ jobs:
       SAFE_MODE: "1"
       ALLOW_NETWORK: "0"
       APP_ENV: dev
+      PYTHONDONTWRITEBYTECODE: "1"
     # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Download exact-head release attestation
+        uses: actions/download-artifact@v4
+        with:
+          name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/hde-epic038-private-receipt/release-attestation
       - name: Check HDE-EPIC038 DEV-01 doc-delta pair
         shell: bash
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas
@@ -26,8 +43,15 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements-dev.txt
+          python -m pip install -r requirements.txt
           python -m pytest --version
           python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
+      - name: Verify downloaded exact-source release attestation
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod 700 "$RUNNER_TEMP/hde-epic038-private-receipt"
+          python tools/evidence/build_release_attestation.py --verify "$RUNNER_TEMP/hde-epic038-private-receipt/release-attestation" --require-clean
       - run: python -m pip install -U pip
       - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
       - run: python -m pip install -e .
@@ -45,10 +69,63 @@ jobs:
       # Current release-bound canonical captures are rebuilt in the isolated
       # attestation job below. Historical checked-in evidence remains immutable.
       - run: python tools/order/generate_ordering_artifacts.py --check
-      - run: python tools/evidence/update_evidence_index.py --check
       - run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
       - name: Check HDE-EPIC038 DEV-01 token matrix
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
+      - name: Produce conditional private HDE-EPIC038 execution receipt
+        id: epic038_receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          primaries=(
+            audit/EPIC-038_close_report.md
+            audit/EPIC-038_MANIFEST.json
+            docs/acceptance_map_epic038.json
+            audit/qa/hde-epic038/acceptance_map_viability.log
+            audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
+            audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
+            audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log
+          )
+          present=0
+          missing=()
+          for path in "${primaries[@]}"; do
+            if [[ -f "$path" ]]; then
+              present=$((present + 1))
+            else
+              missing+=("$path")
+            fi
+          done
+          if (( present == 0 )); then
+            echo "HDE-EPIC038 DEV-03 closeout family absent; private execution receipt not applicable."
+            python tools/evidence/update_evidence_index.py --check
+          elif (( present != ${#primaries[@]} )); then
+            printf 'INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:%s\n' "$(IFS=,; echo "${missing[*]}")"
+            exit 1
+          else
+            receipt_root="$RUNNER_TEMP/hde-epic038-private-receipt"
+            receipt_source="$RUNNER_TEMP/hde-epic038-receipt-source"
+            cleanup() {
+              git worktree remove --force "$receipt_source" >/dev/null 2>&1 || true
+            }
+            trap cleanup EXIT
+            git worktree add --detach "$receipt_source" "$(git rev-parse HEAD)"
+            (
+              cd "$receipt_source"
+              unset _HDE_EPIC038_PRIVATE_CI_ROOT
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --preflight
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
+            )
+            _HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root" python -c 'from tools.evidence import generate_hde_epic038_closeout as closeout; closeout._write_private_ci_receipt()'
+            cleanup
+            trap - EXIT
+            echo "produced=true" >> "$GITHUB_OUTPUT"
+          fi
       - run: python tools/evidence/orientation_demo.py --check
       - name: Run PO-006 token registry validity check + report (gated)
         run: |
@@ -83,15 +160,81 @@ jobs:
         run: python tools/evidence/validate_evidence_paths.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
-      - name: Run EPIC021 QA harness entrypoint self-test (closed rails)
-        env:
-          EPIC021_QA_RUN_ID: ci-selftest-epic021
-        run: python -m pytest tests/qa/test_epic021_harness_entrypoint.py
-      # Legacy evidence tests below intentionally build ephemeral EPIC020/021
-      # artifacts. The committed closure has already been verified read-only above.
-      - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py
+      # These legacy suites intentionally build ephemeral EPIC020/021 artifacts.
+      # The committed closure has already been verified read-only above.
+      - name: Run legacy EPIC020/021 evidence tests in isolated exact-head worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          legacy_source="$RUNNER_TEMP/hde-legacy-evidence-tests"
+          cleanup() {
+            git worktree remove --force "$legacy_source" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          git worktree add --detach "$legacy_source" "$(git rev-parse HEAD)"
+          (
+            cd "$legacy_source"
+            unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ROOT _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
+            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+            export PYTHONPATH="$legacy_source"
+            EPIC021_QA_RUN_ID=ci-selftest-epic021 python -m pytest tests/qa/test_epic021_harness_entrypoint.py
+            python -m pytest tests/evidence tests/ops/test_evidence_index.py tests/ops/test_hde_epic038_ops03.py
+          )
+          cleanup
+          trap - EXIT
       - run: python -m pytest tests/order tests/mech/test_order_properties.py
       - run: python -m pytest tests/cli/test_serializer_guards.py
+      - name: Confirm receipt-free exact-head tree is clean
+        run: |
+          git diff --check
+          git diff --exit-code
+      - name: Publish private exact-head HDE-EPIC038 execution receipt
+        id: epic038_receipt_artifact
+        if: steps.epic038_receipt.outputs.produced == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/hde-epic038-private-receipt
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+      - name: Authenticate and consume private HDE-EPIC038 execution artifact
+        if: steps.epic038_receipt.outputs.produced == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID: ${{ steps.epic038_receipt_artifact.outputs.artifact-id }}
+          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST: ${{ steps.epic038_receipt_artifact.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          authenticated_source="$RUNNER_TEMP/hde-epic038-authenticated-source"
+          cleanup() {
+            git worktree remove --force "$authenticated_source" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          git worktree add --detach "$authenticated_source" "$(git rev-parse HEAD)"
+          (
+            cd "$authenticated_source"
+            unset _HDE_EPIC038_PRIVATE_CI_ROOT
+            SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
+            (
+              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
+            )
+            SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check
+            (
+              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
+              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
+            )
+          )
+          cleanup
+          trap - EXIT
+      - name: Confirm authenticated exact-head receipt fixed point is clean
+        run: |
+          git diff --check
+          git diff --exit-code
   compat-conj-pr01-closure:
     name: PR-01 compat conjunction closure (independent lane)
     runs-on: ubuntu-latest
