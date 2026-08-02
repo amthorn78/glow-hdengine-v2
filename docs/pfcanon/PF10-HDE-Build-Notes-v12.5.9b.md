@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.5.8b  
-Effective Date: 2026.08.01  
+**Version:** v12.5.9b  
+Effective Date: 2026.08.02  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5696,4 +5696,629 @@ Remedial PR 3 exact-head proof:
 * Manifest proof: current manifest SHA `0ace495485ca82d6929f26d9d4920215ee7e3ca18b646310d9ef79db1c97a57f`.  
 * All current staging, capture, matrix, Index, Mirror, checksum, and orientation proof targets resolve and match their governed metadata.
 
-\<eof\>  
+\<eof\>
+
+## 2.40) DEV-02 Closeout remediation HDE-EPIC038
+
+Review Summary
+
+* Merged Change implements DEV-02’s deterministic closeout generator, fail-closed evaluator, remediation-ledger lifecycle, conditional updater registration, CI integration, and focused regression suite. Repo proof: parent-to-squash comparison `58088a72… → dbd7487d…` reports 12 changed files, \+9,045/−162.  
+* Generator behavior aligns with Approved Plan §10 DEV-02 actions 1–11: exact 33-token evaluation, complete `SATISFIED`/`NOT SATISFIED` packages, stable blockers, atomic writes, and read-only `--preflight`/`--check`. See CFR-011 and VAL-003.  
+* Updater behavior aligns with the conditional DEV-03 activation requirement and restores bytes, modes, timestamps, and created paths if convergence or semantic validation fails. See CFR-012 and RCA.  
+* Exact-head workflow run 3165 for head `1584ac7233d1d1cd2b215af2fa001a2e945d5e07` completed successfully across all seven jobs. The focused suite reported `363 passed in 1629.99s`. See VAL-002 and VAL-003.  
+* The current `main` endpoint equals squash commit `dbd7487d93738c2a7e894ea049693e5019992825`; all 12 reviewed final files retain the merged bytes. See Repo Inspection and VAL-001.  
+* No token satisfaction claim was made or reviewed: the exact-head matrix check reported `rows=33 unique=33 claimed=0`, and the DEV-03 family was not active in this run.  
+* Approved Plan §9.1 originally prohibited generator network access. Merged Change’s narrowly bounded, authenticated GitHub Actions receipt consumer is treated as permitted by the current Product Owner scope authorization. Its documentation drainage is recorded as DDC-001.  
+* PF09 task HDE-DIST005 remains an ongoing `Not done` requirement and subtask HDE-DIST005.2 remains `Partial`; no status change is supported.
+
+Repo Inspection
+
+* Observed Repo root: `amthorn78/glow-hdengine-v2`.  
+* Observed HEAD: `dbd7487d93738c2a7e894ea049693e5019992825`.  
+* Branch state: committed `main`; the connector comparison reports `main` identical to the resolved merge endpoint.  
+* Working-tree status before review: not applicable. Repo access exposed committed GitHub objects and workflow evidence, not a local checkout.  
+* Resolution method: Merged PR metadata identified base `58088a72afc386a508d64eb2269ab7e8a179af23`, head `1584ac7233d1d1cd2b215af2fa001a2e945d5e07`, and squash commit `dbd7487d93738c2a7e894ea049693e5019992825`. The landed change was resolved as the parent-to-squash range `58088a72… → dbd7487d…`.  
+* Endpoint relationship: the resolved endpoint equals current `main`.  
+* Changed files reviewed:  
+  * `.github/workflows/ci.yml`  
+  * `artifacts/architecture/architecture_snapshot.keys_only.json`  
+  * `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+  * `ci/checks/check_final_lf.sh`  
+  * `scripts/release_id_recompute.py`  
+  * `tests/evidence/test_hde_epic038_closeout.py`  
+  * `tools/evidence/generate_hde_epic038_closeout.py`  
+  * `tools/evidence/update_evidence_index.py`  
+* Current committed state: per-file fetches at the tested PR head and squash endpoint returned matching blob identities for all 12 paths.  
+* Material later committed divergence: None observed.  
+* Search method: searched Repo for "commits and changed files after dbd7487d93738c2a7e894ea049693e5019992825 through main" (case: sensitive); scope: GitHub commit comparison `dbd7487d… → main`; tool: manual scan; result: 0 hits.  
+* Material overlapping worktree divergence: not applicable because no local worktree formed part of Repo access.  
+* Working-tree status after validation: not applicable; no local validation command or file mutation was performed.  
+* Repo proof: GitHub compare `58088a72… → dbd7487d…` reports one squash commit and the exact 12-file inventory; compare `dbd7487d… → main` reports `identical`, zero commits, and zero changed files.
+
+Changed File Review
+
+CFR-001
+
+File: `.github/workflows/ci.yml`
+
+Change summary: Added exact-head checkout and release-attestation transfer, prerequisite-job ordering, conditional seven-primary DEV-03 handling, receipt-free and authenticated projections, isolated legacy writer tests, and clean-tree gates.
+
+Risk assessment: High
+
+Code review assessment: Credentials are step-scoped; authenticated consumption binds artifact ID, digest, repository, head, run, attempt, event, and workflow. Updater/orientation invocations remain at `ALLOW_NETWORK=0`.
+
+Approved Plan linkage: DEV-02 action 12 and the requirement to activate full-package checking after DEV-03 outputs exist.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: current lines 4–237; observed steps include `Produce conditional private HDE-EPIC038 execution receipt`, `Publish private exact-head HDE-EPIC038 execution receipt`, and `Authenticate and consume private HDE-EPIC038 execution artifact`.
+
+PF reference, if relied on: Not relied on.
+
+CFR-002
+
+File: `artifacts/architecture/architecture_snapshot.keys_only.json`
+
+Change summary: Canonically refreshed the generator’s imports and external-I/O symbols (`subprocess`, `urllib`) and added the updater’s `stat` import.
+
+Risk assessment: Medium
+
+Code review assessment: The generated snapshot accurately exposes the new control-plane dependencies and retains `classification: "allowed"` with `reason_code: "bounded_static_locus"`.
+
+Approved Plan linkage: Required coherent regeneration of governed companions after source changes.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: `tools/evidence/generate_hde_epic038_closeout.py` now records `external_io_symbols: ["subprocess","urllib"]`; snapshot SHA-256 is `8a5287dc5339e1278a1f0ab693e54212cc5b78d8fec53715ee28269cd4f05975`.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-003
+
+File: `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt`
+
+Change summary: Updated the architecture snapshot’s size and SHA-256.
+
+Risk assessment: Medium
+
+Code review assessment: Proof fields match the changed primary’s recorded 42,397-byte size and SHA-256.
+
+Approved Plan linkage: Governed companion coherence.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed `size_bytes: 42397` and `sha256: 8a5287dc…`.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-004
+
+File: `artifacts/evidence_index.jsonl`
+
+Change summary: Updated the architecture-snapshot record and the Machine Mirror self-record while retaining the 553-record topology.
+
+Risk assessment: High
+
+Code review assessment: The architecture row binds artifact key `epic038.pr04.architecture_snapshot` to the new size/hash and proof; the self-record carries the regenerated mirror-body fixed-point hash.
+
+Approved Plan linkage: Canonical updater and Machine Mirror fixed-point requirements.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: architecture row records SHA-256 `8a5287dc…`, size `42397`; `index.machine_mirror` records body SHA-256 `554e2633b399e74b710a1145fc30ded5e3dfedb30cd0c80b656f2fceadd85028`.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-005
+
+File: `artifacts/evidence_index.jsonl.path_proof.txt`
+
+Change summary: Updated the Machine Mirror file hash and body fixed-point hash.
+
+Risk assessment: Medium
+
+Code review assessment: The proof distinguishes the complete file SHA-256 from the self-referential mirror-body SHA-256 and retains the established path and size.
+
+Approved Plan linkage: Machine Mirror proof coherence.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed file SHA-256 `79de5f3eeb59232ea0eefc8652433686de0fac58446c02d6f02d8c45e0ff9525` and body SHA-256 `554e2633…`.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-006
+
+File: `artifacts/evidence_index.jsonl.sha256`
+
+Change summary: Replaced the checksum sentinel with the current Machine Mirror file hash.
+
+Risk assessment: Medium
+
+Code review assessment: The sentinel’s hash matches the primary hash recorded by the current path proof.
+
+Approved Plan linkage: Machine Mirror checksum fixed point.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed `79de5f3e… artifacts/evidence_index.jsonl`.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-007
+
+File: `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+Change summary: Updated the checksum sentinel’s sibling proof.
+
+Risk assessment: Medium
+
+Code review assessment: The proof retains the exact sentinel path and 97-byte size and records SHA-256 `4fa31bdf4164c0e75553b40d02cfec350012a13d7dcf696535c13e86ffe3b8ef`.
+
+Approved Plan linkage: Governed checksum/path-proof coherence.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: current proof fields at the squash endpoint.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+CFR-008
+
+File: `ci/checks/check_final_lf.sh`
+
+Change summary: Added the precommit and postcommit checklist primaries and sibling proofs to planned final-LF validation.
+
+Risk assessment: Low
+
+Code review assessment: Coverage is additive and uses the existing checker rather than introducing a duplicate gate.
+
+Approved Plan linkage: Planned checklist evidence and canonical LF requirements.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed four added paths under `audit/qa/hde-epic038/00_meta/`.
+
+PF reference, if relied on: Not relied on.
+
+CFR-009
+
+File: `scripts/release_id_recompute.py`
+
+Change summary: Extracted reusable `manifest_only_problems()` and made `check_manifest_only()` consume the same current manifest audit.
+
+Risk assessment: Medium
+
+Code review assessment: Generator and CLI now share one read-only manifest-content predicate; declared source hashes and sizes are audited before release admission.
+
+Approved Plan linkage: DEV-02’s current release-family validation requirement.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: functions `manifest_only_problems()` and `check_manifest_only()` at current lines 322–355.
+
+PF reference, if relied on: Not relied on.
+
+CFR-010
+
+File: `tests/evidence/test_hde_epic038_closeout.py`
+
+Change summary: Expanded the suite from 67 to 154 test functions, with parametrization producing 363 passing cases.
+
+Risk assessment: Medium
+
+Code review assessment: Coverage includes all corrected-roster negatives, read-only modes, deterministic decisions, rollback, conditional updater activation, ledger closure, release attestation, authenticated artifact provenance, unsafe ZIP rejection, and receipt tampering.
+
+Approved Plan linkage: DEV-02 required negative tests and success criteria.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed tests include `test_dev02_p1_reused_evidence_is_revalidated_after_planned_materializes`, `test_authenticated_private_artifact_rejects_provenance_or_archive_tamper`, `test_dev02_atomic_write_restores_every_target_after_replacement_failure`, and `test_dev02_preflight_is_fully_read_only`.
+
+PF reference, if relied on: Not relied on.
+
+CFR-011
+
+File: `tools/evidence/generate_hde_epic038_closeout.py`
+
+Change summary: Added the authoritative closeout evaluator, eight-surface transactional package projection, acceptance map, viability log, close report and manifest rendering, checklist generation, remediation ledger, CLI modes, release/receipt admission, and cross-surface validation.
+
+Risk assessment: High
+
+Code review assessment: Every token uses a registered evaluator; planned outputs remain `UNCLAIMED` without actual execution evidence; blockers cannot suppress a complete package; package validation reconstructs canonical bytes and re-evaluates current evidence.
+
+Approved Plan linkage: DEV-02 actions 1 and 3–11.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed `evaluate_closeout`, `_planned_family_state`, `_planned_result`, `build_package`, `validate_package_structure`, `validate_package`, `record_blockers`, `close_blocker`, `_write_package`, and `main`; `allow_abbrev=False` remains enforced.
+
+PF reference, if relied on: Not relied on.
+
+CFR-012
+
+File: `tools/evidence/update_evidence_index.py`
+
+Change summary: Added fail-closed conditional EPIC038 registrations, complete package validation, and transactional updater convergence/rollback.
+
+Risk assessment: High
+
+Code review assessment: No closeout entries activate while every future primary/proof is absent; partial or aliased families fail; full validation runs after updater convergence; failed writes restore captured file and directory metadata.
+
+Approved Plan linkage: DEV-02’s canonical-updater output and conditional activation requirements.
+
+Later-state divergence: None observed (Repo Inspection compare/search proof applies).
+
+Repo proof: observed `_WriteTransaction`, `EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS`, `_load_epic038_closeout_entries`, `_validate_epic038_closeout_package`, and the transaction around the bounded convergence loop.
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+Validation Results
+
+VAL-001
+
+Purpose: Establish exact Git attribution and current final state.
+
+Command or method: GitHub PR metadata plus commit comparisons `58088a72… → dbd7487d…` and `dbd7487d… → main`.
+
+Result: PASS
+
+Key output or observation: The first comparison reports one squash commit and 12 changed files; the second reports `identical`, zero later commits, and zero changed files.
+
+Why it matters: Separates Merged Change from later committed state and proves the reviewed endpoint is current.
+
+VAL-002
+
+Purpose: Verify exact-head CI.
+
+Command or method: GitHub Actions run 30744149677, workflow run 3165, for head `1584ac7233d1d1cd2b215af2fa001a2e945d5e07`.
+
+Result: PASS
+
+Key output or observation: All seven jobs concluded `success`, including `test`, `sanity-pipeline`, evidence/index, rails-policy, and compatibility lanes.
+
+Why it matters: Supplies exact-head execution evidence for the merged source blobs.
+
+VAL-003
+
+Purpose: Verify focused DEV-02 behavior.
+
+Command or method: `python -m pytest -q tests/evidence/test_hde_epic038_closeout.py`
+
+Result: PASS
+
+Key output or observation: `363 passed in 1629.99s (0:27:09)`.
+
+Why it matters: Exercises deterministic positive and negative packages, evaluator admission, read-only modes, rollback, ledger lifecycle, updater activation, and receipt security.
+
+VAL-004
+
+Purpose: Verify current QA, matrix, and governed companion gates.
+
+Command or method: Exact-head workflow steps for finalized current state, matrix, updater check, evidence paths, Mirror schema, Index hash, final LF, and doc deltas.
+
+Result: PASS
+
+Key output or observation: `HDE_EPIC038_QA_CURRENT_STATE_OK`; `TOKEN_MATRIX_OK rows=33 unique=33 claimed=0`; `DOC_DELTA_PAIR_OK sha256=322db819… size_bytes=463`; each named gate step concluded success.
+
+Why it matters: Confirms existing DEV-01 evidence and the changed generated companions remained coherent.
+
+VAL-005
+
+Purpose: Verify broader regression compatibility.
+
+Command or method: Exact-head workflow’s direct database suite and isolated legacy evidence suite.
+
+Result: PASS
+
+Key output or observation: `250 passed, 5 warnings in 1.58s`; `1485 passed in 1812.11s`.
+
+Why it matters: Confirms shared updater and CI changes did not break the proportionate surrounding test surfaces.
+
+VAL-006
+
+Purpose: Verify review-thread resolution.
+
+Command or method: GitHub pull-request review-thread inspection.
+
+Result: PASS
+
+Key output or observation: Nine threads retrieved; nine resolved; zero unresolved.
+
+Why it matters: Confirms every identified P1/P2 correction was incorporated before the squash endpoint.
+
+VAL-007
+
+Purpose: Independent local rerun.
+
+Command or method: NOT RUN; no local repository checkout was available in the reviewed Repo access.
+
+Result: NOT RUN
+
+Key output or observation: Review used complete committed blobs, the full Merged Change, and exact-head workflow logs.
+
+Why it matters: This does not force remediation because the tested head blobs match the merged/current blobs and the required targeted and surrounding checks have exact successful results. No local files were mutated.
+
+RCA
+
+A) Bug/Failure statement
+
+Merged Change review identified multiple fail-closed defects, including “Keep validating reused evidence after planned files appear,” “Keep unexecuted planned checks unclaimed,” and “Authenticate the execution receipt before promoting tokens.” Earlier PR heads could admit stale evidence, strand failed checklists, leave partial updater writes, or trust a synthetic receipt.
+
+B) Root cause(s)
+
+1. Lifecycle validation initially changed after planned files materialized, permitting reused evidence to escape complete revalidation.  
+2. Generated checklist/report bytes were initially conflated with evidence that their associated commands had actually executed.  
+3. Updater mutation and post-write semantic validation were initially separate, allowing failure after governed bytes changed.  
+4. Receipt fields initially proved only self-consistency, not provenance from the immutable current GitHub Actions run.
+
+C) Fix in Merged Change
+
+The final generator always validates reused rows, distinguishes `ABSENT`, `PRIMARY_ONLY`, `REGISTERED`, `UNCLAIMED`, and `FAIL`, and requires authenticated execution evidence before promoting the four externally gated tokens. The updater now journals all writes and rolls back on convergence or validation failure. Receipt consumption authenticates server metadata, upload and raw-ZIP digests, exact run/attempt/repository/head/workflow identity, and safe archive structure.
+
+Repo evidence: CFR-001, CFR-009, CFR-010, CFR-011, and CFR-012.
+
+D) Fix verification
+
+The exact-head suite reports 363 passing cases; all seven workflow jobs succeeded; the focused regressions reproduce each reported defect; and all nine review threads are resolved. The live artifact publish/consume steps were correctly skipped because the DEV-03 family was absent, so their production activation remains a future DEV-03 event rather than a DEV-02 remediation gap.
+
+Findings
+
+Finding ID: F-001
+
+Related review item: CFR-001 / CFR-009 / CFR-010 / CFR-011 / CFR-012 / VAL-002 / VAL-003 / RCA
+
+Severity: Note
+
+Observation: The final implementation satisfies the applicable DEV-02 generator, ledger, updater, CI, release-validation, and test obligations.
+
+Why it matters: It provides a deterministic, fail-closed capability without treating generated bytes or historical captures as current execution proof.
+
+Evidence: CFR-001, CFR-009–CFR-012; VAL-002–VAL-006.
+
+Required action: None
+
+PF reference, if relied on: Not relied on.
+
+Finding ID: F-002
+
+Related review item: CFR-002 / CFR-003 / CFR-004 / CFR-005 / CFR-006 / CFR-007 / CFR-012 / Evidence
+
+Severity: Note
+
+Observation: Architecture and Machine Mirror companion changes form a coherent generated update with matching primary, proof, body-hash, file-hash, and checksum fields.
+
+Why it matters: Governed source changes remain inspectable and machine-verifiable.
+
+Evidence: CFR-002–CFR-007 and VAL-004.
+
+Required action: None
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+PF proof excerpt:
+
+> For any artifact added/moved/removed in this phase:  
+> Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR.  
+> Keep `artifacts/evidence_index.jsonl` as records-only canonical JSONL.
+
+Finding ID: F-003
+
+Related review item: CFR-008 / VAL-004
+
+Severity: Note
+
+Observation: The established final-LF checker now covers both planned checklist primaries and their sibling proofs.
+
+Why it matters: DEV-03 cannot introduce those planned artifacts without the existing canonical text gate seeing them.
+
+Evidence: CFR-008; exact-head `Run ci/checks/check_final_lf.sh` step concluded success.
+
+Required action: None
+
+PF reference, if relied on: Not relied on.
+
+Finding ID: F-004
+
+Related review item: CFR-001 / CFR-011 / Other
+
+Severity: Concern
+
+Observation: Approved Plan §9.1 stated “no network or external-system access,” while the final workflow permits two authenticated generator calls at `ALLOW_NETWORK=1`. The current Product Owner authorization permits this bounded exception.
+
+Why it matters: The exception is materially security-sensitive, but its implementation is restricted to private GitHub Actions artifact authentication; credentials are step-scoped, provenance is server-bound, and updater/orientation remain closed-rail.
+
+Evidence: workflow lines 201–230; generator functions `_github_api_bytes`, `_authenticated_private_ci_files`, and `_private_ci_archive_files`; receipt tamper and synthetic-root tests in CFR-010.
+
+Required action: None. DDC-001 records the non-blocking documentation drainage.
+
+PF reference, if relied on: Not relied on.
+
+Finding ID: F-005
+
+Related review item: VAL-002 / VAL-003 / RCA
+
+Severity: Concern
+
+Observation: The production receipt publish/consume branch was skipped because the seven DEV-03 activation primaries were absent; isolated tests exercised its positive and negative behavior.
+
+Why it matters: This leaves ordinary future-execution risk, not a missing DEV-02 capability. The workflow is designed to activate that branch only when DEV-03 commits the complete primary family.
+
+Evidence: workflow output `HDE-EPIC038 DEV-03 closeout family absent; private execution receipt not applicable.`; 363 focused tests; publish and authenticate steps recorded `skipped`.
+
+Required action: None
+
+PF reference, if relied on: Not relied on.
+
+Finding ID: F-006
+
+Related review item: PF09 / CFR-002–CFR-007 / CFR-012
+
+Severity: Note
+
+Observation: Merged Change advances the ongoing Index/Mirror discipline but does not establish completion of the global task.
+
+Why it matters: Implementation and evidence presence cannot independently change PF09 status.
+
+Evidence: PF09 Impact & Status Posture below; CFR-002–CFR-007 and CFR-012.
+
+Required action: None
+
+PF reference, if relied on: PF09.6-Canon-HDE-Build-Checklist-Distillation, §Task HDE-DIST005 — Global discipline (Phase VI) and §Subtask HDE-DIST005.2 — Global Index & Mirror discipline.
+
+PF09 Impact & Status Posture
+
+PF09 document: PF09.6-Canon-HDE-Build-Checklist-Distillation
+
+PF09 task ID: HDE-DIST005
+
+PF09 subtask ID(s): HDE-DIST005.2
+
+Current PF09 status: Task — `Not done (treated as an ongoing global requirement)`; subtask — `Partial`
+
+Status recommendation: No status change recommended
+
+Why this status posture is supported: Merged Change updates canonical-updater and Machine Mirror surfaces consistent with HDE-DIST005.2, but the phased source explicitly defines the parent as ongoing and the subtask as Partial. DEV-03 and later closeout stages also remain outside this reviewed change.
+
+Evidence pointer(s): Approved Plan §6 and §10 DEV-02 accountability; CFR-002–CFR-007 and CFR-012.
+
+PF proof excerpt(s):
+
+> **Task status:** **Not done** (treated as an ongoing global requirement)
+
+> ### **Subtask HDE-DIST005.2 — Global Index & Mirror discipline**
+
+> **Subtask status:** Partial
+
+Evidence Print
+
+A) Tokens satisfied
+
+No token satisfaction claim reviewed.
+
+B) Evidence artifacts produced or updated
+
+Path: `artifacts/architecture/architecture_snapshot.keys_only.json`
+
+Type: Governed architecture snapshot
+
+Key proof facts observed: Generator imports now expose `subprocess` and `urllib`; updater imports include `stat`; recorded size is 42,397 bytes.
+
+sha256, if observed: `8a5287dc5339e1278a1f0ab693e54212cc5b78d8fec53715ee28269cd4f05975`
+
+Index, Mirror, or path-proof posture, if relevant: One Machine Mirror record binds key `epic038.pr04.architecture_snapshot` to this path and its sibling proof.
+
+Path: `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt`
+
+Type: Sibling path proof
+
+Key proof facts observed: Exact path, size, SHA-256, modification identity, and produced-at identity are present.
+
+sha256, if observed: Not separately observed.
+
+Index, Mirror, or path-proof posture, if relevant: Proof values match the primary’s current Mirror record.
+
+Path: `artifacts/evidence_index.jsonl`
+
+Type: Machine Mirror canonical JSONL
+
+Key proof facts observed: 553 records; architecture row updated; self-record body SHA-256 is `554e2633b399e74b710a1145fc30ded5e3dfedb30cd0c80b656f2fceadd85028`.
+
+sha256, if observed: `79de5f3eeb59232ea0eefc8652433686de0fac58446c02d6f02d8c45e0ff9525`
+
+Index, Mirror, or path-proof posture, if relevant: Mirror schema, Index hash, updater check, and evidence-path validation succeeded in exact-head CI.
+
+Path: `artifacts/evidence_index.jsonl.path_proof.txt`
+
+Type: Machine Mirror sibling path proof
+
+Key proof facts observed: Records the 267,013-byte primary, complete file SHA-256, and self-referential body SHA-256 separately.
+
+sha256, if observed: Not separately observed.
+
+Index, Mirror, or path-proof posture, if relevant: File and body hashes agree with the current Mirror and checksum sentinel.
+
+Path: `artifacts/evidence_index.jsonl.sha256`
+
+Type: Machine Mirror checksum sentinel
+
+Key proof facts observed: Contains the current primary hash and exact primary path.
+
+sha256, if observed: `4fa31bdf4164c0e75553b40d02cfec350012a13d7dcf696535c13e86ffe3b8ef`
+
+Index, Mirror, or path-proof posture, if relevant: Sentinel content matches the Mirror path proof’s complete-file hash.
+
+Path: `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+Type: Checksum-sentinel sibling path proof
+
+Key proof facts observed: Records the checksum path, 97-byte size, and checksum-file SHA-256.
+
+sha256, if observed: Not separately observed.
+
+Index, Mirror, or path-proof posture, if relevant: Exact-head Index-hash and evidence-path gates succeeded.
+
+C) Validation proof
+
+Command or method: GitHub comparison `58088a72… → dbd7487d… → main`
+
+Result: PASS
+
+Where the result appears: Repo Inspection and VAL-001.
+
+Why it is sufficient: Establishes the exact landed range and current-byte identity.
+
+Command or method: GitHub Actions workflow run 30744149677
+
+Result: PASS — seven of seven jobs successful.
+
+Where the result appears: VAL-002.
+
+Why it is sufficient: Run 3165 executed against the exact PR head whose changed blobs match current `main`.
+
+Command or method: `python -m pytest -q tests/evidence/test_hde_epic038_closeout.py`
+
+Result: PASS — `363 passed in 1629.99s`.
+
+Where the result appears: Exact-head `test` job log and VAL-003.
+
+Why it is sufficient: Covers the full DEV-02 positive, negative, lifecycle, rollback, and provenance contracts.
+
+Command or method: Finalized QA, token matrix, doc-delta, updater, evidence-path, Mirror-schema, Index-hash, and final-LF checks.
+
+Result: PASS
+
+Where the result appears: Exact-head `test` job steps and VAL-004.
+
+Why it is sufficient: Confirms the reused evidence and changed governed companions are current and coherent without claiming any acceptance token.
+
+Doc Delta Candidates
+
+DDC-001
+
+Doc: PF10 — HDE Build Notes
+
+Section: Placement not established; canon-author routing required
+
+Canon basis: CANON SILENCE
+
+Impacted PF09 task ID(s): HDE-DIST005
+
+Impacted PF09 subtask ID(s): HDE-DIST005.2
+
+PF09 status action: No status change recommended
+
+Delta: Record the bounded DEV-02 exception for private, authenticated GitHub Actions execution-receipt consumption: exact artifact ID and digest, current run/attempt/repository/head/workflow binding, safe bounded ZIP validation, `ALLOW_NETWORK=1` only for the authenticated generator calls, closed-rail updater/orientation execution, and no tracked receipt or token claim.
+
+Why: This is a material control-plane and evidence-admission contract introduced after the current HDE-EPIC038 PF10 addenda. Documentation drainage is non-blocking, but recording the exception would prevent the Approved Plan’s original no-network wording from being misapplied to DEV-03.
+
+Repo evidence: `.github/workflows/ci.yml` lines 191–230; generator constants `PRIVATE_CI_*` and functions `_authenticated_private_ci_files`, `_private_ci_archive_files`, and `_github_api_bytes`; authenticated-artifact tests in CFR-010.
+
+Search method: searched PF10 — HDE Build Notes for "hde-epic038-private-ci-execution-receipt|\_HDE\_EPIC038\_PRIVATE\_CI\_ARTIFACT\_ID|artifact-digest" (case: sensitive); scope: complete current PF10 document and HDE-EPIC038 addenda through §2.39; tool: rg; result: 0 hits.
+
+DECISION: MERGED CHANGE ACCEPTABLE
+
