@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.9.2
+**Version:** v1.9.3
 
-**Effective date:** 2026-07-09
+**Effective date:** 2026-08-03
 
-**Last Update Gate:** HDE-EPIC037 Closure
+**Last Update Gate:** HDE-EPIC038 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -9634,4 +9634,1072 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * Canonical evidence-path binding is satisfied for PF10-recorded implementation, OPS, PR, and QA evidence families through `artifacts/vendor/hdapi_v2/`, `audit/ops/hde-epic037/`, `audit/qa/hde-epic037/`, `audit/docdeltas/`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl`.  
 * Lowercase directory naming is preserved for directory segments such as `artifacts/vendor/hdapi_v2/`, `audit/ops/hde-epic037/`, `audit/qa/hde-epic037/`, `audit/docdeltas/`, `docs/evidence/`, and `artifacts/`.  
 * Final archive posture: HDE-EPIC037 is SATISFIED for PF10’s closure trace, with implementation posture recommendation READY WITH CAVEATS. HDE-FERM008.7 through HDE-FERM008.12 and parent HDE-FERM008 are supportable from PF10-recorded evidence for later PF09 status drainage, while actual PF09.5 physical drainage, formal close-pack completion, PO closeout, board update, final acceptance, production deployment, PF-canon drainage, durable mapped-cache persistence, and production upsert reopening remain separate from this archive entry rather than silently closed.
+
+### **2.23 HDE-EPIC038 Epic Plan — Distillation Pass 3**
+
+#### **2.23.1 Meta**
+
+**Epic ID:** HDE-EPIC038  
+**Epic title (Implementation Guide):** Distillation Pass 3 (, §Meta)  
+**Epic name (short):** Distillation Pass 3  
+**Phase:** Distillation  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2026.07.10 (operator-provided)  
+**Date completed:** 2026.08.03 (operator-provided)  
+**Epic outcome (per PF10 closure trace):** SATISFIED through an HDE-EPIC038-specific Product Owner exception; implementation posture recommendation: READY WITH CAVEATS; ordinary formal close-pack completion was not achieved or claimed.
+
+**Phase rationale (planned; 1–3 sentences):** This epic belongs in Distillation because it refines and systematizes release reliability, identity, evidence discipline, gates, and controlled mapped-cache persistence. The work focuses on repeatability, canonical evidence, and durable harness behavior rather than new public product scope or exploratory feature expansion. (, §Meta)
+
+**Problem statement (planned):** The HD Engine had multiple partially complete Distillation rows covering gates, release identity, environment snapshots, identity provenance, evidence indexing, BodyGraph mechanics, DB posture, and mapped-cache persistence. This created risk that repeated proof families could drift, identity could remain scattered, evidence could become difficult to trust, and runtime-facing changes could be overclaimed without durable proof. (, §Business Case)
+
+**Proposed change (planned):** Consolidate the core Distillation reliability slice: global evidence discipline, identity and provenance, release identity indexing, environment snapshotting, gate scripts, DB and BodyGraph posture proofs, architecture snapshots, controlled v2 mapped-cache persistence hardening, and a one-button release sanity pipeline. (, §Business Case)
+
+**Value/impact (planned):** User-facing behavior was not to be expanded. The planned value was internal reliability and risk reduction through a repeatable, indexed, secret-safe, deterministic evidence and release-harness posture. (, §Business Case)
+
+**Why now (planned):** Distillation turns repeated success into durable operating practice. The mapped PF09.6 rows remained open or partial across identity, evidence, gates, environment snapshotting, and release sanity, while the separate performance and load harness was intentionally deferred. (, §Business Case)
+
+**What success looks like (planned):** The in-scope PF09.6 subtasks are supportable to completion for this epic’s slice through implemented mechanics, governed evidence, Human Evidence Index and Machine Mirror binding, and truthful nonclaim boundaries. PF documentation and PF09 status drainage remain separate. (, §Business Case)
+
+**Scope anchor (plan):** , §Planned Epic Scope and §Deliverables  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR / OPS / remediation / QA stream (PF10):** PR-01 through PR-06 HDE-EPIC038; OPS-01, OPS-02, and OPS-03; direct-only PR-06 remediation; Implementation Retrospective HDE-EPIC038; Post Implementation Audit Triage HDE-EPIC038; HDE-DIST007 remediation; QA Pass 1, QA Pass 2, and QA Pass 3; Extended Moon Loop remediation; Final QA Closeout Review \+ QA RCA HDE-Epic038; DEV-01 and DEV-02 closeout remediation; withdrawn DEV-03 path; Epic Closure Evidence Review: HDE-EPIC038; Lead Dev Epic Retrospective: HDE-EPIC038.  
+**QA log stream (PF10):** `qa-00` through `qa-23`, recorded as 24 PASS entries in `audit/qa/hde-epic038/qa_step_logs_manifest.json`.
+
+**Scope boundaries (planned):**
+
+* Distillation global discipline, identity, release identity, environment snapshots, deterministic gates, A7 transport gates, CI rails, DB posture, BodyGraph mechanics, architecture evidence, bounded mapped-cache persistence, and release sanity were in scope.  
+* `HDE-DIST004.1` through `HDE-DIST004.4` Performance and Load Harness work remained outside HDE-EPIC038.  
+* No Coagulation deployment hardening, new public Reader behavior, new public route, app-side HumanDesignAPI ownership, broad HumanDesignAPI v2 platform-conformance claim, PF-document implementation deliverable, or embedded Live QA runbook was in scope.  
+* PO-only OPS support was permitted only where D7, D8, D10, or D12 required external, credentialed, open-rails, DB, vendor, environment, infrastructure, or production-like confirmation.
+
+**Non-goals (planned):**
+
+* no public user-copy change  
+* no Reader public-byte expansion  
+* no production mapped-cache authorization without a separate controlled proof and authorization surface  
+* no PF09 status movement by the Epic Plan  
+* no closure of the separate Performance and Load Harness workstream
+
+**Contract changes / new surfaces (planned):** No new public user-facing contract was planned. Internal, admin, evidence, harness, CI, and governed-artifact surfaces could be introduced or updated where required by the mapped Distillation work. (, §Contract and Compatibility Posture)
+
+**Flag strategy (planned):** No new public feature flag. Any internal or admin-only switch required for mapped-cache persistence, rails behavior, or harness selection had to preserve public Reader behavior, the HD Engine vendor seam, secret safety, and the prohibition on app-side vendor ownership. (, §Contract and Compatibility Posture)
+
+**Backward-compat posture (planned):** Public Reader behavior remained unchanged by default; closed-rails refusal remained intact; legacy non-v2 BodyGraph fallback remained preserved unless separately changed by its owning canon; Human Evidence Index and Machine Mirror homes remained unchanged. (, §Contract and Compatibility Posture)
+
+**Open-rails QA declaration (planned):** Bounded open-rails QA was mandatory for claims depending on live external services, DB access, vendor access, credentials, or production-like runtime behavior. Closed-rails evidence could not establish live vendor, DB, or production-persistence truth. (, §Contract and Compatibility Posture)
+
+**Vendor-call ownership (planned):** The HD Engine remained the owner of vendor acquisition, persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior. Direct app-side HumanDesignAPI calls were not authorized. (, §Contract and Compatibility Posture)
+
+**Mapped-cache posture (planned):** Only adapter-mapped HDE BodyGraph/cache payloads, not raw HumanDesignAPI v2 envelopes, could be persisted. The planned slice required write/read-back parity, idempotence, no raw vendor-payload persistence, no secret persistence, closed-rails refusal, and explicit separation between dry-run mapping, compatibility compute, durable cache persistence, and production authorization. (, §Contract and Compatibility Posture)
+
+**Actual contract and architecture outcomes (PF10):**
+
+* PF10 addendum 2.12 — pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport replaced the bridge-era active transport posture with direct PostgreSQL through the Glow-owned provider.  
+* PF10 addendum 2.13 — HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine preserved bridge evidence as historical-only and barred it from satisfying current direct-only gates.  
+* PF10 addendum 2.16 — HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics established `catalog/manifest.json` as the single tracked release-identity input and kept current attestation external.  
+* PF10 addenda 2.7 and 2.8 recorded bounded configured-v2 mapped-cache implementation and OPS-02 evidence without public Reader expansion, production authorization, raw vendor-payload persistence, or broad v2 conformance.  
+* PF10 addenda 2.26 through 2.28 recorded HDE-DIST007 selected-factory compatibility remediation, with 35 tests and seven hosted jobs succeeding.  
+* PF10 addendum 2.44 records that no public Reader expansion, new public route, production mapped-cache authorization, or broad v2-conformance claim was introduced.
+
+**Date provenance note:** records `Date started: 2026-07-10` and `Date completed: [INTENTIONALLY LEFT BLANK]`. This archive record preserves the operator-provided dates `2026.07.10` and `2026.08.03`.
+
+**Plan-source mismatch:** states that PF10 had no active addendum impact for the plan. PF10 later records the implementation, OPS, architectural rescoping, remediation, QA, closeout failure, exceptional closure, and retrospective through addenda 2.1 through 2.44. PF10 controls actual results.
+
+**Closeout-posture chronology mismatch:** PF10 addendum 2.36 records `READY WITH CAVEATS` for the QA-closeout axis. PF10 addendum 2.42 records `RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS`, withdraws the failed r5 closeout remediation, and states that formal close-pack completion was not achieved. PF10 addendum 2.43 later records `Epic closure decision: HDE-EPIC038 is SATISFIED`.
+
+**Closure-axis boundary:** SATISFIED does not claim Gate D PASS, 33-of-33 token satisfaction, a tracked ordinary `SATISFIED` close report, a canonical close manifest, an acceptance map, a merged close PR, PF09 movement, board movement, or Distillation phase exit.
+
+**Merged-PR provenance (PF10):**
+
+* PR-01: PRs \#346 and \#347  
+* PR-02: PRs \#348 and \#349  
+* PR-03: PRs \#350, \#351, and \#353; PR \#352 remained unmerged  
+* PR-04: PRs \#354 and \#355  
+* PR-05: PRs \#356 through \#358  
+* PR-06 and direct-only remediation: PRs \#359 through \#367, with OPS-03 separately captured and admitted  
+* Documentation reconciliation: PR \#368  
+* HDE-DIST007 remediation: PRs \#369 and \#370  
+* QA remediation/finalization: PRs \#371, \#372, \#376, and \#377  
+* r5 DEV-01 and DEV-02: PRs \#379 through \#383  
+* r5 DEV-03: PR \#385 remained closed and unmerged
+
+#### **2.23.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (, §Existing Work Check):**
+
+* The PF09.6 Distillation backbone recorded the in-scope rows as open, Partial, Not done, or Optional. No open row was treated as already complete.  
+* No current repository-content claim was required to choose the Epic Plan scope. Planned paths, proposed paths, PF-canon paths, and current repo reality were kept distinct.  
+* PF10 was recorded as silent for the scope at plan creation.  
+* PF23 was used only for planning-time component and locus framing and did not create implementation scope, acceptance proof, QA PASS, OPS completion, PF09 movement, or current repo truth.
+
+**Planned PF23 anchors (, §PF23 Anchors):**
+
+* Engine core and BodyGraph seams  
+* adapter and Reader transport surfaces  
+* Presenter and canonical-emitter boundary  
+* BodyGraph cache and DB-facing persistence boundary  
+* governed evidence roots  
+* Human Evidence Index and Machine Mirror surfaces  
+* QA and audit roots
+
+**Planned gap statement (, §Planned Epic Scope):**
+
+* global evidence discipline remained incomplete  
+* identity and provenance remained partially complete  
+* release identity and environment snapshot indexing remained incomplete  
+* determinism, A7, CI rails, DB posture, BodyGraph, DB connectivity, architecture snapshot, mapped-cache, and release-sanity rows remained open or partial  
+* Performance and Load Harness work remained separately deferred under `HDE-DIST004`
+
+**Actual reuse and delta (PF10):**
+
+* PF10 addendum 2.1 records PR-01 identity, release-identity, environment-snapshot, and evidence foundations, with current anchors `engine/runtime/identity.py`, `catalog/manifest.json`, `artifacts/identity/service_identity.json`, and `artifacts/audit/env/env_snapshot.json`.  
+* PF10 addendum 2.2 records PR-02 deterministic Reader/CLI and Catalog-driven A7 proof work without adding a public route; `docs/ENDPOINTS_CATALOG.json` designates `GET /reader` as the success route and excludes `/internal/version` from A7 eligibility.  
+* PF10 addendum 2.3 records the reusable PR-03 rails-gate family and its final safety/schema remediation.  
+* PF10 addenda 2.5 and 2.6 record PR-04 DB, BodyGraph, architecture, and OPS-01 work; later addenda classify OPS-01 bridge evidence as historical-only.  
+* PF10 addenda 2.7 and 2.8 record PR-05 and OPS-02 bounded configured-v2 mapped-cache persistence, including one mapped-cache insert, canonical read-back, and a second same-identity write that inserted zero rows.  
+* PF10 addenda 2.12 through 2.20 record direct-only database convergence, OPS-03 direct read-only capture, manifest-derived identity, portable path-proof semantics, and final PR-06R-B evidence admission.  
+* PF10 addendum 2.28 records HDE-DIST007 remediation as technically and evidentially coherent, with 35 tests and seven hosted jobs succeeding.  
+* PF10 addenda 2.29 through 2.36 record `qa-00` through `qa-23` as PASS and the final QA posture as READY WITH CAVEATS.  
+* PF10 addendum 2.43 records all epic-scoped implementation obligations as Satisfied in substance, while PF09 source statuses remain undrained.  
+* PF10 addendum 2.44 records the final coherent outcome: manifest-derived identity, direct PostgreSQL, bounded mapped-cache persistence, a 19-stage PASS, a 24-check QA PASS, and an updater-owned evidence graph.
+
+#### **2.23.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Global discipline**
+
+* **Planned (, §Deliverable D1 — Global discipline):** Complete the epic-scoped burdens of HDE-DIST005.1 and HDE-DIST005.2 through canonical encodings, locale pins, LF discipline, Human Evidence Index updates, hash-sentinel updates, Machine Mirror updates, and path-proof coherence.  
+* **Actual (PF10):** PF10 addendum 2.43 records OBL-002 and OBL-003 as Satisfied. The final evidence review records 553 Human Evidence Index entries and 553 Machine Mirror records with identical ordered key/path topology.  
+* **Evidence anchors (PF10):** `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`; `audit/gates/sanity_pipeline/sanity_pipeline.log`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied for the HDE-EPIC038-scoped HDE-DIST005.1 and HDE-DIST005.2 burden. HDE-DIST005 remains an ongoing global requirement, and its recorded statuses remain undrained.
+
+##### **D2 — Identity and provenance module**
+
+* **Planned (, §Deliverable D2 — Identity and provenance module):** Complete HDE-DIST006.1 through HDE-DIST006.3 through one identity field set, shared identity helpers, parity behavior, release identity proof, emitter hash proof, invocation hash proof, and mirror discipline.  
+* **Actual (PF10):** PR-01 created the identity and evidence foundation; later PR-06R-A amended release identity to derive from canonical packaged manifest bytes. PF10 addendum 2.43 records OBL-004 through OBL-006 as Satisfied in substance.  
+* **Evidence anchors (PF10):** `engine/runtime/identity.py`; `catalog/manifest.json`; `artifacts/identity/service_identity.json`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`.  
+* **Disposition (archive):** Satisfied in substance. Current release identity follows PF10 addendum 2.16, not the earlier historical captured-identity equality model.
+
+##### **D3 — Release identity indexing**
+
+* **Planned (, §Deliverable D3 — Release identity indexing):** Complete HDE-DIST002.4 and HDE-DIST002.5 by indexing pack/manifest identity and producing release bindings tied to BodyGraph source policy and refresh behavior.  
+* **Actual (PF10):** PF10 addendum 2.16 establishes `catalog/manifest.json` as the single tracked release-identity input and keeps current attestation external. PF10 addendum 2.43 records OBL-007 as Satisfied and OBL-008 as Satisfied in substance.  
+* **Evidence anchors (PF10):** `catalog/manifest.json`; `engine/runtime/identity.py`; `artifacts/identity/service_identity.json`; `tools/evidence/build_release_attestation.py`.  
+* **Disposition (archive):** Satisfied in substance under the manifest-derived/external-attestation model. Frozen historical release artifacts are not current-manifest equality evidence.
+
+##### **D4 — Environment snapshot indexing**
+
+* **Planned (, §Deliverable D4 — Environment snapshot indexing):** Complete HDE-DIST003.1 and HDE-DIST003.4 through the singleton v3 environment snapshot, deterministic pins, a presence map, observability indexing, Machine Mirror binding, and path-proof coherence.  
+* **Actual (PF10):** PR-01 established the environment foundation. PF10 addendum 2.44 records `artifacts/audit/env/env_snapshot.json` in v3 posture, and addendum 2.43 records OBL-009 and OBL-010 as Satisfied.  
+* **Evidence anchors (PF10):** `artifacts/audit/env/env_snapshot.json`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied for the epic-scoped environment snapshot and indexing burden.
+
+##### **D5 — Determinism gates**
+
+* **Planned (, §Deliverable D5 — Determinism gates):** Complete HDE-DIST001.1 through preimage recompute, Reader/CLI parity, AB/BA coherence, two-run identity, and canonical JSON comparison.  
+* **Actual (PF10):** PR-02 produced the deterministic Reader/CLI proof family. PF10 addendum 2.43 records OBL-011 as Satisfied, and the final 24-check QA manifest covers the associated checks.  
+* **Evidence anchors (PF10):** `tests/evidence/test_determinism_gate_proofs.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`; `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+* **Disposition (archive):** Satisfied in substance. The historical PR \#349 CI discrepancy remains a non-blocking caveat because later complete QA and integrated proof superseded its closure materiality.
+
+##### **D6 — A7 transport gates**
+
+* **Planned (, §Deliverable D6 — A7 transport gates):** Complete HDE-DIST001.2 through a Catalog JSON success route, GET/HEAD/304 behavior, writer/error posture, encoding invariance, environment-gate proof, and governed evidence binding without using `/internal/version`.  
+* **Actual (PF10):** PR-02 implemented Catalog-driven A7 proofs. The current evidence posture designates `GET /reader` as the success route and records `/internal/version` as not A7-eligible. PF10 addendum 2.43 records OBL-012 as Satisfied.  
+* **Evidence anchors (PF10):** `docs/ENDPOINTS_CATALOG.json`; `tests/evidence/test_determinism_gate_proofs.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied without adding a public route or expanding public Reader bytes.
+
+##### **D7 — CI rails gates**
+
+* **Planned (, §Deliverable D7 — CI rails gates):** Complete HDE-DIST001.3 through closed-rails defaults, bounded open-rails exceptions, typed refusal, retry/backoff proof, keys-only evidence, and secret-safe logs.  
+* **Actual (PF10):** PR-03 established the reusable rails family. PF10 addendum 2.31 later authorized one bounded Extended Moon Loop event for `qa-08`, and addenda 2.32 through 2.36 record the complete rails-sensitive QA stream as PASS. PF10 addendum 2.43 records OBL-013 as Satisfied.  
+* **Evidence anchors (PF10):** `tests/evidence/test_rails_ci_workflow_integration.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`; PF10 addendum 2.31 — HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority.  
+* **Disposition (archive):** Satisfied. Open-rails authority was bounded to the authorized event and expired after it.
+
+##### **D8 — DB posture runtime checks**
+
+* **Planned (, §Deliverable D8 — DB posture runtime checks):** Complete HDE-DIST001.4 through schema/search-path posture, grants, DDL fingerprint, constraints, boundary-view read-only proof, runtime connectivity, secret-free logs, and evidence binding.  
+* **Actual (PF10):** The bridge-era PR-04/OPS-01 posture was superseded for current behavior. PF10 addenda 2.12 through 2.15 establish direct PostgreSQL as the sole active transport, retired-key refusal, direct-selection evidence, and direct-only completion semantics. PF10 addendum 2.43 records OBL-014 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `audit/ops/hde-epic038/ops-03/`; `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+* **Disposition (archive):** Satisfied under PF10’s amended direct-only meaning. The original active bridge posture is historical-only.
+
+##### **D9 — BodyGraph mechanics gates**
+
+* **Planned (, §Deliverable D9 — BodyGraph mechanics gates):** Complete HDE-DIST001.5 through source selection, source invariance, vendor-disabled production posture where applicable, refresh policy, rate-limit policy, circuit-breaker policy, metrics, and keys-only evidence.  
+* **Actual (PF10):** PR-04 established BodyGraph/architecture proof surfaces; PR-05 added bounded mapped-cache behavior; later direct-only remediation separated current direct proof from historical bridge material. PF10 addendum 2.43 records OBL-015 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/bodygraph/resolver.py`; `engine/bodygraph/mapped_cache.py`; `artifacts/architecture/architecture_snapshot.keys_only.json`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`.  
+* **Disposition (archive):** Satisfied in substance within the bounded internal/admin posture. No broad vendor-runtime or public Reader claim is created.
+
+##### **D10 — DB-bridge parity and environment connectivity**
+
+* **Planned (, §Deliverable D10 — DB-bridge parity and environment connectivity):** Complete HDE-DIST001.9 through direct-versus-bridge read parity, environment connectivity, canonical comparison, secret-free evidence, and governed index/mirror binding.  
+* **Actual (PF10):** PF10 addendum 2.12 retired active bridge transport. Addenda 2.14 and 2.19 record OPS-03 as a bounded direct read-only packet with zero SQL writes, zero retries, and zero alternate-provider attempts. Addendum 2.43 records OBL-016 as Satisfied under the amended direct-connectivity meaning.  
+* **Evidence anchors (PF10):** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+* **Disposition (archive):** Satisfied under the direct-only replacement meaning. Planned bridge parity was not executed as the final active architecture and must not be presented as current behavior.
+
+##### **D11 — Architecture snapshot evidence**
+
+* **Planned (, §Deliverable D11 — Architecture snapshot evidence):** Complete HDE-DIST001.10 through a canonical keys-only architecture snapshot with no secrets, raw birth data, credentials, sensitive headers, or raw vendor payloads.  
+* **Actual (PF10):** PR-04 established the keys-only snapshot family. PF10 records `artifacts/architecture/architecture_snapshot.keys_only.json` with `analyzer_verdict: "pass"` and `unknown_count: 0`. Addendum 2.43 records OBL-017 as Satisfied.  
+* **Evidence anchors (PF10):** `artifacts/architecture/architecture_snapshot.keys_only.json`; `tests/evidence/test_architecture_snapshot.py`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`.  
+* **Disposition (archive):** Satisfied. The snapshot remains an evidence artifact, not a public surface.
+
+##### **D12 — v2 mapped-cache persistence hardening**
+
+* **Planned (, §Deliverable D12 — v2 mapped-cache persistence hardening):** Complete HDE-DIST001.11 through controlled mapped-output write/read-back parity, idempotence, no raw vendor-payload persistence, no secret persistence, closed-rails refusal, legacy-fallback preservation, and governed evidence binding.  
+* **Actual (PF10):** PR-05 implemented bounded configured-v2 mapped-cache persistence. OPS-02 recorded one authorized configured-v2 request, one insert/read-back, and a second same-identity write with zero additional insertions. PF10 addendum 2.43 records OBL-018 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/bodygraph/mapped_cache.py`; `engine/bodygraph/resolver.py`; `engine/cli/main.py`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`; `audit/ops/hde-epic038/ops-02/`; `tests/bodygraph/test_v2_mapped_cache.py`.  
+* **Disposition (archive):** Satisfied within the bounded nonproduction/authorized posture. Production mapped-cache authorization, raw vendor-envelope persistence, public Reader changes, and broad v2 conformance remain unclaimed.
+
+##### **D13 — Release sanity pipeline**
+
+* **Planned (, §Deliverable D13 — Release sanity pipeline):** Complete HDE-DIST001.6 through a one-button evidence harness that runs the in-scope proof families in deterministic order and fails closed on drift.  
+* **Actual (PF10):** PR-06 evolved from an initial 17-stage orchestrator into the final direct-only 19-stage release pipeline. PF10 records nineteen stages `OK`, `first_failed_stage:NONE`, and `summary:PASS`. Addendum 2.43 records OBL-019 as Satisfied.  
+* **Evidence anchors (PF10):** `tools/evidence/run_sanity_pipeline.py`; `audit/gates/sanity_pipeline/sanity_pipeline.log`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied. Release-sanity PASS does not itself prove ordinary formal close-pack completion.
+
+##### **D14 — canonical adapter factory route-mount parity**
+
+* **Planned:** Unknown (not present in inputs).  
+* **Actual (PF10):** PF10 addenda 2.26 through 2.28 introduced and completed HDE-DIST007 selected-factory compatibility remediation. PRs \#369 and \#370 restored the compatibility blueprint and completed the intended CI lane, with 35 tests and seven jobs passing.  
+* **Evidence anchors (PF10):** PF10 addendum 2.28 — Epic Remedial PR-01 HDE-EPIC038; PRs \#369 and \#370; `adapter/factory.py`.  
+* **Disposition (archive):** Satisfied technically under HDE-EPIC038. No permanent PF09 row exists for HDE-DIST007; later PF09 assignment or drainage remains separate.
+
+##### **D15 — ordinary formal close-pack and acceptance ledger**
+
+* **Planned (, §Tokens and Evidence (Acceptance)):** Produce `audit/EPIC-038_close_report.md`, `audit/EPIC-038_MANIFEST.json`, `docs/acceptance_map_epic038.json`, `docs/acceptance_map_epic038.json.path_proof.txt`, `audit/qa/hde-epic038/token_evidence_matrix.md`, and `audit/qa/hde-epic038/acceptance_map_viability.log`.  
+* **Actual (PF10):** PF10 addendum 2.42 records that formal close-pack completion was not achieved. `audit/EPIC-038_close_report.md`, `audit/EPIC-038_MANIFEST.json`, and `docs/acceptance_map_epic038.json` are absent from the final repository posture. PR \#385 remained closed and unmerged.  
+* **Evidence anchors (PF10):** `audit/qa/hde-epic038/token_evidence_matrix.md` exists with 33 rows, all `UNCLAIMED`; PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is; PF10 addendum 2.43 — Epic Closure Evidence Review: HDE-EPIC038.  
+* **Disposition (archive):** Not satisfied under the ordinary close-pack path. The final HDE-EPIC038-specific exception makes ordinary close-pack completion not applicable to this epic’s final closure without converting the absent artifacts, Gate D, or token roster into completed facts.
+
+**Planned-vs-actual mismatches archived explicitly:**
+
+* The plan says PF10 had no active addendum impact; PF10 later records the full implementation and closure history through addendum 2.44.  
+* The plan described DB-bridge parity for HDE-DIST001.9; PF10 retired the bridge as an active transport and satisfied the row’s epic burden under direct-only connectivity semantics.  
+* The plan treated `RELEASE_ID_RECOMPUTE_OK` as a canonical acceptance token; PF10 addendum 2.37 later minted/corrected the token, while addendum 2.42 superseded its conflicting current-equality use for HDE-EPIC038.  
+* The plan listed `DEV_DB_BRIDGE_FALLBACK_OK`; PF10 addendum 2.37 retired its current claimability for this epic’s direct-only posture.  
+* The plan expected a conventional close-pack baseline. The r5 closeout architecture failed, PR \#385 remained unmerged, and the epic closed through an explicit exception without ordinary close-pack or token-satisfaction claims.  
+* HDE-DIST007 was not in the original plan but was added and satisfied technically after the implementation audit identified selected-factory route-mount drift.  
+* The plan intended all 13 implementation deliverables to make their PF09 rows supportable to completion. PF10 records those burdens as Satisfied in substance, but physical PF09 status movement remains undrained.  
+* The planned nonclaim boundaries were preserved: no public Reader expansion, new public route, production mapped-cache authorization, app-side vendor ownership, or broad v2 conformance was claimed.
+
+#### **2.23.4 PF Reference Map**
+
+**Core phase and process references (from , §PF Reference Map):**
+
+* `PF21 — 7 Phases of Alchemical Engineering`  
+* `PF27 — Plan Templates`  
+* `PF09.6 — HDE-Build-Checklist-Distillation`  
+* `PF06 — Epic Process Guide`  
+* `PF19 — Glow QA Guide`
+
+**Additional references (from , §PF Reference Map):**
+
+* `PF01 — HDE-Math-Spec`  
+* `PF02 — HDE Architecture`  
+* `PF03 — Technical Writing Best Practices`  
+* `PF04 — HDE Governance`  
+* `PF05 — HDE-CLI-API-Vendor-Ref`  
+* `PF07 — Glow Infrastructure`  
+* `PF09.5 — HDE-Build-Checklist-Fermentation`  
+* `PF12 — HDE-Schemas & Artifacts`  
+* `PF14 — HDE Mechanics Guide`  
+* `PF23 — Reality Audits`  
+* `PF29 — HDE Users Guide`
+
+**Historical context only (from , §PF Reference Map):**
+
+* `PF20 — HDE-Phased Epics`
+
+**Execution and results sources used for this archive entry:**
+
+* PF10 addendum 2.1 — PR-01 HDE-EPIC038  
+* PF10 addendum 2.2 — PR-02 HDE-EPIC038  
+* PF10 addendum 2.3 — PR-03 HDE-EPIC038  
+* PF10 addenda 2.4 and 2.5 — PR-04 HDE-EPIC038 — Approved Rescope and Canon Decisions; PR-04 HDE-EPIC038  
+* PF10 addendum 2.6 — OPS-01 HDE-EPIC038  
+* PF10 addendum 2.7 — PR-05 HDE-EPIC038  
+* PF10 addendum 2.8 — OPS-02 HDE-EPIC038  
+* PF10 addenda 2.9 and 2.10 — PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004; PR-06 Remediation PR-A HDE-EPIC038  
+* PF10 addenda 2.11 through 2.16 — delegated OPS authority, direct PostgreSQL, ADR-CANON-006, ADR-CANON-007, ADR-CANON-008, and scalable manifest-derived release identity  
+* PF10 addenda 2.17 through 2.21 — PR-06R-A review, OPS-03, PR-06R-B final integration, and PR-06 Remediation State  
+* PF10 addendum 2.22 — Implementation Retrospective HDE-EPIC038  
+* PF10 addendum 2.23 — Post Implementation Audit Triage HDE-EPIC038  
+* PF10 addenda 2.24 and 2.25 — syntax-origin defect classification and Epic Remediation Plan recognition  
+* PF10 addenda 2.26 through 2.28 — HDE-DIST007 mapping, bounded rescope, and merged remediation review  
+* PF10 addendum 2.29 — QA Pass 1 HDE-EPIC038  
+* PF10 addendum 2.31 — HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority  
+* PF10 addendum 2.32 — QA Pass 2 HDE-EPIC038  
+* PF10 addendum 2.33 — `ci/checks/check_mirror_schema.sh` Is a Python Entry Point with a Legacy Stable Path  
+* PF10 addendum 2.34 — QA Pass 3 HDE-EPIC038  
+* PF10 addendum 2.35 — Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
+* PF10 addendum 2.36 — Final QA Closeout Review \+ QA RCA HDE-Epic038  
+* PF10 addendum 2.37 — HDE-EPIC038 Token-Roster Correction — Mint `RELEASE_ID_RECOMPUTE_OK` and Retire Current `DEV_DB_BRIDGE_FALLBACK_OK` Claimability  
+* PF10 addenda 2.38 through 2.41 — r5 Epic Remediation Plan, DEV-01, DEV-02, and DEV-R1 evidence brief  
+* PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is  
+* PF10 addendum 2.43 — Epic Closure Evidence Review: HDE-EPIC038  
+* PF10 addendum 2.44 — Lead Dev Epic Retrospective: HDE-EPIC038  
+* , §Business Case, §Contract and Compatibility Posture, §Existing Work Check, §Planned Epic Scope, §Deliverables, §PF09 Completion Map, §Tokens and Evidence (Acceptance), §QA Rails \- Open/Close, §Tracked Issues, §ADR Stubs, and §Plan Preflight
+
+#### **2.23.5 Tokens and Evidence (Acceptance)**
+
+**Planned token inventory (, §Tokens and Evidence (Acceptance)):**
+
+* Baseline tokens: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`  
+* QA rail tokens: `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`, `ENV_RAILS_POLICY_OK`  
+* Phase-specific tokens: `PREIMAGE_RECOMPUTE_OK`, `CLI_READER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`, `A7_TRANSPORT_PROOF_OK`, `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`, `ENV_LC_ALL_C_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_ROLE_OK`, `DB_SCHEMA_FINGERPRINT_OK`, `DB_CONN_ENV_OK`, `DEV_DB_BRIDGE_FALLBACK_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `RELEASE_ID_RECOMPUTE_OK`
+
+**Planned non-token proof obligations pending registry validation (, §Non-token proof obligations pending registry validation):**
+
+* `BG_SOURCE_SELECTION_OK`, `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`, `BG_SOURCE_INVARIANCE_OK`, `BG_TTL_SWR_POLICY_OK`, `BG_RATE_LIMIT_POLICY_OK`, `BG_CIRCUIT_BREAKER_POLICY_OK`, `ENV_SNAPSHOT_SINGLETON_OK`, `ENV_SNAPSHOT_SCHEMA_V3_OK`, and `ENV_PINS_PRESENT_OK` remained evidence obligations, not claimable acceptance tokens without registry admission.
+
+**Planned token posture:**
+
+* No local token was to be minted by the Epic Plan.  
+* PF09 scope and status bindings remained metadata rather than acceptance tokens.  
+* PR existence, branch identity, review state, merge state, and board state remained workflow metadata.  
+* Documentation drainage remained separate from implementation, QA, and closeout.
+
+**Planned evidence pointers (, §B. Evidence pointers):**
+
+* `audit/EPIC-038_close_report.md`  
+* `audit/EPIC-038_MANIFEST.json`  
+* `docs/acceptance_map_epic038.json`  
+* `docs/acceptance_map_epic038.json.path_proof.txt`  
+* `audit/qa/hde-epic038/token_evidence_matrix.md`  
+* `audit/qa/hde-epic038/acceptance_map_viability.log`  
+* `audit/docdeltas/hde-epic038_doc_deltas.md`  
+* `audit/qa/hde-epic038/00_meta/doc_deltas.md`  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `audit/qa/hde-epic038/`
+
+**Actual evidence posture (PF10):**
+
+* **Identity and environment:** `engine/runtime/identity.py`; `catalog/manifest.json`; `artifacts/identity/service_identity.json`; `artifacts/audit/env/env_snapshot.json`.  
+* **Determinism, A7, and rails:** `docs/ENDPOINTS_CATALOG.json`; `tests/evidence/test_determinism_gate_proofs.py`; `tests/evidence/test_rails_ci_workflow_integration.py`.  
+* **Direct DB and architecture:** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `artifacts/architecture/architecture_snapshot.keys_only.json`.  
+* **Mapped cache and OPS-02:** `engine/bodygraph/mapped_cache.py`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`; `audit/ops/hde-epic038/ops-02/`.  
+* **OPS-03:** `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+* **Release gate:** `tools/evidence/run_sanity_pipeline.py`; `audit/gates/sanity_pipeline/sanity_pipeline.log`, recording 19 stages `OK`, `first_failed_stage:NONE`, and `summary:PASS`.  
+* **QA:** `audit/qa/hde-epic038/qa_step_logs_manifest.json`, recording 24 entries and all statuses PASS.  
+* **Evidence graph:** `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`, recording 553/553 ordered key/path parity in the final closure review.  
+* **Token matrix:** `audit/qa/hde-epic038/token_evidence_matrix.md`, recording 33 rows, all `UNCLAIMED`, and zero claimed.
+
+**Actual token and acceptance posture (PF10):**
+
+* PF10 addendum 2.37 corrected the epic’s 33-token roster, minted `RELEASE_ID_RECOMPUTE_OK`, and retired current `DEV_DB_BRIDGE_FALLBACK_OK` claimability.  
+* PF10 addendum 2.42 partially superseded the current-equality use of `RELEASE_ID_RECOMPUTE_OK` because frozen historical identity evidence could not truthfully prove current-manifest equality.  
+* PF10 addendum 2.42 also removed the mandatory 33-token roster as a gate for HDE-EPIC038’s exceptional closure. It did not mark any token PASS or FAIL.  
+* PF10 addendum 2.43 records the governance axis as Satisfied for the exception boundary without claiming token satisfaction.  
+* Gate D PASS, 33-of-33 token satisfaction, a tracked ordinary `SATISFIED` close report, a canonical close manifest, and a merged close PR are not claimed.
+
+**Planned-token mismatches archived explicitly:**
+
+* treated `RELEASE_ID_RECOMPUTE_OK` as sourced from HDE Governance; PF10 later minted it and then superseded its conflicting HDE-EPIC038 current-equality use.  
+* listed `DEV_DB_BRIDGE_FALLBACK_OK`; PF10’s direct-only architecture retired its current claimability.  
+* The plan expected ordinary close-pack and token-evidence completion. PF10 records the final token matrix as entirely unclaimed and the ordinary close-pack family as absent.  
+* The absence of ordinary token satisfaction is truthful and non-blocking only because HDE-EPIC038 closed through an explicit epic-specific exception.
+
+#### **2.23.6 QA Rails — Open/Close (Final PR)**
+
+**Planned rails posture (, §QA Rails \- Open/Close):**
+
+* Closed rails were the default for CI and deterministic proof runs.  
+* Opened rails were permitted only as bounded Product Owner-authorized exceptions for live vendor, DB, bridge, environment, credential, or production-like proof.  
+* Open-rails evidence had to remain secret-free, governed, and separately recorded.  
+* Live QA was required for eventual epic close under Epic Process Guide and Glow QA Guide.  
+* The Epic Plan did not include a Live QA runbook, commands, execution steps, logs, or evidence-layout instructions.
+
+**Actual QA event stream (PF10):**
+
+* CHECK `qa-00` through `qa-07` — PASS. PF10 addendum 2.29 records QA Pass 1 as PASS with failed-and-remediated receipts preserved.  
+* CHECK `qa-08` — PASS after one Product Owner-approved Extended Moon Loop event. PF10 addendum 2.31 records one fresh authorization, two vendor requests, and expiration of the authorization after the event; addendum 2.32 records QA Pass 2\.  
+* CHECK `qa-09` through `qa-23` — PASS. PF10 addendum 2.34 records QA Pass 3, and addendum 2.36 records complete plan-order accounting.  
+* CHECK Live QA venue provenance — `UNKNOWN - NON-MATERIAL`. PF10 addendum 2.35 records that absence of historical Codespaces provenance is not a QA failure and not a closeout blocker when venue is not material to the claimed fact.  
+* CHECK Final QA Closeout Review \+ QA RCA — READY WITH CAVEATS. PF10 addendum 2.36 records 24 planned checks, 24 manifest entries, and every manifest entry matching its primary log.  
+* CHECK Epic Closure Evidence Review — SATISFIED. PF10 addendum 2.43 records no remaining closure-critical Blocked or Ambiguous obligation after applying the HDE-EPIC038-specific exception.
+
+**Remediation loops and decisions (PF10):**
+
+* PR-01 through PR-05 required multiple remedial PRs before their final implementation and evidence postures were accepted. Concrete anchors: PRs \#346 through \#358 and PF10 addenda 2.1 through 2.8.  
+* PR-06 required a material architecture correction from bridge-era behavior to direct-only PostgreSQL, plus OPS-03 and final PR-06R-B evidence admission. Concrete anchors: PF10 addenda 2.12 through 2.20 and PRs \#363 through \#367.  
+* HDE-DIST007 corrected canonical-factory route mounting and completed the intended compatibility CI lane. Concrete anchors: PF10 addenda 2.26 through 2.28 and PRs \#369 and \#370.  
+* `qa-08` required a bounded Extended Moon Loop and CI remediation. Concrete anchors: PF10 addenda 2.31 and 2.32 and PRs \#371 and \#372.  
+* Final QA evidence was completed through PRs \#376 and \#377 and recorded in `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* r5 closeout remediation added DEV-01 and DEV-02 machinery through PRs \#379 through \#383 but could not reach its required terminal state.  
+* PR \#385 failed exact-head release-attestation construction, remained closed and unmerged, and did not create ordinary close-pack completion.  
+* PF10 addendum 2.42 withdrew r5, stopped DEV-03, DEV-04, and DEV-R1, and recommended that the Product Owner close HDE-EPIC038 as is with explicit caveats.
+
+**Closeout-posture chronology archived explicitly:**
+
+* PF10 addendum 2.36 — Final QA Closeout Review \+ QA RCA HDE-Epic038: `READY WITH CAVEATS`.  
+* PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: `RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS`.  
+* PF10 addendum 2.42 — formal close-pack completion was not achieved; Gate D, 33-of-33 token satisfaction, tracked ordinary `SATISFIED`, close manifest, and merged close PR were not claimed.  
+* PF10 addendum 2.43 — Epic closure decision: `HDE-EPIC038 is SATISFIED`.  
+* PF10 addendum 2.44 — implementation posture recommendation: `READY WITH CAVEATS`.  
+* PF10 addendum 2.44 — no hard requirement remained before closure because the Product Owner finalized the epic-specific exception.
+
+#### **2.23.7 Tracked Issues**
+
+**Tracked issue at plan creation (, §Tracked Issues):**
+
+* **Issue ID:** TI-001  
+  * **Title:** PF09 row-listed proof labels require registry-safe acceptance handling  
+  * **Status:** Completed under HDE-EPIC038 for unsupported-claim prevention; future release-token semantics remain carried separately.  
+  * **Scope / description:** PF09.6 row-listed labels could remain proof obligations but could not be claimed as acceptance tokens unless exact registry admission was confirmed.  
+  * **Disposition:** The final token matrix claims zero tokens, and the exceptional closure does not infer token satisfaction. The future `RELEASE_ID_RECOMPUTE_OK` semantic conflict remains GAP-002.
+
+**Actual tracked issues / closeout drifts recorded in PF10:**
+
+* **Plan-source PF10 mismatch**  
+  * **Status:** Completed by PF10 actuality.  
+  * **Scope / description:** The Epic Plan records PF10 silence, while PF10 later contains the complete HDE-EPIC038 implementation and closure history.  
+  * **Disposition:** PF10 controls actual results; the mismatch is preserved explicitly.  
+* **GAP-001 — Ordinary close-pack and token completion not achieved**  
+  * **Status:** Non-blocking under the final HDE-EPIC038-specific exception.  
+  * **Scope / description:** Gate D, 33-token satisfaction, tracked ordinary `SATISFIED`, close manifest, acceptance map, and merged close PR were not achieved.  
+  * **Disposition:** Preserve the nonclaims. No current-epic remediation is authorized.  
+* **GAP-002 — Release-token and historical-identity conflict**  
+  * **Status:** Carried forward to separately authorized future work.  
+  * **Scope / description:** Frozen historical identity evidence cannot truthfully prove equality with the current canonical manifest, making the former `RELEASE_ID_RECOMPUTE_OK` predicate unreachable.  
+  * **Disposition:** Redefine, replace, or retire the token before future reliance. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-003 — Feedback-free closeout lifecycle missing**  
+  * **Status:** Carried forward to separately authorized future work.  
+  * **Scope / description:** r5 required hosted-CI facts to appear in already-tracked final bytes and lacked a reachable terminal transition. PR \#385 confirmed the architecture failure.  
+  * **Disposition:** A future carrier must define and prove a feedback-free terminal lifecycle. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-004 — Merged DEV-01/DEV-02 subsystem remains**  
+  * **Status:** Non-blocking future audit.  
+  * **Scope / description:** PRs \#379 through \#383 remain merged even though r5 was withdrawn.  
+  * **Disposition:** Separately decide whether to retain, simplify, generalize, disable, or remove the subsystem. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-005 — PF09 status drainage and HDE-DIST007 assignment**  
+  * **Status:** Documentation/status drainage only.  
+  * **Scope / description:** Exact HDE-EPIC038 rows remain recorded as Partial, Not done, or Optional, and HDE-DIST007 has no permanent PF09 row.  
+  * **Disposition:** Drain only after preserving the exceptional-closure and ordinary-close nonclaims. No status movement is performed by this archive record.  
+* **GAP-006 — PF10 identity and PF12 discoverability maintenance**  
+  * **Status:** Non-blocking documentation maintenance.  
+  * **Scope / description:** PF10’s second volume retained stale internal version text, and applicable PF12 source discoverability required recovery from repository history during the closure review.  
+  * **Disposition:** Correct during later canon maintenance. Destination document-maintenance action: Unknown (not present in inputs).  
+* **GAP-007 — Development-board closure record**  
+  * **Status:** Non-blocking documentation/status maintenance.  
+  * **Scope / description:** PF10 records that the supplied board bundle was stale and contained no HDE-EPIC038 entry.  
+  * **Disposition:** Any later board record must preserve exceptional closure and the ordinary-close nonclaims. Actual board update: Unknown (not present in inputs).  
+* **GAP-008 — Historical PR \#349 and OPS-03 evidence limitations**  
+  * **Status:** Non-blocking caveats.  
+  * **Scope / description:** PF10 and one observed PR \#349 Actions result conflict; OPS-03 does not preserve every provisioning SQL byte or a complete grants/default-privileges graph.  
+  * **Disposition:** Preserve as caveats unless future business scope makes them material.  
+* **GAP-009 — Distillation phase exit**  
+  * **Status:** Outside this epic.  
+  * **Scope / description:** Exceptional HDE-EPIC038 closure does not establish Distillation phase-exit readiness.  
+  * **Disposition:** Route through separately authorized phase-exit work. Destination epic or task ID: Unknown (not present in inputs).  
+* **Performance and Load Harness**  
+  * **Status:** Deferred with rationale.  
+  * **Scope / description:** `HDE-DIST004.1` through `HDE-DIST004.4` remained outside HDE-EPIC038 as a distinct Distillation workstream.  
+  * **Disposition:** Preserved as future PF09-accounted work. Destination epic ID: Unknown (not present in inputs).
+
+#### **2.23.8 Plan Preflight (MUST)**
+
+**Planned preflight posture (, §Plan Preflight):**
+
+* The Token Inventory separated registry-listed acceptance tokens from non-token proof obligations.  
+* The planned close-pack baseline included the close report, manifest, acceptance map, token-evidence matrix, acceptance-map viability log, and doc-delta surfaces.  
+* Bundle-style evidence required a text-based bundle, manifest, Human Evidence Index binding, Machine Mirror binding, and sibling path-proof posture.  
+* Every concrete evidence path was labeled as PF-canon existing, PF09/PF12 existing, planned, proposed, or unknown.  
+* Current repo existence had to be revalidated before implementation reliance.  
+* External, credentialed, DB, bridge, vendor, environment, production-like, or open-rails work remained PO-only and IA-guided.  
+* PF23 remained planning-time context only.  
+* Every in-scope task-like item was mapped to exact PF09.6 subtasks; Performance and Load Harness work remained explicitly deferred.  
+* The Epic Plan contained no QA Plan, Live QA runbook, QA command sequence, QA evidence-layout design, review, remediation guide, closeout review, or OPS procedure.
+
+**Planned OPS posture (, §Work Category Separation):**
+
+* OPS support could be required for D7, D8, D10, and D12.  
+* Execution owner: PO-only execution, IA-guided.  
+* Planned OPS task IDs, success criteria, evidence paths, and rollback records: Unknown (not present in inputs).  
+* Secret posture: secret-free governed evidence under a lowercase governed root; no embedded OPS procedures.
+
+**Actual OPS records (PF10):**
+
+* **OPS-01**  
+  * **Intent:** bounded read-only DB and bridge-era posture capture.  
+  * **Constraints/rails:** closed-rails, no vendor call, no SQL write, no deployment, and no secret or raw payload persistence.  
+  * **Success posture:** accepted historically, then quarantined as `historical_bridge_evidence`.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-01/`.  
+  * **Rollback intent:** Unknown (not present in inputs).  
+* **OPS-02**  
+  * **Intent:** bounded configured-v2 mapped-cache insertion, canonical read-back, and idempotence proof.  
+  * **Constraints/rails:** one authorized configured-v2 request, mapped payload only, no raw vendor envelope, no production authorization, and no public Reader change.  
+  * **Success posture:** one insert/read-back and a second same-identity write with zero additional insertions.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-02/`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`.  
+  * **Rollback intent:** Unknown (not present in inputs).  
+* **OPS-03**  
+  * **Intent:** authorization-bound direct PostgreSQL read-only posture capture.  
+  * **Constraints/rails:** zero SQL writes, zero retries, zero alternate-provider attempts, bounded role/provisioning claims, and secret-safe evidence.  
+  * **Success posture:** captured and admitted into the final direct-only evidence graph through PR \#367.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+  * **Rollback intent:** Unknown (not present in inputs).
+
+**Planned ADR stubs (, §ADR Stubs):**
+
+* None.
+
+**Actual ADR / decision posture (PF10):**
+
+* PF10 addendum 2.12 establishes direct PostgreSQL as the sole active HDE database transport.  
+* PF10 addendum 2.13 quarantines bridge evidence as historical-only.  
+* PF10 addenda 2.14 and 2.19 define the bounded OPS-03 authorization and evidence-admission boundary.  
+* PF10 addendum 2.16 establishes canonical-manifest-derived release identity and external attestation.  
+* PF10 addendum 2.31 authorizes one bounded Extended Moon Loop event and expires that authority afterward.  
+* PF10 addendum 2.35 replaces a universal Codespaces requirement with a venue-materiality evidence contract.  
+* PF10 addendum 2.42 withdraws r5, stops DEV-03, DEV-04, and DEV-R1, preserves PR \#385 as closed and unmerged, and recommends close-as-is.  
+* PF10 addendum 2.43 records the final HDE-EPIC038-specific exceptional closure as SATISFIED.
+
+**Actual archive-level reconciliation:**
+
+* The 13 planned implementation deliverables are Satisfied in substance under PF10 addendum 2.43.  
+* HDE-DIST007 is Satisfied technically as actual added remediation work.  
+* `audit/gates/sanity_pipeline/sanity_pipeline.log` records a 19-stage PASS.  
+* `audit/qa/hde-epic038/qa_step_logs_manifest.json` records 24 of 24 checks PASS.  
+* `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` record coherent 553/553 ordered key/path topology in the final closure review.  
+* The ordinary close-pack family is absent and not claimed.  
+* `audit/qa/hde-epic038/token_evidence_matrix.md` records 33 rows, all `UNCLAIMED`; no token satisfaction is inferred.  
+* Public Reader expansion, new public routes, production mapped-cache authorization, broad v2 conformance, PF09 movement, board movement, and Distillation phase exit remain unclaimed.  
+* PF09 status drainage, PF-Canon drainage, board maintenance, release-token reconciliation, close-lifecycle redesign, and phase-exit adjudication remain separate actions.  
+* Final archive posture: HDE-EPIC038 is SATISFIED through an epic-specific exceptional closure, with implementation posture recommendation READY WITH CAVEATS.
+
+### **2.23 HDE-EPIC038 Epic Plan — Distillation Pass 3**
+
+#### **2.23.1 Meta**
+
+**Epic ID:** HDE-EPIC038  
+**Epic title (Implementation Guide):** Distillation Pass 3 (, §Meta)  
+**Epic name (short):** Distillation Pass 3  
+**Phase:** Distillation  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2026.07.10 (operator-provided)  
+**Date completed:** 2026.08.03 (operator-provided)  
+**Epic outcome (per PF10 closure trace):** SATISFIED through an HDE-EPIC038-specific Product Owner exception; implementation posture recommendation: READY WITH CAVEATS; ordinary formal close-pack completion was not achieved or claimed.
+
+**Phase rationale (planned; 1–3 sentences):** This epic belongs in Distillation because it refines and systematizes release reliability, identity, evidence discipline, gates, and controlled mapped-cache persistence. The work focuses on repeatability, canonical evidence, and durable harness behavior rather than new public product scope or exploratory feature expansion. (, §Meta)
+
+**Problem statement (planned):** The HD Engine had multiple partially complete Distillation rows covering gates, release identity, environment snapshots, identity provenance, evidence indexing, BodyGraph mechanics, DB posture, and mapped-cache persistence. This created risk that repeated proof families could drift, identity could remain scattered, evidence could become difficult to trust, and runtime-facing changes could be overclaimed without durable proof. (, §Business Case)
+
+**Proposed change (planned):** Consolidate the core Distillation reliability slice: global evidence discipline, identity and provenance, release identity indexing, environment snapshotting, gate scripts, DB and BodyGraph posture proofs, architecture snapshots, controlled v2 mapped-cache persistence hardening, and a one-button release sanity pipeline. (, §Business Case)
+
+**Value/impact (planned):** User-facing behavior was not to be expanded. The planned value was internal reliability and risk reduction through a repeatable, indexed, secret-safe, deterministic evidence and release-harness posture. (, §Business Case)
+
+**Why now (planned):** Distillation turns repeated success into durable operating practice. The mapped PF09.6 rows remained open or partial across identity, evidence, gates, environment snapshotting, and release sanity, while the separate performance and load harness was intentionally deferred. (, §Business Case)
+
+**What success looks like (planned):** The in-scope PF09.6 subtasks are supportable to completion for this epic’s slice through implemented mechanics, governed evidence, Human Evidence Index and Machine Mirror binding, and truthful nonclaim boundaries. PF documentation and PF09 status drainage remain separate. (, §Business Case)
+
+**Scope anchor (plan):** , §Planned Epic Scope and §Deliverables  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR / OPS / remediation / QA stream (PF10):** PR-01 through PR-06 HDE-EPIC038; OPS-01, OPS-02, and OPS-03; direct-only PR-06 remediation; Implementation Retrospective HDE-EPIC038; Post Implementation Audit Triage HDE-EPIC038; HDE-DIST007 remediation; QA Pass 1, QA Pass 2, and QA Pass 3; Extended Moon Loop remediation; Final QA Closeout Review \+ QA RCA HDE-Epic038; DEV-01 and DEV-02 closeout remediation; withdrawn DEV-03 path; Epic Closure Evidence Review: HDE-EPIC038; Lead Dev Epic Retrospective: HDE-EPIC038.  
+**QA log stream (PF10):** `qa-00` through `qa-23`, recorded as 24 PASS entries in `audit/qa/hde-epic038/qa_step_logs_manifest.json`.
+
+**Scope boundaries (planned):**
+
+* Distillation global discipline, identity, release identity, environment snapshots, deterministic gates, A7 transport gates, CI rails, DB posture, BodyGraph mechanics, architecture evidence, bounded mapped-cache persistence, and release sanity were in scope.  
+* `HDE-DIST004.1` through `HDE-DIST004.4` Performance and Load Harness work remained outside HDE-EPIC038.  
+* No Coagulation deployment hardening, new public Reader behavior, new public route, app-side HumanDesignAPI ownership, broad HumanDesignAPI v2 platform-conformance claim, PF-document implementation deliverable, or embedded Live QA runbook was in scope.  
+* PO-only OPS support was permitted only where D7, D8, D10, or D12 required external, credentialed, open-rails, DB, vendor, environment, infrastructure, or production-like confirmation.
+
+**Non-goals (planned):**
+
+* no public user-copy change  
+* no Reader public-byte expansion  
+* no production mapped-cache authorization without a separate controlled proof and authorization surface  
+* no PF09 status movement by the Epic Plan  
+* no closure of the separate Performance and Load Harness workstream
+
+**Contract changes / new surfaces (planned):** No new public user-facing contract was planned. Internal, admin, evidence, harness, CI, and governed-artifact surfaces could be introduced or updated where required by the mapped Distillation work. (, §Contract and Compatibility Posture)
+
+**Flag strategy (planned):** No new public feature flag. Any internal or admin-only switch required for mapped-cache persistence, rails behavior, or harness selection had to preserve public Reader behavior, the HD Engine vendor seam, secret safety, and the prohibition on app-side vendor ownership. (, §Contract and Compatibility Posture)
+
+**Backward-compat posture (planned):** Public Reader behavior remained unchanged by default; closed-rails refusal remained intact; legacy non-v2 BodyGraph fallback remained preserved unless separately changed by its owning canon; Human Evidence Index and Machine Mirror homes remained unchanged. (, §Contract and Compatibility Posture)
+
+**Open-rails QA declaration (planned):** Bounded open-rails QA was mandatory for claims depending on live external services, DB access, vendor access, credentials, or production-like runtime behavior. Closed-rails evidence could not establish live vendor, DB, or production-persistence truth. (, §Contract and Compatibility Posture)
+
+**Vendor-call ownership (planned):** The HD Engine remained the owner of vendor acquisition, persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior. Direct app-side HumanDesignAPI calls were not authorized. (, §Contract and Compatibility Posture)
+
+**Mapped-cache posture (planned):** Only adapter-mapped HDE BodyGraph/cache payloads, not raw HumanDesignAPI v2 envelopes, could be persisted. The planned slice required write/read-back parity, idempotence, no raw vendor-payload persistence, no secret persistence, closed-rails refusal, and explicit separation between dry-run mapping, compatibility compute, durable cache persistence, and production authorization. (, §Contract and Compatibility Posture)
+
+**Actual contract and architecture outcomes (PF10):**
+
+* PF10 addendum 2.12 — pg-bridge and DB\_BRIDGE\_URL Deprecation and Retirement \- Direct PostgreSQL Is the Sole Active HDE Database Transport replaced the bridge-era active transport posture with direct PostgreSQL through the Glow-owned provider.  
+* PF10 addendum 2.13 — HDE-EPIC038 Post-PR359 Remediation — ADR-CANON-006 Direct-Only Selection Evidence and Historical Bridge Quarantine preserved bridge evidence as historical-only and barred it from satisfying current direct-only gates.  
+* PF10 addendum 2.16 — HDE-EPIC038 PR-06R-A Merge — Scalable Manifest-Derived Release Identity, External Attestation, and Portable Evidence Semantics established `catalog/manifest.json` as the single tracked release-identity input and kept current attestation external.  
+* PF10 addenda 2.7 and 2.8 recorded bounded configured-v2 mapped-cache implementation and OPS-02 evidence without public Reader expansion, production authorization, raw vendor-payload persistence, or broad v2 conformance.  
+* PF10 addenda 2.26 through 2.28 recorded HDE-DIST007 selected-factory compatibility remediation, with 35 tests and seven hosted jobs succeeding.  
+* PF10 addendum 2.44 records that no public Reader expansion, new public route, production mapped-cache authorization, or broad v2-conformance claim was introduced.
+
+**Date provenance note:** records `Date started: 2026-07-10` and `Date completed: [INTENTIONALLY LEFT BLANK]`. This archive record preserves the operator-provided dates `2026.07.10` and `2026.08.03`.
+
+**Plan-source mismatch:** states that PF10 had no active addendum impact for the plan. PF10 later records the implementation, OPS, architectural rescoping, remediation, QA, closeout failure, exceptional closure, and retrospective through addenda 2.1 through 2.44. PF10 controls actual results.
+
+**Closeout-posture chronology mismatch:** PF10 addendum 2.36 records `READY WITH CAVEATS` for the QA-closeout axis. PF10 addendum 2.42 records `RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS`, withdraws the failed r5 closeout remediation, and states that formal close-pack completion was not achieved. PF10 addendum 2.43 later records `Epic closure decision: HDE-EPIC038 is SATISFIED`.
+
+**Closure-axis boundary:** SATISFIED does not claim Gate D PASS, 33-of-33 token satisfaction, a tracked ordinary `SATISFIED` close report, a canonical close manifest, an acceptance map, a merged close PR, PF09 movement, board movement, or Distillation phase exit.
+
+**Merged-PR provenance (PF10):**
+
+* PR-01: PRs \#346 and \#347  
+* PR-02: PRs \#348 and \#349  
+* PR-03: PRs \#350, \#351, and \#353; PR \#352 remained unmerged  
+* PR-04: PRs \#354 and \#355  
+* PR-05: PRs \#356 through \#358  
+* PR-06 and direct-only remediation: PRs \#359 through \#367, with OPS-03 separately captured and admitted  
+* Documentation reconciliation: PR \#368  
+* HDE-DIST007 remediation: PRs \#369 and \#370  
+* QA remediation/finalization: PRs \#371, \#372, \#376, and \#377  
+* r5 DEV-01 and DEV-02: PRs \#379 through \#383  
+* r5 DEV-03: PR \#385 remained closed and unmerged
+
+#### **2.23.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (, §Existing Work Check):**
+
+* The PF09.6 Distillation backbone recorded the in-scope rows as open, Partial, Not done, or Optional. No open row was treated as already complete.  
+* No current repository-content claim was required to choose the Epic Plan scope. Planned paths, proposed paths, PF-canon paths, and current repo reality were kept distinct.  
+* PF10 was recorded as silent for the scope at plan creation.  
+* PF23 was used only for planning-time component and locus framing and did not create implementation scope, acceptance proof, QA PASS, OPS completion, PF09 movement, or current repo truth.
+
+**Planned PF23 anchors (, §PF23 Anchors):**
+
+* Engine core and BodyGraph seams  
+* adapter and Reader transport surfaces  
+* Presenter and canonical-emitter boundary  
+* BodyGraph cache and DB-facing persistence boundary  
+* governed evidence roots  
+* Human Evidence Index and Machine Mirror surfaces  
+* QA and audit roots
+
+**Planned gap statement (, §Planned Epic Scope):**
+
+* global evidence discipline remained incomplete  
+* identity and provenance remained partially complete  
+* release identity and environment snapshot indexing remained incomplete  
+* determinism, A7, CI rails, DB posture, BodyGraph, DB connectivity, architecture snapshot, mapped-cache, and release-sanity rows remained open or partial  
+* Performance and Load Harness work remained separately deferred under `HDE-DIST004`
+
+**Actual reuse and delta (PF10):**
+
+* PF10 addendum 2.1 records PR-01 identity, release-identity, environment-snapshot, and evidence foundations, with current anchors `engine/runtime/identity.py`, `catalog/manifest.json`, `artifacts/identity/service_identity.json`, and `artifacts/audit/env/env_snapshot.json`.  
+* PF10 addendum 2.2 records PR-02 deterministic Reader/CLI and Catalog-driven A7 proof work without adding a public route; `docs/ENDPOINTS_CATALOG.json` designates `GET /reader` as the success route and excludes `/internal/version` from A7 eligibility.  
+* PF10 addendum 2.3 records the reusable PR-03 rails-gate family and its final safety/schema remediation.  
+* PF10 addenda 2.5 and 2.6 record PR-04 DB, BodyGraph, architecture, and OPS-01 work; later addenda classify OPS-01 bridge evidence as historical-only.  
+* PF10 addenda 2.7 and 2.8 record PR-05 and OPS-02 bounded configured-v2 mapped-cache persistence, including one mapped-cache insert, canonical read-back, and a second same-identity write that inserted zero rows.  
+* PF10 addenda 2.12 through 2.20 record direct-only database convergence, OPS-03 direct read-only capture, manifest-derived identity, portable path-proof semantics, and final PR-06R-B evidence admission.  
+* PF10 addendum 2.28 records HDE-DIST007 remediation as technically and evidentially coherent, with 35 tests and seven hosted jobs succeeding.  
+* PF10 addenda 2.29 through 2.36 record `qa-00` through `qa-23` as PASS and the final QA posture as READY WITH CAVEATS.  
+* PF10 addendum 2.43 records all epic-scoped implementation obligations as Satisfied in substance, while PF09 source statuses remain undrained.  
+* PF10 addendum 2.44 records the final coherent outcome: manifest-derived identity, direct PostgreSQL, bounded mapped-cache persistence, a 19-stage PASS, a 24-check QA PASS, and an updater-owned evidence graph.
+
+#### **2.23.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Global discipline**
+
+* **Planned (, §Deliverable D1 — Global discipline):** Complete the epic-scoped burdens of HDE-DIST005.1 and HDE-DIST005.2 through canonical encodings, locale pins, LF discipline, Human Evidence Index updates, hash-sentinel updates, Machine Mirror updates, and path-proof coherence.  
+* **Actual (PF10):** PF10 addendum 2.43 records OBL-002 and OBL-003 as Satisfied. The final evidence review records 553 Human Evidence Index entries and 553 Machine Mirror records with identical ordered key/path topology.  
+* **Evidence anchors (PF10):** `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`; `audit/gates/sanity_pipeline/sanity_pipeline.log`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied for the HDE-EPIC038-scoped HDE-DIST005.1 and HDE-DIST005.2 burden. HDE-DIST005 remains an ongoing global requirement, and its recorded statuses remain undrained.
+
+##### **D2 — Identity and provenance module**
+
+* **Planned (, §Deliverable D2 — Identity and provenance module):** Complete HDE-DIST006.1 through HDE-DIST006.3 through one identity field set, shared identity helpers, parity behavior, release identity proof, emitter hash proof, invocation hash proof, and mirror discipline.  
+* **Actual (PF10):** PR-01 created the identity and evidence foundation; later PR-06R-A amended release identity to derive from canonical packaged manifest bytes. PF10 addendum 2.43 records OBL-004 through OBL-006 as Satisfied in substance.  
+* **Evidence anchors (PF10):** `engine/runtime/identity.py`; `catalog/manifest.json`; `artifacts/identity/service_identity.json`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`.  
+* **Disposition (archive):** Satisfied in substance. Current release identity follows PF10 addendum 2.16, not the earlier historical captured-identity equality model.
+
+##### **D3 — Release identity indexing**
+
+* **Planned (, §Deliverable D3 — Release identity indexing):** Complete HDE-DIST002.4 and HDE-DIST002.5 by indexing pack/manifest identity and producing release bindings tied to BodyGraph source policy and refresh behavior.  
+* **Actual (PF10):** PF10 addendum 2.16 establishes `catalog/manifest.json` as the single tracked release-identity input and keeps current attestation external. PF10 addendum 2.43 records OBL-007 as Satisfied and OBL-008 as Satisfied in substance.  
+* **Evidence anchors (PF10):** `catalog/manifest.json`; `engine/runtime/identity.py`; `artifacts/identity/service_identity.json`; `tools/evidence/build_release_attestation.py`.  
+* **Disposition (archive):** Satisfied in substance under the manifest-derived/external-attestation model. Frozen historical release artifacts are not current-manifest equality evidence.
+
+##### **D4 — Environment snapshot indexing**
+
+* **Planned (, §Deliverable D4 — Environment snapshot indexing):** Complete HDE-DIST003.1 and HDE-DIST003.4 through the singleton v3 environment snapshot, deterministic pins, a presence map, observability indexing, Machine Mirror binding, and path-proof coherence.  
+* **Actual (PF10):** PR-01 established the environment foundation. PF10 addendum 2.44 records `artifacts/audit/env/env_snapshot.json` in v3 posture, and addendum 2.43 records OBL-009 and OBL-010 as Satisfied.  
+* **Evidence anchors (PF10):** `artifacts/audit/env/env_snapshot.json`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied for the epic-scoped environment snapshot and indexing burden.
+
+##### **D5 — Determinism gates**
+
+* **Planned (, §Deliverable D5 — Determinism gates):** Complete HDE-DIST001.1 through preimage recompute, Reader/CLI parity, AB/BA coherence, two-run identity, and canonical JSON comparison.  
+* **Actual (PF10):** PR-02 produced the deterministic Reader/CLI proof family. PF10 addendum 2.43 records OBL-011 as Satisfied, and the final 24-check QA manifest covers the associated checks.  
+* **Evidence anchors (PF10):** `tests/evidence/test_determinism_gate_proofs.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`; `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+* **Disposition (archive):** Satisfied in substance. The historical PR \#349 CI discrepancy remains a non-blocking caveat because later complete QA and integrated proof superseded its closure materiality.
+
+##### **D6 — A7 transport gates**
+
+* **Planned (, §Deliverable D6 — A7 transport gates):** Complete HDE-DIST001.2 through a Catalog JSON success route, GET/HEAD/304 behavior, writer/error posture, encoding invariance, environment-gate proof, and governed evidence binding without using `/internal/version`.  
+* **Actual (PF10):** PR-02 implemented Catalog-driven A7 proofs. The current evidence posture designates `GET /reader` as the success route and records `/internal/version` as not A7-eligible. PF10 addendum 2.43 records OBL-012 as Satisfied.  
+* **Evidence anchors (PF10):** `docs/ENDPOINTS_CATALOG.json`; `tests/evidence/test_determinism_gate_proofs.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied without adding a public route or expanding public Reader bytes.
+
+##### **D7 — CI rails gates**
+
+* **Planned (, §Deliverable D7 — CI rails gates):** Complete HDE-DIST001.3 through closed-rails defaults, bounded open-rails exceptions, typed refusal, retry/backoff proof, keys-only evidence, and secret-safe logs.  
+* **Actual (PF10):** PR-03 established the reusable rails family. PF10 addendum 2.31 later authorized one bounded Extended Moon Loop event for `qa-08`, and addenda 2.32 through 2.36 record the complete rails-sensitive QA stream as PASS. PF10 addendum 2.43 records OBL-013 as Satisfied.  
+* **Evidence anchors (PF10):** `tests/evidence/test_rails_ci_workflow_integration.py`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`; PF10 addendum 2.31 — HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority.  
+* **Disposition (archive):** Satisfied. Open-rails authority was bounded to the authorized event and expired after it.
+
+##### **D8 — DB posture runtime checks**
+
+* **Planned (, §Deliverable D8 — DB posture runtime checks):** Complete HDE-DIST001.4 through schema/search-path posture, grants, DDL fingerprint, constraints, boundary-view read-only proof, runtime connectivity, secret-free logs, and evidence binding.  
+* **Actual (PF10):** The bridge-era PR-04/OPS-01 posture was superseded for current behavior. PF10 addenda 2.12 through 2.15 establish direct PostgreSQL as the sole active transport, retired-key refusal, direct-selection evidence, and direct-only completion semantics. PF10 addendum 2.43 records OBL-014 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `audit/ops/hde-epic038/ops-03/`; `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+* **Disposition (archive):** Satisfied under PF10’s amended direct-only meaning. The original active bridge posture is historical-only.
+
+##### **D9 — BodyGraph mechanics gates**
+
+* **Planned (, §Deliverable D9 — BodyGraph mechanics gates):** Complete HDE-DIST001.5 through source selection, source invariance, vendor-disabled production posture where applicable, refresh policy, rate-limit policy, circuit-breaker policy, metrics, and keys-only evidence.  
+* **Actual (PF10):** PR-04 established BodyGraph/architecture proof surfaces; PR-05 added bounded mapped-cache behavior; later direct-only remediation separated current direct proof from historical bridge material. PF10 addendum 2.43 records OBL-015 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/bodygraph/resolver.py`; `engine/bodygraph/mapped_cache.py`; `artifacts/architecture/architecture_snapshot.keys_only.json`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`.  
+* **Disposition (archive):** Satisfied in substance within the bounded internal/admin posture. No broad vendor-runtime or public Reader claim is created.
+
+##### **D10 — DB-bridge parity and environment connectivity**
+
+* **Planned (, §Deliverable D10 — DB-bridge parity and environment connectivity):** Complete HDE-DIST001.9 through direct-versus-bridge read parity, environment connectivity, canonical comparison, secret-free evidence, and governed index/mirror binding.  
+* **Actual (PF10):** PF10 addendum 2.12 retired active bridge transport. Addenda 2.14 and 2.19 record OPS-03 as a bounded direct read-only packet with zero SQL writes, zero retries, and zero alternate-provider attempts. Addendum 2.43 records OBL-016 as Satisfied under the amended direct-connectivity meaning.  
+* **Evidence anchors (PF10):** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+* **Disposition (archive):** Satisfied under the direct-only replacement meaning. Planned bridge parity was not executed as the final active architecture and must not be presented as current behavior.
+
+##### **D11 — Architecture snapshot evidence**
+
+* **Planned (, §Deliverable D11 — Architecture snapshot evidence):** Complete HDE-DIST001.10 through a canonical keys-only architecture snapshot with no secrets, raw birth data, credentials, sensitive headers, or raw vendor payloads.  
+* **Actual (PF10):** PR-04 established the keys-only snapshot family. PF10 records `artifacts/architecture/architecture_snapshot.keys_only.json` with `analyzer_verdict: "pass"` and `unknown_count: 0`. Addendum 2.43 records OBL-017 as Satisfied.  
+* **Evidence anchors (PF10):** `artifacts/architecture/architecture_snapshot.keys_only.json`; `tests/evidence/test_architecture_snapshot.py`; `docs/evidence/INDEX.json`; `artifacts/evidence_index.jsonl`.  
+* **Disposition (archive):** Satisfied. The snapshot remains an evidence artifact, not a public surface.
+
+##### **D12 — v2 mapped-cache persistence hardening**
+
+* **Planned (, §Deliverable D12 — v2 mapped-cache persistence hardening):** Complete HDE-DIST001.11 through controlled mapped-output write/read-back parity, idempotence, no raw vendor-payload persistence, no secret persistence, closed-rails refusal, legacy-fallback preservation, and governed evidence binding.  
+* **Actual (PF10):** PR-05 implemented bounded configured-v2 mapped-cache persistence. OPS-02 recorded one authorized configured-v2 request, one insert/read-back, and a second same-identity write with zero additional insertions. PF10 addendum 2.43 records OBL-018 as Satisfied.  
+* **Evidence anchors (PF10):** `engine/bodygraph/mapped_cache.py`; `engine/bodygraph/resolver.py`; `engine/cli/main.py`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`; `audit/ops/hde-epic038/ops-02/`; `tests/bodygraph/test_v2_mapped_cache.py`.  
+* **Disposition (archive):** Satisfied within the bounded nonproduction/authorized posture. Production mapped-cache authorization, raw vendor-envelope persistence, public Reader changes, and broad v2 conformance remain unclaimed.
+
+##### **D13 — Release sanity pipeline**
+
+* **Planned (, §Deliverable D13 — Release sanity pipeline):** Complete HDE-DIST001.6 through a one-button evidence harness that runs the in-scope proof families in deterministic order and fails closed on drift.  
+* **Actual (PF10):** PR-06 evolved from an initial 17-stage orchestrator into the final direct-only 19-stage release pipeline. PF10 records nineteen stages `OK`, `first_failed_stage:NONE`, and `summary:PASS`. Addendum 2.43 records OBL-019 as Satisfied.  
+* **Evidence anchors (PF10):** `tools/evidence/run_sanity_pipeline.py`; `audit/gates/sanity_pipeline/sanity_pipeline.log`; `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* **Disposition (archive):** Satisfied. Release-sanity PASS does not itself prove ordinary formal close-pack completion.
+
+##### **D14 — canonical adapter factory route-mount parity**
+
+* **Planned:** Unknown (not present in inputs).  
+* **Actual (PF10):** PF10 addenda 2.26 through 2.28 introduced and completed HDE-DIST007 selected-factory compatibility remediation. PRs \#369 and \#370 restored the compatibility blueprint and completed the intended CI lane, with 35 tests and seven jobs passing.  
+* **Evidence anchors (PF10):** PF10 addendum 2.28 — Epic Remedial PR-01 HDE-EPIC038; PRs \#369 and \#370; `adapter/factory.py`.  
+* **Disposition (archive):** Satisfied technically under HDE-EPIC038. No permanent PF09 row exists for HDE-DIST007; later PF09 assignment or drainage remains separate.
+
+##### **D15 — ordinary formal close-pack and acceptance ledger**
+
+* **Planned (, §Tokens and Evidence (Acceptance)):** Produce `audit/EPIC-038_close_report.md`, `audit/EPIC-038_MANIFEST.json`, `docs/acceptance_map_epic038.json`, `docs/acceptance_map_epic038.json.path_proof.txt`, `audit/qa/hde-epic038/token_evidence_matrix.md`, and `audit/qa/hde-epic038/acceptance_map_viability.log`.  
+* **Actual (PF10):** PF10 addendum 2.42 records that formal close-pack completion was not achieved. `audit/EPIC-038_close_report.md`, `audit/EPIC-038_MANIFEST.json`, and `docs/acceptance_map_epic038.json` are absent from the final repository posture. PR \#385 remained closed and unmerged.  
+* **Evidence anchors (PF10):** `audit/qa/hde-epic038/token_evidence_matrix.md` exists with 33 rows, all `UNCLAIMED`; PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is; PF10 addendum 2.43 — Epic Closure Evidence Review: HDE-EPIC038.  
+* **Disposition (archive):** Not satisfied under the ordinary close-pack path. The final HDE-EPIC038-specific exception makes ordinary close-pack completion not applicable to this epic’s final closure without converting the absent artifacts, Gate D, or token roster into completed facts.
+
+**Planned-vs-actual mismatches archived explicitly:**
+
+* The plan says PF10 had no active addendum impact; PF10 later records the full implementation and closure history through addendum 2.44.  
+* The plan described DB-bridge parity for HDE-DIST001.9; PF10 retired the bridge as an active transport and satisfied the row’s epic burden under direct-only connectivity semantics.  
+* The plan treated `RELEASE_ID_RECOMPUTE_OK` as a canonical acceptance token; PF10 addendum 2.37 later minted/corrected the token, while addendum 2.42 superseded its conflicting current-equality use for HDE-EPIC038.  
+* The plan listed `DEV_DB_BRIDGE_FALLBACK_OK`; PF10 addendum 2.37 retired its current claimability for this epic’s direct-only posture.  
+* The plan expected a conventional close-pack baseline. The r5 closeout architecture failed, PR \#385 remained unmerged, and the epic closed through an explicit exception without ordinary close-pack or token-satisfaction claims.  
+* HDE-DIST007 was not in the original plan but was added and satisfied technically after the implementation audit identified selected-factory route-mount drift.  
+* The plan intended all 13 implementation deliverables to make their PF09 rows supportable to completion. PF10 records those burdens as Satisfied in substance, but physical PF09 status movement remains undrained.  
+* The planned nonclaim boundaries were preserved: no public Reader expansion, new public route, production mapped-cache authorization, app-side vendor ownership, or broad v2 conformance was claimed.
+
+#### **2.23.4 PF Reference Map**
+
+**Core phase and process references (from , §PF Reference Map):**
+
+* `PF21 — 7 Phases of Alchemical Engineering`  
+* `PF27 — Plan Templates`  
+* `PF09.6 — HDE-Build-Checklist-Distillation`  
+* `PF06 — Epic Process Guide`  
+* `PF19 — Glow QA Guide`
+
+**Additional references (from , §PF Reference Map):**
+
+* `PF01 — HDE-Math-Spec`  
+* `PF02 — HDE Architecture`  
+* `PF03 — Technical Writing Best Practices`  
+* `PF04 — HDE Governance`  
+* `PF05 — HDE-CLI-API-Vendor-Ref`  
+* `PF07 — Glow Infrastructure`  
+* `PF09.5 — HDE-Build-Checklist-Fermentation`  
+* `PF12 — HDE-Schemas & Artifacts`  
+* `PF14 — HDE Mechanics Guide`  
+* `PF23 — Reality Audits`  
+* `PF29 — HDE Users Guide`
+
+**Historical context only (from , §PF Reference Map):**
+
+* `PF20 — HDE-Phased Epics`
+
+**Execution and results sources used for this archive entry:**
+
+* PF10 addendum 2.1 — PR-01 HDE-EPIC038  
+* PF10 addendum 2.2 — PR-02 HDE-EPIC038  
+* PF10 addendum 2.3 — PR-03 HDE-EPIC038  
+* PF10 addenda 2.4 and 2.5 — PR-04 HDE-EPIC038 — Approved Rescope and Canon Decisions; PR-04 HDE-EPIC038  
+* PF10 addendum 2.6 — OPS-01 HDE-EPIC038  
+* PF10 addendum 2.7 — PR-05 HDE-EPIC038  
+* PF10 addendum 2.8 — OPS-02 HDE-EPIC038  
+* PF10 addenda 2.9 and 2.10 — PR-06 Post-Merge Remediation and OPS-01R HDE-EPIC038 — Approved Rescope and ADR-CANON-004; PR-06 Remediation PR-A HDE-EPIC038  
+* PF10 addenda 2.11 through 2.16 — delegated OPS authority, direct PostgreSQL, ADR-CANON-006, ADR-CANON-007, ADR-CANON-008, and scalable manifest-derived release identity  
+* PF10 addenda 2.17 through 2.21 — PR-06R-A review, OPS-03, PR-06R-B final integration, and PR-06 Remediation State  
+* PF10 addendum 2.22 — Implementation Retrospective HDE-EPIC038  
+* PF10 addendum 2.23 — Post Implementation Audit Triage HDE-EPIC038  
+* PF10 addenda 2.24 and 2.25 — syntax-origin defect classification and Epic Remediation Plan recognition  
+* PF10 addenda 2.26 through 2.28 — HDE-DIST007 mapping, bounded rescope, and merged remediation review  
+* PF10 addendum 2.29 — QA Pass 1 HDE-EPIC038  
+* PF10 addendum 2.31 — HDE-EPIC038 qa-08-po-008 — PO-Approved Extended Moon Loop Remediation and CI Completion Authority  
+* PF10 addendum 2.32 — QA Pass 2 HDE-EPIC038  
+* PF10 addendum 2.33 — `ci/checks/check_mirror_schema.sh` Is a Python Entry Point with a Legacy Stable Path  
+* PF10 addendum 2.34 — QA Pass 3 HDE-EPIC038  
+* PF10 addendum 2.35 — Live QA Execution Environments: Replace the Universal Codespaces Requirement with a Materiality-Based Evidence Contract  
+* PF10 addendum 2.36 — Final QA Closeout Review \+ QA RCA HDE-Epic038  
+* PF10 addendum 2.37 — HDE-EPIC038 Token-Roster Correction — Mint `RELEASE_ID_RECOMPUTE_OK` and Retire Current `DEV_DB_BRIDGE_FALLBACK_OK` Claimability  
+* PF10 addenda 2.38 through 2.41 — r5 Epic Remediation Plan, DEV-01, DEV-02, and DEV-R1 evidence brief  
+* PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: Withdraw r5 and Recommend Product Owner Close As Is  
+* PF10 addendum 2.43 — Epic Closure Evidence Review: HDE-EPIC038  
+* PF10 addendum 2.44 — Lead Dev Epic Retrospective: HDE-EPIC038  
+* , §Business Case, §Contract and Compatibility Posture, §Existing Work Check, §Planned Epic Scope, §Deliverables, §PF09 Completion Map, §Tokens and Evidence (Acceptance), §QA Rails \- Open/Close, §Tracked Issues, §ADR Stubs, and §Plan Preflight
+
+#### **2.23.5 Tokens and Evidence (Acceptance)**
+
+**Planned token inventory (, §Tokens and Evidence (Acceptance)):**
+
+* Baseline tokens: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`  
+* QA rail tokens: `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`, `ENV_RAILS_POLICY_OK`  
+* Phase-specific tokens: `PREIMAGE_RECOMPUTE_OK`, `CLI_READER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`, `A7_TRANSPORT_PROOF_OK`, `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`, `ENV_LC_ALL_C_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_ROLE_OK`, `DB_SCHEMA_FINGERPRINT_OK`, `DB_CONN_ENV_OK`, `DEV_DB_BRIDGE_FALLBACK_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `RELEASE_ID_RECOMPUTE_OK`
+
+**Planned non-token proof obligations pending registry validation (, §Non-token proof obligations pending registry validation):**
+
+* `BG_SOURCE_SELECTION_OK`, `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`, `BG_SOURCE_INVARIANCE_OK`, `BG_TTL_SWR_POLICY_OK`, `BG_RATE_LIMIT_POLICY_OK`, `BG_CIRCUIT_BREAKER_POLICY_OK`, `ENV_SNAPSHOT_SINGLETON_OK`, `ENV_SNAPSHOT_SCHEMA_V3_OK`, and `ENV_PINS_PRESENT_OK` remained evidence obligations, not claimable acceptance tokens without registry admission.
+
+**Planned token posture:**
+
+* No local token was to be minted by the Epic Plan.  
+* PF09 scope and status bindings remained metadata rather than acceptance tokens.  
+* PR existence, branch identity, review state, merge state, and board state remained workflow metadata.  
+* Documentation drainage remained separate from implementation, QA, and closeout.
+
+**Planned evidence pointers (, §B. Evidence pointers):**
+
+* `audit/EPIC-038_close_report.md`  
+* `audit/EPIC-038_MANIFEST.json`  
+* `docs/acceptance_map_epic038.json`  
+* `docs/acceptance_map_epic038.json.path_proof.txt`  
+* `audit/qa/hde-epic038/token_evidence_matrix.md`  
+* `audit/qa/hde-epic038/acceptance_map_viability.log`  
+* `audit/docdeltas/hde-epic038_doc_deltas.md`  
+* `audit/qa/hde-epic038/00_meta/doc_deltas.md`  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `audit/qa/hde-epic038/`
+
+**Actual evidence posture (PF10):**
+
+* **Identity and environment:** `engine/runtime/identity.py`; `catalog/manifest.json`; `artifacts/identity/service_identity.json`; `artifacts/audit/env/env_snapshot.json`.  
+* **Determinism, A7, and rails:** `docs/ENDPOINTS_CATALOG.json`; `tests/evidence/test_determinism_gate_proofs.py`; `tests/evidence/test_rails_ci_workflow_integration.py`.  
+* **Direct DB and architecture:** `engine/db/adapter.py`; `artifacts/runtime/direct_db_selection.snapshot.json`; `artifacts/architecture/architecture_snapshot.keys_only.json`.  
+* **Mapped cache and OPS-02:** `engine/bodygraph/mapped_cache.py`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`; `audit/ops/hde-epic038/ops-02/`.  
+* **OPS-03:** `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+* **Release gate:** `tools/evidence/run_sanity_pipeline.py`; `audit/gates/sanity_pipeline/sanity_pipeline.log`, recording 19 stages `OK`, `first_failed_stage:NONE`, and `summary:PASS`.  
+* **QA:** `audit/qa/hde-epic038/qa_step_logs_manifest.json`, recording 24 entries and all statuses PASS.  
+* **Evidence graph:** `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`, recording 553/553 ordered key/path parity in the final closure review.  
+* **Token matrix:** `audit/qa/hde-epic038/token_evidence_matrix.md`, recording 33 rows, all `UNCLAIMED`, and zero claimed.
+
+**Actual token and acceptance posture (PF10):**
+
+* PF10 addendum 2.37 corrected the epic’s 33-token roster, minted `RELEASE_ID_RECOMPUTE_OK`, and retired current `DEV_DB_BRIDGE_FALLBACK_OK` claimability.  
+* PF10 addendum 2.42 partially superseded the current-equality use of `RELEASE_ID_RECOMPUTE_OK` because frozen historical identity evidence could not truthfully prove current-manifest equality.  
+* PF10 addendum 2.42 also removed the mandatory 33-token roster as a gate for HDE-EPIC038’s exceptional closure. It did not mark any token PASS or FAIL.  
+* PF10 addendum 2.43 records the governance axis as Satisfied for the exception boundary without claiming token satisfaction.  
+* Gate D PASS, 33-of-33 token satisfaction, a tracked ordinary `SATISFIED` close report, a canonical close manifest, and a merged close PR are not claimed.
+
+**Planned-token mismatches archived explicitly:**
+
+* treated `RELEASE_ID_RECOMPUTE_OK` as sourced from HDE Governance; PF10 later minted it and then superseded its conflicting HDE-EPIC038 current-equality use.  
+* listed `DEV_DB_BRIDGE_FALLBACK_OK`; PF10’s direct-only architecture retired its current claimability.  
+* The plan expected ordinary close-pack and token-evidence completion. PF10 records the final token matrix as entirely unclaimed and the ordinary close-pack family as absent.  
+* The absence of ordinary token satisfaction is truthful and non-blocking only because HDE-EPIC038 closed through an explicit epic-specific exception.
+
+#### **2.23.6 QA Rails — Open/Close (Final PR)**
+
+**Planned rails posture (, §QA Rails \- Open/Close):**
+
+* Closed rails were the default for CI and deterministic proof runs.  
+* Opened rails were permitted only as bounded Product Owner-authorized exceptions for live vendor, DB, bridge, environment, credential, or production-like proof.  
+* Open-rails evidence had to remain secret-free, governed, and separately recorded.  
+* Live QA was required for eventual epic close under Epic Process Guide and Glow QA Guide.  
+* The Epic Plan did not include a Live QA runbook, commands, execution steps, logs, or evidence-layout instructions.
+
+**Actual QA event stream (PF10):**
+
+* CHECK `qa-00` through `qa-07` — PASS. PF10 addendum 2.29 records QA Pass 1 as PASS with failed-and-remediated receipts preserved.  
+* CHECK `qa-08` — PASS after one Product Owner-approved Extended Moon Loop event. PF10 addendum 2.31 records one fresh authorization, two vendor requests, and expiration of the authorization after the event; addendum 2.32 records QA Pass 2\.  
+* CHECK `qa-09` through `qa-23` — PASS. PF10 addendum 2.34 records QA Pass 3, and addendum 2.36 records complete plan-order accounting.  
+* CHECK Live QA venue provenance — `UNKNOWN - NON-MATERIAL`. PF10 addendum 2.35 records that absence of historical Codespaces provenance is not a QA failure and not a closeout blocker when venue is not material to the claimed fact.  
+* CHECK Final QA Closeout Review \+ QA RCA — READY WITH CAVEATS. PF10 addendum 2.36 records 24 planned checks, 24 manifest entries, and every manifest entry matching its primary log.  
+* CHECK Epic Closure Evidence Review — SATISFIED. PF10 addendum 2.43 records no remaining closure-critical Blocked or Ambiguous obligation after applying the HDE-EPIC038-specific exception.
+
+**Remediation loops and decisions (PF10):**
+
+* PR-01 through PR-05 required multiple remedial PRs before their final implementation and evidence postures were accepted. Concrete anchors: PRs \#346 through \#358 and PF10 addenda 2.1 through 2.8.  
+* PR-06 required a material architecture correction from bridge-era behavior to direct-only PostgreSQL, plus OPS-03 and final PR-06R-B evidence admission. Concrete anchors: PF10 addenda 2.12 through 2.20 and PRs \#363 through \#367.  
+* HDE-DIST007 corrected canonical-factory route mounting and completed the intended compatibility CI lane. Concrete anchors: PF10 addenda 2.26 through 2.28 and PRs \#369 and \#370.  
+* `qa-08` required a bounded Extended Moon Loop and CI remediation. Concrete anchors: PF10 addenda 2.31 and 2.32 and PRs \#371 and \#372.  
+* Final QA evidence was completed through PRs \#376 and \#377 and recorded in `audit/qa/hde-epic038/qa_step_logs_manifest.json`.  
+* r5 closeout remediation added DEV-01 and DEV-02 machinery through PRs \#379 through \#383 but could not reach its required terminal state.  
+* PR \#385 failed exact-head release-attestation construction, remained closed and unmerged, and did not create ordinary close-pack completion.  
+* PF10 addendum 2.42 withdrew r5, stopped DEV-03, DEV-04, and DEV-R1, and recommended that the Product Owner close HDE-EPIC038 as is with explicit caveats.
+
+**Closeout-posture chronology archived explicitly:**
+
+* PF10 addendum 2.36 — Final QA Closeout Review \+ QA RCA HDE-Epic038: `READY WITH CAVEATS`.  
+* PF10 addendum 2.42 — HDE-EPIC038 Remediation-Failure Decision: `RECOMMEND PRODUCT OWNER CLOSE HDE-EPIC038 AS IS`.  
+* PF10 addendum 2.42 — formal close-pack completion was not achieved; Gate D, 33-of-33 token satisfaction, tracked ordinary `SATISFIED`, close manifest, and merged close PR were not claimed.  
+* PF10 addendum 2.43 — Epic closure decision: `HDE-EPIC038 is SATISFIED`.  
+* PF10 addendum 2.44 — implementation posture recommendation: `READY WITH CAVEATS`.  
+* PF10 addendum 2.44 — no hard requirement remained before closure because the Product Owner finalized the epic-specific exception.
+
+#### **2.23.7 Tracked Issues**
+
+**Tracked issue at plan creation (, §Tracked Issues):**
+
+* **Issue ID:** TI-001  
+  * **Title:** PF09 row-listed proof labels require registry-safe acceptance handling  
+  * **Status:** Completed under HDE-EPIC038 for unsupported-claim prevention; future release-token semantics remain carried separately.  
+  * **Scope / description:** PF09.6 row-listed labels could remain proof obligations but could not be claimed as acceptance tokens unless exact registry admission was confirmed.  
+  * **Disposition:** The final token matrix claims zero tokens, and the exceptional closure does not infer token satisfaction. The future `RELEASE_ID_RECOMPUTE_OK` semantic conflict remains GAP-002.
+
+**Actual tracked issues / closeout drifts recorded in PF10:**
+
+* **Plan-source PF10 mismatch**  
+  * **Status:** Completed by PF10 actuality.  
+  * **Scope / description:** The Epic Plan records PF10 silence, while PF10 later contains the complete HDE-EPIC038 implementation and closure history.  
+  * **Disposition:** PF10 controls actual results; the mismatch is preserved explicitly.  
+* **GAP-001 — Ordinary close-pack and token completion not achieved**  
+  * **Status:** Non-blocking under the final HDE-EPIC038-specific exception.  
+  * **Scope / description:** Gate D, 33-token satisfaction, tracked ordinary `SATISFIED`, close manifest, acceptance map, and merged close PR were not achieved.  
+  * **Disposition:** Preserve the nonclaims. No current-epic remediation is authorized.  
+* **GAP-002 — Release-token and historical-identity conflict**  
+  * **Status:** Carried forward to separately authorized future work.  
+  * **Scope / description:** Frozen historical identity evidence cannot truthfully prove equality with the current canonical manifest, making the former `RELEASE_ID_RECOMPUTE_OK` predicate unreachable.  
+  * **Disposition:** Redefine, replace, or retire the token before future reliance. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-003 — Feedback-free closeout lifecycle missing**  
+  * **Status:** Carried forward to separately authorized future work.  
+  * **Scope / description:** r5 required hosted-CI facts to appear in already-tracked final bytes and lacked a reachable terminal transition. PR \#385 confirmed the architecture failure.  
+  * **Disposition:** A future carrier must define and prove a feedback-free terminal lifecycle. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-004 — Merged DEV-01/DEV-02 subsystem remains**  
+  * **Status:** Non-blocking future audit.  
+  * **Scope / description:** PRs \#379 through \#383 remain merged even though r5 was withdrawn.  
+  * **Disposition:** Separately decide whether to retain, simplify, generalize, disable, or remove the subsystem. Destination epic or task ID: Unknown (not present in inputs).  
+* **GAP-005 — PF09 status drainage and HDE-DIST007 assignment**  
+  * **Status:** Documentation/status drainage only.  
+  * **Scope / description:** Exact HDE-EPIC038 rows remain recorded as Partial, Not done, or Optional, and HDE-DIST007 has no permanent PF09 row.  
+  * **Disposition:** Drain only after preserving the exceptional-closure and ordinary-close nonclaims. No status movement is performed by this archive record.  
+* **GAP-006 — PF10 identity and PF12 discoverability maintenance**  
+  * **Status:** Non-blocking documentation maintenance.  
+  * **Scope / description:** PF10’s second volume retained stale internal version text, and applicable PF12 source discoverability required recovery from repository history during the closure review.  
+  * **Disposition:** Correct during later canon maintenance. Destination document-maintenance action: Unknown (not present in inputs).  
+* **GAP-007 — Development-board closure record**  
+  * **Status:** Non-blocking documentation/status maintenance.  
+  * **Scope / description:** PF10 records that the supplied board bundle was stale and contained no HDE-EPIC038 entry.  
+  * **Disposition:** Any later board record must preserve exceptional closure and the ordinary-close nonclaims. Actual board update: Unknown (not present in inputs).  
+* **GAP-008 — Historical PR \#349 and OPS-03 evidence limitations**  
+  * **Status:** Non-blocking caveats.  
+  * **Scope / description:** PF10 and one observed PR \#349 Actions result conflict; OPS-03 does not preserve every provisioning SQL byte or a complete grants/default-privileges graph.  
+  * **Disposition:** Preserve as caveats unless future business scope makes them material.  
+* **GAP-009 — Distillation phase exit**  
+  * **Status:** Outside this epic.  
+  * **Scope / description:** Exceptional HDE-EPIC038 closure does not establish Distillation phase-exit readiness.  
+  * **Disposition:** Route through separately authorized phase-exit work. Destination epic or task ID: Unknown (not present in inputs).  
+* **Performance and Load Harness**  
+  * **Status:** Deferred with rationale.  
+  * **Scope / description:** `HDE-DIST004.1` through `HDE-DIST004.4` remained outside HDE-EPIC038 as a distinct Distillation workstream.  
+  * **Disposition:** Preserved as future PF09-accounted work. Destination epic ID: Unknown (not present in inputs).
+
+#### **2.23.8 Plan Preflight (MUST)**
+
+**Planned preflight posture (, §Plan Preflight):**
+
+* The Token Inventory separated registry-listed acceptance tokens from non-token proof obligations.  
+* The planned close-pack baseline included the close report, manifest, acceptance map, token-evidence matrix, acceptance-map viability log, and doc-delta surfaces.  
+* Bundle-style evidence required a text-based bundle, manifest, Human Evidence Index binding, Machine Mirror binding, and sibling path-proof posture.  
+* Every concrete evidence path was labeled as PF-canon existing, PF09/PF12 existing, planned, proposed, or unknown.  
+* Current repo existence had to be revalidated before implementation reliance.  
+* External, credentialed, DB, bridge, vendor, environment, production-like, or open-rails work remained PO-only and IA-guided.  
+* PF23 remained planning-time context only.  
+* Every in-scope task-like item was mapped to exact PF09.6 subtasks; Performance and Load Harness work remained explicitly deferred.  
+* The Epic Plan contained no QA Plan, Live QA runbook, QA command sequence, QA evidence-layout design, review, remediation guide, closeout review, or OPS procedure.
+
+**Planned OPS posture (, §Work Category Separation):**
+
+* OPS support could be required for D7, D8, D10, and D12.  
+* Execution owner: PO-only execution, IA-guided.  
+* Planned OPS task IDs, success criteria, evidence paths, and rollback records: Unknown (not present in inputs).  
+* Secret posture: secret-free governed evidence under a lowercase governed root; no embedded OPS procedures.
+
+**Actual OPS records (PF10):**
+
+* **OPS-01**  
+  * **Intent:** bounded read-only DB and bridge-era posture capture.  
+  * **Constraints/rails:** closed-rails, no vendor call, no SQL write, no deployment, and no secret or raw payload persistence.  
+  * **Success posture:** accepted historically, then quarantined as `historical_bridge_evidence`.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-01/`.  
+  * **Rollback intent:** Unknown (not present in inputs).  
+* **OPS-02**  
+  * **Intent:** bounded configured-v2 mapped-cache insertion, canonical read-back, and idempotence proof.  
+  * **Constraints/rails:** one authorized configured-v2 request, mapped payload only, no raw vendor envelope, no production authorization, and no public Reader change.  
+  * **Success posture:** one insert/read-back and a second same-identity write with zero additional insertions.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-02/`; `artifacts/bodygraph/v2_mapped_cache/manifest.json`.  
+  * **Rollback intent:** Unknown (not present in inputs).  
+* **OPS-03**  
+  * **Intent:** authorization-bound direct PostgreSQL read-only posture capture.  
+  * **Constraints/rails:** zero SQL writes, zero retries, zero alternate-provider attempts, bounded role/provisioning claims, and secret-safe evidence.  
+  * **Success posture:** captured and admitted into the final direct-only evidence graph through PR \#367.  
+  * **Evidence:** `audit/ops/hde-epic038/ops-03/`; `audit/ops/hde-epic038/ops-03-operator-record/`.  
+  * **Rollback intent:** Unknown (not present in inputs).
+
+**Planned ADR stubs (, §ADR Stubs):**
+
+* None.
+
+**Actual ADR / decision posture (PF10):**
+
+* PF10 addendum 2.12 establishes direct PostgreSQL as the sole active HDE database transport.  
+* PF10 addendum 2.13 quarantines bridge evidence as historical-only.  
+* PF10 addenda 2.14 and 2.19 define the bounded OPS-03 authorization and evidence-admission boundary.  
+* PF10 addendum 2.16 establishes canonical-manifest-derived release identity and external attestation.  
+* PF10 addendum 2.31 authorizes one bounded Extended Moon Loop event and expires that authority afterward.  
+* PF10 addendum 2.35 replaces a universal Codespaces requirement with a venue-materiality evidence contract.  
+* PF10 addendum 2.42 withdraws r5, stops DEV-03, DEV-04, and DEV-R1, preserves PR \#385 as closed and unmerged, and recommends close-as-is.  
+* PF10 addendum 2.43 records the final HDE-EPIC038-specific exceptional closure as SATISFIED.
+
+**Actual archive-level reconciliation:**
+
+* The 13 planned implementation deliverables are Satisfied in substance under PF10 addendum 2.43.  
+* HDE-DIST007 is Satisfied technically as actual added remediation work.  
+* `audit/gates/sanity_pipeline/sanity_pipeline.log` records a 19-stage PASS.  
+* `audit/qa/hde-epic038/qa_step_logs_manifest.json` records 24 of 24 checks PASS.  
+* `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` record coherent 553/553 ordered key/path topology in the final closure review.  
+* The ordinary close-pack family is absent and not claimed.  
+* `audit/qa/hde-epic038/token_evidence_matrix.md` records 33 rows, all `UNCLAIMED`; no token satisfaction is inferred.  
+* Public Reader expansion, new public routes, production mapped-cache authorization, broad v2 conformance, PF09 movement, board movement, and Distillation phase exit remain unclaimed.  
+* PF09 status drainage, PF-Canon drainage, board maintenance, release-token reconciliation, close-lifecycle redesign, and phase-exit adjudication remain separate actions.  
+* Final archive posture: HDE-EPIC038 is SATISFIED through an epic-specific exceptional closure, with implementation posture recommendation READY WITH CAVEATS.
 
