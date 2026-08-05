@@ -6,10 +6,10 @@
 
 **Status:** Canon
 
-**Version:** v2.8  
-**Effective date:** 2026-07-09
+**Version:** v2.8.1  
+**Effective date:** 2026-08-05
 
-**Last Update Gate:** BN 12.1.7 A10-13
+**Last Update Gate:** BN 12.6.2 A1-6
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -393,7 +393,10 @@ For PRs that change governed evidence artifacts (Index, Mirror, or other governe
 
   * Run the ordering generator once in write mode (no `--check`) to refresh ordering artifacts from the current sources (catalogs, manifests, and Engine math).
 
-  * Then run the same generator again with its `--check` mode to verify that an unchanged tree produces no changes to the ordering artifacts.
+  * Then run the same generator again with its `--check` mode to verify that an unchanged tree produces no changes to the ordering artifacts.  
+* Treat every non-writing check as non-mutating.  
+  * A non-writing check MUST NOT mutate the repository or external state. Prohibited external-state actions include opening a database connection, executing SQL, committing a transaction, applying a migration, or mutating an external service.  
+  * When a verifier executes a route with a persistence seam, direct side-effect interception tests MUST prove that the persistence seam is not invoked.
 
 * Update Evidence Index and Mirror (write, then check).
 
@@ -425,7 +428,13 @@ For PRs that change governed evidence artifacts (Index, Mirror, or other governe
 
   * QA MUST NOT narrow the main lane to only the scoped subset, and MUST NOT treat the scoped lane as a substitute for broader evidence correctness, mirror discipline, or other retained global safeguards.
 
-  * A scoped closure result is trustworthy only when the scoped lane is green and the retained main-lane safeguards are also green.
+  * A scoped closure result is trustworthy only when the scoped lane is green and the retained main-lane safeguards are also green.  
+* Verify proof producers through their real entry points.  
+  * Each governed artifact family MUST have one deterministic writer.  
+  * QA MUST execute the producer’s actual write and check entry points.  
+  * A failed predicate MUST leave no partial writes.  
+  * Write-capable execution MUST require explicit write authorization where applicable.  
+  * Every decisive transport predicate MUST have a direct malformed-response test.
 
 * Enforce release identity and Freeze-Pack Manifest coherence (fail-closed; when in scope).
 
