@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.9.5
+**Version:** v1.9.6
 
 **Status:** Canon
 
-**Effective date:** 2026-07-09
+**Effective date:** 2026-08-05
 
-**Last Update Gate:** BN 12.1.7 A1-9
+**Last Update Gate:** BN 12.6.2 A1-6
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -189,7 +189,8 @@ Mechanical blocker posture: any prohibited ellipsis or any fenced code block in 
 **Canon precedence for template use.**
 
 * Templates and derived plan documents MUST include the canon precedence rule:  
-  “PF10 supersedes all other PF docs where it speaks; otherwise follow PF-Canon.”  
+   “Applicable, active, non-superseded PF10 addenda supersede conflicting PF-Canon only for the exact scope they address; otherwise follow PF-Canon. A formally approved bounded Product Owner rescope may supersede conflicting PF-Canon only for the exact decision it adjudicates.”  
+* When a plan or derived plan document relies on a formally approved bounded Product Owner rescope, it MUST identify the exact approved decision, any transferred later-PR work, the preserved boundaries, the preserved nonclaims, and the PF drain candidates.  
 * PF27 MUST NOT duplicate bytes, token lists, or schemas. It routes by title to the single-home PF documents.
 
 **Primary audience.**
@@ -211,9 +212,9 @@ Plan revision: r\#
 Date (UTC): YYYY-MM-DD  
 Operators (names-only): PO, IA, (optional) QA agent, (optional) Codex
 
-#### Canon precedence statement (required)
+“Applicable, active, non-superseded PF10 addenda supersede conflicting PF-Canon only for the exact scope they address; otherwise follow PF-Canon. A formally approved bounded Product Owner rescope may supersede conflicting PF-Canon only for the exact decision it adjudicates.”
 
-“PF10 supersedes all other PF docs where it speaks; otherwise follow PF-Canon.”
+When a formally approved bounded Product Owner rescope applies, identify the exact approved decision, any transferred later-PR work, the preserved boundaries, the preserved nonclaims, and the PF drain candidates.
 
 #### **Canon set (explicit; stable references only)**
 
@@ -1070,6 +1071,7 @@ Location:
 * Decision separation (required). Review and acceptance language MUST distinguish task-level acceptance of the approved step from PF09 closure status of the mapped row or subtask.  
 * Governed evidence family coherence (required). When a review or closeout decision depends on governed evidence for a bounded task and a claimed closure dimension, the governed evidence family MUST express one authoritative posture only. Mixed-state families are invalid and mechanically block acceptance until normalized.  
 * Evidence-family path collision repair (required). A review MUST treat evidence outputs that overwrite or collide with an existing governed evidence family as blocking until the collision is repaired. A repair is acceptable only when the task-specific evidence is moved to the approved PR/check/task-specific governed path, the overwritten shared or dependency artifacts are restored or refreshed, matching path proofs/index/mirror bindings are coherent, and the review records the collision and repair as evidence posture rather than silently accepting the overwritten state.  
+* Transitive-writer collision and shared-history reconstruction guard (required). For a bounded collision repair that reconstructs shared history, a plan or review MUST identify the unique primary owner for each governed primary; inventory every transitive writer; migrate every active invocation and all affected consumers and companions; verify duplicate-key retirement under the evidence artifact-key collision-repair rule below; name the deterministic rollback source; complete all-order validation; prove fixed-point convergence; and satisfy the final-generator currentness rule below.  
 * Evidence artifact-key collision repair (required). A review MUST treat an evidence-index or Machine Mirror key that can override, shadow, duplicate, or supersede the canonical artifact key for the same discovered physical path as blocking until corrected. A repair is acceptable only when the governed source row uses the canonical artifact key, stale duplicate keys or EPIC-specific keys are filtered or removed before dedupe and regeneration, Human Evidence Index and Machine Mirror are regenerated coherently, and the review records the collision and repair as evidence posture rather than silently accepting a duplicate-key state.  
 * Contradictory-source consolidation is forbidden. A review, closeout, or consolidation artifact MUST NOT summarize or bind acceptance over source artifacts that still encode contradictory closure meanings for the same closure dimension. If contradiction exists, stop and classify the issue as a documentation/evidence failure rather than producing a merged authoritative summary.  
 * Documentation/evidence normalization instead of rerun (required). If the runtime proof remains unchanged and the only defect is contradictory governed evidence or closure semantics, remediation may be a documentation/evidence normalization pass rather than a new runtime rerun only when the unchanged runtime facts are already evidenced, no new runtime or OPS claim is added, the affected governed family is refreshed to one authoritative posture in the same change, the Human Evidence Index, Machine Mirror, checksum sidecars, and required sibling path-proofs are refreshed coherently, and any prior contradictory bundle or report is explicitly treated as superseded evidence.  
@@ -1491,7 +1493,7 @@ Before any new implementation work is planned or started for this epic:
 
 **Rule (normative):**
 
-No new work is scoped for this epic until the Existing Work Check is filled in and reviewed. This applies to **features, tokens, and evidence**. If this section is blank or obviously stale, the epic is **not ready** to enter “In Progress”.
+> No new work is scoped for this epic until the Existing Work Check is filled in and reviewed. This applies to **features, tokens, and evidence**. If this section is blank or obviously stale, the epic is **not ready** to enter “In Progress”.
 
 #### **Deliverables (Jobs To Be Done)**
 
@@ -1837,6 +1839,8 @@ When listing issues:
 
 **Rule (normative):**  
  No epic is closed as “Done” while silently dropping known issues. Every known issue must be: **proved, carried forward, promoted to a cross-epic ISSUE-XXX, or explicitly dropped** in this section, with statuses and destinations clearly recorded.
+
+> 
 
 #### **Plan Preflight (MUST)**
 
