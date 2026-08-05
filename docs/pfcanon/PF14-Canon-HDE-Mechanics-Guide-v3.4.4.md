@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.3
+**Version:** v3.4.4
 
 **Status:** Canon  
-**Effective date:** 2026-07-09
+**Effective date:** 2026-08-05
 
-**Last Update Gate:** BN 12.1.7 A1-9  
+**Last Update Gate:** BN 12.6.2 A1-6  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -226,7 +226,19 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Future mapped-cache persistence mechanics, if implemented, MUST write adapter-mapped HDE BodyGraph/cache payloads, not raw HumanDesignAPI v2 envelopes. The proof family must include mapped output before write, cached output after DB read, canonical-equivalence evidence for governed fields, idempotence evidence, no-secret and no-raw-vendor-payload evidence, and Human Evidence Index and Machine Mirror updates when new governed artifacts are created.  
 * Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.
 
-HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and open-rails proof mechanics for HumanDesignAPI v2 conformance. Closed-rails mechanics MUST prove deterministic refusal and no outbound I/O when rails are closed. Open-rails vendor smoke, when required, is PO-only execution and MUST be treated as an ops task, not PR work and not QA substitution. The mechanics MUST require secret-safe, governed evidence for any PO-run open-rails smoke, including command transcript, stdout, stderr, exit code, redacted or presence-only secret posture, request summary, result summary, and file checksums, while avoiding plaintext secrets and unapproved vendor payload storage.
+HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and open-rails proof mechanics for HumanDesignAPI v2 conformance. Closed-rails mechanics MUST prove deterministic refusal and no outbound I/O when rails are closed.
+
+Default open-rails posture. Open-rails vendor smoke, when required, is PO-only execution and MUST be treated as an OPS task, not ordinary PR work and not QA substitution. The mechanics MUST require secret-safe, governed evidence for any PO-run open-rails smoke, including command transcript, stdout, stderr, exit code, redacted or presence-only secret posture, request summary, result summary, and file checksums, while avoiding plaintext secrets and unapproved vendor payload storage.
+
+Narrow implementation-PR exception. One PR-specific open-rails vendor development proof MAY occur inside an implementation PR only when the Product Owner explicitly authorizes that exact capture in advance and the bounded proof:
+
+* records either independently proven non-production posture or the explicit Product Owner override truth without inventing environment provenance;  
+* defines and enforces a strict request ceiling;  
+* stores no plaintext secret, raw request body, or raw vendor response payload;  
+* keeps ordinary CI non-live;  
+* preserves fixture-backed deterministic proof as a separate required proof surface;  
+* grants no recurring, inferred, or general agent authority for later open-rails execution; and  
+* makes no QA PASS, OPS-completion, acceptance-token, PF09-status, deployment, production-conformance, or epic-closeout claim.
 
 Production/user-surface open-rails proof posture. Mechanics affecting runtime compute, BodyGraph resolution, vendor ingest, route-policy behavior, CLI/operator-facing runtime behavior, deployed behavior, or other production/user surfaces MUST distinguish closed-rails control-flow proof from open-rails runtime behavior proof. When the owning epic or QA plan affects such a surface, PF14 expects the relevant mechanics to support at least one bounded, intentional, secret-safe, evidence-recorded open-rails QA proof for the affected runtime behavior. PF14 records the mechanical proof distinction only; QA planning, acceptance tokens, gates, and closeout posture remain owned by their single homes.
 
@@ -461,8 +473,21 @@ This posture ensures that the ledger-centric evidence model (Human Index, Machin
 Scope (normative).  
 Only a small set of evidence writers may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, bundles/manifests, and path-proofs). All other code — including tests and ad-hoc scripts — MUST NOT modify governed evidence directly.
 
+Focused-owner allocation (normative).
+
+* Every governed primary MUST have exactly one active producer with a bounded, documented primary write set.  
+* The focused BodyGraph policy producer is the sole active primary owner for source selection, source invariance, refresh policy, metrics, and keys-only BodyGraph evidence.  
+* The shared Presenter-history primary MUST have one dedicated owner that reconstructs it from one immutable, closed-shape, four-record source fixture. The owner MUST validate record count and order, unique record IDs, per-row hashes, complete output size, and complete output hash before replacement.  
+* Shared Presenter-history writes MUST use a same-directory temporary file, flush and fsync before atomic replacement, preserve the prior destination on failure, remove temporary residue, and make `--check` read-only.  
+* General Presenter comparisons MUST be stdout-only when the caller does not supply a diagnostic log path. Mutable diagnostic comparisons MUST use caller-supplied task-scoped paths and MUST NOT default to the governed shared-history primary.  
+* A retired broad evidence generator MUST remain non-writing, perform no import-time generation or delegation for side effects, return nonzero, and emit a stable diagnostic directing callers to the focused generators. Active invocations MUST migrate to focused owners; historical references remain provenance.  
+* Current database-selection evidence MUST use the direct-only focused producer. Superseded bridge-era generators, dedicated bridge receipts, and direct-versus-bridge current-proof claims MUST NOT be restored or presented as active owners.  
+* Sibling path proofs, the Human Evidence Index, the Human Index hash sentinel, the Machine Mirror, the Mirror checksum, and orientation/index companions remain solely owned by the canonical evidence updater.  
+* Focused write-set tests MUST prove disjoint primary ownership, read-only check behavior, failure atomicity, no implicit governed diagnostic destination, and fixed-point output across every allowed producer order.  
+* Unknown active invocations, overlapping write sets, direct companion writes, stale current keys, wrong shared-history bytes, mutable shared-history defaults, or updater divergence MUST fail closed.
+
 Exception (narrow, explicit).  
-A7 proof artifacts under artifacts/proofs/ may be emitted only by the focused A7 transport test harness when `HDE_WRITE_A7_PROOFS=1`. Default test runs MUST NOT write these files. The harness MUST NOT update the Evidence Index, Machine Mirror, ordering artifacts, or path-proofs; those remain single-writer outputs of the evidence tools.
+ A7 proof artifacts under artifacts/proofs/ may be emitted only by the focused A7 transport test harness when `HDE_WRITE_A7_PROOFS=1`. Default test runs MUST NOT write these files. The harness MUST NOT update the Evidence Index, Machine Mirror, ordering artifacts, or path-proofs; those remain single-writer outputs of the evidence tools.
 
 Evidence tools (titles-only).  
 Ordering generator.
@@ -3055,96 +3080,84 @@ Routing (titles-only):
 
 # 13\) Identity & Provenance Module \[Required-Now\]
 
-Purpose. Single source of truth for engine and release identity. Values are initialized once per cut and are read-only thereafter; all public and operator surfaces consume via helpers (no direct env reads at emit time).
+Purpose. Single production source of truth for engine and release identity. Production values are initialized once per cut, are read-only thereafter, and are consumed by production public and operator surfaces through the identity helpers. Production emit paths perform no direct identity environment reads.
+
+Bounded compatibility identity (normative). A stable compatibility identity profile MAY exist for explicitly non-production compatibility and development harnesses. It is not a second production identity authority and MUST NOT supply production public or operator surfaces.
+
+Injected-emitter seam (normative). Reader-emission helpers MAY accept identity keywords only as a sanctioned adapter or test-composition seam. Production defaults MUST originate from `identity_meta()`. Request data and environment identity keys MUST NOT select or mutate production identity at emit time.
 
 ## **13.1 Fields (read-only after freeze; stable key order)**
 
 Expose and persist exactly these fields; no extras:
 
-* engine\_tag — opaque engine identity string pinned at build.
-
-* build\_commit — VCS short SHA for bundled repo head at cut time (optional on public/ops; may be unset).
-
-* invocation\_tag — canonical short tag for the current Invocation (public meta carries the tag only).
-
-* invocation\_sha256 — SHA-256 of the canonical Invocation text/bytes captured at cut (stable per cut; evidence/admin use; not added to public meta).
-
-* emitter\_sha256 — SHA-256 over the allow-listed presenter/emitter source captured at cut (evidence/admin; not public).
-
+* engine\_tag — opaque engine identity string pinned at build.  
+* build\_commit — VCS short SHA for bundled repo head at cut time (optional on public/ops; may be unset).  
+* invocation\_tag — canonical short tag for the current Invocation (public meta carries the tag only).  
+* invocation\_sha256 — SHA-256 of the UTF-8 bytes of `invocation_tag`, recomputed and verified against the governed Invocation record at evidence-generation time.  
+* emitter\_sha256 — SHA-256 over the allow-listed presenter/emitter source captured at cut (evidence/admin; not public).  
 * release\_id — lowercase hex-64 of sha256(canonical\_bytes("catalog/manifest.json")) computed at freeze-pack.
 
-Source of truth (titles-only): release\_id derives only from the PF-12 pack manifest; Invocation tag/bytes come from the Invocation registry; engine\_tag, build\_commit, emitter\_sha256, and invocation\_sha256 are taken from the build snapshot at cut. No request-time hashing.
+Source of truth (titles-only): release\_id derives only from the PF-12 pack manifest; Invocation tag and digest come from the governed Invocation record, with the digest recomputed from the UTF-8 tag bytes; engine\_tag, build\_commit, and emitter\_sha256 are taken from the build snapshot at cut. No request-time hashing.
 
 ## **13.2 Accessors**
 
-* identity\_meta() → {"engine\_tag","invocation\_tag"} — inserted into the public envelope before idempotence hashing (PF-01 §3.2).
-
+* identity\_meta() → {"engine\_tag","invocation\_tag","release\_id"} — inserted into the public envelope before idempotence hashing (PF-01 §3.2).  
 * identity\_admin() → {"engine\_tag","release\_id","invocation\_tag","invocation\_sha256","build\_commit","emitter\_sha256"} — for internal/admin surfaces (e.g., /internal/version, evidence capture).
 
-## **13.3 Flow & constraints**
+  ## **13.3 Flow & constraints**
 
-* Fetch-only module. Presenter (Reader) and CLI call this module’s helpers; no direct env reads at emit time; no mutation after freeze.
+* Production authority. Production Presenter, Reader, CLI, and operator consumers call the production identity helpers; they do not read identity values directly from environment variables, request data, or flags.  
+* Compatibility domain. Explicitly non-production compatibility and development harnesses MAY consume the bounded compatibility identity profile. That profile MUST NOT be presented as production identity or used to redefine release identity.  
+* Injected-emitter composition. Adapter and test composition MAY provide explicit identity keyword values to the Reader-emission helper. Omitted values MUST resolve through `identity_meta()`. This seam MUST NOT perform request-controlled or environment-controlled identity discovery.  
+* Preimage coupling. identity\_meta() enters the public preimage before idempotence\_hash is computed (PF-01 §3.2).  
+* Evidence coupling. The same production values flow into artifacts and audit evidence (titles-only); do not duplicate identity bytes in prose or ad-hoc files.
 
-* Preimage coupling. identity\_meta() enters the five-key preimage (public path) before idempotence\_hash is computed (PF-01 §3.2).
+  ## **13.4 Prohibited**
 
-* Evidence coupling. The same values flow into artifacts and audit evidence (titles-only); do not duplicate identity bytes in prose or ad-hoc files.
+* No recomputation of release\_id during request handling.  
+* No branching semantics for release identity. If any operator surface implements a fallback path (for example, when a precomputed release-id artifact is unavailable), that fallback MUST still use the single definition: release\_id \= sha256(canonical\_bytes(catalog/manifest.json)). The hash input MUST be canonical manifest bytes (serializer-backed), not raw or non-canonical bytes, and MUST NOT create alternate release-identity semantics.  
+* No mutation of production identity fields after freeze.  
+* No alternative production identity sources from environment variables, flags, request data, or compatibility defaults on production public or operator paths.  
+* No promotion of the bounded compatibility identity or injected-emitter seam into a second production identity authority.  
+* No request-time hashing for emitter\_sha256 or invocation\_sha256.
 
-## **13.4 Prohibited**
+  ## **13.5 Acceptance (binary; titles-only)**
 
-* No recomputation of release\_id during request handling.
+* Two-run identity: two separately materialized collections from the production identity authority yield bitwise-identical canonical bytes.  
+* release\_id recompute: equals sha256(canonical manifest bytes); recompute job passes.  
+* Reader↔CLI parity: public bodies include identity\_meta() and remain byte-identical.  
+* Emitter/Invocation identities: recorded emitter\_sha256 matches its build-time evidence capture, and invocation\_sha256 equals SHA-256 of the UTF-8 invocation-tag bytes recorded in the governed Invocation record.  
+* Domain separation: production surfaces resolve through the production authority; the bounded compatibility profile remains confined to explicitly non-production compatibility and development harnesses.  
+* Injection posture: omitted Reader-emission identity keywords resolve through production identity helpers, while explicit injection remains a bounded adapter or test-composition seam.
 
-* No branching semantics for release identity. If any operator surface implements a fallback path (for example, when a precomputed release-id artifact is unavailable), that fallback MUST still use the single definition: release\_id \= sha256(canonical\_bytes(catalog/manifest.json)). The hash input MUST be canonical manifest bytes (serializer-backed), not raw or non-canonical bytes, and MUST NOT create an alternate release identity semantics.
-
-* No mutation of identity fields after freeze.
-
-* No alternative sources (env vars, flags) on public paths.
-
-* No request-time hashing for emitter\_sha256 or invocation\_sha256. Compute at build only.
-
-## **13.5 Acceptance (binary; titles-only)**
-
-* Two-run identity: repeated emits with identical inputs yield bitwise-identical bytes (one LF).
-
-* release\_id recompute: equals sha256(canonical manifest bytes); recompute job passes.
-
-* Reader↔CLI parity: public bodies include identity\_meta() and remain byte-identical.
-
-* Emitter/Invocation identities: recorded emitter\_sha256 and invocation\_sha256 match their build-time evidence captures.
-
-## **13.6 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+  ## **13.6 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
 
 Scope (normative). Identity artifacts are records-only and MUST be listed by title/path in Appendix D: Evidence Index and mirrored 1:1 in artifacts/evidence\_index.jsonl. Mirror records are canonical JSONL (UTF-8, no BOM; sorted keys; compact; exactly one trailing \\n) and include: artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor. Update the human Index and mirror in the same commit/PR; CI fails on mismatch or missing path-proofs. All captures run with LC\_ALL=C, LANG=C, TZ=UTC.
 
+Independent two-run collection (normative). The identity provenance job MUST call the production identity authority separately for run 1 and run 2, canonicalize each complete result independently, and compare the resulting bytes before reporting PASS. Reusing one materialized byte string as both runs is insufficient.
+
+Identity dependency closure (normative). Production identity authority, public and admin helpers, Reader, CLI, internal-version consumers, identity provenance primaries, release-id recomputation, and their directly dependent governed evidence form one dependency closure. A change to identity semantics or bytes MUST regenerate and recheck every affected consumer, primary artifact, Human Index entry, Machine Mirror record, checksum, and path proof before the identity family may report PASS.
+
 Artifact keys (titles-only):
 
-* pack/manifest — canonical manifest bytes (freeze pack).
-
-* identity/release\_id — frozen release\_id (64-hex).
-
-* identity/release\_id\_recompute — recompute proof log (on-disk equals canonical; sha256 over canonical bytes).
-
-* identity/emitter\_sha256 — presenter/emitter source hash (proves single shared emitter).
-
-* identity/invocation\_sha256 — invocation canonical-bytes hash (admin provenance).
-
-* identity/service\_identity — admin snapshot of identity fields (JSON; LF-terminated; numeric-free).
-
-* parity/two\_run\_identity — two-run identity digest/log (byte-equal outputs; LF-terminated).
+* pack/manifest — canonical manifest bytes (freeze pack).  
+* identity/release\_id — frozen release\_id (64-hex).  
+* identity/release\_id\_recompute — recompute proof log (on-disk equals canonical; sha256 over canonical bytes).  
+* identity/emitter\_sha256 — presenter/emitter source hash (proves single shared emitter).  
+* identity/invocation\_sha256 — verified digest of the UTF-8 invocation-tag bytes from the governed Invocation record.  
+* identity/service\_identity — admin snapshot of production identity fields (JSON; LF-terminated; numeric-free).  
+* parity/two\_run\_identity — independent two-run identity digest/log (byte-equal outputs; LF-terminated).
 
 Mirror discipline (MUST):
 
-* One JSON object per line; reject unknown keys in mirror records.
-
-* (artifact\_key, discovered\_physical\_path) in the mirror equals (title, path) in the human Index (strict 1:1 join).
-
+* One JSON object per line; reject unknown keys in mirror records.  
+* (artifact\_key, discovered\_physical\_path) in the mirror equals (title, path) in the human Index (strict 1:1 join).  
 * A path\_proof.txt (or equivalent) is stored alongside each artifact and referenced by proof\_anchor.
 
 Routing (titles-only):
 
-* Pack/manifest & release\_id: HDE-Schemas and Artifacts §6.
-
-* Invocation & preimage rules: HDE-Math-Spec §3.
-
+* Pack/manifest & release\_id: HDE-Schemas and Artifacts §6.  
+* Invocation & preimage rules: HDE-Math-Spec §3.  
 * Transport ops surface: §14 Internal Meta Surface (policy owned by HDE-Governance).
 
 # 14\) Internal Meta Surface \[Required-Now\]
@@ -4371,15 +4384,49 @@ Evidence (records-only). artifacts/bodygraph/source\_selection.snapshot.json cap
 
 Canonical JSON (UTF-8, no BOM; sorted keys; compact; exactly one trailing \\n); unknown keys are rejected.
 
-Source invariance (single presenter/emitter). For the same normalized inputs, DB-sourced and vendor-sourced bodies MUST be byte-identical when emitted via the shared presenter/emitter.
+Source-neutral projection boundary (normative). DB-sourced mapped-cache data and configured-v2 vendor data MUST converge through one pure projection of already-mapped HDE data before emission through the shared Presenter.
 
-Proofs live under artifacts/bodygraph/source\_invariance/ as at least:
+The projection MUST:
 
-* ab.json — DB body (reference side)
+* accept mapped HDE data only and reject raw vendor envelopes;  
+* deep-copy accepted input without mutating its caller-owned source;  
+* produce exactly `bodygraph`, `person`, and `person_uid` at the top level;  
+* produce exactly `authority`, `birthDateUtc`, `centers`, `channelsLong`, `channelsShort`, `definition`, `gates`, `profile`, `strategy`, and `type` inside `bodygraph`;  
+* require the top-level and nested person UIDs to agree;  
+* remove the permitted source label and recursively reject transport, vendor, request, response, credential, header, raw-payload, database, SQL, token, and secret metadata;  
+* fail with stable value-free classifications for missing fields, unknown fields, UID mismatch, invalid shape, and unsafe fields; and  
+* perform no network, database, filesystem, clock, environment, random, logging, serialization, or persistence work.
 
-* ba.json — vendor body for the same inputs
+The existing Presenter remains the sole byte authority. Projected values MUST be emitted through the shared Presenter. The projection MUST NOT create a second adapter, emitter, serializer, public route, transport contract, production identity, durable-write authorization, or public Reader change.
 
-* summary.json — summary (attempts, sha256 digests, ab\_ba\_equal: true on success)
+Source invariance (single presenter/emitter). For the same normalized input, independently acquired DB and configured-v2 vendor representations MUST produce equal source-neutral projections and byte-identical output through the shared Presenter.
+
+The focused BodyGraph policy producer is the sole active primary writer for this source-invariance family. The governed primary paths remain:
+
+* artifacts/bodygraph/source\_invariance/ab.json — DB-first run record using the v2 run schema.  
+* artifacts/bodygraph/source\_invariance/ba.json — vendor-first run record using the v2 run schema.  
+* artifacts/bodygraph/source\_invariance/summary.json — v2 summary and negative-control receipt.
+
+A valid source-invariance PASS MUST derive all of the following from current inputs and outputs:
+
+* distinct DB and vendor source identities;  
+* distinct canonical source-representation hashes;  
+* one equal normalized-input SHA-256;  
+* two independently materialized runs for each source, each reopening, deserializing, mapping or projecting, and emitting independently;  
+* stable projection and emitted-byte hashes across both runs for each source;  
+* equal source-neutral projections;  
+* byte-identical shared-Presenter output;  
+* reversed DB/vendor acquisition order between AB and BA;  
+* absence of unsafe fields;  
+* closed-schema validation with unknown fields rejected;  
+* canonical UTF-8 JSON with sorted keys, compact separators, no BOM, and exactly one trailing LF; and  
+* a required negative receipt proving that mutation of the governed DB BodyGraph profile field produces `BODYGRAPH_SOURCE_DIVERGENCE` without embedding raw values.
+
+Top-level PASS and every subordinate run status MUST be derived from the current predicates. Constants, copied claims, label comparisons, parsed-object equality in place of required byte equality, one materialization hashed twice, missing negative controls, duplicate current keys, stale companions, or a partial v1/v2 migration MUST fail closed.
+
+`BG_SOURCE_INVARIANCE_OK` remains a non-token proof label. This mechanics family does not mint or satisfy an acceptance token.
+
+Primary producers MUST NOT write sibling path proofs, the Human Evidence Index, the Machine Mirror, checksum sentinels, or topology/index companions. Those outputs remain owned by the canonical evidence updater and MUST be refreshed only after the final source-invariance primaries and release binding are stable.
 
 Live vendor transport proofs (open-rails QA vs offline tests). For epics whose D-goals or QA acceptance explicitly require live vendor activity (for example, “prove that at least one flow hits the live vendor under open rails”), Mechanics adds the following mechanical requirements on top of the policy and evidence in this section.
 
