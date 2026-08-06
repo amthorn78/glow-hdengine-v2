@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.7.8
+**Version:** v2.8
 
 **Status:** Canon
 
-**Effective date:** 2026-07-09
+**Effective date:** 2026-08-06
 
-**Last Update Gate:** BN 12.1.7 A10-13
+**Last Update Gate:** BN 12.6.2 A1-6
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -4946,10 +4946,34 @@ Each primary artifact above MUST have a sibling .path\_proof.txt transcript stor
 * `artifacts/db/partition_plan.txt`  
 * `artifacts/db/db_rw_smoke.log` (optional)
 
-##### Runtime and environment
+  ##### **Runtime and environment**
 
-* `artifacts/runtime/env_matrix.snapshot.json`: singleton snapshot with schema\_version: 3, default rails and determinism pins, and presence booleans for DB, bridge, and guard. Schema is owned by §8.3.2; tokens are routed by title to Governance.  
-* `artifacts/runtime/env_connectivity.snapshot.json`: dev resolver snapshot that records attempts and selected source on fallback.
+* `artifacts/runtime/env_matrix.snapshot.json`: singleton snapshot with `schema_version: 3`, default rails and determinism pins, and presence booleans only for DB, bridge, and guard configuration. Secret values MUST NOT appear. `tools/evidence/generate_env_matrix_snapshot.py` is the sole primary producer. Its check mode is read-only and MUST reject missing, noncanonical, non-v3, or drifted bytes.  
+* `artifacts/runtime/env_connectivity.snapshot.json`: retained historical bridge and OPS evidence. Its governed bytes, path proof, Human Evidence Index binding, and Machine Evidence Mirror binding remain intact, but it MUST NOT prove current bridge availability, runtime support, fallback, provider parity, consistency, current OPS PASS, or token satisfaction.
+
+  ##### **HDE-EPIC038 PR-01 production identity and provenance evidence**
+
+The accepted capture family consists of these exact key/path bindings:
+
+* `epic038.pr01.service_identity` → `artifacts/identity/service_identity.json`. The artifact is canonical JSON with exactly `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, and `release_id`, and no extra fields.  
+* `epic038.pr01.emitter_sha256` → `artifacts/identity/emitter_sha256.txt`.  
+* `epic038.pr01.invocation_sha256` → `artifacts/identity/invocation_sha256.txt`.  
+* `epic038.pr01.identity_release_id` → `artifacts/identity/release_id.json`.  
+* `epic038.pr01.identity_release_id_recompute` → `artifacts/identity/release_id_recompute.log`.  
+* `epic038.pr01.two_run_identity` → `artifacts/identity/two_run_identity.log`.
+
+`tools/evidence/generate_identity_provenance.py` owns deterministic materialization and read-only checking of this six-artifact family. The service-identity artifact MUST satisfy the six-field contract, and the two-run artifact MUST be based on independently collected runs rather than one captured value reused twice.
+
+`artifacts/identity/release_id.json` and `artifacts/identity/release_id_recompute.log` are frozen historical capture evidence. They MUST NOT be refreshed or relabeled as current release equality or current attestation. Current runtime release identity is derived directly from the canonical packaged bytes of `catalog/manifest.json`; current release provenance belongs to external attestation.
+
+The bounded-development identity proof surfaces are:
+
+* `conjunction.writer.write_readback` → `artifacts/writer/conjunction_write_readback.log`; and  
+* `conjunction.writer.summary` → `artifacts/writer/conjunction_writer_summary.json`.
+
+Their `writer_dev_identity` and `reader_dev_identity` predicates are development evidence only. They do not create a second production identity authority.
+
+Every promoted primary in this family MUST retain exactly one Human Evidence Index binding, one matching Machine Evidence Mirror binding, a sibling path proof, and coherent checksum companions under the updater-owned evidence workflow.
 
 ##### Ops and refusal (closed-rails)
 
@@ -4992,6 +5016,31 @@ These INTVER\_\* families are the governed surfaces for the /internal/version id
 #### 8.6.3.5 Presenter evidence
 
 These entries register the presenter evidence families introduced by HDE-EPIC020 D2 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section: UTF-8, sorted keys, compact separators, exactly one trailing LF for JSON artifacts, governed paths only, and path-proofs plus Index/Mirror parity per §8.3 to §8.6. PF12 binds these families to D2 tokens by artifact\_key and path only. Token semantics remain in HDE-Governance and Glow QA Guide by title. Shared family rule. For each presenter family below, the Human Evidence Index MUST contain at least one entry per artifact\_key with discovered\_physical\_path pointing to the governed artifact path under artifacts/presenter/\*\*. docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any presenter artifact. The Machine Evidence Mirror MUST contain canonical JSONL records for each governed presenter artifact and schema using the exact artifact\_key names below and the minimum Mirror record schema in §8.3.
+
+**HDE-EPIC038 PR-04 Presenter evidence.**
+
+Shared Presenter history:
+
+* Primary: `presenter.bodygraph.json_canon_compare` → `artifacts/presenter/json_canon_compare.log`.  
+* Immutable source fixture: `tools/evidence/fixtures/presenter/json_canon_compare.history.v1.json`, schema `presenter.history_source.v1`. The fixture is generator input and has no Machine Evidence Mirror key.  
+* Sole primary producer: `tools/evidence/generate_presenter_history.py`.  
+* Ordered record IDs: `epic011_s10_rails_closed_match`, `epic011_s10_diff`, `epic011_live_match_a`, and `epic011_live_match_b`.  
+* Canonical output: exactly four LF-terminated JSONL rows, 1559 bytes, SHA-256 `64980228d042249a10ecc89ebddcff00be27aae9c79ba2330a24a28b0c59676c`.
+
+Materialization MUST validate the closed fixture shape, exact record count and order, unique IDs, row hashes, output length, and output hash before replacing the destination atomically. Check mode is read-only and MUST reject missing, extra, changed, noncanonical, provisional, replay-constant, wall-clock-derived, or wrong-order rows.
+
+Historical DB/bridge Presenter receipt:
+
+* Primary: `epic038.pr04.presenter_db_bridge_compare` → `artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json`.  
+* Schema ID: `presenter.db_bridge_compare.v1`.  
+* Schema: `epic038.pr04.presenter_db_bridge_compare_schema` → `schemas/presenter_db_bridge_compare.v1.json`.  
+* Historical producer provenance: `tools/evidence/generate_db_bridge_parity.py`.
+
+The receipt and its schema are retained historical bridge evidence. Their bytes, hashes, path proofs, Human Evidence Index bindings, and Machine Evidence Mirror bindings MUST be preserved, but they MUST NOT be regenerated through a retired bridge or used to prove current bridge availability, fallback, provider parity, consistency, current OPS PASS, or token satisfaction. The receipt is not BodyGraph source-invariance truth and is not a BodyGraph release-binding input.
+
+Each Presenter primary and governed schema MUST have exactly one current key/path binding. PR-specific duplicate aliases are prohibited. Sibling path proofs, the Human Evidence Index, its hash sentinel, the Machine Evidence Mirror, its checksum, orientation/index companions, and their proofs remain solely updater-owned.
+
+The HDE-EPIC020 Presenter families below remain governed as written.
 
 * `PRESENTER_IDENTITY_SUMMARY_V1` — `presenter identity summary`. Canonical JSON summary for showcompat identity. Example path: a JSON file under artifacts/presenter/, for example artifacts/presenter/showcompat\_identity\_summary.json. Schema: an engine/presenter evidence schema under docs/schemas/\*\*. Mirror role: snapshot.  
 * `PRESENTER_PREIMAGE_RECOMPUTE_V1` — `presenter preimage recompute log`. Preimage recompute evidence for presenter and Reader envelopes. Example path: a log file under artifacts/presenter/, for example artifacts/presenter/preimage\_recompute.log. Mirror role: log.  
@@ -5125,16 +5174,53 @@ Names-only projection of governed Magic-10 config, band-edges config, full chann
 * Path: JSON file under artifacts/config\_bundles/, exact filename pinned by the bundle generator and tests.  
 * Path-proof: a sibling \<bundle\_file\>.path\_proof.txt transcript stored alongside the bundle file in the same directory. **Mirror record.** artifact\_key:"config\_bundle.be", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
 
-##### BodyGraph adapter data-source and invariance
+##### **BodyGraph adapter data-source and invariance**
+
+**Governed primaries and schemas.**
 
 * `artifacts/bodygraph/source_selection.snapshot.json`  
-* `artifacts/bodygraph/source_invariance/ab.json`  
-* `artifacts/bodygraph/source_invariance/ba.json`  
-* `artifacts/bodygraph/source_invariance/summary.json`  
-* `artifacts/bodygraph/release_bindings.json`  
+* `bodygraph.source_invariance.ab` → `artifacts/bodygraph/source_invariance/ab.json`; validates against `bodygraph.source_invariance.run.v2`.  
+* `bodygraph.source_invariance.ba` → `artifacts/bodygraph/source_invariance/ba.json`; validates against `bodygraph.source_invariance.run.v2`.  
+* `bodygraph.source_invariance.summary` → `artifacts/bodygraph/source_invariance/summary.json`; validates against `bodygraph.source_invariance.summary.v2`.  
+* `bodygraph.source_invariance.schema.run.v2` → `schemas/bodygraph_source_invariance.run.v2.json`; JSON Schema 2020-12.  
+* `bodygraph.source_invariance.schema.summary.v2` → `schemas/bodygraph_source_invariance.summary.v2.json`; JSON Schema 2020-12.  
+* `epic038.pr01.bodygraph_release_bindings` → `artifacts/bodygraph/release_bindings.json`.  
 * `artifacts/bodygraph/refresh_policy.snapshot.json`  
 * `artifacts/bodygraph/metrics.snapshot.json`  
 * `artifacts/bodygraph/keys_only.logs.sample`
+
+`tools/evidence/generate_bodygraph_policy_proofs.py` is the sole primary producer. The three established source-invariance paths above are the current family. Duplicate PR-specific keys and v1 records MUST NOT be retained as current alternatives.
+
+**Decisive source-invariance contract.**
+
+A valid PASS requires all of the following:
+
+* distinct DB and vendor sources;  
+* distinct canonical source-representation hashes;  
+* the same canonical normalized-input SHA-256;  
+* two independently materialized runs per source, each reopening, deserializing, mapping or projecting, and emitting independently;  
+* stable projected hashes and Presenter-emitted hashes across both runs;  
+* equal source-neutral projections;  
+* byte-identical output from the shared Presenter;  
+* unsafe-field absence;  
+* reversed AB and BA source order;  
+* closed JSON Schema validation with `additionalProperties: false` at every object level;  
+* canonical UTF-8 JSON with sorted keys, compact separators, no BOM, and exactly one trailing LF; and  
+* a negative mutation receipt proving that a DB `bodygraph.profile` mutation produces `BODYGRAPH_SOURCE_DIVERGENCE` without embedding raw values.
+
+`top_level_pass` and every run status MUST be derived from the current predicates. Constants, copied claims, label comparisons, parsed-object equality, or one materialization hashed twice do not satisfy this contract. `BG_SOURCE_INVARIANCE_OK` remains a `non_token`; this family does not mint or satisfy an acceptance token.
+
+**Release binding.**
+
+`artifacts/bodygraph/release_bindings.json` retains schema version 1 and its established key. Its binding set MUST contain exactly these ASCII-sorted paths:
+
+* `artifacts/bodygraph/refresh_policy.snapshot.json`  
+* `artifacts/bodygraph/source_invariance/summary.json`  
+* `artifacts/bodygraph/source_selection.snapshot.json`
+
+The historical DB/bridge Presenter receipt is not BodyGraph source-invariance truth and MUST NOT be included in this release binding.
+
+All sibling path proofs, Human Evidence Index rows, Machine Evidence Mirror rows, checksum sentinels, mirror checksum, orientation/index companions, and their proofs remain owned by `tools/evidence/update_evidence_index.py`. Primary producers MUST NOT write those companions. Missing sources, reused acquisition, v1 records, duplicate current keys, missing negative evidence, noncanonical bytes, unknown fields, stale release bindings, or stale companions fail closed.
 
 #### 8.6.3.10 HDAPI v2 vendor contract and adapter-conformance evidence
 
@@ -8260,11 +8346,23 @@ epic032.pr04.ops01.provider\_parity\_closure\_decision — HDE-EPIC032 OPS-01 pr
 
 bodygraph\_source\_selection — Source selection snapshot (names-only; no PII). (path: artifacts/bodygraph/source\_selection.snapshot.json)
 
-bodygraph\_invariance\_ab — Provider/source invariance proof (A→B). (path: artifacts/bodygraph/source\_invariance/ab.json)
+bodygraph\_invariance\_ab — Current source-invariance v2 A→B primary; key `bodygraph.source_invariance.ab`; schema `bodygraph.source_invariance.run.v2`. (path: artifacts/bodygraph/source\_invariance/ab.json)
 
-bodygraph\_invariance\_ba — Provider/source invariance proof (B→A). (path: artifacts/bodygraph/source\_invariance/ba.json)
+bodygraph\_invariance\_ba — Current source-invariance v2 B→A primary; key `bodygraph.source_invariance.ba`; schema `bodygraph.source_invariance.run.v2`. (path: artifacts/bodygraph/source\_invariance/ba.json)
 
-bodygraph\_invariance\_summary — Summary of invariance checks. (path: artifacts/bodygraph/source\_invariance/summary.json)
+bodygraph\_invariance\_summary — Current source-invariance v2 summary; key `bodygraph.source_invariance.summary`; schema `bodygraph.source_invariance.summary.v2`. (path: artifacts/bodygraph/source\_invariance/summary.json)
+
+bodygraph\_invariance\_run\_schema — Closed JSON Schema 2020-12 for source-invariance run primaries; key `bodygraph.source_invariance.schema.run.v2`. (path: schemas/bodygraph\_source\_invariance.run.v2.json)
+
+bodygraph\_invariance\_summary\_schema — Closed JSON Schema 2020-12 for the source-invariance summary; key `bodygraph.source_invariance.schema.summary.v2`. (path: schemas/bodygraph\_source\_invariance.summary.v2.json)
+
+bodygraph\_release\_bindings — Schema-version-1 BodyGraph release binding with the exact source-selection, source-invariance-summary, and refresh-policy binding set; key `epic038.pr01.bodygraph_release_bindings`. (path: artifacts/bodygraph/release\_bindings.json)
+
+presenter.bodygraph.json\_canon\_compare — Canonical four-row shared Presenter-history JSONL; sole current key for this path. (path: artifacts/presenter/json\_canon\_compare.log)
+
+epic038.pr04.presenter\_db\_bridge\_compare — Retained historical DB/bridge Presenter receipt; not current bridge or BodyGraph release-binding evidence. (path: artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json)
+
+epic038.pr04.presenter\_db\_bridge\_compare\_schema — Retained historical schema for the DB/bridge Presenter receipt; schema ID `presenter.db_bridge_compare.v1`. (path: schemas/presenter\_db\_bridge\_compare.v1.json)
 
 close\_pack\_report — EPIC close-out report (scope, tokens PASS roster, merged SHAs). (path pattern: audit/EPIC-\<NNN\>\_close\_report.md)
 
