@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.5
+**Version:** v3.4.6
 
 **Status:** Canon  
 **Effective date:** 2026-08-06
 
-**Last Update Gate:** BN 12.6.2 A7-21  
+**Last Update Gate:** BN 12.6.2 A22-27  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -5573,6 +5573,10 @@ Purpose (normative). Capture the exact production start command and prove the ap
 Start-command capture (records-only). Capture the exact launch command line used in production (no secrets). Store as canonical text (UTF-8; exactly one trailing \\n). (Evidence path listed in §36.)
 
 Factory binding to $PORT. Prove the service initializes via the factory adapter.factory:create\_app() (titles only) and binds to $PORT from the environment (no hard-coded port).
+
+Selected-factory route inventory. The factory selected by the production start command and documented local launchers MUST register the Reader blueprint and the existing `compat_blueprint`. Its mounted route inventory MUST include `GET /reader`, `GET /internal/version`, and `POST /api/compat/v1`. The compatibility route remains an existing `internal_admin` surface. This mechanic creates no new route, handler, payload, public contract, HTTP home, or launcher target.
+
+Route-mount parity proof. Compatibility contract and parity coverage MUST exercise that selected factory. Mechanics evidence MUST record the selected factory and its mounted blueprint and route inventory against the Endpoint Catalog and HDE Architecture adapter responsibilities. Checks MUST fail closed if either required blueprint registration or any assigned route is absent. Alternate development or wrapper factories MUST NOT mask an omission from the selected factory.
 
 Runtime pins (minimal). Record PORT, APP\_ENV, and identity pins required for traceability as a keys-only text snapshot (UTF-8; one \\n). (Evidence path listed in §36.)
 
