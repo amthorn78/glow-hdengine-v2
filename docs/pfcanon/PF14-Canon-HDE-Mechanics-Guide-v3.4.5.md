@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.4
+**Version:** v3.4.5
 
 **Status:** Canon  
-**Effective date:** 2026-08-05
+**Effective date:** 2026-08-06
 
-**Last Update Gate:** BN 12.6.2 A1-6  
+**Last Update Gate:** BN 12.6.2 A7-21  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -214,12 +214,23 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
 * BodyGraph resolver route-policy classification. `bg:resolve --source vendor` is a BodyGraph resolver workflow, not the canonical v2 chart/geokey validation path.  
 * For configured v2 vendor bases, `bg:resolve --source vendor --dry-run` MAY use the version-neutral `charts` route and deterministic v2 ChartResult adapter to produce mapped HDE BodyGraph/person/cache/compat evidence without writing DB rows.  
-* For configured v2 vendor bases, non-dry-run mapped-cache writes MUST fail closed until a separately scoped mapped-cache persistence implementation and evidence chain exists.  
+* For configured v2 vendor bases, a non-dry-run mapped-cache write MAY proceed only through the bounded persistence path. The caller MUST provide explicit `--upsert` intent, rails MUST be open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`), and both the requested environment and process environment MUST be non-production. `prod`, `production`, and `live` MUST fail closed before vendor or database I/O.  
 * Non-v2 configured bases MAY preserve explicit legacy BodyGraph fallback only as a legacy route-family posture with `HD-Api-Key` auth, governed geokey handling, and no v2 BodyGraph-detail compatibility claim.  
 * Dual-route behavior is not implemented by this mechanics posture. Any future dual-route, v2 chart-backed BodyGraph-detail, or v2-to-internal BodyGraph/person/cache mapping behavior requires a future ADR or owning-canon decision before PF14 may treat it as a supported mechanic.  
 * Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
 * Map the standard v2 response envelope into HDE internal structures only after the mapping is proven.  
 * Preserve the distinction between response-envelope proof, adapter proof, resolver dry-run proof, compat proof, durable cache-persistence proof, and production-write authorization proof.  
+* HDE-EPIC037-style mapped dry-run proof may support scoped BodyGraph/person/cache/compat evidence flows. It does not by itself prove durable BodyGraph cache persistence, production writes, production upsert authorization, public Reader changes, new public routes, app-side HumanDesignAPI ownership, or broad HumanDesignAPI v2 platform conformance.  
+* `ChartResult` StandardResponse data MUST NOT be persisted directly as reusable user data. The bounded persistence owner MUST accept adapter-mapped HDE data only, apply the pure source-neutral BodyGraph projection before persistence, and write no raw vendor envelope, raw request body, raw response body, transport metadata, or credential material.  
+* `ChartSimpleResult` MAY be used for bounded live smoke, auth/geokey proof, route-family confirmation, or provider availability proof only with explicit nonclaims for full BodyGraph detail unless it proves every required field.  
+* Configured-v2 mapped-cache persistence MUST use the existing BodyGraph store through the sanctioned `DBAccess` seam and one persistence owner. It MUST NOT create a second cache, database transport, public route, emitter, serializer, or durable-write authority.  
+* The persistence owner MUST project the mapped input before writing, read back the stored row, and compare canonical bytes for the governed BodyGraph, person, and person-identity fields.  
+* Repeated same-identity writes MUST be idempotent. After a successful initial insert, a second same-identity write MUST insert zero rows, identity cardinality MUST remain one, and canonical write/read-back equality MUST remain true.  
+* Local evidence MUST be generated from deterministic fixtures under hermetic rails. The proof producer MUST arm the complete lower-seam canary set, including database, vendor, socket, DNS, HTTP, and shared-log protections, so an unintended external call or shared-log mutation fails closed.  
+* Evidence writes MUST be failure-atomic. The focused producer MUST stage its bounded primary set before replacement, preserve the previous governed set on failure, remove temporary residue, and keep check mode read-only.  
+* The canonical evidence updater remains the sole owner of sibling path proofs, Human Index rows, Machine Mirror rows, and Index/Mirror hashes for this family. Feature producers MUST NOT write those companions.  
+* The bounded path and its local or OPS evidence do not authorize production writes, create QA PASS, satisfy an acceptance token, move PF09 status, or establish broad HumanDesignAPI v2 conformance.  
+* Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.  
 * HDE-EPIC037-style mapped dry-run proof may support scoped BodyGraph/person/cache/compat evidence flows. It does not by itself prove durable BodyGraph cache persistence, production writes, production upsert authorization, public Reader changes, new public routes, app-side HumanDesignAPI ownership, or broad HumanDesignAPI v2 platform conformance.  
 * `ChartResult` StandardResponse data MUST NOT be written into the durable BodyGraph cache as reusable user data until a bounded mapped-cache persistence slice proves adapter-mapped HDE data, write/read-back parity, idempotence, no raw v2 vendor envelope persistence, no raw request or response body persistence, closed-rails refusal preservation, and governed evidence loop updates.  
 * `ChartSimpleResult` MAY be used for bounded live smoke, auth/geokey proof, route-family confirmation, or provider availability proof only with explicit nonclaims for full BodyGraph detail unless it proves every required field.  
@@ -695,13 +706,23 @@ Other “env pins” snapshots may exist for other proof contexts, but they MUST
 
 This workflow makes the Evidence Index, Machine Mirror, ordering artifacts, sampler evidence, Engine Core evidence, and path-proofs move in lockstep and ensures that drift is caught early by CI, rather than after the fact.
 
-mtime\_utc semantics (routing only)  
-Evidence jobs that write or validate governed \*.path\_proof.txt MUST treat mtime\_utc and produced\_at\_utc according to the canonical semantics defined in HDE-Schemas & Artifacts (Machine Evidence Mirror / path-proof schema) and Glow QA Guide (evidence CI rails and mtime\_utc checks), summarised as:
+Portable path-proof semantics (routing only)  
+ Evidence jobs that write or validate governed \*.path\_proof.txt MUST apply the canonical path-proof schema and ownership rules defined in HDE-Schemas & Artifacts and Glow QA Guide. A governed path proof is correct when it has:
 
-* mtime\_utc is the refresh-time mtime for the artifact: a UTC ISO-8601 timestamp truncated to seconds, with microsecond \== 0, captured when the evidence job refreshes that artifact. It is not required to remain equal to future stat().st\_mtime values across clones, but CI checks MUST enforce that parsed\_mtime \<= current\_fs\_mtime at check time (monotone semantics).  
-* produced\_at\_utc is the logical evidence refresh time for the artifact (when the evidence job was run), also in UTC ISO-8601 form. For governed families such as sampler and Engine Core evidence, the artifact payload, mirror record, and path-proof transcript for a given artifact MUST agree on produced\_at\_utc for a given refresh; backdating or leaving mirror/proof produced\_at\_utc stale relative to the artifact’s refresh time is out of policy.
+* the exact governed path;  
+* the exact SHA-256 of the governed bytes;  
+* the exact byte size;  
+* all required companion fields;  
+* the canonical field structure; and  
+* valid UTC timestamp shapes.
 
-Mechanics does not redefine these semantics here; it routes to HDE-Schemas & Artifacts and the Glow QA Guide by title. The evidence change workflow in this section assumes that tools/evidence/update\_evidence\_index.py, tools/evidence/generate\_engine\_core\_evidence.py, ci/checks/check\_mirror\_schema.sh, sampler and Engine Core evidence generators, the sanity pipeline harness, the env-pins check, and the evidence tests are wired to these mtime\_utc and produced\_at\_utc rules and that any governed path-proofs they emit or validate satisfy the schema and monotone constraints pinned in those PF documents.
+mtime\_utc remains capture-time provenance and MAY seed a newly produced proof. Git does not preserve filesystem mtimes, so a later clone’s, cache restore’s, or CI checkout’s stat().st\_mtime is not an evidence input and MUST NOT be compared with the recorded mtime\_utc as a validity predicate.
+
+produced\_at\_utc remains the logical evidence-production time. Where an artifact payload, Machine Mirror record, and path-proof transcript carry produced\_at\_utc for the same refresh, those governed values MUST remain coherent under the owning schema.
+
+An unchanged proof whose path, SHA-256, size, required companion fields, canonical structure, and timestamp shapes remain valid MUST NOT be rewritten or re-timestamped merely to make a later checkout pass.
+
+The canonical updater remains the owner of updater-generated path proofs. Checks MUST detect path, hash, size, field, schema, or companion drift and MUST NOT hand-edit proofs, compare clone-local mtimes, or repair unrelated governed evidence during validation.
 
 ---
 
@@ -4565,7 +4586,7 @@ Determinism and environment. The refresh worker runs under the same determinism 
 
 # 20\) Persistence Layer (DB posture, partition & bridge) \[Required-Now\]
 
-Scope (normative). Database mechanics for schema identity, runtime posture, partition stance, and bridge parity. Artifact schemas and indexing live in HDE-Schemas & Artifacts; governance tokens live in HDE-Governance and the Build Notes. PF14 owns the mechanics that produce and prove the posture.
+Scope (normative). Database mechanics for schema identity, runtime posture, partition stance, direct-only provider selection, retired-transport enforcement, and current-versus-historical evidence separation. Artifact schemas and indexing live in HDE-Schemas & Artifacts; governance tokens live in HDE-Governance and the Build Notes. PF14 owns the mechanics that produce and prove the posture.
 
 ## **20.1 DB posture mechanics (build-time identity)**
 
@@ -4573,98 +4594,151 @@ Objective. Capture the runtime DB schema, roles/grants, and boundary view postur
 
 Mechanics MUST drive a posture harness that produces at least:
 
-* artifacts/db/ddl\_fingerprint.json — Normalized DDL snapshot of the runtime schema with stable ordering.
-
-* artifacts/db/grants.txt — Baseline roles/grants listing.
-
-* artifacts/db/check\_schema.txt — Schema/search\_path echo and verification.
-
-* artifacts/db/check\_constraints.txt — Constraint checks (including FK, uniqueness, and any invariants called out in canon).
-
+* artifacts/db/ddl\_fingerprint.json — Normalized DDL snapshot of the runtime schema with stable ordering.  
+* artifacts/db/grants.txt — Baseline roles/grants listing.  
+* artifacts/db/check\_schema.txt — Schema/search\_path echo and verification.  
+* artifacts/db/check\_constraints.txt — Constraint checks (including FK, uniqueness, and any invariants called out in canon).  
 * boundary\_view.readonly.proof — Proof artifact (path named in HDE-Schemas & Artifacts) that the boundary view is read-only and does not permit writes outside the HDE schema.
 
 Schema details for these artifacts live in HDE-Schemas & Artifacts; PF14 requires only that the mechanics harness drive them.
 
 All posture captures MUST:
 
-* Run with determinism pins LC\_ALL=C, LANG=C, TZ=UTC.
-
-* Produce canonical JSON/text where applicable (UTF-8; sorted keys; compact; exactly one trailing LF).
-
+* Run with determinism pins LC\_ALL=C, LANG=C, TZ=UTC.  
+* Produce canonical JSON/text where applicable (UTF-8; sorted keys; compact; exactly one trailing LF).  
 * Remain secret-free; logs and artifacts contain no credentials.
 
-## **20.2 Partition mechanics (EPIC-011)**
+  ## **20.2 Partition mechanics (EPIC-011)**
 
 Objective. Enforce EPIC-011’s non-deferred partition stance under standard artifact paths.
 
 The partition harness MUST produce:
 
-* artifacts/db/partition/partition\_plan.txt — Planned partition layout for HDE tables in scope.
-
+* artifacts/db/partition/partition\_plan.txt — Planned partition layout for HDE tables in scope.  
 * artifacts/db/partition/partition\_verify.log — Verification output showing that the live DB matches the plan.
 
 For EPIC-011 there is no “defer partition” posture: both a partition plan and a partition verify output are required. Token naming and semantics for partition acceptance are owned by HDE-Governance (titles-only); this guide records the mechanics expectations only.
 
-## **20.3 Bridge parity mechanics**
+## **20.3 Direct-only database selection mechanics**
 
-Objective. Prove parity between direct DB reads and bridge-mediated reads and capture env connectivity posture.
+Objective. Prove that `DATABASE_URL` and the Glow-owned psycopg provider form the sole active HDE database transport and that retired transport controls cannot select or restore bridge behavior.
 
-Mechanics MUST:
+Runtime selection (normative).
 
-* Drive a parity harness that emits (paths by title only):
+* `DATABASE_URL` is the sole canonical HDE database endpoint key.  
+* Direct PostgreSQL access through the Glow-owned psycopg provider is the sole selectable HDE database transport.  
+* `DBAccess` remains the sanctioned façade for database selection and operations, but it MUST expose no active bridge fallback, bridge forcing, bridge-production override, or alternate HTTP database transport.  
+* A configured direct endpoint is usable only under the applicable environment, rails, credential, and task-specific authorization controls.  
+* Missing, invalid, unavailable, or unauthorized direct access MUST fail closed without alternate-provider selection.  
+* No runtime path may open an HTTP request to a database bridge, synthesize a bridge URL, infer another endpoint, or recreate `pg-bridge` as an undocumented compatibility service.
 
-  * artifacts/bodygraph/vendor\_upsert.\<alias\>.json — vendor upsert transcript for a chosen alias.
+The names-only retired-key roster is exactly:
 
-  * artifacts/bodygraph/db\_resolve.\<alias\>.json — DB resolve transcript for the same alias.
+* `DB_ALLOW_BRIDGE_IN_PROD`  
+* `DB_BRIDGE_URL`  
+* `DB_FORCE_BRIDGE`
 
-  * artifacts/presenter/json\_canon\_compare.log — canonical JSON compare proving structural equality of the two bodies.
+Presence of any retired key, including an empty value, is configuration drift. Selection MUST fail with stable names-only `RetiredBridgeConfiguration` / `retired_bridge_configuration` posture before provider construction, direct endpoint use, or external I/O. A retired value MUST NOT be printed, retained, hashed into evidence, or silently ignored while success is reported.
 
-* Ensure that, in the same change window as parity captures, an env connectivity snapshot is produced:
+Direct selection MUST distinguish these outcomes:
 
-  * artifacts/runtime/env\_connectivity.snapshot.json — dev-only, names-only snapshot showing how DB connectivity was resolved (schema in HDE-Schemas & Artifacts).
+* Healthy direct selection makes one successful psycopg attempt and selects `psycopg`.  
+* Missing `DATABASE_URL` makes one skipped psycopg attempt and fails with `PrimaryUnavailable` / `missing_database_url`.  
+* Unavailable direct PostgreSQL makes one errored psycopg attempt and fails with `PrimaryUnavailable` / `primary_connect_failed`.  
+* Retired-key presence makes zero provider attempts and fails with `RetiredBridgeConfiguration` / `retired_bridge_configuration`.
 
-Bridge parity and env connectivity artifacts are indexed via HDE-Schemas & Artifacts; PF14 requires only that the mechanics jobs produce them.
+Alternate-transport attempts MUST equal zero in every passing proof case.
 
-Acceptance impact and proof-label posture. No new tokens are introduced here. This section clarifies the mechanics expected by existing DB posture/partition/bridge acceptance in HDE-Governance and infrastructure documents (titles-only), without enumerating token names. Provider parity, bridge capability, and non-dev bridge fallback mechanics MAY be collected, indexed, and reviewed as governed proof obligations without acceptance-token semantics. PR summaries, OPS evidence, QA logs, acceptance maps, token-evidence matrices, closeout artifacts, and indexed DB posture or bridge evidence MUST NOT treat those proof labels as satisfied acceptance tokens unless the exact token names are admitted by HDE-Governance or a later live Build Notes addendum.
+DDL truth for this family is projection-only under `hde.ddl_identity_projection.v1`. A direct-posture proof MUST NOT present a bounded DDL projection as full raw database equivalence or restore direct-versus-bridge parity semantics.
 
-### **20.3.1 Bridge-consistency checker fallback contract**
+## **20.3.1 Current direct-selection evidence contract**
 
-Bridge selection snapshot (required). `artifacts/db_bridge/adapter_selection.snapshot.json` is the checked-in adapter selection snapshot used by the bridge-consistency checker for this parity family. It MUST record deterministic adapter selection without raw DSNs or secrets. It MUST expose `selection_order` as structural JSON derived from observed adapter attempts/provider order, not from raw string visibility or detached generator-only data.
+The current direct-selection family is:
 
-DBAccess façade (required). The DB bridge parity family MUST preserve `DBAccess` as the provider-agnostic façade for provider selection and DB operations. Dev fallback evidence MUST prove fallback to bridge through that façade, not by bypassing it. `DBAccess.for_current_env` MUST emit adapter-selection evidence that allows `selection_order` to be compared against observed `attempts[*].provider`.
+* Schema identity: `hde_epic038.direct_db_selection.v1`  
+* Schema path: `schemas/hde_epic038_direct_db_selection.v1.json`  
+* Primary path: `artifacts/runtime/direct_db_selection.snapshot.json`  
+* Artifact key: `epic038.pr06r.direct_db_selection`  
+* Record type: `epic038_pr06r_direct_db_selection`  
+* Sole primary producer: `tools/evidence/generate_hde_epic038_direct_db_selection.py`
 
-Production-like environment guard (required). Runtime tags `prod`, `production`, and `live` MUST be treated as production-like for DB bridge fallback guarding. For production-like tags, bridge fallback MUST be denied unless bridge is explicitly forced by the governed mechanics or explicitly enabled by the production bridge override. The `live` tag MUST NOT create a more permissive runtime mode than `prod` or `production`.
+The primary MUST contain exactly `schema`, `retired_keys`, `cases`, `predicates`, `result`, and `failure`. Unknown keys are rejected at every object level. Serialization is canonical UTF-8 without BOM, with ASCII-sorted object keys, compact separators, and exactly one trailing LF.
 
-Bridge-consistency checker (required). `ci/checks/check_bridge_consistency.py` is the governed checker for the bridge parity family. The checker MUST validate provider parity, env connectivity, and adapter-selection coherence for this family.
+`cases` contains exactly these rows in order:
 
-Provider-parity false-PASS guard (required). The checker MUST reject provider-parity PASS conditions when direct rows are missing, skipped, unavailable, or errored. A truth-preserving skip or unavailable posture MAY be accepted only when the artifact does not present live provider parity as passing.
+1. `healthy_direct`  
+2. `missing_database_url`  
+3. `unavailable_database_url`  
+4. `retired_keys_present`
 
-OPS provider-parity closure packet mechanics (required when OPS evidence is used to close a provider-parity loop). The OPS packet MUST keep provider-parity closure evidence machine-readable, secret-safe, and non-overclaiming. When the packet claims closure, it MUST record the active parity corpus, row-level direct and bridge provider availability, row-level parity values, closure status, bridge consistency result, parity scope rationale, non-claims, command transcript, stdout, stderr, exit code, redacted or presence-only environment posture, final report, and checksum ledger. If an active row such as `ddl_fingerprint` remains in the corpus, closure MUST be based on row-level match evidence, not on silent exclusion. OPS closure evidence MUST NOT claim QA PASS, PF09 status movement, epic closure, or acceptance-token satisfaction for DB proof labels.
+`predicates` contains exactly:
 
-Combined proof-chain supportability mechanics (required when this family uses combined proof evidence). Provider parity and bridge capability mechanics MAY be satisfied by a governed combined proof chain across implementation evidence, OPS parity closure evidence, and later evidence-coherence binding when the combined record explicitly identifies each proof class and preserves the no-claim boundaries for each source. The combined chain MUST preserve row-level provider-parity evidence, bridge-consistency proof, bridge capability proof, evidence-index or mirror binding, and path-proof coherence. The combined chain MUST NOT convert OPS evidence into QA evidence, acceptance-token satisfaction, PF09 status movement, epic closure, or public Reader contract scope. PF14 records the mechanical proof chain and no-claim boundaries only.
+* `direct_only_provider`  
+* `missing_direct_fails_closed`  
+* `unavailable_direct_fails_closed`  
+* `retired_keys_fail_before_provider_attempt`  
+* `alternate_transport_attempts_zero`  
+* `secret_values_absent`
 
-Non-dev typed DB failure proof mechanics (required). When the DB bridge parity family claims non-dev total-failure behavior, the governed proof MUST run under a non-production posture such as `APP_ENV=stage`, prove no proactive probes beyond the sanctioned adapter path, preserve numeric-free public failure posture, preserve secret-free or presence-only env posture, derive selection order from real `DBAccess` attempts, and emit typed deterministic failure as `BridgeUnavailable` with `missing_bridge_url` when the bridge URL is absent. Synthetic `unexpected` or `unexpected_success` outputs MUST NOT be serialized as acceptable proof. The generator MUST fail closed, including through `SystemExit`, when success, typed error class, typed error code, snapshot, or attempt-order expectations deviate.
+`result` is `PASS` only when every predicate and exact case invariant is satisfied. A negative receipt MUST exit nonzero and MUST NOT be consumed as release, PF09-support, QA, OPS-completion, acceptance, or closeout proof.
 
-Structural selection-order validation (required). The DB bridge parity evidence generator MUST validate `selection_order` as a structural array. It MUST derive the expected order from observed adapter attempts, backfill only when doing so preserves the observed attempt order, and fail on non-array, missing, or mismatched `selection_order`. Raw string presence MUST NOT satisfy this predicate.
+The canonical updater is the sole owner of the direct-selection primary’s Human Evidence Index row, Machine Evidence Mirror row, sibling path proof, and Index/Mirror hash companions. The focused producer MUST NOT write those companions.
 
-DB bridge parity generator (required). `tools/evidence/generate_db_bridge_parity.py` is the governed generator for adapter selection, provider parity, bridge capability, env connectivity, redaction posture, fail-closed check mode, closed-rails live-unavailable posture, structural selection-order validation, and non-dev typed total-failure proof. Its `--check` mode MUST compare generated canonical bytes against committed governed artifacts.
+## **20.3.2 Historical bridge evidence quarantine**
 
-Evidence-index key normalization (required). The evidence updater for this family MUST bind `artifacts/db_bridge/adapter_selection.snapshot.json` to the canonical repo artifact key `db_bridge.adapter_selection.snapshot` and remove stale EPIC-specific adapter-selection rows for the same physical path before dedupe or regeneration.
+Existing bridge-era primaries remain immutable historical records. This includes:
 
-Required test coverage. `tests/unit/test_check_bridge_consistency.py`, DB adapter tests, DB adapter-selection tests, and non-dev DB bridge evidence tests MUST cover at least:
+* artifacts/db\_bridge/\*\*  
+* the bridge-era artifacts/runtime/env\_connectivity.snapshot.json  
+* bridge Presenter comparisons and their schemas  
+* audit/ops/hde-epic038/ops-01/\*\*
 
-* one passing deterministic dev fallback through `DBAccess`  
-* one production-like `APP_ENV=live` guard regression where unhealthy `DATABASE_URL` and configured `DB_BRIDGE_URL` do not select bridge  
-* one bridge provider capability case proving `BridgeProvider` exposes the provider methods expected by `DBAccess`: `health`, `query`, `exec`, `tx`, and `introspect`  
-* one provider-parity false-PASS rejection case for missing, skipped, unavailable, or errored direct rows  
-* one truth-preserving skip or unavailable case that does not claim live provider parity as passing  
-* one non-dev `APP_ENV=stage` total-failure case with observed `DBAccess` attempt order and typed `BridgeUnavailable` / `missing_bridge_url`  
-* one adapter-selection contract case requiring `selection_order` to equal `attempts[*].provider`  
-* one generator fail-closed case where missing, non-array, or mismatched `selection_order` exits non-zero rather than emitting synthetic accepted evidence  
-* one generator fail-closed case where unexpected non-dev behavior exits non-zero rather than emitting synthetic accepted evidence  
-* one provider-parity truthfulness case where unavailable direct rows remain unavailable or skipped rather than being reported as PASS  
-* one proof-label posture case proving DB provider/bridge proof labels remain non-token proof labels unless admitted by the owning governance home  
-* one evidence regression test that proves the non-dev failure artifact remains stage-scoped, secret-safe, numeric-free, and ordered from real adapter attempts
+Their primary bytes, producer provenance, checksum identities, sibling path proofs, Human Evidence Index rows, and Machine Evidence Mirror rows MUST remain intact unless a separately authorized historical migration is approved.
+
+Historical rows MAY be classified as `historical_bridge_evidence`. Their notes MUST state that they do not prove current service availability, runtime support, direct-versus-bridge parity, bridge consistency, bridge fallback, acceptance-token satisfaction, or a current OPS PASS.
+
+Historical bridge evidence MUST NOT be regenerated through a retired transport and MUST NOT satisfy a current direct-only release gate. A historical-integrity stage may validate retained presence, exact hashes, canonical readability, and secret-safe nonclaims and may report only `HISTORICAL_INTEGRITY_OK`.
+
+Bridge-era producers, bridge consistency checkers, bridge provider implementations, bridge-specific schemas, and failed OPS diagnostics MAY remain only where required for historical validation or provenance. They MUST NOT be imported, registered, invoked, or interpreted as active database transport.
+
+## **20.3.3 Direct read-only OPS posture**
+
+When current live database-posture evidence is required, execution remains a separately authorized OPS responsibility. The authorization MUST bind the exact source commit, runner, validator, interpreter, target, rails, query roster, expected counts, candidate root, argv vectors, and one-attempt posture before launch.
+
+The bounded capture MUST use `DATABASE_URL` and psycopg only, run under the authorized non-production posture, set the transaction read-only before governed observations, make zero SQL writes, make zero retries, and make zero alternate-provider attempts. Secret values, DSNs, hosts, raw rows, and credential material MUST NOT enter retained evidence.
+
+A pre-launch authorization, source, or rails mismatch produces no database call. A post-launch failure consumes that authorization, produces only an inadmissible temporary failure receipt, and requires new PO-approved authorization bytes before another attempt.
+
+Live direct-posture evidence does not prove Railway inventory, authorize database writes, create QA PASS, satisfy an acceptance token, move PF09 status, deploy, migrate, complete OPS generally, or close an epic.
+
+## **20.3.4 Release integration, rollback, and tests**
+
+Current direct-selection evidence and historical bridge evidence MUST retain separate identities, owners, meanings, and release predicates.
+
+The direct-only release chain MUST:
+
+* consume the current direct-selection primary as current selection proof;  
+* validate an admitted direct read-only OPS packet only where that packet is required;  
+* validate bridge-era bytes only through the historical-integrity contract;  
+* finalize all current primaries and schemas before the canonical updater runs;  
+* keep sibling path proofs, Human Index, Machine Mirror, and hash companions under canonical-updater ownership; and  
+* fail atomically on missing or duplicate records, historical-byte drift, schema drift, path-proof drift, checksum failure, updater failure, orientation failure, or release-stage failure.
+
+Rollback MAY disable database entrypoints or return to another direct-only commit. It MUST NOT restore bridge selection, bridge forcing, bridge fallback, bridge parity, bridge-dependent release admission, or current bridge-success evidence.
+
+Required focused coverage includes:
+
+* healthy direct selection through psycopg;  
+* typed missing-direct and unavailable-direct failures;  
+* each retired key, including an empty value, refusing before provider construction or I/O;  
+* zero alternate-provider attempts;  
+* secret-free, names-only failures;  
+* projection-only DDL identity;  
+* read-only direct-posture packet validation where applicable;  
+* immutable historical bridge hashes and historical-only classification;  
+* disjoint current and historical evidence ownership;  
+* canonical-updater-only companion writes; and  
+* fail-closed release behavior without bridge restoration.
 
 # 21\) BodyGraph refresh worker (dev-only; policy-aligned) \[Required-Now\]
 
@@ -5074,153 +5148,191 @@ Routing: SLO targets and failure posture live in Governance (titles only).
 
 # 27\) Release and Provenance Packaging
 
-Purpose (normative). Freeze the engine pack and prove that release\_id \= sha256(canonical\_bytes("catalog/manifest.json")). Mechanics owns the jobs and evidence; manifest shape and canonical rules live in HDE-Schemas and Artifacts (titles only).
+Purpose (normative). Use one canonical manifest as the tracked release-identity input, derive release\_id from those bytes, and build current release-bound derivatives only through an isolated external attestation. Manifest shape and canonical rules live in HDE-Schemas and Artifacts (titles only).
 
-## **27.1 Manifest integrity checks**
+The required dependency direction is:
 
-Top-level key set is closed (no extras). catalog/manifest.json top-level MUST contain exactly: root, version, built\_at\_utc, files (and no other keys).
+`tracked source -> canonical manifest -> release ID -> external attestation`
 
-Canonical bytes. The on-disk catalog/manifest.json equals its canonical serialization (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing \\n).
+No generated attestation or release derivative may point back into tracked source as an identity input.
 
-files\[\] order. Entries are ASCII-ascending by path; no duplicates by path.
+## **27.1 Canonical manifest and release cut**
 
-No self-listing. catalog/manifest.json MUST NOT appear in files\[\].
+`catalog/manifest.json` is the single release-identity input stored in Git.
 
-Path constraints. Each path is relative to root:"catalog/" (no catalog/ prefix), POSIX, no .. or //, length ≤ 256 bytes.
+Its top-level keys are exactly:
 
-Entry identity. For every {path, sha256, size}: sha256 is lowercase 64-hex of the artifact’s canonical bytes and size matches those canonical bytes.
+* `root`  
+* `version`  
+* `built_at_utc`  
+* `files`
 
-Pins. All checks run with LC\_ALL=C, LANG=C, TZ=UTC.
+The manifest MUST:
 
-## **27.2 Recompute release\_id**
+* use canonical UTF-8 bytes with ASCII-sorted object keys, compact separators, no BOM, and exactly one trailing LF;  
+* set `root` to `catalog/`;  
+* keep `files[]` ASCII-ascending by path with no duplicate path;  
+* exclude `catalog/manifest.json` from `files[]`;  
+* use safe repo-relative POSIX paths with no absolute path, parent traversal, or unsafe symlink source;  
+* bind each declared file to its exact SHA-256 and byte size; and  
+* run its cut and validation mechanics under `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, and `ALLOW_NETWORK=0`.
 
-* Read catalog/manifest.json in binary.
+A normal release cut uses:
 
-* Re-serialize to canonical bytes (see HDE-Schemas and Artifacts §4).
+`python scripts/cut_release_manifest.py --version <semver> --built-at-utc <UTC>`
 
-* Verify on-disk bytes equal canonical bytes (fail closed if not).
+The cut validates its explicit inputs, refreshes the declared file hashes and sizes, sorts the entries, and changes only `catalog/manifest.json`. It MUST NOT write release evidence, Index/Mirror companions, generated source constants, registry reports, or attestations.
 
-* Compute SHA-256 over canonical bytes → 64-hex lowercase; record as release\_id.
+Source validation is read-only:
 
-## **27.3 Evidence & mirror (records-only; same-PR rule)**
+`python scripts/release_id_recompute.py --check-manifest-only`
 
-List by title/path in Appendix D: Evidence Index and mirror 1:1 in artifacts/evidence\_index.jsonl (each record includes artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor; canonical JSONL; one LF). Update human Index and mirror in the same commit/PR; CI fails on mismatch or missing path-proofs.
+A change to a manifest-listed source file causes that audit to fail until one intentional final cut is made after source stabilization. A Git commit does not inherently change release identity; release identity changes only when the canonical manifest bytes change.
 
-* artifacts/math/freeze\_pack\_manifest.json — evidence copy of catalog/manifest.json
+## **27.2 Runtime release identity**
 
-* artifacts/math/release\_id.txt — recorded release\_id
+The release identity is:
 
-* artifacts/math/release\_id\_recompute.log — recompute trace
+`release_id = sha256(canonical_bytes(catalog/manifest.json))`
 
-* artifacts/math/checksums\_audit.log — per-entry verification (path/sha256/size)
+Runtime MUST read the packaged manifest, validate its canonical and closed-shape contract, and derive release\_id directly from those bytes.
 
-* artifacts/bodygraph/release\_bindings.json — {release\_id, data\_source\_policy, ttl\_s, swr\_s, snapshot\_counts{fresh,swr,refresh\_queued}} (canonical JSON; one LF). (Human+machine indices updated in the same PR.)
+Runtime MUST NOT read checked-in evidence paths, release-identity environment variables, generated release-ID constants, registry reports, or mutable attestation files as release-identity inputs.
 
-Freeze-Pack evidence-copy semantics (normative; no dual semantics).
+No request-time manifest hashing or request-controlled release identity is authorized. The packaged manifest is read through the bounded runtime identity mechanism and failure is closed when its contract is invalid.
 
-Single SoT. The Freeze-Pack Manifest SoT is catalog/manifest.json. No other file is permitted to act as the SoT for Freeze-Pack membership or release identity.
+## **27.3 External release attestation**
 
-Evidence copy meaning is fixed. artifacts/math/freeze\_pack\_manifest.json is a byte-identical evidence copy of the canonical bytes of catalog/manifest.json (canonical JSON: UTF-8, no BOM, ASCII-sorted keys recursively, compact separators, exactly one trailing LF). It MUST NOT be a derived schema, subset manifest, or alternate contract.
+Current release-bound derivatives are generated only through:
 
-Equality checks are byte-equal. When tooling checks “equal” between the SoT and the evidence copy, “equal” means byte-equal on canonical bytes, not “JSON-equivalent.”
+`python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`
 
-No path reuse. Any alternate manifest-like artifacts (for example, summaries) MUST be quarantined under a different name/path and MUST NOT reuse artifacts/math/freeze\_pack\_manifest.json. Evidence-only summaries (for example, manifest\_snapshot.json) MUST NOT be used as identity inputs or substituted for the Freeze-Pack Manifest.
+The builder MUST:
 
-## **27.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+* require one exact clean source commit;  
+* refuse an output path inside the source repository;  
+* refuse a non-empty destination and avoid overwriting existing output;  
+* copy the exact tracked source into an isolated working area;  
+* build and install the real packaged console entrypoint in isolation;  
+* run the required legacy producer closure only inside the isolated copy;  
+* prove a second read-only fixed point;  
+* run the final release-sanity gate inside the isolated copy;  
+* use a closed-rails, allowlisted child environment;  
+* exclude database, bridge, vendor, credential, and unrelated `PYTHON*` environment names;  
+* restrict generated writes to the governed isolated evidence roots; and  
+* leave the source checkout byte-stable.
 
-Acceptance is governed by HDE-Governance and pack/manifest rules in HDE-Schemas & Artifacts (titles-only). This section does not list token names. Pack identity acceptance requires proofs for:
+Direct source-tree execution of the write-capable identity closure is prohibited. It is internal to the isolated attestation build only.
 
-* canonical manifest bytes and stable ordering constraints
+The success contract is `hde.release_attestation.v1`. The failure contract is `hde.release_attestation.failure.v1`.
 
-* correct recomputation of release\_id from canonical manifest bytes
+A successful bundle MUST bind at least:
 
-* evidence/index discipline for pack identity artifacts
+* the exact source commit;  
+* an exact-source tracked-tree digest;  
+* the canonical manifest and derived release identity;  
+* a sorted file inventory with hashes and sizes;  
+* deterministic stage, command, and exit-code transcript facts;  
+* canonical checksums;  
+* the final release-admission posture; and  
+* explicit nonclaims for OPS execution, database writes, deployment, migration, QA PASS, acceptance, PF09 status movement, and epic closeout.
 
-Routing (titles-only). Manifest shape, canonical JSON rules, and mirror schema: HDE-Schemas and Artifacts. Public transport remains in HDE-CLI-API-Vendor Ref / HDE-Governance.
+Timing, raw subprocess output, secrets, DSNs, vendor values, and database observations MUST NOT be retained as attestation content. Repeated builds from the same exact source MUST produce the same content tree.
 
-## **27.5 Sanity pipeline (release & provenance) \[Required-Now\]**
+CI MUST build and independently verify the bundle outside the source tree and MAY publish it with bounded retention. That CI artifact is exact-head release evidence; it does not become a tracked identity input, a durable governed release-admission record, or an acceptance token by implication.
 
-Purpose (normative). Provide a single, scriptable pipeline that verifies the release end-to-end and fails closed on any drift. It finishes by updating the human index and the machine mirror with 1:1 parity and path-proofs.
+## **27.4 Tracked evidence boundary and rollback**
 
-Release identity gate (fail-closed; CI posture). The sanity pipeline MUST include a fail-closed release identity gate that enforces the “no dual semantics” posture for Freeze-Pack identity:
+Existing checked-in EPIC022 release evidence and its companions are frozen capture-time records. This includes the historical manifest copy, recorded release ID, recompute trace, checksum audit, snapshots, Index/Mirror rows, hashes, and path proofs associated with that capture.
 
-* Entry point: ci/checks/check\_release\_identity.sh
+Frozen checked-in release evidence:
 
-* Invocation: python ci/checks/check\_release\_identity.sh (Python entrypoint; do not invoke via bash \<SCRIPT\>).
+* is not a current runtime identity input;  
+* is not regenerated for each later release;  
+* retains its historical producer and capture meaning;  
+* MUST NOT be relabeled as a current external release attestation;  
+* MUST NOT be refreshed merely because the manifest or release ID changes; and  
+* remains subject to historical integrity, secret-safety, and canonical-byte checks.
 
-* Posture: closed rails and determinism pins as required by §1.2 and §27 (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC).
+`artifacts/registry/registry_report.json` is configuration evidence, not release-identity evidence. Its loader may validate the manifest and catalog contract, but the report and derived config bundles MUST NOT embed the manifest digest, release ID, or manifest-listed source identities as incidental provenance. An otherwise unchanged registry family MUST NOT churn solely because of a release cut.
 
-* Minimum checks (mechanics):
+Host-specific generated development files are not source. Local `.venv` trees and generated `*.egg-info` metadata MUST remain ignored and untracked. Dependency or editable-package installation MUST NOT dirty the tracked repository or alter release identity.
 
-  * validate manifest schema posture (including the closed top-level key set)
+Rollback MUST revert the runtime manifest derivation, release-cut command, isolated attestation builder, workflow publication, and attestation schemas together. Rollback MUST NOT restore a generated release-ID constant, source-tree identity-closure writes, recursive checked-in derivative regeneration, clone-local mtime validity checks, release identity embedded in registry/config evidence, or bridge-era current-evidence semantics.
 
-  * validate canonical bytes posture for catalog/manifest.json
+Acceptance is governed by HDE-Governance and pack/manifest rules in HDE-Schemas & Artifacts (titles-only). This section creates no token, QA PASS, OPS completion, PF09 status movement, deployment, migration, or closeout claim.
 
-  * assert byte-equality on canonical bytes between catalog/manifest.json and artifacts/math/freeze\_pack\_manifest.json
+Routing (titles-only). Manifest shape, canonical JSON rules, historical evidence schemas, and external-attestation schemas: HDE-Schemas and Artifacts. Public transport remains in HDE-CLI-API-Vendor Ref / HDE-Governance.
 
-  * assert release\_id correctness as sha256(canonical\_bytes(catalog/manifest.json))
+## **27.5 Sanity pipeline (release & provenance) Required−Now**
 
-  * assert the governed recompute evidence set exists and is non-empty
+Purpose (normative). Provide one fail-closed, closed-rails final-admission gate for the direct-only evidence graph. The gate validates current governed bytes, separately validates frozen historical evidence, and does not execute OPS, perform external I/O, or repair an inconsistent evidence graph.
 
-Operator note (non-gating; mechanics awareness). In ephemeral CI workspaces, the gate may regenerate or rewrite governed recompute log outputs as part of producing a clean evidence state. This is acceptable for CI workspaces. In a local working tree, treat these outputs as tool-generated evidence surfaces and avoid committing unintended churn.
+Before final admission:
 
-Ordered steps (minimal sequence)
+* all current primaries and schemas MUST be finalized;  
+* any authorized OPS packet MUST already have been independently admitted and copied exactly;  
+* the canonical updater MUST run once as sole writer of the Human Evidence Index, Machine Evidence Mirror, sibling path proofs, and Index/Mirror hashes; and  
+* topology orientation MUST be generated only after the final evidence skeleton exists.
 
-* Format (code/docs)
+The canonical entrypoint writes `audit/gates/sanity_pipeline/sanity_pipeline.log` and uses exactly these nineteen mandatory stages in order:
 
-* Lint / type checks
+1. Environment pins.  
+2. Identity and release provenance.  
+3. Canonical JSON.  
+4. Reader/CLI, AB/BA, two-run, and preimage determinism.  
+5. A7 Catalog transport.  
+6. CI rails.  
+7. Direct DB selection contract.  
+8. Direct DB posture artifacts.  
+9. BodyGraph policy.  
+10. Architecture snapshot.  
+11. Configured-v2 mapped-cache local evidence.  
+12. Historical bridge evidence integrity.  
+13. OPS-02 mapped-cache packet validation.  
+14. OPS-03 direct DB posture packet validation.  
+15. Human Index and Machine Mirror refresh.  
+16. Evidence-path validation.  
+17. Mirror schema and Index/Mirror hash validation.  
+18. Topology orientation validation.  
+19. Final-LF validation.
 
-* Unit \+ property tests (determinism, comparators)
+The stage roster name for stage 15 is retained as pipeline identity. On the finalized tracked evidence graph, stage 15 MUST invoke the canonical updater in read-only check mode and MUST NOT regenerate or repair Index, Mirror, path-proof, or hash bytes during final admission.
 
-* Schema validation (domains, payloads as applicable)
+Stage 12 may report only `HISTORICAL_INTEGRITY_OK`. It MUST NOT report current bridge availability, parity, capability, consistency, fallback, or current OPS PASS.
 
-* Goldens (AB↔BA, two-run, bands edges, canonical compare)
+Stage 14 is mandatory for final PASS when the direct-posture packet is part of the release graph. No required stage may be skipped.
 
-* Capture artifacts (this release):
+The pipeline MUST:
 
-  * Pack identity: manifest evidence copy, release\_id recompute, checksums audit (see 26.3)
+* run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, and `ALLOW_NETWORK=0`;  
+* stop on the first failed stage;  
+* make no vendor, database, bridge, deployment, migration, or other external call;  
+* never rerun OPS-02 or OPS-03;  
+* preserve separate current-direct and historical-bridge meanings;  
+* validate canonical JSON, deterministic outputs, rails, direct selection, direct posture, BodyGraph policy, mapped-cache evidence, updater fixed point, portable paths, Mirror/Index hashes, topology, and final LF;  
+* reject a missing, duplicate, stale, schema-invalid, hash-invalid, path-invalid, noncanonical, or partially generated evidence family; and  
+* avoid committing any partial generated set.
 
-  * Transport proofs (A7) on a cataloged success route (see §9.1/§27.2)
+The canonical log MUST:
 
-  * Internal-ops /internal/version snapshots (see §27.4/§14)
+* begin exactly with `run:sanity-pipeline`;  
+* identify `HDE-EPIC038-PR06-release-sanity`;  
+* identify the governed environment-pins artifact;  
+* record all nineteen stage outcomes in order;  
+* record `first_failed_stage:NONE` only when every required stage succeeds; and  
+* end with `summary:PASS` only when the complete gate passes.
 
-  * DB posture artifacts (see §20/§27.5)
-
-* Index \+ mirror parity check: update Appendix D: Evidence Index and write mirror records to artifacts/evidence\_index.jsonl (same commit/PR), then verify:
-
-  * 1:1 join (title/path ↔ artifact\_key/discovered\_physical\_path)
-
-  * Canonical JSONL (UTF-8, sorted keys, compact, one LF)
-
-  * Path-proofs present and referenced by proof\_anchor
-
-* Fail closed on drift (non-canonical bytes, parity mismatch, missing path-proofs, changed digests, or schema violations)
+Current release-bound regeneration occurs only inside the external attestation builder’s isolated tracked-source copy. That builder MUST prove the closure write, a second read-only fixed point, and this final sanity gate before publishing the external bundle. Final source-tree CI checks remain detect-only and MUST leave the tracked checkout clean.
 
 Evidence (records-only; machine mirror; same-PR rule)
 
-* audit/gates/sanity\_pipeline/sanity\_pipeline.log — canonical compact sanity surface (required predicate target for determinism-related QA checks). Validators MUST require the first line to be exactly run:sanity-pipeline, and MUST also require the marker lines env\_pins: audit/gates/determinism/env\_pins.log and summary:PASS.  
-* audit/gates/sanity\_pipeline/sanity\_pipeline.log.path\_proof.txt
+* audit/gates/sanity\_pipeline/sanity\_pipeline.log — canonical compact sanity surface.  
+* audit/gates/sanity\_pipeline/sanity\_pipeline.log.path\_proof.txt  
+* artifacts/sanity/sanity.log.path\_proof.txt  
+* artifacts/proofs/sanity\_pipeline.transcript.log — retained transcript surface where governed by the owning evidence schema.
 
-* artifacts/sanity/sanity.log.path\_proof.txt
-
-* artifacts/proofs/sanity\_pipeline.transcript.log — pipeline transcript (ordered steps \+ pass/fail summary)
-
-Existing artifacts produced in step 6 (see 26.3, §27, §20, §36) must also be indexed and mirrored in this run.
-
-When the sanity pipeline script (for example, python tools/evidence/run\_sanity\_pipeline.py) is invoked from a Live QA harness rather than as part of the release CI, Mechanics requires additional behavior on top of the release pipeline rules in this section:
-
-* Prerequisites (tooling; required). The QA harness MUST ensure pytest is installed and the intended virtualenv is active before invoking the sanity pipeline. If pytest is missing or the venv is not active, that QA step MUST be classified as FAIL\_TOOLING and remains blocked until the harness is fixed.  
-* Explicit QA log capture. Any QA step that invokes the sanity pipeline MUST capture a primary QA log under audit/qa/hde-epic\<NNN\>/checks/\<check\_id\>/primary.log, treated as the canonical evidence for that step. The sanity pipeline script MUST emit a clear, parseable pass/fail summary suitable for inclusion in this log, either directly on stdout (so the harness can tee it into the QA log) or to a deterministic, harness-readable log file that the QA harness then copies alongside the check’s primary log under audit/qa/hde-epic\<NNN\>/checks/\<check\_id\>/\<PATH\>. The summary MUST include, at minimum, an overall status line (for example, a status\_final value or equivalent) that allows QA and auditors to determine whether the pipeline completed successfully in that QA environment.
-
-* Classification of QA pipeline failures. If the QA harness invokes the sanity pipeline but no output is captured in the primary QA log (for example, the log remains empty or contains only a header with no pipeline summary), that QA step MUST be classified as a tooling/harness failure rather than as a behavioral failure of the engine or the sanity pipeline itself. In that case, PF14 treats the step as FAIL\_TOOLING from a mechanics perspective: the harness or environment prevented the pipeline’s output from being captured, and the step remains blocked until the harness is fixed. The semantics and exact vocabulary for FAIL\_TOOLING vs FAIL\_BEHAVIOR or PASS remain single-homed in Glow QA Guide and HDE-Build Checklist; this guide only requires that QA steps distinguish “pipeline could not be observed” (tooling) from “pipeline ran and failed tests” (behavior).
-
-* Routing to tokens and QA docs (titles-only). The acceptance tokens that depend on the sanity pipeline and their evidence requirements are defined in Glow QA Guide, HDE-Build Checklist, and HDE Phased Epics (titles-only). PF14 does not list token names. PF14 records that, for QA-invoked runs, those tokens must not be treated as proven unless there is a captured sanity pipeline QA log with a clear pass/fail summary; if QA runs the pipeline and captures no output, that run is mechanics-wise a tooling/harness issue and cannot be used as evidence for those tokens.
-
-These QA-specific requirements do not change the release/CI semantics of the sanity pipeline described earlier in this section. Release acceptance and the canonical pipeline transcript remain governed by the closed-rails CI posture; QA invocations add a second usage of the same pipeline script, with additional logging and classification requirements so that Live QA evidence is unambiguous and mechanics-complete.
-
-Acceptance (routing only; token names owned elsewhere). Acceptance is governed by HDE-Governance and QA acceptance maps (titles-only). This section does not list token names. Sanity pipeline acceptance requires proofs for canonical JSON discipline across governed outputs, pack identity verification, and evidence/index parity for produced artifacts.
-
-Routing (titles-only). Evidence and mirror schema: HDE-Schemas and Artifacts. Transport matrices and /internal/version policy: HDE-CLI-API-Vendor Ref / HDE-Governance. Domain/pack rules: HDE-Schemas and Artifacts.
+Existing governed artifacts implicated by the nineteen stages MUST be indexed and mirrored before this final read-only gate runs.
 
 # 28\) Post-deploy Smoke
 
