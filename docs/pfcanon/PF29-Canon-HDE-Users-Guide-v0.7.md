@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v0.6
+**Version:** v0.7
 
 **Status:** Canon
 
-**Effective date:** 2026-07-09
+**Effective date:** 2026-08-06
 
-**Last Update Gate:** BN 12.1.7 A1-9
+**Last Update Gate:** BN 12.6.2 A7-21
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -74,7 +74,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 
 ## **1\. Feature availability map**
 
-### **1.1 Implemented local and QA surfaces**
+### 1.1 Implemented local and QA surfaces
 
 | Surface | Current availability | Primary use |
 | :---- | :---- | :---- |
@@ -85,7 +85,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 | hdctl showcompat \--dump-admin-dir | \[Implemented\] | Emit left/right BodyGraph JSON, composite BodyGraph JSON, compat proof JSON, and .sha256 sidecars. |
 | hdctl showcompat \--conjunction | \[Implemented\] | Emit conjunction compat JSON. |
 | hdctl aux-preview | \[Implemented\] | Preview Aux narrative text and write IDs-only admin sidecar JSON. |
-| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. With a configured v2 base and dry-run, current behavior uses the version-neutral charts resource path, route-metadata Bearer/geokey posture, and deterministic v2 ChartResult adapter mapping. Non-dry-run configured-v2 writes fail closed until mapped-cache persistence exists; non-v2 configured bases preserve explicit legacy BodyGraph fallback. |
+| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. Configured-v2 dry-run uses the version-neutral charts resource path and deterministic v2 ChartResult adapter mapping. Configured-v2 non-dry-run mapped-cache persistence is implemented only with explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target; failed gates refuse before the vendor request. Non-v2 configured bases preserve explicit legacy BodyGraph fallback |
 | hdctl dev:sampler | \[Implemented\] \[Dev or QA only\] | Deterministic CLI sampler harness. |
 | scripts/dev\_start\_reader.sh | \[Implemented\] \[Dev or QA only\] | Start local Reader/dev adapter harness. |
 | POST /internal/dev/sampler | \[Implemented\] \[Dev or QA only\] | HTTP dev sampler harness. |
@@ -107,7 +107,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 | v2 ChartResult or ChartSimpleResult feeding BodyGraph cache and compat end-to-end | \[Implemented, Operator−authorized only\]  | With a configured v2 base and dry-run, current bg:resolve may use the version-neutral charts route and deterministic v2 ChartResult adapter. This is scoped dry-run/evidence posture, not durable cache persistence |
 | Mapped v2 ChartResult adapter output feeding compat computation | \[Implemented, Dev or QA only\] | Closed-rails evidence proves mapped v2 ChartResult adapter output can enter the existing compatibility computation path and preserve public Reader boundary posture. This does not change public Reader bytes or prove broad platform conformance.  |
 | ChartSimpleResult as full BodyGraph-detail source | \[Current gap\] | ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail or durable cache use. |
-| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Current repo posture deliberately does not implement durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution. Non-dry-run configured-v2 writes must remain fail-closed until safe mapped-cache persistence is implemented and governed. |
+| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Use only with explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target. The workflow persists adapter-mapped HDE data only, verifies canonical read-back, and is idempotent for repeated identity writes. OPS-02 smoke evidence remains a separate evidence axis and does not authorize production writes |
 | PF09 status movement, HDE-FERM008 parent Done, HDE-EPIC037 closeout, production deployment, or final acceptance | \[Current gap\] | HDE-EPIC037 evidence supports later-drain posture only. PF29 must not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, production deployment, final acceptance, or broad HumanDesignAPI v2 platform conformance. |
 
 Feature-availability rows are operator guidance only. They are not backlog items, future-work authorization, PF09 task creation, PF09 status movement, or closure recommendations. Any future work that changes implementation, QA, OPS, evidence, runtime, vendor, architecture, or product behavior must be accounted for in the owning phased PF09 task or subtask, or marked as a PF09 gap in planning artifacts.
@@ -615,13 +615,21 @@ When the configured base is non-v2, explicit legacy BodyGraph fallback is preser
 
 For non-v2 legacy fallback, persistent success must be determined by fields emitted in the JSON payload, including rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match where present. Do not claim rows were written by assumption.
 
-### **11.4 Non-dry-run configured-v2 persistence boundary \[Currentgap\]**
+### **11.4 Configured-v2 mapped-cache persistence \[Implemented\] \[Operator−authorizedonly\]**
 
-Configured-v2 chart-backed bg:resolve supports dry-run mapping only until mapped-cache persistence is implemented. If a configured-v2 bg:resolve run omits \--dry-run, current behavior must fail closed with PROVIDER\_WRITE\_UNSUPPORTED.
+Configured-v2 chart-backed bg:resolve supports bounded mapped-cache persistence of adapter-mapped HDE data. Use it only after explicit authorization and only with open rails, non-production-like requested and process environments, a configured v2 base, the required vendor keys, DATABASE\_URL available to the sanctioned direct PostgreSQL provider, and explicit \--upsert. Missing \--upsert, a production-like environment, retired bridge configuration, or an unavailable sanctioned database target fails closed before the vendor request.
 
-Generic BodyGraph ingest remains guarded from raw v2 ChartResult persistence. Do not use generic BodyGraph ingest, \--upsert, or a non-dry-run configured-v2 command as proof that mapped-cache persistence exists.
+Run:
 
-Do not treat charts/simple success or ChartSimpleResult as proof of full BodyGraph detail. ChartSimpleResult may remain useful for bounded live smoke, authentication proof, geokey proof, provider availability proof, and minimal route-family confirmation, but the current mapped dry-run path uses ChartResult.
+LC\_ALL=C LANG=C TZ=UTC APP\_ENV=dev SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--upsert \> vendor\_bodygraph\_mapped\_cache.json
+
+Treat persistence as successful only when the emitted JSON has status=ok and the ingest object reports the observed rows\_written, rows\_after, read\_back\_match, and idempotent values. The path writes only the projected mapped payload and verifies canonical read-back. Do not infer persistence from exit code or vendor response alone.
+
+This workflow does not authorize production writes or substitute for the separately governed OPS-02 evidence axis.
+
+Generic BodyGraph ingest remains guarded from raw v2 ChartResult persistence. Do not use generic BodyGraph ingest as proof that configured-v2 mapped-cache persistence exists.
+
+Do not treat charts/simple success or ChartSimpleResult as proof of full BodyGraph detail. ChartSimpleResult may remain useful for bounded live smoke, authentication proof, geokey proof, provider availability proof, and minimal route-family confirmation, but the mapped configured-v2 path uses ChartResult.
 
 Dual-route policy is not implemented and requires a future ADR.
 
@@ -640,6 +648,8 @@ Compatibility alias:
 HDAPI\_BASE\_URL
 
 HDAPI\_BASE\_URL is compatibility-only and may be used only when HD\_API\_BASE\_URL is absent. If both are present and conflict, the vendor configuration is ambiguous and must fail closed.
+
+For configured-v2 mapped-cache persistence, DATABASE\_URL is the sole canonical HDE database endpoint key and direct psycopg is the sole active database transport. DB\_BRIDGE\_URL, DB\_FORCE\_BRIDGE, and DB\_ALLOW\_BRIDGE\_IN\_PROD are retired. Their presence is configuration drift and fails closed before provider construction or external I/O. Record only key names or redacted presence posture, never values.
 
 ### **12.2 Header posture by route family**
 
@@ -721,9 +731,9 @@ PF29 does not create that production public endpoint.
 
 ### **13.3 Production/open-rails vendor BodyGraph acquisition \[Operator-authorized only\]**
 
-This workflow documents configured-v2 bg:resolve dry-run behavior, not production mapped-cache persistence and not full platform conformance. With a configured v2 base, current bg:resolve \--source vendor \--dry-run may use the charts route and deterministic ChartResult adapter. With a non-v2 configured base, explicit legacy fallback may proceed under normal rails, config, and payload-success rules.
+This section governs production and production-like posture. Configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter under authorized open rails. With a non-v2 configured base, explicit legacy fallback may proceed under its normal rails, configuration, and emitted-payload success rules.
 
-This workflow is not the canonical place to prove production persistence. Do not remove \--dry-run for configured-v2 bases to claim production writes. Current configured-v2 non-dry-run behavior must fail closed with PROVIDER\_WRITE\_UNSUPPORTED until safe mapped-cache persistence exists and production or production-like write semantics are explicitly authorized and evidenced.
+Configured-v2 mapped-cache persistence is implemented only for the bounded non-production workflow in §11.4. Production or production-like non-dry-run attempts fail closed with PROVIDER\_WRITE\_UNSUPPORTED even when \--upsert is supplied. Do not treat the bounded non-production workflow or OPS-02 evidence as production write authorization or broad v2 conformance.
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 
@@ -819,13 +829,15 @@ With a configured v2 base, current expected dry-run behavior is charts route sel
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 
-### **Recipe G — configured-v2 non-dry-run write guard**
+### **Recipe G — operator-authorized configured-v2 mapped-cache persistence**
 
-Use this only as a bounded refusal check when explicitly authorized. With a configured v2 base, current expected behavior is PROVIDER\_WRITE\_UNSUPPORTED because mapped-cache persistence is not implemented.
+Use only for a separately authorized, bounded non-production run. Confirm that the required vendor keys and DATABASE\_URL are present without printing their values, the configured base is v2, the requested and process environments are non-production-like, and no retired bridge key is present.
 
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \> vendor\_bodygraph\_write\_guard.json
+LC\_ALL=C LANG=C TZ=UTC APP\_ENV=dev SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--upsert \> vendor\_bodygraph\_mapped\_cache.json
 
-Do not treat this as persistence. A future mapped-cache persistence slice must prove write/read-back parity, idempotence, no raw vendor payload persistence, and governed evidence before configured-v2 non-dry-run writes become supported.
+Expect status=ok, adapter status=mapped, mapped-only cache posture, and ingest fields that report rows\_written, rows\_after, read\_back\_match, and idempotent. A repeated same-identity run may report rows\_written=0 and idempotent=true; do not treat that as failure when canonical read-back still matches and the identity cardinality remains one.
+
+This recipe is not production-write authorization, OPS authorization, QA PASS, PF09 status movement, deployment, migration, or closeout.
 
 ## **16\. Known limitations and nonclaims**
 
@@ -839,9 +851,9 @@ PF29 must preserve these nonclaims:
 
 * Current configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter. For non-v2 configured bases, explicit legacy BodyGraph fallback is preserved.
 
-* Current HDAPI v2 evidence supports scoped dry-run mapping, mapped v2 output feeding compatibility computation, PO-produced OPS-01 runtime smoke evidence, and parent evidence binding. It does not prove durable mapped-cache persistence, production upsert, public Reader changes, new public routes, app-side vendor ownership, or broad HumanDesignAPI v2 platform conformance.
+* Current configured-v2 evidence supports scoped dry-run mapping, mapped v2 output feeding compatibility computation, bounded mapped-cache persistence of adapter-mapped HDE data, and a separate PO-authorized OPS-02 smoke proving one configured-v2 request, mapped-only persistence, canonical read-back, idempotence, and production-like refusal. It does not authorize production upsert, public Reader changes, new public routes, app-side vendor ownership, or broad HumanDesignAPI v2 platform conformance.
 
-* Current configured-v2 non-dry-run writes fail closed with PROVIDER\_WRITE\_UNSUPPORTED until safe mapped-cache persistence exists. bg:resolve \--source vendor \--upsert must not be used in production until a future epic explicitly reopens user-bound DB coverage.
+* Configured-v2 non-dry-run persistence requires explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target. Missing intent or direct access and every production-like attempt fail closed; runtime selection does not fall back to a bridge or alternate database transport.
 
 * PF29 does not complete HDE-FERM008.7 through HDE-FERM008.12, does not move PF09 status, does not mark HDE-FERM008 parent Done, and does not perform HDE-EPIC037 closeout, production deployment, OPS completion, PO closeout, board update, PF-canon update, or final acceptance.
 
@@ -865,9 +877,9 @@ PF29 must preserve these nonclaims:
 | PROVIDER\_NETWORK\_BLOCKED | Network access is disabled. | Confirm authorization and set ALLOW\_NETWORK=1 only for bounded open-rails runs. |
 | PROVIDER\_CONFIG\_MISSING | Required vendor config is absent. | Confirm HD\_API\_BASE\_URL, HD\_API\_KEY, and when needed GEO\_API\_KEY, without printing values. |
 | PROVIDER\_CONFIG\_INVALID | Vendor configuration is ambiguous or violates contract. | Check for conflicting HD\_API\_BASE\_URL and HDAPI\_BASE\_URL, invalid base URL, or unpinned vendor policy. |
-| PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Generic BodyGraph ingest attempted to build a v2 chart request outside the resolver adapter path. | Use bg:resolve \--source vendor \--dry-run through the resolver adapter path for configured-v2 dry-run mapping. Do not treat generic BodyGraph ingest as v2 adapter-backed resolution.  |
-| PROVIDER\_WRITE\_UNSUPPORTED | Configured-v2 bg:resolve attempted a non-dry-run write before mapped-cache persistence exists. | Re-run with \--dry-run for the current supported configured-v2 posture, or preserve the fail-closed result as a bounded refusal check. Do not claim persistence or production upsert.  |
-| DB\_QUERY\_FAILED | DB access failed in a DB-backed flow. | Confirm DB configuration and intended environment. Do not infer DB success from this error. |
+| PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Explicit upsert intent is missing, the environment is production-like, or the mapped-cache input or projection violates the supported contract. | Use \--dry-run for mapping-only work. Use \--upsert only within the authorized non-production workflow in §11.4. Never bypass a production-like refusal |
+| DB\_WRITER\_UNAVAILABLE | DATABASE\_URL is absent or unavailable, a retired bridge key is present, or the sanctioned direct provider or write transaction could not be used. | Confirm authorization and names-only DATABASE\_URL presence, remove retired bridge keys from the execution environment, and retry only within the authorized workflow. Do not print values or fall back to another transport. |
+| DB\_QUERY\_FAILED | A DB query, identity-cardinality check, mapped-cache read-back, or canonical-parity check failed. | Inspect the emitted typed error and direct database posture. Do not claim persistence or read-back success.  |
 | BODYGRAPH\_NOT\_FOUND | No BodyGraph row was found for the requested user. | Confirm the user ID and whether ingest/persistence has actually completed. |
 | Evidence mirror or hash check fails | Generated evidence changed without refresh, or path-proof/index/mirror drift exists. | Run the write/update sequence, then the check sequence in §14. |
 
@@ -907,9 +919,15 @@ Run Aux preview:
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl aux-preview \--pair-file compat.json \--category harmony \--band Cool \--perspective shared \--show-narrative \--admin-out aux\_sidecar.json
 
-Run open-rails configured-v2 vendor dry-run. With a configured v2 base, expect charts route selection, deterministic ChartResult adapter mapping, adapter-mapped no-raw-vendor-payload posture, and rows\_written=0. Non-dry-run configured-v2 writes remain fail-closed until mapped-cache persistence exists:
+Run open-rails configured-v2 vendor dry-run. With a configured v2 base, expect charts route selection, deterministic ChartResult adapter mapping, adapter-mapped no-raw-vendor-payload posture, and rows\_written=0:
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
+
+Run operator-authorized non-production configured-v2 mapped-cache persistence only after confirming required vendor keys and DATABASE\_URL are present without printing values, no retired bridge key is present, and the environment is non-production-like:
+
+LC\_ALL=C LANG=C TZ=UTC APP\_ENV=dev SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--upsert \> vendor\_bodygraph\_mapped\_cache.json
+
+Production-like writes remain refused. This command does not itself authorize OPS execution or production persistence.
 
 Refresh evidence after governed generated evidence changes:
 
