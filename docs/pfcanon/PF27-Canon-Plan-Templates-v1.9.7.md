@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.9.6
+**Version:** v1.9.7
 
 **Status:** Canon
 
 **Effective date:** 2026-08-05
 
-**Last Update Gate:** BN 12.6.2 A1-6
+**Last Update Gate:** BN 12.6.2 A7-21
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -134,6 +134,26 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
 * Open-rails work must be bounded, PO-authorized, secret-safe, and evidence-recorded. It must not expose secrets, perform uncontrolled production mutation, probe vendors open-endedly, expand public Reader scope, create a new HTTP home, mint acceptance tokens, or treat a narrow smoke as full conformance.  
 * An open-rails failure is not automatically a product failure. Plans and reviews must classify whether the failure indicates credential, config, vendor account or tier, endpoint availability, vendor contract, request shaping, response mapping, infrastructure, rate-limit, external outage, implementation, or QA-plan expectation posture before assigning behavior failure.  
 * OPS discovery and OPS open-rails tasks are first-class plan items. They may support implementation or QA, but they do not by themselves claim QA PASS, acceptance-token satisfaction, PF09 Done status, OPS completion beyond the bounded task, or epic closure.
+
+**Database-role planning evidence boundaries (hard).**
+
+* Database-role planning MUST keep these categories distinct:  
+  * **Observed live role state:** roles and attributes directly returned by bounded live inspection.  
+  * **Target-role absence:** the dedicated identities selected for an operation are not present before provisioning.  
+  * **Desired security posture:** role names, privilege matrices, tests, schemas, or predicates that describe what an implementation will accept.  
+  * **Authorized mutable precursor:** bounded database changes required before a read-only operational capture can run.  
+  * **Direct capture posture:** authorization-bound, direct-only, read-only observation with no SQL writes.  
+  * **Provisioned bounded posture:** role and privilege outcomes directly supported by retained operational evidence.  
+  * **Complete role architecture:** the separately governed application, writer, migration, owner, administration, deployment, rotation, recovery, and incident-handling model.  
+* Repository names, fixtures, schema fields, acceptance predicates, PF wording, and planned architecture MUST NOT be treated as proof that a corresponding live role exists.  
+* Before binding a one-attempt database authorization, a plan MUST require:  
+  * inspection of the live role roster and effective privileges;  
+  * determination of whether an existing identity satisfies the exact operational predicate;  
+  * Product Owner authorization for any required mutable precursor;  
+  * completion and verification of that precursor before authorization bytes are constructed;  
+  * retention of exact SQL or an authoritative equivalent when later claims depend on the complete grant model;  
+  * preservation of pre-state and post-state when claiming that existing roles remained unchanged; and  
+  * exclusion of credential values from retained evidence.
 
 Template-safe placeholders and ellipsis prohibition (hard).
 
@@ -1034,7 +1054,7 @@ Location:
   * PF09 phased-reference rule (required). Plans, reviews, and future work MUST cite the relevant phased HDE Build Checklist document or documents, using PF09.1 through PF09.7 as applicable, and MUST NOT rely on a retired single-document PF09 surface.  
   * PF07-derived / PF07-gap infrastructure posture (required). Any plan, implementation guide, QA plan, review artifact, remediation guide, runbook, or epic document that includes an infra task, ops task, environment binding, service binding, URL, port, project name, provider name, config key, QA root, or start-command dependency MUST use exactly one of these postures:  
 * Placeholder external-ownership language is non-conforming. Plans and related documents MUST NOT use phrases such as “infra to provide”, “ops to confirm”, “ask infra”, “await ops details”, guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or placeholder external ownership without a concrete PF07-backed value or an explicit PF07-gap statement.  
-* QA plans and Live QA runbooks MUST NOT guess or redefine environment bindings that PF07 is meant to own. This includes, as applicable, `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, `DB_BRIDGE_URL`, production service base URLs, environment-specific host and port bindings, and canonical QA-root patterns.  
+* QA plans and Live QA runbooks MUST NOT guess or redefine environment bindings that PF07 is meant to own. This includes, as applicable, active bindings such as `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, production service base URLs, environment-specific host and port bindings, and canonical QA-root patterns. For HDE database access, `DATABASE_URL` is the sole active endpoint key and direct PostgreSQL through the Glow-owned psycopg provider is the sole active transport. Retired bridge names `DB_BRIDGE_URL`, `DB_FORCE_BRIDGE`, and `DB_ALLOW_BRIDGE_IN_PROD` may appear only as names-only historical evidence or configuration-drift inputs; plans and runbooks MUST NOT require, provision, restore, consume, or treat them as valid HDE runtime inputs, and MUST NOT treat their absence as an error, degraded state, discovery ambiguity, or acceptance failure. A Codespaces execution venue does not create a second database service, hostname, provider, transport, or evidence lane.  
 * Default documented dev and QA access address (required). When a plan, implementation plan, QA plan, remediation guide, review, runbook, example command, or inline documentation needs to show a non-prod local-style client access address, it MUST use `127.0.0.1` as the default host, plus the correct port and endpoint path.  
 * This default does not replace canonical config keys, infra wiring, or per-environment configuration. It is a documented client access convention only.  
 * `127.0.0.1` in these templates is not a service identity claim and not a server bind requirement. Real provider, project, service, base URL, and config-key identity remain governed elsewhere, and services may still bind to `0.0.0.0`, `$PORT`, or another infra-owned target when that is the correct runtime posture.  
@@ -2159,27 +2179,29 @@ All directory names used in Epic Records, evidence paths, and expected artifact 
 
 ### **Definition**
 
-An **Ops task** is any work item that requires privileged access to systems outside the repository and therefore cannot be performed by automated agents. This includes (non-exhaustive):
+An **Ops task** is any work item that requires privileged access to systems outside the repository and therefore requires Product Owner authorization. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent acting on the PO's behalf. This includes (non-exhaustive):
 
-* service configuration
-
-* secrets / env var changes
-
-* deploy / runtime settings
-
-* infrastructure console actions
-
+* service configuration  
+* secrets / env var changes  
+* deploy / runtime settings  
+* infrastructure console actions  
+* live or shared Glow database access that crosses the repository boundary or uses privileged database credentials  
 * certain database operations (creation, grants, production migrations, other privileged state changes)
 
-### **Execution authority (normative)**
+  ### **Execution authority (normative)**
 
-* Ops tasks **MUST** be executed by the **PO (human operator) only**.
+* Ops tasks **MUST** be authorized by the **PO**.  
+* The PO **MAY** execute an authorized task personally or explicitly delegate execution to an automated session agent.  
+* Throughout PF27, **PO-only** identifies the owner of authorization, accountability, and acceptance. It does not require the PO to be the physical keystroke actor when the PO directly delegates execution.  
+* A delegated agent **MAY** perform the authorized operation on the PO's behalf and **MUST** follow the same scope, safety, evidence, redaction, and completion-claim controls that bind a human operator.  
+* When the approved scope and task-specific predicates are satisfied, the delegated agent **MUST** proceed and **MUST NOT** refuse solely because it is not human or demand a second generic human-only approval.  
+* Automated agents **MUST NOT** act without explicit PO delegation, independently approve an operation, invent missing commands, widen scope, bypass a required task-specific approval, simulate external state changes, or claim completion without the required evidence.  
+* System, platform, host, service-provider, organizational, legal, and safety controls remain binding and cannot be overridden by PO delegation.  
+* Delegation does not authorize an automated session agent to edit PF-Canon contrary to canon-maintenance controls.
 
-* Automated agents **MUST NOT** attempt to perform Ops tasks, **MUST NOT** claim completion, and **MUST NOT** simulate external state changes.
+  ### **IA facilitation posture (normative)**
 
-### **IA facilitation posture (normative)**
-
-* Ops tasks **MAY** be part of an epic. When included, they are facilitated by the **Implementation Agent (IA)**, who **MUST** guide the PO through execution.  
+* Ops tasks **MAY** be part of an epic. When included, they are facilitated by the **Implementation Agent (IA)**, who **MUST** guide the PO and any PO-delegated executor through preparation and execution.  
 * IA guidance **MUST** specify **intent, constraints, verification, and evidence requirements**.  
 * When canon already provides concrete operator instructions, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules for the task, the Ops task record **MUST** include those canon-grounded instructions explicitly.  
 * If canon is silent, incomplete, or ambiguous, the Ops task record **MUST** state that the missing instruction is unknown and **MUST NOT** fabricate steps.
@@ -2196,6 +2218,22 @@ Every Ops task record **MUST** include:
 * **Task ID** (stable; referenced consistently)  
 * **Owner:** `PO`  
 * **Facilitator:** `IA`  
+* **Executor:** `PO` or `PO-delegated automated session agent`  
+* **PO delegation record, when delegated:** secret-free reference to the direct PO instruction, exact Task ID, operational objective, target, and approved scope.  
+* **Task-specific authorization identity and dispatch-boundary validity, if required:** exact secret-free authorization artifact or identity, applicable validity predicate or window, and the required STOP CHECK immediately before dispatch.  
+* **Objective blocker and resume posture:** concrete blocker, preserved safe work and evidence, exact PO value or external action required, and resume condition.  
+* **PF07 posture:** `PF07-derived` or `PF07-gap`  
+* **Infra/ops fact inventory** (as applicable):  
+  * target provider  
+  * target project  
+  * target service  
+  * target repository  
+  * target base URL or port  
+  * target database instance or schema  
+  * exact config key name  
+  * exact governed evidence root or QA root  
+  * exact expected value or exact value source in PF07  
+* **PF07 gap statement** (required when the exact value is missing from PF07; state the missing fact set and mark the affected task or claim blocked by missing PF07 infrastructure inventory)  
 * **PF07 posture:** `PF07-derived` or `PF07-gap`  
 * **Infra/ops fact inventory** (as applicable):  
   * target provider  
@@ -2212,7 +2250,8 @@ Every Ops task record **MUST** include:
 * **Exact command proof or unresolved-command posture, if applicable:**  
 * **Input identity boundary, if applicable:** state whether no app user IDs, no `person_uid`, no `user_id`, or other prohibited identity inputs are allowed.  
 * **Secret persistence posture:** presence-only | redacted | hashed | not applicable; plaintext secret persistence is forbidden.  
-* **Non-claims preserved:** state whether the task does not claim QA PASS, Live QA completion, PF09 status change, or epic closure.  
+* **Non-claims preserved:** state that delegation does not convert OPS into PR or QA work and that the task does not claim QA PASS, Live QA completion, acceptance-token satisfaction, PF09 status change, epic completion, deployment success beyond the evidenced target, or closeout.  
+* **Completion-claim boundary:** no agent or human operator may claim OPS completion without the required repo-stored, secret-free evidence meeting the task success criteria.  
 * **Intent / desired end state** (what changes; what “done” looks like)  
 * **Constraints / safety rails** (what must remain true while executing)  
 * **Success criteria** (observable outcomes; not assumptions)  
@@ -2242,7 +2281,7 @@ Use this block when the Ops task depends on an exact command, external system, v
 * **Prerequisite proof:** list any prior PR, OPS, QA, or canon proof that must exist before execution and state the classification if it is absent or contradicted.  
 * **Preflight matrix:** for each preflight row, record requirement, required proof, and status rule.  
 * **Execution wrapper or operator command:** exact wrapper or command posture the PO must use after preflight passes.  
-* **Run rules:** state forbidden retries, guessed substitutions, command edits after failure, automated-agent execution, secret persistence, and forced-PASS edits.  
+* **Run rules:** state forbidden retries, guessed substitutions, command edits after failure, unauthorized or out-of-scope automated-agent execution, secret persistence, forced-PASS edits, execution before any required task-specific authorization is valid at the dispatch boundary, and any retry or changed authorization identity that requires fresh PO approval.  
 * **Required evidence outputs:** concrete governed files to produce under the approved ops evidence root.  
 * **Required content for evidence outputs:** exact content expectations for each required file, including command, input summary, environment posture, stdout, stderr, exit code, result summary, prerequisite matrix, and checksum ledger when applicable.  
 * **Outcome classification map:** define exact PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, and TOOLING\_BLOCKED conditions for the task.  
