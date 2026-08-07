@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.4.4
+**Version:** v2.4.5
 
 **Status:** Canon
 
-**Effective date:** 2026-08-06
+**Effective date:** 2026-08-07
 
-**Last Update Gate:**  BN 12.6.2 A7-21
+**Last Update Gate:**  BN 12.6.2 A22-27
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1828,7 +1828,7 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
   * The normalized viewer-preference object MUST preserve weight 0 semantics for downstream sampler/ranker exclusion and MUST follow the same normalization posture used by `hdctl showcompat`.  
 * **Validation and environment gating.**  
   * Reject invalid or empty `a_id`/`b_id` before any person resolution; do not allow empty strings to propagate into server errors.  
-  * In `APP_ENV=prod`, `POST /api/compat/v1` MUST return 404 with error\_v1 `code=ERR_NOT_FOUND` (internal surface must not be exposed).  
+  * The compatibility namespace is exactly `/api/compat/v1` and its descendants and MUST NOT match unrelated prefixes such as `/api/compat/v10`. Resolve production posture by trimming and case-folding a nonempty `APP_ENV` first and otherwise `ENGINE_ENV`; `prod`, `production`, and `live` resolve to production-like posture. In any resolved production-like posture, every method on the exact namespace or any descendant MUST fail closed with status `404`, presenter-backed `error_v1` `code=ERR_NOT_FOUND`, and `Cache-Control: no-store`; `HEAD` carries no body. This guard applies before compatibility computation so the internal surface remains hidden.  
 * **Success body (dev/internal).** Returns the §7A pair contract and bytes for the public Reader v1 payload.
 
 **Error body.** Typed, numeric-free **error\_v1** envelope as defined in §5.2: `{"schema":"v1","ok":false,"code":"<ERR_*>", "error":"<message>", ...}`. For this route, the canonical codes include:
@@ -1844,8 +1844,8 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 ### **Headers & conditionals (normative)**
 
 * **Success (200).** `Content-Type: application/json; charset=utf-8`; `Cache-Control: private, max-age=0, must-revalidate`. **POST is non-conditional**; do not return `304` for POST. **ETag optional** on this dev-only route in alpha; if emitted, it **MUST** cover the final LF-terminated body bytes.  
-* **Errors.** `Content-Type: application/json; charset=utf-8`; `Cache-Control: no-store`; **no `ETag`**.  
-* **HEAD/304 (optional GET only).** Not required for this dev-only route. If an optional `GET` is exposed and implements A7 for local evidence, it **MUST**: return `304` only after `200` with matching ETag; have **no body**; **omit `Content-Type` and `Content-Length`**; and honor **HEAD 200 parity** and validators as per A.1–A.4.
+* **Errors.** Except for the explicit bodyless non-production `HEAD` response above, all error responses use `Content-Type: application/json; charset=utf-8`, `Cache-Control: no-store`, and no `ETag`. Compatibility `404` and `405` responses use the shared presenter/emitter to emit canonical error\_v1 with `code=ERR_NOT_FOUND` while preserving the routing status; HTTP `HEAD` semantics suppress the production `404` body. The selected factory converts compatibility-scoped HTML `404` and `405` responses to this envelope and preserves Flask’s `Allow` header on a converted `405`.  
+* **Method and subpath handling.** In non-production posture, `HEAD /api/compat/v1` returns `405` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`; `OPTIONS /api/compat/v1` returns `204` with no body, `Content-Length: 0`, no `Content-Type`, `Cache-Control: no-store`, and `Allow: POST, OPTIONS`. Other unsupported methods at the exact namespace return presenter-backed `405` error\_v1, and unsupported descendant paths return presenter-backed `404` error\_v1. Compat GET does not use the optional A7 HEAD/304 flow.
 
 ### **Serialization & determinism (dev)**
 
