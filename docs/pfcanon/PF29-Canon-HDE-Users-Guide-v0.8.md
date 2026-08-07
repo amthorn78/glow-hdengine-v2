@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v0.7
+**Version:** v0.8
 
 **Status:** Canon
 
-**Effective date:** 2026-08-06
+**Effective date:** 2026-08-07
 
-**Last Update Gate:** BN 12.6.2 A7-21
+**Last Update Gate:** BN 12.6.2 A22-27
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -104,10 +104,10 @@ When this guide names a command, route, or file, it is documenting how to run th
 | Fetch person or batch commands | \[Planned, not implemented\] | Explicitly disabled for current alpha-style posture. |
 | Production-public POST /api/compat/v1 | \[Current gap\] | Do not claim. Current code returns 404 when APP\_ENV=prod. |
 | Direct Glow app HumanDesignAPI credential path | \[Current gap\] | Do not claim. Vendor acquisition belongs to the HD Engine boundary unless a future ADR changes that. |
-| v2 ChartResult or ChartSimpleResult feeding BodyGraph cache and compat end-to-end | \[Implemented, Operator−authorized only\]  | With a configured v2 base and dry-run, current bg:resolve may use the version-neutral charts route and deterministic v2 ChartResult adapter. This is scoped dry-run/evidence posture, not durable cache persistence |
+| Configured-v2 ChartResult dry-run resolution  | \[Implemented, Operator−authorized only\]  | With a configured v2 base and authorized open rails, \--dry-run uses the version-neutral charts route and deterministic v2 ChartResult adapter, reports rows\_written=0, and performs no mapped-cache persistence. |
 | Mapped v2 ChartResult adapter output feeding compat computation | \[Implemented, Dev or QA only\] | Closed-rails evidence proves mapped v2 ChartResult adapter output can enter the existing compatibility computation path and preserve public Reader boundary posture. This does not change public Reader bytes or prove broad platform conformance.  |
 | ChartSimpleResult as full BodyGraph-detail source | \[Current gap\] | ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail or durable cache use. |
-| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Use only with explicit \--upsert, open rails, non-production-like requested and process environments, and an available sanctioned direct PostgreSQL target. The workflow persists adapter-mapped HDE data only, verifies canonical read-back, and is idempotent for repeated identity writes. OPS-02 smoke evidence remains a separate evidence axis and does not authorize production writes |
+| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Use only with explicit \--upsert, open rails, non-production-like requested and process environments, a configured v2 base, the required vendor keys, and an available sanctioned direct PostgreSQL target. The workflow persists adapter-mapped HDE data only, verifies canonical read-back, and is idempotent for repeated identity writes. OPS-02 smoke evidence remains separate and does not authorize production writes. |
 | PF09 status movement, HDE-FERM008 parent Done, HDE-EPIC037 closeout, production deployment, or final acceptance | \[Current gap\] | HDE-EPIC037 evidence supports later-drain posture only. PF29 must not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, production deployment, final acceptance, or broad HumanDesignAPI v2 platform conformance. |
 
 Feature-availability rows are operator guidance only. They are not backlog items, future-work authorization, PF09 task creation, PF09 status movement, or closure recommendations. Any future work that changes implementation, QA, OPS, evidence, runtime, vendor, architecture, or product behavior must be accounted for in the owning phased PF09 task or subtask, or marked as a PF09 gap in planning artifacts.
@@ -877,9 +877,10 @@ PF29 must preserve these nonclaims:
 | PROVIDER\_NETWORK\_BLOCKED | Network access is disabled. | Confirm authorization and set ALLOW\_NETWORK=1 only for bounded open-rails runs. |
 | PROVIDER\_CONFIG\_MISSING | Required vendor config is absent. | Confirm HD\_API\_BASE\_URL, HD\_API\_KEY, and when needed GEO\_API\_KEY, without printing values. |
 | PROVIDER\_CONFIG\_INVALID | Vendor configuration is ambiguous or violates contract. | Check for conflicting HD\_API\_BASE\_URL and HDAPI\_BASE\_URL, invalid base URL, or unpinned vendor policy. |
-| PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Explicit upsert intent is missing, the environment is production-like, or the mapped-cache input or projection violates the supported contract. | Use \--dry-run for mapping-only work. Use \--upsert only within the authorized non-production workflow in §11.4. Never bypass a production-like refusal |
-| DB\_WRITER\_UNAVAILABLE | DATABASE\_URL is absent or unavailable, a retired bridge key is present, or the sanctioned direct provider or write transaction could not be used. | Confirm authorization and names-only DATABASE\_URL presence, remove retired bridge keys from the execution environment, and retry only within the authorized workflow. Do not print values or fall back to another transport. |
-| DB\_QUERY\_FAILED | A DB query, identity-cardinality check, mapped-cache read-back, or canonical-parity check failed. | Inspect the emitted typed error and direct database posture. Do not claim persistence or read-back success.  |
+| PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Generic BodyGraph ingest attempted to build a configured-v2 chart request outside the resolver adapter path. | Use bg:resolve \--source vendor through the configured-v2 resolver path. Add \--dry-run for mapping-only use; add \--upsert only for the authorized bounded persistence workflow in §11.4. Do not treat generic BodyGraph ingest as adapter-backed v2 resolution. |
+| PROVIDER\_WRITE\_UNSUPPORTED | Explicit upsert intent is missing, the environment is production-like, or the mapped-cache input or projection violates the supported contract. | Use \--dry-run for mapping-only work. Use \--upsert only within the authorized non-production workflow in §11.4. Never bypass a production-like refusal.  |
+| DB\_WRITER\_UNAVAILABLE  | DATABASE\_URL is absent or unavailable, a retired bridge key is present, or the sanctioned direct provider or write transaction could not be used. | Confirm authorization and names-only DATABASE\_URL presence, remove retired bridge keys from the execution environment, and retry only within the authorized workflow. Do not print values or fall back to another transport. |
+| DB\_QUERY\_FAILED | A DB query, identity-cardinality check, mapped-cache read-back, or canonical-parity check failed. | Inspect the emitted typed error and direct database posture. Do not claim persistence or read-back success. |
 | BODYGRAPH\_NOT\_FOUND | No BodyGraph row was found for the requested user. | Confirm the user ID and whether ingest/persistence has actually completed. |
 | Evidence mirror or hash check fails | Generated evidence changed without refresh, or path-proof/index/mirror drift exists. | Run the write/update sequence, then the check sequence in §14. |
 
