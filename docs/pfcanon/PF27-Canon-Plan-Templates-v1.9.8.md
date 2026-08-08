@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.9.7
+**Version:** v1.9.8
 
 **Status:** Canon
 
-**Effective date:** 2026-08-05
+**Effective date:** 2026-08-08
 
-**Last Update Gate:** BN 12.6.2 A7-21
+**Last Update Gate:** BN 12.6.2 A22-27
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1250,7 +1250,7 @@ Plan command, syntax, and example-literalness approval rule (required):
   * Does the rails posture or secret-safety posture change?  
   * Does the ambiguity require inventing a repo locus, artifact family, acceptance predicate, PF09 scope, or source authority?  
   * Does the defect hide a real implementation, QA, OPS, token, evidence, phase, public/private boundary, or source-of-truth issue?  
-* A reviewer returning a plan for revision over a command, helper, heredoc, syntax, escape, formatting, indentation, copied-chat, or paste-readiness concern MUST state the separate non-syntax defect. Without that separate defect, the allowed classification is Non-issue, Note, In-flight normalization, Operator caution, non-blocking caveat, or executor normalization note.  
+* A reviewer returning a plan for revision over a command, helper, heredoc, syntax, escape, formatting, indentation, copied-chat, or paste-readiness concern MUST state the separate non-syntax defect. Without that separate defect, the allowed classification is Non-issue, Note, In-flight normalization, or Operator caution.  
 * For any plan artifact, command or syntax concerns may be classified only as Non-issue, Note, In-flight normalization, or Operator caution. They MUST NOT be classified as Blocker, Approval blocker, QA readiness blocker, Implementation readiness blocker, Closure blocker, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, acceptance failure, path-proof failure, evidence failure, token failure, PF locator failure, or command validity failure requiring plan revision.  
 * Future plan-review, QA Plan review, implementation-plan review, remediation-plan review, redline-generation, QA-readiness review, closure-review, and Codex-audit prompts should include this guard: plan commands, snippets, helper code, heredocs, shell lines, and examples do not need to be paste-ready or literal. Syntax defects, escape characters, markdown rendering artifacts, indentation issues, and command exactness must never block plan approval. Treat them only as in-flight normalization unless they reveal a separate non-syntax truth, proof, scope, authority, safety, acceptance, phase, or evidence-identity defect.
 
@@ -2319,6 +2319,96 @@ Any Ops task included in an epic **MUST** be represented as a subtask in **HDE B
 ### **No governance drift (normative)**
 
 Ops tasks **MUST NOT** create new acceptance tokens or redefine acceptance semantics. If an Ops task affects acceptance, it **MUST** map to existing acceptance posture and be proven via evidence artifacts.
+
+## **3A) Epic Remediation Plan (Template)**
+
+### **Scope**
+
+Use this template only for a document explicitly identified as an **Epic Remediation Plan**. An Epic Remediation Plan is a distinct approval artifact for bounded, epic-scoped corrective work identified after implementation planning, post-implementation audit, QA-readiness review, or comparable current-state inspection.
+
+An Epic Remediation Plan does not replace the controlling Epic Plan, a broader Implementation Plan, a QA Plan, a Live QA runbook, an OPS transcript, an acceptance review, or an epic-close record. It authorizes only its expressly bounded corrective scope.
+
+### **Approval rule (normative)**
+
+An Epic Remediation Plan **MUST** be reviewed on substantive correctness, execution safety, canon alignment, repository truth, evidence obligations, authorization boundaries, and decision completeness.
+
+It **MUST NOT** be rejected, revised, or conditioned solely because it does not conform to an adjacent Epic Plan or Remediation Implementation Guide template.
+
+Format, heading names, numbering, and ordering are non-blocking when the substantive requirements below are present and unambiguous.
+
+This template does not supersede permanent canon governing architecture, PF09 mapping, tokens, evidence, OPS, QA, acceptance, or closure.
+
+### **Execution and authority boundaries (normative)**
+
+* An Epic Remediation Plan **MAY** contain bounded DEV and OPS steps and **MAY** embed the execution-oriented actions, commands, outputs, verification, and failure handling necessary to make the approved remediation executable.  
+* For this plan type, OPS work, if any, remains Product-Owner-only execution, Implementation-Agent-guided, and evidence-bound. No automated agent is authorized to perform privileged external work.  
+* An Epic Remediation Plan **MAY** require a later QA-readiness reassessment.  
+* An Epic Remediation Plan **MUST NOT** embed Live QA execution, issue a QA verdict, claim acceptance, move PF09 status, or close the epic unless separately authorized by the governing artifact and process.  
+* PF, board, and status drainage **MUST** remain separate from DEV or OPS execution outputs and **MUST NOT** become approval, merge, QA-entry, acceptance, or closeout conditions by themselves.  
+* Truth, proof, safety, or authorization failures remain substantive blockers.
+
+### **Required structure (paste-ready)**
+
+**Identity and baseline**
+
+* **Artifact identity:**  
+* **Visible version:**  
+* **Epic identity:**  
+* **Repository baseline, when repo truth matters:**
+
+**Remediation trigger and current-state evidence**
+
+* **Remediation trigger:**  
+* **Current-state evidence:**
+
+**Scope boundaries**
+
+* **In scope:**  
+* **Out of scope:**
+
+**Canon and phased-build posture**
+
+* **Controlling PF10 posture:**  
+* **Controlling permanent-canon posture:**  
+* **Phased PF09.x mapping or explicit, non-invented PF09 gap:**
+
+**Bounded remediation step**
+
+* **Lane:** DEV | OPS  
+* **Owner:**  
+* **Dependencies:**  
+* **Inputs:**  
+* **Actions:**  
+* **Outputs:**  
+* **Verification:**  
+* **Success criteria:**  
+* **Failure handling:**  
+* **Concrete evidence:**  
+* **Governed-path posture for execution outputs:**
+
+Repeat the bounded-remediation-step block for each DEV or OPS step.
+
+**Authority and claim boundaries**
+
+* **Token boundary:**  
+* **OPS boundary:**  
+* **QA boundary:**  
+* **Documentation-drainage boundary:**  
+* **Acceptance boundary:**  
+* **Closure boundary:**
+
+**Required dispositions**
+
+* **ADR dispositions:**  
+* **Tracked Issue dispositions:**  
+* **Canon-gap dispositions:**  
+* **Canon-reconciliation dispositions:**  
+* **Scope-clarification dispositions:**  
+* **Approval-item dispositions:**
+
+**Approval**
+
+* **Explicit approval sentinel:**
 
 ---
 
