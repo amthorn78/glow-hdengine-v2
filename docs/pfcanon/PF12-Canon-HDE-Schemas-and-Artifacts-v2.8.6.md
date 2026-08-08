@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.8.5
+**Version:** v2.8.6
 
 **Status:** Canon
 
 **Effective date:** 2026-08-08
 
-**Last Update Gate:** 080826 Doc Refresh 4
+**Last Update Gate:** 080826 Doc Refresh 5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1519,874 +1519,321 @@ At the pinned repository state, `schemas/narratives.composer.response.v1.json` i
 
 # 4\. Artifact Serialization Policy
 
-Canonical bytes for all pack files and for the manifest.
+Contract posture: required but not yet repo-conformant.
 
-### **Scope**
+This section owns the exact serialization bytes for pack files, `catalog/manifest.json`, and governed JSON evidence registered in §8.6. Operational logs are outside canonical-JSON scope; they remain keys-only under HDE-Governance and need not be canonical JSON. Schema content, arithmetic, and transport behavior remain in their owning specifications.
 
-Applies to all pack files listed in this document and to the pack manifest. The rules below define the exact byte form used for hashing and equality checks. These rules also apply to JSON evidence artifacts listed in Appendix D (so evidence is reproducibly comparable). Operational logs are out of scope for canonicalization; they must remain keys-only per Governance §7.1 and are not required to be canonical JSON.
+## 4.1 Canonical JSON rules
 
-### **Non-goals**
+A governed JSON document MUST satisfy all of these rules:
 
-This section does not restate any schema content, arithmetic, or transport behavior. It only defines how valid JSON is serialized to bytes.
+- Encode as UTF-8 without a byte-order mark.  
+- Emit object keys in strict ASCII ascending order at every object level.  
+- Preserve schema-declared array order. Reorder only arrays defined as sets, and only under §4.2.  
+- Use compact separators: `,` between members and `:` between a name and value, with no surrounding whitespace.  
+- End the file with exactly one LF byte. Do not emit carriage returns, trailing spaces, tabs, or blank lines outside string values.  
+- Delimit strings with `"`. Escape only characters JSON requires: `"`, `\`, and controls U+0000 through U+001F, using the shortest legal escape such as `\n`, `\t`, or `\u00XX`.  
+- Emit non-ASCII characters directly as well-formed UTF-8. Reject unpaired surrogates and do not alter string values through normalization, trimming, or case conversion.  
+- Follow the owning schema's types. Encode integers in base 10 without a leading plus sign, unnecessary leading zeros, decimal point, or exponent. Pack artifacts MUST NOT contain non-integer numbers, `NaN`, or infinity. A future non-integer quantity requires a Math-owned exact integer or string encoding.  
+- Emit `true`, `false`, and `null` exactly; `null` is allowed only where the owning schema permits it.  
+- Use the field names defined by the owning schema. New unspecified field names SHOULD use lower-snake ASCII.
 
-### **Canonical JSON rules (normative)**
+Canonicalization MUST NOT otherwise change values. Re-serializing the same in-memory value MUST produce identical bytes, and a validator MUST compare those bytes with the on-disk file.
 
-* Encoding: UTF-8 without BOM.
+A records-only JSONL artifact contains one canonical JSON object per line, no array wrapper or blank line, and exactly one LF after the final record.
 
-* Whitespace: compact (no pretty/indent), no trailing spaces, exactly one trailing newline LF (\\n) at end of file.
+### Acceptance hints
 
-* Objects: keys are emitted in ASCII ascending order at every object level.
+`CANON_JSON_UTF8_OK`, `CANON_JSON_SORTED_KEYS_OK`, `CANON_JSON_COMPACT_OK`, `CANON_JSON_SINGLE_LF_OK`, `CANON_JSON_NO_BOM_OK`, `CANON_JSON_IDENTITY_OK`, `JSONL_RECORDS_CANON_OK`.
 
-* Numbers: encoded as JSON numbers (not strings). NaN/Infinity disallowed.
+## 4.2 Arrays-as-sets discipline
 
-* Booleans/null: lowercase JSON literals.
+This discipline applies only when the owning schema defines an array as a set. An ordered array retains its schema-declared order.
 
-* Arrays:
+The schema MUST define an identity rule:
 
-  * If the array represents a set, it MUST be de-duplicated and ASCII-sorted by its identity rule (see §3.2/§3.3).
+- A scalar's identity is its value.  
+- An object's identity is the value of its schema-designated identity field.  
+- A composite identity uses the schema-defined canonical projection to one string.  
+- A set of objects without a defined identity rule is a schema error and fails closed.
 
-  * If the array is ordered by spec, preserve the schema-declared order; do not re-sort.
+Normalize a set in this order:
 
-* JSONL artifacts (records-only): one canonical JSON object per line; no blank lines; each line obeys all canonical JSON rules above (sorted keys, compact); the file ends with exactly one trailing LF.
+1. Project each element to its canonical identity without trimming, case conversion, locale transformation, or other value change.  
+2. If one identity repeats with byte-identical elements, retain one element.  
+3. If one identity repeats with different element values, fail closed and identify the first divergent field.  
+4. Sort the remaining elements in strict ASCII ascending identity order.
 
-* Escapes: JSON string escaping per RFC 8259; no non-canonical escape variants.
+Producers MUST write the normalized order; validators reject duplicates, conflicts, and out-of-order sets.
 
-* Locale: all canonicalization and comparisons run under LC\_ALL=C, LANG=C, TZ=UTC.
+For Channels, the identity is `channel_id = "<low>-<high>"`: each Gate is zero-padded to `01..64`, and the lower Gate is first. Canonical examples are `07-31`, `10-57`, `20-57`, and `34-57`.
 
-* Capture env pins: header/body snapshot jobs and canonicalization checks MUST run with the same env pins: LC\_ALL=C, LANG=C, TZ=UTC.
+### Acceptance hints
 
-### **Determinism & hashing**
+`ARR_SET_IDENTITY_DECLARED_OK`, `ARR_SET_NO_DUPLICATES_OK`, `ARR_SET_NO_CONFLICTS_OK`, `ARR_SET_ASCII_SORT_OK`, `ARR_SET_PROJECTION_CANON_OK`.
 
-* All governed pack files’ sha256 values in the manifest are computed over their canonical bytes.
+## 4.3 Locale & determinism pins
 
-* The release\_id is the sha256 of the canonical bytes of catalog/manifest.json (see §6.1).
+Every pack-file or manifest generation and verification step MUST use `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
 
-* Any byte that violates the rules above invalidates the stored digest and must fail checks.
+Generation MUST NOT depend on:
 
-### **CI enforcement**
+- locale-sensitive collation, case folding, or string comparison;  
+- wall-clock reads or time-derived values;  
+- randomness, seed-dependent libraries, memory addresses, unordered iteration, or other process-specific state; or  
+- floating-point arithmetic or floating-point output.
 
-* Canonicalization check must re-serialize each governed JSON and byte-compare to the on-disk file.
+A required timestamp such as `built_at_utc` MUST be supplied by governed release or CI metadata and MUST NOT be sampled during serialization. It must not influence any artifact except the field that owns it.
 
-* Two-run identity: two consecutive canonical dumps of the same object graph must produce identical bytes.
+Two runs over identical declared inputs and code MUST produce byte-identical pack files and manifest bytes. Checks MUST fail closed on a missing environment pin, nondeterministic output, wall-clock or randomness dependency, float emission, or any §4.1 or §4.2 violation.
 
-* Fail closed on: unsorted keys, missing LF, extra whitespace, BOM, duplicated set entries, locale drift, or number/string mismatches.
+### Acceptance hints
 
-### **Acceptance hints (titles-only)**
-
-* DET\_SERIALIZER\_OK
-
-* TWO\_RUN\_IDENTITY\_OK
-
-* JSON\_CANONICAL\_CHECK\_OK
-
-* MANIFEST\_FILE\_EQ\_CANON\_OK
-
-* JSONL\_RECORDS\_CANON\_OK
-
-* ENV\_LC\_ALL\_C\_OK
-
-§§5–8 reference this policy without redefining it.
-
-## **4.1 Canonical JSON rules**
-
-All artifacts covered by §4 MUST be encoded as canonical JSON. The same semantic content MUST always yield identical bytes.
-
-### **Encoding and file boundary**
-
-* Text encoding: UTF-8.
-
-* No BOM.
-
-* File terminator: exactly one line feed at end of file (LF, byte 0x0A).
-
-* No carriage returns (0x0D) and no trailing spaces or tabs.
-
-### **Object key ordering**
-
-For every JSON object, keys MUST be emitted in strict ASCII ascending order. Ordering is recursive: apply the same rule to all nested objects. Arrays preserve their input order; only object member order is canonicalized.
-
-### **Whitespace and separators**
-
-* Compact form only. No pretty printing.
-
-* Object member separator is a comma , with no surrounding spaces.
-
-* Name–value separator is a colon : with no surrounding spaces.
-
-* Example shape:
-
-  * {"a":1,"b":\[true,false\],"c":{"d":2}}
-
-### **Strings**
-
-* Delimiter: double quotes.
-
-* Content MUST be valid UTF-8.
-
-* Escape only what JSON requires: ", , and control characters U+0000..U+001F (use the shortest legal escape such as \\n, \\t, or \\u00XX).
-
-* Do not escape non-ASCII letters; emit them as UTF-8.
-
-* Disallow unpaired surrogates; strings MUST be well-formed Unicode.
-
-### **Numbers**
-
-* Follow the owning schema’s types.
-
-* Integers: base-10, no leading zeros, no plus sign, no decimal point, no exponent.
-
-* Non-integers: not permitted in pack artifacts. If a future schema requires non-integer quantities, they MUST be represented as exact strings (or exact integer encodings) with a Math-defined rounding/precision policy (see §4.3).
-
-### **Booleans and null**
-
-* Booleans are true or false (lowercase).
-
-* null only where explicitly allowed by the schema.
-
-### **Field names**
-
-Field names follow the schema. If unspecified, prefer lower\_snake ASCII for new fields to keep key ordering unambiguous.
-
-### **Determinism checks (normative)**
-
-* Re-serializing the same in-memory value MUST produce byte-for-byte identical output.
-
-* Canonicalization MUST NOT reorder arrays or change values.
-
-* Any byte that violates the rules above invalidates the artifact.
-
-### **JSONL artifacts (records-only)**
-
-* Structure: exactly one JSON object per line; no array wrapper.
-
-* Line canon: each line is canonical JSON (sorted keys, compact separators).
-
-* File boundary: end with exactly one LF; no blank lines before EOF.
-
-* Purpose: used by the machine Evidence Index and other records-only evidence; see §8.
-
-### **Acceptance hints**
-
-* CANON\_JSON\_UTF8\_OK
-
-* CANON\_JSON\_SORTED\_KEYS\_OK
-
-* CANON\_JSON\_COMPACT\_OK
-
-* CANON\_JSON\_SINGLE\_LF\_OK
-
-* CANON\_JSON\_NO\_BOM\_OK
-
-* CANON\_JSON\_IDENTITY\_OK
-
-## **4.2 Arrays-as-sets discipline**
-
-Deduplicate by identity. Sort ASCII. On value conflict, fail closed.
-
-### **When this applies**
-
-Any array that a schema defines as a set rather than an ordered list.
-
-Typical cases include top-level catalog entries, lists of IDs, and composite references declared as sets.
-
-The owning schema MUST explicitly mark which arrays are treated as sets (and, where possible, encode the identity rule).
-
-### **Identity**
-
-* Scalars: identity is the scalar value itself.
-
-* Objects: identity is the value of the field the schema designates as the identity key (for example id).
-
-* Composite identities: if identity is a tuple, the schema MUST define a canonical projection to a single string (e.g., normalize field order and join with a fixed delimiter).
-
-* If no identity rule is defined for an object array that is treated as a set, that is a schema error to resolve (enforce via a companion check until corrected).
-
-### **Normalization pins (identity projection)**
-
-The projected identity string MUST be canonical and exactly match on-disk bytes for comparison/sort (no trimming, case changes, or locale transforms).
-
-Where the schema mandates a normalized representation, the catalog MUST store that form.
-
-Example (channels): channel\_id \= `"<a>-<b>"` with zero-padded 01..64, min-first (e.g., 31-07, 57-20/57-34/10-57).
-
-### **Deduplication**
-
-* Build a map identity → element.
-
-* If the same identity appears multiple times with byte-identical elements, keep a single instance.
-
-* If the same identity appears with different element values, that is a conflict → fail closed (companion check should point to the first divergent field).
-
-### **Ordering**
-
-After deduplication, arrays-as-sets MUST be ASCII ascending by the identity string (byte-wise, case-sensitive, locale-independent; treat LC\_ALL=C as the reference).
-
-Producers MUST write arrays in this order; validators reject out-of-order sets.
-
-### **Acceptance hints**
-
-* ARR\_SET\_IDENTITY\_DECLARED\_OK
-
-* ARR\_SET\_NO\_DUPLICATES\_OK
-
-* ARR\_SET\_NO\_CONFLICTS\_OK
-
-* ARR\_SET\_ASCII\_SORT\_OK
-
-* ARR\_SET\_PROJECTION\_CANON\_OK
-
-## **4.3 Locale & determinism pins**
-
-LC\_ALL=C. No wall clock. No randomness. No floats in artifact generation.
-
-### **Scope**
-
-Applies to every step that produces canonical pack files or the pack manifest.
-
-### **Locale and environment**
-
-* Set LC\_ALL=C for all generation and verification steps.
-
-* Recommended pins: LANG=C and TZ=UTC to avoid host variance.
-
-* Any collation, case-folding, or string comparison used during generation MUST be performed under this locale.
-
-### **Time sources**
-
-Artifact generation MUST NOT read the wall clock.
-
-No timestamps, date strings, or time-derived fields may be computed during generation.
-
-If a timestamp appears in surrounding evidence, it MUST come from release metadata or CI context and MUST NOT influence artifact bytes.
-
-### **Randomness and process nondeterminism**
-
-No calls to RNGs or seed-dependent libraries.
-
-Do not depend on memory addresses, iteration order of non-deterministic structures, or any nondeterministic API.
-
-Hash-order or interpreter randomization MUST NOT affect outputs; canonical JSON ordering applies.
-
-### **Floating point prohibition**
-
-Artifact generation MUST NOT use floating-point arithmetic.
-
-Outputs MUST NOT contain floating-point numbers.
-
-If a future schema requires non-integer quantities, represent them as exact integers or exact strings with a Math-defined encoding and rounding policy.
-
-### **Determinism requirements**
-
-Two runs over the same inputs and code MUST produce byte-for-byte identical artifacts.
-
-Generation MUST be pure with respect to inputs declared by this document and the owning schemas.
-
-### **CI enforcement**
-
-* Assert LC\_ALL=C in the environment at generation and at checks.
-
-* Run a two-run identity check over the full pack and manifest.
-
-* Grep/audit for wall-clock calls, RNG usage, and float emission in the generation path. Any hit is a hard failure.
-
-### **Acceptance hints**
-
-* ENV\_LC\_ALL\_C\_OK
-
-* NO\_WALL\_CLOCK\_OK
-
-* NO\_RANDOMNESS\_OK
-
-* NO\_FLOATS\_IN\_GEN\_OK
-
-* TWO\_RUN\_IDENTITY\_OK
+`ENV_LC_ALL_C_OK`, `NO_WALL_CLOCK_OK`, `NO_RANDOMNESS_OK`, `NO_FLOATS_IN_GEN_OK`, `TWO_RUN_IDENTITY_OK`, `DET_SERIALIZER_OK`, `JSON_CANONICAL_CHECK_OK`.
 
 # 5\. Freeze-Pack Manifest (catalog/manifest.json) \[Required-Now\]
 
-## **5.1 Manifest file shape \[Required-Now\]**
+## 5.1 Manifest file shape \[Required-Now\]
 
-Purpose. Canonical JSON document that lists every frozen input with {path, sha256, size} and top-level metadata. The canonical bytes of this file determine release\_id (see §6).
+`catalog/manifest.json` is the canonical JSON document that lists every frozen release input. Its finalized canonical bytes determine `release_id` under §6.
 
-Top-level object (no extras).
+### Top-level object
 
-* root — string. Fixed: "catalog/".
+The manifest contains exactly:
 
-* version — string. Semver for the catalog pack (not app version).
+- `built_at_utc` — UTC `YYYY-MM-DDThh:mm:ssZ`;  
+- `files` — the frozen-input entries;  
+- `root` — the exact current pack-namespace label `"catalog/"`; and  
+- `version` — a non-empty manifest format version.
 
-* built\_at\_utc — string. UTC ISO-8601 timestamp (YYYY-MM-DDThh:mm:ssZ).
+`root` is a namespace label, not the path-resolution base. Every `files[].path` resolves from the repository root. Changing this semantic requires a versioned manifest migration and Doc-Delta.
 
-* files — array of entry objects.
+### Entry object
 
-No other top-level members are allowed. Self-exclusion: the root manifest MUST NOT list itself (catalog/manifest.json). Listing catalog/narratives/manifest.json is required (see “Frozen inputs completeness” and §2.8).
+Each `files` member contains exactly:
 
-Files\[\] as a set (arrays-as-sets policy).
+- `path` — a non-empty, case-sensitive, repository-relative POSIX path, including the `catalog/` prefix where applicable; maximum 256 bytes; no absolute path, parent segment, empty segment, `//`, or backslash;  
+- `sha256` — the lowercase 64-hex SHA-256 digest of the exact governed on-disk bytes after format validation; and  
+- `size` — the non-negative integer length of those same bytes.
 
-Treat files as a set keyed by path. Deduplicate by path, ASCII-sort by path (byte-wise, locale-independent), and fail closed on conflicting duplicates. Producers MUST emit files in ASCII ascending path order. Canonical JSON applies everywhere (UTF-8, no BOM; sorted keys; compact separators; exactly one trailing LF).
+Treat `files` as a set keyed by `path`. Paths MUST be unique and emitted in strict ASCII order. `catalog/manifest.json` MUST NOT list itself.
 
-Frozen inputs completeness (normative).
+### Frozen-input completeness
 
-files\[\] MUST enumerate all frozen inputs for the release. This includes, at minimum, the four narratives pack members under catalog/narratives/\* and the narratives pack manifest at catalog/narratives/manifest.json (see §2.8 Narratives pack). Missing any required narratives entry is an error.
+The manifest MUST include every input whose bytes participate in the current release identity. Preserve every legitimate current entry and include, at minimum:
 
-Entry object (exactly three fields).
+- `adapter/http_reader.py`  
+- `catalog/channels_v1.json`  
+- `catalog/gates_v1.json`  
+- `catalog/magic10.json`  
+- `catalog/magic10_caps.json`  
+- `catalog/magic10_seeds.json`  
+- `catalog/narratives/keys.json`  
+- `catalog/narratives/manifest.json`  
+- `catalog/narratives/palettes.json`  
+- `catalog/narratives/suppression_map.json`  
+- `catalog/narratives/templates.json`  
+- `engine/presenter/emitter.py`  
+- `engine/serializer/canon.py`  
+- `math/thresholds.json`  
+- `migrations/005_identity.sql`
 
-* path — string. POSIX path relative to the pack root (root \== "catalog/"). Do not include the "catalog/" prefix. No absolute paths; no ..; no //. Case-sensitive. Path charset/length limits per §0.5 (default: ^\[a-z0-9\_./-\]+$, max 256 bytes).
+Do not list logs, evidence reports, JSONL mirrors, generated registry or configuration reports, or schema files unless a later governed release contract deliberately promotes their bytes to frozen runtime inputs. A checksum sidecar is required only when its owning artifact family explicitly requires one; its existence alone does not make it a frozen input.
 
-* sha256 — string. 64-char lowercase hex of the file’s canonical bytes (per §4 policy).
+### Manifest and member form
 
-* size — integer. Byte length of the same canonical bytes (non-negative; fits in signed 64-bit).
+The manifest MUST itself satisfy §4. Each member follows §5.2: validate the member's owning format, then compare its exact on-disk hash and size.
 
-Additional properties. Not allowed. Each entry MUST contain exactly path, sha256, size.
+Validation fails on an unknown top-level or entry key, malformed path, hash, size, timestamp, or version, duplicate or out-of-order path, missing file, member-format failure, hash or size mismatch, noncanonical manifest, self-listing, incomplete frozen-input set, or non-input extra.
 
-Ordering (producer requirement).
+### Acceptance hints
 
-files\[\] MUST be ASCII ascending by path (byte-wise; locale-independent). Producers MUST emit in this order.
+`PACK_ROOT_PINNED_OK`, `MANIFEST_TOP_LEVEL_OBJECT_OK`, `MANIFEST_FILES_ARRAY_OK`, `MANIFEST_ENTRY_FIELDS_OK`, `MANIFEST_SHA256_HEX64_OK`, `MANIFEST_SIZE_MATCH_OK`, `MANIFEST_PATH_ASCII_SORT_OK`, `MANIFEST_NO_DUP_PATHS_OK`, `MANIFEST_FILE_EXISTS_OK`, `MANIFEST_LISTS_ALL_INPUTS_OK`, `MANIFEST_CANON_JSON_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `NARR_PACKS_IN_MANIFEST_OK`.
 
-Validation rules (summary).
+## 5.2 Hash input
 
-* Every listed path MUST resolve to an existing file under the pack root (catalog/).
+Each manifest entry binds the exact governed on-disk bytes at its repository-relative path. `sha256` is the lowercase SHA-256 digest of those exact bytes; `size` is their exact byte length.
 
-* For each entry, recompute SHA-256 over the file’s canonical bytes; it must match sha256.
+Format validation precedes hashing:
 
-* Recompute byte length; it must match size.
+- Governed canonical JSON MUST pass §4, including exact equality between on-disk bytes and canonical serialization.  
+- A non-JSON member MUST pass its owning encoding and format rules.  
+- Validation MUST NOT parse and re-serialize a member to manufacture hash input different from the bytes on disk.  
+- Compression, transport encoding, editor rendering, file modification time, and other checkout-local metadata are not hash inputs.
 
-* Unknown fields or missing required fields are errors.
+For each entry, validation MUST:
 
-* Duplicate path values with differing sha256 or size are conflicts → error.
+1. validate the path and the member's owning format;  
+2. read the file once in binary mode;  
+3. compute SHA-256 over those exact bytes;  
+4. record the lowercase digest and exact byte length; and  
+5. re-read or independently recompute in check mode and require exact equality.
 
-* Narratives completeness: catalog/narratives/manifest.json and the four narratives members under catalog/narratives/\* MUST be present (see §2.8); omission is an error.
+Finalize and canonicalize `catalog/manifest.json` before computing `release_id`, but never include it in its own `files` array. The arrays-as-sets report at `artifacts/canonical/arrays_as_sets_report.log` is §8.2 integrity evidence, not a frozen input.
 
-* The manifest itself MUST be canonical JSON on disk (UTF-8, sorted keys, compact, exactly one LF).
+Run validation under §4.3. Any path, format, hash, size, or environment mismatch fails closed.
 
-Example (illustrative only).
+### Acceptance hints
 
-{"root":"catalog/","version":"1.0.0","built\_at\_utc":"2025-10-28T00:00:00Z","files":\[{"path":"centers.json","sha256":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":1234},{"path":"gates.json","sha256":"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789","size":5678},{"path":"narratives/manifest.json","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","size":321},{"path":"narratives/templates.json","sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","size":654}\]}
+`HASH_INPUT_EXACT_BYTES_OK`, `HASH_SHA256_HEX64_OK`, `HASH_SIZE_MATCH_OK`, `HASH_FORMAT_VALIDATION_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `HASH_ENV_LC_ALL_C_OK`.
 
-(The example is non-normative and abbreviated; real catalogs will contain additional governed files.)
+## 5.3 Validation
 
-CI enforcement (minimum).
+Manifest validation MUST:
 
-* PACK\_ROOT\_PINNED\_OK
+1. parse `catalog/manifest.json` and require the exact §5.1 top-level shape, `root:"catalog/"`, timestamp form, and version;  
+2. require exact entry keys, safe repository-relative POSIX paths, lowercase 64-hex hashes, non-negative sizes, unique paths, and strict ASCII path order;  
+3. resolve every entry as `repository_root / path` and reject escape or missing targets;  
+4. apply the member's owning format validation, including §4 exact canonical-byte comparison for governed JSON;  
+5. hash and size the exact on-disk bytes and compare both with the entry;  
+6. reject self-listing, missing frozen inputs, and evidence or non-input extras; and  
+7. run under §4.3 without network access, randomness, or checkout-local metadata.
 
-* MANIFEST\_TOP\_LEVEL\_OBJECT\_OK
+Do not compute `release_id` from a malformed, incomplete, noncanonical, duplicate, out-of-order, or otherwise invalid manifest. An invalid manifest is an error state, not an alternate identity.
 
-* MANIFEST\_FILES\_ARRAY\_OK
+### Current repository posture
 
-* MANIFEST\_ENTRY\_FIELDS\_OK
+At the pinned repository snapshot, `catalog/manifest.json` contains eight entries. It omits both topology catalogs and all five required narrative JSON files named in §5.1. The tracked `artifacts/math/freeze_pack_manifest.json` is also not byte-identical to the current manifest. The refreshed manifest contract is therefore not repo-conformant, and no PASS is claimed.
 
-* MANIFEST\_SHA256\_HEX64\_OK
+### Acceptance hints
 
-* MANIFEST\_SIZE\_MATCH\_OK
-
-* MANIFEST\_PATH\_ASCII\_SORT\_OK
-
-* MANIFEST\_NO\_DUP\_PATHS\_OK
-
-* MANIFEST\_FILE\_EXISTS\_OK
-
-* MANIFEST\_CANON\_JSON\_OK
-
-* PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK
-
-(Narratives pack-specific acceptance lives in §2.8: NARR\_PACKS\_IN\_MANIFEST\_OK, NARR\_PACK\_MANIFEST\_OK, NARR\_PACK\_IDENTITY\_OK, and NARR\_PACKS\_CANONICAL\_JSON\_OK.)
-
-## **5.2 Hash input**
-
-Arrays-as-sets report (governed proof artifact).
-
-The arrays-as-sets canonicalization report is a governed proof artifact at `artifacts/canonical/arrays_as_sets_report.log`.
-
-The canonical generator entrypoint is `tools/evidence/generate_arrays_as_sets_report.py` (titles-only; no runbook).
-
-The report may explicitly record the already-canonical case (for example, a note stating that raw equals normalized). The already-canonical case is conforming and must not be treated as an error by consumers of the report.
-
-Canonical bytes of the artifact (per §4), not raw editor formatting.
-
-Normative rule.
-
-Compute sha256 over the artifact’s canonical bytes as defined in §4 (UTF-8, sorted keys, compact, exactly one LF, no BOM). Do not hash whatever an editor wrote if it is non-canonical.
-
-Required procedure (JSON artifacts).
-
-* Read the file in binary mode.
-
-* Parse as JSON and re-serialize with the canonical JSON rules from §4 to obtain canonical\_bytes.
-
-* Compare canonical\_bytes to the on-disk bytes. They MUST match exactly.
-
-* If they differ (pretty print, CRLF, extra spaces, unsorted keys, missing LF, BOM), fail closed. Do not “fix up” during hashing.
-
-* Compute SHA-256 over canonical\_bytes.
-
-* Encode the digest as 64 lowercase hex; record it as sha256.
-
-* Set size to the byte length of canonical\_bytes.
-
-What not to hash.
-
-* Not compressed or transport encodings (no gzip, no br).
-
-* Not editor or IDE previews with altered line endings or encodings.
-
-* Not a “normalized-only-for-hashing” variant while leaving a non-canonical file on disk. The file itself must already be canonical.
-
-Arrays-as-sets interaction.
-
-* If an array is declared a set (§4), the file must already be deduplicated and ASCII-sorted by identity.
-
-* Any duplicate-with-different-value or out-of-order identity makes the artifact non-canonical → fail closed.
-
-Locale and environment.
-
-Run under LC\_ALL=C (§4). Do not allow locale or timezone to affect bytes or hashing.
-
-Self-listing.
-
-RESOLVED: the manifest does not self-list. If this policy changes, compute any self-entry after the file is finalized and canonical, then validate it like any other entry (avoid recursion by hashing the canonical bytes as they exist on disk at that moment).
-
-Acceptance hints.
-
-* HASH\_INPUT\_CANON\_BYTES\_OK
-
-* HASH\_SHA256\_HEX64\_OK
-
-* HASH\_SIZE\_MATCH\_OK
-
-* HASH\_FILE\_EQ\_CANON\_OK
-
-* HASH\_ENV\_LC\_ALL\_C\_OK
-
-## **5.3 Validation**
-
-Hex64 lowercase; size matches canonical bytes; every referenced artifact appears exactly once.
-
-Procedure (normative).
-
-Schema pass. Validate catalog/manifest.json against its owning schema (top-level object with root, version, built\_at\_utc, and a single files array of {path, sha256, size}, no additional top-level members or entry fields).
-
-Entry fields. For each files entry:
-
-* sha256 matches regex ^\[0-9a-f\]{64}$ (lowercase hex).
-
-* size is an integer ≥ 0 (fits in 64-bit signed).
-
-* path is a relative POSIX path (no absolute paths, no .., no //).
-
-File presence. Each path resolves to an existing file under the pack root (root="catalog/"). Missing files are errors.
-
-Canonical bytes check. For each path:
-
-* Read in binary, parse JSON, re-serialize with §4 canonical rules to obtain canonical\_bytes.
-
-* The on-disk bytes MUST equal canonical\_bytes. If not, fail closed (do not “fix up” during hashing).
-
-Digest and length. Recompute SHA-256 over canonical\_bytes; compare to sha256. Recompute byte length; compare to size. Both MUST match.
-
-Uniqueness & order. Treat files as a set keyed by path:
-
-* No duplicate path entries.
-
-* ASCII-ascending order by path. Any out-of-order pair is an error.
-
-Completeness. The set of entries MUST include every frozen input exactly once. No missing entries. No extraneous entries for non-inputs.
-
-Arrays-as-sets interaction. Where any governed artifact contains arrays treated as sets (§4), that artifact MUST already be deduplicated and ASCII-sorted by identity. Any conflict/out-of-order identity makes the artifact non-canonical → error.
-
-Locale & purity. Perform validation under LC\_ALL=C (§4); no wall clock, randomness, or floats in any step.
-
-Self-listing. Not used. If re-enabled by policy, verify the computed self-entry like any other entry.
-
-CI enforcement (minimum checks).
-
-* MANIFEST\_TOP\_LEVEL\_OBJECT\_OK
-
-* MANIFEST\_FILES\_ARRAY\_OK
-
-* MANIFEST\_ENTRY\_FIELDS\_OK
-
-* MANIFEST\_SHA256\_HEX64\_OK
-
-* MANIFEST\_SIZE\_MATCH\_OK
-
-* MANIFEST\_NO\_DUP\_PATHS\_OK
-
-* MANIFEST\_PATH\_ASCII\_SORT\_OK
-
-* MANIFEST\_FILE\_EXISTS\_OK
-
-* MANIFEST\_FILE\_EQ\_CANON\_OK
-
-* MANIFEST\_LISTS\_ALL\_INPUTS\_OK
-
-* MANIFEST\_CANON\_JSON\_OK
-
-* ENV\_LC\_ALL\_C\_OK
-
-* PACK\_ROOT\_PINNED\_OK
-
-* PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK
+`MANIFEST_TOP_LEVEL_OBJECT_OK`, `MANIFEST_ENTRY_FIELDS_OK`, `MANIFEST_PATH_SAFE_OK`, `MANIFEST_PATH_ASCII_SORT_OK`, `MANIFEST_NO_DUP_PATHS_OK`, `MANIFEST_FILE_EXISTS_OK`, `MANIFEST_MEMBER_FORMAT_OK`, `MANIFEST_SHA256_HEX64_OK`, `MANIFEST_SIZE_MATCH_OK`, `MANIFEST_LISTS_ALL_INPUTS_OK`, `MANIFEST_CANON_JSON_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `ENV_LC_ALL_C_OK`.
 
 # 6\. Freeze-Pack Manifest → release\_id \[Required-Now\]
 
-## **6.1 Manifest construction**
+## 6.1 Manifest construction
 
-Purpose. Canonical JSON document listing every frozen input (path, sha256, size) with top-level metadata. This file’s canonical bytes are the exact bytes hashed to derive release\_id and it captures a closed set of frozen inputs for the release.
+`catalog/manifest.json` is the single source of truth for the closed set of frozen release inputs. Section 5.1 owns its structure, entry rules, canonical-byte requirements, ordering, duplicate handling, completeness, self-exclusion, and manifest validation. Any prior name, including `CANON_CHECKSUMS.json`, is deprecated.
 
-Single home.
+In addition to §5.1:
 
-The Freeze-Pack Manifest file is catalog/manifest.json — the single source of truth for the input list. Any prior name (for example, CANON\_CHECKSUMS.json) is deprecated.
+- Include every catalog or artifact consumed as a frozen input in this document's scope.  
+- Include `catalog/narratives/manifest.json` and every member it lists, as governed by §2.8.  
+- Do not include logs, evidence reports, JSONL mirrors, or other non-inputs.
 
-Top-level shape (normative).
+Sealed narrative packs are served from `/narratives/<pack_sha>/<PACK_MEMBER>`. Their identity binds to the canonical bytes of `catalog/narratives/manifest.json`; loader and mount behavior remain in their owning specification.
 
-The manifest is a JSON object with the following properties (no others allowed):
+The finalized, valid canonical manifest bytes are the sole input to §6.2.
 
-* root — string. Pack root, fixed to "catalog/".
+## 6.2 release\_id computation
 
-* version — string. Semver for the catalog pack (not the app version).
+`release_id` is the lowercase 64-hex SHA-256 digest of the finalized canonical bytes of `catalog/manifest.json`.
 
-* built\_at\_utc — string. UTC ISO-8601 timestamp (YYYY-MM-DDThh:mm:ssZ).
+Computation MUST:
 
-* files — array of entry objects.
+1. read the finalized manifest in binary mode;  
+2. parse it and serialize the parsed value under §4;  
+3. require the on-disk bytes to equal that canonical serialization;  
+4. complete all §5 validation;  
+5. compute SHA-256 over the verified on-disk manifest bytes; and  
+6. encode the digest as exactly 64 lowercase hexadecimal characters.
 
-Self-exclusion. The root manifest MUST NOT list itself (catalog/manifest.json). Listing catalog/narratives/manifest.json is required (see Content requirements and §2.8).
+Do not compute an identity from a noncanonical or otherwise invalid manifest. Validation of a claimed `release_id` repeats this procedure and requires exact equality.
 
-Entry objects (see §5.1).
+The computation uses §4.3 and no wall clock, randomness, float, evidence file, environment-provided identity, or mutable derived artifact. Two runs over identical manifest bytes MUST produce the same value.
 
-Exactly: {"path": "\<string\>", "sha256": "\<lowercase 64-hex\>", "size": \<non-negative integer\>}
+### Acceptance hints
 
-path values are relative to the pack root (root \== "catalog/"). Do not include the "catalog/" prefix. Path constraints: repo-relative POSIX; no .., no //; maximum 256 bytes. Case-sensitive. (Default path charset guidance ^\[a-z0-9\_./-\]+$.)
+`RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`, `JSON_CANONICAL_CHECK_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `TWO_RUN_IDENTITY_OK`.
 
-Arrays-as-sets policy.
+### 6.2.1 External release attestation
 
-files is treated as a set keyed by path. Apply §4 arrays-as-sets rules: dedupe by identity (path), ASCII-sort by path, fail closed on conflicts.
+The dependency direction is `tracked source → canonical manifest → release_id → external attestation`.
 
-Canonical bytes.
+Runtime derives `release_id` only from the packaged canonical bytes of `catalog/manifest.json`. It MUST NOT use evidence paths, release-identity environment variables, generated source constants, or mutable attestation files as identity inputs.
 
-Apply §4 canonical JSON rules to the entire file: UTF-8 (no BOM); sorted keys (ASCII) for every object; compact separators; exactly one trailing LF.
-
-Content requirements.
-
-Include every catalog/artifact consumed as a frozen input in this document’s scope (for example: centers.json, gates.json, channels.json, presets.json, magic10.json, magic10\_seeds.json when present, and other denominators where applicable).
-
-Include narratives pack members under catalog/narratives/\* (keys.json, templates.json, optional palettes.json, suppression\_map.json) and the narratives pack manifest at catalog/narratives/manifest.json (see §2.8).
-
-Do not include logs, evidence reports, JSONL mirrors, or other non-inputs.
-
-Narratives completeness check: the items above must be present exactly once; omission is an error.
-
-Runtime (titles-only). Sealed narratives packs are served from /narratives/\<pack\_sha\>/\<PACK\_MEMBER\>. Identity binding is to the canonical bytes of catalog/narratives/manifest.json (see pack\_sha rule above). Loader/mount behavior is referenced here by title only; detailed runtime policy lives outside this document.
-
-Ordering & duplicates.
-
-files entries MUST be ASCII ascending by path.
-
-No duplicate path. Conflicting duplicates (same path, different sha256/size) ⇒ error.
-
-Example (illustrative only).
-
-{"root":"catalog/","version":"1.0.0","built\_at\_utc":"2025-10-28T00:00:00Z","files":\[{"path":"centers.json","sha256":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","size":1234},{"path":"gates.json","sha256":"abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789","size":5678},{"path":"narratives/manifest.json","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","size":321},{"path":"narratives/templates.json","sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","size":654}\]}
-
-CI enforcement (minimum).
-
-MANIFEST\_TOP\_LEVEL\_OBJECT\_OK, MANIFEST\_FILES\_ARRAY\_OK, MANIFEST\_ENTRY\_FIELDS\_OK, MANIFEST\_SHA256\_HEX64\_OK, MANIFEST\_SIZE\_MATCH\_OK, MANIFEST\_PATH\_ASCII\_SORT\_OK, MANIFEST\_NO\_DUP\_PATHS\_OK, MANIFEST\_FILE\_EXISTS\_OK, MANIFEST\_CANON\_JSON\_OK, PACK\_ROOT\_PINNED\_OK, PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK.
-
-## **6.2 release\_id computation**
-
-release\_id \= sha256(canonical\_manifest\_bytes) where the digest is lowercase 64-hex.
-
-Normative rule.
-
-Compute release\_id by hashing the canonical bytes of the Freeze-Pack Manifest defined in §6.1. Canonical bytes follow §4: UTF-8, sorted keys (ASCII), compact, exactly one LF, no BOM. Output is a 64-character lowercase hex SHA-256 string. No prefixes, no uppercase.
-
-Procedure.
-
-* Read the finalized manifest in binary.
-
-* Parse JSON and re-serialize using §4 rules to obtain canonical\_manifest\_bytes.
-
-* Verify on-disk bytes equal canonical\_manifest\_bytes. If not, fail closed.
-
-* Compute SHA-256 over canonical\_manifest\_bytes.
-
-* Encode as 64 lowercase hex; record as release\_id.
-
-Determinism pins.
-
-Run with LC\_ALL=C, LANG=C, TZ=UTC (§4). No wall clock, no randomness, no floats.
-
-Two runs over identical inputs MUST produce identical release\_id.
-
-Validation.
-
-To validate a claimed release\_id, recompute from the on-disk manifest as above and compare for exact equality.
-
-If the manifest is non-canonical, do not compute. Treat as an error until canonicalization is fixed.
-
-Acceptance hints (titles only; tokens live in HDE-Governance §2.0).
-
-RELEASE\_ID\_RECOMPUTE\_OK, RELEASE\_ID\_FROM\_MANIFEST\_OK, JSON\_CANONICAL\_CHECK\_OK, PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK.
-
-### **6.2.1 External release attestation**
-
-The release dependency direction is:
-
-`tracked source → canonical manifest → release_id → external attestation`
-
-Runtime derives `release_id` only from the packaged canonical bytes of `catalog/manifest.json`. Runtime MUST NOT consume evidence paths, release-identity environment variables, generated source constants, or mutable attestation files as release-identity inputs.
-
-Current release-bound derivatives are generated with:
+The repository defines the release-attestation interface as:
 
 `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`
 
-The tracked contract schemas are:
+Its tracked contracts are:
 
-* success: `hde.release_attestation.v1` at `schemas/hde_release_attestation.v1.json`; and  
-* failure: `hde.release_attestation.failure.v1` at `schemas/hde_release_attestation_failure.v1.json`.
+- success: `hde.release_attestation.v1` at `schemas/hde_release_attestation.v1.json`;  
+- failure: `hde.release_attestation.failure.v1` at `schemas/hde_release_attestation_failure.v1.json`.
 
-A successful final attestation requires an exact clean source commit, `source_commit_exact: true`, `release_admission: "PR06R_B_FINAL_PASS"`, and `pipeline_stop: null`. It binds the exact source commit, deterministic tracked-tree digest, canonical manifest and release identity, sorted file inventory, deterministic transcript facts, canonical checksums, and final release-admission posture.
+A successful final attestation requires an exact clean source commit, `source_commit_exact:true`, `release_admission:"PR06R_B_FINAL_PASS"`, and `pipeline_stop:null`. It binds the exact source commit, deterministic tracked-tree digest, canonical manifest and release identity, sorted file inventory, deterministic transcript facts, canonical checksums, and final release-admission posture.
 
-`tools/evidence/build_release_attestation.py` MUST refuse output inside the source repository, a non-empty destination, and overwrite of existing output. Success and failure outputs remain external. They are not governed checked-in release primaries, do not create Human Evidence Index or Machine Evidence Mirror bindings for emitted bundles, and do not create acceptance-token satisfaction by implication.
+The builder MUST refuse a symlinked output root, an output inside the source repository, a non-directory destination, a non-empty destination, or overwrite of existing output. Success and failure outputs remain external. They are not checked-in release primaries and do not create Human Evidence Index, Machine Evidence Mirror, QA PASS, acceptance-token, PF09, deployment, migration, or OPS claims by implication.
 
-Existing checked-in EPIC022 release evidence and its companions remain frozen capture-time records. They are not runtime identity inputs, are not regenerated for later release cuts, and MUST NOT be relabeled as current release attestations.
+Checked-in release evidence remains historical capture evidence, not a runtime identity input, and MUST NOT be relabeled as a current attestation. Configuration evidence and derived configuration bundles MUST NOT acquire incidental manifest digests, release IDs, or frozen-source identities merely because a release is cut.
 
-`artifacts/registry/registry_report.json` remains configuration evidence rather than release-identity or release-provenance evidence. It and derived config bundles MUST NOT embed incidental manifest digests, release IDs, or manifest-listed source-file identities, and an otherwise unchanged registry/configuration family MUST NOT churn solely because of a release cut.
+## 6.3 Change ⇒ new release\_id
 
-## **6.3 Change ⇒ new release\_id**
+Any byte change to a valid canonical manifest changes `release_id`. A listed member's byte change requires its `sha256` or `size` entry to change, which changes the manifest bytes.
 
-Any byte change to a frozen input or to the manifest produces a new release\_id.
+A valid manifest change includes:
 
-Scope.
+- adding or removing an entry;  
+- renaming an entry path; or  
+- changing `path`, `sha256`, `size`, `built_at_utc`, `root`, or `version`.
 
-“Frozen input” means any file listed in the Freeze-Pack Manifest (§6.1).
+Duplicate paths and a `files` array outside strict ASCII path order are invalid states, not alternate release identities. Do not compute `release_id` from them. Correct the defect, restore a valid canonical manifest, and then recompute.
 
-“Manifest structure” means the set of entries and their canonical JSON form in catalog/manifest.json.
+If a governed member violates its format rules and is corrected, regenerate the valid manifest and recompute. Examples include:
 
-Normative rules.
+- changing any byte in `catalog/gates_v1.json`;  
+- canonicalizing `catalog/channels_v1.json` or `catalog/magic10_caps.json` so its on-disk bytes satisfy §4; and  
+- adding a future governed `catalog/presets_v1.json` after its Doc-Delta promotion.
 
-If any listed artifact’s canonical bytes change, the entry (sha256, size) changes ⇒ manifest bytes change ⇒ new release\_id.
+A change outside the manifest's frozen-input set does not change `release_id` unless it also changes the valid manifest bytes. Transport compression and editor settings that do not alter governed bytes do not affect identity.
 
-If the manifest’s entries set changes in any way, manifest bytes change ⇒ new release\_id:
+### Acceptance hints
 
-* Adding/removing an entry.
+`RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`, `MANIFEST_PATH_ASCII_SORT_OK`, `MANIFEST_NO_DUP_PATHS_OK`, `MANIFEST_FILE_EXISTS_OK`, `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`.
 
-* Renaming a path.
+## 6.4 Evidence and CI hooks
 
-* Introducing or resolving a duplicate path.
+These are the required release-identity surfaces:
 
-* Reordering so files is not ASCII-ascending by path.
+| Surface | Contract |
+| :---- | :---- |
+| `artifacts/math/freeze_pack_manifest.json` | Byte-identical evidence copy of the canonical `catalog/manifest.json`; no alternate payload semantics. |
+| `scripts/release_id_recompute.py` | Recompute and validation entrypoint for manifest bytes, member hashes and sizes, derived evidence, and `release_id`. |
+| `artifacts/math/release_id_recompute.log` | Recompute evidence log. |
+| `artifacts/math/release_id.txt` | Exactly one lowercase 64-hex `release_id` followed by one LF. |
+| `artifacts/math/checksums_audit.log` | Per-entry exact-byte hash, size, presence, and failure results. |
+| `artifacts/math/manifest_snapshot.json` | Canonical JSON containing the complete manifest object, `release_id`, and `produced_at_utc` copied from manifest `built_at_utc`; evidence only. |
+| `artifacts/proofs/env_pins.txt` | Names and values of the deterministic environment pins used by the release checks. |
 
-* Changing any field value (path, sha256, size).
+`audit/gates/release/release_id.txt` is deprecated and MUST NOT be used.
 
-If an artifact violates canonical rules and is then corrected to canonical, the artifact bytes change ⇒ new release\_id.
+Mode semantics are normative:
 
-Non-canonical manifest: do not compute (see §6.2 Validation). Fix canonicalization first; then compute.
+- `--check` is fail-closed, returns nonzero on any mismatch, and MUST NOT write or repair governed artifacts.  
+- Write mode without `--check` MAY rewrite derived artifacts only in an isolated release-build workspace and MUST return zero only when the post-write state is clean.  
+- Regression coverage MUST exercise both modes in an isolated temporary workspace so the source working tree is not mutated.
 
-Examples that produce a new release\_id.
+The required identity gate entrypoint is `ci/checks/check_release_identity.sh`, which is a Python entrypoint despite its suffix. It MUST run `scripts/release_id_recompute.py --check`, enforce the §5 manifest contract, require byte equality between the manifest and freeze-pack evidence copy, verify the recorded `release_id`, and fail closed on missing, empty, stale, or inconsistent required surfaces.
 
-Edit to catalog/gates.json that changes any value.
+Run all generation and checks under §4.3. Prove two-run identity for the same inputs. Evidence registration, Human Index and Machine Mirror parity, path proofs, and any family-owned checksum sidecars remain governed by §8.6; this section does not create blanket sidecar requirements.
 
-Fixing key order or line endings in catalog/centers.json to meet §4.
+The current tracked manifest and freeze-pack evidence copy do not satisfy these requirements. Static file presence or a historical PASS line does not establish current conformance.
 
-Adding catalog/presets.json to the pack.
+### Acceptance hints
 
-Adding catalog/magic10\_seeds.json to the pack (when introduced).
+`RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `MANIFEST_LISTS_ALL_INPUTS_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `TWO_RUN_IDENTITY_OK`.
 
-Adding catalog/narratives/manifest.json to the pack.
+# 7\. Interfaces to Other Specs (titles-only) \[Required-Now\]
 
-Adding any catalog/narratives/\* member (keys/templates/palettes/suppression\_map) to the pack.
+This section routes governed truth by exact document title. It does not restate another specification's contract and does not include version numbers.
 
-Renaming a path in the manifest.
+## 7.1 Math (by title)
 
-Correcting an out-of-order files array to ASCII order.
+Reference: HDE-Math-Spec.
 
-Examples that do not produce a new release\_id.
+HDE-Math-Spec owns scoring, thresholds, deterministic preimage and idempotence rules, arithmetic, weighting, tie-breaking, and precedence.
 
-Editor settings that do not alter canonical bytes.
+## 7.2 Governance/CLI (by title)
 
-Changes to logs, evidence reports, JSONL mirrors, or files not listed in the manifest.
+References: HDE-Governance; HDE-CLI-API-Vendor-Ref.
 
-Runtime or transport settings outside the pack (for example, gzip delivery).
+These documents own public success and error shapes, headers and conditional delivery, CLI and vendor request shaping, typed field mapping, and operational log policy.
 
-CI enforcement.
+## 7.3 Architecture (by title)
 
-Recompute release\_id from the finalized manifest and compare to the recorded value.
+Reference: HDE Architecture.
 
-Fail the build if any listed artifact’s recomputed sha256 or size differs from the manifest.
-
-Fail the build if the manifest is not canonical JSON or not ASCII-sorted by path.
-
-Acceptance hints (titles only; tokens live in HDE-Governance §2.0).
-
-RELEASE\_ID\_RECOMPUTE\_OK, RELEASE\_ID\_FROM\_MANIFEST\_OK, MANIFEST\_PATH\_ASCII\_SORT\_OK, MANIFEST\_NO\_DUP\_PATHS\_OK, MANIFEST\_FILE\_EXISTS\_OK, JSON\_CANONICAL\_CHECK\_OK, TWO\_RUN\_IDENTITY\_OK.
-
-## **6.4 Evidence and CI hooks**
-
-Purpose. Prove the manifest is canonical, that each entry’s digest and size match the artifact’s canonical bytes, and that the release\_id equals the SHA-256 of the canonical manifest bytes.
-
-Required artifacts.
-
-Freeze-Pack Manifest evidence copy (no alternate semantics).
-
-* path: artifacts/math/freeze\_pack\_manifest.json
-
-* MUST be a byte-identical copy of the canonical on-disk catalog/manifest.json (identity is on canonical bytes; no derived schemas or alternate contracts).
-
-* MUST NOT be repurposed for any other manifest-like payload (see “no branching semantics” posture in Build Notes by title only).
-
-Recompute script — reads the finalized manifest, verifies canonical form, recomputes release\_id, and proves the freeze-pack identity surfaces are coherent.
-
-* path: scripts/release\_id\_recompute.py
-
-* recompute log (evidence): artifacts/math/release\_id\_recompute.log
-
-Mode semantics (normative).
-
-* \--check MUST be fail-closed (non-zero on any mismatch) and MUST NOT “self-heal” or rewrite governed artifacts.
-
-* Non---check mode MAY rewrite governed artifacts to the canonical state and MUST exit 0 when the post-write state is clean.
-
-* A regression test MUST cover both modes using an isolated temp workspace (so the repo working tree is not mutated).
-
-Release ID file (canonical) — one-line release\_id \+ LF; must be treated as the canonical recorded value for tooling and closeout wiring.
-
-* path: artifacts/math/release\_id.txt
-
-* audit/gates/release/release\_id.txt is deprecated and MUST NOT be used.
-
-Checksum verification report — per-entry results for path, recomputed sha256, size, and any failures.
-
-* path: artifacts/math/checksums\_audit.log
-
-Manifest snapshot — small JSON with release\_id, manifest file path, manifest sha256, entry count, CI timestamp. Evidence only, not an input.
-
-* path: artifacts/math/manifest\_snapshot.json
-
-Environment pins — text file recording LC\_ALL=C, LANG=C, TZ=UTC used during checks.
-
-* path: artifacts/proofs/env\_pins.txt
-
-Normative behavior.
-
-Recompute release\_id.
-
-* Read catalog/manifest.json in binary; parse; re-serialize with §4 rules to canonical bytes; verify on-disk file equals canonical.
-
-* Compute SHA-256 over canonical bytes; compare to the recorded release\_id (must match).
-
-* Assert manifest is UTF-8 (no BOM), sorted keys, compact, exactly one LF; files\[\] is ASCII-sorted by path, has no duplicates, and does not list the manifest itself.
-
-Verify checksums.
-
-* For each entry {path, sha256, size}: open the file; compute canonical bytes; verify on-disk equals canonical; recompute sha256 and size; both must match the manifest.
-
-* Fail if any entry path is not repo-relative POSIX or any hash is not lowercase 64-hex.
-
-Completeness.
-
-* The manifest lists every frozen input exactly once (closed sets, denominators, catalogs, constants, thresholds, seeds if catalogized). No extras for non-inputs.
-
-* Narratives completeness: catalog/narratives/manifest.json and the four catalog/narratives/\* members must be present exactly once (see §2.8).
-
-Locale and determinism.
-
-* Run under LC\_ALL=C, LANG=C, TZ=UTC with no wall-clock dependence, no randomness, and no floating-point nondeterminism (§4).
-
-* Prove two-run identity of the recompute step (same inputs → identical outputs).
-
-CI hooks (minimum).
-
-Release identity gate (fail-closed, closed rails) — CI MUST run the dedicated identity gate entrypoint:
-
-* path: ci/checks/check\_release\_identity.sh
-
-invocation posture (names-only): invoke as a Python entrypoint (for example python ci/checks/check\_release\_identity.sh).
-
-minimum behavior (normative):
-
-* enforce closed rails
-
-* run python scripts/release\_id\_recompute.py \--check
-
-* assert manifest schema \+ canonical bytes posture
-
-* assert byte-equality between catalog/manifest.json (canonical bytes) and artifacts/math/freeze\_pack\_manifest.json
-
-* assert the governed recompute evidence outputs exist and are non-empty
-
-operator note (non-blocking): running the gate may rewrite artifacts/math/release\_id\_recompute.log even in \--check mode in ephemeral CI workspaces; local operators MUST treat this as tool-driven churn and avoid committing unintended log rewrites.
-
-Pre-merge job runs the recompute script and checksum verification; any failure is a hard stop.
-
-Manifest-change gate requires updating, in the same commit/PR:
-
-* the human Evidence Index: docs/evidence/INDEX.json
-
-* the Evidence Index hash sentinel: docs/evidence/INDEX.sha256
-
-* the machine mirror: artifacts/evidence\_index.jsonl
-
-Two-run identity job ensures stable bytes across two executions on the same inputs.
-
-Sentinel check: CI fails if docs/evidence/INDEX.sha256 does not match the current INDEX.json bytes.
-
-Evidence Index entries (titles and paths only).
-
-* Freeze-Pack Manifest (bytes copied for evidence) — artifacts/math/freeze\_pack\_manifest.json
-
-* Release ID file (canonical) — artifacts/math/release\_id.txt
-
-* Recompute release\_id script — scripts/release\_id\_recompute.py
-
-* Recompute release\_id log — artifacts/math/release\_id\_recompute.log
-
-* Checksum verification report — artifacts/math/checksums\_audit.log
-
-* Manifest snapshot (release\_id, manifest sha256, count) — artifacts/math/manifest\_snapshot.json
-
-* Environment pins (LC\_ALL, LANG, TZ) — artifacts/proofs/env\_pins.txt
-
-* Evidence Index hash sentinel — docs/evidence/INDEX.sha256
-
-Acceptance hints (titles only; acceptance token names live in PF04; semantics in HDE-Governance).
-
-RELEASE\_ID\_RECOMPUTE\_OK, RELEASE\_ID\_FROM\_MANIFEST\_OK, PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK, MANIFEST\_SHA256\_HEX64\_OK, JSON\_CANONICAL\_CHECK\_OK, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, TWO\_RUN\_IDENTITY\_OK.
-
-## **7\. Interfaces to Other Specs (titles-only) \[Required-Now\]**
-
-This document routes by title only. Do not restate or duplicate content from other specs. Do not include version numbers in prose.
-
-## **7.1 Math (by title)**
-
-Reference: PF-Canon-HDE-Math-Spec
-
-Defers to Math for:
-
-* Scoring and thresholds
-
-* Deterministic preimage and idempotence recipe
-
-* Any arithmetic, weighting, tie-break, or precedence logic
-
-## **7.2 Governance/CLI (by title)**
-
-References: PF-Canon-HDE-Governance; PF-Canon-HDE-CLI-API-Vendor-Ref
-
-Defers to Governance/CLI for:
-
-* Public success and error shapes
-
-* Headers and conditional delivery behavior
-
-* Vendor request shaping and typed field mapping
-
-## **7.3 Architecture (by title)**
-
-Reference: PF-Canon-HDE-Architecture
-
-Defers to Architecture for:
-
-* System boundaries and single-homes
-
-* Contract-free overview of components and responsibility lines
+HDE Architecture owns system boundaries, single homes, component responsibilities, and the contract-free architecture overview.
 
 ## **CI & Evidence \[Required-Now\]**
 
@@ -3172,46 +2619,6 @@ OPS\_REFUSAL\_FILE\_FORMAT\_OK
 OPS\_REFUSAL\_HEADERS\_OK  
 OPS\_REFUSAL\_BODY\_OK  
 OPS\_REFUSAL\_MIRROR\_LINK\_OK
-
-# 7\. Interfaces to Other Specs (titles-only) \[Required-Now\]
-
-This document routes by title only. Do not restate or duplicate content from other specs. Do not include version numbers in prose.
-
-## **7.1 Math (by title)**
-
-Reference: PF-Canon-HDE-Math-Spec
-
-Defers to Math for:
-
-* Scoring and thresholds
-
-* Deterministic preimage and idempotence recipe
-
-* Any arithmetic, weighting, tie-break, or precedence logic
-
-## **7.2 Governance/CLI (by title)**
-
-References: PF-Canon-HDE-Governance; PF-Canon-HDE-CLI-API-Vendor-Ref
-
-Defers to Governance/CLI for:
-
-* Public success and error shapes
-
-* Headers and conditional delivery behavior
-
-* Vendor request shaping and typed field mapping
-
-## **7.3 Architecture (by title)**
-
-Reference: PF-Canon-HDE-Architecture
-
-Defers to Architecture for:
-
-* System boundaries and single-homes
-
-* Contract-free overview of components and responsibility lines
-
-CI & Evidence \[Required-Now\]
 
 # 8\. CI & Evidence \[Required-Now\]
 
