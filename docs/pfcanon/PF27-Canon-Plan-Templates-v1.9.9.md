@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.9.8
+**Version:** v1.9.9
 
 **Status:** Canon
 
 **Effective date:** 2026-08-08
 
-**Last Update Gate:** BN 12.6.2 A22-27
+**Last Update Gate:** BN 12.6.2 A28-44
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -226,7 +226,17 @@ Mechanical blocker posture: any prohibited ellipsis or any fenced code block in 
 
 Epic ID: HDE-EPIC\#\#\#  
 Plan type: Live QA Plan / Runbook  
-Execution venue: Codespaces (or Other: \_\_\_\_)  
+Execution venue: Codespaces (preferred) | Other: \_\_\_\_
+
+Venue-specific claim: \<CLAIM\> | NOT CLAIMED | NOT APPLICABLE
+
+Why venue can affect the result: \<RATIONALE\> | NOT APPLICABLE
+
+Required venue evidence: \<GOVERNED\_EVIDENCE\> | NOT APPLICABLE
+
+Effect of missing venue evidence: \<EFFECT\> | NOT APPLICABLE
+
+The execution-venue field is descriptive and records an intended or preferred operator surface unless the four venue-materiality fields establish a venue-specific proof contract and explain why venue can affect the result.  
 Target environment: prod | dev | other: \_\_\_\_ (explicit)  
 Plan revision: r\#  
 Date (UTC): YYYY-MM-DD  
@@ -581,6 +591,23 @@ Bounded step-level rerun posture (required when a plan permits one):
 * If an executed Moon Loop is broader than a narrow plan example but still remains minimal, auditable, within approved check scope, and does not add new acceptance surfaces, feature work, evidence family, token, or public contract, the review may accept it as a caveat or PASS-only deviation. The review must state why the deviation remained acceptable and must not hide it under PASS.  
 * Live QA Moon Loop route boundary (required). Moon Loop correction may repair QA-created evidence-harness, header, manifest, path-proof, doc-delta, or QA evidence assembly defects only when the changed files remain under the approved QA root and do not change product behavior, repo evidence-generator behavior, governed artifact behavior, public contracts, PF documents, acceptance tokens, or multiple implementation subsystems.  
 * Non-QA-root remediation route (required). A change to product code, repo tests, repo evidence generators, governed artifacts outside the QA root, public contracts, PF documents, acceptance tokens, or multiple implementation subsystems is remediation work, not Moon Loop correction. It MUST be routed through an approved work item type such as PR, OPS, QA\_PLAN\_UPDATE, or DOC\_UPDATE before it can be treated as the basis for a final PASS-grade QA run. Later QA review MUST cite that routing before accepting the final PASS state. When final PASS relies on non-QA-root governed evidence refresh, the final receipt or review MUST cite the routing receipt, identify the pre-routing failed or blocked receipt when one exists, preserve that pre-routing receipt as context, and distinguish routing proof from PASS proof.
+
+**PO-approved Extended Moon Loop decision record (required only when invoked).**
+
+* **Epic and QA check or hosted-CI run:**  
+* **Repository or routed-source anchor:**  
+* **Triggering failure, blocker, or safety discovery:**  
+* **Unchanged proof objective and PASS or FAIL meaning:**  
+* **Allowed causal scope:**  
+* **Rails, network, credential, and data-safety posture:**  
+* **Authorized action classes:** read-only investigation | code write | external call | PR publication | merge | OPS | deployment | rerun | hosted-CI completion  
+* **Completion gate:**  
+* **One-time authority and expiry:**  
+* **Receipt and routing lineage:**
+
+The decision record MUST cite fresh, explicit Product Owner direction recorded before each corresponding write, external call, publication, or merge. It MUST preserve the original failed, blocked, or pre-routing receipt; each material root-cause finding; the exact changed paths or reviewable diff; canonical generator commands for governed outputs; local regression results; PR, routing, and merge receipts; intermediate hosted-CI failures; the final accepted QA receipt; and the final clean hosted-CI source and run when CI cleanliness is a completion condition.
+
+A prior event, receipt, configuration value, merge, or CI run MUST NOT supply standing or recurring authority. The record does not itself authorize action, enlarge the approved proof target or substantive scope, or relabel non-QA-root remediation as ordinary Moon Loop correction.
 
 **Doc-delta surfaces (required; two-surface pair).**
 
@@ -1048,8 +1075,7 @@ Location:
 
 ### **Hard blockers for plan approval/execution**
 
-* All inputs, loci, and paths MUST be explicit and reproducible. Any required executable locus (script, check entrypoint, endpoint/route, or command) that is not canon-defined or audit-proven is blocked. No fabricated loci.  
-* PF09 phased-reference rule (required). Plans, reviews, and future work MUST cite the relevant phased HDE Build Checklist document or documents, using PF09.1 through PF09.7 as applicable, and MUST NOT rely on a retired single-document PF09 surface.  
+* Live QA Plans and runbooks MUST NOT require equality to a preplanned Git commit as a readiness, behavior, routing, or PASS predicate. Source identity is execution provenance. The plan MUST require capture of actual execution-source identity in governed evidence, validation of the required current code posture, and preservation of routing provenance. This rule does not waive clean-source checks, authorization-bound source identity, routed-artifact provenance, OPS source binding, or exact-source release-attestation verification.  
 * PF07-derived / PF07-gap infrastructure posture (required). Any plan, implementation guide, QA plan, review artifact, remediation guide, runbook, or epic document that includes an infra task, ops task, environment binding, service binding, URL, port, project name, provider name, config key, QA root, or start-command dependency MUST use exactly one of these postures:  
   * PF09 phased-reference rule (required). Plans, reviews, and future work MUST cite the relevant phased HDE Build Checklist document or documents, using PF09.1 through PF09.7 as applicable, and MUST NOT rely on a retired single-document PF09 surface.  
   * PF07-derived / PF07-gap infrastructure posture (required). Any plan, implementation guide, QA plan, review artifact, remediation guide, runbook, or epic document that includes an infra task, ops task, environment binding, service binding, URL, port, project name, provider name, config key, QA root, or start-command dependency MUST use exactly one of these postures:  
@@ -1219,7 +1245,12 @@ Materiality-based blocker discipline (required for Epic Plan and Implementation 
 * A planning artifact MUST NOT be blocked solely for template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table formatting, heading style, punctuation, spacing, bold markers, presentation style, inventory-row ordering, template-perfect phrasing, missing non-decisive locator precision, missing titles-only polish, or an Epic QA root omission in an Epic Plan that does not authorize QA execution, unless the defect materially changes truth, proof, acceptance, execution safety, source authority, portability, implementation scope, PF09.x completion mapping, evidence identity, evidence trust, OPS/PR boundary, public/private surface posture, canon conflict handling, or closeout truth.  
 * Review severity MUST map to material effect: Blocker changes truth, proof, acceptance, execution, source authority, or portability; Caveat creates a real risk with a safe default; Suggestion improves clarity, consistency, or maintainability; Nit is cosmetic, template-polish, or wording-level only.  
 * Valid blocker framing must state the material harm, such as conflict with active PF10, an unresolved ADR after PF10 resolves the exact topic, a required external CA/audit/non-PF source for Codex execution, unregistered token claimed as an acceptance token, Already Implemented claimed without embedded proof, OPS work required inside Codex PR work, unproven repo locus, public surface expansion without canon support, PF23 used as deliverable/token/blocker/acceptance authority, or PF20 used as current planning authority.  
-* Invalid blocker framing includes a missing token row when the plan does not overclaim a token and the evidence family is scoped, imperfect CA quote-block formatting when the fact is embedded and self-contained, provenance labels such as CA vetted when no external CA access is required, or section formatting that is not template-perfect but preserves meaning.
+* Invalid blocker framing includes a missing token row when the plan does not overclaim a token and the evidence family is scoped, imperfect CA quote-block formatting when the fact is embedded and self-contained, provenance labels such as CA vetted when no external CA access is required, or section formatting that is not template-perfect but preserves meaning.  
+* **Terminal-state reachability:** identify the claimed terminal state and prove a feedback-free path from repository-local inputs to the tracked candidate bytes.  
+* **Execution-surface feasibility:** identify every generator, validator, workflow, promotion, and hosted-CI surface required to produce and validate those exact bytes, and prove that each required transition is executable.  
+* **Rails consistency:** state the rails and authorization posture for every transition and require plan or authority revision before any transition that needs a different rails or authorization posture.  
+* **End-to-end proof:** provide a small end-to-end feasibility proof showing that the candidate bytes can reach and be validated at the claimed terminal state without writing canonical results back into already-final tracked source.  
+* **Token reachability, when tokens are in scope:** prove reachability token by token against the current evidence model. Token registration, a planned path, or artifact existence does not establish reachability or PASS.
 
 Live QA Plan approval materiality discipline (required):
 
@@ -3502,7 +3533,7 @@ Execution-deviation acceptance rule:
 * **Coverage vs QA Plan accounting:**  
 * **All-slice coherence proof:** when the QA closeout claims post-implementation coherence after multiple slices, verify all prior step primary logs required for that claim are present, all required implementation-slice artifacts are present, and the derived status agrees with the recorded primary-log header status and exit code.  
 * **Readiness / closeout recommendation:**  
-* **Codespaces harness execution at least once:**  
+* **Execution-venue proof:** state whether venue is material to the claimed proof. When venue is material, verify the four-field venue declaration, the required governed venue binding, and the resulting PASS, FAIL, or blocker effect. When venue is not material, record `NOT CLAIMED`, `NOT APPLICABLE`, or `UNKNOWN - NON-MATERIAL`, as appropriate; do not infer the historical venue or treat missing Codespaces provenance as a QA failure, uncovered QA step, missing closeout element, or closeout blocker.  
 * **Indexed evidence under Human Evidence Index and Machine Mirror:**  
 * **Compliance statement:**
 
