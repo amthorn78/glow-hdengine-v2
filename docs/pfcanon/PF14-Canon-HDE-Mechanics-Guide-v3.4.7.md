@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.6
+**Version:** v3.4.7
 
 **Status:** Canon  
-**Effective date:** 2026-08-06
+**Effective date:** 2026-08-08
 
-**Last Update Gate:** BN 12.6.2 A22-27  
+**Last Update Gate:** BN 12.6.2 A28-44  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -2877,7 +2877,7 @@ Validation set (required when this family changes). Refreshing the conjunction w
 
 * `python tools/evidence/check_lf_endings.py`
 
-* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
+* `python ci/checks/check_mirror_schema.sh`
 
 # 11\) Input Normalization & Validation Layer
 
@@ -8302,7 +8302,7 @@ Validation set (required when this bounded route-probe family changes). Refreshi
 * `python tools/evidence/orientation_demo.py --check`  
 * `python tools/evidence/validate_evidence_paths.py`  
 * `python tools/evidence/check_lf_endings.py`  
-* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
+* `python ci/checks/check_mirror_schema.sh`
 
 EPIC024 showcompat artifacts capture (D03) fixed outputs (records-only):
 
@@ -8708,7 +8708,7 @@ Same-run governed workflow (required). When the EPIC027 close-pack family change
 
 * `python tools/evidence/check_lf_endings.py`
 
-* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
+* `python ci/checks/check_mirror_schema.sh`
 
 * the acceptance-map viability run that writes `audit/qa/hde-epic027/acceptance_map_viability.log`
 
