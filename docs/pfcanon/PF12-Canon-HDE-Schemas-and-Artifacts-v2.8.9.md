@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.8.8
+**Version:** v2.8.9
 
 **Status:** Canon
 
 **Effective date:** 2026-08-08
 
-**Last Update Gate:** 080826 Doc Refresh 7
+**Last Update Gate:** 080826 Doc Refresh 8
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5742,740 +5742,101 @@ Until all of these conditions are proven for the same finalized change, the refr
 
 # Appendix A: UMS Schemas
 
-## Ums.catalog.channels
+This appendix contains no embedded catalog or schema bytes. It indexes the current PF12-owned authorities and preserves a boundary for possible future enrichment. It does not establish implementation, validation, QA, acceptance, or landing state.
 
-{"meta":{"built\_at\_utc":"2025-10-28T18:04:04.331512Z","sources":\["PF08-Reference-Human Design System.md","PF11-Reference-The Rave I Ching.md"\],"assumptions":\["Channel circuits set only when explicitly confirmed by PF11 gate headers; others use well-known stream inference or marked 'Tribal/Ego' where PF08 text implies Ego/Tribal circuitry.","Astrologic spans copied where visible on PF11 headers; no extrapolation performed for missing gates."\]},"channels":\[{"id":"02-14","name":"The Beat","keynote":"A design of being the keeper of keys","from\_center":"g\_center","to\_center":"sacral","circuit":"Knowing","notes":null},{"id":"03-60","name":"Mutation","keynote":"Energy which fluctuates and initiates, pulse","from\_center":"sacral","to\_center":"root","circuit":"Knowing","notes":null},{"id":"08-01","name":"Inspiration","keynote":"The creative role model","from\_center":"throat","to\_center":"g\_center","circuit":"Knowing","notes":null},{"id":"09-52","name":"Concentration","keynote":"A design of determination, focused","from\_center":"sacral","to\_center":"root","circuit":"Understanding","notes":null},{"id":"10-34","name":"Exploration","keynote":"A design of following one's convictions","from\_center":"g\_center","to\_center":"sacral","circuit":"Knowing","notes":null},{"id":"10-57","name":"Perfected Form","keynote":"A design of survival","from\_center":"g\_center","to\_center":"spleen","circuit":"Knowing","notes":null},{"id":"11-56","name":"Curiosity","keynote":"A design of a searcher","from\_center":"ajna","to\_center":"throat","circuit":"Sensing","notes":null},{"id":"12-22","name":"Openness","keynote":"A design of a social being","from\_center":"throat","to\_center":"solar\_plexus","circuit":"Sensing","notes":null},{"id":"15-05","name":"Rhythm","keynote":"A design of being in the flow","from\_center":"g\_center","to\_center":"sacral","circuit":"Understanding","notes":null},{"id":"16-48","name":"The Wave Length","keynote":"A design of talent","from\_center":"throat","to\_center":"spleen","circuit":"Understanding","notes":null},{"id":"17-62","name":"Acceptance","keynote":"A design of an organizational being","from\_center":"ajna","to\_center":"throat","circuit":"Understanding","notes":null},{"id":"18-58","name":"Judgment","keynote":"A design of insatiability","from\_center":"spleen","to\_center":"root","circuit":"Understanding","notes":null},{"id":"20-10","name":"Awakening","keynote":"A design of commitment to higher principles","from\_center":"throat","to\_center":"g\_center","circuit":"Knowing","notes":null},{"id":"20-34","name":"Charisma","keynote":"A design where thoughts must become deeds","from\_center":"throat","to\_center":"sacral","circuit":"Knowing","notes":null},{"id":"20-57","name":"The Brain Wave","keynote":"A design of penetrating awareness","from\_center":"throat","to\_center":"spleen","circuit":"Knowing","notes":null},{"id":"25-51","name":"Initiation","keynote":"A design of needing to be first","from\_center":"g\_center","to\_center":"ego\_heart","circuit":"Tribal/Ego","notes":null},{"id":"26-44","name":"Surrender","keynote":"A design of a transmitter","from\_center":"ego\_heart","to\_center":"spleen","circuit":"Tribal/Ego","notes":null},{"id":"28-38","name":"Struggle","keynote":"A design of stubbornness","from\_center":"spleen","to\_center":"root","circuit":"Knowing","notes":null},{"id":"30-41","name":"Recognition","keynote":"A design of focused energy","from\_center":"solar\_plexus","to\_center":"root","circuit":null,"notes":null},{"id":"31-07","name":"The Alpha","keynote":"For 'good' or 'bad', a design of leadership","from\_center":"throat","to\_center":"g\_center","circuit":"Understanding","notes":null},{"id":"32-54","name":"Transformation","keynote":"A design of being driven","from\_center":"spleen","to\_center":"root","circuit":"Tribal/Ego","notes":null},{"id":"33-13","name":"The Prodigal","keynote":"The design of the witness","from\_center":"throat","to\_center":"g\_center","circuit":"Sensing","notes":null},{"id":"35-36","name":"Transitoriness","keynote":"A design of a 'Jack of all Trades'","from\_center":"throat","to\_center":"solar\_plexus","circuit":"Sensing","notes":null},{"id":"40-37","name":"Community","keynote":"A design of being a part, seeking a whole","from\_center":"ego\_heart","to\_center":"solar\_plexus","circuit":"Tribal/Ego","notes":null},{"id":"42-53","name":"Maturation","keynote":"A design of balanced development, cyclical","from\_center":"sacral","to\_center":"root","circuit":"Sensing","notes":null},{"id":"43-23","name":"Structuring","keynote":"A design of individuality","from\_center":"ajna","to\_center":"throat","circuit":"Knowing","notes":null},{"id":"45-21","name":"Money","keynote":"A design of a materialist","from\_center":"throat","to\_center":"ego\_heart","circuit":"Tribal/Ego","notes":null},{"id":"46-29","name":"Discovery","keynote":"A design of succeeding where others fail","from\_center":"g\_center","to\_center":"sacral","circuit":"Sensing","notes":null},{"id":"49-19","name":"Synthesis","keynote":"A design of being sensitive","from\_center":"solar\_plexus","to\_center":"root","circuit":"Tribal/Ego","notes":null},{"id":"50-27","name":"Preservation","keynote":"A design of custodianship","from\_center":"spleen","to\_center":"sacral","circuit":"Tribal/Ego","notes":null},{"id":"55-39","name":"Emoting","keynote":"A design of moodiness","from\_center":"solar\_plexus","to\_center":"root","circuit":null,"notes":null},{"id":"57-34","name":"Power","keynote":"A design of an archetype","from\_center":"spleen","to\_center":"sacral","circuit":"Knowing","notes":null},{"id":"59-06","name":"Mating","keynote":"A design focused on reproduction","from\_center":"sacral","to\_center":"solar\_plexus","circuit":"Defense","notes":null},{"id":"61-24","name":"Awareness","keynote":"A design of a thinker","from\_center":"head","to\_center":"ajna","circuit":"Knowing","notes":null},{"id":"63-04","name":"Logic","keynote":"A design of mental ease mixed with doubt","from\_center":"head","to\_center":"ajna","circuit":"Understanding","notes":null},{"id":"64-47","name":"Abstraction","keynote":"A design of mental activity and clarity","from\_center":"head","to\_center":"ajna","circuit":null,"notes":null}\],"count":36}
+Before this replacement is applied, the finalized change MUST satisfy §9.4 by preserving the designated legacy UMS enrichment source in a reference-only artifact and proving exact-byte preservation. Until that proof exists, the replacement MUST NOT be represented as landed. The preserved material is historical design input only. It MUST NOT be loaded, treated as a current catalog or schema, included as a Freeze-Pack Manifest input, or cited as current implementation or conformance evidence.
 
-## Ums.catalog.gates.json
+## A.1 Current authorities and boundaries
 
-{  
-"meta": {  
-"built\_at\_utc": "2025-10-28T18:04:04.331512Z",  
-"sources": \[  
-"PF08-Reference-Human Design System.md",  
-"PF11-Reference-The Rave I Ching.md"  
-\],  
-"assumptions": \[  
-"Channel circuits set only when explicitly confirmed by PF11 gate headers; others use well-known stream inference or marked 'Tribal/Ego' where PF08 text implies Ego/Tribal circuitry.",  
-"Astrologic spans copied where visible on PF11 headers; no extrapolation performed for missing gates."  
-\]  
-},  
-"gates": \[  
-{  
-"gate": 1,  
-"rave\_title": "The Gate of Self-Expression",  
-"i\_ching\_name": "The Creative",  
-"channel\_id": "01-08",  
-"harmonic\_gate": 8,  
-"center": "g\_center",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Scorpio", "deg": 13, "min": 15, "sec": 0 },  
-"end": { "sign": "Scorpio", "deg": 18, "min": 52, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 2,  
-"rave\_title": "The Gate of the Direction of the Self",  
-"i\_ching\_name": "The Receptive",  
-"channel\_id": "02-14",  
-"harmonic\_gate": 14,  
-"center": "g\_center",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Taurus", "deg": 13, "min": 15, "sec": 0 },  
-"end": { "sign": "Taurus", "deg": 18, "min": 52, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 3,  
-"rave\_title": "The Gate of Ordering",  
-"i\_ching\_name": "Difficulty at the Beginning",  
-"channel\_id": "03-60",  
-"harmonic\_gate": 60,  
-"center": "sacral",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Aries", "deg": 26, "min": 22, "sec": 30 },  
-"end": { "sign": "Taurus", "deg": 2, "min": 0, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 4,  
-"rave\_title": "The Gate of Formulization",  
-"i\_ching\_name": "Youthful Folly",  
-"channel\_id": "04-63",  
-"harmonic\_gate": 63,  
-"center": "ajna",  
-"circuit": "Understanding",  
-"astro\_span": {  
-"start": { "sign": "Leo", "deg": 18, "min": 52, "sec": 30 },  
-"end": { "sign": "Leo", "deg": 24, "min": 30, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 5,  
-"rave\_title": "The Gate of Fixed Rhythms",  
-"i\_ching\_name": "Waiting",  
-"channel\_id": "05-15",  
-"harmonic\_gate": 15,  
-"center": "sacral",  
-"circuit": "Understanding",  
-"astro\_span": {  
-"start": { "sign": "Sagittarius", "deg": 11, "min": 22, "sec": 30 },  
-"end": { "sign": "Sagittarius", "deg": 17, "min": 0, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 6,  
-"rave\_title": "The Gate of Friction",  
-"i\_ching\_name": "Conflict",  
-"channel\_id": "06-59",  
-"harmonic\_gate": 59,  
-"center": "solar\_plexus",  
-"circuit": "Defense",  
-"astro\_span": {  
-"start": { "sign": "Virgo", "deg": 22, "min": 37, "sec": 30 },  
-"end": { "sign": "Virgo", "deg": 28, "min": 15, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 7,  
-"rave\_title": "The Gate of the Role of the Self",  
-"i\_ching\_name": "The Army",  
-"channel\_id": "07-31",  
-"harmonic\_gate": 31,  
-"center": "g\_center",  
-"circuit": "Understanding",  
-"astro\_span": {  
-"start": { "sign": "Leo", "deg": 13, "min": 15, "sec": 0 },  
-"end": { "sign": "Leo", "deg": 18, "min": 52, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 8,  
-"rave\_title": "The Gate of Contribution",  
-"i\_ching\_name": "Holding Together",  
-"channel\_id": "01-08",  
-"harmonic\_gate": 1,  
-"center": "throat",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Capricorn", "deg": 24, "min": 30, "sec": 0 },  
-"end": { "sign": "Aquarius", "deg": 0, "min": 7, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 9, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 10, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 11,  
-"rave\_title": "The Gate of Ideas",  
-"i\_ching\_name": "Peace",  
-"channel\_id": "11-56",  
-"harmonic\_gate": 56,  
-"center": "ajna",  
-"circuit": "Sensing",  
-"astro\_span": {  
-"start": { "sign": "Sagittarius", "deg": 22, "min": 37, "sec": 30 },  
-"end": { "sign": "Sagittarius", "deg": 28, "min": 15, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 12, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 13, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 14,  
-"rave\_title": "The Gate of Power Skills",  
-"i\_ching\_name": "Possession in Great Measure",  
-"channel\_id": "02-14",  
-"harmonic\_gate": 2,  
-"center": "sacral",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Scorpio", "deg": 24, "min": 30, "sec": 0 },  
-"end": { "sign": "Sagittarius", "deg": 0, "min": 7, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 15,  
-"rave\_title": "The Gate of Extremes",  
-"i\_ching\_name": "Modesty",  
-"channel\_id": "05-15",  
-"harmonic\_gate": 5,  
-"center": "g\_center",  
-"circuit": "Understanding",  
-"astro\_span": {  
-"start": { "sign": "Gemini", "deg": 28, "min": 15, "sec": 0 },  
-"end": { "sign": "Cancer", "deg": 3, "min": 52, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 16, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 17, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 18, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 19,  
-"rave\_title": "The Gate of Wanting",  
-"i\_ching\_name": "Approach",  
-"channel\_id": "19-49",  
-"harmonic\_gate": 49,  
-"center": "root",  
-"circuit": "Tribal/Ego",  
-"astro\_span": {  
-"start": { "sign": "Aquarius", "deg": 7, "min": 37, "sec": 30 },  
-"end": { "sign": "Aquarius", "deg": 13, "min": 15, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 20, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 21, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 22, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 23,  
-"rave\_title": "The Gate of Assimilation",  
-"i\_ching\_name": "Splitting Apart",  
-"channel\_id": "23-43",  
-"harmonic\_gate": 43,  
-"center": "throat",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Taurus", "deg": 18, "min": 52, "sec": 30 },  
-"end": { "sign": "Taurus", "deg": 24, "min": 30, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 24, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 25, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 26, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 27, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 28, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 29,  
-"rave\_title": "The Gate of Saying Yes",  
-"i\_ching\_name": "The Abysmal",  
-"channel\_id": "29-46",  
-"harmonic\_gate": 46,  
-"center": "sacral",  
-"circuit": "Sensing",  
-"astro\_span": {  
-"start": { "sign": "Leo", "deg": 24, "min": 30, "sec": 0 },  
-"end": { "sign": "Virgo", "deg": 0, "min": 7, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 30, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 31,  
-"rave\_title": "The Gate of Leading",  
-"i\_ching\_name": "Influence",  
-"channel\_id": "07-31",  
-"harmonic\_gate": 7,  
-"center": "throat",  
-"circuit": "Understanding",  
-"astro\_span": {  
-"start": { "sign": "Leo", "deg": 2, "min": 0, "sec": 0 },  
-"end": { "sign": "Leo", "deg": 7, "min": 37, "sec": 30 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 32, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 33, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 34, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 35, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 36, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 37, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 38, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 39, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 40, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 41, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 42, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 43,  
-"rave\_title": "The Gate of Insight",  
-"i\_ching\_name": "Breakthrough",  
-"channel\_id": "23-43",  
-"harmonic\_gate": 23,  
-"center": "ajna",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Scorpio", "deg": 18, "min": 52, "sec": 30 },  
-"end": { "sign": "Scorpio", "deg": 24, "min": 30, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{ "gate": 44, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 45, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 46, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 47, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 48, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 49, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 50, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 51, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 52, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 53, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 54, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 55, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{  
-"gate": 56,  
-"rave\_title": "The Gate of Stimulation",  
-"i\_ching\_name": "The Wanderer",  
-"channel\_id": "11-56",  
-"harmonic\_gate": 11,  
-"center": "throat",  
-"circuit": "Sensing",  
-"astro\_span": {  
-"start": { "sign": "Aquarius", "deg": 26, "min": 22, "sec": 30 },  
-"end": { "sign": "Pisces", "deg": 2, "min": 0, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": null  
-},  
-{  
-"gate": 57,  
-"rave\_title": "The Gate of Intuitive Insight",  
-"i\_ching\_name": "The Gentle",  
-"channel\_id": "10-57/20-57/34-57",  
-"harmonic\_gate": null,  
-"center": "spleen",  
-"circuit": "Knowing",  
-"astro\_span": {  
-"start": { "sign": "Libra", "deg": 15, "min": 7, "sec": 30 },  
-"end": { "sign": "Libra", "deg": 20, "min": 45, "sec": 0 }  
-},  
-"crosses": \[\],  
-"notes": "Gate 57 participates in three channels: 10-57, 20-57, 34-57."  
-},  
-{ "gate": 58, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 59, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 60, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 61, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 62, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 63, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." },  
-{ "gate": 64, "status": "TODO", "notes": "Header metadata pending extraction from PF11; do not infer center/circuit/astro without source." }  
-\],  
-"count": 64  
-}
+| Surface | Current source or executable home | Boundary |
+| :---- | :---- | :---- |
+| Centers and Gates | `catalog/gates_v1.json`; `schemas/gates_v1.schema.json`; `engine/config/registry_loader.py` | Centers are derived from Gate rows. PF12 defines no separate current Centers catalog or schema. Canonical machine IDs include `g` and `ego`, not `g_center` or `ego_heart`. |
+| Channels | `catalog/channels_v1.json`; `schemas/channels_v1.schema.json`; `engine/config/registry_loader.py` | Canonical Channel identity is the zero-padded, numeric-minimum-first `NN-NN` form defined in §2.1. Topology, set, and canonical-byte requirements remain owned by §§3.2 and 8.2. |
+| Magic-10 order | `catalog/magic10.json`; `engine/categories/registry.py`; `engine/config/registry_loader.py` | The catalog owns the ordered closed set. |
+| Magic-10 caps | `catalog/magic10_caps.json`; `engine/config/registry_loader.py` | Caps are separate from the Magic-10 order catalog. |
+| Magic-10 seed metadata | `catalog/magic10_seeds.json`; `engine/config/registry_loader.py` | Present keys are a subset of the closed Magic-10 domain. Full-ten coverage is not implied. |
+| Score thresholds | `math/thresholds.json` | Threshold arithmetic remains owned by HDE-Math-Spec. |
+| Viewer preferences | `engine/validation/viewer_prefs.py` | PF12 defines no current Viewer Preferences or Presets catalog. |
+| Narratives pack | `catalog/narratives/manifest.json` and its governed members | The narratives contract remains owned by §2.8 and HDE-Narratives-Guide. |
+| Registry projection | `artifacts/registry/registry_report.json`; §8.5 | The report is derived evidence, not a source catalog or release manifest. |
+| Authorities, Profiles, and Presets | §§2.2 and 2.5 | These remain Future-Promotion surfaces. This appendix assigns no current catalog, schema, manifest, or consumer to them. |
 
-## Ums.schema.channel.json
+The former embedded `Ums.catalog.*` and `ums.schema.*` payloads are not current authorities. Do not cite legacy paths, inferred values, incomplete rows, generated timestamps, or embedded examples as current catalog, schema, runtime, or validation truth. Structural schemas, executable validation, topology integrity, canonical bytes, and derived evidence retain their separate owning sections. A pointer to an owning surface is not proof that its requirements passed.
 
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"schemas/ums.channel.v1.json","title":"UMS Channel (v1)","type":"object","additionalProperties":false,"required":\["id","name","keynote","from\_center","to\_center"\],"properties":{"id":{"type":"string","pattern":"^(?:(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))(?:/(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))\*$","description":"Gate-pair identifier (zero-padded NN-NN), e.g. '31-07'. Multiple pairs allowed with '/': '20-57/34-57/10-57'."},"name":{"type":"string","minLength":1},"keynote":{"type":"string","minLength":1},"from\_center":{"type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"to\_center":{"type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"circuit":{"type":\["string","null"\],"enum":\["Knowing","Understanding","Sensing","Defense","Defence","Tribal/Ego","Ego/Tribal",null\]},"notes":{"type":\["string","null"\]}}}
+## A.2 Future enrichment promotion boundary
 
-## Ums.schema.gate.json
+The reference-only legacy source MAY inform future design, but every promoted value and relationship MUST be reverified against current authoritative sources.
 
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"schemas/ums.gate.v1.json","title":"UMS Gate (v1)","oneOf":\[{"type":"object","additionalProperties":false,"required":\["gate","status"\],"properties":{"gate":{"type":"integer","minimum":1,"maximum":64},"status":{"type":"string","const":"TODO"},"notes":{"type":"string"}}},{"type":"object","additionalProperties":false,"required":\["gate","rave\_title","i\_ching\_name","center","astro\_span"\],"properties":{"gate":{"type":"integer","minimum":1,"maximum":64},"rave\_title":{"type":"string","minLength":1},"i\_ching\_name":{"type":"string","minLength":1},"channel\_id":{"type":"string","pattern":"^(?:(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))(?:/(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))\*$","description":"Primary channel id(s) for the gate; hyphenated, zero-padded NN-NN; multiple allowed when a gate participates in multiple channels."},"harmonic\_gate":{"description":"Harmonic partner gate; null or string allowed when multiple partners exist.","oneOf":\[{"type":"integer","minimum":1,"maximum":64},{"type":"string"},{"type":"null"}\]},"center":{"description":"Center label (snake\_case canonical).","type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"circuit":{"type":\["string","null"\],"enum":\["Knowing","Understanding","Sensing","Defense","Defence","Tribal/Ego","Ego/Tribal",null\]},"astro\_span":{"type":"object","additionalProperties":false,"required":\["start","end"\],"properties":{"start":{"type":"object","additionalProperties":false,"required":\["sign","deg","min","sec"\],"properties":{"sign":{"type":"string","enum":\["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"\]},"deg":{"type":"integer","minimum":0,"maximum":29},"min":{"type":"integer","minimum":0,"maximum":59},"sec":{"type":"integer","minimum":0,"maximum":59}}},"end":{"type":"object","additionalProperties":false,"required":\["sign","deg","min","sec"\],"properties":{"sign":{"type":"string","enum":\["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"\]},"deg":{"type":"integer","minimum":0,"maximum":29},"min":{"type":"integer","minimum":0,"maximum":59},"sec":{"type":"integer","minimum":0,"maximum":59}}}}},"crosses":{"type":"array","items":{"type":"string"},"uniqueItems":true},"notes":{"type":\["string","null"\]}}}\]}
+| Future surface | Preserved design intent | Promotion boundary |
+| :---- | :---- | :---- |
+| Enriched Channels | Names, keynotes, circuit or stream labels, and notes | Retain current canonical IDs and centers; verify every enrichment value; define the owning schema and consumer; add validation, tests, manifest treatment, evidence, and a Doc-Delta. |
+| Enriched Gates | Rave and I Ching names, harmonics, Channel membership, astrological spans, crosses, and notes | Replace incomplete or inferred values only with source-proven data; model one-to-many relationships explicitly; validate all rows and provenance. |
+| Unified wheel or bundle | Zodiac and hexagram constants with a combined Gate and Channel view | Derive the surface from current single-home catalogs; do not create an independently editable duplicate; define generation and identity. |
+| Enriched UMS schemas | Standalone Gate, Channel, and aggregate contracts | Start from current canonical machine IDs and current schemas; use JSON Schema 2020-12, stable identity, exact fields, current-byte fixtures, and same-change executable wiring. |
+| Authorities, Profiles, and Presets | Reserved domain and personalization catalogs | Establish the exact source, consumer, schema, manifest scope, migration, tests, and evidence before promotion. |
 
-## ums.schema.ums.json
-
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"schemas/ums.v1.json","title":"Unified Master Schema (UMS v1)","type":"object","additionalProperties":false,"required":\["version","wheel","gates","channels"\],"properties":{"version":{"type":"string","pattern":"^\\d+\\.\\d+\\.\\d+(-\[A-Za-z0-9.\_-\]+)?$"},"wheel":{"type":"object","additionalProperties":false,"required":\["zodiac","hexagrams"\],"properties":{"zodiac":{"type":"object","additionalProperties":false,"required":\["segments","segment\_size\_deg"\],"properties":{"segments":{"const":12},"segment\_size\_deg":{"const":30}}},"hexagrams":{"type":"object","additionalProperties":false,"required":\["segments","segment\_size\_deg"\],"properties":{"segments":{"const":64},"segment\_size\_deg":{"const":5.625}}}}},"gates":{"type":"array","minItems":64,"maxItems":64,"items":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"schemas/ums.gate.v1.json","title":"UMS Gate (v1)","oneOf":\[{"type":"object","additionalProperties":false,"required":\["gate","status"\],"properties":{"gate":{"type":"integer","minimum":1,"maximum":64},"status":{"type":"string","const":"TODO"},"notes":{"type":"string"}}},{"type":"object","additionalProperties":false,"required":\["gate","rave\_title","i\_ching\_name","center","astro\_span"\],"properties":{"gate":{"type":"integer","minimum":1,"maximum":64},"rave\_title":{"type":"string","minLength":1},"i\_ching\_name":{"type":"string","minLength":1},"channel\_id":{"type":"string","pattern":"^(?:(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))(?:/(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))$","description":"Primary channel id(s) for the gate; hyphenated, zero-padded NN-NN; multiple allowed when a gate participates in multiple channels."},"harmonic\_gate":{"description":"Harmonic partner gate; null or string allowed when multiple partners exist.","oneOf":\[{"type":"integer","minimum":1,"maximum":64},{"type":"string"},{"type":"null"}\]},"center":{"description":"Center label (snake\_case canonical).","type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"circuit":{"type":\["string","null"\],"enum":\["Knowing","Understanding","Sensing","Defense","Defence","Tribal/Ego","Ego/Tribal",null\]},"astro\_span":{"type":"object","additionalProperties":false,"required":\["start","end"\],"properties":{"start":{"type":"object","additionalProperties":false,"required":\["sign","deg","min","sec"\],"properties":{"sign":{"type":"string","enum":\["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"\]},"deg":{"type":"integer","minimum":0,"maximum":29},"min":{"type":"integer","minimum":0,"maximum":59},"sec":{"type":"integer","minimum":0,"maximum":59}}},"end":{"type":"object","additionalProperties":false,"required":\["sign","deg","min","sec"\],"properties":{"sign":{"type":"string","enum":\["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"\]},"deg":{"type":"integer","minimum":0,"maximum":29},"min":{"type":"integer","minimum":0,"maximum":59},"sec":{"type":"integer","minimum":0,"maximum":59}}}}},"crosses":{"type":"array","items":{"type":"string"},"uniqueItems":true},"notes":{"type":\["string","null"\]}}}\]}},"channels":{"type":"array","minItems":36,"maxItems":36,"items":{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"schemas/ums.channel.v1.json","title":"UMS Channel (v1)","type":"object","additionalProperties":false,"required":\["id","name","keynote","from\_center","to\_center"\],"properties":{"id":{"type":"string","pattern":"^(?:(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))(?:/(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\])-(?:0\[1-9\]|\[1-5\]\[0-9\]|6\[0-4\]))$","description":"Gate-pair identifier, e.g. '31-07'. Multiple pairs allowed with '/': '20-57/34-57/10-57'."},"name":{"type":"string","minLength":1},"keynote":{"type":"string","minLength":1},"from\_center":{"type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"to\_center":{"type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"circuit":{"type":\["string","null"\],"enum":\["Knowing","Understanding","Sensing","Defense","Defence","Tribal/Ego","Ego/Tribal",null\]},"notes":{"type":\["string","null"\]}}}},"centers":{"type":"array","items":{"type":"object","additionalProperties":false,"required":\["id"\],"properties":{"id":{"type":"string","enum":\["head","ajna","throat","g\_center","ego","spleen","sacral","solar\_plexus","root"\]},"color":{"type":"string"}}}}}}
-
-## ums.schemas.README
-
-UMS JSON Schemas (JSON Schema 2020-12)
-
-Artifacts:
-
-* ums.schema.channel.json — schema for channel catalog entries  
-* ums.schema.gate.json — schema for gate catalog entries (supports full header and TODO placeholder variants)  
-* ums.schema.ums.json — umbrella schema for a full UMS bundle (gates \+ channels \+ wheel)
-
-Schema hygiene:
-
-* Each schema sets $schema: [https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema) and a stable $id URL.  
-* Title/IDs are aligned to the artifact’s role (e.g., ums.channel.v1.json, ums.gate.v1.json, ums.v1.json).
-
-Validation notes:
-
-* Zero-padded channel IDs. id (and gate channel\_id) require two-digit gate numbers 01..64 in NN-NN form; multiple pairs are allowed with /, e.g., 57-20/57-34/10-57.  
-* Angles are modeled inside a sign; deg 0–29, min/sec 0–59.  
-* Circuits permit both spellings Defense/Defence and the tribal label Tribal/Ego (also Ego/Tribal) as seen in the sources.
-
-Reference math (grounded by the books you provided):
-
-* 64 equal hexagrams tile 360° → 5° 37′ 30″ per gate; 6 lines per gate → 56′ 15″ per line.
-
-Wheel constants appear in ums.schema.ums.json as: {"zodiac":{"segments":12,"segment\_size\_deg":30},"hexagrams":{"segments":64,"segment\_size\_deg":5.625}}.
-
-How to use (AJV example):
-
-* ajv \-s ums.schema.gate.json \-d ums.catalog.gates.json  
-* ajv \-s ums.schema.channel.json \-d ums.catalog.channels.json
-
-— Generated: 2025-10-28T18:38:46.050554Z
+Nothing in this promotion map is a current implementation or release claim. Promotion is additive and governed. The historical source remains non-authoritative after any promoted replacement lands.
 
 # Appendix B — Channel ID normalization (informative)
 
-Purpose. QA aid for catalog builders and vendor normalization tests. This appendix illustrates the identity rule and sorting discipline for channel IDs. The normative home for channel identity is §2.1 (Channels), and topology invariants are defined in §3.2. No schemas or payload bytes live here.
+This appendix provides examples of the Channel identity projection defined in §2.1 and the topology and set rules defined in §3.2. It contains no schema or catalog payload bytes and creates no second normative home.
 
-Rule (titles-only restatement)
+## B.1 Before → After normalization examples
 
-* Channels are unordered edges between two gates.  
-* Store the ID in min→max, zero-padded NN-NN form with gates in 01..64.  
-* Arrays treated as sets MUST be deduplicated and ASCII-sorted by channel\_id.
+| Input | Canonical `channel_id` |
+| :---- | :---- |
+| `57-20` | `20-57` |
+| `8-1` | `01-08` |
+| `34-10` | `10-34` |
+| `43-23` | `23-43` |
+| `3-60` | `03-60` |
+| `12-22` | `12-22` |
+| `10-10` | Invalid: both endpoints identify the same Gate. |
 
-  ## B.1 Before → After (normalization examples)
+These examples illustrate the canonical projection. The owning contract requires malformed or noncanonical stored catalog identities to fail closed. The examples do not authorize silent repair and do not claim that the checked-in validator enforces every required failure case.
 
-| Input (as received) | Normalized channel\_id |
-| ----- | ----- |
-| 57-20 | 20-57 |
-| 8-1 | 01-08 |
-| 34-10 | 10-34 |
-| 43-23 | 23-43 |
-| 3-60 | 03-60 |
-| 12-22 | 12-22 (already canonical) |
-| 10-10 | invalid (same gate twice is not a channel) |
+## B.2 Arrays-as-sets example
 
-  ## B.2 Sorting examples (arrays-as-sets)
+Input: `["57-20","01-08","10-34","23-43","10-34"]`
 
-Before (unordered, duplicates possible): \["57-20","01-08","10-34","23-43","10-34"\]
+After Channel-ID projection, deduplication, and ASCII sorting: `["01-08","10-34","20-57","23-43"]`
 
-Normalize \+ dedupe \+ ASCII-sort → After: \["01-08","10-34","20-57","23-43"\]
+## B.3 Evidence hooks
 
-Notes
+When these hooks are produced as governed evidence, register them in the Human Evidence Index at `docs/evidence/INDEX.json`:
 
-* Normalization is performed before any catalog or evidence emission.  
-* Duplicates or malformed identities fail closed (see §3.1 JSON Schema validation and §3.2 Graph coherence checks).
+- `audit/gates/topology/orientation_demo.txt` — before-and-after orientation examples.  
+- `audit/gates/topology/degree_check.log` — observed Gate degrees and result.  
+- `audit/gates/topology/multiplicity_vector.log` — observed center-pair multiplicities and result.
 
-  ## B.3 Evidence hooks (Index titles/paths only)
+This list names evidence hooks only. It does not assert that an artifact exists, that a check ran, or that a result passed. The Evidence Catalog in §§8.3 and 8.6 governs record identities, current paths, parity, and proof requirements.
 
-Register the following artifacts in the Evidence Index (Governance, Appendix D) to demonstrate orientation and topology invariants:
+# Appendix C — Governed artifact record types (records-only)
 
-* audit/gates/topology/orientation\_demo.txt — before/after normalization examples  
-* audit/gates/topology/degree\_check.log — observed gate degrees \+ pass/fail  
-* audit/gates/topology/multiplicity\_vector.log — observed center-pair multiplicities \+ pass/fail
+This appendix contains no independent artifact inventory. The Evidence Catalog in §§8.3 and 8.6 is the single current home for governed evidence record types and paths.
 
-  # Appendix C — Governed artifact record types (records-only)
+## C.1 Canonical homes
 
-Titles and paths only. One-line purpose each. Bytes live outside PF12; this appendix governs names and paths only.
+- §8.3 owns the Machine Evidence Mirror record contract, allowed metadata, ordering, self-record, parity, and path-proof rules.  
+- §8.6 owns the authoritative governed artifact identities and paths recorded by the Human Evidence Index.  
+- The applicable family section under §8 owns each payload contract, producer boundary, current or historical posture, and required companions.  
+- HDE-Governance owns acceptance-token semantics.
 
-manifest — Freeze-Pack manifest; frozen inputs (path, sha256, size); sole source for release identity. (path: catalog/manifest.json)
+## C.2 Boundary and change routing
 
-freeze\_pack\_manifest — Evidence copy of the Freeze-Pack manifest for audits. (path: artifacts/math/freeze\_pack\_manifest.json)
+The former parallel record list is withdrawn. It MUST NOT be used to establish an artifact path, schema, sidecar requirement, implementation state, validation result, QA or OPS state, acceptance-token posture, or evidence completeness.
 
-release\_id — Canonical release\_id derived from manifest bytes. (path: artifacts/math/release\_id.txt)
-
-release\_id\_recompute — Recompute log proving sha256(canonical\_manifest\_bytes) equals release\_id. (path: artifacts/math/release\_id\_recompute.log)
-
-checksums\_audit — Per-entry sha256/size/presence verification report. (path: artifacts/math/checksums\_audit.log)
-
-manifest\_snapshot — Names-only snapshot (release\_id, manifest sha256, entry count, CI timestamp). (path: artifacts/math/manifest\_snapshot.json)
-
-human\_index — Human Evidence Index; titles/paths only; 1:1 with machine mirror. (path: docs/evidence/INDEX.json)
-
-human\_index\_hash — Hash sentinel for the Human Evidence Index (sha256 of INDEX.json). (path: docs/evidence/INDEX.sha256)
-
-mirror\_jsonl — Machine Evidence Index; JSONL; 1:1 parity with the human index. (path: artifacts/evidence\_index.jsonl)
-
-seeds — Magic-10 seeds catalog; admin-only; exactly 10 entries; manifest-listed frozen input. (path: catalog/magic10\_seeds.json)
-
-db\_fingerprint — Normalized database DDL snapshot with sha256; proves schema identity. (path: artifacts/db/ddl\_fingerprint.json)
-
-db\_grants\_snapshot — Least-privilege grants snapshot for runtime principal. (path: artifacts/db/grants.txt)
-
-db\_schema\_check — Search\_path/schema echo (names-only posture). (path: artifacts/db/check\_schema.txt)
-
-db\_constraints\_check — Constraints posture snapshot. (path: artifacts/db/check\_constraints.txt)
-
-db\_partition\_plan — Partition plan definition/proof. (path: artifacts/db/partition\_plan.txt)
-
-db\_conn\_env\_selection — Connection env selection order proof. (path: artifacts/db/conn\_env\_selection.log)
-
-db\_rw\_smoke\_log (optional) — Minimal read/write smoke probe. (path: artifacts/db/db\_rw\_smoke.log)
-
-registry\_report — Names-only configuration registry proof (no secrets). (path: artifacts/registry/registry\_report.json)
-
-config.magic10 — Magic-10 configuration snapshot; governed config artifact capturing Magic-10 order, per-category caps (integer bounds), and seed metadata (template\_id, seed\_version, updated\_at\_utc, checksum\_sha256) under closed rails; canonical JSON; manifest-listed as evidence only (not a pack input). (path: artifacts/thresholds/magic10\_config.json)
-
-config.band\_edges — Band-edges configuration snapshot; governed config artifact capturing band names, edges, clamp behavior, rounding mode, version, and a source pointer back to math/thresholds.json; canonical JSON; generated under closed rails. (path: artifacts/thresholds/band\_edges.json)
-
-epic018.config.acceptance\_map — HDE-EPIC018 config acceptance map; PF09-style mapping from config tasks (e.g., HDE-CALC004, HDE-CALC004.3, HDE-CALC004.7) to artifact keys, config-related tokens, and tests; canonical JSON; used to prove that each config task is wired to existing artifacts and real tests only. (path: audit/EPIC-018\_config\_acceptance\_map.json)
-
-config\_bundle.fe — Typed frontend config bundle; governed config artifact produced under closed rails from the Magic-10 and band-edges config artifacts plus the registry report; canonical JSON; includes a sources block that records path/sha256/size\_bytes for each upstream governed artifact; used by client-facing components as a read-only projection. (path: JSON file under artifacts/config\_bundles/)
-
-config\_bundle.be — Typed backend config bundle; governed config artifact produced under closed rails from the same governed config artifacts and registry report; canonical JSON; includes full topology slices (channels/centers/domains/alias\_policy) and a sources block with path/sha256/size\_bytes for each upstream governed artifact; used by internal engine/adapter code as a read-only projection. (path: JSON file under artifacts/config\_bundles/)
-
-endpoint\_catalog\_file — Authoritative Endpoint Catalog (records-only) plus checksum. (paths: docs/ENDPOINTS\_CATALOG.json, docs/ENDPOINTS\_CATALOG.json.sha256)
-
-endpoint\_catalog\_snapshot — Reader JSON success-endpoints snapshot; proves success envelopes. (path: artifacts/reader/endpoints\_snapshot.json)
-
-endpoint\_env\_gate\_proof — Env-gating proof (headers-only); shows non-prod entries unreachable in prod. (path: artifacts/proofs/endpoints\_env\_gate\_proof.log)
-
-a7\_headers\_get — A7 GET (200) headers snapshot (headers-only). (path: artifacts/proofs/success\_get.txt)
-
-a7\_headers\_head — A7 HEAD (200) headers snapshot (headers-only). (path: artifacts/proofs/success\_head.txt)
-
-a7\_headers\_304 — A7 304 headers snapshot (headers-only; omits Content-Type and Content-Length). (path: artifacts/proofs/success\_304.txt)
-
-a7\_headers\_writers\_errors — Writers/errors posture headers snapshot (no-store, no ETag). (path: artifacts/proofs/success\_writers\_errors.txt)
-
-reader\_success\_proof — Composite proof JSON for GET/HEAD/304 on Catalog route. (path: artifacts/proofs/reader\_success\_get\_head\_304.json)
-
-artifacts/proofs/ops\_refusal\_proof.txt — ops refusal proof capturing why rails were closed and how the system declined a run under closed-rails posture.
-
-a7.success\_encoding\_invariance — Reader A7 encoding-invariance proof that identity (ETag) and effective length are stable across accepted Accept-Encoding values. (path: artifacts/proofs/success\_encoding\_invariance.txt)
-
-start\_command\_capture — Effective start command captured as bytes \+ sha256. (path: artifacts/proofs/start\_command\_capture.txt)
-
-env\_inventory — Environment inventory (names-only) proving consulted keys. (path: artifacts/proofs/env\_inventory.json)
-
-env\_pins — Environment pins snapshot used for specific runs (LC\_ALL, LANG, TZ). Does not satisfy DETERMINISM\_ENV\_PINS\_OK; the canonical determinism env pins surface is audit/gates/determinism/env\_pins.log (see §8.3.3). (path: artifacts/proofs/env\_pins.txt)
-
-validator\_outputs — Validator outputs proving config sanity. (path: artifacts/proofs/validator\_outputs.json)
-
-internal\_version\_get\_head — /internal/version ops identity proof (headers/body/conditionals). (path: artifacts/proofs/internal\_version\_get\_head.json)
-
-compat.conjunction.identity\_hash — Primary governed compat-closure artifact for explicit conjunction identity-hash capture; bytes MUST match the canonical AB compat bytes for the same pair. (path: artifacts/compat/identity\_hash.txt)
-
-conjunction.writer.write\_readback — Governed writer log for explicit conjunction writer readback proof. Records `writer_invalid_status`, `writer_success_type`, and `writer_error_type` for the current family state. (path: artifacts/writer/conjunction\_write\_readback.log)
-
-conjunction.writer.summary — Governed writer summary snapshot for explicit conjunction writer typed-envelope posture. Records `writer_success_typed_envelope` and `writer_error_typed_envelope` for the current family state. (path: artifacts/writer/conjunction\_writer\_summary.json)
-
-cli.showcompat.stdout — Canonical stdout capture for `hde showcompat` (LF-terminated; no CRLF; non-empty on success; success has empty stderr). (path: artifacts/cli/showcompat/stdout.json)
-
-cli.showcompat.stdout\_sha256 — SHA-256 sidecar for the showcompat stdout capture bytes. (path: artifacts/cli/showcompat/stdout.json.sha256)
-
-cli\_showcompat\_args — Names-only capture arguments/env snapshot used by the deterministic generator (no secrets). (path: artifacts/cli/showcompat/args.json)
-
-cli\_showcompat\_generator — Deterministic producer tool for EPIC022 D2 showcompat capture artifacts. (path: tools/cli/generate\_showcompat\_artifacts.py)
-
-cli.conjunction.pair\_ab — Conjunction-mode pair artifact (AB ordering). (path: artifacts/audit/cli/pair.json)
-
-cli.conjunction.pair\_ba — Conjunction-mode pair artifact (BA ordering). (path: artifacts/audit/cli/pair\_ba.json)
-
-cli.conjunction.showcompat\_ab — Conjunction-mode showcompat artifact (AB ordering). (path: artifacts/audit/cli/showcompat\_ab.json)
-
-cli.conjunction.showcompat\_ba — Conjunction-mode showcompat artifact (BA ordering). (path: artifacts/audit/cli/showcompat\_ba.json)
-
-cli.conjunction.output\_ab — Conjunction-mode showcompat output artifact (AB ordering). (path: artifacts/cli/out.json)
-
-cli.conjunction.output\_ba — Conjunction-mode showcompat output artifact (BA ordering). (path: artifacts/cli/out\_ba.json)
-
-cli.conjunction.abba\_sidecar — Conjunction-mode ABBA sidecar proof artifact tying AB and BA outputs. (path: artifacts/cli/abba\_sidecar.json)
-
-cli.guard.emitter\_symbol\_proof — Governed emitter allow-list proof artifact for the CLI serializer-coupling surface. (path: artifacts/cli/guards/emitter\_symbol\_proof.txt)
-
-cli.guard.serializer\_grep — Serializer grep guard output log for the CLI serialization guardrail. (path: artifacts/cli/guards/serializer\_grep\_guard.log)
-
-cli\_showcompat\_two\_run — Two-run identity log for showcompat. (path: artifacts/cli/showcompat/two\_run\_identity.log)
-
-cli\_showcompat\_abba — AB↔BA byte-diff for showcompat (expected empty). (path: artifacts/cli/showcompat/abba.diff)
-
-cli.showcompat.reader\_cli\_parity — Governed Reader↔CLI parity bytes artifact for the CLI serializer-coupling surface. (path: artifacts/cli/reader\_cli\_parity.bytes)
-
-preimage\_recompute — Log proving sha256(preimage\_bytes) equals idempotence\_hash. (path: artifacts/cli/showcompat/preimage\_recompute.log)
-
-cli\_parity\_ab — CLI/SDK parity artifact (A→B). (path: artifacts/cli/ab.json)
-
-cli\_parity\_ba — CLI/SDK parity artifact (B→A). (path: artifacts/cli/ba.json)
-
-cli\_parity\_summary — CLI/SDK parity summary. (path: artifacts/cli/summary.json)
-
-catalog\_schema\_validation — Catalog schema validation report. (path: artifacts/catalog/catalog\_schema\_validation.log)
-
-domain\_closure\_report — Domain closure report. (path: artifacts/catalog/domain\_closure\_report.log)
-
-topology\_coherence\_report — Topology coherence report. (path: artifacts/topology/topology\_coherence\_report.log)
-
-arrays\_as\_sets\_report — Arrays-as-sets canonicalization report. (path: artifacts/canonical/arrays\_as\_sets\_report.log)
-
-canonical\_json\_check — Canonical JSON gate check log. (path: audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson)
-
-canonicalization\_compare — Canonical JSON gate compare log. (path: audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson)
-
-json\_gate\_structured\_record (optional) — Canonical JSON gate structured record (canonical JSON). (path: audit/gates/json\_gate/canonical/json\_gate\_structured\_record.json)
-
-evidence\_index\_snapshot — Evidence index snapshot artifact (single-home gate-family surface). (path: audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json)
-
-topology\_orientation\_demo — Orientation demo transcript and helper reports used as the exemplar for path-proof validation and topology invariants. (paths: audit/gates/topology/orientation\_demo.txt, audit/gates/topology/degree\_check.log, audit/gates/topology/multiplicity\_vector.log)
-
-env\_matrix\_snapshot — Runtime environment matrix (names-only; capture). (path: artifacts/runtime/env\_matrix.snapshot.json)
-
-env\_matrix\_failure — Runtime environment matrix failure envelope (frozen failure). (path: artifacts/runtime/env\_matrix.failure.json)
-
-runtime.env\_connectivity — Retained bridge-era runtime-connectivity snapshot; record type `historical_bridge_evidence`; historical integrity and nonclaims only. (path: artifacts/runtime/env\_connectivity.snapshot.json)
-
-db\_bridge.adapter\_selection.snapshot — Retained bridge-era adapter-selection snapshot; record type `historical_bridge_evidence`; not current fallback or provider-selection evidence. (path: artifacts/db\_bridge/adapter\_selection.snapshot.json)
-
-db\_bridge.provider\_parity — Retained bridge-era provider-parity proof; record type `historical_bridge_evidence`; not current parity or bridge-availability evidence. (path: artifacts/db\_bridge/provider\_parity.proof.json)
-
-epic032.pr04.env\_connectivity\_nondev\_failure — Retained bridge-era non-dev failure capture; record type `historical_bridge_evidence`; not current transport evidence. (path: artifacts/runtime/env\_connectivity.nondev\_failure.json)
-
-epic032.pr04.ops01.provider\_parity\_closure\_decision — Retained non-claiming EPIC032 OPS evidence; record type `epic032_pr04_ops_evidence`. It MUST NOT establish current bridge support, QA PASS, PF09 status movement, epic closure, or acceptance-token satisfaction. (path: audit/ops/hde-epic032/db-provider-parity/provider\_parity\_closure\_decision.json)
-
-bodygraph\_source\_selection — Source selection snapshot (names-only; no PII). (path: artifacts/bodygraph/source\_selection.snapshot.json)
-
-bodygraph\_invariance\_ab — Current source-invariance v2 A→B primary; key `bodygraph.source_invariance.ab`; schema `bodygraph.source_invariance.run.v2`. (path: artifacts/bodygraph/source\_invariance/ab.json)
-
-bodygraph\_invariance\_ba — Current source-invariance v2 B→A primary; key `bodygraph.source_invariance.ba`; schema `bodygraph.source_invariance.run.v2`. (path: artifacts/bodygraph/source\_invariance/ba.json)
-
-bodygraph\_invariance\_summary — Current source-invariance v2 summary; key `bodygraph.source_invariance.summary`; schema `bodygraph.source_invariance.summary.v2`. (path: artifacts/bodygraph/source\_invariance/summary.json)
-
-bodygraph\_invariance\_run\_schema — Closed JSON Schema 2020-12 for source-invariance run primaries; key `bodygraph.source_invariance.schema.run.v2`. (path: schemas/bodygraph\_source\_invariance.run.v2.json)
-
-bodygraph\_invariance\_summary\_schema — Closed JSON Schema 2020-12 for the source-invariance summary; key `bodygraph.source_invariance.schema.summary.v2`. (path: schemas/bodygraph\_source\_invariance.summary.v2.json)
-
-bodygraph\_release\_bindings — Schema-version-1 BodyGraph release binding with the exact source-selection, source-invariance-summary, and refresh-policy binding set; key `epic038.pr01.bodygraph_release_bindings`. (path: artifacts/bodygraph/release\_bindings.json)
-
-presenter.bodygraph.json\_canon\_compare — Canonical four-row shared Presenter-history JSONL; sole current key for this path. (path: artifacts/presenter/json\_canon\_compare.log)
-
-epic038.pr04.presenter\_db\_bridge\_compare — Retained historical DB/bridge Presenter receipt; not current bridge or BodyGraph release-binding evidence. (path: artifacts/presenter/hde\_epic038\_pr04\_db\_bridge\_compare.json)
-
-epic038.pr04.presenter\_db\_bridge\_compare\_schema — Retained historical schema for the DB/bridge Presenter receipt; schema ID `presenter.db_bridge_compare.v1`. (path: schemas/presenter\_db\_bridge\_compare.v1.json)
-
-epic038\_pr05\_mapped\_cache\_evidence — Bounded configured-v2 mapped-cache primary record type for the eight `epic038.pr05.v2_mapped_cache.*` evidence keys. (paths: artifacts/bodygraph/v2\_mapped\_cache/\*)
-
-epic038\_pr05\_schema — Mapped-cache transcript and manifest schema record type. (paths: schemas/bodygraph\_v2\_mapped\_cache\_transcript.v1.json, schemas/bodygraph\_v2\_mapped\_cache\_manifest.v1.json)
-
-hde.ddl\_identity\_projection.v1 — Shared projection-only DDL identity contract. (path: engine/db/ddl\_identity\_projection.py)
-
-epic038\_pr06r\_direct\_db\_selection — Current direct-only selection record type; key `epic038.pr06r.direct_db_selection`. (path: artifacts/runtime/direct\_db\_selection.snapshot.json)
-
-epic038\_pr06r\_schema — Direct-selection schema record type; key `epic038.pr06r.direct_db_selection_schema`. (path: schemas/hde\_epic038\_direct\_db\_selection.v1.json)
-
-epic038\_ops03\_text — OPS-03 command and exit-code record type. (paths: audit/ops/hde-epic038/ops-03/commands.txt, audit/ops/hde-epic038/ops-03/exit\_code.txt)
-
-epic038\_ops03\_log — OPS-03 stdout and stderr record type. (paths: audit/ops/hde-epic038/ops-03/stdout.log, audit/ops/hde-epic038/ops-03/stderr.log)
-
-epic038\_ops03\_env\_presence — OPS-03 environment-presence record type. (path: audit/ops/hde-epic038/ops-03/env\_presence.json)
-
-epic038\_ops03\_db\_posture — OPS-03 direct read-only database-posture record type. (path: audit/ops/hde-epic038/ops-03/db\_posture\_summary.json)
-
-epic038\_ops03\_nonclaims — OPS-03 nonclaims record type. (path: audit/ops/hde-epic038/ops-03/nonclaims.json)
-
-epic038\_ops03\_result — OPS-03 result-summary record type. (path: audit/ops/hde-epic038/ops-03/result\_summary.json)
-
-epic038\_ops03\_validation — OPS-03 validation-receipt record type. (path: audit/ops/hde-epic038/ops-03/validation\_receipt.json)
-
-epic038\_ops03\_checksum — OPS-03 checksum-ledger record type. (path: audit/ops/hde-epic038/ops-03/checksums.sha256)
-
-epic038\_ops03\_schema — OPS-03 schema record type for authorization, environment-presence, database-posture, nonclaims, result-summary, validation-receipt, and failure-receipt contracts. (paths: schemas/hde\_epic038\_ops03\_\*.v1.json)
-
-historical\_bridge\_evidence — Historical-integrity record type for retained bridge-era and HDE-EPIC038 OPS-01 rows; not current transport, parity, fallback, OPS PASS, or token evidence. (paths include artifacts/db\_bridge/\*\*, bridge-era runtime and Presenter loci, and audit/ops/hde-epic038/ops-01/\*\*)
-
-hde.release\_attestation.v1 — Tracked success-contract schema for externally emitted final release attestations. (path: schemas/hde\_release\_attestation.v1.json)
-
-hde.release\_attestation.failure.v1 — Tracked failure-contract schema for externally emitted release-attestation failures. (path: schemas/hde\_release\_attestation\_failure.v1.json)
-
-close\_pack\_report — EPIC close-out report (scope, tokens PASS roster, merged SHAs). (path pattern: audit/EPIC-\<NNN\>\_close\_report.md)
-
-close\_pack\_manifest — Close-pack manifest (artifact keys, sha256, size). (path pattern: audit/EPIC-\<NNN\>\_MANIFEST.json)
-
-sbom\_cyclonedx (optional) — Software Bill of Materials (CycloneDX) with hash. (paths: sbom/cyclonedx.json, sbom/cyclonedx.json.sha256)
-
-cli\_preview\_stdout — Admin preview stdout (LF-terminated narrative text; no ANSI). (path: artifacts/cli/narrative/stdout.txt)
-
-cli\_preview\_sidecar — Admin preview sidecar (ids-only; canonical JSON; no prose). (path: artifacts/cli/narrative/sidecar.json)
-
-narratives\_coverage\_10x4 — Router coverage table (10 categories × 4 bands). (path: audit/gates/narratives/keys\_10x4.table.json)
-
-epic032.pr01.router\_key\_table\_10x4 — HDE-EPIC032 PR-01 router coverage table for the 10-category by 4-band supported matrix. Current token posture carries `JSON_CANONICAL_CHECK_OK` only unless `NARR_REGISTRY_CLOSURE_OK` is later admitted by HDE-Governance or a live Build Notes addendum. (path: audit/gates/narratives/keys\_10x4.table.json)
-
-epic032.pr02.registry\_diff — HDE-EPIC032 PR-02 canonical registry diff artifact for narrative manifest changes. Current token posture may carry `JSON_CANONICAL_CHECK_OK`. (path: audit/gates/narratives/registry.diff.json)
-
-epic032.pr02.pack\_identity — HDE-EPIC032 PR-02 pack identity evidence proving `pack_sha = sha256(canonical manifest bytes)` and same-bytes two-run identity. Current token posture may carry `TWO_RUN_IDENTITY_OK`. (path: audit/gates/narratives/pack\_identity.txt)
-
-epic032.pr02.doc\_deltas — HDE-EPIC032 PR-02 Doc-Delta posture artifact for narrative registry diffing, Doc-Delta binding, pack identity, and evidence indexing. Current token posture may carry `DOC_DELTA_PRESENT_OK`. (path: audit/docdeltas/hde-epic032\_doc\_deltas.md)
+Add or change a governed record type only in its owning §8 section and synchronize the Human Evidence Index, Machine Evidence Mirror, checksum, sentinel, and path-proof surfaces when the owning contract requires them. A record or path reference does not prove that the artifact exists, was generated, passed validation, or supports acceptance.
 
 # Appendix D — Stateless JSON QA artifacts \[Speculative\]
 
-Status: Speculative — accepted future design, not yet wired.
+This appendix is a non-normative locator only. The former speculative artifact contract is withdrawn.
 
-This appendix canonically defines stateless JSON artifact families for a future no-DB QA mode, as described in HDE-Build Notes Addendum 11\.
+## D.1 Current canonical home
 
-These artifacts are not required for current acceptance until a dedicated epic defines concrete paths and schemas.
+Section 8.13 is the single current PF12 home for stateless or no-database BodyGraph export, compatibility export, and optional run-bundle evidence families. This appendix does not defer, redefine, or duplicate that contract.
 
-## D.1 Scope
+## D.2 Boundary and nonclaims
 
-This appendix describes the intended artifact families for a stateless (no-DB) QA mode:
-
-* A canonical BodyGraph export JSON for single-chart QA.  
-* A canonical compat export JSON for compatibility QA.  
-* An optional composite run-bundle artifact that groups per-run JSON exports and proof metadata.
-
-This appendix does not fix concrete paths or full JSON schemas.
-
-Those will be defined by a future epic and then drained into this appendix as normative detail.
-
-Process, CLI surfaces, and CI flows for stateless QA remain single-homed in:
-
-* HDE-CLI-API-Vendor-Ref  
-* HDE-Mechanics Guide  
-* Glow QA Guide  
-* HDE-Phased Epics
-
-  ## D.2 Artifact families (design, not yet wired)
-
-  ### D.2.1 BodyGraph export JSON
-
-A canonical JSON document representing a single BodyGraph, suitable for round-trip QA without access to the backing database.
-
-Informal expectations:
-
-* Includes the birth/event inputs needed to reconstruct the chart.  
-* Encodes the derived BodyGraph topology (centers, gates, channels, splits).  
-* Uses stable identifiers consistent with the catalogs defined elsewhere in PF canon.
-
-Exact field names, nesting, and allowed value ranges are intentionally deferred to a future epic.
-
-### D.2.2 Compat export JSON
-
-A canonical JSON document representing the compatibility view for one or more charts (for example, relationships or composites) in a form that can be evaluated by stateless tools.
-
-Informal expectations:
-
-* Mirrors the compat structures already used by the engine.  
-* Is sufficient to replay compat scoring and bands in a stateless QA harness.
-
-No precise JSON shape is fixed in this appendix.
-
-### D.2.3 Run-bundle artifact
-
-An optional composite artifact that groups:
-
-* One or more BodyGraph export JSON documents.  
-* Any corresponding compat export JSON documents.  
-* Minimal metadata required to replay a QA run (for example: tool/version identifiers, rails posture, references to evidence artifacts).
-
-This concept is recorded here to give future work a canonical home for its schema.
-
-Current PF canon does not require this artifact for acceptance.
-
-## D.3 Normative status and gating
-
-Until a dedicated epic defines concrete JSON schemas and paths:
-
-* These artifact families are not referenced by any acceptance token.  
-* No CI job, QA checklist, or governance rule may treat their presence or absence as a gate.  
-* Any prototype implementation MUST be clearly marked as experimental and SHOULD reference:  
-  * this appendix  
-  * the corresponding entry in HDE-Build Notes
-
-Once schemas and paths are finalized in a future epic:
-
-* This appendix will be updated with full canonical detail (paths and schemas).  
-* Relevant PF documents will reference this appendix as the single home for stateless JSON QA artifact definitions.
+This appendix defines no artifact fields, schemas, paths, commands, transport surfaces, CI jobs, acceptance tokens, QA procedures, or implementation requirements. Its presence does not establish implementation, adoption, execution, QA PASS, acceptance, or repository conformance.
 
