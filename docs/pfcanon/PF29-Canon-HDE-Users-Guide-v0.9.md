@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v0.8
+**Version:** v0.9
 
 **Status:** Canon
 
-**Effective date:** 2026-08-07
+**Effective date:** 2026-08-08
 
-**Last Update Gate:** BN 12.6.2 A22-27
+**Last Update Gate:** BN 12.6.2 A28-44
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -107,7 +107,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 | Configured-v2 ChartResult dry-run resolution  | \[Implemented, Operator−authorized only\]  | With a configured v2 base and authorized open rails, \--dry-run uses the version-neutral charts route and deterministic v2 ChartResult adapter, reports rows\_written=0, and performs no mapped-cache persistence. |
 | Mapped v2 ChartResult adapter output feeding compat computation | \[Implemented, Dev or QA only\] | Closed-rails evidence proves mapped v2 ChartResult adapter output can enter the existing compatibility computation path and preserve public Reader boundary posture. This does not change public Reader bytes or prove broad platform conformance.  |
 | ChartSimpleResult as full BodyGraph-detail source | \[Current gap\] | ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail or durable cache use. |
-| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Use only with explicit \--upsert, open rails, non-production-like requested and process environments, a configured v2 base, the required vendor keys, and an available sanctioned direct PostgreSQL target. The workflow persists adapter-mapped HDE data only, verifies canonical read-back, and is idempotent for repeated identity writes. OPS-02 smoke evidence remains separate and does not authorize production writes. |
+| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Implemented, Operator−authorized only\]  | Use only with explicit \--upsert, open rails, non-production-like requested and process environments, a configured v2 base, the required vendor keys, and an available sanctioned direct PostgreSQL target. The workflow persists adapter-mapped HDE data only, verifies canonical read-back, and is idempotent for repeated identity writes. OPS-02 smoke evidence remains separate and does not authorize production writes. |
 | PF09 status movement, HDE-FERM008 parent Done, HDE-EPIC037 closeout, production deployment, or final acceptance | \[Current gap\] | HDE-EPIC037 evidence supports later-drain posture only. PF29 must not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, production deployment, final acceptance, or broad HumanDesignAPI v2 platform conformance. |
 
 Feature-availability rows are operator guidance only. They are not backlog items, future-work authorization, PF09 task creation, PF09 status movement, or closure recommendations. Any future work that changes implementation, QA, OPS, evidence, runtime, vendor, architecture, or product behavior must be accounted for in the owning phased PF09 task or subtask, or marked as a PF09 gap in planning artifacts.
@@ -771,6 +771,10 @@ LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 bash ci/checks/check\_evid
 
 ci/checks/check\_mirror\_schema.sh is a Python entrypoint despite the .sh filename. Use python ci/checks/check\_mirror\_schema.sh unless the executable bit and shebang invocation are intentionally being tested.
 
+The checker always reads artifacts/evidence\_index.jsonl through fixed repository-relative paths and does not support caller-selected mirror arguments. Run it from the repository root and omit any appended mirror path; an appended operand is ignored.
+
+Do not invoke the checker with bash or sh. Shell-parser output is an invocation or tooling defect, not a Machine Mirror schema finding. A MISSING:artifacts/evidence\_index.jsonl result obtained outside the repository root is a locus defect until the supported command is rerun from the repository root. Only the supported invocation's exit status and validator output may be used to claim the Mirror-schema result, and the actual command transcript must be preserved.
+
 ## **15\. Minimum runnable recipes**
 
 ### **Recipe A — local QA Reader plus dev sampler**
@@ -927,6 +931,8 @@ LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user q
 Run operator-authorized non-production configured-v2 mapped-cache persistence only after confirming required vendor keys and DATABASE\_URL are present without printing values, no retired bridge key is present, and the environment is non-production-like:
 
 LC\_ALL=C LANG=C TZ=UTC APP\_ENV=dev SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--upsert \> vendor\_bodygraph\_mapped\_cache.json
+
+APP\_ENV=dev constrains only the local HD Engine process. It must not be used to classify the external vendor API base or environment target as nonproduction. External-target authority must come from the exact approved contract and explicit PO decision, not from URL substrings or the local APP\_ENV value.
 
 Production-like writes remain refused. This command does not itself authorize OPS execution or production persistence.
 
