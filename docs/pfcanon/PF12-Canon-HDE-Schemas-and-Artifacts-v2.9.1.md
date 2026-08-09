@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.9
+**Version:** v2.9.1
 
 **Status:** Canon
 
 **Effective date:** 2026-08-08
 
-**Last Update Gate:** BN 12.6.2 A22-27
+**Last Update Gate:** BN 12.6.2 A28-44
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1757,6 +1757,12 @@ The builder MUST refuse a symlinked output root, an output inside the source rep
 
 Checked-in release evidence remains historical capture evidence, not a runtime identity input, and MUST NOT be relabeled as a current attestation. Configuration evidence and derived configuration bundles MUST NOT acquire incidental manifest digests, release IDs, or frozen-source identities merely because a release is cut.
 
+### **6.2.2 Acyclic release-attestation and close-pack lifecycle**
+
+Any future PF12-governed close-pack lifecycle that binds `release_id` or current release provenance MUST preserve the acyclic dependency direction in §6.2.1. All tracked candidate close-pack bytes MUST be complete from tracked repository inputs before hosted CI validates those exact bytes. The lifecycle MUST NOT require a hosted-CI fact that becomes available only after the exact candidate source state is committed to be written back into, or used to derive, the tracked source it attests.
+
+Current external attestation MUST remain external to the tracked source it attests. Frozen historical checked-in release evidence MUST NOT be refreshed, relabeled, or used as current-equality evidence to satisfy a future close-pack predicate.
+
 ## 6.3 Change ⇒ new release\_id
 
 Any byte change to a valid canonical manifest changes `release_id`. A listed member's byte change requires its `sha256` or `size` entry to change, which changes the manifest bytes.
@@ -3091,6 +3097,18 @@ Each primary artifact above MUST have a sibling .path\_proof.txt transcript stor
 - `artifacts/runtime/env_matrix.snapshot.json`: singleton snapshot with `schema_version: 3`, default rails and determinism pins, and presence booleans only for DB, bridge, and guard configuration. Secret values MUST NOT appear. `tools/evidence/generate_env_matrix_snapshot.py` is the sole primary producer. Its check mode is read-only and MUST reject missing, noncanonical, non-v3, or drifted bytes.  
     
 - `artifacts/runtime/env_connectivity.snapshot.json`: retained historical bridge and OPS evidence. Its governed bytes, path proof, Human Evidence Index binding, and Machine Evidence Mirror binding remain intact, but it MUST NOT prove current bridge availability, runtime support, fallback, provider parity, consistency, current OPS PASS, or token satisfaction.
+
+##### **HDE-EPIC038 PR-03 event-bound live vendor ABBA proof evidence**
+
+The governed conditional primary binding is:
+
+* `epic038.pr03.open_rails_vendor_abba` → `audit/gates/determinism/open_rails_vendor_abba.json`; record type `epic038_pr03_open_rails_vendor_abba_proof`; Machine Evidence Mirror role `snapshot`.
+
+The primary is required only after a separately authorized producer succeeds. When it is absent because no such live event occurred, `tools/evidence/update_evidence_index.py` MUST omit its Human Evidence Index and Machine Evidence Mirror rows. When it is present, the updater MUST fail closed unless the artifact has a valid current-event `generated_at_utc`, the required artifact kind, `top_level_pass: true`, `result: "pass"`, and `acceptance_token_satisfied: false`. The accepted `generated_at_utc` becomes the row’s `produced_at_utc`.
+
+The primary MUST have the sibling proof `audit/gates/determinism/open_rails_vendor_abba.json.path_proof.txt`. Its Human Evidence Index and Machine Evidence Mirror rows MUST use the key/path binding above, and the Mirror `proof_anchor` MUST equal that sibling proof path. `tools/evidence/update_evidence_index.py` owns the path proof and the Index/Mirror checksum, sentinel, and orientation companions.
+
+This artifact records only the completed event-bound, exact-target live ABBA proof: exactly two completed vendor requests, one attempt per request, fabricated synthetic inputs, and no retained raw vendor payload or secret values. It does not prove that the target is nonproduction, recurring vendor-call authority, broad HumanDesignAPI v2 conformance, absence of transient vendor processing, production application behavior or deployment, a public route or transport change, service start, migration, database write, OPS completion, acceptance-token satisfaction, PF09 movement, whole-plan PASS, another live interaction, epic acceptance, or closeout.
 
 ##### **HDE-EPIC038 PR-04 keys-only architecture snapshot evidence**
 
