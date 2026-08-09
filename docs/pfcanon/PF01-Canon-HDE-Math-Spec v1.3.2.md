@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.3.1
+**Version:** v1.3.2
 
 **Status:** Canon
 
-**Effective date:** 2026-08-05
+**Effective date:** 2026-08-09
 
-**Last Update Gate:** BN 12.6.2 A22-27
+**Last Update Gate:** 0808 refresh 1
 
 ## **0.2 Change policy**
 
@@ -21,38 +21,38 @@
 
 **Single-source math.** All normative math (algorithms, feature shapes, score formation) lives here. Any repository paths shown in examples are informative, never authoritative.
 
-**Frozen inputs and release identity (HDE-Schemas & Artifacts §§2, 4, 5-6).** This spec is realized by frozen inputs enumerated in the pack manifest (`catalog/manifest.json`). The frozen surface includes at least:
+**Frozen inputs and release identity.** This specification requires its frozen math inputs to be represented in the pack manifest governed by **PF12-Canon-HDE-Schemas-and-Artifacts**. Repository conformance is assessed separately. The PF01-required frozen surface includes at least:
 
-* **Constants pack** (see §5.4.2): `limits.em_max`, `limits.throat_em_max`, `limits.centers_max`, `limits.motor_throat_max`, `limits.mind_throat_max`, `limits.comp_max`, and `bands.thresholds` (inclusive-high maxima).  
-* **Direct Motor→Throat set** (if catalogized in **HDE-Schemas & Artifacts**): governed four-channel set in canonical NN-NN; any change is frozen-input and bumps `release_id`.  
-* **Magic-10 catalog** (**HDE-Schemas & Artifacts** §2.6): closed, ordered ID set; pinned order is the single home there (this spec references by title). *(Thresholds remain in the constants pack.)*  
-* **Topology catalogs** (**HDE-Schemas & Artifacts** §2.1): `centers.json`, `gates.json`, `channels.json` (canonical NN-NN channel identities; centers in `snake_case`).  
-* **Seeds catalog** (when present): if Seeds are catalogized in **HDE-Schemas & Artifacts**, they are admin/test inputs and become frozen inputs that trigger a new `release_id` on change; Seeds are not public in v1.
+* **Feature-constants contract** (see §5.4.2): `limits.em_max`, `limits.throat_em_max`, `limits.centers_max`, `limits.motor_throat_max`, `limits.mind_throat_max`, and `limits.comp_max`; the current global score and band rules are governed separately at `math/thresholds.json`.  
+* **Direct Motor→Throat set** (if catalogized in **PF12-Canon-HDE-Schemas-and-Artifacts**): governed four-channel set in canonical NN-NN; any change is frozen-input and bumps `release_id`.  
+* **Magic-10 catalogs** (**PF12-Canon-HDE-Schemas-and-Artifacts**): `catalog/magic10.json` for the closed order and `catalog/magic10_caps.json` for category signal inputs and bounds.  
+* **Topology catalogs** (**PF12-Canon-HDE-Schemas-and-Artifacts**): `catalog/gates_v1.json` and `catalog/channels_v1.json`; centers are derived from Gate rows and use canonical machine IDs.  
+* **Seeds catalog** (when present): if Seeds are catalogized in **PF12-Canon-HDE-Schemas-and-Artifacts**, they are admin/test inputs and become frozen inputs that trigger a new `release_id` on change; Seeds are not public in v1.
 
-**Frozen-input change ⇒ new `release_id`.** Any byte change to a frozen input or the manifest requires a Doc-Delta and a new `release_id` (**HDE-Schemas & Artifacts** §6: `release_id = sha256(canonical_bytes("catalog/manifest.json"))`).
+**Frozen-input change ⇒ new `release_id`.** Any byte change to a frozen input or the manifest requires a Doc-Delta and a new `release_id` (**PF12-Canon-HDE-Schemas-and-Artifacts** §6: `release_id = sha256(canonical_bytes("catalog/manifest.json"))`).
 
-**Canonical bytes** (**HDE-Schemas & Artifacts** §4). All governed JSON (including the manifest and any constants or catalog files) is serialized as UTF-8 without BOM, sorted keys, compact, with exactly one trailing LF; numbers are JSON numbers; arrays used as sets are deduplicated and ASCII-sorted. Hashing, parity, and equality checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. This spec references those rules and does not restate them.
+**Canonical bytes** (**PF12-Canon-HDE-Schemas-and-Artifacts** §4). All governed JSON (including the manifest and any constants or catalog files) is serialized as UTF-8 without BOM, sorted keys, compact, with exactly one trailing LF; numbers are JSON numbers; arrays used as sets are deduplicated and ASCII-sorted. Hashing, parity, and equality checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. This spec references those rules and does not restate them.
 
 **EPIC017 proof posture (informative).**  
- EPIC017, as recorded in **HDE Phased Epics Map**, is the first epic that fully proves the canonical-bytes and determinism rules defined in this spec. Its deliverables exercise:
+EPIC017, as recorded in **HDE Phased Epics Map**, is associated with implementation and evidence intended to exercise the canonical-bytes and determinism rules defined in this spec. Static repository bytes do not establish execution, chronology, proof sufficiency, or acceptance. The recorded deliverables cover:
 
-* canonical JSON (UTF-8, sorted keys, compact, one trailing LF)
-
-* arrays-as-sets (deduped and ASCII-sorted)
-
-* the `LC_ALL=C` / `LANG=C` / `TZ=UTC` posture for hashing and canonicalization
-
+* canonical JSON (UTF-8, sorted keys, compact, one trailing LF)  
+    
+* arrays-as-sets (deduped and ASCII-sorted)  
+    
+* the `LC_ALL=C` / `LANG=C` / `TZ=UTC` posture for hashing and canonicalization  
+    
 * determinism evidence (AB↔BA identity, two-run identity, idempotence recompute)
 
-These proofs are implemented through tests and evidence artifacts owned by **HDE-Mechanics Guide** and **HDE-Build Checklist**. EPIC017 does **not** modify any math or canonical JSON semantics in this spec; it brings implementation and evidence into full alignment with the existing contract.
+The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide** and **HDE-Build Checklist**. Their presence does not establish that they passed or that implementation is fully aligned. EPIC017 does **not** modify any math or canonical JSON semantics in this spec.
 
-**Identifier and path policy** (**HDE-Schemas & Artifacts** §0.5 / §2.1). String IDs are ASCII and match `^[a-z0-9_]+$` (case-sensitive). Pack paths are POSIX (no `..`, no `//`, max 256 bytes). Centers are `snake_case` in outputs; Title Case is an ingestion alias.
+**Identifier and path policy** (**PF12-Canon-HDE-Schemas-and-Artifacts** §0.5 / §2.1). String IDs are ASCII and match `^[a-z0-9_]+$` (case-sensitive). Pack paths are POSIX (no `..`, no `//`, max 256 bytes). Centers are `snake_case` in outputs; Title Case is an ingestion alias.
 
 **Process scope.** Build and CI flow, CodEx staging, and repo-docs updates live in **HDE-Build Notes** and **Epic-Process-Guide**. This spec remains contract-free for transport/ops and uses titles-only routing to those homes.
 
-**Acceptance and evidence coupling** (**HDE-Schemas & Artifacts** §8; **HDE-Governance** A-gates). Any change that touches frozen inputs or schema/identity must ship with CI tokens and Evidence Index updates, including as applicable:
+**Acceptance and evidence coupling.** Any change that touches frozen inputs or schema/identity must satisfy the applicable CI-token requirements and the Evidence Catalog contract owned by **PF12-Canon-HDE-Schemas-and-Artifacts**. This section retains only the applicable math acceptance-family names:
 
-* **Pack/manifest and mirror:** `RELEASE_ID_RECOMPUTE_OK`, `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`. The machine mirror lives at `artifacts/evidence_index.jsonl` and must be kept 1:1 with the human Evidence Index in **HDE-Governance** (records-only with path-proofs).  
+* **Pack/manifest and Evidence Catalog:** `RELEASE_ID_RECOMPUTE_OK`, `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.  
 * **Domains/catalogs:** `MAGIC10_DOMAIN_CLOSED_OK`, `M10_DEFS_OK`, `M10_SEEDS_OK` (when Seeds are catalogized), `CATALOG_ORIENTATION_CANON_OK`, `PREFS_KEYSET_10_OK`.  
 * **Bands and rounding:** `BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`, `ROUND_HALF_UP_OK`.  
 * **Determinism:** `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`.
@@ -61,111 +61,132 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
 
 ---
 
-## 
-
 ## **0.3 Tagging convention (used throughout)**
 
-* **\[Implemented\]** — Verified in the repo and exercised by surfaces/tests.
-
-* **\[Required-Now\]** — Required for current build goals; if missing in code, it is treated as a gap.
-
+* **\[Implemented\]** — Verified in the repo and exercised by surfaces/tests.  
+    
+* **\[Required-Now\]** — Required for current build goals; if missing in code, it is treated as a gap.  
+    
 * **\[Speculative\]** — Accepted future design; not yet wired. (Preserve math as-is; no public bytes until promoted.)
 
 # **1\) “Map at a Glance” — What’s live vs planned \[Required-Now\]**
 
-* **Public Reader v1 (bands-only, single “harmony”) — \[Implemented\] (with CLI parity target)**
+* **Public Reader v1 (bands-only, single “harmony”) — \[Required-Now\]**  
+    
+  * **Required contract.** The public envelope emits one category `{"id":"harmony","band": <Cool|Open|Warm|Glow>}` plus `eligible`, `meta:{engine_tag,invocation_tag}`, `release_id`, and `idempotence_hash`. Bytes are canonical JSON (UTF-8, sorted keys, compact, exactly one trailing `\n`). `idempotence_hash` is computed over the canonical preimage; **AB↔BA** and **two-run** identity are required (see §3.2 and §3.4).  
+  * **Static implementation posture.** The pinned runtime emits the six-key envelope and computes the preimage hash, but it defaults `eligible` to `true`, retains the `harmony` item when `eligible == false`, and is not accepted by the checked-in success schema because that schema's category enum omits `harmony`. The schema and emitter also still permit `prompt`. These are implementation gaps; they do not weaken the public contract.  
+  * **Evidence routing (titles-only).** Reader v1 emitter and canonical serializer; Reader/CLI sidecar parity; idempotence/preimage recompute. Evidence families and paths are owned by the Evidence Catalog in **PF12-Canon-HDE-Schemas-and-Artifacts**.  
+  * **Scope note.** Transport/CLI specifics (headers, 304/HEAD, validators) live in **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (titles-only).
 
-  * **What’s live.** The public envelope emits one category `{"id":"harmony","band": <Cool|Open|Warm|Glow>}` plus `eligible`, `meta:{engine_tag,invocation_tag}`, `release_id`, and `idempotence_hash`. Bytes are canonical JSON (UTF-8, sorted keys, compact, exactly one trailing `\n`). `idempotence_hash` is computed over the canonical preimage; **AB↔BA** and **two-run** identity hold (see §3.2 and §3.4).  
-  * **Where it’s proved (titles-only).** • Reader v1 emitter & canonical serializer (public envelope rules) • Reader↔CLI parity harness (byte equality for identical inputs) • Idempotence/preimage recompute (preimage → hash → final).  
-     All artifacts are indexed via the machine mirror at `artifacts/evidence_index.jsonl`; titles appear in **Appendix D: Evidence Index**.  
-  * **Scope note.** Transport/CLI specifics (headers, 304/HEAD, validators) live in **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (titles-only).  
-* **Determinism (LF, sorted keys, preimage hash, AB↔BA) — \[Implemented\]**
 
-  * **Canonical JSON, one LF.** Public bytes are emitted as UTF-8, sorted keys, compact separators, exactly one trailing `\n` (see **HDE-Schemas and Artifacts §4**; enforced by emitter and tests).  
+* **Determinism (LF, sorted keys, preimage hash, AB↔BA) — \[Required-Now\]**  
+    
+  * **Canonical JSON, one LF.** Public bytes are required to be emitted as UTF-8, sorted keys, compact separators, exactly one trailing `\n` (see **PF12-Canon-HDE-Schemas-and-Artifacts**). The pinned presenter and serializer statically implement this byte recipe; static inspection does not establish test passage.  
+      
   * **Two-step idempotence.** Build the preimage (without `idempotence_hash`), compute `sha256(preimage_bytes)`, then re-emit with `idempotence_hash` inserted (see §3.2).  
-  * **AB↔BA identity.** Pair inputs are normalized to a canonical order; the same pair key drives downstream math so AB and BA produce byte-identical outputs (see §3.4).  
-  * **Evidence (titles-only).** Reader/CLI schema & LF discipline, AB↔BA goldens, idempotence recompute logs; all entries mirrored 1:1 in the machine mirror.  
+      
+  * **AB↔BA identity.** Pair inputs are normalized to a canonical order; order-neutral math is required so AB and BA produce byte-identical outputs (see §3.4).  
+      
+  * **Evidence (titles-only).** Reader/CLI sidecar schema and LF discipline, AB↔BA goldens, and idempotence recompute are governed evidence families in **PF12-Canon-HDE-Schemas-and-Artifacts**.  
+      
   * **EPIC017 proof record (informative).**  
-     EPIC017, as tracked in **HDE Phased Epics Map**, is the first complete implementation of the determinism invariants defined in this spec. Its deliverables exercise:
-
-    * canonical JSON checks
-
-    * Reader↔CLI parity
-
-    * AB↔BA identity
-
-    * two-run identity
-
+    EPIC017, as tracked in **HDE Phased Epics Map**, records deliverables intended to exercise the determinism invariants defined in this spec. Static repository bytes do not establish firstness, completeness, execution, or acceptance. The recorded deliverables cover:  
+      
+    * canonical JSON checks  
+        
+    * Reader↔CLI parity  
+        
+    * AB↔BA identity  
+        
+    * two-run identity  
+        
     * idempotence-recompute harnesses
 
-  * Acceptance tokens such as `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK` are mapped to evidence artifacts owned by **HDE-Mechanics Guide** and **HDE-Build Checklist**. These proofs demonstrate that implementation conforms to the rules defined here; they do **not** introduce any new math or any alternative determinism contract.
+    
 
-* **Compat Magic-10 (10 categories; scores→bands) — \[Speculative\] (internal math present; not public)**
+  * Acceptance tokens such as `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK` are mapped to evidence families owned by **PF12-Canon-HDE-Schemas-and-Artifacts** and acceptance semantics owned elsewhere. Their definitions do **not** introduce new math or an alternative determinism contract, and their presence does not establish a PASS.
 
-  * **Closed set & order.** Magic-10 IDs and their pinned order are defined in **HDE-Schemas and Artifacts §2.6** (this spec is math-only; public exposure is constrained in §2.2).  
-  * **Viewer prefs (shape & bounds).** Inputs validate against a closed 10-key weight map (0..100 integers) and a `top_category ∈ Magic-10`; deviations yield typed invalid-prefs (titles-only).  
-  * **AB↔BA neutrality.** Pair normalization yields order-neutral inputs; a stable pair key drives deterministic internal scoring.  
-  * **Deterministic scoring & banding.** Per-category scores are integers 0..100 by pinned arithmetic; bands map via inclusive maxima 24/49/74/100 with round\_half\_up (see §2.2 \+ §5.3).  
-  * **Internal result shape (not public).** Internal outputs may include `{id, score, band, personal_key, shared_key}`; Reader v1 exposes only the single harmony band.  
-  * **Doc posture.** Keep full Magic-10 math here as authoritative (IDs/order, banding semantics); public transport bytes remain in **HDE-CLI-API-Vendor Ref** (titles-only).  
-* **Feature extractors (EM / Hanging Gates / Dominance–Compromise / Throat adjacency / …) — \[Speculative\]**
 
+* **Canonical Magic-10 (10 categories; scores→bands) — \[Required-Now\] (implementation gap; Reader projection remains harmony-only)**  
+    
+  * **Closed matrix.** Every eligible pair evaluation produces exactly one intrinsic integer score and band for each of the ten IDs in the frozen order governed by `catalog/magic10.json`; no partial, harmony-only, duplicate, defaulted, or eleventh result is conforming.  
+  * **Human Design grounding.** Governed pair signals determine score magnitude. Person identifiers establish identity and canonical pair order only. Viewer preferences belong to sampler/ranker weighting and do not alter intrinsic compatibility scores or bands.  
+  * **AB↔BA neutrality.** Validated normalized charts are ordered by ASCII `person_uid`; the canonical pair-signal map and deterministic reduction in §5.2 are order-neutral.  
+  * **Deterministic scoring and banding.** Each category score is an integer in `0..100` produced by the half-unit reduction in §5.2, then mapped through the single global inclusive maxima `[24,49,74,100]` in §5.3.  
+  * **Public projection.** Reader v1 exposes only the `harmony` band from the complete canonical matrix. It does not expose scores or the other nine categories.  
+  * **Static implementation posture.** The pinned repository contains three noncanonical or transitional scorer surfaces and no complete ten-category implementation in `engine.core.core`; exact upstream mechanics for every governed pair signal are also not found. These are explicit implementation gaps.
+
+
+* **Feature extractors (EM / Hanging Gates / Dominance–Compromise / Throat adjacency / …) — \[Required-Now\]**  
+    
   * **Intent (one-liners).** Deterministic, pure signals for dyadic analysis (EM, HG, center balance, throat pathways, etc.), producing bounded enums/booleans for aggregation.  
   * **Common invariants.** Pure & deterministic (no time/network/random/file I/O); locale-neutral; AB↔BA symmetric; closed vocabularies; typed failures for unavailable states.  
   * **I/O shapes.** Inputs: normalized charts \+ frozen catalogs (titles-only). Outputs: small bounded maps (for example, `{ "em": true, "dominance": "g_identity", … }`); no narratives.  
-  * **Acceptance (when wired).** Unit goldens \+ property tests; catalog linkage; aggregation contract to presets; **no public surface in v1**.  
-* **Presets & aggregation math — \[Speculative\]**
+  * **Acceptance requirement.** Unit goldens \+ property tests; catalog linkage; deterministic handoff to the §5.2 signal map; **no public surface in v1**. The pinned repository does not contain the complete required extractor and upstream signal-generation surface.
 
-  * **Intent.** Catalog-driven, deterministic combination of feature signals to integer category scores 0..100, then bands via inclusive maxima 24/49/74/100 (see §2.2/§5.3).  
-  * **Preset catalog (frozen).** Named/versioned; any change to weights/caps/floors/corrections bumps the freeze pack and `release_id` (**HDE-Schemas and Artifacts**).  
-  * **Validation.** Preset name resolves to exactly one catalog entry; viewer prefs validated independently; all decisions AB↔BA neutral.  
-  * **Public rule.** Presets affect internal scores only; Reader v1 stays bands-only with single harmony.  
-* **Reader transport — proof surfaces & ops (titles-only routing)**
 
-  * **Endpoint Catalog (JSON success) — \[Required-Now\].** Single proof surface for A7 on success endpoints **(see HDE-CLI-API-Vendor Ref §5.6 and Appendix A)**. Catalog is titles-only/path-agnostic; publish a records-only snapshot and mirror it 1:1.  
-  * **Dev harness — \[Implemented (dev-only)\].** Dev/test capture for schema/LF and parity **(see HDE-CLI-API-Vendor Ref)**; rails closed; no vendor I/O.  
+* **Presets & aggregation math — \[Speculative\]**  
+    
+  * **Posture.** Presets, alternative weights or scoring profiles, and the ungoverned advanced token-aggregation design are **Future-Promotion**. No current governed Presets catalog, Feature Registry, or token-aggregation contract exists.  
+  * **Promotion boundary.** Promotion requires complete governed schemas and paths, fully populated fixed-point values, one fail-closed evaluation order, and pure-compute integration through the canonical Engine Core. No example identity, default, weight, cap, floor, correction, or stage is executable authority.  
+  * **Current matrix unaffected.** Future-Promotion does not defer or narrow the Required-Now intrinsic ten-category matrix in §5.2 or its band mapping in §5.3. Viewer preferences remain sampler/ranker inputs.  
+  * **Public rule.** A future preset must not silently widen Reader v1; the public projection remains numeric-free and harmony-only unless a separately authorized version change says otherwise.
+
+
+* **Reader transport — proof surfaces & ops (titles-only routing)**  
+    
+  * **Endpoint Catalog (JSON success) — \[Required-Now\].** A7 success-endpoint evidence is an externally owned proof family. Its records, paths, Index/Mirror bindings, and production procedure are governed outside PF01; this section preserves only the titles-only routing boundary.  
+  * **Dev harness — \[Required-Now\].** A dev/test capture surface exists, but the pinned code defaults a missing `APP_ENV` to `dev`; strict refusal outside explicit `APP_ENV=dev` remains an implementation gap. Transport details belong in **HDE-CLI-API-Vendor-Ref**.  
   * **/internal/version (ops endpoint) — \[Required-Now\].** Ops-only identity surface; acceptance in **HDE-Governance §10.5**.  
-  * **Production public Reader endpoint — \[Speculative\].** Future public surface; conditional delivery/headers owned in **HDE-CLI-API-Vendor Ref**/**HDE-Governance**.  
-* **Serializer/emitter — single shared entrypoint — \[Required-Now\]**
+  * **Production public Reader endpoint — \[Speculative\].** Future public surface; conditional delivery/headers owned in **HDE-CLI-API-Vendor Ref**/**HDE-Governance**.
 
-  * **One emitter for public bytes.** Reader and CLI call the same presenter/emitter; **no ad-hoc serializers**. Canonical JSON: UTF-8, sorted keys, compact, exactly one LF; arrays-as-sets (dedupe \+ ASCII sort).  
-  * **Determinism & parity.** Single emitter guarantees Reader↔CLI byte equality, AB↔BA, and two-run identity.  
-  * **Evidence.** Grep-guard (no alt serializers), symbol proof (shared emitter), parity fixtures — all titles/paths only and mirrored 1:1.  
-* **Vendor ingest (HDAPI) — \[Owned in HDE-CLI-API-Vendor Ref\]**
 
-  * **Request shaping — \[Implemented\].** Endpoint/method, canonical headers, and three-key body (`birthdate`,`birthtime`,`location`).  
-  * **Base-URL resolution — \[Required-Now\].** `HDAPI_BASE_URL` required (env); no literal default. Missing/empty ⇒ typed failure (no network I/O).  
-  * **Live HTTP gated by SAFE rails — \[Required-Now\].** Vendor calls only when `SAFE_MODE=0` and `ALLOW_NETWORK=1`; default closed for dev/CI.  
-  * **Production calls — \[Speculative\].** Timeouts/retries/backoff/rate-limits/observability pinned before enabling.  
-* **Retired: prompt, uncertainty — removed**
+* **Serializer/emitter — single shared entrypoint — \[Required-Now\]**  
+    
+  * **One emitter for public bytes.** Reader and any CLI Reader-byte sidecar MUST call the same presenter/emitter; **no ad-hoc serializers**. Canonical JSON: UTF-8, sorted keys, compact, exactly one LF; arrays-as-sets (dedupe \+ ASCII sort).  
+  * **Determinism & parity.** A shared emitter is required for Reader-byte parity, AB↔BA identity, and two-run identity. In the pinned repository, `showcompat` stdout emits a distinct compat payload while `--dump-reader` writes the Reader envelope; stdout equality is not statically established.  
+  * **Evidence.** Grep-guard, shared-emitter symbol proof, and Reader-sidecar parity fixtures are Evidence Catalog families owned by **PF12-Canon-HDE-Schemas-and-Artifacts**.
 
-  * **Scope.** Public Reader v1 is narrative-free; any mention of prompt/“uncertainty” is out of scope and removed from schema and emitter.  
-  * **Acceptance.** Success bodies pass schema without prompt; error bodies unchanged (typed, LF-terminated). Goldens for Reader/CLI parity remain bands-only.
 
-**Routing (no duplication).** Transport/CLI specifics are referenced by title in **HDE-CLI-API-Vendor Ref**; operational acceptance (A7, internal-ops exception, evidence policy) is in **HDE-Governance**. Canonical JSON & manifest/mirror rules live in **HDE-Schemas and Artifacts**.
+* **Vendor ingest (HDAPI) — \[Owned in HDE-CLI-API-Vendor Ref\]**  
+    
+  * **Request shaping — current static surface.** The pinned client contains a three-field `birthdate`/`birthtime`/`location` request builder for its supported route family and typed refusal for unsupported route posture. The owning transport canon controls the external contract.  
+  * **Base-URL resolution — current static surface.** The pinned client accepts canonical `HD_API_BASE_URL` and the legacy `HDAPI_BASE_URL`, rejects conflicting values, and fails closed when required vendor configuration is absent.  
+  * **Live HTTP gate — current static surface.** The default request function refuses network I/O unless `SAFE_MODE=0` and `ALLOW_NETWORK=1`. This static definition does not establish deployment or successful external calls.  
+  * **Timeout and retry posture.** Pinned timeout, retry, and backoff profiles exist in code. Runtime enablement, rate-limit behavior, observability, and production authorization are not established by static bytes.
+
+
+* **Retired contract: prompt and uncertainty — prohibited**  
+    
+  * **Scope.** Public Reader v1 is required to be narrative-free; `prompt` and `uncertainty` are prohibited by §§2.1–2.2 and Appendix D. Repository conformance must be established separately.  
+  * **Acceptance requirement.** Success bodies MUST pass the governing schema without `prompt`; error bodies remain typed and LF-terminated; Reader-sidecar parity goldens remain bands-only. The pinned schema and emitter do not yet conform.
+
+**Routing (no duplication).** Transport/CLI specifics are referenced by title in **HDE-CLI-API-Vendor Ref**; operational acceptance (A7, internal-ops exception, evidence policy) is in **HDE-Governance**. Canonical JSON & manifest/mirror rules live in **PF12-Canon-HDE-Schemas-and-Artifacts**.
 
 ---
 
 # 2\. Product Covenant & Public Contract (Reader v1) \[Required-Now\]
 
-## **2.1 Success payload (six keys; numeric-free) \[Implemented\]**
+## **2.1 Success payload (six keys; numeric-free) \[Required-Now\]**
 
-**Normative rule.** The Reader v1 public success body is a numeric-free JSON object containing exactly six top-level keys. No additional public fields are allowed. All serialization uses canonical JSON (**HDE-Schemas & Artifacts** §4: UTF-8 without BOM, sorted keys, compact, exactly one trailing `\n`; arrays treated as sets are deduplicated and ASCII-sorted).
+**Normative rule.** The Reader v1 public success body is a numeric-free JSON object containing exactly six top-level keys. No additional public fields are allowed. All serialization uses canonical JSON (**PF12-Canon-HDE-Schemas-and-Artifacts** §4: UTF-8 without BOM, sorted keys, compact, exactly one trailing `\n`; arrays treated as sets are deduplicated and ASCII-sorted).
+
+**Static implementation posture.** The pinned emitter constructs the six-key envelope and canonical preimage. The checked-in schema does not conform: its category enum omits `harmony`, it still permits `prompt`, and its success branch does not enforce the exact six-key field closure. This is an implementation gap; the normative covenant remains unchanged.
 
 **Required keys (success) — exactly these six**
 
 * **reader\_version :** `"v1"` — fixed string.  
 * **eligible :** `<boolean>` — whether the pair is eligible for public evaluation.  
 * **categories :** `[ { "id", "band" } … ]` — array of public category items (policy in §2.2).  
-* **meta :** `{ "engine_tag", "invocation_tag" }` — engine build tag and invocation tag (both non-empty strings; invocation tag is the short form from **Invocation**; ownership and format per **HDE-Governance** / **HDE-Schemas & Artifacts** Identity, titles-only).  
-* **release\_id :** `<hex64>` — lowercase 64-hex identifier of the frozen pack manifest in use (**HDE-Schemas & Artifacts** §6; see §3.1).  
+* **meta :** `{ "engine_tag", "invocation_tag" }` — engine build tag and invocation tag (both non-empty strings; invocation tag is the short form from **Invocation**; ownership and format per **HDE-Governance** / **PF12-Canon-HDE-Schemas-and-Artifacts** Identity, titles-only).  
+* **release\_id :** `<hex64>` — lowercase 64-hex identifier of the frozen pack manifest in use (**PF12-Canon-HDE-Schemas-and-Artifacts** §6; see §3.1).  
 * **idempotence\_hash :** `<hex64>` — lowercase 64-hex SHA-256 of the canonical five-key preimage (see §3.2).
 
 **Public category policy (v1)**
 
 * Each item in `categories` is exactly `{ "id": <string>, "band": "Cool" | "Open" | "Warm" | "Glow" }`.  
 * Not permitted on the public surface: `prompt` (removed), `personal_key`, `shared_key`, or any numeric (e.g., score, percent).  
-* Category identifiers are `snake_case` and come from the Magic-10 IDs set (**HDE-Schemas & Artifacts** §2.6). In v1, only the `"harmony"` public item may appear (see §2.2).
+* Category identifiers are `snake_case` and come from the Magic-10 IDs set (**PF12-Canon-HDE-Schemas-and-Artifacts** §2.6). In v1, only the `"harmony"` public item may appear (see §2.2).
 
 **Validation posture (success case)**
 
@@ -193,24 +214,24 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
 * If `eligible == false`: `categories` **MUST** be `[]`.  
 * No other public categories are allowed in v1. Exposure of the full Magic-10 set is a future, versioned change (PF-01 remains math-only; the public surface is constrained here).
 
-  ### **Sorting & uniqueness**
+### **Sorting & uniqueness**
 
 * `categories` is treated as a **set**; duplicate `id` values are **forbidden**.  
-* Arrays that represent sets are **deduped and ASCII-sorted** (bytewise) before hashing/compare (PF-12 §4).  
+* Arrays that represent sets are **deduped and ASCII-sorted** (bytewise) before hashing/compare (PF12-Canon-HDE-Schemas-and-Artifacts §4).  
 * In v1 (single item), sorting is **vacuously satisfied**; **uniqueness still applies**.
 
-  ### **Public shape constraints (reaffirmed)**
+### **Public shape constraints (reaffirmed)**
 
 * Each item is **exactly** `{ "id": <string>, "band": "Cool" | "Open" | "Warm" | "Glow" }`.  
-* `id` **must** come from the **Magic-10 closed set** (PF-12 §2.6; PF-01 §5.1). *(v1 publicly exposes only `"harmony"`.)*  
+* `id` **must** come from the **Magic-10 closed set** (PF12-Canon-HDE-Schemas-and-Artifacts §2.6; PF-01 §5.1). *(v1 publicly exposes only `"harmony"`.)*  
 * **Never permitted** on the public surface: `prompt`, `personal_key`, `shared_key`, `score`, or any numeric/free-text payloads.
 
-  ### **Determinism coupling**
+### **Determinism coupling**
 
 * `categories` contributes to the **idempotence preimage** (see §3.2; fields defined in PF-01).  
-* **AB↔BA identity** and **two-run identity** MUST hold at the byte level after **canonical serialization** (PF-12 §4; UTF-8 no BOM, sorted keys, compact, exactly one LF).
+* **AB↔BA identity** and **two-run identity** MUST hold at the byte level after **canonical serialization** (PF12-Canon-HDE-Schemas-and-Artifacts §4; UTF-8 no BOM, sorted keys, compact, exactly one LF).
 
-  ### **Acceptance gates (binary)**
+### **Acceptance gates (binary)**
 
 1. **Exactly-one rule (eligible):** `eligible == true` ⇒ `len(categories) == 1` **and** `categories[0].id == "harmony"`.  
 2. **Band enum:** `categories[0].band ∈ {"Cool","Open","Warm","Glow"}`.  
@@ -218,9 +239,11 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
 4. **No extras:** every `categories[*]` has **only** `id` and `band`.  
 5. **Uniqueness:** **no duplicate `id` values** (trivial in v1).
 
-   ## **2.3 Errors (shape/pointers) \[Required-Now\]**
+**Static implementation posture.** The pinned runtime always constructs one `harmony` category even when the supplied `eligible` value is false. The required `eligible == false` ⇒ `categories: []` behavior is not implemented at the pinned commit.
 
-   ### **Typed public error object (numeric-free, no PII)**
+## **2.3 Errors (shape/pointers) \[Required-Now\]**
+
+### **Typed public error object (no PII; bounded numeric exception)**
 
 * **Shape (minimum):** the public error body is a typed JSON object with:  
   * `ok: false`  
@@ -230,12 +253,14 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
   * `retry_after_ms: <integer >= 0>` — present only when a rate-limit or backoff condition applies  
 * **No additional public fields** (no narratives, no keys, no numerics beyond `retry_after_ms`).
 
-  ### **Hygiene and guardrails**
+### **Hygiene and guardrails**
 
 * **No PII or secrets** in error messages; keep messages succinct and generic.  
-* **Determinism:** error bodies are serialized by the same canonical path as success (**HDE-Schemas & Artifacts** §4): UTF-8, sorted keys, compact separators, exactly one trailing LF.
+* **Determinism:** error bodies are serialized by the same canonical path as success (**PF12-Canon-HDE-Schemas-and-Artifacts** §4): UTF-8, sorted keys, compact separators, exactly one trailing LF.
 
-  ### **Pointers (transport & status live elsewhere)**
+**Static implementation posture.** The pinned `error_envelope` also emits `schema` and can emit `details`; neither field is permitted by this Reader error contract. Repository conformance remains an implementation gap.
+
+### **Pointers (transport & status live elsewhere)**
 
 * **Transport ownership:** HTTP status mapping, headers, conditional delivery, caching, and streams/exit codes are owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** and are referenced here by title only.
 
@@ -249,49 +274,49 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
 
 * **IDs / centers / labels:** ASCII lexicographic (bytewise).  
 * **Channels:** normalize to zero-padded `NN-NN` (min-first, ASCII hyphen `-`), then compare ASCII lexicographically.  
-* **Categories:** primary order by the frozen Magic-10 rank (see **HDE-Schemas and Artifacts §2.6**), tie-break by `id` (ASCII).  
+* **Categories:** primary order by the frozen Magic-10 rank (see **PF12-Canon-HDE-Schemas-and-Artifacts §2.6**), tie-break by `id` (ASCII).  
 * **Stable-on-equality:** when primary keys compare equal, apply a canonical secondary key so the order is **total and stable** across runs.
 
-**Set semantics (arrays-as-sets).** Any array that represents a set **MUST** be deduplicated and ASCII-sorted before hashing/compare (see **HDE-Schemas and Artifacts §4**). Non-canonical or duplicate elements **fail validation**.
+**Set semantics (arrays-as-sets).** Any array that represents a set **MUST** be deduplicated and ASCII-sorted before hashing/compare (see **PF12-Canon-HDE-Schemas-and-Artifacts §4**). Non-canonical or duplicate elements **fail validation**.
 
-**Channel rejection posture.** Reversed or unparsable channel tokens **hard-fail** (typed error). Reversal (e.g., `34-20`) **normalizes to** `20-34` before compare; invalid tokens are **not** coerced.
+**Channel rejection posture.** At the PF01 computation boundary, channel identifiers MUST already be canonical zero-padded `NN-NN` with the lower Gate first; reversed, duplicate, unknown, or unparsable stored values fail validation. An upstream ingestion surface may map a reversed alias such as `34-20` to `20-34` only when its owning contract explicitly authorizes that alias before the value reaches this boundary. Invalid tokens are not coerced here.
 
 **Environment pins (determinism).** All comparisons and byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 **Routing (titles only).**
 
 * Runnable helpers & tests (`dedupe_sort`, `ensure_total_order`, `canonicalize_array`, `sort_pairs`): **HDE-Mechanics Guide**.  
-* Magic-10 rank (closed set & order): **HDE-Schemas and Artifacts §2.6**.
+* Magic-10 rank (closed set & order): **PF12-Canon-HDE-Schemas-and-Artifacts §2.6**.
 
 **Acceptance (tokens; titles only).** `TIEBREAK_TOTAL_ORDER_OK` *(supports `CATEGORY_FRAMEWORK_OK`)* — token names live in **HDE-Governance §2.0**.
 
-**Evidence (records-only; indexed via the machine mirror).** Property tests (antisymmetry / transitivity / totality), a channel-normalization corpus (input → canonical `NN-NN`, rejects for non-canonical), and canonical before/after examples for set-normalized arrays. List by title/path in **Appendix D: Evidence Index** and mirror 1:1 in `artifacts/evidence_index.jsonl` with path-proofs.
+**Evidence (records-only).** Property tests (antisymmetry / transitivity / totality), a channel-normalization corpus (canonical `NN-NN` plus rejected noncanonical values), and canonical before/after examples for set-normalized arrays are governed evidence families in **PF12-Canon-HDE-Schemas-and-Artifacts**. PF01 does not maintain a parallel path list.
 
 **EPIC017 D4 proof (informative).**  
- EPIC017’s “deterministic tie-break and total-order module” deliverable, as recorded in **HDE Phased Epics Map**, implements comparators for IDs, channels, categories, and arrays-as-sets exactly as specified in this section. It proves antisymmetry, transitivity, totality, AB↔BA identity, and two-run identity using ordering artifacts and tests defined in **HDE-Mechanics Guide** and **HDE-Schemas & Artifacts**. These proofs confirm the semantics defined here; EPIC017 does **not** alter the ordering rules or arrays-as-sets behavior in this spec. Any future change to comparator policy or set semantics remains a PF01 math change and must follow the usual release-id and evidence requirements.
+EPIC017’s “deterministic tie-break and total-order module” deliverable, as recorded in **HDE Phased Epics Map**, is associated with comparator code and evidence intended to cover IDs, channels, categories, arrays-as-sets, antisymmetry, transitivity, totality, AB↔BA identity, and two-run identity. Static repository inspection confirms comparator definitions but does not establish execution or PASS. EPIC017 does **not** alter the ordering rules or arrays-as-sets behavior in this spec. Any future change to comparator policy or set semantics remains a PF01 math change and must follow the usual release-id and evidence requirements.
 
 ---
 
 # 3\. Identity & Determinism \[Required-Now\]
 
-## **3.1 release\_id — freeze-pack identity (sha256) \[Implemented\]**
+## **3.1 release\_id — freeze-pack identity (sha256) \[Required-Now\]**
 
 **Definition (normative).** `release_id` is the lowercase 64-hex SHA-256 of the canonical bytes of `catalog/manifest.json`, the single release-identity input stored in Git. It is stable until those canonical manifest bytes change; neither a Git commit nor a change to a manifest-listed source file changes the value unless the manifest is intentionally cut and its canonical bytes change.
 
-**What the freeze pack includes (by title).** The pack is the set of frozen math inputs enumerated in the pack manifest (single home: **HDE-Schemas and Artifacts**), including at minimum:
+**What the freeze pack includes (by title).** The complete manifest membership and artifact paths are governed by **PF12-Canon-HDE-Schemas-and-Artifacts**. PF01 requires the following math inputs to participate in that governed release identity when represented as artifacts:
 
-* **Topology catalogs:** `centers.json`, `gates.json`, `channels.json` (canonical `NN-NN` channel identities; centers in `snake_case`).  
-* **Magic-10 catalog:** the closed, ordered ID set (IDs only; thresholds live in the constants pack).  
-* **Constants pack:** `limits.em_max`, `limits.throat_em_max`, `limits.centers_max`, `limits.motor_throat_max`, `limits.mind_throat_max`, `limits.comp_max`, and `bands.thresholds` (inclusive-high maxima).  
+* **Topology catalogs:** `catalog/gates_v1.json` and `catalog/channels_v1.json` (canonical `NN-NN` channel identities; centers derive from Gate rows and use canonical machine IDs).  
+* **Magic-10 catalog:** `catalog/magic10.json`, the closed, ordered ID set; input bounds live in `catalog/magic10_caps.json`, and global score/band thresholds live in `math/thresholds.json`.  
+* **Feature-constants contract:** `limits.em_max`, `limits.throat_em_max`, `limits.centers_max`, `limits.motor_throat_max`, `limits.mind_throat_max`, and `limits.comp_max`; the current global score clamp, rounding mode, and band maxima are governed at `math/thresholds.json`.  
 * **Direct Motor→Throat set (if catalogized):** governed four-channel set in canonical `NN-NN`; treated as a frozen input when listed in the manifest.  
-* **Seeds catalog (when present):** if catalogized in **HDE-Schemas and Artifacts**, Seeds are admin/test inputs; any byte change triggers a new `release_id`.  
-   Transport/ops bytes are out of scope and **not** part of this identity.
+* **Seeds catalog (when present):** if catalogized in **PF12-Canon-HDE-Schemas-and-Artifacts**, Seeds are admin/test inputs; any governed byte change requires a manifest cut and new `release_id`.  
+  Transport and operational semantics are out of PF01 scope. Their bytes may nevertheless be manifest members when **PF12-Canon-HDE-Schemas-and-Artifacts** governs them as release inputs; PF01 does not redefine the complete manifest as math-only.
 
 ### **Construction (canonical)**
 
 1. **Manifest.** Store the single release-identity input at `catalog/manifest.json`. Its top-level keys are exactly `root`, `version`, `built_at_utc`, and `files`, with shape:  
-2. `{"root":"catalog/","version":"<semver>","built_at_utc":"YYYY-MM-DDThh:mm:ssZ","files":[{"path":"…","sha256":"<64hex>","size":<int>},…]}`. The manifest **MUST NOT** self-list.  
-3. **Canonicalize.** Store the manifest using **HDE-Schemas and Artifacts** canonical JSON rules: UTF-8 (no BOM), ASCII-sorted object keys, compact separators, and exactly one trailing `\n`; arrays-as-sets are deduplicated and ASCII-sorted.  
+2. `{"root":"catalog/","version":"<semver>","built_at_utc":"YYYY-MM-DDThh:mm:ssZ","files":[{"path":"…","sha256":"<64hex>","size":<int>},…]}`. The manifest **MUST NOT** self-list. `files[].path` is repository-relative; `root` is identity metadata and is not a path-resolution base. `built_at_utc` MUST come from one deterministic, governed build input and MUST NOT be sampled during serialization.  
+3. **Canonicalize.** Store the manifest using **PF12-Canon-HDE-Schemas-and-Artifacts** canonical JSON rules: UTF-8 (no BOM), ASCII-sorted object keys, compact separators, and exactly one trailing `\n`; arrays-as-sets are deduplicated and ASCII-sorted.  
 4. **Hash.** `release_id = sha256(canonical_bytes("catalog/manifest.json"))` → 64-hex, lowercase. CI also requires the on-disk manifest to be canonical; non-canonical storage is a hard-fail even if the canonical hash would be unchanged.
 
 **Casing & format**
@@ -316,30 +341,32 @@ These proofs are implemented through tests and evidence artifacts owned by **HDE
 * **Provenance:** evidence (titles/paths only) includes the canonical manifest artifact and the computed `release_id`.  
 * **Determinism:** recomputing over the same pack yields the same `release_id` (two-run identity).
 
+**Static implementation posture.** The pinned runtime validates and hashes the canonical packaged manifest. The pinned manifest has eight entries, omits required topology and complete Magic-10 narrative inputs named by the current PF12 minimum, and therefore does not establish manifest conformance or a PASS. Its inclusion of adapter and migration bytes is consistent with PF12 ownership of the complete release surface and disproves only the former PF01 math-only membership claim.
+
 **Acceptance gates (titles-only)**  
- `RELEASE_ID_FROM_MANIFEST_OK`, `RELEASE_ID_RECOMPUTE_OK`, `MANIFEST_SHA256_HEX64_OK`, `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`.
+`RELEASE_ID_FROM_MANIFEST_OK`, `RELEASE_ID_RECOMPUTE_OK`, `MANIFEST_SHA256_HEX64_OK`, `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`.
 
 **Non-goals (routed by title only).** HTTP headers, conditional delivery, caching/writers, and CLI/Reader validators live in **HDE-CLI-API-Vendor Ref** and **HDE-Governance**.
 
-## **3.2 idempotence\_hash: preimage recipe (sha256 over canonical preimage) \[Implemented\]**
+## **3.2 idempotence\_hash: preimage recipe (sha256 over canonical preimage) \[Required-Now\]**
 
 **Definition (normative).** `idempotence_hash` is the lowercase 64-hex SHA-256 of the canonical preimage of the Reader v1 success envelope. It proves that the published bytes arise from a single, canonical representation.
 
 ### **Canonical preimage (success case)**
 
-Build an object with exactly five keys (no others), each already normalized per this spec and **HDE-Schemas & Artifacts**:
+Build an object with exactly five keys (no others), each already normalized per this spec and **PF12-Canon-HDE-Schemas-and-Artifacts**:
 
 1. `reader_version` : `"v1"`  
 2. `eligible` : `<boolean>`  
 3. `categories` : `[{"id","band"}]` — public policy per §2.2 (v1 exposes one item `{"id":"harmony","band":<Cool|Open|Warm|Glow>}` when `eligible == true`; `[]` when `eligible == false`; numeric-free)  
-4. `meta` : `{"engine_tag","invocation_tag"}` — titles-only references to **HDE-Schemas & Artifacts** (invocation tag is the short form; no other fields in public `meta`)  
+4. `meta` : `{"engine_tag","invocation_tag"}` — titles-only references to **PF12-Canon-HDE-Schemas-and-Artifacts** (invocation tag is the short form; no other fields in public `meta`)  
 5. `release_id` : `<hex64>` — as defined in §3.1
 
 Do not include `idempotence_hash` in the preimage.
 
 ### **Canonical serialization (preimage & final)**
 
-Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays that represent sets are deduplicated and ASCII-sorted. All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
+Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays that represent sets are deduplicated and ASCII-sorted. All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 ### **Emission algorithm (success)**
 
@@ -350,9 +377,9 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 ### **Correctness properties**
 
 * **Deterministic & stable.** Any preimage byte change (field value, order, band, `release_id`) changes `idempotence_hash`. Canonicalization removes non-semantic whitespace/key-order differences.  
-* **AB↔BA identity.** Pair inputs are normalized (this spec’s composite rules; **HDE-Schemas & Artifacts** topology normalization), so AB and BA produce identical `preimage_bytes` and the same `idempotence_hash`.  
+* **AB↔BA identity.** Pair inputs are normalized (this spec’s composite rules; **PF12-Canon-HDE-Schemas-and-Artifacts** topology normalization), so AB and BA produce identical `preimage_bytes` and the same `idempotence_hash`.  
 * **Two-run identity.** Re-emitting the same logical object yields byte-identical preimage and final bodies.  
-* **Reader↔CLI parity.** For identical inputs/environment, CLI stdout and Reader emit byte-identical success bodies (and thus the same `idempotence_hash`).
+* **Reader↔CLI parity.** For identical inputs and environment, a CLI Reader-byte sidecar and Reader MUST emit byte-identical success bodies and the same `idempotence_hash`. The general `showcompat` stdout payload is a different admin/compat surface and is not Reader bytes.
 
 ### **Validation (binary)**
 
@@ -360,8 +387,10 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 * **Recompute check.** Remove `idempotence_hash` from the published body, re-serialize canonically, hash, and confirm equality with the published digest.
 
 **Acceptance (tokens, titles-only).** `PREIMAGE_RECOMPUTE_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `CLI_READER_EMITTER_PARITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`.  
- **Non-goals / routing.** `idempotence_hash` is not an HTTP transport token; ETag/conditional semantics live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** (titles only).  
- **Tokens:** see **HDE-Governance §2.0**.
+**Non-goals / routing.** `idempotence_hash` is not an HTTP transport token; ETag/conditional semantics live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** (titles only).  
+**Tokens:** see **HDE-Governance §2.0**.
+
+**Static implementation posture.** The pinned presenter implements the five-key preimage, canonical hash, and final emission sequence. Complete public conformance remains blocked in code by the ineligible-category and `prompt` gaps identified in §§2.1–2.2; static inspection does not establish the acceptance tokens above.
 
 ---
 
@@ -396,7 +425,7 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 
 ---
 
-## **3.4 Two-run identity & AB↔BA parity (public) \[Implemented\]**
+## **3.4 Two-run identity & AB↔BA parity (public) \[Required-Now\]**
 
 ### **Definition (normative)**
 
@@ -406,18 +435,17 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 ### **How it is achieved (concept)**
 
 * **Canonical preimage → hash → final** (see §3.2). Identical preimages yield identical `idempotence_hash` and final bytes.  
-* **Pair normalization.** Inputs are normalized **before** any computation (see topology normalization in HDE-Schemas and Artifacts), guaranteeing order-neutrality for scores, bands, and envelope.  
+* **Pair normalization.** Inputs are normalized **before** any computation (see topology normalization in PF12-Canon-HDE-Schemas-and-Artifacts), guaranteeing order-neutrality for scores, bands, and envelope.  
 * **Single emitter.** One canonical JSON emitter shared across Reader and CLI (UTF-8, sorted keys, compact, exactly one LF) eliminates serializer drift across surfaces.  
 * **Environment pins.** All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-### **Evidence & goldens (titles/paths only)**
+### **Evidence families (titles-only)**
 
-* **Reader/CLI parity & LF discipline** (schema \+ byte checks): `tests/reader_v1/`, `tests/cli/`, `schemas/reader.v1.schema.json`.  
-* **AB↔BA golden proofs (public success parity):**  
-   `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`.  
-* **Identity markers & scripts:** `artifacts/cards/A3/IDENTITY_OK.txt`, `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`.  
-* **Emitter identity:** canonical emitter SHA-256 (see **Appendix B — Evidence Index**, titles only).  
-* **Index & mirror rule:** Every item above is listed by title/path in the human Evidence Index and mirrored 1:1 in `artifacts/evidence_index.jsonl` with path-proofs (see HDE-Schemas and Artifacts).
+* **Reader/CLI Reader-sidecar parity and LF discipline.**  
+* **AB↔BA public-success goldens.**  
+* **Two-run identity and idempotence recompute.**  
+* **Canonical emitter identity.**  
+* **Ownership.** Exact artifact families, paths, Index/Mirror records, and path proofs are governed by the Evidence Catalog in **PF12-Canon-HDE-Schemas-and-Artifacts**; PF01 does not maintain a parallel path list.
 
 ### **Byte-level acceptance (binary)**
 
@@ -425,91 +453,129 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 * **AB↔BA parity.** Given inputs A,B and B,A, the emitted bytes are bit-for-bit identical; confirm by byte-compare and equal `idempotence_hash`.  
 * **Serializer invariants.** Outputs are UTF-8, sorted keys, compact separators, exactly one LF, no BOM/ANSI, and schema-valid in both success and error modes.
 
+**Static implementation posture.** The pinned canonical serializer and Reader presenter are deterministic by inspection, and the CLI can write Reader bytes through `--dump-reader`. General `showcompat` stdout emits a different compat object; the checked-in Reader schema and ineligible behavior are nonconforming; and static files do not prove any test or acceptance PASS.
+
 **Non-goals / routing.** Header matrices, conditional delivery, caching/writers policy, and CLI stream rules are not duplicated here; see **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (titles only).
 
 ---
 
-#  **4\. Eligibility (mechanical; no numerics) \[Required-Now\]**
+# **4\. Eligibility (mechanical; no numerics) \[Required-Now\]**
 
 ## 4.1 Definition (normative)
 
-* **Eligibility** is a **mechanical, catalog-driven gate** indicating whether a pair can be evaluated for public output.
-
-* The result is a **boolean** (`eligible: true|false`) and **does not carry numerics** or narrative content.
+* **Eligibility** is a pure, mechanical pair-computability predicate indicating whether a validated normalized pair can be evaluated for public output.  
+    
+* Eligibility is not a sampler, ranking, viewer-preference, preset, moderation, consent, blocking, product-access, score, band, or relationship-state predicate.  
+    
+* After required-input and catalog validation, return `true` exactly when `A.person_uid != B.person_uid`.  
+    
+* Return `false` exactly for a valid self-pair: `A.person_uid == B.person_uid` and the two complete normalized chart projections are byte-identical under canonical serialization.  
+    
+* A valid distinct pair remains eligible when it has no electromagnetic Channel, a low compatibility band, or any Type combination.  
+    
+* The result is a **boolean** (`eligible: true|false`) and carries no numerics or narrative content.
 
 ## 4.2 Inputs and catalogs (concept)
 
-* The decision references only **frozen catalogs/manifests** and normalized inputs defined by this spec.
-
-* All lookups are **deterministic** and performed against the **freeze pack** associated with the current `release_id`.
-
-* Eligibility logic is **independent of any “prompt” or “uncertainty” concepts** (both are removed from this spec).
+* **Party records.** Normalized party A and party B each contain `person_uid` and `gates`. `person_uid` MUST match `^[A-Za-z0-9._-]{1,64}$`.  
+    
+* **Gate arrays.** Every `gates` value MUST be an integer in `1..64`; each normalized array MUST be non-empty, duplicate-free, and ascending.  
+    
+* **Gate closure.** Every Gate MUST resolve exactly once in `catalog/gates_v1.json`.  
+    
+* **Channel coherence.** `catalog/channels_v1.json` MUST be closed and internally coherent for the active topology; every channel endpoint used by downstream pair mechanics MUST resolve to the Gate Catalog.  
+    
+* **Release identity.** The active lowercase 64-hex `release_id` identifies the frozen inputs used for the evaluation. All lookups are deterministic and use that active frozen surface.  
+    
+* **Excluded inputs.** No score, band, viewer preference, preset, sampler setting, clock, environment variable, network result, moderation state, application relationship state, `prompt`, or `uncertainty` value is consulted.
 
 ## 4.3 Determinism & neutrality
 
-* **Order-neutral:** After canonical pair normalization, the eligibility outcome for **AB** equals that for **BA**.
-
-* **Two-run identity:** With the same inputs and freeze pack, recomputing eligibility yields the same boolean.
-
-* No time, network, or random sources influence eligibility.
+* **Independent validation first.** Validate each normalized chart independently before pair ordering or self-pair comparison.  
+    
+* **Canonical sets.** Canonicalize each `gates` array as ascending unique integers.  
+    
+* **Order-neutral.** Order the two validated party records by ASCII `person_uid`; after canonical pair normalization, the eligibility outcome for **AB** equals that for **BA**.  
+    
+* **Equal-UID comparison.** When UIDs are equal, compare the complete canonical normalized projections. Identical projections produce `eligible:false`; unequal projections fail with `ERR_READER_INVALID_CHART`.  
+    
+* **Two-run identity:** With the same inputs and freeze pack, recomputing eligibility yields the same boolean.  
+    
+* No time, network, random, environment, scoring, preference, or sampler source influences eligibility.
 
 ## 4.4 Public behavior
 
-* **If `eligible == true`:** the public `categories` array **MUST** comply with §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).
-
-* **If `eligible == false`:** the public `categories` array **MAY** be empty. No numerics or narrative fields appear in either case.
+* **If `eligible == true`:** the public `categories` array **MUST** comply with §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).  
+    
+* **If `eligible == false`:** the public `categories` array **MUST** be `[]`. No numerics or narrative fields appear in either case.  
+    
+* Invalid or missing input does not produce a success envelope and MUST NOT be coerced to `eligible:false`.
 
 ## 4.5 Validation (binary)
 
-* **Catalog closure:** every reference used by the gate must resolve within the freeze pack.
-
-* **Determinism checks:** AB↔BA parity and two-run identity are satisfied for the eligibility boolean.
-
-* **Schema coupling:** the success envelope reflects eligibility as per §2.1; the value participates in the **preimage** for `idempotence_hash` (see §3.2).
+* **Missing input.** An absent party, absent `person_uid`, absent `gates`, or absent active release identity fails closed as `ERR_READER_MISSING_PARAM`, with no Reader success envelope.  
+    
+* **Invalid input.** A malformed `person_uid`; malformed, duplicate, out-of-domain, or unresolved Gate; incoherent topology; or same-UID/different-projection conflict fails closed as `ERR_READER_INVALID_CHART`, with no Reader success envelope.  
+    
+* **Catalog closure:** every reference used by the gate resolves within the active frozen inputs.  
+    
+* **Determinism checks:** AB↔BA parity and two-run identity are satisfied for the eligibility boolean.  
+    
+* **Schema coupling:** the success envelope reflects eligibility as per §2.1; the value participates in the **preimage** for `idempotence_hash` (see §3.2).  
+    
+* **Minimum true fixture.** Two valid normalized charts with distinct valid UIDs, closed Gate membership, and the same active `release_id` produce `eligible:true`, including when no Channel is completed across the pair.  
+    
+* **Minimum false fixture.** The same valid normalized chart supplied twice with the same UID and byte-identical canonical projection produces `eligible:false` and `categories:[]`.  
+    
+* **Minimum invalid fixture.** A Gate `65`, duplicate Gate, or Gate absent from the active catalog produces `ERR_READER_INVALID_CHART` and no success envelope.
 
 ## 4.6 Non-goals / routing
 
-* No transport policy, caching, or HTTP status mapping is specified here; such details are referenced **by title only** in the transport/CLI and governance documents.
+* No transport policy, caching, HTTP status mapping, sampler eligibility, ranking, preference weighting, moderation, consent, blocking, or product-access policy is specified here; those concerns route to their owning documents by exact title.  
+    
+* `person_uid` is the normalized internal identity consumed by this predicate. A public or birth-facing caller need not supply it when an architecture-sanctioned internal resolver derives deterministic metadata before PF01 validation.
 
 ## 4.7 Emission rule (binary) \[Required-Now\]
 
-* **Eligible ⇒** **emit categories** per §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).
-
+* **Eligible ⇒** **emit categories** per §2.2 (v1 Alpha: exactly one item `{id:"harmony", band:…}`; numeric-free).  
+    
 * **Ineligible ⇒** **`categories: []`** (empty array). No numerics, no narrative fields.
 
-## 
+**Static implementation posture.** No Reader eligibility decision function implementing this contract was found in the pinned repository. `engine.runtime.public` accepts a caller-supplied boolean, defaults it to `true`, and emits `harmony` even when false. The sampler has a separate candidate-pool predicate and MUST NOT be reused as Reader pair-computability. This is an explicit implementation gap, not a change to the Required-Now contract.
 
-# 5\. Magic-10 Framework (closed IDs, scoring→bands) \[Speculative\]
+# 5\. Magic-10 Framework (closed IDs, scoring→bands) \[Required-Now\]
 
 ## **5.1 Canonical IDs (closed set) \[Required-Now\]**
 
-**Definition (normative).** The **Magic-10 category identifiers are a closed, ordered set** of ASCII-lowercase strings. **PF-Canon-HDE-Schemas & Artifacts §2.6** is the **single home** for this set **and its order**. This specification **does not restate** the list; any consumer must dereference it **by title**.
+**Definition (normative).** The **Magic-10 category identifiers are a closed, ordered set** of ASCII-lowercase strings. **PF12-Canon-HDE-Schemas-and-Artifacts** and its governed `catalog/magic10.json` artifact are the single home for the set and order. This specification does not create a second catalog list; consumers MUST dereference the governed order.
 
 **Use and exposure**
 
-* **Internal math:** the compat layer consumes this closed set for scoring → band mapping (see **§5.2**, **§5.3**).  
-* **Public surface (v1):** Reader v1 is **bands-only & numeric-free**; it exposes only `{"id":"harmony","band":…}` (see **§2.2**). Exposure of all ten categories is a **future, versioned** change.
+* **Canonical internal math:** the canonical Engine Core consumes the complete closed set for the intrinsic scoring and band matrix in §§5.2–5.3. Every eligible pair requires all ten results atomically.  
+* **Public surface (v1):** Reader v1 is **bands-only & numeric-free** and projects only `{"id":"harmony","band":…}` from the complete canonical matrix (see **§2.2**). Public exposure of all ten categories remains a future, versioned change.
 
 **Ordering and uniqueness**
 
-* **Order is pinned** in **PF-12 §2.6** and is the **normative iteration order** for any ordered consumer (comparators in **§2.4**).  
+* **Order is pinned** in **PF12-Canon-HDE-Schemas-and-Artifacts §2.6** and is the **normative iteration order** for any ordered consumer (comparators in **§2.4**).  
 * Identifiers are **unique**; duplicates are **forbidden**.
 
 **Format and validation**
 
-* Identifiers are **ASCII-lowercase**; **validators MUST enforce exact membership** against PF-12 §2.6. Pattern pre-filters (e.g., `^[a-z]+$`) are insufficient for acceptance; **exact set** membership is required.  
-* Inputs that reference categories (e.g., viewer weights) **must cover exactly this closed set**; **no extras or omissions**.  
-* Catalogs/schemas (PF-12 §2.6) **reject non-members**; stored JSON follows **PF-12 §4** (UTF-8 no BOM, sorted keys, compact, **one LF**).
+* Identifiers are **ASCII-lowercase**; **validators MUST enforce exact membership** against PF12-Canon-HDE-Schemas-and-Artifacts §2.6. Pattern pre-filters (e.g., `^[a-z]+$`) are insufficient for acceptance; **exact set** membership is required.  
+* Intrinsic score and band results MUST cover exactly this closed set, with no extras, omissions, or duplicates. Viewer preferences may use the same closed key set for sampler/ranker weighting, but they do not contribute to intrinsic score magnitude.  
+* Catalogs/schemas (PF12-Canon-HDE-Schemas-and-Artifacts §2.6) **reject non-members**; stored JSON follows **PF12-Canon-HDE-Schemas-and-Artifacts §4** (UTF-8 no BOM, sorted keys, compact, **one LF**).
 
 **Change control (freeze-pack coupling)**
 
-* **No membership/order edits in this version.** Any change to **membership or order** is a **frozen-input change**; it **requires a new pack manifest** (PF-12 §6) and therefore a **new `release_id`** (see **§3.1**).  
+* **No membership/order edits in this version.** Any change to **membership or order** is a **frozen-input change**; it **requires a new pack manifest** (PF12-Canon-HDE-Schemas-and-Artifacts §6) and therefore a **new `release_id`** (see **§3.1**).  
 * Downstream governed artifacts (e.g., Magic-10 catalog, band maxima, presets) must reference **only these IDs**; changing them also **bumps `release_id`**.
 
 **Determinism guarantees**
 
 * Closed membership \+ fixed order, combined with **canonical serialization** and **preimage hashing** (see **§3.2**), ensures **AB↔BA identity** and **two-run identity**.  
 * With identifiers immutable and order pinned, category iteration/aggregation is **byte-stable** across surfaces.
+
+**Static implementation posture.** The pinned `catalog/magic10.json` and `engine.categories.registry` use the governed harmony-first order, while `engine.compat.categories.CATEGORIES_ORDER_V1` is heat-first. The compat order is a nonconforming admin/legacy implementation gap and does not change the governed order.
 
 **Acceptance & CI (titles-only)**
 
@@ -521,341 +587,364 @@ Use **HDE-Schemas & Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), comp
 
 ## **5.2 Deterministic integer scoring model (caps; fixed-point rules)**
 
-**Scope.** Defines the **per-category scoring model** that converts normalized inputs (and, optionally, viewer weights or presets) into **integer scores in \[0..100\]**, prior to band mapping (**§5.3**). Deterministic, **order-neutral (AB↔BA)**, and **fixed-point** (no persisted floats).
+**Scope.** This section defines the Required-Now intrinsic Magic-10 reduction from a validated normalized pair-signal map to the complete ten-category score-and-band matrix. The computation is deterministic, AB↔BA neutral, integer/fixed-point only, Human Design-grounded, and complete-or-fail-closed. Viewer preferences, presets, identifiers, hashes, and product-ranking inputs do not contribute score magnitude.
 
 ### **5.2.1 Inputs (closed and validated)**
 
-* **Category universe:** **exactly** the Magic-10 IDs from **§5.1** (closed set; fixed order).  
-* **Pair normalization:** inputs are canonically ordered **before any scoring**; all downstream steps consume the **normalized** pair.  
-* **Viewer weights (optional):** if present, **every category** must have an **integer weight in \[0..100\]**; missing/extra keys are **invalid**.
+* **Validated pair.** Validate both normalized charts under §4, canonicalize every set-valued chart input, and order the two party projections by ASCII `person_uid`. A self-pair is ineligible and is not scored.  
+* **Category universe.** Iterate exactly the complete frozen order governed by `catalog/magic10.json`; compute one result for each ID and no others.  
+* **Signal key set.** Produce one pair-signal map whose key set is exactly the union of every `inputs` array in `catalog/magic10_caps.json`. Keys are unique and ASCII-sorted. Missing or extra signal keys are invalid.  
+* **Signal value domain.** Each value is a JSON integer in half-score units from `0..200`: `0` represents `0.0`, `1` represents `0.5`, and `200` represents `100.0`. Decimals, binary floats, booleans, non-integers, and out-of-domain values are invalid.  
+* **Excluded inputs.** No clock, randomness, network, environment value, viewer preference, preset, sampler setting, or product state is an input.  
+* **Upstream implementation boundary.** Exact Human Design mechanics that generate every governed signal remain a Required-Now implementation gap. That gap does not permit an identifier-derived score, missing signal, invented default, harmony-only substitute, or partial matrix.
 
-### **5.2.2 Deterministic base (order-neutral seed)**
+### **5.2.2 Deterministic base (governed pair signals)**
 
-Each category’s score begins from a **stable, order-neutral base** derived from `(pair_key, category_id)` with these properties:
+**Pair identity.** Canonically serialize exactly this preimage using UTF-8 without BOM, ASCII-sorted object keys, compact separators, and one trailing LF:
 
-* **Pure function** of `(pair_key, category_id)`; **no time/network/randomness**.  
-* Produces a bounded **integer in \[0..100\]**.  
-* Changes only when inputs or the category ID change (freeze-pack changes are reflected via **§3.1 `release_id`**).
+`{"members":[{"gates":[...],"person_uid":"<uid_lo>"},{"gates":[...],"person_uid":"<uid_hi>"}],"release_id":"<64-lowercase-hex>","signal_scale":2,"signals":{"<ascii_signal_id>":<integer-half-units>,...},"version":"magic10-pair-v1"}`
 
-*Baseline (informative).* A stable hash of `"pair_key:category"` modulo 101 yields a base integer in **\[0..100\]**.
+* `members` is in normalized pair order, and each `gates` array is ascending and unique.  
+* `signal_scale` is the integer `2`.  
+* `signals` contains exactly the required key set with integer values in `0..200`.  
+* `pair_key = sha256(preimage_bytes).hexdigest()` in lowercase hex.  
+* `pair_key` is an identity and cache key only. It is never a seed or operand for score magnitude.
 
-### **5.2.3 Weight application (fixed-point)**
+**Per-category base.** For each category `c` in frozen order:
 
-If viewer or preset weights are provided, they influence scores without floating-point drift:
+1. Read its non-empty ordered input list `I_c` and integer bounds `[L_c,U_c]` from `catalog/magic10_caps.json`.  
+2. For each `i in I_c`, let `q_i` be the normalized half-unit integer and compute `q'_i = min(2*U_c,max(2*L_c,q_i))`.  
+3. Let `n = len(I_c)` and `Q = sum(q'_i)`.  
+4. Compute `base_c = floor((Q+n)/(2*n))`. For this nonnegative domain, that is exactly `round_half_up((Q/2)/n)`.  
+5. The output domain is the integer set `0..100`.
 
-* **Weight domain:** normalize `w_cat ∈ {0..100}` to a **fixed-point factor in \[0..1\]** (half-unit arithmetic; **no persisted floats**).  
-* **Monotone lifting:** apply a deterministic monotone function that never decreases the base when weights increase and **never exceeds 100**.  
-* **Fixed-point arithmetic:** any fractional intermediate is represented in **half-units** and converted by the pinned **rounding rule** (**§5.2.5**) to an integer before clamping.
+Hashing and modulo are not part of the base function. An unknown category, empty input list, missing or extra signal, non-integer signal, or out-of-domain normalized signal fails closed.
 
-*Baseline (informative).* `val = base * (0.5 + 0.5 * w_cat/100)`; then **round\_half\_up** and **clamp to \[0..100\]**.
+### **5.2.3 Weight posture (no intrinsic weight stage)**
+
+* Current intrinsic compatibility has no weight operand: `score_c = base_c` exactly.  
+* No multiplication, division, rounding, floor, cap, correction, or preset stage occurs between `base_c` and `score_c`.  
+* Caller-supplied `viewer_prefs.weights` are sampler/ranker inputs. They MUST NOT change intrinsic Magic-10 scores or bands.  
+* Static preset weights and alternative scoring profiles are Future-Promotion. No default or legacy formula has current authority.
 
 ### **5.2.4 Caps and floors (deterministic bounds)**
 
-* **Per-category clamp:** final category score **MUST** be **clamped to \[0..100\]**.  
-* **Optional floors/caps:** if specified (e.g., by preset), apply **deterministically** and record them in the **freeze pack**; changing them **requires a new `release_id`** (see **§3.1**).
+* Apply each `catalog/magic10_caps.json` input bound in half-units before reduction.  
+* After the exact mean is integerized, apply only the global score clamp governed by `math/thresholds.json`.  
+* No category-level preset floor, category cap, family cap, global floor, dampener, or correction is active in the current contract.  
+* A future cap, floor, weight, or correction has no default and requires explicit Future-Promotion with a complete fixed-point contract.
 
 ### **5.2.5 Rounding rule (pinned)**
 
-Whenever rounding is required, use **round\_half\_up** to the nearest integer. This mode is **normative and global** for scoring steps. Changing it is a math change that **requires a new freeze pack** (and `release_id` bump).
+Apply the operations in this exact order:
+
+1. Validate and canonicalize inputs.  
+2. Apply per-input bounds in half-units.  
+3. Compute the exact rational mean.  
+4. Apply `round_half_up` once through `base_c = floor((Q+n)/(2*n))`.  
+5. Clamp the resulting integer to the `math/thresholds.json` score domain.  
+6. Apply the global inclusive band maxima in §5.3.
+
+Do not round after band selection and do not use binary-float intermediates.
 
 ### **5.2.6 Determinism and neutrality**
 
-* **AB↔BA parity:** scoring consumes the **normalized** pair; scores for AB and BA are **identical**.  
-* **Two-run identity:** same inputs, catalogs, presets/weights ⇒ **bit-identical** integer scores.  
-* **No hidden sources:** scoring never uses wall-clock, randomness, external I/O, locale-dependent collation, or platform-dependent float accumulations.
+* **AB↔BA parity.** Scoring consumes the same validated canonical pair and pair-signal map for AB and BA; the complete ordered score vector is identical.  
+* **Two-run identity.** The same normalized pair, active `release_id`, catalogs, and signals produce the same complete ordered matrix.  
+* **No hidden sources.** Scoring does not use wall-clock time, randomness, external I/O, environment values, locale-dependent collation, platform-dependent float accumulation, identifiers as score seeds, viewer preferences, or presets.
 
 ### **5.2.7 Validation (binary)**
 
-* **Category coverage:** a score is computed for **every Magic-10 ID**; **no extras**.  
-* **Weight coverage:** when weights are present, the key set equals the Magic-10 set and **all values ∈ \[0..100\]** (integers).  
-* **Clamp & rounding proof:** goldens demonstrate correct **round\_half\_up** and final **\[0..100\]** clamping at boundaries (0, 100, midpoints).  
-* **Parity proof:** AB vs BA yields **identical** score vectors; **two identical runs** produce identical vectors.
+* **Matrix completeness.** Compute exactly one score and one band for every Magic-10 ID in frozen order, with no extras or duplicates.  
+* **Atomicity.** All ten results use the same normalized pair, active `release_id`, signal map, catalogs, arithmetic rules, and evaluation run. If any required category, signal, catalog row, score, or band is invalid or unavailable, return no successful matrix.  
+* **Domain.** Every score is an integer in `0..100`; every band is derived only by §5.3.  
+* **Clamp and rounding proof.** Governed examples cover half-unit midpoints and the `0` and `100` boundaries.  
+* **Parity proof.** AB and BA yield identical vectors; two identical runs yield identical vectors. Static definitions or test files do not establish a PASS.
 
 ### **5.2.8 Change control**
 
-Any modification to the **base function**, **weight function**, **caps/floors**, or **rounding rules** is a **math change** and **MUST** be captured in the freeze pack; recomputing the canonical manifest **must yield a new `release_id`** (§3.1).
+Any modification to the signal domain, pair preimage, pair-key version, category input lists or bounds, base formula, rounding order, score clamp, or active weighting posture is a PF01 math change. Any corresponding governed artifact-byte change requires a new manifest cut and `release_id` under **PF12-Canon-HDE-Schemas-and-Artifacts**. Presets and alternative profiles require separately authorized Future-Promotion.
 
 ### **5.2.9 Routing (no transport bytes here)**
 
-Math only. No HTTP/CLI payloads, status/header matrices, or validator bytes are restated here; those live in **PF-Canon-HDE-CLI-API-Vendor-Ref** (titles-only).
+Math only. Public presentation remains the §2 harmony-only, numeric-free projection; transport bytes live in their owning transport canon. `engine.core.core` is the canonical compatibility behavior home. The pinned `engine.compat.ts_v0` path is transitional, `engine.compat.compute` is admin-only, and `engine.magic10.calculators` is transitional. No pinned `engine.core.core` function implements this complete recipe; this is an explicit implementation gap.
 
-* 
+## **5.3 Band mapping (global inclusive maxima)**
 
-## **5.3 Band mapping (preset-specific inclusive maxima)**
+**Definition (normative).** Band mapping converts each intrinsic integer category score in `0..100` to exactly one of four bands using the single global inclusive-high maxima governed by `math/thresholds.json`: `[24,49,74,100]`.
 
-**Definition (normative).** Band mapping converts each integer category score in `[0..100]` to one of four public bands using the preset’s **inclusive-high** maxima. For an active preset *P* with maxima `M_cool(P) ≤ M_open(P) ≤ M_warm(P)` (all integers):
+* **Cool:** `0 ≤ score ≤ 24`  
+* **Open:** `25 ≤ score ≤ 49`  
+* **Warm:** `50 ≤ score ≤ 74`  
+* **Glow:** `75 ≤ score ≤ 100`
 
-* **Cool:** `score ≤ M_cool(P)`  
-* **Open:** `score ≤ M_open(P)`  
-* **Warm:** `score ≤ M_warm(P)`  
-* **Glow:** otherwise (`score > M_warm(P)`; **100 always maps to Glow**)
+No current preset-specific band maxima exist. Preset-specific maxima or an alternative band profile require separately authorized Future-Promotion and must not be inferred from legacy configuration or examples.
 
-**Coupling to the freeze-pack.** In v1, the band maxima are stored in the **constants pack** as `bands.thresholds` (see §5.4.2; **HDE-Schemas and Artifacts**). Any change to any maximum is a frozen-input change and **requires a new `release_id`** (see §3.1).  
- *Forward note:* if a future version introduces **preset-specific** maxima, those values MUST be catalogized in **HDE-Schemas and Artifacts** (titles only) and will likewise be frozen-inputs that bump `release_id`.
+**Coupling to the freeze pack.** The score clamp, rounding mode, and global band maxima are governed at `math/thresholds.json` by **PF12-Canon-HDE-Schemas-and-Artifacts**. Any governed byte change requires a new manifest cut and `release_id` under §3.1.
 
 ### **5.3.1 Domain and monotonicity**
 
-* **Score domain.** Inputs to band mapping are integers `0..100` (see §5.2). If any upstream step produces fixed-point, integerize via §5.2 `round_half_up` first.  
-* **Monotone mapping.** If `s1 ≤ s2` then `band(s1) ≤ band(s2)` in the total order `Cool < Open < Warm < Glow`.  
-* **No gaps or overlaps.** Every integer in `0..100` maps to exactly one band; thresholds are **inclusive** at each maximum.  
-* **Maxima domain.** To preserve `100 → Glow`, presets **MUST** satisfy `0 ≤ M_cool(P) ≤ M_open(P) ≤ M_warm(P) ≤ 99`.
+* **Score domain.** Input is the integer score `score_c` from §5.2 after exact mean integerization and global clamping.  
+* **Monotone mapping.** If `s1 ≤ s2`, then `band(s1) ≤ band(s2)` in the total order `Cool < Open < Warm < Glow`.  
+* **No gaps or overlaps.** Every integer in `0..100` maps to exactly one band; each listed maximum is inclusive.  
+* **No score mutation.** Band selection does not round, clamp, weight, or otherwise change the score.
 
 ### **5.3.2 Boundary behavior (normative)**
 
-* `M_cool(P)` → **Cool**, `M_cool(P)+1` → **Open**  
-* `M_open(P)` → **Open**, `M_open(P)+1` → **Warm**  
-* `M_warm(P)` → **Warm**, `M_warm(P)+1 … 100` → **Glow**  
-* `100 → Glow` (even if `M_warm(P) = 99`)
+* `24` → **Cool**; `25` → **Open**.  
+* `49` → **Open**; `50` → **Warm**.  
+* `74` → **Warm**; `75` → **Glow**.  
+* `100` → **Glow**.
 
 ### **5.3.3 Determinism and neutrality**
 
-* **AB↔BA identity.** Scores are computed from the **normalized composite** (see §5.2; **HDE-Schemas and Artifacts §2.1**); band mapping yields identical results for AB and BA.  
-* **Two-run identity.** With the same inputs, catalogs, constants, and preset, repeated evaluation produces identical band arrays.  
-* **No float dependence.** Mapping uses only integer comparisons; platform/locale cannot affect outcomes. Run checks with `LC_ALL=C`, `LANG=C`, `TZ=UTC` (**HDE-Schemas and Artifacts §4**).
+* **AB↔BA identity.** The canonical score matrix is order-neutral; applying this pure integer comparison produces the same band matrix for AB and BA.  
+* **Two-run identity.** The same scores and governed thresholds produce identical bands.  
+* **No float dependence.** Mapping uses only integer comparisons; platform and locale cannot affect the result.
 
 ### **5.3.4 Validation (binary)**
 
-* **Completeness:** every produced score in `0..100` maps to one of the four bands.  
-* **Boundary proofs:** goldens cover each preset’s edges: `M_cool(P)/M_cool(P)+1`, `M_open(P)/M_open(P)+1`, `M_warm(P)/M_warm(P)+1`, and `100`.  
-* **Parity proofs:** AB vs BA yield identical band arrays; two identical runs yield identical arrays (byte-level after canonical JSON per **HDE-Schemas and Artifacts §4**).
+* **Completeness:** every category score in `0..100` maps to exactly one of `Cool`, `Open`, `Warm`, or `Glow`.  
+* **Boundary proofs:** governed cases cover `24/25`, `49/50`, `74/75`, `0`, and `100`.  
+* **Matrix parity:** the complete AB and BA band vectors are identical; two identical runs yield identical vectors. Static test definitions or artifacts do not establish a PASS.
 
 ### **5.3.5 Change control**
 
-* **Breaking change.** Adjusting any preset maximum or the band order is a math change; it **MUST** be recorded in the pack manifest (**HDE-Schemas and Artifacts §6**) and yields a new `release_id` (see §3.1).  
-* **Downstream lockstep.** Consumer schemas and acceptance must be kept in lockstep when maxima change (titles only), for example: `BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`.
+* **Math change.** Adjusting a maximum, band label, band order, comparison posture, or score domain is a PF01 math change.  
+* **Artifact coupling.** A corresponding change to `math/thresholds.json` or another governed artifact requires a new manifest cut and `release_id` under **PF12-Canon-HDE-Schemas-and-Artifacts**.  
+* **Downstream lockstep.** Consumer schemas and governed acceptance families must remain consistent with the single mapping; acceptance-token semantics and Evidence Catalog paths stay in their owning canon.
 
 ### **5.3.6 Routing (no transport bytes here)**
 
-Math only. Any CLI/Reader payload examples, header rules, or validator matrices remain in **HDE-CLI-API-Vendor Ref** (titles only).
+Math only. CLI/Reader payloads, headers, validators, and evidence-path inventories remain in their canonical owners.
 
-**Acceptance & CI (titles only)**  
- `BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`, `INTRINSIC_SCORING_INT_OK`, `ROUND_HALF_UP_OK`,  
- `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`,  
- `RELEASE_ID_RECOMPUTE_OK`, `EVIDENCE_INDEX_UPDATED_OK` *(when maxima change)*
-
----
+**Acceptance families (titles only)**  
+`BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`, `INTRINSIC_SCORING_INT_OK`, `ROUND_HALF_UP_OK`,  
+`COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`,  
+`RELEASE_ID_RECOMPUTE_OK`, `EVIDENCE_INDEX_UPDATED_OK` when governed threshold bytes change.
 
 ## **5.4 Manifests and freeze-pack coupling (change ⇒ new `release_id`)**
 
-**Purpose (normative).** This section defines **what constitutes the frozen math pack**, how its contents are canonically manifested, and **why any change requires a new `release_id`** (see §3.1). **Transport/ops bytes are out of scope** and are referenced by title to their owners (PF-Canon-HDE-CLI-API-Vendor-Ref, PF-Canon-HDE-Governance).
+**Purpose (normative).** This section identifies the PF01 math inputs that must participate in governed release identity and the PF01 rules that make their bytes release-significant. **PF12-Canon-HDE-Schemas-and-Artifacts** is the single home for complete manifest membership, artifact schemas and paths, canonical serialization, and `release_id` construction. PF01 does not redefine the complete manifest as math-only; manifest members may include non-math release inputs owned elsewhere. Transport and operational semantics remain out of PF01 scope.
 
-### **5.4.1 What the freeze pack contains (math only)**
+### **5.4.1 What the freeze pack contains (math inputs required by PF01)**
 
-The freeze pack is the authoritative set of **math inputs** required to compute public outputs. It excludes transport and ops bytes. At minimum it includes:
+At minimum, PF01 computation depends on these governed inputs:
 
-* **Category manifest.** Closed **Magic-10 identifier set and pinned order** (see §5.1; PF-12 §2.6).  
-* **Band-maxima manifest.** **Preset-specific inclusive-high maxima** for **Cool/Open/Warm/Glow** (see §5.3; PF-12 §2.6).  
-* **Topology catalogs.** Fixed **Centers/Gates/Channels** catalogs (PF-12 §2.1; canonical **NN-NN** channel identity, snake\_case centers) and any math-relevant vocabularies used by extractors (e.g., channel→center adjacency) when serialized as governed artifacts.  
-* **Preset catalog (if used).** Named, versioned presets (e.g., A, B) carrying deterministic arithmetic knobs (e.g., per-category weights, optional caps/floors/feature switches).  
-* **Constants pack** (see §5.4.2). **Frozen denominators/limits** and **band thresholds** required by this spec.
+* **Category order.** `catalog/magic10.json`, containing the closed Magic-10 identifier set and frozen order used by §§5.1–5.3.  
+* **Category signal inputs and bounds.** `catalog/magic10_caps.json`, containing the exact ordered input list and integer bounds for every Magic-10 category.  
+* **Global score and band rules.** `math/thresholds.json`, containing the `0..100` score clamp, `ROUND_HALF_UP`, and inclusive maxima `[24,49,74,100]`.  
+* **Topology catalogs.** `catalog/gates_v1.json` and `catalog/channels_v1.json`, with canonical Gate membership, center IDs derived from Gate rows, and canonical `NN-NN` Channel identities.  
+* **Feature constants.** The exact denominator and limit contract in §5.4.2 when consumed by PF01 feature math.  
+* **Direct Motor→Throat set.** The governed four-Channel set in §5.4.2.1 when serialized for consumption.  
+* **Seeds.** A governed Seeds catalog may be an admin/test release input, but Seeds do not enter the intrinsic §5.2 score formula.
 
-*Non-content:* HTTP headers, caching/writers policy, CLI streams, and validator matrices are **not** part of the pack and are routed by title to PF-CLI-API / PF-Governance.
+**Future-Promotion boundary.** No current governed Presets catalog, Feature Registry, alternative category-weight artifact, preset-specific threshold artifact, or advanced token-aggregation artifact exists. If one is later promoted, **PF12-Canon-HDE-Schemas-and-Artifacts** owns its exact path, schema, and manifest membership; PF01 owns only its fully authorized math.
+
+**Non-content.** HTTP headers, caching and writer policy, CLI streams, validator matrices, evidence-path inventories, and operational procedures are not PF01 math.
 
 ### **5.4.2 Constants pack (frozen keys & schema) \[NEW\]**
 
-**Purpose.** Govern the frozen scalar/vector parameters invoked by this spec. The constants pack is a JSON artifact whose file name and path are recorded in the pack manifest (see **HDE-Schemas and Artifacts §6**). Changes to any frozen value are frozen-input changes and **require a new `release_id`** (see §3.1).
+**Purpose.** PF01 requires the following scalar and vector parameters to be governed before they are consumed by canonical feature math. The pinned repository contains corresponding Python constants, but current **PF12-Canon-HDE-Schemas-and-Artifacts** does not establish a separate governed constants-pack path or manifest entry. The schema below remains a Required-Now PF01 contract with an explicit artifact-implementation gap; no path may be invented.
 
 **D1 — Frozen keys (normative)**
 
-* `limits.em_max` *(int, ≥ 0\)*  
+* `limits.em_max` *(int, \> 0\)*  
 * `limits.throat_em_max` *(int, ≥ 0\)*  
 * `limits.centers_max` *(int, \> 0\)*  
 * `limits.mind_throat_max` *(int, ≥ 0\)*  
 * `limits.motor_throat_max` *(int, ≥ 0\)*  
 * `limits.comp_max` *(int, ≥ 0\)*  
-* `bands.thresholds` — array of 4 ints `[cool, open, warm, 100]` with `0 ≤ cool ≤ open ≤ warm ≤ 99 < 100` *(inclusive-high; see §5.3 for semantics and rounding)*
+* `bands.thresholds` — array of four integers `[cool, open, warm, 100]` with `0 ≤ cool ≤ open ≤ warm ≤ 99 < 100`; the current governed values are `[24,49,74,100]`.
 
-**Note (v1).** Resonance/diagnostic inputs (for example, XR windows, α, hysteresis) are **admin/test-only** and **not** part of the frozen constants pack. If later catalogized in **HDE-Schemas and Artifacts**, they become frozen inputs and any change **yields a new `release_id`**.
+**Note (v1).** XR windows, `alpha`, hysteresis, and other resonance diagnostics are not members of this constants contract. If later promoted and catalogized by **PF12-Canon-HDE-Schemas-and-Artifacts**, they become governed release inputs and any byte change requires a manifest cut and new `release_id`.
 
-**D2 — JSON shape (normative)**  
- A single JSON object with **canonical JSON** serialization (see **HDE-Schemas and Artifacts §4**):
+**D2 — JSON shape (normative)**
 
+When this constants contract is represented as a governed JSON artifact, its payload is exactly:
+
+```json
 {
-
   "limits": {
-
-    "em\_max": \<int\>,
-
-    "throat\_em\_max": \<int\>,
-
-    "centers\_max": \<int\>,
-
-    "mind\_throat\_max": \<int\>,
-
-    "motor\_throat\_max": \<int\>,
-
-    "comp\_max": \<int\>
-
+    "em_max": <int>,
+    "throat_em_max": <int>,
+    "centers_max": <int>,
+    "mind_throat_max": <int>,
+    "motor_throat_max": <int>,
+    "comp_max": <int>
   },
-
-  "bands": { "thresholds": \[ \<int\>, \<int\>, \<int\>, 100 \] }
-
+  "bands": { "thresholds": [ <int>, <int>, <int>, 100 ] }
 }
+```
 
-**Change ⇒ new `release_id`.** Any addition/removal or value change to the keys above is a frozen-input change and **requires** a new `release_id` (see §3.1; **HDE-Schemas and Artifacts §6**).
+The stored artifact MUST use the canonical JSON rules owned by **PF12-Canon-HDE-Schemas-and-Artifacts**. Any addition, removal, or value change to a consumed governed key is a frozen-input change and requires a new manifest cut and `release_id`.
 
-**Indexing & evidence (titles-only).** List the constants artifact in **Appendix D: Evidence Index** and mirror it 1:1 in `artifacts/evidence_index.jsonl` with path-proofs.
-
-**Acceptance & CI (titles-only).**  
- `JSON_CANONICAL_CHECK_OK`, `BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`,  
- `RELEASE_ID_RECOMPUTE_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `EVIDENCE_INDEX_UPDATED_OK`  
- *(token names live in HDE-Governance §2.0)*
+**Evidence routing (titles-only).** Constants-domain, boundary, and release-recompute evidence families are governed by the Evidence Catalog in **PF12-Canon-HDE-Schemas-and-Artifacts**. Applicable token names include `JSON_CANONICAL_CHECK_OK`, `BAND_MAX_INCLUSIVE_OK`, `BAND_EDGE_GOLDENS_OK`, `RELEASE_ID_RECOMPUTE_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, and `EVIDENCE_INDEX_UPDATED_OK`; PF01 does not define their semantics or paths.
 
 #### **5.4.2.1 Direct Motor→Throat (v1) — governed set**
 
-**Purpose (normative).** Define the **direct-only** Motor→Throat set that participates in denominator logic. This set is a governed artifact in the freeze-pack and **must not** include 2-hop routes.
+**Purpose (normative).** Define the direct-only Motor→Throat set used by denominator logic. The set MUST NOT include two-hop routes.
 
 **Canonical definition**
 
 * **Set (`NN-NN`, min-first; ASCII-sorted):** `["12-22","20-34","21-45","35-36"]`  
-* **Normalization rule.** Channel identifiers are normalized to zero-padded `NN-NN` with the lower gate first. Reversed forms (for example, `34-20`) normalize to `20-34`.  
-* **Rejection posture.** Unparsable tokens or non-canonical forms hard-fail validation (typed error); no silent coercion.
+* **PF01 boundary.** Stored and computation-boundary values MUST already be zero-padded canonical `NN-NN` with the lower Gate first.  
+* **Ingestion alias boundary.** An upstream ingestion surface may map a reversed alias such as `34-20` to `20-34` only when its owning contract explicitly authorizes that normalization before PF01 validation.  
+* **Rejection posture.** Unknown, duplicate, unparsable, or noncanonical values at the PF01 boundary fail validation; no silent coercion occurs here.
 
-**Storage & serialization (pack entry)**
+**Storage and serialization**
 
-* Represented as a JSON **array of strings** (the four canonical `NN-NN` pairs).  
-* **Canonical JSON** (see **HDE-Schemas and Artifacts §4**): UTF-8 (no BOM), sorted keys/values (ASCII), compact, exactly one trailing LF; arrays treated as sets (dedupe \+ ASCII-sort).  
-* **Manifest coupling.** Listed in the pack manifest (**HDE-Schemas and Artifacts §6**) with its **repo-relative path (relative to `root: "catalog/"`, no `catalog/` prefix)**, `sha256` (lowercase 64-hex of canonical bytes), and `size`.  
-* **Change ⇒ new `release_id`.** Any addition/removal/value change triggers a manifest recompute and a new `release_id`.
+* When governed as JSON, represent the set as an array of exactly the four strings above.  
+* Apply the canonical array-as-set and JSON byte rules owned by **PF12-Canon-HDE-Schemas-and-Artifacts**.  
+* The artifact is listed under the repository-relative path, hash, size, and manifest-root semantics governed by **PF12-Canon-HDE-Schemas-and-Artifacts**; PF01 does not restate those manifest fields.  
+* Any addition, removal, or value change is a frozen-input change requiring a manifest cut and new `release_id`.  
+* **Static implementation posture.** The pinned `engine/constants.py` contains the exact four-value tuple. No separate governed JSON artifact or manifest entry was found at the expected catalog/manifest loci, so artifact closure remains an implementation gap.
 
 **Validation (binary)**
 
-* **Set equality.** The governed artifact equals the four-element canonical list above (after ASCII-sort).  
-* **Normalization.** A test corpus proves min-first ordering and `NN-NN` padding; reversed/non-canonical items are rejected.  
-* **Manifest closure.** The artifact appears in `files[]` and its recorded `sha256` matches canonical bytes.  
-* **Index & mirror.** Add a titles/paths entry to **Appendix D: Evidence Index** and a 1:1 records-only line in `artifacts/evidence_index.jsonl` (with `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`).
+* **Set equality.** The governed value equals the four-element canonical list above.  
+* **Canonical identity.** Every member is a known canonical Channel in `catalog/channels_v1.json`; the stored list is unique and ASCII-sorted.  
+* **Manifest closure.** When the set is consumed as a governed artifact, its repository-relative path, canonical-byte hash, and size are present in the manifest.  
+* **Evidence ownership.** Direct-Motor→Throat and release-identity evidence families route to **PF12-Canon-HDE-Schemas-and-Artifacts**.
 
-**Acceptance (titles-only).**  
- `MOTOR_THROAT_DIRECT_ONLY_OK`, `RELEASE_ID_RECOMPUTE_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK` *(token names live in HDE-Governance §2.0).*
-
----
+**Acceptance names (titles-only).** `MOTOR_THROAT_DIRECT_ONLY_OK`, `RELEASE_ID_RECOMPUTE_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`.
 
 ### **5.4.3 Canonical manifest (construction rules)**
 
-To produce `release_id`, summarize the pack as a single canonical manifest at `catalog/manifest.json` (PF-12 §6.1–§6.2):
+To produce `release_id`, use the single canonical manifest at `catalog/manifest.json` governed by **PF12-Canon-HDE-Schemas-and-Artifacts**:
 
-1. **Normalization.** Serialize every governed JSON artifact with PF-12 §4 rules: **UTF-8 no BOM, sorted keys, compact, one trailing `\n`; arrays-as-sets are deduped & ASCII-sorted**.  
-2. **Entry list.** The manifest contains **files** (ASCII-sorted by `path`), each entry:  
-   * `path` — **repo-relative POSIX path** (stable; no `..`, no `//`, ASCII, ≤256 bytes)  
-   * `sha256` — **lowercase 64-hex** of the artifact’s **canonical bytes**  
-   * `size` — integer byte length of those canonical bytes  
-      *(Manifest fields `root:"catalog/"`, `version` (semver), `built_at_utc` are required per PF-12 §6.1; **no self-listing**.)*  
-3. **Hash.** `release_id = sha256(canonical_bytes("catalog/manifest.json"))` (lowercase 64-hex).
+1. **Normalization.** Serialize each governed JSON artifact with canonical UTF-8, no BOM, ASCII-sorted object keys, compact separators, and exactly one trailing LF; arrays used as sets are deduplicated and ASCII-sorted.  
+2. **Entry list.** `files` is ASCII-sorted by `path`. Each entry contains:  
+   * `path` — repository-relative POSIX path; no leading slash, backslash, NUL, `..` segment, self-listing, or path normalization difference.  
+   * `sha256` — lowercase 64-hex SHA-256 of the governed bytes.  
+   * `size` — integer byte length of those bytes.  
+3. **Manifest metadata.** Top-level keys are exactly `root`, `version`, `built_at_utc`, and `files`. `root` is required identity metadata and not a path-resolution base. `built_at_utc` MUST be supplied by one deterministic governed build input and MUST NOT be sampled during serialization.  
+4. **Hash.** `release_id = sha256(canonical_bytes("catalog/manifest.json"))` in lowercase hex.
 
-If a **non-JSON** artifact is governed, its canonical bytes are its **literal file bytes**; any change to those bytes changes its `sha256` and thus the `release_id`.
+For a governed non-JSON artifact, canonical bytes are its literal file bytes unless its owner defines another exact byte contract.
+
+**Static implementation posture.** The pinned manifest is canonical and the runtime hashes it, but the manifest has eight entries and omits current PF12-required topology and complete Magic-10 narrative members. Its bytes and runtime definition do not establish complete manifest conformance, validation PASS, deployment, or acceptance.
 
 ### **5.4.4 Change policy (what forces a new `release_id`)**
 
-A new `release_id` is required for any of the following:
+A new manifest cut and `release_id` are required for any governed byte change affecting:
 
-* **Membership change.** Adding, removing, or renaming a category; altering the Magic-10 order (PF-12 §2.6).  
-* **Maxima change.** Changing any **preset band maximum** value (PF-12 §2.6; §5.3).  
-* **Catalog change.** Adding/removing/updating topology catalogs or math vocabularies that feed extractors (PF-12 §2.1).  
-* **Preset change.** Adding/removing a preset or changing any preset arithmetic knob (e.g., per-category weights, caps/floors, feature switches).  
-* **Constants change.** Changing any **constants pack** key or value (see §5.4.2 D1/D2).  
-* **Serialization change.** Any change in canonical content/shape/order of a governed artifact that affects its canonical bytes.
+* **Category domain.** Magic-10 membership or order.  
+* **Signal contract.** Category input lists, input bounds, or another governed §5.2 scoring input.  
+* **Thresholds.** Global score clamp, rounding declaration, band maxima, or band mapping.  
+* **Topology.** Gate or Channel catalog content used by PF01.  
+* **Feature constants.** A consumed key or value from §5.4.2.  
+* **Direct Motor→Throat set.** Any member, representation, or governed artifact byte.  
+* **Promoted future artifacts.** A preset, alternative profile, registry, or aggregation artifact only after explicit promotion establishes it as governed.  
+* **Serialization or manifest contract.** Canonical shape, order, metadata, membership, or another manifest byte.
 
-*Pure re-formatting* that still serializes to **identical canonical bytes** does **not** change `release_id`, but **non-canonical storage fails CI**.
+Pure source reformatting that produces identical governed canonical bytes does not change `release_id`, but noncanonical stored bytes still fail their own validation contract.
 
 ### **5.4.5 Determinism and neutrality guarantees**
 
-* **Two-run identity.** Building the pack twice from identical sources yields the **same** canonical manifest and `release_id`.  
-* **AB↔BA parity.** Because the pack contains only math inputs (independent of pair order), `release_id` is **order-neutral**.  
-* **Environment independence.** `release_id` is unaffected by transport configuration, runtime headers, or locale; recomputation runs under **`LC_ALL=C`**.
+* **Two-run identity.** Building from identical governed sources and the same deterministic manifest metadata yields identical manifest bytes and `release_id`.  
+* **AB↔BA neutrality.** Release identity is independent of pair order.  
+* **Environment independence.** Pair-time transport configuration, headers, locale, network state, and viewer preferences do not enter release identity.
 
 ### **5.4.6 Validation (binary)**
 
-* **Closure.** **Every** math reference used by scoring/aggregation/extractors resolves to a governed entry in the manifest.  
-* **Reproducibility.** Recomputing `sha256(canonical_manifest_bytes)` reproduces the `release_id`.  
-* **Drift checks.** Any pack change is accompanied by updated **acceptance evidence** (titles/records only) that cites the new `release_id`.
+* **Closure.** Every governed math input consumed by scoring or feature extraction resolves to a manifest member when its artifact contract requires manifest membership.  
+* **Reproducibility.** Recomputing SHA-256 over the canonical stored manifest reproduces `release_id`.  
+* **Member integrity.** Each manifest member's governed bytes match its recorded `sha256` and `size`.  
+* **No self-listing and safe paths.** Manifest membership and paths satisfy the PF12 contract.  
+* **Evidence boundary.** Evidence updates and acceptance claims are verified in their owning canon; static artifact presence alone does not establish PASS.  
+* **Current gap.** The pinned manifest does not yet demonstrate required closure for PF01 topology, complete Magic-10, constants, and direct-Motor→Throat inputs.
 
 ### **5.4.7 Backwards-compatibility posture**
 
-Changing the pack **does not** change the **Reader v1 public covenant** (bands-only; single *harmony*) unless this spec explicitly version-bumps the public contract. If public exposure of the full Magic-10 set is introduced later (e.g., Reader v2), the category and band-maxima manifests become **public-contract inputs** and require coordinated versioning and acceptance updates.
+Changing governed pack bytes does not by itself change the Reader v1 public covenant. Reader v1 remains bands-only, numeric-free, and harmony-only unless a separately authorized public-contract version change widens it. Any future public exposure of the full ten-category matrix requires coordinated versioning without changing the current canonical calculation domain.
 
 ### **5.4.8 Routing (no transport bytes here)**
 
-This section defines **math pack identity only**. Transport headers, conditional delivery, caching/writers policy, and CLI validators live in **PF-Canon-HDE-CLI-API-Vendor-Ref** and **PF-Canon-HDE-Governance** (titles-only).
+PF01 defines math input significance and release coupling. **PF12-Canon-HDE-Schemas-and-Artifacts** owns artifact schemas, paths, complete manifest membership, canonical bytes, and Evidence Catalog records. Architecture owns wiring. Transport headers, conditional delivery, caching and writer policy, CLI validators, evidence procedures, and acceptance semantics stay in their own canonical homes.
 
----
-
-## **5.5 Privacy posture (no percent/numerics on public) \[Speculative\]**
+## **5.5 Privacy posture (no percent/numerics on public) \[Required-Now\]**
 
 **Principle (normative).**  
- The public Reader v1 surface is **numeric-free**. No scores, percentages, counters, or derived numeric indicators may appear in public success bodies. Public items are **exactly** `{id, band}` (see §2.2); all other quantitative signals remain **internal**.
+The public Reader v1 surface is **numeric-free**. No scores, percentages, counters, or derived numeric indicators may appear in public success bodies. Public items are **exactly** `{id, band}` (see §2.2); all other quantitative signals remain **internal**.
 
 ### **5.5.1 Allowed vs. disallowed (public success)**
 
-* **Allowed:**
-
-  * `categories[*]`: `{ "id": <Magic-10 id>, "band": "Cool"|"Open"|"Warm"|"Glow" }`
-
+* **Allowed:**  
+    
+  * `categories[*]`: `{ "id": <Magic-10 id>, "band": "Cool"|"Open"|"Warm"|"Glow" }`  
+      
   * `reader_version`, `eligible`, `meta{engine_tag,invocation_tag}`, `release_id`, `idempotence_hash`
 
-* **Disallowed (examples):**
 
-  * `score`, `score_pct`, numeric ranks or counts, confidence/uncertainty values, thresholds, weights, or any numeric fields embedded in categories or at top level
-
+* **Disallowed (examples):**  
+    
+  * `score`, `score_pct`, numeric ranks or counts, confidence/uncertainty values, thresholds, weights, or any numeric fields embedded in categories or at top level  
+      
   * narrative or prompt text (see Appendix D — Retired)
 
 ### **5.5.2 Scope and containment**
 
-* **Internal-only numerics.** All per-category integers in `[0..100]`, intermediate subtotals, caps/floors, dampeners, and preset arithmetic remain **inside the engine** and/or internal compat responses (not public).
-
+* **Internal-only numerics.** All current per-category integers in `[0..100]` and intermediate pair signals remain inside the engine or authorized internal/admin surfaces. Any future-promoted preset arithmetic, cap, floor, dampener, or alternative profile is also internal unless a separately authorized public version change says otherwise.  
+    
 * **No leakage via metadata.** `meta` is strictly `{engine_tag, invocation_tag}` (non-PII strings); it must not encode numeric telemetry or user-specific counts.
 
 ### **5.5.3 Determinism & routing**
 
-* This posture does **not** alter determinism: preimage rules, AB↔BA identity, and two-run identity still apply (see §3).
-
+* This posture does **not** alter determinism: preimage rules, AB↔BA identity, and two-run identity still apply (see §3).  
+    
 * Transport/CLI behavior (e.g., admin streams, headers, or validators) is **not** restated here and is referenced **by title only** in PF-Canon-HDE-CLI-API-Vendor-Ref.
 
 ### **5.5.4 Validation (binary)**
 
-* **Schema gate:** the public success schema rejects any numeric fields beyond those already defined for identity/determinism (e.g., no `score`, no `score_pct`).
-
-* **Golden proofs:** public goldens and grep-guards confirm that `categories[*]` contain only `{id, band}` and that top-level keys match the six-key covenant.
-
-* **Parity checks:** CLI stdout and Reader bodies remain byte-identical under this numeric-free policy.
+* **Schema gate requirement:** the public success schema MUST reject any numeric fields beyond the six-key covenant (for example, `score` or `score_pct`). The pinned schema does not fully enforce the covenant and remains an implementation gap.  
+    
+* **Golden proof requirement:** governed public goldens and grep-guards cover `categories[*]` containing only `{id, band}` and top-level keys matching the six-key covenant. Static files alone do not establish PASS.  
+    
+* **Parity checks:** a CLI Reader-byte sidecar and Reader body MUST be byte-identical under this numeric-free policy. General `showcompat` stdout is an admin/compat payload and is not Reader bytes.
 
 ### **5.5.5 Change control**
 
-* Introducing public numerics (e.g., exposing per-category scores or percentages) is a **versioned public-contract change** and requires an explicit Reader version bump and coordinated acceptance.
-
+* Introducing public numerics (e.g., exposing per-category scores or percentages) is a **versioned public-contract change** and requires an explicit Reader version bump and coordinated acceptance.  
+    
 * Until such a change is approved and versioned, the **numeric-free** public covenant stands.
 
+>   
 > Note: Internal math exists; public exposure of the full 10-item array is **Reader v2** (future).
 
 ## **5.6 Resonance posture (SR/XR; α; hysteresis) \[Required-Now\]**
 
 **Purpose (normative).** Define the v1 resonance posture and its effect on public output. **Public output remains bands-only and numeric-free**; no SR/XR numerics are exposed (see §2).
 
-**Active/postponed behavior (v1).**
+This subsection does not add a second active scoring formula after §5.2. For the Required-Now intrinsic matrix, `SR_c` refers only to the current `score_c` produced by §5.2; no separate SR reducer, XR reducer, blend, or hysteresis stage is active in the current reduction contract.
 
-* **SR active, XR postponed.** `alpha = 1.0` (blend is all-SR).  
-* **Hysteresis armed for future XR.** A one-point guard at the Open↔Warm boundary is defined for future use **only when `alpha < 1.0`**; with `alpha = 1.0` it is inert and not applied.
+**Normative/postponed behavior (v1).**
+
+* **SR requirement, XR postponed.** `alpha = 1.0` declares an all-SR posture if the future blend surface is promoted; current intrinsic scoring remains `score_c = base_c` under §5.2.  
+* **Hysteresis armed for future XR.** A one-point guard at the Open↔Warm boundary is defined for future use **only when `alpha < 1.0`**; with `alpha = 1.0` it is inert and not applied.  
+* **Static implementation posture.** No SR/XR blend, `alpha`, or hysteresis implementation was found in the pinned scoring loci. Exact upstream mechanics for the `resonance_strength` pair signal also remain an implementation gap.
 
 **Pack membership in v1 (governance rule).**
 
 * **Not part of the constants pack.** Resonance parameters (α, hysteresis, XR windows/reducers) are **not** members of the frozen constants pack in v1 and **must not** appear in the freeze-pack manifest.  
-* **Future catalogization.** If any resonance parameter is later catalogized in **HDE-Schemas & Artifacts** and listed in `catalog/manifest.json`, it becomes a **frozen input** and any value change **yields a new `release_id`** (see §6).
+* **Future catalogization.** If any resonance parameter is later catalogized in **PF12-Canon-HDE-Schemas-and-Artifacts** and listed in `catalog/manifest.json`, it becomes a **frozen input** and any value change **yields a new `release_id`** (see §3.1).
 
 **Computation model (informative; deferred paths).**
 
-* **SR (in use).** Integer score `SR_c ∈ [0..100]` per §5.2 (rounding per that section).  
-* **XR (deferred).** When enabled in a future version, XR is computed over preset windows and blended as `R* = (1 − α)·SR + α·XR`; integerize per §5.2.  
+* **SR (current mathematical meaning).** Integer `SR_c ∈ [0..100]` is the §5.2 intrinsic `score_c`; no additional rounding or transformation occurs.  
+* **XR (deferred).** When separately promoted in a future version, XR is computed over governed windows and blended as `R* = α·SR + (1 − α)·XR`; integerize through a complete, separately authorized fixed-point contract consistent with §5.2.  
 * **Hysteresis (only if α \< 1.0).** Apply a ±1 Schmitt-style guard at the Open/Warm boundary **before** §5.3 band mapping; other boundaries remain inclusive per §5.3.
 
 **Determinism.**
 
-* **AB↔BA identity.** Resonance uses the normalized composite (see **HDE-Schemas & Artifacts** topology normalization); identical inputs ⇒ identical outputs.  
+* **AB↔BA identity.** Resonance uses the normalized composite (see **PF12-Canon-HDE-Schemas-and-Artifacts** topology normalization); identical inputs ⇒ identical outputs.  
 * **Two-run identity.** Same inputs and catalogs/constants ⇒ identical results and banding (§5.3).  
 * **Pins.** Run byte-checked evidence with `LC_ALL=C`, `TZ=UTC`.
 
 **Validation & evidence (titles-only).**
 
 * **No public numerics.** Reader/CLI success bodies remain bands-only; any SR/XR values, if computed internally, are not serialized.  
-* **Provenance.** If a future version catalogizes resonance parameters, list the artifact and `release_id` in **Appendix D: Evidence Index** and mirror it in `artifacts/evidence_index.jsonl` (see **HDE-Schemas & Artifacts**).
+* **Provenance.** If a future version catalogizes resonance parameters, its governed artifact, release binding, and evidence family are registered under the Evidence Catalog in **PF12-Canon-HDE-Schemas-and-Artifacts**. PF01 does not maintain a parallel path list.
 
 **Routing (no transport bytes here).** Headers, conditional delivery, caching, and validator matrices live in **HDE-CLI-API-Vendor Ref** / **HDE-Governance** (titles-only).
 
@@ -2098,10 +2187,6 @@ For every feature `F.<…>` consumed by any category (§7.5), the registry **mus
 > ### **7.6.6 Routing (no transport bytes here)**
 
 All transport/ops concerns (headers, validators, streams) are owned by **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (referenced by title only).
-
-* 
-
-> 
 
 > # **8\. Aggregation Algorithm (deterministic, fixed-point) \[Speculative\]**
 
