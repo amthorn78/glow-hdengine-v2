@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.8.9
+**Version:** v2.9
 
 **Status:** Canon
 
 **Effective date:** 2026-08-08
 
-**Last Update Gate:** 080826 Doc Refresh 8
+**Last Update Gate:** BN 12.6.2 A22-27
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -3092,6 +3092,16 @@ Each primary artifact above MUST have a sibling .path\_proof.txt transcript stor
     
 - `artifacts/runtime/env_connectivity.snapshot.json`: retained historical bridge and OPS evidence. Its governed bytes, path proof, Human Evidence Index binding, and Machine Evidence Mirror binding remain intact, but it MUST NOT prove current bridge availability, runtime support, fallback, provider parity, consistency, current OPS PASS, or token satisfaction.
 
+##### **HDE-EPIC038 PR-04 keys-only architecture snapshot evidence**
+
+The governed primary binding is:
+
+* `epic038.pr04.architecture_snapshot` → `artifacts/architecture/architecture_snapshot.keys_only.json`; schema `architecture_snapshot.keys_only.v1` at `schemas/architecture_snapshot.keys_only.v1.json`; record type `epic038_pr04_architecture_snapshot`; Machine Mirror role `snapshot`; primary producer `tools/evidence/generate_architecture_snapshot.py`.
+
+The primary MUST have the sibling proof `artifacts/architecture/architecture_snapshot.keys_only.json.path_proof.txt`. Its Human Evidence Index and Machine Evidence Mirror rows MUST use the key/path binding above, and the Mirror `proof_anchor` MUST equal that sibling proof path. `tools/evidence/update_evidence_index.py` owns the path proof and the Index/Mirror checksum, sentinel, and orientation companions.
+
+The artifact is keys-only architecture evidence. HDE Architecture remains the authority for required routes, blueprint registrations, and runtime architecture meaning; this entry owns only the artifact identity, schema, producer, and evidence bindings.
+
 ##### HDE-EPIC038 direct-only database selection and historical bridge evidence
 
 **DDL identity projection.** `engine/db/ddl_identity_projection.py` is the sole shared implementation of schema `hde.ddl_identity_projection.v1`. Its projection-only result MUST NOT be interpreted as full DDL semantic parity; the only passing comparison label is `projection_match`, with `full_ddl_semantic_parity_claimed: false`.
@@ -3130,6 +3140,30 @@ The bounded-development identity proof surfaces are:
 Their `writer_dev_identity` and `reader_dev_identity` predicates are development evidence only. They do not create a second production identity authority.
 
 Every promoted primary in this family MUST retain exactly one Human Evidence Index binding, one matching Machine Evidence Mirror binding, a sibling path proof, and coherent checksum companions under the updater-owned evidence workflow.
+
+##### **HDE-EPIC038 OPS-02 mapped-cache posture packet**
+
+The retained tracked packet root is exactly `audit/ops/hde-epic038/ops-02/`. Its fifteen current primary bindings use record type `epic038_pr06_ops_evidence`:
+
+* `epic038.pr06.ops02.commands_txt` → `commands.txt`.  
+* `epic038.pr06.ops02.stdout_log` → `stdout.log`.  
+* `epic038.pr06.ops02.stderr_log` → `stderr.log`.  
+* `epic038.pr06.ops02.exit_code_txt` → `exit_code.txt`.  
+* `epic038.pr06.ops02.env_presence_json` → `env_presence.json`.  
+* `epic038.pr06.ops02.request_summary_json` → `request_summary.json`.  
+* `epic038.pr06.ops02.mapped_output_summary_json` → `mapped_output_summary.json`.  
+* `epic038.pr06.ops02.read_back_summary_json` → `read_back_summary.json`.  
+* `epic038.pr06.ops02.canonical_parity_log` → `canonical_parity.log`.  
+* `epic038.pr06.ops02.idempotence_log` → `idempotence.log`.  
+* `epic038.pr06.ops02.no_raw_vendor_payload_persistence_log` → `no_raw_vendor_payload_persistence.log`.  
+* `epic038.pr06.ops02.legacy_fallback_preservation_log` → `legacy_fallback_preservation.log`.  
+* `epic038.pr06.ops02.nonclaims_json` → `nonclaims.json`.  
+* `epic038.pr06.ops02.result_summary_json` → `result_summary.json`.  
+* `epic038.pr06.ops02.checksums_sha256` → `checksums.sha256`.
+
+`scripts/ops/hde_epic038_mapped_cache_smoke.py` is the packet producer. Each primary MUST have a sibling `<artifact-path>.path_proof.txt` transcript. Its Human Evidence Index and Machine Evidence Mirror rows MUST use the key/path bindings above, and every Mirror `proof_anchor` MUST equal the corresponding sibling proof path. `tools/evidence/update_evidence_index.py` owns those path proofs and the Index/Mirror checksum, sentinel, and orientation companions.
+
+The retained packet supports only the bounded configured-v2 mapped-cache write, read-back, canonical-parity, idempotence, no-raw-payload, and legacy-fallback observations recorded for OPS-02. It does not by itself establish QA PASS, acceptance-token satisfaction, HDE Build Checklist status movement, deployment, or closeout.
 
 ##### HDE-EPIC038 OPS-03 direct read-only posture packet
 
