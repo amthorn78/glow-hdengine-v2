@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.3.2
+**Version:** v1.3.3
 
 **Status:** Canon
 
 **Effective date:** 2026-08-09
 
-**Last Update Gate:** 0808 refresh 1
+**Last Update Gate:** 0808 refresh 2
 
 ## **0.2 Change policy**
 
@@ -69,7 +69,7 @@ The associated tests and evidence artifacts are owned by **HDE-Mechanics Guide**
     
 * **\[Speculative\]** — Accepted future design; not yet wired. (Preserve math as-is; no public bytes until promoted.)
 
-# **1\) “Map at a Glance” — What’s live vs planned \[Required-Now\]**
+# 1\. “Map at a Glance” — What’s live vs planned \[Required-Now\]
 
 * **Public Reader v1 (bands-only, single “harmony”) — \[Required-Now\]**  
     
@@ -950,273 +950,239 @@ This subsection does not add a second active scoring formula after §5.2. For th
 
 ---
 
-# **6\. Feature Extraction (engine-facing; deterministic) \[Speculative\]**
+# **6\. Feature Extraction (engine-facing; deterministic) \[Required-Now\]**
 
 ## **6.1 Electromagnetics (EM): detection and throat flags**
 
 ### **Purpose (normative)**
 
-Detect electromagnetic relationships between two normalized charts and produce bounded, deterministic feature outputs for aggregation. EM detection is internal-only; no public numerics or narratives appear on Reader v1.
+Detect electromagnetic relationships between two normalized charts and produce bounded, deterministic feature outputs. Electromagnetism is the pair-level result of reciprocal opposite hanging Gates that complete the same cataloged Channel. Hanging-Gate records are derivation provenance and do not create a second feature contribution. EM detection is engine-internal; Reader v1 exposes neither EM nor HG records and remains numeric-free.
 
 ### **Inputs (closed and validated)**
 
-* **Normalized charts (pair-normalized).** Inputs are canonicalized (AB↔BA neutral) before any detection.  
-* **Frozen catalogs.** A freeze-pack catalog (see §5.4) defines the channel map (gate→channel pairs), center topology (including throat), and any aliases. Catalog changes require a new `release_id` (§3.1).
+* **Pair-normalized charts.** Canonicalize the two Gate sets before detection so that AB and BA resolve to the same normalized pair.  
+* **Gate Catalog.** `catalog/gates_v1.json` supplies the closed Gate domain and the canonical center for each Gate.  
+* **Channel Catalog.** `catalog/channels_v1.json` supplies the closed Channel domain, each Channel's two Gate endpoints, and its center adjacency. Each catalog must pass its owning PF12 validation contract before feature extraction.  
+* **Catalog closure.** Every input Gate must exist in the Gate Catalog; every Channel endpoint must resolve to that catalog; and every derived `channel_id` must identify exactly one Channel row.
 
-  ### **Invariants (applies to every EM computation)**
+### **Invariants (applies to every EM computation)**
 
-* **Deterministic and pure.** No time, network, randomness, or file I/O.  
+* **Deterministic and pure.** No time, network, randomness, environment access, or file I/O occurs during computation. Catalogs arrive as normalized inputs.  
 * **AB↔BA symmetry.** EM outputs for AB equal those for BA after pair normalization.  
-* **Closed vocabularies.** Outputs draw only from frozen enums and IDs; no free text and no arbitrary keys.  
-* **Numeric-free outputs.** EM does not emit scores or counts to public surfaces; internal aggregation consumes only bounded keys, enums, and booleans.
+* **Closed vocabularies.** Outputs draw only from validated catalog IDs and bounded booleans or enums; no free text and no arbitrary keys.  
+* **Numeric-free feature identity.** EM and HG emit no independent score, count, bonus, token, or category weight. Downstream logic may consume each EM Channel identity at most once.
 
-  ### **Detection (normative rules)**
+### **Detection (normative rules)**
 
-* **Channel completion.** Electromagnetics are present when complementary gates (from different persons) complete a cataloged channel.  
-* **Gate→channel resolution.** Each detected EM MUST resolve to a single catalog channel via the freeze-pack mapping; ambiguous or unmapped combinations fail closed (typed error).  
-* **De-duplication (set semantics).** Multiple contributing gates that resolve to the same catalog channel produce one EM entry.  
-* **Canonical channel\_id.** For each EM, compute `channel_id = "<lowGate>-<highGate>"` where `<lowGate>` and `<highGate>` are the numeric gates in ascending order, **zero-padded to two digits** (`01..64`). Example: gates `{8, 1}` ⇒ `channel_id = "01-08"`.  
-* **Sorting.** The EM channels list MUST be sorted in ascending ASCII order by `channel_id`. Zero-padding guarantees ASCII and numeric orders coincide.
+For each canonical Channel `C={g1,g2}`, let `A=(A_g1,A_g2)` and `B=(B_g1,B_g2)` be the endpoint-presence bits after chart and pair normalization.
 
-  ### **Throat flags (normative)**
+* **Electromagnetic predicate.** `C` is electromagnetic exactly when `(A=(1,0) and B=(0,1)) or (A=(0,1) and B=(1,0))`. Each person contributes exactly one different endpoint, and neither person owns both endpoints.  
+* **Derived-stage relationship.** Derive each person's hanging-Gate records under §6.2, join only reciprocal records for the same Channel with opposite present endpoints, and emit one EM identity for that Channel.  
+* **Ownership classification.**  
+  * Exclusive opposite halves produce EM.  
+  * One person owning both endpoints while the other owns neither produces dominance by the full-channel owner.  
+  * One person owning both endpoints while the other owns exactly one produces compromise; the full-channel owner owns the Channel and the other person's present endpoint is the compromised Gate.  
+  * Both people owning both endpoints produces companionship.  
+  * Matching same-end halves, one unmatched half, or two endpoints contributed by the same person do not produce EM.  
+* **Gate-to-Channel resolution.** Each detected EM must resolve to exactly one validated Channel row. Ambiguous or unmapped combinations fail closed with a typed error.  
+* **De-duplication.** A canonical Channel contributes at most once to the EM feature set.  
+* **Canonical `channel_id`.** The Channel Catalog identity is `"<lowGate>-<highGate>"`, with numeric endpoints in ascending order and zero-padded to two digits (`01..64`). Example: Gates `{8,1}` resolve to `"01-08"`.  
+* **Sorting.** The EM Channel list must be duplicate-free and ASCII-sorted by canonical `channel_id`.
 
-* **Throat involvement.** If any detected EM touches the throat center (per center topology), set `throat_em = true`; otherwise `false`.  
-* **Throat-adjacent path.** If the catalog indicates a throat-adjacent pathway (for example, a talk-ladder route), set `throat_route` to the catalog enum value; otherwise omit or set `null`.  
-* **Closed enums.** Flags are strictly bounded booleans or enums defined in the catalog.
+### **Throat flags (normative)**
 
-> Note: Final field names and enums are pinned by the catalog schema in the freeze pack; this spec constrains behavior (determinism, symmetry, closure) rather than publicizing field lists.
+* **Throat involvement.** After the EM set is complete, set `throat_em = true` when any EM Channel's cataloged center set includes `throat`; otherwise set it to `false`.  
+* **Throat-adjacent path.** If an externally governed catalog enum authorizes a throat-adjacent pathway, `throat_route` may carry that bounded enum; otherwise it is omitted or `null`.  
+* **Closed values.** Flags are bounded booleans or externally governed enums.
 
-### **Output (engine-facing; normative shape)**
+### **Output (engine-facing; normative relationship)**
 
-* {  
-*   "em": {  
-*     "present": true|false,  
-*     "channels": \["\<channel\_id\>", ...\]   // sorted, unique, e.g., \["01-08","10-20"\]  
-*   },  
-*   "throat\_em": true|false,  
-*   "throat\_route": "\<enum\>" | null  
-* }  
-    
-* The `channels` array contains **only** canonical `channel_id` strings, unique and sorted.  
-* No counts or scores are required for EM; aggregation may reference only presence and catalog IDs/enums.
-
-  ### **Typed failures**
-
-* **FEATURES\_UNAVAILABLE** — prerequisites missing or invalid (for example, malformed gates, unresolved catalog IDs, incompatible chart normalization).  
-* **CATALOG\_MISMATCH** — an input references gates or channels absent from the active freeze pack.
-
-  ### **Determinism and acceptance (when wired)**
-
-* **AB↔BA parity proof.** EM outputs are identical for AB and BA.  
-* **Two-run identity.** Recomputing EM with the same inputs and catalog yields byte-identical internal feature records.  
-* **Catalog coverage.** Golden tests demonstrate correct detection across representative channels, including throat-linked and non-throat paths.  
-* **Fail-closed proofs.** Goldens show that unmapped or invalid combinations yield typed failures (no partial EM items).  
-* **Sorting and uniqueness.** Goldens prove sorted `channels` and set semantics (no duplicates).
-
-  ### **Change control**
-
-Any change to channel maps, center topology, `channel_id` construction rules, sorting policy, or flag enums is a math-catalog change and requires a new `release_id` (§3.1). Downstream acceptance artifacts must be regenerated.
-
-### **Public surface rule**
-
-EM outputs remain internal-only. Reader v1 stays bands-only with a single `harmony` item (see §2.2). No EM-derived numerics or narratives appear on the public surface.
-
-### **Routing**
-
-Transport and CLI behavior (headers, validators) is not restated here and is referenced by title only in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
-
-## **6.2 Hanging-gate complements \[Speculative\]**
-
-**Purpose (normative).**  
- Identify **complementary half-channels** across two normalized charts (A,B) and emit **bounded, deterministic** feature outputs that downstream aggregation can consume. Hanging-gate (HG) detection is **engine-internal**; Reader v1 remains numeric-free and bands-only (§2.2).
-
-### **Inputs (closed & validated)**
-
-* **Pair-normalized charts.** All detection consumes the **normalized** (order-neutral) pair.
-
-* **Frozen catalogs.** A freeze-pack catalog (see §5.4) defines:
-
-  * **Gate → channel** mappings (each channel lists its two gates and owning centers).
-
-  * **Center topology** (including channel membership and aliases, if any).
-
-  * **Allowed enums/IDs** for feature fields.  
-     Catalog changes require a new `release_id` (§3.1).
-
-### **Invariants (applies to every HG computation)**
-
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Outputs for **AB** equal those for **BA** after normalization.
-
-* **Closed vocabularies.** Only cataloged channel/gate IDs and fixed enums may appear; no free text.
-
-* **Numeric-free outputs.** HG does **not** emit scores or counts to public surfaces.
-
-### **Detection (conceptual rules)**
-
-1. **Complement formation (cross-person).**
-
-   * If **A** contributes gate *g₁* and **B** contributes gate *g₂*, and `{g₁,g₂}` exactly matches a cataloged channel *C*, then **one** HG complement is detected for *C*.
-
-   * Two gates **from the same person** do **not** form an HG complement (that is a defined channel, not HG).
-
-2. **Per-channel set semantics.**
-
-   * Multiple occurrences that resolve to the **same** channel *C* produce a **single** HG item.
-
-3. **Center consistency.**
-
-   * Detected complements must respect the catalog’s center assignments; mismatches **fail closed**.
-
-4. **Ambiguity guard.**
-
-   * If catalogs/aliases yield multiple candidate channels for the same `{g₁,g₂}`, the detector returns a typed failure (see **Typed failures**) rather than guessing.
-
-### **Optional sub-flags (catalog-gated)**
-
-* **Center flags.** Catalog may define optional center tags (e.g., “G-identity HG present”) that the detector may set as **booleans/enums**.
-
-* **Topology hints.** If the catalog declares a special topology hint relevant to HG (e.g., “bridge to throat present”), the detector may set a **bounded enum**.
-
-> Names and allowed values for any sub-flags are pinned by the catalog schema; this spec constrains behavior (determinism, symmetry, closure), not field lists.
-
-### **Output (engine-facing; example shape)**
-
+```json
 {
-
-  "hg": {
-
-    "present": true,
-
-    "channels": \["\<catalog\_channel\_id\>", "..."\],
-
-    "centers": \["\<center\_id\>", "..."\]   // optional, if catalog-gated
-
-  }
-
+  "em": {
+    "channels": ["01-08", "10-20"],
+    "present": true
+  },
+  "throat_em": true,
+  "throat_route": null
 }
+```
 
-* **No counts/scores** are required for HG; aggregation may reference only **presence** and **catalog IDs/enums**.
+* The `channels` array contains only canonical `channel_id` strings and is duplicate-free and ASCII-sorted.  
+* `present` is true exactly when `channels` is non-empty.  
+* HG provenance is nested under, or consumed while constructing, the corresponding internal EM record. It is not a peer aggregatable output.  
+* The stable pair-level feature is the sorted unique EM Channel identity set. No score or count is part of that feature identity.
 
 ### **Typed failures**
 
-* **FEATURES\_UNAVAILABLE** — inputs malformed or prerequisite data missing (e.g., unknown gate code, invalid normalization).
+* **FEATURES\_UNAVAILABLE** — prerequisites are missing or invalid, including malformed Gates or incompatible chart normalization.  
+* **CATALOG\_MISMATCH** — an input or derived identity references a Gate or Channel absent from the validated catalogs.  
+* **AMBIGUOUS\_COMPLEMENT** — an endpoint pair resolves to more than one candidate Channel; the detector fails closed rather than guessing.
 
-* **CATALOG\_MISMATCH** — gates reference channels not present in the active freeze pack.
+### **Determinism and acceptance (when wired)**
 
-* **AMBIGUOUS\_COMPLEMENT** — `{g₁,g₂}` maps to more than one catalog channel due to aliasing; detector fails closed.
-
-### **Determinism & acceptance (when wired)**
-
-* **AB↔BA parity proof.** HG outputs identical for AB and BA.
-
-* **Two-run identity.** Recomputing HG with the same inputs/catalog yields byte-identical feature records.
-
-* **Catalog coverage.** Goldens demonstrate detection across representative channels and centers (including negative/edge cases).
-
-* **Fail-closed proofs.** Goldens show that ambiguous/unmapped pairs return typed failures (no partial HG items).
+* **AB↔BA parity proof.** EM outputs are identical for AB and BA.  
+* **Two-run identity.** Recomputing EM with the same normalized inputs and catalogs yields byte-identical internal feature records.  
+* **Catalog coverage.** Governed tests must demonstrate positive and negative cases across representative throat-linked and non-throat Channels and every ownership classification.  
+* **Fail-closed proofs.** Unmapped, ambiguous, or invalid combinations must yield typed failures and no partial EM items.  
+* **Sorting and uniqueness.** Governed tests must verify ASCII order and per-Channel set semantics.  
+* **Implementation posture.** EM/HG derivation is a current requirement with an implementation gap. Checked-in constants, toggles, tests, or evidence references do not by themselves prove a conforming extractor.
 
 ### **Change control**
 
-* Any change to **gate→channel maps**, **center topology**, or **HG flag enums** is a math-catalog change and requires a **new `release_id`** (§3.1); regenerate acceptance artifacts accordingly.
+Any change to the EM predicate, ownership classification, Channel identity, catalog topology, sorting rule, failure behavior, or externally governed flag enum is a governed math or catalog change and requires the applicable PF12 release and Doc-Delta treatment. Acceptance artifacts must be regenerated only through the separately authorized implementation and evidence workflow.
 
 ### **Public surface rule**
 
-* HG outputs remain **internal-only**; Reader v1 exposes **no** HG-derived numerics or narratives (§2.2).
+EM and HG remain engine-internal. Reader v1 stays numeric-free and emits only its approved `harmony` projection. No EM- or HG-derived numeric, record, or narrative is added to Reader v1.
 
 ### **Routing**
 
-* Transport/CLI validators, status/headers, and admin behaviors are **not** restated here and are referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
+HDE-Math-Spec owns the EM/HG math. HDE-Schemas & Artifacts owns the Gate and Channel paths, schemas, validation, manifest treatment, and artifact contracts. HDE-Architecture owns component wiring. Transport and CLI behavior is owned by HDE-CLI-API-Vendor-Ref and is not restated here.
+
+## **6.2 Hanging-gate derivation provenance \[Required-Now\]**
+
+**Purpose (normative).**  
+Identify each person's per-Channel half-channel state, preserve the present and missing endpoints as derivation provenance, and use reciprocal opposite records to derive the pair-level EM identity in §6.1. HG provenance is engine-internal, is not a peer aggregatable feature, and contributes zero independent score, count, bonus, token, or category weight.
+
+### **Inputs (closed & validated)**
+
+* **Pair-normalized charts.** Detection consumes the same normalized pair used by §6.1 while retaining which normalized person owns each Gate.  
+* **Gate and Channel catalogs.** Use the validated `catalog/gates_v1.json` and `catalog/channels_v1.json` rows described in §6.1. Every endpoint and center assignment must resolve exactly.
+
+### **Invariants (applies to every HG computation)**
+
+* **Deterministic and pure.** No time, network, randomness, environment access, or file I/O occurs during computation.  
+* **AB↔BA symmetry.** Pair-level EM output is invariant under input reversal; member provenance follows the normalized member identities.  
+* **Closed vocabularies.** Only validated `channel_id` and Gate IDs may appear in required HG provenance. Any optional diagnostic field requires an externally owned schema.  
+* **No independent contribution.** HG provenance is consumed only to construct EM and cannot be counted or weighted separately.
+
+### **Detection (normative rules)**
+
+1. **Per-person half-channel state.** For a person `P` and Channel `C={g1,g2}`, create one HG record exactly when `P=(1,0)` or `P=(0,1)`.  
+2. **Required provenance.** Each record contains the canonical `channel_id`, the present Gate, and the missing harmonic Gate.  
+3. **Reciprocal join.** Join only A/B HG records for the same Channel when their present endpoints are opposite. One reciprocal pair derives one deduplicated EM identity.  
+4. **Same-person full Channel.** `P=(1,1)` is that person's defined Channel and produces no HG record for `P`; it is never EM by itself.  
+5. **Unmatched and same-end halves.** A half with no complementary half and two people owning the same endpoint do not produce EM.  
+6. **Catalog consistency.** Endpoint or center mismatches fail closed.  
+7. **Derivation order.** Validate catalog closure; canonicalize both Gate sets; derive HG records per person; join reciprocal opposite records; emit one unique EM identity per Channel; ASCII-sort the EM set; then derive `throat_em` from Channel center adjacency.
+
+### **Optional diagnostic provenance (externally schema-gated)**
+
+A diagnostic surface may expose per-member HG provenance only when an externally owned schema authorizes its exact fields and values. Reader v1 exposes neither HG provenance nor EM records. Without that schema, HG records remain an internal derivation stage and are consumed while constructing EM.
+
+### **Typed failures**
+
+* **FEATURES\_UNAVAILABLE** — inputs are malformed or prerequisite data is missing.  
+* **CATALOG\_MISMATCH** — a Gate, Channel, endpoint, or center assignment does not resolve in the validated catalogs.  
+* **AMBIGUOUS\_COMPLEMENT** — the same endpoint pair resolves to multiple candidate Channels; the detector fails closed.
+
+### **Determinism & acceptance (when wired)**
+
+* **AB↔BA parity proof.** Reversing input order preserves the sorted pair-level EM identity set and normalized member provenance.  
+* **Two-run identity.** Recomputing from the same normalized inputs and catalogs yields byte-identical internal derivation records.  
+* **Catalog coverage.** Governed tests must cover reciprocal opposite halves, same-end halves, unmatched halves, same-person full Channels, dominance, compromise, companionship, throat adjacency, and non-throat Channels.  
+* **Fail-closed proofs.** Ambiguous or unmapped endpoints must return typed failures and no partial EM or HG output.
+
+### **Change control**
+
+Any change to the half-channel predicate, required provenance, reciprocal join, ownership classification, catalog topology, or failure behavior is a governed math or catalog change and requires the applicable PF12 release and Doc-Delta treatment.
+
+### **Public surface rule**
+
+HG provenance and EM records remain engine-internal. Reader v1 exposes neither and remains numeric-free.
+
+### **Routing**
+
+HDE-Math-Spec owns HG/EM derivation math. HDE-Schemas & Artifacts owns catalog paths, schemas, and artifacts. HDE-Architecture owns wiring. Transport and CLI behavior is owned by HDE-CLI-API-Vendor-Ref and is not restated here.
 
 ## 6.3 Dominance / Compromise — center tagging \[Speculative\]
 
 **Purpose (normative).**  
- Produce **bounded, deterministic** center-level tags for a normalized pair indicating **dominance / compromise / neutral** relationships per center definitions in the freeze pack. These tags are **engine-internal**; Reader v1 remains numeric-free and bands-only (§2.2).
+Produce **bounded, deterministic** center-level tags for a normalized pair indicating **dominance / compromise / neutral** relationships per center definitions in the freeze pack. These tags are **engine-internal**; Reader v1 remains numeric-free and bands-only (§2.2).
 
 ### Inputs (closed & validated)
 
-* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.
-
-* **Frozen catalogs.** The freeze pack (see §5.4) defines, per center:
-
-  * Center **IDs** and **topology** (closed set).
-
-  * Center-level **definition rules** and any applicable complements.
-
+* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.  
+    
+* **Frozen catalogs.** The freeze pack (see §5.4) defines, per center:  
+    
+  * Center **IDs** and **topology** (closed set).  
+      
+  * Center-level **definition rules** and any applicable complements.  
+      
   * Allowed **enums** for dominance/compromise outcomes and optional sub-flags.  
-     Any catalog change requires a new `release_id` (§3.1).
+    Any catalog change requires a new `release_id` (§3.1).
 
 ### Invariants (applies to every center tagging pass)
 
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Results for **AB** equal those for **BA** after normalization.
-
-* **Closed vocabularies.** Only cataloged center IDs and **fixed enums** may appear; no free text.
-
+* **Deterministic & pure.** No time, network, randomness, or file I/O.  
+    
+* **AB↔BA symmetry.** Results for **AB** equal those for **BA** after normalization.  
+    
+* **Closed vocabularies.** Only cataloged center IDs and **fixed enums** may appear; no free text.  
+    
 * **Numeric-free outputs.** Tags are enums/booleans only; no counts, no scores.
 
 ### Tagging (conceptual rules)
 
-1. **Per-center evaluation.** For each cataloged center, derive a **relationship outcome** from the two inputs and the center’s rules:
-
-   * **dominant** — one participant’s configuration at the center **preponderates** per catalog criteria.
-
-   * **compromise** — competing configurations **must resolve** to a cataloged compromise state.
-
+1. **Per-center evaluation.** For each cataloged center, derive a **relationship outcome** from the two inputs and the center’s rules:  
+     
+   * **dominant** — one participant’s configuration at the center **preponderates** per catalog criteria.  
+       
+   * **compromise** — competing configurations **must resolve** to a cataloged compromise state.  
+       
    * **neutral** — neither dominance nor compromise criteria are met.
 
-2. **Decision closure.** Every evaluated center **must** yield exactly one of `{dominant, compromise, neutral}`; ambiguous cases **fail closed** (typed error).
+   
 
+2. **Decision closure.** Every evaluated center **must** yield exactly one of `{dominant, compromise, neutral}`; ambiguous cases **fail closed** (typed error).  
+     
 3. **No cross-center leakage.** A center’s tagging depends only on rules/material for that center; other centers may not modify its outcome except via cataloged cross-links (if any).
 
+>   
 > **Note:** The precise conditions that trigger **dominant** or **compromise** are pinned by the catalog schema; this spec constrains behavior (determinism, symmetry, closed enums), not rule text.
 
 ### Optional sub-flags (catalog-gated)
 
-* **Actor indication.** If the catalog allows, a bounded field may indicate **which** participant is dominant (e.g., `dominant_actor: "min"|"max"` or equivalent, aligned to the normalized pair notion).
-
-* **Topology hints.** Catalog may define additional bounded hints (e.g., `compromise_mode: <enum>`).
-
+* **Actor indication.** If the catalog allows, a bounded field may indicate **which** participant is dominant (e.g., `dominant_actor: "min"|"max"` or equivalent, aligned to the normalized pair notion).  
+    
+* **Topology hints.** Catalog may define additional bounded hints (e.g., `compromise_mode: <enum>`).  
+    
 * **All sub-flags are optional**, strictly enumerated, and versioned with the catalog.
 
 ### Output (engine-facing; example shape)
 
+```json
 {
-
-  "center\_tags": \[
-
-    { "center": "\<center\_id\>", "tag": "dominant",   "dominant\_actor": "min" },
-
-    { "center": "\<center\_id\>", "tag": "compromise", "compromise\_mode": "\<enum\>" },
-
-    { "center": "\<center\_id\>", "tag": "neutral" }
-
-  \]
-
+  "center_tags": [
+    {"center": "<center_id>", "dominant_actor": "min", "tag": "dominant"},
+    {"center": "<center_id>", "compromise_mode": "<enum>", "tag": "compromise"},
+    {"center": "<center_id>", "tag": "neutral"}
+  ]
 }
+```
 
-* **Set semantics:** one entry per cataloged center; duplicates are forbidden.
-
+* **Set semantics:** one entry per cataloged center; duplicates are forbidden.  
+    
 * **No numerics:** tags and optional bounded enums only.
 
 ### Typed failures
 
-* **FEATURES\_UNAVAILABLE** — missing prerequisites or malformed inputs.
-
-* **CATALOG\_MISMATCH** — center rules/IDs not found in the active freeze pack.
-
+* **FEATURES\_UNAVAILABLE** — missing prerequisites or malformed inputs.  
+    
+* **CATALOG\_MISMATCH** — center rules/IDs not found in the active freeze pack.  
+    
 * **AMBIGUOUS\_CENTER\_TAG** — rules yield multiple outcomes for the same center; detector fails closed.
 
 ### Determinism & acceptance (when wired)
 
-* **AB↔BA parity proof.** Tag arrays identical for AB and BA (after normalization).
-
-* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.
-
-* **Catalog coverage.** Golden tests cover representative centers for each outcome (`dominant`, `compromise`, `neutral`) and negative/edge cases.
-
+* **AB↔BA parity proof.** Tag arrays identical for AB and BA (after normalization).  
+    
+* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.  
+    
+* **Catalog coverage.** Golden tests cover representative centers for each outcome (`dominant`, `compromise`, `neutral`) and negative/edge cases.  
+    
 * **Fail-closed proofs.** Ambiguous or unmapped cases produce typed failures (no partial tags).
 
 ### Change control
@@ -1234,97 +1200,99 @@ Transport and CLI behavior (headers, validators) is not restated here and is ref
 ## **6.4 Throat adjacency — talk-ladder / narrative / direct-MT flags \[Speculative\]**
 
 **Purpose (normative).**  
- Detect **throat adjacency** features for a normalized pair and emit **bounded, deterministic** flags that inform internal weighting only. Three families of flags are considered: **talk-ladder**, **narrative**, and **direct-MT** (direct motor-to-throat), all defined by the freeze-pack catalogs. No public numerics or prose are produced; Reader v1 remains bands-only (§2.2).
+Detect **throat adjacency** features for a normalized pair and emit **bounded, deterministic** flags that inform internal weighting only. Three families of flags are considered: **talk-ladder**, **narrative**, and **direct-MT** (direct motor-to-throat), all defined by the freeze-pack catalogs. No public numerics or prose are produced; Reader v1 remains bands-only (§2.2).
 
 ### **Inputs (closed & validated)**
 
-* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.
-
-* **Frozen catalogs.** The freeze pack (see §5.4) defines:
-
-  * **Center & channel topology** (including throat and motor centers).
-
-  * **Talk-ladder** adjacency rules (permitted routes and hops).
-
-  * **Narrative adjacency** rules (cataloged patterns only).
-
-  * **Direct-MT** definitions (allowed motor→throat pathways).
-
+* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.  
+    
+* **Frozen catalogs.** The freeze pack (see §5.4) defines:  
+    
+  * **Center & channel topology** (including throat and motor centers).  
+      
+  * **Talk-ladder** adjacency rules (permitted routes and hops).  
+      
+  * **Narrative adjacency** rules (cataloged patterns only).  
+      
+  * **Direct-MT** definitions (allowed motor→throat pathways).  
+      
   * **Closed enums** for all emitted flags.  
-     Any change to these catalogs requires a new `release_id` (§3.1).
+    Any change to these catalogs requires a new `release_id` (§3.1).
 
 ### **Invariants (applies to every throat-adjacency pass)**
 
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Outputs for **AB** equal those for **BA** after normalization.
-
-* **Closed vocabularies.** Only cataloged IDs/enums may appear; **no free text**.
-
+* **Deterministic & pure.** No time, network, randomness, or file I/O.  
+    
+* **AB↔BA symmetry.** Outputs for **AB** equal those for **BA** after normalization.  
+    
+* **Closed vocabularies.** Only cataloged IDs/enums may appear; **no free text**.  
+    
 * **Numeric-free outputs.** Flags are booleans/enums; no counts, no scores.
 
 ### **Detection (conceptual rules)**
 
-1. **Talk-ladder adjacency.**
-
-   * Evaluate whether the pair’s combined graph satisfies a **cataloged talk-ladder route** to throat (e.g., center-to-center hop constraints).
-
+1. **Talk-ladder adjacency.**  
+     
+   * Evaluate whether the pair’s combined graph satisfies a **cataloged talk-ladder route** to throat (e.g., center-to-center hop constraints).  
+       
    * If multiple routes qualify, reduce to the **highest-priority** catalog route (set semantics).
 
-2. **Narrative adjacency (internal flag only).**
+   
 
-   * If a cataloged, **non-textual** narrative adjacency pattern is satisfied (e.g., a specific throat-proximal motif), emit a bounded enum (e.g., `nar_adj: "<enum>"`).
-
+2. **Narrative adjacency (internal flag only).**  
+     
+   * If a cataloged, **non-textual** narrative adjacency pattern is satisfied (e.g., a specific throat-proximal motif), emit a bounded enum (e.g., `nar_adj: "<enum>"`).  
+       
    * This **does not** authorize public narrative text; the flag is internal for weighting.
 
-3. **Direct-MT (motor→throat) path.**
+   
 
-   * Detect **direct motor-to-throat** adjacency when the pair’s combined graph forms an allowed **motor→throat** route per catalog.
-
+3. **Direct-MT (motor→throat) path.**  
+     
+   * Detect **direct motor-to-throat** adjacency when the pair’s combined graph forms an allowed **motor→throat** route per catalog.  
+       
    * If both talk-ladder and direct-MT are true, **both** flags may be set; conflicts are resolved by catalog precedence.
 
-4. **De-duplication & closure.**
+   
 
-   * Emit at most **one** value per flag family (e.g., one `talk_ladder` enum).
-
+4. **De-duplication & closure.**  
+     
+   * Emit at most **one** value per flag family (e.g., one `talk_ladder` enum).  
+       
    * Ambiguities across aliases or overlapping patterns **fail closed** with a typed error.
 
 ### **Output (engine-facing; example shape)**
 
+```json
 {
-
-  "throat\_adj": {
-
-    "talk\_ladder": "\<enum-or-none\>",
-
-    "nar\_adj": "\<enum-or-none\>",
-
-    "direct\_mt": true
-
+  "throat_adj": {
+    "direct_mt": true,
+    "nar_adj": "<enum-or-none>",
+    "talk_ladder": "<enum-or-none>"
   }
-
 }
+```
 
-* Field names and allowed enums are **pinned by the catalog schema**; the example is illustrative.
-
+* Field names and allowed enums are **pinned by the catalog schema**; the example is illustrative.  
+    
 * **Set semantics:** absence of a condition may be encoded as `null`/omitted (per catalog), not as free-form text.
 
 ### **Typed failures**
 
-* **FEATURES\_UNAVAILABLE** — missing prerequisites, invalid inputs, or unresolved IDs.
-
-* **CATALOG\_MISMATCH** — pattern references not present in the active freeze pack.
-
+* **FEATURES\_UNAVAILABLE** — missing prerequisites, invalid inputs, or unresolved IDs.  
+    
+* **CATALOG\_MISMATCH** — pattern references not present in the active freeze pack.  
+    
 * **AMBIGUOUS\_ROUTE** — multiple competing routes/enums match with no catalog precedence; detector fails closed.
 
 ### **Determinism & acceptance (when wired)**
 
-* **AB↔BA parity proof.** Flags identical for AB and BA.
-
-* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.
-
-* **Catalog coverage.** Goldens demonstrate positive/negative cases for talk-ladder, narrative adjacency, and direct-MT, including tie-break precedence.
-
+* **AB↔BA parity proof.** Flags identical for AB and BA.  
+    
+* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.  
+    
+* **Catalog coverage.** Goldens demonstrate positive/negative cases for talk-ladder, narrative adjacency, and direct-MT, including tie-break precedence.  
+    
 * **Fail-closed proofs.** Ambiguity and catalog gaps return typed failures (no partial flag sets).
 
 ### **Change control**
@@ -1342,87 +1310,87 @@ Transport and CLI behavior (headers, validators) is not restated here and is ref
 ## **6.5 Emotional timing & pacing (state \+ dampen flag) \[Speculative\]**
 
 **Purpose (normative).**  
- Detect a pair’s **emotional timing** posture and **pacing** condition from normalized charts and emit **bounded, deterministic** flags for internal weighting only. This detector can (a) report a **state enum** and (b) assert a **dampen** flag that instructs aggregation to **reduce** specific contributions when pacing criteria are unmet. No public numerics or narratives are produced; Reader v1 remains bands-only (§2.2).
+Detect a pair’s **emotional timing** posture and **pacing** condition from normalized charts and emit **bounded, deterministic** flags for internal weighting only. This detector can (a) report a **state enum** and (b) assert a **dampen** flag that instructs aggregation to **reduce** specific contributions when pacing criteria are unmet. No public numerics or narratives are produced; Reader v1 remains bands-only (§2.2).
 
 ### **Inputs (closed & validated)**
 
-* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.
-
-* **Frozen catalogs.** The freeze pack (see §5.4) defines:
-
-  * Emotional topology and definitions (e.g., emotional center predicates, authority states, timing windows).
-
-  * **Allowed enums** for emotional timing state and dampening rationale.
-
+* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.  
+    
+* **Frozen catalogs.** The freeze pack (see §5.4) defines:  
+    
+  * Emotional topology and definitions (e.g., emotional center predicates, authority states, timing windows).  
+      
+  * **Allowed enums** for emotional timing state and dampening rationale.  
+      
   * Any cross-links to other features (e.g., throat-EM interplay) declared by ID, not prose.  
-     Any catalog change requires a new `release_id` (§3.1).
+    Any catalog change requires a new `release_id` (§3.1).
 
 ### **Invariants**
 
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Outputs are identical for **AB** and **BA** after normalization.
-
-* **Closed vocabularies.** Only cataloged enums/IDs may appear; **no free text**.
-
+* **Deterministic & pure.** No time, network, randomness, or file I/O.  
+    
+* **AB↔BA symmetry.** Outputs are identical for **AB** and **BA** after normalization.  
+    
+* **Closed vocabularies.** Only cataloged enums/IDs may appear; **no free text**.  
+    
 * **Numeric-free outputs.** Booleans/enums only; no counts or scores.
 
 ### **Detection (conceptual rules)**
 
-1. **Emotional timing state**
-
-   * Derive a **state enum** (e.g., `paced`, `not_paced`, or other cataloged states) from the pair’s combined emotional topology according to **catalog rules**.
-
+1. **Emotional timing state**  
+     
+   * Derive a **state enum** (e.g., `paced`, `not_paced`, or other cataloged states) from the pair’s combined emotional topology according to **catalog rules**.  
+       
    * State selection must be **total** (one state chosen) and **deterministic**.
 
-2. **Pacing & dampening**
+   
 
-   * If the catalog indicates that **pacing is required** for particular contributions and the pair **is not** in a compliant state, set `dampen = true`.
-
-   * If pacing criteria are satisfied, set `dampen = false`.
-
+2. **Pacing & dampening**  
+     
+   * If the catalog indicates that **pacing is required** for particular contributions and the pair **is not** in a compliant state, set `dampen = true`.  
+       
+   * If pacing criteria are satisfied, set `dampen = false`.  
+       
    * When asserted, `dampen` **reduces** only those internal contributions explicitly listed by the catalog (e.g., specific families or signals) and **never** introduces public numerics.
 
-3. **Cross-feature coupling (catalog-gated)**
+   
 
-   * Optional hints (e.g., “throat-EM eligible for bonus only when `paced`”) are expressed as **bounded enums/IDs** that downstream aggregation can interpret deterministically.
-
+3. **Cross-feature coupling (catalog-gated)**  
+     
+   * Optional hints (e.g., “throat-EM eligible for bonus only when `paced`”) are expressed as **bounded enums/IDs** that downstream aggregation can interpret deterministically.  
+       
    * No detector may alter another detector’s raw outputs; coupling is expressed via **aggregation rules** that read these flags.
 
 ### **Output (engine-facing; example shape)**
 
+```json
 {
-
-  "em\_timing": {
-
-    "state": "\<enum\>",          // e.g., "paced" | "not\_paced" | \<catalog\_state\>
-
-    "dampen": true,             // boolean; instructs aggregation to reduce certain contributions
-
-    "reason": "\<enum-or-none\>"  // optional, catalog-bounded rationale for dampening
-
+  "em_timing": {
+    "dampen": true,
+    "reason": "<enum-or-none>",
+    "state": "<enum>"
   }
-
 }
+```
 
 * Field names and allowed enum values are **pinned by the catalog schema**; the example is illustrative only.
 
 ### **Typed failures**
 
-* **FEATURES\_UNAVAILABLE** — prerequisites missing/invalid; state cannot be derived deterministically.
-
-* **CATALOG\_MISMATCH** — referenced IDs/states not present in the active freeze pack.
-
+* **FEATURES\_UNAVAILABLE** — prerequisites missing/invalid; state cannot be derived deterministically.  
+    
+* **CATALOG\_MISMATCH** — referenced IDs/states not present in the active freeze pack.  
+    
 * **AMBIGUOUS\_STATE** — multiple states match with no catalog precedence; detector **fails closed** (no partial flags).
 
 ### **Determinism & acceptance (when wired)**
 
-* **AB↔BA parity proof.** Identical `em_timing` for AB and BA.
-
-* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.
-
-* **Catalog coverage.** Golden tests show positive/negative edges for `state` and `dampen`, including precedence resolution.
-
+* **AB↔BA parity proof.** Identical `em_timing` for AB and BA.  
+    
+* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.  
+    
+* **Catalog coverage.** Golden tests show positive/negative edges for `state` and `dampen`, including precedence resolution.  
+    
 * **Fail-closed proofs.** Ambiguity and catalog gaps return typed failures.
 
 ### **Change control**
@@ -1440,99 +1408,98 @@ Transport and CLI behavior (headers, validators) is not restated here and is ref
 ## **6.6 Families: G-identity, Tribal care, Rhythm, Story, Mind styles \[Speculative\]**
 
 **Purpose (normative).**  
- Detect **family-level signals** for a normalized pair and emit **bounded, deterministic** tags per family — **G-identity**, **Tribal care**, **Rhythm**, **Story**, **Mind styles** — for *internal* aggregation only. Families provide coarse structure for weighting/caps/floors in presets (§7) and aggregation (§8). Reader v1 remains numeric-free and bands-only (§2.2).
+Detect **family-level signals** for a normalized pair and emit **bounded, deterministic** tags per family — **G-identity**, **Tribal care**, **Rhythm**, **Story**, **Mind styles** — for *internal* aggregation only. Families provide coarse structure for weighting/caps/floors in presets (§7) and aggregation (§8). Reader v1 remains numeric-free and bands-only (§2.2).
 
 ### **Inputs (closed & validated)**
 
-* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.
-
-* **Frozen catalogs.** The freeze pack (§5.4) defines, for each family:
-
-  * The **family ID** (closed set) and **membership map** (what chart features/signals belong to the family).
-
-  * The **allowed enums** for family outcomes and any optional sub-flags.
-
+* **Pair-normalized charts.** All computation consumes the **normalized** (order-neutral) pair.  
+    
+* **Frozen catalogs.** The freeze pack (§5.4) defines, for each family:  
+    
+  * The **family ID** (closed set) and **membership map** (what chart features/signals belong to the family).  
+      
+  * The **allowed enums** for family outcomes and any optional sub-flags.  
+      
   * Any **cross-family constraints** or precedence rules the aggregation layer should observe.  
-     Any catalog change requires a new `release_id` (§3.1).
+    Any catalog change requires a new `release_id` (§3.1).
 
 ### **Invariants (applies to every family)**
 
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Family tags for **AB** equal those for **BA** after normalization.
-
-* **Closed vocabularies.** Only cataloged family IDs and **fixed enums/booleans** may appear; **no free text**.
-
+* **Deterministic & pure.** No time, network, randomness, or file I/O.  
+    
+* **AB↔BA symmetry.** Family tags for **AB** equal those for **BA** after normalization.  
+    
+* **Closed vocabularies.** Only cataloged family IDs and **fixed enums/booleans** may appear; **no free text**.  
+    
 * **Numeric-free outputs.** Families do **not** emit counts or scores to public surfaces.
 
 ### **Detection (conceptual rules)**
 
-1. **Membership resolve.**
-
-   * Resolve chart features into family membership using the catalog map (e.g., all signals that belong to **G-identity**).
-
+1. **Membership resolve.**  
+     
+   * Resolve chart features into family membership using the catalog map (e.g., all signals that belong to **G-identity**).  
+       
    * Treat membership as **set semantics**; duplicates collapse.
 
-2. **Family outcome (bounded).**
+   
 
-   * For each family, derive a **bounded enum** (e.g., `"present"|"weak"|"absent"` or a catalog-specific outcome) from the resolved membership and the catalog rules.
-
+2. **Family outcome (bounded).**  
+     
+   * For each family, derive a **bounded enum** (e.g., `"present"|"weak"|"absent"` or a catalog-specific outcome) from the resolved membership and the catalog rules.  
+       
    * If multiple outcomes match, apply **catalog precedence**; otherwise fail closed (typed error).
 
-3. **No cross-family leakage.**
+   
 
+3. **No cross-family leakage.**  
+     
    * A family’s outcome depends only on the membership and rules declared for that family. Cross-family influences (e.g., “over-concentration” or “floor/cap” suggestions) are **signaled as flags** for the aggregation layer rather than mutating detection.
 
 ### **Optional sub-flags (catalog-gated)**
 
-* **Over-concentration flag.** Signals that too many contributing features cluster within a single family (used by aggregation dampeners).
-
-* **Stability/consistency flags.** Bounded booleans or enums indicating cataloged stability conditions (e.g., “stable identity”).
-
+* **Over-concentration flag.** Signals that too many contributing features cluster within a single family (used by aggregation dampeners).  
+    
+* **Stability/consistency flags.** Bounded booleans or enums indicating cataloged stability conditions (e.g., “stable identity”).  
+    
 * **Coupling hints.** Catalog may define hints for aggregation (e.g., “prefer floor” for a family when certain conditions hold).
 
+>   
 > Names and allowed values are **pinned by the catalog schema**; this spec constrains behavior (determinism, symmetry, closure), not field lists.
 
 ### **Output (engine-facing; example shape)**
 
+```json
 {
-
-  "families": \[
-
-    { "id": "g\_identity", "state": "\<enum\>", "over\_concentration": false },
-
-    { "id": "tribal\_care", "state": "\<enum\>" },
-
-    { "id": "rhythm",      "state": "\<enum\>" },
-
-    { "id": "story",       "state": "\<enum\>" },
-
-    { "id": "mind",        "state": "\<enum\>" }
-
-  \]
-
+  "families": [
+    {"id": "g_identity", "over_concentration": false, "state": "<enum>"},
+    {"id": "tribal_care", "state": "<enum>"},
+    {"id": "rhythm", "state": "<enum>"},
+    {"id": "story", "state": "<enum>"},
+    {"id": "mind", "state": "<enum>"}
+  ]
 }
+```
 
-* **One entry per cataloged family**; duplicates are forbidden.
-
+* **One entry per cataloged family**; duplicates are forbidden.  
+    
 * Enums/flags are **bounded** and versioned with the catalog; **no numerics**.
 
 ### **Typed failures**
 
-* **FEATURES\_UNAVAILABLE** — prerequisites missing/invalid; family membership cannot be derived deterministically.
-
-* **CATALOG\_MISMATCH** — family IDs or membership references not present in the active freeze pack.
-
+* **FEATURES\_UNAVAILABLE** — prerequisites missing/invalid; family membership cannot be derived deterministically.  
+    
+* **CATALOG\_MISMATCH** — family IDs or membership references not present in the active freeze pack.  
+    
 * **AMBIGUOUS\_FAMILY\_OUTCOME** — multiple outcomes match with no catalog precedence; detector **fails closed**.
 
 ### **Determinism & acceptance (when wired)**
 
-* **AB↔BA parity proof.** Family arrays identical for AB and BA (after normalization).
-
-* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.
-
-* **Catalog coverage.** Golden tests cover representative positives/negatives per family, including over-concentration and precedence resolution.
-
+* **AB↔BA parity proof.** Family arrays identical for AB and BA (after normalization).  
+    
+* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.  
+    
+* **Catalog coverage.** Golden tests cover representative positives/negatives per family, including over-concentration and precedence resolution.  
+    
 * **Fail-closed proofs.** Ambiguity and catalog gaps return typed failures (no partial family sets).
 
 ### **Change control**
@@ -1547,646 +1514,95 @@ Transport and CLI behavior (headers, validators) is not restated here and is ref
 
 * Transport/CLI validators, status/headers, and admin behavior are **not** restated here and are referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
 
-## **6.7 Planetary micro (B-only, tiny cap) \[Speculative\]**
+## **6.7 Planetary micro \[Future-Promotion\]**
 
-**Purpose (normative).**  
- Detect **planetary micro** signals for a normalized pair and emit **bounded, deterministic** feature flags for *internal* aggregation. Planetary micro is **preset-gated (B-only)** and subject to a **tiny cap** defined in the freeze-pack catalogs/presets. Reader v1 remains numeric-free and bands-only (§2.2).
+**Purpose (future-promotion boundary).**  
+Retain the planetary-micro detector concept without treating an invented preset identity, token mapping, cap, default, or aggregation stage as current authority. No governed planetary-micro catalog, preset gate, or token-aggregation contract exists in the current surface. Any implementation remains Future-Promotion under §7.
 
-### **Inputs (closed & validated)**
+### **Promotion inputs (closed & validated)**
 
-* **Pair-normalized charts.** All detection consumes the **normalized** (order-neutral) pair.
+Promotion requires an exact governed micro catalog path and schema, a complete Human Design-grounded matching model, executable fail-closed validation, fully populated fixed-point values for any downstream contribution or cap, and normalized catalog inputs supplied to pure Engine Core computation. No `A`, `B`, “tiny cap,” example value, or hidden default is executable authority.
 
-* **Frozen catalogs & presets.** The freeze pack (§5.4) defines:
+### **Invariant detector boundary**
 
-  * A **micro catalog** (closed IDs/enums) and matching rules.
-
-  * The **B-preset** gating (micro considered only when preset B is active).
-
-  * The **tiny cap policy** (catalog/preset directive limiting how many micro tokens the aggregation layer may consider).  
-     Any change requires a new `release_id` (§3.1).
-
-### **Invariants**
-
-* **Deterministic & pure.** No time, network, randomness, or file I/O.
-
-* **AB↔BA symmetry.** Outputs identical for AB and BA after normalization.
-
-* **Closed vocabularies.** Only cataloged micro IDs/enums; **no free text**.
-
-* **Numeric-free extractor output.** The detector emits **booleans/enums only**; any cap application occurs in aggregation (§7–§8).
-
-### **Detection (conceptual rules)**
-
-1. **Preset gate (B-only).**
-
-   * If the active preset is not **B**, **no micro output** is produced.
-
-2. **Micro token resolution.**
-
-   * Apply catalog rules to derive a **set** of micro tokens (closed IDs/enums).
-
-   * Resolve aliases strictly to catalog IDs; duplicates collapse (set semantics).
-
-3. **Tiny cap semantics (aggregation-facing).**
-
-   * The detector **does not count** or trim numerically; it can set an **advisory enum/flag** indicating that micro is *cap-eligible*.
-
-   * The **cap** is enforced by aggregation (e.g., “consider at most *N* micro tokens”), never by emitting numeric counts here.
-
-### **Output (engine-facing; example shape)**
-
-{
-
-  "planetary\_micro": {
-
-    "present": true,
-
-    "tokens": \["\<micro\_id\>", "..."\],   // closed IDs; set semantics
-
-    "cap\_eligible": true,              // indicates that preset B’s tiny-cap rule applies
-
-    "preset\_gate": "B"                 // optional, catalog-bounded enum
-
-  }
-
-}
-
-* Field names and enums are **pinned by the catalog schema**; the example is illustrative.
-
-* No numeric counts are emitted by this detector.
+* **Deterministic and pure.** No time, network, randomness, environment access, or file I/O may occur during computation.  
+* **AB↔BA symmetry.** Outputs for AB and BA must be identical after pair normalization.  
+* **Closed vocabulary.** Only governed micro IDs and bounded enums may appear; no free text or arbitrary keys.  
+* **Set semantics.** Alias resolution must be governed, exact, and fail-closed; duplicate micro identities collapse.  
+* **Numeric-free extractor output.** A promoted detector may emit only bounded IDs, booleans, or enums. It may not invent a score, count, magnitude, cap, preset gate, or category effect.  
+* **No implicit aggregation.** Any future contribution, cap, or category interaction requires the complete §7 promotion prerequisites and one declared evaluation order.
 
 ### **Typed failures**
 
-* **FEATURES\_UNAVAILABLE** — prerequisites missing/invalid; micro cannot be resolved deterministically.
+* **FEATURES\_UNAVAILABLE** — prerequisites are missing or invalid.  
+* **CATALOG\_MISMATCH** — a referenced micro ID or rule is absent from the promoted governed catalog.  
+* **AMBIGUOUS\_MICRO** — multiple conflicting identities match without governed precedence; the detector fails closed.
 
-* **CATALOG\_MISMATCH** — referenced micro IDs or rules not present in the active freeze pack.
+### **Determinism & acceptance (after promotion)**
 
-* **AMBIGUOUS\_MICRO** — multiple conflicting tokens without catalog precedence; detector **fails closed**.
-
-### **Determinism & acceptance (when wired)**
-
-* **AB↔BA parity proof.** Identical `planetary_micro` for AB and BA.
-
-* **Two-run identity.** Re-running with the same inputs/catalog yields byte-identical outputs.
-
-* **Catalog coverage.** Goldens demonstrate positive/negative micro resolution across representative cases.
-
-* **Cap adherence (aggregation tests).** Aggregation goldens verify that, when `cap_eligible` and preset B are active, **no more than the tiny-cap limit** contributes to scoring (cap value owned by preset/catalog).
+Any promoted implementation must prove AB↔BA parity, two-run identity, closed-catalog coverage, set semantics, and fail-closed behavior through the separately governed validation and evidence workflow. This statement does not claim present implementation or test passage.
 
 ### **Change control**
 
-* Any change to **micro IDs/enums**, **resolution rules**, or **cap posture** (including the “B-only” gate) is a math-catalog/preset change and requires a **new `release_id`** (§3.1); regenerate acceptance evidence accordingly.
+Promotion or any later change to micro IDs, matching rules, downstream effects, or cap posture requires PF01 math authority, PF12 schema/path/manifest and release treatment, PF02 wiring consistency, and the applicable Doc-Delta. No preset identity or numeric value may be inferred from this retained concept.
 
 ### **Public surface rule**
 
-* Planetary micro is **internal-only**. No micro-derived numerics or narratives appear on Reader v1 (§2.2).
+Planetary micro remains internal and Future-Promotion. Reader v1 does not expose micro records, numerics, or narratives.
 
 ### **Routing**
 
-* Transport/CLI validators, status/headers, and admin streams are **not restated** here and are referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
+HDE-Math-Spec owns promoted detector and aggregation math; HDE-Schemas & Artifacts owns exact paths, schemas, manifest treatment, and artifact contracts; HDE-Architecture owns component wiring; transport behavior remains outside this section.
 
 # **7\. Presets & Configuration (A/B) \[Speculative\]**
 
-## **7.1 Preset catalog (validated; freeze-pack member) \[Speculative\]**
+## **7.1 Future-Promotion posture**
 
-**Purpose (normative).**  
- Define a **frozen, validated catalog** of presets that parameterize internal scoring/aggregation without changing the public Reader covenant (numeric-free; bands-only). The preset catalog is a **member of the freeze pack** (§5.4); any change requires a new `release_id` (§3.1).
+The detailed preset, alternate-weight, and advanced token-aggregation design is **Future-Promotion**. No current governed Presets catalog, Feature Registry, or token-aggregation contract exists. The `A/B` wording is retained in this protected H1 identity; it does not establish preset IDs, defaults, active modes, or product behavior. The labels `A` and `B` have no standing authority.
 
-### **7.1.1 Catalog membership & keys (closed)**
+Existing preset-oriented code, toggles, and tests are **LEGACY or orphan implementation surfaces**, not a governed Presets catalog and not authority for product math. No active `presets/` or `config/presets/` catalog is part of the inspected current repository surface. This static posture does not prove runtime, deployment, validation, or test state.
 
-* **Entries:** each preset is an object with a **stable `id`** (ASCII lowercase, `^[a-z0-9._-]{1,32}$`) that is **unique** within the catalog.
+The Future-Promotion classification applies only to presets, alternative weights or scoring profiles, planetary-micro policy, and an advanced token-aggregation layer. It does not defer or narrow the Required-Now intrinsic Magic-10 contract: the canonical result contains scores and bands for exactly all ten frozen categories in frozen order, with Human Design grounding, per-category calculation, and the single §5.3 band mapping.
 
-* **A/B scope:** at minimum, the catalog may contain **A** and **B** families; additional presets are allowed but must follow the same schema.
+## **7.2 Promotion prerequisites**
 
-* **No aliases:** a preset `id` maps to **exactly one** entry; aliasing is forbidden.
+Before any preset or advanced token-aggregation contract becomes current, one governed change must establish all of the following:
 
-### **7.1.2 Schema (validation rules)**
+1. Product Owner approval of the business meaning and scope of presets, including whether a preset is an internal model version, an admin-only tuning profile, or a user-selectable product feature.  
+2. For any advanced aggregation layer beyond the Required-Now intrinsic matrix, a complete and populated Human Design-grounded feature-to-category model in which every additional detector output, feature ID, family, category target, sign, magnitude, and precedence rule is defined exactly once.  
+3. Exact governed paths and schemas for the Presets catalog and any Feature Registry, executable fail-closed validators, exact key closure, and explicit unknown-key behavior.  
+4. Fully populated integer or fixed-point values for every weight, cap, floor, dampener, correction, and category distribution. Blank values and example defaults are invalid.  
+5. One complete evaluation order covering de-duplication, priority or shadowing, signal reduction, corrections, floors, caps, `ROUND_HALF_UP`, clamp, and handoff to the single band mapping in §5.3.  
+6. A decision on how presets interact with intrinsic scores and viewer preferences. Viewer preferences remain sampler or ranker inputs and do not alter intrinsic Magic-10 scores or bands.  
+7. Pure-compute integration through the canonical Engine Core, with catalogs supplied as normalized inputs rather than loaded from files or environment during computation.  
+8. PF12 promotion treatment for schema, manifest, release identity, migration, and governed artifact ownership, followed by an authorized public-contract version change only if a preset becomes externally selectable or changes Reader output.
 
-Each preset **MUST** validate against a canonical JSON schema (part of the freeze pack) with, at minimum, the following fields:
+Until all prerequisites are governed, no label, example, orphan file, empty cell, missing value, or implementation artifact creates a default or executable rule.
 
-* **`id`** *(string)* — unique key, stable across releases unless intentionally versioned.
+## **7.3 Invariants for any promoted design**
 
-* **`description`** *(string, optional)* — short, non-normative note; no functional effect.
+* **Closed identities and exact key closure.** Every preset, feature, family, category target, token, enum, and configuration key must belong to a governed closed domain. Unknown or extra keys fail closed.  
+* **Deterministic pure computation.** Results depend only on normalized inputs and governed configuration. No time, network, randomness, environment access, file I/O, hidden state, or hidden default may affect computation.  
+* **AB↔BA neutrality.** Neutral pair results must be identical after canonical pair normalization. Any directional value must be separately identified and governed.  
+* **Fixed-point arithmetic.** All executable magnitudes, weights, corrections, floors, caps, and intermediate values must use the governed integer or fixed-point representation; binary floating point is forbidden.  
+* **Rounding and clamp.** Apply `ROUND_HALF_UP` and the governed clamp at the single declared stages. Do not duplicate or reorder band mapping; final band assignment routes to §5.3.  
+* **Complete evaluation order.** The promoted contract must declare every stage, precedence relation, de-duplication rule, reduction, correction, floor, cap, rounding point, clamp, and handoff exactly once.  
+* **No hidden defaults.** Missing, blank, ambiguous, or ungoverned values fail closed. Examples are not defaults.  
+* **No double counting.** A detector identity, including EM derived from HG provenance, may contribute only as its governed feature contract allows; derivation provenance cannot create an independent contribution.
 
-* **`weights`** *(object)* — **exact** Magic-10 keys (§5.1), each an **integer 0..100**. Missing/extra keys are invalid.
+## **7.4 Ownership and public boundary**
 
-* **`caps` / `floors`** *(object, optional)* — bounded integers or closed enums controlling per-family/category capping/flooring; keys must be from closed vocabularies.
+* **PF01 — HDE-Math-Spec.** Owns promoted preset semantics, mathematical transformations, exact evaluation order, and aggregation behavior.  
+* **PF12 — HDE-Schemas & Artifacts.** Owns exact catalog and artifact paths, schemas or executable validation contracts, manifest membership, migration, release identity, and governed artifact contracts.  
+* **PF02 — HDE-Architecture.** Owns component wiring, pure-compute boundaries, and single-home integration. It does not own formulas or artifact schemas.  
+* **Engine Core boundary.** Any promoted computation runs through the canonical pure Engine Core with normalized configuration injected as input.  
+* **Reader v1 boundary.** Reader v1 remains numeric-free and emits only `harmony`. That output is a projection from the complete canonical ten-category matrix; promotion cannot silently expose presets, scores, weights, tokens, other category bands, EM/HG records, or configuration details.
 
-* **`dampeners`** *(object, optional)* — closed enums or booleans specifying over-concentration guards and other reduction rules (no free text, no floats).
+## **7.5 Promotion and change control**
 
-* **`cross_family`** *(object, optional)* — closed-enum hints for cross-family corrections (e.g., small penalties) interpreted deterministically by aggregation (§8).
+Promoting presets, a Feature Registry, planetary-micro policy, or advanced token aggregation requires an authorized Doc-Delta that satisfies §7.2 and reconciles PF01 math, PF12 artifact ownership, and PF02 wiring in the same governed change. Any externally selectable preset or Reader-output change also requires the authorized public-contract version change owned outside this section.
 
-* **`micro`** *(object, optional)* — planetary-micro posture (e.g., `gate: "B"`, `cap_eligible: true`) using only closed enums/booleans.
-
-* **`rounding`** *(string, optional)* — if present, **must** be `"half_up"` to align with fixed-point rules (§5.2.5).
-
-* **`enabled`** *(boolean, default `true`)* — preset availability flag for runtime selection.
-
-> **Validation is binary:** failure of any rule rejects the entire catalog build and therefore blocks the freeze pack.
-
-### **7.1.3 Determinism & neutrality**
-
-* **AB↔BA identity:** presets **must not** depend on person order; applying a preset to AB and BA yields identical per-category integer scores prior to band mapping (§5.3).
-
-* **Two-run identity:** with the same inputs and freeze pack, recomputation under a given preset yields **bit-identical** integer scores.
-
-* **No floats:** presets may not introduce floating-point sensitivity; all arithmetic resolves via fixed-point rules and **round half-up** (§5.2.5).
-
-  ### 7.1.4 Selection & precedence (concept)
-
-* **Selection.** The caller (CLI/adapter) selects **exactly one** preset (or none) for a computation; default behavior (when omitted) is defined **outside** this section.
-
-* **Viewer weights coexistence.** When both **viewer weights** and a **preset** are provided, a **deterministic precedence policy** **MUST** govern how they combine (e.g., “preset base weights, viewer deltas,” or “viewer overrides”). This spec requires **one pinned policy** and **does not restate it here**.  
-   **Routing (titles-only):** the precedence policy is owned in **PF-Canon-HDE-CLI-API-Vendor-Ref** (see “Preset vs Viewer Weights”). 
-
-### **7.1.5 Change control (new `release_id`)**
-
-Any of the following **requires** a new `release_id` (§3.1):
-
-* Adding/removing a preset or changing any preset field (`weights`, `caps/floors`, `dampeners`, `cross_family`, `micro`, `rounding`, `enabled`).
-
-* Modifying the preset JSON schema such that canonical bytes change.
-
-* Changing Magic-10 IDs (§5.1) or thresholds (§5.3) referenced by presets.
-
-### **7.1.6 Acceptance (binary)**
-
-* **Schema validation:** every entry passes the canonical JSON schema; **exact** Magic-10 coverage in `weights`.
-
-* **Determinism proofs:** AB↔BA parity and two-run identity hold for representative inputs under each preset.
-
-* **Clamp/rounding proofs:** boundary fixtures demonstrate half-up rounding and clamp to `[0..100]` (§5.2.4–§5.2.5).
-
-* **Catalog closure:** all referenced IDs/enums (families, micro, dampeners) resolve within the same freeze pack.
-
-* **No public drift:** public Reader bodies remain numeric-free; presets affect **internal** scores only.
-
-### **7.1.7 Routing (no transport bytes)**
-
-* HTTP headers, CLI flags/defaults, and validator streams are **not** restated here; they are referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
-
-## **7.2 Closed vocab (magnitude map; sign policy) \[Speculative\]**
-
-**Purpose (normative).**  
- Define a **closed vocabulary** that links detector outputs (e.g., EM/HG/family flags) to **bounded, deterministic** arithmetic knobs used by presets and aggregation. The vocabulary is split into two parts: a **magnitude map** (how much a token can contribute) and a **sign policy** (whether a token’s contribution is additive or subtractive). This catalog is part of the **freeze pack** (§5.4); any change requires a new `release_id` (§3.1).
-
-### **7.2.1 Vocabulary membership (closed)**
-
-* **Token IDs.** Each arithmetic token (e.g., a feature flag, family hint, or coupling hint) has a **stable ASCII ID** (`^[a-z0-9._-]{1,32}$`), unique within the vocab.
-
-* **No aliases.** A token ID maps to **one** semantic meaning; aliasing is forbidden.
-
-* **Scopes.** Tokens may be grouped by scope (e.g., `em.*`, `hg.*`, `family.*`) for validation only; scopes carry no arithmetic semantics.
-
-### **7.2.2 Magnitude map (deterministic, bounded)**
-
-* **Definition.** The magnitude map assigns each token ID a **bounded magnitude** chosen from a **closed set** pinned in the catalog (e.g., an enum or a small integer domain).
-
-* **Fixed-point only.** Magnitudes are encoded as **integers** or **closed enums**; no floats.
-
-* **Monotonicity.** If a preset increases the magnitude for a token, downstream scoring **MUST NOT** produce a smaller contribution for that token, all else equal.
-
-* **Fold rule (set semantics).** When multiple detections yield the **same token**, the catalog declares a **commutative, associative** fold operator (e.g., **max** or **bounded sum**) so that AB↔BA and two-run identity hold. The fold operator is part of the vocab definition.
-
-* **Caps/floors.** Any caps/floors that constrain magnitudes across a set of tokens are specified in the **preset** (see §7.1) or the **aggregation** layer (see §8), not here; the vocab only declares token-level magnitudes.
-
-### **7.2.3 Sign policy (closed)**
-
-* **Definition.** Each token maps to a **sign** from a closed enum (e.g., `pos | neg | neutral`), indicating how aggregation interprets the token’s effect.
-
-* **No dynamic signs.** Sign is **cataloged**, not computed at runtime. If a token needs contextual inversion, the catalog must use **distinct IDs** for the inverted case.
-
-* **Neutral tokens.** Tokens marked `neutral` may be used as **gates** (e.g., enabling bonuses elsewhere) without direct arithmetic weight.
-
-### **7.2.4 Selector/priority rules (conflict resolution)**
-
-* **Priority.** If two tokens are **mutually exclusive** by design, the catalog declares a **priority order**; the lower-priority token is ignored when both appear.
-
-* **Shadowing.** A high-priority token may **shadow** a set of lower-priority tokens; shadowed tokens are dropped **before** folding.
-
-* **Canonicalization.** Priority/shadowing rules are **order-independent** and **deterministic** (commutative, associative), ensuring AB↔BA identity.
-
-### **7.2.5 Validation (binary)**
-
-* **Closure.** Every token referenced by detectors, presets, or aggregation **MUST** be present in the vocab; unknown tokens are invalid.
-
-* **Deterministic fold.** The fold operator for duplicate tokens **MUST** be declared and proven commutative/associative in acceptance (see §11).
-
-* **Sign/magnitude coherence.** Each token **MUST** have exactly one sign and one magnitude (or enum equivalent).
-
-* **Domain bounds.** Magnitudes and signs **MUST** be drawn from their closed domains; out-of-range values fail validation.
-
-### **7.2.6 Determinism & neutrality**
-
-* **AB↔BA identity.** Because token formation (detectors) and token folding (vocab rules) are order-invariant, AB and BA yield identical token-to-weight outcomes.
-
-* **Two-run identity.** Re-running with the same inputs and freeze pack yields byte-identical token sets and folded magnitudes.
-
-* **No floats / locale.** No floating-point or locale-sensitive operations are permitted in vocab interpretation.
-
-### **7.2.7 Change control (new `release_id`)**
-
-* Adding/removing a token, changing a token’s **magnitude**, **sign**, **fold operator**, or **priority/shadowing** rules, or altering domain enums is a **math change** and **requires** a new `release_id` (§3.1).
-
-* Any downstream preset or aggregation that references vocab entries **must** be updated in lockstep (schema validation enforces closure).
-
-### **7.2.8 Routing (no transport bytes)**
-
-* This section defines **math vocab** only. Transport/CLI behavior (flags/defaults, validators, headers) is referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
-
-> **Implementation note (informative).** Vocab resolution occurs **before** preset arithmetic in §7 and **before** aggregation folds in §8; the vocab establishes the **deterministic, bounded** building blocks (token → magnitude, sign) that those layers consume.
-
-> 
-
-> ## **7.3 Caps & floors; dampeners (halve-penalty; over-concentration) \[Speculative\]**
-
-**Purpose (normative).**  
- Provide **bounded, deterministic** controls that shape internal scores **without** introducing public numerics. Controls are of three kinds:
-
-1. **Caps** — upper bounds on intermediate or final per-category contributions.
-
-2. **Floors** — lower bounds that prevent collapse of a contribution.
-
-3. **Dampeners** — reductions applied under cataloged conditions (e.g., **over-concentration**), including a **halve-penalty** effect.
-
-All knobs are defined by **closed enums/integers** in the **preset catalog** (§7.1) and/or the **closed vocab** (§7.2), and are part of the **freeze pack** (§5.4). Any change requires a new `release_id` (§3.1).
-
-> ---
-
-> ### **7.3.1 Deterministic application order (fixed)**
-
-For any category’s internal contribution, the engine **MUST** apply controls in the following **canonical order**:
-
-1. **Token fold** (set semantics from §7.2; commutative/associative)
-
-2. **Magnitude \+ sign** (from the closed vocab in §7.2)
-
-3. **Dampeners** (e.g., halve-penalty, oc-guard)
-
-4. **Floors**
-
-5. **Caps**
-
-6. **Clamp to `[0..100]`** and **round half-up** where required (see §5.2.5)
-
-This order is **normative** and must be used everywhere such controls are evaluated to guarantee AB↔BA identity and two-run identity.
-
-> ---
-
-> ### **7.3.2 Caps (upper bounds)**
-
-* **Definition.** A **cap** is a preset-declared upper bound that limits a **category** (or a **family subtotal** if explicitly declared) after dampeners/floors are applied.
-
-* **Domain.** Caps are **integers** or **closed enum levels** (e.g., `low|mid|high → {n₁,n₂,n₃}`), never floats.
-
-* **Effect.** `val' = min(val, CAP)`; then clamp to `[0..100]`.
-
-* **Scope.** Caps **must** name an unambiguous target (category or family); ambiguous or overlapping caps are invalid at validation time.
-
-> ---
-
-> ### **7.3.3 Floors (lower bounds)**
-
-* **Definition.** A **floor** is a preset-declared lower bound that prevents a contribution from collapsing below a cataloged minimum **after** dampeners.
-
-* **Domain.** Floors are **integers** or **closed enum levels**; never floats.
-
-* **Effect.** `val' = max(val, FLOOR)`; then clamp to `[0..100]`.
-
-* **Coherence.** If `FLOOR > CAP`, validation **fails** (catalog/preset must be coherent).
-
-> ---
-
-> ### **7.3.4 Dampeners (including halve-penalty)**
-
-* **Definition.** A **dampener** reduces a contribution under cataloged conditions (e.g., **over-concentration** within a family, pacing not satisfied; see §6.5).
-
-* **Domain.** Dampeners are **closed enums** with pinned effects; at minimum:
-
-  * `none` — no reduction
-
-  * `halve` — **halve-penalty**
-
-  * (optional) additional bounded modes, e.g., `reduce_25`, `reduce_33`, etc., **only** if declared in the freeze pack
-
-* **Effect (fixed-point).** If mode is `halve`:
-
-  * `val' = round_half_up(val * 0.5)`; then clamp to `[0..100]`.
-
-  * Other modes (if present) use **integer** fixed-point recipes pinned by the catalog (e.g., `val * 3 / 4` with round half-up).
-
-* **Triggering.** Dampeners are **not** inferred at runtime; they are triggered strictly by **closed conditions** (e.g., a family’s **over-concentration** flag, or `em_timing.dampen==true`), both defined by detectors/presets and validated in the freeze pack.
-
-> ---
-
-### **7.3.5 Over-concentration guard (oc-guard)**
-
-* **Intent.** Prevent a single family or narrow signal cluster from dominating totals.  
-* **Trigger.** The oc-guard applies when the **family record count \> 3** for the named family/scope, computed **after de-duplication/folding** (set semantics) and validation against the active freeze pack. If the count ≤ 3, the guard does not apply.  
-* **Effect (normative).** Multiply that family’s subtotal by **0.75** using half-unit fixed-point arithmetic and **round away-from-zero**, then proceed to floors and caps (see §8.2 for the canonical order). **Apply at most once per family per computation.**  
-* **No counts.** The guard is modeled as a flag, not a numeric quota; caps/floors enforce bounds without emitting counts.
-
-**Change control.** Any change to the oc-guard factor, its **trigger threshold**, or its scope is a math change and requires a new `release_id` (see §5.4).
-
-> ---
-
-> ### **7.3.6 Validation (binary)**
-
-* **Closure.** Every cap/floor/dampener **MUST** reference a **known** category/family and a **declared** mode/value.
-
-* **Coherence.** For each scoped target, `0 ≤ FLOOR ≤ CAP ≤ 100`; otherwise the catalog **fails** validation.
-
-* **Determinism.** The same inputs and preset produce **bit-identical** integers after applying dampeners, floors, and caps; AB↔BA identity holds.
-
-* **Rounding proof.** Goldens cover half-up rounding at key boundaries (e.g., 0.5, 12.5, 87.5) and demonstrate clamp to `[0..100]`.
-
-> ---
-
-> ### **7.3.7 Change control (new `release_id`)**
-
-Any of the following is a **math change** requiring a new `release_id` (§3.1):
-
-* Adding/removing/updating any **cap**, **floor**, or **dampener** declaration.
-
-* Changing the **fixed-point recipe** for a dampener mode (e.g., redefining `halve`).
-
-* Altering the **application order** or scope mapping.  
-   All affected acceptance artifacts must be regenerated.
-
-> ---
-
-> ### **7.3.8 Non-goals / routing**
-
-* No HTTP/CLI payloads, headers, or validator streams are restated here; such details are referenced **by title only** in **PF-Canon-HDE-CLI-API-Vendor-Ref**.
-
-* This section defines **math controls** only; public Reader v1 remains numeric-free and bands-only (§2.2).
-
-> 
-
-> 
-
-> ## **7.4 Planetary micro policy (B only; cap\_total=+3) \[Speculative\]**
-
-**Purpose (normative).**  
- Constrain how **planetary micro** contributes to **internal** totals under **Preset B**. Public Reader v1 remains **numeric-free** and **bands-only** (§2.2); micro never appears on the public surface.
-
-> ### **7.4.1 Gating & scope**
-
-* **Preset gate (B-only).** Planetary micro is **considered only** when the active preset is **B**. If the active preset ≠ B, planetary micro contributes **nothing** (regardless of detector outputs).
-
-* **Detector → aggregation boundary.** The detector emits **tokens** and a boolean/enum posture (e.g., `cap_eligible`) **without counts** (§6.7). All **counting and capping** occurs **only** in aggregation (this section).
-
-> ### **7.4.2 Tiny cap on total contribution**
-
-* **Cap constant.** `cap_total = +3` micro tokens maximum **may contribute** to aggregation when preset **B** is active.
-
-* **No public numerics.** The cap is an **internal rule**; it never appears in public payloads.
-
-* **Deterministic selection.** If more than three micro tokens are available, choose the contributing set **deterministically** using the closed, order-independent priority rules from the vocab (§7.2.4) and/or preset schema (§7.1):
-
-  1. **Priority/shadowing:** apply shadowing first (higher-priority tokens keep, shadowed tokens drop).
-
-  2. **Magnitude tie-break:** if still \>3, pick the three with highest cataloged **magnitude**; if magnitudes tie, fall back to the **stable token ID order** (ASCII ascending).  
-      These rules are **normative** and must yield the same selection for AB and BA (commutative/associative).
-
-> ### **7.4.3 Integration with aggregation pipeline**
-
-* **Where applied.** The cap is enforced **after** token fold and sign/magnitude resolution (§7.2) and **before** preset caps/floors (§7.3).
-
-* **Effect.** At most three micro tokens advance to the subsequent steps; all others are **ignored** for that computation. No partial weighting is applied to the ignored tokens.
-
-* **Fixed-point arithmetic.** Any contribution from the selected tokens remains integer/fixed-point per §5.2; round **half-up** and clamp to `[0..100]` as required.
-
-> ### **7.4.4 Determinism & neutrality**
-
-* **AB↔BA identity.** Because selection uses order-independent priority/shadow rules, the same three tokens (or fewer) are chosen for **AB** and **BA**.
-
-* **Two-run identity.** With the same inputs, catalogs, and preset, recomputation yields identical selected tokens and identical integer contributions.
-
-* **No floats / locale.** No floating-point or locale-sensitive operations are permitted.
-
-> ### **7.4.5 Validation (binary)**
-
-* **Closure:** all selected tokens **must** exist in the micro vocab (§6.7) and closed vocab (§7.2).
-
-* **Cap proof:** acceptance fixtures show that when \>3 micro tokens are available under preset **B**, exactly three are selected via the deterministic rules; when ≤3 exist, all are selected.
-
-* **Parity proof:** AB vs BA selection and totals are identical; two identical runs produce identical selections and totals.
-
-> ### **7.4.6 Change control**
-
-* Any change to **cap\_total** (e.g., from `+3` to another value), to the **selection priority**, or to the **gating preset** is a math/preset change and **requires** a new `release_id` (§3.1). Re-generate acceptance artifacts accordingly.
-
-> ### **7.4.7 Public surface rule**
-
-* Planetary micro remains **internal-only**. Reader v1 exposes **no** micro-derived fields or numerics; presets influence **internal** totals only.
-
-  ## **7.5 Feature primitives (v1) & loader invariants \[Required-Now\]**
-
-**Purpose (normative).** Define the v1 feature primitives consumed by category scoring (§5.2) and the loader invariants that guarantee deterministic, pack-driven, channel-scoped extraction. These are **math inputs**; public output remains **numeric-free** (bands only). Transport/ops are out of scope (titles-only to **HDE-CLI-API-Vendor Ref** / **HDE-Governance**).
-
-### **7.5.1 Source of truth & inputs (titles-only)**
-
-* **Topology & vocabularies.** `centers.json`, `gates.json`, `channels.json` (see **HDE-Schemas and Artifacts §2.1**). Channel identity is canonical `NN-NN` (min→max, zero-padded); centers are `snake_case`; Title Case is an ingestion alias only.  
-* **Constants pack.** `limits.*` and `bands.thresholds` (see §5.4.2; **HDE-Schemas and Artifacts §6**) — these are **frozen** and used as divisors and parameters.  
-   *Note:* Resonance/diagnostic inputs are not in the v1 constants pack (see §5.6).  
-* **Composite.** All primitives are computed on the **normalized AB composite** (see **HDE-Schemas and Artifacts §2.1**) so that **AB \= BA** (see §7.5.4).  
-* **Channel-level scope & classification (normative).**  
-  * **Per-channel semantics.** “Channel” means the channel **edge** (canonical `NN-NN`), not “gate-pair” or a center. Junction gates (10, 20, 34, 57\) can appear in multiple channels; each channel is evaluated independently.  
-  * **Classification set (pairwise-disjoint).** For each channel, compatibility class is **exactly one of** `{ companion, compromise(A→B), compromise(B→A), EM, null }`. The compromise direction is part of the class.  
-  * **Arrays-as-sets.** When aggregating over channels, treat inputs as a set of canonical identities (dedupe by `NN-NN`; ASCII-sort for determinism; see §4.2). EM/Compromise are counted **per-channel** (e.g., `20-34` and `20-57` are distinct).
-
-  ### **7.5.2 Normalization & null-handling (normative)**
-
-* **Raw → normalized.** Unless stated otherwise, each primitive’s raw value is mapped to a unit interval by a **pack-frozen divisor** `D > 0`, producing `F = clamp(raw, 0, D) / D ∈ [0,1]`. Where a primitive uses a named divisor from the constants pack (e.g., `limits.em_max`), that divisor is **normative and frozen**.  
-* **Null default.** If a raw component is missing/unknown, apply **null → 0** unless the feature’s **Feature Registry** row declares a different `null_handling` (`"ignore"` or `"floor"`) (registry lives in **HDE-Schemas and Artifacts**, titles-only).  
-* **Integerization boundary.** Category aggregation and banding use §5.2 (`round_half_up`) **after** weighting; primitives themselves stay in `[0,1]` (or `{0,1}` for booleans).  
-* **Channel set discipline.** Any intermediate/output array of channel IDs used as a **set** MUST be deduplicated and ASCII-sorted by canonical `NN-NN` (§4.2). EM/compromise counts are **per-channel**, never per-gate.
-
-  ### **7.5.3 Primitive definitions (v1, no public numerics)**
-
-Each item is identified by its feature id `F.<snake_case>`, with raw definition, normalization, and constraints.
-
-1. **F.EM\_TOTAL — total cross-person electromagnetics (completed A–B channels)**
-
-   * **Raw:** `raw = |{ ch : ch connects two centers AND is completed by opposite ownership across A/B }|`. Count **per channel** (canonical `NN-NN`); do **not** merge distinct channels that share a gate (e.g., `20-34` vs `20-57`).  
-   * **Normalizer:** `D = limits.em_max` *(pack-frozen)*.  
-   * **Normalized:** `F = min(raw, D) / D ∈ [0,1]`.  
-   * **Notes:** “Completed” means both endpoints present in the composite and owned by opposite members.  
-2. **F.HAS\_THROAT\_EM — any A–B EM touching throat**
-
-   * **Raw:** indicator: `1` if ∃ completed `ch` with `throat ∈ endpoints(ch)`, else `0`.  
-   * **Normalized:** `F = raw ∈ {0,1}` (boolean).  
-   * **Scope:** EM detected **per channel**; a single EM on `20-57` satisfies the indicator independent of `20-34`.  
-3. **F.CENTERS\_CO\_DEFINED — centers simultaneously defined by both A and B**
-
-   * **Raw:** `raw = |{ c ∈ Centers : c ∈ Defined(A) ∧ c ∈ Defined(B) }|`.  
-   * **Normalizer:** `D = limits.centers_max` *(pack-frozen; typically 9\)*.  
-   * **Normalized:** `F = raw / D ∈ [0,1]`.  
-4. **F.MIND\_TO\_THROAT — direct Mind→Throat completions**
-
-   * **Mind set:** `{head, ajna}`; **Throat:** `throat`.  
-   * **Raw:** number of **direct completed** composite channels whose endpoints are `(head|ajna) ↔ throat`.  
-   * **Normalizer:** `D = limits.mind_throat_max` *(pack-frozen, ≥ 0\)*.  
-   * **Normalized:** `F = (D == 0) ? 0 : min(raw, D) / D`.  
-   * **Notes:** **Direct-only** (no 2-hop paths); per-channel counting; channel IDs are canonical `NN-NN`.  
-5. **F.MOTOR\_TO\_THROAT — direct Motor→Throat completions (v1 direct-only)**
-
-   * **Motor set:** `{ego, sacral, solar_plexus, root}`; **Throat:** `throat`.  
-   * **Raw:** number of **direct completed** composite channels whose endpoints are `(motor) ↔ throat`.  
-   * **Normalizer:** `D = limits.motor_throat_max` *(pack-frozen, ≥ 0\)*.  
-   * **Normalized:** `F = (D == 0) ? 0 : min(raw, D) / D`.  
-   * **Notes:** **Direct-only** in v1 (see §5.4.2.1); do **not** count 2-hop routes; per-channel counting.  
-6. **F.COMP\_WHOLLY\_OWNED\_PENALTY (aka F.COMPROMISE\_PENALTY) — penalize “wholly one-sided” full channels**
-
-   * **Raw:** `comp = |{ ch : ch completed in composite AND both gates from the same member }|` (per channel).  
-   * **Parameter:** `limits.comp_max` *(pack-frozen)* caps the count in normalization.  
-   * **Normalized:** `F = 1 − min(comp, limits.comp_max) / limits.comp_max` *(if `limits.comp_max == 0`, define `F = 1`)*.  
-   * **Range:** `[0,1]`, where `1` \= no one-sided completions; lower values indicate “more compromise”.
-
-**Registration in the Feature Registry (titles-only).** Each `F.*` appears in the **Feature Registry** (in **HDE-Schemas and Artifacts**) with fields `{ feature_id, normalizer_divisor, lower_bound, upper_bound, null_handling, notes }`. For channel-scoped features, the registry key MUST be the canonical `NN-NN` `channel_id`; junction gates may yield multiple rows (one per channel). For `F.MIND_TO_THROAT` and `F.MOTOR_TO_THROAT`, set `normalizer_divisor` to `limits.mind_throat_max` / `limits.motor_throat_max`. Default `null_handling: "zero"` unless otherwise frozen.
-
-### **7.5.4 Determinism & identity (normative)**
-
-* **AB↔BA identity.** Primitives are computed **after** composite normalization; swapping A/B does not change any raw or `F`.  
-* **Two-run identity.** Identical inputs \+ identical pack ⇒ identical primitives and downstream scores/bands (see **HDE-Schemas and Artifacts §4**; run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`).  
-* **No transport dependence.** Primitives depend only on governed math inputs; transport headers/cache/timeouts are irrelevant.
-
-  ### **7.5.5 Validation & CI (titles-only)**
-
-* **Binary/value domains.**  
-  * Booleans: `{0,1}`; normalized features: `F ∈ [0,1]`.  
-  * **Divisors equal the pack-frozen constants; no runtime overrides.**  
-  * `null_handling` obeys the Feature Registry.  
-  * Channel collections are sets (dedupe \+ ASCII-sort by `NN-NN`); EM/compromise counted **per channel**.  
-* **Acceptance tokens:**  
-   `CATALOG_DENOMINATORS_FROZEN_OK`, `FEATURE_NULL_DEFAULT_OK`,  
-   `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`.  
-   *(Token names live in HDE-Governance §2.0.)*
-
-  ### **7.5.6 Routing (no transport bytes here)**
-
-All HTTP/CLI concerns (headers, streams, validators, error envelopes) are owned by **HDE-CLI-API-Vendor Ref** / **HDE-Governance** and are referenced by title only.
-
----
-
-> ## **7.6 Magic-10 feature registry (D3/D3b shapes & “overrides only”) \[Required-Now\]**
-
-**Purpose (normative).** Pin the data shapes and loading semantics for the per-feature constants that drive category scoring (§5.2). These are **math inputs** serialized in the pack (see **HDE-Schemas and Artifacts §2.6, §6**). The pack stores **overrides only**; any “resolved” tables shown in this spec are non-normative views derived from the pack.
-
-**Frozen-input coupling.** Any change to populated divisors / bounds / weights, or to these shapes, is a frozen-input change and **requires a new `release_id`** (see **HDE-Schemas and Artifacts §6**; §3.1).
-
-> ### **7.6.1 D3 — Divisors & bounds (shape; overrides only)**
-
-Each category may override the default normalization of any feature. Omitted features inherit the base/default from the pack; if no base is present, the engine treats the divisor as required by the feature’s definition (or as `1` only where explicitly allowed by §7.5).
-
-**Shape (JSON, canonical; comments shown here in prose):**
-
-> {
-
->   "magic10": {
-
->     "divisors": {
-
->       "\<category\_key\>": {
-
->         "\<feature\_id\>": \<number\>
-
->       }
-
->     },
-
->     "bounds": {
-
->       "\<category\_key\>": {
-
->         "\<feature\_id\>": {
-
->           "min":  \<number or null\>,
-
->           "max":  \<number or null\>,
-
->           "null": "zero" | "ignore" | "floor"
-
->         }
-
->       }
-
->     }
-
->   }
-
-> }
-
-> 
-
-**Rules (normative)**
-
-* **Divisors** are positive and finite; when a primitive specifies a pack key (for example, `limits.em_max`), the override **must** reference that pack-frozen divisor (§7.5).  
-* If both `min` and `max` are present, then `min ≤ max`.  
-* **Null handling** defaults to `zero` unless overridden:  
-   `zero` → substitute `0` before normalization;  
-   `ignore` → exclude the feature from category aggregation for that item;  
-   `floor` → substitute `min` before normalization.  
-* Pack JSON is **canonical** (see **HDE-Schemas and Artifacts §4**): UTF-8 (no BOM), sorted keys, compact, one trailing `\n`.
-
-> ### **7.6.2 D3b — Weight vectors `W_c` (shape; AWAITING VALUES)**
-
-Per category, the pack contains **only non-zero overrides**; missing features implicitly take weight `0` unless a template (T1–T5) supplies an editorial seed. Templates are **not** normative; the frozen weights in the pack are.
-
-**Shape (JSON, canonical):**
-
-> {
-
->   "magic10": {
-
->     "weights": {
-
->       "\<category\_key\>": {
-
->         "\<feature\_id\>": \<number\>
-
->       }
-
->     }
-
->   }
-
-> }
-
-> 
-
-**Notes (v1)**
-
-* **No auto-normalization.** Weights are used exactly as frozen; the engine does **not** renormalize sums to `1`.  
-* **Templates (T1–T5).** May guide authoring; the pack’s concrete weights are the **only** normative source.  
-* **Status.** `weights` content is **AWAITING VALUES**; when populated and manifested, it becomes frozen and bumps `release_id`.
-
-> ### **7.6.3 Registration & linkage to primitives**
-
-For every feature `F.<…>` consumed by any category (§7.5), the registry **must** provide a D3/D3b row wherever that feature participates:
-
-* **Divisor linkage.** If a primitive’s normalization is defined against a pack key (for example, `limits.em_max`, `limits.mind_throat_max`, `limits.motor_throat_max`, `limits.centers_max`, `limits.comp_max`), the D3 `divisors` entry **must** match that key’s value when overridden.  
-* **Bounds & null policy.** If a primitive requires clamping or non-zero floor/ignore semantics, encode them in D3 `bounds` for each category that differs from the base/default.  
-* **Keys & IDs.** Use `snake_case` identifiers for `<category_key>` and `<feature_id>`. Category keys **must** come from the frozen Magic-10 IDs (see **HDE-Schemas and Artifacts §2.6**; §5.1). Feature IDs **must** match §7.5.  
-* **Channel-scoped features.** When a primitive is channel-scoped (§7.5), D3/D3b still keys by `<feature_id>` at the **category** row; channel identity (`NN-NN`) is carried by extraction and set-handling rules in §7.5. (Divisors/bounds/weights typically remain category-level.)
-
-> ### **7.6.4 Determinism & identity**
-
-* **AB↔BA identity.** Features are extracted from the **normalized composite** (see **HDE-Schemas and Artifacts §2.1**); swapping A/B does not change feature values.  
-* **Two-run identity.** Given identical inputs and identical pack contents, two runs produce byte-identical category inputs and downstream aggregates (§5.2).  
-* **Environment pins.** All checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC` (see **HDE-Schemas and Artifacts §4**).
-
-> ### **7.6.5 Validation & CI (titles-only)**
-
-* **Schema/shape:** `JSON_CANONICAL_CHECK_OK`  
-* **Limits coupling:** `CATALOG_DENOMINATORS_FROZEN_OK` (divisors referencing `limits.*` match pack)  
-* **Population (when filled):** `EVIDENCE_INDEX_UPDATED_OK`, `RELEASE_ID_RECOMPUTE_OK`  
-* **Determinism:** `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`
-
-> ### **7.6.6 Routing (no transport bytes here)**
-
-All transport/ops concerns (headers, validators, streams) are owned by **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (referenced by title only).
+This Future-Promotion boundary does not claim implementation completion, runtime success, test passage, deployment, QA, OPS, board, or approval state.
 
 > # **8\. Aggregation Algorithm (deterministic, fixed-point) \[Speculative\]**
 
