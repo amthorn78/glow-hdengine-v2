@@ -2,62 +2,68 @@
 
 ## **0.1 Header**
 
-**Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
-
-**Version:** v2.4.6
-
-**Status:** Canon
-
-**Effective date:** 2026-08-07
-
-**Last Update Gate:**  BN 12.6.2 A28-44
-
+**Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref  
+**Version:** v2.4.7  
+**Status:** Canon  
+**Effective date:** 2026-08-09  
+**Last Update Gate:** 0808 refresh 1  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
 ## **0.2 Scope \[Required-Now\]**
 
-* **Supersession (PF10 addenda).** Consult the complete latest active PF10 base version, whether it is one unlettered document or a complete verified lettered set, and treat every document in a lettered set as an equally authoritative container of independently scoped addenda. Apply every applicable, active, non-superseded addendum to its own scope. A later document letter supersedes nothing by itself; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and lower-numbered guidance remains authoritative for distinct scope. PF10 governs PF05 only where such an addendum explicitly addresses a PF05-owned topic; when the complete active PF10 version is silent on that topic, PF05 governs. PF05 integrates applicable PF10 guidance and routes **by title only** to single homes (no version numbers). Build Notes reference posture: cite PF10 by **addendum number \+ addendum title**; do not use PF10 version strings, document letters, or PF10 section numbers as durable anchors.
-
-* **Ownership.** This document owns the **bytes** for CLI, Reader transport, and Vendor ingest (HDAPI): payload shapes, validators, headers & conditional delivery, typed error mapping, and exit-code/stream rules. It is authoritative for CLI and Reader wire bytes. **Appendix A** transport matrices are kept in lockstep with **HDE-Governance §10** (titles only). Writers/errors posture is policy-owned in Governance; PF05 references it by title.
-
-* **Public resonance posture (v1).** Public surface is **bands-only** and **numeric-free**; resonance is **SR-only** (`alpha=1.0`). `hysteresis=1` is armed for future XR and not exposed. Any XR diagnostics, if used, are **CLI-admin-guarded** and never emitted on Reader 200\.
-
-* **Canonical JSON and locale.** All public bytes are UTF-8 (no BOM), ASCII-sorted keys, compact, with exactly **one trailing LF**. Arrays used as sets are deduped and ASCII-sorted. All byte checks and comparisons run with `LC_ALL=C`, `LANG=C`, and `TZ=UTC` (see **HDE-Schemas & Artifacts**).
-
-* **Endpoint Catalog (JSON success): proof surface (A7).** The Catalog is **internal-only** and **env-gated** per entry; entries not gated for prod are **unreachable in production**. A7 transport proofs **must** run on a **§5.6 Endpoint Catalog (JSON success)** route (titles only; path-agnostic). Internal-ops `/internal/version` is **excluded** and governed by **HDE-Governance §10.5**. A7 **byte rules** are owned in **§5.3** of this document.
-
-* **Single homes.** PF05 is the bytes/contract home for its CLI \+ transport surfaces; it does not own global token semantics or the canonical token roster (those are single-homed in **HDE-Governance**). PF05 may **reference** token names only where needed to pin acceptance claims for PF05 surfaces. PF05 also does not own the global Evidence Index: **HDE-Schemas & Artifacts (PF12)** is the single home; PF05 may list surface-specific artifact paths only when a byte-level contract or proof anchor requires an explicit file reference.
-
+* **Supersession (PF10 addenda).** Consult the complete latest active PF10 base version, whether it is one unlettered document or a complete verified lettered set, and treat every document in a lettered set as an equally authoritative container of independently scoped addenda. Apply every applicable, active, non-superseded addendum to its own scope. A later document letter supersedes nothing by itself; a higher-numbered addendum controls only overlapping or explicitly superseded scope, and lower-numbered guidance remains authoritative for distinct scope. PF10 governs PF05 only where such an addendum explicitly addresses a PF05-owned topic; when the complete active PF10 version is silent on that topic, PF05 governs. PF05 integrates applicable PF10 guidance and routes **by title only** to single homes (no version numbers). Build Notes reference posture: cite PF10 by **addendum number \+ addendum title**; do not use PF10 version strings, document letters, or PF10 section numbers as durable anchors.  
+    
+* **Ownership.** This document owns the **bytes** for CLI, Reader transport, and Vendor ingest (HDAPI): payload shapes, validators, headers & conditional delivery, typed error mapping, and exit-code/stream rules. It is authoritative for CLI and Reader wire bytes. **Appendix A** transport matrices are kept in lockstep with **HDE-Governance §10** (titles only). Writers/errors posture is policy-owned in Governance; PF05 references it by title.  
+    
+* **Public resonance posture (v1).** Public surface is **bands-only** and **numeric-free**; resonance is **SR-only** (`alpha=1.0`). `hysteresis=1` is armed for future XR and not exposed. Any XR diagnostics, if used, are **CLI-admin-guarded** and never emitted on Reader 200\.  
+    
+* **Success carriers, canonical JSON, and locale.** On exit 0, each CLI mode emits exactly one declared success carrier and leaves stderr empty. The closed carrier set is canonical JSON, help text, version text, Aux narrative text, and governed Aux-suppressed empty output. Canonical JSON is mandatory for every ordinary machine success and every file-only receipt; those JSON bytes are UTF-8 (no BOM), ASCII-sorted by key, compact, and terminated by exactly one LF, with arrays used as sets deduped and ASCII-sorted. Nonempty text carriers are UTF-8, LF-only, and terminated by exactly one LF. All byte checks and comparisons run with `LC_ALL=C`, `LANG=C`, and `TZ=UTC` (see **HDE-Schemas & Artifacts**).  
+    
+* **Endpoint Catalog (JSON success): proof surface (A7).** The Catalog is **internal-only** and **env-gated** per entry; entries not gated for prod are **unreachable in production**. A7 transport proofs **must** run on a **§5.6 Endpoint Catalog (JSON success)** route (titles only; path-agnostic). Internal-ops `/internal/version` is **excluded** and governed by **HDE-Governance §10.5**. A7 **byte rules** are owned in **§5.3** of this document.  
+    
+* **Single homes.** PF05 is the bytes/contract home for its CLI \+ transport surfaces; it does not own global token semantics or the canonical token roster (those are single-homed in **HDE-Governance**). PF05 may **reference** token names only where needed to pin acceptance claims for PF05 surfaces. PF05 also does not own the global Evidence Index: **HDE-Schemas & Artifacts (PF12)** is the single home; PF05 may list surface-specific artifact paths only when a byte-level contract or proof anchor requires an explicit file reference.  
+    
 * **Evidence discipline (PF12 single home).** Evidence indexing (titles/paths only), the human Evidence Index and its hash sentinel, and the machine JSONL mirror are governed in **PF12** and must update **in the same PR** as artifact changes. CI enforces: 1:1 join equality (human↔machine), unknown-key rejection, ASCII field order, sort-before-write, **single mirror file**, and required `proof_anchor` path-proofs, per PF12.
 
   ## **0.3 Tagging convention**
 
 * **\[Implemented\]** — Verified in the repository and exercised by surfaces/tests.  
+    
 * **\[Required-Now\]** — Required for current build goals; if missing in code, it is a gap to close.  
+    
 * **\[Speculative\]** — Accepted future design; preserved here but not yet wired.
 
   ## **0.4 Change policy**
 
-* **Single homes; no duplication.** Do not restate Architecture/Math rules; keep CLI/Reader/Vendor **bytes here** and reference other documents **by title only**.
-
-* **Governed paths only.** Evidence and acceptance artifacts must live under governed repo roots: `docs/**`, `artifacts/**`, and `audit/**`. For Live QA runs executed in Codespaces, mechanical evidence is check-scoped under the stable epic root `audit/qa/<epic-id>/checks/<check-id>/`; per-run nesting is disallowed. Transient generator paths (scratch/temp) are disallowed. Root sprawl is drift: any new top-level directory is nonconforming unless explicitly authorized by an ADR; enforce via lint or CI guard (fail the PR).
-
-* **Lowercase directories (ASCII) only.** Don’t create mixed-case directories.
-
-* **Deterministic CLI results.** Any CLI command results used in QA MUST satisfy determinism (AB↔BA) and be reproducible as described in §9. *(Token names live in Governance.)*  
+* **Single homes; no duplication.** Do not restate Architecture/Math rules; keep CLI/Reader/Vendor **bytes here** and reference other documents **by title only**.  
+    
+* **Governed evidence roots.** Governed-root identities, artifact-family paths, admissibility, and top-level-directory authorization are single-homed in **HDE-Schemas & Artifacts**. PF05 may name an explicit PF05 proof path only where required to define or verify a PF05-owned byte contract; it MUST NOT maintain a closed global root roster. Live-QA check scoping and transient-path refusal remain subject to the owning evidence and QA contracts.  
+    
+* **Lowercase directories (ASCII) only.** Don’t create mixed-case directories.  
+    
+* **Deterministic CLI results.** Any CLI command results used in QA MUST satisfy two-run determinism; pair-sensitive data outputs MUST also satisfy AB↔BA identity as described in §9. Help and version have no party order, and Aux narrative parity follows its owning narrative and perspective contract. *(Token names live in Governance.)*  
+    
 * **Evidence anchoring.** Any evidence pointer emitted by the CLI must use governed repo roots and must be path-proven in the evidence index (see **Glow QA Guide** and **HDE-Governance §9** by title).  
-* **Mirror schema check invocation (operator note).**   
+    
+* **Mirror schema check invocation (operator note).**  
+    
   * **Path and interpreter.** `ci/checks/check_mirror_schema.sh` is the retained stable path for a Python entrypoint. Its `.sh` suffix is legacy path identity and does not declare the current interpreter.  
   * **Supported invocation.** Run the gate from the repository root. The preferred form is `python ci/checks/check_mirror_schema.sh`, where `python` resolves to the supported Python 3 interpreter. Direct execution as `ci/checks/check_mirror_schema.sh` is supported only when Git executable mode and shebang handling are guaranteed. A Python harness SHOULD invoke `[sys.executable, "ci/checks/check_mirror_schema.sh"]`.  
   * **Fixed input.** The validator reads the repository Machine Mirror at `artifacts/evidence_index.jsonl` and does not support a caller-selected mirror path. New plans, operator instructions, and harnesses SHOULD omit appended operands; the current program ignores such an operand, and its presence does not prove custom-path support.  
   * **Failure classification.** `bash ci/checks/check_mirror_schema.sh` and `sh ci/checks/check_mirror_schema.sh` are invalid. Shell-parser output from either form is an invocation or tooling defect, not a Machine Mirror schema finding. A missing-mirror result obtained outside the repository root is a locus defect until the supported invocation is rerun from the repository root. Only the supported invocation’s exit status and validator output may support a Mirror-schema PASS or FAIL claim, and evidence MUST preserve the command actually executed.  
-  * **Retention and migration.** Retaining the legacy path is accepted. Any future migration to a `.py` path MUST intentionally introduce and validate the new entrypoint; inventory and update active CI, sanity, QA, test, operator-documentation, and canon callers; preserve historical evidence and command transcripts unchanged; preserve direct and explicit-Python invocation of the legacy path during transition; rerun the owning closed-rails Mirror, Evidence Index, path, hash, and final-LF gates; and define an explicit deprecation and removal point. Because explicit-Python callers would parse a Bash wrapper as Python, the legacy path MUST remain Python-compatible until those callers are drained. No incidental rename, suffix-only cleanup, or partial caller migration is authorized.  
+  * **Retention and migration.** Retaining the legacy path is accepted. Any future migration to a `.py` path MUST intentionally introduce and validate the new entrypoint; inventory and update active CI, sanity, QA, test, operator-documentation, and canon callers; preserve historical evidence and command transcripts unchanged; preserve direct and explicit-Python invocation of the legacy path during transition; rerun the owning closed-rails Mirror, Evidence Index, path, hash, and final-LF gates; and define an explicit deprecation and removal point. Because explicit-Python callers would parse a Bash wrapper as Python, the legacy path MUST remain Python-compatible until those callers are drained. No incidental rename, suffix-only cleanup, or partial caller migration is authorized.
+
+
 * **Live QA Plan command-invocation materiality and rendered-escape review.** PF05 may preserve preferred command invocations for execution and evidence reproducibility. Command examples and vendor request examples in plans are not canonical invocation contracts unless PF05 or another owning PF explicitly makes command bytes the proof target. Distinguish normative protocol bytes from illustrative invocation syntax: vendor header names, route families, endpoint families, payload shape, auth posture, environment-variable identity, rails posture, and secret safety are substantive; shell wrapper form, heredoc formatting, indentation, rendered escapes, copied-chat damage, local invocation style, and paste-readiness are not blockers by themselves. A mismatch from preferred command spelling, path spelling, shell syntax, heredoc form, escaped option, interpreter choice, helper-code syntax, indentation, or pasted command form is a Live QA Plan approval blocker only when raw source changes execution, proves the wrong target, opens unsafe rails, exposes secrets, mutates prohibited state, prevents the check from running, makes PASS/FAIL unverdictable, or damages governed evidence trust. PF05 reviewers MUST judge raw command identity and raw artifact identity from source artifacts, governed records, canonical bindings, raw repo files, or execution transcripts, not assistant-rendered output, markdown previews, copied chat text, or review prose. A blocker based on escaping, syntax, command exactness, or shell-wrapper form requires raw/source proof of a separate executable, governed, canonical, safety, scope, evidence-identity, or semantic defect; otherwise the issue belongs in caveats, suggestions, execution notes, in-flight normalization, or the captured QA evidence command transcript.  
+    
 * **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.  
+    
 * **Documentation drainage is never a blocker.** PF10 drain and any later documentation drainage are never prerequisites, required deliverables, required checks, acceptance conditions, or readiness blockers for PF05-owned CLI, Reader, or Vendor work. Allowed blockers remain limited to truth and proof failures, such as missing required QA artifacts, untrusted evidence, or unresolved fail states that affect acceptance.  
+    
 * **PF10 carries live truth until later drain.** When an undrained canon delta affects PF05-owned surfaces, PF10 remains the temporary live-truth home until drainage occurs. Plans, reviews, QA artifacts, acceptance maps, step logs, and closeout materials may record later drain targets or doc-delta candidates, but they must not require PF document updates as execution or closeout conditions, and they must distinguish supportable-from-repo-evidence posture from already drained posture.  
+    
 * **Freeze-pack changes.** If a freeze-pack is affected, emit a new `release_id` and log it in the Change Log; snapshot/manifest schemas are owned by **HDE-Schemas & Artifacts** (titles only).
 
 **Editorial vs. normative.** Pure editorial rearrangements need not be logged; any change to math, transport, or the public contract **must** be logged.
@@ -68,85 +74,121 @@
 
 ## **CLI commands**
 
-* **`hdctl showcompat` — Implemented; merge-blocking until compat determinism and Reader↔CLI parity are proven.** Canonical compat admin harness and Reader parity surface. See §4.1 for full CLI contract, canonical JSON rules, and acceptance tokens.
-
-* **`read singlebg` — Speculative.** Planned single-chart read. Flags, validators, and payload shape will be owned in §4.2 when wired.
-
-* **`list people` — Speculative.** Planned listing command for people. Sorting/filters and JSON/tabular payloads will be owned in §4.3 when wired.
-
-* **Fetch commands (person/batch) — Speculative.** Explicitly disabled in Alpha. Enabling them requires transport acceptance and Governance tokens as defined in the CLI and Vendor sections (§4.4, §7).
-
-* **`hdctl dev:sampler` — Implemented (dev/admin-only).** Dev/admin sampler harness; runs only when `APP_ENV ∈ {dev, test, local}` under closed rails, reads a JSON candidates file, calls the sampler core, and emits canonical JSON for deterministic QA replay. Full contract (inputs, seed semantics, determinism, and streams) lives in §4.10.
-
+* **`hdctl showcompat` — Implemented; merge-blocking until compat determinism and Reader↔CLI parity are proven.** Canonical compat admin harness and Reader parity surface. See §4.1 for full CLI contract, canonical JSON rules, and acceptance tokens.  
+    
+* **`read singlebg` — Speculative.** Planned single-chart read. Flags, validators, and payload shape will be owned in §4.2 when wired.  
+    
+* **`list people` — Speculative.** Planned listing command for people. Sorting/filters and JSON/tabular payloads will be owned in §4.3 when wired.  
+    
+* **Fetch commands (person/batch) — Speculative.** Explicitly disabled in Alpha. Enabling them requires transport acceptance and Governance tokens as defined in the CLI and Vendor sections (§4.4, §7).  
+    
+* **Repository-state note.** The four current-state rows below are pinned to `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`; they are not branch-head or runtime-PASS claims.  
+    
+* **`hdctl aux-preview` — Present; Required-Now (admin-only).** The parser surface exists; the narrative/admin byte contract remains governed by §4.5.  
+    
+* **`hdctl bg:resolve` — Partially implemented; Required-Now.** The parser and configured-v2 vendor path exist, but DB/auto resolution remains a stub and failure-stream behavior does not conform to §§3.3-3.4; see §4.6.  
+    
+* **`hdctl bg:export-json` — Speculative; explicit gap.** No command is present; the future stateless BodyGraph export contract is recorded in §4.8.  
+    
+* **`hdctl admin-bundle` — Required-Now; not implemented.** No command was found at the pinned commit. Exact invocable and remote-request bytes remain OPEN pending the Doc-Delta required by §4.9.  
+    
+* **`hdctl dev:sampler` — Implemented (dev/admin-only).** Dev/admin sampler harness; runs only when `APP_ENV ∈ {dev, test, local}` under closed rails, reads a JSON candidates file, calls the sampler core, and emits canonical JSON for deterministic QA replay. Full contract (inputs, seed semantics, determinism, and streams) lives in §4.10.  
+    
   ---
 
   ## **Reader transport**
 
-* **Endpoint Catalog (JSON success) — Required-Now.** Internal-only, env-gated per entry, and the **single A7 proof surface** for Reader success routes (not `/internal/version`). A7 header matrix, conditional behavior, and proof artifacts are specified in §5.3, §5.6, and Appendix A; PF12 owns the Evidence Index and mirror schema.
-
-* **Dev harness — Implemented (dev-only).** `/api/reader?v=1` dev Reader surface for schema/LF checks, AB↔BA and two-run identity, and Reader↔CLI parity. Rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); harness proofs are **supplemental** and do not replace Endpoint Catalog A7 proofs. See §5.4.
-
-* **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface (JSON, no cache, no ETag) used for engine identity and rails snapshots. Header and refusal posture are governed by HDE-Governance §10.5; bytes live in the internal-ops section of Reader transport.
-
-* **Production Reader surface — Speculative.** Future public endpoint for Glow App. When enabled, public header and conditional-delivery rules will be owned in §5.2/§5.3; until then, behavior is dev/ops-only.
-
+* **Endpoint Catalog (JSON success) — Required-Now.** Internal-only, env-gated per entry, and the **single A7 proof surface** for Reader success routes (not `/internal/version`). A7 header matrix, conditional behavior, and proof artifacts are specified in §5.3, §5.6, and Appendix A; PF12 owns the Evidence Index and mirror schema.  
+    
+* **Dev harness — Implemented (dev-only).** `/reader?v=1` is the canonical dev Reader surface for schema/LF checks, AB↔BA and two-run identity, and Reader↔CLI reader-dump parity. `/api/reader?v=1` is an alias only when the Reader blueprint is actually mounted under `/api`. Rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); harness proofs are supplemental and do not replace Endpoint Catalog A7 proofs. See §5.4.  
+    
+* **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface (JSON, no cache, no ETag) used for engine identity and rails snapshots. Header and refusal posture are governed by HDE-Governance §10.5; bytes live in the internal-ops section of Reader transport.  
+    
+* **Production Reader surface — Speculative.** Future public endpoint for Glow App. When enabled, public header and conditional-delivery rules will be owned in §5.2/§5.3; until then, behavior is dev/ops-only.  
+    
   ---
 
   ## **Serializer and emitter**
 
-* **Single canonical emitter shared by CLI and Reader — Required-Now.** All public JSON (success and typed errors) is emitted by a single presenter/emitter entrypoint with canonical JSON rules (UTF-8, sorted keys, compact, one LF). No ad-hoc `json.dumps` or alternate serializers on public paths. Full rules and grep-guards live in §6.
-
+* **Single canonical emitter shared by CLI and Reader — Required-Now.** All public JSON (success and typed errors) is emitted by a single presenter/emitter entrypoint with canonical JSON rules (UTF-8, sorted keys, compact, one LF). No ad-hoc `json.dumps` or alternate serializers on public paths. Full rules and grep-guards live in §6.  
+    
   ---
 
   ## **Vendor ingest (HDAPI)**
 
-* **Legacy BodyGraph request shaping — Implemented; HumanDesignAPI v2 pending.** Current PF05 request shaping is legacy BodyGraph-oriented and MUST NOT be treated as HumanDesignAPI v2 conformance. Until HDE-FERM006 through HDE-FERM008 close, v2 endpoint bytes, v2 auth names, request-body rules, response envelope mapping, and v1 legacy fallback policy remain pending and MUST be derived from the governed contract inventory rather than guessed. See §7.1.10 and §7.2.  
+* **Legacy BodyGraph fallback and bounded HumanDesignAPI v2 chart path — implemented with remaining PF05 gaps.** **HDE Build Checklist — Fermentation** records HDE-FERM006 through HDE-FERM008 Done for the bounded HDE BodyGraph-detail scope. At `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, configured v2 bases use the version-neutral `charts` resource, Bearer auth, and the deterministic `ChartResult` adapter; non-v2 bases retain an explicit legacy `bodygraphs` fallback. This does not claim broad HumanDesignAPI v2 platform conformance, public Reader expansion, production deployment, production DB-hot-path completion, or complete conformance to every §7.2/§7.3 byte requirement. See §§7.1.10, 7.2, and 7.4.  
+    
 * **HumanDesignAPI v2 pending route set — Required-Now.** The pending v2 conformance work must reconcile `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates` as the recommended v2 chart routes, and `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple` as legacy v1 routes. The suspect `api-reference/openapi.json` artifact MUST be quarantined until domain, title, server, and path-family validation prove it is a HumanDesignAPI artifact.  
+    
 * **Base-URL, API-version, and credential posture — Required-Now.** `HD_API_BASE_URL` is the canonical HumanDesignAPI base URL key and owns the vendor API-version boundary. Runtime request construction appends only version-neutral resource paths to the configured base URL, preserves any configured version path, and MUST NOT infer route behavior or auth-header family from hardcoded `/v1` or `/v2` path strings. `HDAPI_BASE_URL` is deprecated compatibility only, and conflicting `HD_API_BASE_URL` / `HDAPI_BASE_URL` values fail closed. `HD_API_KEY` is the canonical vendor credential key; v2 chart routes project it as `Authorization: Bearer`, and legacy v1 BodyGraph routes project it as `HD-Api-Key`. `GEO_API_KEY` is preserved where geocoding behavior requires `HD-Geocode-Key`.  
+    
 * **Live HTTP gated by SAFE rails — Required-Now.** Vendor calls are permitted only when rails are explicitly open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); default posture for dev/CI is closed. Closed-rails refusal behavior, admin override, and rails evidence live in §7.1. HumanDesignAPI v2 open-rails smoke, when required, remains PO-only and evidence-backed.  
+    
 * **Adapter data-source policy — Required-Now.** In prod, the adapter reads from DB on the hot path, using vendor only on explicit triggers (birth-data change, scheduled refresh, operator). In dev, direct vendor calls are allowed but must upsert into DB for repeatability. HumanDesignAPI v2 conformance MUST route through one sanctioned vendor seam and MUST NOT create a second HTTP home, bypass adapter guards, or bypass the presenter boundary. See §7.4.  
+    
 * **No-AI vendor boundary — Required-Now.** HumanDesignAPI v2 conformance is deterministic vendor-contract work only. PF05 MUST NOT add OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, AI evidence-family, AI acceptance-token, or AI-enablement bytes, flags, headers, config keys, routes, error mappings, or runtime obligations for this work.  
-* **Production calls — Speculative.** Concrete timeout, retry, backoff, and observability profiles are defined in §7.3 and must be pinned before enabling production vendor traffic. Documentation consolidation alone does not prove live vendor conformance.
-
+    
+* **Production calls — Speculative.** Concrete timeout, retry, backoff, and observability profiles are defined in §7.3 and must be pinned before enabling production vendor traffic. Documentation consolidation alone does not prove live vendor conformance.  
+    
   ---
 
   ## **Evidence discipline: indices and parity**
 
-* **Evidence index & mirror — Required-Now.** Appendix D and HDE-Schemas & Artifacts govern the human Evidence Index (`docs/evidence/INDEX.json` \+ hash sentinel), the machine mirror (`artifacts/evidence_index.jsonl`), and all governed Reader/Vendor proof artifacts. PF05 relies on PF12 for schema and path details; every change to governed artifacts must update both human index and mirror in the same PR, with CI enforcing 1:1 parity and path-proofs.
-
+* **Evidence index & mirror — Required-Now.** **HDE-Schemas & Artifacts** is the single home for the Evidence Catalog, Human Evidence Index, hash sentinel, Machine Evidence Mirror, governed artifact identities and paths, record schemas, parity, checksums, and path-proofs. PF05 may name an explicit PF05 proof anchor only where required to define or verify a PF05-owned byte contract; it does not maintain a parallel Evidence Catalog.  
+    
   ---
 
-  # **2\) Purpose & Scope \[Required-Now\]**
+# **2\) Purpose & Scope \[Required-Now\]**
 
-  ## **2.1 Purpose**
+## **2.1 Purpose**
 
-* **CLI \= test & debug tool.** The CLI exists to **exercise and verify** the HD Engine and transport behavior (schema/LF, AB↔BA, two-run, idempotence), not to serve end users.
-
-* **Reader transport & vendor ingest.** This document **owns** the technical bytes for **Reader transport** (public payload, headers/conditional delivery, error mapping) and **Vendor ingest (HDAPI)** (request shaping, typed failures, rails).
-
+* **CLI \= test & debug tool.** The CLI exists to **exercise and verify** the HD Engine and transport behavior (schema/LF, AB↔BA, two-run, idempotence), not to serve end users.  
+    
+* **Reader transport & vendor ingest.** This document **owns** the technical bytes for **Reader transport** (public payload, headers/conditional delivery, error mapping) and **Vendor ingest (HDAPI)** (request shaping, typed failures, rails).  
+    
 * **Integration & acceptance.** The spec provides what’s needed to integrate the engine behind the Glow app and to pass acceptance (evidence, goldens, CI hygiene).
 
   ## **2.2 Out of scope**
 
-* **Product UX / SPA.** Application UX, narrative copy, and public SPA behavior are **out of scope** here.
-
+* **Product UX / SPA.** Application UX, narrative copy, and public SPA behavior are **out of scope** here.  
+    
 * **Routing by title only.** When needed, reference **Architecture** and **Math** **by title only** (no duplicated rules/bytes).
 
-  # **3\) CLI Overview & Conventions \[Required-Now\]**
+# **3\) CLI Overview & Conventions \[Required-Now\]**
 
-**QA status note (informative).** EPIC027 closed the CLI installability, help/version, argument-policing, showcompat parity/conformance, and deterministic sampler evidence slices. Governed CLI conformance evidence includes `artifacts/cli/help/hdctl_help.txt`, `artifacts/cli/help/showcompat_help.txt`, `artifacts/cli/help/reject_nonjson.txt`, `artifacts/cli/install/entrypoints.txt`, `artifacts/cli/install/installability_summary.json`, `artifacts/cli/ab.json`, `artifacts/cli/ba.json`, and `artifacts/cli/summary.json`. The current CLI evidence snapshot supports `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_MODULE_RUN_OK`, `CLI_INSTALL_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`, `CLI_READER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, and `TWO_RUN_IDENTITY_OK`. All success output must come from the single canonical emitter, be UTF-8 with ASCII-sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
+**Repository evidence note (informative).** Checked-in CLI help, installability, argument-policing, parity/identity, and sampler records are named in the owning evidence sections. Those files record claims about prior runs; their presence does not by itself prove that commands ran successfully at `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, tests passed, acceptance tokens are currently green, or an epic closed. Those conclusions require governed execution and acceptance records. All governed JSON success bytes MUST come from the single canonical emitter, be UTF-8 with ASCII-sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
 
 ## **3.1 Global flags & process contract**
 
 * **Packaging & entrypoints (normative).** Single home in **pyproject**:  
-   `[project.scripts]` defines `hdctl = "engine.cli.main:cli"`.  
-   **Module-runner parity:** `python -m engine.cli --help` ≡ `hdctl --help` (exit 0).  
-   **QA status:** expected PASS for `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_INSTALL_OK`, `CLI_MODULE_RUN_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`.  
+  `[project.scripts]` defines `hdctl = "engine.cli.main:cli"`.  
+  **Module-runner parity:** `python -m engine.cli --help` ≡ `hdctl --help` (exit 0).  
+  **QA status:** expected PASS for `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_INSTALL_OK`, `CLI_MODULE_RUN_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`.  
 * **Governed installability proof (normative).** `CLI_INSTALL_OK` evidence for the shipped console entrypoint MUST be positive and MUST NOT rely on skipped console checks. Governed installability artifacts are `artifacts/cli/install/entrypoints.txt` and `artifacts/cli/install/installability_summary.json`. The proof run MUST use a deterministic editable-install path (`PIP_NO_INDEX=1`, `--no-deps`, `--no-build-isolation`), require `console_entrypoint_available=true`, and keep module and console help/version facts single-sourced and internally coherent across the installability artifacts.  
-* **`--help` / `-h`** — print usage synopsis and exit 0 (no payload; stdout).  
-* **`--version`** — print CLI version/build tag and exit 0 (no payload; stdout).  
-* **Environment gate** — the CLI must **not** alter SAFE rails or emit non-canonical bytes; all public outputs come from the **single presenter/emitter** (see §6).  
+* **`--help` / `-h`** — for the root or a registered subcommand, print deterministic, nonempty UTF-8 usage/help text to stdout, LF-only and ending in one LF; leave stderr empty and exit 0\.  
+* **`--version`** — in the valid root invocation form, print exactly one deterministic, nonempty UTF-8 version/build line ending in one LF to stdout; leave stderr empty and exit 0\. An invalid `--version` plus command combination remains a usage error.  
+* **Environment gate** — the CLI must **not** alter SAFE rails or emit bytes outside the declared carrier contract. All governed JSON output comes from the **single presenter/emitter** (see §6); help, version, and Aux narrative text use their owning deterministic text paths.  
 * **Input normalization** — the CLI prepares normalized inputs (**order-neutral AB↔BA**) before invoking the engine.
+
+### **3.1.1 Closed exit-0 success carriers**
+
+On exit 0, every CLI mode MUST emit exactly one carrier declared by its command contract and MUST leave stderr empty. This set is exhaustive; a new carrier requires an explicit PF05 contract change.
+
+| Carrier ID | Exact permitted surface | Stdout contract |
+| :---- | :---- | :---- |
+| `canonical_json` | Every ordinary machine-readable success surface, including compat, Reader-on-stdout where defined, BodyGraph, sampler, conjunction, admin JSON, and file-write receipts | Exactly one canonical JSON object or array: UTF-8, compact, ASCII-sorted keys, and exactly one trailing LF |
+| `help_text` | Root and registered-subcommand `-h` or `--help` | Deterministic, nonempty human-readable UTF-8 usage/help text; LF-only; final LF required; multiline allowed |
+| `version_text` | Root `--version` in the valid version invocation form | Exactly one deterministic, nonempty human-readable UTF-8 version/build line ending in one LF |
+| `aux_narrative_text` | `hdctl aux-preview` narrative-output mode only | Exact governed Aux narrative transport bytes; UTF-8, LF-only, no ANSI; when nonempty, exactly one final LF |
+| `aux_suppressed_empty` | `hdctl aux-preview` narrative-output mode only, and only for the governed suppressed result | Zero stdout bytes |
+
+For every carrier, exit status is 0, stderr is empty, diagnostics are excluded from stdout, terminal-control bytes are forbidden, output is deterministic under the command's build, pack, input, and environment pins, and no secret or unowned PII is emitted.
+
+**File-output rules.** A command that already emits primary canonical JSON and also writes a sidecar retains the primary JSON without adding a receipt. A command whose only successful product is one or more files emits one command-owned canonical JSON receipt after every required write succeeds. Aux narrative remains the sole stdout carrier when an admin sidecar is requested; no receipt is appended. A failed or partial write is nonzero with empty stdout. Human file-success synopses, generic empty stdout, and every undeclared non-JSON carrier are forbidden. The exact receipt schema remains in the command contract and its schema home.
+
+**Aux suppression boundary.** Empty stdout is allowed only when the governed Aux result is suppressed. It MUST NOT represent a missing output selection, unimplemented branch, skipped write, swallowed exception, or no-op invocation. An Aux form selecting neither narrative stdout nor valid file output fails as usage.
+
+**Repository posture at `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a` (informative).** Static inspection confirms successful argparse help text, a one-line root version path, raw Aux narrative output, governed Aux-suppressed empty output, and canonical-JSON paths for ordinary machine success. It also finds an additional Aux pair-file path that can exit 0 without stdout and no closed, carrier-specific enforcement across all modes. The repository therefore does not yet conform to the exhaustive carrier contract; this statement does not claim runtime behavior or test passage.
 
 ## **3.2 Input forms (files vs inline) \[Required-Now\]**
 
@@ -155,18 +197,54 @@ Input methods for commands that compare or display charts. Titles-only pointers;
 ### **Files (Required-Now)**
 
 * **File arguments.** Commands accept file paths to **canonical chart JSON** (e.g., `--a <path>`, `--b <path>`).  
+    
 * **Schema gate.** Each file must validate against its owning chart JSON Schema (titles-only pointer; schema lives in **HDE-Schemas & Artifacts**).  
+    
 * **Canonical JSON gate.** Files must be UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays-as-sets deduped & ASCII-sorted (see **HDE-Schemas & Artifacts** §4).  
+    
 * **Typed input error on failure.** Missing/unreadable file, non-JSON, schema failure, or canonicalization failure → **typed input error** (stderr code string token; no JSON envelope; see §3.4) on **stderr**; **stdout empty**.  
+    
 * **Locale.** Parsing/validation and byte checks run under `LC_ALL=C`.
 
   ### **Time-zone overrides (when allowed)**
 
-* **Flags.** Use `--a-tz`, `--b-tz` with **IANA** zone identifiers.  
-* **Behavior \[OPEN\]:**  
-  1. chart omits tz and no `--*-tz` provided → **\[OPEN\]** (typed error vs default policy).  
-  2. both chart tz and `--*-tz` present → **\[OPEN\]** precedence rule.  
-* **Invalid tz.** Invalid/unknown IANA tz **must** yield a typed input error (stderr); stdout empty.
+**Status.** Required-Now implementation gap. The contract below is normative; it does not claim that the selected flags, resolution algorithm, provenance, or refusal codes are implemented at the pinned commit.
+
+* **No default birth timezone.** PF05 MUST NOT use UTC, process `TZ`, server or container local time, a viewer or device zone, an IP-derived zone, a fixed offset, or an abbreviation as a person's birth timezone.  
+* **Qualifying sources and precedence.** Resolve each raw birth tuple independently using `explicit override > stored birth-event IANA timezone > deterministic location-derived IANA timezone`. A qualifying explicit override is a valid `--a-tz` or `--b-tz` value on a command path that recalculates from raw birth data and can honor it. A stored zone must belong to the same canonical birth event. A derived zone must come from the normalized birth location or coordinates through a sanctioned resolver with pinned data provenance.  
+* **Invalid higher-priority source.** An invalid explicit or stored zone MUST fail; it MUST NOT fall through to a lower-priority source. Approved IANA link aliases MAY normalize only through an exact mapping in the pinned timezone data. Case-folding, spelling correction, substring matching, and implicit alias invention are forbidden.  
+* **Stored/derived conflict.** Without an explicit override, canonical stored and derived zones that differ MUST fail with `ERR_TIMEZONE_CONFLICT`, even when their UTC offsets happen to match at the supplied instant. A valid explicit override resolves this conflict and its use is recorded in calculation provenance.
+
+#### **Resolution algorithm**
+
+1. Validate the calendar date and wall-clock time.  
+2. Select and validate a qualifying timezone source under the precedence above; when neither override nor stored zone exists, require exactly one place and one derived canonical IANA zone.  
+3. Resolve the local date, local time, and selected zone under pinned timezone data.  
+4. Require exactly one real UTC instant. A fold MUST fail with `ERR_LOCAL_TIME_AMBIGUOUS`; a gap MUST fail with `ERR_LOCAL_TIME_NONEXISTENT`; malformed or impossible calendar or wall-clock input MUST fail with `ERR_LOCAL_TIME_INVALID`. The implementation MUST NOT select a default fold, assume standard or daylight time, or shift across a gap.  
+5. Bind the selected IANA zone, source class, resolved UTC offset, resolved UTC instant, and timezone-data version to calculation provenance. Exact schema fields and placement remain in the owning schema home.  
+6. Only then may chart calculation, or a vendor path demonstrably preserving the same resolved semantics, proceed.
+
+#### **Typed refusal codes**
+
+| Code | Exact condition |
+| :---- | :---- |
+| `ERR_TIMEZONE_REQUIRED` | No explicit override, no stored birth-event timezone, and no birth location is available for derivation |
+| `ERR_TIMEZONE_INVALID` | A supplied explicit or stored identifier is invalid under the pinned IANA identifier and alias contract |
+| `ERR_LOCATION_AMBIGUOUS` | The birth location does not resolve uniquely enough to select one timezone |
+| `ERR_TIMEZONE_UNRESOLVED` | A unique normalized location is available but the sanctioned resolver returns no canonical IANA zone |
+| `ERR_TIMEZONE_CONFLICT` | Stored birth-event timezone and deterministic location-derived timezone disagree, with no explicit override |
+| `ERR_LOCAL_TIME_AMBIGUOUS` | Local date/time and zone map to two real UTC instants |
+| `ERR_LOCAL_TIME_NONEXISTENT` | Local date/time and zone map to no real UTC instant |
+| `ERR_LOCAL_TIME_INVALID` | Calendar date or wall-clock time is malformed, out of range, or impossible |
+| `ERR_TIMEZONE_OVERRIDE_UNSUPPORTED` | The command, source path, or precomputed input cannot actually apply the override |
+
+* **Missing and unavailable resolution.** Missing location produces `ERR_TIMEZONE_REQUIRED`; ambiguous location produces `ERR_LOCATION_AMBIGUOUS`; a unique location with no resolved zone produces `ERR_TIMEZONE_UNRESOLVED`. Operational resolver-data or service failure uses the owning internal/provider error boundary and MUST NOT be mislabeled as user input or defaulted to UTC.  
+    
+* **Precomputed and vendor boundaries.** `--a-tz` and `--b-tz` apply only to qualifying raw-birth recalculation paths. A full precomputed chart on a non-recalculation path, or a vendor path that cannot demonstrably honor the selected zone or exact instant, MUST refuse the override with `ERR_TIMEZONE_OVERRIDE_UNSUPPORTED`; it MUST NOT accept and ignore the flag or relabel computed mechanics.  
+    
+* **Governance dependency.** These exact order-neutral strings are selected for the PF05 contract, but the global error-token roster remains owned by **HDE-Governance**. Before implementation emits them or conformance evidence claims them, Governance MUST register them through its authorized maintenance path. Once registered and implemented, a code is emitted as exactly one LF-terminated stderr line on the command's owned nonzero failure exit, with stdout empty.  
+    
+* **Repository posture at `main@cc754cfbce2f288b16ced5eef3d0f66a6ef5928a` (informative).** No `--a-tz` or `--b-tz` parser option, end-to-end source precedence, UTC-instant resolution, fold/gap handling, timezone-data version, or selected refusal code was found in the inspected repository. The checked-in timezone list is an unversioned five-entry identifier array, and a legacy vendor path explicitly ignores `tz`. The checked-in error map contains `ERR_READER_MISSING_TZ_A` and `ERR_READER_MISSING_TZ_B`; those implementation facts do not replace the selected order-neutral PF05 codes, and any retention, aliasing, migration, or removal remains Governance-owned. These bounded static findings establish an implementation gap, not runtime behavior.
 
   ### **Inline JSON (Speculative)**
 
@@ -175,6 +253,7 @@ Input methods for commands that compare or display charts. Titles-only pointers;
   ### **Aliases policy (inputs)**
 
 * **\[OPEN\] decision.** If input-only aliases are accepted, they must normalize via declared alias ledgers (titles-only to **HDE-Schemas & Artifacts** A1/A4/A5) and outputs remain canonical.  
+    
 * **v1 default (current):** unknown IDs **hard-fail** with a typed input error; no implicit aliases unless an explicit allow-list is adopted.
 
   ### **Validation (binary)**
@@ -182,7 +261,7 @@ Input methods for commands that compare or display charts. Titles-only pointers;
 1. **Exists/reads OK:** file present and readable.  
 2. **JSON/Schema OK:** parses as JSON and passes the owning chart schema.  
 3. **Canonical JSON OK:** UTF-8, no BOM, sorted keys, compact, one LF; arrays-as-sets deduped & ASCII.  
-4. **TZ overrides:** when used, tz flags validate as IANA zones; failure → typed input error (stderr); stdout empty.  
+4. **Timezone resolution:** for every qualifying raw-birth recalculation, validate source precedence, IANA identity, stored/derived agreement, unique place and zone, fold/gap behavior, and one resolved UTC instant; bind the selected zone, source, offset, instant, and timezone-data version to provenance. Any selected typed refusal emits one LF-terminated stderr code and leaves stdout empty.  
 5. **Streams:** on any input error, stderr carries the typed error; stdout empty.
 
 **Routing (titles-only).** Canonical JSON rules & chart schemas: **HDE-Schemas & Artifacts**. Governance tokens: **HDE-Governance** (§2.0).
@@ -193,68 +272,74 @@ Input methods for commands that compare or display charts. Titles-only pointers;
 
 ### **Success → stdout**
 
-* On **exit 0**, each command emits its **canonical success payload** to `stdout` and leaves `stderr` empty.
-
-  * For commands whose success payload is the **Reader v1 envelope** (for example, Reader HTTP endpoints, any CLI commands explicitly defined as “Reader‑on‑stdout”), that payload is the six‑key, numeric‑free Reader v1 body defined in §5.1.
-
+* On **exit 0**, each command mode emits exactly the success carrier declared by its contract to `stdout` and leaves `stderr` empty. The exhaustive carrier set is in §3.1.1.  
+    
+  * For commands whose success payload is the **Reader v1 envelope** (for example, Reader HTTP endpoints, any CLI commands explicitly defined as “Reader‑on‑stdout”), that payload is the six‑key, numeric‑free Reader v1 body defined in §5.1.  
+      
   * For commands whose success payload is **compat/admin JSON** (for example, `hdctl showcompat`), the payload is the compat JSON shape defined for that command (e.g. `{ "a": {…}, "b": {…}, "viewer_prefs": {…}, "compat": { "categories": [...], "meta": {...} } }`), not the Reader v1 envelope.
 
-* **Canonical JSON.** All JSON success payloads on stdout must be:
 
-  * UTF‑8 (no BOM),
-
-  * ASCII‑sorted keys,
-
-  * compact (no pretty printing),
-
-  * terminated by exactly **one** `\n`,
-
+* **Canonical JSON.** All JSON success payloads on stdout must be:  
+    
+  * UTF‑8 (no BOM),  
+      
+  * ASCII‑sorted keys,  
+      
+  * compact (no pretty printing),  
+      
+  * terminated by exactly **one** `\n`,  
+      
   * with arrays‑as‑sets deduped and ASCII‑sorted.
 
-* **Reader parity.**
 
-  * When a command is defined to produce **Reader v1 envelope bytes** (either on stdout or via a dedicated reader‑dump path such as `--dump-reader`), those bytes **must equal** the Reader API body for the same inputs and environment.
-
+* **Reader parity.**  
+    
+  * When a command is defined to produce **Reader v1 envelope bytes** (either on stdout or via a dedicated reader‑dump path such as `--dump-reader`), those bytes **must equal** the Reader API body for the same inputs and environment.  
+      
   * For `hdctl showcompat`, Reader parity is defined between the Reader API success body and the `--dump-reader` sidecar file, not the compat JSON stdout payload.
 
   ### **Usage & typed errors → stderr**
 
 * **Usage (exit 64).** Print a short human synopsis to `stderr`; `stdout` empty.  
+    
 * **Typed errors (non-zero; command-specific).** Print a single stderr code string token (no JSON envelope), LF-terminated; `stdout` empty. Each command must pin its non-usage failure exit code(s) and emitted stderr code strings in its command contract (see §3.4, for example §4.1.4 for `showcompat`).  
+    
 * API error JSON (`error_v1`) must use the same canonical JSON rules and single emitter as success payloads. CLI error code strings are not JSON; they MUST be deterministic, LF-terminated, and free of timestamps, UUIDs, or environment-dependent content.
 
 ### **No mixed streams**
 
-* Do **not** interleave diagnostics with public bytes.
-
-* Logs/diagnostics go to `stderr` or files; **never** into stdout payloads.
-
+* Do **not** interleave diagnostics with public bytes.  
+    
+* Logs/diagnostics go to `stderr` or files; **never** into stdout payloads.  
+    
 * No secrets/PII in logs; redact if referenced.
 
   ### **Determinism pins**
 
-* For the same inputs and flags, outputs (payload bytes, error bytes, and exit code) must be **stable** (**two-run identity**).
-
-* All JSON emitted must follow §6.1 canonicalization.
-
+* For the same inputs and flags, outputs (payload bytes, error bytes, and exit code) must be **stable** (**two-run identity**).  
+    
+* All JSON emitted must follow §6.1 canonicalization.  
+    
 * Locale/encoding pins: run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`; UTF-8 only; single LF terminator; no BOM/ANSI.
 
 ### **Validation (binary)**
 
-1. **Success (0):** `stdout ==` the command’s **canonical success payload** (byte‑for‑byte); `stderr` empty.
-
-   * For Reader‑envelope commands, the canonical success payload is the six‑key Reader v1 body (§5.1).
-
+1. **Success (0):** `stdout ==` the command mode's declared §3.1.1 carrier bytes (byte-for-byte); `stderr` empty.  
+     
+   * For Reader‑envelope commands, the canonical success payload is the six‑key Reader v1 body (§5.1).  
+       
    * For `hdctl showcompat`, the canonical success payload is compat JSON stdout (§4.1/§5.1).
 
-2. **Error/usage:** `stderr` is LF‑terminated (JSON or synopsis); `stdout` empty.
+   
 
-3. **No ANSI / no extra lines:** grep‑guards block escape sequences; exactly one trailing LF.
-
-4. 4\. **Canonical compare:** re-serialize JSON payloads and byte-compare (must match); checks run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
-
-5. **Reader parity:** for any surface that emits Reader v1 bytes (Reader HTTP \+ CLI reader‑dump surfaces), those bytes are **byte‑identical** across Reader and CLI for identical inputs/environment.
-
+2. **Error/usage:** a typed failure emits exactly one LF-terminated canonical code token on `stderr`; a usage failure emits one LF-terminated synopsis; `stdout` is empty in both cases.  
+     
+3. **No ANSI / no extra lines:** grep-guards block escape sequences; every nonempty carrier ends in exactly one LF, while governed Aux-suppressed output is exactly zero bytes.  
+     
+4. **Canonical compare:** re-serialize `canonical_json` payloads and byte-compare them (must match); validate each non-JSON carrier against its declared byte contract. Checks run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
+     
+5. **Reader parity:** for any surface that emits Reader v1 bytes (Reader HTTP \+ CLI reader‑dump surfaces), those bytes are **byte‑identical** across Reader and CLI for identical inputs/environment.  
+     
 6. **Determinism:** two‑run identity holds for both success and error paths.
 
 **Routing (titles‑only).** Canonical JSON rules and chart schemas live in **HDE‑Schemas & Artifacts**; governance tokens and A7 posture live in **HDE‑Governance**.
@@ -265,33 +350,33 @@ Exit codes are exhaustive for the public surface. Non-zero exits must not print 
 
 #### **Codes**
 
-* `0` — Success. `stdout` is a single canonical JSON value (object or array), LF-terminated; `stderr` empty.
-
-* `64` — Usage. `stderr` is a short human synopsis; `stdout` empty.
-
+* `0` — Success. `stdout` is exactly the mode's declared §3.1.1 carrier; `stderr` is empty. Ordinary machine success and file-only receipts use one LF-terminated canonical JSON value.  
+    
+* `64` — Usage. `stderr` is a short human synopsis; `stdout` empty.  
+    
 * Other non-zero exit codes are command-specific. On failure, `stderr` contains exactly one line: a single code string token, LF-terminated (no JSON envelope); `stdout` empty.
 
 #### **Global rules**
 
-1. **No mixed streams:** stdout is reserved for success payloads only; all failures write only to stderr.
-
-2. **No ANSI/no control bytes:** `stderr` MUST be plain UTF-8 text; do not emit colors, cursor codes, or progress spinners.
-
-3. **Exactly one trailing LF:** `stdout` success payloads and `stderr` error code strings must each end with exactly one LF.
-
-4. **No partial payloads:** if an error occurs after emitting some bytes, the command MUST treat that as failure and MUST NOT leave partial JSON on stdout.
+1. **No mixed streams:** stdout is reserved for success payloads only; all failures write only to stderr.  
+     
+2. **No ANSI/no control bytes:** `stderr` MUST be plain UTF-8 text; do not emit colors, cursor codes, or progress spinners.  
+     
+3. **Exactly one trailing LF:** every nonempty stdout carrier and every stderr usage synopsis or error code string must end with exactly one LF. Governed Aux-suppressed output is exactly zero bytes.  
+     
+4. **No partial carriers:** if an error occurs after emitting any stdout bytes or before required file writes complete, the command MUST treat that as failure and MUST leave stdout empty; it MUST NOT leave partial JSON, text, or a premature file receipt.
 
 #### **Validation (binary)**
 
-1. **Success:** If `exit=0`, assert `stdout` parses as JSON and round-trips byte-identically under `serializer_v1` after canonicalization and single-LF normalization; assert `stderr` empty.
-
-2. **Usage:** If `exit=64`, assert `stderr` is human text and ends with one LF; assert `stdout` empty.
-
-3. **Failure:** If `exit!=0` and `exit!=64`, assert `stdout` empty; assert `stderr` is exactly one non-empty LF-terminated line containing a single code string token.
-
-4. **Token correctness:** For failures, assert the stderr code string token is stable, numeric-free, and listed in the command contract. If the failure maps to an HTTP `error_v1`, assert the token matches the transport `error_v1.code`.
-
-5. **Determinism:** two-run identity and AB↔BA parity hold for error paths as well as success.
+1. **Success:** If `exit=0`, assert that exactly one declared §3.1.1 carrier is present and `stderr` is empty. For `canonical_json`, parse and round-trip byte-identically under the owned canonical serializer. Validate help, version, Aux narrative, and governed Aux suppression against their carrier-specific byte contracts.  
+     
+2. **Usage:** If `exit=64`, assert `stderr` is human text and ends with one LF; assert `stdout` empty.  
+     
+3. **Failure:** If `exit!=0` and `exit!=64`, assert `stdout` empty; assert `stderr` is exactly one non-empty LF-terminated line containing a single code string token.  
+     
+4. **Token correctness:** For failures, assert the stderr code string token is stable, numeric-free, and listed in the command contract. If the failure maps to an HTTP `error_v1`, assert the token matches the transport `error_v1.code`.  
+     
+5. **Determinism:** two-run identity holds for every success and error path. AB↔BA identity applies to pair-sensitive data outputs and order-neutral error codes; help and version have no party order, and Aux narrative parity follows its owning narrative and perspective contract.
 
 **Routing (titles-only).** Canonical JSON rules: HDE-Schemas & Artifacts. A7 transport rules and SAFE rails: HDE-Governance and §5.3 of this document.
 
@@ -299,22 +384,36 @@ Exit codes are exhaustive for the public surface. Non-zero exits must not print 
 
 ## **3.5 Single-emitter parity with Reader**
 
-* **One entrypoint.** CLI public bytes MUST be emitted via the byte-authoritative presenter/emitter entrypoint defined in §6.2. Wrapper envelope builders MAY exist (for example Reader v1 envelope emission), but they MUST delegate byte emission to the byte-authoritative entrypoint and MUST NOT serialize public bytes outside it. Output is UTF-8, ASCII-sorted keys, compact separators, exactly **one LF**.  
-* **No ad-hoc serialization.** Forbid `json.dumps(`, `jsonify(`, templating, or any local “mini-emitters” on public paths.  
-* **Symbol allow-list and CI guard.** Pin the allow-listed presenter/emitter emission symbol(s) as the only permitted public serializer entrypoint. CI must fail if public paths reference non-allow-listed serializer symbols or contain disallowed patterns (grep-guard). Tests must assert that CLI and Reader public bytes are emitted via the byte-authoritative entrypoint, and that any wrapper envelope builders delegate without introducing alternate serialization.  
+* **One JSON entrypoint.** Governed CLI and Reader JSON bytes MUST be emitted via the byte-authoritative presenter/emitter entrypoint defined in §6.2. Wrapper envelope builders MAY exist (for example Reader v1 envelope emission), but they MUST delegate JSON byte emission to the byte-authoritative entrypoint and MUST NOT serialize governed JSON outside it. Canonical JSON output is UTF-8, ASCII-sorted by key, compact, and terminated by exactly **one LF**. Help, version, and Aux narrative text follow their §3.1.1 carrier contracts and are not forced through JSON serialization.  
+    
+* **No ad-hoc JSON serialization.** Forbid `json.dumps(`, `jsonify(`, templating, or any local “mini-emitters” on governed JSON paths.  
+    
+* **Symbol allow-list and CI guard.** Pin the allow-listed presenter/emitter emission symbol(s) as the only permitted governed JSON serializer entrypoint. CI must fail if governed JSON paths reference non-allow-listed serializer symbols or contain disallowed patterns (grep-guard). Validation must assert that CLI and Reader governed JSON bytes are emitted via the byte-authoritative entrypoint, that wrappers delegate without alternate JSON serialization, and that the declared text carriers use only their owning byte paths.  
+    
 * **Preimage recipe.** Build the preimage as defined in **PF01** (do not restate fields here), compute `idempotence_hash`, then re-emit the final six-key body.  
-* **Determinism & parity.** A single byte-authoritative emitter ensures Reader↔CLI byte equality, **AB↔BA parity**, and **two-run identity** for identical inputs/environment.  
-* **Evidence.** Provide (1) grep-guard report, (2) import graph/reflection proof that CLI and Reader call only allow-listed emission symbols and that wrappers delegate byte emission to the byte-authoritative entrypoint, and (3) byte-compare fixtures showing CLI stdout equals Reader body. **Evidence is indexed in PF12** (records-only; titles-only).
+    
+* **Determinism & parity.** The single byte-authoritative JSON emitter ensures Reader↔CLI byte equality for Reader-v1 bytes, AB↔BA identity for pair-sensitive JSON, and two-run identity for identical inputs and environment. Every non-JSON carrier independently satisfies its owning §3.1.1 determinism and parity contract.  
+    
+* **Evidence.** Provide (1) a grep-guard report, (2) import-graph or reflection proof that every governed CLI and Reader handler calls only allow-listed emission symbols and that wrappers delegate byte emission to the byte-authoritative entrypoint, and (3) byte-compare fixtures showing that Reader-v1 bytes written by `hdctl showcompat --dump-reader <path>` equal the Reader response body. Evidence identities and paths are indexed through **HDE-Schemas & Artifacts**.
 
   ## **3.6 Determinism expectations for stdout**
 
-* **AB↔BA parity.** For identical inputs differing only by pair order, stdout bytes are identical (including the single trailing LF).  
+* **AB↔BA parity.** For pair-sensitive data outputs with identical inputs differing only by pair order, stdout bytes are identical, including the single trailing LF. Help and version have no party order; Aux narrative parity follows its owning narrative and perspective contract.  
+    
 * **Two-run identity.** Running the same command twice with the same inputs/environment produces byte-identical stdout.  
-* **Schema & shape gates.** The printed stdout payload must validate the **owning contract for that command’s stdout**:  
+    
+* **Carrier, schema & shape gates.** Stdout must validate the **owning carrier and command contract**:  
+    
   * For Reader-envelope-on-stdout surfaces (if any exist), stdout must satisfy the six-key Reader v1 covenant in §5.1.  
   * For `hdctl showcompat`, stdout must satisfy the compat JSON contract in §4.1/§5.1 and must **not** be required to match the Reader v1 six-key covenant (Reader v1 bytes are produced via the reader-dump path).  
-  *  Any contract or canonicalization violation results in a single stderr code string token (no JSON envelope) with an exit code pinned by the command contract (see §3.4); stdout must be empty on failure.    
-* **Locale/TZ pins.** All CLI tests and byte comparisons run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
+  * Any contract or canonicalization violation results in a single stderr code string token (no JSON envelope) with an exit code pinned by the command contract (see §3.4); stdout must be empty on failure.
+
+
+* **Locale/TZ pins.** All CLI byte comparisons run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`. The process `TZ=UTC` pin controls environment determinism only and MUST NOT be used as a person's birth timezone.
+
+### **Dependent reconciliation outside this selection**
+
+The §3.1.1 carrier set controls globally, but the unselected `bg:export-json` wording in §4.8 still permits empty stdout or a human synopsis for file success, and the unselected `admin-bundle` wording in §4.9 still permits a human file-success synopsis. Those command sections remain unchanged in this selection and require later in-owner reconciliation: each file-only success MUST emit a command-owned canonical JSON receipt after all required writes complete.
 
 ## **3.7 Interim “no-user” QA mode (pre-Glow prod)**
 
@@ -322,10 +421,10 @@ Exit codes are exhaustive for the public surface. Non-zero exits must not print 
 
 **Environment premise.**
 
-* No app-level user model is integrated with the HD Engine.
-
-* No persistent user-bound BodyGraph records exist in production.
-
+* No app-level user model is integrated with the HD Engine.  
+    
+* No persistent user-bound BodyGraph records exist in production.  
+    
 * We must not create app-like user records in prod ahead of Glow App integration.
 
 **Compat & Reader (`hdctl showcompat`).**
@@ -377,37 +476,40 @@ Exit codes are exhaustive for the public surface. Non-zero exits must not print 
 
 **Aux narratives (`hdctl aux-preview`).**
 
-* Drive `hdctl aux-preview` from compat JSON produced by the **birth-based** `showcompat` flow.
-
+* Drive `hdctl aux-preview` from compat JSON produced by the **birth-based** `showcompat` flow.  
+    
 * Do not rely on DB users or user-bound BodyGraph rows for Aux tests in pre-Glow prod.
 
 **BodyGraph resolver & vendor ingest (`hdctl bg:resolve`).**
 
-* In pre-Glow prod QA, treat `--user` keys as **ephemeral QA identifiers**, not stable app user IDs.
-
-* Allowed in prod:
-
-  * `bg:resolve` with `--source=db` or `--source=auto` in **stub** mode when there is no real DB behind the adapter.
-
-  * `bg:resolve --source=vendor` under **closed rails** as a typed refusal (no network I/O).
-
+* In pre-Glow prod QA, treat `--user` keys as **ephemeral QA identifiers**, not stable app user IDs.  
+    
+* Allowed in prod:  
+    
+  * `bg:resolve` with `--source=db` or `--source=auto` in **stub** mode when there is no real DB behind the adapter.  
+      
+  * `bg:resolve --source=vendor` under **closed rails** as a typed refusal (no network I/O).  
+      
   * `bg:resolve --source=vendor --dry-run` under **open rails** for a single vendor call that returns ingest metadata and does **not** write DB rows that look like app user records.
 
-* Disallowed in prod until a Glow App user model exists:
 
+* Disallowed in prod until a Glow App user model exists:  
+    
   * `bg:resolve --source=vendor --upsert` (no vendor-driven writes that appear to create user-bound BodyGraph records).
 
 **Evidence skeleton (CLI QA).**
 
-* Live QA runs that only execute the flows above are expected to be **behaviorally read-only** with respect to governed evidence.
-
+* Live QA runs that only execute the flows above are expected to be **behaviorally read-only** with respect to governed evidence.  
+    
 * Snapshot the Evidence Index and machine mirror before and after CLI QA runs; treat any mutation as a defect or unexpected side effect and remediate before closing epic-level acceptance.
 
 **Forward plan.**
 
-* A future epic, once a Glow App user model and user IDs exist, will re-run EPIC017-style QA with **real app user IDs**, exercise DB-backed `showcompat` and `bg:resolve --source=vendor --upsert` semantics in prod or stage, and close any remaining tokens that require real user-bound DB coverage (see **HDE-Phased Epics** and **Glow QA Guide** by title).
-
+* A future epic, once a Glow App user model and user IDs exist, will re-run EPIC017-style QA with **real app user IDs**, exercise DB-backed `showcompat` and `bg:resolve --source=vendor --upsert` semantics in prod or stage, and close any remaining tokens that require real user-bound DB coverage (see **HDE-Phased Epics** and **Glow QA Guide** by title).  
+    
   ---
+
+---
 
 # 4\. Commands (by status)
 
