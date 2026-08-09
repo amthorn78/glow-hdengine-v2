@@ -3,10 +3,10 @@
 ## 0.1 Header
 
 **Title:** PF04-Canon-HDE-Governance  
-**Version:** v2.7.7  
+**Version:** v2.7.8  
 **Status:** Canon  
 **Effective date:** 2026-08-09  
-**Last Update Gate:** 0808 Refresh 1  
+**Last Update Gate:** 0808 Refresh 2  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ## 0.2 Scope & boundaries \[Required-Now\]
@@ -1473,38 +1473,40 @@ SAFE rails for **vendor HTTP** are **default closed** in all environments. Openi
 
 ### **Public traffic (Reader/Aux)**
 
-* Prod public surfaces (Reader JSON success, Aux narrative) must serve requests **without** vendor HTTP.
-
-* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** asserts that public traffic in prod is **DB-backed only**; the Engine does not call vendor HTTP to satisfy public Reader/Aux requests.
-
+* Prod public surfaces (Reader JSON success, Aux narrative) must serve requests **without** vendor HTTP.  
+    
+* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** asserts that public traffic in prod is **DB-backed only**; the Engine does not call vendor HTTP to satisfy public Reader/Aux requests.  
+    
 * Any vendor-originated data used in prod public responses must arrive via prior ingest and DB, not live vendor calls.
 
 ### **Admin ops windows (vendor override)**
 
-* Ops may run vendor calls in prod.
-
-* Vendor override is driven by CLI flags.
-
-* When override is enabled:
-
-  * SAFE rails tokens in §2.0 apply:
-
-    * Bounded retry and backoff (**VENDOR\_RETRY\_BACKOFF\_OK**).
-
-    * Typed 429 handling (**PROVIDER\_429\_TYPED\_OK**).
-
-    * `Retry-After` parsing (**RETRY\_AFTER\_PARSE\_OK**).
-
+* Ops may run vendor calls in prod.  
+    
+* Vendor override is driven by CLI flags.  
+    
+* When override is enabled:  
+    
+  * SAFE rails tokens in §2.0 apply:  
+      
+    * Bounded retry and backoff (**VENDOR\_RETRY\_BACKOFF\_OK**).  
+        
+    * Typed 429 handling (**PROVIDER\_429\_TYPED\_OK**).  
+        
+    * `Retry-After` parsing (**RETRY\_AFTER\_PARSE\_OK**).  
+        
     * No payload logging (**VENDOR\_NO\_PAYLOAD\_LOGGING\_OK**, **LOGS\_KEYS\_ONLY\_OK**).
+
+    
 
   * Observability and privacy tokens (**BG\_PRIVACY\_REDACTION\_OK**, **BG\_METRICS\_EXPOSED\_OK**) remain in force.
 
 ### **Governance stance**
 
-* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** scopes to **public traffic**. It does **not** forbid admin-guarded CLI commands that call vendor in prod.
-
-* All vendor override behavior must be evidenced and indexed via artifacts governed in **HDE-Schemas and Artifacts** and **Glow QA Guide**; PF04 owns the token semantics only.
-
+* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** scopes to **public traffic**. It does **not** forbid admin-guarded CLI commands that call vendor in prod.  
+    
+* All vendor override behavior must be evidenced and indexed via artifacts governed in **HDE-Schemas and Artifacts** and **Glow QA Guide**; PF04 owns the token semantics only.  
+    
   ---
 
 ## **3.2 Refusal semantics (rails closed) \[Required-Now\]**
@@ -1512,63 +1514,67 @@ SAFE rails for **vendor HTTP** are **default closed** in all environments. Openi
 When rails are closed (i.e., `SAFE_MODE≠0` or `ALLOW_NETWORK≠1`), vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O). This applies to **all** vendor invocations, including manual or CLI requests that explicitly set `source="vendor"`; such attempts **MUST** produce a deterministic typed refusal and **MUST NOT** perform any upstream call.
 
 Headers (ops/error surface).  
- Cache-Control: `no-store` **MUST** be present.  
- Content-Type: `application/json; charset=utf-8` **MUST** be used for the refusal body.  
- No `ETag`, no `Vary`, no `Content-Encoding`.  
- Exactly one blank line between headers and body (see PF12 §8.3.1 for the refusal proof format).
+Cache-Control: `no-store` **MUST** be present.  
+Content-Type: `application/json; charset=utf-8` **MUST** be used for the refusal body.  
+No `ETag`, no `Vary`, no `Content-Encoding`.  
+Exactly one blank line between headers and body (see PF12 §8.3.1 for the refusal proof format).
 
 Body (typed, numeric-free).  
- Return a typed error explaining that vendor access is disabled (numeric-free JSON; LF-terminated). Do not echo provider payloads or headers.
+Return a typed error explaining that vendor access is disabled (numeric-free JSON; LF-terminated). Do not echo provider payloads or headers.
 
 Logs (keys-only; no secrets).  
- Logs **MUST NOT** contain API keys/tokens, request/response bodies, or header values.  
- If keys are referenced, they **MUST** be redacted (e.g., `HD-Api-Key: REDACTED`).  
- Labels remain bounded (e.g., `route`, `outcome`, `rails_state`); no PII.
+Logs **MUST NOT** contain API keys/tokens, request/response bodies, or header values.  
+If keys are referenced, they **MUST** be redacted (e.g., `HD-Api-Key: REDACTED`).  
+Labels remain bounded (e.g., `route`, `outcome`, `rails_state`); no PII.
 
 Refusal log allow-list (frozen).  
- Refusal logs are limited to the six-key set: `{ at, route, status, duration_ms, idempotence_hash, release_id }`.  
- (Do not include `retry_after_ms` here; that belongs to 429 evidence only.)
+Refusal logs are limited to the exact seven-key set: `{at, route, status, duration_ms, idempotence_hash, release_id, correlation_id}`.  
+`correlation_id` MUST be one validated, opaque, bounded, non-PII request-scoped identifier selected or generated at the Adapter boundary and propagated unchanged for that request. Missing or invalid inbound values MUST be replaced safely and MUST NOT be logged raw. The value MUST NOT enter a public or refusal body, `idempotence_hash`, `ETag`, Human Design computation, Magic-10 results, or metric labels.  
+`retry_after_ms` remains outside this refusal schema; it belongs only to 429 evidence.
+
+Current implementation posture (static).  
+The pinned repository's inspected logging paths and tests enforce six-key records and do not establish the seven-key refusal record. This remains a Required-Now implementation gap; static inspection does not establish runtime logging behavior.
 
 Deterministic shaping (optional).  
- Request shapes (endpoint, headers, body schema) may be computed without sending the request; shaping must be deterministic and order-neutral (AB↔BA).
+Request shapes (endpoint, headers, body schema) may be computed without sending the request; shaping must be deterministic and order-neutral (AB↔BA).
 
 Canonical probe route.  
- Expose a single refusal probe at `/ops/rails/refusal`:
+Expose a single refusal probe at `/ops/rails/refusal`:
 
-* `GET`/`POST` → 503 single-file capture (headers → blank line → LF-terminated JSON),
-
-* `OPTIONS` → 204 no body,
-
-* `HEAD` → 405 with `Content-Length: 0`,
-
+* `GET`/`POST` → 503 single-file capture (headers → blank line → LF-terminated JSON),  
+    
+* `OPTIONS` → 204 no body,  
+    
+* `HEAD` → 405 with `Content-Length: 0`,  
+    
 * no ETag/Vary/compression.
 
 (Evidence artifact shape lives in PF12 §8.3.1.)
 
 CI posture (must).  
- CI must prove:
+CI must prove:
 
-* No network I/O occurs under closed rails.
-
-* The typed refusal is produced with the required headers/body.
-
+* No network I/O occurs under closed rails.  
+    
+* The typed refusal is produced with the required headers/body.  
+    
 * Logs are keys-only and secret-free (no payloads/headers).
 
 Tokens (titles-only; see §2.0).  
- `NO_EXTERNAL_IO_ON_REFUSAL_OK` · `ERROR_CTYPE_JSON_UTF8_OK` · `NO_CONTENT_ENCODING_OK` · `PF04_LOG_ALLOWLIST_009_OK` · `REFUSAL_ROUTE_PINNED_OK` · `OPS_REFUSAL_FILE_FORMAT_OK` · `OPS_REFUSAL_HEADERS_OK` · `OPS_REFUSAL_BODY_OK` · `OPS_REFUSAL_MIRROR_LINK_OK`
+`NO_EXTERNAL_IO_ON_REFUSAL_OK` · `ERROR_CTYPE_JSON_UTF8_OK` · `NO_CONTENT_ENCODING_OK` · `PF04_LOG_ALLOWLIST_009_OK` · `REFUSAL_ROUTE_PINNED_OK` · `OPS_REFUSAL_FILE_FORMAT_OK` · `OPS_REFUSAL_HEADERS_OK` · `OPS_REFUSAL_BODY_OK` · `OPS_REFUSAL_MIRROR_LINK_OK`
 
 Routing (titles-only).  
- Transport matrix & writers posture: §10 of this document.  
- Evidence/mirror hygiene (same-PR, canonical JSONL, unknown-key reject, `proof_anchor`): **HDE-Schemas & Artifacts** / **Epic-Process-Guide**.  
- Infrastructure names for admin credentials/rails: **Glow Infrastructure** (names-only).
+Transport matrix & writers posture: §10 of this document.  
+Evidence/mirror hygiene (same-PR, canonical JSONL, unknown-key reject, `proof_anchor`): **HDE-Schemas & Artifacts** / **Epic-Process-Guide**.  
+Infrastructure names for admin credentials/rails: **Glow Infrastructure** (names-only).
 
 ---
 
 ## 3.3 Secrets & env validation \[Required-Now\]
 
 * **Validate against canonical env and infrastructure homes (names-only allow-list).** Before any vendor action, validate required environment keys from the canonical env and infrastructure homes (names only; secrets not printed). `ALLOW_NETWORK`, `SAFE_MODE`, and `APP_ENV` are rails-governance keys. `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` are infrastructure/vendor configuration keys, not acceptance tokens. `HDAPI_BASE_URL` is deprecated compatibility spelling only where implementation or migration evidence explicitly records it. If both `HD_API_BASE_URL` and `HDAPI_BASE_URL` are present with different values, fail closed with configuration ambiguity before network I/O. Unknown keys **must** be flagged in CI; missing required keys **must** fail at prod start.  
-   **Required (examples):** `HD_API_BASE_URL` (vendor base URL), `HD_API_KEY` (secret), `GEO_API_KEY` (secret).  
-   **Failure posture:** if rails are **open** but any required key is invalid/missing, the provider **MUST refuse** with a typed error; **do not** attempt partial requests or fallbacks.  
+  **Required (examples):** `HD_API_BASE_URL` (vendor base URL), `HD_API_KEY` (secret), `GEO_API_KEY` (secret).  
+  **Failure posture:** if rails are **open** but any required key is invalid/missing, the provider **MUST refuse** with a typed error; **do not** attempt partial requests or fallbacks.  
 * **Environment-key drift is governance-relevant when it affects rails, secrets, or evidence.** A key-name mismatch, deprecated alias, ambiguous duplicate value, or missing canonical key is a governance-relevant operational risk when it can affect rails posture, secret handling, public/private boundary, acceptance evidence, or vendor request shaping. Treat that condition as configuration drift or tooling blockage, not as a reason to invent an acceptance token.  
 * **Redaction rules (keys-only logs).** Never log secrets, request/response bodies, or header values. When secrets are referenced, print **redacted placeholders only**. Labels remain bounded; **no PII**, **no free-text** payloads.  
 * **Deterministic diagnostics.** Configuration checks and refusal messages **MUST** be deterministic and order-neutral; **no** locale/time/random dependencies (run under `LC_ALL=C`).  
@@ -1582,10 +1588,10 @@ Routing (titles-only).
 * **Pinned network policy (by title).** When open, live calls follow **pinned timeouts, retries, and backoff**; vendor error mapping is **deterministic** and **typed**; **no** payloads/secrets in logs.  
 * **Parity & idempotence remain intact.** Enabling rails **must not** change Reader↔CLI parity, **A7 conformance**, or **idempotence** proofs.  
 * **Evidence.** Provide **records-only** machine-mirror entries for:  
-   (a) **closed-rails refusal** proof,  
-   (b) **open-rails conformance** run (with redaction checks), and  
-   (c) **env-validator outputs** per environment.  
-   *(PF12 single home; same-PR updates apply.)*
+  (a) **closed-rails refusal** proof,  
+  (b) **open-rails conformance** run (with redaction checks), and  
+  (c) **env-validator outputs** per environment.  
+  *(PF12 single home; same-PR updates apply.)*
 
 **PR-specific bounded development-proof exception.** An explicitly Product Owner-authorized, PR-specific, bounded open-rails vendor development proof MAY occur inside an implementation PR only when the authorization defines the non-production or override truth, an exact request limit, a secret-safe evidence shape, a prohibition on ordinary-CI live calls, and explicit nonclaims. This exception does not create recurring authority, does not create general agent OPS authority, and does not substitute for fixture-backed deterministic proof. It does not change the classification of ordinary open-rails vendor smoke as Ops evidence or convert OPS evidence into PR or QA evidence.
 
@@ -1659,20 +1665,20 @@ Controlled vendor-backed no-user smoke evidence is implementation-validation evi
 
 ## **4.1 Classes of evidence \[Required-Now\]**
 
-What must be proved for every cut (**binary gates; no partial**). Index all artifacts in **Appendix D: Evidence Index** and keep it synchronized with repo changes. All byte-comparisons and hashes run with **LC\_ALL=C, TZ=UTC**, and **canonical JSON** (UTF-8 no BOM, ASCII-sorted keys, compact, **exactly one LF**; arrays-as-sets are deduped and ASCII-sorted).
+What must be proved for every cut (**binary gates; no partial**). Index all governed artifacts through the Human Evidence Index and Machine Evidence Mirror owned by **HDE-Schemas & Artifacts**, and keep those evidence surfaces synchronized with repo changes. All byte-comparisons and hashes run with **LC\_ALL=C, TZ=UTC**, and **canonical JSON** (UTF-8 no BOM, ASCII-sorted keys, compact, **exactly one LF**; arrays-as-sets are deduped and ASCII-sorted).
 
 ### **4.1.1 Parity — Reader↔CLI, AB↔BA, two-run**
 
-* **Reader↔CLI byte identity.** For identical inputs and environment, Reader body and CLI stdout are bit-identical (single presenter/emitter; same `idempotence_hash`; one trailing LF).  
+* **Reader↔CLI byte identity.** For identical inputs and environment, the Reader v1 HTTP body and CLI-emitted Reader v1 parity bytes captured via `--dump-reader` are bit-identical (single presenter/emitter; same `idempotence_hash`; one trailing LF). This comparison does not apply to `hdctl showcompat` stdout.  
 * **AB↔BA identity.** Swapping pair order yields bit-identical bytes (pair normalization in effect). Include AB/BA composite fingerprint cases and a byte-compare log; cover integration channel examples.  
 * **Two-run identity.** Two serializations of the same logical invocation produce bit-identical bytes.  
 * **Evidence.** Parity runs and goldens; AB/BA and two-run logs; CI byte-diff jobs; **machine-mirror** records (records-only) for each capture.  
-* **Tokens.** `CLI_READER_EMITTER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`.
+* **Tokens.** `CLI_READER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`.
 
 **Checksum sidecars (naming and optionality).**
 
-* **Showcompat parity artifacts.** The canonical checksum sidecar filename is `stdout.json.sha256` (JSON-filename-qualified). If a legacy alias is required for backward compatibility (for example `stdout.sha256`), it MUST be byte-identical to the canonical checksum sidecar and MUST NOT be the primary name used for Evidence Index bindings.
-
+* **Showcompat parity artifacts.** The canonical checksum sidecar filename is `stdout.json.sha256` (JSON-filename-qualified). If a legacy alias is required for backward compatibility (for example `stdout.sha256`), it MUST be byte-identical to the canonical checksum sidecar and MUST NOT be the primary name used for Evidence Index bindings.  
+    
 * **Identity artifacts under `audit/qa/<epic-id>/artifacts/identity/`.** `.sha256` sidecars for JSON files are optional helper artifacts unless the epic acceptance roster explicitly lists them as required. Optional checksums MUST be generated mechanically (for example `sha256sum`) and may be indexed as helper artifacts; they MUST NOT be used as gating evidence unless registered as required by acceptance canon.
 
 ### **4.1.2 Idempotence recompute — preimage → sha256 → final**
@@ -1698,7 +1704,7 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 ### **4.1.4 Rails posture — closed refusal; open conformance**
 
 **Closed rails (default).**  
- SAFE rails for vendor HTTP are **closed by default** in all environments. When rails are closed (`SAFE_MODE≠0` or `ALLOW_NETWORK≠1`):
+SAFE rails for vendor HTTP are **closed by default** in all environments. When rails are closed (`SAFE_MODE≠0` or `ALLOW_NETWORK≠1`):
 
 * Vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O).  
 * All attempts to call vendor, including explicit `source="vendor"` flows, **MUST** return a deterministic, numeric-free refusal body and **MUST NOT** perform upstream calls.  
@@ -1706,7 +1712,7 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 * Logs for refusal paths are **keys-only**, secret-free, and bounded (`route`, `outcome`, `rails_state`, etc.), with secrets redacted. (Tokens: `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`)
 
 **Open rails (controlled).**  
- Opening rails (`SAFE_MODE=0` and `ALLOW_NETWORK=1`) is an **explicit, governed action**:
+Opening rails (`SAFE_MODE=0` and `ALLOW_NETWORK=1`) is an **explicit, governed action**:
 
 * Network policy (timeouts, retries, backoff, 429 behavior) is pinned by Governance and **must** remain deterministic and keys-only in logs.  
 * Live vendor calls **must not** change Reader↔CLI parity, A7 conformance, or idempotence proofs.  
@@ -1717,11 +1723,14 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 Dev/admin-only surfaces that exercise engine internals under controlled rails (for example, CLI dev harnesses, internal/dev HTTP sampler routes, and similar tools called out in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide**) **MUST** enforce strict `APP_ENV` gating:
 
 * Allowed `APP_ENV` values for these dev/admin surfaces are exactly `{"dev","test","local"}`.  
+    
 * If `APP_ENV` is **missing**, **empty**, or any other value (including `"prod"` or any unrecognized string):  
+    
   * The surface **MUST** treat this as a **rails violation**,  
   * **MUST** fail closed with a typed, numeric-free error (for CLI) or a writer-style refusal envelope (for HTTP),  
   * **MUST NOT** assume a default (for example, treating missing/empty as `"dev"`), and  
   * **MUST NOT** perform sampler/core/vendor work on that invocation.
+
 
 * Gating behavior is part of the rails contract: tests and QA harnesses (named by title in Glow QA Guide and HDE-Build Checklist) **MUST** prove that dev/admin-only surfaces cannot be invoked successfully when `APP_ENV` is missing, empty, or outside the allowed set.
 
@@ -1772,7 +1781,7 @@ Tokens and coupling.
 * **Current release provenance.** Current release-bound derivatives belong to an external `hde.release_attestation.v1` bundle produced outside the source tree from an exact clean source commit and independently verified against that exact source.  
 * **Admission boundary.** The external CI artifact is exact-head PR evidence. It does not mint or satisfy an acceptance token, create release admission by implication, constitute a durable governed release-admission record, replace a required downstream evidence-admission action, or update PF09 or closeout status.  
 * **Historical checked-in release evidence.** Existing checked-in release evidence and companions are frozen capture-time records. They are not current runtime identity inputs or current attestations, MUST NOT be relabeled as current provenance, and MUST NOT be regenerated merely because the manifest or release ID changes.  
-* **Tokens.** `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`.
+* **Tokens.** `PACK_ROOT_PINNED_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `RELEASE_ID_FROM_MANIFEST_OK`.
 
 ### **4.1.7 Topology loader — orientation and graph invariants**
 
@@ -1781,7 +1790,7 @@ Tokens and coupling.
 * **Evidence.** Orientation demo; degree and multiplicity logs; machine-mirror entries.  
 * **Tokens.** `CATALOG_ORIENTATION_CANON_OK` (and related topology tokens in Evidence & Artifacts).
 
-**Pass criteria.** All classes pass (parity, idempotence, A7, rails, bands, pack constants/manifest, topology) with evidence listed in **Appendix D: Evidence Index** and CI gates enabled (grep-guards for ad hoc emitters; LF/encoding checks; A7 cache header and ETag/no-ETag checks).
+**Pass criteria.** All classes pass (parity, idempotence, A7, rails, bands, pack constants/manifest, topology) with evidence cataloged through the Human Evidence Index and Machine Evidence Mirror owned by **HDE-Schemas & Artifacts** and CI gates enabled (grep-guards for ad hoc emitters; LF/encoding checks; A7 cache header and ETag/no-ETag checks).
 
 ### **4.1.8 Sanity pipeline & evidence skeleton (EPIC018+)**
 
@@ -1789,61 +1798,65 @@ Tokens and coupling.
 
 **Pipeline entrypoint (normative).**
 
-* The canonical sanity entrypoint **MUST** be `python tools/evidence/run_sanity_pipeline.py`.
-
-* Before running any checks, the pipeline **MUST** assert and/or apply the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) via the determinism env helper; failures **MUST** stop the pipeline.
-
-* The pipeline **MUST** then run a fixed, ordered sequence of steps that at minimum covers:
-
-  * serializer determinism/idempotence checks (A3),
-
-  * determinism env pins verification (DETERMINISM\_ENV\_PINS\_OK),
-
-  * CLI serializer/guard checks for compat/Reader parity (A4),
-
-  * evidence index/mirror/path-proof checks and orientation/skeleton demos (PF12 evidence skeleton), and
-
+* The canonical sanity entrypoint **MUST** be `python tools/evidence/run_sanity_pipeline.py`.  
+    
+* Before running any checks, the pipeline **MUST** assert and/or apply the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) via the determinism env helper; failures **MUST** stop the pipeline.  
+    
+* The pipeline **MUST** then run a fixed, ordered sequence of steps that at minimum covers:  
+    
+  * serializer determinism/idempotence checks (A3),  
+      
+  * determinism env pins verification (DETERMINISM\_ENV\_PINS\_OK),  
+      
+  * CLI serializer/guard checks for compat/Reader parity (A4),  
+      
+  * evidence index/mirror/path-proof checks and orientation/skeleton demos (PF12 evidence skeleton), and  
+      
   * any additional invariance suites identified in **HDE-Mechanics Guide** and **Glow QA Guide** as part of D1–D4.
+
 
 * The pipeline **MUST** be fail-fast: on the first failing step, it records the failure and emits a `summary:FAIL` line, then exits with a non-zero status code.
 
 **Sanity log artifact (records-only; governed).**
 
-* The pipeline **MUST** write a canonical sanity log at `audit/gates/sanity_pipeline/sanity_pipeline.log` (+ required sibling `audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt`). The log is treated as a governed artifact with a co-located path-proof and Index/mirror entries; PF12 owns the schema, path, and mirror mapping.
-
-* The log **MUST** be stable and records-only:
-
-  * first line identifying the pipeline with the canonical header prefix `run:sanity-pipeline`,
-
-  * exactly one `env:` line describing the determinism env pins in a canonical, sorted form,
-
-  * one `check <name>:OK|FAIL` line per step, in a fixed order, and
-
+* The pipeline **MUST** write a canonical sanity log at `audit/gates/sanity_pipeline/sanity_pipeline.log` (+ required sibling `audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt`). The log is treated as a governed artifact with a co-located path-proof and Index/mirror entries; PF12 owns the schema, path, and mirror mapping.  
+    
+* The log **MUST** be stable and records-only:  
+    
+  * first line identifying the pipeline with the canonical header prefix `run:sanity-pipeline`,  
+      
+  * exactly one `env:` line describing the determinism env pins in a canonical, sorted form,  
+      
+  * one `check <name>:OK|FAIL` line per step, in a fixed order, and  
+      
   * a final `summary:PASS|FAIL` line.
+
 
 * The log **MUST NOT** include timestamps, wall-clock data, or env-dependent noise that would break determinism. It is LF-terminated and BOM-free.
 
 **Coupling to the evidence skeleton.**
 
-* A **green sanity pipeline run** asserts that:
-
-  * the determinism env pins are in place and enforced (as per §4.1.4 and `DETERMINISM_ENV_PINS_OK`), and
-
+* A **green sanity pipeline run** asserts that:  
+    
+  * the determinism env pins are in place and enforced (as per §4.1.4 and `DETERMINISM_ENV_PINS_OK`), and  
+      
   * the evidence skeleton checks (INDEX/`INDEX.sha256`/mirror/path-proofs, including the mirror self-record) succeed under closed rails.
+
 
 * PF12 remains the single home for INDEX/mirror schemas, path-proof format, and the `artifact_key` used for the sanity log; PF04 records only the policy and token coupling.
 
 **CI posture and token coupling.**
 
-* A dedicated CI job **MUST** run the sanity pipeline under the canonical closed-rails env tuple and **MUST** be merge-gating for engine releases and Epic-level gates that rely on the EPIC017 evidence skeleton.
-
-* `SANITY_PIPELINE_OK` is **satisfied** only when:
-
-  * the sanity pipeline job has completed successfully under closed rails,
-
-  * `audit/gates/sanity_pipeline/sanity_pipeline.log` and its path-proof exist and validate, and
-
+* A dedicated CI job **MUST** run the sanity pipeline under the canonical closed-rails env tuple and **MUST** be merge-gating for engine releases and Epic-level gates that rely on the EPIC017 evidence skeleton.  
+    
+* `SANITY_PIPELINE_OK` is **satisfied** only when:  
+    
+  * the sanity pipeline job has completed successfully under closed rails,  
+      
+  * `audit/gates/sanity_pipeline/sanity_pipeline.log` and its path-proof exist and validate, and  
+      
   * `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` have been updated and remain coherent in the same change (as enforced by the existing evidence tokens in §2.0.6).
+
 
 * PF19 — Glow QA Guide owns the broader QA semantics and any composite QA tokens built on top of `SANITY_PIPELINE_OK`; PF04 is the single home for the governance token and its coupling to env pins and the evidence skeleton.
 
@@ -1853,10 +1866,10 @@ Tokens and coupling.
 
 **Config generator (closed rails; titles-only).**
 
-* The canonical generator for governed config artifacts **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_config_artifacts.py` as named in HDE-Mechanics Guide).
-
-* Before writing any config artifact, the generator **MUST** enforce the canonical determinism env pins (closed-rails tuple in §2.0.10/§4.1.4): the generator and its tests run under the same closed-rails env profile used for determinism and evidence jobs.
-
+* The canonical generator for governed config artifacts **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_config_artifacts.py` as named in HDE-Mechanics Guide).  
+    
+* Before writing any config artifact, the generator **MUST** enforce the canonical determinism env pins (closed-rails tuple in §2.0.10/§4.1.4): the generator and its tests run under the same closed-rails env profile used for determinism and evidence jobs.  
+    
 * The generator **MUST** read only from the hardened registry/threshold inputs defined by Math and Mechanics (for example the registry loader and thresholds catalog) and **MUST** emit artifacts using the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF). PF12 — HDE-Schemas & Artifacts owns the schemas and specific artifact\_key mappings; PF04 records the governance policy only.
 
 ### **4.1.10 Typed FE/BE bundles (EPIC018+)**
@@ -1865,107 +1878,115 @@ Tokens and coupling.
 
 **Bundle generation (closed rails; titles-only).**
 
-* The canonical bundle generator for typed FE/BE bundles **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_bundles.py`, with implementation owned by **HDE-Mechanics Guide**).
-
-* Before building any bundle, the generator **MUST** enforce the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) as described in §2.0.10 / §4.1.4.
-
-* The generator **MUST** derive bundle content **only** from the governed config artifacts and registry loader defined by EPIC018 D5:
-
-  * the registry report snapshot,
-
-  * the Magic-10 config artifact, and
-
+* The canonical bundle generator for typed FE/BE bundles **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_bundles.py`, with implementation owned by **HDE-Mechanics Guide**).  
+    
+* Before building any bundle, the generator **MUST** enforce the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) as described in §2.0.10 / §4.1.4.  
+    
+* The generator **MUST** derive bundle content **only** from the governed config artifacts and registry loader defined by EPIC018 D5:  
+    
+  * the registry report snapshot,  
+      
+  * the Magic-10 config artifact, and  
+      
   * the band-edges config artifact,
 
-* with structure and schema owned by **HDE-Schemas & Artifacts** and **HDE-Mechanics Guide** (titles-only). Bundles **must not** introduce new configuration sources or ad-hoc inputs.
 
+* with structure and schema owned by **HDE-Schemas & Artifacts** and **HDE-Mechanics Guide** (titles-only). Bundles **must not** introduce new configuration sources or ad-hoc inputs.  
+    
 * Bundles **MUST** be emitted via the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF). Two runs with identical inputs and env pins **MUST** produce byte-identical bundles (two-run identity).
 
 **Governed bundle artifacts (records-only; titles/paths only).**
 
-* The frontend and backend bundles are treated as governed artifacts (for example: `artifacts/config_bundles/fe_bundle.json` and `artifacts/config_bundles/be_bundle.json`, with exact paths and `artifact_key` mappings defined in **HDE-Schemas & Artifacts**).
-
+* The frontend and backend bundles are treated as governed artifacts (for example: `artifacts/config_bundles/fe_bundle.json` and `artifacts/config_bundles/be_bundle.json`, with exact paths and `artifact_key` mappings defined in **HDE-Schemas & Artifacts**).  
+    
 * Each bundle **MUST** have a co-located `*.path_proof.txt` file and **MUST** appear in both `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` with reserved `artifact_key` values, maintained exclusively by the canonical bundle generator and the evidence index updater under closed rails. Manual edits to bundle bytes, path-proofs, or mirror records are a governance violation and are expected to fail the evidence and config-bundle tokens in §2.0.6 and §2.0.16.
 
 **Sources linkage (config → bundle).**
 
-* Each bundle **MUST** carry a “sources” block (or equivalent structure defined by **HDE-Schemas & Artifacts**) that records, for each upstream governed config artifact used to build the bundle:
-
-  * the `artifact_key` of the source,
-
-  * the `path` within the repo, and
-
+* Each bundle **MUST** carry a “sources” block (or equivalent structure defined by **HDE-Schemas & Artifacts**) that records, for each upstream governed config artifact used to build the bundle:  
+    
+  * the `artifact_key` of the source,  
+      
+  * the `path` within the repo, and  
+      
   * the `sha256` and `size_bytes` of the source artifact.
 
-* Validation tests (named in **Glow QA Guide** and **HDE-Build Checklist**) **MUST** assert that:
 
-  * the paths, hashes, and sizes in the bundle’s sources block exactly match the current governed config artifacts and the Evidence Index/mirror, and
-
+* Validation tests (named in **Glow QA Guide** and **HDE-Build Checklist**) **MUST** assert that:  
+    
+  * the paths, hashes, and sizes in the bundle’s sources block exactly match the current governed config artifacts and the Evidence Index/mirror, and  
+      
   * frontend/backend bundle contents for Magic-10 and band-edges agree with the underlying config artifacts (no drift).
 
 **Coupling to tokens and skeleton.**
 
-* `CONFIG_BUNDLES_DETERMINISTIC_OK` (see §2.0.16) is **satisfied** only when:
-
-  * the FE/BE bundles are generated under closed rails by the canonical bundle generator,
-
-  * FE/BE bundle artifacts and their path-proofs are present and coherent in the Evidence Index and mirror,
-
-  * bundle bytes are canonical JSON and pass two-run identity checks, and
-
+* `CONFIG_BUNDLES_DETERMINISTIC_OK` (see §2.0.16) is **satisfied** only when:  
+    
+  * the FE/BE bundles are generated under closed rails by the canonical bundle generator,  
+      
+  * FE/BE bundle artifacts and their path-proofs are present and coherent in the Evidence Index and mirror,  
+      
+  * bundle bytes are canonical JSON and pass two-run identity checks, and  
+      
   * the sources block in each bundle correctly links to the current governed config artifacts and registry report (no dangling or mismatched references).
+
 
 * The existing evidence and indexing tokens in §2.0.6 (including `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, and `CI_CHECK_MIRROR_SCHEMA_OK`) continue to govern the skeleton as a whole. This class adds bundle-specific constraints that ensure typed FE/BE bundles are **deterministic, closed-rails projections** of governed config artifacts and are always accompanied by up-to-date skeleton evidence.
 
 **Governed config artifacts (records-only; titles/paths only).**
 
-* The following config artifacts are treated as governed members of the evidence skeleton (names-only; PF12 owns exact schemas/paths):
-
-  * the registry report (for example `artifacts/registry/registry_report.json`),
-
-  * the Magic-10 config artifact (for example `artifacts/thresholds/magic10_config.json`), and
-
+* The following config artifacts are treated as governed members of the evidence skeleton (names-only; PF12 owns exact schemas/paths):  
+    
+  * the registry report (for example `artifacts/registry/registry_report.json`),  
+      
+  * the Magic-10 config artifact (for example `artifacts/thresholds/magic10_config.json`), and  
+      
   * the band-edges config artifact (for example `artifacts/thresholds/band_edges.json`).
+
 
 * Each governed config artifact **MUST** have a co-located `*.path_proof.txt` and **MUST** appear in both `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` with a reserved `artifact_key`, maintained exclusively by the canonical generators/writers (config generator and evidence index updater) under closed rails. Manual edits to these artifacts, their path-proofs, or their mirror records are a governance violation and are expected to fail the evidence tokens in §2.0.6 and the config tokens in §2.0.15.
 
 **EPIC-018 config acceptance map (records-only; titles/paths only).**
 
-* The EPIC-018 config acceptance map (for example `audit/EPIC-018_config_acceptance_map.json`) is a governed artifact that ties PF09 config tasks (e.g. HDE-CALC004/HDE-CALC004.3/HDE-CALC004.7) to:
-
-  * specific `artifact_key` values for the registry report and config artifacts,
-
-  * config tokens (including `CONFIG_REGISTRY_OK` and `CONFIG_MAGIC10_OK`), and
-
+* The EPIC-018 config acceptance map (for example `audit/EPIC-018_config_acceptance_map.json`) is a governed artifact that ties PF09 config tasks (e.g. HDE-CALC004/HDE-CALC004.3/HDE-CALC004.7) to:  
+    
+  * specific `artifact_key` values for the registry report and config artifacts,  
+      
+  * config tokens (including `CONFIG_REGISTRY_OK` and `CONFIG_MAGIC10_OK`), and  
+      
   * the tests or harnesses that back those tokens.
 
-* The acceptance map **MUST** be canonical JSON (UTF-8, no BOM; sorted keys; compact separators; exactly one trailing LF), and validation tests **MUST** assert that:
 
-  * every task ID in the map is a known PF09 config task,
-
-  * every `artifact_key` in the map exists in `docs/evidence/INDEX.json` and in the machine mirror, and
-
+* The acceptance map **MUST** be canonical JSON (UTF-8, no BOM; sorted keys; compact separators; exactly one trailing LF), and validation tests **MUST** assert that:  
+    
+  * every task ID in the map is a known PF09 config task,  
+      
+  * every `artifact_key` in the map exists in `docs/evidence/INDEX.json` and in the machine mirror, and  
+      
   * every test reference in the map corresponds to a real test file (and optional node) in the repo.
+
 
 * As with other governed evidence, the acceptance map and its path-proof **MUST** be added to the human Evidence Index, hash sentinel, and machine mirror in the same change that updates them.
 
 **Coupling to tokens and skeleton.**
 
-* `CONFIG_REGISTRY_OK` is **satisfied** only when:
-
-  * the registry report has been generated under closed rails by the canonical config generator,
-
-  * the registry report artifact, its path-proof, and its Index/mirror entries are present and coherent, and
-
+* `CONFIG_REGISTRY_OK` is **satisfied** only when:  
+    
+  * the registry report has been generated under closed rails by the canonical config generator,  
+      
+  * the registry report artifact, its path-proof, and its Index/mirror entries are present and coherent, and  
+      
   * the EPIC-018 config acceptance map links the registry report’s `artifact_key` to this token and to the associated tests without dangling references.
 
-* `CONFIG_MAGIC10_OK` is **satisfied** only when:
 
-  * the Magic-10 and band-edges config artifacts have been generated under closed rails and serialized canonically from the math/threshold inputs,
-
-  * these artifacts and their path-proofs are present and correctly indexed in the Evidence Index and mirror, and
-
+* `CONFIG_MAGIC10_OK` is **satisfied** only when:  
+    
+  * the Magic-10 and band-edges config artifacts have been generated under closed rails and serialized canonically from the math/threshold inputs,  
+      
+  * these artifacts and their path-proofs are present and correctly indexed in the Evidence Index and mirror, and  
+      
   * the EPIC-018 config acceptance map ties the relevant PF09 config tasks to these artifacts, this token, and the backing tests with no broken links.
+
 
 * The existing evidence and indexing tokens in §2.0.6 (including `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, and `CI_CHECK_MIRROR_SCHEMA_OK`) continue to govern the skeleton as a whole; this class adds **config-specific** constraints on how governed config artifacts and the acceptance map participate in that skeleton.
 
@@ -1973,35 +1994,11 @@ Tokens and coupling.
 
 ## **4.2 Evidence index rule \[Required-Now\]**
 
-### **4.2.1 Synchronized updates (MUST)**
+### **4.2.1 Evidence-index governance**
 
-Whenever any golden, artifact, or script changes, **Appendix D: Evidence Index (human)** and the **machine JSONL mirror** **must** be updated in the **same change**; the Change Log / Doc-Delta must reference the updated items.
+Whenever a governed artifact changes, the Human Evidence Index, its hash sentinel, the Machine Evidence Mirror, and required path proofs must be updated coherently in the same change. Their canonical paths, schemas, field sets, ordering, parity, and artifact catalog live in **HDE-Schemas & Artifacts**.
 
-### **4.2.2 Single homes and format**
-
-* **Human Index (this doc).** Lives in **Appendix D: Evidence Index**. Canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact, **exactly one LF**; arrays-as-sets deduped & ASCII-sorted. Allowed fields per entry: `title` (string), `path` (repo-relative POSIX), optional `sha256` (lowercase 64-hex), optional `size` (bytes). Constraints: `{title, path}` pair is unique; path must be repo-relative, must not be absolute, must not contain `..` segments or duplicate slashes, and must not end with a slash.  
-* **Machine mirror (single home in Evidence & Artifacts).** Fixed repo path **`artifacts/evidence_index.jsonl`** with a **records-only JSONL** schema. Each record includes: `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor` (transcript reference \+ on-disk stat). Records are canonical JSON objects (sorted keys, compact), **one per line**, **LF-terminated**.
-
-**Mirror discipline (merge-blocking).**
-
-* **Unknown-key rejection**: CI fails on unknown/missing fields.  
-* **ASCII field order** in each record: `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`.  
-* **Sort-before-write** by (`artifact_key`, `discovered_physical_path`).  
-* **Join rule:** `artifact_key` \== human Index title; `discovered_physical_path` \== human Index path.  
-* **Path-proof equality:** `proof_anchor` **must equal** the discovered path proof stored alongside the artifact (per-dir `path_proof.txt`).  
-* **Single mirror file:** exactly one `artifacts/evidence_index.jsonl` must exist.
-
-### **4.2.3 Parity rule (CI-enforced)**
-
-Human ↔ machine entries **must be 1:1**. CI fails on count or content mismatch, missing files, stale `sha256/size` (when present), or schema violations.
-
-### **4.2.4 Titles and paths only (human index)**
-
-The human Index lists **titles and repository paths only**; no payload bytes or inline data.
-
-### **4.2.5 Single source of truth**
-
-**Appendix D** is the authoritative map for parity, idempotence, A7, rails, bands, topology, and pack/evidence artifacts. CI reads the Index \+ mirror to locate fixtures and scripts and fails if required entries are missing or stale.
+Appendix D is an informative routing aid only. It is not the Human Evidence Index, a schema home, or an authoritative artifact catalog.
 
 ### **4.2.6 Tokens**
 
@@ -2039,18 +2036,18 @@ See **§2.0 Acceptance Tokens**: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MI
 
 **Scoped closure lanes (bounded remediation; truthful CI).**
 
-* When a bounded remediation or cleanup PR has already restored its approved in-scope net diff, but a residual merge-gating check outside that slice still blocks closure, CI MAY add a dedicated scoped closure lane that proves only the in-scope slice.
-
-* A scoped closure lane is additive only. It MUST NOT narrow, replace, or weaken the main lane that preserves repo-wide safeguards, fail-closed coverage, and global evidence validation.
-
-* If the main lane previously executed full-module or guard coverage, the final shipped posture MUST preserve that coverage in the main lane. The scoped lane MAY prove only the bounded slice, but it MUST NOT become the sole lane carrying global truthfulness checks.
-
-* A scoped closure lane MUST keep the net effective change-set scope-clean. It MUST NOT resolve a residual blocker by introducing governed artifact churn or state changes from an adjacent surface outside the bounded slice.
-
-* Final validation posture for such a remediation requires both:
-
-  * the scoped closure lane proves the bounded slice, and
-
+* When a bounded remediation or cleanup PR has already restored its approved in-scope net diff, but a residual merge-gating check outside that slice still blocks closure, CI MAY add a dedicated scoped closure lane that proves only the in-scope slice.  
+    
+* A scoped closure lane is additive only. It MUST NOT narrow, replace, or weaken the main lane that preserves repo-wide safeguards, fail-closed coverage, and global evidence validation.  
+    
+* If the main lane previously executed full-module or guard coverage, the final shipped posture MUST preserve that coverage in the main lane. The scoped lane MAY prove only the bounded slice, but it MUST NOT become the sole lane carrying global truthfulness checks.  
+    
+* A scoped closure lane MUST keep the net effective change-set scope-clean. It MUST NOT resolve a residual blocker by introducing governed artifact churn or state changes from an adjacent surface outside the bounded slice.  
+    
+* Final validation posture for such a remediation requires both:  
+    
+  * the scoped closure lane proves the bounded slice, and  
+      
   * the preserved main lane remains green on the repo-wide safeguards that were in force before the scoped split.
 
 ### **4.3.5 A7 transport checks (Catalog success endpoint)**
@@ -2097,13 +2094,13 @@ This ties the EPIC017 env rule into the existing CI “pin and enforce env varia
 **Canonical manifest (construction)**
 
 * **Top-level fields (required).** A single JSON object with:  
-   `root: "catalog/"`, `version` (pack semver), `built_at_utc` (UTC ISO-8601 with `Z`), and  
-   `files: [{path, sha256, size}]`. Do not self-list the manifest.  
+  `root: "catalog/"`, `version` (pack semver), `built_at_utc` (UTC ISO-8601 with `Z`), and  
+  `files: [{path, sha256, size}]`. Do not self-list the manifest.  
 * **Enumerate frozen math inputs (titles and paths only).** List every governed math artifact used by the engine: closed category set and order, band maxima (inclusive-high), topology catalogs (centers, gates, channels), **Motor→Throat sets** (and other denominators where applicable), preset catalog (if used), constants pack (limits, thresholds, resonance inputs as applicable), and any other normative math tables referenced by this governance. Transport and ops bytes are not part of the pack.  
 * **Per-entry identity.** For each entry compute `sha256(canonical_bytes(entry))` and record:  
-   `path` (repo-relative POSIX path under `catalog/`), `sha256` (lowercase 64-hex), `size` (integer byte length of the same canonical bytes).  
+  `path` (repo-relative POSIX path under `catalog/`), `sha256` (lowercase 64-hex), `size` (integer byte length of the same canonical bytes).  
 * **Canonical storage and hashing.** The manifest itself is stored canonically (see **Evidence & Artifacts**): UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted. Compute  
-   `release_id = sha256(canonical_bytes("catalog/manifest.json"))`. All jobs run with `LC_ALL=C` and `TZ=UTC`.
+  `release_id = sha256(canonical_bytes("catalog/manifest.json"))`. All jobs run with `LC_ALL=C` and `TZ=UTC`.
 
 **Single tracked release-identity source and acyclic evidence semantics.**
 
@@ -2132,73 +2129,100 @@ This ties the EPIC017 env rule into the existing CI “pin and enforce env varia
 * **Closure.** Every math input referenced at runtime resolves to an entry in `files[]`. No missing or ad hoc sources.  
 * **No self-listing.** The manifest does not list itself.
 
-**Tokens:** see §2.0: `RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `PACK_ROOT_PINNED_OK`, `JSON_CANONICAL_CHECK_OK`.
+**Tokens:** see §2.0: `RELEASE_ID_FROM_MANIFEST_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`, `PACK_ROOT_PINNED_OK`, `JSON_CANONICAL_CHECK_OK`.
 
 ---
 
-## **5.2 Pointer-flip and rollback \[Required-Now\]**
+## **5.2 Immutable packaged-release promotion and rollback \[Required-Now\]**
 
-**Purpose (normative).** Provide a deterministic, auditable procedure to promote a frozen math pack to production and to revert safely if acceptance signals fail. **Promotion is a pointer change** in configuration, not a code edit. The active pack is identified **solely** by its `release_id` (§5.1).
+**Purpose (normative).** Provide a deterministic, auditable procedure to promote one immutable packaged release containing the application and the exact manifest-bound frozen inputs it uses, and to revert safely if acceptance signals fail. The deployment platform selects an exact immutable artifact reference or digest; runtime derives `release_id` from the artifact's embedded canonical manifest. No separate active-pack selector or mutable pack pointer is authoritative.
 
-### **5.2.1 Promotion (pointer-flip) — required steps**
+### **5.2.1 Identity and ownership boundary**
 
-1. **Freeze and tag.**  
-    • Build the **canonical manifest**; compute and record the `release_id` (64-hex).  
-    • Attach the manifest and `release_id` to the Change Log / Doc-Delta (titles & repo-relative paths only).
+| Concept | Governing rule | Authoritative home |
+| :---- | :---- | :---- |
+| Canonical manifest | The sole tracked release-identity input is `catalog/manifest.json`. | **HDE-Schemas & Artifacts** for manifest shape; §5.1 for release policy. |
+| `release_id` | The lowercase 64-hex SHA-256 derived at runtime from the packaged canonical manifest. It is not a deployment selector, environment override, or second artifact locator. | §5.1. |
+| Packaged release | One immutable deployable unit containing the application and the exact manifest-bound frozen inputs it uses. | Build and release implementation governed by this policy. |
+| Deployment record | The platform fact that identifies which immutable packaged release is active in an environment. It records the artifact identity and derived `release_id` separately and does not create release identity. | Provider-specific name and location in **Glow Infrastructure**. |
+| External attestation | A release-bound proof derived after source and package stabilization. It is not a runtime input or selector. | The manifest-derived external-attestation model governed by §5.1. |
 
-2. **Staging verification (A-gates).**  
-    • Prove **A3 determinism** (preimage re-check per **PF-01**, AB↔BA, two-run).  
-    • Prove **A4 Reader↔CLI parity** on staging fixtures (single presenter).  
-    • Prove **A7 transport** on a **PF-05 Endpoint Catalog (success JSON)** route: **ETag on 200**, **HEAD parity including `Content-Type`**, **304 omits `Content-Type`**.  
-    • Record artifacts in the **human Index** and **machine JSONL mirror** (records-only, path-agnostic, with path-proofs).
+The deployment artifact and `release_id` remain separate because a code-only change outside the manifest's frozen-input membership can produce a new application artifact without changing the mathematical `release_id`. Operators select and roll back by exact artifact identity, then verify the manifest-derived `release_id` inside that artifact. Selecting by `release_id` alone could select the wrong application build even when the math pack is unchanged.
 
-3. **Canary (optional, recommended).**  
-    • Flip the pack pointer to the new `release_id` for a **bounded, time-boxed** canary.  
-    • Monitor keys-only metrics for regressions in **parity**, **preimage pass rate**, **A7 invariants**, and **typed error mix**.
+If an operator-supplied expected release ID is retained for deployment verification, it is an assertion only. Runtime MUST derive the actual value from the packaged manifest and fail closed on mismatch. An environment value MUST NOT supply, replace, or override release identity. HDE Governance owns promotion, rollback, release-acceptance, and failure policy. **Glow Infrastructure** records provider-specific artifact and deployment names, locations, and bindings without becoming a second policy or identity source.
 
-4. **Production flip.**  
-    • Update the **single pointer** selecting the active pack to the new `release_id`.  
-    • Do **not** modify code, schemas, or runtime knobs during the flip; only the **pack pointer** changes.
+**Current implementation posture (static).** The pinned repository contains manifest-derived release-identity logic, but static inspection does not establish immutable build-once promotion of the same artifact or exact-artifact rollback. This deployment mechanism remains Required-Now; static inspection does not establish deployment or runtime state.
 
-5. **Post-flip evidence.**  
-    • On live traffic or representative fixtures, **re-prove A3, A4, A7** and capture header snapshots (titles only).  
-    • Update **Appendix D** and the **machine mirror** **in the same change**.
+### **5.2.2 Promotion — required steps**
 
-### **5.2.2 Rollback — required steps**
+1. **Stabilize source and cut identity.**  
+   • Stabilize tracked source, intentionally build the **canonical manifest** once, and compute and record its 64-hex `release_id`.  
+   • Attach the manifest and `release_id` to the Change Log / Doc-Delta using titles and repo-relative paths only.  
+     
+2. **Build and bind one immutable artifact.**  
+   • Build one immutable deployment artifact from the stabilized source and embedded manifest.  
+   • Bind the source commit, artifact reference or digest, packaged-manifest digest, and derived `release_id` in release metadata or external attestation. No identifier may silently substitute for another.  
+     
+3. **Verify that exact artifact in staging.**  
+   • Prove **A3 determinism**: preimage re-check per **PF-01**, AB↔BA identity, and two-run identity.  
+   • Prove **A4 Reader↔CLI parity** on staging fixtures through the single presenter.  
+   • Prove **A7 transport** on a **PF-05 Endpoint Catalog (success JSON)** route: `ETag` on 200, HEAD parity including `Content-Type`, and 304 omitting `Content-Type`.  
+   • Record the governed artifacts in the Human Evidence Index and Machine Evidence Mirror, including required path proofs, under **HDE-Schemas & Artifacts** governance. A staging rebuild is not the production candidate.  
+     
+4. **Deploy a bounded canary when used.**  
+   • Canary deployment is optional and recommended. Deploy complete instances of the candidate artifact to a bounded, time-boxed traffic slice.  
+   • Each request MUST execute entirely against one complete release. A request, worker, or process MUST NOT combine old code with new math inputs or new code with an old manifest.  
+   • Monitor keys-only metrics for regressions in parity, preimage pass rate, A7 invariants, and typed error mix.  
+     
+5. **Promote the validated artifact to production.**  
+   • Promote the same artifact bytes or the same content-addressed artifact digest validated in staging.  
+   • Promotion MUST NOT rebuild from a branch, tag, unlocked dependency set, or mutable workspace and MUST NOT modify code, schemas, runtime knobs, or manifest bytes during promotion.  
+     
+6. **Capture post-promotion evidence.**  
+   • On live traffic or representative fixtures, re-prove A3, A4, and A7 and capture header snapshots by title only.  
+   • Record the active deployment artifact identity and its manifest-derived `release_id` as separate fields. The deployment record observes the release; it does not create release identity.  
+   • Update the Human Evidence Index, hash sentinel, Machine Evidence Mirror, and required path proofs coherently in the same change.
 
-1. **Trigger conditions (any one is sufficient).**  
-    • Parity failure (Reader↔CLI mismatch), **AB↔BA** or **two-run** failure, or **preimage/idempotence** mismatch.  
-    • **A7 violation** (missing/incorrect `ETag`, 304 without prior 200, **HEAD parity mismatch**, **304 with `Content-Type`**).  
-    • Elevated **typed failures** attributable to the pack.
+### **5.2.3 Rollback — required steps**
 
-2. **Immediate action.**  
-    • Flip the pack pointer back to the **previous `release_id`** (last known good).  
-    • Do **not** change code or hot-patch the emitter; only revert the pointer.
+1. **Trigger conditions; any one is sufficient.**  
+   • Reader↔CLI parity failure, AB↔BA or two-run failure, or preimage/idempotence mismatch.  
+   • A7 violation, including a missing or incorrect `ETag`, a 304 without a prior 200, HEAD parity mismatch, or a 304 carrying `Content-Type`.  
+   • Elevated typed failures attributable to the candidate release.  
+     
+2. **Select the exact last-known-good artifact.**  
+   • Use the immutable artifact reference recorded during its successful promotion.  
+   • If the exact prior artifact is unavailable, there is no proven rollback. Stop promotion and treat rollback readiness as failed. A source checkout, branch name, Git tag, or fresh rebuild is not an equivalent substitute.  
+     
+3. **Redeploy without mutation.**  
+   • Redeploy the exact last-known-good artifact without rebuilding it, editing code, changing the manifest, changing runtime knobs to simulate old behavior, swapping a data pack inside a running release, or hot-patching the emitter.  
+     
+4. **Verify restored identity and behavior.**  
+   • Verify that runtime derives the last-known-good `release_id` from the redeployed package and that the reported identity matches the deployment record.  
+   • Re-run the applicable A3, A4, and A7 checks. Confirm that public bodies and validators match the last-known-good release and that identity bytes and `ETag` values reflect the restored artifact.  
+     
+5. **Record and investigate.**  
+   • Record the rollback in the Change Log with a one-line reason, time, prior and restored artifact identities, and the corresponding `release_id` values.  
+   • Preserve the failed candidate for investigation; do not mutate it in place or relabel it as the prior release. Open an investigation item linked to the failing evidence and do not re-promote until fixed.
 
-3. **Drift checks.**  
-    • Confirm that **public bodies and validators** now match the last known good (A3, A4, A7 **pass**).  
-    • Verify caches reflect the rollback: identity bytes and therefore `ETag`s revert to prior values.
+### **5.2.4 Guardrails (normative)**
 
-4. **Evidence and follow-up.**  
-    • Record the rollback in the Change Log (one-line reason, time, `release_id→release_id`).  
-    • Open an investigation item with links to failing evidence; **do not** re-promote until fixed.
+* **Immutability.** A published packaged release and its embedded manifest are immutable. Any math or frozen-input change produces a new `release_id` (§5.1); any application-artifact change produces a new artifact identity. No in-place edits.  
+* **Single release-identity source.** Runtime derives `release_id` from the packaged canonical manifest. No separate active-pack selector, mutable pack pointer, release-identity environment value, deployment record, or external attestation may act as a second identity source.  
+* **Exact-artifact selection.** Promotion and rollback select an immutable artifact reference or digest. A branch, tag, mutable workspace, or `release_id` alone is insufficient.  
+* **No mixed releases.** Never serve a request from mixed application and manifest inputs. Canary scopes MUST remain bounded and time-boxed, and each instance MUST run one complete release.  
+* **No in-process substitution.** Do not swap packs inside a running release, rebuild during promotion or rollback, or hot-patch a candidate or last-known-good artifact.  
+* **Keys-only ops.** Release, canary, and rollback logs contain no payloads or secrets. Labels remain bounded, including route, outcome, and `rails_state`.  
+* **Evidence first.** A promotion or rollback is incomplete until the Human Evidence Index, hash sentinel, Machine Evidence Mirror, and required path proofs are updated coherently in the same change and CI gates pass for parity, idempotence, A7, mirror parity, and path-proof validation.  
+* **Artifact retention.** Promotion MUST NOT begin unless the exact candidate and last-known-good artifacts are retained and addressable for the required promotion and rollback actions.
 
-### **5.2.3 Guardrails (normative)**
+### **5.2.5 Binary acceptance (pass or fail)**
 
-* **Immutability.** A published pack is **immutable**. Any math or input change produces a new `release_id` (§5.1). No in-place edits.  
-* **Single source of identity.** The active pack in any environment is identified **only** by the pointer’s `release_id`. Do not infer from tags or branches.  
-* **No mixed packs.** Never serve mixed results from multiple packs in the same environment. Canaries must be scoped and time-boxed.  
-* **Keys-only ops.** Release, canary, and rollback logs contain **no payloads or secrets**. Labels are bounded (route, outcome, `rails_state`).  
-* **Evidence first.** A promotion or rollback is **incomplete** until the **human Index \+ machine mirror** are updated **in the same change** and CI gates pass (parity, idempotence, A7 tokens, **mirror parity & path-proof validation**).
+A promotion is **Accepted** only if the exact validated artifact is promoted without rebuild, its deployment artifact identity and manifest-derived `release_id` are recorded separately, A3, A4, and A7 pass on staging and production, and the governed evidence surfaces and CI checks pass.
 
-### **5.2.4 Binary acceptance (pass or fail)**
+A rollback is **Accepted** only if the exact recorded last-known-good artifact is redeployed without rebuild, its manifest-derived `release_id` and deployment identity are verified, the applicable A3, A4, and A7 checks pass, and the governed evidence surfaces and CI checks pass.
 
-A pointer-flip or rollback is **Accepted** only if, after the change:
-
-* **A3, A4, A7** gates **pass** on the active environment (staging then production).  
-* The **Evidence Index (human) and machine mirror** are updated and CI passes (**parity, preimage re-check, A7 tokens, grep-guards, mirror parity & path proofs**).
-
-Otherwise, the change is **Rejected** and must be rolled back to the **last known-good `release_id`**.
+Otherwise the change is **Rejected**. If the exact last-known-good artifact is available, redeploy it. If it is unavailable, stop and record rollback readiness as failed; do not claim that rollback occurred.
 
 # **6\. Operations & SLOs \[Required-Now\]**
 
