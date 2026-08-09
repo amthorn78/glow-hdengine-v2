@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
-**Version:** v2.4.1
+**Version:** v2.4.2
 
 **Status:** Canon  
 **Effective date:** 2026-08-09
 
-**Last Update Gate:** 0808 refresh 1
+**Last Update Gate:** 0808 refresh 2
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -702,106 +702,126 @@ Even where PF02 introduces concrete flows (BodyGraph lifecycle, compat request f
 
 This section names runtime surfaces and their responsibilities. It remains **contract-free**. Any payload shapes, header matrices, status codes, conditional delivery behaviour, or CLI/Reader specifics are routed by title to:
 
-* **HDE-CLI-API-Vendor-Ref** (public envelope, request/response shapes, CLI/Reader semantics)
-
-* **HDE-Governance** (A7 validators, evidence posture, transport acceptance, ops signals)
-
+* **HDE-CLI-API-Vendor-Ref** (public envelope, request/response shapes, CLI/Reader semantics)  
+    
+* **HDE-Governance** (A7 validators, evidence posture, transport acceptance, ops signals)  
+    
 * **HDE-Schemas & Artifacts** (canonical JSON policy, pack/manifest, machine Evidence Index schema and parity)
 
 Titles only; **no bytes restated here**.
 
 ---
 
-## **3.1 Compat v1 \[Implemented\]**
+## **3.1 Compat v1**
 
-**Role & purpose.**  
- `/api/compat/v1` is the adapter’s compatibility surface. It calls the Engine in-proc and returns the public compatibility envelope emitted by the single canonical Presenter emitter. It does **not** expose internals or narratives.
+**Role & purpose \[Required-Now\].**  
+`/api/compat/v1` is the adapter’s compatibility surface. It calls the Engine in-proc and returns the public compatibility envelope emitted by the single canonical Presenter emitter. It does **not** expose internals or narratives.
 
-**Validation (high level).**
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected application factory registers the compat blueprint. The checked-in GET handler returns a JSON success body, while the POST handler invokes compatibility computation and sends its result through the shared public emitter.
 
-* **GET (probe-only):** health-only probing. It MUST NOT compute compat and MUST NOT include a JSON body.
+**Validation (high level) \[Required-Now\].**
 
-* **POST (compute; internal/admin):** the only method that computes compat. Expects a valid pair definition and viewer preferences that are:
-
-  * well-formed
-
-  * complete (all ten Magic-10 keys)
-
+* **GET (probe-only):** health-only probing. It MUST NOT compute compat and MUST NOT include a JSON body.  
+    
+* **POST (compute; internal/admin):** the only method that computes compat. Expects a valid pair definition and viewer preferences that are:  
+    
+  * well-formed  
+      
+  * complete (all ten Magic-10 keys)  
+      
   * within allowed ranges
 
+
 * **Endpoint Catalog binding (high level):** the Endpoint Catalog entry for `/api/compat/v1` binds the POST compute surface and MUST include a non-empty env gate field. Env-gate proof is headers-only.  
+    
 * Malformed or incomplete inputs are rejected. (Detailed shapes live in **HDE-CLI-API-Vendor-Ref**.)
 
-**Viewer-preference normalization handoff (high level).**
+**Current repository discrepancy.**  
+The checked-in GET handler emits `{"ok":true,"schema":"v1"}` through the JSON writer path, which conflicts with the required bodyless health-only probe.
+
+**Static inspection cannot establish.**  
+Static repository bytes do not establish whether the GET handler is runtime-reachable in any environment.
+
+**Viewer-preference normalization handoff (high level) \[Required-Now\].**
 
 Compat and CLI compatibility flows normalize viewer preferences before candidate-selection, sampler, or ranker behavior consumes them. Zero-weight intent is carried as normalized input truth into the existing sampler/ranker behavior home; sampler/ranker remains the owner of candidate exclusion behavior. This handoff uses existing CLI and compat call paths and does not create a new public surface, route, serializer path, or public contract.
 
-**Threshold ownership handoff (high level).**
+**Threshold ownership handoff (high level) \[Required-Now\].**
 
 Compat threshold symbols used by compat and CLI compatibility flows are compatibility-facing shims over the existing Magic-10 threshold source in the Engine math layer. `engine.compat.thresholds.THRESHOLDS_V1` derives from `engine.magic10.thresholds.THRESHOLD_EDGES`, and `engine.compat.thresholds.BANDS` derives from `engine.magic10.thresholds.BANDS`. This preserves one threshold home, keeps threshold arithmetic and constants-pack ownership outside Architecture, and does not create a new public route, flag, serializer path, public contract, or second threshold source.
 
-**Presenter rule.**  
- The adapter never hand-crafts public JSON. Only the Presenter’s single emitter serializes public bytes for **all** callers (HTTP and CLI).
+**Presenter rule \[Required-Now\].**  
+The adapter never hand-crafts public JSON. Only the Presenter’s single emitter serializes public bytes for **all** callers (HTTP and CLI).
 
-**Conjunction compute contract (internal).**
+**Conjunction compute contract (internal) \[Required-Now\].**
 
 Conjunction computation is an internal Engine surface. It does not create a new production HTTP endpoint and it emits public bytes via the same Presenter emitter used everywhere else.
 
-* Location: `engine/compat/compute.py`
-
-* Entry points (names-only):
-
-  * `conjunction_public` (pure compute over resolved BodyGraphs)
-
+* Location: `engine/compat/compute.py`  
+    
+* Entry points (names-only):  
+    
+  * `conjunction_public` (pure compute over resolved BodyGraphs)  
+      
   * `conjunction_public_resolved` (local-first resolution via the existing BodyGraph resolver path, then compute; SAFE rails apply)
 
-**Birth-only no-user boundary (architecture-level).**
+**Birth-only no-user boundary (architecture-level) \[Required-Now\].**
 
 `conjunction_public_resolved` is the sanctioned no-user resolver boundary for local compatibility proof when caller input provides a complete birth tuple and provides no `person_uid`, `user_id`, or app user ID. The boundary may derive deterministic internal metadata before strict Engine compute, including an internal `person_uid`, but that metadata stays internal and is not a caller input, public field, public route contract, CLI flag, or serializer path. Existing internal `user_id` flows remain separate and unchanged.
 
-**Parity expectations.**
+**Parity expectations \[Required-Now\].**
 
-* For identical inputs, public bytes match CLI output (byte identity).
-
-* Output is non-empty canonical JSON (LF-terminated).
-
+* For identical inputs, public bytes match CLI output (byte identity).  
+    
+* Output is non-empty canonical JSON (LF-terminated).  
+    
 * Locale pins for byte checks: `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 **Routing (titles-only).**
 
-* Request/response details, field lists, examples, CLI↔Reader byte-parity rules → **HDE-CLI-API-Vendor-Ref**
-
-* A7 validators and header behaviour → **HDE-Governance**
-
-* Canonical JSON policy → **HDE-Schemas & Artifacts**
-
+* Request/response details, field lists, examples, CLI↔Reader byte-parity rules → **HDE-CLI-API-Vendor-Ref**  
+    
+* A7 validators and header behaviour → **HDE-Governance**  
+    
+* Canonical JSON policy → **HDE-Schemas & Artifacts**  
+    
 * Process & PR workflow (PR-first; Evidence Index and mirror updated in the same PR) → **Epic-Process-Guide**
 
-See §2.4 for the compat request flow, including how BodyGraph, Engine Core, and Presenter interact for this surface.
+See §2.2 for the high-level Reader/CLI → Engine Core → Presenter flow and §2.4 for the BodyGraph lifecycle used by this surface.
 
 ---
 
 ## **3.2 Reader v1 \[Required-Now\] (public success route)**
 
 **Intent.**  
- A public Reader surface on the adapter that uses the same canonical emitter path as the CLI. It exposes the six-key public envelope for client apps without duplicating computation or serialization logic.
+A public Reader surface on the adapter that uses the same canonical emitter path as the CLI. It exposes the six-key public envelope for client apps without duplicating computation or serialization logic.
 
 **Responsibilities (conceptual).**
 
-* Accept normalized inputs or references and perform lightweight structural checks before calling the Engine in-proc.
-
-* Return the public envelope via the canonical emitter (no narratives, no internal fields, no side effects).
-
-* Maintain CLI↔Reader byte parity for identical inputs and environment; parity is a requirement (bytes owned elsewhere).
-
-* Obey A7 success-route posture (routing notes below).
-
+* Accept normalized inputs or references and perform lightweight structural checks before calling the Engine in-proc.  
+    
+* Return the public envelope via the canonical emitter (no narratives, no internal fields, no side effects).  
+    
+* Maintain CLI↔Reader byte parity for identical inputs and environment; parity is a requirement (bytes owned elsewhere).  
+    
+* Obey A7 success-route posture (routing notes below).  
+    
 * Use DB-backed BodyGraphs for compat computation, following the BodyGraph lifecycle (no inline vendor I/O on Reader 200).
+
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the checked-in adapter defines `/reader`, emits through the shared Reader emitter, gates non-dev `APP_ENV` values while treating an absent `APP_ENV` as `dev`, and loads local chart files. The Endpoint Catalog classifies `GET /reader` and `HEAD /reader` as internal `dev_harness` routes with `APP_ENV=dev`.
+
+**Current repository discrepancy.**  
+The checked-in Reader is a dev fixture surface, not the required public DB-backed Reader. Its handler reads caller-supplied local chart paths and does not implement the DB-backed BodyGraph lifecycle required above.
+
+**Static inspection cannot establish.**  
+Static repository bytes do not establish runtime reachability, deployment, or production enablement for the Reader surface.
 
 **Non-goals.**
 
-* No alternate serializers, payload shaping, or per-surface formatters.
-
+* No alternate serializers, payload shaping, or per-surface formatters.  
+    
 * No direct vendor/network calls on the public success route.
 
 **Reader route posture (route-only).**
@@ -817,67 +837,73 @@ See §2.4 for the compat request flow, including how BodyGraph, Engine Core, and
 **A7 proof surface (route-only; titles-only).**
 
 * **Cataloged route only.**  
+    
 * Reader success proofs run only on a cataloged JSON success route named in the Endpoint Catalog (HDE-CLI-API-Vendor-Ref). The Catalog’s single home is `docs/ENDPOINTS_CATALOG.json` (+ `.sha256` sidecar). The `.sha256` sidecar must reference `docs/ENDPOINTS_CATALOG.json` for repo-root verification. Proofs target a route listed there; `/internal/version` remains excluded. When the selected cataloged proof route is `/reader`, `/reader` is the governed Reader success-proof surface for that scope, env gated to dev (`APP_ENV=dev`), and A7-eligible. This does not classify `/reader` as a dev-only conjunction or preview route. Env-gate proof is mandatory (headers-only).  
+    
 * **Catalog posture.**  
-   The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod. Capture a headers-only env-gate proof.
-
+  The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod. Capture a headers-only env-gate proof.  
+    
 * **A7 invariants to satisfy.**  
-   Require:
-
-  * `Vary: Authorization, Accept-Encoding`
-
-  * Encoding invariance of identity (ETag) and effective `Content-Length` across accepted encodings
-
-  * HEAD 200 validator parity with `Content-Type == GET` and `Content-Length == len(identity 200 body)`
-
+  Require:  
+    
+  * `Vary: Authorization, Accept-Encoding`  
+      
+  * Encoding invariance of identity (ETag) and effective `Content-Length` across accepted encodings  
+      
+  * HEAD 200 validator parity with `Content-Type == GET` and `Content-Length == len(identity 200 body)`  
+      
   * 304 only after prior 200, with no body and omitting both `Content-Type` and `Content-Length`
 
+
 * **Ops exclusion.**  
-   `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
+  `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
 
 **Routing (titles-only).**
 
-* Field definitions, examples, conditional delivery, and parity proofs → **HDE-CLI-API-Vendor-Ref**
-
-* A7 acceptance policy and tokens → **HDE-Governance**
-
+* Field definitions, examples, conditional delivery, and parity proofs → **HDE-CLI-API-Vendor-Ref**  
+    
+* A7 acceptance policy and tokens → **HDE-Governance**  
+    
 * Canonical JSON policy, pack/manifest, and machine mirror discipline → **HDE-Schemas & Artifacts**
 
 Reader’s public success route uses the same Engine Core \+ Presenter flow as compat v1. **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** own success envelope bytes and A7 posture by title, and Reader obtains BodyGraphs via the DB-backed lifecycle described in §2.4.
 
 ---
 
-## **3.3 Sample (dev harness) \[Implemented\] (dev-only)**
+## **3.3 Sample (dev harness) (dev-only)**
 
-**Intent.**  
- A local, non-public developer harness on the adapter for manual and automated checks during development. It shares the single canonical emitter with CLI and Reader so public bytes are identical for identical inputs.
+**Intent \[Required-Now\].**  
+A local, non-public developer harness on the adapter for manual and automated checks during development. It shares the single canonical emitter with CLI and Reader so public bytes are identical for identical inputs.
 
-**Responsibilities (conceptual).**
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected Reader blueprint defines `POST /internal/dev/sampler` and the three dev conjunction GET routes named below. Their handlers use `_dev_admin_gate()`, and the Endpoint Catalog lists the four routes as internal `dev_harness` surfaces that are not A7-eligible.
 
-* Provide minimal endpoints or commands to exercise Engine paths with fixture inputs.
+**Responsibilities (conceptual) \[Required-Now\].**
 
-* Perform lightweight structural validation before calling the Engine in-proc.
-
-* Emit results via the single canonical emitter (no alternate serializers or formatting).
-
+* Provide minimal endpoints or commands to exercise Engine paths with fixture inputs.  
+    
+* Perform lightweight structural validation before calling the Engine in-proc.  
+    
+* Emit results via the single canonical emitter (no alternate serializers or formatting).  
+    
 * Maintain CLI↔harness parity for identical inputs and environment (bytes owned elsewhere).
 
-**Non-goals.**
+**Non-goals \[Required-Now\].**
 
-* No public availability.
-
-* No narrative text.
-
-* No transport or policy bytes are defined in PF02.
-
-* No uncontrolled vendor/network calls. Rails are closed by default; acquisition is permitted only when explicitly enabled under SAFE rails, and only through the existing BodyGraph resolver seam described in §2.4.
-
+* No public availability.  
+    
+* No narrative text.  
+    
+* No transport or policy bytes are defined in PF02.  
+    
+* No uncontrolled vendor/network calls. Rails are closed by default; acquisition is permitted only when explicitly enabled under SAFE rails, and only through the existing BodyGraph resolver seam described in §2.4.  
+    
 * No new persistence surfaces. Any writes are limited to the existing BodyGraph cache upsert described in §2.4.
 
-**Gating & posture (dev-only; titles-only routing).**
+**Gating & posture (dev-only; titles-only routing) \[Required-Now\].**
 
 * Harness is dev-only; never mounted in production.  
-* Harness routes are gated via the dev admin gate (`_dev_admin_gate()`), and MUST deny when `APP_ENV` is not one of: `dev`, `test`, `local`.  
+* Harness routes MUST deny when `APP_ENV` is not one of: `dev`, `test`, `local`.  
 * Canonical internal/dev sampler route (HTTP POST; names-only):  
   * POST /internal/dev/sampler  
 * Dev-only conjunction routes (HTTP GET; names-only):  
@@ -885,162 +911,213 @@ Reader’s public success route uses the same Engine Core \+ Presenter flow as c
   * `GET /dev/reader/conjunction`  
   * `GET /dev/writer/conjunction`  
 * **Writer readback parity flow (names-only).** The dev conjunction writer/readback proof path remains inside the dev harness surface family, using `GET /dev/writer/conjunction` together with `GET /dev/reader/conjunction`. PF02 records only the route names and adapter ownership here; writer/readback bytes and proof artifacts remain out of scope here.  
-  Endpoint Catalog entries for these dev conjunction endpoints are classified as `dev_harness` and are not A7-eligible.  
+* **Current repository catalog \[Implemented\].** Endpoint Catalog entries for these dev conjunction endpoints are classified as `dev_harness` and are not A7-eligible.  
 * Rails are closed by default (for example, `SAFE_MODE=1`, `ALLOW_NETWORK=0`). Dev-only conjunction endpoints MAY run under open rails only when explicitly enabled (for example, `SAFE_MODE=0`, `ALLOW_NETWORK=1`).  
 * Optional GET/HEAD/304 captures are allowed for the GET dev harness endpoints, but A7 proofs are not run here. A7 proofs run on the cataloged JSON success route (Endpoint Catalog) and are driven by the Catalog.  
 * Locale is optional; when present, it is advisory only and does not affect canonical JSON bytes.
 
+**Current repository discrepancy.**  
+The selected factory registers the Reader blueprint without an environment-specific unmount. The dev route handlers enforce a request-time gate, but static repository bytes do not establish that the routes are never mounted in production or that any route is runtime-reachable.
+
+**Required architecture \[Required-Now\].**  
 Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1. Dev-only conjunction preview endpoints emit canonical JSON bytes; rails are closed by default unless explicitly opened. Sample harness is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
 
 **Routing (titles-only).**
 
-* Dev-harness routing/guards and optional GET semantics → **HDE-CLI-API-Vendor-Ref**
-
-* A7 proof surface policy and ops exception (`/internal/version`) → **HDE-Governance**
-
+* Dev-harness routing/guards and optional GET semantics → **HDE-CLI-API-Vendor-Ref**  
+    
+* A7 proof surface policy and ops exception (`/internal/version`) → **HDE-Governance**  
+    
 * Canonical JSON policy, Evidence Index/mirror discipline (same-PR parity) → **HDE-Schemas & Artifacts**
-
-  ---
-
-  ## **3.4 Internal ops signals (speculative, future support)**
-
-**Names & roles (concept only).**
-
-* `/internal/healthz` — **liveness.** Constant-time “process is up” probe; no Engine invocation; no disk or network; no PII.
-
-* `/internal/readyz` — **readiness.** “Can serve traffic” probe; checks prerequisites such as config loaded, emitter path available, and rails posture sane without running compat math or touching vendors.
-
-* `/internal/version` — **identity.** Build and config snapshot for drift detection. Reads identity fields only and is side-effect-free. No secrets.
-
-These routes do not touch Engine Core, sampler core, or vendor; they are liveness/identity-only surfaces.
-
-**Non-goals.**  
- No payload or header matrices, auth policy, or acceptance tables in this section. These are ops signals, not product surfaces.
-
-**Routing (titles-only).**  
- All concrete transport or policy details for these signals are owned by **HDE-Governance**. See **HDE-Governance** §10.5 for `/internal/version` posture and acceptance.
 
 ---
 
-## **3.5 Internal-ops identity (route-only)**
+## **3.4 Internal ops signals**
 
-**Purpose.**  
- Adapter exposes internal-ops identity/diagnostic routes for operations and monitoring. These are not public data planes.
+**Future concepts \[Speculative\].**
 
-**Responsibility split.**
+* `/internal/healthz` — **liveness.** Constant-time “process is up” probe; no Engine invocation; no disk or network; no PII.  
+    
+* `/internal/readyz` — **readiness.** “Can serve traffic” probe; checks prerequisites such as config loaded, emitter path available, and rails posture sane without running compat math or touching vendors.
 
-* Adapter wires the route and applies guards.
+**Governed identity surface \[Required-Now\].**
 
-* Presenter emits canonical JSON when applicable.
+* `/internal/version` — **identity.** Build and config snapshot for drift detection. Reads identity fields only and is side-effect-free. No secrets. It is ops-only, identity-only, and non-A7.
 
+**Boundary \[Required-Now\].**  
+Any adopted internal ops signal MUST NOT touch Engine Core, sampler core, or vendor; these are liveness, readiness, or identity-only surfaces.
+
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected application factory mounts the Reader blueprint that defines `/internal/version`. Definitions for `/internal/healthz` and `/internal/readyz` occur in the alternate `adapter/wsgi.py` factory, not in the selected factory.
+
+**Static inspection cannot establish.**  
+Static repository bytes do not establish runtime reachability, deployment, or a truthful readiness predicate.
+
+**Non-goals \[Required-Now\].**  
+No payload or header matrices, auth policy, or acceptance tables in this section. These are ops signals, not product surfaces.
+
+**Routing (titles-only).**  
+All concrete transport or policy details for these signals, including `/internal/version` posture and acceptance, are owned by **HDE-Governance**.
+
+---
+
+## **3.5 Internal-ops identity and refusal (route-only)**
+
+**Purpose \[Required-Now\].**  
+Record the adopted internal-ops routes and bounded repository drift without turning checked-in diagnostic routes into architectural interfaces. These are not public data planes.
+
+**Adopted routes \[Required-Now\].**
+
+* `/internal/version` is the ops-only, identity-only, non-A7 surface.  
+    
+* `/ops/rails/refusal` is the canonical closed-rails refusal probe.
+
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected application factory mounts the Reader blueprint. That blueprint defines `/internal/version`, `/ops/db/unavailable`, `/ops/rails/refusal`, `/ops/probe/env`, and `/ops/writer/diagnostic`.
+
+**Current repository discrepancy.**  
+The checked-in `/ops/db/unavailable`, `/ops/probe/env`, and `/ops/writer/diagnostic` routes are `RETIRED/NONCANONICAL` as architecture and excluded from the Endpoint Catalog. Their continued presence in the selected blueprint is repository drift; this document does not describe them as supported ops, admin, diagnostic, evidence, product, or public interfaces. No repository removal, test migration, deployment convergence, or catalog mutation is claimed.
+
+**Static inspection cannot establish.**  
+Static repository bytes do not establish runtime reachability, deployment, production exposure, or external consumers for any route.
+
+**Responsibility split \[Required-Now\].**
+
+* Adapter wires adopted routes and applies guards.  
+    
+* Presenter emits canonical JSON when applicable.  
+    
 * Engine remains pure compute. No cross-role leakage.
 
 **Governance pointer.**  
- Behaviour, headers, and acceptance tokens are governed by **HDE-Governance**. PF02 remains contract-free and does not restate header/body rules.
+Behaviour, headers, and acceptance tokens for the adopted routes are governed by **HDE-Governance**. PF02 remains contract-free and does not restate header/body rules.
 
 **Contract posture (titles-only).**  
-HDE-Governance governs invariants for the identity surface (for example, no-store, no ETag, HEAD 200 with `Content-Type` parity and `Content-Length == identity GET`, conditionals ignored / never 304\) and owns the identity-surface acceptance/evidence posture. PF02 points by title only.
+HDE-Governance governs invariants for the identity surface (for example, no-store, no ETag, HEAD 200 with `Content-Type` parity and `Content-Length == identity GET`, conditionals ignored / never 304\) and owns the identity-surface acceptance/evidence posture. It also governs the closed-rails refusal semantics for `/ops/rails/refusal`. PF02 points by title only.
 
 **Evidence & indexing (titles-only).**  
- Proof artifacts and success-endpoint snapshots are indexed per **HDE-Governance** / **HDE-Schemas & Artifacts**; the human Evidence Index and the machine JSONL mirror must remain 1:1 (updated in the same PR).
+Proof artifacts and success-endpoint snapshots are indexed per **HDE-Governance** / **HDE-Schemas & Artifacts**; the human Evidence Index and the machine JSONL mirror must remain 1:1 (updated in the same PR).
 
 For `/internal/version` coupling \+ two-run identity, the governed proof surface is the internal\_version evidence bundle under `artifacts/ops/internal_version/`. Canonical member filenames (and any explicitly permitted alias files) are owned by HDE-Schemas & Artifacts and governed by HDE-Governance; ad-hoc filename variants are prohibited. PF02 names this evidence surface for architectural traceability and continues to route all token semantics and detailed proof formats by title to their single-home documents.
 
-**Non-goals.**  
- No public contract bytes, no payload schemas, no alternate emitters, no persistence, and no vendor/network calls from this surface.
+**Non-goals \[Required-Now\].**  
+No public contract bytes, no payload schemas, no alternate emitters, no persistence, and no vendor/network calls from the adopted surfaces.
 
 **Routing (titles-only).**
 
-* Identity invariants, acceptance, and evidence posture **→ HDE-Governance**
-
-* Endpoint Catalog / success JSON → **HDE-CLI-API-Vendor-Ref**
-
+* Identity and refusal invariants, acceptance, and evidence posture **→ HDE-Governance**  
+    
+* Endpoint Catalog / success JSON → **HDE-CLI-API-Vendor-Ref**  
+    
 * Canonical JSON and machine mirror → **HDE-Schemas & Artifacts**
 
-  ---
+---
 
-## **3.6 Aux Narrative (concept-only, route-only) \[Speculative\]**
+## **3.6 Aux Narrative (concept-only, route-only)**
 
-**Role.**  
- Serve deterministic narrative text **outside** the public Reader surface. No narratives appear on Reader 200\.
+**Role \[Required-Now\].**  
+Serve deterministic narrative text **outside** the public Reader surface. No narratives appear on Reader 200\.
 
-**Responsibilities (conceptual).**
+**Current repository behavior \[Implemented\].**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, the selected adapter blueprint defines `GET /api/aux/narrative` and `GET /aux/narrative`. The HTTP handler and `aux-preview` CLI both call `engine.narratives.emit_public_aux`, which emits LF-terminated text when a narrative is available and an empty body when suppressed.
 
-* Adapter wires the Aux route (`/aux/narrative`); Presenter emits text via the single canonical emitter; Engine remains pure compute (keys only).  
+**Responsibilities (conceptual) \[Required-Now\].**
+
+* Adapter wires the PF05-owned canonical Aux route and alias; Presenter owns the public Aux byte-emission boundary; Engine Core remains pure compute (keys only).  
 * Text constraints: no CR characters; LF-terminated output (schema/constraints routed by title).  
 * Maintain CLI admin preview parity (bytes owned elsewhere; titles-only routing).
 
-**Proof surface (route-only; titles-only).**
+**Current repository discrepancy.**  
+The checked-in Aux byte-emission helper is under `engine/narratives/` rather than the Presenter boundary, and the inspected Aux HTTP handler contains no `v=1` selector enforcement. Current canon adopts the text surface; these checked-in facts remain implementation drift, not authority to weaken the Presenter or version-selection requirements.
 
-* **Cataloged route only.**  
-   Aux success proofs run only on a cataloged JSON success route named in the Endpoint Catalog (**HDE-CLI-API-Vendor-Ref**).
+**Route and proof posture (route-only; titles-only) \[Required-Now\].**
 
+* **Canonical route and alias.**  
+  **HDE-CLI-API-Vendor-Ref** owns `GET /api/aux/narrative?v=1` as canonical and `/aux/narrative?v=1` as its byte-identical alias.  
+    
+* **Representation.**  
+  Aux returns `text/plain; charset=utf-8` when text is shown. When suppressed, Aux returns 200 with no body and no ETag; a policy header is optional. Exact bytes remain in their owning documents.  
+    
+* **A7 separation.**  
+  A7 proofs run only on a cataloged JSON success route. Aux HEAD and 304 are out of scope for EPIC-010; the Aux text route is not recast as the cataloged JSON success proof surface.  
+    
 * **Catalog posture.**  
-   The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof.
-
-* **Suppression carve-out.**  
-   When suppressed, Aux returns 200 with no body and no ETag (policy header optional).
-
+  The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof for the selected A7 catalog route.  
+    
 * **Ops exclusion.**  
   `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
 
+**Static inspection cannot establish.**  
+Static repository bytes do not establish runtime reachability, deployment, alias parity, or production enablement for the Aux routes.
+
 **Routing (titles-only).**
 
-* Endpoint route bytes and CLI admin preview → **HDE-CLI-API-Vendor-Ref**
-
-* Suppression carve-out and A7 posture for Aux → **HDE-Governance**
-
+* Endpoint route bytes and CLI admin preview → **HDE-CLI-API-Vendor-Ref**  
+    
+* Suppression carve-out and A7 posture for Aux → **HDE-Governance**  
+    
 * Composer response/schema & narratives pack catalogs → **HDE-Schemas & Artifacts**
 
-  ---
+---
 
-  ## **3.7 Narratives architecture (two-plane; concept-only)**
+## **3.7 Narratives architecture (two-plane; concept-only)**
 
 **Planes.**
 
-* **Authoring plane (DB-backed):** intake, lints, preview, publish pointer, audit.
-
+* **Authoring plane (DB-backed):** intake, lints, preview, publish pointer, audit.  
+    
 * **Runtime plane (file-backed):** engine loads a sealed pack by `pack_sha`; no DB reads on the hot path.
 
 **Identity & store (names-level).**
 
-* Manifest-driven identity: `pack_sha = sha256(canonical manifest bytes)`.
-
-* Authoritative path: object storage at `/narratives/<pack_sha>/<OBJECT_KEY>`; the repo carries the manifest \+ evidence.
-
-* Loader: fetch → verify → atomic symlink swap → load; on any verify mismatch, fail-closed (keep previous pack); keys-only logs.
-
-* Ops: CLI-first operations; admin HTTP optional later.
-
+* Manifest-driven identity: `pack_sha = sha256(canonical manifest bytes)`.  
+    
+* Authoritative path: object storage at `/narratives/<pack_sha>/<OBJECT_KEY>`; the repo carries the manifest \+ evidence.  
+    
+* Loader: fetch → verify → atomic symlink swap → load; on any verify mismatch, fail-closed (keep previous pack); keys-only logs.  
+    
+* Ops: CLI-first operations; admin HTTP optional later.  
+    
 * Reader posture: Reader stays narrative-free; Aux suppression returns 200 empty, no ETag (policy by title).
 
-Engine outputs are keys and structured metrics; narratives never live in `engine/`. Aux surfaces interpret Engine outputs in combination with narratives packs (owned by the Narratives Guide, **HDE-Mechanics Guide**, and **HDE-Schemas & Artifacts** by title) to produce text. Reader 200 stays narrative-free; narrative suppression returns 200 with an empty body by design.
+Engine compatibility and sampler outputs are keys and structured metrics. Narrative loading, composition, and preview code is isolated under `engine/narratives/`; it remains outside Engine Core and sampler core. Aux surfaces interpret Engine outputs in combination with narrative packs (owned by the Narratives Guide, **HDE-Mechanics Guide**, and **HDE-Schemas & Artifacts** by title) to produce text. Reader 200 stays narrative-free; narrative suppression returns 200 with an empty body by design.
 
 **Ownership & indexing (titles-only).**
 
-* Evidence/indexing discipline → **HDE-Schemas & Artifacts**
-
-* Mechanics for loading, swapping, and failure modes → **HDE-Mechanics Guide**
-
+* Evidence/indexing discipline → **HDE-Schemas & Artifacts**  
+    
+* Mechanics for loading, swapping, and failure modes → **HDE-Mechanics Guide**  
+    
 * Narrative posture, authoring semantics, and pack contents → **Narratives Guide**
 
-  ---
+---
 
-  ## **3.8 Reader dev/QA posture & services \[Required-Now\]**
+## **3.8 Reader dev/QA posture & services \[Required-Now\]**
 
 **Intent.**  
- Record, at the architectural level, how the Reader runs in dev/QA environments and how Live QA chooses between Reader and other entrypoints, while keeping PF02 contract-free. Concrete commands, ports, and environment wiring remain single-home in other documents and are referenced here by title only.
+Record, at the architectural level, how the Reader runs in dev/QA environments and how Live QA chooses between Reader and other entrypoints, while keeping PF02 contract-free. Concrete commands, ports, and environment wiring remain single-home in other documents and are referenced here by title only.
 
 ### **3.8.1 Dev/QA Reader availability**
 
-* Reader v1 is exposed through the adapter process as one of the runtime surfaces named in this section. It uses the single canonical Presenter emitter and never hand-crafts public JSON.
-
+* Reader v1 is exposed through the adapter process as one of the runtime surfaces named in this section. It uses the single canonical Presenter emitter and never hand-crafts public JSON.  
+    
 * In any dev/QA console that plans to exercise Reader or other HTTP runtime surfaces, the adapter/Reader process **must** be started explicitly using the canonical start command and environment described in **Glow Infrastructure** and the **HDE-Mechanics Guide**. Live QA **must not** rely on guessing hostnames or ports.  
+    
 * **Repo-side start-helper posture (names-only).** Dev Reader start helpers are part of the adapter/dev-harness boundary and MUST propagate `APP_ENV` exactly as supplied by the calling environment. They do not silently default `APP_ENV`.  
+    
 * **Infra-owned harness binding input (names-only).** Sampler healthchecks and other QA-side callers consume `DEV_SAMPLER_URL` (or an equivalent infra-owned binding) as the authoritative address for `/internal/dev/sampler`. Architecture records that this binding is separate from route ownership and does not permit guessed host or port reconstruction when the binding is absent or malformed.  
+    
 * PF02 does not introduce service names, ports, or commands. Those details are single-home in **Glow Infrastructure**, the **HDE-Mechanics Guide**, and any field guides that describe running the adapter and Reader inside a dev container (including Codespaces). This document only records the responsibility that HTTP-based tests must target a known, running Reader instance.  
+    
 * In dev/QA, the adapter/Reader stack is hosted by a concrete framework development HTTP server (currently a Flask dev server) that exposes the same Reader and internal/dev sampler routes as the production adapter. Architecture treats this dev server as part of the adapter and dev harness component: it is a real, required piece of the system in dev/QA, but the choice of framework and all start commands, ports, and environment wiring remain the responsibility of **Glow Infrastructure** and **HDE-Mechanics Guide**, not PF02.  
+    
 * The dev Reader harness used in dev/QA consoles (including Codespaces) MUST expose the canonically required dev/internal HTTP surfaces for QA, using the same Presenter emitter and error-handling semantics as the production/stable adapter app. In particular, the harness is responsible for mounting the compat HTTP surface (`/api/compat/v1`) as defined in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title. This requirement applies to the set of dev/internal HTTP routes needed for QA; it does not require the dev harness to expose every production-only surface. PF02 records this responsibility at the architectural level and continues to route all concrete route shapes and error envelopes by title to their single-home documents.
+
+**Current repository discrepancy.**  
+At repository commit `cc754cfbce2f288b16ced5eef3d0f66a6ef5928a`, `dev/reader_harness/app.py` silently treats an absent `APP_ENV` as `dev`, registers only the Reader blueprint under `/api`, calls `app.getattr` instead of `app.register_blueprint`, and does not mount the compat blueprint. The root `run_flask_dev.sh` and `run_flask.py` helpers start `adapter.factory:create_app` rather than the dedicated harness. These checked-in facts do not satisfy the required dedicated-harness contract.
+
+**Static inspection cannot establish.**  
+Static repository bytes do not establish that any dev/QA service is running or reachable.
 
 ### **3.8.2 QA entrypoints (concept-only)**
 
@@ -1058,10 +1135,10 @@ For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev 
 
 All of these entrypoints:
 
-* Call the same Engine modules (Engine Core and sampler core, where applicable).
-
-* Emit bytes via the single Presenter emitter.
-
+* Call the same Engine modules (Engine Core and sampler core, where applicable).  
+    
+* Emit bytes via the single Presenter emitter.  
+    
 * Run under explicitly pinned rails (for example, `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`) that are logged as part of QA evidence (owned by **Glow QA Guide** and **HDE-Phased Epics** by title).
 
 PF02 does not define which entrypoint satisfies any particular D-goal; that choice and its evidence requirements are owned by **HDE-Phased Epics**, the **Glow QA Guide**, and **HDE-Governance**. Architecture only requires that any surface chosen for Live QA be canonical and emitter-backed.
@@ -1070,8 +1147,8 @@ PF02 does not define which entrypoint satisfies any particular D-goal; that choi
 
 For epics whose D-goals include live vendor behaviour or Reader/HTTP behaviour, Live QA **must** either:
 
-* Start and use a Reader (or other HTTP) surface that reaches the Engine through the adapter and the single Presenter emitter, **or**
-
+* Start and use a Reader (or other HTTP) surface that reaches the Engine through the adapter and the single Presenter emitter, **or**  
+    
 * Use a CLI entrypoint that exercises the same Engine and Presenter path and is documented in **HDE-CLI-API-Vendor-Ref**.
 
 Reader and CLI surfaces are **peers** with respect to the single-emitter rule: both call the same Presenter emitter symbol. PF02 does not define which surface satisfies any particular D-goal; that choice and its evidence requirements are owned by **HDE-Phased Epics**, the **Glow QA Guide**, and **HDE-Governance**.
@@ -1099,7 +1176,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 * **Access address versus service identity.** This documented loopback default is an access convention only. It does not redefine the service identity, provider or project names, or the server bind address used by the adapter process.  
 * **Prod-facing exception.** If a QA console, runbook, or harness is targeting the real production service, the documented address stays the real hosted production URL rather than a loopback form.  
 * **Binding-coverage distinction.** Environment-specific validation of a dev harness binding is separate from the architectural existence of the route. A dev or internal surface can exist in the adapter while a particular environment remains not yet closed until its infra-owned binding is published and validated.  
-* **Codespaces Live QA posture (routing note).** Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). A standalone Step-0 “Codespaces snapshot” artifact is **not required** and MUST be treated as optional and non-gating; plans MUST NOT require, validate, or gate approval on it.   
+* **Codespaces Live QA posture (routing note).** Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). A standalone Step-0 “Codespaces snapshot” artifact is **not required** and MUST be treated as optional and non-gating; plans MUST NOT require, validate, or gate approval on it.  
 * **Environment variable discipline (Live QA).** Environment variable names MUST be treated as governed interface surfaces (like repo paths and endpoints), not free-text fields. QA plans, QA runbooks, and QA evidence schemas MUST NOT introduce, require, or depend on any `MODO_*` variable names for PASS or FAIL or required evidence structure; any `MODO_*` strings are non-canonical and inert.  
   * **No QA-time env var minting (hard).** New environment variable names MUST NOT be introduced during Live QA (including Moon Loop). If a QA step would require a new environment variable name to function, treat it as development work under PO approval and canonize the variable name before any plan depends on it.  
   * **Review posture (mechanical blocker).** Any unapproved environment variable name used as a required input, required header key, required manifest key, or required evidence schema key is a mechanical blocker for plan approval. Fix by removing it or replacing it with canon-approved variables only.  
@@ -1134,46 +1211,55 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
     * Adjudication is owned by the PO, who decides whether the resolution path is a canon update, implementation remediation, or a formalized exception with a canon follow-up.  
   * **No VCS workflow content (hard).** Live QA Plans MUST NOT instruct or discuss branches, commits, PRs, or any other VCS workflow steps, and MUST NOT gate PASS/FAIL on VCS state (for example “working tree clean” or “on correct branch”). Read-only, non-mutating git commands are allowed only as optional, non-gating repo-root sanity checks and must not rely on branch names, commit SHAs, or PR identifiers.  
   * **Discovery-first, objective-first Live QA plans.** Live QA Plans MUST specify intent and proof obligations per step and MUST treat any repo detail not proven at planning time as unknown until discovered during the run.  
-    * Steps SHOULD use general command-line directives rather than brittle verbatim command text; execution-time command resolution and the recorded command transcript in `primary.log` are authoritative.
+      
+    * Steps SHOULD use general command-line directives rather than brittle verbatim command text; execution-time command resolution and the recorded command transcript in `primary.log` are authoritative.  
+        
+    * The plan SHOULD describe the goal of the action, the observable outputs that matter, and the evidence that must be captured.  
+        
+    * Reduce plan brittleness by minimizing locus strings unless the locus is canon-defined or is a fixed-path obligation.  
+        
+    * If a plan must include an exact command string, it MUST be proven by an allowed provenance source.  
+        
+    * When a check requires interacting with a repo-resident locus that is not proven at planning time, the plan MUST state the discovery intent, state the discovery acceptance, require recording the discovered locus string verbatim into check evidence before using it, and provide PASS, FAIL, and BLOCKED outcomes for discovery itself.  
+        
+    * Each check MUST be expressible as: Intent; Discovery step (only if needed); Minimal test step; Required evidence; PASS criteria; FAIL criteria; BLOCKED criteria when discovery cannot proceed without guessing.  
+        
+    * Loci discovered during execution are valid for that run only and MUST NOT be treated as planning-time proof for future plans unless they are incorporated into an allowed provenance source.  
+        
+    * Moon Loop may be used to remediate syntax and quoting mismatches, but MUST NOT change objectives, loci exercised, required outputs, or PASS or FAIL predicates.
 
-    * The plan SHOULD describe the goal of the action, the observable outputs that matter, and the evidence that must be captured.
+    
 
-    * Reduce plan brittleness by minimizing locus strings unless the locus is canon-defined or is a fixed-path obligation.
-
-    * If a plan must include an exact command string, it MUST be proven by an allowed provenance source.
-
-    * When a check requires interacting with a repo-resident locus that is not proven at planning time, the plan MUST state the discovery intent, state the discovery acceptance, require recording the discovered locus string verbatim into check evidence before using it, and provide PASS, FAIL, and BLOCKED outcomes for discovery itself.
-
-    * Each check MUST be expressible as: Intent; Discovery step (only if needed); Minimal test step; Required evidence; PASS criteria; FAIL criteria; BLOCKED criteria when discovery cannot proceed without guessing.
-
-    * Loci discovered during execution are valid for that run only and MUST NOT be treated as planning-time proof for future plans unless they are incorporated into an allowed provenance source.
-
-    * Moon Loop may be used to remediate syntax and quoting mismatches, but MUST NOT change objectives, loci exercised, required outputs, or PASS or FAIL predicates.  
   * **Repo-locus provenance lock (MUST).** Planning documents and plans MUST NOT invent, guess, infer, paraphrase, normalize, or fill in any repo-resident locus string.  
-    * The only allowed provenance sources for repo-reality claims are PF10 — HDE Build Notes, PF-Canon, and the initial QA Audit for the epic.
+      
+    * The only allowed provenance sources for repo-reality claims are PF10 — HDE Build Notes, PF-Canon, and the initial QA Audit for the epic.  
+        
+    * This rule applies to file paths, directory paths, endpoint names, routes, module and component identifiers, script names, runbook names, command strings, check and test identifiers, CI job names, environment variable names treated as already-existing, fixed output locations treated as already-existing, and negative existence claims.  
+        
+    * When a repo-resident locus string is used, it MUST be copied character-for-character from an allowed provenance source. No renaming, no case folding, no “equivalent” substitutions, no wildcard expansions, and no invented variants.  
+        
+    * Placeholder routes, placeholder file paths, placeholder module names, placeholder commands, invented scripts, and any statement that implies app topology certainty without proof are vetoed.  
+        
+    * Review gate: any unvalidated or inferred locus claim is a mechanical blocker until corrected.  
+        
+    * File minting is allowed and expected only for plan-created outputs. New files and directories MAY be created under canon-defined homes once the locus is validated. New roots and second homes MUST NOT be assumed.  
+        
+    * Evidence output clarity: plans SHOULD name primary governed evidence outputs by exact path and filename and SHOULD avoid vague family phrases or wildcards in evidence-output lines.  
+        
+    * A plan MUST NOT reference a file path as required unless it is canon-defined, audit-proven, or explicitly QA-created by the plan with exact repo-relative path and filename, runnable creation instructions, a one-line purpose, reproducible creation detail, and explicit PASS and FAIL predicates tied to file contents.  
+        
+    * Governed evidence artifacts used to decide PASS or FAIL MUST be written under a concrete lowercase path under `audit/**` (preferred) or `artifacts/**`.  
+        
+    * Plans MUST separate pre-existing artifacts (required to exist before execution) from QA-run artifacts (created during execution); preflight presence checks may gate only on pre-existing artifacts.  
+        
+    * If a deliverable family or path is not canonized, the plan MUST treat it as non-gating posture-only (for example, log `UNPROVEN` or `TOOLING_BLOCKED`) and MUST NOT introduce new required paths to simulate it.
 
-    * This rule applies to file paths, directory paths, endpoint names, routes, module and component identifiers, script names, runbook names, command strings, check and test identifiers, CI job names, environment variable names treated as already-existing, fixed output locations treated as already-existing, and negative existence claims.
+    
 
-    * When a repo-resident locus string is used, it MUST be copied character-for-character from an allowed provenance source. No renaming, no case folding, no “equivalent” substitutions, no wildcard expansions, and no invented variants.
-
-    * Placeholder routes, placeholder file paths, placeholder module names, placeholder commands, invented scripts, and any statement that implies app topology certainty without proof are vetoed.
-
-    * Review gate: any unvalidated or inferred locus claim is a mechanical blocker until corrected.
-
-    * File minting is allowed and expected only for plan-created outputs. New files and directories MAY be created under canon-defined homes once the locus is validated. New roots and second homes MUST NOT be assumed.
-
-    * Evidence output clarity: plans SHOULD name primary governed evidence outputs by exact path and filename and SHOULD avoid vague family phrases or wildcards in evidence-output lines.
-
-    * A plan MUST NOT reference a file path as required unless it is canon-defined, audit-proven, or explicitly QA-created by the plan with exact repo-relative path and filename, runnable creation instructions, a one-line purpose, reproducible creation detail, and explicit PASS and FAIL predicates tied to file contents.
-
-    * Governed evidence artifacts used to decide PASS or FAIL MUST be written under a concrete lowercase path under `audit/**` (preferred) or `artifacts/**`.
-
-    * Plans MUST separate pre-existing artifacts (required to exist before execution) from QA-run artifacts (created during execution); preflight presence checks may gate only on pre-existing artifacts.
-
-    * If a deliverable family or path is not canonized, the plan MUST treat it as non-gating posture-only (for example, log `UNPROVEN` or `TOOLING_BLOCKED`) and MUST NOT introduce new required paths to simulate it.  
   * **Plan-created scripts and helpers.** Live QA Plans MUST NOT invent or assume helper scripts exist. Plan-created scripts are permitted only when a required deliverable cannot be produced without one.  
-    * A plan-created script MUST name the exact repo-relative path and filename where it will be created, include runnable creation instructions, state why the script is required, and keep the script minimal and purpose-bound to the deliverable.
-
+      
+    * A plan-created script MUST name the exact repo-relative path and filename where it will be created, include runnable creation instructions, state why the script is required, and keep the script minimal and purpose-bound to the deliverable.  
+        
     * QA agents MAY create ephemeral helper scripts under `/tmp` during Live QA execution, but `/tmp` scripts and outputs are execution-only: they MUST NOT be treated as deliverables or evidence, MUST NOT be indexed or mirrored, and MUST NOT be referenced as acceptance binding surfaces. `/tmp` helpers must not print or persist secrets (presence-only or redacted where applicable).
 
 **Routing (titles-only).**
@@ -1188,58 +1274,60 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 ## **4.1 Boundary guarantees (no bytes)**
 
-* **Engine → Adapter.**
-
-  * Engine computes deterministically; no time/network/IO/randomness at compute time.
-
+* **Engine → Adapter.**  
+    
+  * Engine computes deterministically; no time/network/IO/randomness at compute time.  
+      
   * Inputs are pure data; outputs are normalized structures; no narratives or free text.
 
-* **Adapter → Clients (and CLI parity).**
 
-  * Adapter calls the Engine in-proc and never hand-crafts public JSON.
-
-  * Adapter does not emit non-canonical JSON; all public bytes come from the single canonical emitter.
-
+* **Adapter → Clients (and CLI parity).**  
+    
+  * Adapter calls the Engine in-proc and never hand-crafts public JSON.  
+      
+  * Adapter does not emit non-canonical JSON; all public bytes come from the single canonical emitter.  
+      
   * Adapter does not leak internals or non-public fields.
 
-* **Presenter (canonical emitter) → All surfaces.**
 
-  * One emitter path for CLI and HTTP surfaces; UTF-8, sorted keys, compact, exactly one LF.
-
-  * Idempotence preimage and AB↔BA parity are preserved by construction.
-
+* **Presenter (canonical emitter) → All surfaces.**  
+    
+  * One emitter path for CLI and HTTP surfaces; UTF-8, sorted keys, compact, exactly one LF.  
+      
+  * Idempotence preimage and AB↔BA parity are preserved by construction.  
+      
   * Compat v1, Reader v1, dev sampler harnesses, and offline determinism/evidence pipelines all route through the same Engine Core and sampler core modules; no surface is allowed to fork or reimplement core math. Differences are in rails, environment, and evidence policy only (owned in other PF docs by title).
 
 **Adapter → BodyGraph source (env-aware).**  
- **Prod:** request path **does not** call vendor; BodyGraph comes from **DB**; refresh is **out-of-band** (policy by title).  
- **Dev:** direct vendor allowed; on success, **upsert** to DB.  
- Adapter and CLI follow the **BodyGraph lifecycle** in §2.4 to decide when to read from DB vs call vendor and refresh. Engine remains stateless with respect to source and always consumes normalized BodyGraph inputs. Offline determinism and evidence pipelines respect the same boundary: they work with DB-backed or fixture BodyGraphs and never call vendor directly; rails/guards, evidence families, and indices live in their single homes (**HDE-Governance**, **HDE-Schemas & Artifacts**, **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Phased Epics** by title).
+**Prod:** request path **does not** call vendor; BodyGraph comes from **DB**; refresh is **out-of-band** (policy by title).  
+**Dev:** direct vendor allowed; on success, **upsert** to DB.  
+Adapter and CLI follow the **BodyGraph lifecycle** in §2.4 to decide when to read from DB vs call vendor and refresh. Engine remains stateless with respect to source and always consumes normalized BodyGraph inputs. Offline determinism and evidence pipelines respect the same boundary: they work with DB-backed or fixture BodyGraphs and never call vendor directly; rails/guards, evidence families, and indices live in their single homes (**HDE-Governance**, **HDE-Schemas & Artifacts**, **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Phased Epics** by title).
 
 * **Internal ops signals → Ops tooling.**  
-   Liveness/readiness/version are side-effect-free; no compat math, no vendor calls, no PII, no secrets.
+  Liveness/readiness/version are side-effect-free; no compat math, no vendor calls, no PII, no secrets.
 
-  ## **4.2 Correlation ID propagation (concept only)**
+## **4.2 Correlation ID propagation (concept only)**
 
-* A correlation ID is accepted and propagated end to end across CLI, Adapter, and—when rails are open—vendor calls to enable traceability.
-
-* It is non-PII, opaque, and bounded. It is deterministic per invocation, order-neutral for AB vs BA, and stable across two runs of the same invocation.
-
-* It is not part of public payloads, not included in the idempotence preimage or ETag identity, and not persisted as user data.
-
-* Logging is keys-only. The correlation ID is captured only as metadata; no other payload values, header values, or secrets are logged.
-
+* A correlation ID is accepted and propagated end to end across CLI, Adapter, and—when rails are open—vendor calls to enable traceability.  
+    
+* It is non-PII, opaque, and bounded. It is deterministic per invocation, order-neutral for AB vs BA, and stable across two runs of the same invocation.  
+    
+* It is not part of public payloads, not included in the idempotence preimage or ETag identity, and not persisted as user data.  
+    
+* Logging is keys-only. The correlation ID is captured only as metadata; no other payload values, header values, or secrets are logged.  
+    
 * It is a transport-only carrier. Forward it as a single pinned header or metadata field. Do not duplicate across carriers.
 
 **Routing (titles only).**
 
-* Carrier name, exact casing, format bounds, and generation/validation rules live in **HDE-CLI-API-Vendor-Ref**.
-
+* Carrier name, exact casing, format bounds, and generation/validation rules live in **HDE-CLI-API-Vendor-Ref**.  
+    
 * Logging posture, redaction rules, metrics cardinality, and evidence live in **HDE-Governance**.
 
-  ## **4.3 Non-goals (kept out of Architecture)**
+## **4.3 Non-goals (kept out of Architecture)**
 
-* No HTTP header matrices, status/error schemas, caching/writers rules, CLI streams/exit codes, or vendor timeouts/retries.
-
+* No HTTP header matrices, status/error schemas, caching/writers rules, CLI streams/exit codes, or vendor timeouts/retries.  
+    
 * No persistence policy, rate-limit values, or SLAs. These details are owned by other documents and referenced by **title only**.
 
 # 5\. Determinism & Identity Proofs \[Required-Now\]
