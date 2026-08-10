@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.8  
+**Version:** v3.4.9  
 **Status:** Canon  
-**Effective date:** 2026-08-09  
-**Last Update Gate:** 0808 refresh 1  
+**Effective date:** 2026-08-10  
+**Last Update Gate:** 0808 refresh 2  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -1313,7 +1313,7 @@ Routing (titles-only):
 
 # 2\) Canonical Enumerations Registry
 
-Purpose. Wire and prove the frozen domain registries (centers, gates, channels, categories) used by the engine. Mechanics validates and snapshots the domains; HDE-Schemas and Artifacts is the single home for authoritative catalogs and schemas. Developer notes in this repo are informative only (never authoritative).
+Purpose. Wire and prove the frozen domain registries (centers, gates, channels, categories) used by the engine. Mechanics validates and reports the domains; HDE-Schemas & Artifacts is the single home for authoritative catalogs, schemas, and exact evidence contracts. Developer notes in this repo are informative only (never authoritative).
 
 ## **2.1 Domain invariants (normative)**
 
@@ -1323,39 +1323,51 @@ Gates: closed domain; numeric identity per schema; unique; each attached to a si
 
 Channels: closed set of edges; canonical NN-NN (zero-padded, min-first, ASCII hyphen); ASCII-sorted; unique; no multi-hop encodings.
 
-Categories (Magic-10): closed ID set with pinned order (HDE-Schemas and Artifacts §2.6).
+Categories (Magic-10): closed ID set with pinned order (HDE-Schemas & Artifacts §2.6).
 
-Set semantics: arrays that represent sets MUST be deduped and ASCII-sorted before hashing/compare (HDE-Schemas and Artifacts §4).
+Set semantics: arrays that represent sets MUST be deduped and ASCII-sorted before hashing/compare (HDE-Schemas & Artifacts §4).
 
 Validation posture: unknown IDs, duplicates, non-canonical channel forms, or schema mismatches hard-fail with typed errors.
 
 ## **2.2 Validation & generation (mechanics)**
 
-Mechanics provides a single registry job that:
+Mechanics provides a single registry job that orchestrates the following distinct stages in order:
 
-* Load & validate each domain against its HDE-Schemas and Artifacts JSON-Schema (titles-only)
+1. Pin `LC_ALL=C`, `LANG=C`, and `TZ=UTC`, and apply the governing closed-rails posture.  
+2. Read the governed catalog and schema bytes once for the run, or bind every reread to identical SHA-256 digests and sizes.  
+3. Execute each topology catalog against its current owning JSON Schema under Draft 2020-12. Schema validation MUST establish schema dialect and identity, validator readiness, exact schema and instance paths and bytes, required fields, key and additional-property posture, types, enums, cardinalities, and deterministic complete failure output. Exact evidence fields and schemas remain in HDE-Schemas & Artifacts §8.1.  
+4. Load the catalogs and manifest through the typed loader. Normalize Channel IDs to zero-padded NN-NN, min-first form for comparison; reject noncanonical governed source bytes rather than silently repairing them. Enforce alias, cross-catalog, Magic-10, and manifest-safety rules owned by HDE-Schemas & Artifacts.  
+5. Prove closure, uniqueness, and positive topology coherence over the exact governed inputs:  
+   * nine centers: `ajna`, `ego`, `g`, `head`, `root`, `sacral`, `solar_plexus`, `spleen`, and `throat`;  
+   * Gates exactly `1..64`, each present once and mapped to one center;  
+   * exactly 36 unique canonical Channels, each with two distinct Gates, an ID equal to the zero-padded min-first Gate pair, and a declared center set equal to the distinct centers derived from those Gates;  
+   * junction Gates, including `10`, `20`, `34`, and `57`, permitted to participate in multiple valid Channels;  
+   * all ten Magic-10 categories in the exact governed order—`harmony`, `heat`, `communication`, `alignment`, `comfort`, `consistency`, `expansion`, `creativity`, `drive`, `balance`—with caps covering all ten.  
+6. Run the deterministic Channel and catalog negative corpus. It MUST refuse malformed Channel-ID shape, non-zero-padded or non-min-first identity, ID/Gate-pair mismatch, identical Gate endpoints, Gates outside `1..64`, unknown Gate or center references, duplicate Channel identity including canonical-comparison collisions, declared-center/Gate-derived-center mismatch, duplicate or noncanonical set arrays, unauthorized aliases or unknown alias targets, wrong enums, missing required properties, and additional properties. Each case binds a stable case identity, exact input or fixture, expected governed error classification, observed classification, and binary result; exact error strings and evidence schemas remain in their owning documents.  
+7. Run exhaustive arrays-as-sets and on-disk canonical-byte checks. Every schema-declared set field MUST be inspected for duplicates and canonical order. Every in-scope governed JSON input MUST already equal the canonical serializer output: UTF-8, no BOM, ASCII-sorted keys, compact separators, and exactly one trailing LF.  
+8. Stop on the first failed prerequisite. The job MUST NOT emit or promote a new registry report from invalid or differently bound inputs.  
+9. Emit `registry.registry_report` at `artifacts/registry/registry_report.json` from the exact source bytes bound by the prerequisite evidence. The report records the effective registry identities and counts, Gate-center mapping, all-ten Magic-10 order and caps, present seed metadata, alias policy, source paths, source counts or order, and source SHA-256 values under HDE-Schemas & Artifacts §8.5.  
+10. Cross-check that every report source path and SHA-256 matches the corresponding independent validation evidence.  
+11. Generate or update the report and proof path proofs, the Human Evidence Index (`docs/evidence/INDEX.json`), its hash sentinel, and the Machine Mirror (`artifacts/evidence_index.jsonl`) through their canonical writers in the same change. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3.  
+12. Treat the evidence family as admissible only when the report and every required prerequisite proof bind the same source-digest set.
 
-* Normalize channels to NN-NN min-first and enforce ASCII sort \+ dedupe for set-arrays
+Seeds remain admin/test-only frozen inputs and a validated subset under HDE-Schemas & Artifacts. Any seed change bumps `release_id` (HDE-Schemas & Artifacts §6; HDE-Math-Spec §5.1.1). The presence of only `harmony` and `heat` seed rows does not reduce the ten-category registry or caps requirement. Seeds are not public in Reader v1.
 
-* Prove closure & uniqueness (no extras/omissions, no duplicates, no cross-catalog drift)
+## **2.3 Artifacts and proof destinations (records-only; indexed via the machine mirror)**
 
-* Emit a registry snapshot (records-only metadata: domain name, item counts, canonical sha256/size of each governed artifact) and index it in the machine mirror at artifacts/evidence\_index.jsonl
+List every governed artifact by title and path in the Human Evidence Index (`docs/evidence/INDEX.json`) and mirror it 1:1 in `artifacts/evidence_index.jsonl`, with its sibling path proof. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3. Canonical JSON and JSONL use UTF-8 without BOM, ASCII-sorted keys, compact separators, and exactly one trailing LF.
 
-* Update the human Evidence Index (Appendix D) in the same change; CI enforces human↔machine 1:1 parity and path-proofs (discovered\_physical\_path \+ proof\_anchor)
+* `registry.registry_report` — the sole primary registry snapshot and quick-diff checksum summary, at `artifacts/registry/registry_report.json`.  
+* `artifacts/catalog/catalog_schema_validation.log` — owning-schema execution and schema/instance path, SHA-256, size, and outcome proof.  
+* `artifacts/catalog/domain_closure_report.log` — exact closed-domain, uniqueness, missing/extra identity, duplicate/unknown-reference refusal, all-ten Magic-10 closure, and Channel negative-corpus proof.  
+* `artifacts/topology/topology_coherence_report.log` — positive Gate, Channel, and center relationship proof.  
+* `artifacts/canonical/arrays_as_sets_report.log` — exhaustive set-field normalization and checked-in storage-discipline proof.  
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` — on-disk canonical-byte equality proof for every in-scope governed JSON input.  
+* The Human Evidence Index, Machine Mirror, and `artifacts/registry/registry_report.json.path_proof.txt` — the report's evidence identity, path, SHA-256, and size bindings.
 
-* Pins (determinism). All checks run with LC\_ALL=C, LANG=C, TZ=UTC; JSON is canonical (UTF-8 no BOM, sorted keys, compact, one LF)
+Do not emit separate `domain_snapshot` or `registry_checksums` artifacts, and do not mint a generic `closure_report` identity. Effective identities, counts, and source checksums survive in `registry.registry_report`; schema/instance size and digest pairing survives in `catalog_schema_validation.log`; closure, topology, set-integrity, and canonical-byte proof survives in the exact destinations above. Every proof and the report MUST bind the same source-digest set.
 
-* Seeds (catalogized; admin/test). If Seeds are present in HDE-Schemas and Artifacts, they are admin/test-only and treated as frozen inputs; any change bumps release\_id (HDE-Schemas and Artifacts §6; HDE-Math-Spec §5.1.1). Seeds are not public in Reader v1.
-
-## **2.3 Artifacts (records-only; path-agnostic; indexed via the machine mirror)**
-
-List by title/path in Appendix D and mirror 1:1 in artifacts/evidence\_index.jsonl (each record includes artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor; one LF; canonical JSON).
-
-domain\_snapshot — counts & identities (sha256/size) for centers/gates/channels/categories.
-
-closure\_report — proofs of domain closure & uniqueness; channel-normalization reject corpus (non-canonical inputs → errors).
-
-registry\_checksums — summarized checksums for governed artifacts (for quick diffing).
+The registry report is a derived registry projection. Its presence alone does not prove prerequisite validation success, Human Design accuracy, release completeness, QA acceptance, or production readiness.
 
 ## **2.4 Acceptance (tokens; titles-only)**
 
@@ -1363,13 +1375,15 @@ Acceptance is governed by HDE-Governance (titles-only). This section does not li
 
 The mechanics obligations in §2 require that acceptance proofs exist for:
 
-* closed-domain validation (centers/gates/channels/categories)
+* owning-schema execution and closed-domain validation for centers, Gates, Channels, categories, and caps  
+* canonical Channel identity, positive topology coherence, and deterministic negative refusal  
+* exhaustive set-order discipline and on-disk canonical-byte equality  
+* all-ten Magic-10 order and cap coverage while treating present seeds as a validated subset  
+* release identity coupling for any seed-bearing inputs  
+* one `registry.registry_report` plus its independent prerequisite validation evidence, all bound to the same source-digest set  
+* same-change Human Evidence Index, Machine Mirror, hash-sentinel, and path-proof discipline for every governed output
 
-* canonical channel orientation and set-order discipline
-
-* release identity coupling for any seed-bearing inputs
-
-* evidence/index discipline for the registry snapshots and reports produced by this section
+Acceptance MUST NOT be inferred from registry-report presence alone.
 
 # 3\) Programmatic Configuration System
 
@@ -1377,11 +1391,11 @@ Purpose (normative). Provide a typed, deterministic configuration surface for th
 
 Single homes (titles-only):
 
-* Domains/schemas & canonical JSON rules: PF-Canon-HDE-Schemas & Artifacts (§2, §4, §8)
-
-* Math semantics (constants, ordering/banding): PF-Canon-HDE-Math-Spec
-
-* Governance (evidence policy & tokens): PF-Canon-HDE-Governance
+* Domains/schemas & canonical JSON rules: HDE-Schemas & Artifacts (§2, §4, §8)  
+    
+* Math semantics (constants, ordering/banding): HDE-Math-Spec  
+    
+* Governance (evidence policy & tokens): HDE-Governance
 
 ## **3.1 Loader behavior (normative)**
 
@@ -1391,9 +1405,9 @@ Alias policy \= OFF (default). No implicit aliases. If an allow-list is explicit
 
 Normalization. Channel IDs normalize to zero-padded NN–NN (min-first); arrays that represent sets are deduped & ASCII-sorted before hashing/compare.
 
-Determinism. Output is order-neutral (AB↔BA), locale-neutral (LC\_ALL=C), and two-run identical; canonical JSON is UTF-8 (no BOM), sorted keys, compact, exactly one LF (PF-12 §4).
+Determinism. Output is order-neutral (AB↔BA), locale-neutral (LC\_ALL=C), and two-run identical; canonical JSON is UTF-8 (no BOM), sorted keys, compact, exactly one LF (HDE-Schemas & Artifacts §4).
 
-Implementation note (informative). In the current Engine repo, the typed loader behavior described in this section is implemented by engine.config.registry\_loader.load\_registry\_config. This reference is non-normative; the canonical rules remain those in PF-Canon-HDE-Schemas & Artifacts and this section.
+Implementation note (informative). In the current Engine repo, engine.config.registry\_loader.load\_registry\_config is the typed-loader locus. Static inspection confirms typed loading and several manual domain checks, but it does not establish owning-schema execution, exhaustive set-array sorting, or end-to-end conformance with every requirement in this section. This reference is non-normative; the canonical rules remain those in HDE-Schemas & Artifacts and this section.
 
 ## **3.2 Typed artifacts (codegen) — outputs, not paths**
 
@@ -1413,46 +1427,46 @@ The canonical schema and field shapes for registry\_report.v1 are defined in HDE
 
 At a high level, the report:
 
-* declares a schema tag (for example "registry\_report.v1")
-
-* records generated\_at\_utc
-
-* describes upstream inputs (catalogs and manifest)
-
-* summarizes registry state under artifacts.registry (channels, gates/centers, domains and counts, Magic-10, alias\_policy)
-
+* declares a schema tag (for example "registry\_report.v1")  
+    
+* records generated\_at\_utc  
+    
+* describes upstream inputs (catalogs and manifest)  
+    
+* summarizes registry state under artifacts.registry (channels, gates/centers, domains and counts, Magic-10, alias\_policy)  
+    
 * includes optional notes for internal commentary
 
 Programmatic generation & determinism.
 
 The registry report MUST be generated programmatically by the Programmatic Configuration System:
 
-* load and validate catalogs and manifest via the typed loader described in §3.1
-
-* construct the report object in memory and emit it via the canonical serializer (see §4 / §10.1)
+* load and validate catalogs and manifest via the typed loader described in §3.1  
+    
+* construct the report object in memory and emit it via the canonical serializer (see §4)
 
 generated\_at\_utc SHOULD be stable across two runs in a determinism-pinned environment. Tools MUST either:
 
-* reuse the existing generated\_at\_utc from a prior report when inputs have not changed
-
+* reuse the existing generated\_at\_utc from a prior report when inputs have not changed  
+    
 * use a pinned time source controlled by environment (for example, an epoch exposed via SOURCE\_DATE\_EPOCH or equivalent) so that two runs under the same conditions produce byte-identical JSON
 
 Two-run identity MUST hold for the registry report: running the generator twice with identical inputs and environment yields byte-identical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF).
 
-Implementation note (informative). For the current Engine, the registry report generator is implemented by tools/generate\_registry\_report.py, which loads catalogs and manifest via the typed loader in §3.1 and emits artifacts/registry/registry\_report.json through the canonical serializer. This reference is informative only; Mechanics remains implementation-agnostic and the governed rules are those in PF-Canon-HDE-Schemas & Artifacts and this section.
+Implementation note (informative). For the current Engine, the registry report generator is implemented by tools/generate\_registry\_report.py, which loads catalogs and manifest via the typed loader in §3.1 and emits artifacts/registry/registry\_report.json through the canonical serializer. This reference is informative only; Mechanics remains implementation-agnostic and the governed rules are those in HDE-Schemas & Artifacts and this section.
 
 Alias policy summary.
 
 The report MUST expose a names-only alias policy summary under artifacts.registry (see HDE-Schemas and Artifacts for exact shape):
 
-* mode — "off" or "allow\_list" (or equivalent closed set)
-
+* mode — "off" or "allow\_list" (or equivalent closed set)  
+    
 * aliases — a mapping from alias IDs to canonical channel IDs when the allow-list is enabled
 
 This summary reflects the loader’s alias behavior:
 
-* aliases are OFF by default
-
+* aliases are OFF by default  
+    
 * when an allow-list is configured, only declared aliases are present; all others fail closed (see §3.1)
 
 Mechanics does not carry alias ledger content or catalog values; it only enforces that the alias policy exposed in the report matches the loader behavior.
@@ -1461,32 +1475,18 @@ Evidence & indexing (titles-only).
 
 The registry report MUST be part of the evidence skeleton:
 
-* A human Evidence Index entry is present in docs/evidence/INDEX.json (titles/paths only)
-
-* A Machine Mirror record is present in artifacts/evidence\_index.jsonl with:
-
-  * artifact\_key (for example "registry.registry\_report")
-
-  * role:"snapshot"
-
-  * discovered\_physical\_path:"artifacts/registry/registry\_report.json"
-
-  * sha256
-
-  * size\_bytes
-
-  * produced\_at\_utc
-
-  * proof\_anchor pointing to the corresponding path-proof transcript
+* A human Evidence Index entry is present in docs/evidence/INDEX.json (titles/paths only)  
+    
+* A Machine Mirror record is present in artifacts/evidence\_index.jsonl. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3.
 
 Human Index, hash sentinel, mirror record, and path-proof for the report MUST be updated in the same PR as any change to the report; CI enforces human↔machine 1:1 parity, canonical JSONL, and path-proof presence (tokens routed by title to HDE-Governance and HDE-Schemas and Artifacts).
 
 Routing (titles-only):
 
-* Catalog/manifest schemas and the token→evidence matrix: HDE-Schemas and Artifacts
-
-* Loader error envelope \+ canonical JSON serialization rules: HDE-Mechanics Guide
-
+* Catalog/manifest schemas and the token→evidence matrix: HDE-Schemas and Artifacts  
+    
+* Loader error envelope \+ canonical JSON serialization rules: HDE-Mechanics Guide  
+    
 * Evidence skeleton tokens and CI posture: HDE-Governance, HDE-Build Checklist, and HDE-Phased Epics
 
 ## **3.4 Validation (binary)**
@@ -1499,7 +1499,7 @@ Typed artifacts: FE and BE bundles are type-complete, immutable, and consistent 
 
 Determinism: re-running the loader yields identical bytes for codegen bundles and the registry report.
 
-Evidence: human Index and PF-12 mirror contain synchronized records with path-proofs; canonical JSON lints pass (UTF-8/no BOM, sorted keys, one LF).
+Evidence: human Index and HDE-Schemas & Artifacts mirror contain synchronized records with path-proofs; canonical JSON lints pass (UTF-8/no BOM, sorted keys, one LF).
 
 ## **3.5 Acceptance (tokens; titles-only)**
 
@@ -1507,19 +1507,19 @@ Acceptance is governed by HDE-Governance (titles-only). This section does not li
 
 The mechanics obligations in §3 require that acceptance proofs exist for:
 
-* deterministic config generation (two-run identical governed config artifacts)
-
-* canonical JSON discipline for all governed outputs
-
+* deterministic config generation (two-run identical governed config artifacts)  
+    
+* canonical JSON discipline for all governed outputs  
+    
 * evidence/index parity for generated reports and bundles
 
 ## **3.6 Routing (no duplication)**
 
-Canonical rules & mirror schema: PF-Canon-HDE-Schemas & Artifacts.
+Canonical rules & mirror schema: HDE-Schemas & Artifacts.
 
-Math semantics & constants: PF-Canon-HDE-Math-Spec.
+Math semantics & constants: HDE-Math-Spec.
 
-Evidence policy & governance tokens: PF-Canon-HDE-Governance.
+Evidence policy & governance tokens: HDE-Governance.
 
 ## **3.7 Config artifacts (Magic-10 and band edges)**
 
@@ -1529,35 +1529,37 @@ Purpose (normative). The Programmatic Configuration System must emit governed co
 
 The configuration generator responsible for producing governed config artifacts MUST:
 
-* Run under closed rails and determinism pins before writing any governed config artifact:
-
-  * SAFE\_MODE \= 1
-
-  * ALLOW\_NETWORK \= 0
-
-  * LC\_ALL \= C
-
-  * LANG \= C
-
+* Run under closed rails and determinism pins before writing any governed config artifact:  
+    
+  * SAFE\_MODE \= 1  
+      
+  * ALLOW\_NETWORK \= 0  
+      
+  * LC\_ALL \= C  
+      
+  * LANG \= C  
+      
   * TZ \= UTC
 
-* Use the typed loader behavior defined in §3.1 to read catalogs, manifest, and any thresholds inputs.
 
-* Emit all config artifacts via the Canonical Serialization Package (see §4 and §10.1):
-
-  * UTF-8, no BOM
-
-  * ASCII-sorted keys
-
-  * compact separators
-
-  * exactly one trailing line feed
-
+* Use the typed loader behavior defined in §3.1 to read catalogs, manifest, and any thresholds inputs.  
+    
+* Emit all config artifacts via the Canonical Serialization Package (see §4):  
+    
+  * UTF-8, no BOM  
+      
+  * ASCII-sorted keys  
+      
+  * compact separators  
+      
+  * exactly one trailing line feed  
+      
   * arrays that represent sets deduped and ASCII-sorted before emission
+
 
 * Two-run identity MUST hold for each governed config artifact: running the generator twice with identical inputs and environment yields byte-identical JSON.
 
-Implementation note (informative). In the current engine repository, this behavior is implemented by a closed-rails generator script in tools/config/generate\_config\_artifacts.py and helper functions in tools/config/artifacts.py. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
+Implementation note (informative). In the current engine repository, tools/config/generate\_config\_artifacts.py and tools/config/artifacts.py are the generator loci for this artifact family. Static inspection confirms closed-rails guard calls and canonical serializer use; it does not establish exhaustive arrays-as-sets normalization, successful two-run execution, or conformance of generated bytes. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
 
 ### **3.7.2 Magic-10 config artifact**
 
@@ -1565,23 +1567,25 @@ The configuration system MUST materialize a governed Magic-10 configuration arti
 
 At a minimum, this artifact:
 
-* Captures the Magic-10 category order exactly as used by the engine (closed set and pinned order).
-
-* Records per-category configuration and bounds, including:
-
-  * numeric caps for inputs and derived scores (integer bounds)
-
+* Captures the Magic-10 category order exactly as used by the engine (closed set and pinned order).  
+    
+* Records per-category configuration and bounds, including:  
+    
+  * numeric caps for inputs and derived scores (integer bounds)  
+      
   * any additional per-category configuration metadata required by the engine math
 
-* Records seed metadata for the Magic-10 configuration as a structured block, including at least:
 
-  * template identifier (template\_id)
-
-  * seed version (seed\_version)
-
-  * updated\_at\_utc (UTC ISO time, semantics single-homed in HDE-Schemas & Artifacts and Glow QA Guide)
-
+* Records seed metadata for the Magic-10 configuration as a structured block, including at least:  
+    
+  * template identifier (template\_id)  
+      
+  * seed version (seed\_version)  
+      
+  * updated\_at\_utc (UTC ISO time, semantics single-homed in HDE-Schemas & Artifacts and Glow QA Guide)  
+      
   * checksum\_sha256 over the underlying config source or thresholds used to derive this artifact
+
 
 * Emits canonical, deterministic JSON governed by the rules in §3.7.1 and §4.
 
@@ -1593,12 +1597,12 @@ The configuration system MUST also materialize a governed band-edges configurati
 
 At a minimum, this artifact:
 
-* Captures band labels and numeric edges for the engine’s banding policy (such as inclusive-high thresholds).
-
-* Records, in a names-only form, the clamp and rounding behavior used by the engine (for example, clamp bounds and the rounding mode consistent with round\_half\_up in HDE-Math-Spec).
-
-* Carries a version tag and a structured pointer back to the thresholds input used to derive it (for example, a reference to the thresholds pack or math thresholds source discussed in §7.3 and in HDE-Schemas & Artifacts).
-
+* Captures band labels and numeric edges for the engine’s banding policy (such as inclusive-high thresholds).  
+    
+* Records, in a names-only form, the clamp and rounding behavior used by the engine (for example, clamp bounds and the rounding mode consistent with round\_half\_up in HDE-Math-Spec).  
+    
+* Carries a version tag and a structured pointer back to the thresholds input used to derive it (for example, a reference to the thresholds pack or math thresholds source discussed in §7.3 and in HDE-Schemas & Artifacts).  
+    
 * Emits canonical JSON governed by §3.7.1 and §4, under the same two-run identity requirements as the registry report.
 
 Band-edges configuration is admin/test-visible only; band mechanics and public band behavior remain specified in HDE-Math-Spec and in the Category Framework (§7).
@@ -1607,10 +1611,10 @@ Band-edges configuration is admin/test-visible only; band mechanics and public b
 
 Governed config artifacts participate in the same evidence skeleton as other artifacts described in §1.3 and §25:
 
-* Each config artifact (registry report, Magic-10 config, band-edges config) MUST appear in the human Evidence Index with a title and discovered path, and have a corresponding record in the machine mirror with sha256, size\_bytes, produced\_at\_utc, role, and proof\_anchor.
-
-* Each config artifact MUST have a co-located path-proof transcript referenced by proof\_anchor; governed evidence tools described in §1.3.1 are the only writers for these path-proofs and the mirror.
-
+* Each config artifact (registry report, Magic-10 config, band-edges config) MUST appear in the human Evidence Index with a title and discovered path, and have a corresponding record in the machine mirror. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3.  
+    
+* Each config artifact MUST have a co-located path-proof transcript referenced by proof\_anchor; governed evidence tools described in §1.3.1 are the only writers for these path-proofs and the mirror.  
+    
 * Mapping of PF09 tasks and QA tokens to config artifacts and tests lives in the config acceptance map and QA documents by title (HDE-Build Checklist, HDE-Schemas & Artifacts, Glow QA Guide, and HDE Phased Epics). PF14 records only that governed config artifacts exist, are generated under closed rails, are canonical and two-run identical, and are part of the evidence skeleton; it does not duplicate the acceptance map schema or token definitions.
 
 ## **3.8 Typed FE/BE config bundles (projections of governed config)**
@@ -1621,35 +1625,37 @@ Purpose (normative). The Programmatic Configuration System must expose typed con
 
 The bundle generator responsible for producing FE/BE config bundles MUST:
 
-* Run under closed rails and determinism pins before computing or writing any bundle:
-
-  * SAFE\_MODE \= 1
-
-  * ALLOW\_NETWORK \= 0
-
-  * LC\_ALL \= C
-
-  * LANG \= C
-
+* Run under closed rails and determinism pins before computing or writing any bundle:  
+    
+  * SAFE\_MODE \= 1  
+      
+  * ALLOW\_NETWORK \= 0  
+      
+  * LC\_ALL \= C  
+      
+  * LANG \= C  
+      
   * TZ \= UTC
 
-* Load configuration exclusively through the typed loader described in §3.1 and the governed config artifacts described in §3.7 (registry report, Magic-10 config, band-edges config), without introducing new configuration sources.
 
-* Emit both bundles using the Canonical Serialization Package (§4 / §10.1):
-
-  * UTF-8, no BOM
-
-  * ASCII-sorted keys
-
-  * compact separators
-
-  * exactly one trailing line feed
-
+* Load configuration exclusively through the typed loader described in §3.1 and the governed config artifacts described in §3.7 (registry report, Magic-10 config, band-edges config), without introducing new configuration sources.  
+    
+* Emit both bundles using the Canonical Serialization Package (§4):  
+    
+  * UTF-8, no BOM  
+      
+  * ASCII-sorted keys  
+      
+  * compact separators  
+      
+  * exactly one trailing line feed  
+      
   * arrays that represent sets deduped and ASCII-sorted before emission
+
 
 * Two-run identity MUST hold for each bundle: generating FE and BE bundles twice with identical inputs and environment yields byte-identical JSON.
 
-Implementation note (informative). In the current engine repository, this behavior is implemented by a closed-rails bundle builder in engine/config/bundles.py and a CLI script in tools/config/generate\_bundles.py. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
+Implementation note (informative). In the current engine repository, engine/config/bundles.py and tools/config/generate\_bundles.py are the bundle-builder and CLI loci. Static inspection confirms closed-rails guard calls and canonical serializer use; it does not establish exhaustive arrays-as-sets normalization, successful two-run execution, or conformance of generated bytes. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
 
 ### **3.8.2 Backend config bundle (internal scope)**
 
@@ -1657,35 +1663,38 @@ The backend bundle is a governed config snapshot whose artifact\_key and schema 
 
 At a minimum, this bundle:
 
-* Includes the full Magic-10 configuration as derived from the Magic-10 config artifact:
-
-  * closed category order
-
-  * per-category caps and other configuration parameters
-
+* Includes the full Magic-10 configuration as derived from the Magic-10 config artifact:  
+    
+  * closed category order  
+      
+  * per-category caps and other configuration parameters  
+      
   * the seed metadata block (template identifier, seed version, updated\_at\_utc, checksum) consistent with §3.7.2
 
-* Includes the full band-edges payload as derived from the band-edges config artifact:
 
-  * band labels
-
-  * edges
-
-  * clamp behavior
-
-  * rounding mode
-
-  * version
-
+* Includes the full band-edges payload as derived from the band-edges config artifact:  
+    
+  * band labels  
+      
+  * edges  
+      
+  * clamp behavior  
+      
+  * rounding mode  
+      
+  * version  
+      
   * source pointer consistent with §3.7.3
 
-* Includes the registry-backed domain view needed by backend scoring and ordering logic, such as:
 
-  * channels with ids, gates, centers, circuit\_primary/substream, primary\_domain, domains, and any flags required by the engine
-
-  * centers and domains as recorded in the registry report
-
+* Includes the registry-backed domain view needed by backend scoring and ordering logic, such as:  
+    
+  * channels with ids, gates, centers, circuit\_primary/substream, primary\_domain, domains, and any flags required by the engine  
+      
+  * centers and domains as recorded in the registry report  
+      
   * alias\_policy in a names-only form consistent with §3.1 and §3.3
+
 
 * Carries a structured sources block that, for each upstream governed config artifact used (for example, registry\_report, Magic-10 config, band-edges config), records at least path, sha256, and size\_bytes values matching the current Evidence Index / Machine Mirror entries.
 
@@ -1697,31 +1706,34 @@ The frontend bundle is a governed config snapshot whose artifact\_key and schema
 
 At a minimum, this bundle:
 
-* Provides a slimmed view of Magic-10 configuration suitable for clients:
-
-  * Magic-10 category order and caps
-
+* Provides a slimmed view of Magic-10 configuration suitable for clients:  
+    
+  * Magic-10 category order and caps  
+      
   * any additional per-category configuration needed for UI behavior
 
-* Provides a reduced band-edges view:
 
-  * band labels
-
-  * edges
-
-  * clamp behavior
-
-  * rounding mode
-
-  * version
-
+* Provides a reduced band-edges view:  
+    
+  * band labels  
+      
+  * edges  
+      
+  * clamp behavior  
+      
+  * rounding mode  
+      
+  * version  
+      
   * a names-only reference back to the same thresholds source used for the backend bundle
 
-* Exposes channel identifiers and related metadata required by clients:
 
-  * channel ids plus associated centers and domains
-
+* Exposes channel identifiers and related metadata required by clients:  
+    
+  * channel ids plus associated centers and domains  
+      
   * alias policy in the same names-only form as the backend bundle
+
 
 * Carries a sources block with the same structure and guarantees as the backend bundle, so clients can verify that FE config reflects the current governed config artifacts and registry state.
 
@@ -1735,18 +1747,18 @@ For now: HDE-Schemas & Artifacts owns the canonical artifact\_keys, path convent
 
 Each bundle MUST:
 
-* appear in the human Evidence Index with an artifact\_key and discovered\_physical\_path
-
-* have a corresponding record in the machine mirror with sha256, size\_bytes, produced\_at\_utc, role, and proof\_anchor
-
+* appear in the human Evidence Index with an artifact\_key and discovered\_physical\_path  
+    
+* have a corresponding record in the machine mirror; Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3.  
+    
 * have a co-located path-proof transcript referenced by proof\_anchor
 
 Tests for typed bundles MUST:
 
-* prove canonical formatting and two-run identity
-
-* validate bundle structures against the local JSON Schemas
-
+* prove canonical formatting and two-run identity  
+    
+* validate bundle structures against the local JSON Schemas  
+    
 * assert that Magic-10, band-edges, channels, centers, domains, alias\_policy, and the sources block are consistent with the governed config artifacts and registry report described in §3.3 and §3.7
 
 PF14 does not introduce new acceptance tokens for bundles; token names and gating for config bundles remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics.
@@ -1759,7 +1771,7 @@ One serializer and one emitter MUST serve all public bytes (Reader, CLI, evidenc
 
 Single presenter/emitter (byte-authoritative). All public JSON bytes MUST be produced by one presenter/emitter entrypoint symbol. Reader and CLI MUST delegate byte emission to this exact symbol (titles-only allow-list; no alternate byte emitters). Wrapper envelope builders MAY exist, but they MUST NOT serialize public bytes outside the allow-listed entrypoint.
 
-See §10.2 for the unified entrypoint and §10.1 for canonicalization; the preimage recipe is in §3.2.
+See §8.2 for the unified presenter/emitter entrypoint and §4 for canonicalization. Local preimage assembly is defined in §8.3; owning identity and preimage semantics are in HDE-Math-Spec §3.2.
 
 Canonical JSON. UTF-8 (no BOM); ASCII-sorted keys; compact separators (, and : only); exactly one trailing LF (\\n). Arrays that function as sets are deduplicated and ASCII-sorted by identity.
 
@@ -1784,19 +1796,25 @@ Acceptance is governed by HDE-Governance (titles-only). This section does not li
 The mechanics obligations in §4 require that acceptance proofs exist for:
 
 * shared presenter/emitter coupling across Reader and CLI  
+    
 * canonical JSON discipline (UTF-8, sorted keys, compact, exactly one trailing LF, arrays-as-sets canonicalization)  
+    
 * determinism (AB↔BA neutrality and two-run identity)  
+    
 * evidence/index discipline for serializer and emitter guard artifacts
 
   ## **4.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
 
-List by title/path in Appendix D: Evidence Index and add 1:1 records in artifacts/evidence\_index.jsonl (each with artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor; canonical JSONL; one LF).
+List by title/path in the Human Evidence Index (docs/evidence/INDEX.json) and add 1:1 records in artifacts/evidence\_index.jsonl. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3. Records use canonical JSONL with exactly one trailing LF.
 
 Examples:
 
 * grep\_guard/serializer — proves no ad-hoc serializers on public paths (CI regex results).  
+    
 * emitter\_symbol/proof — import-graph/reflection proof that Reader and CLI call the same presenter symbol.  
+    
 * canonical\_json/check — policy check (UTF-8/no BOM, sorted keys, compact, one LF).  
+    
 * canonical\_json/compare — byte-compare of public bytes vs canonical re-serialization (expected empty diff).
 
   ## **4.6 Routing (titles-only)**
@@ -1849,7 +1867,7 @@ AB↔BA identity. Using the same comparators on normalized (A,B) and (B,A) yield
 
 Two-run identity. Re-running with the same inputs produces byte-identical sequences after canonicalization.
 
-Serializer coupling. Canonical dumps use UTF-8 (no BOM), sorted keys, compact, exactly one LF (§4/§10.1), with arrays already deduped & ASCII-sorted.
+Serializer coupling. Canonical dumps use UTF-8 (no BOM), sorted keys, compact, exactly one LF (§4), with arrays already deduped & ASCII-sorted.
 
 ## **5.6 Validation (binary & property tests)**
 
@@ -1862,16 +1880,7 @@ Serializer coupling. Canonical dumps use UTF-8 (no BOM), sorted keys, compact, e
 
 ## **5.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
 
-List by title/path in Appendix D: Evidence Index and mirror 1:1 in artifacts/evidence\_index.jsonl (records-only JSONL; UTF-8 no BOM; sorted keys; compact; exactly one LF).
-
-Each mirror record includes:
-
-* artifact\_key  
-* sha256  
-* size\_bytes  
-* produced\_at\_utc  
-* discovered\_physical\_path  
-* proof\_anchor
+List by title/path in the Human Evidence Index (docs/evidence/INDEX.json) and mirror 1:1 in artifacts/evidence\_index.jsonl. Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3. Records-only JSONL remains UTF-8 without BOM, with ASCII-sorted keys, compact separators, and exactly one trailing LF.
 
 Update human Index and mirror in the same PR; CI enforces 1:1 parity and path-proofs.
 
@@ -1889,7 +1898,7 @@ Routing (titles-only):
 
 ## **5.8 Dev sampler HTTP harness (internal/dev-only)**
 
-Purpose. Provide a dev/admin-only HTTP harness for the sampler core that mirrors the dev sampler CLI semantics while remaining a strictly internal surface. This harness is for local and dev/admin use; it is not part of the public API, is not listed in the Endpoint Catalog, and is not an A7 proof surface.
+Purpose. Provide a dev/admin-only HTTP harness for the sampler core that mirrors the dev sampler CLI semantics while remaining a strictly internal surface. This harness is for local and dev/admin use; it is not part of the public API, is classified as `dev_harness` in the Endpoint Catalog, and is not an A7 proof surface.
 
 Route and method. Route: POST /internal/dev/sampler. Method posture: POST only; unsupported methods return 405\. The route is non-conditional: no conditional headers are honored, and the route never returns 304\. Transport posture: emitted via the same canonical serializer used elsewhere in this document (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted). Successful dev/admin responses carry JSON Content-Type, Cache-Control: no-store, and no ETag. Error envelopes follow the writer/error posture defined elsewhere in this document.
 
@@ -2031,7 +2040,7 @@ This records a local/dev evidence family only. It does not add a public route, d
 
 A7 and Endpoint Catalog posture. POST /internal/dev/sampler is an internal/dev surface and is explicitly not a JSON success route in the Endpoint Catalog.
 
-No A7 proofs are run against this route, and it must not be referenced in the Catalog or any A7 composite proofs.
+No A7 proofs are run against this route, and its Catalog entry must not be referenced in any A7 composite proofs.
 
 Any headers-only captures for this route are local/dev diagnostics only and do not contribute to A7 acceptance tokens.
 
@@ -2039,15 +2048,15 @@ The CLI dev sampler remains the primary sampler harness; this HTTP dev harness i
 
 # 6\) Deterministic Engine Core \[Required-Now\]
 
-Contract. The Engine Core is pure compute (ops, scoring, aggregation). It performs no I/O, uses no clocks, reads no globals/env, and does not depend on system locale. All behavior is driven by explicit inputs and frozen pack/preset constants (titles-only to PF-Canon-HDE-Schemas & Artifacts / PF-Canon-HDE-Math-Spec).
+Contract. The Engine Core is pure compute (ops, scoring, aggregation). It performs no I/O, uses no clocks, reads no globals/env, and does not depend on system locale. All behavior is driven by explicit inputs and frozen pack/preset constants (titles-only to HDE-Schemas & Artifacts / HDE-Math-Spec).
 
 ## **6.1 Inputs & state (explicit only)**
 
-Explicit parameters. All data (composite, feature flags, constants, viewer\_prefs) is passed by value or via a typed config object. No hidden sources. Do not read files, environment variables, or the clock; do not mutate module globals or singletons. Preconditions satisfied upstream. Alias normalization, tz resolution, and ingestion occur before the core (titles-only to PF-Canon-HDE-Schemas & Artifacts §2.1 / PF-Canon-HDE-CLI-API-Vendor-Ref §3.2).
+Explicit parameters. All data (composite, feature flags, constants, viewer\_prefs) is passed by value or via a typed config object. No hidden sources. Do not read files, environment variables, or the clock; do not mutate module globals or singletons. Preconditions satisfied upstream. Alias normalization, tz resolution, and ingestion occur before the core (titles-only to HDE-Schemas & Artifacts §2.1 / HDE-CLI-API-Vendor-Ref §3.2).
 
 ## **6.2 Determinism pins**
 
-AB↔BA neutral. Core results are identical when inputs A,B are swapped (AB \== BA after normalization). Two-run identity. Two evaluations over the same inputs \+ constants produce byte-identical results. Stable iteration. Do not rely on unspecified map/set iteration order: reduce over ASCII-sorted keys; arrays-as-sets are deduped & ASCII-sorted. Locale & serializer. All canonicalization/compares run under LC\_ALL=C. Any JSON the core emits for evidence uses the canonical serializer (UTF-8 no BOM, sorted keys, compact, exactly one LF). Numeric rules (titles-only). Follow PF-Canon-HDE-Math-Spec for integerization and rounding (round\_half\_up); avoid floating-point accumulation for public-path numerics. Use integer/fixed-point paths defined in PF-01.
+AB↔BA neutral. Core results are identical when inputs A,B are swapped (AB \== BA after normalization). Two-run identity. Two evaluations over the same inputs \+ constants produce byte-identical results. Stable iteration. Do not rely on unspecified map/set iteration order: reduce over ASCII-sorted keys; arrays-as-sets are deduped & ASCII-sorted. Locale & serializer. All canonicalization/compares run under LC\_ALL=C. Any JSON the core emits for evidence uses the canonical serializer (UTF-8 no BOM, sorted keys, compact, exactly one LF). Numeric rules (titles-only). Follow HDE-Math-Spec for integerization and rounding (round\_half\_up); avoid floating-point accumulation for public-path numerics. Use integer/fixed-point paths defined in HDE-Math-Spec.
 
 ## **6.3 Concurrency & parallelism**
 
@@ -2065,9 +2074,9 @@ Two-run identity: run core twice on the same inputs → byte-equal outputs. ABBA
 
 artifact\_key: engine/tworun\_identity — two-run proof; artifact\_key: engine/abba\_identity — ABBA compare; artifact\_key: canonical\_json/compare — canonical re-serialization proof (if core emits JSON artifacts); artifact\_key: guards/no\_io\_no\_clock — static/grep proof of no I/O/clocks/globals.
 
-Each mirror record includes artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof. The human Evidence Index (Appendix D) is updated in the same change; CI enforces human↔machine 1:1 parity and path-proofs.
+Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3. The Human Evidence Index (docs/evidence/INDEX.json) is updated in the same change; CI enforces human↔machine 1:1 parity and path-proofs.
 
-Routing (titles-only). Numeric rules & public rounding/banding: PF-Canon-HDE-Math-Spec. Canonical JSON & pack/manifest: PF-Canon-HDE-Schemas & Artifacts. Governance tokens: PF-04 — §2.0 Acceptance Tokens.
+Routing (titles-only). Numeric rules & public rounding/banding: HDE-Math-Spec. Canonical JSON & pack/manifest: HDE-Schemas & Artifacts. Governance tokens: HDE-Governance — §2.0 Acceptance Tokens.
 
 ## **6.7 Canonical Engine Core module and tests**
 
@@ -2075,12 +2084,12 @@ Scope (normative). The Dissolution engine work for tasks HDE-DISS004.1–.3 real
 
 Canonical module and entrypoint. The Engine Core module lives at engine/core/core.py and exports frozen dataclasses and helpers that implement the pure-compute contract in §6:
 
-* ParticipantState — frozen dataclass capturing the normalized state per party (for example, person identifier, compat score, band, and an immutable traits tuple).
-
-* CoreConfig — frozen dataclass carrying Engine Core configuration, including band\_priority, which defaults to the canonical band ordering (for example, the BANDS tuple from compat thresholds).
-
-* PerspectiveBreakdown — frozen dataclass capturing perspective-specific metrics for one party (for example, party-local score, delta, and any supporting breakdowns).
-
+* ParticipantState — frozen dataclass capturing the normalized state per party (for example, person identifier, compat score, band, and an immutable traits tuple).  
+    
+* CoreConfig — frozen dataclass carrying Engine Core configuration, including band\_priority, which defaults to the canonical band ordering (for example, the BANDS tuple from compat thresholds).  
+    
+* PerspectiveBreakdown — frozen dataclass capturing perspective-specific metrics for one party (for example, party-local score, delta, and any supporting breakdowns).  
+    
 * CoreResult — frozen dataclass aggregating neutral metrics, ordered identifiers and bands, perspective breakdowns for both parties, and any shared-traits summary.
 
 The canonical Engine Core entrypoint is engine.core.core.compute\_core. Mechanics and tests MUST treat this symbol as the single home for Engine Core behavior when evaluating the determinism and neutrality requirements in §6.2 and the acceptance checks in §6.5.
@@ -2089,41 +2098,41 @@ Neutral metrics, ordering, and shared traits. Neutral metrics are computed as sy
 
 Identifier and band ordering use the deterministic ordering utilities from the Engine’s comparators and thresholds:
 
-* Party identifiers are canonicalized via compare\_ids. When both identifiers are equal, the pair is mapped to the ABBA\_CANONICAL\_PAIR constant so that self-pairs have a fixed canonical representation.
-
+* Party identifiers are canonicalized via compare\_ids. When both identifiers are equal, the pair is mapped to the ABBA\_CANONICAL\_PAIR constant so that self-pairs have a fixed canonical representation.  
+    
 * Band pairs are ordered via a \_band\_rank function derived from CoreConfig.band\_priority and then by band name, ensuring that for a fixed configuration, ordered\_bands is identical for compute\_core(A,B, config) and compute\_core(B,A, config) and deterministic across runs.
 
 These behaviors are normative for Engine Core; any future Engine Core changes MUST preserve AB↔BA neutrality and two-run identity as defined in §6.2.
 
 Dedicated Engine Core test suite (closed rails). Purity tests live under tests/core/test\_engine\_core\_purity.py and MUST:
 
-* import and reload engine.core.core under ensure\_determinism\_env(apply=True) to enforce determinism pins and closed rails
-
-* use AST-based checks to reject imports whose root module is in {os, time, datetime, random, socket, subprocess}
-
+* import and reload engine.core.core under ensure\_determinism\_env(apply=True) to enforce determinism pins and closed rails  
+    
+* use AST-based checks to reject imports whose root module is in {os, time, datetime, random, socket, subprocess}  
+    
 * scan the module source text for forbidden snippets such as "os.environ", "time.", "datetime.", "random.", and "socket."
 
-Together, these guards prove that the Engine Core performs no file, network, clock, RNG, or env access and does not introduce import-time side effects, satisfying the “no I/O/clocks/globals” requirement in §6.1 and §6.5.
+Successful execution of these guards under the specified rails provides the required proof that the Engine Core performs no file, network, clock, RNG, or env access and does not introduce import-time side effects, satisfying the “no I/O/clocks/globals” requirement in §6.1 and §6.5. Checked-in guard definitions alone do not prove passage.
 
 AB↔BA behavior tests live under tests/core/test\_engine\_core\_abba.py and MUST:
 
-* construct asymmetric A/B inputs (different compat scores and bands) using ParticipantState and CoreConfig
-
-* assert that neutral fields in CoreResult (for example, neutral score, ordered\_pair, ordered\_bands, and shared traits) are identical for compute\_core(A,B, config) and compute\_core(B,A, config)
-
+* construct asymmetric A/B inputs (different compat scores and bands) using ParticipantState and CoreConfig  
+    
+* assert that neutral fields in CoreResult (for example, neutral score, ordered\_pair, ordered\_bands, and shared traits) are identical for compute\_core(A,B, config) and compute\_core(B,A, config)  
+    
 * assert that perspective-specific metrics in the PerspectiveBreakdown structures cross-swap as expected (for example, deltas for BA are the negation of the AB deltas) while remaining internally consistent
 
-These tests are the canonical proof of AB↔BA neutrality for Engine Core and directly exercise the requirements in §6.2 and §6.5.
+Successful execution of these tests provides the canonical proof of AB↔BA neutrality for Engine Core and directly exercises the requirements in §6.2 and §6.5. Checked-in test definitions alone do not prove passage.
 
 Determinism and JSON-compatibility tests live under tests/core/test\_engine\_core\_determinism.py and MUST:
 
-* call compute\_core twice with identical inputs and CoreConfig under ensure\_determinism\_env(apply=True) and assert that the two CoreResult instances are equal
-
-* serialize each result via json.dumps(dataclasses.asdict(result), sort\_keys=True) and assert that the resulting JSON strings are byte-identical
-
+* call compute\_core twice with identical inputs and CoreConfig under ensure\_determinism\_env(apply=True) and assert that the two CoreResult instances are equal  
+    
+* serialize each result via json.dumps(dataclasses.asdict(result), sort\_keys=True) and assert that the resulting JSON strings are byte-identical  
+    
 * verify that when CoreConfig.band\_priority is customized, ordered\_bands and ordered\_pair remain deterministic and consistent with the configured band priority
 
-These tests serve as the Engine Core’s two-run identity and JSON-compatibility proof under the determinism posture in §6.2 and §6.3. They demonstrate that CoreResult is safe for use with the canonical serializer and evidence tooling described elsewhere in this guide, even though the Engine Core evidence artifacts themselves are wired in a later epic.
+Successful execution of these tests provides the Engine Core’s two-run identity and JSON-compatibility proof under the determinism posture in §6.2 and §6.3. A passing run demonstrates that CoreResult is safe for use with the canonical serializer and evidence tooling described elsewhere in this guide; checked-in test definitions alone do not prove passage. The Engine Core evidence artifacts themselves remain wired in a later epic.
 
 Evidence wiring (future epic). This subsection records the Engine Core’s pure-compute module and test harness only. The evidence artifacts and Machine Mirror records listed in §6.6 remain the long-term target for Engine Core evidence, but their wiring is explicitly assigned to a later epic (HDE-DISS004.4) and is not part of the mechanics recorded for the behavior-only work on HDE-DISS004.1–.3.
 
