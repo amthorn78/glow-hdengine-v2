@@ -3,10 +3,10 @@
 ## 0.1 Document Control
 
 **Title:** PF17-Canon-HDE-Narratives-Guide  
-**Version:** v1.5.1  
+**Version:** v1.5.2  
 **Status:** Canon  
-**Effective** **date**: 2026-08-10  
-**Last Update Gate:** 0808 refresh 1  
+**Effective** **date**: 2026-08-11  
+**Last Update Gate:** 0808 refresh 2  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -987,22 +987,22 @@ Missing, unsupported, duplicate, partial, or identity-invalid state must not be 
 ## **5.1 Reader v1 Posture — bands-only; narrative-free**
 
 **Posture (unchanged).**  
- Reader v1 public JSON remains numeric-free (bands-only) and contains no narrative text. Narrative text appears only on the Aux narrative surface and in admin CLI preview.
+Reader v1 public JSON remains numeric-free (bands-only) and contains no narrative text. Narrative text appears only on the Aux narrative surface and in admin CLI preview.
 
 This guide does not restate payload shapes or header matrices; it links by title only. Payload bytes live in **PF05 — CLI/API**; transport/A7 policy lives in **PF04 — Governance**; the bands-only Reader covenant is defined in **PF01 — Math Spec**.
 
 **Implications.**  
- Reader v1 keeps its existing public contract (six-key, numeric-free success body). Any narrative-related exposure continues to route through Aux/CLI, not Reader v1.
+Reader v1 keeps its existing public contract (six-key, numeric-free success body). Any narrative-related exposure continues to route through Aux/CLI, not Reader v1.
 
 **A7 proof surface (route-only).**  
- When Reader success routes are proven, proofs run only on a cataloged JSON success route (Endpoint Catalog, PF05). The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof. `/internal/version` is ops-only and not A7-eligible.
+When Reader success routes are proven, proofs run only on a cataloged JSON success route (Endpoint Catalog, PF05). The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof. `/internal/version` is ops-only and not A7-eligible.
 
 **Routing (titles-only).**
 
-* PF05 — CLI/API: declare Reader v1 narrative-free and define Aux/CLI behaviors.
-
-* PF04 — Governance: A7 (ETag/HEAD/304; writers/errors; ops exclusion).
-
+* PF05 — CLI/API: declare Reader v1 narrative-free and define Aux/CLI behaviors.  
+    
+* PF04 — Governance: A7 (ETag/HEAD/304; writers/errors; ops exclusion).  
+    
 * PF01 — Math Spec: bands-only Reader covenant.
 
 ---
@@ -1010,39 +1010,39 @@ This guide does not restate payload shapes or header matrices; it links by title
 ## **5.2 Aux Narrative (text/plain) — 200 ok text; 200 suppressed empty body (no ETag) \[Canon\]**
 
 **Route (titles-only).**  
- The Aux narrative endpoint and payload bytes are defined in **PF05 — CLI/API & Vendor Ref**. PF17 does not restate endpoint bytes.
+The Aux narrative endpoint and payload bytes are defined in **PF05 — CLI/API & Vendor Ref**. PF17 does not restate endpoint bytes.
 
 **Bodies (posture).**
 
-* **200 ok (text shown).** Narrative text is emitted when policy allows. Transport bytes live in PF05/PF04; PF17 stays contract-free.
-
+* **200 ok (text shown).** Narrative text is emitted when policy allows. Transport bytes live in PF05/PF04; PF17 stays contract-free.  
+    
 * **200 suppressed (text withheld).** **Empty body, no `ETag`**, and **`Vary: Authorization, Accept-Encoding` present**. A policy header such as `X-Narrative-Policy: suppressed` **may** be present. *(Bytes in PF05; policy in PF04.)*
 
 **A7 proof surface (route-only).**
 
-* Catalog-only. Aux success proofs run only on a cataloged JSON success route (Endpoint Catalog in PF05).
-
-* The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof.
-
-* `/internal/version` is ops-only and not A7-eligible.
-
+* Catalog-only. Aux success proofs run only on a cataloged JSON success route (Endpoint Catalog in PF05).  
+    
+* The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof.  
+    
+* `/internal/version` is ops-only and not A7-eligible.  
+    
 * **Aux HEAD and 304 are explicitly out of scope for EPIC-010; A7 proofs remain Catalog JSON-success only.**
 
 **Invariants (bytes/tests live in PF04/PF05/PF14).**  
- On the cataloged route, proofs satisfy:
+On the cataloged route, proofs satisfy:
 
-* Strong quoted ETag on 200 (identity over LF-terminated body; pre-compression).
-
-* HEAD 200 validator parity (Content-Type \== GET; no body; Content-Length \== len(identity 200 body)).
-
-* 304 after prior 200, omitting both Content-Type and Content-Length, validators mirror cached GET.
-
-* `Vary: Authorization, Accept-Encoding` present.
-
+* Strong quoted ETag on 200 (identity over LF-terminated body; pre-compression).  
+    
+* HEAD 200 validator parity (Content-Type \== GET; no body; Content-Length \== len(identity 200 body)).  
+    
+* 304 after prior 200, omitting both Content-Type and Content-Length, validators mirror cached GET.  
+    
+* `Vary: Authorization, Accept-Encoding` present.  
+    
 * Encoding-invariance of identity (ETag) and effective Content-Length across accepted encodings.
 
 **Reader posture (for clarity).**  
- Reader v1 remains bands-only and narrative-free; Aux/CLI are the narrative surfaces. (Routing: PF01/PF05.)
+Reader v1 remains bands-only and narrative-free; Aux/CLI are the narrative surfaces. (Routing: PF01/PF05.)
 
 **Acceptance (names-only; enforcement lives in PF04/PF09/PF14).**
 
@@ -1050,16 +1050,16 @@ NARR\_200\_TEXT\_OK · NARR\_SUPPRESSED\_NO\_ETAG\_OK · A7\_GET\_QUOTED\_ETAG\_
 
 **Routing (titles-only).**
 
-* PF05 — CLI/API: endpoint, payload bytes, stdout/sidecar guarantees, Endpoint Catalog.
-
-* PF04 — Governance: A7 transport (ETag/HEAD/304; writers/errors). PF04 pins “200 suppressed \= empty body, no ETag.”
-
-* PF12 — Schemas & Artifacts: composite success-proof JSON schema and evidence conventions (titles only).
-
+* PF05 — CLI/API: endpoint, payload bytes, stdout/sidecar guarantees, Endpoint Catalog.  
+    
+* PF04 — Governance: A7 transport (ETag/HEAD/304; writers/errors). PF04 pins “200 suppressed \= empty body, no ETag.”  
+    
+* PF12 — Schemas & Artifacts: composite success-proof JSON schema and evidence conventions (titles only).  
+    
 * PF01 — Math Spec: bands-only Reader covenant (numeric-free).
 
 **Evidence scope (EPIC-010).**  
- Aux evidence captures exactly **two** header snapshots: `aux_text_200.snap` and `aux_suppression_200.snap`; Aux HEAD/304 captures are out of scope (A7 is Catalog-only).
+Aux evidence captures exactly **two** header snapshots: `aux_text_200.snap` and `aux_suppression_200.snap`; Aux HEAD/304 captures are out of scope (A7 is Catalog-only).
 
 ---
 
@@ -1067,12 +1067,12 @@ NARR\_200\_TEXT\_OK · NARR\_SUPPRESSED\_NO\_ETAG\_OK · A7\_GET\_QUOTED\_ETAG\_
 
 **Behavior (posture).**
 
-* **Exact bytes parity.** CLI preview must emit exactly the bytes the single Presenter/emitter produces for the same inputs; stdout is LF-terminated (no `\r`). This preserves single-emitter parity across HTTP and CLI.
-
-* **Flags (titles-only).** Use a preview flag such as `--show-narrative` and an output option such as `--admin-out <path>` for sidecars. Names, shapes, and stdout/sidecar guarantees are defined in PF05 — CLI/API (not restated here).
-
-* **Admin-only.** Access to narrative preview is restricted to authorized/admin contexts; public Reader v1 remains narrative-free. **Preview is enabled by default for admins across dev/stage/prod and uses the same emitter as Aux (bytes parity, LF-terminated).**
-
+* **Exact bytes parity.** CLI preview must emit exactly the bytes the single Presenter/emitter produces for the same inputs; stdout is LF-terminated (no `\r`). This preserves single-emitter parity across HTTP and CLI.  
+    
+* **Flags (titles-only).** Use a preview flag such as `--show-narrative` and an output option such as `--admin-out <path>` for sidecars. Names, shapes, and stdout/sidecar guarantees are defined in PF05 — CLI/API (not restated here).  
+    
+* **Admin-only.** Access to narrative preview is restricted to authorized/admin contexts; public Reader v1 remains narrative-free. Narrative preview **must** use the same emitter as Aux and emit LF-terminated bytes.  
+    
 * **Suppression parity.** When the composer returns suppressed, the CLI preview mirrors suppression (no narrative text). Transport details remain governed in PF04/PF05.
 
 **Sidecar (evidence).**
@@ -1081,41 +1081,20 @@ NARR\_200\_TEXT\_OK · NARR\_SUPPRESSED\_NO\_ETAG\_OK · A7\_GET\_QUOTED\_ETAG\_
 
 **Same-PR indices and mirror hygiene.**
 
-* Append a compact JSON object to the machine Evidence Index (`artifacts/evidence_index.jsonl`) in the same PR as the human Evidence Index update (`docs/evidence/INDEX.json`).
-
-* The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a `proof_anchor` to a path-proof stored alongside the artifact.
-
+* Append a compact JSON object to the machine Evidence Index (`artifacts/evidence_index.jsonl`) in the same PR as the human Evidence Index update (`docs/evidence/INDEX.json`).  
+    
+* The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a `proof_anchor` to a path-proof stored alongside the artifact.  
+    
 * Maintain LF discipline in all artifacts (no `\r`).
-
-**Example (EPIC017 Aux admin preview, QA07 — informative).**  
- In EPIC017 QA, `hdctl aux-preview --admin-out` was run for a synthetic birth pair using the same compat JSON as Aux. The admin sidecar was a single JSON object containing:
-
-* `composition_id` and `key` with a naming pattern of `category.band.perspective.slot` (for example, `heat.open.shared.1` for the Heat / Open / shared case and first slot in the pack).
-
-* `pack_sha` as a 64-character lowercase hex digest that identifies the pinned narratives pack.
-
-* `pair` with `a_person_uid` and `b_person_uid` values matching the `a.person_uid` and `b.person_uid` fields in the compat JSON for the same CLI-scoped people.
-
-* `release_id` as a 64-character lowercase hex value that was all zeros in this CLI-only QA preview, reflecting a local preview identity rather than a specific production Engine release.
-
-This example confirms that the Aux admin preview:
-
-* selects a composition based on `{category, band, perspective, slot}` consistent with the pack and compat outcome,
-
-* carries `pack_sha` so QA and ops can trace the narrative back to a specific narratives pack version, and
-
-* ties the preview to the same CLI-scoped pair ids used by compat, with `release_id` allowed to be a non-prod value (such as all zeros) in CLI/QA, while `pack_sha` remains the primary identity for the narratives pack and the authoritative Engine identity stays `/internal/version` (PF05/PF04).
-
-This subsection remains **informative**; byte contracts and schemas for the sidecar continue to live in PF05/PF12.
 
 **Routing (titles-only).**
 
-* PF05 — CLI/API: flag names, stdout/sidecar contracts, and any endpoint coupling.
-
-* PF04 — Governance: A7 transport behavior mirrored in CLI proofs (e.g., HEAD/304 parity where applicable).
-
-* PF12 — Schemas & Artifacts: Evidence Index JSONL conventions and canonicalization rules.
-
+* PF05 — CLI/API: flag names, stdout/sidecar contracts, and any endpoint coupling.  
+    
+* PF04 — Governance: A7 transport behavior mirrored in CLI proofs (e.g., HEAD/304 parity where applicable).  
+    
+* PF12 — Schemas & Artifacts: Evidence Index JSONL conventions and canonicalization rules.  
+    
 * PF06 — Epic-Process-Guide: PR-first; Doc-Delta \+ indices in the same PR.
 
 **Acceptance (names-only; enforcement in PF14/PF09).**
@@ -1143,8 +1122,7 @@ CLI\_PREVIEW\_BYTES\_EQ\_EMITTER\_OK · CLI\_PREVIEW\_SUPPRESSION\_PARITY\_OK ·
 
 **Notes.**
 
-* PF17 lists **names only** to avoid duplicating test logic or payload bytes; payload/transport rules remain in **PF05/PF04**.  
-  ---
+* ## PF17 lists **names only** to avoid duplicating test logic or payload bytes; payload/transport rules remain in **PF05/PF04**.
 
   ## **6.2 Lints & Safety — NARR\_LEN\_≤300\_OK · NARR\_NO\_EM\_DASH\_OK · NARR\_BANNED\_TOKENS\_OK · NARR\_JARGON\_FREE\_OK \[Canon\]**
 
@@ -1165,8 +1143,7 @@ CLI\_PREVIEW\_BYTES\_EQ\_EMITTER\_OK · CLI\_PREVIEW\_SUPPRESSION\_PARITY\_OK ·
 
 **Notes.**
 
-* Keep this section **names-only**; payload and transport remain in **PF05/PF04**.  
-  ---
+* ## Keep this section **names-only**; payload and transport remain in **PF05/PF04**.
 
   ## **6.3 Transport Proofs (A7) — NARR\_200\_TEXT\_OK · NARR\_SUPPRESSED\_NO\_ETAG\_OK · A7\_HEAD\_PARITY\_OK · A7\_304\_OMITS\_CT\_CL\_OK · A7\_VARY\_AUTH\_AE\_OK · A7\_ENCODING\_INVARIANCE\_OK · A7\_429\_HEADERS\_OK · A7\_RETRY\_AFTER\_BOTH\_OK \[Canon\]**
 
@@ -1191,9 +1168,10 @@ CLI\_PREVIEW\_BYTES\_EQ\_EMITTER\_OK · CLI\_PREVIEW\_SUPPRESSION\_PARITY\_OK ·
 **Enforcement homes (titles-only).**
 
 * **PF14 — Mechanics:** implement A7 probes for Aux (GET/HEAD/304/429).  
-* **PF09 — Build Checklist:** block on missing/failed A7 markers.  
-* **PF04 — Governance:** authoritative A7 rules (ETag/HEAD/304/rate-limits/writers+errors).  
-  ---
+    
+* **PF09 — Build Checklist:** block on missing/failed A7 markers.
+
+* ## **PF04 — Governance:** authoritative A7 rules (ETag/HEAD/304/rate-limits/writers+errors).
 
   ## **6.4 Provenance — NARR\_PACK\_SHA\_OK (echo & match) \[Canon\]**
 
@@ -1216,225 +1194,149 @@ CLI\_PREVIEW\_BYTES\_EQ\_EMITTER\_OK · CLI\_PREVIEW\_SUPPRESSION\_PARITY\_OK ·
 **Routing (titles-only).**
 
 * **PF12 — Schemas & Artifacts:** pack schema/manifest and identity rules (canonical JSON, manifest listing).  
-* **PF05 — CLI/API:** response/sidecar byte contracts (ids in outputs).  
-* **PF14 / PF09:** tests and blocking gates for **NARR\_PACK\_SHA\_OK**.  
-  ---
+* **PF05 — CLI/API:** response/sidecar byte contracts (ids in outputs).
 
-# 7\) Variety Without Randomness (titles-only; \[Speculative\]) — 
+* ## **PF14 / PF09:** tests and blocking gates for **NARR\_PACK\_SHA\_OK**.
 
-### **7.1 Variety objectives — no randomness**
+# 7\) Runtime Variety Boundary \[Canon\]
 
-**Goal.** Provide bounded micro-variety across repeated views **without** randomness or time dependence.
+## 7.1 Current no-variety contract
 
-**Constraints.**
+For one validated request and one immutable validated pack view, the composer must:
 
-* Variety **never** alters acceptance outcomes or lints (text stays ≤300, 2–4 sentences, numeric-free).
+1. Resolve the exact `{category, band, perspective}` candidate group.  
+2. Evaluate complete-paragraph candidates in strict slot order `1`, `2`, then `3`.  
+3. Select the first candidate that is present, schema-valid, editorially valid, and not blocked by a governed suppression rule.  
+4. Return that same candidate for every repeated evaluation of the same request and pack view.  
+5. If no candidate is eligible, return the existing valid-identity Suppressed result. Do not relax validation or rotate to an ungoverned content source.
 
-* Variety **never** changes `pack_sha`, `composition_id`, or `fragment_ids` ordering rules.
+Repeated viewing is not a composer input. It cannot change selection, `composition_id`, narrative bytes, or the strong ETag over those bytes.
 
-* No external I/O; deterministic per `{category, band, perspective, pack_sha, release_id}`.
+Numeric slots are ranked fallback candidates, not a rotation bank. A later slot is considered only because an earlier slot is ineligible.
 
-**Acceptance (names-only).** `VARIETY_OBJECTIVES_OK`  
- **Routing (titles-only).** Concrete mechanics pinned in **PF14**; any flags live in **PF05/PF04**.
+`pack_sha` continues to identify the canonical narrative manifest bytes. `release_id` continues to bind the active freeze identity. `composition_id` continues to use the current PF17 singleton selected-key preimage. For Text, `fragment_ids` continues to contain exactly the selected template key. Identical request and pack-view inputs yield identical narrative bytes and the same representation validator.
 
-### **7.2 Prime-Step Traversal (deterministic index) \[Speculative\]**
+Operational audit time remains outside narrative selection, `composition_id`, `idempotence_hash`, ETag, pack identity, and release identity. A keys-only log may record the bounded structural fact `fragment_ids.length: 1`; it must not expose the fragment key or supply composer state.
 
-**Status.** Speculative. Deterministic traversal of eligible fragments; exact seeds/steps/windows are pinned in **PF14**.
+## 7.2 Prohibited state and selection methods
 
-**Intent.** Preserve strict determinism while allowing light variety across repeated views by walking the candidate set with a fixed prime step. No RNG, no timers, no external I/O.
+The current PF17 composer contract and any current caller must not use any of the following to change the selected narrative:
 
-**Definitions.**
+- a recent `composition_id` list;  
+- a cooling window;  
+- a view count or sequence number;  
+- a user, pair, dyad, session, device, or process identifier used as a rotation seed;  
+- wall-clock time, request time, release age, or a calendar bucket;  
+- randomness or pseudorandomness;  
+- prime-step traversal;  
+- a ring, bucket, alternate bank, or collision policy;  
+- process-local memory, a cache entry, mutable global state, or a database read;  
+- a hidden flag, environment variable, or transport default; or  
+- a post-composition text substitution that changes the emitted paragraph without changing governed identity.
 
-* Let eligible fragments (post keys/guards/lints) form an ordered list **F** of length **N**.
+## 7.3 Editorial diversity boundary
 
-* Choose a **prime step** `p` with `gcd(p, N) = 1`.
+Editorial diversity belongs to governed corpus authoring. It may be achieved through:
 
-* Compute a deterministic **start index** `s` from a stable seed derived only from validated inputs/identities (e.g., hash of `{category, band, perspective, pack_sha, release_id}`), then `s = seed mod N`. *(Seed formula pinned in PF14.)*
+- distinct copy for each of the ten categories;  
+- distinct copy for each band and perspective;  
+- carefully authored complete-paragraph candidates;  
+- a new governed pack version; and  
+- later, separately authorized semantic mappings when the project has an explicit requirement for them.
 
-**Traversal (normative on adoption).**
+The current runtime contract still selects deterministically from that authored material. Editorial guidance to vary phrasing does not authorize runtime state, repeated-view rotation, or mutation of an already selected paragraph.
 
-1. Initialize `i ← s`.
+Schema and pack-identity subjects route to **PF12-Canon-HDE-Schemas-and-Artifacts**. CLI and Aux byte subjects route to **PF05-Canon-HDE-CLI-API-Vendor-Ref**. Mechanical and test subjects route to **PF14-Canon-HDE-Mechanics-Guide**. Narrative build-gate subjects route to **PF09.5-Canon-HDE-Build-Checklist-Fermentation**. Editorial copy subjects route to **Glow Tonality Guide v1.1: Writing for Human Connection**.
 
-2. Test `F[i]` against all hard lints and coherence guards; also check **Cooling Window K** (if configured).
+## 7.4 Future-promotion gate
 
-3. If `F[i]` passes, **select** it; else advance deterministically `i ← (i + p) mod N` and repeat **≤ N** probes.
+Runtime variety may return only through a separately approved, versioned feature. A later proposal must first establish:
 
-4. If no candidate passes within **N** probes, **suppress** (conflict); **never** relax rules for variety.
+1. A measured product requirement that repeated-view sameness is a material user problem.  
+2. One named state owner and one owning specification.  
+3. An explicit, typed, validated input. Hidden state is prohibited.  
+4. Exact scope, retention, privacy, concurrency, reset, replay, and failure semantics.  
+5. Exact consequences for selection provenance, `composition_id`, ETag, caches, sidecars, and audit identity.  
+6. AB-to-BA symmetry or directional covariance rules.  
+7. A bounded termination rule and fail-closed outcome.  
+8. A versioned pack or composer contract and a migration path that does not reinterpret old bytes in place.  
+9. Current-schema and implementation changes followed by direct verification before any conformance claim.
 
-**Determinism & identity.**
+These conditions are future-promotion prerequisites. They do not create a current schema, task, command, endpoint, token, owner, implementation claim, or unresolved authoring question.
 
-* For fixed inputs, `(N, p, s)` are fixed; the same traversal yields the same choice (**two-run identity**).
-
-* `composition_id` **MUST** be derived deterministically from `{chosen_fragment_id, inputs, pack_sha}` (recipe pinned in PF14) so audits can reproduce selection.
-
-**AB↔BA coherence.**  
- Seeds must be chosen so `A→B` and `B→A` outcomes are coherent by construction (either the same shared fragment or the correct directional pair).
-
-**Open pins (PF14 to resolve).**  
- Seed recipe; allowed prime set/chooser; termination bound (≤ N); interaction with **K** and **R** (rings).
-
-**Acceptance (names-only).** `VARIETY_PRIME_STEP_OK`, `PRIME_STEP_TRAVERSAL_OK`, `PRIME_STEP_TERMINATES_OK`, `PRIME_STEP_AB_BA_COHERENCE_OK`  
- **Routing (titles-only).** Any pack metadata for prime step lives in **PF12**.
-
-### **7.3 Cooling Window K (release-scoped)**
-
-Deterministic “recently-used” guard; values/plumbing pinned in **PF14**.
-
-**Intent.** Avoid immediate repetition without randomness while preserving two-run identity and AB↔BA coherence.
-
-**Definition.**
-
-* `K` \= small integer count of recent `composition_id`s to avoid when selecting a new fragment.
-
-* **Scope** \= release-scoped; the window resets when `release_id` changes. *(PF14 pins per-dyad vs per-dyad+perspective.)*
-
-**Deterministic behavior.**
-
-1. Build eligible set (post filters/lints/guards).
-
-2. Apply **Prime-Step Traversal** (§7.2).
-
-3. If the candidate’s `composition_id` is in **K**, advance one prime step and test next; repeat until found or **≤ N** probes.
-
-4. If all candidates are blocked by lints/guards/window, **suppress** (conflict). No relaxation.
-
-**State & plumbing (OPEN).**  
- Where state lives (caller-provided recent IDs vs deterministic ephemeral cache keyed by `{dyad, perspective, release_id}`), value of **K** (e.g., 2–4), and termination policy (≤ N probes).
-
-**Determinism & parity.**  
- Including `release_id` guarantees repeatable resets; AB↔BA coherence must hold for whichever scope PF14 pins.
-
-**Acceptance (names-only).** `VARIETY_COOLING_WINDOW_OK`, `COOLING_WINDOW_APPLIED_OK`, `COOLING_WINDOW_RELEASE_SCOPED_OK`, `COOLING_WINDOW_TERMINATES_OK`, `COOLING_WINDOW_AB_BA_COHERENCE_OK`  
- **Routing (titles-only).** **PF14** pins K/scope/state; **PF12** defines pack bytes if window metadata is stored (none by default).
-
-### **7.4 Variety Rings R (optional grouping)** 
-
-Curated alternates for common scenarios allowing light variation without randomness.
-
-**Intent (deterministic variety).** Provide 4–6 pre-approved alternates for a `{category, band, narrative_kind, perspective}` case. Selection uses a stable **bucket** derived only from validated inputs/identities (e.g., `{category, band, families_fired, perspective, pack_sha, release_id}`), never RNG/time/I/O.
-
-**Model (concept).**
-
-* **Ring R**: ordered list of curated fragment IDs `(r0…rR−1)` defined in the pack for a case; ring contents are manifest-listed and SHA-pinned.
-
-* **Bucket**: compute `b = f(inputs, identities) mod R`, where `f` is a deterministic hash (pinned in PF14). Candidate \= `r_b` **before** guards.
-
-**Selection order (with other tools).**
-
-1. Build eligible set (post filters/lints/guards).
-
-2. If a ring exists, attempt `r_b` first; if it fails, advance deterministically using **Prime-Step Traversal** (§7.2).
-
-3. Apply **Cooling Window K** (§7.3) if configured; if a candidate is in **K**, skip deterministically.
-
-4. If all ring/prime-step candidates fail guards or K, **suppress** (no relaxation).
-
-**Determinism & parity.**  
- Same validated inputs (incl. `pack_sha`, `release_id`) ⇒ same bucket and same outcome (text or suppression). Two-run identity holds. For symmetric perspectives, rings must preserve AB↔BA coherence (PF14 property tests).
-
-**Open pins (PF14/PF12).**  
- Ring size **R** (e.g., 4–6) and pack schema field for rings (PF12); exact bucket function and interactions with prime-step/K; termination bound (≤ N).
-
-**Acceptance (names-only).** `VARIETY_RINGS_OK`, `VARIETY_RING_BUCKET_OK`, `VARIETY_RING_REPLAY_OK`, `VARIETY_RING_TERMINATES_OK`, `VARIETY_RING_AB_BA_COHERENCE_OK`  
- **Routing (titles-only).** Bucket math & tests in **PF14**; any ring fields live in **PF12**.
-
-### **7.5 OPEN Pins (K/R values, buckets, collision policy) \[Speculative\]**
-
-Items that **MUST** be pinned in **PF14 — Mechanics** (and **PF12** if pack bytes are required) before implementation.
-
-**To decide (and where to pin).**
-
-* **K — Cooling window** size & scope; state location; termination policy (≤ N).
-
-* **R — Ring size/placement** and the pack schema field where curated ring members live; rings manifest-listed and SHA-pinned (PF12).
-
-* **Bucket function (rings)**: deterministic `b = f(inputs, identities) mod R`; exact inputs and hash choice.
-
-* **Seed function (prime-step)**: exact seed recipe `s = seed mod N` and prime chooser with `gcd(p, N) = 1`.
-
-* **Collision/termination policy**: max deterministic advances when guards/K/R exclude candidates; guarantee termination ≤ N probes; otherwise suppress.
-
-* **AB↔BA coherence constraints**: how seeds/buckets/scopes ensure symmetric perspectives remain coherent; property tests.
-
-* **Evidence & acceptance**: register acceptance names in PF14/PF09; add **same-PR** index entries for any new artifacts (human \+ machine mirror with canonical JSONL, unknown-key rejection, `proof_anchor`).
-
-**Routing (titles-only).** **PF14** pins formulas, state, tests; **PF12** defines any ring/metadata fields and keeps manifest/identity rules.
-
----
-
-## **8\) Security, Privacy & Ops (titles-only; \[Canon\])**
+# **8\) Security, Privacy & Ops (titles-only; \[Canon\])**
 
 ### **8.1 Access control & privacy — admin-only preview; no PII in artifacts \[Canon\]**
 
 **Admin scope.** Narrative preview is **restricted to authorized/admin** contexts; public **Reader v1 remains narrative-free** (bands-only). Preview endpoints **must not** appear on public Reader surfaces.  
- **Ids-only artifacts.** Never include rendered narrative **text** or **PII** in logs, sidecars, evidence, or acceptance outputs. Preview artifacts **MUST** contain **ids only** (e.g., `composition_id`, `fragment_ids[]`, `pack_sha`, optional `release_id`) for audit traceability — **no user data**.  
- **Suppression parity.** If composition yields **suppressed**, **CLI preview mirrors suppression** (no text body). Aux/HTTP transport posture (200 empty, no ETag when suppressed) is governed in PF04/PF05.  
- **Acceptance (names-only).** `ADMIN_PREVIEW_GUARD_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`.
+**Ids-only artifacts.** Never include rendered narrative **text** or **PII** in logs, sidecars, evidence, or acceptance outputs. Preview artifacts **MUST** contain **ids only** (e.g., `composition_id`, `fragment_ids[]`, `pack_sha`, optional `release_id`) for audit traceability — **no user data**.  
+**Suppression parity.** If composition yields **suppressed**, **CLI preview mirrors suppression** (no text body). Aux/HTTP transport posture (200 empty, no ETag when suppressed) is governed in PF04/PF05.  
+**Acceptance (names-only).** `ADMIN_PREVIEW_GUARD_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`.
 
 ### **8.2 Logging posture — keys/ids only; include `correlation_id`, `release_id`, `pack_sha` \[Canon\]**
 
 **Keys/ids only (MUST).** Logs and sidecars **MUST NOT** include rendered narrative text. Record **identifiers only**, e.g.:
 
 * `policy_reason`, `composition_id`, `fragment_ids[]`, `pack_sha`, `release_id`, `correlation_id`.  
-   **Line discipline.** All emitted text and logs are **LF-only**; narrative text **MUST NOT** contain `\r`. **No ANSI**, no trailing spaces.  
-   **Evidence parity.** When logs/sidecars reflect emitted artifacts, update the **human index \+ hash sentinel \+ machine mirror in the same PR** (see §8.3).  
-   **Routing (titles-only).** PF12 — Evidence Index/mirror conventions; PF04 — A7 transport & refusal/logging posture; PF05 — sidecar byte contracts and preview flows; PF15 — editorial safety/banned tokens (names-only).  
-* **Acceptance (names‑only)**. \`OBS\_KEYS\_ONLY\_OK\`.
+  **Line discipline.** All emitted text and logs are **LF-only**; narrative text **MUST NOT** contain `\r`. **No ANSI**, no trailing spaces.  
+  **Evidence parity.** When logs/sidecars reflect emitted artifacts, update the **human index \+ hash sentinel \+ machine mirror in the same PR** (see §8.3).  
+  **Routing (titles-only).** PF12 — Evidence Index/mirror conventions; PF04 — A7 transport & refusal/logging posture; PF05 — sidecar byte contracts and preview flows; PF15 — editorial safety/banned tokens (names-only).  
+    
+* **Acceptance (names-only).** `OBS_KEYS_ONLY_OK`.
 
   ### **8.3 Ops & Evidence discipline — governed paths & mirror hygiene \[Canon\]**
 
-**Governed locations only.** Evidence **must** live under `artifacts/**` or `docs/**`; **no** transient/generator paths.  
-LC/TZ pins. All canonicalization and comparison steps must run with the environment set to **LC\_ALL=C, LANG=C, TZ=UTC**.
+**Governed locations only.** Evidence **must** use a repository-relative path cataloged by **HDE-Schemas-and-Artifacts**; transient generator paths are not authoritative. Directory placement alone does not confer authority. LC/TZ pins. All canonicalization and comparison steps must run with the environment set to **LC\_ALL=C, LANG=C, TZ=UTC**.
 
- **Same-PR parity (human ↔ machine).** When preview artifacts are written, update **in the same PR**:
+**Same-PR parity (human ↔ machine).** When preview artifacts are written, update **in the same PR**:
 
-* **Human** Evidence Index: `docs/evidence/INDEX.json`
-
-* **Hash sentinel**: `docs/evidence/INDEX.sha256` (merge-gating; matches INDEX bytes)
-
+* **Human** Evidence Index: `docs/evidence/INDEX.json`  
+    
+* **Hash sentinel**: `docs/evidence/INDEX.sha256` (merge-gating; matches INDEX bytes)  
+    
 * **Machine mirror**: `artifacts/evidence_index.jsonl`  
-   **Mirror hygiene (records-only JSONL).** UTF-8, sorted keys, compact, **exactly one LF**; **unknown-keys rejected**; **ASCII field order**; **sort-before-write**; **single mirror file**. Each record includes `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a **`proof_anchor`** to a co-located path-proof.  
-   **Acceptance (names-only).** `EVIDENCE_PATHS_VALIDATED_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`.  
+  **Mirror hygiene (records-only JSONL).** UTF-8, sorted keys, compact, **exactly one LF**; **unknown-keys rejected**; **ASCII field order**; **sort-before-write**; **single mirror file**. Each record includes `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a **`proof_anchor`** to a co-located path-proof.  
+  **Acceptance (names-only).** `EVIDENCE_PATHS_VALIDATED_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`.  
+    
 * **Header snapshot normalization.** Stored snapshots use lower-case header names; values are verbatim (PF12; `SNAPSHOT_HEADER_LOWERCASE_OK`).
 
   ### **8.4 Routing (titles-only) \[Canon\]**
 
-* **PF05 — CLI/API.** Admin flags/flows for preview; sidecar/output contracts.
-
-* **PF04 — Governance.** A7 transport for Aux (ETag/HEAD/304/429; writers/errors); refusal/logging allow-lists; suppression posture.
-
-* **PF12 — Schemas & Artifacts.** Evidence Index \+ mirror schema and canonicalization rules.
-
+* **PF05 — CLI/API.** Admin flags/flows for preview; sidecar/output contracts.  
+    
+* **PF04 — Governance.** A7 transport for Aux (ETag/HEAD/304/429; writers/errors); refusal/logging allow-lists; suppression posture.  
+    
+* **PF12 — Schemas & Artifacts.** Evidence Index \+ mirror schema and canonicalization rules.  
+    
 * **PF15 — Copy Tonality Guide.** Editorial safety rules (banned tokens/phrases); PF17 lists names only.
 
-
-## **9\) Rollout & Gating (when adopted)**
+# **9\) Rollout & Gating (when adopted)**
 
 ### **9.1 Sequencing & Dependencies — plan-first, prove-as-you-go \[Canon\]**
 
 **Order (must follow this sequence).**
 
 1. **PF14 — Mechanics (implement & test).**  
-    Build the deterministic composer; enforce lints; wire suppression; prove determinism (**two-run**, **AB↔BA**); implement any variety features (§7); add unit/property tests.
-
+   Build the deterministic composer; enforce lints; wire suppression; prove determinism (**two-run**, **AB↔BA**); implement any variety features (§7); add unit/property tests.  
+     
 2. **PF05 / PF04 — Surfaces & transport (wire & prove).**  
-    Expose Aux/CLI behaviors in **PF05** (routes, stdout/sidecar guarantees) and prove **A7 transport in PF04**:  
-    – **200:** **strong quoted ETag**.  
-    – **HEAD 200:** validator parity; **no body**; **Content-Length \= len(identity 200 body)**.  
-    – **304:** only after prior 200; **omits both `Content-Type` and `Content-Length`**; no body.  
-    – **Vary:** `Authorization, Accept-Encoding`.  
-    – **Encoding invariance** of identity (ETag) and effective length.  
-    – **Catalog-only** proof surface with **headers-only env-gate** proof; include the **composite success-proof JSON** (schema lives in PF12).
-
+   Expose Aux/CLI behaviors in **PF05** (routes, stdout/sidecar guarantees) and prove **A7 transport in PF04**:  
+   – **200:** **strong quoted ETag**.  
+   – **HEAD 200:** validator parity; **no body**; **Content-Length \= len(identity 200 body)**.  
+   – **304:** only after prior 200; **omits both `Content-Type` and `Content-Length`**; no body.  
+   – **Vary:** `Authorization, Accept-Encoding`.  
+   – **Encoding invariance** of identity (ETag) and effective length.  
+   – **Catalog-only** proof surface with **headers-only env-gate** proof; include the **composite success-proof JSON** (schema lives in PF12).  
+     
 3. **PF09 — Build Checklist (gate & ship).**  
-    Make narrative markers **blocking** (determinism, lints/safety, A7 proofs, provenance). **Ship only** when all narrative gates pass.
+   Make narrative markers **blocking** (determinism, lints/safety, A7 proofs, provenance). **Ship only** when all narrative gates pass.
 
 **Doc-in-PR rule (evidence parity).** Every code/test change that affects narratives **must update, in the same PR**:
 
 * the **human Evidence Index** `docs/evidence/INDEX.json`,  
 * the **hash sentinel** `docs/evidence/INDEX.sha256` (merge-gating; must match INDEX.json), and  
 * the **machine mirror** `artifacts/evidence_index.jsonl` (**records-only** canonical JSONL: UTF-8, compact, **one LF**, **unknown-keys rejected**, **ASCII field order**, **sort-before-write**, **single mirror file**; each record includes `discovered_physical_path` and a **`proof_anchor`** to a co-located path-proof).  
-   Run captures and CI under \*\*\`LC\_ALL=C, LANG=C, TZ=UTC\`\*\*. Governed locations only: artifacts live under \`artifacts/\*\*\` and \`docs/\*\*\`.
+  Run captures and CI under **`LC_ALL=C, LANG=C, TZ=UTC`**. Evidence must use a repository-relative path cataloged by **HDE-Schemas-and-Artifacts**; transient generator paths are not authoritative.
 
 **Dependencies & handoffs.**
 
@@ -1445,14 +1347,14 @@ LC/TZ pins. All canonicalization and comparison steps must run with the environm
 **Acceptance (names-only).** `DOC_DELTA_RECORDED_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`.
 
 **Routing (titles-only).**  
- PF14 — Mechanics (implementation/tests) • PF05 — CLI/API & PF04 — Governance (surfaces \+ A7 proofs) • PF09 — Build Checklist (blocking narrative gates).
+PF14 — Mechanics (implementation/tests) • PF05 — CLI/API & PF04 — Governance (surfaces \+ A7 proofs) • PF09 — Build Checklist (blocking narrative gates).
 
 ---
 
 ### **9.2 Narrative Acceptance Gate (CF-NARR) — close conditions & blocking tokens \[Canon\]**
 
 **Scope (“touching narratives”).**  
- Composer changes (inputs/outputs, lints, suppression, determinism) • Surfaces/transport posture for Aux/CLI (A7 proofs by title) • Packs/identity/provenance (`catalog` listing, **`pack_sha` echo/match**).
+Composer changes (inputs/outputs, lints, suppression, determinism) • Surfaces/transport posture for Aux/CLI (A7 proofs by title) • Packs/identity/provenance (`catalog` listing, **`pack_sha` echo/match**).
 
 **Close condition (all must pass).**
 
@@ -1467,10 +1369,10 @@ LC/TZ pins. All canonicalization and comparison steps must run with the environm
 * **Determinism:** `NARR_DETERMINISM_OK` · `NARR_AB_BA_COHERENCE_OK` · `NARR_LF_NORMALIZATION_OK`.  
 * **Lints & safety:** `NARR_LEN_≤300_OK` · `NARR_NO_EM_DASH_OK` · `NARR_BANNED_TOKENS_OK` · `NARR_JARGON_FREE_OK` *(or `NARR_INCLUSIVE_TONE_OK` per PF15)*.  
 * **Transport (Aux A7):**  
-   `NARR_200_TEXT_OK` · `NARR_SUPPRESSED_NO_ETAG_OK` ·  
-   `A7_GET_QUOTED_ETAG_OK` · `A7_HEAD_PARITY_OK` · `A7_304_OMITS_CT_CL_OK` · `A7_VARY_AUTH_AE_OK` · `A7_ENCODING_INVARIANCE_OK` ·  
-   `ENDPOINTS_CATALOG_INTERNAL_OK` · `ENDPOINTS_CATALOG_ENV_GATE_OK` · `A7_TRANSPORT_PROOF_OK`  
-   *(rate-limits as applicable: `A7_429_HEADERS_OK`, `A7_RETRY_AFTER_BOTH_OK`)*  
+  `NARR_200_TEXT_OK` · `NARR_SUPPRESSED_NO_ETAG_OK` ·  
+  `A7_GET_QUOTED_ETAG_OK` · `A7_HEAD_PARITY_OK` · `A7_304_OMITS_CT_CL_OK` · `A7_VARY_AUTH_AE_OK` · `A7_ENCODING_INVARIANCE_OK` ·  
+  `ENDPOINTS_CATALOG_INTERNAL_OK` · `ENDPOINTS_CATALOG_ENV_GATE_OK` · `A7_TRANSPORT_PROOF_OK`  
+  *(rate-limits as applicable: `A7_429_HEADERS_OK`, `A7_RETRY_AFTER_BOTH_OK`)*  
 * **Provenance:** `NARR_PACK_SHA_OK` (echo & match against release-pinned manifest).
 
 **Process rules.**
@@ -1482,11 +1384,11 @@ LC/TZ pins. All canonicalization and comparison steps must run with the environm
 **Aggregated gate (names-only).** `NARR_GATE_ACCEPT_OK` (set **true** only when the entire CF-NARR set above is green).
 
 **Routing (titles-only).**  
- PF14 — Mechanics: maintain tests for the CF-NARR token set • PF09 — Build Checklist: ensure all CF-NARR tokens are blocking • PF05/PF04/PF12: bytes/matrices live in their homes; this subsection does not duplicate them.
+PF14 — Mechanics: maintain tests for the CF-NARR token set • PF09 — Build Checklist: ensure all CF-NARR tokens are blocking • PF05/PF04/PF12: bytes/matrices live in their homes; this subsection does not duplicate them.
 
 ---
 
-## **Appendix A) Minimal schema stubs (request/response; pack manifest) — route canonical homes to PF12 \[Informative stubs\]**
+# **Appendix A) Minimal schema stubs (request/response; pack manifest) — route canonical homes to PF12 \[Informative stubs\]**
 
 **Status.** Informative stubs only. These illustrate shapes for implementers and QA while **PF12 — HDE-Schemas & Artifacts** publishes and version-controls the **canonical schemas**. Canonicalization rules and the **machine Evidence Index** also live in **PF12** (titles-only routed here).
 
@@ -1497,20 +1399,50 @@ LC/TZ pins. All canonicalization and comparison steps must run with the environm
 Inputs reflect the current spec after retiring `uncertainty` and `pace_met`. **This stub is illustrative only; PF12 will publish the canonical schema.**
 
 * {  
-*   "$schema": "https://json-schema.org/draft/2020-12/schema",  
-*   "title": "composer.request.v1 (stub)",  
-*   "type": "object",  
-*   "additionalProperties": false,  
-*   "required": \["band", "families\_fired", "perspective", "release\_id", "pack\_sha"\],  
-*   "properties": {  
-*     "band": { "type": "string", "enum": \["Cool", "Open", "Warm", "Glow"\] },  
-*     "families\_fired": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "ASCII-sorted, unique family ids" },  
-*     "perspective": { "type": "string", "enum": \["shared", "a\_to\_b", "b\_to\_a"\] },  
-*     "release\_id": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" },  
-*     "pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
-*   }  
-* }
+* "$schema": "[https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema)",  
+* "title": "composer.request.v1 (stub)",  
+* "type": "object",  
+* "additionalProperties": false,  
+* "required": \["category", "band", "families\_fired", "perspective", "release\_id", "pack\_sha"\],  
+* "properties": {  
+* 
 
+```
+"category": { "type": "string", "description": "Magic-10 id (closed set)" },  
+```
+
+* 
+
+```
+"band": { "type": "string", "enum": \["Cool", "Open", "Warm", "Glow"\] },  
+```
+
+* 
+
+```
+"families\_fired": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "ASCII-sorted, unique family ids" },  
+```
+
+* 
+
+```
+"perspective": { "type": "string", "enum": \["shared", "a\_to\_b", "b\_to\_a"\] },  
+```
+
+* 
+
+```
+"release\_id": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" },  
+```
+
+* 
+
+```
+"pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
+```
+
+* }  
+* }
 
 *Notes:* Validation is **fail-closed**; violations lead to a **suppressed** result (see A.2). See **PF12** for the canonical request schema once published.
 
@@ -1519,34 +1451,143 @@ Inputs reflect the current spec after retiring `uncertainty` and `pace_met`. **T
 Outcomes are **mutually exclusive**: **Text** or **Suppressed**. The only policy reason retained is `"conflict"`.
 
 * {  
-*   "$schema": "https://json-schema.org/draft/2020-12/schema",  
-*   "title": "composer.response.v1 (stub)",  
-*   "oneOf": \[  
-*     {  
-*       "type": "object",  
-*       "additionalProperties": false,  
-*       "required": \["text", "composition\_id", "fragment\_ids", "pack\_sha"\],  
-*       "properties": {  
-*         "text": { "type": "string", "maxLength": 300 },  
-*         "composition\_id": { "type": "string", "minLength": 8, "maxLength": 128 },  
-*         "fragment\_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },  
-*         "pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
-*       }  
-*     },  
-*     {  
-*       "type": "object",  
-*       "additionalProperties": false,  
-*       "required": \["suppressed", "policy\_reason", "composition\_id", "pack\_sha"\],  
-*       "properties": {  
-*         "suppressed": { "const": true },  
-*         "policy\_reason": { "type": "string", "enum": \["conflict"\] },  
-*         "composition\_id": { "type": "string", "minLength": 8, "maxLength": 128 },  
-*         "pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
-*       }  
-*     }  
-*   \]  
-* }
+* "$schema": "[https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema)",  
+* "title": "composer.response.v1 (stub)",  
+* "oneOf": \[  
+* 
 
+```
+{  
+```
+
+* 
+
+```
+  "type": "object",  
+```
+
+* 
+
+```
+  "additionalProperties": false,  
+```
+
+* 
+
+```
+  "required": \["text", "composition\_id", "fragment\_ids", "pack\_sha"\],  
+```
+
+* 
+
+```
+  "properties": {  
+```
+
+* 
+
+```
+    "text": { "type": "string", "maxLength": 300 },  
+```
+
+* 
+
+```
+    "composition\_id": { "type": "string", "minLength": 8, "maxLength": 128 },  
+```
+
+* 
+
+```
+    "fragment\_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },  
+```
+
+* 
+
+```
+    "pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
+```
+
+* 
+
+```
+  }  
+```
+
+* 
+
+```
+},  
+```
+
+* 
+
+```
+{  
+```
+
+* 
+
+```
+  "type": "object",  
+```
+
+* 
+
+```
+  "additionalProperties": false,  
+```
+
+* 
+
+```
+  "required": \["suppressed", "policy\_reason", "composition\_id", "pack\_sha"\],  
+```
+
+* 
+
+```
+  "properties": {  
+```
+
+* 
+
+```
+    "suppressed": { "const": true },  
+```
+
+* 
+
+```
+    "policy\_reason": { "type": "string", "enum": \["conflict"\] },  
+```
+
+* 
+
+```
+    "composition\_id": { "type": "string", "minLength": 8, "maxLength": 128 },  
+```
+
+* 
+
+```
+    "pack\_sha": { "type": "string", "pattern": "^\[0-9a-f\]{64}$" }  
+```
+
+* 
+
+```
+  }  
+```
+
+* 
+
+```
+}  
+```
+
+* \]  
+* }
 
 *Notes:* Both paths **echo `pack_sha`** for provenance; canonical response bytes/sidecar shapes live in **PF05**; **schema ownership** lives in **PF12**. Aux **“200 suppressed \= empty body, no `ETag`”** is pinned in **PF04**.
 
@@ -1555,32 +1596,116 @@ Outcomes are **mutually exclusive**: **Text** or **Suppressed**. The only policy
 A pack describes governed content and guards the composer consults. File list and identities are **manifest-listed**; pack identity is **`pack_sha`**. **PF12** owns the real schema.
 
 * {  
-*   "$schema": "https://json-schema.org/draft/2020-12/schema",  
-*   "title": "narrative.pack.v1 (stub)",  
-*   "type": "object",  
-*   "additionalProperties": false,  
-*   "required": \["nodes"\],  
-*   "properties": {  
-*     "nodes": {  
-*       "type": "array",  
-*       "items": {  
-*         "type": "object",  
-*         "additionalProperties": false,  
-*         "required": \["id", "slot", "band", "text"\],  
-*         "properties": {  
-*           "id": { "type": "string" },  
-*           "slot": { "type": "string" },  
-*           "band": { "type": "string", "enum": \["Cool", "Open", "Warm", "Glow"\] },  
-*           "text": { "type": "string" },  
-*           "constraints": { "type": "object", "additionalProperties": true }  
-*         }  
-*       }  
-*     },  
-*     "palettes": { "type": "object", "additionalProperties": true },  
-*     "suppression\_map": { "type": "object", "additionalProperties": true }  
-*   }  
-* }
+* "$schema": "[https://json-schema.org/draft/2020-12/schema](https://json-schema.org/draft/2020-12/schema)",  
+* "title": "narrative.pack.v1 (stub)",  
+* "type": "object",  
+* "additionalProperties": false,  
+* "required": \["nodes"\],  
+* "properties": {  
+* 
 
+```
+"nodes": {  
+```
+
+* 
+
+```
+  "type": "array",  
+```
+
+* 
+
+```
+  "items": {  
+```
+
+* 
+
+```
+    "type": "object",  
+```
+
+* 
+
+```
+    "additionalProperties": false,  
+```
+
+* 
+
+```
+    "required": \["id", "slot", "band", "text"\],  
+```
+
+* 
+
+```
+    "properties": {  
+```
+
+* 
+
+```
+      "id": { "type": "string" },  
+```
+
+* 
+
+```
+      "slot": { "type": "string" },  
+```
+
+* 
+
+```
+      "band": { "type": "string", "enum": \["Cool", "Open", "Warm", "Glow"\] },  
+```
+
+* 
+
+```
+      "text": { "type": "string" },  
+```
+
+* 
+
+```
+      "constraints": { "type": "object", "additionalProperties": true }  
+```
+
+* 
+
+```
+    }  
+```
+
+* 
+
+```
+  }  
+```
+
+* 
+
+```
+},  
+```
+
+* 
+
+```
+"palettes": { "type": "object", "additionalProperties": true },  
+```
+
+* 
+
+```
+"suppression\_map": { "type": "object", "additionalProperties": true }  
+```
+
+* }  
+* }
 
 **Notes**
 
@@ -1591,7 +1716,7 @@ A pack describes governed content and guards the composer consults. File list an
 
 ---
 
-## **Appendix B) Example artifacts (compose\_examples, identities, acceptance tokens file) — samples only \[Informative stubs\]**
+# **Appendix B) Example artifacts (compose\_examples, identities, acceptance tokens file) — samples only \[Informative stubs\]**
 
 **Status.** Informative stubs. These non-canonical examples illustrate artifact shapes for QA and implementers. Canonical schemas/canonicalization and the machine mirror live in **PF12 — Schemas & Artifacts**; payload/sidecar bytes live in **PF05 — CLI/API**. **Update the human Evidence Index \+ hash sentinel and machine JSONL in the same PR** when adding artifacts.
 
@@ -1600,23 +1725,93 @@ A pack describes governed content and guards the composer consults. File list an
 ### **B.1 `examples/compose_examples.json` (sample)**
 
 * \[  
-*   {  
-*     "request": {  
-*       "band": "Warm",  
-*       "families\_fired": \["talk\_ladder","story"\],  
-*       "perspective": "shared",  
-*       "release\_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",  
-*       "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  
-*     },  
-*     "response": {  
-*       "text": "You two find an easy rhythm together. Conversation opens doors and softens edges.",  
-*       "composition\_id": "comp\_q1w2e3r4",  
-*       "fragment\_ids": \["frag\_opener\_01","frag\_center\_17","frag\_closer\_03"\],  
-*       "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  
-*     }  
-*   }  
-* \]
+* {  
+* 
 
+```
+"request": {  
+```
+
+* 
+
+```
+  "category": "harmony",  
+```
+
+* 
+
+```
+  "band": "Warm",  
+```
+
+* 
+
+```
+  "families\_fired": \["talk\_ladder","story"\],  
+```
+
+* 
+
+```
+  "perspective": "shared",  
+```
+
+* 
+
+```
+  "release\_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",  
+```
+
+* 
+
+```
+  "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  
+```
+
+* 
+
+```
+},  
+```
+
+* 
+
+```
+"response": {  
+```
+
+* 
+
+```
+  "text": "You two find an easy rhythm together. Conversation opens doors and softens edges.",  
+```
+
+* 
+
+```
+  "composition\_id": "comp\_q1w2e3r4",  
+```
+
+* 
+
+```
+  "fragment\_ids": \["frag\_opener\_01","frag\_center\_17","frag\_closer\_03"\],  
+```
+
+* 
+
+```
+  "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  
+```
+
+* 
+
+```
+}  
+```
+
+* }  
+* \]
 
 *Notes:* Request/response fields mirror the spec after retiring `uncertainty`/`pace_met`. Responses **echo `pack_sha`** and include `composition_id` & `fragment_ids` for provenance.
 
@@ -1632,7 +1827,6 @@ Place **SHA identities** next to governed files under `catalog/narratives/`:
 * catalog/narratives/palettes.json.sha256  
 * catalog/narratives/suppression\_map.json  
 * catalog/narratives/suppression\_map.json.sha256
-
 
 *Notes:* Packs are **manifest-listed** and **SHA-pinned**; pack identity **couples to `release_id`**. Sibling `*.sha256` files **ship with artifacts**.
 
@@ -1656,316 +1850,43 @@ Place **SHA identities** next to governed files under `catalog/narratives/`:
 * A7\_RETRY\_AFTER\_BOTH\_OK  
 * NARR\_PACK\_SHA\_OK
 
-
 *Notes:* Names-only acceptance roster; gates/tests live in **PF09/PF14**; A7 details live in **PF04**. PF17 does **not** restate header matrices or payload bytes.
 
 ### **B.4 Machine Evidence Index (JSONL) — one line per artifact (sample)**
 
-**File:** `artifacts/evidence_index.jsonl` *(append lines; same PR as the human Evidence Index \+ sentinel)*
-
-* {"artifact\_key":"compose\_examples","role":"snapshot","sha256":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","size\_bytes":234,"produced\_at\_utc":"2025-11-06T12:00:00Z","discovered\_physical\_path":"examples/compose\_examples.json","proof\_anchor":"audit/examples/compose\_examples.stat.txt"}  
-* {"artifact\_key":"narratives\_acceptance\_tokens","role":"log","sha256":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","size\_bytes":182,"produced\_at\_utc":"2025-11-06T12:00:00Z","discovered\_physical\_path":"acceptance/narratives\_acceptance.txt","proof\_anchor":"audit/acceptance/narratives\_acceptance.stat.txt","ids":{"pack\_sha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","release\_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}
-
-
-*Notes:* **Canonical JSONL**; one object per line; **unknown keys rejected**; each record includes a `proof_anchor` (path-proof). **Never include narrative text** in logs/sidecars — **ids-only**.
+**Canonical home.** The Machine Evidence Mirror schema, allowed metadata keys, companion files, and `proof_anchor` rules live in **HDE-Schemas-and-Artifacts**. Do not copy a sample row from this guide; construct and validate mirror records against that document’s current contract.
 
 ### **B.5 CLI sidecar (ids-only) — sample**
 
 **Path:** `preview/compose_sidecar.json`
 
 * {  
-*   "composition\_id": "comp\_q1w2e3r4",  
-*   "fragment\_ids": \["frag\_opener\_01", "frag\_center\_17", "frag\_closer\_03"\],  
-*   "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",  
-*   "release\_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  
+* "composition\_id": "comp\_q1w2e3r4",  
+* "fragment\_ids": \["frag\_opener\_01", "frag\_center\_17", "frag\_closer\_03"\],  
+* "pack\_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",  
+* "release\_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  
 * }
-
 
 **Notes.**
 
 * **Ids only; no prose.** Sidecar echoes the same identifiers present in composer outputs for provenance (`composition_id`, `fragment_ids[]`, `pack_sha`) and may include `release_id` to tie to the freeze.  
-* **Evidence parity.** When this file is produced/updated, append a line to `artifacts/evidence_index.jsonl` and update the **human Evidence Index \+ sentinel** in the **same PR**.  
-* 
+* **Evidence parity.** When this file is produced/updated, append a line to `artifacts/evidence_index.jsonl` and update the **human Evidence Index \+ sentinel** in the **same PR**.
 
 ---
 
-# **Appendix** C) Copywriter Templates
+# Appendix C) Narrative Authoring and Copywriting Routing
 
-Here’s a **clean, copy-and-paste template pack** that can be used to request and then update deliverables from a copywriter session. It’s designed to be **unambiguous, lint-ready**, and easy for Codex/IA to act on. There are two parts:
+PF17 owns current narrative mechanics and the DB-first authoring/export boundary. Applicable PF17 sections retain the current composer semantics, direction-aware inventory, suppression boundary, and authoring/export requirements.
 
-1. **New Request (Intake)** — to kick off a session and gather fresh narratives
+Current ownership routes are:
 
-2. **Update (PATCH)** — to revise, add, or remove specific items after the session
+- **Glow Tonality Guide v1.1: Writing for Human Connection** owns editorial guidance and copy templates.  
+- **PF02-Canon-HDE-Architecture** owns two-plane narrative architecture and component boundaries.  
+- **PF12-Canon-HDE-Schemas-and-Artifacts** owns narrative schemas, pack members, canonical bytes, manifest identity, and closed domains.  
+- **PF05-Canon-HDE-CLI-API-Vendor-Ref** owns CLI and Aux preview bytes, payloads, streams, and transport mappings.  
+- **PF14-Canon-HDE-Mechanics-Guide** owns mechanical implementation and test responsibilities.
 
-I’m also including a **review checklist** and a **one-liner handoff** to Codex so your operator can move immediately without asking you follow-ups.
+PF17 Appendix C defines no current `NIB-1.0`, chat intake, PATCH, ID-minting, preview, publish, storage-upload, or pull-request workflow.
 
----
-
-## C. 1 New Request — Copywriter Intake Template (NIB-style)
-
-> Use this template to request a new batch. Paste it into the session/chat as-is and fill the blanks.
-
-\>\>\>BEGIN NARRATIVES REQUEST  
-REQUEST:  
-  title: "\<short label for this batch\>"  
-  owner: "\<your name/role\>"  
-  due\_by: "\<YYYY-MM-DD or ASAP\>"  
-  audience: "\<dating, friendship, collaborators, etc.\>"  
-  voice\_tone: "\<e.g., warm, encouraging, inclusive\>"  
-  constraints:  
-    max\_chars: 300  
-    sentences: "2-4"  
-    single\_paragraph: true  
-    no\_digits: true            \# no ASCII numerals 0–9  
-    no\_emdash: true            \# no — em-dash  
-    inclusive\_tone: true  
-    no\_crlf: true              \# no carriage returns; text ends with one LF
-
-SCOPE:  
-  \# Choose any you want in this batch. You can start small (partial coverage).  
-  categories: \["harmony","friction","growth","chemistry","timing","focus","support","play","depth","clarity"\]  
-  bands: \["cool","open","warm","glow"\]  
-  perspectives: \["shared","a\_to\_b","b\_to\_a"\]  
-  slots: \["opener","center","closer","softener"\]  \# softener is optional
-
-GUIDANCE:  
-  user\_goal: "\<what the narrative should help the user feel/do\>"  
-  avoid: \["jargon","advice/imperatives like 'should'","body/medical claims","numbers/dates"\]  
-  examples (optional):  
-    \- "A good 'shared/warm/opener' sounds like: \<1 short sample\>"  
-    \- "But avoid: \<too technical / too long / salesy\>"
-
-ROWS:  
-  \# Add as many as you want. Use the id convention below.  
-  \# id format: nar.\<category\>.\<band\>.\<perspective\>.\<slot\>.\<slug-\#\#\>  
-  \# slug ends with \-01, \-02, ... to allow future revisions.
-
-  \- category: harmony  
-    band: warm  
-    perspective: shared  
-    slot: opener  
-    id: nar.harmony.warm.shared.opener.glow-welcome-01  
-    text: "\<≤300 chars; 2–4 sentences; one paragraph; inclusive; no digits/em-dash\>"
-
-  \- category: harmony  
-    band: warm  
-    perspective: shared  
-    slot: center  
-    id: nar.harmony.warm.shared.center.glow-welcome-02  
-    text: "\<…\>"
-
-  \# (add more rows as needed)
-
-SUPPRESSION (optional):  
-  \# When to suppress a narrative so we’re honest (leave empty if none)  
-  \- guard: "if profile=Reflector and authority=SoundingBoard"  
-    action: "suppress"  
-    ids: \["nar.harmony.warm.shared.opener.glow-welcome-01"\]
-
-NOTES (optional):  
-  \- "\<any editorial notes or nuance\>"  
-\<\<\<END NARRATIVES REQUEST
-
----
-
-## C.2 Update Request — Copywriter PATCH Template (targeted changes)
-
-> Use this to fix specific lines or add/remove after a session. Keep it surgical.
-
-\>\>\>BEGIN NARRATIVES UPDATE  
-REQUEST:  
-  title: "\<short label for patch\>"  
-  owner: "\<your name/role\>"  
-  reason: "\<typo fix|tone fix|add coverage|remove unsafe content\>"  
-  due\_by: "\<YYYY-MM-DD or ASAP\>"
-
-PATCH:  
-  \# choose one op per entry: replace | add | remove
-
-  \- op: replace  
-    id: nar.harmony.warm.shared.opener.glow-welcome-01  
-    text: "\<new text here; same constraints\>"
-
-  \- op: add  
-    row:  
-      category: timing  
-      band: cool  
-      perspective: a\_to\_b  
-      slot: closer  
-      id: nar.timing.cool.a\_to\_b.closer.steady-signals-01  
-      text: "\<≤300 chars; 2–4 sentences; one paragraph; no digits/em-dash\>"
-
-  \- op: remove  
-    id: nar.harmony.warm.shared.center.glow-welcome-02
-
-SUPPRESSION (optional):  
-  \- op: add  
-    rule:  
-      guard: "if category=harmony and band=warm and missing=true"  
-      action: "suppress"  
-      ids: \[\]
-
-NOTES (optional):  
-  \- "\<anything helpful for the fix\>"  
-\<\<\<END NARRATIVES UPDATE
-
----
-
-### C.2.1 Acceptance & lint gates (copy-review checklist)
-
-Paste this under your request if you want the copywriter to self-check before handing back:
-
-* **Length** ≤ 300 chars
-
-* **Sentences** 2–4, one paragraph
-
-* **Digits** none (no 0–9)
-
-* **Em-dash** none (—)
-
-* **Tone** inclusive, simple, human
-
-* **No CR** (no `\r`), ends with one LF (`\n`)
-
-* **ID matches the row** (category/band/perspective/slot align to id segments)
-
-* **Directional**: `a_to_b` and `b_to_a` are allowed to differ; `shared` should read coherently for both
-
-* **No claims** (medical/diagnostic/prescriptive)
-
-* **Suppression** rules present if needed (honest no-output over filler)
-
----
-
-### C.2.2 One-liner handoff for Codex (operator)
-
-> Put this under the copywriter’s response so the operator can act without questions.
-
-* **Intake**: “Ingest the above as **NIB-1.0**. Validate lints/IDs. Report any row-level errors with `error + field + hint`.”
-
-* **Preview**: “Render preview via shared presenter. Confirm CLI \= HTTP bytes. If not equal, block and report.”
-
-* **Publish** (only when requested): “Publish as a new pack; export canonical pack files, build `manifest.json`, compute `pack_sha`, upload to object storage; open one PR with human index \+ hash sentinel and machine mirror lines (records-only, ASCII key order, one LF, sorted, de-duped, path-proofs).”
-
-* **PATCH**: “Apply `add|replace|remove` ops; re-lint; re-preview; publish/export only if requested.”
-
----
-
-### C.2.3 Quick tips for the copywriter (keeps feedback cycles short)
-
-**Do**
-
-* Keep it **clear, kind, grounded** (“you two…”, “together you’ll notice…”).
-
-* Use **short sentences**; neutral verbs (“notice”, “tend to”, “often”).
-
-* Show **felt sense** (timing, ease, openness), not analysis.
-
-**Don’t**
-
-* Don’t instruct, fix, or prescribe (“you should”, “do this”).
-
-* Don’t use numbers/dates or intensifiers (“always”, “never”).
-
-* Don’t reveal private mechanics (no inner technical labels).
-
----
-
-### C.2.4 Minimal “tiny” variant (if you need to drop a fast ask)
-
-> For quick asks in a thread — Codex can still ingest this.
-
-NEED:  
-\- 4 lines for category=harmony, band=warm, perspective=shared  
-\- slots: opener|center|closer|softener (softener optional)  
-\- ≤300 chars; 2–4 sentences; one paragraph; no digits/em-dash
-
-FORMAT (per row):  
-id=nar.harmony.warm.shared.opener.glow-welcome-01  
-text="\<your line\>"
-
-id=nar.harmony.warm.shared.center.glow-welcome-02  
-text="\<your line\>"
-
----
-
-### C.2.5 FAQ — to prevent back-and-forth
-
-**Q: What if I’m not sure about the exact ID?**  
- A: Fill the row fields and leave `id:` blank; Codex will mint a slug and return it to you for review. For replacements, **id is required**.
-
-**Q: Can I ship partial coverage?**  
- A: Yes. We can publish category/band subsets; the renderer fails closed when a slot is missing.
-
-**Q: Can I ask for “more poetic / more minimal” without specifics?**  
- A: Yes—add 1–2 micro examples under `GUIDANCE.examples`. It reduces rewrite cycles.
-
-**Q: I need a softer/stronger tone for one category**  
- A: Add a `NOTES:` bullet for that category; we’ll pass it to the linter as a soft hint.
-
-**Q: Can I request alternative variants?**  
- A: Add multiple rows with `slug-01`, `slug-02` and mark your preferred one in `NOTES:`. We’ll keep both offline and publish the preferred.
-
----
-
-### C.2.6 Ready-to-send example (new request, small batch)
-
-\>\>\>BEGIN NARRATIVES REQUEST  
-REQUEST:  
-  title: "Harmony Warm — shared intro"  
-  owner: "Nathan"  
-  due\_by: "2025-11-10"  
-  audience: "romantic"  
-  voice\_tone: "warm, honest, grounded"  
-  constraints:  
-    max\_chars: 300  
-    sentences: "2-4"  
-    single\_paragraph: true  
-    no\_digits: true  
-    no\_emdash: true  
-    inclusive\_tone: true  
-    no\_crlf: true
-
-SCOPE:  
-  categories: \["harmony"\]  
-  bands: \["warm"\]  
-  perspectives: \["shared"\]  
-  slots: \["opener","center","closer"\]
-
-GUIDANCE:  
-  user\_goal: "Set a hopeful tone without promising outcomes; invite curiosity."  
-  avoid: \["jargon","advice","medical/body claims"\]  
-  examples:  
-    \- "You find an easy rhythm together…"  
-    \- "But avoid: 'always/never', directives like 'should'"
-
-ROWS:  
-  \- category: harmony  
-    band: warm  
-    perspective: shared  
-    slot: opener  
-    id: nar.harmony.warm.shared.opener.glow-welcome-01  
-    text: "You two warm up quickly, with gentle clarity. It’s not loud; it’s steady. Each step feels natural and invites the next."
-
-  \- category: harmony  
-    band: warm  
-    perspective: shared  
-    slot: center  
-    id: nar.harmony.warm.shared.center.glow-welcome-02  
-    text: "It’s easy to fall into a shared pace. Small signals stand out—a glance, a pause—and you both tend to honor them."
-
-  \- category: harmony  
-    band: warm  
-    perspective: shared  
-    slot: closer  
-    id: nar.harmony.warm.shared.closer.glow-welcome-03  
-    text: "This is a place to keep tending. Keep listening for the subtle ‘yes’. You don’t need to rush; your rhythm emerges on its own."
-
-NOTES:  
-  \- "If any line feels borderline prescriptive, soften the verb."  
-\<\<\<END NARRATIVES REQUEST
-
----
-
-If you want, I can also emit these as **two Markdown files** (e.g., `templates/NARRATIVES_REQUEST.md` and `templates/NARRATIVES_UPDATE.md`) formatted for your repo, or as a **Google Docs friendly** version.
+A future authoring workflow requires a separately approved canonical owner and versioned contract before it may be documented as runnable.
 
