@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
-**Version:** v2.4.3
+**Version:** v2.4.4
 
 **Status:** Canon  
 **Effective date:** 2026-08-11
 
-**Last Update Gate:** 0808 refresh 3
+**Last Update Gate:** 0808 refresh 4
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1449,30 +1449,30 @@ Catalog, transport, environment, index, release-identity, and other non-computat
 
 **BodyGraph as canonical cache.**
 
-* The BodyGraph is the canonical cached representation of a user’s human-design state.
-
-* Adapter reads/writes BodyGraphs in the database so later requests can reuse cached results instead of calling the vendor.
-
+* The BodyGraph is the canonical cached representation of a user’s human-design state.  
+    
+* Adapter reads/writes BodyGraphs in the database so later requests can reuse cached results instead of calling the vendor.  
+    
 * Engine stays stateless and just consumes whatever BodyGraph the adapter hands it.
 
 **Prod posture (no inline vendor on the hot path).**
 
 In production:
 
-* The request path for compat/Reader surfaces **does not** call the vendor inline.
-
-* BodyGraphs come from the database (via the DB runtime resolver); refresh runs out-of-band.
-
+* The request path for compat/Reader surfaces **does not** call the vendor inline.  
+    
+* BodyGraphs come from the database (via the DB runtime resolver); refresh runs out-of-band.  
+    
 * TTL/SWR, rate-limits, and circuit-breaker behaviour (`fail/window_s/cooldown_s`) are enforced outside PF02, by Governance, Infrastructure, and Mechanics.
 
 **Dev posture (inline allowed, but cached).**
 
 In dev and similar non-prod environments:
 
-* Direct vendor calls are allowed under SAFE rails and appropriate env pins.
-
-* On a successful vendor fetch \+ Engine compute, Adapter upserts the resulting BodyGraph and metadata into the DB so later requests can reuse it.
-
+* Direct vendor calls are allowed under SAFE rails and appropriate env pins.  
+    
+* On a successful vendor fetch \+ Engine compute, Adapter upserts the resulting BodyGraph and metadata into the DB so later requests can reuse it.  
+    
 * This keeps Engine behaviour identical across environments: it always acts on BodyGraphs handed in by Adapter, regardless of how they were obtained.
 
 **DB runtime resolver (env-aware, titles-only).**
@@ -1488,8 +1488,8 @@ Resolver semantics, connection details, and evidence live in **Glow Infrastructu
 
 **Flow ownership (by title).**
 
-* The end-to-end BodyGraph ingest and durability flow (including schemas, fingerprints, and indices) lives in the BodyGraph ingest/durability section of this document and in **HDE-Schemas & Artifacts** and **HDE-Governance**.
-
+* The end-to-end BodyGraph ingest and durability flow (including schemas, fingerprints, and indices) lives in the BodyGraph ingest/durability section of this document and in **HDE-Schemas & Artifacts** and **HDE-Governance**.  
+    
 * Section 6 names the posture and boundaries; detailed flows remain single-home elsewhere.
 
 ---
@@ -1497,7 +1497,7 @@ Resolver semantics, connection details, and evidence live in **Glow Infrastructu
 ## **6.2 Vendor seam (concept only)**
 
 **Shaping and calling (bounded).**  
- The vendor seam shapes requests, normalises responses, and is the **only place** in the Engine/Adapter stack where live HTTP calls to the vendor may occur. Live HTTP and database access are **never performed in Engine Core or sampler core modules**; they are confined to vendor seam modules that sit alongside Adapter and obey the same rails and Governance posture.
+The vendor seam shapes requests, normalises responses, and is the **only place** in the Engine/Adapter stack where live HTTP calls to the vendor may occur. Live HTTP and database access are **never performed in Engine Core or sampler core modules**; they are confined to vendor seam modules that sit alongside Adapter and obey the same rails and Governance posture.
 
 **Responsibilities.**
 
@@ -1536,7 +1536,7 @@ Boundary classification is architecture-level and must distinguish `allowed`, `f
 
 PF02 owns the architectural boundary rule only. Boundary analyzers, renderer separation, table-driven taxonomy, generated evidence artifacts, path proofs, tests, and validation mechanics live in HDE-Mechanics Guide, HDE-Schemas & Artifacts, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
-**`g:resolve --source vendor` route-policy boundary (architecture-level).** HDE-EPIC037 records configured-v2 `bg:resolve --source vendor` as an adapter-backed v2 chart flow for dry-run resolution. When the configured HumanDesignAPI base is v2, the resolver selects the recommended v2 chart route family, the version-neutral `charts` resource path, and the deterministic ChartResult adapter. When the configured base is non-v2, the legacy BodyGraph fallback remains explicit legacy behavior.
+**`bg:resolve --source vendor` route-policy boundary (architecture-level).** HDE-EPIC037 records configured-v2 `bg:resolve --source vendor` as an adapter-backed v2 chart flow for dry-run resolution. When the configured HumanDesignAPI base is v2, the resolver selects the recommended v2 chart route family, the version-neutral `charts` resource path, and the deterministic ChartResult adapter. When the configured base is non-v2, the legacy BodyGraph fallback remains explicit legacy behavior.
 
 Closed rails must refuse before outbound I/O. Configured-v2 request construction must not fall back to legacy `bodygraphs` as a substitute for v2 BodyGraph-detail behavior, and generic ingest must not silently treat v2 chart requests as legacy BodyGraph ingest. Resolver and vendor-client architecture may classify route family, auth posture, payload family, and adapter result, but exact CLI flags, command bytes, outbound headers, request/response shapes, error codes, evidence artifacts, and QA workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
@@ -1547,18 +1547,18 @@ This posture does not prove durable mapped-cache persistence, production writes,
 The BodyGraph ingest/resolution seam MAY be implemented under `engine/bodygraph/`. Even though this path sits under the top-level `engine/` package, Architecture treats `engine/bodygraph/` as a **non-core I/O seam component**, not part of Engine Core or sampler core “pure compute.” The seam is allowed to orchestrate vendor HTTP and BodyGraph cache DB reads/writes (subject to rails and policy owned elsewhere), while all deterministic compute remains in the pure modules (Engine Core and sampler core) and all public bytes remain emitted by the single Presenter emitter.
 
 **Engine purity preserved.**  
- Engine Core and sampler core remain in-proc, deterministic, and free of network/time/IO concerns and environment-based behaviour:
+Engine Core and sampler core remain in-proc, deterministic, and free of network/time/IO concerns and environment-based behaviour:
 
-* No engine runtime modes or hidden toggles for dev/prod; logic is identical in all environments.
-
-* Engine Core has no knowledge of whether inputs came from vendor or cache; it always treats them as pure data.
-
+* No engine runtime modes or hidden toggles for dev/prod; logic is identical in all environments.  
+    
+* Engine Core has no knowledge of whether inputs came from vendor or cache; it always treats them as pure data.  
+    
 * Any source-selection logic (DB vs vendor, TTL enforcement, stale-while-revalidate) lives in Adapter/CLI and the vendor seam, not in Engine Core.
 
 Even if vendor seam modules live in the same top-level package as Engine Core, Architecture treats them as a **separate component**. Moving them or refactoring their location must not change Engine Core behaviour.
 
 **Operational hygiene.**  
- Vendor seams must honour Governance posture:
+Vendor seams must honour Governance posture:
 
 * No secrets or PII in logs (keys-only traces where allowed).  
 * Rails must be explicitly open before any live HTTP is attempted.  
@@ -1574,18 +1574,18 @@ Even if vendor seam modules live in the same top-level package as Engine Core, A
 
 PF02 does **not** define:
 
-* Timeouts, retries/backoff, rate limits, or circuit-breaker thresholds.
-
-* Header or payload details, conditional delivery rules, error taxonomy/mapping, or auth policy.
-
+* Timeouts, retries/backoff, rate limits, or circuit-breaker thresholds.  
+    
+* Header or payload details, conditional delivery rules, error taxonomy/mapping, or auth policy.  
+    
 * Vendor request or response shapes, SLAs, or persistence/retention policy.
 
 **Route by title.**
 
-* Transport and public envelope bytes (CLI/Reader/vendor) → **HDE-CLI-API-Vendor-Ref**
-
-* Acceptance and ops policy (including A7 validators, caching for 200/HEAD, no-store on writers/errors, required evidence) → **HDE-Governance**
-
+* Transport and public envelope bytes (CLI/Reader/vendor) → **HDE-CLI-API-Vendor-Ref**  
+    
+* Acceptance and ops policy (including A7 validators, caching for 200/HEAD, no-store on writers/errors, required evidence) → **HDE-Governance**  
+    
 * BodyGraph table shapes, fingerprints, indices, evidence families, and mirror bindings → **HDE-Schemas & Artifacts** and related Mechanics/Checklist docs
 
 **Contract-free stance.**
@@ -1612,31 +1612,30 @@ No import-time I/O in engine math. Engine code performs no file, network, or tim
 
 ## **8.1 Ownership of “bytes” (route by title)**
 
-PF02 is contract-free. Use titles only for cross-doc references. Do not copy headers, schemas, status matrices, tokens, or paths here. Concrete bytes and locations live in their single homes below.
+PF02 maps ownership and does not reproduce external contracts. Cross-document routing uses exact owner titles.
 
-Math & scoring (arithmetic, banding, presets, extractors, preimage/idempotence, ordering) → **HDE-Math-Spec**.
-
-Pack catalogs & manifest (freeze-pack identity, checksums, canonical JSON policy, human `docs/evidence/INDEX.json`, machine `artifacts/evidence_index.jsonl` schema/parity) → **HDE-Schemas & Artifacts**.
-
-CLI / Reader / vendor route bytes (public six-key envelope, request/response shapes & examples, streams/exits, Endpoint Catalog (JSON success) ownership and route titles, CLI admin preview, vendor request shaping, parity rules) → **HDE-CLI-API-Vendor-Ref**.
-
-A7 transport & ops policy (ETag/200, 304 header omissions, HEAD parity, Vary: Authorization, Accept-Encoding, encoding-invariance, writers no-store/no ETag, /internal/version identity endpoint posture (excluded from A7 proofs), acceptance tokens) → **HDE-Governance**.
-
-QA tokens & D-goals (Live QA token semantics, rails posture, and per-epic D-goal records and acceptance conditions) → **Glow QA Guide** and **HDE-Phased Epics**.
-
-Guards & ops how-to / CI (capture scripts, serializer path allow-lists/denylists, dev-harness ops posture, PR-first workflow with CodEx-opened PR and same-PR Evidence Index updates) → **Epic-Process-Guide** and **HDE-Mechanics Guide**.
-
-Infrastructure names/locations (providers, projects, services, repos, domains, DB schemas) → **Glow Infrastructure**.
-
-Narratives surface (Aux route & Composer), suppression rule (200 with no body, no ETag), and A7 posture for Aux → **HDE Narratives Guide** (and **HDE-Governance** for policy).
-
-Invocation tag / covenant text → **PF-Invocation**.
-
-Endpoint Catalog (JSON success) single home & env-gate proof → **HDE-CLI-API-Vendor-Ref** (route titles) and **HDE-Schemas & Artifacts** (path `docs/ENDPOINTS_CATALOG.json` \+ `.sha256`, env-gate proof indexing). PF02 pins this location only.
-
-BodyGraph evidence families (source-selection snapshot, source-invariance proofs, refresh-policy snapshot, ingest metrics/log samples) → **HDE-Mechanics Guide** / **HDE-Build Checklist** (what to capture, when), **HDE-Schemas & Artifacts** (indices/mirror discipline). Schema names for durability live in **Glow Infrastructure** (names-only).
+* Math and scoring → **PF01-Canon-HDE-Math-Spec**.  
+    
+* Catalogs, manifests, schemas, governed artifacts, and evidence indexing → **PF12-Canon-HDE-Schemas-and-Artifacts**.  
+    
+* CLI, Reader, vendor, and Endpoint Catalog wire contracts → **PF05-Canon-HDE-CLI-API-Vendor-Ref**.  
+    
+* Governance, transport and operations policy, validation, and acceptance-token semantics → **PF04-Canon-HDE-Governance**.  
+    
+* QA principles, checklists, and cross-component playbooks → **PF19-Canon-Glow-QA-Guide**.  
+    
+* Historical epic records and trace pointers → **PF20-Reference-HDE-Phased Epics**.  
+    
+* Epic delivery and PR-first process → **PF06-Canon-Epic-Process-Guide**.  
+    
+* Mechanical components, tooling, and build tasks → **PF14-Canon-HDE-Mechanics-Guide**.  
+    
+* Infrastructure inventory → **PF07-Canon-Glow-Infrastructure**.  
+    
+* Narrative mechanics and semantics → **PF17-Canon-HDE-Narratives-Guide**.  
+    
+* Invocation text → **PF-Invocation**.
 
 Auxiliary evidence-looking roots (for example `parity/`, `errors/`, `proofs/`, `reports/`, and `scan_reports/`) are non-authoritative by default unless **HDE-Schemas & Artifacts** explicitly catalogs them into the governed evidence model or another PF single home explicitly routes authority there.
 
 Governed payload truth remains under the governed evidence model and its Human Evidence Index / Machine Evidence Index discoverability surfaces. Auxiliary support roots and derived views do not create alternate mirror, close-pack, or canonical-gate homes.
-
