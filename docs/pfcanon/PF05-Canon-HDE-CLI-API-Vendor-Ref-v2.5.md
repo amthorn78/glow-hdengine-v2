@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref  
-**Version:** v2.4.9  
+**Version:** v2.5  
 **Status:** Canon  
-**Effective date:** 2026-08-11  
-**Last Update Gate:** 0808 refresh 3  
+**Effective date:** 2026-08-12  
+**Last Update Gate:** 0808 refresh 4  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -3264,47 +3264,53 @@ Evidence and tests (titles-only):
 
 ### **7.1.1 Rails defaults (env inventory; titles-only)**
 
-* **Dev / Codex and QA / Codespaces:** rails **CLOSED** in the current deployed records unless explicitly opened for a bounded, PO-authorized task.
-
-  * `SAFE_MODE = 1`
-
+* **Dev / Codex and QA / Codespaces:** rails **CLOSED** in the current deployed records unless explicitly opened for a bounded, PO-authorized task.  
+    
+  * `SAFE_MODE = 1`  
+      
   * `ALLOW_NETWORK = 0`
 
-* **Prod / Railway:** rails **OPEN** only where the deployed environment inventory records the explicit PO-owned production binding.
 
-  * `SAFE_MODE = 0`
+* **Prod / Railway:** rails **OPEN** only where the deployed environment inventory records the explicit PO-owned production binding.  
+    
+  * `SAFE_MODE = 0`  
+      
+  * `ALLOW_NETWORK = 1`
 
-  * `ALLOW_NETWORK = 1`  
+
 * **CI:** rails **CLOSED** by default.  
+    
   * `SAFE_MODE = 1`  
   * `ALLOW_NETWORK = 0`
 
-* Opening rails is an **explicit job/session decision** (ops/config), not a runtime toggle.
 
+* Opening rails is an **explicit job/session decision** (ops/config), not a runtime toggle.  
+    
 * The authoritative environment inventory lives in **Glow-Infrastructure** (titles-only).
 
 ### **7.1.2 Two-gate rule (both required)**
 
-* A live HDAPI call is permitted **only when both**:
-
-  * `SAFE_MODE = 0`, and
-
+* A live HDAPI call is permitted **only when both**:  
+    
+  * `SAFE_MODE = 0`, and  
+      
   * `ALLOW_NETWORK = 1`.
 
 ### **7.1.3 Refusal semantics (closed rails)**
 
-* When either gate is not satisfied, vendor paths **MUST NOT** perform any network I/O (no sockets, DNS, HTTP).
-
-* In this case, return a **typed refusal**:
-
-  * Numeric-free, LF-terminated canonical JSON.
-
+* When either gate is not satisfied, vendor paths **MUST NOT** perform any network I/O (no sockets, DNS, HTTP).  
+    
+* In this case, return a **typed refusal**:  
+    
+  * Numeric-free, LF-terminated canonical JSON.  
+      
   * No secrets; logs follow **keys-only** posture.
 
-* Proof remains a **single-file capture**:
 
-  * Headers → blank line → LF-terminated JSON body.
-
+* Proof remains a **single-file capture**:  
+    
+  * Headers → blank line → LF-terminated JSON body.  
+      
   * Path: `artifacts/proofs/ops_refusal_proof.txt` (see PF12).
 
 ### **7.1.4 Environment variables (must be present and non-empty; names-only)**
@@ -3319,62 +3325,65 @@ Missing or empty env values **MUST** produce a typed failure **without** I/O.
 
 ### **7.1.5 Determinism and shaping (closed rails)**
 
-* With rails closed:
-
-  * Providers **may shape** the request (URL, headers, body schema) **deterministically**:
-
-    * Order-neutral.
-
+* With rails closed:  
+    
+  * Providers **may shape** the request (URL, headers, body schema) **deterministically**:  
+      
+    * Order-neutral.  
+        
     * No time/locale/random dependence.
+
+    
 
   * Providers **must not send** the request; the output is the typed refusal.
 
-* All checks run under:
 
+* All checks run under:  
+    
   * `LC_ALL = C`  
   * `LANG = C`  
   * `TZ = UTC`.
 
 ### **7.1.6 CI / test posture**
 
-* CI runs **CLOSED** by default (`SAFE_MODE=1`, `ALLOW_NETWORK=0`).
-
-* Any CI job that opens rails **must**:
-
-  * Pin timeout/retry/backoff policy.
-
+* CI runs **CLOSED** by default (`SAFE_MODE=1`, `ALLOW_NETWORK=0`).  
+    
+* Any CI job that opens rails **must**:  
+    
+  * Pin timeout/retry/backoff policy.  
+      
   * Attach **keys-only** evidence in the same PR.
 
 ### **7.1.7 Evidence (titles/paths only; PF12 single home)**
 
 The following artifacts are governed and indexed in **PF12**:
 
-* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON).
-
-* `artifacts/runtime/env_connectivity.snapshot.json` — dev jobs (env and connectivity snapshot).
-
+* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON).  
+    
+* `artifacts/runtime/env_connectivity.snapshot.json` — dev jobs (env and connectivity snapshot).  
+    
 * Grep-guard reports for keys-only logging.
 
 ### **7.1.8 Acceptance (titles-only; tokens live in Governance)**
 
 The behavior above is covered by acceptance tokens owned in **HDE-Governance** (names-only):
 
-* `NO_EXTERNAL_IO_ON_REFUSAL_OK`
-
-* `ERROR_CTYPE_JSON_UTF8_OK`
-
-* `NO_CONTENT_ENCODING_OK`
-
-* `PF04_LOG_ALLOWLIST_009_OK`
-
-* `REFUSAL_ROUTE_PINNED_OK`
-
-* `OPS_REFUSAL_FILE_FORMAT_OK`
-
-* `OPS_REFUSAL_HEADERS_OK`
-
-* `OPS_REFUSAL_BODY_OK`
-
+* `NO_EXTERNAL_IO_ON_REFUSAL_OK`  
+    
+* `ERROR_CTYPE_JSON_UTF8_OK`  
+    
+* `NO_CONTENT_ENCODING_OK`  
+    
+* `PF04_LOG_ALLOWLIST_009_OK`  
+    
+* `REFUSAL_ROUTE_PINNED_OK`  
+    
+* `OPS_REFUSAL_FILE_FORMAT_OK`  
+    
+* `OPS_REFUSAL_HEADERS_OK`  
+    
+* `OPS_REFUSAL_BODY_OK`  
+    
 * `OPS_REFUSAL_MIRROR_LINK_OK`
 
 #### 7.1.8a OPS discovery, open-rails testing, and repo-reality observations (vendor ingest)
@@ -3389,46 +3398,38 @@ Codex Audit or other supplied read-only repo-reality observations may support PF
 
 ### **7.1.9 Routing (titles-only)**
 
-* Env inventory: **Glow-Infrastructure**.
-
-* Transport matrices and refusal/error policy: **HDE-Governance**.
-
+* Env inventory: **Glow-Infrastructure**.  
+    
+* Transport matrices and refusal/error policy: **HDE-Governance**.  
+    
 * Evidence index and mirror: **HDE-Schemas & Artifacts**.
 
 ---
 
-### **7.1.10 Endpoint policy (legacy BodyGraph vendor HTTP; HumanDesignAPI v2 pending)**
+### **7.1.10 Endpoint policy (explicit version-gated dual lineage)**
 
-**Current legacy BodyGraph endpoint posture:**
+**Normative route selection.**
 
-The current implemented vendor-ingest contract remains legacy BodyGraph-oriented and MUST NOT be cited as HumanDesignAPI v2 conformance.
+`bg:resolve --source vendor` selects one full-detail route from the validated terminal API-version segment of the configured base:
 
-The current legacy request-shaping block uses:
+* A terminal, case-sensitive `v2` segment selects the version-neutral resource `charts`.  
+* A terminal, case-sensitive `v1` segment selects the intentionally retained legacy resource `bodygraphs`.  
+* An unversioned base, unsupported version, nonterminal version marker, multiple conflicting version markers, or otherwise ambiguous base fails with `PROVIDER_ROUTE_UNSUPPORTED` before credential projection or any external I/O.  
+* Route selection is immutable for the invocation. A v2 request failure never triggers a v1 request, and a v1 request failure never triggers v2.
 
-POST /bodygraphs
+The low-level provider contract retains `charts`, `charts/simple`, `charts/coordinates`, `bodygraphs`, and `bodygraphs/simple`. Only full `charts` and full `bodygraphs` are resolver-selectable. The other three resources remain contracted inventory for request-building and conformance work; they are not retired, do not establish live provider availability, and cannot satisfy the full resolver contract merely because their request shape is known.
 
-with the three-key JSON body:
+**Configured-base boundary.**
 
-{"birthdate":"...","birthtime":"...","location":"..."}
+`HD_API_BASE_URL` is canonical. `HDAPI_BASE_URL` is a deprecated compatibility alias during the existing migration window only. Normalize a candidate by trimming surrounding ASCII whitespace and trailing `/` characters for comparison and joining; preserve every other configured path prefix. The URL must be absolute HTTPS, contain a host, contain no userinfo, query, or fragment, and end in exactly `v1` or `v2`.
 
-**HumanDesignAPI v2 endpoint posture pending:**
+If both environment names are present, both normalized URLs must be byte-equal. A conflict produces `PROVIDER_CONFIG_INVALID` before I/O. If the canonical name is absent, the compatibility alias may supply the value. If both are absent, return `PROVIDER_CONFIG_MISSING`. Append exactly one `/` and the version-neutral resource; never append another version segment and never follow redirects.
 
-HumanDesignAPI v2 conformance is pending governed contract inventory and implementation evidence. The pending v2 route map MUST distinguish at least these recommended v2 chart routes:
+**Legacy and claim boundary.**
 
-* `POST /v2/charts`  
-* `POST /v2/charts/simple`  
-* `POST /v2/charts/coordinates`
+The explicit v1 `bodygraphs` path is retained legacy selection, not fallback. No legacy route is retired by repository nonselection. Retirement requires a separately versioned decision with consumer, migration, evidence, and rollback review.
 
-PF05 MUST NOT collapse those v2 routes into the legacy BodyGraph endpoint, and MUST NOT claim v2 runtime conformance until HDE-FERM006 through HDE-FERM008 close with governed evidence.
-
-**Legacy v1 isolation pending:**
-
-The pending contract inventory MUST distinguish legacy v1 routes, including:
-
-* `POST /v1/bodygraphs`  
-* `POST /v1/bodygraphs/simple`
-
-Whether v1 BodyGraph routes remain supported as explicit legacy fallback or are retired after v2 migration is a PO decision. Until that decision is drained, v1 behavior MUST be labeled legacy or pending and MUST NOT be silently deleted, silently promoted, or treated as the recommended v2 path.
+The bounded Fermentation work and repository request builders do not establish broad HumanDesignAPI v2 platform conformance, live route availability, public Reader change, production mapped-cache persistence, or QA acceptance. A complete full-route response may enter only the existing governed HDE normalization boundary; simple results cannot be promoted to complete BodyGraph detail.
 
 **Privacy / payload constraints:**
 
@@ -3438,190 +3439,276 @@ Whether v1 BodyGraph routes remain supported as explicit legacy fallback or are 
 
 ---
 
-### **7.1.11 SAFE rails and admin override (vendor ingest)**
+### **7.1.11 SAFE rails and production vendor override**
 
-Vendor HTTP for BodyGraph ingest is subject to the SAFE rails posture described in Governance:
+Vendor HTTP remains subject to the generic SAFE rails in **HDE-Governance**. Closed SAFE or network rails refuse before every vendor decision and perform no credential loading, DNS, socket, or HTTP activity. The production override is an additional admin gate; it never opens either generic rail and never permits public Reader or Aux traffic to call the vendor.
 
-* When rails are **closed** (`SAFE_MODE=1` or `ALLOW_NETWORK=0`):
+#### **7.1.11a Exact CLI flag**
 
-  * **No vendor HTTP calls** are made.
+The only production authorization flag in this selection is:
 
-* In **prod**, admin vendor calls are permitted **only** when:
+```
+--allow-prod-vendor <AUTHORIZATION_REF>
+```
 
-  * Rails are explicitly **open** (`SAFE_MODE=0`, `ALLOW_NETWORK=1`), and
+It is one value-bearing flag accepted only by `hdctl bg:resolve --source vendor`. It has no short spelling, compatibility alias, negated form, environment-variable form, or implicit default.
 
-  * The documented **admin override environment guard** is set.
+`AUTHORIZATION_REF` is an audit reference, not a credential. It must contain 1–128 ASCII characters and match:
 
-* Otherwise, vendor calls **MUST NOT** be attempted and `bg:resolve` / CLI commands **MUST** fail closed with a typed error.
+```
+^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$
+```
 
-This section owns the **on-wire HTTP contract** (endpoint, headers, body). Policy, rails, and override semantics are owned by **HDE-Governance** and referenced here by title only.
+An empty value, control character, whitespace, character outside the allow-list, missing value, or duplicate occurrence is invalid. The reference identifies the approved Product Owner work item or recorded Product Owner delegation and must never contain a token or secret.
+
+#### **7.1.11b Environment classification**
+
+`APP_ENV` is canonical. `ENGINE_ENV` is a compatibility alias for this CLI gate only when `APP_ENV` is absent or blank.
+
+* Normalize by trimming ASCII whitespace and lowercasing.  
+* Production-like values are exactly `prod`, `production`, and `live`.  
+* Recognized non-production values are exactly `dev`, `test`, `local`, `stage`, and `staging`.  
+* Treat an unset or all-whitespace value as absent.  
+* If both names are nonblank, their normalized values must be equal; a conflict is `PROVIDER_CONFIG_INVALID`.  
+* Use nonblank `APP_ENV`; otherwise use nonblank `ENGINE_ENV`.  
+* If neither is nonblank, or the effective value is outside both allow-lists, return `PROVIDER_CONFIG_INVALID` before I/O. Never treat an unknown label as non-production.
+
+The flag never changes environment classification.
+
+#### **7.1.11c Rail and flag matrix**
+
+| Effective environment | Generic rails | Override flag | Result |
+| :---- | :---- | :---- | :---- |
+| any recognized value | `SAFE_MODE` closed | any | existing `PROVIDER_REFUSED`; zero vendor I/O |
+| any recognized value | network not allowed | any | existing `PROVIDER_NETWORK_BLOCKED`; zero vendor I/O |
+| `prod`, `production`, or `live` | both rails open | absent | `PROVIDER_PROD_OVERRIDE_REQUIRED`; zero vendor I/O |
+| `prod`, `production`, or `live` | both rails open | malformed or duplicated | CLI usage error; zero vendor I/O |
+| `prod`, `production`, or `live` | both rails open | valid, but actor identity or audit sink unavailable | `PROVIDER_AUDIT_UNAVAILABLE`; zero vendor I/O |
+| `prod`, `production`, or `live` | both rails open | valid and auditable | vendor read/resolve may proceed, subject to every route, credential, retry, and write guard |
+| recognized non-production | both rails open | absent | normal non-production vendor policy |
+| recognized non-production | both rails open | present | `PROVIDER_PROD_OVERRIDE_INVALID`; zero vendor I/O |
+
+The familiar open representation is `SAFE_MODE=0` and `ALLOW_NETWORK=1`. The production flag substitutes for neither value.
+
+#### **7.1.11d Evaluation order and scope**
+
+Evaluate the gates in this order before client construction, secret loading, DNS, sockets, or HTTP:
+
+1. Parse the command and reject malformed, duplicated, or inapplicable flags.  
+2. Confirm `--source vendor`; using the flag with `--source db` or `--source auto` is a CLI usage error.  
+3. Apply the generic SAFE and network rails.  
+4. Resolve and validate the effective environment.  
+5. Apply the production/non-production flag matrix.  
+6. Resolve authenticated actor identity and durably write the pre-I/O audit event.  
+7. Apply base-URL, route, credential-presence, request, retry, and any separate persistence gates.
+
+The flag authorizes only one bounded admin vendor HTTP opportunity. It does not authorize public Reader/Aux vendor traffic, production `--upsert`, any production database write, bypass of `PROVIDER_WRITE_UNSUPPORTED`, a route or version, credentials, expanded retries, or a no-network dry run. A production dry run that contacts the vendor still requires the flag.
+
+#### **7.1.11e Error carrier and authorized setter**
+
+A missing value, duplicate flag, invalid syntax, or use with a non-vendor source uses the canonical CLI usage carrier and exits `64`. Runtime policy refusals use the canonical `status="error"` resolver envelope with one stable typed code and a non-sensitive message and exit `1`. Every refusal has outbound-attempt count `0`.
+
+The authorized initiator is an authenticated human Product Owner or a human operations executor explicitly delegated by the Product Owner in the referenced approved work item. An AI agent, CI job, application request, or unauthenticated shell cannot self-authorize by supplying the flag. Actor identity comes from the authenticated execution environment or control plane, never a free-form `--operator` value. If a stable authenticated actor identity is unavailable, refuse the operation. The authorization reference records the decision basis; it is not authentication and grants no privilege by itself.
+
+#### **7.1.11f Audit contract**
+
+Every production-like invocation that reaches semantic override evaluation, including an absent, invalid, refused, or allowed authorization reference, creates one append-only, locally durable, keys-only event before I/O. A syntax failure that prevents parsing, including a duplicate flag or missing value, remains observable through the trusted process/control-plane audit rather than an application event assembled from unparsed arguments.
+
+| Field | Rule |
+| :---- | :---- |
+| `schema_version` | fixed audit schema version |
+| `event` | exactly `vendor_prod_override` |
+| `occurred_at` | UTC timestamp from the governed clock boundary |
+| `correlation_id` | generated by the trusted runtime; not supplied as birth or user data |
+| `actor_principal` | authenticated OS/control-plane principal |
+| `authorization_ref` | validated flag value, or `null` when absent |
+| `command` | exactly `bg:resolve` |
+| `source` | exactly `vendor` |
+| `environment` | normalized production alias |
+| `safe_mode_open` | boolean result only |
+| `network_open` | boolean result only |
+| `route_family` / `resource_path` | allow-listed label if route classification was reached; otherwise `null` |
+| `outcome` | one of `refused`, `allowed`, `failed`, `completed` |
+| `error_code` | stable typed code or `null` |
+| `outbound_attempted` | boolean; never a raw request count with subject data |
+
+Do not record `--user`, birth date, birth time, location, coordinates, request or response bodies, configured URL, header values, tokens, API keys, geocode keys, database identifiers, or raw provider messages. Sanitize audit fields against CR/LF and delimiter injection. The flag value, actor, and policy state never appear in an exception string or raw diagnostic outside the governed audit record.
+
+Failure to persist the pre-I/O event is `PROVIDER_AUDIT_UNAVAILABLE` and blocks the call. A post-I/O completion event may update the same correlation record or append a second state event under the audit schema, with the same exclusions.
 
 ---
 
-## **7.2 Request Shaping (owned here) \[Implemented\]**
+## **7.2 Request Shaping (owned here) \[Required-Now\]**
 
-Purpose (normative).  
- Define the exact HDAPI request construction used by CLI and Reader vendor calls: endpoint paths, method, base-URL resolution, canonical headers, content type, request-body schema, and deterministic error mapping from provider responses to typed CLI/Reader errors. Rails and enablement live in §7.1.
+**Purpose.** Define the exact route-scoped HDAPI request and response contract used by vendor resolution: base-URL validation, resource selection, method, headers, request object, serialization, response-family validation, and provider-to-HDE typed mapping. Rails and enablement live in §7.1.
 
-### **7.2.0 HumanDesignAPI v2 request and response contract pending**
+### **7.2.0 Contract and implementation posture**
 
-HumanDesignAPI v2 full live/runtime conformance remains pending. Current governed evidence records source-selection, deterministic request-shaping proof, proof-level response-envelope mapping, adapter/presenter boundary proof, closed-rails refusal, and a bounded OPS-02 open-rails smoke for `charts/coordinates` bound by PR-06 for HDE-FERM008.2 only. These proof slices do not claim full HumanDesignAPI v2 runtime conformance, normalized data-path completion, HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, public Reader changes, public route or payload changes, new HTTP homes, or AI scope.
+The contract in this section is Required-Now. Static inspection of the pinned repository confirms low-level request builders for all five inventoried resources and current resolver selection of v2 `charts` or legacy `bodygraphs`; it also shows material gaps against this contract: broad non-v2 legacy selection, no production-vendor override flag or audit gate, and retry configuration outside the five approved tuples. Repository definitions do not establish runtime success, deployment, live-provider availability, or QA acceptance.
 
-Pending v2 contract work MUST follow this source precedence:
+Existing governed evidence records source selection, deterministic request-shaping proof, proof-level response-envelope mapping, adapter/presenter boundary proof, closed-rails refusal, a bounded `charts/coordinates` open-rails smoke, field-sufficiency proof, deterministic `ChartResult` adapter mapping, configured-v2 dry-run route wiring, mapped v2-to-compat proof, bounded open-rails runtime smoke evidence, and parent evidence binding. Those bounded proof slices do not claim broad HumanDesignAPI v2 platform conformance, normalized-data-path completeness beyond their stated scope, production deployment, production upsert, public Reader changes, new HTTP homes, app-side vendor ownership, raw payload persistence, QA PASS, OPS completion by documentation, or AI scope.
 
-* validated `v2-routes.yaml` and `v1-routes.yaml` first,  
-* rendered endpoint pages second,  
-* high-level guide pages third,  
-* suspect artifacts quarantined until validated.
+Contract interpretation retains the validated source precedence: validated `v2-routes.yaml` and `v1-routes.yaml`, rendered endpoint pages, then high-level guide pages. A suspect API-description artifact does not define PF05 bytes until its domain, title, server, and route family are validated.
 
-The advertised `api-reference/openapi.json` artifact MUST NOT define PF05 bytes unless validation proves it belongs to HumanDesignAPI by domain, title, server, and path-family.
+PF05 preserves the distinction between v2 full chart, v2 simple chart, coordinate-route chart, legacy full BodyGraph, legacy simple BodyGraph, raw payload-family sufficiency, deterministic adapter mapping, mapped cache posture, mapped-cache persistence, and the normalized HDE BodyGraph/person/cache contract. `ChartSimpleResult` and `SimpleBodygraphResponse` are not sufficient for full resolver success.
 
-The v2 request contract, when drained, MUST define:
+HumanDesignAPI vendor acquisition, request shaping, credential handling, response normalization, BodyGraph persistence/retrieval, and HDE computation remain inside the HD Engine boundary. This contract introduces no OpenAI, LLM, agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rail, AI evidence family, or AI QA obligation.
 
-* the byte-authoritative request contracts for `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates`,  
-* v2 auth headers, including `Authorization: Bearer` and `HD-Geocode-Key` conditions for location-based calls,  
-* exact v2 base URL posture and credential/config key names,  
-* request-body shape, including whether ISO-style birthdate values are required,  
-* response envelope mapping for `timestamp`, `success`, `message`, `errorCode`, `type`, and `data`,  
-* typed error mapping,  
-* retry and rate-limit handling,  
-* v1 legacy isolation or retirement posture.
+### **7.2.1 Endpoints, method, and base URL**
 
-PF05 pins `HD_API_BASE_URL` as the canonical HumanDesignAPI base URL key, `HD_API_KEY` as the canonical vendor credential key, and `GEO_API_KEY` as the geocoding key where required. `HDAPI_BASE_URL` is deprecated legacy spelling and may be supported only as a temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values MUST fail closed as configuration ambiguity. The configured `HD_API_BASE_URL` owns the vendor API-version path and may include a vendor version segment without changing runtime route constants. PF05 MUST NOT restate current deployed base URL values as runtime-contract text; deployed values belong to infrastructure inventory and OPS evidence. Legacy BodyGraph resource paths under a configured v2 base remain live-behavior-unproven and MUST NOT be claimed as live vendor conformance from route-version remediation alone.
+**Base resolution.**
 
-PF05 MUST preserve the distinction between v2 chart smoke, v2 full chart payload, legacy BodyGraph payload, raw vendor payload-family sufficiency, deterministic adapter mapping, mapped cache posture, mapped-cache persistence, and normalized HD Engine BodyGraph/person/cache contract. HDE-EPIC037 PR-01 proves that raw `ChartResult` and `ChartSimpleResult` payload families are not by themselves sufficient for the existing BodyGraph/person/cache/compat contract and must fail closed without an adapter. HDE-EPIC037 PR-02 proves a pure, context-backed deterministic `ChartResult` adapter for scoped mapping only. `ChartSimpleResult` MUST NOT be presumed sufficient for full BodyGraph detail. Adapter-mapped data may be used only within the scoped behavior that has been implemented and evidenced; it does not by itself prove live vendor success, generic raw payload compatibility, mapped-cache write persistence, production upsert, public Reader change, new HTTP home, app-side vendor ownership, or AI scope.
+* `HD_API_BASE_URL` is canonical; deprecated `HDAPI_BASE_URL` may supply the value only when the canonical name is absent.  
+* Trim surrounding ASCII whitespace and trailing `/` characters for comparison and joining; preserve every other path prefix.  
+* Require absolute HTTPS, a host, no userinfo, no query, no fragment, and final non-empty path segment exactly `v1` or `v2`.  
+* If both names are present, require normalized byte equality. A conflict is `PROVIDER_CONFIG_INVALID`; both absent is `PROVIDER_CONFIG_MISSING`.  
+* Append exactly one `/` and the version-neutral resource path. Do not hardcode another version segment.  
+* Use `POST` with no query. Do not follow redirects; any `3xx` is classified without replaying credentials.
 
-No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider config key, AI credential, AI runtime rail, AI evidence family, or AI QA obligation is introduced by this v2 request and response contract work.
+**Resource support and exact request contract.**
 
-### **7.2.1 Endpoints, method, base URL**
+| Resource | Configured lineage | `bg:resolve` status | Exact request object | Authentication | Geocode header | Success family |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| `charts` | terminal `v2` | **SUPPORTED; selected full route** | `birthdate`, `birthtime`, `location` only | `Authorization: Bearer <HD_API_KEY>` | required: `HD-Geocode-Key: <GEO_API_KEY>` | v2 `StandardResponse`, `type="ChartResult"` |
+| `charts/simple` | terminal `v2` | **CONTRACTED INVENTORY; not resolver-selectable** | `birthdate`, `birthtime`, `location` only | `Authorization: Bearer <HD_API_KEY>` | required: `HD-Geocode-Key: <GEO_API_KEY>` | v2 `StandardResponse`, `type="ChartSimpleResult"` |
+| `charts/coordinates` | terminal `v2` | **CONTRACTED INVENTORY; not resolver-selectable** | `birthdate`, `birthtime`, `lat`, `lng` only | `Authorization: Bearer <HD_API_KEY>` | forbidden | v2 `StandardResponse`, `type="ChartResult"` |
+| `bodygraphs` | terminal `v1` | **SUPPORTED; selected legacy full route** | `birthdate`, `birthtime`, `location` only | `HD-Api-Key: <HD_API_KEY>` | required: `HD-Geocode-Key: <GEO_API_KEY>` | flat v1 `BodygraphResponse` |
+| `bodygraphs/simple` | terminal `v1` | **CONTRACTED LEGACY INVENTORY; not resolver-selectable** | `birthdate`, `birthtime`, `location` only | `HD-Api-Key: <HD_API_KEY>` | required: `HD-Geocode-Key: <GEO_API_KEY>` | flat v1 `SimpleBodygraphResponse` |
 
-* **Primary endpoint:** `POST /bodygraphs` (JSON).
-
-  * This is the **only** vendor BodyGraph endpoint HDE uses. No alternate vendor endpoint is defined here; see §7.1.10 for the explicit statement that `POST /bodygraphs/simple` is unsupported for this engine.
-
-* **Endpoint and resource-path posture.**
-
-  * egacy v1 BodyGraph source documentation remains `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple`.  
-  * Recommended v2 chart source documentation remains `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates`.  
-  * Runtime request construction MUST use version-neutral resource paths joined to the configured `HD_API_BASE_URL`. The governed resource paths are `bodygraphs`, `bodygraphs/simple`, `charts`, `charts/simple`, and `charts/coordinates`.  
-  * Runtime request construction MUST preserve any API-version path already present in `HD_API_BASE_URL`; it MUST NOT hardcode active `/v1` or `/v2` route prefixes into runtime route constants.  
-* **Base-URL resolution.**  
-  * Resolve canonically from `HD_API_BASE_URL`.  
-  * If `HD_API_BASE_URL` is absent, a temporary compatibility implementation MAY read deprecated `HDAPI_BASE_URL`.  
-  * If both keys exist and values differ, fail closed with a typed configuration ambiguity.  
-  * If no usable base URL exists, fail closed with a typed error before I/O; do not default to any literal URL.  
-* **Method rules.**
-
-  * `POST` is normative for JSON BodyGraph requests.
-
-  * `GET` **MUST NOT** carry a request body; if ever used, it is only for dev-harness health probes and not for BodyGraph computation.
+Contracted inventory permits the low-level request builder and conformance tests to describe and validate a route. It does not make the route resolver-selectable, prove that a live account supports it, or make a simple payload sufficient for the normalized full-detail contract.
 
 ### **7.2.2 Canonical headers (dash-case, exact on wire)**
 
-Send these verbatim on wire. Do not add other headers unless explicitly pinned.
+Every request sends:
 
 * `Accept: application/json`  
 * `Content-Type: application/json; charset=utf-8`  
-* `Legacy v1 BodyGraph routes: HD-Api-Key: <secret>`  
-* `HumanDesignAPI v2 chart routes: Authorization: Bearer <secret>`  
-* `Routes requiring geocoding: HD-Geocode-Key: <secret>`  
-* `User-Agent: GlowHDEngine/<release_id>` (lowercase 64-hex; contains no secrets)
+* exactly one route-appropriate authentication header  
+* `HD-Geocode-Key: <GEO_API_KEY>` only where §7.2.1 requires it  
+* `User-Agent: GlowHDEngine/<release_id>`, where `release_id` is lowercase 64-hex
 
-Capture normalization.  
- Persisted header captures follow the normalization rules in HDE-Schemas & Artifacts (artifact header casing and formatting). On wire, use the exact forms above.
+Never send both authentication families. Never send a geocode secret on `charts/coordinates`. Do not add another header unless a later governed PF05 contract pins it.
 
-Redaction.  
- API keys are secrets. Never echo values in logs or errors. Keys-only logging posture is owned in HDE-Governance; reference by title only.
+API and geocode keys are secrets. Never echo their values in logs, errors, or evidence. Persisted header captures follow the canonical normalization rules in **HDE-Schemas & Artifacts**; on-wire casing remains exact as shown.
 
-### **7.2.3 Request body schema (exact three keys)**
+### **7.2.3 Route-scoped request objects**
 
-The JSON body must contain exactly these keys (no others), serialized canonically (UTF-8 no BOM, sorted keys, compact, one LF):
+**v2 location routes: `charts` and `charts/simple`.**
 
-`{"birthdate":"DD-MMM-YYYY","birthtime":"HH:MM","location":"City, Country"}`
+```json
+{"birthdate":"YYYY-MM-DD","birthtime":"HH:MM","location":"<location>"}
+```
 
-* `birthdate`: English month abbreviations `Jan..Dec`; day zero-padded `01..31`; year `YYYY`.
+* `birthdate` is the supplied local civil birth date in valid, zero-padded Gregorian `YYYY-MM-DD` form.  
+* `birthtime` is the supplied local civil birth time in zero-padded 24-hour `HH:MM` form from `00:00` through `23:59`; seconds and a timezone suffix are forbidden.  
+* `location` is one JSON string, not a structured object. Trim outer whitespace; require 4–200 Unicode scalar values; preserve spelling and diacritics without transliteration, case-folding, or inferred replacement.
 
-* `birthtime`: 24-hour `HH:MM` (`00..23:00..59`).
+**v2 coordinate route: `charts/coordinates`.**
 
-* `location`: ASCII English `"City, Country"` with a single comma and single space; trim outer whitespace; collapse internal runs to single spaces.
+```json
+{"birthdate":"YYYY-MM-DD","birthtime":"HH:MM","lat":0,"lng":0}
+```
 
-* **No tz.** Do not send timezone. Vendor derives timezone from `location` using `HD-Geocode-Key`.
+The date and time rules match v2 location routes. `lat` and `lng` are finite JSON numbers, not strings or booleans. Latitude is within `[-90, 90]`; longitude is within `[-180, 180]`. `NaN` and infinities are invalid. The object contains no `location`, and the request sends no geocode header. The current CLI has no governed coordinate-input surface, so this route is not resolver-selectable.
+
+**v1 routes: `bodygraphs` and `bodygraphs/simple`.**
+
+```json
+{"birthdate":"DD-MMM-YYYY","birthtime":"HH:MM","location":"<location>"}
+```
+
+Convert a validated input date mechanically to zero-padded `DD-MMM-YYYY` with the fixed English month set `Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`. Preserve the same `HH:MM` and one-string location rules. The four-scalar minimum is a provider-source rule; the 200-scalar maximum is a Glow safety limit, not a provider-support claim.
+
+No request contains `tz`. The vendor derives timezone from the governed route input. PF05 does not manufacture, infer, or repair timezone data at this boundary.
+
+Every route request object uses unique names, lexicographically sorted keys, no insignificant whitespace, minimum required JSON escapes, UTF-8 encoding, no BOM, and exactly one terminal LF. Request construction has no AI transformation, heuristic location correction, timezone guess, or fallback body.
+
+**Route-scoped response acceptance.**
+
+A successful v2 response is a JSON object with required `StandardResponse` members `timestamp`, `success`, `message`, `errorCode`, `type`, and `data`. `success` must be JSON `true`; `errorCode` must be a string empty after trimming; `type` must exactly match the route family; and `data` must be a conforming JSON object. Missing members, wrong types, duplicate object names, malformed JSON, a route-family mismatch, or non-object `data` produce `PROVIDER_BAD_RESPONSE`. A well-formed provider-declared failure produces `PROVIDER_ERROR`. Its public carrier may contain only a bounded, allow-listed provider-code label and never echoes `message`, raw bytes, request values, or secrets. Unknown extra provider members may be ignored only at the adapter boundary and are never logged, persisted, or promoted into the normalized HDE contract.
+
+Full `ChartResult` requires: `activations`, `authority`, `birthDateUtc`, `centers`, `channelsLong`, `channelsShort`, `circuitries`, `cognition`, `definition`, `determination`, `distraction`, `environment`, `gates`, `incarnationCross`, `motivation`, `notSelfTheme`, `perspective`, `profile`, `signature`, `strategy`, `transference`, `type`, and `variables`. Mapping may use only governed normalized fields and never synthesizes a missing field. `ChartSimpleResult` remains insufficient for full resolver success.
+
+A v1 `bodygraphs` response must be the validated flat `BodygraphResponse`; `bodygraphs/simple` must be the flat `SimpleBodygraphResponse`. A v2 wrapper on a v1 route, a flat v1 response on a v2 route, or a simple response presented as full detail is `PROVIDER_BAD_RESPONSE`.
+
+Configuration absence or conflict maps to `PROVIDER_CONFIG_MISSING` or `PROVIDER_CONFIG_INVALID`. An unsupported or ambiguous base maps to `PROVIDER_ROUTE_UNSUPPORTED`. Any redirect or otherwise unmapped status maps to `PROVIDER_ERROR`. None is retryable. §7.2.5 retains the HTTP status mapping; §7.3 owns the exact retry budget and profiles.
 
 ### **7.2.4 Deterministic construction**
 
-* **Order-neutral.** URL, headers, and body are constructed identically for AB and BA.
-
-* **Locale-neutral.** No locale or formatting beyond the pinned rules. Strings are ASCII/UTF-8 as stated. Jobs run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
-
-* **No floats or wall-clock.** Shaping must not depend on time or non-deterministic sources.
-
+* **Order-neutral.** URL, headers, and body are constructed identically for AB and BA.  
+    
+* **Locale-neutral.** No locale or formatting beyond the pinned rules. Strings are ASCII/UTF-8 as stated. Jobs run under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.  
+    
+* **No floats or wall-clock.** Shaping must not depend on time or non-deterministic sources.  
+    
 * **Path joining.** Join base URL and endpoint with a single `/`; no duplicate slashes; no query string unless explicitly pinned.
 
 ### **7.2.5 Deterministic error mapping (provider → typed errors)**
 
 Map provider HTTP outcomes to typed, numeric-free errors. Never include vendor payloads or secrets in errors or logs.
 
-* `401` → `PROVIDER_UNAUTHORIZED`
-
-* `403` → `PROVIDER_FORBIDDEN`
-
-* `404` → `PROVIDER_NOT_FOUND`
-
-* `429` → `PROVIDER_RATE_LIMITED`
-
-  * If a valid `Retry-After` is present: delta-seconds → integer ms; HTTP-date → integer ms (UTC).
-
+* `401` → `PROVIDER_UNAUTHORIZED`  
+    
+* `403` → `PROVIDER_FORBIDDEN`  
+    
+* `404` → `PROVIDER_NOT_FOUND`  
+    
+* `429` → `PROVIDER_RATE_LIMITED`  
+    
+  * If a valid `Retry-After` is present: delta-seconds → integer ms; HTTP-date → integer ms (UTC).  
+      
   * On invalid / unsupported / overflow: omit `retry_after_ms`.
 
-* `5xx` → `PROVIDER_UNAVAILABLE`
 
+* `5xx` → `PROVIDER_UNAVAILABLE`  
+    
 * Malformed or invalid vendor JSON → `PROVIDER_BAD_RESPONSE` (schema or mapping failure; do not echo vendor body)
 
 Acceptance (vendor mapping).  
- Tests and logs must prove the remap above and that no provider payloads or secrets are logged. Error objects are numeric-free and LF-terminated canonical JSON.
+Tests and logs must prove the remap above and that no provider payloads or secrets are logged. Error objects are numeric-free and LF-terminated canonical JSON.
 
 ### **7.2.6 Logging and redaction (keys-only)**
 
-* Never log request or response bodies, header values, tokens, or URIs containing keys.
-
-* Keys-only allow-lists live in HDE-Governance. Do not inline key names in this spec. Tests assert conformance to the allow-list by title.
-
-* Redaction examples and fixtures (for example showing a secret value replaced with `REDACTED`) belong in evidence only, not in live logs.
-
+* Never log request or response bodies, header values, tokens, or URIs containing keys.  
+    
+* Keys-only allow-lists live in HDE-Governance. Do not inline key names in this spec. Tests assert conformance to the allow-list by title.  
+    
+* Redaction examples and fixtures (for example showing a secret value replaced with `REDACTED`) belong in evidence only, not in live logs.  
+    
 * For persisted captures, apply header capture normalization per HDE-Schemas & Artifacts.
 
 ### **7.2.7 Validation (binary)**
 
-1. Method and endpoint. `POST` used for JSON. Any health `GET` (dev harness only) carries no body.
-
-2. Headers. Exact dash-case set above. `Accept` and `Content-Type` as specified. Secrets present on wire but never logged. Captures normalized per HDE-Schemas & Artifacts.
-
-3. Body shape. Exactly three keys. Values match `DD-MMM-YYYY` / `HH:MM` / `"City, Country"` rules. No timezone key present.
-
-4. 4\. Determinism. Shaping output is identical for AB vs BA. No locale, time, or random dependence. Checks under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
-
-5. Error mapping. Each provider outcome maps to the typed error above. `retry_after_ms` is integer, non-negative, and omitted on invalid formats.
-
+1. Method and endpoint. `POST` used for JSON. Any health `GET` (dev harness only) carries no body.  
+     
+2. Headers. Exact dash-case set above. `Accept` and `Content-Type` as specified. Secrets present on wire but never logged. Captures normalized per HDE-Schemas & Artifacts.  
+     
+3. Body shape. Exactly three keys. Values match `DD-MMM-YYYY` / `HH:MM` / `"City, Country"` rules. No timezone key present.  
+     
+4. Determinism. Shaping output is identical for AB vs BA. No locale, time, or random dependence. Checks run under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
+     
+5. Error mapping. Each provider outcome maps to the typed error above. `retry_after_ms` is integer, non-negative, and omitted on invalid formats.  
+     
 6. Hygiene. All emitted JSON is canonical (UTF-8 no BOM, sorted keys, compact, one LF).
 
 Evidence (records-only; titles-only; indexed via PF12).
 
-* `vendor/shaping_example` — canonical headers, body, and URL (no secrets).
-
-* `rails/closed_refusal` — typed refusal proof (no I/O).
-
+* `vendor/shaping_example` — canonical headers, body, and URL (no secrets).  
+    
+* `rails/closed_refusal` — typed refusal proof (no I/O).  
+    
 * `rails/open_conformance` — header redaction and policy proof (if rails opened in an integration profile).
 
-Indexing discipline: update PF12 human `docs/evidence/INDEX.json`, hash sentinel, and machine `artifacts/evidence_index.jsonl` in the same change; each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor`.
+Indexing discipline: governed evidence identities and paths, Human Index and sentinel behavior, Machine Mirror schema, parity, checksums, and path-proofs are single-homed in **HDE-Schemas & Artifacts** and must be updated coherently when that contract requires it.
 
 Routing (titles-only).  
- Rails and enablement: §7.1. Live HTTP policies: §7.3. Canonical JSON and capture normalization: HDE-Schemas & Artifacts §4. Governance tokens and keys-only allow-lists: HDE-Governance §2.0.
+Rails and enablement: §7.1. Live HTTP policies: §7.3. Canonical JSON and capture normalization: HDE-Schemas & Artifacts §4. Governance tokens and keys-only allow-lists: HDE-Governance §2.0.
 
 ---
 
 ## **7.3 Live HTTP Call Behavior \[Required-Now\]**
 
-Scope & prerequisites.
+### **7.3.1 Scope and prerequisites**
 
 Rails open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); env ready (`HD_API_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY` when needed); shaping fixed per §7.2. Deprecated `HDAPI_BASE_URL` may be used only as an explicitly labeled temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values fail closed.
 
@@ -3629,33 +3716,43 @@ Rails open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); env ready (`HD_API_BASE_URL`, 
 
 Domains (ms):
 
-* `connect_timeout_ms ∈ {1000,2000,5000}`
-
-* `read_timeout_ms ∈ {2000,5000,10000}`
-
+* `connect_timeout_ms ∈ {1000,2000,5000}`  
+    
+* `read_timeout_ms ∈ {2000,5000,10000}`  
+    
 * `total_timeout_ms ∈ {5000,10000,15000,30000}`
 
 One `timeout_profile ∈ {small, default, long}` pins the triple.
 
 ### **7.3.3 Retries, status classification, and redirects (deterministic classes)**
 
-`max_attempts ∈ {0,1,2,3}` (includes the initial try).
+`max_attempts` counts the initial HTTP request. Its exact domain is the integer set `{1,2,3}`. JSON booleans, floats, numeric strings, zero, negatives, and values above three are invalid and produce `PROVIDER_CONFIG_INVALID` before request construction or I/O.
 
-Retryable classes are exactly `{network_error, 5xx}`.
+`max_retries = max_attempts - 1`
 
-Do not retry `429`, other `4xx`, `3xx`, or other non-200 statuses outside `4xx` and `5xx`.
+Automatic retry classes are exactly `network_error` and HTTP `5xx`. Input or configuration errors, unsupported routes, authentication failures, `404`, `429`, redirects, provider-declared v2 failures, type mismatches, malformed payloads, other `4xx`, and other statuses are not retryable.
 
-Non-200 HTTP statuses outside `4xx` and `5xx` MUST be classified as `http_status_other`, mapped to typed error code `PROVIDER_ERROR`, and emitted with `retried:false` in governed proof artifacts when that fact is captured.
+Non-`4xx`/`5xx` non-`200` statuses are classified as `http_status_other`, mapped to `PROVIDER_ERROR`, and recorded with `retried:false` when governed proof captures that fact.
 
-The default vendor request path MUST NOT follow redirects. If the provider returns a redirect status such as `302` with a `Location` header, PF05 requires the original status, response body, and response headers to be surfaced for classification rather than following the redirect.
+The default vendor path never follows redirects. A redirect status, including `302`, is surfaced with its response body and headers for bounded classification; credentials are never replayed to `Location`. HTTP error responses from the default path are converted into status, body, and header tuples before classification so injected and default paths use the same typed mapping.
 
-HTTP error responses captured by the default request path MUST be converted into status, body, and header tuples before classification. This allows the same typed mapping rules to apply to injected and default request paths.
+### **7.3.4 Backoff profiles (exact tuples; no jitter)**
 
-### **7.3.4 Backoff policy (deterministic; no jitter)**
+Only these complete tuples are valid:
 
-`backoff ∈ {none, fixed, exponential}` with closed integer params.
+| `max_attempts` | `backoff_kind` | `base_ms` | `ceiling_ms` | Schedule |
+| ----: | :---- | ----: | ----: | :---- |
+| 1 | `none` | 0 | 0 | one initial attempt; no retry |
+| 2 | `fixed` | 250 | 250 | at most one retry after 250 ms |
+| 2 | `fixed` | 500 | 500 | at most one retry after 500 ms |
+| 3 | `exponential` | 250 | 500 | retry after 250 ms, then 500 ms |
+| 3 | `exponential` | 500 | 2000 | retry after 500 ms, then 1000 ms; **default** |
 
-Schedule respects `total_timeout_ms`; no random jitter.
+The default tuple is exactly `(3, "exponential", 500, 2000)`. Profile fields are not independently mixable; every other Cartesian combination is invalid.
+
+Attempt 1 has no preceding delay. A fixed profile uses `base_ms` for every retry and requires `base_ms == ceiling_ms`. For an exponential profile, the delay before retry ordinal `r` is `min(base_ms × 2^(r-1), ceiling_ms)`, where `r=1` precedes attempt 2\.
+
+There is no jitter, random seed, wall-clock-dependent selection, provider-body-dependent selection, hidden retry, or `Retry-After` rescheduling. The selected total operation budget remains a hard ceiling across connection, response, and backoff. If the remaining budget cannot contain the next scheduled attempt, stop with the most specific safe typed failure without exceeding the budget.
 
 ### **7.3.5 Rate limits & Retry-After (429)**
 
@@ -3692,7 +3789,7 @@ Refusal on closed rails requires no I/O; deterministic mapping follows §7.2.
 Pin a concrete policy (from the domains above); prove refusal on closed rails; prove conformance on open rails; maintain CLI↔Reader parity; update indices in the same PR.
 
 Acceptance impact.  
- Moves 429 out of retryable set for EPIC011; no token additions (PF04 owns tokens).
+Moves 429 out of retryable set for EPIC011; no token additions (PF04 owns tokens).
 
 ### **7.3.9 HumanDesignAPI v2 live conformance pending**
 
@@ -3756,10 +3853,13 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
 **Routing (titles-only).**
 
 * Tokens & policy: **HDE-Governance** (vendor source policy, privacy, keys-only logs).  
+    
 * Evidence/indexing: **HDE-Schemas & Artifacts** (PF12).  
+    
 * DB names/ownership: **Glow Infrastructure** (names-only).  
-* PF05 remains the bytes home for any adapter-emitted request/response examples.
-
+    
+* PF05 remains the bytes home for any adapter-emitted request/response examples.  
+    
   ---
 
 # **8\. Error Model & Exit Codes \[Required-Now\]**
@@ -3772,12 +3872,12 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
 
 `{"schema":"v1","ok":false,"code":"<ERR_*>","error":"<non-PII message>"}`
 
-* `schema:"v1"` (string, required)
-
-* `ok:false` (boolean, required)
-
-* `code` (canonical `ERR_*` token, UPPER\_SNAKE; closed vocabulary; legacy lowercase aliases may be accepted as internal inputs but are not emitted)
-
+* `schema:"v1"` (string, required)  
+    
+* `ok:false` (boolean, required)  
+    
+* `code` (canonical `ERR_*` token, UPPER\_SNAKE; closed vocabulary; legacy lowercase aliases may be accepted as internal inputs but are not emitted)  
+    
 * `error` (human-readable, non-PII, non-secret)
 
 Optional fields are schema-owned and must remain numeric-free (for example `retry_after_ms` integer ≥ 0 when transport policy explicitly permits it, and optional `details` object when permitted by the error\_v1 schema).
@@ -3792,168 +3892,161 @@ Optional fields are schema-owned and must remain numeric-free (for example `retr
 
 **Primary home:** §3.3 “Streams discipline (stdout / stderr)” (tagged Required-Now). This section is a cross-surface summary.
 
-* **Success (exit 0\) → stdout.** Print the command’s canonical success payload (LF-terminated) to `stdout`; `stderr` empty.
-
-  * For Reader success surfaces, the success payload is the Reader v1 body (§5.1).
-
+* **Success (exit 0\) → stdout.** Print the command’s canonical success payload (LF-terminated) to `stdout`; `stderr` empty.  
+    
+  * For Reader success surfaces, the success payload is the Reader v1 body (§5.1).  
+      
   * For `hdctl showcompat`, the success payload is compat JSON (§4.1). Reader v1 bytes, when needed for parity, are produced via the command’s reader-dump parity path (not by replacing stdout).
 
-* **Usage (exit 64\) → stderr.** Print a short synopsis to `stderr`; `stdout` empty.
 
-* **Typed failures and internal failures (non-zero; command-specific) → stderr.** Print a single LF-terminated code string token to `stderr`; `stdout` empty. Where the same failure maps to an HTTP `error_v1`, the CLI token MUST equal the HTTP `error_v1.code` value. The exact non-usage failure exit code is pinned by the command contract (see §3.4 and the command section).
-
+* **Usage (exit 64\) → stderr.** Print a short synopsis to `stderr`; `stdout` empty.  
+    
+* **Typed failures and internal failures (non-zero; command-specific) → stderr.** Print a single LF-terminated code string token to `stderr`; `stdout` empty. Where the same failure maps to an HTTP `error_v1`, the CLI token MUST equal the HTTP `error_v1.code` value. The exact non-usage failure exit code is pinned by the command contract (see §3.4 and the command section).  
+    
 * **No mixed streams.** Never interleave diagnostics with public bytes.
 
 ## **8.3 Exit codes (taxonomy) \[Required−Now\]**
 
 **Primary home:** §3.4 “Exit codes taxonomy Required−NowRequired-NowRequired−Now”. This section is a short summary.
 
-* `0` — Success. Canonical success payload on stdout (LF-terminated); stderr empty.
-
-* `64` — Usage/config/input error. Synopsis on stderr; stdout empty.
-
+* `0` — Success. Canonical success payload on stdout (LF-terminated); stderr empty.  
+    
+* `64` — Usage/config/input error. Synopsis on stderr; stdout empty.  
+    
 * Other non-zero exit codes — command-specific. The exact non-usage failure exit code(s) are pinned by the command contract (see §3.4 and the command section, for example §4.1.4 for `showcompat`). For all such failures, stderr contains a single LF-terminated code string token and stdout remains empty.
 
 These codes are exhaustive for the CLI public surface in the sense that success is `0` and usage is `64`, while all other outcomes are non-zero failures that must follow the stderr-only, single-token discipline.
 
 ## **8.4 Determinism & hygiene gates \[Required−Now\]**
 
-* Canonical emitter. Success stdout and HTTP `error_v1` bodies follow the single-emitter rules (UTF-8, sorted keys, compact, one LF).
-
-* CLI stderr discipline. CLI stderr code strings and usage synopses are plain UTF-8 text, LF-terminated, and must not be wrapped in JSON envelopes.
-
-* No ad-hoc dumps. Forbid `json.dumps` and alternate serializers on public paths.
-
-* Idempotence posture. Typed errors are not part of the success preimage; success preimage/idempotence checks remain unchanged.
-
+* Canonical emitter. Success stdout and HTTP `error_v1` bodies follow the single-emitter rules (UTF-8, sorted keys, compact, one LF).  
+    
+* CLI stderr discipline. CLI stderr code strings and usage synopses are plain UTF-8 text, LF-terminated, and must not be wrapped in JSON envelopes.  
+    
+* No ad-hoc dumps. Forbid `json.dumps` and alternate serializers on public paths.  
+    
+* Idempotence posture. Typed errors are not part of the success preimage; success preimage/idempotence checks remain unchanged.  
+    
 * Parity expectations. CLI error token serialization must be stable across runs (two-run identity) and deterministic across AB/BA inputs where applicable. When the same failure maps to an HTTP surface, the CLI token MUST equal the HTTP `error_v1.code` value for that failure.
 
-  # 9\. Acceptance & Evidence \[Required-Now\]
+# 9\. Acceptance & Evidence \[Required-Now\]
 
-  ## 9.1 Parity (binary)
+## 9.1 Parity (binary)
 
-* **Reader↔CLI byte-equality.** For identical inputs/environment, Reader response bytes and CLI stdout **MUST** be byte-identical (including the single trailing LF).  
-* **AB↔BA identity.** Swapping pair order produces **bit-for-bit identical** bytes (pair normalization in effect).  
-* **Two-run identity.** Two serializations under identical inputs produce **byte-identical** output.  
-  ---
+* **Reader↔CLI byte-equality.** For identical inputs and environment, Reader response bytes and Reader-v1 bytes written by `hdctl showcompat --dump-reader <path>` MUST be byte-identical, including the single trailing LF. Ordinary `showcompat` stdout remains the distinct compat JSON envelope.  
+* **AB↔BA identity.** Swapping pair order produces **bit-for-bit identical** bytes (pair normalization in effect).
 
-  ## 9.2 Idempotence (binary)
+* ## **Two-run identity.** Two serializations under identical inputs produce **byte-identical** output.
 
-* **Preimage re-check.** Remove `idempotence_hash`, canonicalize the five-key preimage with the single emitter, compute `sha256(preimage_bytes)`, and verify it equals the published `idempotence_hash`.  
-* **Scope.** Check holds for **both** Reader **and** CLI outputs.  
-  ---
+## 9.2 Idempotence (binary)
 
-  ## 9.3 Transport (A7) invariants (binary)
+* **Preimage re-check.** Remove `idempotence_hash`, canonicalize the five-key preimage with the single emitter, compute `sha256(preimage_bytes)`, and verify it equals the published `idempotence_hash`.
+
+* ## **Scope.** Check holds for **both** Reader **and** CLI outputs.
+
+## 9.3 Transport (A7) invariants (binary)
 
 * **ETag / 304 / HEAD.** Emit **strong, quoted ETag** on `200`; return `304` **only after** a prior `200`\-with-body for that identity; `HEAD` **mirrors `200` validators** and has **no body**.  
 * **304 entity headers (tightened).** **Omit both** `Content-Type` **and** `Content-Length` on `304`; body is empty.  
 * **POST is non-conditional.** `POST` never carries validators and never returns `304`.  
 * **Cache semantics.** `200`/`HEAD`: `Cache-Control: private, max-age=0, must-revalidate`. Writers/errors: `Cache-Control: no-store`.  
 * **Content-Type on 200\.** `Content-Type: application/json; charset=utf-8`.  
-* **Vary (required).** `Vary: Authorization, Accept-Encoding` present.  
-* **Encoding invariance.** For the same canonical body, the **identity ETag** and **HEAD identity length** (LF-terminated, pre-compression) are stable across accepted `Accept-Encoding` selections (`identity`, `gzip`, `br`).  
-  ---
+* **Vary (required).** `Vary: Authorization, Accept-Encoding` present.
 
-  ## 9.4 Vendor rails acceptance (binary)
+* ## **Encoding invariance.** For the same canonical body, the **identity ETag** and **HEAD identity length** (LF-terminated, pre-compression) are stable across accepted `Accept-Encoding` selections (`identity`, `gzip`, `br`).
+
+## 9.4 Vendor rails acceptance (binary)
 
 * **Refusal posture (rails closed).** With rails closed (any of `SAFE_MODE!=0` **or** `ALLOW_NETWORK!=1`), vendor calls **MUST NOT** perform network I/O and **MUST** return a typed refusal (numeric-free), with secrets redacted.  
-* **Shaping correctness (closed).** Request shaping (endpoint, headers, body) remains **deterministic** and **order-neutral** without sending the request.  
-* **Conformance when opened.** With rails open and env present, live calls obey pinned **timeouts/retries/backoff**; typed error mapping is deterministic; **no payload/secret logging**; parity/identity remain unaffected.  
-  ---
+* **Shaping correctness (closed).** Request shaping (endpoint, headers, body) remains **deterministic** and **order-neutral** without sending the request.
 
-  ## 9.5 Evidence posture (titles-only; PF12 single home)
+* ## **Conformance when opened.** With rails open and env present, live calls obey pinned **timeouts/retries/backoff**; typed error mapping is deterministic; **no payload/secret logging**; parity/identity remain unaffected.
 
-* **Maintain proofs.** Keep evidence current for: parity (Reader↔CLI, AB↔BA, two-run), idempotence recompute, transport (ETag/304/HEAD, no-store on writers/errors, Vary, encoding-invariance), and vendor rails (refusal closed; conformance open).  
-* **Same-change evidence-family completeness (MUST).** When a PF05-scoped proof or gate run changes any governed artifact in an evidence family, refreshing only a subset of related companions is non-conforming. All changed primary artifacts, sibling `*.path_proof.txt` transcripts, and affected human-index and machine-mirror companion files for that family MUST be regenerated to current same-change chronology in the same run or change.  
-* **Bounded evidence-family refresh (MUST).** When a PF05-scoped PR, remediation slice, or proof refresh is explicitly bounded to a named PF05 evidence family, governed updates MUST be limited to that family and to directly required shared index, mirror, topology, and sibling `*.path_proof.txt` companions. Unrelated governed artifact churn outside the approved family is non-conforming unless the changed artifact is directly required by the same proof flow.  
-* **Canonical JSON gate dual-family closeout (MUST).** If both `audit/gates/json_gate/canonical/` and `audit/gates/canonical_json/` are still produced by the same generation flow, closeout MUST refresh both families and their sibling `*.path_proof.txt` transcripts in the same run. Refreshing only one family is insufficient, and closure claims MUST use whole-family same-change validation rather than subset freshness.  
-* **Index (human).** **`docs/evidence/INDEX.json`** (PF12 §8.6) lists artifacts and scripts (**titles/paths only; no payload bytes**). A **hash sentinel** **`docs/evidence/INDEX.sha256`** gates merges and is **not mirrored**.  
-* **Machine mirror (single home).** The records-only JSONL mirror lives at **`artifacts/evidence_index.jsonl`** (PF12 §8.3). Human↔machine entries **must be 1:1**; a non one-to-one join is a failure. Each mirror record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` (transcript reference plus on-disk stat). The mirror is **ASCII field-ordered** and **sort-before-write** with **unknown-key rejection**; a **single** mirror file is permitted.  
-* **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK`.  
-* **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, and `CI_CHECK_FINAL_LF_OK`.  
-* **Close-pack execution truthfulness (MUST).** If a PF05-scoped acceptance map, token-evidence matrix, close report, or manifest claims Human Index refresh, hash-sentinel refresh, machine-mirror refresh, mirror-schema validation, LF validation, orientation-demo refresh, acceptance-map viability generation, or related evidence-workflow execution, that claim MUST be backed by same-run governed QA log anchors under `audit/qa/<epic-id>/checks/<check-id>/`.  
-* **Epic-close runtime proof sufficiency (MUST).** A PF05-scoped epic-close recommendation MUST NOT rely on artifact-only close-pack files. When changed PF05 runtime surfaces are part of the close recommendation, same-run governed QA proof MUST show that prerequisite runtime logs are present and that the changed runtime proof families actually executed in that run.
+## 9.5 Evidence posture (titles-only; PF12 single home)
 
-* **Runtime-proof synthesis deliverables (MUST).** The governed synthesis step MUST capture `runtime_log_presence.txt`, `runtime_surface_inventory.txt`, and the corresponding `primary.log` under `audit/qa/<epic-id>/checks/<check-id>/`.  
-* **Update discipline (MUST).** When any golden, artifact, or script path changes, update **`docs/evidence/INDEX.json`**, **`docs/evidence/INDEX.sha256`**, and **`artifacts/evidence_index.jsonl`** in the **same commit/PR**, and add a matching entry in **§11 Change Management: Doc-Delta Hooks**.  
-* **Update discipline (MUST).** When any golden, artifact, or script path changes, update **`docs/evidence/INDEX.json`**, **`docs/evidence/INDEX.sha256`**, and **`artifacts/evidence_index.jsonl`** in the **same commit/PR**, and add a matching entry in **§11 Change Management: Doc-Delta Hooks**.  
-* **Process routing.** The “update in same PR” workflow and merge gating for the sentinel live in **Epic-Process-Guide** (titles only).
+* **PF05 proof families.** Maintain current, truthful evidence for Reader↔CLI, AB↔BA and two-run parity; idempotence recomputation; Reader transport; canonical emission; and vendor-rails refusal/open-conformance where an authorized open-rails run exists.  
+* **No status inference.** A path, file, test, mirror record, checklist row, or stored token does not by itself prove generation, execution, PASS, acceptance, closure, deployment, or production readiness.  
+* **Single home.** Evidence-family identities and paths, Human Evidence Index, hash sentinel, Machine Evidence Mirror, complete record schemas, parity, checksums, path-proofs, same-change requirements, and regeneration rules are owned by **HDE-Schemas & Artifacts**. PF05 does not restate those contracts.  
+* **Process and tokens.** Merge workflow lives in **Epic-Process-Guide** and token semantics live in **HDE-Governance**. PF05 names neither a parallel token roster nor a parallel path list.
 
 # **10\. Security & Privacy \[Required-Now\]**
 
 ## **10.1 Public covenant (numeric-free)**
 
-* **Bands-only, no numerics.** Public Reader bodies are **numeric-free**; `categories[*]` are **exactly** `{id, band}`. No `score`, `score_pct`, or other numeric fields appear on the public surface.
-
+* **Bands-only, no numerics.** Public Reader bodies are **numeric-free**; `categories[*]` are **exactly** `{id, band}`. No `score`, `score_pct`, or other numeric fields appear on the public surface.  
+    
 * **Canonical emission only.** All public bytes (success and typed errors) are produced by the **single presenter emitter** (UTF-8, sorted keys, compact, **one LF**).
 
 ## **10.2 Logging hygiene (keys-only)**
 
-* **No secrets/PII in logs.** Never log request/response bodies, header **values**, or vendor payloads. API keys and tokens **must** be redacted (keys-only posture).
-
+* **No secrets/PII in logs.** Never log request/response bodies, header **values**, or vendor payloads. API keys and tokens **must** be redacted (keys-only posture).  
+    
 * **Deterministic, bounded labels.** Observability uses bounded enums/labels (route, outcome class, rails state); no user identifiers or free-text payloads in logs.
 
 ## **10.3 Dev harness containment**
 
-* **Fixtures only; no vendors.** The dev Reader harness uses **local fixtures** and **must not** perform vendor calls.
-
-* **Environment gate.** The harness is enabled **only** when `APP_ENV=dev`; it **must not** be mounted in production.
-
-* **Parity evidence, not a product surface.** The harness exists to prove schema/LF, AB↔BA, two-run, and Reader↔CLI byte parity; it does not relax any privacy rules. 
+* **Fixtures only; no vendors.** The dev Reader harness uses **local fixtures** and **must not** perform vendor calls.  
+    
+* **Environment gate.** The harness is enabled **only** when `APP_ENV=dev`; it **must not** be mounted in production.  
+    
+* **Parity evidence, not a product surface.** The harness exists to prove schema/LF, AB↔BA, two-run, and Reader↔CLI byte parity; it does not relax any privacy rules.
 
 ## **10.4 Admin surfaces: authentication, authorization, and audit**
 
 Admin-only surfaces:
 
-* hdctl admin-bundle
-
-* the admin bundle HTTP route
-
+* hdctl admin-bundle  
+    
+* the admin bundle HTTP route  
+    
 * any future admin-only routes that expose full product payloads
 
 must follow stricter authentication and audit rules than public Reader or dev harness endpoints.
 
 Authentication and authorization:
 
-* All admin bundle surfaces must require a valid admin credential for access in production.
-
-* Pre-Glow:
-
-  * a high-entropy secret or equivalent credential must be provisioned as a Railway or infrastructure secret
-
+* All admin bundle surfaces must require a valid admin credential for access in production.  
+    
+* Pre-Glow:  
+    
+  * a high-entropy secret or equivalent credential must be provisioned as a Railway or infrastructure secret  
+      
   * CLI and HTTP admin bundle calls must present this credential; unauthenticated calls must not receive an admin bundle
 
-* Post-Glow:
 
+* Post-Glow:  
+    
   * admin surfaces must align with the app-level admin identity model once it is defined; until then, they must not be left open
 
 Logging and audit:
 
-* Every successful admin bundle operation must be logged in operations logs with:
-
-  * timestamp
-
-  * caller identity or account
-
-  * a high-level description of the requested match
-
+* Every successful admin bundle operation must be logged in operations logs with:  
+    
+  * timestamp  
+      
+  * caller identity or account  
+      
+  * a high-level description of the requested match  
+      
   * a correlation identifier for tracing
 
-* Logs must:
 
-  * remain keys-only (no secrets, no full bundle payloads, no vendor bodies)
-
+* Logs must:  
+    
+  * remain keys-only (no secrets, no full bundle payloads, no vendor bodies)  
+      
   * be governed by the same retention and PII constraints as other operations logs
 
 QA hooks (names-only; owned elsewhere):
 
-* Governance and QA documents will define QA tokens that ensure:
-
-  * parity between CLI and HTTP admin bundle outputs
-
-  * that admin bundles contain the required structural elements (BodyGraphs, compat JSON, three narratives, meta)
-
+* Governance and QA documents will define QA tokens that ensure:  
+    
+  * parity between CLI and HTTP admin bundle outputs  
+      
+  * that admin bundles contain the required structural elements (BodyGraphs, compat JSON, three narratives, meta)  
+      
   * that admin surfaces are not callable without the admin credential
+
 
 * PF05 does not define token semantics; it requires that CLI and HTTP surfaces be designed so such QA checks can be implemented and tied to evidence in the Evidence Index.
 
@@ -3968,70 +4061,56 @@ Admin surfaces are never part of the Reader public covenant and must remain clea
 * **Examples (pattern only).**  
   * v0.3 — Remove prompt; retire uncertainty; unify to single presenter emitter; tag sections for status.  
   * v1.0 — Add §7.2 Request Shaping; pin typed error mapping; assert rails refusal posture.  
-* **Where to put links.** Evidence artifacts and scripts are indexed in **Appendix D — Evidence Index** (titles/paths only); do not paste payloads or transport bytes here. If the human Index changed, note **“Sentinel updated: YES”** in the Change Log entry (the sentinel is derived from Appendix D and is not mirrored).
+* v2.4.6 — Clarify PF10 addendum precedence and pin the supported invocation, fixed input, failure classification, and migration boundary for `ci/checks/check_mirror_schema.sh` in §§0.2 and 0.4. Sentinel updated: NO.  
+* v2.4.7 — Define the closed CLI success-carrier set and fail-closed birth-time timezone-source precedence, ambiguity, fold/gap, provenance, and typed-refusal contract in §§0.2 and 3\. Sentinel updated: NO.  
+* v2.4.8 — Define the Required-Now `admin_bundle_v1` CLI and `POST /internal/admin/bundle/v1` contracts, including authentication, request/response bytes, audit identity, file receipt, and parity in §4.9. Sentinel updated: NO.  
+* v2.4.9 — Define the PF12-owned `public_aux` Catalog alias model, reject undocumented Aux query controls, require exactly one `v=1`, and normalize the §6.2 status tag in §§5–6. Sentinel updated: NO.  
+* **Where to put links.** Governed artifact identities and paths are indexed through the Evidence Catalog in **HDE-Schemas & Artifacts**; do not paste payload or transport bytes here. If the Human Evidence Index changes, record “Sentinel updated: YES” only after recomputing `docs/evidence/INDEX.sha256`; the sentinel is the SHA-256 digest of the canonical bytes of `docs/evidence/INDEX.json` and is not mirrored.
 
 ## **11.2 Doc-Delta Hooks (how we propose, review, and land changes)**
 
-**Purpose.** Provide a uniform, auditable record for any normative change. Each Doc-Delta is self-contained and copy-paste-ready.
+**Purpose.** Provide a uniform, auditable record for a normative PF05 change without duplicating evidence schemas, paths, token semantics, or process rules owned elsewhere.
 
-### **11.2.1 Doc-Delta template (fill all required fields)**
+### **11.2.1 Doc-Delta template**
 
-* **DOC-DELTA-ID:** `CLI-<YYYYMMDD>-<shortslug>`  
-* **Date / Author:** `<YYYY-MM-DD> / <name>`  
-* **Scope:** (pick one or more) `Math | Public Contract/Transport | Serializer/Emitter | Vendor Ingest | Schema | Acceptance/Evidence | Editorial`  
-* **Targets (section anchors):** e.g., `§5.1`, `§7.2.5`, `Appendix D`  
-* **Summary (≤5 bullets):**  
-  * … (action verb; concrete change)  
-  * …  
-* **Acceptance impact (binary gates to update):**  
-  * Parity (Reader↔CLI, AB↔BA, two-run)  
-  * Idempotence (preimage recompute)  
-  * Transport (ETag/304/HEAD; no-store on writers/errors)  
-  * Vendor rails (refusal closed; conformance open)  
-* **Evidence updates (titles/paths only):** goldens, scripts, schema, CI grep-guards to add/update.  
-* **Sentinel impact:** `Yes/No`. If **Yes**, recompute the **human Evidence Index hash sentinel** (derived from Appendix D; **not mirrored**) and mark the Change Log entry with “Sentinel updated: YES”.  
-* **Freeze-pack impact:** `Yes/No`. If **Yes**, include the new canonical manifest digest and `release_id`.  
-* **Routing (titles-only):** confirm that **Architecture/Math** remain referenced by title only and that **this doc** continues to own transport/CLI/vendor bytes—no duplication.  
-* **Rollout plan:** CI jobs to update (parity, LF one-trailing-LF check, idempotence, rails refusal), and any gated integration jobs.  
-* **PR checklist tokens:** include `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+* **Doc-Delta ID / date / author:** stable identifier and accountable owner.  
+* **Scope:** affected PF05-owned CLI, Reader-transport, serializer/emitter, vendor-ingest, or acceptance behavior.  
+* **Targets:** PF05-local section anchors only.  
+* **Normative delta:** at most five concrete action bullets, including exact byte/behavior changes.  
+* **Acceptance impact:** name the affected parity, idempotence, transport, vendor-rails, security, or compatibility proof families; do not assert PASS.  
+* **Evidence impact:** name affected governed evidence families and route all identities, paths, record schemas, checksums, and path-proofs to **HDE-Schemas & Artifacts**.  
+* **Sentinel impact:** `Yes/No`. If Yes, recompute `docs/evidence/INDEX.sha256` from canonical `docs/evidence/INDEX.json` bytes and note “Sentinel updated: YES” in the Change Log.  
+* **Freeze-pack impact:** `Yes/No`; if Yes, record the newly governed release identity through its owning contract.  
+* **Rollout and rollback:** implementation order, verification hooks, failure posture, and rollback boundary.
 
-### **11.2.2 Acceptance to land a Doc-Delta (binary outcome)**
+### **11.2.2 Acceptance to land**
 
-A Doc-Delta is **Accepted** only when:
+A Doc-Delta is accepted only when the owning binary gates have governed execution evidence; affected evidence families and required companions are coherent under **HDE-Schemas & Artifacts**; the Human/Machine join and sentinel are current when applicable; and any freeze-pack identity change is governed. A stored artifact, test definition, checklist status, or token name is not a substitute for that execution evidence. Otherwise the Doc-Delta is rejected; no partial normative merge is implied.
 
-* All implicated binary gates pass (see **Acceptance impact**).  
-* **Appendix D (human Index)** and the **machine mirror** at `artifacts/evidence_index.jsonl` are updated **in the same PR** (records-only, path-agnostic).  
-* The **human↔machine join is exactly 1:1** (no extras/misses); CI enforces join parity and path proofs under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.  
-* **Sentinel** is recomputed when the human Index changed and is noted in the Change Log entry.  
-* Freeze-pack changes (if any) produce a new `release_id` and are logged.
+### **11.2.3 Guardrails**
 
-Otherwise, it is **Rejected** (no partial merges).
+* Reader and CLI public bytes use the same byte-authoritative presenter; no local public emitter.  
+* Reader v1 remains numeric-free and field-closed.  
+* PF05 owns its transport/CLI/vendor bytes and routes other contracts by canonical title.  
+* Locale, clock, random, ordering, and trailing-LF behavior remain deterministic.  
+* Workflow lives in **Epic-Process-Guide**; evidence schema/path ownership lives in **HDE-Schemas & Artifacts**; token semantics live in **HDE-Governance**.
 
-### **11.2.3 Guardrails (do not regress)**
+---
 
-* **Single emitter.** Reader and CLI must produce public bytes via the same presenter emitter; forbid ad-hoc `json.dumps`.  
-* **Numeric-free public.** Reader v1 success remains `{id, band}` only; no numerics on the public surface.  
-* **No duplicated bytes.** Architecture/Math are referenced by title only; transport and vendor bytes live here.  
-* **Determinism first.** Never introduce jitter or locale/time dependencies; AB↔BA and two-run identity remain required. CI byte comparisons run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`; JSON is UTF-8 (no BOM), ASCII-sorted keys, compact, exactly one trailing LF.  
-* **Process ownership.** The **“update in same PR”** workflow lives in **Epic-Process-Guide** (titles only). **Build Notes are WIP-only and never a single home**; drained items must land in canon.  
-  ---
-
-# **Appendices \[Informative / Reference\]**
-
-## **Appendix A — Transport Matrices (headers, conditional rules, examples) \[Required-Now\]**
+# **Appendix A — Transport Matrices (headers, conditional rules, examples) \[Required-Now\]**
 
 **Purpose.** Pin the Reader transport behavior the CLI must emit or parity-check. These matrices are normative for CLI/Reader and are kept in lockstep with HDE-Governance §10 (titles only). They cover at minimum: 200 strong quoted ETag; 304-after-200 with no body and omitted Content-Type and Content-Length; HEAD parity (no body; Content-Length equals identity 200 body; Content-Type \== GET); writers/errors no-store with no ETag; and encoding-invariance of identity across Accept-Encoding. Architecture and Math are referenced by title only.
 
 **Proof surface.** Proofs run on a cataloged JSON success route listed in §5.6 (not on `/internal/version`). Byte rules are owned here; examples live in tests and PF12 evidence artifacts (titles only).
 
-### **A.1 Success (200) — required headers**
+## **A.1 Success (200) — required headers**
 
 * Content-Type: `application/json; charset=utf-8`  
 * ETag: `"<strong, quoted>"` (identity over the final LF-terminated body; MUST be present on 200; identity is computed over pre-compression bytes)  
 * Vary: `Authorization, Accept-Encoding`  
 * Cache-Control: `private, max-age=0, must-revalidate`
 
-### **A.2 304 Not Modified (conditional GET)**
+## **A.2 304 Not Modified (conditional GET)**
 
 **Preconditions.** A prior 200 success with a strong, quoted ETag exists, and the request presents a matching `If-None-Match`.
 
@@ -4044,13 +4123,13 @@ Otherwise, it is **Rejected** (no partial merges).
 * Omit Content-Type  
 * Omit Content-Length
 
-### **A.3 Writers and errors**
+## **A.3 Writers and errors**
 
 * Cache-Control: `no-store` (MUST)  
 * No ETag (MUST)  
 * Errors: `Content-Type: application/json; charset=utf-8` and LF-terminated body
 
-### **A.4 HEAD parity**
+## **A.4 HEAD parity**
 
 * **Status.** 200  
 * **Body.** None  
@@ -4058,128 +4137,157 @@ Otherwise, it is **Rejected** (no partial merges).
 * **Length.** `Content-Length == len(identity 200 body)` (pre-compression)  
 * **Type.** `Content-Type` on HEAD equals GET
 
-### **A.5 POST semantics**
+## **A.5 POST semantics**
 
-* **Non-conditional.** Requests do not send validators; responses never return 304\.  
-* **Success endpoints.** Successful POST responses on success endpoints include a strong, quoted ETag and the success cache headers from A.1.  
-* **Writer-style POSTs.** Remain no-store with no ETag.
+* **Non-conditional.** Requests do not send validators; responses never return `304`.  
+* **POST responses.** Successful POST responses do not carry validators. Writer-style POSTs remain `no-store` with no `ETag`.
 
-### **A.6 Encoding invariance (accepted Accept-Encoding: identity, gzip, br)**
+## **A.6 Encoding invariance (accepted Accept-Encoding: identity, gzip, br)**
 
 * **Identity stability.** For the same canonical body, the ETag identity is unchanged across accepted encodings.  
 * **Length stability.** The effective Content-Length of the identity body is invariant across accepted encodings.  
 * **Evidence.** Capture on a cataloged JSON success route; artifacts are listed and indexed in PF12 (human `INDEX.json` \+ hash sentinel \+ machine mirror, same-PR rule).
 
-### **A.7 Aux Narrative (excerpt, Aux Narrative)**
+## **A.7 Aux Narrative (excerpt, Aux Narrative)**
 
 **Aux — Text (200)**  
- *Status:* 200  
- *Content-Type:* `text/plain; charset=utf-8`  
- *ETag:* **present**, strong, quoted (over LF-terminated identity body)  
- *Vary:* `Authorization, Accept-Encoding` (**required**)  
- *Body:* LF-terminated text (no `\r`, no ANSI)
+*Status:* 200  
+*Content-Type:* `text/plain; charset=utf-8`  
+*ETag:* **present**, strong, quoted (over LF-terminated identity body)  
+*Vary:* `Authorization, Accept-Encoding` (**required**)  
+*Body:* LF-terminated text (no `\r`, no ANSI)
 
 **Aux — Suppressed (200)**  
- *Status:* 200  
- *Content-Type:* (absent or policy-owned; optional `X-Narrative-Policy: suppressed`)  
- *ETag:* **absent**  
- *Vary:* `Authorization, Accept-Encoding` (**required**)  
- *Body:* **empty**
+*Status:* 200  
+*Content-Type:* (absent or policy-owned; optional `X-Narrative-Policy: suppressed`)  
+*ETag:* **absent**  
+*Vary:* `Authorization, Accept-Encoding` (**required**)  
+*Body:* **empty**
 
 *(Matrices mirror §5.7; A7 proofs remain Catalog-only.)*
 
-## **Appendix B — Vendor Request/Response Examples (typed mapping tables; redact secrets) \[Speculative\]**
+# **Appendix B — Vendor Request/Response Examples (typed mapping tables; redact secrets) \[Speculative\]**
 
 **Purpose.** Provide **redacted** examples for HDAPI interactions to aid integration tests. These are **illustrative**, follow §7.2 request shaping, and obey §7.3 policies when rails are open. **Never** include real keys or payload bodies in logs.
 
-### **B.1 Request (redacted example; rails open)**
+## **B.1 Request (redacted example; rails open)**
 
-**HumanDesignAPI v2 conformance note.** The example below is the current legacy BodyGraph-oriented request example. It is not a HumanDesignAPI v2 request example and MUST NOT be cited as proof that PF05 is v2-conformant. HumanDesignAPI v2 request examples, including route selection, auth headers, birthdate format, geocode-key conditions, response envelope mapping, and typed errors, remain pending until derived from the governed contract inventory and drained through the PF05 v2 contract update.
+The validated configured base owns the version segment. Each request uses a version-neutral resource and exactly the route-specific object and headers below.
 
-The canonical vendor BodyGraph request for HDE is:
+| Resource | Resolver-selectable | Body members | Auth | Geocode |
+| :---- | :---- | :---- | :---- | :---- |
+| `charts` | terminal v2 full route | `birthdate`, `birthtime`, `location` | `Authorization: Bearer <redacted>` | `HD-Geocode-Key: <redacted>` |
+| `charts/simple` | no; contracted inventory | `birthdate`, `birthtime`, `location` | `Authorization: Bearer <redacted>` | `HD-Geocode-Key: <redacted>` |
+| `charts/coordinates` | no; contracted inventory | `birthdate`, `birthtime`, `lat`, `lng` | `Authorization: Bearer <redacted>` | forbidden |
+| `bodygraphs` | terminal v1 legacy full route | `birthdate`, `birthtime`, `location` | `HD-Api-Key: <redacted>` | `HD-Geocode-Key: <redacted>` |
+| `bodygraphs/simple` | no; contracted legacy inventory | `birthdate`, `birthtime`, `location` | `HD-Api-Key: <redacted>` | `HD-Geocode-Key: <redacted>` |
 
-POST /bodygraphs
+**v2 full location request.**
 
-with JSON body:
+```
+POST /v2/charts
+Accept: application/json
+Authorization: Bearer <redacted>
+Content-Type: application/json; charset=utf-8
+HD-Geocode-Key: <redacted>
+User-Agent: GlowHDEngine/<release_id>
 
-{  
-  "birthdate": "YYYY-MM-DD",  
-  "birthtime": "HH:MM",  
-  "location": "free-text or structured location (see vendor docs)"  
-}
+{"birthdate":"YYYY-MM-DD","birthtime":"HH:MM","location":"<location>"}
+```
 
-and headers:
+**v2 coordinate-inventory request.**
 
-* `Accept: application/json`
+```
+POST /v2/charts/coordinates
+Accept: application/json
+Authorization: Bearer <redacted>
+Content-Type: application/json; charset=utf-8
+User-Agent: GlowHDEngine/<release_id>
 
-* `Content-Type: application/json; charset=utf-8`
+{"birthdate":"YYYY-MM-DD","birthtime":"HH:MM","lat":0,"lng":0}
+```
 
-* `HD-Api-Key: <redacted>`
+**v1 retained-legacy full request.**
 
-* `HD-Geocode-Key: <optional, redacted>`
+```
+POST /v1/bodygraphs
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+HD-Api-Key: <redacted>
+HD-Geocode-Key: <redacted>
+User-Agent: GlowHDEngine/<release_id>
 
-* `User-Agent: GlowHDEngine/<release_id>`
+{"birthdate":"DD-MMM-YYYY","birthtime":"HH:MM","location":"<location>"}
+```
 
-HDE does **not** use `POST /bodygraphs/simple`. That endpoint is treated as unsupported for this engine and MUST NOT appear in engine code, QA harnesses, or governed documentation.
+The displayed paths illustrate a configured base ending in `/v2` or `/v1` joined to the version-neutral resource. Runtime route constants contain no version segment. The serialized JSON request object has sorted unique keys, no insignificant whitespace, UTF-8 encoding, no BOM, and one LF. The placeholder `<release_id>` is the governed lowercase 64-hex value; no example authorizes a literal placeholder on wire.
 
-**Acceptance impact**
+Simple and coordinate resources remain low-level contracted inventory, not `bg:resolve` choices. A simple response cannot satisfy full BodyGraph resolution. A route or payload example never authorizes public Reader vendor traffic, production persistence, or cross-lineage fallback.
 
-* No new tokens; this redline encodes endpoint policy that is already implied by PF10 and PF01.
+## **B.2 Response → typed error mapping (deterministic)**
 
-* Keeps PF05 as the single home for the on-wire vendor HTTP contract while deferring rails and override policy to PF04.
+A v2 success uses `StandardResponse` and a route-matching `type`: `ChartResult` for `charts` and `charts/coordinates`, or `ChartSimpleResult` for `charts/simple`. A v1 success is the matching flat `BodygraphResponse` or `SimpleBodygraphResponse`. Cross-family wrappers, wrong route types, incomplete full-detail results, malformed JSON, and duplicate object names are `PROVIDER_BAD_RESPONSE`.
 
-* **B.2 Response → typed error mapping (deterministic)**  
-* `401` → `PROVIDER_UNAUTHORIZED`
+| Condition | Canonical code | Retry |
+| :---- | :---- | :---- |
+| missing or conflicting configuration | `PROVIDER_CONFIG_MISSING` or `PROVIDER_CONFIG_INVALID` | no |
+| unsupported or ambiguous route base | `PROVIDER_ROUTE_UNSUPPORTED` | no |
+| `401` | `PROVIDER_UNAUTHORIZED` | no |
+| `403` | `PROVIDER_FORBIDDEN` | no |
+| `404` | `PROVIDER_NOT_FOUND` | no |
+| `429` | `PROVIDER_RATE_LIMITED` | no |
+| `500`–`599` | `PROVIDER_UNAVAILABLE` after the attempt budget | yes |
+| network error | `PROVIDER_UNAVAILABLE` after the attempt budget | yes |
+| malformed or mismatched response | `PROVIDER_BAD_RESPONSE` | no |
+| provider-declared v2 failure or any other status, including `3xx` | `PROVIDER_ERROR` | no |
 
-* `403` → `PROVIDER_FORBIDDEN`
+A valid `Retry-After` may project nonnegative integer `retry_after_ms` but never schedules an automatic retry. No vendor body is echoed and secrets remain redacted. The CLI projects the canonical provider code as its single LF-terminated `stderr` token; governed HTTP projects the same code through its canonical `error_v1` envelope.
 
-* `404` → `PROVIDER_NOT_FOUND`
-
-* `429` → `PROVIDER_RATE_LIMITED` (+ `retry_after_ms` if header parses)
-
-* `5xx` → `PROVIDER_UNAVAILABLE`  
-   No vendor body echo; secrets redacted; numeric-free error object on stderr (CLI) per §8.
-
-### **B.3 Profiles/placeholders**
+## **B.3 Profiles/placeholders**
 
 * **Timeout profile:** `default|small|long` (see §7.3.2)
 
-* **Backoff:** `none|fixed|exponential` with closed integer params (see §7.3.4)
+| `max_attempts` | `backoff_kind` | `base_ms` | `ceiling_ms` | Schedule |
+| ----: | :---- | ----: | ----: | :---- |
+| 1 | `none` | 0 | 0 | one initial attempt; no retry |
+| 2 | `fixed` | 250 | 250 | one retry after 250 ms |
+| 2 | `fixed` | 500 | 500 | one retry after 500 ms |
+| 3 | `exponential` | 250 | 500 | retries after 250 ms and 500 ms |
+| 3 | `exponential` | 500 | 2000 | retries after 500 ms and 1000 ms; **default** |
 
-* **Retries:** `max_attempts ∈ {0,1,2,3}` (see §7.3.3)  
-   Pin a single set before enabling production calls; record via Doc-Delta.
+`max_attempts` counts the initial request and accepts only integers `1`, `2`, or `3`. Zero and every unlisted tuple fail before I/O with `PROVIDER_CONFIG_INVALID`. No profile uses jitter. Only `network_error` and `5xx` retry, and the total operation budget is a hard ceiling.
 
 ---
 
-## **Appendix C — CLI Parity Harness (usage recipes for AB↔BA, two-run) \[Required-Now\]**
+# **Appendix C — CLI Parity Harness (usage recipes for AB↔BA, two-run) \[Required-Now\]**
 
 **Purpose.** Repeatable recipes to prove **Reader↔CLI byte parity**, **AB↔BA identity**, and **two-run identity**, without exposing vendor calls. The harness is **dev-only** (`APP_ENV=dev`).
 
-### **C.1 Reader↔CLI parity (success)**
+## **C.1 Reader↔CLI parity (success)**
 
-1. **Run Reader (dev harness)** with fixture inputs; capture the **LF-terminated** body.
-
-2. **Run CLI** `hdctl showcompat` for the same inputs; capture **stdout**.
-
-3. **Hygiene pre-checks (both bodies):** assert **UTF-8**, **BOM/ANSI-free**, **exactly one LF**, and **six-key success** with `{id,band}` only.
-
-4. **Byte-compare:** bodies **MUST** be identical (same `idempotence_hash`, same single LF).
-
+1. **Run Reader (dev harness)** with fixture inputs; capture the **LF-terminated** body.  
+     
+2. **Run CLI.** Run `hdctl showcompat --dump-reader <path>` for the same inputs; capture the LF-terminated bytes written to `<path>`. Ordinary stdout remains compat JSON and is not a Reader-envelope parity input.  
+     
+3. **Hygiene pre-checks.** Validate both Reader bodies as UTF-8, BOM/ANSI-free, exactly one LF, six top-level keys, and `{id,band}` category items only.  
+     
+4. **Byte-compare.** The Reader response body and CLI reader-dump bytes MUST be identical, including `idempotence_hash` and the single LF.  
+     
 5. **Preimage re-check:** remove `idempotence_hash`, re-serialize the five-key preimage canonically, and confirm `sha256(preimage_bytes)` equals the published digest.
 
-   ### **C.2 AB↔BA identity**
+## **C.2 AB↔BA identity**
 
 * Repeat **C.1** for **(A,B)** and **(B,A)**; the two outputs **MUST** match **bit-for-bit** (pair normalization in effect).
 
-  ### **C.3 Two-run identity**
+## **C.3 Two-run identity**
 
 * Repeat the **same** command twice with identical inputs/environment; outputs **MUST** be **byte-identical** (including the single LF).
 
-  ### **C.4 Hygiene**
+## **C.4 Hygiene**
 
-* Use the **single presenter emitter** on both surfaces; **forbid** ad-hoc `json.dumps` or local “mini-emitters”.
-
-* Enforce schema & LF gates on every run; fail fast on any deviation. 
+* Use the **single presenter emitter** on both surfaces; **forbid** ad-hoc `json.dumps` or local “mini-emitters”.  
+    
+* Enforce schema & LF gates on every run; fail fast on any deviation.
 
 ## **Appendix D — Evidence Index (titles/paths only) \[Required-Now\]**
 
