@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.5.1  
+**Version:** v3.5.2  
 **Status:** Canon  
 **Effective date:** 2026-08-12  
-**Last Update Gate:** 0808 refresh 4  
+**Last Update Gate:** 0808 refresh 5  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -4860,96 +4860,96 @@ Dev/run scripts (or CI jobs) produce binary acceptance and records-only evidence
 
 All byte checks run with:
 
-* LC\_ALL=C
-
-* LANG=C
-
+* LC\_ALL=C  
+    
+* LANG=C  
+    
 * TZ=UTC
 
 JSON is canonical:
 
-* UTF-8, no BOM
-
-* ASCII-sorted keys
-
-* Compact (no pretty-print)
-
+* UTF-8, no BOM  
+    
+* ASCII-sorted keys  
+    
+* Compact (no pretty-print)  
+    
 * Exactly one trailing LF
 
 ## **25.2 What the harness must prove**
 
 Determinism (math & emission)
 
-* AB↔BA parity (pair neutrality)
-
-* Two-run identity
-
-* Canonical re-serialization byte-compare
-
-* Preimage → hash → final reproducibility
-
-* Registry configuration snapshot.
-
-* A canonical registry\_report (registry\_report.v1) exists at artifacts/registry/registry\_report.json, generated via the Programmatic Configuration System (§3), and participates in the same two-run identity and canonical-JSON checks as other governed artifacts.
-
-* CI rails posture. CI runs CLOSED by default. Any job that opens rails must pin retry/timeout/backoff policy and must index all governed evidence in the same PR (titles-only routing to Governance/Schemas & Artifacts).
+* AB↔BA parity (pair neutrality)  
+    
+* Two-run identity  
+    
+* Canonical re-serialization byte-compare  
+    
+* Preimage → hash → final reproducibility  
+    
+* Registry configuration snapshot.  
+    
+* A canonical registry\_report (registry\_report.v1) exists at artifacts/registry/registry\_report.json, generated via the Programmatic Configuration System (§3), and participates in the same two-run identity and canonical-JSON checks as other governed artifacts.  
+    
+* CI rails posture. CI runs CLOSED by default. Any job that opens rails must pin retry/timeout/backoff policy and must index all governed evidence in the same PR (titles-only routing to PF04-Canon-HDE-Governance and PF12-Canon-HDE-Schemas-and-Artifacts).
 
 Transport A7 (success endpoints)
 
 Proof surface.
 
-* Run on a Catalog JSON success route (see §9.1).
-
-* /internal/version is ops-only and not A7-eligible (see §9.4; HDE-Governance §10.5).
+* Run on a Catalog JSON success route (see §9.1).  
+    
+* /internal/version is ops-only and not A7-eligible (see §9.4; PF04-Canon-HDE-Governance §10.5).
 
 A7 must prove:
 
-* 200 has a strong quoted ETag, success cache headers, and Vary: Authorization, Accept-Encoding.
-
-* HEAD mirrors 200 validators; no body; Content-Type \== GET; Content-Length \== identity 200 body.
-
-* 304 is served only after 200; no body; omit Content-Type and omit Content-Length; validators mirror cached 200\.
-
-* POST is non-conditional (never 304).
-
-* Writers/errors: Cache-Control: no-store; no ETag; errors include Content-Type: application/json; charset=utf-8.
-
-* Encoding invariance: for the same canonical body, ETag identity and effective Content-Length are stable across accepted encodings (identity/gzip/br); capture a headers-only proof.
-
+* 200 has a strong quoted ETag, success cache headers, and Vary: Authorization, Accept-Encoding.  
+    
+* HEAD mirrors 200 validators; no body; Content-Type \== GET; Content-Length \== identity 200 body.  
+    
+* 304 is served only after 200; no body; omit Content-Type and omit Content-Length; validators mirror cached 200\.  
+    
+* POST is non-conditional (never 304).  
+    
+* Writers/errors: Cache-Control: no-store; no ETag; errors include Content-Type: application/json; charset=utf-8.  
+    
+* Encoding invariance: for the same canonical body, ETag identity and effective Content-Length are stable across accepted encodings (identity/gzip/br); capture a headers-only proof.  
+    
 * Env-gating: capture a headers-only env-gate proof demonstrating non-prod entries are unreachable in prod.
 
 Band edges
 
-* Inclusive-high thresholds
-
+* Inclusive-high thresholds  
+    
 * Snapshot edges and diffs for each preset (see §5.3)
 
 Reader↔CLI parity
 
-* Shared emitter
-
+* Shared emitter  
+    
 * CLI stdout equals Reader 200 body for mirrored surfaces
 
 Reader↔CLI error-envelope parity (deterministic scenario roster; stored artifacts)
 
 The harness MUST enforce a fixed, ordered scenario roster for error parity evidence and tests (scenario ids are harness-internal, not token names):
 
-* invalid\_json
-
-* invalid\_viewer\_prefs
-
-* db\_unavailable
-
+* invalid\_json  
+    
+* invalid\_viewer\_prefs  
+    
+* db\_unavailable  
+    
 * vendor\_attempt\_closed\_rails
 
 For each scenario, the harness MUST:
 
-* generate or invoke the HTTP-side envelope deterministically under closed rails and determinism pins
-
-* generate or invoke the CLI-side error deterministically under the same pins
-
-* store the pair of artifacts at canonical governed paths (see §37.7)
-
+* generate or invoke the HTTP-side envelope deterministically under closed rails and determinism pins  
+    
+* generate or invoke the CLI-side error deterministically under the same pins  
+    
+* store the pair of artifacts at canonical governed paths (see §37.7)  
+    
 * run a CI-safe parity test that asserts runtime results are exactly equal to stored artifacts (no “close enough”), including stdout \== "" for CLI error cases and the expected stderr marker
 
 Deterministic triggering MUST NOT rely on live network or a live database. If a scenario requires simulating DB unavailability or a closed-rails vendor attempt, the harness MUST use deterministic injection (for example env-pinned triggers) so the resulting envelopes and stored artifacts are stable under closed rails.
@@ -4958,8 +4958,8 @@ These artifacts are governed evidence. Any change to the stored artifacts requir
 
 Serializer path guards
 
-* Grep-guard denies ad-hoc serializers
-
+* Grep-guard denies ad-hoc serializers  
+    
 * Symbol proof shows Reader/CLI resolve to the same presenter/emitter
 
 Narratives & architecture (keys-only)
@@ -4974,125 +4974,113 @@ Aux evidence scope (EPIC-010)
 
 Capture exactly two headers-only snapshots:
 
-* tests/transport/headers/aux\_text\_200.snap
-
+* tests/transport/headers/aux\_text\_200.snap  
+    
 * tests/transport/headers/aux\_suppression\_200.snap
 
 Aux HEAD/304 captures are out of scope.
 
 A7 proofs remain Catalog JSON-success only.
 
-(Bytes/policy routed by title to PF05/PF04)
+(Bytes/policy routed by title to PF05-Canon-HDE-CLI-API-Vendor-Ref and PF04-Canon-HDE-Governance)
 
 ## **25.3 Orchestration & ordering**
 
-The harness can be invoked standalone or as part of the sanity pipeline (see §26.5).
+The harness can be invoked standalone or as part of the sanity pipeline (see §27.5).
 
 Minimum ordering:
 
-* Format
-
-* Lint/type
-
-* Unit/property tests
-
-* Schema checks
-
-* Goldens
-
-* Capture artifacts
-
-* Index \+ mirror parity check
-
+* Format  
+    
+* Lint/type  
+    
+* Unit/property tests  
+    
+* Schema checks  
+    
+* Goldens  
+    
+* Capture artifacts  
+    
+* Index \+ mirror parity check  
+    
 * Fail-closed on drift
 
-## **25.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## **25.4 Acceptance (titles-only; token names live in PF04-Canon-HDE-Governance §2.0)**
 
-* Determinism. Governed by the determinism token family (AB↔BA, two-run, canonical compare).
-
-* Transport A7. Governed by A7 tokens.
-
-* Writers/errors posture governed by writers/error tokens.
-
-* Encoding-invariance and Vary tokens required.
-
-* Catalog posture (internal-only, env-gated) tokens required.
-
-* Bands. Governed by bands/edges tokens.
-
-* CLI parity & serializer guards. Governed by CLI/Emitter parity and no-alt-JSON tokens.
-
-* Evidence discipline. Governed by Index/Mirror tokens (human↔machine 1:1; canonical JSONL; path-proofs).
-
-* Aux/Narrative (EPIC-010). Acceptance is governed by HDE-Governance and Glow QA Guide (titles-only). PF14 does not list token names. Mechanics requires that Aux evidence capture and suppression posture are provable via the limited headers-only snapshots and any associated parity checks defined in the governing docs.
+* Determinism. Governed by the determinism token family (AB↔BA, two-run, canonical compare).  
+    
+* Transport A7. Governed by A7 tokens.  
+    
+* Writers/errors posture governed by writers/error tokens.  
+    
+* Encoding-invariance and Vary tokens required.  
+    
+* Catalog posture (internal-only, env-gated) tokens required.  
+    
+* Bands. Governed by bands/edges tokens.  
+    
+* CLI parity & serializer guards. Governed by CLI/Emitter parity and no-alt-JSON tokens.  
+    
+* Evidence discipline. Governed by Index/Mirror tokens (human↔machine 1:1; canonical JSONL; path-proofs).  
+    
+* Aux/Narrative (EPIC-010). Acceptance is governed by PF04-Canon-HDE-Governance and PF19-Canon-Glow-QA-Guide (titles-only). PF14 does not list token names. Mechanics requires that Aux evidence capture and suppression posture are provable via the limited headers-only snapshots and any associated parity checks defined in the governing docs.
 
 ## **25.5 Evidence & indexing (records-only; machine mirror; same-PR rule)**
 
-Single home for titles/paths. §36 Documentation Artifacts and Registry (“Reader success catalog & A7 proofs”). This guide does not pin file paths here.
+Single home for titles/paths. §37 Documentation Artifacts and Registry (“Reader success catalog & A7 proofs”). This guide does not pin file paths here.
 
 Indexing:
 
-* List artifact titles/paths in Appendix D: Evidence Index.
-
+* List artifact titles/paths in the Human Evidence Index (docs/evidence/INDEX.json).  
+    
 * Mirror 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; exactly one LF).
 
-Mirror record fields:
-
-* artifact\_key
-
-* sha256
-
-* size\_bytes
-
-* produced\_at\_utc
-
-* discovered\_physical\_path
-
-* proof\_anchor
+Machine Mirror record fields, semantics, and order are defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3.
 
 Parity gate:
 
-* Update human Index and mirror in the same commit/PR.
-
-* CI fails on:
-
-  * Mismatch
-
-  * Non-canonical JSONL
-
-  * Unknown keys
-
+* Update human Index and mirror in the same commit/PR.  
+    
+* CI fails on:  
+    
+  * Mismatch  
+      
+  * Non-canonical JSONL  
+      
+  * Unknown keys  
+      
   * Missing path-proofs
 
 Required titles to appear in Index \+ mirror (examples, titles-only):
 
-* Endpoint Catalog snapshot
-
-* Env-gate proof
-
-* A7 headers (GET/HEAD/304/writers+errors)
-
-* Encoding-invariance proof
-
-* Reader↔CLI parity and canonical-compare artifacts
-
-* Band-edge snapshots
-
-* Serializer grep-guard and emitter-symbol proofs
-
+* Endpoint Catalog snapshot  
+    
+* Env-gate proof  
+    
+* A7 headers (GET/HEAD/304/writers+errors)  
+    
+* Encoding-invariance proof  
+    
+* Reader↔CLI parity and canonical-compare artifacts  
+    
+* Band-edge snapshots  
+    
+* Serializer grep-guard and emitter-symbol proofs  
+    
 * /internal/version headers/body/two-run captures
 
-Mirror field order note. Mirror field order & CI tokens are pinned once in §1.3; this section routes by title only to PF12/PF10 for the exact order and gates.
+Mirror field order note. Mirror field order and CI tokens are pinned once in §1.3; this section routes by exact title to PF12-Canon-HDE-Schemas-and-Artifacts §8.3 for the owned field order and gates.
 
 ## **25.6 Routing (titles-only)**
 
-* Transport matrices & A7 policy: HDE-CLI-API-Vendor-Ref; HDE-Governance.
-
-* Domains & catalogs / canonical JSON rules: HDE-Schemas & Artifacts.
-
-* Math semantics (preimage, bands, comparators): HDE-Math-Spec.
-
-* Ops endpoint posture: HDE-Governance §10.5 (see §9.4 for PF14 ops block).
+* Transport matrices & A7 policy: PF05-Canon-HDE-CLI-API-Vendor-Ref; PF04-Canon-HDE-Governance.  
+    
+* Domains & catalogs / canonical JSON rules: PF12-Canon-HDE-Schemas-and-Artifacts.  
+    
+* Math semantics (preimage, bands, comparators): PF01-Canon-HDE-Math-Spec.  
+    
+* Ops endpoint posture: PF04-Canon-HDE-Governance §10.5 (see §9.4 for PF14 ops block).
 
 # 26\) Performance and Load Harness
 
@@ -5100,11 +5088,11 @@ Load tests for Reader, Compat, and Narrative Selection Router (keys-only). Micro
 
 Outputs: non-PII bench reports (bounded histograms \+ percentiles), thresholds, and regression flags.
 
-Routing: SLO targets and failure posture live in Governance (titles only).
+Routing: SLO targets and failure posture live in PF04-Canon-HDE-Governance (titles only).
 
 # 27\) Release and Provenance Packaging
 
-Purpose (normative). Use one canonical manifest as the tracked release-identity input, derive release\_id from those bytes, and build current release-bound derivatives only through an isolated external attestation. Manifest shape and canonical rules live in HDE-Schemas and Artifacts (titles only).
+Purpose (normative). Use one canonical manifest as the tracked release-identity input, derive release\_id from those bytes, and build current release-bound derivatives only through an isolated external attestation. Manifest shape and canonical rules live in PF12-Canon-HDE-Schemas-and-Artifacts (titles only).
 
 The required dependency direction is:
 
@@ -5216,11 +5204,11 @@ Host-specific generated development files are not source. Local `.venv` trees an
 
 Rollback MUST revert the runtime manifest derivation, release-cut command, isolated attestation builder, workflow publication, and attestation schemas together. Rollback MUST NOT restore a generated release-ID constant, source-tree identity-closure writes, recursive checked-in derivative regeneration, clone-local mtime validity checks, release identity embedded in registry/config evidence, or bridge-era current-evidence semantics.
 
-Acceptance is governed by HDE-Governance and pack/manifest rules in HDE-Schemas & Artifacts (titles-only). This section creates no token, QA PASS, OPS completion, PF09 status movement, deployment, migration, or closeout claim.
+Acceptance is governed by PF04-Canon-HDE-Governance and pack/manifest rules in PF12-Canon-HDE-Schemas-and-Artifacts (titles-only). This section creates no token, QA PASS, OPS completion, PF09 status movement, deployment, migration, or closeout claim.
 
-Routing (titles-only). Manifest shape, canonical JSON rules, historical evidence schemas, and external-attestation schemas: HDE-Schemas and Artifacts. Public transport remains in HDE-CLI-API-Vendor Ref / HDE-Governance.
+Routing (titles-only). Manifest shape, canonical JSON rules, historical evidence schemas, and external-attestation schemas: PF12-Canon-HDE-Schemas-and-Artifacts. Public transport remains in PF05-Canon-HDE-CLI-API-Vendor-Ref / PF04-Canon-HDE-Governance.
 
-## **27.5 Sanity pipeline (release & provenance) Required−Now**
+## **27.5 Sanity pipeline (release & provenance) \[Required-Now\]**
 
 Purpose (normative). Provide one fail-closed, closed-rails final-admission gate for the direct-only evidence graph. The gate validates current governed bytes, separately validates frozen historical evidence, and does not execute OPS, perform external I/O, or repair an inconsistent evidence graph.
 
@@ -5298,7 +5286,7 @@ Purpose (normative). Run a minimal, production-against-production verification i
 
 Environment pins. All captures/compares run with LC\_ALL=C, LANG=C, TZ=UTC.
 
-Routing. Transport matrices live in HDE-CLI-API-Vendor Ref; /internal/version policy in HDE-Governance §10.5; DB mechanics in §20.
+Routing. Transport matrices live in PF05-Canon-HDE-CLI-API-Vendor-Ref; /internal/version policy in PF04-Canon-HDE-Governance §10.5; DB mechanics in §20.
 
 ## **28.2 Success route (A7) — transport smoke**
 
@@ -5306,10 +5294,10 @@ Surface. Use a route listed in the Endpoint Catalog (JSON success) (see §9.1).
 
 Prove (headers-only):
 
-* 200: strong quoted ETag, Content-Type: application/json; charset=utf-8, Cache-Control: private, max-age=0, must-revalidate, Vary: Authorization, Accept-Encoding.
-
-* HEAD parity: no body; validators mirror 200; Content-Type \== GET; Content-Length \== identity 200 body.
-
+* 200: strong quoted ETag, Content-Type: application/json; charset=utf-8, Cache-Control: private, max-age=0, must-revalidate, Vary: Authorization, Accept-Encoding.  
+    
+* HEAD parity: no body; validators mirror 200; Content-Type \== GET; Content-Length \== identity 200 body.  
+    
 * 304: served only after a prior 200; no body; omit Content-Type and Content-Length; validators mirror cached 200\.
 
 ## **28.3 Writers & errors — posture smoke**
@@ -5340,57 +5328,57 @@ Schema identity: normalized DDL fingerprint captured (see §20.1).
 
 ## **28.6 Evidence (records-only; machine mirror; same-PR rule)**
 
-List by title/path in Appendix D: Evidence Index and mirror 1:1 in artifacts/evidence\_index.jsonl (each record: artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor; canonical JSONL; one LF).
+List by title/path in the Human Evidence Index (docs/evidence/INDEX.json) and mirror it 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; one LF). Machine Mirror record fields, semantics, and order are defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3.
 
 Success route (A7) proofs
 
-* artifacts/proofs/success\_get.txt
-
-* artifacts/proofs/success\_head.txt
-
-* artifacts/proofs/success\_304.txt
-
+* artifacts/proofs/success\_get.txt  
+    
+* artifacts/proofs/success\_head.txt  
+    
+* artifacts/proofs/success\_304.txt  
+    
 * artifacts/proofs/success\_writers\_errors.txt
 
 Internal ops
 
-* artifacts/ops/internal\_version/headers\_get.txt
-
-* artifacts/ops/internal\_version/headers\_head.txt
-
-* artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt
-
-* artifacts/ops/internal\_version/headers\_cond\_if\_modified\_since.txt
-
-* artifacts/ops/internal\_version/body\_get.json \+ artifacts/ops/internal\_version/body\_get.sha256
-
-* artifacts/ops/internal\_version/request\_chain\_manifest.json
-
+* artifacts/ops/internal\_version/headers\_get.txt  
+    
+* artifacts/ops/internal\_version/headers\_head.txt  
+    
+* artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt  
+    
+* artifacts/ops/internal\_version/headers\_cond\_if\_modified\_since.txt  
+    
+* artifacts/ops/internal\_version/body\_get.json \+ artifacts/ops/internal\_version/body\_get.sha256  
+    
+* artifacts/ops/internal\_version/request\_chain\_manifest.json  
+    
 * artifacts/ops/internal\_version/two\_run\_identity.log
 
 DB posture
 
-* artifacts/db/ddl\_fingerprint.json
-
-* artifacts/db/grants.txt
-
-* artifacts/db/check\_schema.txt
-
-* artifacts/db/check\_constraints.txt
-
-* artifacts/db/partition\_plan.txt (if used)
-
+* artifacts/db/ddl\_fingerprint.json  
+    
+* artifacts/db/grants.txt  
+    
+* artifacts/db/check\_schema.txt  
+    
+* artifacts/db/check\_constraints.txt  
+    
+* artifacts/db/partition\_plan.txt (if used)  
+    
 * artifacts/db/db\_rw\_smoke.log (optional)
 
 Pins & harness
 
-* audit/gates/determinism/env\_pins.log
-
+* audit/gates/determinism/env\_pins.log  
+    
 * audit/gates/determinism/env\_pins.log.path\_proof.txt
 
-## **28.7 Acceptance (titles-only; tokens live in HDE-Governance §2.0)**
+## **28.7 Acceptance (titles-only; tokens live in PF04-Canon-HDE-Governance §2.0)**
 
-Success route (A7). Governed by the A7 token family in Governance (200 ETag, HEAD parity, 304 omission, success cache/Vary).
+Success route (A7). Governed by the A7 token family in PF04-Canon-HDE-Governance (200 ETag, HEAD parity, 304 omission, success cache/Vary).
 
 Writers/errors. Governed by the writers/error token family (no-store, no ETag, error Content-Type).
 
@@ -5400,7 +5388,7 @@ DB posture. Governed by DB\_ tokens\* (connection/env, search\_path, roles, sche
 
 Evidence discipline. Governed by Index/Mirror tokens (human↔machine 1:1; canonical JSONL; path-proofs).
 
-This guide asserts capability-level conformance and routes all token names to HDE-Governance §2.0. Artifacts are captured per §27.6 and indexed per §1.3/§36.
+This guide asserts capability-level conformance and routes all token names to PF04-Canon-HDE-Governance §2.0. Artifacts are captured and indexed per §1.3 and §37.
 
 # 29\) Server Cache (Production) — rolled in
 
@@ -5516,7 +5504,7 @@ Deterministic build. Reproducible container image; pin base; lock package indexe
 
 Least privilege. Run as non-root; drop Linux capabilities; prefer read-only root FS with writable tmp/cache only if required.
 
-Single binary & emitter. Wire the allow-listed presenter/emitter (see §4, §10.2); forbid ad hoc serialization in entrypoints.
+Single binary & emitter. Wire the allow-listed presenter/emitter (see §4 and §8.2); forbid ad hoc serialization in entrypoints.
 
 Locale pins. Export LC\_ALL=C, LANG=C, TZ=UTC for all emit/compare paths to preserve byte identity.
 
@@ -5526,15 +5514,15 @@ Resource limits. Set CPU/memory limits and graceful shutdown (SIGTERM → drain 
 
 Purpose (normative). Capture the exact production start command and prove the app factory binds to $PORT.
 
-Start-command capture (records-only). Capture the exact launch command line used in production (no secrets). Store as canonical text (UTF-8; exactly one trailing \\n). (Evidence path listed in §36.)
+Start-command capture (records-only). Capture the exact launch command line used in production (no secrets). Store as canonical text (UTF-8; exactly one trailing \\n). (Evidence path listed in §37.)
 
 Factory binding to $PORT. Prove the service initializes via the factory adapter.factory:create\_app() (titles only) and binds to $PORT from the environment (no hard-coded port).
 
 Selected-factory route inventory. The factory selected by the production start command and documented local launchers MUST register the Reader blueprint and the existing `compat_blueprint`. Its mounted route inventory MUST include `GET /reader`, `GET /internal/version`, and `POST /api/compat/v1`. The compatibility route remains an existing `internal_admin` surface. This mechanic creates no new route, handler, payload, public contract, HTTP home, or launcher target.
 
-Route-mount parity proof. Compatibility contract and parity coverage MUST exercise that selected factory. Mechanics evidence MUST record the selected factory and its mounted blueprint and route inventory against the Endpoint Catalog and HDE Architecture adapter responsibilities. Checks MUST fail closed if either required blueprint registration or any assigned route is absent. Alternate development or wrapper factories MUST NOT mask an omission from the selected factory.
+Route-mount parity proof. Compatibility contract and parity coverage MUST exercise that selected factory. Mechanics evidence MUST record the selected factory and its mounted blueprint and route inventory against the Endpoint Catalog and PF02-Canon-HDE-Architecture adapter responsibilities. Checks MUST fail closed if either required blueprint registration or any assigned route is absent. Alternate development or wrapper factories MUST NOT mask an omission from the selected factory.
 
-Runtime pins (minimal). Record PORT, APP\_ENV, and identity pins required for traceability as a keys-only text snapshot (UTF-8; one \\n). (Evidence path listed in §36.)
+Runtime pins (minimal). Record PORT, APP\_ENV, and identity pins required for traceability as a keys-only text snapshot (UTF-8; one \\n). (Evidence path listed in §37.)
 
 ## **32.2 Configuration & environment**
 
@@ -5550,8 +5538,8 @@ Rails posture. Rails defaults derive from the Env Deployment Inventory (titles-o
 
 HTTP probes.
 
-* /healthz: liveness (process up, core initialized).
-
+* /healthz: liveness (process up, core initialized).  
+    
 * /readyz: readiness (emitter wired, pack loaded, manifest hashed, rails posture read).
 
 Probe bytes. Minimal, numeric-free JSON; canonicalized (UTF-8/no BOM, sorted keys, compact, one LF).
@@ -5568,11 +5556,11 @@ Tracing. Optional correlation\_id (non-PII) with bounded cardinality.
 
 ## **32.5 Transport & identity (titles-only)**
 
-Reader A7 (public). See HDE-CLI-API-Vendor Ref and HDE-Governance (ETag over LF-terminated body; Vary policy; 304 omits Content-Type and Content-Length; HEAD parity; POST non-conditional).
+Reader A7 (public). See PF05-Canon-HDE-CLI-API-Vendor-Ref and PF04-Canon-HDE-Governance (ETag over LF-terminated body; Vary policy; 304 omits Content-Type and Content-Length; HEAD parity; POST non-conditional).
 
 Internal ops /internal/version. Operator-only; Cache-Control: no-store; no ETag; HEAD parity; conditionals ignored; body includes engine\_tag, release\_id, invocation\_tag, emitter\_sha256, optional build\_commit (see §14).
 
-Identity. release\_id from canonical manifest (HDE-Schemas and Artifacts §6); invocation\_tag participates in preimage (HDE-Math-Spec §3); presenter uses canonical serializer (§4).
+Identity. release\_id from canonical manifest (PF12-Canon-HDE-Schemas-and-Artifacts §6); invocation\_tag participates in preimage (PF01-Canon-HDE-Math-Spec §3); presenter uses canonical serializer (§4).
 
 ## **32.6 Acceptance (binary)**
 
@@ -5588,23 +5576,23 @@ Start command & factory. Start command captured; factory proven; binds $PORT.
 
 Determinism. LC\_ALL=C, LANG=C, TZ=UTC enforced; canonical re-serialization byte-compare passes for all public/ops surfaces emitted from this process.
 
-Acceptance token naming and semantics are owned by HDE-Governance (titles-only). This guide does not list token names. The acceptance obligations in §32 include start-command capture, app factory correctness, binding to $PORT, environment allow-list discipline, and ops posture for /internal/version, all proven via governed evidence.
+Acceptance token naming and semantics are owned by PF04-Canon-HDE-Governance (titles-only). This guide does not list token names. The acceptance obligations in §32 include start-command capture, app factory correctness, binding to $PORT, environment allow-list discipline, and ops posture for /internal/version, all proven via governed evidence.
 
 ## **32.7 Evidence (titles/paths only)**
 
-Single home for artifact titles/paths. Do not pin file paths here. The authoritative registry of artifacts and their titles/paths lives in §36 Documentation Artifacts and Registry.
+Single home for artifact titles/paths. Do not pin file paths here. The authoritative registry of artifacts and their titles/paths lives in §37 Documentation Artifacts and Registry.
 
 Mechanics MUST:
 
-* List artifacts by title/path in Appendix D: Evidence Index (human).
-
-* Write records-only mirror entries to artifacts/evidence\_index.jsonl in the same commit/PR (machine).
-
-* Ensure each mirror record is canonical JSONL (UTF-8, no BOM; sorted keys; compact; exactly one LF) and includes: artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor.
-
+* List artifacts by title/path in the Human Evidence Index (docs/evidence/INDEX.json).  
+    
+* Write records-only mirror entries to artifacts/evidence\_index.jsonl in the same commit/PR (machine).  
+    
+* Ensure each mirror record is canonical JSONL (UTF-8, no BOM; sorted keys; compact; exactly one LF). Machine Mirror record fields, semantics, and order are defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3.  
+    
 * Maintain strict 1:1 parity between human Index and machine mirror; CI fails on mismatch or missing path-proofs.
 
-Routing (titles-only). A7 and ops policies: HDE-Governance. Public bytes & preimage: HDE-CLI-API-Vendor Ref / HDE-Math-Spec. Pack/manifest: HDE-Schemas and Artifacts. Evidence registry/mirror discipline: §1.3 and §36.
+Routing (titles-only). A7 and ops policies: PF04-Canon-HDE-Governance. Public bytes & preimage: PF05-Canon-HDE-CLI-API-Vendor-Ref / PF01-Canon-HDE-Math-Spec. Pack/manifest: PF12-Canon-HDE-Schemas-and-Artifacts. Evidence registry/mirror discipline: §1.3 and §37.
 
 # 33\) SDKs (Client Libraries) — rolled in
 
@@ -5612,18 +5600,18 @@ Client libraries use the allow-listed presenter-emitter and enforce transport ru
 
 TypeScript SDK (required)
 
-* readPerson(id | payload) — calls Reader; returns the exact public body bytes (LF-terminated). await .json() is available as a convenience parser.
-
-* compat(a, b, prefs) — calls /api/compat/v1 with POST and Content-Type: application/json; returns the exact body bytes; await .json() available.
-
+* readPerson(id | payload) — calls Reader; returns the exact public body bytes (LF-terminated). await .json() is available as a convenience parser.  
+    
+* compat(a, b, prefs) — calls /api/compat/v1 with POST and Content-Type: application/json; returns the exact body bytes; await .json() available.  
+    
 * sample(viewer\_prefs, seed?) — calls /api/sample/v1 with POST; returns the exact body bytes; ordering matches service; await .json() available.
 
 conditionalGetHelper (Reader; production)
 
 Implements conditional GET with If-None-Match.
 
-* On 200: returns {status:200, etag, body\_bytes}, updates cache.
-
+* On 200: returns {status:200, etag, body\_bytes}, updates cache.  
+    
 * On 304: returns {status:304, etag, body\_bytes} using cached bytes; server 304 has no body, omits Content-Type, and has Content-Length 0 or absent.
 
 Helpers surface the strong, quoted ETag for callers.
@@ -5650,39 +5638,78 @@ Python SDK parity tests pass for bytes and ordering across all three calls.
 
 # 34\) Dev HTTP Harness (single home)
 
-Current local capture posture is dev-only, bound to 127.0.0.1, not public, with CORS disabled and APP\_ENV=dev; debug reloader stays off during captures. This section inventories co-located route classes rather than declaring every listed route dev-only. `/reader` is the cataloged Reader success surface in current scope, and the existing endpoint inventory MUST designate `/reader` explicitly as the governed Reader success-proof surface rather than forcing that conclusion to be inferred from route existence plus A7 eligibility. Dev-only wording applies only to explicitly preview or conjunction routes. The Endpoint Catalog remains the single A7 proof surface for Reader success routes, the dev harness remains supplemental, and `/internal/version` remains ops-only. Emits canonical JSON via the allow-listed presenter-emitter (§4/§8).
+**Runner and scope.** The canonical dev HTTP capture runner is `scripts/dev_start_reader.sh`, which invokes `python -m adapter.http_reader`. It is for deterministic dev evidence capture, not public infrastructure. This section inventories a bounded capture context; it does not replace the authoritative Endpoint Catalog owned by PF12-Canon-HDE-Schemas-and-Artifacts, declare omitted adapter routes retired, or prove reachability, Catalog membership, A7 eligibility, implementation completion, or public authorization. Dev-harness evidence remains supplemental. `/internal/version` remains ops-only.
 
-Routes:
+**Required local capture profile.**
 
-* GET /reader?v=1 (Reader; cataloged success surface in current scope)  
-* GET /api/reader?v=1 (Reader alias when mounted under /api prefix)  
-* GET|POST /api/compat/v1 (pair; ids-only GET)  
-* POST /api/sample/v1
+* Bind ordinary local capture to `127.0.0.1`. Do not expose this profile publicly.  
+    
+* Use port `8000` by default. An explicitly supplied `PORT` may override it; captures and examples MUST use the effective port.  
+    
+* Require the caller to supply `APP_ENV=dev`. Do not document a missing value as equivalent to dev.  
+    
+* Keep rails closed with `SAFE_MODE=1` and `ALLOW_NETWORK=0`; captures perform no vendor or unrelated network I/O.  
+    
+* Pin `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
+    
+* Disable CORS. No cross-origin allow-list, wildcard, credentials, or CORS response headers are authorized for this harness.  
+    
+* Set Flask `debug=False`, `use_debugger=False`, and `use_reloader=False` explicitly.
 
-Aux route (context). The Aux narrative surface is served at `/aux/narrative` from the same adapter HTTP surface family.
+**Routes in the bounded capture context.**
 
-Method posture:
+| Route | Method posture | Classification and constraint |
+| :---- | :---- | :---- |
+| `/reader?v=1` | `GET`, `HEAD` | Canonical Reader v1 dev/proof surface. It requires explicit `APP_ENV=dev`; the Endpoint Catalog owned by PF12-Canon-HDE-Schemas-and-Artifacts retains the Reader success-proof designation. |
+| `/api/reader?v=1` | `GET`, `HEAD` only when the Reader blueprint is mounted under `/api` | Conditional alias of `/reader`, never a second contract or proof surface. |
+| `/api/compat/v1` | `GET`, `POST`, `HEAD`, `OPTIONS` | Internal/admin compatibility surface. `GET` is the fixed bodyless probe; `POST` performs evaluation. The other methods follow the exact PF05-Canon-HDE-CLI-API-Vendor-Ref posture. |
+| `/aux/narrative?v=1` | `GET` | Canonical public Aux narrative surface. Co-location does not make it dev-only or A7-eligible. |
+| `/api/aux/narrative?v=1` | `GET` only when the configured alias is exposed | Conditional alias of the canonical Aux contract, not an independent public surface. |
+| `/internal/dev/sampler` | `POST` only | Dev/admin-only internal sampler. It requires `APP_ENV` in `{dev,test,local}`, runs with closed rails, returns writer-style `no-store` responses, and is not A7-eligible. |
 
-* All /api routes are dev-only unless explicitly stated otherwise. The harness binds to 127.0.0.1:5000 by default and MUST NOT be exposed as a public interface.  
-* GET MUST NOT include a body.
+PF05-Canon-HDE-CLI-API-Vendor-Ref owns each route's exact request, response, status, header, conditional, and error contract. PF12-Canon-HDE-Schemas-and-Artifacts owns the authoritative Endpoint Catalog.
 
-Error posture:
+**Error, serializer, and logging posture.**
 
-* Errors return JSON `{"error": "<MSG>"}` and MUST include a non-2xx HTTP status. (The harness is for dev; this is not a public error contract.)
+* Failures use the route-specific non-2xx status and typed error contract owned by PF05-Canon-HDE-CLI-API-Vendor-Ref; this section defines no competing dev error envelope.  
+    
+* Where PF05-Canon-HDE-CLI-API-Vendor-Ref requires JSON, emit canonical UTF-8 JSON through the allow-listed shared presenter/emitter and terminate it with exactly one LF when the owning contract requires it.  
+    
+* Keep diagnostics and logs separate from response bytes. Capture logs contain no secrets, credentials, birth data, narrative prose, or payload bodies.  
+    
+* Preserve every route-specific `Cache-Control`, `ETag`, method, conditional, numeric-free, public/private, and A7/non-A7 boundary.
 
-Runner:
+**Required start and local examples.** After the runner is hardened to the required profile, start the ordinary local capture with:
 
-* The harness is implemented by `python -m adapter.http_dev_harness`.
+```shell
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh
+```
 
-Quick start (curl — local 5000):
+This command is a documentation contract, not a claim that the current server bind satisfies the required loopback posture. For an explicit `PORT` override, replace `8000` in each local base URL with the effective port.
 
-* Pair (POST): `curl -s http://127.0.0.1:5000/api/compat/v1 -H 'Content-Type: application/json' -X POST -d '{"a":{}, "b":{}, "viewer_prefs":{}}' | jq .`  
-* Pair (GET): `curl -s http://127.0.0.1:5000/api/compat/v1?id=<A_ID>&id=<B_ID>&viewer_prefs=<VP_JSON_URLENCODED> | jq .`  
-* Sample with seed (POST): `curl -s http://127.0.0.1:5000/api/sample/v1 -H 'Content-Type: application/json' -X POST -d '{"seed": 1}' | jq.`  
-  Reader (GET; v1): `curl -s http://127.0.0.1:5000/reader?v=1 | jq .`  
-* Sample with seed (POST): `curl -s http://127.0.0.1:5000/api/sample/v1 -H 'Content-Type: application/json' -X POST -d '{"viewer_prefs":{}, "seed":12345}' | jq .`
+* Bodyless compatibility probe: `curl -s http://127.0.0.1:8000/api/compat/v1 | jq .`  
+    
+* Reader v1: `curl -s 'http://127.0.0.1:8000/reader?v=1&a=<A_CHART_PATH>&b=<B_CHART_PATH>&a_tz=<A_TZ>&b_tz=<B_TZ>' | jq .`  
+    
+* Internal sampler: `curl -s http://127.0.0.1:8000/internal/dev/sampler -H 'Content-Type: application/json' -X POST -d '{"viewer_id":"<VIEWER_ID>","candidate_ids":["<CANDIDATE_ID>"],"seed":"<SEED>"}' | jq .`
 
-For Codespaces and other shared environments, Mechanics requires that QA and docs use the infra-provided dev start commands and URLs (for example, values exposed via devcontainer or environment keys described in Glow Infrastructure and HDE-Build Checklist by title) instead of hard-coding hostnames or ports in plans or scripts.
+**Shared environments.** Use only the infrastructure-provided private or authenticated start command, bind, forwarded base URL or `DEV_SAMPLER_URL`, and effective port. Do not compute, guess, or hard-code a shared-environment host or port. A shared-environment `0.0.0.0` bind is permissible only behind that environment's access-controlled forwarding boundary; it does not authorize public exposure or change any route classification.
+
+**Current repository posture at `d7e8b4e7f07a844fd976dcd68a8cabe983891e75` (static inspection only).**
+
+* `scripts/dev_start_reader.sh` invokes `python -m adapter.http_reader`, defaults `PORT=8000`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`, and propagates `APP_ENV` only when the caller supplies it.  
+    
+* `adapter/http_reader.py` binds `0.0.0.0`, not the required ordinary-local `127.0.0.1`; the loopback requirement is not currently satisfied.  
+    
+* The module invocation does not explicitly bind `debug=False`, `use_debugger=False`, or `use_reloader=False`; explicit capture controls remain required.  
+    
+* The selected factory contains no explicit CORS binding or test-backed disabled-CORS declaration; the disabled posture remains a requirement.  
+    
+* The Reader handler treats missing `APP_ENV` as dev; that behavior does not satisfy the explicit caller-supplied `APP_ENV=dev` requirement.  
+    
+* `docs/ENDPOINTS_CATALOG.json` includes the Reader `GET`/`HEAD` rows and `POST /internal/dev/sampler`, but it does not express the complete current PF05-Canon-HDE-CLI-API-Vendor-Ref and PF12-Canon-HDE-Schemas-and-Artifacts route-and-alias projection. Catalog conformance is not claimed.  
+    
+* `.devcontainer/devcontainer.json` supplies `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler` for the Codespaces container. This statically confirms that one Codespaces binding only; other shared environments must use their own infrastructure-provided value.
 
 # 35\) Runbooks (Operations)
 
@@ -5694,8 +5721,8 @@ Definition. An Ops task is any work item that requires privileged access to syst
 
 Execution authority (hard).
 
-* Ops tasks MUST be executed by the PO (human operator) only.
-
+* Ops tasks MUST be executed by the PO (human operator) only.  
+    
 * Automated agents MUST NOT attempt to perform Ops tasks, MUST NOT claim completion, and MUST NOT simulate external state changes.
 
 IA facilitation posture (required). When Ops tasks are part of an epic, they are facilitated by the Implementation Agent (IA). The IA MUST specify intent, constraints, verification, and evidence requirements in a what-not-how manner, then work directly with the PO during execution.
@@ -5719,30 +5746,30 @@ Not a PR (required). Ops tasks are not Codex PRs. Any implementation or remediat
 
 Ops task record format (what-not-how; required fields). Every Ops task record MUST include:
 
-* Task ID (stable, referenced consistently)
-
-* Owner: PO
-
-* Facilitator: IA
-
-* Target system/service (name only, no secrets)
-
-* Intent / desired end state (what changes, and what “done” looks like)
-
-* Constraints / safety rails (what must remain true while executing)
-
-* Success criteria (observable outcomes, not assumptions)
-
-* Evidence to capture (what artifact(s) will prove the change, and where stored)
-
-* Rollback intent (what “revert” means at a high level)
-
+* Task ID (stable, referenced consistently)  
+    
+* Owner: PO  
+    
+* Facilitator: IA  
+    
+* Target system/service (name only, no secrets)  
+    
+* Intent / desired end state (what changes, and what “done” looks like)  
+    
+* Constraints / safety rails (what must remain true while executing)  
+    
+* Success criteria (observable outcomes, not assumptions)  
+    
+* Evidence to capture (what artifact(s) will prove the change, and where stored)  
+    
+* Rollback intent (what “revert” means at a high level)  
+    
 * Secret handling note (explicitly: no plaintext secrets in docs or evidence)
 
 Evidence posture (required). Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase path such as:
 
-* audit/ops/\<epic-id\>/\<PATH\> for Ops execution evidence
-
+* audit/ops/\<epic-id\>/\<PATH\> for Ops execution evidence  
+    
 * audit/qa/\<epic-id\>/\<PATH\> when the evidence is part of QA execution
 
 Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence MUST be presence-only, redacted, or hashed, while still being sufficient to verify the intended state.
@@ -5758,6 +5785,8 @@ Clarification. If a change is fully achievable as code (including tests and dete
 Dashboards for Reader, Compat, Narrative Router, and Server Cache latencies, error rates, hit/miss, and rate-limits. Actionable alerts for error spikes and budget breaches.
 
 Notes: include A7 headers health and cache hit ratio panels.
+
+---
 
 ---
 
