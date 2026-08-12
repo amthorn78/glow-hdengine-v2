@@ -6,10 +6,10 @@
 
 **Status:** Canon
 
-**Version:** v2.9.4  
+**Version:** v2.9.5  
 **Effective date:** 2026-08-12
 
-**Last Update Gate:** 0808 refresh 4
+**Last Update Gate:** 0808 refresh 5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5652,197 +5652,123 @@ This interpretation does not apply when a relied-on artifact is missing, the Hum
 * When equivalence or substitution is used instead of an independently exercised runtime, the approval artifact or governing plan MUST state the closure mode explicitly before the governed evidence family is rewritten.  
 * If the approved task is only to normalize documentation or evidence posture for a bounded slice, review MUST stay bounded to that task. Full epic closure is not a blocker unless the approved task explicitly claims full closure.
 
-# 10\. Templates & harnesses (to be filled; titles-only anchors)
+# 10\. QA checklists, harnesses, and review rules
 
-This section names the standard QA templates and harnesses. Concrete formats, scripts, and CI wiring live in PF09 — HDE-Build Checklist and PF12 — HDE-Schemas & Artifacts (titles-only).
+PF19 is the canonical home for the QA checklists, QA harness requirements, evidence-quality and failure-classification rules, exact later-drain QA vocabulary, and QA review semantics in this section. `PF27-Canon-Plan-Templates` owns reusable structure for its declared plan, runbook, review, and closeout classes. `PF06-Canon-Epic-Process-Guide` owns process sequencing, `Remediation Task Plan` structure, and its declared PR review-pack structures. `PF12-Canon-HDE-Schemas-and-Artifacts` owns governed schemas, catalogs, artifact paths, canonical bytes, and evidence-refresh mechanics. This section states only the PF19-owned QA rule or the minimum applicability boundary needed to route safely; it does not reproduce owner-controlled template or schema contracts.
 
-## **10.1 Pre-commit checklist (CI job stub)**
+## 10.1 Pre-commit QA checklist
 
-Anchor: “Pre-commit QA checklist (PF09 CI stub)”.
+Anchor: “Pre-commit QA checklist”.
 
-Purpose. A copyable block that teams can drop into their CI config to enforce:
+Purpose. A reusable checklist that teams can apply to CI configuration to enforce:
 
-* lint \+ format
-
-* JSON/JSONL canonicalization and final-LF checks
-
-* deterministic, no-I/O tests
-
+* lint \+ format  
+    
+* JSON/JSONL canonicalization and final-LF checks  
+    
+* deterministic, no-I/O tests  
+    
 * snapshot hygiene and env pins
 
-Notes. PF19 defines the required items; PF09 provides the actual CI job template and examples.
+Notes. PF19 defines the required QA items. The applicable phased PF09 document controls phase scope, `PF12-Canon-HDE-Schemas-and-Artifacts` controls governed evidence formats, and checked-in CI is the source for current implementation reality.
 
-## **10.2 Post-commit capture checklist (headers \+ index)**
+## 10.2 Post-commit evidence-capture checklist
 
-Anchor: “Post-commit evidence capture checklist”.
+Anchor: “Post-commit evidence-capture checklist”.
 
 Purpose. A step-by-step recipe to:
 
-* capture headers/body snapshots (Text, Suppressed, A7 surfaces)
-
-* generate composite proof JSON (when A7 is in scope)
-
+* capture headers/body snapshots (Text, Suppressed, A7 surfaces)  
+    
+* generate composite proof JSON (when A7 is in scope)  
+    
 * update docs/evidence/INDEX.json \+ .sha256 and artifacts/evidence\_index.jsonl in the same PR
 
-Governed roots only. All indexed artifacts MUST live under a governed evidence root declared in the Evidence Catalog (HDE Schemas & Artifacts, titles-only). Transient/generator paths are forbidden as sources for indexed evidence.
+Governed roots only. All indexed artifacts MUST live under a governed evidence root declared by `PF12-Canon-HDE-Schemas-and-Artifacts`. Transient/generator paths are forbidden as sources for indexed evidence.
 
 Header normalization. Normalize header names to lower-case before persisting governed snapshots.
 
 For each new or changed governed artifact under a governed evidence root, the capture workflow MUST:
 
-* create or update a co-located \<artifact\>.path\_proof.txt file, and
-
+* create or update a co-located \<artifact\>.path\_proof.txt file, and  
+    
 * ensure there is exactly one Mirror record whose proof\_anchor points at that path\_proof.txt
 
 Treat “artifact present but no path\_proof” and “path\_proof present but no Mirror record” as QA failures, not as minor hygiene issues.
 
 For lifecycle and OPS-managed artifacts (for example backup/restore probes), confirm that the associated evidence changes (artifact \+ path\_proof \+ Mirror) land in the same PR as the code or configuration change they support.
 
-## **10.3 Validated-tuple QA harness (Aux & CLI parity)**
+`PF12-Canon-HDE-Schemas-and-Artifacts` controls the schemas, governed roots, canonical Index and Mirror bytes, path-proof contracts, and refresh mechanics used by this checklist.
 
-Anchor: “Validated-tuple QA harness for Aux & CLI parity”.
+## 10.3 Validated-tuple QA harness for Aux and CLI parity
+
+Anchor: “Validated-tuple QA harness for Aux and CLI parity”.
 
 Purpose. A small, repeatable harness that:
 
-* takes fixed test tuples as inputs
-
-* sets env pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`)
-
-* invokes the shared emitter path used by HTTP and CLI (no alternate serializers)
-
-* calls Aux via BE/CLI and writes snapshots under tests/transport/headers/:
-
-  * aux\_text\_200.snap
-
+* takes fixed test tuples as inputs  
+    
+* sets env pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`)  
+    
+* invokes the shared emitter path used by HTTP and CLI (no alternate serializers)  
+    
+* calls Aux via BE/CLI and writes snapshots under tests/transport/headers/:  
+    
+  * aux\_text\_200.snap  
+      
   * aux\_suppression\_200.snap
 
 Notes. Runs without env-gates; the CLI preview is always available and calls the same emitter as Aux. Parity artifacts are indexed in the same PR.
 
-## **10.4 A7 proof capture recipe**
+## 10.4 A7 proof-capture recipe
 
-Anchor: “A7 proof capture recipe (Catalog /reader)”.
+Anchor: “A7 proof-capture recipe (Catalog /reader)”.
 
 Purpose. A reusable recipe that:
 
-* captures GET/HEAD/304 headers for the Catalog JSON success route
-
-* verifies strong quoted ETag, Vary, and encoding invariance
-
-* captures env-gate proof (non-prod entries unreachable in prod)
-
-* builds and validates composite A7 proof JSON against PF12 schema
+* captures GET/HEAD/304 headers for the Catalog JSON success route  
+    
+* verifies strong quoted ETag, Vary, and encoding invariance  
+    
+* captures env-gate proof (non-prod entries unreachable in prod)  
+    
+* builds and validates composite A7 proof JSON against the schema owned by `PF12-Canon-HDE-Schemas-and-Artifacts`
 
 Preconditions (merge gate). Before capturing any A7 proofs, the harness must:
 
-* verify that docs/ENDPOINTS\_CATALOG.json exists and that the Reader JSON success route is present and marked as a Catalog JSON surface, and
-
+* verify that docs/ENDPOINTS\_CATALOG.json exists and that the Reader JSON success route is present and marked as a Catalog JSON surface, and  
+    
 * abort with a clear QA failure if the Catalog entry is missing or invalid (no partial A7 runs)
 
 After capturing proofs, the harness must:
 
-* update docs/evidence/INDEX.json \+ .sha256 and artifacts/evidence\_index.jsonl in the same PR, and
-
+* update docs/evidence/INDEX.json \+ .sha256 and artifacts/evidence\_index.jsonl in the same PR, and  
+    
 * run the mirror quick-check (§10.5)
 
 Failure to index or mirror any A7 artifact means the A7 gate is not satisfied, and no A7 tokens may be claimed for that PR.
 
-## **10.5 Mirror schema quick-check**
-
-### **Remediation Implementation Guides (DEV/OPS-only; verification embedded)**
-
-This section defines the required posture and schema for Remediation Implementation Guides. It does not change Live QA plan formats.
-
-#### **Scope (normative)**
-
-A Remediation Implementation Guide is an execution guide for implementing and verifying remediation work. It is DEV/OPS-only and must not introduce additional step lanes.
-
-#### **Permitted step types (only)**
-
-A Remediation Implementation Guide MUST use only two step types: DEV and OPS.
-
-No other step types are permitted (no QA, DOC, REVIEW, or verification-only steps).
-
-#### **Verification embedding requirement (normative)**
-
-All verification MUST be embedded inside the owning DEV or OPS step.
-
-Verification must reference the exact governed evidence outputs produced by that step (paths and filenames specified in the step).
-
-#### **OPS posture linkage (normative)**
-
-OPS steps MUST follow the Ops execution posture: PO-only execution, IA-guided, secret-free evidence, lowercase audit paths (see the Ops tasks rule under §11.1).
-
-#### **Strict lane separation (normative)**
-
-* A step labeled DEV MUST contain only DEV actions.  
-* A step labeled OPS MUST contain only OPS actions.  
-* If a step depends on outputs produced by a prior step in the other lane, the dependent step MUST declare its dependency explicitly using the dependency-line rule below.
-
-#### **Canonical schema requirements (template rules)**
-
-Step Overview (mandatory). The guide MUST include a Step Overview table that lists, at minimum:
-
-* Step ID  
-* Step name  
-* Step type (DEV or OPS)  
-* Owner/role  
-* Depends on  
-* Cross-lane dependency (Yes/No)  
-* Outputs (governed artifact paths)
-
-Step Details schema (mandatory). Each step MUST include a Step Details block with, at minimum:
-
-* Step ID  
-* Step name  
-* Step type (DEV or OPS)  
-* Step intent (short; what the step accomplishes)  
-* Constraints / rails (what must remain true while executing)  
-* Actions (what-not-how; include exact commands only when required)  
-* Verification (embedded; mechanical checks and PASS condition)  
-* Evidence outputs (exact paths and filenames; secret-free)  
-* In-flight determinations (optional; only if new ADRs or decisions are required)
-
-#### **Dependency-line rule (locked; required modification)**
-
-If a step depends on outputs produced by a prior step in the other lane, the dependent step MUST include exactly one cross-lane dependency line in this exact form: `Inputs needed from Step S<N> during implementation: <exact items>`.
-
-Rules for this line:
-
-* S\<N\> MUST be the actual producing step ID (no placeholders such as Sx).  
-* The line MUST appear exactly once in the dependent step.  
-* The line MUST NOT be duplicated, nested, or prefixed by a placeholder field label.  
-* The \<exact items\> MUST name concrete artifacts or values produced by the referenced step (paths preferred), not vague phrases.
-
-PF docs consulted and ADRs. A remediation guide SHOULD include:
-
-* a short PF Docs Consulted list (titles-only), and  
-* an ADRs Requiring Approval list for any canon decisions or external task creation required by the remediation.
-
-#### **ADR discipline (normative; no restate / no drift)**
-
-When a remediation guide includes an ADRs Requiring Approval list:
-
-* Each ADR MUST be a canon-resolution instruction and MUST include explicit drain targets (which PF canon doc(s) will be updated).  
-* ADRs MUST NOT be created to restate topics already canonized in PF10 — HDE Build Notes (or other PF canon).  
-* ADRs MUST NOT cite PF20 — HDE Phased Epics to define/justify evidence surfaces, acceptance tokens, QA log/schema requirements, plan template structure, or canon superseding rules.  
-* PF20 — HDE Phased Epics is a tracking ledger (scope/status/history) only; it is not an implementation/remediation planning authority.
-
-### **Machine mirror schema quick-check**
+## 10.5 Machine Mirror schema quick-check
 
 Anchor: Machine mirror schema quick-check.
 
 Purpose. A small tool or CI step that:
 
 * loads `artifacts/evidence_index.jsonl`  
+    
 * verifies:  
+    
   * sorted keys and pinned field order  
+      
   * exactly one LF per record  
+      
   * canonical JSONL form  
+      
   * rejection of unknown keys
 
-Notes. PF19 names the required checks. The mirror record schema and field-order rules are defined in HDE-Schemas & Artifacts (titles-only). The repo provides the quick-check implementation.
+Notes. PF19 names the required QA checks. `PF12-Canon-HDE-Schemas-and-Artifacts` defines the Mirror record schema and field-order rules. The repository provides the quick-check implementation.
 
-#### **Invocation rule (normative; operator-facing)**
+### Invocation rule (normative; operator-facing)
 
 In the engine repo, `ci/checks/check_mirror_schema.sh` is a Python entrypoint at a legacy stable path and begins with a Python shebang. The `.sh` suffix identifies the retained path; it does not declare the interpreter.
 
@@ -5858,63 +5784,33 @@ A Python harness SHOULD use its active interpreter explicitly, equivalent to:
 
 * `[sys.executable, "ci/checks/check_mirror_schema.sh"]`
 
-The validator reads the fixed repository-relative input `artifacts/evidence_index.jsonl`. It does not accept a caller-selected mirror path. New plans, harnesses, and operator instructions MUST omit the unused `artifacts/evidence_index.jsonl` operand.
+The validator reads the fixed repository-relative input `artifacts/evidence_index.jsonl`. It does not accept a caller-selected Mirror path. New plans, harnesses, and operator instructions MUST omit the unused `artifacts/evidence_index.jsonl` operand.
 
 The following invocations are invalid:
 
 * `bash ci/checks/check_mirror_schema.sh`  
+    
 * `sh ci/checks/check_mirror_schema.sh`
 
-Shell-parser output from an invalid shell invocation is an invocation defect, not a Machine Mirror schema finding. A missing-mirror result obtained outside the repository root is a locus defect until the supported command is evaluated from the repository root. Either defect may be normalized by rerunning the supported invocation from the correct locus. Only the supported invocation’s exit status and validator output may establish the Mirror-schema result.
+Shell-parser output from an invalid shell invocation is an invocation defect, not a Machine Mirror schema finding. A missing-Mirror result obtained outside the repository root is a locus defect until the supported command is evaluated from the repository root. Either defect may be normalized by rerunning the supported invocation from the correct locus. Only the supported invocation’s exit status and validator output may establish the Mirror-schema result.
 
 Plans and governed evidence MUST preserve the command actually executed and MUST NOT rewrite a shell-parser failure as validator behavior.
 
+`PF12-Canon-HDE-Schemas-and-Artifacts` \> `Refresh sequence (normative)` currently shows `ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`. That operand form does not match the checked-in fixed-input implementation or the current CI call sites and MUST NOT be copied into PF19. This is an out-of-section PF12 documentation discrepancy; this rule does not claim that PF12 has been corrected.
+
 Any future migration to a `.py` path is an intentional compatibility change. It must update active CI, sanity orchestration, QA harnesses, tests, operator documentation, and current canon references; preserve historical evidence and command transcripts; and preserve both supported legacy call shapes until explicit-Python callers have been drained. No suffix-only cleanup or partial caller migration is authorized by this rule.
 
-### **Remediation Task Plans (DEV PRs \+ OPS tasks only)**
+## 10.6 Remediation QA evidence and review rules
 
-This section defines the canonical structure and approval rails for remediation task plans. It applies to remediation work that includes DEV PRs and/or OPS tasks.
+### Artifact and owner boundaries
 
-#### **Task model (normative; only two types)**
+`PF27-Canon-Plan-Templates` \> `4) Remediation Implementation Guide (Template)` is the single reusable template home for a `Remediation Implementation Guide`. `PF06-Canon-Epic-Process-Guide` Appendix B retains only the process purpose and scope. PF19 retains QA evidence quality, failure classification, review semantics, and QA standard playbooks that are not template shape. A `Remediation Implementation Guide` is not a `Remediation Task Plan` and is not an `Epic Remediation Plan`.
 
-A remediation task plan MUST contain only two task types:
+`PF06-Canon-Epic-Process-Guide` \> `Appendix C — Remediation Task Plans (DEV PRs + OPS tasks)`, including `Canonical Remediation Task Plan Template (paste-ready)`, is the canonical structure and approval-gate home for the distinct `Remediation Task Plan` artifact. PF06 controls its PR and OPS task model, `DISCOVERY` and `CHANGE` intent, cross-lane dependency line, execution-ready and approval gates, required outputs and verification, OPS authorization and evidence capture, in-flight command posture, mechanical blockers, remediation-only planning boundary, portability and provenance fields, and paste-ready fields. A `Remediation Task Plan` is not an alias, rename, or subtype of either PF27 remediation artifact.
 
-* DEV tasks are PRs only and MUST be enumerated as PR-01, PR-02, and later PR tasks (no mixed-task steps).  
-* OPS tasks are PO-run procedures only and MUST be enumerated as OPS-01, OPS-02, and later OPS tasks (no mixed-task steps).  
-* Discovery is allowed but MUST be explicit per task as DISCOVERY vs CHANGE.
+`PF12-Canon-HDE-Schemas-and-Artifacts` controls governed evidence schemas, paths, canonical Index and Mirror bytes, path-proof contracts, and refresh mechanics. The applicable `PF27-Canon-Plan-Templates` or PF06 artifact class controls reusable review structure, wrapper guards, and an `ASK OK?` submission sentinel where its template requires one. PF19 does not reproduce those owner-controlled contracts. PF19 QA requires that missing, incoherent, stale, or misbound governed evidence cannot support the claimed result.
 
-#### **Cross-lane dependencies (normative; exact line)**
-
-Cross-lane dependencies MUST be explicitly declared in the dependent task using the exact line: `Inputs needed from Task <ID> during implementation: <exact items>`.
-
-Rules:
-
-* \<ID\> MUST be the actual producing task ID (no placeholders such as Sx, TBD, or to be determined).  
-* Placeholders in this dependency line are a mechanical blocker.  
-* \<exact items\> MUST name concrete artifacts/values produced by the referenced task (paths preferred).
-
-#### **Approval gate scope (tight; normative)**
-
-* any “unsafe” byte-production must already be conformed in CI
-
-* correct sequencing and explicit cross-lane dependencies
-
-* concrete deliverables (directory segments must be lowercase; filenames may be mixed case unless a specific rule forbids it)
-
-* the explicit “done means” clause for each task
-
-Detailed command lines and step-by-step failure handling are not required as plan-approval conditions. They MAY be developed in flight during execution, using repo reality and operator judgment, as long as the evidence posture remains intact.
-
-#### **Evidence posture remains non-negotiable (normative)**
-
-Even when commands/failure handling are developed in flight, OPS execution MUST still capture:
-
-* the exact commands actually run (verbatim)  
-* stdout/stderr plus exit code (or equivalent output)  
-* the produced artifacts at the declared output paths  
-* deviation notes needed to explain why a different command/flag was used
-
-This evidence MUST land under `audit/qa/<epic-id>/<EPIC_QA_SUBPATH>` (lowercase) with explicit filenames sufficient for later audit.
+### Evidence-package caveats and failure history
 
 Evidence-package caveat handling is as follows.
 
@@ -5923,151 +5819,159 @@ Uploaded deliverables packages, zipped check logs, generated archives, copied pa
 A package caveat may be non-blocking only when all of the following are true:
 
 * the caveat is recorded by PF10, the closeout review, or the QA RCA;  
+    
 * current repo evidence supplies the same proof target under governed roots;  
+    
 * the current repo evidence is readable and non-empty;  
+    
 * the current repo evidence is tied to the same QA event, check ID, proof target, or closeout step;  
+    
 * required path-proof, index, mirror, hash-sentinel, or manifest coverage remains coherent where applicable;  
+    
 * the closeout review names the package caveat and the alternate governed repo proof.
 
 If any of those conditions is false, classify the package issue as an evidence-integrity defect, `TOOLING_BLOCKED`, or unresolved closeout evidence gap according to the actual defect.
 
 When a failed QA check is later accepted through remediation or rerun evidence, the original failed primary log or failure record must remain visible as failure context unless it is genuinely unavailable. The final PASS basis must name the accepted remediation or rerun evidence and must not relabel the original failure as if it never occurred.
 
-In-flight command flexibility does not permit:
+### EPIC022 remediation evidence patterns
 
-* changing governed artifact locations or filenames  
-* introducing new governed files without an explicit statement of indexing/mirror intent  
-* indexing remediation-only diagnostics into governed indices/mirror
-
-  #### **Mechanical blockers (auto-reject if present anywhere in the plan)**
-
-* Any PR-xx task missing (a) explicit verification, or (b) explicit evidence outputs.
-
-* Any OPS-xx task missing (a) explicit verification, or (b) explicit evidence outputs.
-
-* Any deliverable specified only as a directory (must be a concrete file path including filename; directory segments must be lowercase, for example `audit/qa/<epic-id>/<task-id>/<filename>`).
-
-* Any plan that introduces a new document type without naming the PF doc that authorizes it.
-
-* Any plan that repeats old canon (restates PF19 or PF10) instead of pointing.
-
-#### **Remediation-only artifacts vs governed surfaces (normative)**
-
-Remediation-only diagnostics/manifests MUST NOT be introduced under governed artifact surfaces unless explicitly framed as an ADR-worthy governance change. Default posture: remediation-only artifacts live under remediation audit paths (for example `audit/qa/<epic-id>/remediation/<REMEDIATION_SUBPATH>`) and do not enter governed evidence indices/mirror.
-
-#### **EPIC022 remediation patterns (default posture; names-only)**
+These patterns are retained as PF19 QA playbook content rather than as the `Remediation Task Plan` template identity. They do not rename a PF06 task, invent current repository loci, or claim that an EPIC022 example is current implementation truth.
 
 The following patterns are the default posture for remediation task plans unless a plan explicitly states why a different pattern is required.
 
 PR-01 (DISCOVERY-only) discovery report posture (copy/paste safety):
 
 * PR-01 deliverable is exactly one discovery report file under `audit/qa/<epic-id>/remediation/<REMEDIATION_SUBPATH>`, with no code/test/script changes.  
+    
 * If the report includes Evidence Index/Mirror update commands, the default copy/paste command MUST NOT include an epic-id flag from another epic.  
+    
 * If the evidence tooling supports an \--epic-id flag, treat it as optional and non-default in the report. If included at all, it must match the current epic and must be clearly labeled as optional.  
+    
 * If a placement decision is not yet enforced by tests (example: request-chain manifest placement), the discovery report MUST mark the location as TBD and constrain options to the smallest set that matches observed governed placement patterns and enforcing tests. Do not present an unverified fits at \<path\> as settled.
 
 OPS-01 host reachability probe (read-only discovery; evidence bundle):
 
 * When an OPS task selects a single prod host/base\_url for follow-on runtime probes, the OPS evidence bundle SHOULD include:  
+    
   * a host reachability matrix file and explicit selection outputs (for example host\_matrix.md, selected\_base\_url.txt, selected\_host\_label.txt)  
+      
   * a raw headers capture file that includes the HTTP status line and at least one header line (for example headers\_raw\_SELECTED.txt)  
+      
   * a stderr capture for the HTTP tool (for example curl\_stderr\_SELECTED.txt)  
+      
   * a structured headers sample in JSON with lower-case header keys and required keys status\_line and headers (for example headers\_internal\_version\_sample.json)
 
 Evidence quality note (portability):
 
 * Artifacts MUST be file bytes written by commands. Avoid copy/paste noise.  
+    
 * If a table or excerpt contains terminal control sequences, treat it as a portability risk. Regenerate the artifact so the on-disk file is plain text.
 
 OPS-02 runtime bundle capture (open rails; portable snapshot):
 
 * When an OPS task runs a runtime probe and copies a governed artifact family into an audit bundle for portability, the bundle SHOULD include:  
+    
   * a command transcript split into files (for example run\_command.txt, run\_stdout.txt, run\_exit\_status.txt)  
+      
   * an expected-vs-actual artifact inventory (for example expected\_artifact\_files.txt and file\_list\_actual.txt)  
+      
   * a remediation-only snapshot manifest that enumerates sha256 and size for each copied file (for example remediation\_only/manifest\_snapshot.json and remediation\_only/manifest\_snapshot.json.sha256)  
-  * any newly introduced governed artifacts plus their sibling path proofs when copied (for example request\_chain\_manifest.json and request\_chain\_manifest.json.path\_proof.txt when present in the governed family)  
+      
+  * any newly introduced governed artifacts plus their sibling path proofs when copied (for example request\_chain\_manifest.json and request\_chain\_manifest.json.path\_proof.txt when present in the governed family)
+
+
 * If a plan claims checksum validated for a produced .sha256 file, the OPS evidence bundle SHOULD include the verification command output as evidence (do not rely on a prose assertion).
 
 PR-03 Index/Mirror regeneration (integration summary \+ exclusion check):
 
 * Any PR that regenerates governed Index/Mirror/proofs SHOULD include an integration summary artifact under the epic remediation QA tree that records:  
+    
   * the exact regeneration and validation commands executed under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0` plus env pins), and  
+      
   * an explicit inclusion check for any new required evidence family entries (for example request-chain manifest mirrored with a valid proof\_anchor), and  
-  * an explicit exclusion check that remediation-only bundle paths are not indexed (for example no matches for a remediation-only subtree across `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`).  
+      
+  * an explicit exclusion check that remediation-only bundle paths are not indexed (for example no matches for a remediation-only subtree across `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`).
+
+
 * Broad path-proof refresh touching other indexed artifacts is non-blocking when it is the natural outcome of running the canonical full regeneration.
 
-#### **Exact filenames rule for Evidence Index \+ path proofs (plans touching governed indices)**
+When the approved work touches governed Index or Mirror evidence, use `PF12-Canon-HDE-Schemas-and-Artifacts` \> `Refresh sequence (normative)` for the complete output, path-proof, and refresh contract, and apply the no-operand Mirror invocation in `10.5`. Do not substitute a copied PF19 roster for the PF12 contract.
 
-Any remediation plan that includes tasks touching governed evidence indices/mirrors MUST explicitly name the exact index \+ path-proof filenames as task outputs and as embedded verification checks (inside OPS/DEV tasks, not as standalone verification-only tasks).
+### Retrieval-first and negative-proof review
 
-Canonical placement is co-located sibling path proofs: `<file>.path_proof.txt` MUST sit next to `<file>` and MUST NOT be placed in an alternate directory (for example docs/evidence/path\_proofs/\<SUBPATH\> is non-canon).
+AI reviewers of QA plans, Live QA reviews, QA closeout analysis, remediation guides, repo audits, and related QA review artifacts MUST use a retrieval-first, proof-first workflow: use PF10 first where it explicitly speaks; read the current artifact end-to-end; consult the owning PF canon home for each specific issue; and prove repo-reality claims before asserting paths, commands, routes, environment variables, test IDs, artifact paths, or component homes. When repo reality matters, use exact-string search before broader search, and keep unproven loci as `UNKNOWN` or `BLOCKED` rather than guessing. Findings MUST distinguish canon requirement, observed repo reality, and inference, and MUST anchor to verbatim source text plus controlling proof.
 
-Canonical quick reference (must be used verbatim in plans where applicable):
+When a QA review, repo audit, PF23 consult, or closeout check proves that a searched-for blocker, path, route, token, command, artifact, or contradiction is absent, that negative result is still proof if it is mechanically captured with source, search term, scope, and visible neighboring context. Reviewers MUST NOT trigger a rerun, fallback audit, or blocker solely because the proof is negative. If the negative proof is incomplete, ambiguous, or not mechanically captured, classify the issue as insufficient proof or `TOOLING_BLOCKED`, not as a behavior failure.
 
-Evidence index (human-readable):
+## 10.7 Later-drain QA semantics
 
-* docs/evidence/INDEX.json  
-* docs/evidence/INDEX.sha256  
-* docs/evidence/INDEX.json.path\_proof.txt  
-* docs/evidence/INDEX.sha256.path\_proof.txt
+PF19 governs the exact later-drain QA vocabulary and the evidence-sufficiency, failure-classification, and nonclaim semantics for a later-drain recommendation. `PF27-Canon-Plan-Templates` governs reusable field placement for its declared plan, review, and closeout classes. `PF06-Canon-Epic-Process-Guide` governs reusable field placement for its declared PR review-pack classes. Use the complete owner block where that class already has one and normalize its QA vocabulary to the exact PF19 values. Until the declared owner contains a complete destination, retain the missing field coverage here as an explicitly transitional compatibility rule. A later-drain recommendation does not perform a PF-canon update, move PF09 status, establish QA PASS, close an epic, or make documentation drainage a gate for the approved work.
 
-Evidence index mirror (machine-readable):
+A later-drain statement applies only when a covered approval artifact is intentionally being used to support a later PF-canon drain. It does not move the drain earlier or make drainage an implementation, approval, QA, OPS, merge, completion, or closeout prerequisite. Approval artifacts MUST NOT stop at vague language such as accepted, complete, merge-ready, approved, or no further remediation needed when the practical intent is to support a later PF-canon update.
 
-* artifacts/evidence\_index.jsonl  
-* artifacts/evidence\_index.jsonl.path\_proof.txt
+### Artifact-class routing
 
-Evidence Index Refresh Flow reference lock (normative):
+| Covered artifact class | Durable field-placement owner | PF19 treatment |
+| :---- | :---- | :---- |
+| PF06 PR final review pack | `PF06-Canon-Epic-Process-Guide` `4.6 PR review pack template — provenance, diff review, RCA, and pass proof` | Use the owner’s complete field family, but normalize the two divergent value families to the exact PF19 vocabulary below. |
+| PF06 docs-only PR final review pack | `PF06-Canon-Epic-Process-Guide` `4.7 PR review pack template — docs-only PR (Lead Dev gate)` | Retain only the missing fields as transitional compatibility coverage when the review intentionally supports later drain. |
+| PR remediation acceptance review | `PF27-Canon-Plan-Templates` `5) Remediation Review Record (Template; REVIEW mode only)` | Use the complete owner block. Retain PF19 vocabulary, evidence sufficiency, and failure/nonclaim semantics without duplicating the fields. |
+| Epic closure or final close-pack review | `PF27-Canon-Plan-Templates` `10) Epic Closure Review + Retrospective (Template; REVIEW mode only)` | Use the complete owner block. Retain PF19 evidence-sufficiency and no-overclaim semantics without duplicating the fields. |
+| OPS task final review | `PF27-Canon-Plan-Templates` `11) Ops Task Final Review Record (Template; REVIEW mode only)` | Use the complete owner block. Apply PF19 interpretation only when QA evidence is in scope. |
+| `Implementation Closeout Report` | `PF27-Canon-Plan-Templates` `7) Implementation Closeout Report (Template; REVIEW mode only)` | Retain only the missing fields as transitional compatibility coverage until the owner contains a complete destination. |
+| `QA Pass Review Record` | `PF27-Canon-Plan-Templates` `8) QA Pass Review Record (Template; REVIEW mode only)` | Retain only the missing fields as transitional compatibility coverage when the review is intended to feed later drain. |
+| `Final QA Closeout Review + QA RCA` | `PF27-Canon-Plan-Templates` `9) Final QA Closeout Review + QA RCA (Template; REVIEW mode only)` | Retain only the missing fields as transitional compatibility coverage when later drain is intended. |
+| Implementation-plan or QA-plan approval artifact | Its applicable PF27 plan template and `Review guardrails` | Preserve the missing current-posture, readiness, and epic-close-expectation fields as transitional compatibility coverage; drainage remains non-gating. |
 
-* Plans/remediations that invoke or reference the Evidence Index Refresh Flow MUST cite HDE-Schemas & Artifacts — Refresh sequence (normative) (titles-only) and MUST NOT cite non-verifiable PF12 section numbers for this topic.  
-* The plan MUST explicitly bind the refresh outputs (do not hand-wave): docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, and all governed \<artifact\>.path\_proof.txt transcripts regenerated by the refresh tooling run (including Index/Mirror path proofs when applicable).
+A general PR final or remediation review without a declared artifact identity MUST first be classified to the exact PF06 or PF27 type that matches its purpose. Do not apply one generic PF19 form across unlike review classes. An `Epic Remediation Plan` or another PF27 artifact not named above has no automatic `10.7` applicability; its intentional later-drain purpose and exact template applicability must be explicit.
 
-Canonical invocations (plans MUST call out explicitly):
+### Exact PF19 QA vocabulary and semantics
 
-* Regeneration: `python tools/evidence/update_evidence_index.py` (write mode).  
-* Validation-only: `python tools/evidence/update_evidence_index.py --check`.  
-* Mirror schema check (when applicable): `python ci/checks/check_mirror_schema.sh` (not bash).
+`Supported later-drain action` MUST use exactly one of:
 
-Plans MUST treat path-proof artifacts as first-class deliverables: if a task edits an index/mirror file, the sibling .path\_proof.txt update is part of the same task’s outputs \+ verification.
+* `change to Done`  
+* `change to Partial`  
+* `change to Not done`  
+* `change to Consolidation pending`  
+* `change to Optional`  
+* `No status change recommended`
 
-QA plan review posture. Live QA plan reviews, QA plan reviews, remediation-guide reviews, closeout reviews, and related QA review artifacts MUST treat markdown-only wrappers as non-blocking when the same required field, content, ordering, adjacency, and meaning remain intact and no executable command, code, schema, JSON, token spelling, path string, endpoint string, or other machine-sensitive content is changed. Reviewers MAY record styling cleanup as a nit, but MUST NOT block approval on wrapper styling alone.
+`Drain readiness classification` MUST use exactly one of:
 
-Approval-submission sentinel. Approval-submitted QA plans, Live QA plans, remediation plans, and related plan-form artifacts MUST include `ASK OK?` as the approval-submission sentinel. Its presence is required and non-blocking by default; reviewers MUST NOT treat it as stray text, noise, or a blocker merely because it appears. Missing the required sentinel remains a valid approval blocker. The in-plan `ASK OK?` sentinel is distinct from a reviewer’s final decision line such as `ASK OK`.
+* `Supportable from repo evidence`  
+* `Not yet supportable from repo evidence`  
+* `Already drained into PF-canon`
 
-Retrieval-first QA review. AI reviewers of QA plans, Live QA reviews, QA closeout analysis, remediation guides, repo audits, and related QA review artifacts MUST use a retrieval-first, proof-first workflow: use PF10 first where it explicitly speaks; read the current artifact end-to-end; consult the owning PF canon home for each specific issue; and prove repo-reality claims before asserting paths, commands, routes, environment variables, test IDs, artifact paths, or component homes. When repo reality matters, use exact-string search before broader search, and keep unproven loci as `UNKNOWN` or `BLOCKED` rather than guessing. Findings MUST distinguish canon requirement, observed repo reality, and inference, and MUST anchor to verbatim source text plus controlling proof.
+`Epic-close expectation` MUST use exactly one of:
 
-Negative audit proof posture. When a QA review, repo audit, PF23 consult, or closeout check proves that a searched-for blocker, path, route, token, command, artifact, or contradiction is absent, that negative result is still proof if it is mechanically captured with source, search term, scope, and visible neighboring context. Reviewers MUST NOT trigger a rerun, fallback audit, or blocker solely because the proof is negative. If the negative proof is incomplete, ambiguous, or not mechanically captured, classify the issue as insufficient proof or `TOOLING_BLOCKED`, not as a behavior failure.
+* `at epic close`  
+* `after an additional PR or OPS slice`  
+* `after a separate canon-only drain step`
 
-#### **Portability vs provenance for non-PF evidence (normative)**
+`Supportable from repo evidence` is a recommendation posture, not a PF09 status change, edited PF document, board transition, token PASS, QA PASS, epic closure, completed PF10 drain, or Product Owner action. `Already drained into PF-canon` is valid only when the exact current canon bytes establish that the drain occurred. An epic-close expectation is a timing recommendation, not an accomplished close or drain.
 
-When a non-PF observation drives a branching decision or supports a claim in a remediation plan, the plan MUST state:
+PF06 §4.6 currently uses `Already drained into PF-Canon`, `Supportable from repo evidence only`, and `drain at epic close` as near-match variants. Those spellings are not additional allowed values. This is an out-of-section PF06 documentation discrepancy; this rule does not claim that PF06 has been corrected.
 
-* the observation origin (where it was seen)
+### Transitional compatibility fields
 
-* whether it is portable (can be reproduced in CI or in a governed QA plan), and
+For a covered class whose durable owner lacks a complete, vocabulary-conforming destination, include only the fields missing from the owner’s current block, selected from this seven-field compatibility set:
 
-* the output artifact path where the observation is captured (include filename; directory segments must be lowercase)
+* `Affected PF canon home(s)` — name only current canon homes actually affected by the evidence; do not infer ownership from filenames or plans.  
+    
+* `Exact affected locator(s)` — use exact, current, reviewable locators; unresolved locators remain unknown rather than guessed.  
+    
+* `Current canon posture` — derive this from current permanent canon plus an applicable active PF10 addendum where one explicitly speaks; if the reviewed evidence does not establish posture, say so explicitly.  
+    
+* `Supported later-drain action` — use exactly one value from the PF19 action vocabulary above. The recommendation does not perform the status move or canon drain.  
+    
+* `Drain readiness classification` — use exactly one value from the PF19 readiness vocabulary above. Current evidence controls supportability; current canon bytes alone establish `Already drained into PF-canon`.  
+    
+* `Evidence basis` — provide exact, readable, relevant, coherent, secret-safe evidence pointers. Vague approval language is not an evidence basis.  
+    
+* `Epic-close expectation` — use exactly one value from the PF19 timing vocabulary above. The value does not establish QA PASS, closure, a board move, or an accomplished drain.
 
-This rule prevents plans from relying on screenshots, ad-hoc terminal scrollback, or ephemeral browser views.
-
-## **10.6 Approval artifacts that support later PF-canon drain**
-
-Later-drain PF-canon update statement (normative).
-
-If an approval artifact is intended to support later PF-canon drainage, it MUST include an explicit later-drain PF-canon update statement. This does not move canon drain earlier. It makes the supported later drain explicit at approval time.
-
-Required fields are as follows.
-
-* Affected PF canon home(s)  
-* Exact affected locator(s)  
-* Current canon posture. If the current posture is not established in reviewed evidence, the artifact MUST say so explicitly.  
-* Supported later-drain action — exactly one of `change to Done`, `change to Partial`, `change to Not done`, `change to Consolidation pending`, `change to Optional`, or `No status change recommended`  
-* Drain readiness classification — exactly one of `Supportable from repo evidence`, `Not yet supportable from repo evidence`, or `Already drained into PF-canon`  
-* Evidence basis — exact evidence pointer(s) that support the later-drain posture  
-* Epic-close expectation — exactly one of `at epic close`, `after an additional PR or OPS slice`, or `after a separate canon-only drain step`
-
-Approval artifacts MUST NOT stop at vague approval language such as accepted, complete, merge-ready, approved, or no further remediation needed when the practical intent is to support a later PF-canon update.
-
-This rule applies to PR final reviews, PR remediation acceptance reviews, OPS task final reviews, final close-pack reviews, and any implementation-plan or QA-plan approval artifact that is intended to feed later PF-canon drain.
+Do not reproduce this compatibility set for PF27 sections 5, 10, or 11, or for another class whose owner already contains a complete, vocabulary-conforming block. Remove transitional PF19 coverage for a class only after its complete current owner destination is verified and its vocabulary is reconciled.
 
 # 11\. Roles & RACI (QA)
 
