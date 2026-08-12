@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.5  
+**Version:** v3.5.1  
 **Status:** Canon  
-**Effective date:** 2026-08-11  
-**Last Update Gate:** 0808 refresh 3  
+**Effective date:** 2026-08-12  
+**Last Update Gate:** 0808 refresh 4  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -3469,74 +3469,62 @@ Index human+machine in the same PR; mirror canonical JSONL; one LF; proof\_ancho
 
 # 17\) CLI Components
 
-## **17.1 Command catalog (titles-only; PF05 governs)**
+## **17.1 Command catalog (titles-only; PF05-Canon-HDE-CLI-API-Vendor-Ref governs)**
 
-Single home for commands. The complete CLI command/flag catalog and their status live in PF05 — HDE-CLI-API-Vendor-Ref (for example, “CLI Overview & Conventions”, “Commands (by status)”). PF14 does not enumerate or norm all commands; it records mechanical expectations and routes to PF05 by title.
+Single home for commands. The complete CLI command/flag catalog and their status live in PF05-Canon-HDE-CLI-API-Vendor-Ref (for example, “CLI Overview & Conventions”, “Commands (by status)”). PF14 does not enumerate or norm all commands; it records mechanical expectations and routes to PF05-Canon-HDE-CLI-API-Vendor-Ref by title.
 
-Conformance expectation. CLI help/usage, flags, and behavior must match PF05. Any divergence between hdctl behavior and PF05 is a defect until corrected (or PF05 is updated).
+Conformance expectation. CLI help/usage, flags, and behavior must match PF05-Canon-HDE-CLI-API-Vendor-Ref. Any divergence between hdctl behavior and PF05-Canon-HDE-CLI-API-Vendor-Ref is a defect until corrected (or PF05-Canon-HDE-CLI-API-Vendor-Ref is updated).
 
 Examples (non-exhaustive).
 
 * `hdctl showcompat <ARGS>` — canonical compat harness for comparing two users and driving Aux narrative preview. On success, its primary success payload is a single compat JSON document on stdout (admin/test surface), emitted via the shared presenter/emitter as canonical JSON (UTF-8, ASCII-sorted keys, compact, one LF; no ANSI). When `--dump-reader <path>` is present, it also writes the six-key Reader v1 success envelope to `<path>` using the same emitter; those bytes must be byte-identical to the Reader 200 body for the same inputs/environment. The command remains merge-blocking until the compat JSON determinism and Reader↔CLI parity tokens are passing.
 
-Additional commands (for example, read singlebg, list people, bg:resolve, and disabled fetch variants) are defined and governed in PF05, including whether they are Required-Now or Speculative. Implement and test them according to PF05 without redefining schemas or bytes here.
+Additional commands (for example, read singlebg, list people, bg:resolve, and disabled fetch variants) are defined and governed in PF05-Canon-HDE-CLI-API-Vendor-Ref, including whether they are Required-Now or Speculative. Implement and test them according to PF05-Canon-HDE-CLI-API-Vendor-Ref without redefining schemas or bytes here.
 
 ## **17.2 Streams & exits**
 
-* stdout (success): public JSON body only, LF-terminated, no ANSI, no extra bytes.
-
-* stderr (failure): typed JSON errors only; diagnostics without secrets or PII; successful runs never write to stderr.
-
-* Exit codes:
-
-  * 0 — success (canonical payload on stdout only).
-
-  * 64 — usage error (bad flags/arguments; synopsis to stderr; stdout empty).
-
-  * Other error codes are non-zero and command-specific as defined in PF05; in all cases stdout remains empty on failure.
-
-* No mixed streams. A run is either stdout-only success or stderr-only failure; commands must not interleave diagnostics with public bytes.
+* stderr and failure exits: governed by PF05-Canon-HDE-CLI-API-Vendor-Ref §3.3. PF14 does not restate CLI transport bytes or the HTTP error envelope here.
 
 ## **17.3 Determinism & parity**
 
-* Reader↔CLI parity. For each mirrored surface where the CLI emits a corresponding success body, CLI stdout is byte-identical to the Reader 200 body for the same inputs/environment (single shared presenter/emitter). Acceptance authority for determinism and canonical JSON is owned by HDE-Governance and the public surface contracts in HDE-CLI-API-Vendor-Ref (titles-only).
-
-* AB↔BA identity. For pair-sensitive inputs, swapping the parties (A/B) yields identical outputs once normalized.
-
-* Two-run identity. Repeating the same command with identical inputs and environment yields byte-identical stdout (single LF).
-
-* Canonical JSON. All success payloads use canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF. Arrays used as sets are deduped and ASCII-sorted (see PF14 §4/§10.1).
-
+* Reader↔CLI parity. For each mirrored surface where the CLI emits a corresponding success body, CLI stdout is byte-identical to the Reader 200 body for the same inputs/environment (single shared presenter/emitter). Acceptance authority for determinism and canonical JSON is owned by HDE-Governance and the public surface contracts in HDE-CLI-API-Vendor-Ref (titles-only).  
+    
+* AB↔BA identity. For pair-sensitive inputs, swapping the parties (A/B) yields identical outputs once normalized.  
+    
+* Two-run identity. Repeating the same command with identical inputs and environment yields byte-identical stdout (single LF).  
+    
+* Canonical JSON. All success payloads use canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF. Arrays used as sets are deduped and ASCII-sorted (see PF14 §4).  
+    
 * Merge-blocking status. hdctl showcompat remains merge-blocking until the governing parity and determinism acceptance checks pass (titles-only; acceptance token registry and semantics live in HDE-Governance).
 
 ## **17.4 Inputs & schemas (titles-only)**
 
-* IDs & catalogs. CLI commands that accept IDs or cataloged names validate them against HDE-Schemas & Artifacts (§2.1/§2.6). This guide does not duplicate schema bytes.
-
-* Viewer prefs. \--viewer-prefs-file / \--prefs flags must carry the closed 10-key weight map with top\_category ∈ Magic-10 and weights for all ten Magic-10 categories (see HDE-Math-Spec §2.2/§5.x). PF05 owns the exact CLI flag shapes.
-
-* Rails. CLI runs under SAFE rails by default and must not open vendor rails on its own. Any command that can reach vendor or external HTTP must honor the rails and override semantics defined in PF04/PF07/PF05 (§7.1/§7.3 here, and the rails sections in Governance/Infrastructure).
+* IDs & catalogs. CLI commands that accept IDs or cataloged names validate them against HDE-Schemas & Artifacts (§2.1/§2.6). This guide does not duplicate schema bytes.  
+    
+* Viewer prefs. \--viewer-prefs-file / \--prefs flags must carry the closed 10-key weight map with top\_category ∈ Magic-10 and weights for all ten Magic-10 categories (see HDE-Math-Spec §2.2/§5.x). PF05-Canon-HDE-CLI-API-Vendor-Ref owns the exact CLI flag shapes.  
+    
+* Rails. CLI runs under SAFE rails by default and must not open vendor rails on its own. Any command that can reach vendor or external HTTP must honor the rails and override semantics defined in PF04-Canon-HDE-Governance/PF07/PF05-Canon-HDE-CLI-API-Vendor-Ref (§7.1/§7.3 here, and the rails sections in Governance/Infrastructure).
 
 ### **17.4.1 showcompat conjunction mode (mechanics only)**
 
-PF05 owns the exact flag spellings, accepted payload shapes, and CLI bytes for conjunction mode. PF14 records the mechanics requirements for the conjunction execution branch only.
+PF05-Canon-HDE-CLI-API-Vendor-Ref owns the exact flag spellings, accepted payload shapes, and CLI bytes for conjunction mode. PF14 records the mechanics requirements for the conjunction execution branch only.
 
-* `hdctl showcompat` MUST provide a conjunction branch that delegates to the resolved conjunction surface (`conjunction_public_resolved`) rather than introducing a parallel compute path.
-
-* The conjunction branch MUST accept exactly one complete conjunction input family per invocation, using the existing showcompat input families routed by PF05. Mixed, incomplete, or mutually incompatible conjunction inputs MUST fail deterministically on the normal CLI failure path, with non-zero exit, stderr-only failure output, and empty stdout.
-
-* Before emission, the conjunction branch MUST canonicalize pair ordering so equivalent A/B and B/A inputs produce byte-identical success output under the determinism pins in this guide.
-
-* When required local BodyGraph inputs are missing, the conjunction branch MUST honor SAFE rails. Closed rails MUST refuse deterministically, without network I/O and without partial conjunction output. Open rails MAY resolve through the existing resolver path under the policy owned by HDE-Governance and HDE-CLI-API-Vendor-Ref.
-
-* Source-resolution and payload-normalization failures in the conjunction branch MUST surface as deterministic typed CLI failure classes via the standard CLI error path. The conjunction branch MUST NOT leak unexpected exceptions or configuration-specific stderr.
-
+* `hdctl showcompat` MUST provide a conjunction branch that delegates to the resolved conjunction surface (`conjunction_public_resolved`) rather than introducing a parallel compute path.  
+    
+* The conjunction branch MUST accept exactly one complete conjunction input family per invocation, using the existing showcompat input families routed by PF05-Canon-HDE-CLI-API-Vendor-Ref. Mixed, incomplete, or mutually incompatible conjunction inputs MUST fail deterministically on the normal CLI failure path, with non-zero exit, stderr-only failure output, and empty stdout.  
+    
+* Before emission, the conjunction branch MUST canonicalize pair ordering so equivalent A/B and B/A inputs produce byte-identical success output under the determinism pins in this guide.  
+    
+* When required local BodyGraph inputs are missing, the conjunction branch MUST honor SAFE rails. Closed rails MUST refuse deterministically, without network I/O and without partial conjunction output. Open rails MAY resolve through the existing resolver path under the policy owned by HDE-Governance and HDE-CLI-API-Vendor-Ref.  
+    
+* Source-resolution and payload-normalization failures in the conjunction branch MUST surface as deterministic typed CLI failure classes via the standard CLI error path. The conjunction branch MUST NOT leak unexpected exceptions or configuration-specific stderr.  
+    
 * On success, the conjunction branch MUST emit canonical JSON through the shared presenter/emitter, with exactly one trailing LF and no stderr bytes.
 
 Required tests.
 
-* `tests/cli/test_cli_canonical_bytes.py` MUST cover conjunction-mode canonical stdout emission and deterministic closed-rails refusal when local inputs are missing.
-
+* `tests/cli/test_cli_canonical_bytes.py` MUST cover conjunction-mode canonical stdout emission and deterministic closed-rails refusal when local inputs are missing.  
+    
 * `tests/cli/test_showcompat_sources.py` MUST cover deterministic conjunction-mode failure surfacing for DB/query and invalid-payload classes.
 
 ## **17.5 Installability & entrypoints**
@@ -3544,16 +3532,16 @@ Required tests.
 * Console script. The pyproject console-script entrypoint hdctl is present and installable.  
 * Module-run. `python -m engine.cli` behaves identically to the console script; parity is required for help, version, and command invocation.  
 * Deterministic installability proof. The CLI conformance tooling MUST be able to produce positive installability proof in a clean environment using a deterministic editable-install path. When this proof path is exercised, it MUST run with `PIP_NO_INDEX=1`, `--no-deps`, and `--no-build-isolation`, and it MUST fail closed if the installed `hdctl` console entrypoint is absent from the interpreter scripts directory.  
-* Positive help and version proof. Installability proof is not complete unless both the console entrypoint and the module runner return help and version successfully with exit 0, stdout output, and no stderr noise, as routed by PF05.  
+* Positive help and version proof. Installability proof is not complete unless both the console entrypoint and the module runner return help and version successfully with exit 0, stdout output, and no stderr noise, as routed by PF05-Canon-HDE-CLI-API-Vendor-Ref.  
 * Single-sourced installability metadata. The installability proof artifacts MUST report one coherent console-entrypoint result and MUST NOT write duplicate or conflicting help or version payloads across summary and installability outputs.
 
 ## **17.6 Environment pins (runtime)**
 
-* Pins. All CLI acceptance jobs run with LC\_ALL=C, LANG=C, TZ=UTC. Logs are keys-only, with no ANSI escapes.
+* Pins. All CLI acceptance jobs run with LC\_ALL=C, LANG=C, TZ=UTC. Logs are keys-only, with no ANSI escapes.  
+    
+* Env allow-list. The CLI reads only documented environment variables and fails closed on unknown or malformed env that would affect behavior (see PF14 §32.2 and PF05-Canon-HDE-CLI-API-Vendor-Ref env/flags sections). Secrets are never echoed.
 
-* Env allow-list. The CLI reads only documented environment variables and fails closed on unknown or malformed env that would affect behavior (see PF14 §31.2 and PF05 env/flags sections). Secrets are never echoed.
-
-## **17.7 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## **17.7 Acceptance (titles-only; token names live in PF04-Canon-HDE-Governance §2.0)**
 
 Acceptance is governed by HDE-Governance and CLI contracts in HDE-CLI-API-Vendor-Ref (titles-only). This section does not list token names. CLI components must have acceptance proofs for the same categories described in §16.7 (installability, streams/exits, determinism/parity, and evidence discipline), without PF14 enumerating token rosters.
 
@@ -3561,32 +3549,34 @@ Acceptance is governed by HDE-Governance and CLI contracts in HDE-CLI-API-Vendor
 
 CLI components share the core evidence discipline:
 
-* List each CLI evidence artifact by title and path in Appendix D: Evidence Index.
-
-* Mirror artifacts 1:1 in artifacts/evidence\_index.jsonl (record fields as per PF12 and §1.3).
-
-* Ensure the machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and includes a proof\_anchor to a co-located path\_proof file.
-
+* List each CLI evidence artifact by title and path in the Human Evidence Index (docs/evidence/INDEX.json).  
+    
+* Mirror artifacts 1:1 in artifacts/evidence\_index.jsonl (record fields as defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3).  
+    
+* Ensure the machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and includes a proof\_anchor to a co-located path\_proof file.  
+    
 * Update the human Index and machine mirror in the same PR; CI fails on mismatch, non-canonical JSONL, unknown keys, or missing path-proofs.
 
 Required artifacts for the CLI parity and serializer-coupling harness include:
 
-* Parity harness artifacts:
-
-  * artifacts/cli/ab.json — canonical output for AB inputs (LF-terminated).
-
-  * artifacts/cli/ba.json — canonical output for BA inputs (must be byte-identical to AB).
-
+* Parity harness artifacts:  
+    
+  * artifacts/cli/ab.json — canonical output for AB inputs (LF-terminated).  
+      
+  * artifacts/cli/ba.json — canonical output for BA inputs (must be byte-identical to AB).  
+      
   * artifacts/cli/summary.json — canonical JSON summarizing attempted commands, sha256 of AB/BA, and an ab\_ba\_equal: true marker.
 
-* Serializer and emitter guard artifacts (canonical homes; see §37.6):
 
-  * artifacts/cli/guards/serializer\_grep\_guard.log — grep guard log proving there are no ad-hoc serializers on governed CLI public paths.
-
+* Serializer and emitter guard artifacts (canonical homes; see §37.6):  
+    
+  * artifacts/cli/guards/serializer\_grep\_guard.log — grep guard log proving there are no ad-hoc serializers on governed CLI public paths.  
+      
   * artifacts/cli/guards/emitter\_symbol\_proof.txt — emitter symbol proof snapshot for governed CLI handlers, including the optional aux-preview exemption.
 
-* Canonical JSON policy and compare logs:
 
+* Canonical JSON policy and compare logs:  
+    
   * audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson — canonical JSON policy check log.  
   * audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson — canonical JSON compare log.  
   * Legacy (compatibility-only; non-authoritative): audit/gates/canonical\_json/json\_canonical\_check.log
@@ -3601,18 +3591,18 @@ Status: Informative, non-gating. This section records a future mechanics require
 
 HDE-Build Notes observes that, in pre-Glow environments:
 
-* There is no app-level user model or user IDs.
-
-* There are no persistent user-bound BodyGraphs in production.
-
-* We must not create app-like user records in production ahead of Glow App integration.
-
+* There is no app-level user model or user IDs.  
+    
+* There are no persistent user-bound BodyGraphs in production.  
+    
+* We must not create app-like user records in production ahead of Glow App integration.  
+    
 * Many earlier QA flows assumed DB-backed users (for example, showcompat \--user-a/--user-b \--source=db, bg:resolve \--source=vendor \--upsert), which cannot run under these constraints.
 
 Current mechanics in this guide assume DB-backed flows for:
 
-* CLI commands that resolve or store BodyGraphs via DB (or vendor+DB).
-
+* CLI commands that resolve or store BodyGraphs via DB (or vendor+DB).  
+    
 * Evidence capture tied to DB posture and runtime environment.
 
 This section does not change those flows. It describes the additional stateless capabilities that a future epic is expected to add so that engine math can be exercised purely via CLI plus files, without DB.
@@ -3623,38 +3613,39 @@ Addendum 11 in HDE-Build Notes introduces a future requirement for a stateless J
 
 a) Stateless BodyGraph export. A future CLI flow must:
 
-* Accept only birth data or vendor JSON (no user IDs, no DB lookup).
-
-* Call engine math directly, without DB.
-
-* Emit a canonical JSON BodyGraph export containing:
-
-  * Raw birth/event details needed to reconstruct the chart.
-
-  * Full BodyGraph topology (centers, gates, channels, lines, profile, authority, definition, type).
-
+* Accept only birth data or vendor JSON (no user IDs, no DB lookup).  
+    
+* Call engine math directly, without DB.  
+    
+* Emit a canonical JSON BodyGraph export containing:  
+    
+  * Raw birth/event details needed to reconstruct the chart.  
+      
+  * Full BodyGraph topology (centers, gates, channels, lines, profile, authority, definition, type).  
+      
   * Stable identifiers consistent with the domain catalogs (IDs only; no prose).
 
-* Write canonical JSON governed by HDE-Schemas and Artifacts (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one LF, arrays-as-sets deduped then ASCII-sorted).
+
+* Write canonical JSON governed by PF12-Canon-HDE-Schemas-and-Artifacts (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one LF, arrays-as-sets deduped then ASCII-sorted).
 
 b) Stateless compat export. A future CLI flow must:
 
-* Accept two BodyGraph JSON files or two birth tuples.
-
-* Compute compat and Reader v1 envelopes directly, without DB.
-
-* Write canonical JSON compat output and Reader envelopes under governed paths.
-
+* Accept two BodyGraph JSON files or two birth tuples.  
+    
+* Compute compat and Reader v1 envelopes directly, without DB.  
+    
+* Write canonical JSON compat output and Reader envelopes under governed paths.  
+    
 * Preserve determinism and AB↔BA parity using the same canonical serializer and comparator rules defined in this guide (§4/§5/§6).
 
 c) Stateless vendor-to-engine pipeline. A future CLI-driven pipeline must support: birth → vendor fetch (dry-run) → BodyGraph JSON → compat \+ Reader JSON.
 
 Each stage must:
 
-* Be invokable via CLI.
-
-* Write only JSON files and logs under governed paths.
-
+* Be invokable via CLI.  
+    
+* Write only JSON files and logs under governed paths.  
+    
 * Perform no DB writes, unless an explicit upsert path is chosen (and that upsert remains clearly separated from stateless QA flows and governed by vendor/DB posture sections (§19/§20) and Governance).
 
 Mechanics does not define specific command names, flags, or paths for these flows. It records that when implemented, they must reuse the shared emitter, canonical serializer, comparators, and deterministic engine posture defined in this guide.
@@ -3663,10 +3654,10 @@ Mechanics does not define specific command names, flags, or paths for these flow
 
 This guide records the mechanical requirement only. Ownership remains:
 
-* HDE-Schemas and Artifacts — JSON schemas and artifact catalogs for stateless BodyGraph, compat, and any run-bundle exports.
-
-* HDE-CLI-API-Vendor-Ref — CLI command shapes and behavior for stateless flows.
-
+* PF12-Canon-HDE-Schemas-and-Artifacts — JSON schemas and artifact catalogs for stateless BodyGraph, compat, and any run-bundle exports.  
+    
+* HDE-CLI-API-Vendor-Ref — CLI command shapes and behavior for stateless flows.  
+    
 * Glow QA Guide and HDE Phased Epics — QA plans and acceptance wiring for stateless QA mode.
 
 Mechanics MUST NOT define concrete paths or JSON schemas for these artifacts; it references the owning documents by title only.
@@ -3675,14 +3666,14 @@ Mechanics MUST NOT define concrete paths or JSON schemas for these artifacts; it
 
 Until the stateless JSON QA mode is implemented and drained into the relevant PF documents:
 
-* No acceptance token may treat the presence or absence of stateless JSON QA artifacts as a gate.
-
-* PF14’s normative mechanics remain those of the current DB-backed engine and CLI flows.
-
-* QA plans that cannot rely on DB users SHOULD:
-
-  * call out “no user IDs / no DB users” as an environment constraint
-
+* No acceptance token may treat the presence or absence of stateless JSON QA artifacts as a gate.  
+    
+* PF14’s normative mechanics remain those of the current DB-backed engine and CLI flows.  
+    
+* QA plans that cannot rely on DB users SHOULD:  
+    
+  * call out “no user IDs / no DB users” as an environment constraint  
+      
   * use birth-based and vendor dry-run patterns described in HDE-Build Notes and the QA documents, while continuing to satisfy all existing determinism and evidence checks defined in this guide.
 
 ## **17.10 Interim no-user QA mode (pre-Glow prod)**
@@ -3691,10 +3682,10 @@ Status (normative). This section is normative for pre-Glow production environmen
 
 Assumptions (pre-Glow prod).
 
-* No app-level user IDs exist in production.
-
-* No persistent user-bound BodyGraphs exist in production.
-
+* No app-level user IDs exist in production.  
+    
+* No persistent user-bound BodyGraphs exist in production.  
+    
 * Mechanics and QA MUST NOT create app-like user records in production ahead of Glow App integration.
 
 ### **17.10.1 Compat & Reader (prod QA)**
@@ -3895,51 +3886,28 @@ Observed OPS-02 proof facts include exit code `0`, non-empty parseable JSON stdo
 
 This observed bundle may support remediation verification and later checklist review language. It remains implementation-validation evidence only and does not by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-map closure, close-pack completion, or epic closure.
 
-OPS-02 observed completion bundle (records-only). The controlled vendor-backed birth-only no-user smoke for HDE-EPIC030 OPS-02 records an implementation-validation PASS posture, with command execution through `hdctl showcompat --source vendor`, birthdate, birthtime, and location inputs only, no caller app user ID, no caller `user_id`, and no caller-provided `person_uid`.
-
-Observed OPS-02 evidence paths include:
-
-* `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
-* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
-* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
-* `audit/ops/hde-epic030/ops-02/target_disposition.md`  
-* `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
-* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
-* `audit/ops/hde-epic030/ops-02/stdout.json`  
-* `audit/ops/hde-epic030/ops-02/stderr.log`  
-* `audit/ops/hde-epic030/ops-02/exit_code.txt`  
-* `audit/ops/hde-epic030/ops-02/stdout_parse_validation.md`  
-* `audit/ops/hde-epic030/ops-02/stdout.json.sha256`  
-* `audit/ops/hde-epic030/ops-02/execution_classification.md`  
-* `audit/ops/hde-epic030/ops-02/result_summary.md`  
-* `audit/ops/hde-epic030/ops-02/files_sha256.txt`  
-* `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`
-
-Observed OPS-02 proof facts include exit code `0`, non-empty parseable JSON stdout, empty stderr, recorded stdout SHA-256, boolean-only redacted environment presence, `secret_values_detected=false`, `vendor_call_executed=true`, `command_source_was_ops01=true`, and PR-02 runtime binding present.
-
-This observed bundle may support remediation verification and later checklist review language. It remains implementation-validation evidence only and does not by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-map closure, close-pack completion, or epic closure.
-
 ### **17.10.2 Aux narratives (prod QA)**
 
 For Aux preview in pre-Glow prod:
 
-* hdctl aux-preview MUST consume compat JSON produced from birth-based showcompat runs as described in §17.10.1.
-
+* hdctl aux-preview MUST consume compat JSON produced from birth-based showcompat runs as described in §17.10.1.  
+    
 * QA MUST NOT rely on DB-backed users to exercise Aux; the Aux preview surface remains a file-based consumer of compat JSON in this mode.
 
 ### **17.10.3 BodyGraph resolver & vendor ingest (prod QA)**
 
 In pre-Glow prod, BodyGraph resolver and vendor ingest QA flows MUST respect the following additional constraints (in addition to §19 Vendor Ingest Pipeline and §22 SAFE Rails and Provider Gate):
 
-* CLI \--user arguments passed to bg:resolve MUST be treated as ephemeral QA keys only (for example, qa\_epic017\_resolve1, qa\_epic017\_vendor1) and MUST NOT be interpreted as real app user IDs.
-
-* Under rails CLOSED, any bg:resolve \--source=vendor invocation MUST return a typed refusal and MUST NOT perform outbound HTTP.
-
-* Under rails OPEN in pre-Glow prod, QA MAY run:
-
-  * bg:resolve DB/auto stub checks (no real DB rows)
-
+* CLI \--user arguments passed to bg:resolve MUST be treated as ephemeral QA keys only (for example, qa\_epic017\_resolve1, qa\_epic017\_vendor1) and MUST NOT be interpreted as real app user IDs.  
+    
+* Under rails CLOSED, any bg:resolve \--source=vendor invocation MUST return a typed refusal and MUST NOT perform outbound HTTP.  
+    
+* Under rails OPEN in pre-Glow prod, QA MAY run:  
+    
+  * bg:resolve DB/auto stub checks (no real DB rows)  
+      
   * bg:resolve \--source=vendor \--dry-run to exercise vendor shaping and ingest metadata without writing DB rows
+
 
 * bg:resolve \--source=vendor \--upsert MUST NOT be invoked in production until an app-level user model is live and a future epic re-opens user-bound DB coverage via HDE Phased Epics and Glow QA Guide.
 
@@ -3949,18 +3917,18 @@ These constraints are environment-specific; they do not change the long-term sem
 
 For Live QA sessions in pre-Glow prod:
 
-* Mechanics MUST snapshot the Human Evidence Index and Machine Mirror before and after CLI QA runs that exercise showcompat, aux-preview, or bg:resolve in this mode.
-
-* Any mutation of governed evidence artifacts (docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, or governed \*.path\_proof.txt) during such QA runs MUST be treated as a defect or unexpected side effect.
-
+* Mechanics MUST snapshot the Human Evidence Index and Machine Mirror before and after CLI QA runs that exercise showcompat, aux-preview, or bg:resolve in this mode.  
+    
+* Any mutation of governed evidence artifacts (docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, or governed \*.path\_proof.txt) during such QA runs MUST be treated as a defect or unexpected side effect.  
+    
 * CLI QA flows in this mode MUST NOT write governed evidence artifacts directly; they only consume the evidence skeleton defined in §1.3, §25, and §37, leaving governed paths unchanged.
 
 ### **17.10.5 Forward plan (routing only)**
 
 Once the Glow App and user model are integrated, a future epic recorded in HDE Phased Epics and governed by the Glow QA Guide will:
 
-* use real app user IDs to exercise DB-backed showcompat and bg:resolve \--source=vendor \--upsert in prod or stage
-
+* use real app user IDs to exercise DB-backed showcompat and bg:resolve \--source=vendor \--upsert in prod or stage  
+    
 * close out any acceptance tokens that currently depend on DB-backed user flows (routing by title to HDE-Governance and HDE Phased Epics)
 
 Until that epic is live, QA requirements that assume “existing users in prod” MUST be treated as blocked by environment and satisfied instead using the no-user QA mode described in this section.
@@ -3973,52 +3941,54 @@ Status (normative, admin-only). This section defines an admin-only bundle and it
 
 Mechanics defines an internal admin bundle builder that:
 
-* Accepts a canonical pair input in the same compat input space as the Compatibility Engine (§7.2) and the CLI showcompat harness: two parties (IDs, BodyGraphs, or births as permitted by the existing compat contract) plus viewer preferences (top category and weights across the closed Magic-10 set).
-
-* Uses the existing BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts / HDE-Math-Spec) to obtain canonical BodyGraph JSON for each party, as already required for bg:resolve and related flows.
-
-* Calls the internal compat math (titles-only to Category Framework and Compatibility Engine) to compute the per-category compat result over the closed Magic-10 set, at minimum:
-
-  * category identity
-
-  * integer score 0..100
-
-  * band (Cool, Open, Warm, Glow)
-
+* Accepts a canonical pair input in the same compat input space as the Compatibility Engine (§7.2) and the CLI showcompat harness: two parties (IDs, BodyGraphs, or births as permitted by the existing compat contract) plus viewer preferences (top category and weights across the closed Magic-10 set).  
+    
+* Uses the existing BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts / HDE-Math-Spec) to obtain canonical BodyGraph JSON for each party, as already required for bg:resolve and related flows.  
+    
+* Calls the internal compat math (titles-only to Category Framework and Compatibility Engine) to compute the per-category compat result over the closed Magic-10 set, at minimum:  
+    
+  * category identity  
+      
+  * integer score 0..100  
+      
+  * band (Cool, Open, Warm, Glow)  
+      
   * narrative keys {personal\_key, shared\_key} consistent with the main compat contract
 
-* Calls the Aux/Narratives system (titles-only to Narratives Guide and HDE Narrative Deliverables) to obtain three narratives per match:
 
-  * a private A→B narrative
-
-  * a private B→A narrative
-
+* Calls the Aux/Narratives system (titles-only to Narratives Guide and HDE Narrative Deliverables) to obtain three narratives per match:  
+    
+  * a private A→B narrative  
+      
+  * a private B→A narrative  
+      
   * a shared narrative
 
-* Assembles a single in-memory admin bundle object with at least the following top-level keys (names are pinned here; detailed schemas remain in HDE-Schemas & Artifacts):
 
-  * a\_bodygraph — canonical BodyGraph JSON for person A, as produced by the resolvers
-
-  * b\_bodygraph — canonical BodyGraph JSON for person B, as produced by the resolvers
-
-  * compat — the canonical compat JSON for the pair (categories in frozen Magic-10 order), where each category entry carries {id, score, band, personal\_key, shared\_key} and existing compat meta as defined by math and schemas
-
-  * narratives — an array of exactly three Aux narrative compositions for this match (A→B, B→A, shared). Each narrative entry includes, at minimum, the composition identifier and pack SHA (or equivalent identity) plus the narrative text; the exact narrative payload schema remains single-homed in the Narratives documents
-
+* Assembles a single in-memory admin bundle object with at least the following top-level keys (names are pinned here; detailed schemas remain in HDE-Schemas & Artifacts):  
+    
+  * a\_bodygraph — canonical BodyGraph JSON for person A, as produced by the resolvers  
+      
+  * b\_bodygraph — canonical BodyGraph JSON for person B, as produced by the resolvers  
+      
+  * compat — the canonical compat JSON for the pair (categories in frozen Magic-10 order), where each category entry carries {id, score, band, personal\_key, shared\_key} and existing compat meta as defined by math and schemas  
+      
+  * narratives — an array of exactly three Aux narrative compositions for this match (A→B, B→A, shared). Each narrative entry includes, at minimum, the composition identifier and pack SHA (or equivalent identity) plus the narrative text; the exact narrative payload schema remains single-homed in the Narratives documents  
+      
   * meta — build and environment metadata, including at minimum the engine identity (for example, engine\_tag, release\_id), invocation identity (for example, invocation\_tag or equivalent), and a names-only description of the bundle source and rails posture (for example, whether the bundle was built locally or via a prod route, and whether SAFE rails were closed or open). Detailed field schemas for meta remain single-homed in HDE-Schemas & Artifacts and HDE-Governance
 
 The admin bundle builder is pure mechanics: it calls existing resolvers, compat, and Aux engines; it does not perform I/O, does not serve HTTP, and does not define transport or CLI flags.
 
-Its output is serialized only via the canonical serializer (§4 / §10.1) when consumed by CLI or HTTP surfaces:
+Its output is serialized only via the canonical serializer (§4) when consumed by CLI or HTTP surfaces:
 
-* UTF-8, no BOM
-
-* ASCII-sorted keys
-
-* compact separators
-
-* exactly one trailing line feed
-
+* UTF-8, no BOM  
+    
+* ASCII-sorted keys  
+    
+* compact separators  
+    
+* exactly one trailing line feed  
+    
 * arrays-as-sets deduped and ASCII-sorted
 
 AB↔BA parity and two-run identity MUST hold for the admin bundle under determinism pins (LC\_ALL=C, LANG=C, TZ=UTC).
@@ -4031,40 +4001,40 @@ Mechanics requires that the CLI provide a repeatable admin bundle experience tha
 
 The CLI admin-bundle flow MUST use the admin bundle builder described in §17.11.1 as its source of truth. It may be implemented either as:
 
-* a dedicated aggregator command
-
+* a dedicated aggregator command  
+    
 * a documented harness/composition of existing commands (bg:resolve, showcompat, Aux preview), as long as the composition is mechanically defined and stable
 
 The CLI admin-bundle flow MUST:
 
-* accept a canonical pair input (fixture, births, or internal IDs consistent with existing compat/BodyGraph contracts)
-
-* obtain the bundle by calling the Engine (directly or via the admin HTTP route described in §17.11.3)
-
-* emit the bundle as canonical JSON on stdout or to a single bundle file, subject to:
-
-  * UTF-8, no BOM
-
-  * ASCII-sorted keys
-
-  * compact separators
-
-  * exactly one trailing LF
-
+* accept a canonical pair input (fixture, births, or internal IDs consistent with existing compat/BodyGraph contracts)  
+    
+* obtain the bundle by calling the Engine (directly or via the admin HTTP route described in §17.11.3)  
+    
+* emit the bundle as canonical JSON on stdout or to a single bundle file, subject to:  
+    
+  * UTF-8, no BOM  
+      
+  * ASCII-sorted keys  
+      
+  * compact separators  
+      
+  * exactly one trailing LF  
+      
   * arrays-as-sets deduped and ASCII-sorted
 
 The flow MUST be reproducible from:
 
-* a Codespaces image used for HDE QA
-
+* a Codespaces image used for HDE QA  
+    
 * at least one clean local environment matching supported Python versions
 
 This uses the same documented entrypoints described in the CLI sections of this guide and in HDE-CLI-API-Vendor-Ref.
 
 Rails and env posture for this flow (SAFE rails, vendor behavior, secrets) remain governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide. PF14 requires that the CLI admin-bundle flow:
 
-* respect SAFE rails and determinism pins (SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ) for any bundle generation used as evidence
-
+* respect SAFE rails and determinism pins (SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ) for any bundle generation used as evidence  
+    
 * not bypass the allow-listed presenter/emitter, canonical serializer, or existing CLI parity and serializer guards (§4, §16, §17.3, §18)
 
 Evidence for the CLI admin bundle experience (for example, bundle JSON artifacts and canonical-compare logs) must be captured and indexed under the existing evidence skeleton rules (§1.3, §25, §37); token names and QA acceptance rosters remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics.
@@ -4075,24 +4045,24 @@ Mechanics also requires an internal HTTP admin bundle route to serve the same ad
 
 The route is an internal admin/QA surface, not a public user route:
 
-* it is not A7-eligible
-
-* it is not a Reader v1 success route
-
+* it is not A7-eligible  
+    
+* it is not a Reader v1 success route  
+    
 * it is protected by whatever authentication and authorization posture is defined in Governance/Infrastructure (titles-only)
 
 The route:
 
-* accepts a canonical pair input (fixture, births, or internal IDs consistent with existing BodyGraph and compat mechanics)
-
-* calls the admin bundle builder (§17.11.1) to construct the full product payload bundle
-
-* returns JSON only, with no HTML, using the canonical serializer (§4 / §10.1) and determinism pins (LC\_ALL=C, LANG=C, TZ=UTC)
+* accepts a canonical pair input (fixture, births, or internal IDs consistent with existing BodyGraph and compat mechanics)  
+    
+* calls the admin bundle builder (§17.11.1) to construct the full product payload bundle  
+    
+* returns JSON only, with no HTML, using the canonical serializer (§4) and determinism pins (LC\_ALL=C, LANG=C, TZ=UTC)
 
 The Admin GUI (which may live in a separate repo) is expected to:
 
-* call this route against the same production Engine on Railway that the Glow App will later use
-
+* call this route against the same production Engine on Railway that the Glow App will later use  
+    
 * render BodyGraphs, compat categories with numeric scores and bands, and three narratives (A→B, B→A, shared) from the returned bundle
 
 PF14 does not define the HTTP route name, auth model, or HTML/UX; those live in HDE-CLI-API-Vendor-Ref, Governance, and any Admin-UI epic records by title. PF14 only requires that such an admin bundle route exist, be wired to the admin bundle builder, use canonical JSON, and behave as an internal admin-only surface.
@@ -4101,10 +4071,10 @@ PF14 does not define the HTTP route name, auth model, or HTML/UX; those live in 
 
 The admin bundle surfaces (builder, CLI experience, HTTP route) are strictly admin QA and operator tools:
 
-* They may expose BodyGraph JSON, per-category scores, bands, and narrative keys/text for internal use.
-
-* They MUST NOT be used directly as public app routes or as replacements for Reader v1 or Aux public contracts. App integration continues to go through the Reader/Aux paths governed in HDE-Math-Spec, HDE-CLI-API-Vendor-Ref, Narratives Guide, and Glow QA Guide.
-
+* They may expose BodyGraph JSON, per-category scores, bands, and narrative keys/text for internal use.  
+    
+* They MUST NOT be used directly as public app routes or as replacements for Reader v1 or Aux public contracts. App integration continues to go through the Reader/Aux paths governed in HDE-Math-Spec, HDE-CLI-API-Vendor-Ref, Narratives Guide, and Glow QA Guide.  
+    
 * All admin bundle captures and parity checks (for example, CLI vs HTTP bundle equality for the same inputs) must follow the existing evidence skeleton rules for canonical JSON, AB↔BA and two-run identity, and Index/Mirror parity (§1.3, §25, §37).
 
 Any new tokens or epic-level acceptance criteria for admin bundle flows are defined in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics by title; PF14 does not define new token names here.
@@ -4117,18 +4087,19 @@ Status (normative, pre-Glow). The admin bundle surfaces defined in §17.11 (buil
 
 Mechanics requires that:
 
-* The CLI admin-bundle flow (§17.11.2) and the HTTP admin bundle route (§17.11.3) MUST NOT be callable without an admin credential. An unauthenticated request MUST NOT be able to obtain the full admin bundle.
-
-* The admin credential (for example, a token or equivalent secret) MUST:
-
-  * be stored as a secret under the infrastructure and governance policies described by HDE-Governance and Glow Infrastructure (for example, Railway secrets), not checked into the repo
-
+* The CLI admin-bundle flow (§17.11.2) and the HTTP admin bundle route (§17.11.3) MUST NOT be callable without an admin credential. An unauthenticated request MUST NOT be able to obtain the full admin bundle.  
+    
+* The admin credential (for example, a token or equivalent secret) MUST:  
+    
+  * be stored as a secret under the infrastructure and governance policies described by HDE-Governance and Glow Infrastructure (for example, Railway secrets), not checked into the repo  
+      
   * be required on every admin bundle call (CLI and HTTP), using a transport mechanism and header/field semantics pinned in HDE-CLI-API-Vendor-Ref and HDE-Governance
 
-* The same underlying authentication and authorization posture MUST apply to both admin surfaces:
 
-  * CLI and Admin GUI both act as clients presenting the admin credential to the Engine
-
+* The same underlying authentication and authorization posture MUST apply to both admin surfaces:  
+    
+  * CLI and Admin GUI both act as clients presenting the admin credential to the Engine  
+      
   * the Engine enforces that only authenticated and authorized admin callers may access the admin bundle route or equivalent CLI path
 
 Mechanics does not pick specific header names or token formats; it requires that admin bundle surfaces are never open admin endpoints in production and routes the detailed auth model to HDE-Governance, Glow Infrastructure, Glow QA Guide, and HDE-CLI-API-Vendor-Ref.
@@ -4137,15 +4108,16 @@ Mechanics does not pick specific header names or token formats; it requires that
 
 Mechanics further requires that every successful admin bundle call (CLI or HTTP):
 
-* be logged with, at minimum:
-
-  * a timestamp
-
-  * a caller identity or account (for example, operator username, service account, or equivalent)
-
-  * a high-level description of the input type (for example, “birth-based pair” vs “user-id pair” once user IDs exist, without logging raw birth details or other PII beyond what Governance allows)
-
+* be logged with, at minimum:  
+    
+  * a timestamp  
+      
+  * a caller identity or account (for example, operator username, service account, or equivalent)  
+      
+  * a high-level description of the input type (for example, “birth-based pair” vs “user-id pair” once user IDs exist, without logging raw birth details or other PII beyond what Governance allows)  
+      
   * a correlation identifier that can be used to trace the call across logs
+
 
 * produce logs that are treated as operations logs and governed by the logging, retention, and PII rules in HDE-Governance and Glow QA Guide
 
@@ -4157,16 +4129,17 @@ Admin bundle logs must not capture secrets (credentials, tokens) or raw config v
 
 Admin credentials used for CLI and HTTP admin bundle surfaces MUST be:
 
-* Rotatable without code changes:
-
-  * credentials are loaded from environment or configuration governed by HDE-Governance and Glow Infrastructure
-
+* Rotatable without code changes:  
+    
+  * credentials are loaded from environment or configuration governed by HDE-Governance and Glow Infrastructure  
+      
   * rotation of the secret value (for example, updating a Railway secret) does not require code deploys
 
-* Revocable:
 
-  * removing or changing the admin credential in the secret store MUST immediately prevent old credentials from successfully calling the admin bundle surfaces
-
+* Revocable:  
+    
+  * removing or changing the admin credential in the secret store MUST immediately prevent old credentials from successfully calling the admin bundle surfaces  
+      
   * tests and QA harnesses for admin surfaces MUST assume that credentials can change between runs and MUST NOT bake secrets into test fixtures
 
 Mechanics does not define acceptance tokens for authentication, logging, or rotation; token names and QA playbooks (for example, admin-bundle auth required, CLI/HTTP parity, and “no open admin endpoints”) remain single-homed in HDE-Governance, Glow QA Guide, HDE-Build Checklist, and HDE Phased Epics by title. PF14 records the mechanical requirement that admin bundle surfaces are authenticated, logged, and backed by rotatable, revocable credentials in pre-Glow.
@@ -4179,17 +4152,18 @@ Status (normative, pre-Glow). In the pre-Glow era, the canonical CLI (for exampl
 
 Mechanics requires that:
 
-* The CLI be runnable from any shell that can reach the production Engine on Railway (and, where applicable, its DB), subject to the secrets and rails posture governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide (titles-only), not just from GitHub Codespaces.
-
-* The same CLI mechanics defined in §16 and §17 (streams/exits, determinism, canonical JSON, parity) apply regardless of where the CLI is run (Codespaces, local machine, or other operator shell), provided environment pins and rails policy are satisfied.
-
-* The CLI continue to respect all pre-Glow constraints recorded elsewhere in this guide and in Governance:
-
-  * \--user remains an ephemeral QA key in pre-Glow prod; it is not bound to an app-level user model.
-
-  * bg:resolve \--source=vendor \--upsert MUST NOT be used in prod until a future epic explicitly re-opens user-bound upsert flows.
-
+* The CLI be runnable from any shell that can reach the production Engine on Railway (and, where applicable, its DB), subject to the secrets and rails posture governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide (titles-only), not just from GitHub Codespaces.  
+    
+* The same CLI mechanics defined in §16 and §17 (streams/exits, determinism, canonical JSON, parity) apply regardless of where the CLI is run (Codespaces, local machine, or other operator shell), provided environment pins and rails policy are satisfied.  
+    
+* The CLI continue to respect all pre-Glow constraints recorded elsewhere in this guide and in Governance:  
+    
+  * \--user remains an ephemeral QA key in pre-Glow prod; it is not bound to an app-level user model.  
+      
+  * bg:resolve \--source=vendor \--upsert MUST NOT be used in prod until a future epic explicitly re-opens user-bound upsert flows.  
+      
   * Any flows that open rails or reach vendor APIs must follow the SAFE rails and vendor posture defined in HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide.
+
 
 * This section does not add new commands or flags; it binds the existing CLI mechanics to a stronger product requirement: terminal CLI access to the Engine is part of the pre-Glow product surface.
 
@@ -4197,24 +4171,24 @@ Mechanics requires that:
 
 Mechanics further requires that, in pre-Glow, the combination of CLI subcommands and harnesses defined in this guide and in HDE-CLI-API-Vendor-Ref be sufficient to obtain the full product payload for a match, consistent with:
 
-* Compatibility engine math and banding (titles-only to HDE-Math-Spec and §7.2).
-
-* BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts).
-
+* Compatibility engine math and banding (titles-only to HDE-Math-Spec and §7.2).  
+    
+* BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts).  
+    
 * Aux/Narratives behavior (titles-only to Narratives Guide and HDE Narrative Deliverables).
 
 For a given pair input (fixture, births, or internal IDs allowed by existing contracts), an operator using only CLI subcommands (direct commands and/or a documented harness) can obtain, as structured output:
 
-* per-person BodyGraph JSON
-
-* compat results with bands and numeric scores over the closed Magic-10 set
-
+* per-person BodyGraph JSON  
+    
+* compat results with bands and numeric scores over the closed Magic-10 set  
+    
 * three narratives per match (two private, one shared), as already wired via the admin bundle builder (§17.11.1) and related Aux mechanics
 
 These flows MUST operate within the pre-Glow rails posture described in §17.9, §17.10, §19.1, and in Governance/Infrastructure:
 
-* When no user model exists, they rely on birth-based and dry-run vendor flows; they do not create app-like user records in prod.
-
+* When no user model exists, they rely on birth-based and dry-run vendor flows; they do not create app-like user records in prod.  
+    
 * Any DB-writing flows remain governed by SAFE rails defaults and explicit rails-open windows as defined in Governance and Infrastructure; the requirement to support terminal CLI access does not relax those policies.
 
 Mechanics treats the admin bundle surfaces in §17.11 as the preferred way to structure the full product payload for CLI, but does not require a single new command name. Whether the full payload is retrieved via a dedicated aggregator command or a documented composition of existing commands, the CLI must be able to produce the full product payload from a terminal in a way that satisfies the determinism, canonical JSON, and evidence discipline already defined in §4, §16, §17, §18, §25, and §37.
@@ -4231,14 +4205,14 @@ Scope. Force all CLI public bytes through the same allow-listed presenter/emitte
 
 ## **18.1 Policy (normative)**
 
-Single entrypoint. CLI MUST route every public body through the shared presenter/emitter symbol (see §10.2).
+Single entrypoint. CLI MUST route every public body through the shared presenter/emitter symbol (see §8.2).
 
-Canonical rules apply. §4/§10.1 canonicalization (UTF-8; sorted keys; compact; one LF; arrays-as-sets) MUST hold for CLI stdout.
+Canonical rules apply. §4 canonicalization (UTF-8; sorted keys; compact; one LF; arrays-as-sets) MUST hold for CLI stdout.
 
 Surface parity:
 
-* /api/compat/v1: CLI stdout is byte-identical to the Reader 200 body.
-
+* /api/compat/v1: CLI stdout is byte-identical to the Reader 200 body.  
+    
 * /api/sample/v1: CLI stdout uses the same deterministic selection \+ ordering as Reader.
 
 ## **18.2 Prohibited (hard fail)**
@@ -4251,29 +4225,29 @@ Symbol allow-list. Maintain a code/CI allow-list of presenter/emitter symbols; o
 
 Grep-guard. CI fails on public paths if ad-hoc serialization is detected (regex for \\bjson.dumps( and known alternates).
 
-## **18.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## **18.4 Acceptance (titles-only; token names live in PF04-Canon-HDE-Governance §2.0)**
 
 Acceptance is governed by HDE-Governance (titles-only). This section does not list token names. CLI serializer coupling must have acceptance proofs for:
 
-* shared presenter/emitter usage for public bytes
-
-* prohibition of ad-hoc serialization on governed public paths
-
-* determinism (AB↔BA and two-run identity)
-
+* shared presenter/emitter usage for public bytes  
+    
+* prohibition of ad-hoc serialization on governed public paths  
+    
+* determinism (AB↔BA and two-run identity)  
+    
 * evidence/index discipline for guard artifacts and parity proofs
 
 ## **18.5 Evidence (records-only; machine mirror; same-PR rule)**
 
 CLI serializer coupling evidence must demonstrate:
 
-* AB↔BA and two-run identity for compat bytes under the shared presenter/emitter
-
-* canonical JSON on CLI stdout for governed commands
-
+* AB↔BA and two-run identity for compat bytes under the shared presenter/emitter  
+    
+* canonical JSON on CLI stdout for governed commands  
+    
 * that governed CLI handlers use the allow-listed emitter and do not call ad-hoc JSON serializers
 
-List evidence artifacts by title and path in Appendix D and mirror them 1:1 in artifacts/evidence\_index.jsonl (record fields as per §1.3). The machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and each record includes a proof\_anchor to a co-located path\_proof file.
+List evidence artifacts by title and path in the Human Evidence Index (docs/evidence/INDEX.json) and mirror them 1:1 in artifacts/evidence\_index.jsonl (record fields as defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3). The machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and each record includes a proof\_anchor to a co-located path\_proof file.
 
 Required artifacts for CLI serializer coupling:
 
@@ -4306,11 +4280,11 @@ If audit/gates/guards/\*\* copies of the guard artifacts are present for interna
 
 ## **18.6 Routing (titles-only)**
 
-Canonical serializer & unified entrypoint: §4 and §10.2.
+Canonical serializer & unified entrypoint: §4 and §8.2.
 
-Public payload/transport: HDE-CLI-API-Vendor Ref / HDE-Governance.
+Public payload/transport: PF05-Canon-HDE-CLI-API-Vendor-Ref / HDE-Governance.
 
-Domain catalogs & prefs schema: HDE-Schemas and Artifacts / HDE-Math-Spec.
+Domain catalogs & prefs schema: PF12-Canon-HDE-Schemas-and-Artifacts / HDE-Math-Spec.
 
 # 19\) Vendor Ingest Pipeline — source policy & proofs (normative)
 
@@ -4318,16 +4292,17 @@ Domain catalogs & prefs schema: HDE-Schemas and Artifacts / HDE-Math-Spec.
 
 Policy (env-aware).
 
-* Prod. Source of truth is the database. Vendor APIs run only on explicit triggers or scheduled refresh; never inline on the request path.
-
-* Pre-Glow prod (no users). When there is no app-level user model integrated with the HD Engine and no persistent user-bound BodyGraph rows configured in production:
-
-  * Mechanics and QA MUST NOT create app-like user records in prod via CLI or vendor ingest.
-
+* Prod. Source of truth is the database. Vendor APIs run only on explicit triggers or scheduled refresh; never inline on the request path.  
+    
+* Pre-Glow prod (no users). When there is no app-level user model integrated with the HD Engine and no persistent user-bound BodyGraph rows configured in production:  
+    
+  * Mechanics and QA MUST NOT create app-like user records in prod via CLI or vendor ingest.  
+      
   * bg:resolve \--source=vendor \--upsert MUST NOT be invoked in prod; QA and ops flows in this environment MAY use only DB/auto stub behavior and vendor dry-run semantics as described below.
 
-* Dev. Direct vendor calls are allowed; on success, ingest MUST upsert the BodyGraph to DB for repeatability.
 
+* Dev. Direct vendor calls are allowed; on success, ingest MUST upsert the BodyGraph to DB for repeatability.  
+    
 * SAFE rails. SAFE rails apply in all environments; rails posture and acceptance tokens are owned by HDE-Governance (titles-only).
 
 BodyGraph I/O seam (normative). Mechanics treats BodyGraph resolution and ingest as a sanctioned I/O seam that is distinct from deterministic core compute.
@@ -4338,16 +4313,16 @@ Canonical seam location (implementation boundary). BodyGraph vendor and DB I/O i
 
 What may occur in the seam. Code inside the BodyGraph seam MAY perform:
 
-* network I/O to vendor services (through a vendor client abstraction)
-
+* network I/O to vendor services (through a vendor client abstraction)  
+    
 * DB reads/writes for BodyGraph storage (through a DB access abstraction)
 
 Rails requirements for all I/O. Any network or DB I/O in the BodyGraph seam MUST:
 
-* respect SAFE\_MODE and ALLOW\_NETWORK rails (no vendor calls when network rails are closed; fail-closed refusals when misconfigured)
-
-* use a small, well-defined set of seam abstractions (for example, vendor client and DBAccess-like components)
-
+* respect SAFE\_MODE and ALLOW\_NETWORK rails (no vendor calls when network rails are closed; fail-closed refusals when misconfigured)  
+    
+* use a small, well-defined set of seam abstractions (for example, vendor client and DBAccess-like components)  
+    
 * keep logs and artifacts secret-free (keys-only posture; no credentials and no vendor payload bodies in governed artifacts)
 
 Purity preserved elsewhere. Deterministic decisions (eligibility, banding, compat math, narrative key selection, canonical JSON emission) MUST remain in the pure compute modules (core/sampler/compat/presenter/runtime) and MUST NOT be implemented inside the BodyGraph seam. The BodyGraph seam orchestrates I/O and normalization around those pure decisions.
@@ -4364,22 +4339,22 @@ In pre-Glow prod QA flows, CLI \--user values passed to bg:resolve MUST be treat
 
 When rails are OPEN in pre-Glow prod QA flows:
 
-* bg:resolve DB/auto MAY be exercised in stub mode (no real DB rows)
-
+* bg:resolve DB/auto MAY be exercised in stub mode (no real DB rows)  
+    
 * bg:resolve \--source=vendor \--dry-run MAY perform a single vendor call that returns ingest metadata and MUST NOT write DB rows
 
 Routing and token semantics for per-call selection are owned by HDE-Governance and HDE-CLI-API-Vendor-Ref (titles-only).
 
 Evidence (records-only). artifacts/bodygraph/source\_selection.snapshot.json capturing at least:
 
-* app\_env
-
-* attempted (requested source)
-
-* selected (actual source used)
-
-* reason (closed enum explaining selection/fallback)
-
+* app\_env  
+    
+* attempted (requested source)  
+    
+* selected (actual source used)  
+    
+* reason (closed enum explaining selection/fallback)  
+    
 * upserted (boolean indicating DB upsert)
 
 Canonical JSON (UTF-8, no BOM; sorted keys; compact; exactly one trailing \\n); unknown keys are rejected.
@@ -4436,23 +4411,24 @@ Offline ingest tests (for example, unit/integration tests, dry-run pipelines, an
 
 A live vendor transport proof requires at least one run in which the Engine/Reader or CLI:
 
-* executes under open rails (for example, ALLOW\_NETWORK=1 with SAFE rails posture consistent with Governance and Infrastructure)
-
+* executes under open rails (for example, ALLOW\_NETWORK=1 with SAFE rails posture consistent with Governance and Infrastructure)  
+    
 * actually sends a request from the Engine/Reader/CLI surface to a vendor endpoint, with the transport captured as governed evidence
 
 Required elements of a live vendor transport proof (mechanics only). For any epic that claims live vendor coverage via this pipeline, Mechanics requires at least one governed evidence artifact (names and schemas single-homed in HDE-Schemas & Artifacts and Glow QA Guide) that records, at minimum:
 
-* Rails snapshot at call time — a names-only env log for the live-vendor step (for example, a D0/Dn env snapshot) including at least SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV, LC\_ALL, LANG, and TZ, so that auditors can see that the vendor call actually ran under open rails and determinism pins.
-
-* Vendor endpoint and method — the vendor hostname, scheme, and path (for example, https://\<vendor\_host\>/\<path\> or equivalent) and the HTTP method used (GET, POST, etc.), with any secrets (API keys, auth tokens) removed or redacted per Governance.
-
-* Request/response status and headers — a headers-only or structured log that captures:
-
-  * the HTTP status code returned by the vendor
-
-  * selected response headers (for example, Date, Content-Type, and vendor-specific rate-limit headers where allowed)
-
+* Rails snapshot at call time — a names-only env log for the live-vendor step (for example, a D0/Dn env snapshot) including at least SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV, LC\_ALL, LANG, and TZ, so that auditors can see that the vendor call actually ran under open rails and determinism pins.  
+    
+* Vendor endpoint and method — the vendor hostname, scheme, and path (for example, https://\<vendor\_host\>/\<path\> or equivalent) and the HTTP method used (GET, POST, etc.), with any secrets (API keys, auth tokens) removed or redacted per Governance.  
+    
+* Request/response status and headers — a headers-only or structured log that captures:  
+    
+  * the HTTP status code returned by the vendor  
+      
+  * selected response headers (for example, Date, Content-Type, and vendor-specific rate-limit headers where allowed)  
+      
   * any vendor error codes or reason phrases that are needed to interpret the result
+
 
 * Body visibility (names-only). Bodies MUST NOT be logged verbatim for vendor responses; when bodies are needed for debugging or QA, Mechanics requires that they be down-sampled or transformed into names-only or bounded summaries consistent with the logging posture in this guide and Governance. Raw vendor payloads and PII must not appear in governed live-vendor proof artifacts.
 
@@ -4460,40 +4436,40 @@ The exact artifact names, JSON shapes, and token mappings for these proofs are d
 
 Surfaces and harnesses (CLI vs HTTP). A live vendor transport proof may be obtained via either:
 
-* a CLI surface that drives vendor ingest and records the evidence above
-
+* a CLI surface that drives vendor ingest and records the evidence above  
+    
 * an HTTP surface (for example, a Reader or internal admin route) that drives vendor ingest and is exercised by a QA harness
 
 Mechanics requires that each epic’s QA plan declare which surface(s) are used for live vendor proofs (CLI and/or HTTP) and that the corresponding harness:
 
-* uses the same Vendor Ingest Pipeline mechanics and source-selection rules defined in this section
-
-* runs under clearly logged rails (closed vs open, SAFE rails posture)
-
+* uses the same Vendor Ingest Pipeline mechanics and source-selection rules defined in this section  
+    
+* runs under clearly logged rails (closed vs open, SAFE rails posture)  
+    
 * writes the live-vendor proof artifacts as governed evidence under the existing evidence skeleton (Index/Mirror, path-proofs, same-PR rule), using titles-only routing for schemas and directories
 
 Pre-Glow constraints in §19.1 (no app-like users in prod, upsert disabled in pre-Glow prod, dry-run only in certain flows) remain fully in force; live vendor proofs must respect those environment rules and may use dry-run or non-upsert surfaces where required.
 
 Routing (titles-only). The names and schemas for live vendor transport evidence families, their locations under artifacts/\*\* or audit/\*\*, and the acceptance tokens (for example, any “live vendor transport” or “open rails env” tokens) remain single-homed in:
 
-* Glow QA Guide (QA plans and token evidence requirements)
-
-* HDE-Phased Epics (epic-specific D-goals and acceptance)
-
-* HDE-Build Checklist (build and QA gates)
-
+* Glow QA Guide (QA plans and token evidence requirements)  
+    
+* HDE-Phased Epics (epic-specific D-goals and acceptance)  
+    
+* HDE-Build Checklist (build and QA gates)  
+    
 * HDE-Schemas & Artifacts (artifact schemas and catalog entries)
 
 PF14 records that, when an epic requires live vendor activity, Mechanics expects at least one open-rails vendor call to be exercised from an Engine/Reader/CLI surface using this pipeline, with the transport-level evidence and rails snapshot captured as governed artifacts under the shared evidence skeleton and indexed in the same PR as other ingest evidence.
 
 Acceptance (routing only). Acceptance is governed by HDE-Governance and Glow QA Guide (titles-only). This section does not list token names. Vendor ingest must have acceptance proofs for:
 
-* correct source-selection behavior by environment and rails posture
-
-* refusal behavior when rails are closed
-
-* invariance between equivalent DB-sourced and vendor-sourced bodies when emitted via the shared presenter/emitter
-
+* correct source-selection behavior by environment and rails posture  
+    
+* refusal behavior when rails are closed  
+    
+* invariance between equivalent DB-sourced and vendor-sourced bodies when emitted via the shared presenter/emitter  
+    
 * evidence/index discipline for vendor ingest proof artifacts
 
 ## **19.2 Refresh, TTL & SWR (out-of-band; normative)**
@@ -4502,66 +4478,65 @@ Purpose. Pin the invariants for the BodyGraph refresh worker (EPIC-011), its pol
 
 Guards (no inline vendor calls). A refresh worker MUST:
 
-* run out-of-band, off the hot Reader path; it MUST NOT perform inline vendor calls for request-time reads
-
-* respect all four guard classes:
-
-  * TTL: when data becomes stale
-
-  * SWR (stale-while-revalidate): when stale data may be served while a refresh runs
-
-  * rate-limit: how often refresh attempts may be made
-
+* run out-of-band, off the hot Reader path; it MUST NOT perform inline vendor calls for request-time reads  
+    
+* respect all four guard classes:  
+    
+  * TTL: when data becomes stale  
+      
+  * SWR (stale-while-revalidate): when stale data may be served while a refresh runs  
+      
+  * rate-limit: how often refresh attempts may be made  
+      
   * circuit-breaker thresholds and cooldown: behavior under sustained error conditions
 
 Policy snapshot (v1, titles-only). The refresh policy is captured in the governed snapshot artifact: artifacts/bodygraph/refresh\_policy.snapshot.json. HDE-Schemas & Artifacts owns the path and JSON schema; PF14 references it by title only.
 
 The snapshot uses a v1 nested schema pinned by ADR and tests:
 
-* Top-level TTL/SWR fields (for example, ttl\_s, swr\_s).
-
-* Nested objects:
-
-  * rate\_limit.{requests\_per\_window, window\_s}
-
+* Top-level TTL/SWR fields (for example, ttl\_s, swr\_s).  
+    
+* Nested objects:  
+    
+  * rate\_limit.{requests\_per\_window, window\_s}  
+      
   * circuit\_breaker.{fail\_threshold, window\_s, cooldown\_s}
 
 A sample\_counts block is attached to a copy of the policy, recording counters such as:
 
-* refresh\_attempts
-
-* refresh\_successes
-
-* refresh\_failures
-
-* breaker\_tripped
-
+* refresh\_attempts  
+    
+* refresh\_successes  
+    
+* refresh\_failures  
+    
+* breaker\_tripped  
+    
 * rate\_limit\_hits
 
 These values are enforced by governed evidence tests.
 
 Worker alignment rule (POLICY ↔ snapshot). The refresh worker implementation in scripts/bodygraph/run\_refresh\_worker.py MUST:
 
-* use a POLICY constant whose structure matches the v1 nested schema described above
-
+* use a POLICY constant whose structure matches the v1 nested schema described above  
+    
 * serialize that structure into refresh\_policy.snapshot.json (plus sample\_counts) using canonical JSON (UTF-8, sorted keys, compact, exactly one LF)
 
 The worker MUST NOT reintroduce the legacy flat layout (rate\_limit: 60, cb.{\<FIELDS\>}) that predates the v1 schema. Any such regression would overwrite the governed snapshot with a schema that no longer matches the ADR and MUST be treated as out-of-policy.
 
 Any future change to TTL/SWR, rate-limit, or circuit-breaker thresholds MUST:
 
-* update the ADR and snapshot schema (HDE-Mechanics, HDE-CLI-API-Vendor-Ref, HDE-Build Notes) so they all describe the same v1-compatible policy
-
+* update the ADR and snapshot schema (HDE-Mechanics, HDE-CLI-API-Vendor-Ref, HDE-Build Notes) so they all describe the same v1-compatible policy  
+    
 * update the refresh worker’s POLICY constant and its usages to match the updated schema and values
 
 Guard tests (for example test\_refresh\_policy\_snapshot\_matches\_adr) MUST remain green; they enforce that the emitted snapshot matches the ADR-pinned policy and that the worker reads from the same nested fields it writes.
 
 Determinism and environment. The refresh worker runs under the same determinism pins and SAFE-rails posture as other EPIC-011 jobs:
 
-* Determinism: LC\_ALL=C, LANG=C, TZ=UTC.
-
+* Determinism: LC\_ALL=C, LANG=C, TZ=UTC.  
+    
 * SAFE rails and vendor shaping policy remain governed by HDE-Governance and HDE-CLI-API-Vendor-Ref (titles-only).
-
 
 # 20\) Persistence Layer (DB posture, partition & bridge) \[Required-Now\]
 
@@ -4584,7 +4559,9 @@ Schema details for these artifacts live in HDE-Schemas & Artifacts; PF14 require
 All posture captures MUST:
 
 * Run with determinism pins LC\_ALL=C, LANG=C, TZ=UTC.  
+    
 * Produce canonical JSON/text where applicable (UTF-8; sorted keys; compact; exactly one trailing LF).  
+    
 * Remain secret-free; logs and artifacts contain no credentials.
 
   ## **20.2 Partition mechanics (EPIC-011)**
@@ -4593,8 +4570,8 @@ Objective. Enforce EPIC-011’s non-deferred partition stance under standard art
 
 The partition harness MUST produce:
 
-* artifacts/db/partition/partition\_plan.txt — Planned partition layout for HDE tables in scope.  
-* artifacts/db/partition/partition\_verify.log — Verification output showing that the live DB matches the plan.
+* artifacts/db/partition\_plan.txt — Planned partition layout for HDE tables in scope.  
+* artifacts/db/partition\_verify.log — Verification output showing that the live DB matches the plan.
 
 For EPIC-011 there is no “defer partition” posture: both a partition plan and a partition verify output are required. Token naming and semantics for partition acceptance are owned by HDE-Governance (titles-only); this guide records the mechanics expectations only.
 
@@ -4630,7 +4607,7 @@ Alternate-transport attempts MUST equal zero in every passing proof case.
 
 DDL truth for this family is projection-only under `hde.ddl_identity_projection.v1`. A direct-posture proof MUST NOT present a bounded DDL projection as full raw database equivalence or restore direct-versus-bridge parity semantics.
 
-## **20.3.1 Current direct-selection evidence contract**
+### **20.3.1 Current direct-selection evidence contract**
 
 The current direct-selection family is:
 
@@ -4663,7 +4640,7 @@ The primary MUST contain exactly `schema`, `retired_keys`, `cases`, `predicates`
 
 The canonical updater is the sole owner of the direct-selection primary’s Human Evidence Index row, Machine Evidence Mirror row, sibling path proof, and Index/Mirror hash companions. The focused producer MUST NOT write those companions.
 
-## **20.3.2 Historical bridge evidence quarantine**
+### **20.3.2 Historical bridge evidence quarantine**
 
 Existing bridge-era primaries remain immutable historical records. This includes:
 
@@ -4680,7 +4657,7 @@ Historical bridge evidence MUST NOT be regenerated through a retired transport a
 
 Bridge-era producers, bridge consistency checkers, bridge provider implementations, bridge-specific schemas, and failed OPS diagnostics MAY remain only where required for historical validation or provenance. They MUST NOT be imported, registered, invoked, or interpreted as active database transport.
 
-## **20.3.3 Direct read-only OPS posture**
+### **20.3.3 Direct read-only OPS posture**
 
 When current live database-posture evidence is required, execution remains a separately authorized OPS responsibility. The authorization MUST bind the exact source commit, runner, validator, interpreter, target, rails, query roster, expected counts, candidate root, argv vectors, and one-attempt posture before launch.
 
@@ -4690,7 +4667,7 @@ A pre-launch authorization, source, or rails mismatch produces no database call.
 
 Live direct-posture evidence does not prove Railway inventory, authorize database writes, create QA PASS, satisfy an acceptance token, move PF09 status, deploy, migrate, complete OPS generally, or close an epic.
 
-## **20.3.4 Release integration, rollback, and tests**
+### **20.3.4 Release integration, rollback, and tests**
 
 Current direct-selection evidence and historical bridge evidence MUST retain separate identities, owners, meanings, and release predicates.
 
@@ -4727,12 +4704,12 @@ Role. scripts/bodygraph/run\_refresh\_worker.py is a dev-only worker that refres
 
 The worker uses a POLICY dict whose structure and values MUST match the ADR and the governed refresh\_policy.snapshot.json v1 schema:
 
-* schema — "v1".
-
-* ttl\_s / swr\_s — time-to-live and stale-while-revalidate windows (values as defined in ADR).
-
-* rate\_limit — nested object with requests\_per\_window and window\_s.
-
+* schema — "v1".  
+    
+* ttl\_s / swr\_s — time-to-live and stale-while-revalidate windows (values as defined in ADR).  
+    
+* rate\_limit — nested object with requests\_per\_window and window\_s.  
+    
 * circuit\_breaker — nested object with fail\_threshold, window\_s, cooldown\_s.
 
 PF14 does not restate specific numeric values; they live in HDE-Build Notes/ADR and in the snapshot schema in HDE-Schemas & Artifacts. The worker MUST treat POLICY as the single source of truth for its behavior.
@@ -4741,14 +4718,14 @@ PF14 does not restate specific numeric values; they live in HDE-Build Notes/ADR 
 
 The worker:
 
-* Uses POLICY to decide when to enqueue or skip refreshes (TTL/SWR), when to rate-limit, and when to open/close the circuit breaker.
-
-* Updates structured sample\_counts for at least:
-
-  * refresh\_failures
-
-  * breaker\_tripped
-
+* Uses POLICY to decide when to enqueue or skip refreshes (TTL/SWR), when to rate-limit, and when to open/close the circuit breaker.  
+    
+* Updates structured sample\_counts for at least:  
+    
+  * refresh\_failures  
+      
+  * breaker\_tripped  
+      
   * rate\_limit\_hits
 
 The exact metrics surface and aggregation are governed in infra/ops docs (PF07/PF19); PF14 records that these counts are produced and governed.
@@ -4757,8 +4734,8 @@ The exact metrics surface and aggregation are governed in infra/ops docs (PF07/P
 
 Mechanics MUST ensure:
 
-* Running the worker never mutates the schema of refresh\_policy.snapshot.json; reads are allowed, but writes to the snapshot happen only via the governed snapshot path in HDE-Schemas & Artifacts.
-
+* Running the worker never mutates the schema of refresh\_policy.snapshot.json; reads are allowed, but writes to the snapshot happen only via the governed snapshot path in HDE-Schemas & Artifacts.  
+    
 * Any change to the policy shape or thresholds is coordinated with HDE-Build Notes addenda (ADR and bugfix PR-7R) and HDE-Schemas & Artifacts snapshot schema and tests, so that worker POLICY, ADR, and refresh\_policy.snapshot.json remain in lock-step.
 
 Acceptance impact. No new tokens. This section clarifies the behavior assumed by existing refresh-policy evidence and tests described in HDE-Build Notes and HDE-Schemas & Artifacts; the worker remains dev-only and is not an acceptance gate in CI.
@@ -4767,52 +4744,52 @@ Acceptance impact. No new tokens. This section clarifies the behavior assumed by
 
 Refuse outbound/vendor work unless explicitly enabled. Provide open/close hooks for surfaces/providers and a posture sanity script.
 
-* Defaults. Rails CLOSED for all tests and dev harness runs; vendor calls return typed refusals (numeric-free).
-
-* Logging. Keys-only; no payloads, header values, or secrets.
-
-* Evidence. Posture check log (rails closed) and at least one refusal fixture (typed, numeric-free).
-
+* Defaults. Rails CLOSED for all tests and dev harness runs; vendor calls return typed refusals (numeric-free).  
+    
+* Logging. Keys-only; no payloads, header values, or secrets.  
+    
+* Evidence. Posture check log (rails closed) and at least one refusal fixture (typed, numeric-free).  
+    
 * Policy, SAFE-rails tokens, and vendor transport matrices remain single-homed in HDE-Governance and HDE-CLI-API-Vendor-Ref (titles-only).
 
 Conjunction resolution surfaces (SAFE rails; required). A higher-level conjunction surface (conjunction\_public\_resolved) MAY accept unresolved inputs and MUST resolve them to person\_uid-bearing records before delegating to conjunction\_public.
 
 Resolution and rails rules:
 
-* Local-first: if an input can be satisfied from local lookup, it MUST be used without network I/O.
-
-* Open acquisition: if local lookup misses and SAFE rails are explicitly open, the surface MAY acquire via resolver (resolve\_db\_user\_id and resolve\_bodygraph) and MUST treat that acquisition as a controlled exception.
-
-* Close-back: after any open acquisition step, the surface MUST re-check local lookup and proceed under closed posture for subsequent steps.
-
-* Default closed: if the provided rails environment is missing or empty, the surface MUST behave as if rails are closed.
-
+* Local-first: if an input can be satisfied from local lookup, it MUST be used without network I/O.  
+    
+* Open acquisition: if local lookup misses and SAFE rails are explicitly open, the surface MAY acquire via resolver (resolve\_db\_user\_id and resolve\_bodygraph) and MUST treat that acquisition as a controlled exception.  
+    
+* Close-back: after any open acquisition step, the surface MUST re-check local lookup and proceed under closed posture for subsequent steps.  
+    
+* Default closed: if the provided rails environment is missing or empty, the surface MUST behave as if rails are closed.  
+    
 * Explicit open: rails MUST only be considered open when an explicit rails environment indicates SAFE\_MODE=0 and ALLOW\_NETWORK=1.
 
 Cache normalization rule (bug-class prevention; required). Local lookup can return a vendor-shaped record that lacks person\_uid. If a user\_id hint is available for that record, the surface MUST normalize the record into the resolved shape instead of raising. If no hint is available, the surface MUST return a deterministic refusal response rather than crashing.
 
 Tests (required). The conjunction\_public\_resolved contract tests MUST cover:
 
-* Rails closed refusal when resolution would require network I/O.
-
-* Rails open acquisition success.
-
-* Close-back behavior after open acquisition.
-
-* rails\_env missing or empty defaults to closed.
-
+* Rails closed refusal when resolution would require network I/O.  
+    
+* Rails open acquisition success.  
+    
+* Close-back behavior after open acquisition.  
+    
+* rails\_env missing or empty defaults to closed.  
+    
 * Vendor-shaped local cache hit normalization with a user\_id hint.
 
 # 23\) Rate Limit and Backoff Component (429)
 
 Closed policy (normative)
 
-* Retry/backoff family: one of {none, fixed, exponential} with integer parameters; no jitter.
-
-* Retryable conditions: only {network\_error, 5xx}; other 4xx do not retry.
-
-* 429 handling: record typed PROVIDER\_RATE\_LIMITED (optionally retry\_after\_ms if provided); no auto-success path in this epic (titles-only: EPIC-012 owns the 429 success-route).
-
+* Retry/backoff family: one of {none, fixed, exponential} with integer parameters; no jitter.  
+    
+* Retryable conditions: only {network\_error, 5xx}; other 4xx do not retry.  
+    
+* 429 handling: record typed PROVIDER\_RATE\_LIMITED (optionally retry\_after\_ms if provided); no auto-success path in this epic (titles-only: EPIC-012 owns the 429 success-route).  
+    
 * Envelope & logs: typed, numeric-free error; keys-only diagnostics (no payload bodies or header values; secrets always redacted).
 
 # 24\) Caching and Transport Wiring \[Required-Now\]
@@ -4823,11 +4800,11 @@ Compat surfaces. Return 200 OK deterministic JSON only (no validators).
 
 No conditionals. Do not implement 304 or HEAD in alpha; do not attach validators; skip CDN ceremony.
 
-Determinism. Canonical JSON (UTF-8 no BOM, sorted keys, compact, exactly one LF); AB↔BA and two-run identity hold (see §10.1 / §4).
+Determinism. Canonical JSON (UTF-8 no BOM, sorted keys, compact, exactly one LF); AB↔BA and two-run identity hold (see §4).
 
 ## **24.2 Production posture (Reader / Compat)**
 
-Scope (normative). Mechanics wires and verifies runtime transport behavior for JSON success routes and companion surfaces. Full matrices live in HDE-CLI-API-Vendor Ref (Appendix A); A7 proofs run on a Catalog JSON success route (not /internal/version).
+Scope (normative). Mechanics wires and verifies runtime transport behavior for JSON success routes and companion surfaces. Full matrices live in PF05-Canon-HDE-CLI-API-Vendor-Ref (Appendix A); A7 proofs run on a Catalog JSON success route (not /internal/version).
 
 200 (success). Content-Type: application/json; charset=utf-8; include a strong, quoted ETag computed over the LF-terminated body (pre-compression); Cache-Control: private, max-age=0, must-revalidate; Vary: Authorization, Accept-Encoding.
 
@@ -4851,9 +4828,9 @@ Success route proofs. Run on a route listed in docs/ENDPOINTS\_CATALOG.json (not
 
 Ops exclusion. /internal/version is operator-only and not A7-eligible (see §14 / HDE-Governance §10.5).
 
-Matrices & bytes. Owned by HDE-Governance / HDE-CLI-API-Vendor Ref (titles-only). This guide enforces wiring and evidence.
+Matrices & bytes. Owned by HDE-Governance / PF05-Canon-HDE-CLI-API-Vendor-Ref (titles-only). This guide enforces wiring and evidence.
 
-## **24.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## **24.4 Acceptance (titles-only; token names live in PF04-Canon-HDE-Governance §2.0)**
 
 A7 success. Governed by the A7 token family (200 ETag, HEAD parity, 304 omission, success cache/Vary).
 
@@ -4863,17 +4840,17 @@ POST posture & invariance. Governed by Governance tokens for non-conditional POS
 
 ## **24.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
 
-Single home for titles/paths. §36 Documentation Artifacts and Registry (“Reader success catalog & A7 proofs”).
+Single home for titles/paths. §37 Documentation Artifacts and Registry (“Reader success catalog & A7 proofs”).
 
-Indexing. List titles/paths in Appendix D: Evidence Index and mirror 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; one LF; each record includes artifact\_key, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
+Indexing. List titles and paths in the Human Evidence Index (docs/evidence/INDEX.json) and mirror them 1:1 in artifacts/evidence\_index.jsonl. Machine Mirror record fields, semantics, and order are defined in PF12-Canon-HDE-Schemas-and-Artifacts §8.3.
 
 Same-PR rule. Update human Index and mirror in the same commit/PR; CI enforces parity and path-proofs.
 
 ## **24.6 Routing (titles-only)**
 
-Transport matrices & header rules. HDE-Governance / HDE-CLI-API-Vendor Ref.
+Transport matrices & header rules. HDE-Governance / PF05-Canon-HDE-CLI-API-Vendor-Ref.
 
-Evidence registry & mirror discipline. §1.3 and §36.
+Evidence registry & mirror discipline. §1.3 and §37.
 
 # 25\) Gate Scripts and Evidence Harness \[Required-Now\]
 
