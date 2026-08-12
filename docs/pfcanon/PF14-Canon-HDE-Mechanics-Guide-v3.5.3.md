@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.5.2  
+**Version:** v3.5.3  
 **Status:** Canon  
 **Effective date:** 2026-08-12  
-**Last Update Gate:** 0808 refresh 5  
+**Last Update Gate:** 0808 refresh 6  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -5806,13 +5806,14 @@ Registry for small, deterministic documentation artifacts and gate evidence. Tit
 
 Governed paths only:
 
-* /artifacts/\*\* — public documentation snapshots and pack/identity evidence.
-
-* /audit/gates/\*\* — gate evidence produced by §24 scripts (bands / canonical / props / etc.).
-
-* /audit/qa/\*\* — epic-scoped Live QA artifacts (per-check primary logs, manifests, and QA meta outputs).
-
+* /artifacts/\*\* — public documentation snapshots and pack/identity evidence.  
+    
+* /audit/gates/\*\* — gate evidence produced by §24 scripts (bands / canonical / props / etc.).  
+    
+* /audit/qa/\*\* — epic-scoped Live QA artifacts (per-check primary logs, manifests, and QA meta outputs).  
+    
 * /audit/docdeltas/\*\* — doc-delta capture artifacts used by Step-0B and close-pack workflows.  
+    
 * Transient generator paths (for example, codex/out/\*\*) are not authoritative and MUST NOT be indexed.
 
 Per-epic close-pack and acceptance scaffolds (canonical names; mechanics-only).
@@ -5874,8 +5875,8 @@ Undrained delta posture (mechanics-only). When repo evidence supports a later ca
 
 Acceptance scaffolds (epic-scoped; canonical locations):
 
-* audit/qa/hde-epic\<NNN\>/token\_evidence\_matrix.md
-
+* audit/qa/hde-epic\<NNN\>/token\_evidence\_matrix.md  
+    
 * docs/acceptance\_map\_epic\<NNN\>.json
 
 These are governed artifacts. PF14 does not define token semantics; it requires only that these artifacts exist, remain parseable, and do not introduce ambiguous duplicate rows or placeholder bindings once concrete evidence exists.
@@ -5884,33 +5885,34 @@ CI-safe scaffold checks (mechanics only).
 
 The repo SHOULD include CI-safe tests that validate, at minimum:
 
-* the epic-scoped close-pack and acceptance scaffold files exist at the canonical paths above
-
+* the epic-scoped close-pack and acceptance scaffold files exist at the canonical paths above  
+    
 * the acceptance artifacts are structurally coherent (parseable, no duplicate token ids/rows)  
-* the acceptance artifacts contain no Unicode ellipsis character (U+2026) and no sequences of three consecutive U+002E FULL STOP characters
-
-* the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.
-
-* token-to-evidence bindings that reference non-placeholder evidence paths MUST be Index/Mirror backed: each referenced path MUST exist in docs/evidence/INDEX.json, and MUST have a corresponding Machine Mirror record in artifacts/evidence\_index.jsonl with a non-empty proof\_anchor (validators MUST NOT skip this check when a path is absent from both registries).
-
+    
+* the acceptance artifacts contain no Unicode ellipsis character (U+2026) and no sequences of three consecutive U+002E FULL STOP characters  
+    
+* the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.  
+    
+* token-to-evidence bindings that reference non-placeholder evidence paths MUST be Index/Mirror backed: each referenced path MUST exist in docs/evidence/INDEX.json, and MUST have a corresponding Machine Mirror record in artifacts/evidence\_index.jsonl with a non-empty proof\_anchor (validators MUST NOT skip this check when a path is absent from both registries).  
+    
 * token-to-evidence bindings MUST reference primary evidence artifacts (not their \*.path\_proof.txt transcripts). Path-proofs are required, but MUST be referenced via the machine mirror proof\_anchor (and/or mirror checks), not treated as primary evidence titles/bindings.
 
 Token name validity (names-only). Any acceptance token name referenced by these acceptance scaffolds MUST match the HDE-Governance Token Registry exactly (titles-only) or, if newly minted and not yet drained, the canonical token spelling in HDE-Build Notes (titles-only). Aliases and near-matches are prohibited; correct the scaffold artifacts to the canonical token spelling. This guide does not list token names.
 
 EPIC024 token-registry validity check (PO-006) fixed outputs (records-only):
 
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/rg\_acceptance\_map\_output.txt
-
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/rg\_registry\_output.txt
-
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/token\_comparison.json
-
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/primary.log
-
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/transcript.txt
-
-* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/primary.log.path\_proof.txt
-
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/rg\_acceptance\_map\_output.txt  
+    
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/rg\_registry\_output.txt  
+    
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/token\_comparison.json  
+    
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/primary.log  
+    
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/transcript.txt  
+    
+* audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/primary.log.path\_proof.txt  
+    
 * audit/qa/hde-epic024/checks/po-006\_token\_registry\_validity/transcript.txt.path\_proof.txt
 
 Implementation note (mechanics-only). The `rg_`\-named output files above are EPIC024 records; future token-registry validity checks SHOULD avoid reliance on external grep-style tooling and SHOULD prefer deterministic parser-based checks while preserving equivalent evidence semantics.
@@ -5919,8 +5921,8 @@ Placeholder evidence strings are permitted only for D0 scaffolding; once an epic
 
 Human Index (single home):
 
-* docs/evidence/INDEX.json — titles/paths only; no payload bytes.
-
+* docs/evidence/INDEX.json — titles/paths only; no payload bytes.  
+    
 * docs/evidence/INDEX.sha256 — hash sentinel for the Human Evidence Index.
 
 Machine Mirror (single home):
@@ -5929,78 +5931,79 @@ Machine Mirror (single home):
 
 ## **37.3 Conventions**
 
-* Deterministic filenames (lowercase, stable tokens).
-
-* Allowed extensions: .json, .log, .txt, .md, .bytes.
-
-* Text artifacts end with exactly one trailing LF (\\n).
-
-* JSON is canonical:
-
-  * UTF-8, no BOM
-
-  * ASCII-sorted keys
-
-  * compact (no pretty-printing)
-
+* Deterministic filenames (lowercase, stable tokens).  
+    
+* Allowed extensions: .json, .log, .txt, .md, .bytes.  
+    
+* Text artifacts end with exactly one trailing LF (\\n).  
+    
+* JSON is canonical:  
+    
+  * UTF-8, no BOM  
+      
+  * ASCII-sorted keys  
+      
+  * compact (no pretty-printing)  
+      
   * exactly one trailing LF
 
-* .bytes files mirror the exact body bytes (including the body’s own trailing LF, if present).
 
+* .bytes files mirror the exact body bytes (including the body’s own trailing LF, if present).  
+    
 * Header snapshots follow §4.3 normalization (lower-cased keys, compact, one LF).
 
 Close-pack manifest key\_outputs is a named binding map (normative):
 
-* audit/EPIC-\<NNN\>\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where each key is a stable pointer name (string) and each value is a repo-relative artifact path (string).
-
+* audit/EPIC-\<NNN\>\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where each key is a stable pointer name (string) and each value is a repo-relative artifact path (string).  
+    
 * key\_outputs MUST NOT be a list.
 
 For EPIC023, key\_outputs MUST include these bindings (keys \+ exact values):
 
-* acceptance\_map: docs/acceptance\_map\_epic023.json
-
-* token\_matrix: audit/qa/hde-epic023/token\_evidence\_matrix.md
-
-* acceptance\_map\_viability: audit/qa/hde-epic023/acceptance\_map\_viability.log
-
-* qa\_step\_manifest: audit/qa/hde-epic023/qa\_step\_logs\_manifest.json
-
-* doc\_deltas: audit/docdeltas/hde-epic023\_doc\_deltas.md
-
-* close\_report: audit/EPIC-023\_close\_report.md
-
+* acceptance\_map: docs/acceptance\_map\_epic023.json  
+    
+* token\_matrix: audit/qa/hde-epic023/token\_evidence\_matrix.md  
+    
+* acceptance\_map\_viability: audit/qa/hde-epic023/acceptance\_map\_viability.log  
+    
+* qa\_step\_manifest: audit/qa/hde-epic023/qa\_step\_logs\_manifest.json  
+    
+* doc\_deltas: audit/docdeltas/hde-epic023\_doc\_deltas.md  
+    
+* close\_report: audit/EPIC-023\_close\_report.md  
+    
 * close\_manifest: audit/EPIC-023\_MANIFEST.json
 
 Additional key\_outputs entries are allowed, but these bindings are the closure minimum for EPIC023.
 
 For EPIC024, key\_outputs MUST include these bindings (keys \+ exact values):
 
-* acceptance\_map: docs/acceptance\_map\_epic024.json
-
-* token\_matrix: audit/qa/hde-epic024/token\_evidence\_matrix.md
-
-* acceptance\_map\_viability: audit/qa/hde-epic024/acceptance\_map\_viability.log
-
-* qa\_step\_manifest: audit/qa/hde-epic024/qa\_step\_logs\_manifest.json
-
-* doc\_deltas: audit/docdeltas/hde-epic024\_doc\_deltas.md
-
-* close\_report: audit/EPIC-024\_close\_report.md
-
+* acceptance\_map: docs/acceptance\_map\_epic024.json  
+    
+* token\_matrix: audit/qa/hde-epic024/token\_evidence\_matrix.md  
+    
+* acceptance\_map\_viability: audit/qa/hde-epic024/acceptance\_map\_viability.log  
+    
+* qa\_step\_manifest: audit/qa/hde-epic024/qa\_step\_logs\_manifest.json  
+    
+* doc\_deltas: audit/docdeltas/hde-epic024\_doc\_deltas.md  
+    
+* close\_report: audit/EPIC-024\_close\_report.md  
+    
 * close\_manifest: audit/EPIC-024\_MANIFEST.json
 
 Additional key\_outputs entries are allowed, but these bindings are the closure minimum for EPIC024.
 
 EPIC024 Step-0B doc-delta capture (fixed paths):
 
-* audit/docdeltas/hde-epic024\_doc\_deltas.md
-
+* audit/docdeltas/hde-epic024\_doc\_deltas.md  
+    
 * audit/qa/hde-epic024/00\_meta/doc\_deltas.md
 
 Doc-delta capture validation (EPIC024 PO-011) (normative):
 
-* The two doc-delta files above MUST be byte-identical (diff exit code 0).
-
+* The two doc-delta files above MUST be byte-identical (diff exit code 0).  
+    
 * Doc-delta content MUST include PF refs per entry.
 
 PO-011 primary log (fixed path):
@@ -6019,231 +6022,208 @@ EPIC026 close-pack generator (fixed outputs):
 
 Generated close-pack outputs (records-only where applicable):
 
-* audit/EPIC-026\_MANIFEST.json
-
-* audit/EPIC-026\_MANIFEST.json.path\_proof.txt
-
-* audit/EPIC-026\_close\_report.md
-
-* audit/EPIC-026\_close\_report.md.path\_proof.txt
-
+* audit/EPIC-026\_MANIFEST.json  
+    
+* audit/EPIC-026\_MANIFEST.json.path\_proof.txt  
+    
+* audit/EPIC-026\_close\_report.md  
+    
+* audit/EPIC-026\_close\_report.md.path\_proof.txt  
+    
 * audit/docdeltas/hde-epic026\_doc\_deltas.md  
-* audit/EPIC-026\_close\_report.md.path\_proof.txt
-
-* audit/EPIC-026\_close\_pack.md
-
-* audit/docdeltas/hde-epic026\_doc\_deltas.md
-
-* audit/docdeltas/hde-epic026\_drain\_targets.md
-
-* audit/qa/hde-epic026/00\_meta/doc\_deltas.md
-
-* audit/qa/hde-epic026/qa\_step\_logs\_manifest.json
-
+    
+* audit/EPIC-026\_close\_pack.md  
+    
+* audit/docdeltas/hde-epic026\_drain\_targets.md  
+    
+* audit/qa/hde-epic026/00\_meta/doc\_deltas.md  
+    
+* audit/qa/hde-epic026/qa\_step\_logs\_manifest.json  
+    
 * audit/qa/hde-epic026/qa\_step\_logs\_manifest.json.path\_proof.txt
 
 Generator posture (normative):
 
-* The generator MUST run under closed rails for governed close-pack regeneration:
-
-  * SAFE\_MODE \= 1
-
+* The generator MUST run under closed rails for governed close-pack regeneration:  
+    
+  * SAFE\_MODE \= 1  
+      
   * ALLOW\_NETWORK \= 0
 
-* The generator MUST regenerate the governed close-pack artifacts above as tool-produced outputs. Do not hand-edit the generated manifest, close report, doc-delta ledger outputs, or companion path-proof transcripts.
 
+* The generator MUST regenerate the governed close-pack artifacts above as tool-produced outputs. Do not hand-edit the generated manifest, close report, doc-delta ledger outputs, or companion path-proof transcripts.  
+    
 * Where the close-pack enumerates named output bindings, close-pack validation MUST validate named bindings and exact path values rather than list membership.
 
 EPIC026 close-pack validation check (po-012) observed step outputs (records-only):
 
-* `audit/qa/hde-epic026/checks/po-012/primary.log`
-
-* `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`
-
-* `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`
-
-* `audit/qa/hde-epic026/checks/po-012/generator_rc.txt`
-
-* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`
-
-* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`
-
-* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json`
-
+* `audit/qa/hde-epic026/checks/po-012/primary.log`  
+    
+* `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`  
+    
+* `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`  
+    
+* `audit/qa/hde-epic026/checks/po-012/generator_rc.txt`  
+    
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`  
+    
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`  
+    
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json`  
+    
 * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`
 
 Validation posture (records-only). This check uses step-scoped stdout, stderr, and rc captures to verify the close-pack generator entrypoint `python tools/qa/generate_epic026_close_pack.py`. The `close_pack_copy/` family is a validation copy set and does not replace the governed close-pack outputs listed above.
 
 ## **37.4 Machine Mirror (records-only)**
 
-Every artifact listed in this registry MUST have a 1:1 record in artifacts/evidence\_index.jsonl.
+Every primary governed artifact listed in this registry MUST have exactly one record in `artifacts/evidence_index.jsonl`. A required sibling `*.path_proof.txt` transcript is linked from the primary record through `proof_anchor` and MUST NOT receive a separate Machine Mirror row unless HDE-Schemas & Artifacts explicitly catalogs that transcript as an independent primary governed artifact.
 
-Required fields per record:
-
-* artifact\_key
-
-* role
-
-* sha256
-
-* size\_bytes
-
-* produced\_at\_utc
-
-* discovered\_physical\_path
-
-* proof\_anchor (path-proof transcript)
-
-Exact field order (normative):
-
-* artifact\_key
-
-* discovered\_physical\_path
-
-* produced\_at\_utc
-
-* proof\_anchor
-
-* role
-
-* sha256
-
-* size\_bytes
+Machine Mirror record fields, semantics, and order are defined in HDE-Schemas & Artifacts §8.3.
 
 Discipline:
 
-* Sort-before-write by (artifact\_key, discovered\_physical\_path).
-
-* Unknown keys are rejected.
-
-* One LF per record; no blank lines.
-
+* Sort-before-write by (artifact\_key, discovered\_physical\_path).  
+    
+* Unknown keys are rejected.  
+    
+* One LF per record; no blank lines.  
+    
 * Update the Human Index and Machine Mirror in the same commit/PR.
 
 Acceptance (routing only). Acceptance token naming and semantics are owned by HDE-Governance (titles-only). This guide does not list token names. CI must enforce machine mirror canonical JSONL discipline, unknown-key rejection, fixed field set/order as defined by the mirror schema, and strict 1:1 parity with the Human Evidence Index, with path-proofs required.
 
 EPIC027 early Live QA evidence paths observed (records-only):
 
-* checks/po-001:
-
-  * `audit/qa/hde-epic027/checks/po-001/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-001/route_inventory.txt`
-
-  * `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt`
-
+* checks/po-001:  
+    
+  * `audit/qa/hde-epic027/checks/po-001/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-001/route_inventory.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-001/endpoint_catalog.txt`
 
-* checks/po-002:
 
-  * `audit/qa/hde-epic027/checks/po-002/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-002/compat_surface.txt`
-
+* checks/po-002:  
+    
+  * `audit/qa/hde-epic027/checks/po-002/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-002/compat_surface.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt`
 
-* checks/po-003:
 
-  * `audit/qa/hde-epic027/checks/po-003/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`
-
-  * `audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt`
-
+* checks/po-003:  
+    
+  * `audit/qa/hde-epic027/checks/po-003/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-003/showcompat_help.txt`
 
-* checks/po-004:
 
-  * `audit/qa/hde-epic027/checks/po-004/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt`
-
-  * `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt`
-
-  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt`
-
+* checks/po-004:  
+    
+  * `audit/qa/hde-epic027/checks/po-004/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-004/bg_resolve_help.txt`
 
-* checks/po-005:
 
-  * `audit/qa/hde-epic027/checks/po-005/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`
-
+* checks/po-005:  
+    
+  * `audit/qa/hde-epic027/checks/po-005/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-005/catalog_routes.txt`
 
-* checks/po-006:
 
-  * `audit/qa/hde-epic027/checks/po-006/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`
-
+* checks/po-006:  
+    
+  * `audit/qa/hde-epic027/checks/po-006/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt`
 
-* checks/po-007:
 
-  * `audit/qa/hde-epic027/checks/po-007/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_write.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_check.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_write.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_check.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/validate_evidence_paths.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt`
-
-  * `audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt`
-
+* checks/po-007:  
+    
+  * `audit/qa/hde-epic027/checks/po-007/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_write.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_check.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_write.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_check.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/validate_evidence_paths.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-007/qa_step_manifest_lookup.txt`
 
-* checks/po-008:
 
-  * `audit/qa/hde-epic027/checks/po-008/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`
-
-  * `audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt`
-
+* checks/po-008:  
+    
+  * `audit/qa/hde-epic027/checks/po-008/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`  
+      
+  * `audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-008/qa_step_manifest_lookup.txt`
 
-* checks/po-009:
 
-  * `audit/qa/hde-epic027/checks/po-009/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`
-
+* checks/po-009:  
+    
+  * `audit/qa/hde-epic027/checks/po-009/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-009/token_inventory.txt`
 
-* checks/po-010:
 
-  * `audit/qa/hde-epic027/checks/po-010/primary.log`
-
-  * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`
-
+* checks/po-010:  
+    
+  * `audit/qa/hde-epic027/checks/po-010/primary.log`  
+      
+  * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`  
+      
   * `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`
 
 EPIC027 current-state step notes (records-only).
 
-* `checks/po-005` confirms `/reader` as the cataloged A7-eligible success-route target for the step and keeps `/internal/version` outside the A7 PASS target family.
-
-* `checks/po-006` confirms the writer proof remains outside the A7 family and records writer-family discoverability in the Machine Mirror.
-
-* `checks/po-007` records `epic027.qa_step_logs_manifest` coverage in `tools/evidence/update_evidence_index.py`, `docs/evidence/INDEX.json`, and `artifacts/evidence_index.jsonl`.
-
-* `checks/po-008` records that the close-pack generator ran, that close-pack bindings point to the EPIC027 QA root and current canonical ledger files, that the EPIC027 qa-step manifest is ledger-bound, and that the blocked branch for this step cleared once `po-007` reached PASS.
-
-* `checks/po-009` records PASS inventory checks for catalog surfaces, no unexpected public success surface, no non-canonical token names introduced, and manifest-pair refresh from the `po-009` primary.log governed header.
-
+* `checks/po-005` confirms `/reader` as the cataloged A7-eligible success-route target for the step and keeps `/internal/version` outside the A7 PASS target family.  
+    
+* `checks/po-006` confirms the writer proof remains outside the A7 family and records writer-family discoverability in the Machine Mirror.  
+    
+* `checks/po-007` records `epic027.qa_step_logs_manifest` coverage in `tools/evidence/update_evidence_index.py`, `docs/evidence/INDEX.json`, and `artifacts/evidence_index.jsonl`.  
+    
+* `checks/po-008` records that the close-pack generator ran, that close-pack bindings point to the EPIC027 QA root and current canonical ledger files, that the EPIC027 qa-step manifest is ledger-bound, and that the blocked branch for this step cleared once `po-007` reached PASS.  
+    
+* `checks/po-009` records PASS inventory checks for catalog surfaces, no unexpected public success surface, no non-canonical token names introduced, and manifest-pair refresh from the `po-009` primary.log governed header.  
+    
 * `checks/po-010` records PASS runtime proof across CLI, dev-http-conjunction, and reader-a7 surfaces, with no missing prerequisite runtime logs and with the refreshed manifest pair returned to fresh internal provenance after the byte-changing refresh.
 
 Shared per-epic current-state manifest pair refreshed by po-001 to po-010:
 
-* `audit/qa/hde-epic027/qa_step_logs_manifest.json`
-
+* `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
+    
 * `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`
 
 EPIC028 early Live QA evidence paths observed (records-only):
@@ -6530,46 +6510,6 @@ EPIC030 final Live QA current-state notes for this slice (records-only):
 * checks/po-010 records a PASS generated-proof fail-closed step under `audit/qa/hde-epic030/checks/po-010/`. The first run correctly stopped at TOOLING\_BLOCKED because PR-01 through PR-03 lacked explicit fail-closed proof coverage. The accepted remediation added PR-01 through PR-03 fail-closed proof coverage, reran the full fail-closed suite with PR-01 through PR-05 proof families covered, recorded `fail_closed_visibility.txt` as proven for PR-01 through PR-05, and preserved non-claim posture for close-pack completion, PF-canon drainage completion, and acceptance-map closure.  
 * checks/po-011 records a PASS traceability step under `audit/qa/hde-epic030/checks/po-011/`, with `traceability_summary.json` recording required PR-slice artifacts present, indexed in `docs/evidence/INDEX.json`, and mirrored in `artifacts/evidence_index.jsonl`, and with the primary log recording PASS, exit code `0`, and plan-copy command provenance.  
 * checks/po-012 records a PASS reused-history classification step under `audit/qa/hde-epic030/checks/po-012/`, after bounded Step-0B precondition remediation restored `audit/docdeltas/hde-epic030_doc_deltas.md`, `audit/qa/hde-epic030/00_meta/doc_deltas.md`, and `audit/qa/hde-epic030/00_meta/step_0b_primary.log`. The final classification separates reused-history rows `HDE-DISS005.1`, `HDE-DISS006.1`, and `HDE-DISS006.2` from active HDE-EPIC030 rows and records `new_implementation_claim_for_reused_history: False`.
-
-EPIC030 late Live QA evidence paths observed (records-only):
-
-* checks/po-013:  
-  * audit/qa/hde-epic030/checks/po-013/primary.log  
-  * audit/qa/hde-epic030/checks/po-013/source\_of\_truth\_posture.txt  
-* checks/po-014:  
-  * audit/qa/hde-epic030/checks/po-014/primary.log  
-  * audit/qa/hde-epic030/checks/po-014/all\_slice\_coherence.json  
-  * audit/qa/hde-epic030/checks/po-014/exit\_code.txt  
-* checks/po-015:  
-  * audit/qa/hde-epic030/checks/po-015/primary.log  
-  * audit/qa/hde-epic030/checks/po-015/discovery.json  
-  * audit/qa/hde-epic030/checks/po-015/discovery\_validation.txt  
-* checks/po-016:  
-  * audit/qa/hde-epic030/checks/po-016/primary.log  
-  * audit/EPIC-030\_QA\_RCA.md  
-* checks/po-017:  
-  * audit/qa/hde-epic030/checks/po-017/primary.log  
-  * audit/qa/hde-epic030/checks/po-017/documentation\_drainage\_posture.txt
-
-EPIC030 late Live QA current-state notes (records-only):
-
-* checks/po-013 records a PASS source-of-truth posture step under audit/qa/hde-epic030/checks/po-013/, with repo-supported completion, canon-drain completion, and formal close-pack completion kept as separate states. The step records that documentation drainage is not a required execution gate before QA PASS.  
-* checks/po-014 records a PASS all-slice coherence step under audit/qa/hde-epic030/checks/po-014/, with all prior po-001 through po-013 primary logs present, required PR-01 through PR-05 core artifacts present, and derived PASS status aligned with recorded primary-log status and exit code 0\.  
-* checks/po-015 records a PASS baseline discovery step under audit/qa/hde-epic030/checks/po-015/, with discovery.json present and parseable, rails, paths, and surfaces present, and discovery\_validation.txt recording discovery validity.  
-* checks/po-016 records a PASS QA RCA step under audit/qa/hde-epic030/checks/po-016/, with audit/EPIC-030\_QA\_RCA.md generated and containing Coverage vs QA Plan, Findings classification, Outcome meaning, evidence support, canon follow-up, and closeout-readiness interpretation.  
-* checks/po-017 records a PASS documentation-drainage posture step under audit/qa/hde-epic030/checks/po-017/, with drainage\_blocker recorded as False, PF09.2 drainage before otherwise-proven QA PASS recorded as False, and real truth-and-proof blockers preserved as the relevant blocker class.  
-* checks/po-015 and checks/po-016 record Plan \+ QA syntax correction command provenance for rendered Markdown exception-class syntax defects. The corrected executions preserve the approved proof targets, artifact families, and PASS/FAIL predicates, and the provenance is recorded in governed step evidence.
-
-EPIC030 QA RCA and closeout interpretation posture (records-only). The QA RCA records source-of-truth posture, coverage vs QA Plan, QA timeline, findings classification, root cause analysis, remediation loop assessment, implementation gaps, doc deltas excluding PF10, and an explicit readiness recommendation. The recorded root cause class is proof-class and evidence-discipline separation across a Dissolution closeout, including no-user/vendor proof ambiguity, generated-proof fail-closed coverage gaps, and separation between repo-supported completion, PF09.2 drainage, and formal close-pack completion.
-
-EPIC030 QA RCA remediation-loop notes (records-only):
-
-* po-006 remediation updated audit/ops/hde-epic030/ops-02/files\_sha256.txt with a deterministic self-reference row and reran the existing tests, grep, OPS-02 validator, and header generation without running a new vendor command.  
-* po-010 remediation changed an initial TOOLING\_BLOCKED posture to PASS after PR-01 through PR-03 generated proof families received explicit fail-closed coverage and the full po-010 suite reran.  
-* po-011 and po-012 remediation used Step-0B precondition evidence to reduce ambiguity around reused-history and active-scope separation before final PASS.  
-* The repeated evidence-generator lesson is that top-level PASS must derive from decisive predicate checks and not from partial or stale local state.
-
-EPIC030 closeout readiness note (records-only). The recorded QA verdict is READY WITH CAVEATS. The caveats preserve that QA closeout readiness is not a claim that PF09.2 drainage is complete or that formal close-pack completion is proven beyond the surfaced close-pack artifacts and separate OPS review.
 
 EPIC030 late Live QA evidence paths observed (records-only):
 
@@ -7783,100 +7723,6 @@ HDE-EPIC033 Live QA Step-0B through PO-009 current-state notes observed (records
 * PO-007 through PO-009 record two acceptable execution deviations: a reconstructed PF27-compatible helper wrapper because the pasted helper transcript was truncated or malformed, and a PO-009 proof-posture append that added explicit `repo_evidence_supportable_only=true` and `pf09_5_drainage_claim=UNPROVEN_BY_THIS_CHECK` lines to the receipt. The deviations are recorded as bounded and do not alter required deliverables or PASS or FAIL posture.  
 * PF14 records these Live QA entries as mechanics evidence records only. They do not create PF09 status movement, PF09 drainage, acceptance-token authority, final epic closure, runtime v2 conformance, runtime request shaping, open-rails vendor smoke, public Reader contract change, new HTTP home, HDE-FERM007 scope, HDE-FERM008 scope, or AI scope.
 
-HDE-EPIC033 Live QA Step-0B through PO-009 evidence paths observed (records-only):
-
-* checks/step-0b-doc-delta-capture:  
-  * `audit/qa/hde-epic033/checks/step-0b-doc-delta-capture/primary.log`  
-  * `audit/qa/hde-epic033/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt`  
-  * `audit/docdeltas/hde-epic033_doc_deltas.md`  
-  * `audit/docdeltas/hde-epic033_doc_deltas.md.path_proof.txt`  
-  * `audit/qa/hde-epic033/00_meta/doc_deltas.md`  
-  * `audit/qa/hde-epic033/00_meta/doc_deltas.md.path_proof.txt`  
-* checks/po-001:  
-  * `audit/qa/hde-epic033/checks/po-001/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-001/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/source_inventory.json`  
-  * `artifacts/vendor/hdapi_v2/source_inventory.md`  
-  * `artifacts/vendor/hdapi_v2/source_cache/v1-routes.yaml`  
-  * `artifacts/vendor/hdapi_v2/source_cache/v2-routes.yaml`  
-  * `artifacts/vendor/hdapi_v2/source_cache/source_metadata.json`  
-* checks/po-002:  
-  * `audit/qa/hde-epic033/checks/po-002/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-002/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/source_inventory.md`  
-  * `artifacts/vendor/hdapi_v2/source_cache/llms_txt.body`  
-  * `artifacts/vendor/hdapi_v2/source_cache/llms-full.endpoint-tiers.txt`  
-  * `artifacts/vendor/hdapi_v2/known_anomalies.md`  
-* checks/po-003:  
-  * `audit/qa/hde-epic033/checks/po-003/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-003/primary.log.path_proof.txt`  
-  * `tests/evidence/test_hdapi_v2_contract_inventory.py`  
-* checks/po-004:  
-  * `audit/qa/hde-epic033/checks/po-004/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-004/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/openapi_validation.log`  
-  * `artifacts/vendor/hdapi_v2/known_anomalies.md`  
-* checks/po-005:  
-  * `audit/qa/hde-epic033/checks/po-005/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-005/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/endpoint_reference.csv`  
-  * `artifacts/vendor/hdapi_v2/contract_map.json`  
-* checks/po-006:  
-  * `audit/qa/hde-epic033/checks/po-006/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-006/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/contract_map.json`  
-  * `artifacts/vendor/hdapi_v2/known_anomalies.md`  
-* checks/po-006-remediation-r3:  
-  * `audit/qa/hde-epic033/checks/po-006-remediation-r3/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-006-remediation-r3/primary.log.path_proof.txt`  
-  * `audit/qa/hde-epic033/checks/po-006/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-006/primary.log.path_proof.txt`  
-  * `artifacts/vendor/hdapi_v2/contract_map.json`  
-  * `artifacts/vendor/hdapi_v2/known_anomalies.md`  
-* checks/po-007:  
-  * `audit/qa/hde-epic033/checks/po-007/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-007/primary.log.path_proof.txt`  
-  * `docs/evidence/INDEX.json`  
-  * `docs/evidence/INDEX.sha256`  
-  * `artifacts/evidence_index.jsonl`  
-  * `artifacts/evidence_index.jsonl.sha256`  
-  * `docs/evidence/INDEX.json.path_proof.txt`  
-  * `docs/evidence/INDEX.sha256.path_proof.txt`  
-  * `artifacts/evidence_index.jsonl.path_proof.txt`  
-  * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
-* checks/po-008:  
-  * `audit/qa/hde-epic033/checks/po-008/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-008/primary.log.path_proof.txt`  
-  * `docs/acceptance_map_epic033.json`  
-  * `audit/qa/hde-epic033/token_evidence_matrix.md`  
-  * `audit/qa/hde-epic033/acceptance_map_viability.log`  
-* checks/po-009:  
-  * `audit/qa/hde-epic033/checks/po-009/primary.log`  
-  * `audit/qa/hde-epic033/checks/po-009/primary.log.path_proof.txt`  
-  * `docs/acceptance_map_epic033.json`  
-  * `audit/qa/hde-epic033/acceptance_map_viability.log`
-
-HDE-EPIC033 Live QA Step-0B through PO-009 current-state notes observed (records-only).
-
-* Step-0B records PASS for doc-delta capture with exit code `0`, final `primary.log` header status PASS, governed evidence under `audit/**`, a check-scoped primary log, a sibling primary-log path-proof transcript, two doc-delta surfaces, two doc-delta sibling path proofs, and no broader HDE-EPIC033 closure claim.  
-* Step-0B records no deviation or Moon Loop repair, no FAIL\_BEHAVIOR, no FAIL\_TOOLING, no TOOLING\_BLOCKED, no missing required file, no stale or mismatched path proof, and no missing primary-log path proof.  
-* PO-001, PO-002, and PO-003 record PASS with exit code `0`, final `primary.log` header status PASS, governed roots under `audit/**` and `artifacts/**`, check-scoped primary logs, sibling path-proof transcripts, closed rails, determinism pins, and no unplanned token claim.  
-* checks/po-001 records PASS for source-inventory grounding, including closed-rails source-cache mode, `cache_path`, `cache_sha256`, required source-cache files, and source inventory artifacts.  
-* checks/po-002 records PASS for AI and LLM vendor-documentation boundary posture, including `llms.txt` and `llms-full.txt` classified as documentation-discovery-only context and no AI product, runtime, evidence, token, credential, rail, QA, prompt, embedding, chatbot, model-call, or provider scope.  
-* checks/po-003 records PASS for targeted HDAPI v2 contract-inventory tests, with `TESTS_PASS_OK` claimed by that step and with a recorded operational deviation where Ruby was installed by `sudo apt-get` to satisfy a pytest dependency before rerun to PASS. The deviation is recorded as acceptable for the step because it changed no required deliverable and did not change PASS or FAIL criteria.  
-* PO-004, PO-005, and PO-006 record PASS for the step group, with PO-006 accepted through the Moon Loop Remediation R3 receipt as the final PO-006 proof basis.  
-* checks/po-004 records PASS for suspect OpenAPI quarantine and non-authority posture. The suspect `api-reference/openapi.json` is recorded as quarantined and not used as authority for vendor bytes, schemas, endpoint routes, request shaping, response mapping, runtime conformance, or architecture conformance, while validated YAML route specs remain first-precedence authority for the contract-inventory slice.  
-* checks/po-005 records PASS for endpoint reference and contract-map posture, including all five required route rows and both route-family labels for recommended v2 chart routes and legacy v1 BodyGraph routes.  
-* checks/po-006 records an initial FAIL\_BEHAVIOR context caused by a QA-harness-only brittle phrase-match defect, not by a product, repo-test, public-contract, or non-QA-root governed-artifact defect. The accepted R3 remediation stays within `audit/qa/hde-epic033/checks/`, preserves the same proof target, and satisfies contract-map parseability, final-LF, non-conformance, and no-runtime-request-shaping PASS criteria.  
-* PO-006 Moon Loop remediation is recorded as bounded QA evidence-harness remediation under the approved QA root. It does not modify product code, repo tests, public contracts, PF documents, acceptance tokens, or governed non-QA-root artifacts.  
-* PO-007, PO-008, and PO-009 record PASS with exit code `0`, final `primary.log` header status PASS, governed roots under `audit/**`, `docs/**`, and `artifacts/**`, check-scoped QA receipts, sibling path proofs, and no broader HDE-EPIC033 closure claim.  
-* checks/po-007 records PASS for governed evidence binding, including Human Evidence Index presence, Machine Mirror presence, hash sentinels, path-proof files, and evidence-index or mirror artifacts.  
-* checks/po-008 records PASS for acceptance-token posture, including baseline existing-token posture, vendor-v2-specific tokens recorded as NONE, existing registry-valid tokens only, and no minted vendor-v2-specific token.  
-* checks/po-009 records PASS for HDE-FERM006 supportability posture, including HDE-FERM006.1 through HDE-FERM006.4 bound in the acceptance map, no runtime v2 conformance claim, repo-evidence-only supportability, and no PF09.5 drainage claim by the check.  
-* PO-007 through PO-009 record no final FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, required-file absence, stale path proof, missing primary-log path-proof, or token-posture mismatch.  
-* PO-007 through PO-009 record two acceptable execution deviations: a reconstructed PF27-compatible helper wrapper because the pasted helper transcript was truncated or malformed, and a PO-009 proof-posture append that added explicit `repo_evidence_supportable_only=true` and `pf09_5_drainage_claim=UNPROVEN_BY_THIS_CHECK` lines to the receipt. The deviations are recorded as bounded and do not alter required deliverables or PASS or FAIL posture.  
-* PF14 records these Live QA entries as mechanics evidence records only. They do not create PF09 status movement, PF09 drainage, acceptance-token authority, final epic closure, runtime v2 conformance, runtime request shaping, open-rails vendor smoke, public Reader contract change, new HTTP home, HDE-FERM007 scope, HDE-FERM008 scope, or AI scope.
-
 HDE-EPIC033 continued Live QA evidence paths observed (records-only):
 
 * checks/po-010:  
@@ -7997,22 +7843,22 @@ Final closeout verdict and recommendation observed:
 
 When a governed review, QA step, or docs-evidence update depends on the shipped CLI syntax or CLI rejection behavior for conjunction flows, governed capture artifacts MUST be recorded for:
 
-* `hdctl --help`
-
-* `hdctl showcompat --help`
-
+* `hdctl --help`  
+    
+* `hdctl showcompat --help`  
+    
 * any intentionally rejected unsupported conjunction-modifier invocation exercised by the step
 
 The capture family MUST:
 
-* record the exact command invoked
-
-* capture stdout, stderr, and exit code as produced by the command
-
-* live under a governed repo path
-
-* be listed in the Human Index and mirrored 1:1 in the Machine Mirror with a co-located path-proof
-
+* record the exact command invoked  
+    
+* capture stdout, stderr, and exit code as produced by the command  
+    
+* live under a governed repo path  
+    
+* be listed in the Human Index and mirrored 1:1 in the Machine Mirror with a co-located path-proof  
+    
 * be refreshed in the same PR whenever the shipped help text, accepted conjunction modifiers, or CLI rejection behavior changes
 
 Help captures are evidence of the shipped CLI help surfaces only. Rejection captures are evidence of CLI argument-policing behavior only. PF05 remains the single home for CLI contract bytes, flag semantics, and exit-code mappings.
@@ -8023,16 +7869,16 @@ Generation tool (normative). Canonical entrypoint: `python tools/cli/generate_cl
 
 Required governed artifacts. When CLI conformance evidence is refreshed for conjunction work, the governed capture family MUST include:
 
-* `artifacts/cli/help/hdctl_help.txt`
-
-* `artifacts/cli/help/showcompat_help.txt`
-
-* `artifacts/cli/help/reject_nonjson.txt`
-
-* `artifacts/cli/install/entrypoints.txt`
-
-* `artifacts/cli/install/installability_summary.json`
-
+* `artifacts/cli/help/hdctl_help.txt`  
+    
+* `artifacts/cli/help/showcompat_help.txt`  
+    
+* `artifacts/cli/help/reject_nonjson.txt`  
+    
+* `artifacts/cli/install/entrypoints.txt`  
+    
+* `artifacts/cli/install/installability_summary.json`  
+    
 * `artifacts/cli/summary.json`
 
 Path-proofs (normative). Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be listed in the Human Index and mirrored 1:1 in the Machine Mirror in the same PR as any byte change.
@@ -8041,8 +7887,8 @@ Installability coherence (normative). `artifacts/cli/install/entrypoints.txt` an
 
 Conformance summary (normative). `artifacts/cli/summary.json` MUST preserve conjunction CLI conformance sections for:
 
-* installability
-
+* installability  
+    
 * `sampler_semantics`
 
 The summary MUST continue to capture deterministic CLI parity facts required elsewhere in this guide and MUST be regenerated, not hand-edited.
@@ -8051,8 +7897,8 @@ The summary MUST continue to capture deterministic CLI parity facts required els
 
 Catalog:
 
-* docs/ENDPOINTS\_CATALOG.json
-
+* docs/ENDPOINTS\_CATALOG.json  
+    
 * docs/ENDPOINTS\_CATALOG.json.sha256
 
 Env-gate proof:
@@ -8071,42 +7917,45 @@ Success route proofs:
 
 Serializer and emitter guards are the mechanical enforcement layer for CLI serializer coupling (see §4 and §18). They prove that:
 
-* public CLI flows do not use ad-hoc JSON serializers, and
-
+* public CLI flows do not use ad-hoc JSON serializers, and  
+    
 * governed CLI handlers call the allow-listed presenter/emitter symbols.
 
 ### **37.6.1 Guard tools (closed-rails, deterministic)**
 
 Mechanics defines two canonical CLI guard tools:
 
-* tools/cli/serializer\_grep\_guard.py
-
-  * AST-based grep guard over the governed CLI scope (default roots under engine/cli).
-
-  * Detects imports of the json module and call-sites that resolve to json.dumps or json.dump (including alias imports).
-
-  * Renders a deterministic report with:
-
-    * a single scope line describing the scanned roots
-
+* tools/cli/serializer\_grep\_guard.py  
+    
+  * AST-based grep guard over the governed CLI scope (default roots under engine/cli).  
+      
+  * Detects imports of the json module and call-sites that resolve to json.dumps or json.dump (including alias imports).  
+      
+  * Renders a deterministic report with:  
+      
+    * a single scope line describing the scanned roots  
+        
     * a summary line of the form “summary: PASS” or “summary: FAIL” followed by sorted violation lines when present
+
+    
 
   * The report contains no timestamps, environment echoes, or non-deterministic content.
 
-* tools/cli/emitter\_symbol\_proof.py
 
-  * AST-based emitter proof over the CLI module (engine/cli/main.py).
-
-  * Tracks call-sites in the governed handlers (showcompat, aux\_preview, bg\_resolve) and records which allow-listed emitter symbols they invoke.
-
+* tools/cli/emitter\_symbol\_proof.py  
+    
+  * AST-based emitter proof over the CLI module (engine/cli/main.py).  
+      
+  * Tracks call-sites in the governed handlers (showcompat, aux\_preview, bg\_resolve) and records which allow-listed emitter symbols they invoke.  
+      
   * Emits deterministic lines of the form “handler:function:emitters” plus a summary line indicating PASS or FAIL for the non-optional handlers.
 
 Both guard tools:
 
-* import and call ensure\_determinism\_env from engine/runtime/determinism\_env.py at startup
-
-* require the determinism pins and closed rails to be satisfied (LC\_ALL=C, LANG=C, TZ=UTC, SAFE\_MODE=1, ALLOW\_NETWORK=0)
-
+* import and call ensure\_determinism\_env from engine/runtime/determinism\_env.py at startup  
+    
+* require the determinism pins and closed rails to be satisfied (LC\_ALL=C, LANG=C, TZ=UTC, SAFE\_MODE=1, ALLOW\_NETWORK=0)  
+    
 * fail closed (non-zero exit) if the pins are not met
 
 CI must call these tools only under the closed-rails determinism posture described in §1.2 and §6.2; check\_env\_pins and related jobs enforce the pins before running the guards.
@@ -8115,30 +7964,31 @@ CI must call these tools only under the closed-rails determinism posture describ
 
 The canonical guard artifacts and their roles are:
 
-* artifacts/cli/guards/serializer\_grep\_guard.log
-
-  * Role: log.
-
-  * Contains the serializer grep guard report (scope line, summary line, and any sorted violation lines).
-
+* artifacts/cli/guards/serializer\_grep\_guard.log  
+    
+  * Role: log.  
+      
+  * Contains the serializer grep guard report (scope line, summary line, and any sorted violation lines).  
+      
   * A PASS report demonstrates that the governed CLI scope has no direct json.dumps or json.dump usage and that public JSON flows pass through the canonical emitter.
 
-* artifacts/cli/guards/emitter\_symbol\_proof.txt
 
-  * Role: snapshot.
-
-  * Contains the emitter symbol proof for the governed CLI handlers.
-
-  * For showcompat and bg\_resolve, the proof must show at least one allow-listed emitter symbol (for example, emitter.emit\_public or emit\_reader\_public\_envelope) and must mark the summary as PASS.
-
+* artifacts/cli/guards/emitter\_symbol\_proof.txt  
+    
+  * Role: snapshot.  
+      
+  * Contains the emitter symbol proof for the governed CLI handlers.  
+      
+  * For showcompat and bg\_resolve, the proof must show at least one allow-listed emitter symbol (for example, emitter.emit\_public or emit\_reader\_public\_envelope) and must mark the summary as PASS.  
+      
   * aux-preview is treated as an optional emitter handler: when it has no canonical emitter, it is rendered as a handler line with a “none” emitter listing and is explicitly exempt in the PASS/FAIL decision, so the absence of an emitter for aux-preview does not cause the guard to fail, while still keeping the handler visible in the proof.
 
 These artifacts are the paths of record for:
 
-* Phase I serializer work
-
-* EPIC017 and EPIC018 CLI serializer acceptance
-
+* Phase I serializer work  
+    
+* EPIC017 and EPIC018 CLI serializer acceptance  
+    
 * evidence indexing for serializer/emitter guards
 
 The Evidence Index and Machine Mirror must use these paths as discovered\_physical\_path for the corresponding records; any other locations are copies only.
@@ -8147,18 +7997,18 @@ The Evidence Index and Machine Mirror must use these paths as discovered\_physic
 
 Indexing and mirror discipline for guard artifacts follow §1.3 and §37.4:
 
-* List guard artifacts by title and path in Appendix D: Evidence Index.
-
-* Mirror them 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; UTF-8, ASCII-sorted keys, compact, one LF; unknown keys rejected; exact field order pinned in §1.3).
-
+* List guard artifacts by title and path in Appendix D: Evidence Index.  
+    
+* Mirror them 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; UTF-8, ASCII-sorted keys, compact, one LF; unknown keys rejected; exact field order pinned in §1.3).  
+    
 * Each mirror record includes a proof\_anchor pointing at a co-located path\_proof transcript for the guard artifact.
 
 For backward compatibility:
 
-* Implementations may also write copies of the guard artifacts under audit/gates/guards/\*\* for internal audit workflows.
-
-* These audit/gates/guards/\*\* paths are secondary only and are not required for mechanics-level acceptance.
-
+* Implementations may also write copies of the guard artifacts under audit/gates/guards/\*\* for internal audit workflows.  
+    
+* These audit/gates/guards/\*\* paths are secondary only and are not required for mechanics-level acceptance.  
+    
 * Future PF documents and epic records that reference CLI serializer/emitter guards should use the artifacts/cli/guards/\*\* paths as canonical and treat audit/gates/guards/\*\* as historical or auxiliary.
 
 ### **37.6.4 Live QA runs under open rails (informative)**
@@ -8167,20 +8017,20 @@ Status (informative, mechanics-aware). The canonical pass condition for CLI seri
 
 Env-mismatch failures are expected. When the determinism pins required by ensure\_determinism\_env are not satisfied (for example, SAFE\_MODE or ALLOW\_NETWORK differ from the closed-rails CI posture), the guard tools are expected to:
 
-* refuse to run in “PASS” mode
-
+* refuse to run in “PASS” mode  
+    
 * exit non-zero with logs that clearly indicate an environment mismatch rather than a serializer/emitter wiring error
 
 Open-rails Live QA is env-enforcement only. Running the guards in an open-rails Live QA environment is allowed as an env-enforcement check:
 
-* A non-zero exit due solely to determinism env mismatch confirms that the guards are enforcing the closed-rails policy correctly.
-
+* A non-zero exit due solely to determinism env mismatch confirms that the guards are enforcing the closed-rails policy correctly.  
+    
 * Such runs do not contribute to the canonical guard acceptance condition and must not be interpreted as evidence of broken CLI serializer or emitter wiring.
 
 Canonical acceptance remains CLOSED-rails. The authoritative acceptance for CLI serializer/emitter guard tokens remains:
 
-* CI and other CLOSED-rails jobs that run the guard tools under the determinism pins described in §1.2 and §6.2
-
+* CI and other CLOSED-rails jobs that run the guard tools under the determinism pins described in §1.2 and §6.2  
+    
 * guard artifacts and mirror records produced in that posture, as described in §17.8, §18.5, and §37.6.2–§37.6.3
 
 Mechanics records this distinction so that PF-Canon and QA plans can treat open-rails guard runs as informational (env-pin enforcement) while continuing to rely on CLOSED-rails CI runs for normative D-stage/guard acceptance. PF14 does not define new tokens here; token semantics and QA expectations for guard runs remain single-homed in HDE-Governance, Glow QA Guide, HDE-Build Checklist, and HDE Phased Epics by title.
@@ -8189,8 +8039,8 @@ Mechanics records this distinction so that PF-Canon and QA plans can treat open-
 
 AB ↔ BA goldens:
 
-* artifacts/cli/ab.json
-
+* artifacts/cli/ab.json  
+    
 * artifacts/cli/ba.json — LF-terminated canonical JSON; BA must be byte-identical to AB.
 
 Parity summary:
@@ -8209,36 +8059,36 @@ Canonical surface (normative). Canonical JSON compare evidence MUST bind to this
 
 Error parity (Reader↔CLI; stored artifacts; deterministic roster):
 
-* parity/errors\_reader\_cli.invalid\_json.http.json
-
-* parity/errors\_reader\_cli.invalid\_json.cli.txt
-
-* parity/errors\_reader\_cli.invalid\_viewer\_prefs.http.json
-
-* parity/errors\_reader\_cli.invalid\_viewer\_prefs.cli.txt
-
-* parity/errors\_reader\_cli.db\_unavailable.http.json
-
-* parity/errors\_reader\_cli.db\_unavailable.cli.txt
-
-* parity/errors\_reader\_cli.vendor\_attempt\_closed\_rails.http.json
-
-* parity/errors\_reader\_cli.vendor\_attempt\_closed\_rails.cli.txt
-
-* errors/schema\_check/error\_envelope\_db\_unavailable.log
-
-* errors/schema\_check/error\_envelope\_vendor\_attempt\_closed\_rails.log
-
+* parity/errors\_reader\_cli.invalid\_json.http.json  
+    
+* parity/errors\_reader\_cli.invalid\_json.cli.txt  
+    
+* parity/errors\_reader\_cli.invalid\_viewer\_prefs.http.json  
+    
+* parity/errors\_reader\_cli.invalid\_viewer\_prefs.cli.txt  
+    
+* parity/errors\_reader\_cli.db\_unavailable.http.json  
+    
+* parity/errors\_reader\_cli.db\_unavailable.cli.txt  
+    
+* parity/errors\_reader\_cli.vendor\_attempt\_closed\_rails.http.json  
+    
+* parity/errors\_reader\_cli.vendor\_attempt\_closed\_rails.cli.txt  
+    
+* errors/schema\_check/error\_envelope\_db\_unavailable.log  
+    
+* errors/schema\_check/error\_envelope\_vendor\_attempt\_closed\_rails.log  
+    
 * errors/token\_map/token\_map.json
 
 Showcompat stdout capture (closed rails; deterministic fixture):
 
-* artifacts/cli/showcompat/stdout.json
-
-* artifacts/cli/showcompat/stdout.json.sha256
-
-* artifacts/cli/showcompat/args.json
-
+* artifacts/cli/showcompat/stdout.json  
+    
+* artifacts/cli/showcompat/stdout.json.sha256  
+    
+* artifacts/cli/showcompat/args.json  
+    
 * (Compatibility-only alias; when required for backward compatibility) artifacts/cli/showcompat/stdout.sha256
 
 Generation tool (normative). The showcompat stdout capture artifacts above MUST be generated (not hand-edited). Canonical entrypoint: `python tools/cli/generate_showcompat_artifacts.py`. The generator MUST enforce the stdout byte constraints in §16.2 and MUST update checksum sidecars from the exact emitted stdout.json bytes.
@@ -8251,18 +8101,18 @@ These showcompat capture artifacts are deterministic fixtures used to prove stdo
 
 Conjunction CLI artifacts (required). When conjunction-mode CLI evidence is captured, the governed artifact family includes:
 
-* `artifacts/audit/cli/pair.json`
-
-* `artifacts/audit/cli/pair_ba.json`
-
-* `artifacts/audit/cli/showcompat_ab.json`
-
-* `artifacts/audit/cli/showcompat_ba.json`
-
-* `artifacts/cli/abba_sidecar.json`
-
-* `artifacts/cli/out.json`
-
+* `artifacts/audit/cli/pair.json`  
+    
+* `artifacts/audit/cli/pair_ba.json`  
+    
+* `artifacts/audit/cli/showcompat_ab.json`  
+    
+* `artifacts/audit/cli/showcompat_ba.json`  
+    
+* `artifacts/cli/abba_sidecar.json`  
+    
+* `artifacts/cli/out.json`  
+    
 * `artifacts/cli/out_ba.json`
 
 Path-proofs (normative). Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be listed in the Human Evidence Index and mirrored 1:1 in `artifacts/evidence_index.jsonl` in the same PR as any byte change.
@@ -8291,22 +8141,22 @@ Validation set (required when this bounded route-probe family changes). Refreshi
 
 EPIC024 showcompat artifacts capture (D03) fixed outputs (records-only):
 
-* `python tools/evidence/run_showcompat_artifacts.py` (command entrypoint)
-
-* artifacts/showcompat/epic024/showcompat\_manifest.json
-
-* artifacts/showcompat/epic024/showcompat\_manifest.json.path\_proof.txt
-
-* artifacts/showcompat/epic024/showcompat\_symbols.json
-
-* artifacts/showcompat/epic024/showcompat\_symbols.json.path\_proof.txt
-
+* `python tools/evidence/run_showcompat_artifacts.py` (command entrypoint)  
+    
+* artifacts/showcompat/epic024/showcompat\_manifest.json  
+    
+* artifacts/showcompat/epic024/showcompat\_manifest.json.path\_proof.txt  
+    
+* artifacts/showcompat/epic024/showcompat\_symbols.json  
+    
+* artifacts/showcompat/epic024/showcompat\_symbols.json.path\_proof.txt  
+    
 * audit/qa/hde-epic024/checks/D03\_showcompat\_artifacts/primary.log
 
 ## **37.8 CLI Admin Preview (narrative)**
 
-* artifacts/cli/narrative/stdout.txt — LF-terminated text (no ANSI).
-
+* artifacts/cli/narrative/stdout.txt — LF-terminated text (no ANSI).  
+    
 * artifacts/cli/narrative/sidecar.json — ids-only canonical JSON (no prose).
 
 Both must be indexed in the Human Index and Machine Mirror in the same PR.
@@ -8335,10 +8185,10 @@ No alternate filenames (normative). Future plans MUST validate these canonical s
 
 Legacy compatibility surfaces (non-authoritative). Until the migration away from audit/gates/canonical\_json/ is complete, the following compatibility-only legacy artifacts MAY continue to be emitted from the same canonical JSON gate run:
 
-* audit/gates/canonical\_json/canonical\_json.gate.json
-
-* audit/gates/canonical\_json/json\_canon\_compare.log
-
+* audit/gates/canonical\_json/canonical\_json.gate.json  
+    
+* audit/gates/canonical\_json/json\_canon\_compare.log  
+    
 * audit/gates/canonical\_json/json\_canonical\_check.log
 
 If these legacy artifacts are emitted, each MUST have a co-located .path\_proof.txt transcript and MAY remain indexed/mirrored as compatibility-only outputs during migration. Plans, acceptance binding, and close-pack checks MUST continue to bind to audit/gates/json\_gate/canonical/ as the canonical surface, and the legacy family MUST NOT be treated as permission to invent additional legacy filenames
@@ -8375,34 +8225,29 @@ Edges diff:
 
 ## **37.11 Pack identity & provenance**
 
-Evidence copy of manifest:
+Historical EPIC022 release evidence (frozen capture-time records):
 
-* artifacts/math/freeze\_pack\_manifest.json (Evidence-copy semantics are locked: artifacts/math/freeze\_pack\_manifest.json is a byte-identical evidence copy of the canonical bytes of catalog/manifest.json. It is not a derived manifest or alternate contract. See §27.3 for the normative semantics.)
+* `artifacts/math/freeze_pack_manifest.json`  
+* `artifacts/math/release_id.txt`  
+* `artifacts/math/release_id_recompute.log`
 
-Recomputed release\_id:
+Release-ID evidence path canonicalization for this retained historical family (normative). The canonical retained paths are:
 
-* artifacts/math/release\_id.txt
+* `artifacts/math/release_id.txt`  
+* `artifacts/math/release_id_recompute.log`
 
-Recompute log:
-
-* artifacts/math/release\_id\_recompute.log
-
-Release-id evidence path canonicalization (normative). Release-id evidence is canonical at:
-
-* artifacts/math/release\_id.txt
-
-* artifacts/math/release\_id\_recompute.log
-
-Any references to audit/gates/release/release\_id.txt (or similar audit/gates/release/\*\* paths) are deprecated and MUST NOT be used for evidence indexing or close-pack checks. If a transitional copy is required, it MUST be mechanically generated from the canonical artifacts/math/\*\* source (no manual editing), and indexing MUST reference the canonical artifacts/math/\*\* paths.
+References to `audit/gates/release/release_id.txt` or similar `audit/gates/release/**` paths are deprecated and MUST NOT be used for evidence indexing or close-pack checks. If a transitional copy is required, it MUST be mechanically generated from the canonical `artifacts/math/**` source without manual editing, and indexing MUST reference the canonical `artifacts/math/**` paths.
 
 Checksums audit:
 
-* artifacts/math/checksums\_audit.log
+* `artifacts/math/checksums_audit.log`
+
+These paths preserve the manifest bytes, release ID, recompute trace, and checksum audit from their original capture. They are not current runtime identity inputs and MUST NOT be interpreted as mirrors of later `catalog/manifest.json` bytes. Current release identity derives from `catalog/manifest.json`; current release-bound derivatives are produced only through the external attestation mechanics in §27.3.
 
 (Optional) SBOM (CycloneDX) \+ hash:
 
-* sbom/cyclonedx.json
-
+* sbom/cyclonedx.json  
+    
 * sbom/cyclonedx.json.sha256
 
 ## **37.12 Identity & Math**
@@ -8427,14 +8272,14 @@ HEAD headers:
 
 Conditional headers:
 
-* artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt
-
+* artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt  
+    
 * artifacts/ops/internal\_version/headers\_cond\_if\_modified\_since.txt
 
 Body & hash:
 
-* artifacts/ops/internal\_version/body\_get.json
-
+* artifacts/ops/internal\_version/body\_get.json  
+    
 * artifacts/ops/internal\_version/body\_get.sha256
 
 Two-run identity & coupling proof:
@@ -8443,7 +8288,7 @@ Two-run identity & coupling proof:
 
 Request-chain manifest:
 
-* artifacts/ops/internal\_version/request\_chain\_manifest.jso
+* artifacts/ops/internal\_version/request\_chain\_manifest.json
 
 Filename aliases (compatibility-only; no ad-hoc variants). If an epic’s acceptance bindings require legacy names for the conditional header snapshot files (specifically, artifacts/ops/internal\_version/cond\_if\_none\_match\_headers.txt and/or artifacts/ops/internal\_version/cond\_if\_modified\_since\_headers.txt), the Live QA harness MAY emit explicitly defined alias copies as compatibility-only artifacts. Any such alias MUST be mechanically generated from the canonical files above (no manual edits), and evidence indexing MUST continue to reference the canonical filenames listed in this section. No other filename variants are permitted beyond the canonical set plus any explicitly defined aliases governed elsewhere (titles-only).
 
@@ -8455,8 +8300,8 @@ DDL snapshot:
 
 Grants/constraints checks:
 
-* artifacts/db/grants.txt
-
+* artifacts/db/grants.txt  
+    
 * artifacts/db/check\_constraints.txt
 
 Schema check:
@@ -8473,11 +8318,13 @@ Start command capture:
 
 Environment pins:
 
-* audit/gates/determinism/env\_pins.log
-
+* audit/gates/determinism/env\_pins.log  
+    
 * audit/gates/determinism/env\_pins.log.path\_proof.txt
 
-DB bridge and provider parity:
+Historical DB bridge and provider-parity evidence (retained records only):
+
+The artifacts in this subsection are frozen bridge-era records governed by §20.3.2. They do not prove current bridge availability, runtime support, fallback, direct-versus-bridge parity, bridge consistency, acceptance-token satisfaction, or a current OPS result.
 
 * `artifacts/db_bridge/adapter_selection.snapshot.json` — deterministic adapter-selection snapshot for the DB bridge parity family, secret-free and DSN-free.  
 * `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt` — co-located path-proof transcript for the adapter-selection snapshot.  
@@ -8578,10 +8425,10 @@ Source selection snapshot:
 
 Source invariance:
 
-* artifacts/bodygraph/source\_invariance/ab.json
-
-* artifacts/bodygraph/source\_invariance/ba.json
-
+* artifacts/bodygraph/source\_invariance/ab.json  
+    
+* artifacts/bodygraph/source\_invariance/ba.json  
+    
 * artifacts/bodygraph/source\_invariance/summary.json
 
 Refresh policy:
@@ -8633,8 +8480,8 @@ Each listed registry-family artifact and sentinel MUST be paired with its matchi
 
 Aux (EPIC-010 scope; headers-only):
 
-* tests/transport/headers/aux\_text\_200.snap
-
+* tests/transport/headers/aux\_text\_200.snap  
+    
 * tests/transport/headers/aux\_suppression\_200.snap
 
 (No Aux HEAD/304 captures in EPIC-010; A7 remains Catalog-only.)
@@ -8657,8 +8504,8 @@ Machine Mirror:
 
 Evidence index snapshot (gate-family; canonical):
 
-* audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json
-
+* audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json  
+    
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json.path\_proof.txt
 
 ### **37.18.1 EPIC027 close-pack and same-run ledger refresh**
@@ -8667,34 +8514,34 @@ Canonical close-pack generator (required). `python tools/qa/generate_epic027_clo
 
 Required close-pack artifacts. The generator MUST emit and refresh, at minimum:
 
-* `docs/acceptance_map_epic027.json`
-
-* `audit/qa/hde-epic027/token_evidence_matrix.md`
-
-* `audit/qa/hde-epic027/acceptance_map_viability.log`
-
-* `audit/EPIC-027_close_report.md`
-
+* `docs/acceptance_map_epic027.json`  
+    
+* `audit/qa/hde-epic027/token_evidence_matrix.md`  
+    
+* `audit/qa/hde-epic027/acceptance_map_viability.log`  
+    
+* `audit/EPIC-027_close_report.md`  
+    
 * `audit/EPIC-027_MANIFEST.json`
 
 Close-report truthfulness (required). The close-pack generator MUST NOT claim Human Index, Machine Mirror, checksum, path-proof, or same-run gate refresh unless that workflow was actually executed in the same run.
 
 Same-run governed workflow (required). When the EPIC027 close-pack family changes, the bound close-pack workflow MUST execute and persist the same-run outputs for:
 
-* `python tools/evidence/update_evidence_index.py`
-
-* `python tools/evidence/update_evidence_index.py --check`
-
-* `python tools/evidence/orientation_demo.py`
-
-* `python tools/evidence/orientation_demo.py --check`
-
-* `python tools/evidence/validate_evidence_paths.py`
-
-* `python tools/evidence/check_lf_endings.py`
-
-* `python ci/checks/check_mirror_schema.sh`
-
+* `python tools/evidence/update_evidence_index.py`  
+    
+* `python tools/evidence/update_evidence_index.py --check`  
+    
+* `python tools/evidence/orientation_demo.py`  
+    
+* `python tools/evidence/orientation_demo.py --check`  
+    
+* `python tools/evidence/validate_evidence_paths.py`  
+    
+* `python tools/evidence/check_lf_endings.py`  
+    
+* `python ci/checks/check_mirror_schema.sh`  
+    
 * the acceptance-map viability run that writes `audit/qa/hde-epic027/acceptance_map_viability.log`
 
 Same-change ledger refresh (required). Any byte change in the EPIC027 close-pack family MUST refresh the Human Index, Machine Mirror, hash sentinels, and changed path-proof companions in the same PR.
@@ -8899,11 +8746,10 @@ Same-PR rule. Any addition, removal, or relocation in this registry must update 
 
 CI enforces:
 
-* Human↔machine 1:1 parity
-
-* canonical JSONL
-
-* unknown-key rejection
-
+* Human↔machine 1:1 parity  
+    
+* canonical JSONL  
+    
+* unknown-key rejection  
+    
 * presence and correctness of path-proofs
-
