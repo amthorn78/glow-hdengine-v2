@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide
 
-**Version:** v2.4.4
+**Version:** v2.4.5
 
 **Status:** Canon
 
 **Effective date**: 2026-08-12
 
-**Last Update Gate:** 0808 Refresh 3
+**Last Update Gate:** 0808 Refresh 4
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5194,187 +5194,143 @@ Open closure items or Lead questions:
 
 * \<What must be decided, accepted, or scheduled before closure\>
 
-# Appendices
+# **Appendix A — Large Schemas & Assets (CodEx constraints)**
 
-## **Appendix A — Large Schemas & Assets (CodEx constraints)**
-
-### **Purpose**
+## **Purpose**
 
 Define how to include large schemas or assets when content is too large to paste inline or when the workflow cannot rely on file attachments. This appendix preserves ownership, auditability, and single-home discipline while keeping execution mechanical and repeatable.
 
-### **Constraints (facts)**
+## **Constraints (facts)**
 
-* CodEx can read PF docs, but may not have reliable access to large external assets via attachment workflows. Execution-critical formats and small schemas should still be pasted inline by the IA to keep an unambiguous in-session reference.
+* CodEx can read PF docs, but may not have reliable access to large external assets via attachment workflows. Execution-critical formats and small schemas should still be pasted inline by the IA to keep an unambiguous in-session reference.  
+    
+* CodEx cannot accept file uploads as part of the build interaction; only IA-provided inline text or snippets and repo contents are used during build.  
+    
+* Only the Product Owner (PO) may load large files into the repo or PR branch when needed. Implementation Agents do not run git and do not create PRs.  
+    
+* CodEx may adapt within scope but must report every change in the Detailed Change Report.  
+    
+* Governed locations only. Assets must live under artifacts/\*\* or docs/**; governed evidence may also live under audit/**. Transient or generator paths are disallowed.  
+    
+* Single-PR parity. When assets are introduced or moved, update all `PF12-Canon-HDE-Schemas-and-Artifacts`\-required evidence ledgers, hash sentinels, mirrors, and path-proofs in the same PR. If the CodEx UI cannot include doc edits, the IA provides verbatim text in the same PR body for CodEx to commit.  
+    
+* Mirror hygiene. Apply the complete current Machine Evidence Mirror and path-proof contract in `PF12-Canon-HDE-Schemas-and-Artifacts`; this appendix does not reproduce its schema or byte rules.
 
-* CodEx cannot accept file uploads as part of the build interaction; only IA-provided inline text or snippets and repo contents are used during build.
+## **Roles & responsibilities**
 
-* Only the Product Owner (PO) may load large files into the repo or PR branch when needed. Agents do not run git and do not create PRs.
+### **Lead Dev / IA**
 
-* CodEx may adapt within scope but must report every change in the Detailed Change Report.
-
-* Governed locations only. Assets and evidence must live under artifacts/\*\* and docs/\*\*. Transient or generator paths are disallowed.
-
-* Single-PR parity. Repo docs (Doc-Delta), the human Evidence Index (docs/evidence/INDEX.json), the Evidence Index hash sentinel (docs/evidence/INDEX.sha256), and the machine mirror (artifacts/evidence\_index.jsonl) must be updated in the same PR when assets are introduced or moved. If the CodEx UI cannot include doc edits, the IA provides verbatim text in the same PR body for CodEx to commit.
-
-* Mirror hygiene (PF12). The mirror is records-only canonical JSONL (UTF-8, compact, exactly one LF), unknown-keys rejected, ASCII field order, sort-before-write, single mirror file; each record includes artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and a proof\_anchor pointing to a co-located path-proof.
-
-### **Roles & responsibilities**
-
-#### **Lead Dev / IA**
-
-* Prepare inline materials (formats, small schemas, snippets).
-
-* When assets are too large for inline use, create an Asset Draft Pack (fields below) for the PO to load.
-
+* Prepare inline materials (formats, small schemas, snippets).  
+    
+* When assets are too large for inline use, create an Asset Draft Pack (fields below) for the PO to load.  
+    
 * Ensure the CodEx-opened PR captures Evidence Index, hash sentinel, mirror updates, and single-home pointers. Avoid separate docs-only PRs.
 
-#### **Product Owner**
+### **Product Owner**
 
-* Load the Asset Draft Pack files into the CodEx PR branch at the specified targets.
-
+* Load the Asset Draft Pack files into the CodEx PR branch at the specified targets.  
+    
 * Confirm the CodEx-opened PR and, after Lead Dev gate passes, squash-merge.
 
-#### **CodEx**
+### **CodEx**
 
-* Can read PF docs, but the IA SHOULD still paste execution-critical formats and small schemas or snippets inline to keep an unambiguous in-session reference and reduce drift.
-
-* Uses IA-provided inline materials and repo contents during build.
-
+* Can read PF docs, but the IA SHOULD still paste execution-critical formats and small schemas or snippets inline to keep an unambiguous in-session reference and reduce drift.  
+    
+* Uses IA-provided inline materials and repo contents during build.  
+    
 * Proposes scoped adjustments; lists every change in the Detailed Change Report (files added, modified, removed; deviations and improvements).
 
-### **When to use an Asset Draft Pack**
+## **When to use an Asset Draft Pack**
 
 Use a pack when any required artifact cannot reasonably be pasted inline for CodEx (e.g., large JSON or YAML schemas, binaries, long fixtures).
 
-### **Asset Draft Pack — minimal fields**
+## **Asset Draft Pack — minimal fields**
 
 Paste verbatim to the PO and attach in the PR body; the PO loads these files to the PR branch.
 
 asset\_pack:  
- epic\_id: "EPIC-?.?"  
- owner: "IA or Lead Dev"  
- assets:  
- \- asset\_id: "schema\_user\_profile\_v3"  
- title: "User Profile Schema v3"  
- repo\_target\_location: "\<path/inside/repo\>"  
- size\_bytes: 123456  
- sha256: "\<64-hex\>"  
- license\_note: "\<source/license or 'internal'\>"  
- single\_home\_category: "Architecture" \# route by category title only  
- notes: "Consumed by component X; CodEx will assume this location."
+epic\_id: "EPIC-?.?"  
+owner: "IA or Lead Dev"  
+assets:  
+\- asset\_id: "schema\_user\_profile\_v3"  
+title: "User Profile Schema v3"  
+repo\_target\_location: "\<path/inside/repo\>"  
+size\_bytes: 123456  
+sha256: "\<64-hex\>"  
+license\_note: "\<source/license or 'internal'\>"  
+single\_home\_category: "Architecture" \# route by category title only  
+notes: "Consumed by component X; CodEx will assume this location."
 
-### **Guardrails**
+## **Guardrails**
 
-* No secrets or PII. Include license and source.
+* No secrets or PII. Include license and source.  
+    
+* Exactly one single home per concept; route by category title only, not by version numbers.  
+    
+* Keep paths repo-relative and stable; list titles and paths in the human Evidence Index.  
+    
+* For governed assets, apply the indexing, Machine Evidence Mirror, and co-located path-proof requirements in `PF12-Canon-HDE-Schemas-and-Artifacts`.
 
-* Exactly one single home per concept; route by category title only, not by version numbers.
+## **Flow (high level)**
 
-* Keep paths repo-relative and stable; list titles and paths in the human Evidence Index.
-
-* For governed assets, add a mirror record (records-only JSONL) with a proof\_anchor to a path-proof stored alongside the asset.
-
-### **Flow (high level)**
-
-* Lead Dev → IA: approve scope; decide inline versus Asset Pack.
-
-* IA → CodEx: send inline materials; name target paths for large assets.
-
-* PO: load the Asset Pack at the target paths in the CodEx PR branch.
-
-* CodEx: build & test; if something is missing, switch to planning mode and note stubs in the Detailed Change Report.
-
-* IA: review the change report; request adjustments or approve.
-
-* PO: confirm the CodEx-opened PR, then squash-merge after the Lead Dev gate passes.
-
+* Lead Dev → IA: approve scope; decide inline versus Asset Pack.  
+    
+* IA → CodEx: send inline materials; name target paths for large assets.  
+    
+* PO: load the Asset Pack at the target paths in the CodEx PR branch.  
+    
+* CodEx: build & test; if something is missing, switch to planning mode and note stubs in the Detailed Change Report.  
+    
+* IA: review the change report; request adjustments or approve.  
+    
+* PO: confirm the CodEx-opened PR, then squash-merge after the Lead Dev gate passes.  
+    
 * Docs & evidence: IA ensures Doc-Delta, human Evidence Index \+ hash sentinel, and machine mirror reflect the final assets in the same PR.
 
-### **Planning mode (CodEx)**
+## **Planning mode (CodEx)**
 
 Use to propose file trees, stub schemas, and integration points; surface gaps early. IA decides what to paste inline versus pack; planning output is advisory.
 
-### **Acceptance and drift guards (titles only; tokens live in Governance)**
+## **Acceptance and drift guards (titles only; tokens live in Governance)**
 
-* Evidence parity (same PR): EVIDENCE\_INDEX\_UPDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK.
-
-* PR posture: PR\_OPENED\_OK, DOC\_DELTA\_PRESENT\_OK.
-
-* Report completeness: the Detailed Change Report lists every file added/modified/removed and every deviation from IA instructions.
-
+* Evidence parity (same PR): use only the current acceptance-token names and semantics in `PF04-Canon-HDE-Governance`; this appendix does not reproduce the roster.  
+    
+* PR posture: use only the current acceptance-token names and semantics in `PF04-Canon-HDE-Governance`; this appendix does not reproduce the roster.  
+    
+* Report completeness: the Detailed Change Report lists every file added/modified/removed and every deviation from IA instructions.  
+    
 * No surprises: if an asset was not present at build time, CodEx records a stub; IA reconciles before close.
 
-## **Appendix B — Remediation Implementation Guides (DEV/OPS only)**
+# **Appendix B — Remediation Implementation Guides (DEV/OPS only)**
 
-### **Purpose**
+## **Purpose**
 
-Define the canonical structure and step schema for Remediation Implementation Guides used for escalations and remediation execution.
+Identify the canonical home and PF06 scope for Remediation Implementation Guides used for escalations and remediation execution.
 
-### **Scope**
+## **Scope**
 
 This appendix applies to Remediation Implementation Guides only. It does not change Live QA plan formats.
 
-### **Allowed step types (only)**
+## **Canonical owner and PF06 boundary**
 
-A Remediation Implementation Guide MUST use only two step types:
+`PF27-Canon-Plan-Templates` is the single canonical home for the reusable Remediation Implementation Guide template. Use its complete current `Remediation Implementation Guide (Template)` section for the permitted step types, embedded verification, OPS posture, strict lane separation, exact cross-lane dependency-line contract, and paste-ready template fields. This appendix retains only the PF06 purpose and scope stated above; it does not reproduce the governed template contract.
 
-* DEV
+# **Appendix C — Remediation Task Plans (DEV PRs \+ OPS tasks)**
 
-* OPS
-
-No other step types are permitted (no QA, DOC, REVIEW, or verification-only steps).
-
-### **Verification embedding requirement**
-
-All verification MUST be embedded inside the owning DEV or OPS step.
-
-Verification MUST produce concrete, repo-stored evidence outputs (paths and filenames specified in the step).
-
-Verification MUST NOT be separated into a standalone verification step.
-
-### **OPS posture linkage**
-
-OPS steps in remediation guides MUST comply with the Ops task policy in §0.2 (PO-executed, IA-guided, not CodEx PR work, secret-free evidence, lowercase audit paths).
-
-### **Strict lane separation**
-
-A step labeled DEV MUST contain only DEV actions.
-
-A step labeled OPS MUST contain only OPS actions.
-
-If a DEV action depends on an OPS output (or vice versa), the producing step MUST come first and the dependent step MUST declare its dependency explicitly (see Dependency-line rule below).
-
-### **Dependency-line rule (locked)**
-
-If a step depends on outputs produced by a prior step in the other lane, the dependent step MUST include exactly one cross-lane dependency line in this exact form:
-
-Inputs needed from Step S\<N\> during implementation: \<exact items\>
-
-Rules for this line:
-
-* S\<N\> MUST be the actual producing step ID (no placeholders such as Sx).
-
-* The line MUST appear exactly once in the dependent step.
-
-* The line MUST NOT be duplicated, nested, or prefixed by an alternate label.
-
-* If there is no cross-lane dependency, the line MUST be omitted (do not include placeholders).
-
-## **Appendix C — Remediation Task Plans (DEV PRs \+ OPS tasks)**
-
-### **Purpose**
+## **Purpose**
 
 Define the canonical structure and approval gates for Remediation Task Plans that combine DEV PR work and OPS procedures.
 
-### **Scope**
+## **Scope**
 
 This appendix applies to remediation task plans submitted for approval. It does not change Live QA plan formats.
 
-### **Task model (locked)**
+## **Task model (locked)**
 
 A remediation task plan MUST contain only two task types:
 
-* DEV tasks are PRs only and MUST be enumerated as PR-01, PR-02, PR-03 (continue as needed) (no mixed-task steps).
-
+* DEV tasks are PRs only and MUST be enumerated as PR-01, PR-02, PR-03 (continue as needed) (no mixed-task steps).  
+    
 * OPS tasks are PO-authorized procedures. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent. OPS tasks MUST be enumerated as OPS-01, OPS-02, OPS-03 (continue as needed) (no mixed-task steps).
 
 Each task MUST also declare its closure posture as exactly one of:
@@ -5390,8 +5346,8 @@ Approval and review of a NON-CLOSURE task MUST judge only the truthful completio
 
 Each task MUST declare its intent as exactly one of:
 
-* DISCOVERY
-
+* DISCOVERY  
+    
 * CHANGE
 
 Cross-lane dependencies (locked line). If a task depends on outputs produced by a prior task in the other lane, the dependent task MUST include exactly one dependency line in this exact form:
@@ -5400,29 +5356,29 @@ Inputs needed from Task \<ID\> during implementation: \<exact items\>
 
 Placeholders (for example TBD, to be determined, Sx) in this line are a mechanical blocker.
 
-### **Execution-ready gate (normative)**
+## **Execution-ready gate (normative)**
 
 A remediation task plan submitted for approval MUST be execution-ready:
 
-* every task has a syntax-normalized semantic contract that is executable by its assigned authorized actor; literal paste-and-run syntax is not a plan-approval test
-
+* every task has a syntax-normalized semantic contract that is executable by its assigned authorized actor; literal paste-and-run syntax is not a plan-approval test  
+    
 * there are no missing inputs, no missing outputs, and no ambiguous success criteria
 
-### **Approval gate scope (tight)**
+## **Approval gate scope (tight)**
 
 For remediation task plans, approval MUST focus on:
 
-* correct task model (OPS vs DEV; DISCOVERY vs CHANGE; no mixed tasks)
-
-* correct sequencing and explicit cross-lane dependencies
-
-* concrete deliverables (lowercase paths \+ filenames)
-
+* correct task model (OPS vs DEV; DISCOVERY vs CHANGE; no mixed tasks)  
+    
+* correct sequencing and explicit cross-lane dependencies  
+    
+* concrete deliverables (lowercase paths \+ filenames)  
+    
 * concrete verification success criteria (what done means)
 
 Not approval blockers: Detailed command lines and step-by-step failure handling are not required as plan-approval conditions.
 
-### **Evidence posture remains non-negotiable (in-flight detail allowed)**
+## **Evidence posture remains non-negotiable (in-flight detail allowed)**
 
 In-flight operational detail is allowed during execution (OPS command selection, exact CLI flags, procedural failure handling), as long as evidence posture remains intact.
 
@@ -5441,55 +5397,33 @@ Post-failure command discipline. OPS commands, flags, targets, credentials, host
 
 In-flight flexibility MUST NOT permit:
 
-* changing governed artifact locations or filenames
-
-* introducing new governed files without explicitly stating indexing/mirror intent
-
+* changing governed artifact locations or filenames  
+    
+* introducing new governed files without explicitly stating indexing/mirror intent  
+    
 * indexing remediation-only diagnostics into governed indices/mirror
 
-### **Mechanical blockers (auto-reject if present anywhere in the plan)**
+## **Mechanical blockers (auto-reject if present anywhere in the plan)**
 
-* Any PR-xx task missing an embedded CodEx Prompt. A present prompt’s syntax-origin or paste-readiness defect is non-blocking and may be normalized during execution when the semantic contract is preserved.
-
-* Any task that mixes DEV \+ OPS work in a single task.
-
-* Any task output specified only as a directory. Deliverables MUST be concrete file paths including filenames (for example audit/qa/\<epic-id\>/\<task-id\>/\<filename\>), and directory names MUST be lowercase ASCII.
-
-* Any cross-lane dependency missing the exact dependency line, or using non-concrete exact items.
-
+* Any PR-xx task missing an embedded CodEx Prompt. A present prompt’s syntax-origin or paste-readiness defect is non-blocking and may be normalized during execution when the semantic contract is preserved.  
+    
+* Any task that mixes DEV \+ OPS work in a single task.  
+    
+* Any task output specified only as a directory. Deliverables MUST be concrete file paths including filenames (for example audit/qa/\<epic-id\>/\<task-id\>/\<filename\>), and directory names MUST be lowercase ASCII.  
+    
+* Any cross-lane dependency missing the exact dependency line, or using non-concrete exact items.  
+    
 * Any task missing explicit verification success criteria (what done means and how it is recognized from produced artifacts).
 
-### **Exact filenames rule (Evidence Index \+ mirror \+ path-proofs)**
+## **Governed evidence filenames and path-proofs**
 
-Any remediation task plan that includes tasks touching governed evidence indices/mirrors MUST explicitly name the exact index \+ path-proof filenames as task outputs and as embedded verification checks (inside the owning DEV/OPS task; not as standalone verification-only tasks).
+Any remediation task plan that includes tasks touching governed evidence indices, mirrors, or path-proofs MUST name the exact current files as task outputs and as embedded verification checks inside the owning DEV or OPS task, not as standalone verification-only tasks.
 
-### **Canonical quick reference (use verbatim when applicable)**
+The complete current filenames, locations, canonical-byte rules, sibling path-proof relationships, and indexing and mirror requirements are owned by `PF12-Canon-HDE-Schemas-and-Artifacts`. Use that source directly; this appendix does not reproduce the roster.
 
-Evidence index (human-readable):
+If a plan proposes a new file under governed surfaces, it MUST state whether it is intended to appear in the Human Evidence Index and Machine Evidence Mirror. Absence of that statement is a blocker.
 
-* docs/evidence/INDEX.json
-
-* docs/evidence/INDEX.sha256
-
-* docs/evidence/INDEX.json.path\_proof.txt
-
-* docs/evidence/INDEX.sha256.path\_proof.txt
-
-Evidence index mirror (machine-readable):
-
-* `artifacts/evidence_index.jsonl`
-
-* `artifacts/evidence_index.jsonl.path_proof.txt`
-
-* `artifacts/evidence_index.jsonl.sha256`
-
-* `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
-
-Path-proof artifacts are co-located siblings: \<file\>.path\_proof.txt sits next to \<file\>. Plans MUST NOT relocate path-proofs into alternate directories.
-
-If a plan proposes a new file under governed surfaces, it MUST state whether it is intended to appear in the indices/mirror. Absence of that statement is a blocker.
-
-### **Portability vs provenance (non-PF evidence)**
+## **Portability vs provenance (non-PF evidence)**
 
 Remediation task plans may include a short Evidence inventory reviewed (non-PF) list for provenance, but MUST NOT require the reader/executor to open external files to execute the plan.
 
@@ -5499,25 +5433,25 @@ If an Artifact Map is included, it MUST explicitly label non-PF inputs as proven
 
 When a non-PF observation drives a branching decision, the plan MUST include:
 
-* the observation to look for (exact string/status/shape)
-
-* the decision rule
-
+* the observation to look for (exact string/status/shape)  
+    
+* the decision rule  
+    
 * the output artifact path where the observation is captured (file path including filename; lowercase directory names)
 
-### **Canonical Remediation Task Plan Template (paste-ready)**
+## **Canonical Remediation Task Plan Template (paste-ready)**
 
-#### **Artifact Map**
+### **Artifact Map**
 
-* Inputs (non-PF): provenance only; not required to execute
-
+* Inputs (non-PF): provenance only; not required to execute  
+    
 * Output: Remediation Task Plan (for approval)
 
-#### **Observed Evidence Snapshot (self-contained; non-PF)**
+### **Observed Evidence Snapshot (self-contained; non-PF)**
 
 * Evidence excerpts required for execution (quotes or precise paraphrases only)
 
-#### **Task Overview**
+### **Task Overview**
 
 * Task ID  
 * Task name  
@@ -5529,7 +5463,7 @@ When a non-PF observation drives a branching decision, the plan MUST include:
 * Cross-lane dependency  
 * Outputs
 
-#### **Task Details (repeat per task)**
+### **Task Details (repeat per task)**
 
 Task ID:
 
@@ -5543,6 +5477,7 @@ Task ID:
 * Actions (what-not-how; execution detail may be developed in flight for OPS):  
 * Outputs (required; concrete paths \+ filenames; lowercase directory names):  
 * Verification (required; success criteria and what artifacts prove done):  
+* CodEx Prompt (required for DEV; omit for OPS):  
 * Evidence capture (required for OPS): where commands/output/deviations are recorded (paths \+ filenames; lowercase directory names):
 
 Include the dependency-line rule exactly once when cross-lane dependency exists.
