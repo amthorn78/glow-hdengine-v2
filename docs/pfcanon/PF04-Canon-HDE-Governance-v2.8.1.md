@@ -3,10 +3,10 @@
 ## 0.1 Header
 
 **Title:** PF04-Canon-HDE-Governance  
-**Version:** v2.8  
+**Version:** v2.8.1  
 **Status:** Canon  
-**Effective date:** 2026-08-11  
-**Last Update Gate:** 0808 Refresh 4  
+**Effective date:** 2026-08-12  
+**Last Update Gate:** 0808 Refresh 5  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ## 0.2 Scope & boundaries \[Required-Now\]
@@ -4430,8 +4430,8 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 **Rule (normative).** The canonical Reader HTTP surface is `GET /reader`.
 
-* If the Reader blueprint is mounted under `/api`, `GET /api/reader` is an alias of the same contract. It is not a distinct surface with distinct semantics.
-
+* If the Reader blueprint is mounted under `/api`, `GET /api/reader` is an alias of the same contract. It is not a distinct surface with distinct semantics.  
+    
 * Reader proof-surface selection is performed via query parameter versioning (for example `v=1`), not by inventing path segments.
 
 **Rule (normative).** The Aux Narrative HTTP surface is `GET /aux/narrative` (and `GET /api/aux/narrative` only when the Aux blueprint is mounted under `/api`).
@@ -4440,8 +4440,8 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 **Rule (normative).** When a proof or Live QA plan needs a Reader or Aux route, it MUST:
 
-* name the canonical route (`/reader` or `/aux/narrative`), with `/api/**` used only when that is the configured mount
-
+* name the canonical route (`/reader` or `/aux/narrative`), with `/api/**` used only when that is the configured mount  
+    
 * capture evidence from the real route surface, not from an invented substitute
 
 **Governed Reader success-proof-surface designation (normative).** The canonical Reader route named above, including `/api/reader` only when `/api` is the configured mount, is the governed Reader success-proof surface for Reader transport proof selection and related QA interpretation.
@@ -4452,7 +4452,7 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 ## 10.1 Success (200) matrix \[Required-Now\]
 
- **Purpose (normative).** Govern the required headers and body properties for a **200 OK** Reader response on a **Catalog JSON success** route. These are governance rules; transport bytes and concrete route lists live by title in **HDE-CLI-API-Vendor-Ref** and are validated via **A7** acceptance tokens (§2.0). **A7 proofs run on a Catalog JSON success route; `/internal/version` is excluded.**
+**Purpose (normative).** Govern the required headers and body properties for a **200 OK** Reader response on a **Catalog JSON success** route. These are governance rules; transport bytes and concrete route lists live by title in **HDE-CLI-API-Vendor-Ref** and are validated via **A7** acceptance tokens (§2.0). **A7 proofs run on a Catalog JSON success route; `/internal/version` is excluded.**
 
 ### Headers — required
 
@@ -4465,7 +4465,7 @@ If any template/checklist/process language causes non-execution issues to be tre
 ### Body — success covenant
 
 * **Six keys exactly.** Top-level object contains only: **reader\_version, eligible, categories, meta, release\_id, idempotence\_hash**.  
-* **Categories policy (v1).** `categories[*]` are exactly **{ id, band }** (numeric-free). If `eligible == true` in v1 Alpha, a single `{"id":"harmony","band":…}`; if `eligible == false`, `[]`.  
+* **Categories policy (v1).** `categories[*]` are exactly **{ id, band }** (numeric-free). If `eligible == true` in v1 Alpha, a single `{"id":"harmony","band":<BAND>}`; if `eligible == false`, `[]`.  
 * **Serialization.** Canonical emitter: UTF-8, **sorted keys**, compact separators, **exactly one trailing LF** (`\n`).  
 * **Idempotence coupling.** `idempotence_hash = sha256(preimage_bytes)` where the preimage fields are defined in **HDE-Math-Spec** (do not restate here). **Re-serialize canonically after insertion.**
 
@@ -4480,7 +4480,7 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 ## 10.2 Conditional delivery \[Required-Now\]
 
- **Purpose (normative).** Define when and how conditional responses are served on a **Catalog JSON success** route. Governance rules live here; transport bytes live by title in **HDE-CLI-API-Vendor-Ref**. **A7 proofs run on a Catalog JSON success route; `/internal/version` is excluded.**
+**Purpose (normative).** Define when and how conditional responses are served on a **Catalog JSON success** route. Governance rules live here; transport bytes live by title in **HDE-CLI-API-Vendor-Ref**. **A7 proofs run on a Catalog JSON success route; `/internal/version` is excluded.**
 
 ### **304 Not Modified — only after a prior 200-with-body**
 
@@ -4512,18 +4512,18 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 ## 10.3 Writers and errors \[Required-Now\]
 
- **Purpose (normative).** Govern headers and body shape for writer and error responses. Governance rules live here; transport bytes live by title in **HDE-CLI-API-Vendor-Ref**. Writers/errors are **no-store** and **not** part of A7 success proofs.
+**Purpose (normative).** Govern headers and body shape for writer and error responses. Governance rules live here; transport bytes live by title in **HDE-CLI-API-Vendor-Ref**. Writers/errors are **no-store** and **not** part of A7 success proofs.
 
 **Acceptance-bound writer proof families (normative).**
 
-* When writer-surface completion is claimed for acceptance, the governed proof family MAY include writer envelope proof, writer idempotence proof, write and readback parity proof, writer evidence-indexing proof, and explicit confirmation that writer surfaces remain outside A7 success proofs.
-
-* Any writer proof generator or harness MUST NOT silently force open rails. If open rails are required for a writer proof path, they MUST be supplied explicitly by the caller and treated as part of the declared proof posture for that run.
-
-* Any writer proof generator or harness MUST pin every environment field that can influence emitted writer bytes. Omitting byte-affecting env fields is non-conforming.
-
-* Writer-surface proof generation MUST NOT widen the writer contract or widen the A7 proof surface. A writer proof path may validate writer behavior, but it does not convert writer surfaces into A7 success routes.
-
+* When writer-surface completion is claimed for acceptance, the governed proof family MAY include writer envelope proof, writer idempotence proof, write and readback parity proof, writer evidence-indexing proof, and explicit confirmation that writer surfaces remain outside A7 success proofs.  
+    
+* Any writer proof generator or harness MUST NOT silently force open rails. If open rails are required for a writer proof path, they MUST be supplied explicitly by the caller and treated as part of the declared proof posture for that run.  
+    
+* Any writer proof generator or harness MUST pin every environment field that can influence emitted writer bytes. Omitting byte-affecting env fields is non-conforming.  
+    
+* Writer-surface proof generation MUST NOT widen the writer contract or widen the A7 proof surface. A writer proof path may validate writer behavior, but it does not convert writer surfaces into A7 success routes.  
+    
 * When writer evidence-indexing proof is part of acceptance, the writer proof family and its governed index or path-proof companions MUST remain internally coherent as one acceptance-bound evidence family.
 
 ### **Headers — required**
@@ -4535,8 +4535,8 @@ If any template/checklist/process language causes non-execution issues to be tre
 ### **Body — typed error shape (errors only)**
 
 * **Shape.** Typed, numeric-free error object (see CLI/Reader error model):  
-   `{"ok": false, "code": "<TOKEN>", "error": "<non-PII message>"}`.  
-   Optional `retry_after_ms` (integer ≥ 0\) only under a pinned vendor rate-limit policy.  
+  `{"ok": false, "code": "<TOKEN>", "error": "<non-PII message>"}`.  
+  Optional `retry_after_ms` (integer ≥ 0\) only under a pinned vendor rate-limit policy.  
 * **Serialization.** Canonical emitter (UTF-8, sorted keys, compact separators), **exactly one trailing LF**.  
 * **No payload echo.** Do **not** include vendor payloads, header values, or secrets.
 
@@ -4565,7 +4565,7 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 ## 10.4 Aux Narrative suppression (carve-out) — Reader scope note
 
- **Purpose (normative).** Define the suppression behavior for the **Aux Narrative** surface **without changing** the Reader matrices.
+**Purpose (normative).** Define the suppression behavior for the **Aux Narrative** surface **without changing** the Reader matrices.
 
 **Behavior.**  When text is present: 200 text/plain; charset=utf-8 with a strong, quoted ETag and Vary: Authorization, Accept-Encoding. When suppressed: 200 with an empty body and no ETag; Vary: Authorization, Accept-Encoding is still present. A policy header may be present as a generic signal (X-Narrative-Policy: suppressed). This carve-out applies only to Aux Narrative. Reader transport rules in §10.1–§10.3 remain unchanged and are fully governed by A7 (success on Catalog routes only). Aux HEAD and 304 are out of scope for EPIC-010.
 
@@ -4588,41 +4588,42 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 **nterim auth posture (operator-network-only; token auth deferred).**
 
-* **Interim posture (now).** `/internal/version` has **no application-layer auth**. It is treated as **operator-network-only**: access is restricted by operator-controlled network and service configuration (owned outside this document by titles-only single homes).
-
-* **Runbook restriction (non-negotiable until token auth exists).** Runbooks, remediation guides, and operational tooling MUST NOT require an auth header for `/internal/version`. If an auth header is mentioned, it MUST be explicitly labeled **optional** and treated as **Observed Evidence (non-PF)** only.
-
-* **Non-canonical language guard.** Any document language that implies “auth required” for `/internal/version` is non-canonical unless/until the implementation exists and is canonized via Doc-Delta.
-
+* **Interim posture (now).** `/internal/version` has **no application-layer auth**. It is treated as **operator-network-only**: access is restricted by operator-controlled network and service configuration (owned outside this document by titles-only single homes).  
+    
+* **Runbook restriction (non-negotiable until token auth exists).** Runbooks, remediation guides, and operational tooling MUST NOT require an auth header for `/internal/version`. If an auth header is mentioned, it MUST be explicitly labeled **optional** and treated as **Observed Evidence (non-PF)** only.  
+    
+* **Non-canonical language guard.** Any document language that implies “auth required” for `/internal/version` is non-canonical unless/until the implementation exists and is canonized via Doc-Delta.  
+    
 * **Future hardening (deferred).** A future epic may introduce an auth-gated token header with explicit 401/403 behavior. Until that epic lands, the interim operator-network-only posture governs.
 
 ---
 
 #### **Methods and status**
 
-* `GET /internal/version` and `HEAD /internal/version` **always return 200** on success.
-
-* Conditional request headers (`If-None-Match`, `If-Modified-Since`, and similar) are **ignored**; `/internal/version` **never returns 304**.
-
-* `HEAD /internal/version`:
-
-  * Returns `200` with the same validators as `GET` (where present).
-
-  * May carry `Content-Length` equal to `len(identity GET body)` (LF-terminated bytes).
-
+* `GET /internal/version` and `HEAD /internal/version` **always return 200** on success.  
+    
+* Conditional request headers (`If-None-Match`, `If-Modified-Since`, and similar) are **ignored**; `/internal/version` **never returns 304**.  
+    
+* `HEAD /internal/version`:  
+    
+  * Returns `200` with the same validators as `GET` (where present).  
+      
+  * May carry `Content-Length` equal to `len(identity GET body)` (LF-terminated bytes).  
+      
   * Has an empty body.
 
 ---
 
 #### **Headers and caching**
 
-* All successful responses **must** include:
-
-  * `Cache-Control: no-store`.
-
-  * **No** `ETag`.
-
+* All successful responses **must** include:  
+    
+  * `Cache-Control: no-store`.  
+      
+  * **No** `ETag`.  
+      
   * **No** `Last-Modified`.
+
 
 * `Vary` is optional on this surface (it may be present but is not required for acceptance).
 
@@ -4632,24 +4633,24 @@ If any template/checklist/process language causes non-execution issues to be tre
 
 The JSON body is a **frozen minimal identity envelope**. It exposes exactly **six** provenance fields and **no extras**:
 
-* `engine_tag`
-
-* `build_commit`
-
-* `invocation_tag`
-
-* `invocation_sha256`
-
-* `emitter_sha256`
-
+* `engine_tag`  
+    
+* `build_commit`  
+    
+* `invocation_tag`  
+    
+* `invocation_sha256`  
+    
+* `emitter_sha256`  
+    
 * `release_id`
 
 The body is emitted via the **canonical JSON serializer** and must satisfy:
 
-* UTF-8 encoding (no BOM).
-
-* **Fixed key order:** the six fields **must appear in the order listed above**, with no additional top-level keys. For `/internal/version` this fixed ordering is **normative** and is the sole exception to the global “sorted keys” rule for canonical JSON.
-
+* UTF-8 encoding (no BOM).  
+    
+* **Fixed key order:** the six fields **must appear in the order listed above**, with no additional top-level keys. For `/internal/version` this fixed ordering is **normative** and is the sole exception to the global “sorted keys” rule for canonical JSON.  
+    
 * Compact separators and exactly one trailing `\n` (LF).
 
 All other canonical JSON rules (no BOM, LF-termination, deterministic bytes under closed rails) still apply; only the general “ASCII-sorted keys” requirement is relaxed here in favor of this fixed identity field order.
@@ -4661,56 +4662,56 @@ All other canonical JSON rules (no BOM, LF-termination, deterministic bytes unde
 Names-only; token semantics live in this document, bytes and tests live elsewhere by title.
 
 **Proof surface invariants (explicit checklist; minimum set).**  
- Any remediation guide, QA step, or probe tool that produces governed `/internal/version` evidence MUST explicitly enumerate and verify these invariants. It is not acceptable to imply these checks by referencing PF sections only.
+Any remediation guide, QA step, or probe tool that produces governed `/internal/version` evidence MUST explicitly enumerate and verify these invariants. It is not acceptable to imply these checks by referencing PF sections only.
 
 A. Transport
 
-* `GET` MUST return 200\.
-
-* `HEAD` MUST return 200 and satisfy parity expectations.
-
+* `GET` MUST return 200\.  
+    
+* `HEAD` MUST return 200 and satisfy parity expectations.  
+    
 * Conditional requests (`If-None-Match`, `If-Modified-Since`) MUST NOT yield 304; they MUST return 200\.
 
 B. Headers
 
-* `Cache-Control: no-store` MUST be present.
-
-* `Content-Type: application/json; charset=utf-8` MUST be present (and satisfy GET↔HEAD parity expectations).
-
-* `ETag` MUST be absent.
-
+* `Cache-Control: no-store` MUST be present.  
+    
+* `Content-Type: application/json; charset=utf-8` MUST be present (and satisfy GET↔HEAD parity expectations).  
+    
+* `ETag` MUST be absent.  
+    
 * `Last-Modified` MUST be absent.
 
 C. Body (identity payload)
 
-* Body MUST be fixed-schema JSON with exactly these keys (no extras): `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`.
-
+* Body MUST be fixed-schema JSON with exactly these keys (no extras): `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`.  
+    
 * Body bytes MUST satisfy the canon “identity bytes” posture (including LF termination) where applicable to the proof surface.
 
 **Token emission gating (no “false OK”).**
 
-* A tool MUST NOT emit any `*_OK` token unless the corresponding invariant has been verified against the same captured bytes that are being written as governed artifacts for that run.
-
-* If the run status is `FAIL_TOOLING` (or equivalent failure), the tool MUST NOT emit `*_OK` tokens for invariants that did not pass. In particular, it MUST NOT emit integrity-success signals (for example, path-proof match or two-run identity) unless those checks demonstrably passed on the produced artifacts.
-
+* A tool MUST NOT emit any `*_OK` token unless the corresponding invariant has been verified against the same captured bytes that are being written as governed artifacts for that run.  
+    
+* If the run status is `FAIL_TOOLING` (or equivalent failure), the tool MUST NOT emit `*_OK` tokens for invariants that did not pass. In particular, it MUST NOT emit integrity-success signals (for example, path-proof match or two-run identity) unless those checks demonstrably passed on the produced artifacts.  
+    
 * Coupling requirement (anti-mixed-target / anti-redirect drift): for each probe run, the evidence must be coupled such that the emitted tokens, captured headers, captured body, and any two-run identity digest refer to the same resolved target/response chain. If coupling cannot be established, the run MUST fail and MUST NOT emit `*_OK` tokens.
 
 *Applicability:* These rules apply equally to DEV and OPS steps when they produce governed `/internal/version` evidence.
 
 * **INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK**  
-   `GET /internal/version` 200 includes `Content-Type: application/json; charset=utf-8`.
-
+  `GET /internal/version` 200 includes `Content-Type: application/json; charset=utf-8`.  
+    
 * **INTERNAL\_VERSION\_HEAD\_PARITY\_OK**  
-   `HEAD /internal/version` returns 200; mirrors GET validators; empty body; `Content-Length == len(identity GET body)`; `Content-Type == GET`.
-
+  `HEAD /internal/version` returns 200; mirrors GET validators; empty body; `Content-Length == len(identity GET body)`; `Content-Type == GET`.  
+    
 * **INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK**  
-   `If-None-Match` / `If-Modified-Since` are ignored; on success, the route always returns 200 (never 304).
-
+  `If-None-Match` / `If-Modified-Since` are ignored; on success, the route always returns 200 (never 304).  
+    
 * **INTERNAL\_VERSION\_NO\_ETAG\_OK**  
-   No `ETag` on `GET` or `HEAD`.
-
+  No `ETag` on `GET` or `HEAD`.  
+    
 * **INTERNAL\_VERSION\_NO\_STORE\_OK**  
-   `Cache-Control: no-store` is present on `GET` and `HEAD`.
+  `Cache-Control: no-store` is present on `GET` and `HEAD`.
 
 ---
 
@@ -4723,7 +4724,7 @@ Evidence for `/internal/version` is records-only and titles-only at this level; 
 **No extra governed narrative artifacts.** The governed `/internal/version` evidence surface is exactly the canonical bundle enumerated below plus its required indexing and path proofs. Do not introduce additional governed narrative artifacts for this surface (for example, a `provenance_note.md`) unless a Doc-Delta explicitly registers the new evidence surface and the evidence catalog defines it.
 
 **Filenames (canonical set \+ permitted aliases).**  
- The canonical filename set for the `/internal/version` evidence bundle is registered in **HDE-Schemas & Artifacts** (titles-only). This section lists the governance-required bundle contents; where filename expectations differ across consumers during a drain window, the following posture applies:
+The canonical filename set for the `/internal/version` evidence bundle is registered in **HDE-Schemas & Artifacts** (titles-only). This section lists the governance-required bundle contents; where filename expectations differ across consumers during a drain window, the following posture applies:
 
 * Live QA MUST produce the canonical filenames.  
 * Live QA MAY additionally emit alias copies for compatibility. The only permitted aliases at this level are the conditional header snapshot filenames listed in this section (`cond_if_none_match_headers.txt` and `cond_if_modified_since_headers.txt`) when the canonical filenames differ elsewhere.  
@@ -4733,32 +4734,39 @@ Evidence for `/internal/version` is records-only and titles-only at this level; 
 **Evidence artifacts (canonical paths; records-only):**
 
 * `artifacts/ops/internal_version/body_get.json` — exact `GET` body bytes (LF-terminated; six keys; fixed identity-field order).  
-* `artifacts/ops/internal_version/body_get.sha256` — SHA-256 sidecar for the exact `body_get.json` bytes.
-
+    
+* `artifacts/ops/internal_version/body_get.sha256` — SHA-256 sidecar for the exact `body_get.json` bytes.  
+    
 * `artifacts/ops/internal_version/headers_get.txt` — raw `GET /internal/version` response headers (must include the HTTP status line and header lines).  
+    
 * `artifacts/ops/internal_version/headers_head.txt` — raw `HEAD /internal/version` response headers (must include the HTTP status line and header lines). If capture tooling emits non-header diagnostic lines, validators must ignore lines that are not a status line or `Key: value` header lines.  
+    
 * `artifacts/ops/internal_version/headers_cond_if_none_match.txt` — `GET` with `If-None-Match` (still 200; conditionals ignored). (Legacy alias permitted only when explicitly required: `cond_if_none_match_headers.txt`.)  
+    
 * `artifacts/ops/internal_version/headers_cond_if_modified_since.txt` — `GET` with `If-Modified-Since` (still 200; conditionals ignored). (Legacy alias permitted only when explicitly required: `cond_if_modified_since_headers.txt`.)  
+    
 * `artifacts/ops/internal_version/request_chain_manifest.json` — deterministic request-chain manifest for the `/internal/version` proof surface (indexable/mirrored as a primary artifact with a co-located path proof).  
+    
 * `artifacts/ops/internal_version/two_run_identity.log` — two-run byte identity log for the body, including the coupling verification result described in this section.
 
 Indexing requirements:
 
-* For each artifact above:
-
-  * Add a titles/paths entry in `docs/evidence/INDEX.json` and update `docs/evidence/INDEX.sha256`.
-
-  * Add or update a Machine Mirror record in `artifacts/evidence_index.jsonl` with:
-
-    * `artifact_key`,
-
-    * `discovered_physical_path`,
-
-    * `produced_at_utc`,
-
-    * `proof_anchor` (path to the co-located `*.path_proof.txt`),
-
+* For each artifact above:  
+    
+  * Add a titles/paths entry in `docs/evidence/INDEX.json` and update `docs/evidence/INDEX.sha256`.  
+      
+  * Add or update a Machine Mirror record in `artifacts/evidence_index.jsonl` with:  
+      
+    * `artifact_key`,  
+        
+    * `discovered_physical_path`,  
+        
+    * `produced_at_utc`,  
+        
+    * `proof_anchor` (path to the co-located `*.path_proof.txt`),  
+        
     * `role`, `sha256`, `size_bytes`.
+
 
 * Mirror rules (single file, canonical JSONL, sorted keys, unknown-key rejection) and path-proof schema are defined in **HDE-Schemas and Artifacts**; PF04 governs only the token and routing semantics.
 
@@ -4766,26 +4774,26 @@ Indexing requirements:
 
 #### **Routing (titles-only)**
 
-* Contract bytes (examples and schema) for `GET /internal/version` live in **HDE-CLI-API-Vendor-Ref**.
-
-* Operational policy, acceptance tokens, and runbook semantics live here in **HDE-Governance**.
-
+* Contract bytes (examples and schema) for `GET /internal/version` live in **HDE-CLI-API-Vendor-Ref**.  
+    
+* Operational policy, acceptance tokens, and runbook semantics live here in **HDE-Governance**.  
+    
 * Evidence artifacts and their indexing rules live in **HDE-Schemas and Artifacts** and **Glow QA Guide** (names-only at this level).
 
 #### **Coupling proof (two-run identity \+ identity coupling) \[Required−Now\]**
 
 For any epic that claims `/internal/version` identity coupling and/or two-run identity closure, the governed proof artifact is a single log:
 
-* `artifacts/ops/internal_version/two_run_identity.log`
-
+* `artifacts/ops/internal_version/two_run_identity.log`  
+    
 * `artifacts/ops/internal_version/two_run_identity.log.path_proof.txt`
 
 This log MUST include, at minimum:
 
-* **Two-run identity result:** an explicit statement that two consecutive invocations produce byte-identical identity output (or not), including the compared digests/byte identifiers.
-
-* **Coupling verification result:** explicit pass/fail checks that the `/internal/version` identity is coupled to the required identity sources by title/path reference, including release identity coupling where applicable.
-
+* **Two-run identity result:** an explicit statement that two consecutive invocations produce byte-identical identity output (or not), including the compared digests/byte identifiers.  
+    
+* **Coupling verification result:** explicit pass/fail checks that the `/internal/version` identity is coupled to the required identity sources by title/path reference, including release identity coupling where applicable.  
+    
 * **Rails posture \+ determinism pins reference:** names-only pointers to the applicable rails posture and determinism pins evidence surfaces (the determinism pins themselves remain proven by their canonical log).
 
 No new acceptance tokens are introduced for “coupling proof.” This evidence is bound under the existing internal-version acceptance posture. Acceptance artifacts MUST bind coupling claims to this log (and other required governed identity artifacts) rather than inventing new token names or alternate proof artifacts.
@@ -4796,21 +4804,21 @@ No new acceptance tokens are introduced for “coupling proof.” This evidence 
 
 In production, `/internal/version`:
 
-* Returns `application/json; charset=utf-8`.
-
-* Uses `Cache-Control: no-store`.
-
-* Never emits `ETag` or `Last-Modified`.
-
-* Ignores conditional request headers (`If-None-Match`, `If-Modified-Since`); never returns 304\.
-
+* Returns `application/json; charset=utf-8`.  
+    
+* Uses `Cache-Control: no-store`.  
+    
+* Never emits `ETag` or `Last-Modified`.  
+    
+* Ignores conditional request headers (`If-None-Match`, `If-Modified-Since`); never returns 304\.  
+    
 * Ensures `HEAD` 200 mirrors GET validators and may carry `Content-Length == len(identity GET body)` with an empty body.
 
 # **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
 
-## **11.1 Request shaping (owned here) \[Required-Now\]**
+## **11.1 Vendor request governance and exact-byte ownership \[Required-Now\]**
 
-**Scope (normative).** This section pins the bytes used to construct HDAPI requests and to remap provider outcomes into typed, numeric-free errors. Rails posture (open/closed) is governed in §3; live-call behavior (timeouts/retries/backoff) is in §11.2.
+**Scope (normative).** PF04 governs vendor-request authorization, route-policy classification, secret safety, persistence boundaries, observability, proof posture, and change control. **PF05-Canon-HDE-CLI-API-Vendor-Ref** owns exact request and response bytes for every vendor route family. A PF04 route name or policy rule does not define, duplicate, or amend PF05 wire bytes. Rails posture (open/closed) is governed in §3; live-call behavior (timeouts/retries/backoff) is in §11.2.
 
 **HDAPI v2 conformance pending governance posture.** Until the vendor v2 conformance work is implemented and evidenced, HDE vendor architecture MUST be treated as legacy, partially conforming, or pending v2 conformance, not v2-conformant. Documentation consolidation, vendor research, or contract inventory alone MUST NOT be used as runtime conformance proof.
 
@@ -4840,14 +4848,14 @@ Boundary proof models must be conservative and fail closed. Unknown, unsupported
 
 A proof-model failure is a validation failure even when no live runtime failure has been proven. Boundary-proof evidence may support a later-drain or review posture only when it preserves its own non-claim boundaries and does not claim live vendor conformance, open-rails success, public Reader expansion, PF09 status movement, acceptance-token satisfaction, epic closure, or PF-canon drainage by itself.
 
-V2 endpoint bytes, auth names, request-body rules, response envelopes, rate-limit behavior, error mapping, and legacy-v1 fallback policy remain pending until their owning PF homes and governed evidence bind them. Existing v1 BodyGraph request shaping in this section MUST NOT be cited as v2 request shaping.
+Exact endpoint, authentication, request-body, response-envelope, rate-limit, provider-error, and fallback bytes are owned by **PF05-Canon-HDE-CLI-API-Vendor-Ref** and remain subject to route-specific reconciliation there. Current PF05 names all five resource paths but still combines pending chart contracts with an unqualified legacy three-key DD-MMM body rule. PF04 therefore MUST NOT claim that PF05 is internally complete or that checked-in implementation is live-vendor truth. Existing legacy BodyGraph request material retained below is a disposition record only and MUST NOT be cited as v2 chart shaping.
 
 ### **11.1.1 Vendor route family, resource path, and base URL posture**
 
-* **Base URL resolution:** `HD_API_BASE_URL` is canonical. `HDAPI_BASE_URL` is deprecated compatibility spelling only where implementation or migration evidence explicitly records it. If both names are present with different values, the provider must fail closed with configuration ambiguity before network I/O.  
-* **Configured API-version boundary:** the vendor API version belongs to the configured base URL, not to hardcoded runtime route constants. Runtime request construction must append version-neutral resource paths only and must preserve any path prefix already present in `HD_API_BASE_URL`.  
-* **Governed resource paths:** current vendor request shaping distinguishes legacy BodyGraph resources `bodygraphs` and `bodygraphs/simple` from chart resources `charts`, `charts/simple`, and `charts/coordinates`. Legacy BodyGraph resources use the legacy BodyGraph auth posture. Chart resources use the Bearer auth posture.  
-* **Determinism:** URL construction is order-neutral and locale-neutral. Auth family must be represented by governed route metadata or contract metadata, not inferred from string checks for vendor API-version path segments.
+* **Exact-byte owner:** **PF05-Canon-HDE-CLI-API-Vendor-Ref** owns route availability, HTTP method, exact resource path, base-URL composition, authentication bytes, request body, response envelope, provider-error bytes, and route-specific fallback details.  
+* **Governed route-family classifications:** legacy BodyGraph resources are `bodygraphs` and `bodygraphs/simple`; chart resources are `charts`, `charts/simple`, and `charts/coordinates`. These names classify PF04 route policy only and do not define or amend PF05 wire bytes.  
+* **Base-URL and route-policy governance:** one explicit route policy MUST select the route family. Ambiguous configuration MUST fail closed before network I/O. Runtime code MUST NOT infer auth family or resource policy from string checks for vendor API-version path segments. Exact base-URL and resource-path behavior is governed by PF05.  
+* **Determinism:** route-policy selection and request construction are order-neutral and locale-neutral. Auth family must be represented by governed route metadata or contract metadata.
 
 **`bg:resolve --source vendor` route-policy governance.** `bg:resolve --source vendor` remains an HD Engine workflow for resolving BodyGraph details. Future claims that this workflow works as a canonical vendor-backed BodyGraph-resolution path require an explicit vendor-route policy. The policy must classify the selected behavior as v2 chart-backed BodyGraph resolution, explicit legacy BodyGraph fallback, dual-route policy, or unsupported nonclaim.
 
@@ -4863,65 +4871,75 @@ Production persistence requires an additional authorization boundary. The safe p
 
 ### **11.1.2 Auth and geocode header posture**
 
-Send only governed header families for the selected route family; do not add other vendor auth headers unless explicitly pinned here or in the owning byte-contract home:
+**PF05-Canon-HDE-CLI-API-Vendor-Ref** owns exact outbound header names, presence rules, authentication bytes, geocode-header bytes, and release-identity header bytes. PF04 governs the route-family and secret-safety boundaries:
 
-* `Accept: application/json`  
-* `Content-Type: application/json; charset=utf-8`  
-* `HD-Api-Key: REDACTED` for legacy BodyGraph resources only  
-* `Authorization: Bearer REDACTED` for chart resources  
-* `HD-Geocode-Key: REDACTED` when the governed route requires geocoding  
-* `User-Agent: GlowHDEngine/RELEASE_ID` where RELEASE\_ID is derived from §5.1
+* The selected route MUST use the exact PF05-owned header contract for that route family and MUST NOT add an ungoverned vendor authentication family.  
+* Legacy BodyGraph and chart authentication families MUST NOT be crossed. Geocode posture MUST follow the selected PF05 route contract.  
+* Missing, conflicting, or ambiguous authentication or geocode configuration MUST fail closed before network I/O.
 
 **Redaction:** header names and redacted header shapes may be recorded. Raw header values, raw Bearer token values, raw API key values, raw geocode key values, request bodies, response bodies, and vendor payload dumps MUST NOT be logged or persisted except inside an explicitly approved governed evidence shape.
 
 **Auth-family mismatch posture:** using `HD-Api-Key` for chart resources, using Bearer auth for legacy BodyGraph resources, omitting required geocode header posture, blurring the environment-variable name with the outbound header name, or deriving auth from a vendor API-version string is a governance-relevant request-shaping and secret-safety defect when it affects live vendor behavior, open-rails smoke, QA evidence, or acceptance claims.
 
-### **11.1.3 Request body schema (exact three keys) \[Required-Now\]**
+### **11.1.3 PF05 request contracts and legacy BodyGraph reconciliation \[Required-Now\]**
 
-**Normative rule.** The request **MUST** contain exactly three top-level fields—no others—and they **MUST** be formatted as follows:
+**Exact-byte ownership (normative).** **PF05-Canon-HDE-CLI-API-Vendor-Ref** owns the exact field set, encoding, date and time formats, location or coordinate format, prohibited fields, validation bytes, and request serialization for each selected vendor route.
+
+**Legacy BodyGraph disposition record (historical; not independent wire-contract authority).** The prior PF04 rule described legacy `bodygraphs` and `bodygraphs/simple` requests as exactly three top-level fields:
 
 1. {"birthdate":"DD-MMM-YYYY","birthtime":"HH:MM","location":"City, Country"}  
-     
 * **birthdate** — English month abbreviations `Jan..Dec`; day zero-padded (`01..31`); four-digit year. Examples: `03-Jan-1980`, `21-Sep-1995`.  
 * **birthtime** — 24-hour `HH:MM`; zero-padded hour and minute (`00..23`, `00..59`). Examples: `00:00`, `09:30`, `23:59`.  
-* **location** — ASCII English `"City, Country"`; a **single** comma \+ space separator; no leading/trailing spaces. Examples: `Paris, France`, `New York, USA`.
+* **location** — ASCII English `"City, Country"`; a **single** comma \+ space separator; no leading/trailing spaces. Examples: `Paris, France`, `New York, USA`.  
+* **Excluded legacy field** — the record excluded `tz` because the legacy contract derived timezone from location through geocoding.
 
-**Do not send `tz`.** The vendor derives timezone from location via geocoding; any `tz` field **MUST NOT** be present.  
- **Determinism.** Body construction is order-neutral (AB↔BA) and locale-neutral; no floats, wall-clock, or platform-dependent formatting.
+This legacy record MUST NOT govern `charts`, `charts/simple`, or `charts/coordinates`. Current PF05 requires route-specific reconciliation before any exact-contract-complete or v2-conformant claim.
+
+**Determinism governance.** Construction under the selected PF05 contract is order-neutral (AB↔BA) and locale-neutral; no floats, wall-clock, or platform-dependent formatting may enter request shaping.
 
 **Validation & failure posture.**
 
-* If any field is missing, extra, or malformed, the client **MUST** fail locally with a **typed, numeric-free error** (LF-terminated) and **MUST NOT** attempt network I/O.  
-* Whitespace and casing rules above are normative; violations are treated as schema errors.
+* Missing, extra, malformed, unsupported, or ambiguous local input or configuration MUST fail before network I/O under the exact PF05-owned typed-error contract.  
+    
+* Public failures MUST remain typed, numeric-free, LF-safe, secret-safe, and non-echoing. Exact tokens, envelope bytes, ordering, and termination are owned by PF05.
 
   ### **11.1.4 Typed error mapping (provider → CLI/Reader)**
 
-Provider outcomes **MUST** be remapped to these typed, numeric-free errors (no vendor payload echo):
+Provider outcomes **MUST** be remapped under the exact **PF05-Canon-HDE-CLI-API-Vendor-Ref** route contract. PF04 requires typed, numeric-free, secret-safe, non-echoing failures and distinct handling for unauthorized, forbidden, not-found, rate-limited, provider-unavailable, and malformed-response outcomes.
 
-* **401 → `PROVIDER_UNAUTHORIZED`**  
-* **403 → `PROVIDER_FORBIDDEN`**  
-* **404 → `PROVIDER_NOT_FOUND`**  
-* **429 → `PROVIDER_RATE_LIMITED`**  
-  * If a valid `Retry-After` header is present, deterministically parse (delta-seconds or RFC-date) to integer `retry_after_ms`; on invalid/unsupported header, omit the field.  
-* **5xx → `PROVIDER_UNAVAILABLE`**  
-* **Malformed / bad JSON → `PROVIDER_BAD_RESPONSE`** (schema/mapping failure)
+* If a valid `Retry-After` header is present, deterministically parse delta-seconds or HTTP-date to integer `retry_after_ms`; on an invalid or unsupported header, omit the field. Parsing the field does not by itself authorize a retry.  
+* Exact provider-to-public tokens, error-envelope bytes, field ordering, and termination are owned by PF05.
 
-**Emission.** Error objects are serialized by the **single presenter emitter** and LF-terminated (see A-gates and transport rules).
+**Emission.** Error objects pass through the **single presenter emitter** and satisfy the PF05-owned exact bytes plus the A-gates and transport rules.
 
 ### **11.1.5 Rails coupling (pointer)**
 
 * **Rails closed (default; §3.1):** perform **no network I/O**; it is permissible to compute deterministic shaping (URL/headers/body) for diagnostics, but return a **typed refusal** and keep logs secret-free (keys-only).  
+    
 * **Rails open:** request shaping remains identical; live-call policy is pinned in §11.2.
 
   ### **11.1.6 Acceptance (binary)**
 
 To pass governance:
 
-1. **Shaping is canonical:** endpoint, headers, and body exactly match §§11.1.1–11.1.3; order-/locale-neutral construction.  
-2. **Typed mapping proven:** provider statuses remap only to the tokens above; optional `retry_after_ms` is parsed deterministically.  
-3. **Logging hygiene:** no payloads or header values; secrets redacted; labels bounded (per §7.1/§8.2).  
-4. **A-gates unaffected:** Reader↔CLI parity and idempotence (A3/A4) remain unchanged by vendor paths.  
-5. **Evidence:** index redacted examples/mapping tests in Appendix D (titles/paths only); keep synchronized with repo changes.  
+1. **Explicit route policy:** one route policy is selected, and no route or auth family is inferred from an API-version substring.  
+     
+2. **Closed-rails refusal:** rails refuse network I/O deterministically when closed.  
+     
+3. **PF05 contract conformance:** implementation conforms to the exact PF05-owned contract for the selected route.  
+     
+4. **No family crossing:** route-family authentication and geocode policy are not crossed.  
+     
+5. **Local failure:** invalid local inputs or configuration fail before I/O under the PF05-owned exact typed-error contract.  
+     
+6. **Secret and payload safety:** logs, metrics, evidence, and caches contain no plaintext secret or uncontrolled raw vendor payload; labels remain bounded (per §7.1/§8.2).  
+     
+7. **Bounded claims:** mapped-cache, app-integration, public Reader, and BodyGraph compatibility claims remain within separately proven scope.  
+     
+8. **Single presentation boundary:** the single presenter and serializer boundary remains intact; Reader↔CLI parity and idempotence (A3/A4) remain unchanged by vendor paths.  
+     
+9. **Evidence:** Appendix D indexes the exact bounded evidence without treating it as live-vendor or production proof.  
+     
    ---
 
 ## **11.2 Live call policy \[Speculative\]**
@@ -4931,7 +4949,7 @@ To pass governance:
 ### **11.2.1 Prerequisites & posture**
 
 * **Rails open:** both gates satisfied (see §3.1); required env present/non-empty (see §3.3).  
-* **Shaping fixed:** endpoint, headers, and body exactly as in §11.1.  
+* **Shaping fixed:** the selected route conforms to the exact PF05-owned wire contract and to §11.1 governance.  
 * **Determinism first:** no locale/time/random dependencies in policy selection; no payload/secret logging (keys-only).
 
 ### **11.2.2 Timeouts (closed integers; pick one profile)**
@@ -4945,33 +4963,36 @@ To pass governance:
 
 ### **11.2.3 Retries & backoff (closed, no jitter)**
 
-* **Retries:** `max_attempts ∈ {0,1,2,3}` (includes the first try). Retry classes: `{network_error, 5xx, 429}` only.  
+* **Total-attempt domain:** `max_attempts ∈ {1,2,3}` is the total outbound-call budget, including the initial call. Attempt 1 is the initial call; retries, if eligible, use one-based `attempt_idx` values 2 through `max_attempts`. The maximum retry count is `max_attempts - 1`.  
+* **Zero is invalid:** `max_attempts = 0` MUST fail local validation before network I/O under the PF05-owned exact configuration-error contract. Rails, not `max_attempts`, control I/O authorization.  
+* **Retry classes:** base retry-eligible classes are `{network_error, 5xx}`. A `429` is retry-eligible only when a future approved policy explicitly pins `retry_on_429=true`. All other `4xx` outcomes are nonretryable. Every actual retry consumes the same total-attempt budget and requires an explicit replay-safety basis.  
 * **Backoff enum:** `backoff ∈ {none, fixed, exponential}`.  
 * **Backoff params (ms):**  
   * `fixed_delay_ms ∈ {250, 500, 1000}`  
   * `exp_base_ms ∈ {250, 500}`, `exp_factor = 2`, `exp_ceiling_ms ∈ {1000, 2000, 4000}`  
-* **Schedule:**  
-  * `none → 0 ms`; `fixed →` repeat `fixed_delay_ms`;  
-  * `exponential → min(exp_base_ms * 2^(n-1), exp_ceiling_ms)` for attempt `n ≥ 2`.  
-* **Budget:** never exceed `total_timeout_ms`; **no jitter**.
+* **Schedule before attempt `n ≥ 2`:**  
+  * `none → 0 ms`; `fixed → fixed_delay_ms`;  
+  * `exponential → min(exp_base_ms * 2^(n - 2), exp_ceiling_ms)`.  
+  * No delay precedes attempt 1\. The first retry uses `exp_base_ms`; the second uses `2 * exp_base_ms`, capped by `exp_ceiling_ms`.  
+* **Total-time budget:** all outbound time and scheduled backoff share one monotonic `total_timeout_ms` deadline. A retry MUST NOT be scheduled if its delay would exhaust the remaining budget; a new attempt MUST NOT begin after the deadline; connect and read limits do not extend it. Budget exhaustion uses the PF05-owned exact error contract and MUST NOT echo provider payloads or secrets. **No jitter.**
 
 ### **11.2.4 429 handling (deterministic)**
 
-* **Typed error:** map to `PROVIDER_RATE_LIMITED` (see §11.1.4); no payload echo.  
+* **Typed error:** use the PF05-owned rate-limited typed-error contract (see §11.1.4); no payload echo.  
 * **Retry-After parse:** if present, deterministically parse delta-seconds or HTTP-date → `retry_after_ms` (integer); invalid header → omit the field.  
-* **Optional retry on 429:** enabled only when policy pins `retry_on_429=true`; then apply the same backoff and respect `max_attempts` and the total time budget.
+* **Optional retry on 429:** enabled only when a future approved policy pins `retry_on_429=true`. Parsing or surfacing valid `Retry-After` information does not authorize a retry. An enabled retry applies the same total-attempt and total-time budgets. The future policy MUST pin how `Retry-After` combines with the selected backoff.
 
 ### **11.2.5 Observability (non-PII; bounded labels)**
 
 * **Counters/timers/histograms (examples):** `vendor.req_total`, `vendor.req_success`, `vendor.req_error_{class}`, `vendor.retry_attempts`, `vendor.latency_ms` (bounded buckets).  
-* **Labels (bounded):** `route`, `outcome ∈ {ok, network_error, 4xx, 5xx, 429}`, `rails_state ∈ {open,closed}`, `timeout_profile`, `attempt_idx`.  
+* **Labels (bounded):** `route`, `outcome ∈ {ok, network_error, 4xx, 5xx, 429}`, `rails_state ∈ {open,closed}`, `timeout_profile`, `attempt_idx`. `attempt_idx` is one-based and identifies the outbound call. `vendor.retry_attempts` counts retry calls only, never attempt 1; its maximum is `max_attempts - 1`. A local configuration refusal is a zero-I/O configuration outcome, not an outbound attempt.  
 * **Keys-only logs:** never log request/response bodies or header values; secrets always redacted (see §7.1, §8.2).
 
 ### **11.2.6 Acceptance to flip rails (controlled integration)**
 
 Before enabling live calls in any environment, a Doc-Delta **MUST** pin the selections and evidence must pass:
 
-1. **Policy pinning:** choose one timeout profile, `max_attempts`, backoff, and 429 handling.  
+1. **Policy pinning:** choose one timeout profile, `max_attempts` under the total-attempt definition in §11.2.3, backoff, replay-safety basis, and 429 handling.  
 2. **Redaction tests:** prove logs contain no secrets/payloads; only bounded labels.  
 3. **Refusal proof:** with rails closed, show deterministic refusal and correct shaping (no I/O).  
 4. **Open-rails conformance:** with rails open, prove success, retry, and 429 paths follow pinned policy; parity/idempotence (A3/A4) unaffected.  
@@ -4986,7 +5007,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 ## **12.1 CORE-CANON / CORE-DET / CORE-READER / CORE-MATCH**
 
 **Anchors.** Use these exact IDs in evidence and Doc-Delta targets: `GATE:CORE-CANON`, `GATE:CORE-DET`, `GATE:CORE-READER`, `GATE:CORE-MATCH`.  
- All gates inherit the serializer and locale pins: UTF-8, sorted keys, compact separators (`,` and `:`), exactly one LF, `LC_ALL=C`, `TZ=UTC`. Any historic prompt or uncertainty checks are retired.
+All gates inherit the serializer and locale pins: UTF-8, sorted keys, compact separators (`,` and `:`), exactly one LF, `LC_ALL=C`, `TZ=UTC`. Any historic prompt or uncertainty checks are retired.
 
 ### **GATE:CORE-CANON — Canonical emission and comparators \[Required-Now\]**
 
@@ -4996,7 +5017,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * **Objects:** keys ASCII-sorted; compact separators; UTF-8; BOM/ANSI-free; exactly one LF.  
 * **Arrays as sets:** dedupe by identity, then ASCII-sort; on value conflict, fail closed.  
 * **Environment pins:** `LC_ALL=C`, `TZ=UTC`.  
-   **Evidence.** Canonical re-serialize comparison; grep-guards (no `json.dumps` on public paths); LF/encoding checks.
+  **Evidence.** Canonical re-serialize comparison; grep-guards (no `json.dumps` on public paths); LF/encoding checks.
 
 ### **GATE:CORE-DET — Determinism and identity \[Required-Now\]**
 
@@ -5005,7 +5026,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * **Preimage recipe:** build the preimage (without `idempotence_hash`), canonicalize, verify `sha256(preimage_bytes) == idempotence_hash`; then re-serialize canonically.  
 * **AB↔BA identity** (pair normalization) and **two-run identity** hold byte-for-byte.  
 * No nondeterminism on public paths from time, locale, randomness, or floating-point behavior.  
-   **Evidence.** Preimage recompute logs; AB/BA and two-run byte-compare goldens.
+  **Evidence.** Preimage recompute logs; AB/BA and two-run byte-compare goldens.
 
 ### **GATE:CORE-READER — Public covenant and transport hooks \[Required-Now\]**
 
@@ -5021,7 +5042,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
   * HEAD mirrors 200 validators; **no body; `Content-Length` equals identity 200; `Content-Type` equals GET**.  
   * Writers/errors: **Cache-Control: no-store** and **no `ETag`**; errors include `Content-Type: application/json; charset=utf-8`.  
   * **POST is non-conditional** (ignore `If-*` conditionals).  
-     **Evidence.** Schema/shape tests; Reader↔CLI parity runs; A7 header snapshots.
+    **Evidence.** Schema/shape tests; Reader↔CLI parity runs; A7 header snapshots.
 
 ### **GATE:CORE-MATCH — Compat math posture \[Required-Now\]**
 
@@ -5031,7 +5052,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * **Validation:** `viewer_prefs.weights` covers all 10 IDs with integers `0..100`; invalid shapes ⇒ typed failure.  
 * **Determinism:** AB↔BA and two-run identity hold for internal scoring; fixed-point arithmetic with round away-from-zero and clamp to `[0..100]`.  
 * **Public boundary:** no public numerics; Reader v1 remains `{id, band}` only (compat internals do not leak).  
-   **Evidence.** Validator tests; fixed-point boundary goldens; proofs of “no public numerics” in success bodies.
+  **Evidence.** Validator tests; fixed-point boundary goldens; proofs of “no public numerics” in success bodies.
 
 **Note.** Any previously listed gate checks for prompt or uncertainty are removed from governance. Those features are retired and must not appear in public payloads or acceptance criteria.
 
@@ -5056,10 +5077,10 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * Schema and shape (six-key success; `{id, band}` only): `schemas/reader.v1.schema.json`  
 * Reader↔CLI parity (dev harness and tests): `adapter/http_reader.py` (dev-only harness), `tests/reader_v1/test_emitter.py`, `tests/cli/test_cli_stdout_schema_and_lf.py`  
 * A7 transport snapshots (validators):  
-   `tests/transport/headers/etag_200.snap`,  
-   `tests/transport/headers/cond_304.snap`,  
-   `tests/transport/headers/head_parity.snap`,  
-   `tests/transport/headers/no_store_writers_errors.snap`  
+  `tests/transport/headers/etag_200.snap`,  
+  `tests/transport/headers/cond_304.snap`,  
+  `tests/transport/headers/head_parity.snap`,  
+  `tests/transport/headers/no_store_writers_errors.snap`  
 * For internal-ops transport evidence of `/internal/version`, see **Appendix D: D.6** (titles only).
 
 ### **GATE:CORE-MATCH — Compat math posture**
@@ -5078,7 +5099,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 ## **13.1 Reader versioning (v1) \[Required-Now\]**
 
 **Principle (normative).**  
- **Reader v1** is a **strict** public contract. Success bodies contain **exactly six** top-level keys and a **bands-only** `categories` array. Any change that alters this public shape or its semantics is a **versioned change** (Reader v2+).
+**Reader v1** is a **strict** public contract. Success bodies contain **exactly six** top-level keys and a **bands-only** `categories` array. Any change that alters this public shape or its semantics is a **versioned change** (Reader v2+).
 
 ### **13.1.1 v1 success contract (strict)**
 
@@ -5106,6 +5127,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * Changing **transport policy** within A7 (headers/conditional delivery as defined in §10) with no change to public body bytes.  
 * Changing **rails** policy for vendor ingest (enablement, timeouts/retries/backoff) with no change to public body bytes.
 
+>   
 > These changes still require a **Doc-Delta** and updated evidence; if they alter frozen math, they produce a new **`release_id`** (§5.1).
 
 ### **13.1.5 Compatibility & validation (binary)**
@@ -5123,7 +5145,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 ## **13.2 Presets/evolution policy \[Required-Now\]**
 
 **Governance stance (normative).**  
- Presets are a **frozen, cataloged control surface** for internal scoring/aggregation. They **MUST NOT** change the public Reader v1 covenant (numeric-free; `{id, band}` only) and are promoted via the **freeze-pack** process. Arithmetic and schema details are **owned by Math** and are referenced here **by title only**.
+Presets are a **frozen, cataloged control surface** for internal scoring/aggregation. They **MUST NOT** change the public Reader v1 covenant (numeric-free; `{id, band}` only) and are promoted via the **freeze-pack** process. Arithmetic and schema details are **owned by Math** and are referenced here **by title only**.
 
 ### **13.2.1 Ownership & routing**
 
@@ -5133,14 +5155,19 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 ### **13.2.2 Change control (freeze-pack impact)**
 
 * **Preset changes ⇒ new `release_id`.** Adding/removing a preset, or changing preset **weights**, **caps/floors**, **dampeners**, **cross-family** hints, **micro** posture, or the preset **schema** is a **math change** and **MUST** be captured in the freeze-pack; promotion requires a **new `release_id`** (see §5.1).  
+    
 * **Precedence policy.** If presets co-exist with viewer weights, the **deterministic precedence policy** must be **pinned by title** (Math/CLI reference). Changing that policy requires a **Doc-Delta** and updated evidence.  
+    
 * **No public drift.** Preset evolution **MUST NOT** introduce public numerics or new public fields under Reader v1 (see §13.1).
 
   ### **13.2.3 Acceptance to land (binary)**
 
 * Schema validation (titles-only). Every preset validates against the Math-owned schema (exact Magic-10 keys; integers 0..100; closed enums for caps/dampeners).  
+    
 * Determinism. Fixed-point arithmetic with **round away-from-zero**; AB↔BA and two-run identity hold under the selected preset(s).  
+    
 * Public covenant. Reader v1 success remains {id, band} only; no changes to six-key shape or error model.  
+    
 * Evidence. Update Appendix D — Evidence Index with preset schema passes, fixed-point boundary goldens, and parity/identity runs; add a Doc-Delta entry in §9.
 
 ### **13.2.4 Versioning posture**
@@ -5178,70 +5205,85 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 
 ## **15.2 Open issues list**
 
-> Keep this list short and actionable. Each item has an **owner**, a **next step**, and a **target Doc-Delta** or **deadline**.
+> Keep this list short and actionable. Each item has an **owner**, a **next step**, and a **target Doc-Delta** or **deadline**.  
+> 
 
-* **OI-001 — Reader v2 planning (full Magic-10 exposure).**
-
+* **OI-001 — Reader v2 planning (full Magic-10 exposure).**  
+    
   * *Owner:* Architecture \+ Math leads  
-  * *Next step:* Draft v2 public schema \+ acceptance; define migration plan; Doc-Delta proposal  
-  * *Status:* OPEN  
-* **OI-002 — Preset precedence vs viewer weights (pinning).**
-
-  * *Owner:* Math \+ CLI  
-  * *Next step:* Route final policy by title (CLI/Math); add tests; Doc-Delta  
-  * *Status:* OPEN  
-* **OI-003 — Vendor open-rails pilot (timeouts/retries/backoff/429).**
-
-  * *Owner:* Transport  
-  * *Next step:* Pin profile enums; add integration job; Doc-Delta to flip rails; redaction proof  
-  * *Status:* OPEN  
-* **OI-004 — Serializer unification proof in CI (symbol allowlist).**
-
-  * *Owner:* Platform  
-  * *Next step:* Add symbol-level emitter check; extend grep-guards; refresh parity/idempotence goldens  
-  * *Status:* OPEN  
-* **OI-005 — A7 HEAD `Content-Length` verification on large bodies.**
-
-  * *Owner:* Transport  
-  * *Next step:* Add header snapshot test for edge cases; Doc-Delta if matrix changes  
+  * *Next step:* Draft a versioned `reader.v2` public schema, exact acceptance contract, and migration plan through an approved Doc-Delta. Keep Reader v1 unchanged. Reader v2 may expose the canonical complete ten-item intrinsic Magic-10 result only when every eligible pair has exactly the ten PF01 categories in canonical order, with no omission, duplication, default fill, harmony-only substitution, or viewer-preference mutation. Update PF01, PF05, PF12, tests, and Evidence Index entries in their owning surfaces.  
+  * *Verified-as-of repository basis:* At pinned commit `0f89b37b222941e8da18759c02626d6b48c323a1`, `schemas/reader.v1.schema.json` exists and `schemas/reader.v2.schema.json` was not found in the complete tree. PF01 keeps full public Magic-10 exposure in a future Reader v2 versioned contract.  
   * *Status:* OPEN
 
+
+* **OI-002 — Preset precedence vs viewer weights (pinning).**  
+    
+  * *Owner:* Math \+ CLI  
+  * *Next step:* Obtain the product and Math decision to keep presets legacy/orphan or promote them. If promoted, define the complete Human Design-grounded feature model, exact fixed-point representation, canonical evaluation order, precedence relative to viewer preferences, schema, validation, and tests in an approved Doc-Delta. Until then, presets MUST NOT alter intrinsic Magic-10 scores, bands, category identity, category order, or Human Design mechanics; viewer preferences remain sampler/ranker inputs only.  
+  * *Verified-as-of repository basis:* At pinned commit `0f89b37b222941e8da18759c02626d6b48c323a1`, preset loading and viewer-preference weighting exist as separate static code surfaces. PF01 treats preset code as future-promotion or legacy-orphan posture and supplies no current precedence rule.  
+  * *Status:* OPEN
+
+
+* **OI-003 — Vendor open-rails pilot (timeouts/retries/backoff/429).**  
+    
+  * *Owner:* Transport  
+  * *Next step:* After the applicable Distillation prerequisites are satisfied, submit one authorized Doc-Delta that pins an exact per-environment timeout profile, `max_attempts`, backoff, 429 posture, `Retry-After` rule, and retry-safety basis; add controlled open-rails success, retry, timeout, 429, refusal, and redaction proof; then update the PF04 Change Log and Appendix D in the same change.  
+  * *Verified-as-of repository basis:* At pinned commit `0f89b37b222941e8da18759c02626d6b48c323a1`, static vendor implementation policy and fixture/local policy evidence exist, but PF10 states `No current addenda`; these bytes do not promote a permanent-canon environment policy or prove live-provider behavior.  
+  * *Status:* OPEN
+
+
+* **OI-004 — Serializer unification proof in CI (symbol allowlist).**  
+    
+  * *Owner:* Platform  
+  * *Next step:* Add a symbol-level CI check proving that every public Reader and CLI emission path reaches the single canonical emitter and serializer; extend alternate-serializer and ad hoc byte-emission guards; add negative fixtures; refresh parity and idempotence goldens; record the job, tests, and artifacts in Appendix D and the governing Doc-Delta.  
+  * *Verified-as-of repository basis:* At pinned commit `0f89b37b222941e8da18759c02626d6b48c323a1`, the Reader v1 emitter delegates through the engine presenter to the canonical serializer, but `ci/jobs/canonical_emitter_symbol_check.yml` was not found in the complete tree. Static delegation alone does not prove all public paths.  
+  * *Status:* OPEN
+
+
+* **OI-005 — A7 HEAD `Content-Length` verification on large bodies.**  
+    
+  * *Owner:* Transport  
+  * *Next step:* Add deterministic large-body GET/HEAD parity coverage and a stable header snapshot. Prove that successful HEAD has an empty body and reports the same representation `Content-Length` and relevant `Content-Type` as the corresponding identity GET. Reconcile lower-level tests or transport surfaces that expect zero or absent HEAD length. Add `ci/jobs/transport_head_parity.yml` and `tests/transport/headers/head_parity.snap`, or record approved replacement paths. Use a Doc-Delta if the transport matrix changes and update Appendix D in the same change.  
+  * *Verified-as-of repository basis:* At pinned commit `0f89b37b222941e8da18759c02626d6b48c323a1`, the active Reader A7 test and one generated proof use the selected GET representation length, while `adapter/etag_core.py` returns `Content-Length: 0` for HEAD. The named large-body CI job and snapshot were not found in the complete tree.  
+  * *Status:* OPEN
+
+>   
 > Update this list as items close; each closure should cite the Doc-Delta ID and the Evidence Index entries that were updated in the same change.
 
-# **Appendices \[Informative / Reference\]**
+Appendices \[Informative / Reference\]
 
-## **Appendix A — Transport Matrices (Reader) \[Required-Now\]**
+# **Appendix A — Transport Matrices (Reader) \[Required-Now\]**
 
 **Governance.** This appendix defines the required headers and conditional rules for Reader responses. Transport **bytes and examples** live by title in **HDE-CLI-API-Vendor-Ref**; this section governs policy only. No payload bytes appear in this document.
 
-### **A.1 Success (200) — required headers**
+## **A.1 Success (200) — required headers**
 
 * **Content-Type:** `application/json; charset=utf-8` — UTF-8 JSON; BOM/ANSI-free.  
 * **ETag:** `"strong, quoted"` — identity over the final LF-terminated body (canonical JSON per HDE-Schemas & Artifacts, pre-compression); encoding-invariant.  
 * **Vary:** `Authorization, Accept-Encoding` — at minimum.  
 * **Cache-Control:** `private, max-age=0, must-revalidate` — required on 200 (and mirrored on HEAD; see A.4).
 
-### **A.2 Success (200) — body covenant**
+## **A.2 Success (200) — body covenant**
 
 * **Six keys exactly:** `reader_version, eligible, categories, meta, release_id, idempotence_hash`.  
 * **Categories policy (v1):** `categories[*] == { id, band }` only (numeric-free); v1 Alpha: single `{"id":"harmony","band":<band>}` when `eligible == true`.  
 * **Canonical emission:** UTF-8, sorted keys, compact separators, exactly one LF.  
 * **Idempotence:** `idempotence_hash = sha256(preimage_bytes)` where the preimage fields are defined in HDE-Math-Spec (no local restatement here).
 
-### **A.3 304 Not Modified (conditional GET)**
+## **A.3 304 Not Modified (conditional GET)**
 
 * **Precondition (strong ETag).** A prior 200 OK with a strong, quoted `ETag` **MUST** exist for the same resource, and the request **MUST** present a matching `If-None-Match`.  
 * **Shape.** **No body; omit both `Content-Type` and `Content-Length`.**  
 * **Validators.** Repeat the validators from the cached 200 (for example, `ETag`, `Vary`, `Cache-Control`).  
 * **Writers/errors excluded.** Never use 304 for writers or error responses; those responses **MUST** send `Cache-Control: no-store` and **MUST NOT** send `ETag`.
 
-### **A.4 HEAD parity**
+## **A.4 HEAD parity**
 
 * **Headers mirror 200** (strong quoted `ETag`; `Vary: Authorization, Accept-Encoding`; `Cache-Control: private, max-age=0, must-revalidate`; `Content-Type: application/json; charset=utf-8`).  
 * **No body;** `Content-Length == len(identity 200 body)` (canonical LF-terminated bytes, pre-compression).  
 * **Encoding invariance.** Identity (`ETag`) is unchanged by accepted `Accept-Encoding` selections.
 
-### **A.5 Writers & errors**
+## **A.5 Writers & errors**
 
 * `Cache-Control: no-store` on **all** writers and **all** error responses.  
 * **No `ETag`** on writers/errors.  
@@ -5254,15 +5296,15 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 * **OPTIONS → 204 (no body).** For writer resources, OPTIONS **MUST** return 204 with no body; no `ETag`/`Vary`/compression. Under HTTP/2, `Content-Length: 0` may be omitted.  
 * **HEAD 405 (strict).** Writers’ HEAD on non-HEAD writer routes returns 405; include `Content-Length: 0`.
 
-### **A.6 Examples (titles-only; no payload bytes)**
+## **A.6 Examples (titles-only; no payload bytes)**
 
 * Success \+ ETag (200) — Transport: Success 200 headers (cataloged endpoint)  
 * Conditional GET (304) — Transport: Conditional 304 headers (cataloged endpoint)  
 * HEAD parity — Transport: HEAD-vs-200 parity headers  
 * Writers/errors — Transport: no-store \+ no-ETag headers  
-   *(Keep these titles synchronized with Appendix D: Evidence Index and the machine JSONL mirror; update both in the same change when snapshots move.)*
+  *(Keep these titles synchronized with Appendix D: Evidence Index and the machine JSONL mirror; update both in the same change when snapshots move.)*
 
-### **A.7 Acceptance checklist (binary)**
+## **A.7 Acceptance checklist (binary)**
 
 1. **200:** strong, quoted `ETag`; body meets six-key covenant; LF/encoding OK; `Cache-Control: private, max-age=0, must-revalidate` present; `Vary` present; encoding-invariant `ETag`.  
 2. **304:** served only **after 200**; **no body**; validators mirror 200; **`Content-Type` omitted; `Content-Length` omitted.**  
@@ -5274,11 +5316,11 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 
 ---
 
-## **Appendix B — Acceptance Gate Details \[Required-Now\]**
+# **Appendix B — Acceptance Gate Details \[Required-Now\]**
 
 Titles and paths only; no payload bytes. This appendix lists gate checklists and CI jobs that enforce them. Keep it synchronized with **Appendix D — Evidence Index** and CI config in the same change.
 
-### **B.1 GATE:CORE-CANON — Canonical emission and comparators**
+## **B.1 GATE:CORE-CANON — Canonical emission and comparators**
 
 * **Checklist (binary):** single presenter/emitter; UTF-8; sorted keys; compact separators; one LF; arrays-as-sets deduped and ASCII-sorted; conflict ⇒ fail-closed; `LC_ALL=C`.  
 * **CI jobs (titles-only):**  
@@ -5286,7 +5328,7 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/no_json_dumps_public_guard.yml`  
   * `ci/jobs/lf_and_encoding_check.yml`
 
-### **B.2 GATE:CORE-DET — Determinism and identity**
+## **B.2 GATE:CORE-DET — Determinism and identity**
 
 * **Checklist (binary):** preimage (five-key) → `sha256` → final; AB↔BA byte-equality; two-run identity.  
 * **CI jobs (titles-only):**  
@@ -5294,7 +5336,7 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/ab_ba_parity_bytecompare.yml`  
   * `ci/jobs/two_run_identity_bytecompare.yml`
 
-### **B.3 GATE:CORE-READER — Public covenant and transport hooks**
+## **B.3 GATE:CORE-READER — Public covenant and transport hooks**
 
 * **Checklist (binary):** success \= six keys; `categories[*] == {id, band}` (numeric-free); typed error shape; Reader↔CLI byte-equality; A7 hooks present.  
 * **CI jobs (titles-only):**  
@@ -5302,7 +5344,7 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/schema_shape_error.yml`  
   * `ci/jobs/reader_cli_parity.yml`
 
-### **B.4 A7 — Transport tokens (200 / 304 / HEAD / writers+errors)**
+## **B.4 A7 — Transport tokens (200 / 304 / HEAD / writers+errors)**
 
 **Proof surface.** A7 proofs run on a **Catalog JSON success** route listed in PF05 §5.6 (titles-only); **not** on `/internal/version`.
 
@@ -5318,7 +5360,7 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/transport_head_parity.yml`  
   * `ci/jobs/transport_no_store_writers_errors.yml`
 
-### **B.5 Rails posture — Closed refusal / Open conformance**
+## **B.5 Rails posture — Closed refusal / Open conformance**
 
 * **Checklist (binary):** closed ⇒ no network I/O, typed refusal, keys-only logs; open ⇒ pinned timeouts/retries/backoff/429, deterministic mapping, no payload/secret logging; parity/idempotence unaffected.  
 * **CI jobs (titles-only):**  
@@ -5326,7 +5368,7 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/rails_open_conformance.yml`  
   * `ci/jobs/logs_keys_only_redaction.yml`
 
-### **B.6 GATE:CORE-MATCH — Compat math posture (titles-only; math owned in spec)**
+## **B.6 GATE:CORE-MATCH — Compat math posture (titles-only; math owned in spec)**
 
 * **Checklist (binary):** closed Magic-10 IDs/order; inclusive maxima thresholds; viewer prefs ints `0..100`; fixed-point with round away-from-zero and clamp `[0..100]`; no public numerics.  
 * **CI jobs (titles-only):**  
@@ -5337,87 +5379,105 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
 
 **Maintenance rule (MUST).** When a gate’s golden/snapshot/script path changes, update **Appendix D — Evidence Index** and the corresponding CI job references here **in the same change**, and add a one-line entry in **§9 Change Management — Doc-Delta Hooks**.
 
-### **B.7 EPIC017 token/test mapping (compat, registry, ordering, evidence)**
+## **B.7 EPIC017 token/test mapping (compat, registry, ordering, evidence)**
 
 *Compat & CLI tokens*
 
 * **CLI\_NO\_ALT\_JSON\_OK**, **CLI\_SHOWCOMPAT\_CANON\_OK**, **CLI\_STDOUT\_LF\_OK**, **CLI\_READER\_PARITY\_OK**  
-   *Tests/scripts (titles-only):* `tests/test_emitter_determinism.py`, `tests/test_reader_transport.py`, `tests/cli/test_cli_showcompat.py`.
+  *Tests/scripts (titles-only):* `tests/test_emitter_determinism.py`, `tests/test_reader_transport.py`, `tests/cli/test_cli_showcompat.py`.
 
 *Determinism & composite tokens*
 
 * **JSON\_CANONICAL\_CHECK\_OK**, **TWO\_RUN\_IDENTITY\_OK**, **COMPOSITE\_ABBA\_IDENTITY\_OK**, **TIEBREAK\_TOTAL\_ORDER\_OK**  
-   *Tests/scripts (titles-only):* `tools/order/generate_ordering_artifacts.py`, `tests/order/test_ordering_artifacts.py`, `cli.showcompat.*` determinism tests.
+  *Tests/scripts (titles-only):* `tools/order/generate_ordering_artifacts.py`, `tests/order/test_ordering_artifacts.py`, `cli.showcompat.*` determinism tests.
 
 *Registry tokens*
 
 * **CONFIG\_GEN\_OK**, **UNKNOWN\_IDS\_FAIL\_CLOSED\_OK**  
-   *Tests/scripts (titles-only):* `tools/generate_registry_report.py`, `tests/config/test_registry_report_determinism.py`, `tests/config/test_registry_report_exists_and_is_canonical.py`.
+  *Tests/scripts (titles-only):* `tools/generate_registry_report.py`, `tests/config/test_registry_report_determinism.py`, `tests/config/test_registry_report_exists_and_is_canonical.py`.
 
 *Evidence and mirror tokens*
 
 * **EVIDENCE\_INDEX\_UPDATED\_OK**, **MACHINE\_MIRROR\_UPDATED\_OK**, **EVIDENCE\_INDEX\_HASH\_OK**, **EVIDENCE\_INDEX\_MIRROR\_OK**, **EVIDENCE\_PATHS\_VALIDATED\_OK**, **EVIDENCE\_PATH\_PROOFS\_OK**, **CI\_CHECK\_MIRROR\_SCHEMA\_OK**, **CI\_CHECK\_FINAL\_LF\_OK**  
-   *Tests/scripts (titles-only):* `tools/evidence/update_evidence_index.py`, `tests/ops/test_evidence_index.py`, `tests/evidence/test_evidence_skeleton.py`.
+  *Tests/scripts (titles-only):* `tools/evidence/update_evidence_index.py`, `tests/ops/test_evidence_index.py`, `tests/evidence/test_evidence_skeleton.py`.
 
 *Doc-deltas & QA coverage tokens*
 
 * **DOC\_DELTA\_PRESENT\_OK**, **TESTS\_PASS\_OK**  
-   *Artifacts/tests (titles-only):* `audit/docdeltas/PF04_EPIC017_tokens_and_env.md`, `audit/docdeltas/PF04_EPIC017_tokens_and_env.md.path_proof.txt`, `qa.compat.coverage_summary`.
+  *Artifacts/tests (titles-only):* `audit/docdeltas/PF04_EPIC017_tokens_and_env.md`, `audit/docdeltas/PF04_EPIC017_tokens_and_env.md.path_proof.txt`, `qa.compat.coverage_summary`.
 
 ---
 
-## **Appendix C — Bench & Ops Runbook \[Required-Now\]**
+# **Appendix C — Bench & Ops Runbook \[Required-Now\]**
 
 Titles/paths only — no payload bytes. This runbook defines how to run the bench harness and verify SLOs. Keep references synchronized with **Appendix D — Evidence Index** and CI config in the same change.
 
-### **C.1 Purpose & scope**
+## **C.1 Purpose & scope**
 
 * Prove determinism (A3), Reader↔CLI parity (A4), and transport invariants (A7) under load, without PII or payload logging.  
+    
 * Produce bounded latency histograms and percentile summaries (p95/p99).  
+    
 * Support promotion/rollback decisions (see §5.2).
 
-  ### **C.2 Bench profiles (titles-only)**
+  ## **C.2 Bench profiles (titles-only)**
 
 * **Math/transport profile (rails closed).** Deterministic engine \+ presenter; no network I/O.  
+    
 * **Vendor profile (rails open).** Timeouts/retries/backoff per §11.2; typed mapping; keys-only logs. Pin profile names/arguments in repo scripts (see Appendix D).
 
-  ### **C.3 Usage recipe (deterministic runs)**
+  ## **C.3 Usage recipe (deterministic runs)**
 
 1. **Prepare fixtures & env.** Fixed fixture set, pinned env; do not vary counts/data between cuts.  
+     
 2. **Warm-up then measure.** Discard warm-up; collect metrics during a fixed measurement window.  
+     
 3. **Collect checks.**  
+     
    * Parity & identity: AB↔BA, two-run, Reader↔CLI byte-compare; preimage → sha256 → final.  
-   * A7 spot checks (dev harness): ETag on 200; 304-after-200; HEAD parity; no-store on writers/errors.  
+   * A7 spot checks (dev harness): ETag on 200; 304-after-200; HEAD parity; no-store on writers/errors.
+
+   
+
 4. **Capture histograms/counters.** Engine/presenter/reader latency buckets; outcome counters with bounded labels.  
+     
 5. **Write artifacts (titles/paths only).** Bench report (percentiles \+ histogram snapshot), parity/identity logs, A7 header snapshots.
 
-   ### **C.4 SLO verification (binary)**
+   ## **C.4 SLO verification (binary)**
 
 * **Inputs:** bench report for current cut; pinned SLO targets (§6.2).  
+    
 * **Pass when:** (1) p95/p99 thresholds met by profile/metric; (2) A3/A4 pass in the same runs; (3) A7 spot checks pass; (4) rails posture honored.  
+    
 * **Fail posture:** stop canary or rollback via pointer-flip (§5.2); open investigation.
 
-  ### **C.5 Reporting & evidence (titles-only)**
+  ## **C.5 Reporting & evidence (titles-only)**
 
 * **Bench report:** `artifacts/bench/bench_report_{release_id}.json`  
+    
 * **Parity/identity logs:** `artifacts/bench/parity_identity_{release_id}.log`  
-* **Transport snapshots:** `artifacts/bench/transport_headers_{release_id}/…`  
+    
+* **Transport snapshots:** `artifacts/bench/transport_headers_{release_id}/<TRANSPORT_SNAPSHOT_FILE>`  
+    
 * **Indexing:** update **Appendix D — Evidence Index** in the same change.
 
-  ### **C.6 CI hooks (titles-only)**
+  ## **C.6 CI hooks (titles-only)**
 
 * **Jobs:** `ci/jobs/bench_math_transport.yml` (rails closed) `ci/jobs/bench_vendor_open.yml` (rails open; policy pinned) `ci/jobs/slo_verify.yml` (compare report vs targets)  
+    
 * **Guards:** enforce keys-only logging; fail on payload/body/header-value patterns; assert one LF and canonical encoding on emitted JSON.
 
-  ### **C.7 Ops notes**
+  ## **C.7 Ops notes**
 
 * **No schema drift.** Bench harness must not alter public bytes or schemas.  
+    
 * **Keys-only logs.** Never log payloads or header values; secrets always redacted (see §7.1, §8.2).  
+    
 * **Pointer discipline.** Promotions/rollbacks are pointer flips to `release_id`; record outcomes in the Change Log and update Appendix D.
 
 ---
 
-## **Appendix D — Evidence Index (titles/paths only) \[Required-Now\]**
+# **Appendix D — Evidence Index (titles/paths only) \[Required-Now\]**
 
 **Single-home rule.** PF12 governs the **human Evidence Index** (`docs/evidence/INDEX.json`), the **hash sentinel** (`docs/evidence/INDEX.sha256`), and the **machine JSONL mirror** (`artifacts/evidence_index.jsonl`). **Update all three in the same PR** when any governed artifact changes. The mirror is **one file**, **records-only canonical JSONL** (UTF-8; sorted keys; compact; **one LF**); **ASCII field order**; **sort-before-write**; **unknown-keys rejected**; each record includes a **`proof_anchor`** to a co-located path-proof.
 
@@ -5425,26 +5485,26 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 ---
 
-### **D.0 Close-pack & release manifests (admin)**
+## **D.0 Close-pack & release manifests (admin)**
 
 **Deterministic path-of-record (baseline close-pack pair; non-token).**  
- The canonical close-pack pair MUST live at the deterministic audit/ locations below. This is a baseline closure artifact requirement and is not tokenized by default.
+The canonical close-pack pair MUST live at the deterministic audit/ locations below. This is a baseline closure artifact requirement and is not tokenized by default.
 
-* `audit/EPIC-###_close_report.md`
-
-* `audit/EPIC-###_close_report.md.path_proof.txt`
-
-* `audit/EPIC-###_MANIFEST.json`
-
+* `audit/EPIC-###_close_report.md`  
+    
+* `audit/EPIC-###_close_report.md.path_proof.txt`  
+    
+* `audit/EPIC-###_MANIFEST.json`  
+    
 * `audit/EPIC-###_MANIFEST.json.path_proof.txt`  
-   (Where `###` is the zero-padded 3-digit epic number, e.g., `009`, `023`. The close report and manifest MUST each have a co-located `.path_proof.txt` sibling at the deterministic `audit/` location.)
+  (Where `###` is the zero-padded 3-digit epic number, e.g., `009`, `023`. The close report and manifest MUST each have a co-located `.path_proof.txt` sibling at the deterministic `audit/` location.)
 
 **No relocation / no dual-home acceptance binding.**  
- These artifacts MUST NOT be relocated into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
+These artifacts MUST NOT be relocated into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
 
 ---
 
-### **D.1 Parity (Reader↔CLI, AB↔BA, two-run)**
+## **D.1 Parity (Reader↔CLI, AB↔BA, two-run)**
 
 * Goldens: `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
 * Harness/tests: `tests/reader_v1/test_emitter.py`, `tests/cli/test_cli_stdout_schema_and_lf.py`  
@@ -5454,14 +5514,14 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 ---
 
-### **D.2 LF & encoding discipline (UTF-8; one LF; no BOM/ANSI)**
+## **D.2 LF & encoding discipline (UTF-8; one LF; no BOM/ANSI)**
 
 * Checks/tests: `tests/cli/test_cli_stdout_schema_and_lf.py`, `tests/reader_v1/test_emitter.py`  
 * CI guards: `ci/jobs/lf_and_encoding_check.yml`, `ci/grep-guards/no_ansi_no_bom.regex`
 
 ---
 
-### **D.3 Idempotence coupling (preimage → sha256 → final)**
+## **D.3 Idempotence coupling (preimage → sha256 → final)**
 
 * Identity marker/logs: `artifacts/cards/A3/IDENTITY_OK.txt`  
 * Recompute scripts: `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`  
@@ -5469,7 +5529,7 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 ---
 
-### **D.4 Endpoint Catalog & transport proofs (Reader A7)**
+## **D.4 Endpoint Catalog & transport proofs (Reader A7)**
 
 **Proof surface & posture (titles-only).**
 
@@ -5496,18 +5556,18 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-proof sidecars in the same change. Any mismatch indicates stale sidecars and is a mechanical blocker.
 
-* `docs/ENDPOINTS_CATALOG.json`
-
-* `docs/ENDPOINTS_CATALOG.json.sha256`
-
-* `docs/ENDPOINTS_CATALOG.json.path_proof.txt`
-
-* `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`
-
-* `artifacts/audit/ENDPOINTS_CATALOG.json`
-
-* `artifacts/audit/ENDPOINTS_CATALOG.json.sha256`
-
+* `docs/ENDPOINTS_CATALOG.json`  
+    
+* `docs/ENDPOINTS_CATALOG.json.sha256`  
+    
+* `docs/ENDPOINTS_CATALOG.json.path_proof.txt`  
+    
+* `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`  
+    
+* `artifacts/audit/ENDPOINTS_CATALOG.json`  
+    
+* `artifacts/audit/ENDPOINTS_CATALOG.json.sha256`  
+    
 * `tests/http/test_endpoint_catalog.py`
 
 **Writer/error posture (headers-only).**
@@ -5524,7 +5584,7 @@ Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-
 
 ---
 
-### **D.5 Rails posture (refusal & open conformance)**
+## **D.5 Rails posture (refusal & open conformance)**
 
 * **Closed-rails refusal proof** (single-file canonical; headers → blank line → body): `artifacts/proofs/refusal_run.txt` *(format rules in PF12 §8.3.1)*  
 * **Shaping correctness (closed rails):** `ci/jobs/logs_keys_only_redaction.yml`  
@@ -5532,7 +5592,7 @@ Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-
 
 ---
 
-### **D.6 Internal-ops surface: `/internal/version`**
+## **D.6 Internal-ops surface: `/internal/version`**
 
 * GET body capture — `artifacts/ops/internal_version/body_get.json` and `artifacts/ops/internal_version/body_get.sha256`  
 * GET headers capture — `artifacts/ops/internal_version/headers_get.txt`  
@@ -5544,24 +5604,24 @@ Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-
 
 ---
 
-### D.7 Database runtime posture (prod & dev)
+## D.7 Database runtime posture (prod & dev)
 
 Env snapshot — `artifacts/runtime/env_matrix.snapshot.json` (singleton; one file representing the default rails settings across environments, using the canonical v3 schema with uppercase rails keys such as `SAFE_MODE` and `ALLOW_NETWORK` and labeled policy fields; governed by `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK`).  
- Current direct-selection snapshot — `artifacts/runtime/direct_db_selection.snapshot.json` (direct-only provider selection, retired-key refusal, fail-closed direct unavailability, zero alternate-transport attempts, and secret-value absence).  
- Historical bridge-era connectivity snapshot — `artifacts/runtime/env_connectivity.snapshot.json` (retained historical evidence only; not current bridge availability, support, fallback, parity, or token proof).  
- DDL/search\_path/grants set — `artifacts/db/check_schema.txt` (search\_path), `artifacts/db/grants.txt` (least-privilege), `artifacts/db/ddl_fingerprint.json` (normalized fingerprint), `artifacts/db/conn_env_selection.log` (selection proof)
+Current direct-selection snapshot — `artifacts/runtime/direct_db_selection.snapshot.json` (direct-only provider selection, retired-key refusal, fail-closed direct unavailability, zero alternate-transport attempts, and secret-value absence).  
+Historical bridge-era connectivity snapshot — `artifacts/runtime/env_connectivity.snapshot.json` (retained historical evidence only; not current bridge availability, support, fallback, parity, or token proof).  
+DDL/search\_path/grants set — `artifacts/db/check_schema.txt` (search\_path), `artifacts/db/grants.txt` (least-privilege), `artifacts/db/ddl_fingerprint.json` (normalized fingerprint), `artifacts/db/conn_env_selection.log` (selection proof)
 
 (Tokens & policy live in §2.0 / §6.3.)
 
 ---
 
-### **D.8 QA artifacts namespace (transient captures)**
+## **D.8 QA artifacts namespace (transient captures)**
 
 * Namespace (titles-only): `artifacts/qa/` *(transient test-only; governed by PF12)*
 
 ---
 
-### **D.9 BodyGraph adapter data-source & invariance (PF10-AA)**
+## **D.9 BodyGraph adapter data-source & invariance (PF10-AA)**
 
 * Source selection snapshot — `artifacts/bodygraph/source_selection.snapshot.json`  
 * Source invariance (A→B) — `artifacts/bodygraph/source_invariance/ab.json`  
@@ -5576,12 +5636,12 @@ Env snapshot — `artifacts/runtime/env_matrix.snapshot.json` (singleton; one fi
 
 ---
 
-### **D.10 Bands and thresholds (inclusive-high)**
+## **D.10 Bands and thresholds (inclusive-high)**
 
 * Edge proofs: `audit/gates/bands/edges.snapshot.json`, `audit/gates/bands/edges.diff.json` (boundaries at 24/49/74/100; see HDE Math Spec)  
 * CI jobs: `ci/jobs/bands_edges_snapshot.yml`, `ci/jobs/bands_edges_diff.yml`
 
-### **D.11 Pack constants and release identity**
+## **D.11 Pack constants and release identity**
 
 * Constants pack (evidence snapshot): `artifacts/math/constants.json`, `artifacts/math/constants.json.sha256`  
 * Current release-identity input: `catalog/manifest.json`  
@@ -5590,7 +5650,7 @@ Env snapshot — `artifacts/runtime/env_matrix.snapshot.json` (singleton; one fi
 
 ---
 
-### **D.12 Topology loader: orientation and graph invariants**
+## **D.12 Topology loader: orientation and graph invariants**
 
 * Orientation demo: `audit/gates/topology/orientation_demo.txt` (before/after high–low → min→max NN-NN; arrays-as-sets deduped and ASCII-sorted)  
 * Integration degree check: `audit/gates/topology/degree_check.log` (verifies 10/20/34/57 ⇒ degree 3; all other gates ⇒ degree 1\)  
