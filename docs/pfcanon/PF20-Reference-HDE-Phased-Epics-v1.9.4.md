@@ -2,9 +2,9 @@
 
 **Status:** Reference
 
-**Version:** v1.9.3
+**Version:** v1.9.4
 
-**Effective date:** 2026-08-03
+**Effective date:** 2026-08-13
 
 **Last Update Gate:** HDE-EPIC038 Closure
 
@@ -10169,9 +10169,9 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * PF09 status drainage, PF-Canon drainage, board maintenance, release-token reconciliation, close-lifecycle redesign, and phase-exit adjudication remain separate actions.  
 * Final archive posture: HDE-EPIC038 is SATISFIED through an epic-specific exceptional closure, with implementation posture recommendation READY WITH CAVEATS.
 
-### **2.23 HDE-EPIC038 Epic Plan — Distillation Pass 3**
+### **2.24 HDE-EPIC038 Epic Plan — Distillation Pass 3**
 
-#### **2.23.1 Meta**
+#### **2.24.1 Meta**
 
 **Epic ID:** HDE-EPIC038  
 **Epic title (Implementation Guide):** Distillation Pass 3 (, §Meta)  
@@ -10260,7 +10260,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * r5 DEV-01 and DEV-02: PRs \#379 through \#383  
 * r5 DEV-03: PR \#385 remained closed and unmerged
 
-#### **2.23.2 Existing Work Check (MUST)**
+#### **2.24.2 Existing Work Check (MUST)**
 
 **Planned existing-work posture (, §Existing Work Check):**
 
@@ -10300,7 +10300,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * PF10 addendum 2.43 records all epic-scoped implementation obligations as Satisfied in substance, while PF09 source statuses remain undrained.  
 * PF10 addendum 2.44 records the final coherent outcome: manifest-derived identity, direct PostgreSQL, bounded mapped-cache persistence, a 19-stage PASS, a 24-check QA PASS, and an updater-owned evidence graph.
 
-#### **2.23.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+#### **2.24.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
 
 ##### **D1 — Global discipline**
 
@@ -10418,7 +10418,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * The plan intended all 13 implementation deliverables to make their PF09 rows supportable to completion. PF10 records those burdens as Satisfied in substance, but physical PF09 status movement remains undrained.  
 * The planned nonclaim boundaries were preserved: no public Reader expansion, new public route, production mapped-cache authorization, app-side vendor ownership, or broad v2 conformance was claimed.
 
-#### **2.23.4 PF Reference Map**
+#### **2.24.4 PF Reference Map**
 
 **Core phase and process references (from , §PF Reference Map):**
 
@@ -10476,7 +10476,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * PF10 addendum 2.44 — Lead Dev Epic Retrospective: HDE-EPIC038  
 * , §Business Case, §Contract and Compatibility Posture, §Existing Work Check, §Planned Epic Scope, §Deliverables, §PF09 Completion Map, §Tokens and Evidence (Acceptance), §QA Rails \- Open/Close, §Tracked Issues, §ADR Stubs, and §Plan Preflight
 
-#### **2.23.5 Tokens and Evidence (Acceptance)**
+#### **2.24.5 Tokens and Evidence (Acceptance)**
 
 **Planned token inventory (, §Tokens and Evidence (Acceptance)):**
 
@@ -10537,7 +10537,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * The plan expected ordinary close-pack and token-evidence completion. PF10 records the final token matrix as entirely unclaimed and the ordinary close-pack family as absent.  
 * The absence of ordinary token satisfaction is truthful and non-blocking only because HDE-EPIC038 closed through an explicit epic-specific exception.
 
-#### **2.23.6 QA Rails — Open/Close (Final PR)**
+#### **2.24.6 QA Rails — Open/Close (Final PR)**
 
 **Planned rails posture (, §QA Rails \- Open/Close):**
 
@@ -10576,7 +10576,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * PF10 addendum 2.44 — implementation posture recommendation: `READY WITH CAVEATS`.  
 * PF10 addendum 2.44 — no hard requirement remained before closure because the Product Owner finalized the epic-specific exception.
 
-#### **2.23.7 Tracked Issues**
+#### **2.24.7 Tracked Issues**
 
 **Tracked issue at plan creation (, §Tracked Issues):**
 
@@ -10633,7 +10633,7 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
   * **Scope / description:** `HDE-DIST004.1` through `HDE-DIST004.4` remained outside HDE-EPIC038 as a distinct Distillation workstream.  
   * **Disposition:** Preserved as future PF09-accounted work. Destination epic ID: Unknown (not present in inputs).
 
-#### **2.23.8 Plan Preflight (MUST)**
+#### **2.24.8 Plan Preflight (MUST)**
 
 **Planned preflight posture (, §Plan Preflight):**
 
