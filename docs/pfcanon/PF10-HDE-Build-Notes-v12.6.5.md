@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.6.4  
-Effective Date: 2026.08.09  
+**Version:** v12.6.5  
+Effective Date: 2026.08.14  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -183,10 +183,94 @@ TEMPLATE Addendum Entry (do not edit/remove)
 
 ## 1.1 Addendum Index:
 
-No current addenda.
+2.1. Block reviewer-invented technical design
 
 # 2\) Numbered Addenda
 
 ---
+
+## 2.1. Block reviewer-invented technical design
+
+Timestamp: 081426 16:04  
+Details:
+
+Decision summary:
+
+Source-bound reviewers must not create technical design merely to satisfy an output contract requiring exact fixes, complete decisions, or paste-ready wording. When the permitted sources do not establish an execution-critical identifier or design choice, the reviewer must report the missing decision or information through the task’s authorized failure disposition. The reviewer must not manufacture the missing design.
+
+Scope:
+
+This addendum governs source-bound Epic Plan reviews, Implementation Plan reviews, remediation reviews, QA and OPS planning reviews, documentation redlines, approval reviews, and validation tasks. It applies whenever the reviewer is authorized to inspect and decide but is not explicitly authorized to design or implement new technical surfaces.
+
+This addendum does not prohibit an explicitly authorized plan-authoring or implementation-design task from proposing new technical surfaces. Such proposals remain subject to the governing plan template, owning canon, repository-locus validation, and explicit planned-new labeling.
+
+Normative live rule:
+
+1. Source boundaries control exact-fix requirements.  
+   An instruction to provide exact expected fix text, paste-ready replacement text, or a complete decision does not expand the reviewer’s authority. If an exact safe correction would require the reviewer to choose a new technical design not established by the permitted sources, the reviewer must use the task’s authorized `NEEDS REVISION`, `Unverifiable`, Blocker, rejection, or missing-information disposition.  
+2. Reviewers must not originate execution-critical technical identifiers.  
+   Unless an identifier appears verbatim in the document under review, applicable live Build Notes, controlling permanent canon, an explicitly approved Product Owner decision, or directly inspected repository reality for an existing item, a reviewer must not introduce or assign:  
+   * a path or filename;  
+   * a directory or component home;  
+   * a command or command sequence;  
+   * a script, module, tool, or test;  
+   * a CLI option or environment variable;  
+   * an endpoint, route, provider, service, or configuration key;  
+   * a token or token alias;  
+   * a schema field or artifact-family name;  
+   * an evidence artifact or evidence key;  
+   * a manifest or `key_outputs` binding name;  
+   * a producer, validator, writer, or check-mode interface;  
+   * an acceptance predicate that depends on an unestablished technical design.  
+3. Existing conventions do not authorize specific inventions.  
+   The existence of a parent directory, neighboring artifact, naming pattern, similar command, reusable tool, or prior epic convention proves only the inspected fact. It does not authorize the reviewer to mint a new child path, filename, command, script, flag, key, token, artifact, or interface.  
+4. Similar language is not source evidence.  
+   A reviewer must not treat similar spelling, a shared prefix, an acronym, a filename resemblance, or semantic association as proof that two terms are equivalent. The reviewer must not expand an acronym unless a permitted source explicitly supplies that expansion.  
+5. Literal disputes require literal verification.  
+   When an operator challenges a word, identifier, path, command, or claimed source:  
+   * search the document under review, every relied-on source, the repository scope when applicable, and the reviewer’s own output for the exact string;  
+   * distinguish exact occurrence from similar or related terminology;  
+   * state `No occurrence verified` when the exact string is absent;  
+   * do not invent an explanation for where the term came from;  
+   * do not agree that the term appeared unless its occurrence has been verified.  
+6. Every introduced technical identifier requires traceable authority.  
+   Before emitting a source-bound review, the reviewer must be able to map every execution-critical technical identifier appearing in required fix text to one of these bases:  
+   * verbatim document-under-review text;  
+   * applicable active Build Notes;  
+   * controlling permanent canon;  
+   * explicit approved Product Owner decision;  
+   * verified repository fact for an existing item.  
+7. A reviewer-created design is not an allowed authority basis.  
+8. Unsupported exact fixes are invalid.  
+   If required fix text contains a reviewer-invented execution-critical identifier or design, that finding is invalid. If an ADR, Tracked Issue decision, approval recommendation, or final decision relies on the invalid finding, the dependent decision is also invalid.  
+   When unsupported reviewer-created design is systemic or affects the final approval posture, the entire review must be discarded and rerun from the unchanged source inputs. Unsupported text must not be repaired through post hoc justification.  
+9. Corrections must separate the actual failure from adjacent valid terminology.  
+   If a challenged term was never present, the correction must say so. The reviewer must not falsely claim that the nonexistent term was introduced, derived from an acronym, or intended as another valid term. Any separate unsupported paths, commands, artifacts, or designs must be identified as separate defects.  
+10. Review completeness never overrides truthfulness.  
+    A complete-looking answer is non-conforming when completeness was achieved by filling source gaps with plausible technical material. A bounded `NEEDS REVISION`, `Unverifiable`, or rejection decision is the required complete answer when the permitted sources do not support a safe substantive decision.
+
+Plan effect:
+
+Any source-bound review produced after this addendum becomes active must apply these rules before approval or downstream redline application. A review containing unsupported reviewer-created technical design must not be used to revise a plan, authorize implementation, create QA or OPS work, establish evidence obligations, satisfy acceptance, or support closeout.
+
+This addendum does not validate or authorize any path, command, script, option, evidence artifact, manifest key, or other technical identifier introduced by the failed HDE-EPIC039 approval review that exposed this defect.
+
+Drain targets:
+
+* Plan Templates: source-bound review authority, exact-fix limits, and invalid-review handling.  
+* Epic Process Guide: approval-review invalidation and downstream-use prohibition.  
+* Technical Writing Best Practices: literal-term verification, source attribution, and correction integrity.
+
+Supersession:
+
+None. This is new live guidance.
+
+Evidence and source basis:
+
+The HDE-EPIC039 Epic Plan approval review dated 081426 introduced new technical paths, filenames, producer scripts, command interfaces, CLI behavior, evidence artifacts, and manifest binding names that were not established by the document under review, applicable Build Notes, controlling permanent canon, an approved Product Owner decision, or existing repository reality. Repository naming conventions were incorrectly treated as authority to design new technical surfaces.
+
+A subsequent correction also responded to an operator-supplied term without first verifying whether that exact term appeared in the plan, sources, repository facts, or review output, and then constructed an unsupported explanation for it.
+
+These failures establish the need for an immediate live prohibition against reviewer-created technical design and unverified term substitution.
 
 \<eof\>
