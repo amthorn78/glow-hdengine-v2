@@ -1,5 +1,13 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - 'artifacts/**'
+      - 'docs/**'
+  pull_request:
+    paths-ignore:
+      - 'artifacts/**'
+      - 'docs/**'
 jobs:
   test:
     needs:
