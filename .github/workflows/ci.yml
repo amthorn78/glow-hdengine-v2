@@ -1,13 +1,19 @@
 name: ci
 on:
   push:
-    paths-ignore:
-      - 'artifacts/**'
-      - 'docs/**'
+    paths:
+      - '**'
+      - '!artifacts/**'
+      - '!docs/**'
+      - 'artifacts/evidence_index.jsonl*'
+      - 'docs/evidence/INDEX*'
   pull_request:
-    paths-ignore:
-      - 'artifacts/**'
-      - 'docs/**'
+    paths:
+      - '**'
+      - '!artifacts/**'
+      - '!docs/**'
+      - 'artifacts/evidence_index.jsonl*'
+      - 'docs/evidence/INDEX*'
 jobs:
   test:
     needs:
