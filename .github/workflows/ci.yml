@@ -1,11 +1,17 @@
 name: ci
 on:
   push:
-    paths-ignore:
-      - '**/*.md'
+    paths:
+      - '**'
+      - '!**/*.md'
+      - 'docs/adr/**'
+      - 'docs/design/**'
   pull_request:
-    paths-ignore:
-      - '**/*.md'
+    paths:
+      - '**'
+      - '!**/*.md'
+      - 'docs/adr/**'
+      - 'docs/design/**'
 jobs:
   test:
     needs:
