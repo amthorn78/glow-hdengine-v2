@@ -4,14 +4,20 @@ on:
     paths:
       - '**'
       - '!**/*.md'
+      - 'artifacts/**'
+      - 'audit/**'
       - 'docs/adr/**'
       - 'docs/design/**'
+      - 'docs/evidence/**'
   pull_request:
     paths:
       - '**'
       - '!**/*.md'
+      - 'artifacts/**'
+      - 'audit/**'
       - 'docs/adr/**'
       - 'docs/design/**'
+      - 'docs/evidence/**'
 jobs:
   test:
     needs:
