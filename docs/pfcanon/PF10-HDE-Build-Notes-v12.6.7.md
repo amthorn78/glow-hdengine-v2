@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.6.6  
+**Version:** v12.6.7  
 Effective Date: 2026.08.16  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -353,115 +353,164 @@ The field was present, truthfully stated that the planned epic was not complete,
 
 Plan Templates already contains “Materiality-based blocker discipline (required for Epic Plan and Implementation Plan review)” and “Explicit non-blockers (do not gate approval).” This incident shows that an explicit live rule is also required to prevent reviewers from bypassing materiality by first labeling harmless template normalization as a required change.
 
-## **2.3. Keep CI for product protection, not closeout evidence**
+## **2.3. Keep CI tied to continuing product and delivery risk, not epic administration**
 
-Timestamp: 081626 02:10  
+Timestamp: 081626 03:30  
 Details:
+
+Revision posture:
+
+This text replaces the 081626 02:10 form of addendum 2.3 in full. The original rule correctly prohibited CI abuse for epic closeout, but it defined legitimate CI and automation too narrowly. This revision preserves the prohibition while distinguishing required PR CI, release and security automation, QA and audit automation, and epic closeout automation.
 
 Decision summary:
 
-The product exists for BUSINESS USE. It does not exist to produce evidence, satisfy an epic closeout process, complete an audit package, make a reviewer’s work easier, or generate process artifacts.
+The product exists for BUSINESS USE. The repository and its automation must primarily support the continuing ability to build, test, secure, package, release, deploy, operate, maintain, and evolve that product.
 
-CI exists only to protect product features and the technical conditions required for those features to build, run, deploy, remain secure, and avoid regression. CI and other repository-level mechanical enforcement must never be created, expanded, tightened, or retained solely to facilitate epic closeout or evidence production.
+Required CI must protect a current, continuing risk to product behavior or product delivery. Its value must remain independently true without reference to an epic’s closeout, evidence package, token record, reviewer convenience, or historical administrative state.
 
-Evidence records whether product work succeeded. Product work, product architecture, repository structure, and CI must not be designed around producing evidence.
+Evidence is not inherently illegitimate. Test reports, security findings, build provenance, release attestations, and similar outputs may be proper results of genuine product, build, security, compliance, or release controls. Epic-closeout evidence and process automation may also be useful when separately authorized and isolated from required product CI. The prohibited practice is making administrative closeout machinery, historical epic state, or evidence production a permanent merge burden or a dependency of the product.
 
 Scope:
 
-This addendum governs CI workflows, required status checks, merge-blocking jobs, repository validators, linters, pre-commit gates, file-presence checks, schema checks, artifact generators, evidence generators, manifests, indexes, mirrors, hashes, path proofs, receipts, ledgers, close packs, token matrices, release attestations, and any other automated or mechanically enforced rule proposed or used for implementation, QA, acceptance, audit, or epic closeout.
+This addendum governs:
+
+* CI workflows and their triggers, jobs, steps, dependencies, artifacts, and permissions;  
+* required status checks and merge-blocking rules;  
+* build, test, security, compatibility, packaging, release, deployment, and operational validation;  
+* repository validators, linters, pre-commit gates, schema checks, file-presence checks, and generated-file checks;  
+* evidence generators, manifests, indexes, mirrors, hashes, path proofs, receipts, ledgers, close packs, token matrices, provenance, and attestations; and  
+* any other automated or mechanically enforced rule proposed or used for implementation, QA, acceptance, audit, release, or epic closeout.
 
 It applies to Epic Plans, Implementation Plans, remediation plans, QA Plans, closeout plans, reviews, redlines, implementation prompts, QA prompts, repository changes, workflow changes, and repository-setting decisions.
+
+Definitions and lane model:
+
+1. **Required PR CI** provides fast, reliable, deterministic feedback about whether a proposed change preserves current product and delivery integrity. It may block merge when the protected risk and failure consequence justify that power.  
+2. **Release or security automation** builds, packages, signs, attests, scans, or validates an actual release or security boundary. It may gate release or deployment when the output is consumed by that process or satisfies a real security, legal, contractual, or compliance obligation.  
+3. **QA or audit automation** performs deeper validation, captures governed results, or supports a bounded review. It may be automated without becoming an ordinary merge gate.  
+4. **Epic closeout automation** prepares or validates administrative closeout material. It may reduce manual work, but it must remain outside required PR CI unless a specific part independently qualifies for another lane.
 
 Normative live rule:
 
 1. Business-use primacy controls.  
-   The first purpose of the repository and product is to deliver and protect real business-use behavior. Process compliance, evidence production, audit convenience, token presentation, and closeout packaging are subordinate activities. They must adapt to the product. The product must not be reshaped to serve them.  
-2. CI requires an independent product-protection purpose.  
-   Every CI job, required check, or merge-blocking mechanical rule must protect an identifiable product feature or a technical condition directly required for product features to build, run, deploy, remain secure, or avoid regression. The proponent must identify:  
-   * the product feature or product-delivery condition protected;  
-   * the real defect or regression the rule detects;  
-   * the user or business harm that could occur without the rule; and  
-   * why CI or merge blocking is the appropriate protection surface.  
-     If those points cannot be established without citing epic closeout, evidence production, audit packaging, token satisfaction, reviewer preference, or documentation convenience, the rule must not be added to CI or made merge-blocking.  
-3. Closeout does not authorize repository mechanics.  
-   An epic closeout requirement, missing closeout artifact, review finding, evidence gap, acceptance-record gap, token-record gap, or audit request does not authorize creation or expansion of CI, required checks, product tests, repository validators, generators, schemas, manifests, indexes, mirrors, hashes, path proofs, receipts, or other permanent mechanical enforcement.  
-4. Evidence obligations do not become product requirements by repetition.  
-   Requiring evidence in a plan, QA artifact, review, acceptance record, or closeout package does not transform evidence production into product behavior. Repeating the requirement across documents does not create an independent business-use basis for CI.  
-5. Evidence must follow product work.  
-   Evidence may capture, reference, summarize, or preserve the outputs of normal product implementation and normal product-protective testing. Evidence production must not dictate product architecture, runtime behavior, public interfaces, internal component homes, repository layout, CI topology, dependency structure, or merge protection.  
-6. No evidence-only CI.  
-   A CI job or required check is prohibited when its only or primary purpose is to:  
-   * create, refresh, normalize, package, index, mirror, hash, sign, upload, download, or validate closeout evidence;  
-   * produce or consume an epic-specific receipt, close pack, token matrix, evidence bundle, evidence index, path proof, audit ledger, doc-delta package, or acceptance package;  
-   * prove that an epic-specific process artifact exists or has a preferred format;  
-   * satisfy a reviewer-created proof demand;  
-   * make a historical epic appear continuously closed on every future product change; or  
-   * turn a one-time QA or closeout operation into a permanent repository gate.  
-7. No permanent epic-specific closeout logic in product CI.  
-   A regression test may originate during an epic and remain in CI only when it protects continuing product behavior independent of that epic’s identity or closeout state. Permanent CI must test the product contract, not the historical epic, its closeout package, its evidence lifecycle, or its administrative completion.  
-8. Names do not establish product purpose.  
-   Calling a job or artifact `acceptance`, `sanity`, `release`, `attestation`, `determinism`, `contract`, `validation`, `canonical`, or `required` does not make it product-protective. Purpose is determined by what the rule actually checks, produces, consumes, and blocks.  
-9. Product-consumed artifacts are the narrow exception.  
-   CI may validate an artifact associated with evidence only when the application, build, release, or supported business workflow actually consumes that artifact and a defect in it would cause a real product or product-delivery failure. The CI rule must protect that product consequence, not the artifact’s usefulness for closeout.  
-10. Documentation-only and evidence-only changes do not justify product CI.  
-    Changes limited to documentation, audit records, evidence artifacts, closeout packages, or historical records must not trigger or require product CI unless the changed material is an actual input to the product, build, release, deployment, security posture, or supported business workflow.  
-11. Closeout gaps remain in the closeout lane.  
-    If the available product work and normal product-protective tests do not provide sufficient evidence for an asserted closeout claim, the closeout record must state the insufficiency, narrow the claim, or remain incomplete. The gap must not be externalized into product CI merely to manufacture the missing proof.  
-12. One-time evidence capture must remain one-time and non-gating.  
-    When separately authorized, a bounded QA, audit, or closeout action may capture evidence outside product CI. It must not become a required status check, permanent product workflow job, ordinary merge gate, product runtime dependency, or recurring burden on unrelated future work.  
-13. Reviewers and planners must not demand CI abuse.  
-    A reviewer, plan author, QA author, closeout author, or automated agent must not require a new CI job, required check, validator, generator, schema, artifact family, or repository gate merely to make an epic reviewable, approvable, acceptable, evidentially tidy, or closable. Such a requirement is invalid unless it independently passes the product-protection test in rule 2\.  
-14. Mechanical enforcement must be proportional.  
-    Even when a real product-protection purpose exists, the rule must use the smallest mechanism that protects the product. A local test, targeted test, existing CI job, or bounded validation must be preferred over a new permanent job, global gate, new artifact family, or expanded merge-blocking dependency when the smaller mechanism protects the same product behavior.  
-15. Existing closeout-driven mechanics are remediation candidates, not precedent.  
-    The presence of an existing epic-specific closeout job, evidence generator, receipt flow, token-matrix check, index check, or other mechanical rule does not authorize copying or extending it. Any existing rule that lacks an independent product-protection purpose must be identified for removal or narrowing through separately authorized implementation work.  
-16. This addendum does not fabricate completion or weaken real product protection.  
-    It does not permit false closeout, false evidence, false acceptance, false token claims, skipped product tests, weakened security, ignored regressions, or removal of mechanics that genuinely protect product behavior. An evidence gap must remain visible. A product defect must still fail product CI. The prohibited act is changing or burdening the product and its CI solely to manufacture or maintain process evidence.
+   Product and delivery needs control repository design. Process compliance, evidence presentation, audit convenience, token presentation, and closeout packaging are subordinate. They must adapt to the product and its delivery system. The product must not be reshaped to manufacture administrative proof.  
+2. CI protects continuing product and delivery integrity.  
+   Legitimate CI scope includes current correctness, buildability, dependency integrity, compatibility, security, supply-chain integrity, packaging, deployability, migration safety, operability, release integrity, and regression prevention. A check does not need to map to a user-facing feature when it protects a real condition required to deliver or operate the product safely.  
+3. Every required check needs a continuing-risk justification.  
+   For every CI job, required status check, or merge-blocking mechanical rule, the proponent must identify:  
+   * the current product behavior or delivery condition protected;  
+   * the concrete defect, regression, security failure, release failure, or operational failure detected;  
+   * the user, business, security, legal, contractual, or operational harm prevented;  
+   * why the protection remains necessary without reference to the originating epic or its closeout; and  
+   * why CI or merge blocking is the proportionate enforcement surface.  
+     If those points cannot be established, the rule must not be required PR CI.  
+4. Lane placement is part of correctness.  
+   A useful automated control may still be in the wrong lane. Product and integration checks belong in required PR CI when justified. Release-only and security-bound controls belong in release or security automation. Deep QA and audit capture belong in their bounded lanes. Epic-closeout preparation belongs in closeout automation. Moving a control out of required PR CI is not the same as deleting the control.  
+5. Epic closeout alone does not authorize required CI.  
+   A closeout requirement, missing closeout artifact, review finding, evidence gap, acceptance-record gap, token-record gap, or audit request does not independently authorize a required CI job, required status check, merge gate, product test, or permanent repository dependency.  
+6. Evidence may be a legitimate output of real engineering controls.  
+   CI may produce logs, test reports, coverage, security findings, SBOMs, build provenance, release attestations, checksums, or other evidence when they are natural outputs of a genuine product, build, security, compliance, release, deployment, or operational control. Their legitimacy comes from the risk protected and the consumer or obligation served, not from being called evidence.  
+7. Administrative evidence does not belong in required PR CI.  
+   A job or required check is prohibited when its only or primary purpose is to create, refresh, normalize, package, index, mirror, hash, sign, upload, download, or validate an epic close report, token matrix, doc-delta package, close pack, historical receipt, closeout ledger, acceptance package, or other administrative proof of an epic’s state.  
+8. Release, security, and compliance evidence require a real boundary.  
+   Provenance, attestations, signatures, SBOMs, or compliance records may gate release, deployment, or merge only when a current build, release, deployment, security policy, external obligation, or supported business workflow actually consumes or requires them. A self-referential evidence chain or a reviewer’s preference is not such a boundary.  
+9. Optional closeout automation is permitted within strict boundaries.  
+   Separately authorized tooling may reduce closeout toil by generating or validating administrative artifacts. It must be isolated from product runtime and architecture, must not become an ordinary required status check, must not burden unrelated future changes, and must not create a source-to-CI-to-source feedback loop. Its existence does not make its outputs product requirements.  
+10. Permanent CI must not test historical epic administration.  
+    A regression test may originate during an epic and remain in CI when it protects continuing product or delivery behavior. Its permanent assertions and CI placement must stand independently of the epic’s identity, closeout package, token record, evidence lifecycle, or administrative completion.  
+11. Names do not determine purpose.  
+    Calling a job or artifact `acceptance`, `sanity`, `release`, `attestation`, `determinism`, `contract`, `validation`, `canonical`, `evidence`, or `required` proves nothing about its proper lane. Purpose is determined by what the control checks, produces, consumes, blocks, and protects.  
+12. Change-aware execution must preserve required-check behavior.  
+    Documentation-only, audit-only, evidence-only, and historical-record-only changes should run only checks relevant to the changed material unless that material is an input to the product, build, release, deployment, security posture, or supported business workflow. Workflow-level path filtering must not be applied in a way that leaves required checks pending or blocks merge incorrectly. The implementation must preserve reliable required-check semantics while avoiding irrelevant work.  
+13. CI must validate committed source, not repair it.  
+    Required CI must not generate canonical results that must be written back into tracked source to make the same candidate pass. CI may build ephemeral outputs and release artifacts, but it must not create a receipt-driven or run-identity-driven source mutation loop.  
+14. Mechanical enforcement must be proportional and maintainable.  
+    Use the smallest reliable mechanism that protects the identified risk. Prefer a targeted test, an existing job, or a lane-specific workflow over a new global gate when they provide the same protection. Required checks must be deterministic, actionable, maintained, and fast enough to provide useful feedback. Flaky, redundant, obsolete, or excessively broad checks must be repaired, narrowed, relocated, or removed.  
+15. Existing mechanics are subject to current justification.  
+    Existing CI is not precedent merely because it exists. Every existing job and step must survive the same continuing-risk and lane-placement tests as a new proposal. Mixed jobs must be narrowed or separated so legitimate product protection can remain while administrative closeout work is removed or relocated.  
+16. HDE-EPIC039 is the implementation home for the current CI remediation.  
+    HDE-EPIC039 must inspect the complete current CI workflow at its execution ref and classify every trigger, job, step, `needs` edge, artifact transfer, and source-writing behavior under this addendum. It must:  
+    * remove the HDE-EPIC038 doc-delta, token-matrix, private-receipt, authenticated receipt-consumption, and other administrative closeout bindings from required CI;  
+    * remove or relocate other epic-specific evidence and closeout controls that fail the continuing-risk test;  
+    * preserve or narrow tests that independently protect current product, build, compatibility, security, database, runtime, ordering, rails, release, or deployment behavior;  
+    * evaluate release-attestation and sanity-pipeline behavior against actual release, security, or deployment consumers rather than preserving or deleting it by name;  
+    * remove historical epic identity and administrative assertions from any retained permanent CI control where the underlying product regression remains valuable;  
+    * correct triggers and job conditions so irrelevant documentation, audit, evidence, or historical-only changes do not incur unrelated product CI while required-check semantics remain sound;  
+    * repair the job-dependency graph after removals or separations; and  
+    * leave no tracked-source writeback, hosted-receipt feedback loop, or closeout-only merge gate.  
+17. Repository-setting changes remain separately controlled.  
+    The Epic Plan must not claim unverified branch-protection or required-check configuration. If implementation observes a repository setting bound to an obsolete or renamed check, the setting change must be routed to the authorized repository-settings owner and recorded separately from source implementation.  
+18. This addendum does not fabricate completion or weaken real protection.  
+    It does not permit false closeout, false evidence, false acceptance, false token claims, skipped product tests, weakened security, ignored regressions, or removal of a control that genuinely protects current product or delivery integrity. A closeout gap must remain visible. A product, build, release, security, or operational defect must still fail in its proper lane.
 
 Required decision test:
 
-Before approving any new or expanded CI or mechanical enforcement, answer these questions:
+Before approving or retaining any CI or mechanical control, answer:
 
-1. What product feature or product-delivery condition does this protect?  
-2. What real product defect or regression causes it to fail?  
-3. What user or business harm does that failure prevent?  
-4. Would the rule still be needed to protect the product feature if the epic’s evidence package and closeout process did not exist?  
-5. Is the rule checking product truth, or merely producing or policing evidence about process completion?  
-6. Can an existing product test or smaller non-gating mechanism provide the same protection?
+1. What current product behavior or delivery condition does it protect?  
+2. What concrete defect or failure does it detect?  
+3. What material harm does it prevent?  
+4. Would the control still be needed if the originating epic, its closeout process, and its evidence package did not exist?  
+5. Which lane is correct: required PR CI, release or security automation, QA or audit automation, or epic closeout automation?  
+6. Why must it block merge, release, or deployment rather than report non-blockingly?  
+7. Can a smaller, faster, less coupled, or existing mechanism protect the same risk?  
+8. Does it produce an ephemeral engineering output, a release artifact, or tracked administrative evidence?  
+9. Does it require CI output, run identity, or a later receipt to mutate tracked source?  
+10. Is its failure deterministic, actionable, and owned?
 
-If questions 1 through 3 do not have concrete product-grounded answers, or if question 4 is `No`, the rule is closeout-driven and must not be created, expanded, required, or retained in CI.
+Decision rules:
+
+* If questions 1 through 4 lack concrete continuing-risk answers, the control must not be required PR CI.  
+* If the control matters only to release, deployment, security, or an external obligation, place it in that lane and gate only the applicable boundary.  
+* If it exists for QA, audit, or closeout, keep it non-required and isolated unless part of it independently qualifies for another lane.  
+* If a job mixes legitimate product protection with administrative work, preserve the legitimate checks and remove, separate, or relocate the administrative portion.  
+* If the control requires hosted results to be written back into tracked source, redesign or remove that feedback path before adoption.
 
 Plan and review effect:
 
-Plans and reviews must classify closeout-only CI or mechanical enforcement as prohibited scope, not as an implementation deliverable, QA prerequisite, acceptance prerequisite, evidence prerequisite, or closeout remedy.
+Plans and reviews must apply the lane model and continuing-risk test rather than classifying all evidence as either automatically required or automatically prohibited.
 
-When a proposed plan, review fix, remediation, or PR adds mechanical enforcement primarily for evidence or closeout, the required correction is to remove that enforcement proposal and route any legitimate evidence need to a bounded non-CI QA, audit, or closeout action. No reviewer may invent the replacement tool, path, artifact, or workflow.
+Plans must not add permanent CI or merge-blocking enforcement merely to make an epic reviewable, approvable, acceptable, evidentially tidy, or closable. Legitimate evidence needs may be served by existing engineering outputs, release or security automation, bounded QA or audit automation, or separately authorized closeout tooling.
 
-This addendum itself authorizes no repository modification. Existing CI removal or narrowing requires a separately authorized, source-grounded implementation task and must preserve every check that independently protects product behavior.
+Reviewers must not invent replacement paths, tools, workflow names, job names, or repository-setting changes. When a current control fails this addendum, the review may require removal, narrowing, separation, or lane reassignment, while implementation design remains with the authorized planning and implementation workflow.
+
+HDE-EPIC039 must be revised before approval so that its D1 through D5 work, CI remediation, evidence posture, and closeout lifecycle conform to this addendum. The epic must not perform a blanket purge of evidence-related controls; it must remove administrative abuse while preserving independently justified product and delivery protection.
 
 Drain targets:
 
-* Glow Development Philosophy: business-use primacy and the subordinate role of evidence.  
-* HDE-Governance: CI purpose, required-check eligibility, acceptance boundaries, and evidence-versus-product protection.  
-* Epic Process Guide: closeout boundaries and the prohibition against creating repository mechanics to satisfy closeout.  
-* HDE-Schemas and Artifacts: evidence families and schemas do not create CI or merge-gate obligations.  
-* Glow QA Guide: QA may consume product-protective test results but must not convert QA or closeout evidence production into product CI.  
-* Plan Templates: plans and reviews must not require closeout-driven CI or permanent evidence-production mechanics.
+* Glow Development Philosophy: business-use primacy and product-delivery integrity.  
+* HDE-Governance: required-check eligibility, continuing-risk justification, lane separation, and evidence boundaries.  
+* Epic Process Guide: closeout automation and the prohibition against historical epic administration in required CI.  
+* HDE-Schemas and Artifacts: artifact and evidence requirements do not independently determine CI placement.  
+* Glow QA Guide: QA automation and evidence capture remain distinct from ordinary required PR CI.  
+* Plan Templates: plans and reviews must classify CI, release, QA, audit, and closeout automation by lane and continuing risk.
 
 Supersession:
 
+This revision supersedes the 081626 02:10 form of addendum 2.3 in full.
+
 No earlier Build Notes addendum is superseded. Addenda 2.1 and 2.2 retain their separate scopes.
 
-For the exact scope of whether CI, required checks, or other mechanical enforcement may be created, expanded, or retained, this addendum supersedes any conflicting interpretation of permanent canon that treats evidence, acceptance, token, index, mirror, manifest, hash, path-proof, receipt, audit, or closeout requirements as sufficient authority without an independent product-protection purpose.
+For the exact scope of whether CI, required checks, release automation, or other mechanical enforcement may be created, expanded, relocated, or retained, this revised addendum supersedes conflicting interpretations of permanent canon that either:
+
+* treat evidence, acceptance, token, index, mirror, manifest, hash, path-proof, receipt, audit, or closeout requirements as sufficient authority for required CI without a continuing-risk justification; or  
+* prohibit legitimate product, build, security, release, deployment, operational, compliance, QA, audit, or non-gating closeout automation merely because it produces evidence.
 
 Evidence and source basis:
 
-The operator directed that CI and other mechanical rules must never be created merely to facilitate epic closeout; CI exists to protect product features only; and the product exists for business use, not evidence production.
+The operator’s controlling intent is to prevent CI abuse, not to remove legitimate engineering protection or useful non-gating automation. The initial form of addendum 2.3 correctly identified historical closeout machinery as harmful but used `product features only` and `no evidence-only CI` formulations that could incorrectly exclude build integrity, security, deployability, release provenance, compliance, and bounded automation that reduces manual toil.
 
-Current repository inspection at commit `26e41934be7197be98cbfa0891618db439a9a380` confirms the failure class. `.github/workflows/ci.yml` contains permanent HDE-EPIC038-specific closeout and evidence mechanics, including steps named `Check HDE-EPIC038 DEV-01 doc-delta pair`, `Check HDE-EPIC038 DEV-01 token matrix`, `Produce conditional private HDE-EPIC038 execution receipt`, `Publish private exact-head HDE-EPIC038 execution receipt`, and `Authenticate and consume private HDE-EPIC038 execution artifact`. The workflow also contains evidence-index, evidence-path, evidence-bundle, and historical epic-specific checks within ordinary CI.
+Current repository inspection at `amthorn78/glow-hdengine-v2`, `main` commit `35cebe8c0f7b9ce952446048841ceaa31264c6fd`, confirms one active workflow, `.github/workflows/ci.yml`. It runs on every `push` and `pull_request` and mixes continuing product tests with HDE-EPIC038 doc-delta, token-matrix, private-receipt, authenticated receipt-consumption, evidence-index, evidence-path, evidence-bundle, step-log, historical epic, and release-attestation mechanics. This mixture requires classification and separation, not assumption by name.
 
-These observed repository facts show how one epic’s proof and closeout machinery can become a permanent burden on later product work. They do not establish that every named step lacks product value, and this addendum does not itself authorize removal. They establish the need for a controlling purpose test before any closeout or evidence mechanism is allowed to enter or remain in product CI.
+Industry source basis:
 
-Permanent canon contains evidence, acceptance, QA, artifact, and closeout requirements in HDE-Governance, Epic Process Guide, HDE-Schemas and Artifacts, Glow QA Guide, and Plan Templates. Those requirements continue to govern truthful records within their own scopes. Under this addendum, they must not be interpreted as authority to redesign product CI or create permanent repository mechanics solely to make evidence or closeout easier.
+* [DORA — Continuous integration](https://dora.dev/capabilities/continuous-integration/) defines CI around rapid automated feedback and keeping the integrated system working.  
+* [DORA — Continuous delivery](https://dora.dev/capabilities/continuous-delivery/) treats deployability, reliability, security, and safe release as continuing delivery concerns, not merely feature behavior.  
+* [GitHub — Using artifact attestations to establish provenance for builds](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds) recognizes build provenance as a legitimate software-supply-chain security control.  
+* [SLSA v1.0 — Build requirements](https://slsa.dev/spec/v1.0/requirements) establishes provenance generation and build isolation as valid build-platform responsibilities.  
+* [GitHub — Workflow syntax](https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions), [Skipping workflow runs](https://docs.github.com/actions/managing-workflow-runs/skipping-workflow-runs), and [Using conditions to control job execution](https://docs.github.com/actions/using-jobs/using-conditions-to-control-job-execution) establish that change-aware execution must account for required-check behavior because a skipped workflow can remain pending while a skipped job reports success.  
+* [Google SRE — Eliminating Toil](https://sre.google/sre-book/eliminating-toil/) and [Release Engineering](https://sre.google/sre-book/release-engineering/) support automation that reduces repetitive work and improves release consistency, while reinforcing that automation should create enduring engineering value rather than recurring administrative burden.
+
+These sources support a continuing-risk and lane-placement standard. They do not support permanent epic-closeout machinery in ordinary required CI, and they do not support deleting legitimate build, security, release, or operational controls merely because those controls produce evidence.
 
 \<eof\>
