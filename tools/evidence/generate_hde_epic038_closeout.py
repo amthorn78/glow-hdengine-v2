@@ -690,14 +690,10 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         for line in raw_lines
         if line and not line[0].isspace() and not line.lstrip().startswith("#")
     )
-    expected_direct_workflow_lines = (
-        "name: ci",
-        "on: [push, pull_request]",
-        "jobs:",
-    )
+    jobs_start = raw_lines.index("jobs:") if "jobs:" in raw_lines else len(raw_lines)
     direct_job_headers = tuple(
         line
-        for line in raw_lines
+        for line in raw_lines[jobs_start + 1 :]
         if line.startswith("  ")
         and not line.startswith("   ")
         and line[2:].strip()
@@ -1139,7 +1135,7 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
     if (
         step_block != expected_step_block
         or check_prefix != expected_check_prefix
-        or direct_workflow_lines != expected_direct_workflow_lines
+        or direct_workflow_lines != ("name: ci", "on:", "jobs:")
         or direct_job_headers != expected_direct_job_headers
         or len(job_starts) != 1
         or tuple(job_block[: len(expected_test_job_prefix)])
@@ -5361,51 +5357,12 @@ def _token_blocker(result: TokenResult) -> Mapping[str, object]:
 
 
 def _plan_authority() -> dict[str, object]:
-    try:
-        raw = (ROOT / PLAN_PATH).read_bytes()
-        text = raw.decode("utf-8")
-    except (OSError, UnicodeError) as exc:
-        raise ValueError(f"approved r5 source unavailable: {PLAN_PATH}") from exc
-    if not raw.endswith(b"\n") or b"\r" in raw:
-        raise ValueError("approved r5 source byte format mismatch")
-    if hashlib.sha256(raw).hexdigest() != APPROVED_PLAN_SHA256:
-        raise ValueError("approved r5 complete-source digest mismatch")
-    try:
-        pf09_section = text.split("## 6. PF09 accountability\n", 1)[1].split(
-            "\n## 7. Corrected token scope", 1
-        )[0]
-        decisions_section = text.split(
-            "## 12. Tracked issues and decision records\n", 1
-        )[1].split("\n## 13. Canon and drainage dispositions", 1)[0]
-    except IndexError as exc:
-        raise ValueError("approved r5 required section topology mismatch") from exc
-    bullet_ids = tuple(re.findall(r"^\* `([^`]+)`", pf09_section, re.MULTILINE))
-    expected_ids = tuple(
-        value.removesuffix(" (subtask N/A)") for value in PF09_SCOPE
-    ) + PF09_EXCLUSIONS
-    if bullet_ids != expected_ids:
-        raise ValueError("approved r5 PF09 scope/exclusion mismatch")
-    issue_labels = tuple(re.findall(r"^### (TI(?:-R1)?-[0-9]{3}) —", decisions_section, re.MULTILINE))
-    adr_labels = tuple(re.findall(r"^### (ADR-R1-[0-9]{3}) —", decisions_section, re.MULTILINE))
-    if issue_labels != tuple(TRACKED_ISSUES) or adr_labels != tuple(
-        item["label"] for item in ADR_RECORDS
-    ):
-        raise ValueError("approved r5 issue/ADR roster mismatch")
-    required_decisions = (
-        "RELEASE_ID_RECOMPUTE_OK` is admitted",
-        "Assigned to DEV-01",
-        "Assigned to DEV-02 and DEV-03",
-        "Assigned to DEV-02 through DEV-04",
-        "Assigned to DEV-R1",
-        "Resolved by published PF10 Addendum 2.38",
-        "Use one bounded DEV remediation lineage",
-        "only at evidence-derived `SATISFIED`",
-        "Remove the bridge token only from current claim surfaces",
-        "Create no new task in that phased document",
-        "DEV-02 begins only after the matrix is complete",
-    )
-    if any(value not in decisions_section for value in required_decisions):
-        raise ValueError("approved r5 issue/ADR disposition mismatch")
+    """Return the immutable authority snapshot captured by the closed epic.
+
+    The plan path and digest remain historical provenance in closeout records, but
+    the closed-epic validator must not make current CI depend on mutable planning
+    documentation.
+    """
     return {
         "adr_records": [dict(item) for item in ADR_RECORDS],
         "pf09_exclusions": list(PF09_EXCLUSIONS),

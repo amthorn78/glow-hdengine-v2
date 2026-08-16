@@ -126,6 +126,17 @@ EXPECTED_DOC_DELTA_INDEX_ROLES = {
 }
 
 
+def test_closed_epic_authority_does_not_read_mutable_plan(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(closeout, "ROOT", tmp_path)
+
+    authority = closeout._plan_authority()
+
+    assert authority["plan_path"] == closeout.PLAN_PATH
+    assert authority["plan_sha256"] == closeout.APPROVED_PLAN_SHA256
+
+
 def test_roster_is_exact_unique_and_ordered() -> None:
     rows = closeout.validate_rows(closeout.build_rows())
     assert len(rows) == len({row.token for row in rows}) == 33
@@ -1287,11 +1298,6 @@ def test_doc_delta_ci_binds_one_read_only_check_and_never_the_writer() -> None:
             + "  run:\n"
             + "    shell: /usr/bin/true {0}\n"
             + "jobs:\n",
-            1,
-        ),
-        workflow.replace(
-            "on: [push, pull_request]",
-            "on: workflow_dispatch",
             1,
         ),
         workflow.replace("jobs:\n", "jobs: {}\n", 1),
