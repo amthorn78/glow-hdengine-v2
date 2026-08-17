@@ -5,13 +5,12 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.mech.helpers import canonicalize_array  # noqa: E402
+from engine.mech.helpers import canonicalize_declared_set  # noqa: E402
 from engine.runtime.determinism_env import ensure_determinism_env  # noqa: E402
 
 REPORT_PATH = ROOT / "artifacts" / "canonical" / "arrays_as_sets_report.log"
@@ -26,34 +25,62 @@ def _load_channels(path: Path) -> list[dict[str, object]]:
     return channels
 
 
-def _normalize_strings(values: Iterable[object]) -> list[str]:
-    return [str(value) for value in values]
+def _require_canonical_set(
+    values: object, *, identity: str | None, path: str
+) -> None:
+    if not isinstance(values, list):
+        raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}")
+    try:
+        normalized = canonicalize_declared_set(values, identity=identity)
+    except ValueError as exc:
+        raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}") from exc
+    if values != normalized:
+        raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}")
+
+
+def _validate_source_sets(channels: list[dict[str, object]]) -> None:
+    _require_canonical_set(channels, identity="id", path="$.channels")
+    for index, entry in enumerate(channels):
+        if not isinstance(entry, dict):
+            raise SystemExit(
+                f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels[{index}]"
+            )
+        for field in ("centers", "domains", "flags", "gates"):
+            _require_canonical_set(
+                entry.get(field),
+                identity=None,
+                path=f"$.channels[{index}].{field}",
+            )
 
 
 def _select_case(channels: list[dict[str, object]], field: str) -> tuple[dict[str, object], bool]:
     fallback_entry: dict[str, object] | None = None
-    fallback_raw: list[str] | None = None
-    fallback_normalized: list[str] | None = None
+    fallback_raw: list[object] | None = None
+    fallback_normalized: list[object] | None = None
 
-    for entry in channels:
+    for index, entry in enumerate(channels):
+        if not isinstance(entry, dict):
+            raise SystemExit(
+                f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels[{index}]"
+            )
         values = entry.get(field)
-        if not isinstance(values, list) or not values:
+        path = f"$.channels[{index}].{field}"
+        if not isinstance(values, list):
+            raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}")
+        if not values:
             continue
         channel_id = entry.get("id")
         if not isinstance(channel_id, str):
-            continue
-        raw = _normalize_strings(values)
-        normalized = canonicalize_array(raw)
-        if normalized != raw:
-            return (
-                {
-                    "channel_id": channel_id,
-                    "field": field,
-                    "raw": raw,
-                    "normalized": normalized,
-                },
-                False,
+            raise SystemExit(
+                f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels[{index}]"
             )
+        raw = list(values)
+        try:
+            normalized = canonicalize_declared_set(raw, identity=None)
+        except ValueError as exc:
+            raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}") from exc
+        if normalized != raw:
+            raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}")
         if fallback_entry is None:
             fallback_entry = entry
             fallback_raw = raw
@@ -82,7 +109,7 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
     lines = [
         f"case: channel_id={channel_id} field={field}",
         f"path: {path}",
-        "normalizer: engine.mech.helpers.canonicalize_array",
+        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)",
         f"raw: {json.dumps(raw, ensure_ascii=False)}",
         f"normalized: {json.dumps(normalized, ensure_ascii=False)}",
     ]
@@ -92,32 +119,60 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
     return lines
 
 
+def _render_channel_roster_case(channels: list[dict[str, object]]) -> list[str]:
+    try:
+        normalized = canonicalize_declared_set(channels, identity="id")
+    except ValueError as exc:
+        raise SystemExit("ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels") from exc
+    if channels != normalized:
+        raise SystemExit("ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels")
+    raw_ids = [entry.get("id") for entry in channels]
+    normalized_ids = [entry.get("id") for entry in normalized]
+    lines = [
+        "case: field=channels identity=id",
+        "path: catalog/channels_v1.json:channels",
+        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=id)",
+        f"raw identities: {json.dumps(raw_ids, ensure_ascii=False)}",
+        f"normalized identities: {json.dumps(normalized_ids, ensure_ascii=False)}",
+    ]
+    lines.append("note: raw == normalized (already canonical)")
+    lines.append("")
+    return lines
+
+
 def build_report() -> str:
     channels = _load_channels(CHANNELS_PATH)
-    centers_case, centers_fallback = _select_case(channels, "centers")
-    domains_case, domains_fallback = _select_case(channels, "domains")
+    _validate_source_sets(channels)
     lines = [
         "arrays-as-sets report v1",
         "surface: registry.catalog.channels_v1",
         f"source: {CHANNELS_PATH.relative_to(ROOT)}",
         "",
     ]
-    lines.extend(_render_case(centers_case, fallback=centers_fallback))
-    lines.extend(_render_case(domains_case, fallback=domains_fallback))
+    lines.extend(_render_channel_roster_case(channels))
+    for field in ("centers", "domains", "flags", "gates"):
+        case, fallback = _select_case(channels, field)
+        lines.extend(_render_case(case, fallback=fallback))
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
-def write_report() -> Path:
+def write_report(*, check: bool = False) -> Path:
     ensure_determinism_env()
+    expected = build_report().encode("utf-8")
+    if check:
+        if not REPORT_PATH.is_file() or REPORT_PATH.read_bytes() != expected:
+            raise SystemExit("ARRAYS_AS_SETS_REPORT_STALE")
+        return REPORT_PATH
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(build_report(), encoding="utf-8")
+    REPORT_PATH.write_bytes(expected)
     return REPORT_PATH
 
 
 def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Generate arrays-as-sets report")
+    parser.add_argument("--check", action="store_true", help="fail if the report is missing or stale")
     args = parser.parse_args(argv)
-    write_report()
+    write_report(check=args.check)
     return 0
 
 

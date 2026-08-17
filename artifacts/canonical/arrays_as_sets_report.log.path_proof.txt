@@ -1,0 +1,5 @@
+path: artifacts/canonical/arrays_as_sets_report.log
+size_bytes: 1982
+sha256: 8373f43a57af2cfdebc7876b179747fe9d021fc7d901cefdde6e7d91df935f03
+mtime_utc: 2026-08-17T00:50:01Z
+produced_at_utc: 2026-07-26T22:42:05Z

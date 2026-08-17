@@ -3,10 +3,141 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Mapping
 
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
+
+
+# PF12 — HDE Schemas & Artifacts, §2.1 owns the closed Gate domain 1..64,
+# while §4.2 preserves array order unless an owning contract declares set
+# semantics.  The Gate catalog rows are ordered source data, not a declared
+# set, so preserve the exact numeric domain order rather than normalizing it.
+FROZEN_GATE_IDS = tuple(range(1, 65))
+
+
+# PF08 — Human Design System, §Channels defines the complete 36-Channel
+# BodyGraph roster.  This is an identity set: catalog ordering is enforced by
+# the canonical JSON gate, while this loader independently refuses a
+# schema-valid substitution of one Channel identity for another.
+FROZEN_CHANNEL_IDS = (
+    "01-08",
+    "02-14",
+    "03-60",
+    "04-63",
+    "05-15",
+    "06-59",
+    "07-31",
+    "09-52",
+    "10-20",
+    "10-34",
+    "10-57",
+    "11-56",
+    "12-22",
+    "13-33",
+    "16-48",
+    "17-62",
+    "18-58",
+    "19-49",
+    "20-34",
+    "20-57",
+    "21-45",
+    "23-43",
+    "24-61",
+    "25-51",
+    "26-44",
+    "27-50",
+    "28-38",
+    "29-46",
+    "30-41",
+    "32-54",
+    "34-57",
+    "35-36",
+    "37-40",
+    "39-55",
+    "42-53",
+    "47-64",
+)
+
+
+# PF12 — HDE Schemas & Artifacts, §2.1 owns the exact Gate counts for the
+# nine canonical center IDs.  Individual Gate-to-center assignments remain
+# single-homed in catalog/gates_v1.json; this aggregate independently refuses
+# a coherent cross-catalog reassignment that changes the governed topology.
+FROZEN_GATE_CENTER_COUNTS = {
+    "ajna": 6,
+    "ego": 4,
+    "g": 8,
+    "head": 3,
+    "root": 9,
+    "sacral": 9,
+    "solar_plexus": 7,
+    "spleen": 7,
+    "throat": 11,
+}
+
+
+# PF08 — Human Design System, §Channels lists each Channel's Gate endpoints in
+# the same order as its Center heading (for example, 8-1 under Throat-to-G).
+# Preserve that exact Gate-to-Center assignment independently of the Gate
+# catalog so a coherent reassignment cannot redefine its own expected topology.
+FROZEN_CHANNEL_ENDPOINT_CENTERS = {
+    "01-08": ((8, "throat"), (1, "g")),
+    "02-14": ((2, "g"), (14, "sacral")),
+    "03-60": ((3, "sacral"), (60, "root")),
+    "04-63": ((63, "head"), (4, "ajna")),
+    "05-15": ((15, "g"), (5, "sacral")),
+    "06-59": ((59, "sacral"), (6, "solar_plexus")),
+    "07-31": ((31, "throat"), (7, "g")),
+    "09-52": ((9, "sacral"), (52, "root")),
+    "10-20": ((20, "throat"), (10, "g")),
+    "10-34": ((10, "g"), (34, "sacral")),
+    "10-57": ((10, "g"), (57, "spleen")),
+    "11-56": ((11, "ajna"), (56, "throat")),
+    "12-22": ((12, "throat"), (22, "solar_plexus")),
+    "13-33": ((33, "throat"), (13, "g")),
+    "16-48": ((16, "throat"), (48, "spleen")),
+    "17-62": ((17, "ajna"), (62, "throat")),
+    "18-58": ((18, "spleen"), (58, "root")),
+    "19-49": ((49, "solar_plexus"), (19, "root")),
+    "20-34": ((20, "throat"), (34, "sacral")),
+    "20-57": ((20, "throat"), (57, "spleen")),
+    "21-45": ((45, "throat"), (21, "ego")),
+    "23-43": ((43, "ajna"), (23, "throat")),
+    "24-61": ((61, "head"), (24, "ajna")),
+    "25-51": ((25, "g"), (51, "ego")),
+    "26-44": ((26, "ego"), (44, "spleen")),
+    "27-50": ((50, "spleen"), (27, "sacral")),
+    "28-38": ((28, "spleen"), (38, "root")),
+    "29-46": ((46, "g"), (29, "sacral")),
+    "30-41": ((30, "solar_plexus"), (41, "root")),
+    "32-54": ((32, "spleen"), (54, "root")),
+    "34-57": ((57, "spleen"), (34, "sacral")),
+    "35-36": ((35, "throat"), (36, "solar_plexus")),
+    "37-40": ((40, "ego"), (37, "solar_plexus")),
+    "39-55": ((55, "solar_plexus"), (39, "root")),
+    "42-53": ((42, "sacral"), (53, "root")),
+    "47-64": ((64, "head"), (47, "ajna")),
+}
+
+
+# PF12 §2.5 makes each caps `inputs` value an array, and §4.2 preserves array
+# order unless an owning contract declares set semantics.  The current Magic-10
+# calculators consume these values as tuples in catalog order.  Freeze the exact
+# ordered input contract here without sorting or deduplicating it.
+FROZEN_MAGIC10_INPUTS = {
+    "harmony": ("rapport_delta", "resonance_strength"),
+    "heat": ("spark_intensity", "momentum_flux"),
+    "communication": ("signal_clarity", "exchange_density"),
+    "alignment": ("vector_cohesion", "axis_agreement"),
+    "comfort": ("soothe_index", "buffer_resilience"),
+    "consistency": ("pattern_integrity", "variance_stability"),
+    "expansion": ("growth_tendency", "horizon_reach"),
+    "creativity": ("novelty_factor", "expression_flow"),
+    "drive": ("willpower_current", "focus_pressure"),
+    "balance": ("equilibrium_score", "counterweight_ratio"),
+}
 
 
 # Discovery (PR3 / EPIC017): this loader owns the PF12 catalogs under catalog/ (gates_v1,
@@ -125,6 +256,7 @@ def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
     if not isinstance(gates_raw, list):
         raise SchemaValidationError("INVALID_GATES", "gates must be a list")
     gates: dict[int, Gate] = {}
+    source_gate_ids: list[int] = []
     centers: set[str] = set()
     for entry in gates_raw:
         if not isinstance(entry, dict):
@@ -135,7 +267,30 @@ def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
             raise SchemaValidationError("INVALID_GATES", "gate id must be an int")
         if gate_id in gates:
             raise DuplicateIdError("DUPLICATE_GATE", f"duplicate gate id {gate_id}")
+        source_gate_ids.append(gate_id)
         gates[gate_id] = Gate(gate=gate_id, center=center)
+    if tuple(source_gate_ids) != FROZEN_GATE_IDS:
+        raise SchemaValidationError(
+            "GATE_ID_ORDER_MISMATCH",
+            "gate catalog rows must preserve the exact 1..64 source order",
+            {
+                "actual": source_gate_ids,
+                "expected": list(FROZEN_GATE_IDS),
+            },
+        )
+    center_counts = {
+        center: sum(gate.center == center for gate in gates.values())
+        for center in sorted(centers)
+    }
+    if center_counts != FROZEN_GATE_CENTER_COUNTS:
+        raise SchemaValidationError(
+            "GATE_CENTER_COUNTS_MISMATCH",
+            "gate center counts must match the frozen topology",
+            {
+                "actual": center_counts,
+                "expected": dict(FROZEN_GATE_CENTER_COUNTS),
+            },
+        )
     return gates, tuple(sorted(centers))
 
 
@@ -144,6 +299,11 @@ def _normalize_channel_id(channel_id: str, gates: Iterable[int]) -> str:
         raise SchemaValidationError("INVALID_CHANNEL_ID", f"invalid channel id format: {channel_id}")
     a, b = map(int, channel_id.split("-"))
     g1, g2 = sorted(int(g) for g in gates)
+    if g1 == g2:
+        raise SchemaValidationError(
+            "DUPLICATE_CHANNEL_GATE",
+            f"channel {channel_id} must reference two distinct gates",
+        )
     if (a, b) != (g1, g2):
         raise SchemaValidationError("CHANNEL_ID_MISMATCH", f"channel id {channel_id} does not match gates {gates}")
     return f"{g1:02d}-{g2:02d}"
@@ -201,6 +361,36 @@ def _load_channels(
         for c in centers_tuple:
             if c not in known_centers:
                 raise UnknownIdError("UNKNOWN_CENTER", f"channel {normalized_id} references unknown center {c}")
+        projected_centers = {gate_map[g].center for g in gates_tuple}
+        if len(projected_centers) != 2:
+            raise SchemaValidationError(
+                "DUPLICATE_CHANNEL_CENTER",
+                f"channel {normalized_id} gate projection must contain two distinct centers",
+            )
+        if set(centers_tuple) != projected_centers:
+            raise SchemaValidationError(
+                "CHANNEL_CENTER_PROJECTION_MISMATCH",
+                f"channel {normalized_id} centers do not match its gate projection",
+            )
+        expected_endpoints_raw = FROZEN_CHANNEL_ENDPOINT_CENTERS.get(normalized_id)
+        expected_endpoints = (
+            dict(expected_endpoints_raw) if expected_endpoints_raw is not None else None
+        )
+        actual_endpoints = {gate: gate_map[gate].center for gate in gates_tuple}
+        if expected_endpoints is not None and actual_endpoints != expected_endpoints:
+            raise SchemaValidationError(
+                "CHANNEL_CENTER_IDENTITY_MISMATCH",
+                f"channel {normalized_id} endpoints do not match the frozen Channel topology",
+                {
+                    "actual": [
+                        [gate, actual_endpoints[gate]] for gate in sorted(actual_endpoints)
+                    ],
+                    "expected": [
+                        [gate, expected_endpoints[gate]]
+                        for gate in sorted(expected_endpoints)
+                    ],
+                },
+            )
         circuit_primary = entry.get("circuit_primary")
         primary_domain = entry.get("primary_domain")
         domain_list = entry.get("domains", [])
@@ -231,6 +421,22 @@ def _load_channels(
     if pending_aliases and not allow_aliases:
         raise AliasPolicyError("ALIASES_FORBIDDEN", "alias entries are not allowed")
 
+    actual_channel_ids = set(channels)
+    expected_channel_ids = set(FROZEN_CHANNEL_IDS)
+    if set(FROZEN_CHANNEL_ENDPOINT_CENTERS) != expected_channel_ids:
+        raise SchemaValidationError(
+            "FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH",
+            "frozen Channel center bindings must cover the exact Channel roster",
+        )
+    if actual_channel_ids != expected_channel_ids:
+        missing = sorted(expected_channel_ids - actual_channel_ids)
+        unknown = sorted(actual_channel_ids - expected_channel_ids)
+        raise SchemaValidationError(
+            "CHANNEL_ID_ROSTER_MISMATCH",
+            "channel identities must match the frozen 36-Channel roster",
+            {"missing": missing, "unknown": unknown},
+        )
+
     ledger = dict(alias_ledger or {})
     for entry in pending_aliases:
         alias_id_raw = entry.get("id")
@@ -257,7 +463,7 @@ def _load_channels(
 
 def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], dict[str, Magic10Seed]]:
     order_raw = _load_json(root / "catalog" / "magic10.json")
-    if not isinstance(order_raw, dict) or "order" not in order_raw:
+    if not isinstance(order_raw, dict) or set(order_raw) != {"order"}:
         raise SchemaValidationError("INVALID_MAGIC10", "magic10.json must contain an order array")
     order_list = order_raw.get("order")
     if not isinstance(order_list, list):
@@ -265,6 +471,11 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
     magic_order = tuple(order_list)
     if magic_order != FROZEN_MAGIC10_ORDER:
         raise SchemaValidationError("MAGIC10_ORDER_MISMATCH", "magic10 order must match registry")
+    if set(FROZEN_MAGIC10_INPUTS) != set(magic_order):
+        raise SchemaValidationError(
+            "FROZEN_MAGIC10_INPUT_ROSTER_MISMATCH",
+            "frozen Magic-10 input bindings must cover the exact category roster",
+        )
 
     caps_raw = _load_json(root / "catalog" / "magic10_caps.json")
     if not isinstance(caps_raw, dict):
@@ -273,15 +484,45 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         raise SchemaValidationError("MAGIC10_CAPS_COVERAGE", "magic10_caps must cover full magic10 order")
     caps: dict[str, Magic10Caps] = {}
     for key, entry in caps_raw.items():
-        if not isinstance(entry, dict):
-            raise SchemaValidationError("INVALID_MAGIC10", "magic10_caps entries must be objects")
+        if not isinstance(entry, dict) or set(entry) != {"inputs", "bounds"}:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", "magic10_caps entries must contain inputs and bounds only"
+            )
         inputs = entry.get("inputs")
         bounds = entry.get("bounds")
         if not isinstance(inputs, list) or not inputs:
             raise SchemaValidationError("INVALID_MAGIC10", f"magic10_caps[{key}] inputs must be a non-empty list")
-        if not isinstance(bounds, dict) or "min" not in bounds or "max" not in bounds:
+        if any(not isinstance(value, str) or not value for value in inputs):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_caps[{key}] inputs must be non-empty strings"
+            )
+        expected_inputs = FROZEN_MAGIC10_INPUTS[key]
+        if tuple(inputs) != expected_inputs:
+            raise SchemaValidationError(
+                "MAGIC10_INPUTS_MISMATCH",
+                f"magic10_caps[{key}] inputs must match the frozen ordered contract",
+                {
+                    "actual": list(inputs),
+                    "expected": list(expected_inputs),
+                },
+            )
+        if not isinstance(bounds, dict) or set(bounds) != {"min", "max"}:
             raise SchemaValidationError("INVALID_MAGIC10", f"magic10_caps[{key}] bounds invalid")
-        caps[key] = Magic10Caps(inputs=tuple(inputs), bounds={"min": int(bounds["min"]), "max": int(bounds["max"])})
+        minimum = bounds["min"]
+        maximum = bounds["max"]
+        if (
+            type(minimum) is not int
+            or type(maximum) is not int
+            or minimum != 0
+            or maximum != 100
+        ):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10",
+                f"magic10_caps[{key}] bounds must be integers with min 0 and max 100",
+            )
+        caps[key] = Magic10Caps(
+            inputs=tuple(inputs), bounds={"min": minimum, "max": maximum}
+        )
 
     seeds_raw = _load_json(root / "catalog" / "magic10_seeds.json")
     if not isinstance(seeds_raw, dict):
@@ -294,13 +535,35 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         if not isinstance(entry, dict):
             raise SchemaValidationError("INVALID_MAGIC10", "magic10_seeds entries must be objects")
         required = {"template_id", "seed_version", "updated_at_utc", "checksum_sha256"}
-        if not required <= entry.keys():
-            raise SchemaValidationError("INVALID_MAGIC10", f"magic10_seeds[{key}] missing required fields")
+        if set(entry) != required:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] fields invalid"
+            )
+        if any(not isinstance(entry[field], str) or not entry[field] for field in required):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] values must be non-empty strings"
+            )
+        checksum = entry["checksum_sha256"]
+        if re.fullmatch(r"[0-9a-f]{64}", checksum) is None:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] checksum invalid"
+            )
+        timestamp = entry["updated_at_utc"]
+        if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", timestamp) is None:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] timestamp invalid"
+            )
+        try:
+            datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError as exc:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] timestamp invalid"
+            ) from exc
         seeds[key] = Magic10Seed(
-            template_id=str(entry["template_id"]),
-            seed_version=str(entry["seed_version"]),
-            updated_at_utc=str(entry["updated_at_utc"]),
-            checksum_sha256=str(entry["checksum_sha256"]),
+            template_id=entry["template_id"],
+            seed_version=entry["seed_version"],
+            updated_at_utc=timestamp,
+            checksum_sha256=checksum,
         )
 
     return magic_order, caps, seeds

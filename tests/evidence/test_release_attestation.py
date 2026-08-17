@@ -241,11 +241,11 @@ def test_isolated_write_boundary_allows_only_declared_outputs():
 
 
 def test_declared_output_roster_is_exact_owned_and_stable():
-    assert len(closure.DECLARED_PRODUCER_OUTPUTS) == 101
-    assert len(set(closure.DECLARED_PRODUCER_OUTPUTS)) == 101
-    assert len(closure.ATTESTATION_PRIMARY_OUTPUTS) == 101
-    assert len(closure.ATTESTATION_PATH_PROOF_TARGETS) == 92
-    assert len(closure.ATTESTATION_GENERATED_OUTPUTS) == 193
+    assert len(closure.DECLARED_PRODUCER_OUTPUTS) == 98
+    assert len(set(closure.DECLARED_PRODUCER_OUTPUTS)) == 98
+    assert len(closure.ATTESTATION_PRIMARY_OUTPUTS) == 98
+    assert len(closure.ATTESTATION_PATH_PROOF_TARGETS) == 89
+    assert len(closure.ATTESTATION_GENERATED_OUTPUTS) == 187
     assert closure.ATTESTATION_GENERATED_OUTPUTS == tuple(
         sorted(set(closure.ATTESTATION_GENERATED_OUTPUTS))
     )

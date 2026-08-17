@@ -29,7 +29,7 @@ class CompositionResult:
 
 
 def _normalize_direction(value: str) -> str:
-    return value.strip().lower().replace("\\_", "_")
+    return value
 
 
 def _validate_pack_sha(pack_sha: str) -> bool:
@@ -94,7 +94,7 @@ def compose_text(
     if record is None:
         return CompositionResult(False, target_key, target_key, None, CONFLICT_REASON)
 
-    if normalized_perspective in {"a_to_b", "b_to_a"} and normalized_perspective not in record.directions:
+    if record.perspective != normalized_perspective:
         return CompositionResult(False, target_key, target_key, None, CONFLICT_REASON)
 
     if target_key in pack.suppression_map:

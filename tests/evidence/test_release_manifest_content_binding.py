@@ -4,8 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 from engine.serializer import canon
 from scripts import release_id_recompute
+from tools.evidence import generate_epic032_pr01_router_evidence
+from tools.evidence import generate_narrative_registry_diff
 from tools.evidence import regenerate_identity_closure
 
 
@@ -184,6 +188,40 @@ def test_closure_roster_covers_release_dependent_local_derivatives():
         step = next(item for item in regenerate_identity_closure.CLOSURE_STEPS if item.write == write)
         assert step.check in checks
         assert step.check[-1] in {"--check", "--check-only"}
+
+
+def test_closure_excludes_frozen_epic032_router_producer():
+    producer = "tools/evidence/generate_epic032_pr01_router_evidence.py"
+    commands = {
+        command
+        for step in regenerate_identity_closure.CLOSURE_STEPS
+        for command in (step.write, step.check)
+    }
+
+    assert all(producer not in command for command in commands)
+    assert producer not in Path(
+        "tools/evidence/build_release_attestation.py"
+    ).read_text(encoding="utf-8")
+    frozen = {
+        *generate_epic032_pr01_router_evidence.FROZEN_OUTPUTS,
+        *generate_narrative_registry_diff.FROZEN_EPIC032_EVIDENCE,
+    }
+    frozen_with_proofs = frozen | {
+        f"{path}.path_proof.txt" for path in frozen
+    }
+    assert frozen_with_proofs.isdisjoint(
+        regenerate_identity_closure.ATTESTATION_GENERATED_OUTPUTS
+    )
+
+
+def test_epic032_router_captures_are_frozen_and_write_refused():
+    generate_epic032_pr01_router_evidence._verify_frozen_outputs()
+
+    with pytest.raises(
+        SystemExit,
+        match="HISTORICAL_EPIC032_ROUTER_WRITE_REFUSED",
+    ):
+        generate_epic032_pr01_router_evidence.main([])
 
 
 def test_closure_write_skips_current_producers(monkeypatch):

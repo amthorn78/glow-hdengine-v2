@@ -66,11 +66,6 @@ CLI_CONFORMANCE_OUTPUTS = (
     "artifacts/cli/install/entrypoints.txt",
     "artifacts/cli/install/installability_summary.json",
 )
-EPIC032_ROUTER_OUTPUTS = (
-    "audit/gates/narratives/keys_10x4.table.json",
-    "artifacts/narratives/router/parity_abba.log",
-    "artifacts/narratives/router/cli_http_parity.log",
-)
 CANONICAL_JSON_OUTPUTS = (
     "audit/gates/canonical_json/json_canonical_check.log",
     "audit/gates/canonical_json/json_canon_compare.log",
@@ -214,12 +209,6 @@ CLOSURE_STEPS = (
         ("tools/cli/generate_cli_conformance_artifacts.py",),
         ("tools/cli/generate_cli_conformance_artifacts.py", "--check"),
         CLI_CONFORMANCE_OUTPUTS,
-    ),
-    ClosureStep(
-        "epic032_router",
-        ("tools/evidence/generate_epic032_pr01_router_evidence.py",),
-        ("tools/evidence/generate_epic032_pr01_router_evidence.py", "--check"),
-        EPIC032_ROUTER_OUTPUTS,
     ),
     ClosureStep(
         "canonical_json",
