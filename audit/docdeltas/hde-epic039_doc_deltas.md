@@ -11,3 +11,10 @@
 ## Scope boundaries
 
 This implementation evidence makes no claim of token satisfaction, QA PASS, acceptance, PF09 status movement, OPS completion, deployment, epic closeout, or complete PF17 composer and transport conformance. It changes the sealed narrative registry and direction-specific runtime selection only; it does not add public routes, change compatibility payload contracts, alter Human Design calculations, meanings, scoring, or bands, or reinterpret non-narrative ordered arrays.
+
+## PR-02 evidence-ledger publication
+
+- Consolidated the Human Index, both checksums, Machine Mirror self-record, path proofs, and orientation into one updater-owned staged transaction with immediate fixed-point validation; orientation write compatibility now delegates to that sole writer. (PF04 — HDE Governance, §2.0.6; PF12 — HDE Schemas and Artifacts, §8.3; PF14 — HDE Mechanics Guide, §§1.3.1–1.3.2.)
+- Replaced active repair-style updater/orientation/updater sequences with one updater publication followed by read-only checks, and extended the existing hash and final-LF controls across the complete D2 ledger skeleton. (PF05 — HDE CLI/API/Vendor Ref, §0.4; PF10 — HDE Build Notes, Addenda 2.3–2.5; PF14 — HDE Mechanics Guide, §1.3.)
+
+These PR-02 changes do not claim QA PASS, acceptance, token satisfaction, PF09 status movement, OPS completion, deployment, or epic closeout.

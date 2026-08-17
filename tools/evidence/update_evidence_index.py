@@ -19,6 +19,7 @@ import json
 import os
 import stat as _stat
 import sys
+import tempfile
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -28,6 +29,7 @@ HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 MIRROR_SHA_PATH = ROOT / "artifacts/evidence_index.jsonl.sha256"
+ORIENTATION_PATH = ROOT / "audit/gates/topology/orientation_demo.txt"
 SANITY_LOG_REL = "audit/gates/sanity_pipeline/sanity_pipeline.log"
 SANITY_LOG_KEY = ("sanity.pipeline.log", SANITY_LOG_REL)
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
@@ -174,6 +176,17 @@ class _WriteTransaction:
 
 
 _ACTIVE_WRITE_TRANSACTION: _WriteTransaction | None = None
+_STAGED_BYTES: dict[Path, bytes] | None = None
+
+
+def _read_bytes(path: Path) -> bytes:
+    if _STAGED_BYTES is not None and path in _STAGED_BYTES:
+        return _STAGED_BYTES[path]
+    return path.read_bytes()
+
+
+def _path_exists(path: Path) -> bool:
+    return (_STAGED_BYTES is not None and path in _STAGED_BYTES) or path.exists()
 
 
 def _capture_transaction_preimage(path: Path) -> None:
@@ -3260,7 +3273,7 @@ def _sha256_bytes(data: bytes) -> str:
 
 
 def _sha256_path(path: Path) -> str:
-    return _sha256_bytes(path.read_bytes())
+    return _sha256_bytes(_read_bytes(path))
 
 
 def _render_env_pins() -> str:
@@ -3316,10 +3329,10 @@ def _load_mirror_roles() -> dict[tuple[str, str], str]:
 
 
 def _load_existing_proof(proof_path: Path) -> dict[str, str]:
-    if not proof_path.exists():
+    if not _path_exists(proof_path):
         return {}
     data: dict[str, str] = {}
-    for line in proof_path.read_text(encoding="utf-8").splitlines():
+    for line in _read_bytes(proof_path).decode("utf-8").splitlines():
         if not line:
             continue
         if ": " not in line:
@@ -3472,13 +3485,11 @@ def _write_path_proof(
         ]
     )
     proof_text = "\n".join(proof_lines)
-    if proof_path.exists():
-        existing_text = proof_path.read_text(encoding="utf-8")
+    if _path_exists(proof_path):
+        existing_text = _read_bytes(proof_path).decode("utf-8")
         if existing_text == proof_text:
             return proof_rel, produced
-    _capture_transaction_preimage(proof_path)
-    proof_path.parent.mkdir(parents=True, exist_ok=True)
-    proof_path.write_text(proof_text, encoding="utf-8")
+    _write_if_changed(proof_path, proof_text.encode("utf-8"), check=False)
     return proof_rel, produced
 
 
@@ -3776,12 +3787,12 @@ def _render_mirror(
             records.append(record)
             continue
 
-        sha = _sha256_bytes(rel_path.read_bytes())
+        sha = _sha256_bytes(_read_bytes(rel_path))
         stat = rel_path.stat()
         proof_anchor, produced_at = _write_path_proof(
             path,
             sha256=sha,
-            size_bytes=stat.st_size,
+            size_bytes=len(_read_bytes(rel_path)),
             mtime_utc=None,
             produced_at=str(entry.get("produced_at_utc")) if entry.get("produced_at_utc") else None,
             default_produced_at=produced_default,
@@ -3790,7 +3801,7 @@ def _render_mirror(
         )
         record.update({
             "sha256": sha,
-            "size_bytes": stat.st_size,
+            "size_bytes": len(_read_bytes(rel_path)),
             "produced_at_utc": produced_at,
             "proof_anchor": proof_anchor,
         })
@@ -3827,15 +3838,71 @@ def _render_mirror(
     return ("\n".join(rendered_lines) + "\n").encode("utf-8"), mirror_rec
 
 
+def _render_orientation(
+    entries: Iterable[Mapping[str, object]], mirror_bytes: bytes
+) -> bytes:
+    """Render the orientation summary from the final ordered ledger model."""
+
+    human_keys = [
+        (str(entry["artifact_key"]), str(entry["discovered_physical_path"]))
+        for entry in _dedupe_entries(entries)
+    ]
+    records = [json.loads(line) for line in mirror_bytes.splitlines() if line]
+    mirror_keys = [
+        (str(record["artifact_key"]), str(record["discovered_physical_path"]))
+        for record in records
+    ]
+    if human_keys != mirror_keys:
+        raise SystemExit("ORIENTATION_MODEL_MISMATCH")
+    return (
+        "orientation demo (evidence skeleton)\n"
+        f"total_artifacts: {len(human_keys)}\n"
+        "status: ok\n"
+        "sample: INDEX and mirror entries are coherent\n"
+    ).encode("utf-8")
+
+
+def _publish_staged(staged: Mapping[Path, bytes | None]) -> None:
+    """Replace the complete staged model under the active rollback boundary."""
+
+    for path in sorted(staged, key=lambda item: item.as_posix()):
+        content = staged[path]
+        if content is None:
+            if path.exists():
+                _capture_transaction_preimage(path)
+                path.unlink()
+            continue
+        if path.exists() and path.read_bytes() == content:
+            continue
+        _capture_transaction_preimage(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+        temporary = Path(temporary_name)
+        try:
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            if path.exists():
+                os.chmod(temporary, _stat.S_IMODE(path.stat().st_mode))
+            os.replace(temporary, path)
+        finally:
+            if temporary.exists():
+                temporary.unlink()
+
+
 def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
-    if path.exists():
-        existing = path.read_bytes()
+    if _path_exists(path):
+        existing = _read_bytes(path)
         if existing == content:
             return
         if check:
             raise SystemExit(f"STALE:{path}")
     elif check:
         raise SystemExit(f"STALE:{path}")
+    if _STAGED_BYTES is not None:
+        _STAGED_BYTES[path] = content
+        return
     _capture_transaction_preimage(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
@@ -3848,7 +3915,7 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
     _write_path_proof(
         rel,
         sha256=_sha256_path(path),
-        size_bytes=stat.st_size,
+        size_bytes=len(_read_bytes(path)),
         mtime_utc=proof_existing.get("mtime_utc"),
         produced_at=proof_existing.get("produced_at_utc"),
         default_produced_at=default_produced_at,
@@ -4079,6 +4146,9 @@ def main(argv: list[str] | None = None) -> None:
         mirror_rec["size_bytes"] = mirror_size
         _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
+        orientation_bytes = _render_orientation(entries, mirror_bytes)
+        _write_if_changed(ORIENTATION_PATH, orientation_bytes, check=check)
+
         mirror_stat = MIRROR_PATH.stat()
         mirror_file_sha = _sha256_path(MIRROR_PATH)
         mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
@@ -4089,7 +4159,7 @@ def main(argv: list[str] | None = None) -> None:
         proof_anchor, produced_at = _write_path_proof(
             MIRROR_REL,
             sha256=mirror_file_sha,
-            size_bytes=mirror_stat.st_size,
+            size_bytes=len(_read_bytes(MIRROR_PATH)),
             mtime_utc=mirror_proof_existing.get("mtime_utc"),
             produced_at=str(mirror_rec.get("produced_at_utc")),
             default_produced_at=produced_default,
@@ -4105,10 +4175,10 @@ def main(argv: list[str] | None = None) -> None:
             mirror_rec["produced_at_utc"] = produced_at
             if check:
                 raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
-        if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
+        if len(_read_bytes(MIRROR_PATH)) != int(mirror_rec["size_bytes"]):
             if check:
                 raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
-            mirror_rec["size_bytes"] = mirror_stat.st_size
+            mirror_rec["size_bytes"] = len(_read_bytes(MIRROR_PATH))
 
     if args.check:
         _run_once(check=True)
@@ -4119,22 +4189,31 @@ def main(argv: list[str] | None = None) -> None:
     # Mirror rendering depends on artifacts written by this same updater
     # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
     # so a single rewrite is not always sufficient.
-    with _WriteTransaction(ROOT):
-        max_passes = 6
-        last_error: SystemExit | None = None
-        for _ in range(max_passes):
-            _run_once(check=False)
-            _validate_epic038_closeout_package()
-            try:
-                _run_once(check=True)
-                last_error = None
-                break
-            except SystemExit as exc:
-                last_error = exc
+    global _STAGED_BYTES
+    try:
+        with _WriteTransaction(ROOT):
+            _STAGED_BYTES = {}
+            max_passes = 6
+            last_error: SystemExit | None = None
+            for _ in range(max_passes):
+                _run_once(check=False)
+                _validate_epic038_closeout_package()
+                try:
+                    _run_once(check=True)
+                    last_error = None
+                    break
+                except SystemExit as exc:
+                    last_error = exc
 
-        if last_error is not None:
-            raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
-        _validate_epic038_closeout_package()
+            if last_error is not None:
+                raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+            staged = dict(_STAGED_BYTES)
+            _STAGED_BYTES = None
+            _publish_staged(staged)
+            _run_once(check=True)
+            _validate_epic038_closeout_package()
+    finally:
+        _STAGED_BYTES = None
 
 
 if __name__ == "__main__":

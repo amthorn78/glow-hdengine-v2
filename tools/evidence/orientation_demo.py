@@ -19,6 +19,7 @@ from tools.evidence.update_evidence_index import (  # noqa: E402
     _sha256_bytes,
     _load_existing_proof,
     _load_human_index,
+    main as update_evidence_index,
 )
 
 ORIENTATION_PATH = ROOT / "audit/gates/topology/orientation_demo.txt"
@@ -147,6 +148,11 @@ def _render_report(messages: list[str], total: int) -> str:
 
 
 def generate_orientation(check: bool = False) -> None:
+    if not check:
+        # Compatibility write mode has no independent write authority.  The
+        # canonical updater publishes orientation with the complete ledger.
+        update_evidence_index([])
+        return
     entries = _load_human_index()
     mirror_lines = MIRROR_PATH.read_text(encoding="utf-8").splitlines(True)
     records = _load_mirror_records()
@@ -157,14 +163,13 @@ def generate_orientation(check: bool = False) -> None:
     # report. The explicit comparison below keeps --check aligned to that semantics.
     if check and messages:
         raise SystemExit("ORIENTATION_MISMATCH")
-    ORIENTATION_PATH.parent.mkdir(parents=True, exist_ok=True)
     existing_text = (
         ORIENTATION_PATH.read_text(encoding="utf-8") if ORIENTATION_PATH.exists() else None
     )
     if existing_text != text:
         if check:
             raise SystemExit("ORIENTATION_DRIFT")
-        ORIENTATION_PATH.write_text(text, encoding="utf-8")
+        raise AssertionError("unreachable: compatibility writes delegate to updater")
 
 
 def main(argv: list[str] | None = None) -> None:

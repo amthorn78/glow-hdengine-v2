@@ -116,8 +116,6 @@ jobs:
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --preflight
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
             )
@@ -219,8 +217,6 @@ jobs:
             SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
             (
               unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
               SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
             )
             SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check

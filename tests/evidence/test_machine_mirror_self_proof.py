@@ -1,5 +1,8 @@
 import datetime as dt
 import json
+import os
+
+import pytest
 
 from tools.evidence import update_evidence_index as uei
 
@@ -44,3 +47,42 @@ def test_machine_mirror_self_proof_matches_canonical_digest():
     assert int(proof["size_bytes"]) == int(mirror_size)
     assert proof.get("path") == mirror_rel
     assert proof.get("produced_at_utc") == rendered_rec["produced_at_utc"]
+
+
+def test_staged_publication_add_replace_remove_is_transactional(tmp_path):
+    existing = tmp_path / "existing.txt"
+    added = tmp_path / "added.txt"
+    removed = tmp_path / "removed.txt"
+    existing.write_bytes(b"before\n")
+    removed.write_bytes(b"remove-me\n")
+
+    with uei._WriteTransaction(tmp_path):
+        uei._publish_staged({existing: b"after\n", added: b"added\n", removed: None})
+
+    assert existing.read_bytes() == b"after\n"
+    assert added.read_bytes() == b"added\n"
+    assert not removed.exists()
+
+
+def test_staged_publication_rolls_back_every_preimage(tmp_path, monkeypatch):
+    first = tmp_path / "a.txt"
+    second = tmp_path / "b.txt"
+    first.write_bytes(b"first-before\n")
+    second.write_bytes(b"second-before\n")
+    real_replace = os.replace
+    calls = 0
+
+    def fail_second(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("fault injection")
+        real_replace(source, destination)
+
+    monkeypatch.setattr(uei.os, "replace", fail_second)
+    with pytest.raises(OSError, match="fault injection"):
+        with uei._WriteTransaction(tmp_path):
+            uei._publish_staged({first: b"first-after\n", second: b"second-after\n"})
+
+    assert first.read_bytes() == b"first-before\n"
+    assert second.read_bytes() == b"second-before\n"
