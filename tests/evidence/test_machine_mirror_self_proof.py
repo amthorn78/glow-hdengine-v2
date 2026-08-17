@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import os
+import stat
 
 import pytest
 
@@ -57,7 +58,13 @@ def test_staged_publication_add_replace_remove_is_transactional(tmp_path):
     removed.write_bytes(b"remove-me\n")
 
     with uei._WriteTransaction(tmp_path):
-        uei._publish_staged({existing: b"after\n", added: b"added\n", removed: None})
+        uei._publish_staged(
+            {
+                existing: b"after\n",
+                added: b"added\n",
+                removed: uei._STAGED_DELETION,
+            }
+        )
 
     assert existing.read_bytes() == b"after\n"
     assert added.read_bytes() == b"added\n"
@@ -67,8 +74,12 @@ def test_staged_publication_add_replace_remove_is_transactional(tmp_path):
 def test_staged_publication_rolls_back_every_preimage(tmp_path, monkeypatch):
     first = tmp_path / "a.txt"
     second = tmp_path / "b.txt"
+    added = tmp_path / "new-directory" / "c.txt"
     first.write_bytes(b"first-before\n")
     second.write_bytes(b"second-before\n")
+    os.chmod(first, 0o640)
+    os.chmod(second, 0o600)
+    original_root_mode = tmp_path.stat().st_mode
     real_replace = os.replace
     calls = 0
 
@@ -82,7 +93,18 @@ def test_staged_publication_rolls_back_every_preimage(tmp_path, monkeypatch):
     monkeypatch.setattr(uei.os, "replace", fail_second)
     with pytest.raises(OSError, match="fault injection"):
         with uei._WriteTransaction(tmp_path):
-            uei._publish_staged({first: b"first-after\n", second: b"second-after\n"})
+            uei._publish_staged(
+                {
+                    first: b"first-after\n",
+                    second: uei._STAGED_DELETION,
+                    added: b"added\n",
+                }
+            )
 
     assert first.read_bytes() == b"first-before\n"
     assert second.read_bytes() == b"second-before\n"
+    assert stat.S_IMODE(first.stat().st_mode) == 0o640
+    assert stat.S_IMODE(second.stat().st_mode) == 0o600
+    assert not added.exists()
+    assert not added.parent.exists()
+    assert tmp_path.stat().st_mode == original_root_mode
