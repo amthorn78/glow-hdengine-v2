@@ -6,6 +6,7 @@ from engine.stable.sercanon import serialize  # canonical serializer (LF-termina
 
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 ADMIN_SELECTION_TRACE = ("step1", "step2", "step3")
+DEFAULT_RELEASE_ID = hashlib.sha256(b"dev").hexdigest()
 
 def _resolve_release_id() -> str:
     # Precedence: env > artifacts file > strict 64-hex fallback
@@ -15,7 +16,7 @@ def _resolve_release_id() -> str:
     if f.exists():
         txt = f.read_text(encoding="utf-8").strip()
         if txt and HEX64.match(txt): return txt
-    return hashlib.sha256(b"dev").hexdigest()
+    return DEFAULT_RELEASE_ID
 
 def _stderr_json(code: str, message: str) -> None:
     sys.stderr.write(json.dumps(
@@ -44,19 +45,21 @@ def _fmt_float_pct(x: float) -> str:
     s = f"{x:.6f}".rstrip("0").rstrip(".")
     return s + "%"
 
-def _public_envelope(a: dict, b: dict) -> dict:
-    rid = _resolve_release_id()
+def _public_envelope_for_release(release_id: str) -> dict:
     env = {
         "reader_version": "v1",
         "eligible": True,
         "categories": [{"id":"open_leader","band":"Open"}],
         "meta": {"engine_tag":"Isis6","invocation_tag":"INV-aaaaaaaaaaaaaaaa"},
-        "release_id": rid,
+        "release_id": release_id,
     }
     pre = dict(env)
     pre_b = serialize(pre)  # LF-terminated bytes
     env["idempotence_hash"] = hashlib.sha256(pre_b).hexdigest()
     return env
+
+def _public_envelope(a: dict, b: dict) -> dict:
+    return _public_envelope_for_release(_resolve_release_id())
 
 def _load(p: str) -> dict:
     with open(p, "r", encoding="utf-8") as f:

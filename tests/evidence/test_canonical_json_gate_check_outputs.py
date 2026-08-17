@@ -11,6 +11,15 @@ from engine.config.registry_loader import SchemaValidationError, _normalize_chan
 from tools.evidence import run_canonical_json_gate
 
 
+def _refresh_reader_idempotence_hash(payload):
+    preimage = {
+        key: value for key, value in payload.items() if key != "idempotence_hash"
+    }
+    payload["idempotence_hash"] = hashlib.sha256(
+        run_canonical_json_gate.sercanon(preimage, sort_keys=True)
+    ).hexdigest()
+
+
 def test_stale_outputs_detects_missing_and_drift(tmp_path):
     current = tmp_path / "current.log"
     missing = tmp_path / "missing.log"
@@ -39,6 +48,22 @@ def test_d1_inventory_is_complete_unique_sorted_and_bound():
     assert tuple(target.rel_path for target in targets) == (
         run_canonical_json_gate.EXPECTED_TARGET_PATHS
     )
+    assert run_canonical_json_gate.EXPECTED_TARGET_BINDINGS == tuple(
+        sorted(run_canonical_json_gate.EXPECTED_TARGET_BINDINGS)
+    )
+    assert tuple(
+        (target.rel_path, target.validator, target.schema) for target in targets
+    ) == run_canonical_json_gate.EXPECTED_TARGET_BINDINGS
+    assert run_canonical_json_gate.EXPECTED_SET_RULES == tuple(
+        sorted(run_canonical_json_gate.EXPECTED_SET_RULES)
+    )
+    assert tuple(
+        sorted(
+            (target.rel_path, path, identity)
+            for target in targets
+            for path, identity in target.set_rules
+        )
+    ) == run_canonical_json_gate.EXPECTED_SET_RULES
     assert all(target.validator for target in targets)
     assert all(path and identity for target in targets for path, identity in target.set_rules)
     assert {target.validator for target in targets} <= set(
@@ -81,6 +106,34 @@ def test_same_cardinality_target_substitution_fails_closed():
     )
 
     assert len(targets) == len(run_canonical_json_gate.EXPECTED_TARGET_PATHS)
+    assert not run_canonical_json_gate._target_inventory_is_exact(targets)
+
+
+def test_same_path_binding_erasure_and_set_rule_substitution_fail_closed():
+    targets = list(run_canonical_json_gate.TARGETS)
+    index = next(
+        index
+        for index, target in enumerate(targets)
+        if target.rel_path == "catalog/channels_v1.json"
+    )
+    original = targets[index]
+    targets[index] = run_canonical_json_gate.Target(
+        original.name,
+        original.rel_path,
+        original.validator,
+        None,
+        (),
+    )
+    assert not run_canonical_json_gate._target_inventory_is_exact(targets)
+
+    targets[index] = run_canonical_json_gate.Target(
+        original.name,
+        original.rel_path,
+        original.validator,
+        original.schema,
+        (*original.set_rules[:-1], ("$.channels[*].unknown", "value")),
+    )
+    assert len(targets[index].set_rules) == len(original.set_rules)
     assert not run_canonical_json_gate._target_inventory_is_exact(targets)
 
 
@@ -166,6 +219,25 @@ def test_declared_set_rule_rejects_unique_but_non_ascii_order():
     payload = json.loads((run_canonical_json_gate.ROOT / target.rel_path).read_text(encoding="utf-8"))
     payload["channels"][0]["domains"] = ["talk", "narrative"]
     with pytest.raises(ValueError, match=r"set_not_canonical:\$\.channels\[\*\]\.domains:0"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_channel_gate_set_uses_strict_ascii_scalar_identity_order():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/channels_v1.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    channel = next(row for row in payload["channels"] if row["id"] == "02-14")
+    assert channel["gates"] == [14, 2]
+    channel["gates"] = [2, 14]
+    with pytest.raises(
+        ValueError,
+        match=r"set_not_canonical:\$\.channels\[\*\]\.gates",
+    ):
         run_canonical_json_gate._validate_target(target, payload)
 
 
@@ -258,6 +330,37 @@ def test_narrative_bindings_fail_closed_on_semantic_invalidity(rel_path, invalid
     )
     with pytest.raises(Exception):
         run_canonical_json_gate._validate_target(target, invalid)
+
+
+def test_narrative_manifest_shape_and_identity_are_closed():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/narratives/manifest.json"
+    )
+    current = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+
+    wrong_pack = copy.deepcopy(current)
+    wrong_pack["pack_name"] = "anything"
+    with pytest.raises(Exception, match="pack_name"):
+        run_canonical_json_gate._validate_target(target, wrong_pack)
+
+    extra_top_level = copy.deepcopy(current)
+    extra_top_level["ungoverned"] = True
+    with pytest.raises(Exception, match="manifest fields invalid"):
+        run_canonical_json_gate._validate_target(target, extra_top_level)
+
+    invalid_timestamp = copy.deepcopy(current)
+    invalid_timestamp["created_utc"] = "2025-02-30T00:00:00Z"
+    with pytest.raises(Exception, match="created_utc invalid"):
+        run_canonical_json_gate._validate_target(target, invalid_timestamp)
+
+    extra_child_field = copy.deepcopy(current)
+    extra_child_field["files"][0]["ungoverned"] = True
+    with pytest.raises(Exception, match="file entry fields invalid"):
+        run_canonical_json_gate._validate_target(target, extra_child_field)
 
 
 def test_narrative_template_values_must_be_strings():
@@ -405,6 +508,48 @@ def test_conjunction_capture_rejects_coherent_forged_uids(tmp_path, monkeypatch)
             run_canonical_json_gate._validate_target(target, payloads[name])
 
 
+def test_conjunction_capture_rejects_coherent_same_band_score_forgery(
+    tmp_path, monkeypatch
+):
+    source_root = run_canonical_json_gate.ROOT
+    artifact_dir = tmp_path / "artifacts" / "cli"
+    artifact_dir.mkdir(parents=True)
+    payloads = {}
+    for name in ("ab", "ba"):
+        payload = json.loads(
+            (source_root / f"artifacts/cli/{name}.json").read_bytes()
+        )
+        payload["conjunction"]["compat"]["categories"][0]["score"] = 46
+        payloads[name] = payload
+        (artifact_dir / f"{name}.json").write_bytes(
+            run_canonical_json_gate.sercanon(payload, sort_keys=True)
+        )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for name in ("ab", "ba"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == f"artifacts/cli/{name}.json"
+        )
+        with pytest.raises(ValueError, match="conjunction_source_mismatch"):
+            run_canonical_json_gate._validate_target(target, payloads[name])
+
+
+def test_showcompat_capture_rejects_coherent_same_band_score_forgery():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "artifacts/cli/showcompat/stdout.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    payload["compat"]["categories"][0]["score"] = 22
+    with pytest.raises(ValueError, match="showcompat_capture_source_mismatch"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
 def test_showcompat_args_bind_recorded_input_to_output_births():
     target = next(
         target
@@ -422,8 +567,62 @@ def test_showcompat_args_bind_recorded_input_to_output_births():
         + "\n"
     ).encode("utf-8")
     payload["input"]["stdin_sha256"] = hashlib.sha256(stdin_bytes).hexdigest()
-    with pytest.raises(ValueError, match="birth_binding_mismatch"):
+    with pytest.raises(ValueError, match="source_pair_mismatch"):
         run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_hd_cli_reader_pair_rejects_coherent_source_forgery(tmp_path, monkeypatch):
+    source_root = run_canonical_json_gate.ROOT
+    artifact_dir = tmp_path / "artifacts" / "cli"
+    artifact_dir.mkdir(parents=True)
+    payloads = {}
+    for name in ("out", "out_ba"):
+        payload = json.loads(
+            (source_root / f"artifacts/cli/{name}.json").read_bytes()
+        )
+        payload["eligible"] = False
+        _refresh_reader_idempotence_hash(payload)
+        payloads[name] = payload
+        (artifact_dir / f"{name}.json").write_bytes(
+            run_canonical_json_gate.sercanon(payload, sort_keys=True)
+        )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for name in ("out", "out_ba"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == f"artifacts/cli/{name}.json"
+        )
+        with pytest.raises(ValueError, match="reader_hd_cli_source_mismatch"):
+            run_canonical_json_gate._validate_target(target, payloads[name])
+
+
+def test_frozen_audit_reader_pair_rejects_coherent_rewrite(tmp_path, monkeypatch):
+    source_root = run_canonical_json_gate.ROOT
+    artifact_dir = tmp_path / "artifacts" / "audit" / "cli"
+    artifact_dir.mkdir(parents=True)
+    payloads = {}
+    for name in ("showcompat_ab", "showcompat_ba"):
+        payload = json.loads(
+            (source_root / f"artifacts/audit/cli/{name}.json").read_bytes()
+        )
+        payload["eligible"] = False
+        _refresh_reader_idempotence_hash(payload)
+        payloads[name] = payload
+        (artifact_dir / f"{name}.json").write_bytes(
+            run_canonical_json_gate.sercanon(payload, sort_keys=True)
+        )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for name in ("showcompat_ab", "showcompat_ba"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == f"artifacts/audit/cli/{name}.json"
+        )
+        with pytest.raises(ValueError, match="frozen_generated_capture_mismatch"):
+            run_canonical_json_gate._validate_target(target, payloads[name])
 
 
 def test_cli_summary_rejects_open_rails_nested_evidence():

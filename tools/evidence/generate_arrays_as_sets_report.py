@@ -5,13 +5,12 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.mech.helpers import canonicalize_array  # noqa: E402
+from engine.mech.helpers import canonicalize_declared_set  # noqa: E402
 from engine.runtime.determinism_env import ensure_determinism_env  # noqa: E402
 
 REPORT_PATH = ROOT / "artifacts" / "canonical" / "arrays_as_sets_report.log"
@@ -26,14 +25,10 @@ def _load_channels(path: Path) -> list[dict[str, object]]:
     return channels
 
 
-def _normalize_strings(values: Iterable[object]) -> list[str]:
-    return [str(value) for value in values]
-
-
 def _select_case(channels: list[dict[str, object]], field: str) -> tuple[dict[str, object], bool]:
     fallback_entry: dict[str, object] | None = None
-    fallback_raw: list[str] | None = None
-    fallback_normalized: list[str] | None = None
+    fallback_raw: list[object] | None = None
+    fallback_normalized: list[object] | None = None
 
     for entry in channels:
         values = entry.get(field)
@@ -42,8 +37,8 @@ def _select_case(channels: list[dict[str, object]], field: str) -> tuple[dict[st
         channel_id = entry.get("id")
         if not isinstance(channel_id, str):
             continue
-        raw = _normalize_strings(values)
-        normalized = canonicalize_array(raw)
+        raw = list(values)
+        normalized = canonicalize_declared_set(raw, identity=None)
         if normalized != raw:
             return (
                 {
@@ -82,7 +77,7 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
     lines = [
         f"case: channel_id={channel_id} field={field}",
         f"path: {path}",
-        "normalizer: engine.mech.helpers.canonicalize_array",
+        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)",
         f"raw: {json.dumps(raw, ensure_ascii=False)}",
         f"normalized: {json.dumps(normalized, ensure_ascii=False)}",
     ]
@@ -94,16 +89,15 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
 
 def build_report() -> str:
     channels = _load_channels(CHANNELS_PATH)
-    centers_case, centers_fallback = _select_case(channels, "centers")
-    domains_case, domains_fallback = _select_case(channels, "domains")
     lines = [
         "arrays-as-sets report v1",
         "surface: registry.catalog.channels_v1",
         f"source: {CHANNELS_PATH.relative_to(ROOT)}",
         "",
     ]
-    lines.extend(_render_case(centers_case, fallback=centers_fallback))
-    lines.extend(_render_case(domains_case, fallback=domains_fallback))
+    for field in ("centers", "domains", "flags", "gates"):
+        case, fallback = _select_case(channels, field)
+        lines.extend(_render_case(case, fallback=fallback))
     return "\n".join(lines).rstrip("\n") + "\n"
 
 

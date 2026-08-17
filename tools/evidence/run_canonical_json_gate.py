@@ -29,20 +29,34 @@ from tools.evidence.generate_narrative_registry_diff import (
     validate_registry_snapshot as validate_narrative_registry_snapshot,
 )
 from adapter.http_reader import create_app
-from engine.cli.main import _candidate_from_payload, _derive_uid
+from engine.cli.main import (
+    _candidate_from_payload,
+    _canonical_pair,
+    _conjunction_party_from_payload,
+    _derive_uid,
+    _load_viewer_prefs,
+    _normalize_party,
+    _party_from_normalized,
+)
 from engine.compat.categories import CATEGORIES_ORDER_V1
-from engine.compat.compute import band_for
+from engine.compat.compute import band_for, compat_public, conjunction_public
 from engine.config.registry_loader import load_registry_config
 from engine.mech.helpers import canonicalize_declared_set
 from engine.narratives.constants import BANDS
 from engine.narratives.loader import load_pack
 from engine.sampler.core import ViewerProfile, sample_and_rank
 from scripts.cut_release_manifest import cut_manifest
-from scripts.hd_cli import ADMIN_SELECTION_TRACE
+from scripts.hd_cli import (
+    ADMIN_SELECTION_TRACE,
+    DEFAULT_RELEASE_ID,
+    _public_envelope_for_release,
+)
 from tools.cli.generate_cli_conformance_artifacts import (
     CONJUNCTION_AB,
+    CONJUNCTION_BA,
     SAMPLER_CANDIDATES,
 )
+from tools.cli.generate_showcompat_artifacts import PAIR as SHOWCOMPAT_PAIR
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
 JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
@@ -151,6 +165,7 @@ TARGETS: Sequence[Target] = _GENERATED + (
             ("$.channels[*].centers", "value"),
             ("$.channels[*].domains", "value"),
             ("$.channels[*].flags", "value"),
+            ("$.channels[*].gates", "value"),
         ),
     ),
     Target(
@@ -208,6 +223,43 @@ EXPECTED_TARGET_PATHS = (
     "schemas/gates_v1.schema.json",
 )
 
+EXPECTED_TARGET_BINDINGS = (
+    ("artifacts/audit/cli/pair.json", "canonical_json.generated.pair_input.v1", None),
+    ("artifacts/audit/cli/pair_ba.json", "canonical_json.generated.pair_input.v1", None),
+    ("artifacts/audit/cli/showcompat_ab.json", "canonical_json.generated.reader_envelope.v1", None),
+    ("artifacts/audit/cli/showcompat_ba.json", "canonical_json.generated.reader_envelope.v1", None),
+    ("artifacts/cli/ab.json", "canonical_json.generated.conjunction_envelope.v1", None),
+    ("artifacts/cli/abba_sidecar.json", "canonical_json.generated.selection_trace.v1", None),
+    ("artifacts/cli/ba.json", "canonical_json.generated.conjunction_envelope.v1", None),
+    ("artifacts/cli/out.json", "canonical_json.generated.reader_envelope.v1", None),
+    ("artifacts/cli/out_ba.json", "canonical_json.generated.reader_envelope.v1", None),
+    ("artifacts/cli/reader_dump.json", "canonical_json.generated.reader_envelope.v1", None),
+    ("artifacts/cli/showcompat/args.json", "canonical_json.generated.showcompat_args.v1", None),
+    ("artifacts/cli/showcompat/stdout.json", "canonical_json.generated.showcompat_capture.v1", None),
+    ("artifacts/cli/summary.json", "canonical_json.generated.cli_conformance_summary.v1", None),
+    ("catalog/channels_v1.json", "engine.config.registry_loader.load_registry_config", "schemas/channels_v1.schema.json"),
+    ("catalog/gates_v1.json", "engine.config.registry_loader.load_registry_config", "schemas/gates_v1.schema.json"),
+    ("catalog/magic10.json", "engine.config.registry_loader.load_registry_config", None),
+    ("catalog/magic10_caps.json", "engine.config.registry_loader.load_registry_config", None),
+    ("catalog/magic10_seeds.json", "engine.config.registry_loader.load_registry_config", None),
+    ("catalog/manifest.json", "scripts.cut_release_manifest.cut_manifest(check=True)", None),
+    ("catalog/narratives/keys.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("catalog/narratives/manifest.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("catalog/narratives/palettes.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("catalog/narratives/suppression_map.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("catalog/narratives/templates.json", "tools.evidence.generate_narrative_registry_diff.validate_registry_snapshot", None),
+    ("schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+    ("schemas/gates_v1.schema.json", "jsonschema.Draft202012Validator.check_schema", None),
+)
+
+EXPECTED_SET_RULES = (
+    ("catalog/channels_v1.json", "$.channels[*].centers", "value"),
+    ("catalog/channels_v1.json", "$.channels[*].domains", "value"),
+    ("catalog/channels_v1.json", "$.channels[*].flags", "value"),
+    ("catalog/channels_v1.json", "$.channels[*].gates", "value"),
+    ("catalog/manifest.json", "$.files", "path"),
+)
+
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _EXPECTED_SCHEMA_SHA256 = {
@@ -247,6 +299,21 @@ _CONJUNCTION_COUNTERPARTS = {
 _PAIR_COUNTERPARTS = {
     "artifacts/audit/cli/pair.json": "artifacts/audit/cli/pair_ba.json",
     "artifacts/audit/cli/pair_ba.json": "artifacts/audit/cli/pair.json",
+}
+_CONJUNCTION_SOURCE_PAIRS = {
+    "artifacts/cli/ab.json": CONJUNCTION_AB,
+    "artifacts/cli/ba.json": CONJUNCTION_BA,
+}
+_HD_CLI_READER_PATHS = frozenset(("artifacts/cli/out.json", "artifacts/cli/out_ba.json"))
+# These five D1 records are frozen capture-time evidence, byte-identical to the
+# approved authoring snapshot.  Their exact digests prevent a coherent rewrite
+# of both a capture and its companion from manufacturing new historical facts.
+_FROZEN_GENERATED_SHA256 = {
+    "artifacts/audit/cli/pair.json": "aba063e58eccc267cdac192782d3e211d2c3bee2ddab82cd8f33072f799e3e4f",
+    "artifacts/audit/cli/pair_ba.json": "ad2d8222b8b66a676a0d060da46b16b8c7202d54d648db322d017ce790c70719",
+    "artifacts/audit/cli/showcompat_ab.json": "e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3",
+    "artifacts/audit/cli/showcompat_ba.json": "e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3",
+    "artifacts/cli/reader_dump.json": "1c8009b23095fb556225864f04136839ac4433b656465055379235db604fef42",
 }
 
 
@@ -339,6 +406,62 @@ def _validate_birth(value: object, *, include_tz: bool, label: str) -> None:
         _require_string(birth["tz"], f"{label}.tz")
 
 
+def _expected_showcompat_capture_bytes() -> bytes:
+    viewer_prefs = _load_viewer_prefs(None)
+    left_normalized = _normalize_party(dict(SHOWCOMPAT_PAIR["left"]), "left")
+    right_normalized = _normalize_party(dict(SHOWCOMPAT_PAIR["right"]), "right")
+    left_person, left_chart = _party_from_normalized(left_normalized)
+    right_person, right_chart = _party_from_normalized(right_normalized)
+    left_person, right_person, _left_chart, _right_chart = _canonical_pair(
+        left_person, right_person, left_chart, right_chart
+    )
+    compat = compat_public(
+        left_person,
+        right_person,
+        viewer_prefs["top_category"],
+        viewer_prefs["weights"],
+        engine_tag=_CAPTURE_IDENTITY_META["engine_tag"],
+        release_id=_CAPTURE_IDENTITY_META["release_id"],
+        invocation_tag=_CAPTURE_IDENTITY_META["invocation_tag"],
+    )
+    return sercanon(
+        {
+            "a": left_person,
+            "b": right_person,
+            "compat": compat,
+            "viewer_prefs": viewer_prefs,
+        },
+        sort_keys=True,
+    )
+
+
+def _expected_conjunction_capture_bytes(target: Target) -> bytes:
+    source = _CONJUNCTION_SOURCE_PAIRS.get(target.rel_path)
+    if source is None:
+        raise ValueError("conjunction_source_fixture_missing")
+    viewer_prefs = _load_viewer_prefs(None)
+    left = _conjunction_party_from_payload(dict(source["left"]), "left")
+    right = _conjunction_party_from_payload(dict(source["right"]), "right")
+    payload = conjunction_public(
+        left,
+        right,
+        viewer_top=viewer_prefs["top_category"],
+        viewer_weights=viewer_prefs["weights"],
+        engine_tag=_CAPTURE_IDENTITY_META["engine_tag"],
+        release_id=_CAPTURE_IDENTITY_META["release_id"],
+        invocation_tag=_CAPTURE_IDENTITY_META["invocation_tag"],
+    )
+    return sercanon(payload, sort_keys=True)
+
+
+def _validate_frozen_generated_capture(target: Target, obj: object) -> None:
+    expected_sha = _FROZEN_GENERATED_SHA256.get(target.rel_path)
+    if expected_sha is None:
+        return
+    if hashlib.sha256(sercanon(obj, sort_keys=True)).hexdigest() != expected_sha:
+        raise ValueError("frozen_generated_capture_mismatch")
+
+
 def _validate_showcompat_capture(_target: Target, obj: object) -> None:
     payload = _require_exact_keys(obj, {"a", "b", "compat", "viewer_prefs"}, "showcompat")
     for side in ("a", "b"):
@@ -356,6 +479,8 @@ def _validate_showcompat_capture(_target: Target, obj: object) -> None:
     )
     if any(type(value) is not int or not 0 <= value <= 100 for value in weights.values()):
         raise ValueError("viewer_prefs_weight_invalid")
+    if sercanon(obj, sort_keys=True) != _expected_showcompat_capture_bytes():
+        raise ValueError("showcompat_capture_source_mismatch")
 
 
 def _validate_showcompat_args(_target: Target, obj: object) -> None:
@@ -391,6 +516,8 @@ def _validate_showcompat_args(_target: Target, obj: object) -> None:
     stdin_payload = _require_exact_keys(input_record["stdin_payload"], {"left", "right"}, "showcompat_args_stdin")
     _validate_birth(stdin_payload["left"], include_tz=False, label="showcompat_args_stdin.left")
     _validate_birth(stdin_payload["right"], include_tz=False, label="showcompat_args_stdin.right")
+    if stdin_payload != SHOWCOMPAT_PAIR:
+        raise ValueError("showcompat_args_source_pair_mismatch")
     stdin_bytes = (
         json.dumps(stdin_payload, separators=(",", ":"), sort_keys=True) + "\n"
     ).encode("utf-8")
@@ -460,6 +587,10 @@ def _validate_reader_envelope(target: Target, obj: object) -> None:
     parity_path = _READER_BYTE_PARITY.get(target.rel_path)
     if parity_path and sercanon(obj, sort_keys=True) != (ROOT / parity_path).read_bytes():
         raise ValueError("reader_cli_parity_mismatch")
+    if target.rel_path in _HD_CLI_READER_PATHS and sercanon(
+        obj, sort_keys=True
+    ) != sercanon(_public_envelope_for_release(DEFAULT_RELEASE_ID), sort_keys=True):
+        raise ValueError("reader_hd_cli_source_mismatch")
 
 
 def _validate_conjunction_envelope(target: Target, obj: object) -> None:
@@ -478,6 +609,8 @@ def _validate_conjunction_envelope(target: Target, obj: object) -> None:
     counterpart = _CONJUNCTION_COUNTERPARTS[target.rel_path]
     if sercanon(obj, sort_keys=True) != sercanon(_read_bound_json(counterpart), sort_keys=True):
         raise ValueError("conjunction_counterpart_mismatch")
+    if sercanon(obj, sort_keys=True) != _expected_conjunction_capture_bytes(target):
+        raise ValueError("conjunction_source_mismatch")
 
 
 def _expected_sampler_capture() -> tuple[bytes, list[str]]:
@@ -809,6 +942,7 @@ def _validate_target(target: Target, obj: object) -> None:
         schema = json.loads((ROOT / target.schema).read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema).validate(obj)
     validator(target, obj)
+    _validate_frozen_generated_capture(target, obj)
 
     for rule_path, identity in target.set_rules:
         if not rule_path or not identity:
@@ -966,9 +1100,23 @@ def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
 
 
 def _target_inventory_is_exact(targets: Sequence[Target]) -> bool:
-    return len(targets) == len(EXPECTED_TARGET_PATHS) and tuple(
-        sorted(target.rel_path for target in targets)
-    ) == EXPECTED_TARGET_PATHS
+    target_paths = tuple(sorted(target.rel_path for target in targets))
+    target_bindings = tuple(
+        sorted((target.rel_path, target.validator, target.schema) for target in targets)
+    )
+    set_rules = tuple(
+        sorted(
+            (target.rel_path, rule_path, identity)
+            for target in targets
+            for rule_path, identity in target.set_rules
+        )
+    )
+    return (
+        len(targets) == len(EXPECTED_TARGET_PATHS)
+        and target_paths == EXPECTED_TARGET_PATHS
+        and target_bindings == EXPECTED_TARGET_BINDINGS
+        and set_rules == EXPECTED_SET_RULES
+    )
 
 
 def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:

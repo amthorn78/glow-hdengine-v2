@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from engine.mech.helpers import canonicalize_array
+from engine.mech.helpers import canonicalize_declared_set
 from tools.evidence.generate_arrays_as_sets_report import build_report, write_report
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,8 +21,8 @@ def _select_case(
     channels: list[dict[str, object]], field: str
 ) -> tuple[dict[str, object], bool]:
     fallback_entry: dict[str, object] | None = None
-    fallback_raw: list[str] | None = None
-    fallback_normalized: list[str] | None = None
+    fallback_raw: list[object] | None = None
+    fallback_normalized: list[object] | None = None
 
     for entry in channels:
         values = entry.get(field)
@@ -31,8 +31,8 @@ def _select_case(
         channel_id = entry.get("id")
         if not isinstance(channel_id, str):
             continue
-        raw = [str(value) for value in values]
-        normalized = canonicalize_array(raw)
+        raw = list(values)
+        normalized = canonicalize_declared_set(raw, identity=None)
         if normalized != raw:
             return (
                 {
@@ -64,26 +64,24 @@ def _select_case(
 
 def test_arrays_as_sets_registry_report():
     channels = _load_channels()
-    centers_case, centers_fallback = _select_case(channels, "centers")
-    domains_case, domains_fallback = _select_case(channels, "domains")
-
-    assert centers_case["normalized"] == sorted(set(centers_case["raw"]))
-    assert domains_case["normalized"] == sorted(set(domains_case["raw"]))
-
     assert REPORT_PATH.exists()
     report_text = REPORT_PATH.read_text(encoding="utf-8")
+    fallbacks: list[bool] = []
+    for field in ("centers", "domains", "flags", "gates"):
+        case, fallback = _select_case(channels, field)
+        assert case["normalized"] == canonicalize_declared_set(
+            case["raw"], identity=None
+        )
+        assert (
+            f"catalog/channels_v1.json:channels[id={case['channel_id']}].{field}"
+            in report_text
+        )
+        fallbacks.append(fallback)
 
-    centers_path = (
-        f"catalog/channels_v1.json:channels[id={centers_case['channel_id']}].centers"
-    )
-    domains_path = (
-        f"catalog/channels_v1.json:channels[id={domains_case['channel_id']}].domains"
-    )
-
-    assert centers_path in report_text
-    assert domains_path in report_text
+    gates_case, _ = _select_case(channels, "gates")
+    assert all(type(value) is int for value in gates_case["raw"])
     assert "arrays-as-sets report v1" in report_text
-    if centers_fallback or domains_fallback:
+    if any(fallbacks):
         assert "note: raw == normalized (already canonical)" in report_text
 
 

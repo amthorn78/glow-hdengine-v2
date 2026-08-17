@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -37,6 +39,10 @@ IDENTITY_PERSPECTIVES = ("personal", "shared")
 IDENTITY_SLOTS = (1, 2, 3)
 PERSONAL_DIRECTIONS = ("a_to_b", "b_to_a")
 SUPPRESSED_SHARED_CATEGORIES = frozenset(("balance", "drive"))
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+_UTC_TIMESTAMP = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+)
 
 
 class RegistryDiffError(RuntimeError):
@@ -91,6 +97,17 @@ def _require_manifest(
     manifest = _read_json(manifest_path, repo_root=repo_root)
     if not isinstance(manifest, dict):
         raise RegistryDiffError("manifest must be an object")
+    if set(manifest) != {"created_utc", "files", "pack_name"}:
+        raise RegistryDiffError("manifest fields invalid")
+    if manifest["pack_name"] != "narratives_v1":
+        raise RegistryDiffError("manifest pack_name must be narratives_v1")
+    created_utc = manifest["created_utc"]
+    if not isinstance(created_utc, str) or _UTC_TIMESTAMP.fullmatch(created_utc) is None:
+        raise RegistryDiffError("manifest created_utc invalid")
+    try:
+        dt.datetime.strptime(created_utc, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError as exc:
+        raise RegistryDiffError("manifest created_utc invalid") from exc
     files = manifest.get("files")
     if not isinstance(files, list):
         raise RegistryDiffError("manifest.files must be a list")
@@ -99,10 +116,18 @@ def _require_manifest(
     for entry in files:
         if not isinstance(entry, dict):
             raise RegistryDiffError("manifest file entry must be an object")
+        if set(entry) != {"path", "sha256", "size_bytes"}:
+            raise RegistryDiffError("manifest file entry fields invalid")
         path = entry.get("path")
         sha = entry.get("sha256")
         size = entry.get("size_bytes")
-        if not isinstance(path, str) or not isinstance(sha, str) or not isinstance(size, int):
+        if (
+            not isinstance(path, str)
+            or not isinstance(sha, str)
+            or _HEX64.fullmatch(sha) is None
+            or type(size) is not int
+            or size < 0
+        ):
             raise RegistryDiffError("manifest file entry missing path/sha256/size_bytes")
         if path in by_path:
             raise RegistryDiffError(f"duplicate manifest path: {path}")

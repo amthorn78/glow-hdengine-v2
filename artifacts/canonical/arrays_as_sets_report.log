@@ -4,14 +4,28 @@ source: catalog/channels_v1.json
 
 case: channel_id=01-08 field=centers
 path: catalog/channels_v1.json:channels[id=01-08].centers
-normalizer: engine.mech.helpers.canonicalize_array
+normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)
 raw: ["g", "throat"]
 normalized: ["g", "throat"]
 note: raw == normalized (already canonical)
 
 case: channel_id=01-08 field=domains
 path: catalog/channels_v1.json:channels[id=01-08].domains
-normalizer: engine.mech.helpers.canonicalize_array
+normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)
 raw: ["narrative"]
 normalized: ["narrative"]
+note: raw == normalized (already canonical)
+
+case: channel_id=03-60 field=flags
+path: catalog/channels_v1.json:channels[id=03-60].flags
+normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)
+raw: ["format"]
+normalized: ["format"]
+note: raw == normalized (already canonical)
+
+case: channel_id=01-08 field=gates
+path: catalog/channels_v1.json:channels[id=01-08].gates
+normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)
+raw: [1, 8]
+normalized: [1, 8]
 note: raw == normalized (already canonical)
