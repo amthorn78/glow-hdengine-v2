@@ -9,6 +9,30 @@ from pathlib import Path
 from tools.evidence import update_evidence_index
 
 
+def test_refresh_path_proof_supports_staged_missing_artifact(tmp_path, monkeypatch):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    staged = {}
+    monkeypatch.setattr(update_evidence_index, "_STAGED_BYTES", staged)
+    artifact = tmp_path / "generated" / "sentinel.sha256"
+    artifact_bytes = b"abc  generated/source.json\n"
+    staged[artifact] = artifact_bytes
+
+    update_evidence_index._refresh_path_proof(
+        artifact,
+        default_produced_at="2026-08-17T00:00:00Z",
+        check=False,
+    )
+
+    proof_path = tmp_path / "generated/sentinel.sha256.path_proof.txt"
+    assert not artifact.exists()
+    assert proof_path in staged
+    proof = update_evidence_index._load_existing_proof(proof_path)
+    assert proof["path"] == "generated/sentinel.sha256"
+    assert proof["sha256"] == hashlib.sha256(artifact_bytes).hexdigest()
+    assert proof["size_bytes"] == str(len(artifact_bytes))
+    assert proof["mtime_utc"] == "2026-08-17T00:00:00Z"
+
+
 def test_path_proof_validation_is_independent_of_clone_mtime(
     tmp_path,
     monkeypatch,

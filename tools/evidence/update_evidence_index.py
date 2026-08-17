@@ -3911,7 +3911,15 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
 def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) -> None:
     rel = path.relative_to(ROOT).as_posix()
     proof_existing = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
-    stat = path.stat()
+    # A newly rendered updater-owned companion can exist only in the staged
+    # byte model until the transaction publishes.  Use that model's stable
+    # production timestamp as its provisional stat provenance instead of
+    # requiring an on-disk inode before publication.
+    stat_mtime = (
+        path.stat().st_mtime
+        if path.exists()
+        else _parse_utc_iso8601(default_produced_at).timestamp()
+    )
     _write_path_proof(
         rel,
         sha256=_sha256_path(path),
@@ -3920,7 +3928,7 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
         produced_at=proof_existing.get("produced_at_utc"),
         default_produced_at=default_produced_at,
         check=check,
-        stat_mtime=stat.st_mtime,
+        stat_mtime=stat_mtime,
     )
 
 
