@@ -330,7 +330,19 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
         ]
         raise RegistryDiffError(f"unexpected registry identities: {','.join(extra)}")
 
-    records.sort(key=lambda row: (row["category_slug"], row["band"], row["perspective"], row["slot"], row["key"]))
+    canonical_records = sorted(
+        records,
+        key=lambda row: (
+            row["category_slug"],
+            row["band"],
+            row["perspective"],
+            row["slot"],
+            row["key"],
+        ),
+    )
+    if records != canonical_records:
+        raise RegistryDiffError("keys.json rows must match canonical identity order")
+    records = canonical_records
     summary = {
         "category_count": len(summary_by_category),
         "key_count": len(records),

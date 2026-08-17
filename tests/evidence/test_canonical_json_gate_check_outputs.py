@@ -389,6 +389,53 @@ def test_topology_loader_rejects_schema_valid_projection_defects():
         run_canonical_json_gate._validate_target(gates_target, gates)
 
 
+def test_gate_catalog_rejects_coherent_source_order_swap(tmp_path, monkeypatch):
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "catalog", tmp_path / "catalog"
+    )
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "schemas", tmp_path / "schemas"
+    )
+    gates_path = tmp_path / "catalog" / "gates_v1.json"
+    gates = json.loads(gates_path.read_bytes())
+    gates["gates"][0], gates["gates"][1] = (
+        gates["gates"][1],
+        gates["gates"][0],
+    )
+    gates_bytes = run_canonical_json_gate.sercanon(gates, sort_keys=True)
+    gates_path.write_bytes(gates_bytes)
+
+    manifest_path = tmp_path / "catalog" / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest_entry = next(
+        entry
+        for entry in manifest["files"]
+        if entry["path"] == "catalog/gates_v1.json"
+    )
+    manifest_entry["sha256"] = hashlib.sha256(gates_bytes).hexdigest()
+    manifest_entry["size"] = len(gates_bytes)
+    manifest_path.write_bytes(
+        run_canonical_json_gate.sercanon(manifest, sort_keys=True)
+    )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/gates_v1.json"
+    )
+    with pytest.raises(
+        SchemaValidationError,
+        match=r"exact 1\.\.64 source order",
+    ) as exc_info:
+        run_canonical_json_gate._validate_target(target, gates)
+    assert exc_info.value.code == "GATE_ID_ORDER_MISMATCH"
+    assert exc_info.value.details == {
+        "actual": [2, 1, *range(3, 65)],
+        "expected": list(range(1, 65)),
+    }
+
+
 def test_channel_loader_rejects_schema_valid_identity_substitution():
     target = next(
         target
@@ -766,6 +813,23 @@ def test_narrative_key_matches_its_source_identity():
     )
     payload[0]["key"] = "alignment.cool.personal.renamed"
     with pytest.raises(Exception, match="key/source identity mismatch"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_narrative_key_rows_require_canonical_identity_order():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/narratives/keys.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    payload[0], payload[1] = payload[1], payload[0]
+
+    # The gate validator writes a coherent candidate sidecar and updates the
+    # narrative manifest member before exercising the owning pack validator.
+    with pytest.raises(Exception, match="canonical identity order"):
         run_canonical_json_gate._validate_target(target, payload)
 
 

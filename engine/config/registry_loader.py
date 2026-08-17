@@ -10,6 +10,13 @@ from typing import Iterable, Mapping
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
 
 
+# PF12 — HDE Schemas & Artifacts, §2.1 owns the closed Gate domain 1..64,
+# while §4.2 preserves array order unless an owning contract declares set
+# semantics.  The Gate catalog rows are ordered source data, not a declared
+# set, so preserve the exact numeric domain order rather than normalizing it.
+FROZEN_GATE_IDS = tuple(range(1, 65))
+
+
 # PF08 — Human Design System, §Channels defines the complete 36-Channel
 # BodyGraph roster.  This is an identity set: catalog ordering is enforced by
 # the canonical JSON gate, while this loader independently refuses a
@@ -249,6 +256,7 @@ def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
     if not isinstance(gates_raw, list):
         raise SchemaValidationError("INVALID_GATES", "gates must be a list")
     gates: dict[int, Gate] = {}
+    source_gate_ids: list[int] = []
     centers: set[str] = set()
     for entry in gates_raw:
         if not isinstance(entry, dict):
@@ -259,7 +267,17 @@ def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
             raise SchemaValidationError("INVALID_GATES", "gate id must be an int")
         if gate_id in gates:
             raise DuplicateIdError("DUPLICATE_GATE", f"duplicate gate id {gate_id}")
+        source_gate_ids.append(gate_id)
         gates[gate_id] = Gate(gate=gate_id, center=center)
+    if tuple(source_gate_ids) != FROZEN_GATE_IDS:
+        raise SchemaValidationError(
+            "GATE_ID_ORDER_MISMATCH",
+            "gate catalog rows must preserve the exact 1..64 source order",
+            {
+                "actual": source_gate_ids,
+                "expected": list(FROZEN_GATE_IDS),
+            },
+        )
     center_counts = {
         center: sum(gate.center == center for gate in gates.values())
         for center in sorted(centers)
