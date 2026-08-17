@@ -116,6 +116,8 @@ def _require_manifest(
     extra = sorted(actual_paths - expected_paths)
     if extra:
         raise RegistryDiffError(f"unexpected manifest paths: {','.join(extra)}")
+    if tuple(by_path) != REQUIRED_MANIFEST_FILES:
+        raise RegistryDiffError("manifest paths must match required ASCII order")
 
     for rel in sorted(actual_paths):
         artifact_path = active_repo_root / rel

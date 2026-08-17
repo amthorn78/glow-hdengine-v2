@@ -99,6 +99,30 @@ def test_registry_diff_rejects_unexpected_manifest_rows(tmp_path, monkeypatch):
         generator._require_manifest()
 
 
+def test_registry_diff_rejects_swapped_manifest_rows_with_current_sidecar(tmp_path):
+    from tools.evidence import generate_narrative_registry_diff as generator
+
+    catalog_copy = tmp_path / "catalog" / "narratives"
+    shutil.copytree(Path("catalog/narratives"), catalog_copy)
+    manifest_path = catalog_copy / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["files"][0], manifest["files"][1] = (
+        manifest["files"][1],
+        manifest["files"][0],
+    )
+    manifest_bytes = generator._canonical_json_bytes(manifest, trailing_lf=False)
+    manifest_path.write_bytes(manifest_bytes)
+    manifest_path.with_suffix(".json.sha256").write_text(
+        hashlib.sha256(manifest_bytes).hexdigest() + "\n", encoding="utf-8"
+    )
+
+    with pytest.raises(
+        generator.RegistryDiffError,
+        match="manifest paths must match required ASCII order",
+    ):
+        generator.validate_registry_snapshot(catalog_copy, repo_root=tmp_path)
+
+
 def test_registry_diff_rejects_unknown_category_and_band():
     from tools.evidence import generate_narrative_registry_diff as generator
 

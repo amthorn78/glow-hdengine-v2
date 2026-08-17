@@ -210,6 +210,9 @@ _READER_COUNTERPARTS = {
     "artifacts/audit/cli/showcompat_ab.json": "artifacts/audit/cli/showcompat_ba.json",
     "artifacts/audit/cli/showcompat_ba.json": "artifacts/audit/cli/showcompat_ab.json",
 }
+_READER_BYTE_PARITY = {
+    "artifacts/cli/reader_dump.json": "artifacts/cli/reader_cli_parity.bytes",
+}
 _CONJUNCTION_COUNTERPARTS = {
     "artifacts/cli/ab.json": "artifacts/cli/ba.json",
     "artifacts/cli/ba.json": "artifacts/cli/ab.json",
@@ -427,6 +430,9 @@ def _validate_reader_envelope(target: Target, obj: object) -> None:
         _read_bound_json(counterpart), sort_keys=True
     ):
         raise ValueError("reader_counterpart_mismatch")
+    parity_path = _READER_BYTE_PARITY.get(target.rel_path)
+    if parity_path and sercanon(obj, sort_keys=True) != (ROOT / parity_path).read_bytes():
+        raise ValueError("reader_cli_parity_mismatch")
 
 
 def _validate_conjunction_envelope(target: Target, obj: object) -> None:

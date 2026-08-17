@@ -534,6 +534,27 @@ def test_reader_leader_identity_must_match_band():
         run_canonical_json_gate._validate_target(target, payload)
 
 
+def test_reader_dump_is_bound_to_its_capture_time_cli_parity_bytes():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "artifacts/cli/reader_dump.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    payload["eligible"] = not payload["eligible"]
+    preimage = {
+        key: value for key, value in payload.items() if key != "idempotence_hash"
+    }
+    payload["idempotence_hash"] = hashlib.sha256(
+        run_canonical_json_gate.sercanon(preimage, sort_keys=True)
+    ).hexdigest()
+
+    with pytest.raises(ValueError, match="reader_cli_parity_mismatch"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
 @pytest.mark.parametrize(
     ("categories", "message"),
     (
