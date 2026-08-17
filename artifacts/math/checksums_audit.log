@@ -1,14 +1,7 @@
 PASS adapter/http_reader.py
-PASS catalog/channels_v1.json
-PASS catalog/gates_v1.json
 PASS catalog/magic10.json
 PASS catalog/magic10_caps.json
 PASS catalog/magic10_seeds.json
-PASS catalog/narratives/keys.json
-PASS catalog/narratives/manifest.json
-PASS catalog/narratives/palettes.json
-PASS catalog/narratives/suppression_map.json
-PASS catalog/narratives/templates.json
 PASS engine/presenter/emitter.py
 PASS engine/serializer/canon.py
 PASS math/thresholds.json

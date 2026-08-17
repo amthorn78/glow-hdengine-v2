@@ -22,6 +22,7 @@ from engine.serializer.canon import sercanon
 from tools.evidence import update_evidence_index
 from adapter.http_reader import create_app
 from engine.config.registry_loader import load_manifest, load_registry_config
+from engine.mech.helpers import canonicalize_declared_set
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
 JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
@@ -45,14 +46,15 @@ _GENERATED = (
     ("cli_conjunction_pair_ba", "artifacts/audit/cli/pair_ba.json"), ("cli_conjunction_showcompat_ab", "artifacts/audit/cli/showcompat_ab.json"),
     ("cli_conjunction_showcompat_ba", "artifacts/audit/cli/showcompat_ba.json"),
 )
-TARGETS: Sequence[Target] = tuple(Target(name, path, "generated_artifact_json_contract") for name, path in _GENERATED) + (
+TARGETS: Sequence[Target] = tuple(Target(name, path, "json_object_contract") for name, path in _GENERATED) + (
     Target("catalog_manifest", "catalog/manifest.json", "engine.config.registry_loader.load_manifest", set_rules=(("$.files", "path"),)),
     Target("catalog_channels", "catalog/channels_v1.json", "jsonschema.Draft202012Validator", "schemas/channels_v1.schema.json", (("$.channels[*].centers", "value"), ("$.channels[*].domains", "value"), ("$.channels[*].flags", "value"))),
     Target("catalog_gates", "catalog/gates_v1.json", "jsonschema.Draft202012Validator", "schemas/gates_v1.schema.json"),
     Target("catalog_magic10", "catalog/magic10.json", "engine.config.registry_loader.load_registry_config"),
     Target("catalog_magic10_caps", "catalog/magic10_caps.json", "engine.config.registry_loader.load_registry_config"),
     Target("catalog_magic10_seeds", "catalog/magic10_seeds.json", "engine.config.registry_loader.load_registry_config"),
-    *(Target(f"catalog_narratives_{name}", f"catalog/narratives/{name}.json", "pf12_governed_json_contract") for name in ("keys", "manifest", "palettes", "suppression_map", "templates")),
+    Target("catalog_narratives_keys", "catalog/narratives/keys.json", "json_array_contract"),
+    *(Target(f"catalog_narratives_{name}", f"catalog/narratives/{name}.json", "json_object_contract") for name in ("manifest", "palettes", "suppression_map", "templates")),
     Target("schema_gates", "schemas/gates_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
     Target("schema_channels", "schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
 )
@@ -72,9 +74,37 @@ def _validate_target(target: Target, obj: object) -> None:
         load_manifest(ROOT)
     elif target.validator.endswith("load_registry_config"):
         load_registry_config(ROOT)
-    for path, identity in target.set_rules:
-        if not path or not identity:
+    elif target.validator == "json_object_contract":
+        if not isinstance(obj, dict):
+            raise ValueError("target_must_be_object")
+    elif target.validator == "json_array_contract":
+        if not isinstance(obj, list):
+            raise ValueError("target_must_be_array")
+    else:
+        raise ValueError(f"unimplemented_validator:{target.validator}")
+
+    for rule_path, identity in target.set_rules:
+        if not rule_path or not identity:
             raise ValueError("incomplete_set_rule")
+        if rule_path == "$.files" and isinstance(obj, dict):
+            values = obj.get("files")
+            expected = canonicalize_declared_set(values, identity=identity) if isinstance(values, list) else None
+            if values != expected:
+                raise ValueError(f"set_not_canonical:{rule_path}")
+        elif rule_path.startswith("$.channels[*].") and isinstance(obj, dict):
+            field = rule_path.rsplit(".", 1)[-1]
+            channels = obj.get("channels")
+            if not isinstance(channels, list):
+                raise ValueError("channels_set_owner_missing")
+            for index, channel in enumerate(channels):
+                values = channel.get(field) if isinstance(channel, dict) else None
+                if not isinstance(values, list):
+                    raise ValueError(f"set_array_missing:{rule_path}:{index}")
+                expected = canonicalize_declared_set(values, identity=None if identity == "value" else identity)
+                if values != expected:
+                    raise ValueError(f"set_not_canonical:{rule_path}:{index}")
+        else:
+            raise ValueError(f"unimplemented_set_rule:{rule_path}")
 
 
 @dataclass(frozen=True)

@@ -48,3 +48,19 @@ def test_topology_schemas_accept_current_catalogs_and_reject_bounded_invalid_cas
     invalid["channels"][0]["centers"] = [invalid["channels"][0]["centers"][0]] * 2
     with pytest.raises(Exception):
         run_canonical_json_gate._validate_target(target, invalid)
+
+
+def test_declared_set_rule_rejects_unique_but_non_ascii_order():
+    target = next(target for target in run_canonical_json_gate.TARGETS if target.rel_path == "catalog/channels_v1.json")
+    payload = json.loads((run_canonical_json_gate.ROOT / target.rel_path).read_text(encoding="utf-8"))
+    payload["channels"][0]["domains"] = ["talk", "action_voice"]
+    with pytest.raises(ValueError, match=r"set_not_canonical:\$\.channels\[\*\]\.domains:0"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_unimplemented_validator_and_wrong_bound_type_fail_closed():
+    target_type = run_canonical_json_gate.Target
+    with pytest.raises(ValueError, match="unimplemented_validator"):
+        run_canonical_json_gate._validate_target(target_type("bad", "bad.json", "advertised_only"), {})
+    with pytest.raises(ValueError, match="target_must_be_object"):
+        run_canonical_json_gate._validate_target(target_type("bad", "bad.json", "json_object_contract"), None)
