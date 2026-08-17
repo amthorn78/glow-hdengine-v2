@@ -87,6 +87,23 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
     return lines
 
 
+def _render_channel_roster_case(channels: list[dict[str, object]]) -> list[str]:
+    normalized = canonicalize_declared_set(channels, identity="id")
+    raw_ids = [entry.get("id") for entry in channels]
+    normalized_ids = [entry.get("id") for entry in normalized]
+    lines = [
+        "case: field=channels identity=id",
+        "path: catalog/channels_v1.json:channels",
+        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=id)",
+        f"raw identities: {json.dumps(raw_ids, ensure_ascii=False)}",
+        f"normalized identities: {json.dumps(normalized_ids, ensure_ascii=False)}",
+    ]
+    if channels == normalized:
+        lines.append("note: raw == normalized (already canonical)")
+    lines.append("")
+    return lines
+
+
 def build_report() -> str:
     channels = _load_channels(CHANNELS_PATH)
     lines = [
@@ -95,6 +112,7 @@ def build_report() -> str:
         f"source: {CHANNELS_PATH.relative_to(ROOT)}",
         "",
     ]
+    lines.extend(_render_channel_roster_case(channels))
     for field in ("centers", "domains", "flags", "gates"):
         case, fallback = _select_case(channels, field)
         lines.extend(_render_case(case, fallback=fallback))

@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import shutil
 
 import pytest
 import jsonschema
@@ -36,6 +37,30 @@ def test_stale_outputs_detects_missing_and_drift(tmp_path):
         current,
         missing,
     ]
+
+
+def test_gate_capture_timestamp_is_independent_of_intentional_release_cut(
+    tmp_path, monkeypatch
+):
+    catalog = tmp_path / "catalog"
+    catalog.mkdir()
+    (catalog / "manifest.json").write_text(
+        json.dumps(
+            {
+                "built_at_utc": "2030-01-02T03:04:05Z",
+                "files": [],
+                "root": "catalog/",
+                "version": "2.0.0",
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+
+    assert run_canonical_json_gate._generated_at() == (
+        run_canonical_json_gate.GATE_CAPTURED_AT_UTC
+    )
+    assert run_canonical_json_gate._generated_at() == "2025-12-26T00:00:00Z"
 
 
 def test_d1_inventory_is_complete_unique_sorted_and_bound():
@@ -136,6 +161,28 @@ def test_same_path_binding_erasure_and_set_rule_substitution_fail_closed():
     assert len(targets[index].set_rules) == len(original.set_rules)
     assert not run_canonical_json_gate._target_inventory_is_exact(targets)
 
+    targets[index] = run_canonical_json_gate.Target(
+        original.name,
+        original.rel_path,
+        original.validator,
+        original.schema,
+        tuple(
+            rule
+            for rule in original.set_rules
+            if rule != ("$.channels", "id")
+        ),
+    )
+    assert (
+        targets[index].rel_path,
+        targets[index].validator,
+        targets[index].schema,
+    ) == (
+        original.rel_path,
+        original.validator,
+        original.schema,
+    )
+    assert not run_canonical_json_gate._target_inventory_is_exact(targets)
+
 
 def test_topology_schemas_accept_current_catalogs_and_reject_bounded_invalid_case():
     for catalog_name in ("gates_v1", "channels_v1"):
@@ -212,6 +259,193 @@ def test_topology_loader_rejects_schema_valid_projection_defects():
     jsonschema.Draft202012Validator(gates_schema).validate(gates)
     with pytest.raises(Exception, match="duplicate gate id"):
         run_canonical_json_gate._validate_target(gates_target, gates)
+
+
+def test_channel_loader_rejects_schema_valid_identity_substitution():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/channels_v1.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    schema = json.loads(
+        (run_canonical_json_gate.ROOT / target.schema).read_bytes()
+    )
+    replacement = payload["channels"][0]
+    replacement["id"] = "01-03"
+    replacement["gates"] = [1, 3]
+    replacement["centers"] = ["g", "sacral"]
+    jsonschema.Draft202012Validator(schema).validate(payload)
+
+    with pytest.raises(
+        SchemaValidationError, match="frozen 36-Channel roster"
+    ) as exc_info:
+        run_canonical_json_gate._validate_target(target, payload)
+    assert exc_info.value.code == "CHANNEL_ID_ROSTER_MISMATCH"
+    assert exc_info.value.details == {
+        "missing": ["01-08"],
+        "unknown": ["01-03"],
+    }
+
+
+def test_topology_gate_rejects_coherent_gate_center_count_drift(
+    tmp_path, monkeypatch
+):
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "catalog", tmp_path / "catalog"
+    )
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "schemas", tmp_path / "schemas"
+    )
+    gates_path = tmp_path / "catalog/gates_v1.json"
+    channels_path = tmp_path / "catalog/channels_v1.json"
+    gates = json.loads(gates_path.read_bytes())
+    channels = json.loads(channels_path.read_bytes())
+
+    next(row for row in gates["gates"] if row["gate"] == 1)["center"] = "head"
+    next(row for row in channels["channels"] if row["id"] == "01-08")[
+        "centers"
+    ] = ["head", "throat"]
+    gates_path.write_bytes(run_canonical_json_gate.sercanon(gates, sort_keys=True))
+    channels_path.write_bytes(
+        run_canonical_json_gate.sercanon(channels, sort_keys=True)
+    )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for rel_path in ("catalog/gates_v1.json", "catalog/channels_v1.json"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == rel_path
+        )
+        payload = json.loads((tmp_path / rel_path).read_bytes())
+        with pytest.raises(
+            SchemaValidationError, match="gate center counts must match"
+        ) as exc_info:
+            run_canonical_json_gate._validate_target(target, payload)
+        assert exc_info.value.code == "GATE_CENTER_COUNTS_MISMATCH"
+        assert exc_info.value.details == {
+            "actual": {
+                "ajna": 6,
+                "ego": 4,
+                "g": 7,
+                "head": 4,
+                "root": 9,
+                "sacral": 9,
+                "solar_plexus": 7,
+                "spleen": 7,
+                "throat": 11,
+            },
+            "expected": {
+                "ajna": 6,
+                "ego": 4,
+                "g": 8,
+                "head": 3,
+                "root": 9,
+                "sacral": 9,
+                "solar_plexus": 7,
+                "spleen": 7,
+                "throat": 11,
+            },
+        }
+
+
+def test_topology_gate_rejects_coherent_same_count_gate_center_swap(
+    tmp_path, monkeypatch
+):
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "catalog", tmp_path / "catalog"
+    )
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "schemas", tmp_path / "schemas"
+    )
+    gates_path = tmp_path / "catalog/gates_v1.json"
+    channels_path = tmp_path / "catalog/channels_v1.json"
+    gates = json.loads(gates_path.read_bytes())
+    channels = json.loads(channels_path.read_bytes())
+
+    next(row for row in gates["gates"] if row["gate"] == 1)["center"] = "sacral"
+    next(row for row in gates["gates"] if row["gate"] == 3)["center"] = "g"
+    next(row for row in channels["channels"] if row["id"] == "01-08")[
+        "centers"
+    ] = ["sacral", "throat"]
+    next(row for row in channels["channels"] if row["id"] == "03-60")[
+        "centers"
+    ] = ["g", "root"]
+    gates_path.write_bytes(run_canonical_json_gate.sercanon(gates, sort_keys=True))
+    channels_path.write_bytes(
+        run_canonical_json_gate.sercanon(channels, sort_keys=True)
+    )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for rel_path in ("catalog/gates_v1.json", "catalog/channels_v1.json"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == rel_path
+        )
+        payload = json.loads((tmp_path / rel_path).read_bytes())
+        with pytest.raises(
+            SchemaValidationError, match="frozen Channel topology"
+        ) as exc_info:
+            run_canonical_json_gate._validate_target(target, payload)
+        assert exc_info.value.code == "CHANNEL_CENTER_IDENTITY_MISMATCH"
+        assert exc_info.value.details == {
+            "actual": [[1, "sacral"], [8, "throat"]],
+            "expected": [[1, "g"], [8, "throat"]],
+        }
+
+
+def test_topology_gate_rejects_coherent_within_channel_endpoint_swap(
+    tmp_path, monkeypatch
+):
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "catalog", tmp_path / "catalog"
+    )
+    shutil.copytree(
+        run_canonical_json_gate.ROOT / "schemas", tmp_path / "schemas"
+    )
+    gates_path = tmp_path / "catalog/gates_v1.json"
+    gates = json.loads(gates_path.read_bytes())
+
+    next(row for row in gates["gates"] if row["gate"] == 1)["center"] = "throat"
+    next(row for row in gates["gates"] if row["gate"] == 8)["center"] = "g"
+    gates_path.write_bytes(run_canonical_json_gate.sercanon(gates, sort_keys=True))
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    for rel_path in ("catalog/gates_v1.json", "catalog/channels_v1.json"):
+        target = next(
+            target
+            for target in run_canonical_json_gate.TARGETS
+            if target.rel_path == rel_path
+        )
+        payload = json.loads((tmp_path / rel_path).read_bytes())
+        with pytest.raises(
+            SchemaValidationError, match="frozen Channel topology"
+        ) as exc_info:
+            run_canonical_json_gate._validate_target(target, payload)
+        assert exc_info.value.code == "CHANNEL_CENTER_IDENTITY_MISMATCH"
+        assert exc_info.value.details == {
+            "actual": [[1, "throat"], [8, "g"]],
+            "expected": [[1, "g"], [8, "throat"]],
+        }
+
+
+def test_top_level_channel_set_uses_id_identity_and_ascii_order():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/channels_v1.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    payload["channels"] = list(reversed(payload["channels"]))
+
+    with pytest.raises(ValueError, match=r"set_not_canonical:\$\.channels$"):
+        run_canonical_json_gate._validate_target(target, payload)
 
 
 def test_declared_set_rule_rejects_unique_but_non_ascii_order():
@@ -696,6 +930,24 @@ def test_magic10_caps_binding_rejects_coercions_and_open_entries():
     open_entry["alignment"]["extra"] = "ungoverned"
     with pytest.raises(SchemaValidationError, match="inputs and bounds only"):
         run_canonical_json_gate._validate_target(target, open_entry)
+
+
+@pytest.mark.parametrize(("field", "value"), (("min", 1), ("max", 99)))
+def test_magic10_caps_binding_rejects_coherent_noncanonical_bounds(field, value):
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/magic10_caps.json"
+    )
+    candidate = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    candidate["alignment"]["bounds"][field] = value
+
+    with pytest.raises(
+        SchemaValidationError, match="bounds must be integers with min 0 and max 100"
+    ):
+        run_canonical_json_gate._validate_target(target, candidate)
 
 
 def test_magic10_seed_binding_rejects_coercions_formats_and_open_entries():

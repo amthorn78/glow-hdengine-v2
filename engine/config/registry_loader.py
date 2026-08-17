@@ -10,6 +10,111 @@ from typing import Iterable, Mapping
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
 
 
+# PF08 — Human Design System, §Channels defines the complete 36-Channel
+# BodyGraph roster.  This is an identity set: catalog ordering is enforced by
+# the canonical JSON gate, while this loader independently refuses a
+# schema-valid substitution of one Channel identity for another.
+FROZEN_CHANNEL_IDS = (
+    "01-08",
+    "02-14",
+    "03-60",
+    "04-63",
+    "05-15",
+    "06-59",
+    "07-31",
+    "09-52",
+    "10-20",
+    "10-34",
+    "10-57",
+    "11-56",
+    "12-22",
+    "13-33",
+    "16-48",
+    "17-62",
+    "18-58",
+    "19-49",
+    "20-34",
+    "20-57",
+    "21-45",
+    "23-43",
+    "24-61",
+    "25-51",
+    "26-44",
+    "27-50",
+    "28-38",
+    "29-46",
+    "30-41",
+    "32-54",
+    "34-57",
+    "35-36",
+    "37-40",
+    "39-55",
+    "42-53",
+    "47-64",
+)
+
+
+# PF12 — HDE Schemas & Artifacts, §2.1 owns the exact Gate counts for the
+# nine canonical center IDs.  Individual Gate-to-center assignments remain
+# single-homed in catalog/gates_v1.json; this aggregate independently refuses
+# a coherent cross-catalog reassignment that changes the governed topology.
+FROZEN_GATE_CENTER_COUNTS = {
+    "ajna": 6,
+    "ego": 4,
+    "g": 8,
+    "head": 3,
+    "root": 9,
+    "sacral": 9,
+    "solar_plexus": 7,
+    "spleen": 7,
+    "throat": 11,
+}
+
+
+# PF08 — Human Design System, §Channels lists each Channel's Gate endpoints in
+# the same order as its Center heading (for example, 8-1 under Throat-to-G).
+# Preserve that exact Gate-to-Center assignment independently of the Gate
+# catalog so a coherent reassignment cannot redefine its own expected topology.
+FROZEN_CHANNEL_ENDPOINT_CENTERS = {
+    "01-08": ((8, "throat"), (1, "g")),
+    "02-14": ((2, "g"), (14, "sacral")),
+    "03-60": ((3, "sacral"), (60, "root")),
+    "04-63": ((63, "head"), (4, "ajna")),
+    "05-15": ((15, "g"), (5, "sacral")),
+    "06-59": ((59, "sacral"), (6, "solar_plexus")),
+    "07-31": ((31, "throat"), (7, "g")),
+    "09-52": ((9, "sacral"), (52, "root")),
+    "10-20": ((20, "throat"), (10, "g")),
+    "10-34": ((10, "g"), (34, "sacral")),
+    "10-57": ((10, "g"), (57, "spleen")),
+    "11-56": ((11, "ajna"), (56, "throat")),
+    "12-22": ((12, "throat"), (22, "solar_plexus")),
+    "13-33": ((33, "throat"), (13, "g")),
+    "16-48": ((16, "throat"), (48, "spleen")),
+    "17-62": ((17, "ajna"), (62, "throat")),
+    "18-58": ((18, "spleen"), (58, "root")),
+    "19-49": ((49, "solar_plexus"), (19, "root")),
+    "20-34": ((20, "throat"), (34, "sacral")),
+    "20-57": ((20, "throat"), (57, "spleen")),
+    "21-45": ((45, "throat"), (21, "ego")),
+    "23-43": ((43, "ajna"), (23, "throat")),
+    "24-61": ((61, "head"), (24, "ajna")),
+    "25-51": ((25, "g"), (51, "ego")),
+    "26-44": ((26, "ego"), (44, "spleen")),
+    "27-50": ((50, "spleen"), (27, "sacral")),
+    "28-38": ((28, "spleen"), (38, "root")),
+    "29-46": ((46, "g"), (29, "sacral")),
+    "30-41": ((30, "solar_plexus"), (41, "root")),
+    "32-54": ((32, "spleen"), (54, "root")),
+    "34-57": ((57, "spleen"), (34, "sacral")),
+    "35-36": ((35, "throat"), (36, "solar_plexus")),
+    "37-40": ((40, "ego"), (37, "solar_plexus")),
+    "39-55": ((55, "solar_plexus"), (39, "root")),
+    "42-53": ((42, "sacral"), (53, "root")),
+    "47-64": ((64, "head"), (47, "ajna")),
+}
+
+
 # Discovery (PR3 / EPIC017): this loader owns the PF12 catalogs under catalog/ (gates_v1,
 # channels_v1, magic10*.json, manifest.json). The legacy registry_report lived at
 # artifacts/reports/registry_report.json with only category ranks; we normalize it to
@@ -137,6 +242,19 @@ def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
         if gate_id in gates:
             raise DuplicateIdError("DUPLICATE_GATE", f"duplicate gate id {gate_id}")
         gates[gate_id] = Gate(gate=gate_id, center=center)
+    center_counts = {
+        center: sum(gate.center == center for gate in gates.values())
+        for center in sorted(centers)
+    }
+    if center_counts != FROZEN_GATE_CENTER_COUNTS:
+        raise SchemaValidationError(
+            "GATE_CENTER_COUNTS_MISMATCH",
+            "gate center counts must match the frozen topology",
+            {
+                "actual": center_counts,
+                "expected": dict(FROZEN_GATE_CENTER_COUNTS),
+            },
+        )
     return gates, tuple(sorted(centers))
 
 
@@ -218,6 +336,25 @@ def _load_channels(
                 "CHANNEL_CENTER_PROJECTION_MISMATCH",
                 f"channel {normalized_id} centers do not match its gate projection",
             )
+        expected_endpoints_raw = FROZEN_CHANNEL_ENDPOINT_CENTERS.get(normalized_id)
+        expected_endpoints = (
+            dict(expected_endpoints_raw) if expected_endpoints_raw is not None else None
+        )
+        actual_endpoints = {gate: gate_map[gate].center for gate in gates_tuple}
+        if expected_endpoints is not None and actual_endpoints != expected_endpoints:
+            raise SchemaValidationError(
+                "CHANNEL_CENTER_IDENTITY_MISMATCH",
+                f"channel {normalized_id} endpoints do not match the frozen Channel topology",
+                {
+                    "actual": [
+                        [gate, actual_endpoints[gate]] for gate in sorted(actual_endpoints)
+                    ],
+                    "expected": [
+                        [gate, expected_endpoints[gate]]
+                        for gate in sorted(expected_endpoints)
+                    ],
+                },
+            )
         circuit_primary = entry.get("circuit_primary")
         primary_domain = entry.get("primary_domain")
         domain_list = entry.get("domains", [])
@@ -247,6 +384,22 @@ def _load_channels(
 
     if pending_aliases and not allow_aliases:
         raise AliasPolicyError("ALIASES_FORBIDDEN", "alias entries are not allowed")
+
+    actual_channel_ids = set(channels)
+    expected_channel_ids = set(FROZEN_CHANNEL_IDS)
+    if set(FROZEN_CHANNEL_ENDPOINT_CENTERS) != expected_channel_ids:
+        raise SchemaValidationError(
+            "FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH",
+            "frozen Channel center bindings must cover the exact Channel roster",
+        )
+    if actual_channel_ids != expected_channel_ids:
+        missing = sorted(expected_channel_ids - actual_channel_ids)
+        unknown = sorted(actual_channel_ids - expected_channel_ids)
+        raise SchemaValidationError(
+            "CHANNEL_ID_ROSTER_MISMATCH",
+            "channel identities must match the frozen 36-Channel roster",
+            {"missing": missing, "unknown": unknown},
+        )
 
     ledger = dict(alias_ledger or {})
     for entry in pending_aliases:
@@ -309,10 +462,12 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         if (
             type(minimum) is not int
             or type(maximum) is not int
-            or not 0 <= minimum <= maximum <= 100
+            or minimum != 0
+            or maximum != 100
         ):
             raise SchemaValidationError(
-                "INVALID_MAGIC10", f"magic10_caps[{key}] bounds must be integers within 0..100"
+                "INVALID_MAGIC10",
+                f"magic10_caps[{key}] bounds must be integers with min 0 and max 100",
             )
         caps[key] = Magic10Caps(
             inputs=tuple(inputs), bounds={"min": minimum, "max": maximum}

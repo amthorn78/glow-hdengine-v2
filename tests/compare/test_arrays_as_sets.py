@@ -67,6 +67,15 @@ def test_arrays_as_sets_registry_report():
     assert REPORT_PATH.exists()
     report_text = REPORT_PATH.read_text(encoding="utf-8")
     fallbacks: list[bool] = []
+    normalized_channels = canonicalize_declared_set(channels, identity="id")
+    assert channels == normalized_channels
+    assert "path: catalog/channels_v1.json:channels\n" in report_text
+    assert (
+        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=id)"
+        in report_text
+    )
+    assert "raw identities: " in report_text
+    assert "normalized identities: " in report_text
     for field in ("centers", "domains", "flags", "gates"):
         case, fallback = _select_case(channels, field)
         assert case["normalized"] == canonicalize_declared_set(

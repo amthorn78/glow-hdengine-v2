@@ -2,6 +2,13 @@ arrays-as-sets report v1
 surface: registry.catalog.channels_v1
 source: catalog/channels_v1.json
 
+case: field=channels identity=id
+path: catalog/channels_v1.json:channels
+normalizer: engine.mech.helpers.canonicalize_declared_set(identity=id)
+raw identities: ["01-08", "02-14", "03-60", "04-63", "05-15", "06-59", "07-31", "09-52", "10-20", "10-34", "10-57", "11-56", "12-22", "13-33", "16-48", "17-62", "18-58", "19-49", "20-34", "20-57", "21-45", "23-43", "24-61", "25-51", "26-44", "27-50", "28-38", "29-46", "30-41", "32-54", "34-57", "35-36", "37-40", "39-55", "42-53", "47-64"]
+normalized identities: ["01-08", "02-14", "03-60", "04-63", "05-15", "06-59", "07-31", "09-52", "10-20", "10-34", "10-57", "11-56", "12-22", "13-33", "16-48", "17-62", "18-58", "19-49", "20-34", "20-57", "21-45", "23-43", "24-61", "25-51", "26-44", "27-50", "28-38", "29-46", "30-41", "32-54", "34-57", "35-36", "37-40", "39-55", "42-53", "47-64"]
+note: raw == normalized (already canonical)
+
 case: channel_id=01-08 field=centers
 path: catalog/channels_v1.json:channels[id=01-08].centers
 normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)

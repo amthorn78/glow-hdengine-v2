@@ -60,6 +60,10 @@ from tools.cli.generate_showcompat_artifacts import PAIR as SHOWCOMPAT_PAIR
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
 JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
+# Capture-time provenance belongs to this governed gate family.  It must not
+# follow catalog/manifest.json's release cut timestamp: AGENTS.md requires an
+# intentional release cut to change only that manifest.
+GATE_CAPTURED_AT_UTC = "2025-12-26T00:00:00Z"
 
 # These governed CLI captures retain their capture-time identity.  Current
 # release-bound identity is produced externally; historical source-tree evidence
@@ -162,6 +166,7 @@ TARGETS: Sequence[Target] = _GENERATED + (
         "engine.config.registry_loader.load_registry_config",
         "schemas/channels_v1.schema.json",
         (
+            ("$.channels", "id"),
             ("$.channels[*].centers", "value"),
             ("$.channels[*].domains", "value"),
             ("$.channels[*].flags", "value"),
@@ -253,6 +258,7 @@ EXPECTED_TARGET_BINDINGS = (
 )
 
 EXPECTED_SET_RULES = (
+    ("catalog/channels_v1.json", "$.channels", "id"),
     ("catalog/channels_v1.json", "$.channels[*].centers", "value"),
     ("catalog/channels_v1.json", "$.channels[*].domains", "value"),
     ("catalog/channels_v1.json", "$.channels[*].flags", "value"),
@@ -947,8 +953,9 @@ def _validate_target(target: Target, obj: object) -> None:
     for rule_path, identity in target.set_rules:
         if not rule_path or not identity:
             raise ValueError("incomplete_set_rule")
-        if rule_path == "$.files" and isinstance(obj, dict):
-            values = obj.get("files")
+        if rule_path in {"$.channels", "$.files"} and isinstance(obj, dict):
+            field = rule_path.removeprefix("$.")
+            values = obj.get(field)
             expected = canonicalize_declared_set(values, identity=identity) if isinstance(values, list) else None
             if values != expected:
                 raise ValueError(f"set_not_canonical:{rule_path}")
@@ -1053,11 +1060,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
 
 
 def _generated_at() -> str:
-    manifest = json.loads((ROOT / "catalog/manifest.json").read_text(encoding="utf-8"))
-    generated_at = manifest.get("built_at_utc")
-    if not isinstance(generated_at, str) or not generated_at.endswith("Z"):
-        raise ValueError("catalog_manifest_built_at_utc_invalid")
-    return generated_at
+    return GATE_CAPTURED_AT_UTC
 
 
 def _sha256(data: bytes) -> str:
