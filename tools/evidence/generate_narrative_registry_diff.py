@@ -35,6 +35,8 @@ REQUIRED_MANIFEST_FILES = (
 REQUIRED_KEY_FIELDS = ("band", "category", "category_slug", "key", "perspective", "slot")
 IDENTITY_PERSPECTIVES = ("personal", "shared")
 IDENTITY_SLOTS = (1, 2, 3)
+PERSONAL_DIRECTIONS = ("a_to_b", "b_to_a")
+SUPPRESSED_SHARED_CATEGORIES = frozenset(("balance", "drive"))
 
 
 class RegistryDiffError(RuntimeError):
@@ -45,17 +47,25 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _read_json(path: Path) -> Any:
+def _display_path(path: Path, *, repo_root: Path | None = None) -> str:
+    active_root = repo_root or ROOT
+    try:
+        return path.relative_to(active_root).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def _read_json(path: Path, *, repo_root: Path | None = None) -> Any:
     try:
         raw = path.read_bytes()
     except FileNotFoundError as exc:
-        raise RegistryDiffError(f"missing file: {path.relative_to(ROOT).as_posix()}") from exc
+        raise RegistryDiffError(f"missing file: {_display_path(path, repo_root=repo_root)}") from exc
     if raw.startswith(b"\xef\xbb\xbf"):
-        raise RegistryDiffError(f"BOM not allowed: {path.relative_to(ROOT).as_posix()}")
+        raise RegistryDiffError(f"BOM not allowed: {_display_path(path, repo_root=repo_root)}")
     try:
         return json.loads(raw.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise RegistryDiffError(f"invalid JSON: {path.relative_to(ROOT).as_posix()}") from exc
+        raise RegistryDiffError(f"invalid JSON: {_display_path(path, repo_root=repo_root)}") from exc
 
 
 def _canonical_json_bytes(payload: Any, *, trailing_lf: bool = True) -> bytes:
@@ -63,12 +73,22 @@ def _canonical_json_bytes(payload: Any, *, trailing_lf: bool = True) -> bytes:
     return (json.dumps(payload, separators=(",", ":"), sort_keys=True) + suffix).encode("utf-8")
 
 
-def _manifest_canonical_bytes(manifest_path: Path = MANIFEST_PATH) -> bytes:
-    return _canonical_json_bytes(_read_json(manifest_path), trailing_lf=False)
+def _manifest_canonical_bytes(
+    manifest_path: Path | None = None, *, repo_root: Path | None = None
+) -> bytes:
+    active_manifest_path = manifest_path or MANIFEST_PATH
+    return _canonical_json_bytes(
+        _read_json(active_manifest_path, repo_root=repo_root), trailing_lf=False
+    )
 
 
-def _require_manifest() -> dict[str, Any]:
-    manifest = _read_json(MANIFEST_PATH)
+def _require_manifest(
+    catalog_root: Path | None = None, *, repo_root: Path | None = None
+) -> dict[str, Any]:
+    active_catalog_root = catalog_root or CATALOG_ROOT
+    active_repo_root = repo_root or ROOT
+    manifest_path = active_catalog_root / "manifest.json"
+    manifest = _read_json(manifest_path, repo_root=repo_root)
     if not isinstance(manifest, dict):
         raise RegistryDiffError("manifest must be an object")
     files = manifest.get("files")
@@ -98,8 +118,10 @@ def _require_manifest() -> dict[str, Any]:
         raise RegistryDiffError(f"unexpected manifest paths: {','.join(extra)}")
 
     for rel in sorted(actual_paths):
-        artifact_path = ROOT / rel
-        canonical = _canonical_json_bytes(_read_json(artifact_path), trailing_lf=False)
+        artifact_path = active_repo_root / rel
+        canonical = _canonical_json_bytes(
+            _read_json(artifact_path, repo_root=repo_root), trailing_lf=False
+        )
         entry = by_path[rel]
         if _sha256(canonical) != entry["sha256"]:
             raise RegistryDiffError(f"manifest sha mismatch: {rel}")
@@ -109,12 +131,18 @@ def _require_manifest() -> dict[str, Any]:
         try:
             sidecar_sha = sidecar.read_text(encoding="utf-8").strip()
         except FileNotFoundError as exc:
-            raise RegistryDiffError(f"missing sidecar: {sidecar.relative_to(ROOT).as_posix()}") from exc
+            raise RegistryDiffError(
+                f"missing sidecar: {_display_path(sidecar, repo_root=repo_root)}"
+            ) from exc
         if sidecar_sha != entry["sha256"]:
-            raise RegistryDiffError(f"sidecar sha mismatch: {sidecar.relative_to(ROOT).as_posix()}")
+            raise RegistryDiffError(
+                f"sidecar sha mismatch: {_display_path(sidecar, repo_root=repo_root)}"
+            )
 
-    manifest_sha = _sha256(_manifest_canonical_bytes())
-    manifest_sidecar = MANIFEST_PATH.with_suffix(MANIFEST_PATH.suffix + ".sha256")
+    manifest_sha = _sha256(
+        _manifest_canonical_bytes(manifest_path, repo_root=repo_root)
+    )
+    manifest_sidecar = manifest_path.with_suffix(manifest_path.suffix + ".sha256")
     try:
         expected_manifest_sha = manifest_sidecar.read_text(encoding="utf-8").strip()
     except FileNotFoundError as exc:
@@ -122,6 +150,63 @@ def _require_manifest() -> dict[str, Any]:
     if manifest_sha != expected_manifest_sha:
         raise RegistryDiffError("manifest sidecar mismatch")
 
+    return manifest
+
+
+def validate_registry_snapshot(
+    catalog_root: Path | None = None, *, repo_root: Path | None = None
+) -> dict[str, Any]:
+    """Validate one coherent narrative snapshot without producing evidence."""
+
+    active_catalog_root = catalog_root or CATALOG_ROOT
+    manifest = _require_manifest(active_catalog_root, repo_root=repo_root)
+    identity_records, _summary = _identity_table(
+        _read_json(active_catalog_root / "keys.json", repo_root=repo_root)
+    )
+
+    key_values = {record["key"] for record in identity_records}
+    templates = _read_json(
+        active_catalog_root / "templates.json", repo_root=repo_root
+    )
+    if not isinstance(templates, dict):
+        raise RegistryDiffError("templates.json must be an object")
+    if set(templates) != key_values:
+        raise RegistryDiffError("templates.json keys must exactly match keys.json")
+    if any(not isinstance(value, str) or not value for value in templates.values()):
+        raise RegistryDiffError("template values must be nonempty strings")
+
+    palettes = _read_json(
+        active_catalog_root / "palettes.json", repo_root=repo_root
+    )
+    if palettes != {"palettes": {"default": {"style": "plain"}}}:
+        raise RegistryDiffError("palettes.json must contain the governed default palette")
+
+    suppression_map = _read_json(
+        active_catalog_root / "suppression_map.json", repo_root=repo_root
+    )
+    if not isinstance(suppression_map, dict):
+        raise RegistryDiffError("suppression_map.json must be an object")
+    expected_suppressions = {
+        record["key"]
+        for record in identity_records
+        if record["perspective"] == "personal"
+        or (
+            record["perspective"] == "shared"
+            and record["category_slug"] in SUPPRESSED_SHARED_CATEGORIES
+        )
+    }
+    if set(suppression_map) != expected_suppressions:
+        raise RegistryDiffError(
+            "suppression_map.json keys must match the governed suppression policy"
+        )
+    for key, policy in suppression_map.items():
+        if not isinstance(policy, dict) or set(policy) != {"notes", "policy_reason"}:
+            raise RegistryDiffError(f"invalid suppression policy shape: {key}")
+        if policy["policy_reason"] != "duplicate":
+            raise RegistryDiffError(f"invalid suppression policy reason: {key}")
+        notes = policy["notes"]
+        if not isinstance(notes, str) or not notes.startswith("Duplicate narrative from "):
+            raise RegistryDiffError(f"invalid suppression policy notes: {key}")
     return manifest
 
 
@@ -153,10 +238,21 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
         missing = [field for field in REQUIRED_KEY_FIELDS if field not in raw]
         if missing:
             raise RegistryDiffError(f"key record missing fields: {','.join(missing)}")
+        expected_fields = set(REQUIRED_KEY_FIELDS)
+        if raw["perspective"] == "personal":
+            expected_fields.add("directions")
+        if set(raw) != expected_fields:
+            raise RegistryDiffError("key record fields do not match its perspective")
+        if raw["perspective"] == "personal" and raw["directions"] != list(
+            PERSONAL_DIRECTIONS
+        ):
+            raise RegistryDiffError(
+                "personal key directions must be a_to_b then b_to_a"
+            )
         record = {field: raw[field] for field in REQUIRED_KEY_FIELDS}
         if any(not isinstance(record[field], str) for field in ("band", "category", "category_slug", "key", "perspective")):
             raise RegistryDiffError("key record string field has invalid type")
-        if not isinstance(record["slot"], int):
+        if type(record["slot"]) is not int:
             raise RegistryDiffError("key record slot has invalid type")
         if record["category_slug"] not in allowed_categories:
             raise RegistryDiffError(f"unknown category_slug: {record['category_slug']}")
@@ -168,6 +264,18 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
             raise RegistryDiffError(f"unknown perspective: {record['perspective']}")
         if record["slot"] not in IDENTITY_SLOTS:
             raise RegistryDiffError(f"unknown slot: {record['slot']}")
+        expected_key = ".".join(
+            (
+                record["category_slug"],
+                record["band"].lower(),
+                record["perspective"],
+                str(record["slot"]),
+            )
+        )
+        if record["key"] != expected_key:
+            raise RegistryDiffError(
+                f"key/source identity mismatch: {record['key']}"
+            )
         tuple_key = (record["category_slug"], record["band"], record["perspective"], record["slot"])
         if tuple_key in tuples:
             raise RegistryDiffError("duplicate category/band/perspective/slot tuple")
@@ -207,7 +315,7 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
 
 
 def build_artifacts() -> tuple[dict[str, Any], str]:
-    manifest = _require_manifest()
+    manifest = validate_registry_snapshot()
     _identity_records, registry_summary = _identity_table(_read_json(KEYS_PATH))
     manifest_bytes_a = _manifest_canonical_bytes()
     manifest_bytes_b = _manifest_canonical_bytes()

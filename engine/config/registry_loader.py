@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Mapping
 
@@ -206,6 +207,17 @@ def _load_channels(
         for c in centers_tuple:
             if c not in known_centers:
                 raise UnknownIdError("UNKNOWN_CENTER", f"channel {normalized_id} references unknown center {c}")
+        projected_centers = {gate_map[g].center for g in gates_tuple}
+        if len(projected_centers) != 2:
+            raise SchemaValidationError(
+                "DUPLICATE_CHANNEL_CENTER",
+                f"channel {normalized_id} gate projection must contain two distinct centers",
+            )
+        if set(centers_tuple) != projected_centers:
+            raise SchemaValidationError(
+                "CHANNEL_CENTER_PROJECTION_MISMATCH",
+                f"channel {normalized_id} centers do not match its gate projection",
+            )
         circuit_primary = entry.get("circuit_primary")
         primary_domain = entry.get("primary_domain")
         domain_list = entry.get("domains", [])
@@ -262,7 +274,7 @@ def _load_channels(
 
 def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], dict[str, Magic10Seed]]:
     order_raw = _load_json(root / "catalog" / "magic10.json")
-    if not isinstance(order_raw, dict) or "order" not in order_raw:
+    if not isinstance(order_raw, dict) or set(order_raw) != {"order"}:
         raise SchemaValidationError("INVALID_MAGIC10", "magic10.json must contain an order array")
     order_list = order_raw.get("order")
     if not isinstance(order_list, list):
@@ -278,15 +290,33 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         raise SchemaValidationError("MAGIC10_CAPS_COVERAGE", "magic10_caps must cover full magic10 order")
     caps: dict[str, Magic10Caps] = {}
     for key, entry in caps_raw.items():
-        if not isinstance(entry, dict):
-            raise SchemaValidationError("INVALID_MAGIC10", "magic10_caps entries must be objects")
+        if not isinstance(entry, dict) or set(entry) != {"inputs", "bounds"}:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", "magic10_caps entries must contain inputs and bounds only"
+            )
         inputs = entry.get("inputs")
         bounds = entry.get("bounds")
         if not isinstance(inputs, list) or not inputs:
             raise SchemaValidationError("INVALID_MAGIC10", f"magic10_caps[{key}] inputs must be a non-empty list")
-        if not isinstance(bounds, dict) or "min" not in bounds or "max" not in bounds:
+        if any(not isinstance(value, str) or not value for value in inputs):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_caps[{key}] inputs must be non-empty strings"
+            )
+        if not isinstance(bounds, dict) or set(bounds) != {"min", "max"}:
             raise SchemaValidationError("INVALID_MAGIC10", f"magic10_caps[{key}] bounds invalid")
-        caps[key] = Magic10Caps(inputs=tuple(inputs), bounds={"min": int(bounds["min"]), "max": int(bounds["max"])})
+        minimum = bounds["min"]
+        maximum = bounds["max"]
+        if (
+            type(minimum) is not int
+            or type(maximum) is not int
+            or not 0 <= minimum <= maximum <= 100
+        ):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_caps[{key}] bounds must be integers within 0..100"
+            )
+        caps[key] = Magic10Caps(
+            inputs=tuple(inputs), bounds={"min": minimum, "max": maximum}
+        )
 
     seeds_raw = _load_json(root / "catalog" / "magic10_seeds.json")
     if not isinstance(seeds_raw, dict):
@@ -299,13 +329,35 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         if not isinstance(entry, dict):
             raise SchemaValidationError("INVALID_MAGIC10", "magic10_seeds entries must be objects")
         required = {"template_id", "seed_version", "updated_at_utc", "checksum_sha256"}
-        if not required <= entry.keys():
-            raise SchemaValidationError("INVALID_MAGIC10", f"magic10_seeds[{key}] missing required fields")
+        if set(entry) != required:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] fields invalid"
+            )
+        if any(not isinstance(entry[field], str) or not entry[field] for field in required):
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] values must be non-empty strings"
+            )
+        checksum = entry["checksum_sha256"]
+        if re.fullmatch(r"[0-9a-f]{64}", checksum) is None:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] checksum invalid"
+            )
+        timestamp = entry["updated_at_utc"]
+        if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", timestamp) is None:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] timestamp invalid"
+            )
+        try:
+            datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError as exc:
+            raise SchemaValidationError(
+                "INVALID_MAGIC10", f"magic10_seeds[{key}] timestamp invalid"
+            ) from exc
         seeds[key] = Magic10Seed(
-            template_id=str(entry["template_id"]),
-            seed_version=str(entry["seed_version"]),
-            updated_at_utc=str(entry["updated_at_utc"]),
-            checksum_sha256=str(entry["checksum_sha256"]),
+            template_id=entry["template_id"],
+            seed_version=entry["seed_version"],
+            updated_at_utc=timestamp,
+            checksum_sha256=checksum,
         )
 
     return magic_order, caps, seeds

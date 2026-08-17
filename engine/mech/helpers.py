@@ -29,7 +29,7 @@ def _first_divergence(left: Any, right: Any, path: str = "$") -> str:
 
 
 def canonicalize_declared_set(
-    seq: Sequence[Any], *, identity: str | Callable[[Any], str] | None
+    seq: Sequence[Any], *, identity: str | Callable[[Any], Any] | None
 ) -> list[Any]:
     """Deduplicate and ASCII-sort a schema/PF-declared set without changing values."""
     if identity is None:
@@ -44,19 +44,24 @@ def canonicalize_declared_set(
     else:
         identity_fn = identity
 
-    retained: dict[str, tuple[bytes, Any]] = {}
+    retained: dict[bytes, tuple[bytes, Any]] = {}
     for item in seq:
         raw_identity = identity_fn(item)
         if not isinstance(raw_identity, (str, int, float, bool)) or raw_identity is None:
             raise ValueError("set_identity_must_be_scalar")
-        key = str(raw_identity)
+        # Canonical scalar bytes preserve JSON type as well as value.  Stringifying
+        # would collapse distinct identities such as 1 and "1".
+        key = sercanon(raw_identity, sort_keys=True)
         element_bytes = sercanon(item, sort_keys=True)
         prior = retained.get(key)
         if prior is None:
             retained[key] = (element_bytes, item)
         elif prior[0] != element_bytes:
             field = _first_divergence(prior[1], item)
-            raise SetIdentityConflict(f"set_identity_conflict:{key}:first_divergent_field:{field}")
+            identity_text = key.decode("utf-8").rstrip("\n")
+            raise SetIdentityConflict(
+                f"set_identity_conflict:{identity_text}:first_divergent_field:{field}"
+            )
     return [retained[key][1] for key in sorted(retained)]
 
 

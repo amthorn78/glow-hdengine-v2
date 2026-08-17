@@ -11,6 +11,10 @@ def test_declared_object_set_deduplicates_and_sorts_without_normalizing():
     assert canonicalize_declared_set(values, identity="path") == [values[1], values[0]]
 
 
+def test_scalar_identity_preserves_json_type():
+    assert canonicalize_declared_set([1, "1", 1, "1"], identity=None) == ["1", 1]
+
+
 def test_conflicting_identity_reports_first_divergent_field():
     with pytest.raises(SetIdentityConflict, match=r"first_divergent_field:\$\.size"):
         canonicalize_declared_set([{"path": "a", "size": 1}, {"path": "a", "size": 2}], identity="path")
