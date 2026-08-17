@@ -33,7 +33,12 @@ def test_d1_inventory_is_complete_unique_sorted_and_bound():
     targets = sorted(run_canonical_json_gate.TARGETS, key=lambda target: target.rel_path)
     assert len(targets) == 26
     assert len({target.rel_path for target in targets}) == 26
-    assert [target.rel_path for target in targets] == sorted(target.rel_path for target in targets)
+    assert run_canonical_json_gate.EXPECTED_TARGET_PATHS == tuple(
+        sorted(run_canonical_json_gate.EXPECTED_TARGET_PATHS)
+    )
+    assert tuple(target.rel_path for target in targets) == (
+        run_canonical_json_gate.EXPECTED_TARGET_PATHS
+    )
     assert all(target.validator for target in targets)
     assert all(path and identity for target in targets for path, identity in target.set_rules)
     assert {target.validator for target in targets} <= set(
@@ -62,6 +67,21 @@ def test_all_26_current_target_bindings_execute(monkeypatch):
 
 def test_incomplete_target_inventory_fails_closed():
     assert run_canonical_json_gate._run_gate(run_canonical_json_gate.TARGETS[:-1], check_only=True) == 1
+
+
+def test_same_cardinality_target_substitution_fails_closed():
+    targets = list(run_canonical_json_gate.TARGETS)
+    original = targets[0]
+    targets[0] = run_canonical_json_gate.Target(
+        original.name,
+        "artifacts/cli/reader_cli_parity.bytes",
+        original.validator,
+        original.schema,
+        original.set_rules,
+    )
+
+    assert len(targets) == len(run_canonical_json_gate.EXPECTED_TARGET_PATHS)
+    assert not run_canonical_json_gate._target_inventory_is_exact(targets)
 
 
 def test_topology_schemas_accept_current_catalogs_and_reject_bounded_invalid_case():
@@ -553,6 +573,28 @@ def test_reader_dump_is_bound_to_its_capture_time_cli_parity_bytes():
 
     with pytest.raises(ValueError, match="reader_cli_parity_mismatch"):
         run_canonical_json_gate._validate_target(target, payload)
+
+
+@pytest.mark.parametrize(
+    "trace",
+    (
+        ["arbitrary"],
+        ["step3", "step2", "step1"],
+        ["step1", "step2"],
+        ["step1", "step2", "step3", "step4"],
+    ),
+)
+def test_selection_trace_is_bound_to_producer_order(trace):
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "artifacts/cli/abba_sidecar.json"
+    )
+
+    with pytest.raises(ValueError, match="selection_trace_source_mismatch"):
+        run_canonical_json_gate._validate_target(
+            target, {"selection_trace": trace}
+        )
 
 
 @pytest.mark.parametrize(

@@ -38,6 +38,7 @@ from engine.narratives.constants import BANDS
 from engine.narratives.loader import load_pack
 from engine.sampler.core import ViewerProfile, sample_and_rank
 from scripts.cut_release_manifest import cut_manifest
+from scripts.hd_cli import ADMIN_SELECTION_TRACE
 from tools.cli.generate_cli_conformance_artifacts import (
     CONJUNCTION_AB,
     SAMPLER_CANDIDATES,
@@ -178,11 +179,37 @@ TARGETS: Sequence[Target] = _GENERATED + (
     Target("schema_channels", "schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
 )
 
-EXPECTED_TARGET_PATHS = frozenset(target.rel_path for target in TARGETS)
+EXPECTED_TARGET_PATHS = (
+    "artifacts/audit/cli/pair.json",
+    "artifacts/audit/cli/pair_ba.json",
+    "artifacts/audit/cli/showcompat_ab.json",
+    "artifacts/audit/cli/showcompat_ba.json",
+    "artifacts/cli/ab.json",
+    "artifacts/cli/abba_sidecar.json",
+    "artifacts/cli/ba.json",
+    "artifacts/cli/out.json",
+    "artifacts/cli/out_ba.json",
+    "artifacts/cli/reader_dump.json",
+    "artifacts/cli/showcompat/args.json",
+    "artifacts/cli/showcompat/stdout.json",
+    "artifacts/cli/summary.json",
+    "catalog/channels_v1.json",
+    "catalog/gates_v1.json",
+    "catalog/magic10.json",
+    "catalog/magic10_caps.json",
+    "catalog/magic10_seeds.json",
+    "catalog/manifest.json",
+    "catalog/narratives/keys.json",
+    "catalog/narratives/manifest.json",
+    "catalog/narratives/palettes.json",
+    "catalog/narratives/suppression_map.json",
+    "catalog/narratives/templates.json",
+    "schemas/channels_v1.schema.json",
+    "schemas/gates_v1.schema.json",
+)
 
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
-_TRACE_TOKEN = re.compile(r"^[A-Za-z0-9_.:-]+$")
 _EXPECTED_SCHEMA_SHA256 = {
     "schemas/channels_v1.schema.json": "a663bf3ffc4d4a7d3da274da359e41c89fea17914f583c963c6f74c0288d8a42",
     "schemas/gates_v1.schema.json": "b3308ca513a1f3e4490ce6c526124675fad1fdcdb5c6abce7257af99d76ed13a",
@@ -620,10 +647,8 @@ def _validate_cli_summary(_target: Target, obj: object) -> None:
 def _validate_selection_trace(_target: Target, obj: object) -> None:
     payload = _require_exact_keys(obj, {"selection_trace"}, "selection_trace")
     trace = payload["selection_trace"]
-    if not isinstance(trace, list) or not trace:
-        raise ValueError("selection_trace_must_be_nonempty_array")
-    if any(not isinstance(value, str) or _TRACE_TOKEN.fullmatch(value) is None for value in trace):
-        raise ValueError("selection_trace_token_invalid")
+    if trace != list(ADMIN_SELECTION_TRACE):
+        raise ValueError("selection_trace_source_mismatch")
 
 
 def _validate_pair_input(target: Target, obj: object) -> None:
@@ -940,6 +965,12 @@ def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
     ]
 
 
+def _target_inventory_is_exact(targets: Sequence[Target]) -> bool:
+    return len(targets) == len(EXPECTED_TARGET_PATHS) and tuple(
+        sorted(target.rel_path for target in targets)
+    ) == EXPECTED_TARGET_PATHS
+
+
 def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     env = ensure_determinism_env(apply=True)
     generated_at = _generated_at()
@@ -948,7 +979,7 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     compare_rows: list[dict[str, object]] = []
     failures: list[str] = []
 
-    if len(targets) != len(EXPECTED_TARGET_PATHS) or {target.rel_path for target in targets} != EXPECTED_TARGET_PATHS:
+    if not _target_inventory_is_exact(targets):
         failures.append("target_inventory_incomplete_or_duplicate")
     for target in sorted(targets, key=lambda t: t.rel_path):
         rel = target.rel_path

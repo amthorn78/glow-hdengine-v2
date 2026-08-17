@@ -5,6 +5,7 @@ import sys, argparse, json, os, hashlib, math, tempfile, pathlib, re
 from engine.stable.sercanon import serialize  # canonical serializer (LF-terminated bytes)
 
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+ADMIN_SELECTION_TRACE = ("step1", "step2", "step3")
 
 def _resolve_release_id() -> str:
     # Precedence: env > artifacts file > strict 64-hex fallback
@@ -98,7 +99,7 @@ def main() -> None:
             sys.exit(3)
         sys.stderr.write(pct + "\n")
     if ns.admin_out:
-        admin_doc = {"selection_trace":["step1","step2","step3"]}
+        admin_doc = {"selection_trace": list(ADMIN_SELECTION_TRACE)}
         _atomic_write_0600(ns.admin_out, serialize(admin_doc))
 
 if __name__ == "__main__":
