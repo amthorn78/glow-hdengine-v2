@@ -200,10 +200,18 @@ def test_manifest_binding_rejects_false_integrity_and_unsafe_paths(monkeypatch):
         ("version", "1.0.1"),
         ("built_at_utc", "2025-12-27T00:00:00Z"),
     ):
-        wrong_metadata = copy.deepcopy(payload)
-        wrong_metadata[field] = value
-        with pytest.raises(ValueError, match="metadata_invalid"):
-            run_canonical_json_gate._validate_target(target, wrong_metadata)
+        intentional_cut = copy.deepcopy(payload)
+        intentional_cut[field] = value
+        run_canonical_json_gate._validate_target(target, intentional_cut)
+
+    for field, value, error in (
+        ("version", "01.0.0", "release_version_invalid"),
+        ("built_at_utc", "2025-02-30T00:00:00Z", "release_built_at_invalid"),
+    ):
+        malformed_metadata = copy.deepcopy(payload)
+        malformed_metadata[field] = value
+        with pytest.raises(ValueError, match=error):
+            run_canonical_json_gate._validate_target(target, malformed_metadata)
 
     for unsafe_path in ("../escape", "catalog\\escape.json", "a" * 257):
         unsafe = copy.deepcopy(payload)

@@ -638,12 +638,12 @@ def _validate_release_manifest_snapshot(_target: Target, obj: object) -> None:
     files = payload["files"]
     if not isinstance(files, list) or not files:
         raise ValueError("release_manifest_files_invalid")
-    if (
-        payload["root"] != "catalog/"
-        or payload["version"] != "1.0.0"
-        or payload["built_at_utc"] != "2025-12-26T00:00:00Z"
-    ):
+    if payload["root"] != "catalog/":
         raise ValueError("release_manifest_metadata_invalid")
+    version = _require_string(payload["version"], "release_manifest.version")
+    built_at_utc = _require_string(
+        payload["built_at_utc"], "release_manifest.built_at_utc"
+    )
     seen: set[str] = set()
     with tempfile.TemporaryDirectory(prefix="canonical-manifest-") as temp_name:
         temp_root = Path(temp_name)
@@ -677,8 +677,8 @@ def _validate_release_manifest_snapshot(_target: Target, obj: object) -> None:
         manifest_path.write_bytes(sercanon(payload, sort_keys=True))
         result = cut_manifest(
             manifest_path,
-            version=_require_string(payload["version"], "release_manifest.version"),
-            built_at_utc=_require_string(payload["built_at_utc"], "release_manifest.built_at_utc"),
+            version=version,
+            built_at_utc=built_at_utc,
             check=True,
         )
         if result != 0:
