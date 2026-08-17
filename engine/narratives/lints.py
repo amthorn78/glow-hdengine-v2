@@ -8,7 +8,9 @@ from typing import Iterable
 from .constants import INCLUSIVE_BANNED_TOKENS, JARGON_BANNED_TOKENS
 
 _SENTENCE_PATTERN = re.compile(r"[^.!?]+[.!?]")
-_ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ,'!.?")
+# PF17 forbids the em dash, not the ordinary ASCII hyphen used by governed
+# source copy such as "right-sized".
+_ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -,'!.?")
 
 
 def check_length(text: str) -> bool:
@@ -42,8 +44,8 @@ def check_jargon_free(text: str) -> bool:
 
 
 def check_inclusive_tone(text: str) -> bool:
-    lowered = text.lower()
-    return not any(token in lowered for token in INCLUSIVE_BANNED_TOKENS)
+    words = set(re.findall(r"[a-z]+", text.lower()))
+    return words.isdisjoint(INCLUSIVE_BANNED_TOKENS)
 
 
 def check_allowed_characters(text: str) -> bool:

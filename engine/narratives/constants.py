@@ -13,6 +13,7 @@ INCLUSIVE_BANNED_TOKENS = {
     "lame",
     "normal",
     "abnormal",
+    "blame",
 }
 JARGON_BANNED_TOKENS = {
     "synergy",

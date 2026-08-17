@@ -884,8 +884,9 @@ def _validate_narrative_snapshot(target: Target, obj: object) -> None:
         catalog_root = temp_root / "catalog" / "narratives"
         shutil.copytree(ROOT / "catalog" / "narratives", catalog_root)
         candidate = temp_root / target.rel_path
-        candidate.write_bytes(sercanon(obj, sort_keys=True))
-        candidate_sha = hashlib.sha256(_canonical_json_without_lf(obj)).hexdigest()
+        candidate_bytes = sercanon(obj, sort_keys=True)
+        candidate.write_bytes(candidate_bytes)
+        candidate_sha = hashlib.sha256(candidate_bytes).hexdigest()
         candidate.with_suffix(candidate.suffix + ".sha256").write_text(
             candidate_sha + "\n", encoding="utf-8"
         )
@@ -897,9 +898,10 @@ def _validate_narrative_snapshot(target: Target, obj: object) -> None:
             if len(matches) != 1:
                 raise ValueError("narrative_manifest_binding_missing_or_duplicate")
             matches[0]["sha256"] = candidate_sha
-            matches[0]["size_bytes"] = len(_canonical_json_without_lf(obj))
-            manifest_path.write_bytes(sercanon(manifest, sort_keys=True))
-            manifest_sha = hashlib.sha256(_canonical_json_without_lf(manifest)).hexdigest()
+            matches[0]["size_bytes"] = len(candidate_bytes)
+            manifest_bytes = sercanon(manifest, sort_keys=True)
+            manifest_path.write_bytes(manifest_bytes)
+            manifest_sha = hashlib.sha256(manifest_bytes).hexdigest()
             manifest_path.with_suffix(".json.sha256").write_text(
                 manifest_sha + "\n", encoding="utf-8"
             )

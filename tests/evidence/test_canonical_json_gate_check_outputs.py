@@ -786,8 +786,7 @@ def test_narrative_template_values_must_be_strings():
         run_canonical_json_gate._validate_target(target, payload)
 
 
-@pytest.mark.parametrize("directions", ("a_to_b", ["bogus"], None))
-def test_personal_narrative_directions_are_closed(directions):
+def test_retired_personal_narrative_encoding_is_rejected():
     target = next(
         target
         for target in run_canonical_json_gate.TARGETS
@@ -796,10 +795,27 @@ def test_personal_narrative_directions_are_closed(directions):
     payload = json.loads(
         (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
     )
-    personal = next(row for row in payload if row["perspective"] == "personal")
-    personal["directions"] = directions
-    with pytest.raises(Exception, match="personal key directions"):
+    payload[0]["perspective"] = "personal"
+    payload[0]["directions"] = ["a_to_b", "b_to_a"]
+    with pytest.raises(Exception, match="key record fields do not match PF17"):
         run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_narrative_registry_has_exact_directional_candidate_roster():
+    payload = json.loads(
+        (
+            run_canonical_json_gate.ROOT
+            / "catalog/narratives/keys.json"
+        ).read_bytes()
+    )
+
+    assert len(payload) == 360
+    assert {
+        perspective: sum(row["perspective"] == perspective for row in payload)
+        for perspective in ("a_to_b", "b_to_a", "shared")
+    } == {"a_to_b": 120, "b_to_a": 120, "shared": 120}
+    assert all(row["perspective"] != "personal" for row in payload)
+    assert all("directions" not in row for row in payload)
 
 
 def test_narrative_key_matches_its_source_identity():
@@ -811,8 +827,8 @@ def test_narrative_key_matches_its_source_identity():
     payload = json.loads(
         (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
     )
-    payload[0]["key"] = "alignment.cool.personal.renamed"
-    with pytest.raises(Exception, match="key/source identity mismatch"):
+    payload[0]["key"] = "nar.alignment.cool.a_to_b.1.renamed"
+    with pytest.raises(Exception, match="exactly preserve the PF18 directional corpus"):
         run_canonical_json_gate._validate_target(target, payload)
 
 
@@ -843,9 +859,47 @@ def test_narrative_slot_rejects_json_boolean():
         (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
     )
     payload[0]["slot"] = True
-    payload[0]["key"] = "alignment.cool.personal.True"
+    payload[0]["key"] = "nar.alignment.cool.a_to_b.True.face-01"
     with pytest.raises(Exception, match="key record slot has invalid type"):
         run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_narrative_template_copy_is_bound_to_pf18_source():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/narratives/templates.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    payload["nar.alignment.cool.b_to_a.1.face-01"] = (
+        "Around this person, you feel a forged aim. The room feels clear."
+    )
+    with pytest.raises(Exception, match="exactly preserve PF18 source copy"):
+        run_canonical_json_gate._validate_target(target, payload)
+
+
+def test_narrative_suppression_is_limited_to_pf15_invalid_source_candidates():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/narratives/suppression_map.json"
+    )
+    payload = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    assert set(payload) == {
+        "nar.balance.glow.a_to_b.2.fair-01",
+        "nar.balance.glow.shared.2.fair-01",
+    }
+    forged = copy.deepcopy(payload)
+    forged["nar.alignment.cool.a_to_b.1.face-01"] = {
+        "notes": "PF15 forbidden token: forged",
+        "policy_reason": "conflict",
+    }
+    with pytest.raises(Exception, match="PF17/PF15 candidate policy"):
+        run_canonical_json_gate._validate_target(target, forged)
 
 
 def test_jsonschema_is_an_operational_dependency():

@@ -1,5 +1,5 @@
 path: catalog/manifest.json
-size_bytes: 1983
-sha256: 0f2d759a92ad5c75ac1bad9001b7d203b231c9931e4be214feaf2a217793caca
+size_bytes: 1981
+sha256: dbf89997d358cdd524e787f8dc08a9b9b5d8ceea0a2f2db97559d3f5001513bf
 mtime_utc: 2026-07-30T17:29:00Z
 produced_at_utc: 2026-07-26T22:42:05Z

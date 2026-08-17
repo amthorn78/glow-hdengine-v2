@@ -9,21 +9,15 @@ from .state import get_pack
 
 
 def _normalize_category(value: str) -> str:
-    slug = value.strip().lower().replace(" ", "_")
-    return slug
+    return value
 
 
 def _normalize_band(value: str) -> str:
-    cleaned = value.strip()
-    for band in BANDS:
-        if cleaned.lower() == band.lower():
-            return band
-    return ""
+    return value if value in BANDS else ""
 
 
 def _normalize_perspective(value: str) -> str:
-    cleaned = value.strip().lower().replace("\\_", "_")
-    return cleaned
+    return value
 
 
 def _dedupe_sequence(values: Iterable[str]) -> tuple[str, ...]:
@@ -59,13 +53,14 @@ def route_keys(
     if normalized_perspective not in PERSPECTIVES:
         return {"personal_key": MISSING_NARRATIVE_KEY, "shared_key": MISSING_NARRATIVE_KEY}
 
-    bucket = (category_slug, normalized_band)
-    shared_record = pack.shared_primary.get(bucket)
-    personal_record = pack.personal_primary.get(bucket)
-
-    if personal_record and normalized_perspective in {"a_to_b", "b_to_a"}:
-        if normalized_perspective not in personal_record.directions:
-            personal_record = None
+    shared_record = pack.primary_by_perspective.get(
+        (category_slug, normalized_band, "shared")
+    )
+    personal_record = None
+    if normalized_perspective in {"a_to_b", "b_to_a"}:
+        personal_record = pack.primary_by_perspective.get(
+            (category_slug, normalized_band, normalized_perspective)
+        )
 
     shared_key = shared_record.key if shared_record else MISSING_NARRATIVE_KEY
     personal_key = personal_record.key if personal_record else MISSING_NARRATIVE_KEY
