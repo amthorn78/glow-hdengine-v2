@@ -1,7 +1,10 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from engine.mech.helpers import canonicalize_declared_set
+from tools.evidence import generate_arrays_as_sets_report as report_generator
 from tools.evidence.generate_arrays_as_sets_report import build_report, write_report
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -78,6 +81,7 @@ def test_arrays_as_sets_registry_report():
     assert "normalized identities: " in report_text
     for field in ("centers", "domains", "flags", "gates"):
         case, fallback = _select_case(channels, field)
+        assert case["raw"] == case["normalized"]
         assert case["normalized"] == canonicalize_declared_set(
             case["raw"], identity=None
         )
@@ -94,8 +98,109 @@ def test_arrays_as_sets_registry_report():
         assert "note: raw == normalized (already canonical)" in report_text
 
 
+def test_report_render_helpers_intrinsically_reject_noncanonical_sets():
+    channels = _load_channels()
+    nested = json.loads(json.dumps(channels))
+    nested[0]["centers"] = list(reversed(nested[0]["centers"]))
+    with pytest.raises(
+        SystemExit,
+        match=r"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:\$\.channels\[0\]\.centers$",
+    ):
+        report_generator._select_case(nested, "centers")
+
+    top_level = list(reversed(channels))
+    with pytest.raises(
+        SystemExit,
+        match=r"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:\$\.channels$",
+    ):
+        report_generator._render_channel_roster_case(top_level)
+
+
 def test_report_is_deterministic_and_check_mode_is_nonwriting():
     assert build_report().encode("utf-8") == REPORT_PATH.read_bytes()
     before = REPORT_PATH.stat().st_mtime_ns
     assert write_report(check=True) == REPORT_PATH
     assert REPORT_PATH.stat().st_mtime_ns == before
+
+
+def _write_channels(path: Path, payload: dict[str, object]) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_build_report_rejects_noncanonical_top_level_channel_set(
+    tmp_path, monkeypatch
+):
+    payload = json.loads(CHANNELS_PATH.read_text(encoding="utf-8"))
+    payload["channels"] = list(reversed(payload["channels"]))
+    source = tmp_path / "channels_v1.json"
+    _write_channels(source, payload)
+    monkeypatch.setattr(report_generator, "CHANNELS_PATH", source)
+
+    with pytest.raises(
+        SystemExit,
+        match=r"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:\$\.channels$",
+    ):
+        build_report()
+
+
+@pytest.mark.parametrize("field", ("centers", "domains", "flags", "gates"))
+def test_build_report_rejects_every_noncanonical_nested_channel_set(
+    tmp_path, monkeypatch, field
+):
+    payload = json.loads(CHANNELS_PATH.read_text(encoding="utf-8"))
+    channels = payload["channels"]
+    if field == "flags":
+        index = next(i for i, row in enumerate(channels) if row[field])
+        channels[index][field] = channels[index][field] * 2
+    else:
+        index = next(i for i, row in enumerate(channels) if len(row[field]) > 1)
+        channels[index][field] = list(reversed(channels[index][field]))
+    source = tmp_path / "channels_v1.json"
+    _write_channels(source, payload)
+    monkeypatch.setattr(report_generator, "CHANNELS_PATH", source)
+
+    with pytest.raises(
+        SystemExit,
+        match=rf"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:\$\.channels\[{index}\]\.{field}$",
+    ):
+        build_report()
+
+
+def test_write_report_rejects_noncanonical_source_without_overwriting(
+    tmp_path, monkeypatch
+):
+    payload = json.loads(CHANNELS_PATH.read_text(encoding="utf-8"))
+    payload["channels"][0]["gates"] = list(
+        reversed(payload["channels"][0]["gates"])
+    )
+    source = tmp_path / "channels_v1.json"
+    output = tmp_path / "arrays_as_sets_report.log"
+    _write_channels(source, payload)
+    output.write_bytes(b"preserve-me\n")
+    monkeypatch.setattr(report_generator, "CHANNELS_PATH", source)
+    monkeypatch.setattr(report_generator, "REPORT_PATH", output)
+
+    with pytest.raises(SystemExit, match="ARRAYS_AS_SETS_SOURCE_NONCANONICAL"):
+        write_report()
+    assert output.read_bytes() == b"preserve-me\n"
+
+
+def test_check_mode_rejects_noncanonical_source_before_staleness(
+    tmp_path, monkeypatch
+):
+    payload = json.loads(CHANNELS_PATH.read_text(encoding="utf-8"))
+    payload["channels"][0]["centers"] = list(
+        reversed(payload["channels"][0]["centers"])
+    )
+    source = tmp_path / "channels_v1.json"
+    output = tmp_path / "arrays_as_sets_report.log"
+    _write_channels(source, payload)
+    output.write_bytes(REPORT_PATH.read_bytes())
+    before = output.stat().st_mtime_ns
+    monkeypatch.setattr(report_generator, "CHANNELS_PATH", source)
+    monkeypatch.setattr(report_generator, "REPORT_PATH", output)
+
+    with pytest.raises(SystemExit, match="ARRAYS_AS_SETS_SOURCE_NONCANONICAL"):
+        write_report(check=True)
+    assert output.read_bytes() == REPORT_PATH.read_bytes()
+    assert output.stat().st_mtime_ns == before
