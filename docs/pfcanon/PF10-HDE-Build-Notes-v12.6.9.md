@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.6.7  
+**Version:** v12.6.9  
 Effective Date: 2026.08.16  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -187,7 +187,11 @@ TEMPLATE Addendum Entry (do not edit/remove)
 
 2.2. Require materiality for approval blockers
 
-2.3. Keep CI for product protection, not closeout evidence
+2.3. Keep CI tied to continuing product and delivery risk, not epic administration
+
+2.4. Consolidate autonomous-agent PR pushes before triggering CI
+
+2.5. Require budget-efficient CI remediation in HDE-EPIC039
 
 # 2\) Numbered Addenda
 
@@ -512,5 +516,278 @@ Industry source basis:
 * [Google SRE — Eliminating Toil](https://sre.google/sre-book/eliminating-toil/) and [Release Engineering](https://sre.google/sre-book/release-engineering/) support automation that reduces repetitive work and improves release consistency, while reinforcing that automation should create enduring engineering value rather than recurring administrative burden.
 
 These sources support a continuing-risk and lane-placement standard. They do not support permanent epic-closeout machinery in ordinary required CI, and they do not support deleting legitimate build, security, release, or operational controls merely because those controls produce evidence.
+
+## **2.4. Consolidate autonomous-agent PR pushes before triggering CI**
+
+Timestamp: 081726 15:25  
+Details:
+
+Decision summary:
+
+An update to the head branch of an open pull request is a cost-bearing external action when it starts hosted CI. Autonomous agents must therefore treat remote push frequency as a material engineering constraint, not as an incidental implementation detail.
+
+Agents must continue using local commits, targeted tests, full applicable local validation, diff inspection, and iterative debugging as needed. They must consolidate that work into coherent remote updates. They must not use the open pull request branch as a scratchpad, push each small edit separately, or repeatedly invoke the full hosted CI suite for conditions that can be checked locally.
+
+This rule does not weaken required CI. The final candidate head must still receive every required current check, and correctness, security, and truthful validation remain controlling.
+
+Scope:
+
+This addendum governs autonomous or semi-autonomous agents that create, update, repair, review, or take over an open pull request. It applies to:
+
+* local commits later pushed to the pull request branch;  
+* repository-hosted commits, tree writes, file updates, and branch-reference updates that change the pull request head;  
+* responses to CI failures, code-review findings, requested changes, and merge-readiness checks;  
+* implementation prompts, remediation prompts, PR-takeover prompts, and agent operating instructions; and  
+* CI workflow design insofar as duplicate or superseded runs create avoidable cost.
+
+It does not authorize a workflow change, branch-protection change, skipped required check, merge, or release. Those actions remain subject to their existing authority and implementation lanes.
+
+Definitions:
+
+1. **Local commit** means a commit created without updating the remote pull request branch. A local commit does not trigger hosted CI and is not restricted by this addendum.  
+2. **CI-triggering branch update** means any push, repository-hosted commit, file update, tree update, or reference update that changes the head of an open pull request and is eligible to start hosted automation.  
+3. **Feedback cycle** means the complete set of CI results, review comments, requested changes, and agent-discovered defects available for one pull request head before the next remote update.  
+4. **Coherent correction batch** means one internally consistent set of changes that addresses all then-known related findings, passes applicable local validation, and is ready to be reviewed and tested as a unit.  
+5. **Remote-only validation** means a material condition that cannot be reproduced or established with the repository, available local tooling, permitted credentials, or other non-hosted inspection available to the agent.
+
+Normative live rule:
+
+1. Remote pushes are not progress markers.  
+   An agent must not update an open pull request merely to save work remotely, display partial progress, solicit premature CI, expose an intermediate diff, or demonstrate activity. Work that is not ready for a coherent hosted validation cycle remains local.  
+2. Local iteration remains unrestricted.  
+   Agents may create, amend, reorder, or squash local commits and may run targeted validation as often as needed. This addendum limits cost-bearing remote updates, not careful development. Shared history must not be rewritten unless that operation is otherwise authorized and safe.  
+3. One feedback cycle produces at most one ordinary correction push.  
+   Before changing the pull request head, the agent must collect every accessible CI failure, unresolved review thread, requested change, and materially connected defect for the current head. The agent must address the complete known set in one coherent correction batch whenever the changes can be safely combined.  
+4. A known follow-up edit blocks an intermediate push.  
+   If the agent already knows that another edit is required for the same correction batch, it must finish that edit and its applicable local validation before pushing. It must not knowingly trigger CI on a superseded intermediate state.  
+5. Local validation precedes hosted validation.  
+   Before each ordinary push, the agent must run the smallest relevant local checks during iteration, then the complete applicable local validation available for the consolidated batch. It must inspect the final diff and repository status and resolve every known local failure. Hosted CI must not be used as the first-line debugger for a locally reproducible condition.  
+6. Remote-only validation is a bounded exception.  
+   When a material condition can be tested only in hosted CI, the agent may make a coherent diagnostic or corrective push after completing every available local check. The implementation report must identify the remote-only condition and why another non-hosted source could not establish it.  
+7. Do not serialize independent known fixes.  
+   An agent must not push one review comment, test failure, file edit, formatting repair, or closely related correction at a time when the known fixes can be implemented and validated together without increasing risk.  
+8. Do not push while the current feedback set is still forming.  
+   Unless a security, corruption, or branch-safety issue requires immediate replacement, an agent must allow the current head’s required checks and requested automated reviews to reach a useful disposition before publishing the next correction batch. If a run is already known to be superseded, the agent must avoid creating additional superseded runs and may cancel the obsolete run only when cancellation is authorized and safe.  
+9. Repository-hosted editing must be atomic at the batch level.  
+   When the agent operates through a connector or API rather than a local checkout, it must prepare the complete file set and create one branch-head update for the coherent batch. Repeated single-file commits or reference updates are prohibited when one tree and commit can safely carry the complete batch.  
+10. Skip directives are not a cost-control substitute.  
+    An agent must not add a skip-CI marker, alter a trigger, disable a workflow, remove a required check, convert a required check to non-blocking, or evade branch protection merely to avoid cost. A final candidate must not be presented as merge-ready until the required checks apply to its current exact head.  
+11. The fifth CI-triggering update is a circuit breaker, not a target.  
+    If an autonomous assignment reaches five CI-triggering branch updates after the agent begins work on the open pull request, the agent must pause before a sixth. It must report the push count, causes of repeated cycles, current CI and review state, unresolved work, validation already performed, and a consolidation plan. Further autonomous pushes require an explicit operator instruction or a task instruction that already authorizes continuation beyond this circuit breaker.  
+12. Correctness exceptions remain narrow.  
+    An immediate additional push is permitted when necessary to remove exposed credentials, active malicious content, repository corruption, or another verified urgent safety defect. The agent must still report why the exception was used.  
+13. Final-head validation remains mandatory.  
+    A green earlier commit does not validate a later head. After the final consolidated change, the agent must obtain the required validation for that exact head unless the authorized task expressly adopts another completion posture. This addendum does not create such an alternative posture.  
+14. Commit count and push count must not be conflated.  
+    Multiple local commits pushed together normally create one hosted feedback cycle. A repository-hosted commit that immediately updates the pull request head is a CI-triggering branch update even if the agent calls it a commit rather than a push.  
+15. Workflow design must avoid duplicate and superseded work when safely possible.  
+    An authorized CI design or remediation task must inspect overlapping event triggers, duplicate same-head execution, change-insensitive jobs, and superseded in-progress runs. It must preserve required-check semantics while eliminating redundant runs through the smallest safe mechanism. This requirement does not authorize an implementation agent to change CI outside its approved scope.
+
+Required push decision test:
+
+Before each update to an open pull request head, the agent must be able to answer:
+
+1. What complete, coherent change is ready for remote review or hosted validation?  
+2. Have all currently accessible CI failures, review findings, and materially connected defects for the current head been collected?  
+3. Have all known fixes that can be safely combined been included?  
+4. Have the smallest relevant iterative checks and the complete applicable local validation passed?  
+5. Has the final diff and repository status been inspected?  
+6. Is any additional edit already known to be imminent for the same batch?  
+7. Is hosted CI necessary now, or can more useful work be completed locally first?  
+8. Will this update duplicate a run for the same effective candidate or knowingly supersede an in-progress run?  
+9. How many CI-triggering branch updates has this autonomous assignment already made?  
+10. Will every required check still run against the final exact head before merge readiness is claimed?
+
+Decision rules:
+
+* If the batch is incomplete, a known same-batch edit remains, or an available local validation is failing, do not push.  
+* If several then-known findings can be corrected together safely, consolidate them and push once.  
+* If only hosted CI can establish a material condition, a bounded remote-validation push is permitted after all available local work is complete.  
+* If the update would be the sixth CI-triggering branch update in the autonomous assignment, pause and return the required cost-risk and consolidation report unless continued pushing is already explicitly authorized.  
+* If the candidate is final, push the consolidated candidate and require the current exact head to complete every applicable required check.  
+* If correctness and cost control conflict, preserve correctness, disclose the additional run, and use the narrowest safe update.
+
+Plan, prompt, and review effect:
+
+Implementation and PR-takeover prompts must direct agents to batch remote updates, validate locally before pushing, gather the complete current feedback set, and honor the five-update circuit breaker. A generic instruction to “work the PR until green” or “continue until approval” does not authorize unlimited CI-triggering pushes and does not override this addendum.
+
+Plans and reviews must treat avoidable full-suite retriggering as a material delivery-cost concern when the repository’s workflow makes each branch update expensive. Reviewers must not require one push per finding, one push per file, or one push per local checkpoint. They must permit one consolidated correction batch to resolve multiple findings.
+
+An agent’s final implementation report must state the number of CI-triggering branch updates it made and identify any remote-only validation exception or urgent safety exception used. This report is operational transparency, not a new governed evidence artifact and not an acceptance or closeout condition.
+
+Drain targets:
+
+* Epic Process Guide: autonomous pull-request update discipline, feedback-cycle batching, and the repeated-push circuit breaker.  
+* HDE-Governance: hosted-CI cost stewardship, exception authority, and required-check non-bypass.  
+* Plan Templates: implementation-prompt and PR-takeover requirements for local-first validation and consolidated remote updates.  
+* Glow QA Guide: separation of iterative local validation, remote-only validation, and exact-final-head confirmation.
+
+Supersession:
+
+None. This is new live guidance.
+
+Addendum 2.3 remains authoritative for CI purpose, lane placement, continuing-risk justification, and workflow proportionality. This addendum 2.4 governs autonomous-agent behavior that causes CI to run repeatedly and the cost discipline for remote pull-request updates. The two addenda apply together.
+
+Evidence and source basis:
+
+The Product Owner reports that autonomous agents have sometimes made forty to fifty updates while working one pull request. Each update can cause the repository’s large hosted CI suite to run again, producing substantial and nontrivial cost. The observed pattern is not a hypothetical optimization concern; it is a material operating expense caused by serial remote iteration.
+
+Current repository inspection confirms that the active CI workflow declares both `push` and `pull_request` event triggers. Consequently, an update to an open pull request branch is eligible to start the hosted workflow through the configured event paths. The active workflow is large enough that unnecessary retriggering has a material cost consequence.
+
+The required response is not to abandon CI or reduce truthful validation. It is to move ordinary debugging and iteration before the remote boundary, consolidate all then-known corrections, avoid duplicate or superseded runs, and reserve hosted CI for coherent candidates and genuinely remote-only conditions
+
+## **2.5. Require budget-efficient CI remediation in HDE-EPIC039**
+
+Timestamp: 081726 15:33  
+Details:
+
+Decision summary:
+
+HDE-EPIC039 is the required implementation home for the current CI remediation. That remediation must make hosted CI materially more budget-efficient while preserving every independently justified product, build, compatibility, security, release, deployment, and operational protection.
+
+Budget efficiency is not an optional optimization, later cleanup item, or separate future epic. It is an execution requirement and completion condition for the HDE-EPIC039 work that remediates CI.
+
+The required outcome is not simply a smaller workflow. The resulting CI must avoid duplicate, irrelevant, and knowingly superseded hosted work; apply expensive validation only where the protected risk requires it; and still produce a reliable required-check disposition for the exact candidate head that may be merged.
+
+Scope:
+
+This addendum governs the HDE-EPIC039 implementation work that inspects, classifies, removes, narrows, separates, retains, or repairs CI. It applies to:
+
+* workflow event triggers and event overlap;  
+* jobs, steps, matrices, conditions, and dependency edges;  
+* required status checks and their stable reporting behavior;  
+* setup, dependency installation, build, test, validation, artifact-transfer, and teardown work;  
+* parallel, duplicated, cancelled, skipped, and superseded runs;  
+* change-aware execution and lane placement;  
+* pull-request, default-branch, release, security, QA, audit, and closeout automation boundaries; and  
+* the HDE-EPIC039 plans, reviews, implementation prompts, validation, and completion claims governing that work.
+
+This addendum does not authorize repository writes, workflow changes, repository-setting changes, branch-protection changes, merge, release, QA execution, or OPS execution outside the approved HDE-EPIC039 implementation lane.
+
+Definitions:
+
+1. **Budget-efficient CI** performs the smallest amount of hosted work that reliably protects the current product and delivery risks assigned to each event and change surface. It does not mean cheapest at the expense of correctness.  
+2. **Duplicate execution** means two or more hosted jobs or suites validating the same effective candidate, risk, and boundary without a distinct justified consumer or failure consequence.  
+3. **Superseded execution** means hosted work running against a pull-request head that has already been replaced by a newer head and whose result can no longer establish merge readiness for the current candidate.  
+4. **Irrelevant execution** means a hosted job or step whose protected input, product surface, delivery boundary, or current consumer cannot be affected by the triggering change.  
+5. **Full required suite** means the complete hosted validation required to establish that an exact candidate head is eligible for the applicable merge boundary.  
+6. **Required-check continuity** means that every exact candidate head receives a deterministic success or failure disposition for every check required by the applicable merge rules, including when expensive internal jobs are conditionally unnecessary.
+
+Normative live rule:
+
+1. HDE-EPIC039 must complete the budget remediation.  
+   The HDE-EPIC039 CI-remediation work must implement and validate the requirements in this addendum. The work must not be declared complete while material avoidable CI cost remains in the classified scope. The requirement must not be deferred to another epic, optional follow-up, future optimization, documentation note, or repository-setting suggestion.  
+2. Establish the execution-ref cost shape before editing.  
+   At the HDE-EPIC039 execution ref, the implementer must inspect the complete active workflow graph and record, within the implementation report, the events, jobs, steps, matrices, dependencies, repeated setup, artifact transfers, and required-check conclusions that run for each material event class. This is a bounded implementation record, not a new governed artifact family.  
+3. One candidate must not receive duplicate equivalent full suites.  
+   An ordinary update to an open pull request must not start multiple equivalent full required suites for the same exact candidate head merely because event triggers overlap. If two event paths remain, each must protect a materially distinct boundary or consumer. Naming, historical configuration, or existing behavior is not sufficient justification.  
+4. Superseded pull-request runs must not continue consuming substantial resources without justification.  
+   When a newer pull-request head makes an older run incapable of establishing current merge readiness, the old run must be cancelled, short-circuited, or prevented from performing unnecessary expensive work whenever that can be done without corrupting state, losing required output, or weakening another real boundary.  
+5. Expensive work must be change-aware and event-aware.  
+   Heavy jobs and steps must run only when the triggering change or event can affect the risk they protect. Documentation-only, audit-only, evidence-only, historical-record-only, or otherwise unrelated changes must not run the full product suite unless the changed material is a real input to the protected product or delivery boundary.  
+6. Change awareness must preserve required-check continuity.  
+   The implementation must not use workflow-level filtering, skipped workflows, renamed jobs, or conditional omission in a way that leaves required checks pending, silently bypasses protection, or makes merge readiness depend on an absent status. The exact head must receive a stable required-check conclusion even when expensive internal work is not applicable.  
+7. Required PR CI must be separated from other lanes.  
+   Release-only, security-only, deep QA, audit capture, and epic-closeout work must not run on every ordinary pull-request update unless the specific work independently protects that merge boundary. A valid control placed in the wrong event or lane must be moved, narrowed, or separated rather than retained as ordinary full-suite burden.  
+8. Repeated setup and validation must be justified.  
+   The implementer must inspect repeated dependency installation, repeated repository checkout, repeated environment construction, duplicated test collection, repeated generated-file validation, matrix fan-out, artifact upload and download, and repeated execution of the same validator. Redundant work must be consolidated, reused, cached, narrowed, or removed when a safe deterministic mechanism provides the same protection.  
+9. Reuse and caching must not weaken integrity.  
+   Caches, shared outputs, and reused artifacts may be introduced or retained only when their keys, provenance, invalidation conditions, trust boundary, and failure behavior preserve deterministic exact-source validation. Budget efficiency does not authorize stale, cross-trust, mutable, or unverifiable inputs.  
+10. Fast feedback and final assurance are separate needs.  
+    The remediation must preserve rapid actionable feedback for ordinary development while ensuring that the exact final candidate receives the complete validation required for merge. Expensive validation may be staged or assigned to a narrower boundary, but it must not disappear when that boundary is reached.  
+11. Hosted CI must not be the ordinary debugging loop.  
+    HDE-EPIC039 implementation prompts and agent instructions must require local-first diagnosis and validation, coherent correction batches, and the remote-push discipline established by addendum 2.4. Structural CI efficiency and agent push discipline are both required; neither substitutes for the other.  
+12. Workflow success must remain truthful.  
+    A summary, aggregator, no-op, conditional, or skipped job may report success only when all applicable underlying protections for that exact head either passed or were deterministically proven not applicable. A green status must never conceal a failure, missing prerequisite, unexecuted applicable check, or ambiguous condition.  
+13. Budget verification must itself be budget-efficient.  
+    The implementer must prefer static workflow validation, local tests, existing run metadata, and the ordinary final-head CI cycle over repeated hosted experiments. It must not trigger numerous full suites merely to prove that the suite was made cheaper. A genuinely remote-only defect may justify an additional bounded cycle, with the reason recorded.  
+14. Cost improvement must be checkable without inventing a currency target.  
+    HDE-EPIC039 must demonstrate a reduced hosted execution shape through event-to-job counts, elimination of duplicate full-suite eligibility, cancellation or short-circuit behavior for superseded heads, and removal or relocation of irrelevant heavy work. An exact monetary savings claim is not required unless authoritative billing data is available.  
+15. Existing protection must survive the remediation.  
+    Budget efficiency must not remove, skip, weaken, or make flaky a check that independently protects a current material risk. When a costly check is justified, the implementer must retain it in the smallest correct lane and execution shape.  
+16. Repository settings remain a separate authority boundary.  
+    If the source remediation changes a required check name, workflow identity, or reporting surface and a repository setting must be reconciled, the implementer must identify the exact observed setting dependency and route the setting change to its authorized owner. The source change must not fabricate or assume repository-setting completion.
+
+Required HDE-EPIC039 validation matrix:
+
+The completed CI remediation must establish the expected trigger, job, and required-check behavior for each applicable row below:
+
+1. An ordinary code update to an open pull request.  
+2. A second pull-request update that supersedes an in-progress older head.  
+3. A documentation-only change.  
+4. An audit-only, evidence-only, or historical-record-only change.  
+5. A change affecting a product, build, compatibility, security, release, deployment, or operational surface.  
+6. The exact final pull-request candidate presented for merge readiness.  
+7. A default-branch update after merge.  
+8. A release, security, QA, audit, or closeout event when such a separate lane remains applicable.
+
+For each applicable row, the implementation report must state:
+
+* the event that starts evaluation;  
+* the required-check conclusion that must appear;  
+* the expensive jobs that run;  
+* the expensive jobs that do not run and the proven reason they are inapplicable;  
+* whether an older same-pull-request run is cancelled or short-circuited;  
+* whether another event path can launch an equivalent suite for the same head; and  
+* the validation proving that protection remains truthful.
+
+Acceptance conditions:
+
+HDE-EPIC039 CI remediation passes only when all of the following are true:
+
+1. One ordinary open-pull-request update cannot launch duplicate equivalent full required suites for the same exact head.  
+2. A superseded pull-request head does not continue avoidable expensive work when safe cancellation, short-circuiting, or prevention is available.  
+3. Irrelevant changes do not run unrelated heavy jobs.  
+4. Every required check reaches a deterministic conclusion for the exact current head.  
+5. The final merge candidate receives every applicable required protection.  
+6. Release, security, QA, audit, and closeout work runs only in its justified lane and boundary.  
+7. No skip directive, fail-open condition, false-green summary, missing required status, or repository-setting assumption is used to create apparent efficiency.  
+8. Repeated setup, duplicate validators, matrix expansion, and artifact transfer have each been inspected and either reduced or retained with a concrete continuing-risk justification.  
+9. The before-and-after execution shapes show a material reduction in avoidable hosted work.  
+10. The remediation introduces no tracked-source writeback, hosted-result feedback loop, false completion claim, false QA claim, false token claim, or false closeout claim.
+
+Failure conditions:
+
+The CI remediation fails when any of the following remains:
+
+* duplicate equivalent full suites for one ordinary pull-request head;  
+* avoidable expensive execution against known superseded heads;  
+* unrelated heavy jobs on changes that cannot affect their protected boundary;  
+* required checks that remain pending or disappear because of filtering or conditional execution;  
+* a final candidate that is not validated at its exact head;  
+* an efficiency claim based only on renamed jobs, hidden work, skipped protection, or unverified assumptions;  
+* a deferral of material budget remediation beyond HDE-EPIC039; or  
+* an inability to show the before-and-after event and job execution shape.
+
+Plan, prompt, review, and completion effect:
+
+Every HDE-EPIC039 plan, implementation prompt, execution review, and completion review that governs CI remediation must include this addendum as current controlling guidance.
+
+If an existing HDE-EPIC039 plan or prompt treats CI cost reduction as optional, omits duplicate-run and superseded-run behavior, lacks required-check continuity, or allows budget remediation to be deferred, it must be reconciled before the CI-remediation work is accepted.
+
+Reviewers must treat failure to implement these requirements as a material blocker to completion of the HDE-EPIC039 CI-remediation work. They must not require a particular YAML arrangement, job name, tool, cache implementation, or trigger syntax unless established by the approved implementation source or current repository reality. The implementation outcome is mandatory; the smallest safe repository-grounded design remains with the authorized HDE-EPIC039 implementation task.
+
+HDE-EPIC039 must not be declared complete on the basis of reduced CI cost alone. All other approved epic scope, validation, evidence, QA, acceptance, and closeout requirements remain separately applicable.
+
+Drain targets:
+
+* HDE-Governance: hosted-CI budget stewardship, duplicate-run prohibition, required-check continuity, and cost-aware merge protection.  
+* Epic Process Guide: assignment of structural CI remediation to an epic and the prohibition on deferring an active material cost defect.  
+* Plan Templates: required CI-budget acceptance criteria, validation matrix, and review posture for implementation plans.  
+* Glow QA Guide: exact-head assurance, remote-only validation limits, and truthful conditional-check behavior.
+
+Supersession and relationship to other addenda:
+
+This is new live guidance.
+
+Addendum 2.3 remains authoritative for the purpose, continuing-risk justification, and lane placement of CI and mechanical controls. Addendum 2.4 remains authoritative for autonomous-agent push batching and repeated-remote-update discipline.
+
+For the specific question of whether budget-efficient structural CI remediation is mandatory within HDE-EPIC039, this addendum 2.5 controls. It expands the HDE-EPIC039 remediation obligation and does not relax any protection required by addendum 2.3 or any agent discipline required by addendum 2.4.
+
+Evidence and source basis:
+
+The Product Owner has established that repeated full-suite execution on updates to active pull requests has incurred massive and nontrivial cost. Autonomous push discipline reduces unnecessary triggers, but agent behavior alone cannot correct duplicated event paths, irrelevant heavy jobs, superseded execution, repeated setup, or other structural cost in the workflow itself.
+
+The Product Owner therefore assigns structural, budget-efficient CI remediation to HDE-EPIC039 as required implementation scope. The objective is to reduce avoidable hosted consumption without losing development efficiency or weakening current product and delivery protection.
 
 \<eof\>
