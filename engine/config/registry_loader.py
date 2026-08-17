@@ -115,6 +115,24 @@ FROZEN_CHANNEL_ENDPOINT_CENTERS = {
 }
 
 
+# PF12 §2.5 makes each caps `inputs` value an array, and §4.2 preserves array
+# order unless an owning contract declares set semantics.  The current Magic-10
+# calculators consume these values as tuples in catalog order.  Freeze the exact
+# ordered input contract here without sorting or deduplicating it.
+FROZEN_MAGIC10_INPUTS = {
+    "harmony": ("rapport_delta", "resonance_strength"),
+    "heat": ("spark_intensity", "momentum_flux"),
+    "communication": ("signal_clarity", "exchange_density"),
+    "alignment": ("vector_cohesion", "axis_agreement"),
+    "comfort": ("soothe_index", "buffer_resilience"),
+    "consistency": ("pattern_integrity", "variance_stability"),
+    "expansion": ("growth_tendency", "horizon_reach"),
+    "creativity": ("novelty_factor", "expression_flow"),
+    "drive": ("willpower_current", "focus_pressure"),
+    "balance": ("equilibrium_score", "counterweight_ratio"),
+}
+
+
 # Discovery (PR3 / EPIC017): this loader owns the PF12 catalogs under catalog/ (gates_v1,
 # channels_v1, magic10*.json, manifest.json). The legacy registry_report lived at
 # artifacts/reports/registry_report.json with only category ranks; we normalize it to
@@ -435,6 +453,11 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
     magic_order = tuple(order_list)
     if magic_order != FROZEN_MAGIC10_ORDER:
         raise SchemaValidationError("MAGIC10_ORDER_MISMATCH", "magic10 order must match registry")
+    if set(FROZEN_MAGIC10_INPUTS) != set(magic_order):
+        raise SchemaValidationError(
+            "FROZEN_MAGIC10_INPUT_ROSTER_MISMATCH",
+            "frozen Magic-10 input bindings must cover the exact category roster",
+        )
 
     caps_raw = _load_json(root / "catalog" / "magic10_caps.json")
     if not isinstance(caps_raw, dict):
@@ -454,6 +477,16 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
         if any(not isinstance(value, str) or not value for value in inputs):
             raise SchemaValidationError(
                 "INVALID_MAGIC10", f"magic10_caps[{key}] inputs must be non-empty strings"
+            )
+        expected_inputs = FROZEN_MAGIC10_INPUTS[key]
+        if tuple(inputs) != expected_inputs:
+            raise SchemaValidationError(
+                "MAGIC10_INPUTS_MISMATCH",
+                f"magic10_caps[{key}] inputs must match the frozen ordered contract",
+                {
+                    "actual": list(inputs),
+                    "expected": list(expected_inputs),
+                },
             )
         if not isinstance(bounds, dict) or set(bounds) != {"min", "max"}:
             raise SchemaValidationError("INVALID_MAGIC10", f"magic10_caps[{key}] bounds invalid")

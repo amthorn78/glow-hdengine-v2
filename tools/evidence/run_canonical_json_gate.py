@@ -1067,6 +1067,35 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _target_evidence_bytes(
+    target: Target,
+    obj: object,
+    data: bytes,
+    canonical_bytes: bytes,
+) -> tuple[bytes, bytes, str | None]:
+    """Return the stable byte scope recorded for a validated target.
+
+    An intentional release cut is allowed to change only ``version`` and
+    ``built_at_utc`` in ``catalog/manifest.json``.  The gate still validates and
+    canonical-compares the complete candidate, but its checked-in evidence binds
+    only the invariant release input graph so those two metadata fields do not
+    force unrelated governed log rewrites.
+    """
+
+    if target.rel_path == "catalog/manifest.json" and isinstance(obj, dict):
+        invariant = {
+            "files": obj.get("files"),
+            "root": obj.get("root"),
+        }
+        invariant_bytes = sercanon(invariant, sort_keys=True)
+        return (
+            invariant_bytes,
+            invariant_bytes,
+            "release_manifest.root_files.v1",
+        )
+    return data, canonical_bytes, None
+
+
 def _write_if_changed(path: Path, content: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and path.read_bytes() == content:
@@ -1183,6 +1212,13 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
         if not match:
             issues.append("non_canonical_bytes")
 
+        evidence_data, evidence_canonical, evidence_scope = _target_evidence_bytes(
+            target,
+            obj,
+            data,
+            canonical_bytes,
+        )
+
         status = "pass" if not issues else "fail"
         if status == "fail":
             failures.append(rel)
@@ -1192,9 +1228,12 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 **entry_common,
                 "status": status,
                 "issues": issues,
-                "sha256": _sha256(data),
-                "canonical_sha256": _sha256(canonical_bytes) if canonical_bytes else None,
-                "size_bytes": len(data),
+                **({"evidence_scope": evidence_scope} if evidence_scope else {}),
+                "sha256": _sha256(evidence_data),
+                "canonical_sha256": (
+                    _sha256(evidence_canonical) if evidence_canonical else None
+                ),
+                "size_bytes": len(evidence_data),
                 "match": match,
                 "trailing_lf": trailing_lf,
             }
@@ -1204,9 +1243,12 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 **compare_common,
                 "status": status,
                 "match": match,
-                "original_sha256": _sha256(data),
-                "canonical_sha256": _sha256(canonical_bytes) if canonical_bytes else None,
-                "size_bytes": len(data),
+                **({"evidence_scope": evidence_scope} if evidence_scope else {}),
+                "original_sha256": _sha256(evidence_data),
+                "canonical_sha256": (
+                    _sha256(evidence_canonical) if evidence_canonical else None
+                ),
+                "size_bytes": len(evidence_data),
                 "issues": issues,
             }
         )

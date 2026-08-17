@@ -8,7 +8,12 @@ import shutil
 import pytest
 import jsonschema
 
-from engine.config.registry_loader import SchemaValidationError, _normalize_channel_id
+from engine.config.registry_loader import (
+    FROZEN_MAGIC10_INPUTS,
+    SchemaValidationError,
+    _normalize_channel_id,
+)
+from engine.magic10.calculators import CATEGORY_INPUTS
 from tools.evidence import run_canonical_json_gate
 
 
@@ -61,6 +66,129 @@ def test_gate_capture_timestamp_is_independent_of_intentional_release_cut(
         run_canonical_json_gate.GATE_CAPTURED_AT_UTC
     )
     assert run_canonical_json_gate._generated_at() == "2025-12-26T00:00:00Z"
+
+
+def test_full_gate_outputs_remain_current_after_metadata_only_release_cut(
+    tmp_path, monkeypatch
+):
+    source_root = run_canonical_json_gate.ROOT
+    for name in ("artifacts", "audit", "schemas"):
+        (tmp_path / name).symlink_to(source_root / name, target_is_directory=True)
+    for name in ("adapter", "catalog", "engine", "math", "migrations"):
+        shutil.copytree(source_root / name, tmp_path / name)
+
+    manifest_path = tmp_path / "catalog" / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["version"] = "2.0.0"
+    manifest["built_at_utc"] = "2030-01-02T03:04:05Z"
+    manifest_path.write_bytes(
+        run_canonical_json_gate.sercanon(manifest, sort_keys=True)
+    )
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        run_canonical_json_gate,
+        "CANON_DIR",
+        tmp_path / "audit" / "gates" / "canonical_json",
+    )
+    monkeypatch.setattr(
+        run_canonical_json_gate,
+        "JSON_GATE_DIR",
+        tmp_path / "audit" / "gates" / "json_gate" / "canonical",
+    )
+    assert (
+        run_canonical_json_gate._run_gate(
+            run_canonical_json_gate.TARGETS,
+            check_only=True,
+        )
+        == 0
+    )
+
+    manifest["built_at_utc"] = "2030-02-30T03:04:05Z"
+    manifest_path.write_bytes(
+        run_canonical_json_gate.sercanon(manifest, sort_keys=True)
+    )
+    assert (
+        run_canonical_json_gate._run_gate(
+            run_canonical_json_gate.TARGETS,
+            check_only=True,
+        )
+        == 1
+    )
+
+    manifest["built_at_utc"] = "2030-01-02T03:04:05Z"
+    member_path = tmp_path / "adapter" / "http_reader.py"
+    member_bytes = member_path.read_bytes() + b"# intentional release member change\n"
+    member_path.write_bytes(member_bytes)
+    member_entry = next(
+        entry
+        for entry in manifest["files"]
+        if entry["path"] == "adapter/http_reader.py"
+    )
+    member_entry["sha256"] = hashlib.sha256(member_bytes).hexdigest()
+    member_entry["size"] = len(member_bytes)
+    manifest_path.write_bytes(
+        run_canonical_json_gate.sercanon(manifest, sort_keys=True)
+    )
+    manifest_target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/manifest.json"
+    )
+    run_canonical_json_gate._validate_target(manifest_target, manifest)
+    assert (
+        run_canonical_json_gate._run_gate(
+            run_canonical_json_gate.TARGETS,
+            check_only=True,
+        )
+        == 1
+    )
+
+
+def test_manifest_evidence_projection_binds_root_and_files_not_cut_metadata():
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/manifest.json"
+    )
+    manifest_path = run_canonical_json_gate.ROOT / target.rel_path
+    manifest = json.loads(manifest_path.read_bytes())
+    canonical = run_canonical_json_gate.sercanon(manifest, sort_keys=True)
+
+    baseline = run_canonical_json_gate._target_evidence_bytes(
+        target, manifest, canonical, canonical
+    )
+    cut = copy.deepcopy(manifest)
+    cut["version"] = "2.0.0"
+    cut["built_at_utc"] = "2030-01-02T03:04:05Z"
+    cut_bytes = run_canonical_json_gate.sercanon(cut, sort_keys=True)
+    assert run_canonical_json_gate._target_evidence_bytes(
+        target, cut, cut_bytes, cut_bytes
+    ) == baseline
+
+    changed_root = copy.deepcopy(manifest)
+    changed_root["root"] = "other/"
+    changed_root_bytes = run_canonical_json_gate.sercanon(
+        changed_root, sort_keys=True
+    )
+    assert run_canonical_json_gate._target_evidence_bytes(
+        target,
+        changed_root,
+        changed_root_bytes,
+        changed_root_bytes,
+    ) != baseline
+
+    changed_files = copy.deepcopy(manifest)
+    changed_files["files"][0]["sha256"] = "0" * 64
+    changed_files_bytes = run_canonical_json_gate.sercanon(
+        changed_files, sort_keys=True
+    )
+    assert run_canonical_json_gate._target_evidence_bytes(
+        target,
+        changed_files,
+        changed_files_bytes,
+        changed_files_bytes,
+    ) != baseline
 
 
 def test_d1_inventory_is_complete_unique_sorted_and_bound():
@@ -930,6 +1058,46 @@ def test_magic10_caps_binding_rejects_coercions_and_open_entries():
     open_entry["alignment"]["extra"] = "ungoverned"
     with pytest.raises(SchemaValidationError, match="inputs and bounds only"):
         run_canonical_json_gate._validate_target(target, open_entry)
+
+
+def test_magic10_frozen_input_sentry_matches_runtime_calculators():
+    assert CATEGORY_INPUTS == FROZEN_MAGIC10_INPUTS
+
+
+@pytest.mark.parametrize(
+    ("mutation", "actual"),
+    (
+        ("substitution", ["replacement_input", "axis_agreement"]),
+        ("omission", ["vector_cohesion"]),
+        (
+            "addition",
+            ["vector_cohesion", "axis_agreement", "additional_input"],
+        ),
+        ("order", ["axis_agreement", "vector_cohesion"]),
+    ),
+)
+def test_magic10_caps_binding_rejects_coherent_ordered_input_drift(
+    mutation, actual
+):
+    target = next(
+        target
+        for target in run_canonical_json_gate.TARGETS
+        if target.rel_path == "catalog/magic10_caps.json"
+    )
+    candidate = json.loads(
+        (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
+    )
+    candidate["alignment"]["inputs"] = actual
+
+    with pytest.raises(
+        SchemaValidationError, match="inputs must match the frozen ordered contract"
+    ) as exc_info:
+        run_canonical_json_gate._validate_target(target, candidate)
+    assert exc_info.value.code == "MAGIC10_INPUTS_MISMATCH", mutation
+    assert exc_info.value.details == {
+        "actual": actual,
+        "expected": ["vector_cohesion", "axis_agreement"],
+    }
 
 
 @pytest.mark.parametrize(("field", "value"), (("min", 1), ("max", 99)))
