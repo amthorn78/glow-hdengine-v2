@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.6.9  
-Effective Date: 2026.08.16  
+**Version:** v12.7  
+Effective Date: 2026.08.17  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -192,6 +192,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.4. Consolidate autonomous-agent PR pushes before triggering CI
 
 2.5. Require budget-efficient CI remediation in HDE-EPIC039
+
+2.6 HDE-EPIC039 PR-01 Lineage
 
 # 2\) Numbered Addenda
 
@@ -789,5 +791,51 @@ Evidence and source basis:
 The Product Owner has established that repeated full-suite execution on updates to active pull requests has incurred massive and nontrivial cost. Autonomous push discipline reduces unnecessary triggers, but agent behavior alone cannot correct duplicated event paths, irrelevant heavy jobs, superseded execution, repeated setup, or other structural cost in the workflow itself.
 
 The Product Owner therefore assigns structural, budget-efficient CI remediation to HDE-EPIC039 as required implementation scope. The objective is to reduce avoidable hosted consumption without losing development efficiency or weakening current product and delivery protection.
+
+## **2.6 HDE-EPIC039 PR-01 Lineage**
+
+### **Approval record**
+
+* Repository: `amthorn78/glow-hdengine-v2`  
+* Original PR: `#387`  
+* Remedial PR: `#388`  
+* Reviewed final endpoint: `d54c005f184477ed5e5f48440f71f45b0017064c`  
+* Decision: `MERGED WORK ACCEPTABLE`  
+* At review time, `main` was identical to the final lineage endpoint and contained no later changes.
+
+### **Retained implementation decisions**
+
+1. Canonical JSON is enforced only across the exact declared target inventory. The accepted inventory contains 26 targets and requires UTF-8 without BOM, recursively ASCII-sorted object keys, compact serialization, schema-valid values, and exactly one trailing LF.  
+2. Set normalization applies only to schema-declared sets. Ordered arrays remain ordered. Declared sets deduplicate identical members, reject conflicting identities, and ASCII-sort the remaining identities. The accepted gate contains six explicit declared-set rules.  
+3. Canonical-gate coverage is machine-readable and omission-resistant. The authoritative and supplemental gate families must remain coherent and must fail closed on missing targets, binding drift, noncanonical source bytes, or invalid set declarations.  
+4. The Gate and Channel schemas now have stable `$id` values. Runtime loading enforces the exact 64-Gate and 36-Channel rosters, distinct Channel endpoints, Gate-derived center projection, exact Magic-10 structures, allowed fields, input order, value bounds, timestamps, and checksum syntax.  
+5. `catalog/manifest.json` remains the current source-identity input. Its accepted version and timestamp were preserved, and its roster now includes the narrative manifest and all four narrative members.  
+6. Narrative pack identity is derived from the exact LF-terminated bytes of `catalog/narratives/manifest.json`, not from reserialized JSON.  
+7. The Product-Owner-approved direction-native narrative migration is retained as an explicit scope amendment:  
+   * 360 registry rows and 360 templates;  
+   * 120 rows for each exact perspective: `shared`, `a_to_b`, and `b_to_a`;  
+   * exact perspective routing without silent normalization;  
+   * two governed candidate suppressions for source paragraphs containing the prohibited token `blame`.  
+8. Checked-in EPIC022 release-identity surfaces are frozen historical captures. They must not be refreshed, relabeled, rewritten, or compared with the live manifest as current-equality evidence.  
+9. Current source validation is limited to the live manifest and its declared member bytes. Current release derivatives remain external to the tracked source they attest.  
+10. Retired EPIC032 evidence producers operate as fixed-roster verifiers only, refuse source-tree writes, and remain excluded from current attestation closure.  
+11. Governed outputs remain bound through path proofs, the Human Evidence Index, the Machine Mirror, checksum sentinels, and the byte-identical HDE-EPIC039 Doc-Delta pair.
+
+### **Required canon drainage**
+
+* **PF12 §6.4:** Reconcile the section with §§6.2.1–6.2.2. Remove the frozen/current equality requirement. Define checked-in EPIC022 surfaces as frozen historical captures, current validation as manifest/member validation, and current release derivatives as external attestation outputs.  
+* **PF12 §8.1:** Replace the stale “Current-to-required gaps” posture. Record the stable schema `$id` values and the implemented exact Gate, Channel, center-projection, Magic-10, and manifest guards.  
+* **PF12 §8.2:** Replace the stale defect inventory. Record that distinct Channel endpoints and center projection are enforced; the governed catalogs are canonical; and the arrays-as-sets report is promoted and bound through the Human Index, Machine Mirror, and path proofs.  
+* **PF17 §4.2:** Update repository posture to state that the root manifest includes the narrative manifest and all four required members, and that pack identity uses the exact LF-terminated narrative-manifest bytes.  
+* **PF09.1 `HDE-CALC002.2`:** Change status from `Consolidation pending` to `Done` when the separate PF09 governance update is performed.  
+* **PF09.1 `HDE-CALC002.3`:** Change status from `Consolidation pending` to `Done` when the separate PF09 governance update is performed.
+
+These PF09 status changes were supported by the review but were not made by the PR lineage.
+
+### **CI and scope boundaries**
+
+* Hosted CI was inspected but was not acceptance authority for this lineage. The remaining failure occurred in obsolete HDE-EPIC038 administrative test bindings assigned to HDE-EPIC039 PR-04.  
+* The acceptance decision does not constitute QA execution, token satisfaction, OPS completion, deployment, epic closeout, or an already-completed PF09 status change.  
+* The accepted lineage did not change public routes, compatibility payload contracts, Human Design calculations or meanings, scoring behavior, OPS state, PF files, or frozen historical evidence bytes.
 
 \<eof\>
