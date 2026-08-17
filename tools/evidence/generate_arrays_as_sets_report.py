@@ -107,17 +107,23 @@ def build_report() -> str:
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
-def write_report() -> Path:
+def write_report(*, check: bool = False) -> Path:
     ensure_determinism_env()
+    expected = build_report().encode("utf-8")
+    if check:
+        if not REPORT_PATH.is_file() or REPORT_PATH.read_bytes() != expected:
+            raise SystemExit("ARRAYS_AS_SETS_REPORT_STALE")
+        return REPORT_PATH
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(build_report(), encoding="utf-8")
+    REPORT_PATH.write_bytes(expected)
     return REPORT_PATH
 
 
 def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Generate arrays-as-sets report")
+    parser.add_argument("--check", action="store_true", help="fail if the report is missing or stale")
     args = parser.parse_args(argv)
-    write_report()
+    write_report(check=args.check)
     return 0
 
 

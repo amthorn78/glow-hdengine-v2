@@ -3108,6 +3108,30 @@ A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC039_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": f"epic039.pr01.{key}",
+        "discovered_physical_path": path,
+        "epic_id": "HDE-EPIC039",
+        "record_type": "epic039_pr01_canonical_json_evidence",
+        "role": role,
+        "schema_version": "1.0",
+        "tokens": tokens,
+        "notes": "Bounded Calcination PR-01 implementation evidence; no QA, acceptance-token, PF09, OPS, or closeout claim",
+    }
+    for key, path, role, tokens in (
+        ("arrays_as_sets_report", "artifacts/canonical/arrays_as_sets_report.log", "report", ["CANONICAL_JSON_GATE_UPDATED_OK"]),
+        ("canonical_check", "audit/gates/json_gate/canonical/json_gate_check_log.ndjson", "log", ["JSON_CANONICAL_CHECK_OK"]),
+        ("canonical_compare", "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson", "log", ["CANONICAL_JSON_GATE_PASSED_OK"]),
+        ("canonical_record", "audit/gates/json_gate/canonical/json_gate_structured_record.json", "summary", ["CANONICAL_JSON_GATE_UPDATED_OK", "CANONICAL_JSON_GATE_PASSED_OK"]),
+        ("doc_delta", "audit/docdeltas/hde-epic039_doc_deltas.md", "doc_delta", []),
+        ("doc_delta_mirror", "audit/qa/hde-epic039/00_meta/doc_deltas.md", "doc_delta", []),
+    )
+]
+for _epic039_entry in EPIC039_PR01_PRIMARY_ARTIFACTS:
+    if not _epic039_entry["tokens"]:
+        del _epic039_entry["tokens"]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -3599,6 +3623,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
             *EPIC038_PR06_PRIMARY_ARTIFACTS,
+            *EPIC039_PR01_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

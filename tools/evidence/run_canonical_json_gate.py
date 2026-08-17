@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
+import jsonschema
+
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -19,6 +21,7 @@ from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
 from tools.evidence import update_evidence_index
 from adapter.http_reader import create_app
+from engine.config.registry_loader import load_manifest, load_registry_config
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
 JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
@@ -28,23 +31,50 @@ JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
 class Target:
     name: str
     rel_path: str
+    validator: str
+    schema: str | None = None
+    set_rules: tuple[tuple[str, str], ...] = ()
 
 
-TARGETS: Sequence[Target] = (
-    Target("cli_showcompat_stdout", "artifacts/cli/showcompat/stdout.json"),
-    Target("cli_showcompat_args", "artifacts/cli/showcompat/args.json"),
-    Target("cli_reader_dump", "artifacts/cli/reader_dump.json"),
-    Target("cli_summary", "artifacts/cli/summary.json"),
-    Target("cli_ab_stdout", "artifacts/cli/ab.json"),
-    Target("cli_ba_stdout", "artifacts/cli/ba.json"),
-    Target("cli_conjunction_output_ab", "artifacts/cli/out.json"),
-    Target("cli_conjunction_output_ba", "artifacts/cli/out_ba.json"),
-    Target("cli_conjunction_selection_trace", "artifacts/cli/abba_sidecar.json"),
-    Target("cli_conjunction_pair_ab", "artifacts/audit/cli/pair.json"),
-    Target("cli_conjunction_pair_ba", "artifacts/audit/cli/pair_ba.json"),
-    Target("cli_conjunction_showcompat_ab", "artifacts/audit/cli/showcompat_ab.json"),
-    Target("cli_conjunction_showcompat_ba", "artifacts/audit/cli/showcompat_ba.json"),
+_GENERATED = (
+    ("cli_showcompat_stdout", "artifacts/cli/showcompat/stdout.json"), ("cli_showcompat_args", "artifacts/cli/showcompat/args.json"),
+    ("cli_reader_dump", "artifacts/cli/reader_dump.json"), ("cli_summary", "artifacts/cli/summary.json"),
+    ("cli_ab_stdout", "artifacts/cli/ab.json"), ("cli_ba_stdout", "artifacts/cli/ba.json"),
+    ("cli_conjunction_output_ab", "artifacts/cli/out.json"), ("cli_conjunction_output_ba", "artifacts/cli/out_ba.json"),
+    ("cli_conjunction_selection_trace", "artifacts/cli/abba_sidecar.json"), ("cli_conjunction_pair_ab", "artifacts/audit/cli/pair.json"),
+    ("cli_conjunction_pair_ba", "artifacts/audit/cli/pair_ba.json"), ("cli_conjunction_showcompat_ab", "artifacts/audit/cli/showcompat_ab.json"),
+    ("cli_conjunction_showcompat_ba", "artifacts/audit/cli/showcompat_ba.json"),
 )
+TARGETS: Sequence[Target] = tuple(Target(name, path, "generated_artifact_json_contract") for name, path in _GENERATED) + (
+    Target("catalog_manifest", "catalog/manifest.json", "engine.config.registry_loader.load_manifest", set_rules=(("$.files", "path"),)),
+    Target("catalog_channels", "catalog/channels_v1.json", "jsonschema.Draft202012Validator", "schemas/channels_v1.schema.json", (("$.channels[*].centers", "value"), ("$.channels[*].domains", "value"), ("$.channels[*].flags", "value"))),
+    Target("catalog_gates", "catalog/gates_v1.json", "jsonschema.Draft202012Validator", "schemas/gates_v1.schema.json"),
+    Target("catalog_magic10", "catalog/magic10.json", "engine.config.registry_loader.load_registry_config"),
+    Target("catalog_magic10_caps", "catalog/magic10_caps.json", "engine.config.registry_loader.load_registry_config"),
+    Target("catalog_magic10_seeds", "catalog/magic10_seeds.json", "engine.config.registry_loader.load_registry_config"),
+    *(Target(f"catalog_narratives_{name}", f"catalog/narratives/{name}.json", "pf12_governed_json_contract") for name in ("keys", "manifest", "palettes", "suppression_map", "templates")),
+    Target("schema_gates", "schemas/gates_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+    Target("schema_channels", "schemas/channels_v1.schema.json", "jsonschema.Draft202012Validator.check_schema"),
+)
+
+EXPECTED_TARGET_PATHS = frozenset(target.rel_path for target in TARGETS)
+
+
+def _validate_target(target: Target, obj: object) -> None:
+    if not target.validator:
+        raise ValueError("unbound_target")
+    if target.schema:
+        schema = json.loads((ROOT / target.schema).read_text(encoding="utf-8"))
+        jsonschema.Draft202012Validator(schema).validate(obj)
+    elif target.validator.endswith("check_schema"):
+        jsonschema.Draft202012Validator.check_schema(obj)
+    elif target.validator.endswith("load_manifest"):
+        load_manifest(ROOT)
+    elif target.validator.endswith("load_registry_config"):
+        load_registry_config(ROOT)
+    for path, identity in target.set_rules:
+        if not path or not identity:
+            raise ValueError("incomplete_set_rule")
 
 
 @dataclass(frozen=True)
@@ -186,6 +216,8 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     compare_rows: list[dict[str, object]] = []
     failures: list[str] = []
 
+    if len(targets) != len(EXPECTED_TARGET_PATHS) or {target.rel_path for target in targets} != EXPECTED_TARGET_PATHS:
+        failures.append("target_inventory_incomplete_or_duplicate")
     for target in sorted(targets, key=lambda t: t.rel_path):
         rel = target.rel_path
         path = ROOT / rel
@@ -220,6 +252,10 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
         canonical_bytes = b""
         if obj is not None:
             canonical_bytes = sercanon(obj, sort_keys=True)
+            try:
+                _validate_target(target, obj)
+            except Exception as exc:  # validators deliberately fail closed
+                issues.append(f"validation_error:{type(exc).__name__}:{exc}")
 
         trailing_lf = data.endswith(b"\n")
         if not trailing_lf:
@@ -352,6 +388,15 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
             target.rel_path
             for target in sorted(targets, key=lambda target: target.rel_path)
         ],
+        "target_bindings": [
+            {"path": target.rel_path, "schema": target.schema, "validator": target.validator}
+            for target in sorted(targets, key=lambda target: target.rel_path)
+        ],
+        "set_rules": [
+            {"identity": identity, "path": path, "target": target.rel_path}
+            for target in sorted(targets, key=lambda target: target.rel_path)
+            for path, identity in sorted(target.set_rules)
+        ],
         "env": env,
         "outputs": {
             "check_log": "audit/gates/canonical_json/json_canonical_check.log",
@@ -367,6 +412,15 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
         "checked_targets": [
             target.rel_path
             for target in sorted(targets, key=lambda target: target.rel_path)
+        ],
+        "target_bindings": [
+            {"path": target.rel_path, "schema": target.schema, "validator": target.validator}
+            for target in sorted(targets, key=lambda target: target.rel_path)
+        ],
+        "set_rules": [
+            {"identity": identity, "path": path, "target": target.rel_path}
+            for target in sorted(targets, key=lambda target: target.rel_path)
+            for path, identity in sorted(target.set_rules)
         ],
         "env": env,
         "outputs": {

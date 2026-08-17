@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from engine.mech.helpers import canonicalize_array
+from tools.evidence.generate_arrays_as_sets_report import build_report, write_report
 
 ROOT = Path(__file__).resolve().parents[2]
 CHANNELS_PATH = ROOT / "catalog" / "channels_v1.json"
@@ -84,3 +85,10 @@ def test_arrays_as_sets_registry_report():
     assert "arrays-as-sets report v1" in report_text
     if centers_fallback or domains_fallback:
         assert "note: raw == normalized (already canonical)" in report_text
+
+
+def test_report_is_deterministic_and_check_mode_is_nonwriting():
+    assert build_report().encode("utf-8") == REPORT_PATH.read_bytes()
+    before = REPORT_PATH.stat().st_mtime_ns
+    assert write_report(check=True) == REPORT_PATH
+    assert REPORT_PATH.stat().st_mtime_ns == before
