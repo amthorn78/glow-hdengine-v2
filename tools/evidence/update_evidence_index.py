@@ -3529,7 +3529,9 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
             if field == "tokens":
                 if not isinstance(value, (list, tuple)):
                     raise ValueError(f"Invalid tokens for {key}: {value!r}")
-                value = list(value)
+                if not all(isinstance(token, str) and token for token in value):
+                    raise ValueError(f"Invalid tokens for {key}: {value!r}")
+                value = sorted(set(value))
             normalized[field] = value
     if path in HISTORICAL_BRIDGE_PRIMARY_PATHS:
         normalized["record_type"] = "historical_bridge_evidence"

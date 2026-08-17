@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from engine.config.registry_loader import SchemaValidationError, _normalize_channel_id
 from tools.evidence import run_canonical_json_gate
 
 
@@ -64,3 +65,15 @@ def test_unimplemented_validator_and_wrong_bound_type_fail_closed():
         run_canonical_json_gate._validate_target(target_type("bad", "bad.json", "advertised_only"), {})
     with pytest.raises(ValueError, match="target_must_be_object"):
         run_canonical_json_gate._validate_target(target_type("bad", "bad.json", "json_object_contract"), None)
+
+
+def test_duplicate_channel_gate_endpoints_fail_schema_and_loader():
+    target = next(target for target in run_canonical_json_gate.TARGETS if target.rel_path == "catalog/channels_v1.json")
+    payload = json.loads((run_canonical_json_gate.ROOT / target.rel_path).read_text(encoding="utf-8"))
+    payload["channels"][0]["id"] = "01-01"
+    payload["channels"][0]["gates"] = [1, 1]
+    with pytest.raises(Exception):
+        run_canonical_json_gate._validate_target(target, payload)
+    with pytest.raises(SchemaValidationError, match="two distinct gates") as exc_info:
+        _normalize_channel_id("01-01", [1, 1])
+    assert exc_info.value.code == "DUPLICATE_CHANNEL_GATE"

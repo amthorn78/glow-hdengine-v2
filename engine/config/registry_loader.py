@@ -144,6 +144,11 @@ def _normalize_channel_id(channel_id: str, gates: Iterable[int]) -> str:
         raise SchemaValidationError("INVALID_CHANNEL_ID", f"invalid channel id format: {channel_id}")
     a, b = map(int, channel_id.split("-"))
     g1, g2 = sorted(int(g) for g in gates)
+    if g1 == g2:
+        raise SchemaValidationError(
+            "DUPLICATE_CHANNEL_GATE",
+            f"channel {channel_id} must reference two distinct gates",
+        )
     if (a, b) != (g1, g2):
         raise SchemaValidationError("CHANNEL_ID_MISMATCH", f"channel id {channel_id} does not match gates {gates}")
     return f"{g1:02d}-{g2:02d}"
