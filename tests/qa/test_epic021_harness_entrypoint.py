@@ -6,7 +6,7 @@ import pytest
 from tools.qa import epic021_qa
 from tools.evidence import run_sanity_pipeline
 from tools.qa.epic021_qa import run_epic021_qa
-from tools.qa.qa_harness import CheckResult, HarnessConfig, Status, record_check
+from tools.qa.qa_harness import HarnessConfig, Status
 
 
 def _repo(root: Path) -> None:
@@ -133,16 +133,46 @@ def test_outer_transaction_restores_bytes_modes_and_new_targets(
 def _legacy_bootstrap_binding(root: Path) -> tuple[HarnessConfig, Path, Path]:
     config = HarnessConfig("HDE-EPIC021", repo_root=root)
     relative = "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log"
-    primary, _ = record_check(
-        config,
-        CheckResult(
-            "D00_bootstrap",
-            Status.PASS,
-            command=("python", "-V"),
-            command_provenance="test fixture",
-            exit_code=0,
-            evidence_artifacts=(relative,),
-        ),
+    primary = root / relative
+    primary.parent.mkdir(parents=True)
+    primary.write_text(
+        json.dumps(
+            {
+                "captured_env": {},
+                "check_id": "D00_bootstrap",
+                "check_name": "historical EPIC021 bootstrap",
+                "claimed_tokens": [],
+                "command": ["python", "-V"],
+                "command_provenance": "historical test fixture",
+                "evidence_artifacts": [relative],
+                "exit_code": 0,
+                "intended_tokens": [],
+                "pf_refs": [],
+                "schema_version": "pf27.step_log_header.v2",
+                "status": "PASS",
+                "status_reason": "",
+                "timestamp_utc": "2026-08-18T00:00:00Z",
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (config.qa_root / "qa_step_logs_manifest.json").write_text(
+        json.dumps(
+            {
+                "D00_bootstrap": {
+                    "check_id": "D00_bootstrap",
+                    "log_path": relative,
+                    "status": "PASS",
+                }
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
     )
     proof = primary.with_name("primary.log.path_proof.txt")
     proof.write_bytes(b"historical proof\n")
@@ -256,19 +286,30 @@ def test_legacy_bootstrap_supersession_rolls_back_with_outer_transaction(
 def test_legacy_bootstrap_supersession_rejects_dual_current_authority(
     tmp_path: Path,
 ):
-    config, _, _ = _legacy_bootstrap_binding(tmp_path)
-    record_check(
-        config,
-        CheckResult(
-            "d00-bootstrap",
-            Status.PASS,
-            command=("python", "-V"),
-            command_provenance="test fixture",
-            exit_code=0,
-            evidence_artifacts=(
-                "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log",
-            ),
-        ),
+    config, legacy_primary, _ = _legacy_bootstrap_binding(tmp_path)
+    current_relative = "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
+    current_primary = tmp_path / current_relative
+    current_primary.parent.mkdir(parents=True)
+    current_header = json.loads(
+        legacy_primary.read_text(encoding="utf-8").splitlines()[0]
+    )
+    current_header["check_id"] = "d00-bootstrap"
+    current_header["check_name"] = "current EPIC021 bootstrap"
+    current_header["evidence_artifacts"] = [current_relative]
+    current_primary.write_text(
+        json.dumps(current_header, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    checks = json.loads(manifest.read_text(encoding="utf-8"))
+    checks["d00-bootstrap"] = {
+        "check_id": "d00-bootstrap",
+        "log_path": current_relative,
+        "status": "PASS",
+    }
+    manifest.write_text(
+        json.dumps(checks, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
     )
 
     with pytest.raises(RuntimeError, match="EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING"):

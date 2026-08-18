@@ -159,6 +159,60 @@ def test_epic027_flat_v1_transition_retains_all_historical_identities(repository
         ).read_bytes() == before[check_id]
 
 
+@pytest.mark.parametrize("schema_version", ["v1", "v2"])
+def test_uppercase_legacy_entry_cannot_be_carried_into_current_manifest(
+    repository: Path, schema_version: str
+):
+    config = _configure(repository, "HDE-EPIC027")
+    check_id = "D00_legacy"
+    if schema_version == "v1":
+        primary = _write_v1(config, check_id)
+    else:
+        relative = f"audit/qa/hde-epic027/checks/{check_id}/primary.log"
+        primary = config.repo_root / relative
+        primary.parent.mkdir(parents=True)
+        primary.write_text(
+            json.dumps(
+                {
+                    "captured_env": {},
+                    "check_id": check_id,
+                    "check_name": "historical uppercase check",
+                    "claimed_tokens": [],
+                    "command": ["true"],
+                    "command_provenance": "historical test fixture",
+                    "evidence_artifacts": [relative],
+                    "exit_code": 0,
+                    "intended_tokens": [],
+                    "pf_refs": [],
+                    "schema_version": "pf27.step_log_header.v2",
+                    "status": "PASS",
+                    "status_reason": "",
+                    "timestamp_utc": "2026-08-18T00:00:00Z",
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    entry = _entry(config, check_id)
+    if schema_version == "v2":
+        entry["status"] = "PASS"
+    manifest.write_text(
+        json.dumps({check_id: entry}), encoding="utf-8"
+    )
+    manifest_before = manifest.read_bytes()
+    primary_before = primary.read_bytes()
+
+    with pytest.raises(ValueError, match="lowercase ASCII"):
+        record_check(config, _pass("current"))
+
+    assert manifest.read_bytes() == manifest_before
+    assert primary.read_bytes() == primary_before
+    assert not (config.qa_root / "checks/current/primary.log").exists()
+
+
 def test_epic028_wrapped_v1_transition_becomes_flat(repository: Path):
     config = _configure(repository, "HDE-EPIC028")
     for check_id in ("d0", "po-001"):

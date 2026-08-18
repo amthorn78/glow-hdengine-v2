@@ -18,7 +18,8 @@ from pathlib import Path, PurePosixPath
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
 
 EPIC_RE = re.compile(r"HDE-EPIC([0-9]{3})\Z")
-CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+CHECK_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
+LEGACY_CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 PF_TITLE_RE = re.compile(
     r"PF[0-9]{2}(?:\.[0-9]+)?-(?:Canon|Reference)-[A-Za-z0-9][A-Za-z0-9-]*\Z"
 )
@@ -177,7 +178,18 @@ def validate_check_id(check_id: str) -> str:
         or not CHECK_RE.fullmatch(check_id)
         or check_id in {".", ".."}
     ):
-        raise ValueError("check_id must be a safe single path segment")
+        raise ValueError("check_id must be a lowercase ASCII safe path segment")
+    return check_id
+
+
+def _validate_legacy_check_id(check_id: str) -> str:
+    """Validate a historical identity without admitting it for new publication."""
+    if (
+        not isinstance(check_id, str)
+        or not LEGACY_CHECK_RE.fullmatch(check_id)
+        or check_id in {".", ".."}
+    ):
+        raise ValueError("legacy check_id must be a safe single path segment")
     return check_id
 
 
@@ -313,6 +325,7 @@ def _primary_log_content(
     *,
     captured_at_utc: str | None = None,
 ) -> tuple[Path, str]:
+    validate_check_id(result.check_id)
     path = config.qa_root / "checks" / result.check_id / "primary.log"
     rel = _repo_relative(config, path)
     evidence = list(result.evidence_artifacts)
@@ -373,7 +386,9 @@ def write_primary_log(config: HarnessConfig, result: CheckResult) -> Path:
     return path
 
 
-def read_primary_header(path: Path) -> dict[str, object]:
+def _read_primary_header(
+    path: Path, *, allow_legacy_check_id: bool
+) -> dict[str, object]:
     if not path.is_file() or path.stat().st_size == 0:
         raise ValueError("primary log is missing or empty")
     first = path.read_text(encoding="utf-8").splitlines()[0]
@@ -400,7 +415,10 @@ def read_primary_header(path: Path) -> dict[str, object]:
         or data["schema_version"] != "pf27.step_log_header.v2"
     ):
         raise ValueError("malformed PF27 v2 header")
-    check_id = validate_check_id(data["check_id"])
+    check_id_validator = (
+        _validate_legacy_check_id if allow_legacy_check_id else validate_check_id
+    )
+    check_id = check_id_validator(data["check_id"])
     if not isinstance(data["check_name"], str) or not data["check_name"]:
         raise ValueError("malformed PF27 v2 check_name")
     status = Status(data["status"])
@@ -462,6 +480,11 @@ def read_primary_header(path: Path) -> dict[str, object]:
     return data
 
 
+def read_primary_header(path: Path) -> dict[str, object]:
+    """Read a canonical current PF27 v2 header."""
+    return _read_primary_header(path, allow_legacy_check_id=False)
+
+
 def _verify_written_primary(path: Path, check_id: str, status: Status) -> None:
     parsed = read_primary_header(path)
     if parsed["check_id"] != check_id or parsed["status"] != status.value:
@@ -490,7 +513,7 @@ def _read_supported_primary_header(
         )
     schema = data.get("schema_version")
     if schema == "pf27.step_log_header.v2":
-        data = read_primary_header(path)
+        data = _read_primary_header(path, allow_legacy_check_id=True)
     elif schema == "pf27.step_log_header.v1":
         if data.get("check_id") != expected_check_id:
             raise ValueError(
@@ -516,7 +539,7 @@ def _manifest_entry_log_path(
     *,
     require_nonempty: bool = True,
 ) -> Path:
-    validate_check_id(check_id)
+    _validate_legacy_check_id(check_id)
     if not isinstance(entry, dict) or entry.get("check_id") != check_id:
         raise ValueError("manifest key and entry check identity disagree")
     raw_path = entry.get("log_path")
@@ -567,7 +590,9 @@ def _manifest_shape(
     if not payload or (
         not ({"epic_id", "checks", "runs"} & set(payload))
         and all(
-            isinstance(key, str) and CHECK_RE.fullmatch(key) and isinstance(value, dict)
+            isinstance(key, str)
+            and LEGACY_CHECK_RE.fullmatch(key)
+            and isinstance(value, dict)
             for key, value in payload.items()
         )
     ):
@@ -648,6 +673,8 @@ def _preflight_legacy_family_replacement(
 
 
 def _manifest_content(checks: Mapping[str, Mapping[str, str]]) -> str:
+    for check_id in checks:
+        validate_check_id(check_id)
     payload = {key: dict(checks[key]) for key in sorted(checks)}
     return json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
 
@@ -678,6 +705,7 @@ def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
 
 
 def verify_manifest_entry(config: HarnessConfig, check_id: str) -> dict[str, str]:
+    validate_check_id(check_id)
     path = config.qa_root / "qa_step_logs_manifest.json"
     payload = _loads_json_strict(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or check_id not in payload:
@@ -698,6 +726,8 @@ def _verify_flat_manifest(
     config: HarnessConfig,
     expected: Mapping[str, Mapping[str, str]],
 ) -> None:
+    for check_id in expected:
+        validate_check_id(check_id)
     path = config.qa_root / "qa_step_logs_manifest.json"
     if not path.is_file() or path.stat().st_size == 0:
         raise ValueError("canonical flat manifest is missing or empty")
@@ -764,6 +794,7 @@ def run_pytest_check(
     check_name: str = "",
     intended_tokens: Sequence[str] = (),
 ) -> CheckResult:
+    validate_check_id(check_id)
     command = (sys.executable, "-m", "pytest", *pytest_args)
     readiness_command = (sys.executable, "-m", "pytest", "--version")
     entrypoints, _, option_error = _parse_pytest_arguments(
@@ -999,11 +1030,24 @@ def record_check_family(
     staged_results = tuple(results)
     if not staged_results:
         raise ValueError("check family cannot be empty")
-    result_ids = [result.check_id for result in staged_results]
+    # CheckResult validates at construction, and the publication boundary
+    # revalidates so mutated/deserialized instances cannot create noncanonical
+    # current paths before any family member is written.
+    result_ids = [validate_check_id(result.check_id) for result in staged_results]
+    checks_root = config.qa_root / "checks"
+    for path, _ in additional_files:
+        absolute_path = Path(os.path.abspath(path))
+        try:
+            relative = absolute_path.relative_to(checks_root)
+        except ValueError:
+            continue
+        if relative.parts:
+            validate_check_id(relative.parts[0])
     if len(result_ids) != len(set(result_ids)):
         raise ValueError("check family contains duplicate check IDs")
     replacement_ids = {
-        validate_check_id(check_id) for check_id in replace_legacy_family_ids
+        _validate_legacy_check_id(check_id)
+        for check_id in replace_legacy_family_ids
     }
     admitted_ids = {validate_check_id(check_id) for check_id in admit_new_check_ids}
     if replacement_ids & admitted_ids:

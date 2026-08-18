@@ -12,6 +12,7 @@ from tools.qa.qa_harness import (
     generate_acceptance_map_viability,
     read_primary_header,
     record_check,
+    record_check_family,
     require_governed_viability,
     run_pytest_check,
     summarize_checks,
@@ -124,6 +125,93 @@ def test_unsafe_check_ids_are_rejected(repository: Path, check_id: str):
         CheckResult(check_id, Status.PASS, exit_code=0)
 
 
+@pytest.mark.parametrize("publish_family", [False, True])
+def test_current_publishers_reject_uppercase_ids_before_writes_and_admit_lowercase(
+    repository: Path, publish_family: bool
+):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    sidecar = config.qa_root / "publication-sidecar.log"
+
+    with pytest.raises(ValueError, match="lowercase ASCII"):
+        CheckResult("D00_new", Status.PASS)
+
+    corrupted = CheckResult(
+        "d00-new",
+        Status.PASS,
+        command=("true",),
+        command_provenance="test fixture",
+        exit_code=0,
+    )
+    object.__setattr__(corrupted, "check_id", "D00_new")
+    with pytest.raises(ValueError, match="lowercase ASCII"):
+        if publish_family:
+            record_check_family(
+                config,
+                (corrupted,),
+                additional_files=((sidecar, "must not publish\n"),),
+            )
+        else:
+            record_check(
+                config,
+                corrupted,
+                additional_files=((sidecar, "must not publish\n"),),
+            )
+
+    assert not (config.qa_root / "checks/D00_new/primary.log").exists()
+    assert not (config.qa_root / "qa_step_logs_manifest.json").exists()
+    assert not sidecar.exists()
+
+    lowercase = CheckResult(
+        "d00-new",
+        Status.PASS,
+        command=("true",),
+        command_provenance="test fixture",
+        exit_code=0,
+    )
+    uppercase_sidecar = config.qa_root / "checks/D00_new/sidecar.txt"
+    with pytest.raises(ValueError, match="lowercase ASCII"):
+        if publish_family:
+            record_check_family(
+                config,
+                (lowercase,),
+                additional_files=((uppercase_sidecar, "must not publish\n"),),
+            )
+        else:
+            record_check(
+                config,
+                lowercase,
+                additional_files=((uppercase_sidecar, "must not publish\n"),),
+            )
+    assert not (config.qa_root / "checks/d00-new/primary.log").exists()
+    assert not (config.qa_root / "qa_step_logs_manifest.json").exists()
+    assert not uppercase_sidecar.exists()
+    assert not uppercase_sidecar.parent.exists()
+
+    uppercase_report = config.qa_root / "UPPERCASE-REPORT.txt"
+    if publish_family:
+        logs, manifest = record_check_family(
+            config,
+            (lowercase,),
+            additional_files=((uppercase_report, "allowed outside checks\n"),),
+        )
+        log = logs[0]
+    else:
+        log, manifest = record_check(
+            config,
+            lowercase,
+            additional_files=((uppercase_report, "allowed outside checks\n"),),
+        )
+    assert log == config.qa_root / "checks/d00-new/primary.log"
+    assert uppercase_report.read_text(encoding="utf-8") == "allowed outside checks\n"
+    assert json.loads(manifest.read_text(encoding="utf-8")) == {
+        "d00-new": {
+            "check_id": "d00-new",
+            "log_path": "audit/qa/hde-epic039/checks/d00-new/primary.log",
+            "status": "PASS",
+        }
+    }
+
+
 def test_pf27_header_and_manifest_replace_by_check_id(repository: Path):
     config = HarnessConfig("HDE-EPIC039", repo_root=repository)
     first = CheckResult(
@@ -188,6 +276,27 @@ def test_same_interpreter_and_classification(
         HarnessConfig("HDE-EPIC039", repo_root=repository), "missing", ("missing.py",)
     )
     assert missing.status is Status.TOOLING_BLOCKED
+
+
+def test_pytest_rejects_uppercase_check_id_without_spawning(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    test_file = repository / "test_sample.py"
+    test_file.write_text("def test_ok():\n    assert True\n", encoding="utf-8")
+    calls = []
+    monkeypatch.setattr(
+        "tools.qa.qa_harness.subprocess.run",
+        lambda *args, **kwargs: calls.append((args, kwargs)),
+    )
+
+    with pytest.raises(ValueError, match="lowercase ASCII"):
+        run_pytest_check(
+            HarnessConfig("HDE-EPIC039", repo_root=repository),
+            "D00_new",
+            ("-q", "test_sample.py"),
+        )
+
+    assert calls == []
 
 
 @pytest.mark.parametrize(
