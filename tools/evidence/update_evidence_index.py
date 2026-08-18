@@ -4039,10 +4039,12 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
     )
 
 
-def _rebind_sanity_log_only() -> None:
+def _rebind_sanity_log_only(*, produced_default: str, check: bool) -> None:
     """Rebind the canonical sanity log without changing evidence membership."""
+    for updater_input in (HUMAN_INDEX, HASH_SENTINEL, MIRROR_PATH):
+        _assert_unaliased_write_path(updater_input)
     try:
-        human_payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+        human_payload = json.loads(_read_bytes(HUMAN_INDEX).decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise SystemExit("SANITY_REBIND_HUMAN_INDEX_INVALID") from exc
     if not isinstance(human_payload, list):
@@ -4066,7 +4068,7 @@ def _rebind_sanity_log_only() -> None:
         f"{_sha256_path(HUMAN_INDEX)}  docs/evidence/INDEX.json\n"
     ).encode("utf-8")
     try:
-        current_sentinel = HASH_SENTINEL.read_bytes()
+        current_sentinel = _read_bytes(HASH_SENTINEL)
     except OSError as exc:
         raise SystemExit("SANITY_REBIND_HUMAN_INDEX_SENTINEL_INVALID") from exc
     if current_sentinel != expected_sentinel:
@@ -4074,7 +4076,7 @@ def _rebind_sanity_log_only() -> None:
 
     records: list[dict[str, object]] = []
     try:
-        mirror_lines = MIRROR_PATH.read_text(encoding="utf-8").splitlines()
+        mirror_lines = _read_bytes(MIRROR_PATH).decode("utf-8").splitlines()
     except (OSError, UnicodeError) as exc:
         raise SystemExit("SANITY_REBIND_MIRROR_INVALID") from exc
     for raw in mirror_lines:
@@ -4106,8 +4108,9 @@ def _rebind_sanity_log_only() -> None:
         raise SystemExit("SANITY_REBIND_REQUIRED_ROW_MISSING")
 
     sanity_path = ROOT / SANITY_LOG_REL
+    _assert_unaliased_write_path(sanity_path)
     try:
-        sanity_bytes = sanity_path.read_bytes()
+        sanity_bytes = _read_bytes(sanity_path)
     except OSError as exc:
         raise SystemExit("SANITY_REBIND_LOG_MISSING") from exc
     if not sanity_bytes:
@@ -4115,8 +4118,9 @@ def _rebind_sanity_log_only() -> None:
     if not sanity_bytes.endswith(b"summary:FAIL\n"):
         raise SystemExit("SANITY_REBIND_LOG_NOT_FAIL")
 
-    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-    sanity_stat = sanity_path.stat()
+    sanity_mtime = _proof_mtime(
+        sanity_path, default_produced_at=produced_default
+    )
     sanity_proof = _load_existing_proof(ROOT / f"{SANITY_LOG_REL}.path_proof.txt")
     proof_anchor, sanity_produced = _write_path_proof(
         SANITY_LOG_REL,
@@ -4125,8 +4129,8 @@ def _rebind_sanity_log_only() -> None:
         mtime_utc=sanity_proof.get("mtime_utc"),
         produced_at=produced_default,
         default_produced_at=produced_default,
-        check=False,
-        stat_mtime=sanity_stat.st_mtime,
+        check=check,
+        stat_mtime=sanity_mtime,
     )
     by_key[SANITY_LOG_KEY].update(
         {
@@ -4153,25 +4157,28 @@ def _rebind_sanity_log_only() -> None:
         if mirror_record.get("size_bytes") == len(mirror_bytes):
             break
         mirror_record["size_bytes"] = len(mirror_bytes)
-    _write_if_changed(MIRROR_PATH, mirror_bytes, check=False)
+    _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
-    mirror_stat = MIRROR_PATH.stat()
+    mirror_size = _size_bytes(MIRROR_PATH)
+    mirror_mtime = _proof_mtime(
+        MIRROR_PATH, default_produced_at=produced_default
+    )
     mirror_file_sha = _sha256_path(MIRROR_PATH)
     mirror_sha_bytes = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
-    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_bytes, check=False)
+    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_bytes, check=check)
     _refresh_path_proof(
-        MIRROR_SHA_PATH, default_produced_at=produced_default, check=False
+        MIRROR_SHA_PATH, default_produced_at=produced_default, check=check
     )
     mirror_proof = _load_existing_proof(ROOT / f"{MIRROR_REL}.path_proof.txt")
     _write_path_proof(
         MIRROR_REL,
         sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
+        size_bytes=mirror_size,
         mtime_utc=mirror_proof.get("mtime_utc"),
         produced_at=produced_default,
         default_produced_at=produced_default,
-        check=False,
-        stat_mtime=mirror_stat.st_mtime,
+        check=check,
+        stat_mtime=mirror_mtime,
         extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
     )
 
@@ -4183,7 +4190,7 @@ def _rebind_sanity_log_only() -> None:
         produced_at=None,
         default_produced_at=produced_default,
         check=True,
-        stat_mtime=sanity_stat.st_mtime,
+        stat_mtime=sanity_mtime,
     )
     _refresh_path_proof(
         MIRROR_SHA_PATH, default_produced_at=produced_default, check=True
@@ -4191,14 +4198,38 @@ def _rebind_sanity_log_only() -> None:
     _write_path_proof(
         MIRROR_REL,
         sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
+        size_bytes=mirror_size,
         mtime_utc=None,
         produced_at=None,
         default_produced_at=produced_default,
         check=True,
-        stat_mtime=mirror_stat.st_mtime,
+        stat_mtime=mirror_mtime,
         extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
     )
+
+
+def _run_sanity_log_rebind_transaction() -> None:
+    """Publish the failure-log rebind through the atomic ledger boundary."""
+
+    global _STAGED_VIEW
+    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    try:
+        with _WriteTransaction(ROOT):
+            _STAGED_VIEW = _StagedView(ROOT, produced_default)
+            _rebind_sanity_log_only(
+                produced_default=produced_default, check=False
+            )
+            _rebind_sanity_log_only(
+                produced_default=produced_default, check=True
+            )
+            staged = dict(_STAGED_VIEW.changes)
+            _STAGED_VIEW = None
+            _publish_staged(staged)
+            _rebind_sanity_log_only(
+                produced_default=produced_default, check=True
+            )
+    finally:
+        _STAGED_VIEW = None
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -4223,7 +4254,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.rebind_sanity_log:
         if args.check or args.epic_id:
             parser.error("--rebind-sanity-log cannot be combined with --check or --epic-id")
-        _rebind_sanity_log_only()
+        _run_sanity_log_rebind_transaction()
         return
 
     epic_ids = set(args.epic_id)

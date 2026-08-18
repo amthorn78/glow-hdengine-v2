@@ -8,6 +8,80 @@ import pytest
 from tools.evidence import update_evidence_index as uei
 
 
+def _configure_sanity_rebind_fixture(tmp_path, monkeypatch):
+    human_index = tmp_path / "docs/evidence/INDEX.json"
+    hash_sentinel = tmp_path / "docs/evidence/INDEX.sha256"
+    mirror_path = tmp_path / "artifacts/evidence_index.jsonl"
+    mirror_sha_path = tmp_path / "artifacts/evidence_index.jsonl.sha256"
+    sanity_path = tmp_path / uei.SANITY_LOG_REL
+    for path in (human_index, hash_sentinel, mirror_path, sanity_path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    human_entries = [
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        },
+        {
+            "artifact_key": "sanity.pipeline.log",
+            "discovered_physical_path": uei.SANITY_LOG_REL,
+        },
+    ]
+    human_bytes = (json.dumps(human_entries, indent=2) + "\n").encode("utf-8")
+    human_index.write_bytes(human_bytes)
+    hash_sentinel.write_bytes(
+        f"{uei._sha256_bytes(human_bytes)}  docs/evidence/INDEX.json\n".encode(
+            "utf-8"
+        )
+    )
+
+    sanity_bytes = b"stage: test\nsummary:FAIL\n"
+    sanity_path.write_bytes(sanity_bytes)
+    produced = "2026-08-17T00:00:00Z"
+    records = [
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": "artifacts/evidence_index.jsonl",
+            "produced_at_utc": produced,
+            "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
+            "role": "self_record",
+            "sha256": "0" * 64,
+            "size_bytes": 0,
+        },
+        {
+            "artifact_key": "sanity.pipeline.log",
+            "discovered_physical_path": uei.SANITY_LOG_REL,
+            "produced_at_utc": produced,
+            "proof_anchor": f"{uei.SANITY_LOG_REL}.path_proof.txt",
+            "role": "snapshot",
+            "sha256": uei._sha256_bytes(sanity_bytes),
+            "size_bytes": len(sanity_bytes),
+        },
+    ]
+    mirror_path.write_text(
+        "".join(
+            f"{json.dumps(record, separators=(',', ':'), sort_keys=True)}\n"
+            for record in records
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(uei, "ROOT", tmp_path)
+    monkeypatch.setattr(uei, "HUMAN_INDEX", human_index)
+    monkeypatch.setattr(uei, "HASH_SENTINEL", hash_sentinel)
+    monkeypatch.setattr(uei, "MIRROR_PATH", mirror_path)
+    monkeypatch.setattr(uei, "MIRROR_REL", "artifacts/evidence_index.jsonl")
+    monkeypatch.setattr(uei, "MIRROR_SHA_PATH", mirror_sha_path)
+    monkeypatch.setattr(uei, "_STAGED_VIEW", None)
+    monkeypatch.setattr(uei, "_ACTIVE_WRITE_TRANSACTION", None)
+    return {
+        "human": human_index,
+        "sentinel": hash_sentinel,
+        "mirror": mirror_path,
+        "sanity": sanity_path,
+    }
+
+
 def test_machine_mirror_self_proof_matches_canonical_digest():
     proof_path = uei.MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
     proof = uei._load_existing_proof(proof_path)
@@ -108,6 +182,75 @@ def test_staged_publication_rolls_back_every_preimage(tmp_path, monkeypatch):
     assert not added.exists()
     assert not added.parent.exists()
     assert tmp_path.stat().st_mode == original_root_mode
+
+
+def test_sanity_rebind_rejects_aliased_inputs(tmp_path, monkeypatch):
+    for name in ("human", "sentinel", "mirror", "sanity"):
+        root = tmp_path / name
+        paths = _configure_sanity_rebind_fixture(root, monkeypatch)
+        alias = paths[name]
+        target = root / f"real-{name}.txt"
+        target.write_bytes(alias.read_bytes())
+        alias.unlink()
+        alias.symlink_to(target)
+
+        with pytest.raises(SystemExit, match="ALIASED_TRANSACTION_FILE"):
+            uei._run_sanity_log_rebind_transaction()
+
+        assert alias.is_symlink()
+        assert target.is_file()
+        assert uei._STAGED_VIEW is None
+        assert uei._ACTIVE_WRITE_TRANSACTION is None
+
+
+def test_sanity_rebind_publishes_coherent_model(tmp_path, monkeypatch):
+    paths = _configure_sanity_rebind_fixture(tmp_path, monkeypatch)
+    human_before = paths["human"].read_bytes()
+    sentinel_before = paths["sentinel"].read_bytes()
+
+    uei._run_sanity_log_rebind_transaction()
+
+    assert paths["human"].read_bytes() == human_before
+    assert paths["sentinel"].read_bytes() == sentinel_before
+    mirror_sha = uei._sha256_path(paths["mirror"])
+    assert uei.MIRROR_SHA_PATH.read_bytes() == (
+        f"{mirror_sha}  {uei.MIRROR_REL}\n".encode("utf-8")
+    )
+    for rel in (uei.SANITY_LOG_REL, uei.MIRROR_REL, f"{uei.MIRROR_REL}.sha256"):
+        assert (tmp_path / f"{rel}.path_proof.txt").is_file()
+    assert uei._STAGED_VIEW is None
+    assert uei._ACTIVE_WRITE_TRANSACTION is None
+
+
+def test_sanity_rebind_rolls_back_partial_publication(tmp_path, monkeypatch):
+    _configure_sanity_rebind_fixture(tmp_path, monkeypatch)
+    before = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    real_replace = os.replace
+    calls = 0
+
+    def fail_second(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("sanity rebind fault injection")
+        real_replace(source, destination)
+
+    monkeypatch.setattr(uei.os, "replace", fail_second)
+    with pytest.raises(OSError, match="sanity rebind fault injection"):
+        uei._run_sanity_log_rebind_transaction()
+
+    after = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    assert after == before
+    assert uei._STAGED_VIEW is None
+    assert uei._ACTIVE_WRITE_TRANSACTION is None
 
 
 def test_unchanged_fast_path_rejects_file_and_parent_aliases(
