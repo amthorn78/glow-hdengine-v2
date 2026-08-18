@@ -6,7 +6,48 @@ import json
 import os
 from pathlib import Path
 
+import pytest
+
 from tools.evidence import update_evidence_index
+
+
+def test_refresh_path_proof_supports_staged_missing_artifact(tmp_path, monkeypatch):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    view = update_evidence_index._StagedView(
+        tmp_path, "2026-08-17T00:00:00Z"
+    )
+    monkeypatch.setattr(update_evidence_index, "_STAGED_VIEW", view)
+    artifact = tmp_path / "generated" / "sentinel.sha256"
+    artifact_bytes = b"abc  generated/source.json\n"
+    view.stage_bytes(artifact, artifact_bytes)
+
+    update_evidence_index._refresh_path_proof(
+        artifact,
+        default_produced_at="2026-08-17T00:00:00Z",
+        check=False,
+    )
+
+    proof_path = tmp_path / "generated/sentinel.sha256.path_proof.txt"
+    assert not artifact.exists()
+    assert proof_path in view.changes
+    proof = update_evidence_index._load_existing_proof(proof_path)
+    assert proof["path"] == "generated/sentinel.sha256"
+    assert proof["sha256"] == hashlib.sha256(artifact_bytes).hexdigest()
+    assert proof["size_bytes"] == str(len(artifact_bytes))
+    assert proof["mtime_utc"] == "2026-08-17T00:00:00Z"
+
+
+def test_staged_deletion_is_absent_and_unreadable(tmp_path):
+    artifact = tmp_path / "removed.txt"
+    artifact.write_bytes(b"stale disk bytes\n")
+    view = update_evidence_index._StagedView(
+        tmp_path, "2026-08-17T00:00:00Z"
+    )
+    view.stage_deletion(artifact)
+
+    assert not view.exists(artifact)
+    with pytest.raises(FileNotFoundError, match="staged deletion has no bytes"):
+        view.read_bytes(artifact)
 
 
 def test_path_proof_validation_is_independent_of_clone_mtime(

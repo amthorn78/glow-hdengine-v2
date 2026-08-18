@@ -13,3 +13,14 @@ if [[ "$expected" != "$actual" ]]; then
   echo "INDEX_SHA_MISMATCH:${expected}!=$actual" >&2
   exit 1
 fi
+
+if [[ ! -f artifacts/evidence_index.jsonl || ! -f artifacts/evidence_index.jsonl.sha256 ]]; then
+  echo "MIRROR_INDEX_FILES_MISSING" >&2
+  exit 1
+fi
+mirror_expected=$(cut -d ' ' -f1 < artifacts/evidence_index.jsonl.sha256)
+mirror_actual=$(sha256sum artifacts/evidence_index.jsonl | awk '{print $1}')
+if [[ "$mirror_expected" != "$mirror_actual" ]]; then
+  echo "MIRROR_SHA_MISMATCH:${mirror_expected}!=$mirror_actual" >&2
+  exit 1
+fi

@@ -6,6 +6,13 @@ required_files=(
   docs/evidence/INDEX.json
   docs/evidence/INDEX.sha256
   artifacts/evidence_index.jsonl
+  docs/evidence/INDEX.json.path_proof.txt
+  docs/evidence/INDEX.sha256.path_proof.txt
+  artifacts/evidence_index.jsonl.path_proof.txt
+  artifacts/evidence_index.jsonl.sha256
+  artifacts/evidence_index.jsonl.sha256.path_proof.txt
+  audit/gates/topology/orientation_demo.txt
+  audit/gates/topology/orientation_demo.txt.path_proof.txt
   artifacts/runtime/env_matrix.snapshot.json
   artifacts/runtime/env_matrix.snapshot.json.path_proof.txt
   audit/qa/hde-epic038/token_evidence_matrix.md

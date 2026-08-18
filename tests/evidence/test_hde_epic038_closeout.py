@@ -1464,7 +1464,7 @@ def test_private_receipt_ci_is_exact_head_external_and_authenticated() -> None:
     assert '          ALLOW_NETWORK: "1"\n' not in consumer_step
     assert consumer_step.count("git worktree add --detach") == 1
     assert consumer_step.count("ALLOW_NETWORK=1") == 2
-    assert consumer_step.count("ALLOW_NETWORK=0") == 4
+    assert consumer_step.count("ALLOW_NETWORK=0") == 2
     assert consumer_step.count(
         "unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
         "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
@@ -3696,14 +3696,9 @@ def dev02_source_tree(tmp_path_factory: pytest.TempPathFactory) -> Path:
     # producers only. This prevents a stale checkout companion from turning all
     # 33 predicates into the same synthetic matrix-level failure and creating a
     # false negative fixture.
-    for _ in range(2):
-        _assert_success(
-            _run_repo_tool(root, "tools/evidence/update_evidence_index.py")
-        )
-        _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
-        _assert_success(
-            _run_repo_tool(root, "tools/evidence/update_evidence_index.py")
-        )
+    _assert_success(
+        _run_repo_tool(root, "tools/evidence/update_evidence_index.py")
+    )
     _assert_success(
         _run_repo_tool(root, "tools/evidence/update_evidence_index.py", "--check")
     )
@@ -3721,10 +3716,10 @@ def dev02_fixed_point_tree(
         dev02_source_tree,
         tmp_path_factory.mktemp("hde-epic038-dev02-fixed") / "repo",
     )
-    # Exercise the exact approved DEV-03 producer order in the isolated tree:
-    # one atomic primary-package write, updater, orientation, then the second
-    # updater. No extra generator pass may silently revise the decision after
-    # companion evidence appears.
+    # Exercise the current single-writer producer order in the isolated tree:
+    # one atomic primary-package write followed by one canonical updater write.
+    # No extra generator pass may silently revise the decision after companion
+    # evidence appears.
     planned_proofs = tuple(
         proof for _path, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
     )
@@ -3734,9 +3729,6 @@ def dev02_fixed_point_tree(
     )
     assert not any((root / proof).exists() for proof in planned_proofs)
     generated_primaries = _package_at(root)
-    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
-    assert _package_at(root) == generated_primaries
-    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
     _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
     assert _package_at(root) == generated_primaries
     _assert_success(
@@ -3822,7 +3814,7 @@ def test_dev02_release_semantic_rejects_canonical_manifest_content_drift(
     assert blocker["permitted_files"] == []
 
 
-def test_dev02_updater_repairs_orientation_producer_stale_proof_before_full_validation(
+def test_dev02_orientation_compatibility_write_is_idempotent_after_updater(
     dev02_repo: Path,
 ) -> None:
     _assert_success(
@@ -3834,23 +3826,64 @@ def test_dev02_updater_repairs_orientation_producer_stale_proof_before_full_vali
         _run_repo_tool(dev02_repo, "tools/evidence/update_evidence_index.py")
     )
 
-    orientation = dev02_repo / "audit/gates/topology/orientation_demo.txt"
-    proof = dev02_repo / "audit/gates/topology/orientation_demo.txt.path_proof.txt"
-    before = orientation.read_bytes()
+    governed = tuple(
+        dev02_repo / relative
+        for relative in (
+            "docs/evidence/INDEX.json",
+            "docs/evidence/INDEX.json.path_proof.txt",
+            "docs/evidence/INDEX.sha256",
+            "docs/evidence/INDEX.sha256.path_proof.txt",
+            "artifacts/evidence_index.jsonl",
+            "artifacts/evidence_index.jsonl.path_proof.txt",
+            "artifacts/evidence_index.jsonl.sha256",
+            "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+            "audit/gates/topology/orientation_demo.txt",
+            "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+        )
+    )
+    before = {path: path.read_bytes() for path in governed}
     _assert_success(
         _run_repo_tool(dev02_repo, "tools/evidence/orientation_demo.py")
     )
-    after = orientation.read_bytes()
-    assert after != before
-    assert closeout._proof_fields(proof)["sha256"] != hashlib.sha256(after).hexdigest()
-
-    _assert_success(
-        _run_repo_tool(dev02_repo, "tools/evidence/update_evidence_index.py")
-    )
-    assert closeout._proof_fields(proof)["sha256"] == hashlib.sha256(after).hexdigest()
+    assert {path: path.read_bytes() for path in governed} == before
     _assert_success(
         _run_repo_tool(
             dev02_repo, "tools/evidence/update_evidence_index.py", "--check"
+        )
+    )
+    _assert_success(
+        _run_repo_tool(dev02_repo, "tools/evidence/orientation_demo.py", "--check")
+    )
+
+
+def test_dev02_updater_recovers_missing_closeout_proofs_in_one_write(
+    dev02_fixed_repo: Path,
+) -> None:
+    primaries = _package_at(dev02_fixed_repo)
+    proof_paths = tuple(
+        dev02_fixed_repo / proof
+        for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    )
+    for proof_path in proof_paths:
+        proof_path.unlink()
+
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo, "tools/evidence/update_evidence_index.py"
+        )
+    )
+    assert all(proof_path.is_file() for proof_path in proof_paths)
+    assert _package_at(dev02_fixed_repo) == primaries
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo,
+            "tools/evidence/update_evidence_index.py",
+            "--check",
+        )
+    )
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo, "tools/evidence/orientation_demo.py", "--check"
         )
     )
 
@@ -4168,13 +4201,6 @@ def test_canonical_updater_accepts_receipt_satisfied_projection_without_receipt(
         _replace_bytes(dev02_fixed_repo / relative, body)
     primaries = _package_at(dev02_fixed_repo)
 
-    _assert_success(
-        _run_repo_tool(dev02_fixed_repo, "tools/evidence/update_evidence_index.py")
-    )
-    assert _package_at(dev02_fixed_repo) == primaries
-    _assert_success(
-        _run_repo_tool(dev02_fixed_repo, "tools/evidence/orientation_demo.py")
-    )
     _assert_success(
         _run_repo_tool(dev02_fixed_repo, "tools/evidence/update_evidence_index.py")
     )
@@ -5578,8 +5604,6 @@ def test_dev02_ledger_parser_rejects_noncanonical_serialization(
 
 def _converge_dev02_evidence_graph(root: Path) -> None:
     _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
-    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
-    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
 
 
 @pytest.fixture(scope="session")
@@ -5610,9 +5634,6 @@ def dev02_open_ledger_tree(
     finally:
         closeout.ROOT = previous_root
     primaries = _package_at(root)
-    _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
-    assert _package_at(root) == primaries
-    _assert_success(_run_repo_tool(root, "tools/evidence/orientation_demo.py"))
     _assert_success(_run_repo_tool(root, "tools/evidence/update_evidence_index.py"))
     assert _package_at(root) == primaries
     entry = closeout.parse_ledger(package[closeout.LEDGER_PATH])["entries"][0]

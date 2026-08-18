@@ -270,8 +270,6 @@ def _update_indexes() -> None:
             raise SystemExit(proc.stderr)
 
     _run([sys.executable, "tools/evidence/update_evidence_index.py"])
-    _run([sys.executable, "tools/evidence/orientation_demo.py"])
-    _run([sys.executable, "tools/evidence/update_evidence_index.py"])
     _run([sys.executable, "tools/evidence/update_evidence_index.py", "--check"])
     _run([sys.executable, "tools/evidence/orientation_demo.py", "--check"])
 

@@ -13,12 +13,14 @@ Discovery summary (PR2 — EPIC017):
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import datetime as _dt
 import hashlib
 import json
 import os
 import stat as _stat
 import sys
+import tempfile
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -28,6 +30,7 @@ HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 MIRROR_SHA_PATH = ROOT / "artifacts/evidence_index.jsonl.sha256"
+ORIENTATION_PATH = ROOT / "audit/gates/topology/orientation_demo.txt"
 SANITY_LOG_REL = "audit/gates/sanity_pipeline/sanity_pipeline.log"
 SANITY_LOG_KEY = ("sanity.pipeline.log", SANITY_LOG_REL)
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
@@ -35,7 +38,10 @@ EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+from engine.runtime.determinism_env import (  # noqa: E402
+    DETERMINISM_ENV_PINS,
+    ensure_determinism_env,
+)
 
 
 class _WriteTransaction:
@@ -176,9 +182,136 @@ class _WriteTransaction:
 _ACTIVE_WRITE_TRANSACTION: _WriteTransaction | None = None
 
 
+class _StagedDeletion:
+    """Explicit final-model marker for a path that must be absent."""
+
+
+_STAGED_DELETION = _StagedDeletion()
+
+
+@dataclasses.dataclass
+class _StagedView:
+    """Coherent read/write view of the updater's final, unpublished model."""
+
+    root: Path
+    produced_default: str
+    changes: dict[Path, bytes | _StagedDeletion] = dataclasses.field(
+        default_factory=dict
+    )
+
+    def _assert_scoped(self, path: Path) -> None:
+        try:
+            path.relative_to(self.root)
+        except ValueError as exc:
+            raise RuntimeError(f"staged path escapes repository: {path}") from exc
+
+    def exists(self, path: Path) -> bool:
+        self._assert_scoped(path)
+        staged = self.changes.get(path)
+        if staged is _STAGED_DELETION:
+            return False
+        if isinstance(staged, bytes):
+            return True
+        return path.exists()
+
+    def read_bytes(self, path: Path) -> bytes:
+        self._assert_scoped(path)
+        staged = self.changes.get(path)
+        if staged is _STAGED_DELETION:
+            raise FileNotFoundError(f"staged deletion has no bytes: {path}")
+        if isinstance(staged, bytes):
+            return staged
+        return path.read_bytes()
+
+    def size_bytes(self, path: Path) -> int:
+        return len(self.read_bytes(path))
+
+    def proof_mtime(self, path: Path) -> float:
+        """Return stable provenance without requiring an inode for additions."""
+
+        self._assert_scoped(path)
+        if path.exists():
+            return path.stat().st_mtime
+        if self.exists(path):
+            return _parse_utc_iso8601(self.produced_default).timestamp()
+        raise FileNotFoundError(path)
+
+    def stage_bytes(self, path: Path, content: bytes) -> None:
+        self._assert_scoped(path)
+        self.changes[path] = content
+
+    def stage_deletion(self, path: Path) -> None:
+        self._assert_scoped(path)
+        self.changes[path] = _STAGED_DELETION
+
+
+_STAGED_VIEW: _StagedView | None = None
+
+
+def _read_bytes(path: Path) -> bytes:
+    if _STAGED_VIEW is not None:
+        return _STAGED_VIEW.read_bytes(path)
+    return path.read_bytes()
+
+
+def _path_exists(path: Path) -> bool:
+    if _STAGED_VIEW is not None:
+        return _STAGED_VIEW.exists(path)
+    return path.exists()
+
+
+def _size_bytes(path: Path) -> int:
+    if _STAGED_VIEW is not None:
+        return _STAGED_VIEW.size_bytes(path)
+    return path.stat().st_size
+
+
+def _proof_mtime(path: Path, *, default_produced_at: str) -> float:
+    if _STAGED_VIEW is not None:
+        return _STAGED_VIEW.proof_mtime(path)
+    if path.exists():
+        return path.stat().st_mtime
+    return _parse_utc_iso8601(default_produced_at).timestamp()
+
+
 def _capture_transaction_preimage(path: Path) -> None:
     if _ACTIVE_WRITE_TRANSACTION is not None:
         _ACTIVE_WRITE_TRANSACTION.capture(path)
+
+
+def _assert_unaliased_write_path(path: Path) -> None:
+    """Reject aliased updater outputs before any unchanged-byte fast path."""
+
+    # Path's direct filesystem operations always resolve relative names from
+    # CWD. Derive that actual lexical target before selecting its policy scope.
+    scoped_path = path if path.is_absolute() else Path.cwd() / path
+    if _STAGED_VIEW is not None:
+        root = _STAGED_VIEW.root
+    elif _ACTIVE_WRITE_TRANSACTION is not None:
+        root = _ACTIVE_WRITE_TRANSACTION.root
+    else:
+        root = ROOT
+        if not scoped_path.is_relative_to(root):
+            # Standalone helper tests and callers may use a scratch path. Keep
+            # that behavior while checking its complete lexical parent chain.
+            root = Path(scoped_path.anchor)
+    try:
+        relative = scoped_path.relative_to(root)
+    except ValueError as exc:
+        raise RuntimeError(f"transaction path escapes repository: {path}") from exc
+    if ".." in relative.parts:
+        raise RuntimeError(f"transaction path escapes repository: {path}")
+    if scoped_path == root:
+        raise RuntimeError(f"transaction path names repository root: {path}")
+    if scoped_path.is_symlink():
+        raise SystemExit(f"ALIASED_TRANSACTION_FILE:{scoped_path}")
+    current = scoped_path.parent
+    while True:
+        if current.is_symlink():
+            raise SystemExit(f"ALIASED_TRANSACTION_DIRECTORY:{current}")
+        if current == root:
+            break
+        current = current.parent
 
 
 BASELINE_ENTRIES: list[dict[str, object]] = [
@@ -1766,8 +1899,6 @@ def _load_epic037_pr04_entries() -> list[dict[str, object]]:
         path = ROOT / rel
         if not path.exists():
             raise SystemExit(f"MISSING_EPIC037_PR04_ARTIFACT:{rel}")
-        if not path.with_name(path.name + ".path_proof.txt").exists():
-            raise SystemExit(f"MISSING_EPIC037_PR04_PATH_PROOF:{rel}")
         normalized = dict(entry)
         if isinstance(produced, str) and produced:
             normalized["produced_at_utc"] = produced
@@ -3260,7 +3391,7 @@ def _sha256_bytes(data: bytes) -> str:
 
 
 def _sha256_path(path: Path) -> str:
-    return _sha256_bytes(path.read_bytes())
+    return _sha256_bytes(_read_bytes(path))
 
 
 def _render_env_pins() -> str:
@@ -3305,9 +3436,9 @@ def _isolated_release_timestamp() -> str | None:
 
 def _load_mirror_roles() -> dict[tuple[str, str], str]:
     roles: dict[tuple[str, str], str] = {}
-    if not MIRROR_PATH.exists():
+    if not _path_exists(MIRROR_PATH):
         return roles
-    for raw in MIRROR_PATH.read_text(encoding="utf-8").splitlines():
+    for raw in _read_bytes(MIRROR_PATH).decode("utf-8").splitlines():
         if not raw.strip():
             continue
         obj = json.loads(raw)
@@ -3316,10 +3447,11 @@ def _load_mirror_roles() -> dict[tuple[str, str], str]:
 
 
 def _load_existing_proof(proof_path: Path) -> dict[str, str]:
-    if not proof_path.exists():
+    _assert_unaliased_write_path(proof_path)
+    if not _path_exists(proof_path):
         return {}
     data: dict[str, str] = {}
-    for line in proof_path.read_text(encoding="utf-8").splitlines():
+    for line in _read_bytes(proof_path).decode("utf-8").splitlines():
         if not line:
             continue
         if ": " not in line:
@@ -3423,7 +3555,7 @@ def _write_path_proof(
         except Exception:  # noqa: BLE001
             produced = default_produced_at
     if check:
-        if not proof_path.exists():
+        if not _path_exists(proof_path):
             raise SystemExit(f"MISSING_PROOF:{proof_rel}")
         proof = existing
         if set(proof) != expected_field_names:
@@ -3472,13 +3604,11 @@ def _write_path_proof(
         ]
     )
     proof_text = "\n".join(proof_lines)
-    if proof_path.exists():
-        existing_text = proof_path.read_text(encoding="utf-8")
+    if _path_exists(proof_path):
+        existing_text = _read_bytes(proof_path).decode("utf-8")
         if existing_text == proof_text:
             return proof_rel, produced
-    _capture_transaction_preimage(proof_path)
-    proof_path.parent.mkdir(parents=True, exist_ok=True)
-    proof_path.write_text(proof_text, encoding="utf-8")
+    _write_if_changed(proof_path, proof_text.encode("utf-8"), check=False)
     return proof_rel, produced
 
 
@@ -3549,7 +3679,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 
 def _load_human_index() -> list[dict[str, object]]:
-    payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+    payload = json.loads(_read_bytes(HUMAN_INDEX).decode("utf-8"))
     payload = [
         entry
         for entry in payload
@@ -3776,21 +3906,22 @@ def _render_mirror(
             records.append(record)
             continue
 
-        sha = _sha256_bytes(rel_path.read_bytes())
-        stat = rel_path.stat()
+        sha = _sha256_bytes(_read_bytes(rel_path))
         proof_anchor, produced_at = _write_path_proof(
             path,
             sha256=sha,
-            size_bytes=stat.st_size,
+            size_bytes=_size_bytes(rel_path),
             mtime_utc=None,
             produced_at=str(entry.get("produced_at_utc")) if entry.get("produced_at_utc") else None,
             default_produced_at=produced_default,
             check=check,
-            stat_mtime=stat.st_mtime,
+            stat_mtime=_proof_mtime(
+                rel_path, default_produced_at=produced_default
+            ),
         )
         record.update({
             "sha256": sha,
-            "size_bytes": stat.st_size,
+            "size_bytes": _size_bytes(rel_path),
             "produced_at_utc": produced_at,
             "proof_anchor": proof_anchor,
         })
@@ -3827,15 +3958,68 @@ def _render_mirror(
     return ("\n".join(rendered_lines) + "\n").encode("utf-8"), mirror_rec
 
 
+def _render_orientation(
+    entries: Iterable[Mapping[str, object]],
+) -> bytes:
+    """Render the orientation summary from the final ordered ledger model."""
+
+    human_keys = [
+        (str(entry["artifact_key"]), str(entry["discovered_physical_path"]))
+        for entry in _dedupe_entries(entries)
+    ]
+    return (
+        "orientation demo (evidence skeleton)\n"
+        f"total_artifacts: {len(human_keys)}\n"
+        "status: ok\n"
+        "sample: INDEX and mirror entries are coherent\n"
+    ).encode("utf-8")
+
+
+def _publish_staged(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
+    """Replace the complete staged model under the active rollback boundary."""
+
+    for path in sorted(staged, key=lambda item: item.as_posix()):
+        _assert_unaliased_write_path(path)
+        content = staged[path]
+        if content is _STAGED_DELETION:
+            if path.exists():
+                _capture_transaction_preimage(path)
+                path.unlink()
+            continue
+        if path.exists() and path.read_bytes() == content:
+            continue
+        _capture_transaction_preimage(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+        temporary = Path(temporary_name)
+        try:
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            if path.exists():
+                os.chmod(temporary, _stat.S_IMODE(path.stat().st_mode))
+            else:
+                os.chmod(temporary, 0o644)
+            os.replace(temporary, path)
+        finally:
+            if temporary.exists():
+                temporary.unlink()
+
+
 def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
-    if path.exists():
-        existing = path.read_bytes()
+    _assert_unaliased_write_path(path)
+    if _path_exists(path):
+        existing = _read_bytes(path)
         if existing == content:
             return
         if check:
             raise SystemExit(f"STALE:{path}")
     elif check:
         raise SystemExit(f"STALE:{path}")
+    if _STAGED_VIEW is not None:
+        _STAGED_VIEW.stage_bytes(path, content)
+        return
     _capture_transaction_preimage(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
@@ -3844,23 +4028,24 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
 def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) -> None:
     rel = path.relative_to(ROOT).as_posix()
     proof_existing = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
-    stat = path.stat()
     _write_path_proof(
         rel,
         sha256=_sha256_path(path),
-        size_bytes=stat.st_size,
+        size_bytes=_size_bytes(path),
         mtime_utc=proof_existing.get("mtime_utc"),
         produced_at=proof_existing.get("produced_at_utc"),
         default_produced_at=default_produced_at,
         check=check,
-        stat_mtime=stat.st_mtime,
+        stat_mtime=_proof_mtime(path, default_produced_at=default_produced_at),
     )
 
 
-def _rebind_sanity_log_only() -> None:
-    """Rebind the canonical sanity log without changing evidence membership."""
+def _rebind_sanity_log_model(*, produced_default: str, check: bool) -> None:
+    """Render or validate the targeted sanity-log rebind model."""
+    for updater_input in (HUMAN_INDEX, HASH_SENTINEL, MIRROR_PATH):
+        _assert_unaliased_write_path(updater_input)
     try:
-        human_payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+        human_payload = json.loads(_read_bytes(HUMAN_INDEX).decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise SystemExit("SANITY_REBIND_HUMAN_INDEX_INVALID") from exc
     if not isinstance(human_payload, list):
@@ -3884,7 +4069,7 @@ def _rebind_sanity_log_only() -> None:
         f"{_sha256_path(HUMAN_INDEX)}  docs/evidence/INDEX.json\n"
     ).encode("utf-8")
     try:
-        current_sentinel = HASH_SENTINEL.read_bytes()
+        current_sentinel = _read_bytes(HASH_SENTINEL)
     except OSError as exc:
         raise SystemExit("SANITY_REBIND_HUMAN_INDEX_SENTINEL_INVALID") from exc
     if current_sentinel != expected_sentinel:
@@ -3892,7 +4077,7 @@ def _rebind_sanity_log_only() -> None:
 
     records: list[dict[str, object]] = []
     try:
-        mirror_lines = MIRROR_PATH.read_text(encoding="utf-8").splitlines()
+        mirror_lines = _read_bytes(MIRROR_PATH).decode("utf-8").splitlines()
     except (OSError, UnicodeError) as exc:
         raise SystemExit("SANITY_REBIND_MIRROR_INVALID") from exc
     for raw in mirror_lines:
@@ -3924,8 +4109,9 @@ def _rebind_sanity_log_only() -> None:
         raise SystemExit("SANITY_REBIND_REQUIRED_ROW_MISSING")
 
     sanity_path = ROOT / SANITY_LOG_REL
+    _assert_unaliased_write_path(sanity_path)
     try:
-        sanity_bytes = sanity_path.read_bytes()
+        sanity_bytes = _read_bytes(sanity_path)
     except OSError as exc:
         raise SystemExit("SANITY_REBIND_LOG_MISSING") from exc
     if not sanity_bytes:
@@ -3933,8 +4119,9 @@ def _rebind_sanity_log_only() -> None:
     if not sanity_bytes.endswith(b"summary:FAIL\n"):
         raise SystemExit("SANITY_REBIND_LOG_NOT_FAIL")
 
-    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-    sanity_stat = sanity_path.stat()
+    sanity_mtime = _proof_mtime(
+        sanity_path, default_produced_at=produced_default
+    )
     sanity_proof = _load_existing_proof(ROOT / f"{SANITY_LOG_REL}.path_proof.txt")
     proof_anchor, sanity_produced = _write_path_proof(
         SANITY_LOG_REL,
@@ -3943,8 +4130,8 @@ def _rebind_sanity_log_only() -> None:
         mtime_utc=sanity_proof.get("mtime_utc"),
         produced_at=produced_default,
         default_produced_at=produced_default,
-        check=False,
-        stat_mtime=sanity_stat.st_mtime,
+        check=check,
+        stat_mtime=sanity_mtime,
     )
     by_key[SANITY_LOG_KEY].update(
         {
@@ -3971,25 +4158,28 @@ def _rebind_sanity_log_only() -> None:
         if mirror_record.get("size_bytes") == len(mirror_bytes):
             break
         mirror_record["size_bytes"] = len(mirror_bytes)
-    _write_if_changed(MIRROR_PATH, mirror_bytes, check=False)
+    _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
-    mirror_stat = MIRROR_PATH.stat()
+    mirror_size = _size_bytes(MIRROR_PATH)
+    mirror_mtime = _proof_mtime(
+        MIRROR_PATH, default_produced_at=produced_default
+    )
     mirror_file_sha = _sha256_path(MIRROR_PATH)
     mirror_sha_bytes = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
-    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_bytes, check=False)
+    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_bytes, check=check)
     _refresh_path_proof(
-        MIRROR_SHA_PATH, default_produced_at=produced_default, check=False
+        MIRROR_SHA_PATH, default_produced_at=produced_default, check=check
     )
     mirror_proof = _load_existing_proof(ROOT / f"{MIRROR_REL}.path_proof.txt")
     _write_path_proof(
         MIRROR_REL,
         sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
+        size_bytes=mirror_size,
         mtime_utc=mirror_proof.get("mtime_utc"),
         produced_at=produced_default,
         default_produced_at=produced_default,
-        check=False,
-        stat_mtime=mirror_stat.st_mtime,
+        check=check,
+        stat_mtime=mirror_mtime,
         extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
     )
 
@@ -4001,7 +4191,7 @@ def _rebind_sanity_log_only() -> None:
         produced_at=None,
         default_produced_at=produced_default,
         check=True,
-        stat_mtime=sanity_stat.st_mtime,
+        stat_mtime=sanity_mtime,
     )
     _refresh_path_proof(
         MIRROR_SHA_PATH, default_produced_at=produced_default, check=True
@@ -4009,14 +4199,44 @@ def _rebind_sanity_log_only() -> None:
     _write_path_proof(
         MIRROR_REL,
         sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
+        size_bytes=mirror_size,
         mtime_utc=None,
         produced_at=None,
         default_produced_at=produced_default,
         check=True,
-        stat_mtime=mirror_stat.st_mtime,
+        stat_mtime=mirror_mtime,
         extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
     )
+
+
+def _run_sanity_log_rebind_transaction() -> None:
+    """Publish the failure-log rebind through the atomic ledger boundary."""
+
+    global _STAGED_VIEW
+    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    try:
+        with _WriteTransaction(ROOT):
+            _STAGED_VIEW = _StagedView(ROOT, produced_default)
+            _rebind_sanity_log_model(
+                produced_default=produced_default, check=False
+            )
+            _rebind_sanity_log_model(
+                produced_default=produced_default, check=True
+            )
+            staged = dict(_STAGED_VIEW.changes)
+            _STAGED_VIEW = None
+            _publish_staged(staged)
+            _rebind_sanity_log_model(
+                produced_default=produced_default, check=True
+            )
+    finally:
+        _STAGED_VIEW = None
+
+
+def _rebind_sanity_log_only() -> None:
+    """Atomically rebind the canonical sanity log without topology changes."""
+
+    _run_sanity_log_rebind_transaction()
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -4074,12 +4294,14 @@ def main(argv: list[str] | None = None) -> None:
         _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=check)
         _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=check)
 
+        orientation_bytes = _render_orientation(entries)
+        _write_if_changed(ORIENTATION_PATH, orientation_bytes, check=check)
+
         mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
         mirror_size = len(mirror_bytes)
         mirror_rec["size_bytes"] = mirror_size
         _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
-        mirror_stat = MIRROR_PATH.stat()
         mirror_file_sha = _sha256_path(MIRROR_PATH)
         mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
         _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=check)
@@ -4089,12 +4311,14 @@ def main(argv: list[str] | None = None) -> None:
         proof_anchor, produced_at = _write_path_proof(
             MIRROR_REL,
             sha256=mirror_file_sha,
-            size_bytes=mirror_stat.st_size,
+            size_bytes=_size_bytes(MIRROR_PATH),
             mtime_utc=mirror_proof_existing.get("mtime_utc"),
             produced_at=str(mirror_rec.get("produced_at_utc")),
             default_produced_at=produced_default,
             check=check,
-            stat_mtime=mirror_stat.st_mtime,
+            stat_mtime=_proof_mtime(
+                MIRROR_PATH, default_produced_at=produced_default
+            ),
             extra_fields={"mirror_body_sha256": mirror_body_sha},
         )
         if proof_anchor != mirror_rec["proof_anchor"]:
@@ -4105,10 +4329,10 @@ def main(argv: list[str] | None = None) -> None:
             mirror_rec["produced_at_utc"] = produced_at
             if check:
                 raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
-        if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
+        if _size_bytes(MIRROR_PATH) != int(mirror_rec["size_bytes"]):
             if check:
                 raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
-            mirror_rec["size_bytes"] = mirror_stat.st_size
+            mirror_rec["size_bytes"] = _size_bytes(MIRROR_PATH)
 
     if args.check:
         _run_once(check=True)
@@ -4119,22 +4343,45 @@ def main(argv: list[str] | None = None) -> None:
     # Mirror rendering depends on artifacts written by this same updater
     # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
     # so a single rewrite is not always sufficient.
-    with _WriteTransaction(ROOT):
-        max_passes = 6
-        last_error: SystemExit | None = None
-        for _ in range(max_passes):
-            _run_once(check=False)
-            _validate_epic038_closeout_package()
+    global _STAGED_VIEW
+    try:
+        with _WriteTransaction(ROOT):
+            initial_produced = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+            existing_mirror_proof = _load_existing_proof(
+                MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
+            )
+            staged_produced = existing_mirror_proof.get(
+                "produced_at_utc", initial_produced
+            )
             try:
-                _run_once(check=True)
-                last_error = None
-                break
-            except SystemExit as exc:
-                last_error = exc
+                _parse_utc_iso8601(staged_produced)
+            except (TypeError, ValueError):
+                staged_produced = initial_produced
+            _STAGED_VIEW = _StagedView(ROOT, staged_produced)
+            max_passes = 6
+            last_error: SystemExit | None = None
+            for _ in range(max_passes):
+                _run_once(check=False)
+                try:
+                    _run_once(check=True)
+                    last_error = None
+                    break
+                except SystemExit as exc:
+                    last_error = exc
 
-        if last_error is not None:
-            raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
-        _validate_epic038_closeout_package()
+            if last_error is not None:
+                raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+            staged = dict(_STAGED_VIEW.changes)
+            _STAGED_VIEW = None
+            _publish_staged(staged)
+            _run_once(check=True)
+            # The legacy closeout validator reads its registered companions
+            # directly from the filesystem. Validate only after publication,
+            # while the rollback transaction is still active, so it observes
+            # one coherent ledger without gaining a second staged-read model.
+            _validate_epic038_closeout_package()
+    finally:
+        _STAGED_VIEW = None
 
 
 if __name__ == "__main__":

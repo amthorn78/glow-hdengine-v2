@@ -318,6 +318,13 @@ FINAL_LF_REQUIRED_PATHS = (
     "docs/evidence/INDEX.json",
     "docs/evidence/INDEX.sha256",
     "artifacts/evidence_index.jsonl",
+    "docs/evidence/INDEX.json.path_proof.txt",
+    "docs/evidence/INDEX.sha256.path_proof.txt",
+    "artifacts/evidence_index.jsonl.path_proof.txt",
+    "artifacts/evidence_index.jsonl.sha256",
+    "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+    "audit/gates/topology/orientation_demo.txt",
+    "audit/gates/topology/orientation_demo.txt.path_proof.txt",
     "artifacts/runtime/env_matrix.snapshot.json",
     "artifacts/runtime/env_matrix.snapshot.json.path_proof.txt",
     "audit/qa/hde-epic038/token_evidence_matrix.md",
@@ -935,14 +942,6 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
             "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
             "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
         ),
-        (
-            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
-            "LANG=C TZ=UTC python tools/evidence/orientation_demo.py"
-        ),
-        (
-            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
-            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
-        ),
         f"              {PLAN_CLOSEOUT_CHECK_COMMAND}",
         f"              {PLAN_FOCUSED_TEST_COMMAND}",
         "            )",
@@ -1087,14 +1086,6 @@ def validate_doc_delta_ci(workflow_text: str | None = None) -> None:
         (
             "              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID "
             "_HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST"
-        ),
-        (
-            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
-            "LANG=C TZ=UTC python tools/evidence/update_evidence_index.py"
-        ),
-        (
-            "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "
-            "LANG=C TZ=UTC python tools/evidence/orientation_demo.py"
         ),
         (
             "              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C "

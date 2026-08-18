@@ -7,10 +7,17 @@ from tools.evidence import orientation_demo
 
 
 def test_orientation_report_matches_files(tmp_path):
-    orientation_demo.generate_orientation(check=False)
+    orientation_demo.generate_orientation(check=True)
     text = Path("audit/gates/topology/orientation_demo.txt").read_text(encoding="utf-8")
     assert text.startswith("orientation demo (evidence skeleton)\n")
     assert "status: ok" in text
+
+
+def test_orientation_write_delegates_to_updater(monkeypatch):
+    calls = []
+    monkeypatch.setattr(orientation_demo, "update_evidence_index", lambda argv: calls.append(argv))
+    orientation_demo.generate_orientation(check=False)
+    assert calls == [[]]
 
 
 def test_orientation_detects_mismatch(tmp_path, monkeypatch):
