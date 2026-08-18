@@ -1594,10 +1594,19 @@ def _publish_captured_candidate(
     root: Path,
     *,
     expected_preimages: Mapping[str, PublicationTargetPreimage] | None = None,
+    expected_revision: str | None = None,
 ) -> None:
+    def require_expected_head() -> None:
+        if (
+            expected_revision is not None
+            and _require_git_head(root) != expected_revision
+        ):
+            raise RuntimeError("EPIC029_SOURCE_HEAD_CHANGED")
+
     originals: dict[str, tuple[bytes, int] | None] = {}
     preflight: dict[str, PublicationTargetPreimage] = {}
     published: list[str] = []
+    require_expected_head()
     for staged_file in candidate:
         rel = staged_file.rel
         target = root / rel
@@ -1624,26 +1633,38 @@ def _publish_captured_candidate(
             else None
         )
     try:
+        require_expected_head()
         for staged_file in candidate:
             rel = staged_file.rel
+            require_expected_head()
             if _publication_target_preimage(root, rel) != preflight[rel]:
                 raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
+            require_expected_head()
+            published.append(rel)
             _write_bytes_atomically(
                 root / rel,
                 staged_file.content,
                 staged_file.mode,
             )
-            published.append(rel)
+            require_expected_head()
         for staged_file in candidate:
+            require_expected_head()
             if (root / staged_file.rel).read_bytes() != staged_file.content:
                 rel = staged_file.rel
                 raise RuntimeError(f"Post-publication byte verification failed: {rel}")
+            require_expected_head()
         config = qa_harness.HarnessConfig(EPIC_ID, repo_root=root)
         for check_id in (*REQUALIFICATION_CHECK_IDS, "acceptance-map-viability"):
+            require_expected_head()
             qa_harness.verify_manifest_entry(config, check_id)
+            require_expected_head()
+        require_expected_head()
         _verify_viability_pair(root)
+        require_expected_head()
         _verify_manifest_paths(root)
+        require_expected_head()
         _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), root)
+        require_expected_head()
     except BaseException:
         for rel in reversed(published):
             target = root / rel
@@ -1718,6 +1739,7 @@ def _orchestrate_from_head() -> int:
         candidate,
         ROOT,
         expected_preimages=publication_preimages,
+        expected_revision=revision,
     )
     return 0
 

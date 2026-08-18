@@ -1262,6 +1262,45 @@ def _supersede_legacy_bootstrap_manifest(config: qa_harness.HarnessConfig) -> No
     )
 
 
+def _record_bootstrap_with_legacy_supersession(
+    config: qa_harness.HarnessConfig,
+    bootstrap: qa_harness.CheckResult,
+) -> tuple[Path, Path]:
+    """Publish the lowercase bootstrap and retire its legacy binding atomically."""
+    if bootstrap.check_id != BOOTSTRAP_CHECK_ID:
+        raise ValueError("EPIC021_BOOTSTRAP_CHECK_ID_MISMATCH")
+    checks = qa_harness._preflight_manifest(config)
+    if LEGACY_BOOTSTRAP_CHECK_ID in checks and BOOTSTRAP_CHECK_ID in checks:
+        raise RuntimeError("EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING")
+    checks.pop(LEGACY_BOOTSTRAP_CHECK_ID, None)
+
+    bootstrap_log, bootstrap_content = qa_harness._primary_log_content(
+        config, bootstrap
+    )
+    checks[BOOTSTRAP_CHECK_ID] = {
+        "check_id": BOOTSTRAP_CHECK_ID,
+        "log_path": qa_harness._repo_relative(config, bootstrap_log),
+        "status": bootstrap.status.value,
+    }
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+
+    def verify_publication() -> None:
+        qa_harness._verify_written_primary(
+            bootstrap_log, BOOTSTRAP_CHECK_ID, bootstrap.status
+        )
+        qa_harness._verify_flat_manifest(config, checks)
+
+    qa_harness._publish_with_rollback(
+        (
+            (bootstrap_log, bootstrap_content),
+            (manifest, qa_harness._manifest_content(checks)),
+        ),
+        verify_publication,
+        repo_root=config.repo_root,
+    )
+    return bootstrap_log, manifest
+
+
 def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
     """Execute EPIC021's concrete bootstrap and governed viability definitions."""
     config = qa_harness.HarnessConfig(EPIC_ID, repo_root=repo_root)
@@ -1271,8 +1310,9 @@ def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
         ("-q", BOOTSTRAP_TEST),
         check_name="EPIC021 tooling bootstrap",
     )
-    _supersede_legacy_bootstrap_manifest(config)
-    bootstrap_log, manifest = qa_harness.record_check(config, bootstrap)
+    bootstrap_log, manifest = _record_bootstrap_with_legacy_supersession(
+        config, bootstrap
+    )
     viability = qa_harness.generate_acceptance_map_viability(
         config, publish_governed_ledger=True
     )
@@ -1327,8 +1367,7 @@ def _execute_current_family() -> dict[str, object]:
         check_name="EPIC021 tooling bootstrap",
         intended_tokens=("QA_BOOTSTRAP_OK",),
     )
-    _supersede_legacy_bootstrap_manifest(config)
-    qa_harness.record_check(config, bootstrap)
+    _record_bootstrap_with_legacy_supersession(config, bootstrap)
     _require_pass(bootstrap)
 
     tooling_classification = _tooling_classification_result(root=ROOT)

@@ -892,8 +892,10 @@ def test_orchestration_allows_unrelated_source_drift(
         root: Path,
         *,
         expected_preimages: Mapping[str, epic029.PublicationTargetPreimage],
+        expected_revision: str,
     ) -> None:
         assert expected_preimages[rel].content == b"source preimage\n"
+        assert expected_revision == "a" * 40
         captured = tuple(candidate)
         published.append(captured)
         (root / rel).write_bytes(captured[0].content)
@@ -974,6 +976,51 @@ def test_publication_target_race_aborts_before_writes(
 
     assert writes == []
     assert target.read_bytes() == b"concurrent change\n"
+
+
+def test_publication_rolls_back_when_source_head_changes_during_write(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    rel = "audit/qa/hde-epic029/token_evidence_matrix.md"
+    target = tmp_path / rel
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"stable source preimage\n")
+    original_mode = target.stat().st_mode & 0o777
+    unrelated = tmp_path / "local-untracked-notes.txt"
+    unrelated.write_bytes(b"preserve me\n")
+    preimages = epic029._capture_publication_preimages(tmp_path)
+    expected_revision = "a" * 40
+    current_revision = expected_revision
+    write_bytes_atomically = epic029._write_bytes_atomically
+
+    def advance_head_during_candidate_write(path: Path, data: bytes, mode: int) -> None:
+        nonlocal current_revision
+        write_bytes_atomically(path, data, mode)
+        if data == b"candidate\n":
+            current_revision = "b" * 40
+
+    monkeypatch.setattr(
+        epic029,
+        "_require_git_head",
+        lambda _root: current_revision,
+    )
+    monkeypatch.setattr(
+        epic029,
+        "_write_bytes_atomically",
+        advance_head_during_candidate_write,
+    )
+
+    with pytest.raises(RuntimeError, match="EPIC029_SOURCE_HEAD_CHANGED"):
+        epic029._publish_captured_candidate(
+            (epic029.StagedCandidateFile(rel, b"candidate\n", 0o640),),
+            tmp_path,
+            expected_preimages=preimages,
+            expected_revision=expected_revision,
+        )
+
+    assert target.read_bytes() == b"stable source preimage\n"
+    assert target.stat().st_mode & 0o777 == original_mode
+    assert unrelated.read_bytes() == b"preserve me\n"
 
 
 def test_orchestration_never_publishes_before_worktree_cleanup_succeeds(

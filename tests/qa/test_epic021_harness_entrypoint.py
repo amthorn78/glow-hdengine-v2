@@ -195,6 +195,40 @@ def test_wrapper_replaces_legacy_binding_but_preserves_historical_bytes(
     assert proof.read_bytes() == proof_before
 
 
+def test_wrapper_restores_exact_legacy_manifest_when_lowercase_write_is_blocked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    _repo(tmp_path)
+    _, primary, proof = _legacy_bootstrap_binding(tmp_path)
+    manifest = tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+    manifest_before = manifest.read_bytes()
+    primary_before = primary.read_bytes()
+    proof_before = proof.read_bytes()
+    lowercase = tmp_path / "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
+    lowercase.parent.mkdir(parents=True)
+    blocked_target = tmp_path / "blocked-bootstrap.log"
+    blocked_target.write_bytes(b"do not replace\n")
+    lowercase.symlink_to(blocked_target)
+
+    class Done:
+        returncode = 0
+        stdout = "passed"
+        stderr = ""
+
+    monkeypatch.setattr(
+        "tools.qa.qa_harness.subprocess.run", lambda *args, **kwargs: Done()
+    )
+
+    with pytest.raises(ValueError, match="publication output cannot be a symlink"):
+        run_epic021_qa(repo_root=tmp_path)
+
+    assert manifest.read_bytes() == manifest_before
+    assert primary.read_bytes() == primary_before
+    assert proof.read_bytes() == proof_before
+    assert lowercase.is_symlink()
+    assert blocked_target.read_bytes() == b"do not replace\n"
+
+
 def test_legacy_bootstrap_supersession_rolls_back_with_outer_transaction(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
