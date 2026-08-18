@@ -6,7 +6,7 @@ import pytest
 from tools.qa import epic021_qa
 from tools.evidence import run_sanity_pipeline
 from tools.qa.epic021_qa import run_epic021_qa
-from tools.qa.qa_harness import Status
+from tools.qa.qa_harness import CheckResult, HarnessConfig, Status, record_check
 
 
 def _repo(root: Path) -> None:
@@ -42,7 +42,7 @@ def _repo(root: Path) -> None:
         "| --- | --- | --- | --- | --- | --- | --- |\n"
         "| QA_HARNESS_DISCIPLINE_OK | PF04 | proof.txt | "
         "python -m pytest -q tests/qa/test_epic021_scaffolding.py | "
-        "checks/D00_bootstrap/primary.log | Implemented | fixture |\n",
+        "checks/d00-bootstrap/primary.log | Implemented | fixture |\n",
         encoding="utf-8",
     )
     tests = root / "tests/qa"
@@ -73,7 +73,7 @@ def test_wrapper_delegates_to_current_state_harness(
             tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
         ).read_text()
     )
-    assert set(manifest) == {"D00_bootstrap", "acceptance-map-viability"}
+    assert set(manifest) == {"d00-bootstrap", "acceptance-map-viability"}
     assert "run_id" not in json.dumps(manifest)
     ledger = tmp_path / "audit/qa/hde-epic021/acceptance_map_viability.log"
     assert result["governed_ledger"] == ledger
@@ -128,6 +128,117 @@ def test_outer_transaction_restores_bytes_modes_and_new_targets(
     assert existing.stat().st_mode & 0o777 == 0o640
     assert not created.exists()
     assert not created.parent.exists()
+
+
+def _legacy_bootstrap_binding(root: Path) -> tuple[HarnessConfig, Path, Path]:
+    config = HarnessConfig("HDE-EPIC021", repo_root=root)
+    relative = "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log"
+    primary, _ = record_check(
+        config,
+        CheckResult(
+            "D00_bootstrap",
+            Status.PASS,
+            command=("python", "-V"),
+            command_provenance="test fixture",
+            exit_code=0,
+            evidence_artifacts=(relative,),
+        ),
+    )
+    proof = primary.with_name("primary.log.path_proof.txt")
+    proof.write_bytes(b"historical proof\n")
+    return config, primary, proof
+
+
+def test_legacy_bootstrap_binding_is_superseded_idempotently_without_rewrite(
+    tmp_path: Path,
+):
+    config, primary, proof = _legacy_bootstrap_binding(tmp_path)
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    primary_before = primary.read_bytes()
+    proof_before = proof.read_bytes()
+
+    epic021_qa._supersede_legacy_bootstrap_manifest(config)
+    first_manifest = manifest.read_bytes()
+    epic021_qa._supersede_legacy_bootstrap_manifest(config)
+
+    assert json.loads(first_manifest) == {}
+    assert manifest.read_bytes() == first_manifest
+    assert primary.read_bytes() == primary_before
+    assert proof.read_bytes() == proof_before
+
+
+def test_wrapper_replaces_legacy_binding_but_preserves_historical_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    _repo(tmp_path)
+    _, primary, proof = _legacy_bootstrap_binding(tmp_path)
+    primary_before = primary.read_bytes()
+    proof_before = proof.read_bytes()
+
+    class Done:
+        returncode = 0
+        stdout = "passed"
+        stderr = ""
+
+    monkeypatch.setattr(
+        "tools.qa.qa_harness.subprocess.run", lambda *args, **kwargs: Done()
+    )
+    run_epic021_qa(repo_root=tmp_path)
+
+    manifest = json.loads(
+        (
+            tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert set(manifest) == {"d00-bootstrap", "acceptance-map-viability"}
+    assert primary.read_bytes() == primary_before
+    assert proof.read_bytes() == proof_before
+
+
+def test_legacy_bootstrap_supersession_rolls_back_with_outer_transaction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    config, primary, proof = _legacy_bootstrap_binding(tmp_path)
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    before = {
+        path: path.read_bytes()
+        for path in (manifest, primary, proof)
+    }
+    monkeypatch.setattr(epic021_qa, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        epic021_qa,
+        "_wrapper_write_paths",
+        lambda: (manifest, primary, proof),
+    )
+
+    with pytest.raises(RuntimeError, match="injected"):
+        with epic021_qa._WrapperWriteTransaction():
+            epic021_qa._supersede_legacy_bootstrap_manifest(config)
+            raise RuntimeError("injected")
+
+    assert {path: path.read_bytes() for path in before} == before
+
+
+def test_legacy_bootstrap_supersession_rejects_dual_current_authority(
+    tmp_path: Path,
+):
+    config, _, _ = _legacy_bootstrap_binding(tmp_path)
+    record_check(
+        config,
+        CheckResult(
+            "d00-bootstrap",
+            Status.PASS,
+            command=("python", "-V"),
+            command_provenance="test fixture",
+            exit_code=0,
+            evidence_artifacts=(
+                "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log",
+            ),
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING"):
+        epic021_qa._supersede_legacy_bootstrap_manifest(config)
 
 
 def test_main_rolls_back_input_writes_when_finalization_fails(
@@ -256,7 +367,7 @@ def test_close_pack_names_required_rails_and_same_run_receipts():
             "audit/qa/hde-epic021/checks/acceptance-map-viability/primary.log"
         ),
         "qa_log_bootstrap": (
-            "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log"
+            "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
         ),
         "qa_log_bootstrap_tooling_classification": (
             "audit/qa/hde-epic021/checks/"

@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic021/checks/d00-bootstrap/primary.log
+size_bytes: 1024
+sha256: 1729162fccfa5ddd465cdc3b2a048df59138e6a9e2ebe24717d2aa20214964a5
+mtime_utc: 2026-08-18T19:06:17Z
+produced_at_utc: 2026-08-18T19:06:17Z

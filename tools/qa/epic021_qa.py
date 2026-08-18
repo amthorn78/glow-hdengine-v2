@@ -25,7 +25,8 @@ from tools.qa import qa_harness
 
 EPIC_ID = "HDE-EPIC021"
 EPIC_SLUG = "hde-epic021"
-BOOTSTRAP_CHECK_ID = "D00_bootstrap"
+BOOTSTRAP_CHECK_ID = "d00-bootstrap"
+LEGACY_BOOTSTRAP_CHECK_ID = "D00_bootstrap"
 BOOTSTRAP_TEST = "tests/qa/test_epic021_scaffolding.py"
 QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 ACCEPTANCE_MAP_PATH = ROOT / "docs" / "acceptance_map_epic021.json"
@@ -246,15 +247,15 @@ TOKENS = (
         "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "audit/qa/hde-epic021/README.md; audit/qa/hde-epic021/qa_step_logs_manifest.json; audit/qa/hde-epic021/checks/po-postcommit/primary.log",
         "python tools/qa/epic021_qa.py; python -m pytest -q -p no:cacheprovider tests/qa/test_epic021_harness_entrypoint.py tests/qa/test_generic_qa_harness.py",
-        "checks/D00_bootstrap/primary.log; checks/po-epic021-live-qa/primary.log; checks/po-postcommit/primary.log; checks/acceptance-map-viability/primary.log",
+        "checks/d00-bootstrap/primary.log; checks/po-epic021-live-qa/primary.log; checks/po-postcommit/primary.log; checks/acceptance-map-viability/primary.log",
         "The responsible tools/qa/epic021_qa.py entrypoint and stable current-state receipts replace run consolidation and placeholders.",
     ),
     _token(
         "QA_BOOTSTRAP_OK",
         "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log; audit/qa/hde-epic021/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log; audit/qa/hde-epic021/qa_step_logs_manifest.json",
         "python -m pytest -q -p no:cacheprovider tests/qa/test_epic021_scaffolding.py",
-        "checks/D00_bootstrap/primary.log",
+        "checks/d00-bootstrap/primary.log",
         "The current PF27 bootstrap receipt replaces the noncanonical PR_OPENED_OK label.",
     ),
     _token(
@@ -322,7 +323,7 @@ The entrypoint validates the supplied rails without modifying them. A successful
 transaction publishes one flat, check-keyed `qa_step_logs_manifest.json` whose
 current receipts are:
 
-- `checks/D00_bootstrap/primary.log`
+- `checks/d00-bootstrap/primary.log`
 - `checks/bootstrap-tooling-classification/primary.log`
 - `checks/po-epic021-live-qa/primary.log`
 - `checks/po-precommit/primary.log`
@@ -333,7 +334,7 @@ current receipts are:
 QA_ROOT-owned binding artifacts are:
 
 - `token_evidence_matrix.md`
-- `checks/D00_bootstrap/primary.log`
+- `checks/d00-bootstrap/primary.log`
 - `qa_step_logs_manifest.json`
 - `acceptance_map_viability.log`
 
@@ -367,6 +368,9 @@ move a PF09/PF20 status, or rewrite historical EPIC021 evidence.
 - Replace run-id and `step_*` acceptance mechanics with stable
   `checks/<check_id>/primary.log` receipts, a flat check-keyed manifest, and the
   governed root viability ledger.
+- Supersede the nonconforming uppercase `D00_bootstrap` current binding with
+  the plan-owned `d00-bootstrap` check. Preserve the former receipt and proof
+  as unindexed historical evidence rather than a second current authority.
 
 The historical run directories remain unchanged and non-gating.
 """
@@ -401,7 +405,7 @@ def _close_manifest_content(captured_at_utc: str) -> str:
                 "audit/qa/hde-epic021/checks/acceptance-map-viability/primary.log"
             ),
             "qa_log_bootstrap": (
-                "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log"
+                "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
             ),
             "qa_log_bootstrap_tooling_classification": (
                 "audit/qa/hde-epic021/checks/"
@@ -1104,7 +1108,7 @@ def _wrapper_write_paths() -> tuple[Path, ...]:
         CLOSE_MANIFEST_PATH,
         VIABILITY_LOG_PATH,
         QA_ROOT / "qa_step_logs_manifest.json",
-        QA_ROOT / "checks/D00_bootstrap/primary.log",
+        QA_ROOT / "checks/d00-bootstrap/primary.log",
         QA_ROOT / "checks/po-epic021-live-qa/primary.log",
         QA_ROOT / "checks/bootstrap-tooling-classification/primary.log",
         QA_ROOT / "00_meta/bootstrap_tooling_failure.log",
@@ -1239,6 +1243,25 @@ def _write_acceptance_inputs() -> None:
     qa_harness._atomic_write(README_PATH, _readme_content())
 
 
+def _supersede_legacy_bootstrap_manifest(config: qa_harness.HarnessConfig) -> None:
+    """Retire the uppercase current binding without rewriting its history."""
+    manifest_path = config.qa_root / "qa_step_logs_manifest.json"
+    if not manifest_path.exists():
+        return
+    checks = qa_harness._preflight_manifest(config)
+    if LEGACY_BOOTSTRAP_CHECK_ID not in checks:
+        return
+    if BOOTSTRAP_CHECK_ID in checks:
+        raise RuntimeError("EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING")
+    migrated = dict(checks)
+    migrated.pop(LEGACY_BOOTSTRAP_CHECK_ID)
+    qa_harness._publish_with_rollback(
+        ((manifest_path, qa_harness._manifest_content(migrated)),),
+        lambda: qa_harness._verify_flat_manifest(config, migrated),
+        repo_root=config.repo_root,
+    )
+
+
 def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
     """Execute EPIC021's concrete bootstrap and governed viability definitions."""
     config = qa_harness.HarnessConfig(EPIC_ID, repo_root=repo_root)
@@ -1248,6 +1271,7 @@ def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
         ("-q", BOOTSTRAP_TEST),
         check_name="EPIC021 tooling bootstrap",
     )
+    _supersede_legacy_bootstrap_manifest(config)
     bootstrap_log, manifest = qa_harness.record_check(config, bootstrap)
     viability = qa_harness.generate_acceptance_map_viability(
         config, publish_governed_ledger=True
@@ -1303,6 +1327,7 @@ def _execute_current_family() -> dict[str, object]:
         check_name="EPIC021 tooling bootstrap",
         intended_tokens=("QA_BOOTSTRAP_OK",),
     )
+    _supersede_legacy_bootstrap_manifest(config)
     qa_harness.record_check(config, bootstrap)
     _require_pass(bootstrap)
 

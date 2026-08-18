@@ -1845,8 +1845,10 @@ def evaluate_acceptance_map_viability(
         planned_governed_ledger=planned_governed_ledger,
     )
     entries: list[AcceptanceTokenEntry] = []
+    acceptance_names: list[str] = []
     matrix: dict[str, MatrixRow] = {}
-    token_posture_disposition: dict[str, str] = {}
+    token_integrity_disposition: dict[str, str] = {}
+    acceptance_identity_is_valid = True
 
     registry, registry_error = _governance_tokens(config)
     if registry is None:
@@ -1875,21 +1877,22 @@ def evaluate_acceptance_map_viability(
         if not isinstance(data, dict) or data.get("epic_id") != config.epic_id:
             issues.append(
                 (
-                    Status.FAIL_BEHAVIOR,
+                    Status.FAIL_TOOLING,
                     "acceptance map epic identity is malformed or mismatched",
                 )
             )
+            acceptance_identity_is_valid = False
         tokens = data.get("tokens") if isinstance(data, dict) else None
         if not isinstance(tokens, list) or not tokens:
             issues.append(
-                (Status.FAIL_BEHAVIOR, "acceptance map tokens must be a non-empty list")
+                (Status.FAIL_TOOLING, "acceptance map tokens must be a non-empty list")
             )
         else:
             for token_index, item in enumerate(tokens, start=1):
                 if not isinstance(item, dict):
                     issues.append(
                         (
-                            Status.FAIL_BEHAVIOR,
+                            Status.FAIL_TOOLING,
                             f"acceptance token entry {token_index} is not an object",
                         )
                     )
@@ -1900,26 +1903,30 @@ def evaluate_acceptance_map_viability(
                 if not isinstance(name, str) or not TOKEN_RE.fullmatch(name):
                     issues.append(
                         (
-                            Status.FAIL_BEHAVIOR,
+                            Status.FAIL_TOOLING,
                             f"acceptance token entry {token_index} has an invalid name",
                         )
                     )
                     continue
+                acceptance_names.append(name)
                 posture = _normalized_acceptance_posture(item.get("status"))
                 if posture is None:
                     issues.append(
                         (
-                            Status.FAIL_BEHAVIOR,
+                            Status.FAIL_TOOLING,
                             f"acceptance token {name} has a missing or invalid status",
                         )
                     )
-                    token_posture_disposition[name] = "INVALID_ACCEPTANCE_STATUS"
+                    token_integrity_disposition[name] = "INVALID_ACCEPTANCE_STATUS"
                 if not isinstance(owner_pf, str) or not owner_pf.strip():
                     issues.append(
                         (
-                            Status.FAIL_BEHAVIOR,
+                            Status.FAIL_TOOLING,
                             f"acceptance token {name} has a missing or invalid owner_pf",
                         )
+                    )
+                    token_integrity_disposition.setdefault(
+                        name, "INVALID_ACCEPTANCE_OWNER"
                     )
                     continue
                 if (
@@ -1932,9 +1939,12 @@ def evaluate_acceptance_map_viability(
                 ):
                     issues.append(
                         (
-                            Status.FAIL_BEHAVIOR,
+                            Status.FAIL_TOOLING,
                             f"acceptance token {name} has malformed or empty evidence_titles",
                         )
+                    )
+                    token_integrity_disposition.setdefault(
+                        name, "INVALID_ACCEPTANCE_EVIDENCE_TITLES"
                     )
                     continue
                 entries.append(
@@ -1945,16 +1955,20 @@ def evaluate_acceptance_map_viability(
                         posture,
                     )
                 )
-            names = [entry.name for entry in entries]
-            if len(names) != len(set(names)):
+            if len(acceptance_names) != len(set(acceptance_names)):
                 issues.append(
-                    (Status.FAIL_BEHAVIOR, "acceptance map has duplicate token names")
+                    (Status.FAIL_TOOLING, "acceptance map has duplicate token names")
                 )
-                for name in names:
-                    if names.count(name) > 1:
-                        token_posture_disposition[name] = (
+                for name in acceptance_names:
+                    if acceptance_names.count(name) > 1:
+                        token_integrity_disposition[name] = (
                             "DUPLICATE_ACCEPTANCE_TOKEN"
                         )
+            if not acceptance_identity_is_valid:
+                for name in acceptance_names:
+                    token_integrity_disposition.setdefault(
+                        name, "ACCEPTANCE_MAP_IDENTITY_MISMATCH"
+                    )
 
     if (
         not config.token_matrix_path.is_file()
@@ -1971,44 +1985,44 @@ def evaluate_acceptance_map_viability(
         if matrix_error:
             issues.append((Status.FAIL_TOOLING, matrix_error))
 
-    entry_names = {entry.name for entry in entries}
+    entry_names = set(acceptance_names)
     matrix_names = set(matrix)
-    if entries and matrix and entry_names != matrix_names:
+    if entry_names and matrix and entry_names != matrix_names:
         issues.append(
-            (Status.FAIL_BEHAVIOR, "acceptance map and matrix token coverage differ")
+            (Status.FAIL_TOOLING, "acceptance map and matrix token coverage differ")
         )
     for entry in entries:
         matrix_row = matrix.get(entry.name)
         if matrix_row is not None and entry.owner_pf != matrix_row.owner_pf:
             issues.append(
                 (
-                    Status.FAIL_BEHAVIOR,
+                    Status.FAIL_TOOLING,
                     f"acceptance map and matrix owner_pf disagree for {entry.name}",
                 )
             )
-            token_posture_disposition.setdefault(entry.name, "OWNER_MISMATCH")
+            token_integrity_disposition.setdefault(entry.name, "OWNER_MISMATCH")
         if matrix_row is None:
             continue
         matrix_posture = _normalized_acceptance_posture(matrix_row.status)
         if matrix_posture is None:
             issues.append(
                 (
-                    Status.FAIL_BEHAVIOR,
+                    Status.FAIL_TOOLING,
                     f"matrix token {entry.name} has a missing or invalid status",
                 )
             )
-            token_posture_disposition[entry.name] = "INVALID_MATRIX_STATUS"
+            token_integrity_disposition[entry.name] = "INVALID_MATRIX_STATUS"
         elif entry.status is None:
             pass
         elif entry.status != matrix_posture:
             issues.append(
                 (
-                    Status.FAIL_BEHAVIOR,
+                    Status.FAIL_TOOLING,
                     "acceptance map and matrix status disagree for "
                     f"{entry.name}: {entry.status} != {matrix_posture}",
                 )
             )
-            token_posture_disposition[entry.name] = "STATUS_MISMATCH"
+            token_integrity_disposition[entry.name] = "STATUS_MISMATCH"
         elif entry.status not in COMPLETE_ACCEPTANCE_POSTURES:
             issues.append(
                 (
@@ -2016,15 +2030,16 @@ def evaluate_acceptance_map_viability(
                     f"acceptance token {entry.name} is not implemented: {entry.status}",
                 )
             )
-            token_posture_disposition[entry.name] = entry.status.upper()
+            token_integrity_disposition[entry.name] = entry.status.upper()
     if registry is not None:
         for name in sorted(entry_names - registry):
             issues.append(
                 (
-                    Status.FAIL_BEHAVIOR,
+                    Status.FAIL_TOOLING,
                     f"acceptance map contains unregistered token: {name}",
                 )
             )
+            token_integrity_disposition.setdefault(name, "UNREGISTERED")
 
     for entry in entries:
         for item_index, value in enumerate(entry.evidence_titles, start=1):
@@ -2102,8 +2117,8 @@ def evaluate_acceptance_map_viability(
             token_status[name] = "MISSING_MATRIX"
         elif name not in entry_names:
             token_status[name] = "ORPHAN_MATRIX"
-        elif name in token_posture_disposition:
-            token_status[name] = token_posture_disposition[name]
+        elif name in token_integrity_disposition:
+            token_status[name] = token_integrity_disposition[name]
         else:
             token_diagnostics = [item.status for item in broken if item.token == name]
             token_status[name] = (

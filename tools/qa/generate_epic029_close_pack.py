@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
 import tempfile
@@ -175,6 +176,15 @@ class StagedCandidateFile:
     rel: str
     content: bytes
     mode: int
+
+
+@dataclass(frozen=True)
+class PublicationTargetPreimage:
+    """Ordinary-filesystem state used to detect target-local publication races."""
+
+    kind: str
+    content: bytes | None
+    mode: int | None
 
 
 CommandRunner = Callable[[Sequence[str], Path, Mapping[str, str]], subprocess.CompletedProcess[str]]
@@ -1393,22 +1403,29 @@ def _git_command(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
         raise RuntimeError(f"Git worktree operation failed: {exc}") from exc
 
 
-def _require_clean_git_head(root: Path) -> None:
+def _require_git_head(root: Path) -> str:
     probe = _git_command(root, "rev-parse", "--is-inside-work-tree")
     if probe.returncode != 0 or probe.stdout.strip() != "true":
         raise RuntimeError("EPIC029 orchestration requires a real Git worktree")
-    status = _git_command(root, "status", "--porcelain=v1", "--untracked-files=all")
-    if status.returncode != 0:
-        raise RuntimeError(f"Git cleanliness preflight failed: {status.stderr.strip()}")
-    if status.stdout:
-        raise RuntimeError("EPIC029 orchestration requires a clean HEAD worktree")
+    head = _git_command(root, "rev-parse", "--verify", "HEAD^{commit}")
+    revision = head.stdout.strip()
+    if head.returncode != 0 or re.fullmatch(r"[0-9a-fA-F]{40,64}", revision) is None:
+        raise RuntimeError("EPIC029 orchestration requires an available Git HEAD")
+    return revision
 
 
 @contextlib.contextmanager
-def _staging_worktree(root: Path) -> Iterator[Path]:
+def _staging_worktree(root: Path, revision: str) -> Iterator[Path]:
     with tempfile.TemporaryDirectory(prefix="epic029-requalification-") as temp_dir:
         stage = Path(temp_dir) / "worktree"
-        added = _git_command(root, "worktree", "add", "--detach", str(stage), "HEAD")
+        added = _git_command(
+            root,
+            "worktree",
+            "add",
+            "--detach",
+            str(stage),
+            revision,
+        )
         if added.returncode != 0:
             raise RuntimeError(f"Unable to create staging worktree: {added.stderr.strip()}")
         body_error: BaseException | None = None
@@ -1524,6 +1541,33 @@ def _write_bytes_atomically(path: Path, data: bytes, mode: int) -> None:
         temp_path.unlink(missing_ok=True)
 
 
+def _publication_target_preimage(root: Path, rel: str) -> PublicationTargetPreimage:
+    target = root / rel
+    try:
+        metadata = target.lstat()
+    except FileNotFoundError:
+        return PublicationTargetPreimage("missing", None, None)
+    mode = metadata.st_mode & 0o777
+    if stat.S_ISREG(metadata.st_mode):
+        return PublicationTargetPreimage("file", target.read_bytes(), mode)
+    if stat.S_ISLNK(metadata.st_mode):
+        return PublicationTargetPreimage(
+            "symlink",
+            os.fsencode(os.readlink(target)),
+            mode,
+        )
+    return PublicationTargetPreimage("other", None, mode)
+
+
+def _capture_publication_preimages(
+    root: Path,
+) -> dict[str, PublicationTargetPreimage]:
+    return {
+        rel: _publication_target_preimage(root, rel)
+        for rel in sorted(_publication_allowlist())
+    }
+
+
 def _capture_staged_candidate(
     stage: Path, paths: Sequence[str]
 ) -> tuple[StagedCandidateFile, ...]:
@@ -1546,9 +1590,13 @@ def _capture_staged_candidate(
 
 
 def _publish_captured_candidate(
-    candidate: Sequence[StagedCandidateFile], root: Path
+    candidate: Sequence[StagedCandidateFile],
+    root: Path,
+    *,
+    expected_preimages: Mapping[str, PublicationTargetPreimage] | None = None,
 ) -> None:
     originals: dict[str, tuple[bytes, int] | None] = {}
+    preflight: dict[str, PublicationTargetPreimage] = {}
     published: list[str] = []
     for staged_file in candidate:
         rel = staged_file.rel
@@ -1562,12 +1610,24 @@ def _publish_captured_candidate(
             if ancestor == ancestor.parent:
                 raise RuntimeError(f"Publication target escapes source root: {rel}")
             ancestor = ancestor.parent
+        current = _publication_target_preimage(root, rel)
+        if expected_preimages is not None:
+            expected = expected_preimages.get(rel)
+            if expected is None or current != expected:
+                raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
+        if current.kind not in {"file", "missing"}:
+            raise RuntimeError(f"Publication target is not a regular file: {rel}")
+        preflight[rel] = current
         originals[rel] = (
-            (target.read_bytes(), target.stat().st_mode & 0o777) if target.exists() else None
+            (current.content or b"", current.mode or 0)
+            if current.kind == "file"
+            else None
         )
     try:
         for staged_file in candidate:
             rel = staged_file.rel
+            if _publication_target_preimage(root, rel) != preflight[rel]:
+                raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
             _write_bytes_atomically(
                 root / rel,
                 staged_file.content,
@@ -1601,8 +1661,9 @@ def _publish_staged_candidate(stage: Path, root: Path, paths: Sequence[str]) -> 
     _publish_captured_candidate(_capture_staged_candidate(stage, paths), root)
 
 
-def _orchestrate_from_clean_head() -> int:
-    _require_clean_git_head(ROOT)
+def _orchestrate_from_head() -> int:
+    revision = _require_git_head(ROOT)
+    publication_preimages = _capture_publication_preimages(ROOT)
     try:
         sanity_preimage = (ROOT / SANITY_LOG_REL).read_bytes()
     except OSError as exc:
@@ -1611,7 +1672,7 @@ def _orchestrate_from_clean_head() -> int:
         raise RuntimeError("Canonical sanity-log preimage is empty")
     candidate: tuple[StagedCandidateFile, ...]
     staged_stdout = ""
-    with _staging_worktree(ROOT) as stage:
+    with _staging_worktree(ROOT, revision) as stage:
         command = (
             sys.executable,
             "tools/qa/generate_epic029_close_pack.py",
@@ -1645,8 +1706,19 @@ def _orchestrate_from_clean_head() -> int:
         staged_stdout = completed.stdout
     if staged_stdout:
         print(staged_stdout, end="")
-    _require_clean_git_head(ROOT)
-    _publish_captured_candidate(candidate, ROOT)
+    try:
+        current_sanity = (ROOT / SANITY_LOG_REL).read_bytes()
+    except OSError as exc:
+        raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED") from exc
+    if current_sanity != sanity_preimage:
+        raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED")
+    if _require_git_head(ROOT) != revision:
+        raise RuntimeError("EPIC029_SOURCE_HEAD_CHANGED")
+    _publish_captured_candidate(
+        candidate,
+        ROOT,
+        expected_preimages=publication_preimages,
+    )
     return 0
 
 
@@ -1660,7 +1732,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(str(exc), file=sys.stderr)
         return 1
     try:
-        return _materialize_staged_close_pack() if args.staged_materialization else _orchestrate_from_clean_head()
+        return (
+            _materialize_staged_close_pack()
+            if args.staged_materialization
+            else _orchestrate_from_head()
+        )
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(str(exc), file=sys.stderr)
         return 1

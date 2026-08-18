@@ -12,7 +12,7 @@ The entrypoint validates the supplied rails without modifying them. A successful
 transaction publishes one flat, check-keyed `qa_step_logs_manifest.json` whose
 current receipts are:
 
-- `checks/D00_bootstrap/primary.log`
+- `checks/d00-bootstrap/primary.log`
 - `checks/bootstrap-tooling-classification/primary.log`
 - `checks/po-epic021-live-qa/primary.log`
 - `checks/po-precommit/primary.log`
@@ -23,7 +23,7 @@ current receipts are:
 QA_ROOT-owned binding artifacts are:
 
 - `token_evidence_matrix.md`
-- `checks/D00_bootstrap/primary.log`
+- `checks/d00-bootstrap/primary.log`
 - `qa_step_logs_manifest.json`
 - `acceptance_map_viability.log`
 

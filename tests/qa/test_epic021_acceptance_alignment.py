@@ -83,6 +83,13 @@ def test_canonical_renderer_uses_the_complete_current_roster():
         "PF19-DD-QA-PLAN-VIABILITY-TOKENS",
     }
     matrix = epic021_qa._token_matrix_content()
+    rendered_inputs = (
+        json.dumps(payload, sort_keys=True)
+        + matrix
+        + epic021_qa._readme_content()
+    )
+    assert "d00-bootstrap" in rendered_inputs
+    assert "D00_bootstrap" not in rendered_inputs
     assert "<run-id>" not in matrix
     assert "step_*" not in matrix
     assert "`" not in matrix

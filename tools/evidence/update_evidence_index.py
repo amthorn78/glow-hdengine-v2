@@ -398,6 +398,13 @@ EPIC024_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC021_SUPERSEDED_INDEX_KEYS = {
+    (
+        "audit.qa.hde_epic021.checks.d00_bootstrap.primary.log",
+        "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log",
+    ),
+}
+
 EPIC021_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic021.acceptance_map",
@@ -452,7 +459,7 @@ EPIC021_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
     {
         "artifact_key": "audit.qa.hde_epic021.checks.d00_bootstrap.primary.log",
-        "discovered_physical_path": "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log",
         "epic_id": "HDE-EPIC021",
         "tokens": ["QA_BOOTSTRAP_OK"],
     },
@@ -3883,7 +3890,12 @@ def _load_human_index() -> list[dict[str, object]]:
     payload = [
         entry
         for entry in payload
-        if entry.get("artifact_key") not in EPIC038_CLOSEOUT_FAMILY_KEYS
+        if (
+            entry.get("artifact_key"),
+            entry.get("discovered_physical_path"),
+        )
+        not in EPIC021_SUPERSEDED_INDEX_KEYS
+        and entry.get("artifact_key") not in EPIC038_CLOSEOUT_FAMILY_KEYS
         and entry.get("discovered_physical_path")
         not in EPIC038_CLOSEOUT_FAMILY_PATHS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))

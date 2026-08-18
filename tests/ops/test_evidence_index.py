@@ -105,7 +105,7 @@ EPIC021_TARGETS = [
     ("epic021.manifest", "audit/EPIC-021_MANIFEST.json"),
     (
         "audit.qa.hde_epic021.checks.d00_bootstrap.primary.log",
-        "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log",
+        "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log",
     ),
     (
         "audit.qa.hde_epic021.checks.po_epic021_live_qa.primary.log",
@@ -225,6 +225,19 @@ def test_epic021_roster_flows_to_human_index_loader():
     }
 
     assert set(EPIC021_TARGETS) <= loaded
+
+
+def test_epic021_superseded_uppercase_bootstrap_is_not_currently_indexed():
+    loaded = {
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in update_evidence_index._load_human_index()
+    }
+
+    assert not (update_evidence_index.EPIC021_SUPERSEDED_INDEX_KEYS & loaded)
+    assert (
+        "audit.qa.hde_epic021.checks.d00_bootstrap.primary.log",
+        "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log",
+    ) in loaded
 
 
 def test_epic029_roster_flows_to_human_and_machine_renderers(

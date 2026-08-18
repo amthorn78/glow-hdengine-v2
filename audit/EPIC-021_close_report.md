@@ -8,7 +8,7 @@ or PF20 Done posture.
 
 ## Capture timestamp
 
-- `2026-08-18T17:30:09Z`
+- `2026-08-18T19:06:16Z`
 
 ## Acceptance and evidence pointers
 

@@ -406,7 +406,7 @@ def test_viability_rejects_bad_references(
     assert generate_acceptance_map_viability(config).status is expected
 
 
-def test_viability_duplicate_or_orphan_tokens_fail_behavior(repository: Path):
+def test_viability_duplicate_or_orphan_tokens_fail_tooling(repository: Path):
     config = HarnessConfig("HDE-EPIC039", repo_root=repository)
     data = {
         "epic_id": "HDE-EPIC039",
@@ -427,7 +427,7 @@ def test_viability_duplicate_or_orphan_tokens_fail_behavior(repository: Path):
     }
     config.acceptance_map_path.write_text(json.dumps(data), encoding="utf-8")
     duplicate = generate_acceptance_map_viability(config)
-    assert duplicate.status is Status.FAIL_BEHAVIOR
+    assert duplicate.status is Status.FAIL_TOOLING
     assert (
         duplicate.token_status["QA_HARNESS_DISCIPLINE_OK"]
         == "DUPLICATE_ACCEPTANCE_TOKEN"
@@ -446,7 +446,66 @@ def test_viability_duplicate_or_orphan_tokens_fail_behavior(repository: Path):
         + _matrix_row("evidence/proof.json", token="QA_HARNESS_ENTRYPOINT_SELFTEST_OK"),
         encoding="utf-8",
     )
-    assert generate_acceptance_map_viability(config).status is Status.FAIL_BEHAVIOR
+    orphan = generate_acceptance_map_viability(config)
+    assert orphan.status is Status.FAIL_TOOLING
+    assert orphan.token_status["QA_HARNESS_ENTRYPOINT_SELFTEST_OK"] == "ORPHAN_MATRIX"
+
+
+def test_wrong_epic_identity_is_tooling_failure_and_invalidates_tokens(
+    repository: Path,
+):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["epic_id"] = "HDE-EPIC040"
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = generate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "epic identity" in result.status_reason
+    assert (
+        result.token_status["QA_HARNESS_DISCIPLINE_OK"]
+        == "ACCEPTANCE_MAP_IDENTITY_MISMATCH"
+    )
+
+
+@pytest.mark.parametrize(
+    ("payload", "reason"),
+    [
+        ([], "epic identity"),
+        ({"epic_id": "HDE-EPIC039", "tokens": {}}, "non-empty list"),
+        ({"epic_id": "HDE-EPIC039", "tokens": []}, "non-empty list"),
+        (
+            {"epic_id": "HDE-EPIC039", "tokens": ["not-an-object"]},
+            "not an object",
+        ),
+        (
+            {
+                "epic_id": "HDE-EPIC039",
+                "tokens": [
+                    {
+                        "name": "not-a-canonical-token",
+                        "owner_pf": "PF04",
+                        "status": "implemented",
+                        "evidence_titles": ["evidence/proof.json"],
+                    }
+                ],
+            },
+            "invalid name",
+        ),
+    ],
+)
+def test_malformed_acceptance_map_structure_is_tooling_failure(
+    repository: Path, payload: object, reason: str
+):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = generate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert reason in result.status_reason
+    assert "VALID" not in result.token_status.values()
 
 
 @pytest.mark.parametrize("owner_pf", [None, "", "PF19"])
@@ -466,11 +525,30 @@ def test_viability_requires_matching_acceptance_owner_pf(
         encoding="utf-8",
     )
     result = generate_acceptance_map_viability(config)
-    assert result.status is Status.FAIL_BEHAVIOR
+    assert result.status is Status.FAIL_TOOLING
     assert "owner_pf" in result.status_reason
-    assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] != "VALID"
-    if owner_pf == "PF19":
-        assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] == "OWNER_MISMATCH"
+    assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] == (
+        "OWNER_MISMATCH" if owner_pf == "PF19" else "INVALID_ACCEPTANCE_OWNER"
+    )
+
+
+@pytest.mark.parametrize("evidence_titles", [None, [], [""], [1]])
+def test_malformed_acceptance_evidence_titles_are_tooling_failure(
+    repository: Path, evidence_titles: object
+):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = evidence_titles
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = generate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "evidence_titles" in result.status_reason
+    assert (
+        result.token_status["QA_HARNESS_DISCIPLINE_OK"]
+        == "INVALID_ACCEPTANCE_EVIDENCE_TITLES"
+    )
 
 
 @pytest.mark.parametrize(
@@ -479,11 +557,11 @@ def test_viability_requires_matching_acceptance_owner_pf(
         ("implemented", "Implemented", Status.PASS, "VALID"),
         ("covered", "Covered", Status.PASS, "VALID"),
         ("satisfied", "Satisfied", Status.PASS, "VALID"),
-        ("planned", "Implemented", Status.FAIL_BEHAVIOR, "STATUS_MISMATCH"),
-        (None, "Implemented", Status.FAIL_BEHAVIOR, "INVALID_ACCEPTANCE_STATUS"),
-        ("done", "Implemented", Status.FAIL_BEHAVIOR, "INVALID_ACCEPTANCE_STATUS"),
-        ("implemented", "done", Status.FAIL_BEHAVIOR, "INVALID_MATRIX_STATUS"),
-        ("implemented", "", Status.FAIL_BEHAVIOR, "INVALID_MATRIX_STATUS"),
+        ("planned", "Implemented", Status.FAIL_TOOLING, "STATUS_MISMATCH"),
+        (None, "Implemented", Status.FAIL_TOOLING, "INVALID_ACCEPTANCE_STATUS"),
+        ("done", "Implemented", Status.FAIL_TOOLING, "INVALID_ACCEPTANCE_STATUS"),
+        ("implemented", "done", Status.FAIL_TOOLING, "INVALID_MATRIX_STATUS"),
+        ("implemented", "", Status.FAIL_TOOLING, "INVALID_MATRIX_STATUS"),
         ("planned", "Planned", Status.TOOLING_BLOCKED, "PLANNED"),
         (
             "token_incomplete",

@@ -11,5 +11,8 @@ move a PF09/PF20 status, or rewrite historical EPIC021 evidence.
 - Replace run-id and `step_*` acceptance mechanics with stable
   `checks/<check_id>/primary.log` receipts, a flat check-keyed manifest, and the
   governed root viability ledger.
+- Supersede the nonconforming uppercase `D00_bootstrap` current binding with
+  the plan-owned `d00-bootstrap` check. Preserve the former receipt and proof
+  as unindexed historical evidence rather than a second current authority.
 
 The historical run directories remain unchanged and non-gating.

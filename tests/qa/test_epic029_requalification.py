@@ -820,12 +820,160 @@ def test_staged_publication_restores_preimage_when_verification_fails(
         "verify_manifest_entry",
         fail_verification,
     )
+    preimages = epic029._capture_publication_preimages(target)
+    candidate = epic029._capture_staged_candidate(stage, (rel,))
 
     with pytest.raises(RuntimeError, match="mocked final verification failure"):
-        epic029._publish_staged_candidate(stage, target, (rel,))
+        epic029._publish_captured_candidate(
+            candidate,
+            target,
+            expected_preimages=preimages,
+        )
 
     assert (target / rel).read_bytes() == b"preimage\n"
     assert (target / protected_rel).read_bytes() == b"protected\n"
+
+
+def test_git_head_preflight_never_queries_source_cleanliness(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    revision = "a" * 40
+    unrelated = tmp_path / "local-untracked-notes.txt"
+    unrelated.write_bytes(b"preserve me\n")
+    calls: list[tuple[str, ...]] = []
+
+    def fake_git(_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+        calls.append(args)
+        if args == ("rev-parse", "--is-inside-work-tree"):
+            return subprocess.CompletedProcess(args, 0, "true\n", "")
+        if args == ("rev-parse", "--verify", "HEAD^{commit}"):
+            return subprocess.CompletedProcess(args, 0, f"{revision}\n", "")
+        raise AssertionError(f"unexpected Git query: {args}")
+
+    monkeypatch.setattr(epic029, "_git_command", fake_git)
+
+    assert epic029._require_git_head(tmp_path) == revision
+    assert calls == [
+        ("rev-parse", "--is-inside-work-tree"),
+        ("rev-parse", "--verify", "HEAD^{commit}"),
+    ]
+    assert unrelated.read_bytes() == b"preserve me\n"
+
+
+def test_orchestration_allows_unrelated_source_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sanity = tmp_path / epic029.SANITY_LOG_REL
+    sanity.parent.mkdir(parents=True)
+    sanity.write_bytes(_sanity_pass_bytes())
+    rel = "audit/qa/hde-epic029/token_evidence_matrix.md"
+    target = tmp_path / rel
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"source preimage\n")
+    unrelated = tmp_path / "local-untracked-notes.txt"
+    unrelated.write_bytes(b"preserve me\n")
+
+    stage = tmp_path / "stage"
+    staged_sanity = stage / epic029.SANITY_LOG_REL
+    staged_sanity.parent.mkdir(parents=True)
+    staged_sanity.write_bytes(sanity.read_bytes())
+    staged_target = stage / rel
+    staged_target.parent.mkdir(parents=True)
+    staged_target.write_bytes(b"candidate\n")
+    published: list[tuple[epic029.StagedCandidateFile, ...]] = []
+
+    @contextlib.contextmanager
+    def successful_stage(_root: Path, revision: str):
+        assert revision == "a" * 40
+        yield stage
+
+    def publish(
+        candidate: Sequence[epic029.StagedCandidateFile],
+        root: Path,
+        *,
+        expected_preimages: Mapping[str, epic029.PublicationTargetPreimage],
+    ) -> None:
+        assert expected_preimages[rel].content == b"source preimage\n"
+        captured = tuple(candidate)
+        published.append(captured)
+        (root / rel).write_bytes(captured[0].content)
+
+    monkeypatch.setattr(epic029, "ROOT", tmp_path)
+    monkeypatch.setattr(epic029, "_require_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(epic029, "_staging_worktree", successful_stage)
+    monkeypatch.setattr(epic029, "_candidate_paths", lambda _stage: (rel,))
+    monkeypatch.setattr(epic029, "_publish_captured_candidate", publish)
+    monkeypatch.setattr(
+        epic029.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, "", ""),
+    )
+
+    assert epic029._orchestrate_from_head() == 0
+    assert published[0][0].content == b"candidate\n"
+    assert target.read_bytes() == b"candidate\n"
+    assert unrelated.read_bytes() == b"preserve me\n"
+
+
+def test_publication_preserves_unrelated_source_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    rel = "audit/qa/hde-epic029/token_evidence_matrix.md"
+    target = tmp_path / rel
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"stable local preimage\n")
+    unrelated = tmp_path / "notes" / "untracked.txt"
+    unrelated.parent.mkdir(parents=True)
+    unrelated.write_bytes(b"unrelated local bytes\n")
+    preimages = epic029._capture_publication_preimages(tmp_path)
+    candidate = (epic029.StagedCandidateFile(rel, b"candidate\n", 0o640),)
+
+    monkeypatch.setattr(
+        epic029.qa_harness,
+        "verify_manifest_entry",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(epic029, "_verify_viability_pair", lambda *args: None)
+    monkeypatch.setattr(epic029, "_verify_manifest_paths", lambda *args: None)
+    monkeypatch.setattr(epic029, "_run_required_command", lambda *args: None)
+
+    epic029._publish_captured_candidate(
+        candidate,
+        tmp_path,
+        expected_preimages=preimages,
+    )
+
+    assert target.read_bytes() == b"candidate\n"
+    assert target.stat().st_mode & 0o777 == 0o640
+    assert unrelated.read_bytes() == b"unrelated local bytes\n"
+
+
+def test_publication_target_race_aborts_before_writes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    rel = "audit/qa/hde-epic029/token_evidence_matrix.md"
+    target = tmp_path / rel
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"initial\n")
+    preimages = epic029._capture_publication_preimages(tmp_path)
+    target.write_bytes(b"concurrent change\n")
+    writes: list[Path] = []
+
+    monkeypatch.setattr(
+        epic029,
+        "_write_bytes_atomically",
+        lambda path, *_args: writes.append(path),
+    )
+
+    with pytest.raises(RuntimeError, match=f"PUBLICATION_TARGET_CHANGED:{rel}"):
+        epic029._publish_captured_candidate(
+            (epic029.StagedCandidateFile(rel, b"candidate\n", 0o644),),
+            tmp_path,
+            expected_preimages=preimages,
+        )
+
+    assert writes == []
+    assert target.read_bytes() == b"concurrent change\n"
 
 
 def test_orchestration_never_publishes_before_worktree_cleanup_succeeds(
@@ -841,19 +989,19 @@ def test_orchestration_never_publishes_before_worktree_cleanup_succeeds(
     published: list[object] = []
 
     @contextlib.contextmanager
-    def failing_cleanup(_root: Path):
+    def failing_cleanup(_root: Path, _revision: str):
         yield stage
         raise RuntimeError("worktree cleanup failed")
 
     monkeypatch.setattr(epic029, "ROOT", tmp_path)
-    monkeypatch.setattr(epic029, "_require_clean_git_head", lambda _root: None)
+    monkeypatch.setattr(epic029, "_require_git_head", lambda _root: "a" * 40)
     monkeypatch.setattr(epic029, "_staging_worktree", failing_cleanup)
     monkeypatch.setattr(epic029, "_candidate_paths", lambda _stage: ())
     monkeypatch.setattr(epic029, "_capture_staged_candidate", lambda *_args: ())
     monkeypatch.setattr(
         epic029,
         "_publish_captured_candidate",
-        lambda *args: published.append(args),
+        lambda *args, **kwargs: published.append((args, kwargs)),
     )
     monkeypatch.setattr(
         epic029.subprocess,
@@ -862,9 +1010,93 @@ def test_orchestration_never_publishes_before_worktree_cleanup_succeeds(
     )
 
     with pytest.raises(RuntimeError, match="worktree cleanup failed"):
-        epic029._orchestrate_from_clean_head()
+        epic029._orchestrate_from_head()
 
     assert published == []
+
+
+def test_orchestration_never_publishes_after_source_head_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sanity = tmp_path / epic029.SANITY_LOG_REL
+    sanity.parent.mkdir(parents=True)
+    sanity.write_bytes(_sanity_pass_bytes())
+    stage = tmp_path / "stage"
+    staged_sanity = stage / epic029.SANITY_LOG_REL
+    staged_sanity.parent.mkdir(parents=True)
+    staged_sanity.write_bytes(sanity.read_bytes())
+    revisions = iter(("a" * 40, "b" * 40))
+    published: list[object] = []
+
+    @contextlib.contextmanager
+    def successful_cleanup(_root: Path, revision: str):
+        assert revision == "a" * 40
+        yield stage
+
+    monkeypatch.setattr(epic029, "ROOT", tmp_path)
+    monkeypatch.setattr(epic029, "_require_git_head", lambda _root: next(revisions))
+    monkeypatch.setattr(epic029, "_staging_worktree", successful_cleanup)
+    monkeypatch.setattr(epic029, "_candidate_paths", lambda _stage: ())
+    monkeypatch.setattr(epic029, "_capture_staged_candidate", lambda *_args: ())
+    monkeypatch.setattr(
+        epic029,
+        "_publish_captured_candidate",
+        lambda *args, **kwargs: published.append((args, kwargs)),
+    )
+    monkeypatch.setattr(
+        epic029.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, "", ""),
+    )
+
+    with pytest.raises(RuntimeError, match="EPIC029_SOURCE_HEAD_CHANGED"):
+        epic029._orchestrate_from_head()
+
+    assert published == []
+
+
+def test_orchestration_never_publishes_after_source_sanity_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sanity = tmp_path / epic029.SANITY_LOG_REL
+    sanity.parent.mkdir(parents=True)
+    sanity.write_bytes(_sanity_pass_bytes())
+    stage = tmp_path / "stage"
+    staged_sanity = stage / epic029.SANITY_LOG_REL
+    staged_sanity.parent.mkdir(parents=True)
+    staged_sanity.write_bytes(sanity.read_bytes())
+    published: list[object] = []
+
+    @contextlib.contextmanager
+    def source_sanity_changes_during_cleanup(_root: Path, _revision: str):
+        yield stage
+        sanity.write_bytes(b"concurrent source sanity change\n")
+
+    monkeypatch.setattr(epic029, "ROOT", tmp_path)
+    monkeypatch.setattr(epic029, "_require_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(
+        epic029,
+        "_staging_worktree",
+        source_sanity_changes_during_cleanup,
+    )
+    monkeypatch.setattr(epic029, "_candidate_paths", lambda _stage: ())
+    monkeypatch.setattr(epic029, "_capture_staged_candidate", lambda *_args: ())
+    monkeypatch.setattr(
+        epic029,
+        "_publish_captured_candidate",
+        lambda *args, **kwargs: published.append((args, kwargs)),
+    )
+    monkeypatch.setattr(
+        epic029.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(args[0], 0, "", ""),
+    )
+
+    with pytest.raises(RuntimeError, match="EPIC029_SANITY_LOG_PREIMAGE_CHANGED"):
+        epic029._orchestrate_from_head()
+
+    assert published == []
+    assert sanity.read_bytes() == b"concurrent source sanity change\n"
 
 
 def test_publication_allowlist_excludes_protected_surfaces() -> None:
