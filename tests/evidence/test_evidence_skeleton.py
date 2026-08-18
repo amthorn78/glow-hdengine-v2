@@ -149,6 +149,62 @@ def test_explicit_produced_at_change_rewrites_unchanged_proof(
     assert proof["mtime_utc"] == "2026-07-27T23:38:13Z"
 
 
+@pytest.mark.parametrize(
+    "rel",
+    (
+        "audit/docdeltas/hde-epic039_doc_deltas.md",
+        "audit/qa/hde-epic039/00_meta/doc_deltas.md",
+    ),
+)
+def test_epic039_doc_delta_proofs_reject_and_correct_backdating(
+    tmp_path,
+    monkeypatch,
+    rel,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    artifact = tmp_path / rel
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(b"bounded documentation delta\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    proof_path = tmp_path / f"{rel}.path_proof.txt"
+    proof_path.write_text(
+        "\n".join(
+            (
+                f"path: {rel}",
+                f"size_bytes: {artifact.stat().st_size}",
+                f"sha256: {digest}",
+                "mtime_utc: 2026-08-17T00:50:47Z",
+                "produced_at_utc: 2026-07-26T22:42:05Z",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+    original = proof_path.read_bytes()
+    kwargs = {
+        "rel": rel,
+        "sha256": digest,
+        "size_bytes": artifact.stat().st_size,
+        "mtime_utc": "2026-08-17T00:50:47Z",
+        "produced_at": "2026-07-26T22:42:05Z",
+        "default_produced_at": "2026-08-18T00:00:00Z",
+        "stat_mtime": artifact.stat().st_mtime,
+    }
+
+    with pytest.raises(SystemExit, match="PROOF_PRODUCED_BACKDATED"):
+        update_evidence_index._write_path_proof(check=True, **kwargs)
+    assert proof_path.read_bytes() == original
+
+    _, produced_at = update_evidence_index._write_path_proof(check=False, **kwargs)
+    proof = update_evidence_index._load_existing_proof(proof_path)
+    assert produced_at == "2026-08-17T00:50:47Z"
+    assert proof["produced_at_utc"] == proof["mtime_utc"]
+    update_evidence_index._write_path_proof(
+        check=True,
+        **{**kwargs, "produced_at": produced_at},
+    )
+
+
 def test_isolated_path_proof_uses_immutable_manifest_timestamp(
     tmp_path,
     monkeypatch,

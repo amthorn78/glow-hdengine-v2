@@ -3355,6 +3355,8 @@ NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC035_PR01_ARTIFACT_RELS,
     *EPIC035_PR02_ARTIFACT_RELS,
     *EPIC036_PR01_ARTIFACT_RELS,
+    "audit/docdeltas/hde-epic039_doc_deltas.md",
+    "audit/qa/hde-epic039/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     *LEGACY_NON_BACKDATED_ARTIFACT_RELS,
@@ -3530,6 +3532,14 @@ def _write_path_proof(
             or requested_produced is None
             or existing_produced == requested_produced
         )
+        chronology_matches = True
+        if rel in NON_BACKDATED_PROOF_RELS:
+            try:
+                chronology_matches = _parse_utc_iso8601(
+                    existing_produced or ""
+                ) >= _parse_utc_iso8601(existing_mtime or "")
+            except Exception:  # noqa: BLE001
+                chronology_matches = False
         if (
             existing.get("path") == rel
             and existing.get("sha256") == sha256
@@ -3538,6 +3548,7 @@ def _write_path_proof(
             and explicit_produced_matches
             and existing_mtime is not None
             and existing_produced is not None
+            and chronology_matches
         ):
             return proof_rel, existing_produced
     if requested_produced and existing_mtime:
