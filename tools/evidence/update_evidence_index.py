@@ -3512,6 +3512,12 @@ def _write_path_proof(
     existing = _load_existing_proof(proof_path)
     existing_produced = _normalize_utc(existing.get("produced_at_utc"))
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
+    existing_sha_matches = existing.get("sha256") == sha256
+    try:
+        existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
+    except ValueError:
+        existing_size_matches = False
+    existing_integrity_matches = existing_sha_matches and existing_size_matches
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
     isolated_timestamp = _isolated_release_timestamp()
@@ -3519,10 +3525,6 @@ def _write_path_proof(
         requested_produced = isolated_timestamp
         requested_mtime = isolated_timestamp
     if not check and existing:
-        try:
-            existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
-        except ValueError:
-            existing_size_matches = False
         existing_fields_match = (
             set(existing) == expected_field_names
             and all(existing.get(key) == value for key, value in extra_fields.items())
@@ -3551,6 +3553,17 @@ def _write_path_proof(
             and chronology_matches
         ):
             return proof_rel, existing_produced
+    if (
+        not check
+        and existing
+        and rel in NON_BACKDATED_PROOF_RELS
+        and not existing_integrity_matches
+    ):
+        # A proof for different bytes cannot supply chronology for this capture.
+        # Explicit caller timestamps and isolated-release timestamps remain valid
+        # inputs; otherwise the staged/capture defaults below own the new proof.
+        existing_mtime = None
+        existing_produced = None
     if requested_produced and existing_mtime:
         try:
             if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):

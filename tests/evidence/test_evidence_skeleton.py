@@ -150,31 +150,40 @@ def test_explicit_produced_at_change_rewrites_unchanged_proof(
 
 
 @pytest.mark.parametrize(
-    "rel",
-    (
-        "audit/docdeltas/hde-epic039_doc_deltas.md",
-        "audit/qa/hde-epic039/00_meta/doc_deltas.md",
-    ),
+    ("rel", "old_bytes", "new_bytes"),
+    [
+        (rel, old_bytes, new_bytes)
+        for rel in (
+            "audit/docdeltas/hde-epic039_doc_deltas.md",
+            "audit/qa/hde-epic039/00_meta/doc_deltas.md",
+        )
+        for old_bytes, new_bytes in (
+            (b"old bytes\n", b"new bytes\n"),
+            (b"old bytes\n", b"new bytes with a different size\n"),
+        )
+    ],
 )
-def test_epic039_doc_delta_proofs_reject_and_correct_backdating(
+def test_epic039_doc_delta_byte_changes_refresh_chronology(
     tmp_path,
     monkeypatch,
     rel,
+    old_bytes,
+    new_bytes,
 ):
     monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
     artifact = tmp_path / rel
     artifact.parent.mkdir(parents=True)
-    artifact.write_bytes(b"bounded documentation delta\n")
-    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    artifact.write_bytes(new_bytes)
+    digest = hashlib.sha256(new_bytes).hexdigest()
     proof_path = tmp_path / f"{rel}.path_proof.txt"
     proof_path.write_text(
         "\n".join(
             (
                 f"path: {rel}",
-                f"size_bytes: {artifact.stat().st_size}",
-                f"sha256: {digest}",
-                "mtime_utc: 2026-08-17T00:50:47Z",
-                "produced_at_utc: 2026-07-26T22:42:05Z",
+                f"size_bytes: {len(old_bytes)}",
+                f"sha256: {hashlib.sha256(old_bytes).hexdigest()}",
+                "mtime_utc: 2026-08-17T00:00:00Z",
+                "produced_at_utc: 2026-08-17T00:00:00Z",
                 "",
             )
         ),
@@ -184,25 +193,117 @@ def test_epic039_doc_delta_proofs_reject_and_correct_backdating(
     kwargs = {
         "rel": rel,
         "sha256": digest,
-        "size_bytes": artifact.stat().st_size,
-        "mtime_utc": "2026-08-17T00:50:47Z",
-        "produced_at": "2026-07-26T22:42:05Z",
+        "size_bytes": len(new_bytes),
+        "mtime_utc": None,
+        "produced_at": None,
         "default_produced_at": "2026-08-18T00:00:00Z",
-        "stat_mtime": artifact.stat().st_mtime,
+        "stat_mtime": _dt.datetime(
+            2026, 8, 18, tzinfo=_dt.timezone.utc
+        ).timestamp(),
     }
 
-    with pytest.raises(SystemExit, match="PROOF_PRODUCED_BACKDATED"):
+    with pytest.raises(SystemExit, match="PROOF_(SHA|SIZE)"):
         update_evidence_index._write_path_proof(check=True, **kwargs)
     assert proof_path.read_bytes() == original
 
     _, produced_at = update_evidence_index._write_path_proof(check=False, **kwargs)
     proof = update_evidence_index._load_existing_proof(proof_path)
-    assert produced_at == "2026-08-17T00:50:47Z"
+    assert produced_at == "2026-08-18T00:00:00Z"
+    assert proof["sha256"] == digest
+    assert proof["size_bytes"] == str(len(new_bytes))
     assert proof["produced_at_utc"] == proof["mtime_utc"]
+    corrected = proof_path.read_bytes()
+
+    update_evidence_index._write_path_proof(check=True, **kwargs)
+    update_evidence_index._write_path_proof(check=False, **kwargs)
+    assert proof_path.read_bytes() == corrected
+
+    # Clone-local mtimes never re-timestamp unchanged protected bytes.
     update_evidence_index._write_path_proof(
-        check=True,
-        **{**kwargs, "produced_at": produced_at},
+        check=False,
+        **{
+            **kwargs,
+            "default_produced_at": "2099-01-01T00:00:00Z",
+            "stat_mtime": _dt.datetime(
+                2099, 1, 1, tzinfo=_dt.timezone.utc
+            ).timestamp(),
+        },
     )
+    assert proof_path.read_bytes() == corrected
+
+
+def test_render_mirror_refreshes_changed_epic039_chronology_without_explicit_timestamp(
+    tmp_path,
+    monkeypatch,
+):
+    rel = "audit/docdeltas/hde-epic039_doc_deltas.md"
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        update_evidence_index,
+        "MIRROR_PATH",
+        tmp_path / update_evidence_index.MIRROR_REL,
+    )
+    monkeypatch.setattr(update_evidence_index, "_load_mirror_roles", lambda: {})
+    capture = "2026-08-18T00:00:00Z"
+    capture_timestamp = _dt.datetime(
+        2026, 8, 18, tzinfo=_dt.timezone.utc
+    ).timestamp()
+    monkeypatch.setattr(
+        update_evidence_index,
+        "_proof_mtime",
+        lambda path, *, default_produced_at: capture_timestamp,
+    )
+    artifact = tmp_path / rel
+    artifact.parent.mkdir(parents=True)
+    old_bytes = b"old bytes\n"
+    new_bytes = b"new bytes\n"
+    artifact.write_bytes(new_bytes)
+    proof_path = tmp_path / f"{rel}.path_proof.txt"
+    proof_path.write_text(
+        "\n".join(
+            (
+                f"path: {rel}",
+                f"size_bytes: {len(old_bytes)}",
+                f"sha256: {hashlib.sha256(old_bytes).hexdigest()}",
+                "mtime_utc: 2026-08-17T00:00:00Z",
+                "produced_at_utc: 2026-08-17T00:00:00Z",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+    entries = [
+        {"artifact_key": "epic039.pr01.doc_delta", "discovered_physical_path": rel},
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": update_evidence_index.MIRROR_REL,
+        },
+    ]
+
+    rendered, _ = update_evidence_index._render_mirror(
+        entries, produced_default=capture, check=False
+    )
+    record = next(
+        json.loads(line)
+        for line in rendered.decode("utf-8").splitlines()
+        if json.loads(line)["artifact_key"] == "epic039.pr01.doc_delta"
+    )
+    proof = update_evidence_index._load_existing_proof(proof_path)
+    assert record["produced_at_utc"] == capture
+    assert proof["produced_at_utc"] == proof["mtime_utc"] == capture
+    assert (
+        record["sha256"]
+        == proof["sha256"]
+        == hashlib.sha256(new_bytes).hexdigest()
+    )
+    assert record["size_bytes"] == int(proof["size_bytes"]) == len(new_bytes)
+    corrected = proof_path.read_bytes()
+
+    checked, _ = update_evidence_index._render_mirror(
+        entries, produced_default=capture, check=True
+    )
+    assert checked == rendered
+    assert proof_path.read_bytes() == corrected
 
 
 def test_isolated_path_proof_uses_immutable_manifest_timestamp(
