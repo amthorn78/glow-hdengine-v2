@@ -279,6 +279,32 @@ def _capture_transaction_preimage(path: Path) -> None:
         _ACTIVE_WRITE_TRANSACTION.capture(path)
 
 
+def _assert_unaliased_write_path(path: Path) -> None:
+    """Reject aliased updater outputs before any unchanged-byte fast path."""
+
+    if _STAGED_VIEW is not None:
+        root = _STAGED_VIEW.root
+    elif _ACTIVE_WRITE_TRANSACTION is not None:
+        root = _ACTIVE_WRITE_TRANSACTION.root
+    else:
+        root = ROOT
+    try:
+        relative = path.relative_to(root)
+    except ValueError as exc:
+        raise RuntimeError(f"transaction path escapes repository: {path}") from exc
+    if ".." in relative.parts:
+        raise RuntimeError(f"transaction path escapes repository: {path}")
+    if path.is_symlink():
+        raise SystemExit(f"ALIASED_TRANSACTION_FILE:{path}")
+    current = path.parent
+    while True:
+        if current.is_symlink():
+            raise SystemExit(f"ALIASED_TRANSACTION_DIRECTORY:{current}")
+        if current == root:
+            break
+        current = current.parent
+
+
 BASELINE_ENTRIES: list[dict[str, object]] = [
     {
         "artifact_key": "registry.registry_report",
@@ -3943,6 +3969,7 @@ def _publish_staged(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
     """Replace the complete staged model under the active rollback boundary."""
 
     for path in sorted(staged, key=lambda item: item.as_posix()):
+        _assert_unaliased_write_path(path)
         content = staged[path]
         if content is _STAGED_DELETION:
             if path.exists():
@@ -3971,6 +3998,7 @@ def _publish_staged(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
 
 
 def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
+    _assert_unaliased_write_path(path)
     if _path_exists(path):
         existing = _read_bytes(path)
         if existing == content:

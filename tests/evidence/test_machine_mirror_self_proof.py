@@ -108,3 +108,36 @@ def test_staged_publication_rolls_back_every_preimage(tmp_path, monkeypatch):
     assert not added.exists()
     assert not added.parent.exists()
     assert tmp_path.stat().st_mode == original_root_mode
+
+
+def test_unchanged_fast_path_rejects_file_and_parent_aliases(
+    tmp_path, monkeypatch
+):
+    expected = b"already-current\n"
+    real_file = tmp_path / "real-file.txt"
+    real_file.write_bytes(expected)
+    file_alias = tmp_path / "owned-file.txt"
+    file_alias.symlink_to(real_file)
+
+    real_directory = tmp_path / "real-directory"
+    real_directory.mkdir()
+    (real_directory / "owned-file.txt").write_bytes(expected)
+    directory_alias = tmp_path / "owned-directory"
+    directory_alias.symlink_to(real_directory, target_is_directory=True)
+
+    monkeypatch.setattr(uei, "ROOT", tmp_path)
+    monkeypatch.setattr(uei, "_STAGED_VIEW", None)
+    monkeypatch.setattr(uei, "_ACTIVE_WRITE_TRANSACTION", None)
+    cases = (
+        (file_alias, "ALIASED_TRANSACTION_FILE"),
+        (directory_alias / "owned-file.txt", "ALIASED_TRANSACTION_DIRECTORY"),
+    )
+    for path, error in cases:
+        for check in (False, True):
+            with pytest.raises(SystemExit, match=error):
+                uei._write_if_changed(path, expected, check=check)
+
+    assert file_alias.is_symlink()
+    assert directory_alias.is_symlink()
+    assert real_file.read_bytes() == expected
+    assert (real_directory / "owned-file.txt").read_bytes() == expected
