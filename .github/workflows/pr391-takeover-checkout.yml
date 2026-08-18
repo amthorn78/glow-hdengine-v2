@@ -1,0 +1,48 @@
+name: pr391-takeover-checkout
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    if: github.event.pull_request.number == 391
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 3
+          persist-credentials: false
+
+      - name: Verify credential-free checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git config --local --get-regexp '^(http\..*\.extraheader|credential\.)' >/dev/null 2>&1; then
+            echo "credential-bearing local Git config remains" >&2
+            exit 1
+          fi
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
+
+      - name: Package exact checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar --exclude='./.git/config' --exclude='./.git/hooks' -czf "$RUNNER_TEMP/pr391-checkout-$EXPECTED_HEAD_SHA.tar.gz" .
+
+      - name: Upload exact checkout
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr391-checkout-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/pr391-checkout-${{ github.event.pull_request.head.sha }}.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
