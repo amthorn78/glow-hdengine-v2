@@ -3856,6 +3856,38 @@ def test_dev02_orientation_compatibility_write_is_idempotent_after_updater(
     )
 
 
+def test_dev02_updater_recovers_missing_closeout_proofs_in_one_write(
+    dev02_fixed_repo: Path,
+) -> None:
+    primaries = _package_at(dev02_fixed_repo)
+    proof_paths = tuple(
+        dev02_fixed_repo / proof
+        for _primary, proof in closeout.CLOSEOUT_PRIMARY_BINDINGS.values()
+    )
+    for proof_path in proof_paths:
+        proof_path.unlink()
+
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo, "tools/evidence/update_evidence_index.py"
+        )
+    )
+    assert all(proof_path.is_file() for proof_path in proof_paths)
+    assert _package_at(dev02_fixed_repo) == primaries
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo,
+            "tools/evidence/update_evidence_index.py",
+            "--check",
+        )
+    )
+    _assert_success(
+        _run_repo_tool(
+            dev02_fixed_repo, "tools/evidence/orientation_demo.py", "--check"
+        )
+    )
+
+
 def test_dev02_updater_rejects_structurally_invalid_package_before_mutation(
     dev02_repo: Path,
 ) -> None:

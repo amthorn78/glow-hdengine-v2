@@ -4287,7 +4287,6 @@ def main(argv: list[str] | None = None) -> None:
             last_error: SystemExit | None = None
             for _ in range(max_passes):
                 _run_once(check=False)
-                _validate_epic038_closeout_package()
                 try:
                     _run_once(check=True)
                     last_error = None
@@ -4301,6 +4300,10 @@ def main(argv: list[str] | None = None) -> None:
             _STAGED_VIEW = None
             _publish_staged(staged)
             _run_once(check=True)
+            # The legacy closeout validator reads its registered companions
+            # directly from the filesystem. Validate only after publication,
+            # while the rollback transaction is still active, so it observes
+            # one coherent ledger without gaining a second staged-read model.
             _validate_epic038_closeout_package()
     finally:
         _STAGED_VIEW = None
