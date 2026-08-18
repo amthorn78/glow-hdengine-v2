@@ -24,8 +24,13 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     (tmp_path / "docs/pfcanon").mkdir(parents=True)
     (tmp_path / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md").write_text(
         "## **2.0 Acceptance Tokens (single-home roster)**\n"
-        "* **QA_HARNESS_DISCIPLINE_OK** — registered.\n"
-        "* **QA_HARNESS_ENTRYPOINT_SELFTEST_OK** — registered.\n"
+        "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — bullet declaration.\n"
+        "**QA\\_HARNESS\\_ENTRYPOINT\\_SELFTEST\\_OK** — standalone declaration.\n"
+        "* **`HYPHEN-TOKEN_OK`** — bold-code declaration.\n"
+        "* **IN_BOLD_DASH_OK — in-bold declaration.**\n"
+        "`RETIRED_PROSE_OK` is a retired non-token label only.\n"
+        "QA_HARNESS_DISCIPLINE_OK appears again in explanatory prose.\n"
+        "* **QA\\_HARNESS\\_DISCIPLINE\\_OK** — legitimate repeated declaration.\n"
         "## **2.1 Next**\n",
         encoding="utf-8",
     )
@@ -109,6 +114,45 @@ def test_viability_passes_exact_and_legacy_single_path(repository: Path):
     assert list(manifest["checks"]).count("acceptance-map-viability") == 1
 
 
+def test_pf04_declaration_forms_ignore_explanatory_prose(repository: Path):
+    from tools.qa.qa_harness import _governance_tokens
+
+    tokens, error = _governance_tokens(HarnessConfig("HDE-EPIC039", repo_root=repository))
+    assert error == ""
+    assert tokens == {
+        "QA_HARNESS_DISCIPLINE_OK",
+        "QA_HARNESS_ENTRYPOINT_SELFTEST_OK",
+        "HYPHEN-TOKEN_OK",
+        "IN_BOLD_DASH_OK",
+    }
+
+
+def test_viability_validates_each_semicolon_delimited_reference(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    (repository / "evidence/second.txt").write_text("second\n", encoding="utf-8")
+    config.token_matrix_path.write_text(
+        "| token_name | owner | evidence_artifacts |\n| --- | --- | --- |\n"
+        "| QA_HARNESS_DISCIPLINE_OK | PF04 | evidence/proof.json; Proof (`evidence/second.txt`) |\n",
+        encoding="utf-8",
+    )
+    assert generate_acceptance_map_viability(config).status is Status.PASS
+    config.token_matrix_path.write_text(
+        config.token_matrix_path.read_text(encoding="utf-8").replace("; Proof", "; ; Proof"),
+        encoding="utf-8",
+    )
+    assert generate_acceptance_map_viability(config).status is Status.FAIL_TOOLING
+
+
+def test_generator_only_viability_ledger_matches_primary_evaluation(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    result = generate_acceptance_map_viability(config, publish_governed_ledger=True)
+    assert result.status is Status.PASS
+    assert result.governed_ledger == config.viability_ledger_path
+    ledger = json.loads(result.governed_ledger.read_text(encoding="utf-8"))
+    primary_evaluation = json.loads(result.primary_log.read_text(encoding="utf-8").splitlines()[1])
+    assert ledger == primary_evaluation
+
+
 @pytest.mark.parametrize("reference", ["../escape.txt", "/tmp/absolute", "no path prose", "evidence/proof.json and evidence/other.json", "evidence/empty.txt", "evidence/bad.json"])
 def test_viability_rejects_bad_references(repository: Path, reference: str):
     (repository / "evidence/other.json").write_text('{"ok":true}', encoding="utf-8")
@@ -143,3 +187,47 @@ def test_writer_failure_is_fail_tooling(repository: Path, monkeypatch: pytest.Mo
     result = generate_acceptance_map_viability(HarnessConfig("HDE-EPIC039", repo_root=repository))
     assert result.status is Status.FAIL_TOOLING
     assert result.primary_log is None
+
+
+def test_legacy_manifest_is_replaced_without_importing_run_state(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    historical = config.qa_root / "legacy-run/historical.log"
+    historical.parent.mkdir(parents=True)
+    historical.write_text("historical bytes\n", encoding="utf-8")
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    manifest.write_text(json.dumps({"epic_id": config.epic_id, "runs": [{"run_id": "old", "produced_at_utc": "old", "steps": [{"log_path": str(historical), "status": "PASS"}]}]}), encoding="utf-8")
+    before = historical.read_bytes()
+    record_check(config, CheckResult("current", Status.PASS, exit_code=0, command=("true",), command_provenance="fixture"))
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert payload == {"checks": {"current": {"check_id": "current", "log_path": "audit/qa/hde-epic039/checks/current/primary.log", "status": "PASS"}}, "epic_id": config.epic_id}
+    assert historical.read_bytes() == before
+
+
+def test_unknown_manifest_shape_fails_before_primary_log(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    manifest.write_text(json.dumps({"epic_id": config.epic_id, "steps": []}), encoding="utf-8")
+    with pytest.raises(ValueError, match="unknown QA manifest shape"):
+        record_check(config, CheckResult("current", Status.PASS, exit_code=0, command=("true",), command_provenance="fixture"))
+    assert not (config.qa_root / "checks/current/primary.log").exists()
+
+
+def test_publication_rolls_back_when_manifest_write_fails(repository: Path, monkeypatch: pytest.MonkeyPatch):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    original = json.dumps({"epic_id": config.epic_id, "runs": []})
+    manifest.write_text(original, encoding="utf-8")
+    from tools.qa import qa_harness
+    real_write = qa_harness._atomic_write
+    calls = 0
+    def fail_second(path, content):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("manifest write failed")
+        real_write(path, content)
+    monkeypatch.setattr(qa_harness, "_atomic_write", fail_second)
+    with pytest.raises(OSError, match="manifest write failed"):
+        record_check(config, CheckResult("current", Status.PASS, exit_code=0, command=("true",), command_provenance="fixture"))
+    assert manifest.read_text(encoding="utf-8") == original
+    assert not (config.qa_root / "checks/current/primary.log").exists()

@@ -20,6 +20,12 @@ EPIC_RE = re.compile(r"HDE-EPIC([0-9]{3})\Z")
 CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 TOKEN_RE = re.compile(r"\b[A-Z][A-Z0-9]*(?:[_-][A-Z0-9]+)+\b")
 PATH_RE = re.compile(r"(?<![A-Za-z0-9_./-])([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)+)(?![A-Za-z0-9_./-])")
+TOKEN_DECLARATION_RE = re.compile(
+    r"^\s*(?:[*+-]\s+)?\*\*`?"
+    r"(?P<name>[A-Z][A-Z0-9]*(?:(?:\\_|_|-)[A-Z0-9]+)+)"
+    r"`?(?:(?:\*\*\s*[—–-])|(?:\s+[—–-].*\*\*))",
+    re.VERBOSE,
+)
 
 
 class Status(str, Enum):
@@ -48,6 +54,7 @@ class HarnessConfig:
         object.__setattr__(self, "qa_root", root / "audit" / "qa" / f"hde-epic{match.group(1)}")
         object.__setattr__(self, "acceptance_map_path", root / "docs" / f"acceptance_map_epic{match.group(1)}.json")
         object.__setattr__(self, "token_matrix_path", self.qa_root / "token_evidence_matrix.md")
+        object.__setattr__(self, "viability_ledger_path", self.qa_root / "acceptance_map_viability.log")
 
 
 @dataclass(frozen=True)
@@ -76,6 +83,7 @@ class ViabilityResult:
     status_reason: str
     primary_log: Path | None
     manifest: Path | None
+    governed_ledger: Path | None
     token_status: Mapping[str, str]
 
 
@@ -125,8 +133,7 @@ def _repo_relative(config: HarnessConfig, path: Path) -> str:
     return path.resolve().relative_to(config.repo_root).as_posix()
 
 
-def write_primary_log(config: HarnessConfig, result: CheckResult) -> Path:
-    """Atomically write and validate one PF27-v2 current-state primary log."""
+def _primary_log_content(config: HarnessConfig, result: CheckResult) -> tuple[Path, str]:
     path = config.qa_root / "checks" / result.check_id / "primary.log"
     rel = _repo_relative(config, path)
     evidence = list(result.evidence_artifacts)
@@ -160,6 +167,12 @@ def write_primary_log(config: HarnessConfig, result: CheckResult) -> Path:
     content = json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n"
     if body:
         content += body + "\n"
+    return path, content
+
+
+def write_primary_log(config: HarnessConfig, result: CheckResult) -> Path:
+    """Write one primary log; prefer ``record_check`` for coherent publication."""
+    path, content = _primary_log_content(config, result)
     _atomic_write(path, content)
     parsed = read_primary_header(path)
     if parsed["check_id"] != result.check_id or parsed["status"] != result.status.value:
@@ -181,6 +194,27 @@ def read_primary_header(path: Path) -> dict[str, object]:
     return data
 
 
+def _preflight_manifest(config: HarnessConfig) -> dict[str, dict[str, str]]:
+    path = config.qa_root / "qa_step_logs_manifest.json"
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or payload.get("epic_id") != config.epic_id:
+        raise ValueError("manifest epic identity is malformed")
+    if isinstance(payload.get("checks"), dict) and set(payload) == {"checks", "epic_id"}:
+        return dict(payload["checks"])
+    if isinstance(payload.get("runs"), list) and set(payload) == {"epic_id", "runs"}:
+        # Recognized transition envelope. Historical run data is deliberately
+        # neither interpreted nor imported into current-state correctness.
+        return {}
+    raise ValueError("unknown QA manifest shape")
+
+
+def _manifest_content(config: HarnessConfig, checks: Mapping[str, Mapping[str, str]]) -> str:
+    payload = {"checks": {key: checks[key] for key in sorted(checks)}, "epic_id": config.epic_id}
+    return json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
+
+
 def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
     header = read_primary_header(log_path)
     check_id = validate_check_id(str(header["check_id"]))
@@ -188,15 +222,9 @@ def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
     if log_path.resolve() != expected.resolve():
         raise ValueError("non-canonical primary log path")
     path = config.qa_root / "qa_step_logs_manifest.json"
-    checks: dict[str, dict[str, str]] = {}
-    if path.exists():
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        if payload.get("epic_id") != config.epic_id or not isinstance(payload.get("checks"), dict):
-            raise ValueError("malformed current-state manifest")
-        checks = payload["checks"]
+    checks = _preflight_manifest(config)
     checks[check_id] = {"check_id": check_id, "log_path": _repo_relative(config, expected), "status": str(header["status"])}
-    payload = {"checks": {key: checks[key] for key in sorted(checks)}, "epic_id": config.epic_id}
-    _atomic_write(path, json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n")
+    _atomic_write(path, _manifest_content(config, checks))
     verify_manifest_entry(config, check_id)
     return path
 
@@ -230,9 +258,46 @@ def run_pytest_check(config: HarnessConfig, check_id: str, pytest_args: Sequence
     return CheckResult(check_id, status, reason, check_name, command, "epic wrapper check definition", completed.returncode, completed.stdout + completed.stderr, intended_tokens=tuple(intended_tokens), pf_refs=("PF14 — HDE Mechanics Guide §1.6.1", "PF19 — Glow QA Guide §2.2.5", "PF27 — Plan Templates §Step-log header schema expectations (required; v2)"))
 
 
-def record_check(config: HarnessConfig, result: CheckResult) -> tuple[Path, Path]:
-    log = write_primary_log(config, result)
-    return log, update_manifest(config, log)
+def _publish_atomically(files: Sequence[tuple[Path, str]]) -> None:
+    """Publish a small related file set and restore prior bytes on failure."""
+    originals = {path: path.read_bytes() if path.exists() else None for path, _ in files}
+    written: list[Path] = []
+    try:
+        for path, content in files:
+            _atomic_write(path, content)
+            written.append(path)
+    except BaseException:
+        for path in reversed(written):
+            original = originals[path]
+            if original is None:
+                path.unlink(missing_ok=True)
+            else:
+                _atomic_write(path, original.decode("utf-8"))
+        raise
+
+
+def record_check(
+    config: HarnessConfig,
+    result: CheckResult,
+    *,
+    additional_files: Sequence[tuple[Path, str]] = (),
+) -> tuple[Path, Path]:
+    """Preflight and coherently publish a primary log and manifest."""
+    checks = _preflight_manifest(config)
+    log, log_content = _primary_log_content(config, result)
+    rel = _repo_relative(config, log)
+    checks[result.check_id] = {
+        "check_id": result.check_id,
+        "log_path": rel,
+        "status": result.status.value,
+    }
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    _publish_atomically(((log, log_content), (manifest, _manifest_content(config, checks)), *additional_files))
+    header = read_primary_header(log)
+    if header["status"] != result.status.value:
+        raise RuntimeError("primary log verification failed")
+    verify_manifest_entry(config, result.check_id)
+    return log, manifest
 
 
 def _governance_tokens(config: HarnessConfig) -> tuple[set[str] | None, str]:
@@ -247,14 +312,20 @@ def _governance_tokens(config: HarnessConfig) -> tuple[set[str] | None, str]:
     end = text.find("## **2.1 ", start)
     if start < 0 or end < 0:
         return None, "PF04 §2.0 token roster is incomplete"
-    tokens = set(TOKEN_RE.findall(text[start:end]))
+    tokens: set[str] = set()
+    for line in text[start:end].splitlines():
+        declaration = TOKEN_DECLARATION_RE.match(line)
+        if declaration:
+            name = declaration.group("name").replace("\\_", "_")
+            if TOKEN_RE.fullmatch(name):
+                tokens.add(name)
     if not tokens:
         return None, "PF04 §2.0 token roster is empty"
     return tokens, ""
 
 
-def _matrix_rows(path: Path) -> tuple[dict[str, str], str]:
-    rows: dict[str, str] = {}
+def _matrix_rows(path: Path) -> tuple[dict[str, tuple[str, ...]], str]:
+    rows: dict[str, tuple[str, ...]] = {}
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except OSError as exc:
@@ -268,7 +339,10 @@ def _matrix_rows(path: Path) -> tuple[dict[str, str], str]:
         name = cells[0]
         if not TOKEN_RE.fullmatch(name) or name in rows:
             return {}, f"malformed or duplicate matrix token row: {name}"
-        rows[name] = cells[2]
+        references = tuple(item.strip() for item in cells[2].split(";"))
+        if not references or any(not item for item in references):
+            return {}, f"empty evidence reference in matrix token row: {name}"
+        rows[name] = references
     return rows, "" if rows else "matrix contains no token rows"
 
 
@@ -300,7 +374,12 @@ def _resolve_reference(config: HarnessConfig, value: object) -> tuple[Path | Non
     return target, ""
 
 
-def generate_acceptance_map_viability(config: HarnessConfig, check_id: str = "acceptance-map-viability") -> ViabilityResult:
+def generate_acceptance_map_viability(
+    config: HarnessConfig,
+    check_id: str = "acceptance-map-viability",
+    *,
+    publish_governed_ledger: bool = False,
+) -> ViabilityResult:
     """Evaluate derived acceptance inputs and record a current-state viability check."""
     validate_check_id(check_id)
     missing = [path for path in (config.acceptance_map_path, config.token_matrix_path) if not path.is_file() or path.stat().st_size == 0]
@@ -330,14 +409,66 @@ def generate_acceptance_map_viability(config: HarnessConfig, check_id: str = "ac
                     elif set(matrix) != set(names):
                         status, reason, token_status = Status.FAIL_BEHAVIOR, "acceptance map and matrix token coverage differ", {name: "MISSING_MATRIX" for name in set(names) - set(matrix)} | {name: "ORPHAN_MATRIX" for name in set(matrix) - set(names)}
                     else:
-                        errors = {name: error for name, reference in matrix.items() if (error := _resolve_reference(config, reference)[1])}
+                        errors: dict[str, str] = {}
+                        for name, references in matrix.items():
+                            reference_errors = [
+                                f"reference {index}: {error}"
+                                for index, reference in enumerate(references, start=1)
+                                if (error := _resolve_reference(config, reference)[1])
+                            ]
+                            if reference_errors:
+                                errors[name] = "; ".join(reference_errors)
                         status = Status.PASS if not errors else Status.FAIL_BEHAVIOR
                         reason = "" if not errors else "; ".join(f"{name}: {errors[name]}" for name in sorted(errors))
                         token_status = {name: ("VALID" if name not in errors else "INVALID_REFERENCE") for name in names}
-    result = CheckResult(check_id, status, reason, "Acceptance-map viability", (), "Not executed", 0 if status is Status.PASS else None, json.dumps({"token_status": token_status}, sort_keys=True), intended_tokens=(), pf_refs=("PF04 — HDE Governance §2.0", "PF14 — HDE Mechanics Guide §1.6.3", "PF19 — Glow QA Guide §4.4.5", "PF27 — Plan Templates §Step-log header schema expectations (required; v2)"))
+    evaluation = {
+        "epic_id": config.epic_id,
+        "status": status.value,
+        "status_reason": reason,
+        "token_status": token_status,
+    }
+    evaluation_content = json.dumps(evaluation, sort_keys=True, separators=(",", ":")) + "\n"
+    result = CheckResult(check_id, status, reason, "Acceptance-map viability", (), "Not executed", 0 if status is Status.PASS else None, evaluation_content, intended_tokens=(), pf_refs=("PF04 — HDE Governance §2.0", "PF14 — HDE Mechanics Guide §1.6.3", "PF19 — Glow QA Guide §4.4.5", "PF27 — Plan Templates §Step-log header schema expectations (required; v2)"))
     try:
-        log, manifest = record_check(config, result)
+        additional = ((config.viability_ledger_path, evaluation_content),) if publish_governed_ledger else ()
+        log, manifest = record_check(config, result, additional_files=additional)
         verify_manifest_entry(config, check_id)
+        governed_ledger = config.viability_ledger_path if publish_governed_ledger else None
+        if governed_ledger is not None and governed_ledger.read_text(encoding="utf-8") != evaluation_content:
+            raise RuntimeError("governed viability ledger verification failed")
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
-        return ViabilityResult(Status.FAIL_TOOLING, f"viability evidence writer failed: {exc}", None, None, token_status)
-    return ViabilityResult(status, reason, log, manifest, token_status)
+        return ViabilityResult(Status.FAIL_TOOLING, f"viability evidence writer failed: {exc}", None, None, None, token_status)
+    return ViabilityResult(status, reason, log, manifest, governed_ledger, token_status)
+
+
+def require_governed_viability(result: ViabilityResult, expected_path: Path) -> Path:
+    """Fail closed unless a generator received its verified PASS ledger."""
+    ledger = result.governed_ledger
+    if result.status is not Status.PASS:
+        raise SystemExit(f"ACCEPTANCE_MAP_VIABILITY_{result.status.value}:{result.status_reason}")
+    if ledger is None or ledger.resolve() != expected_path.resolve():
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_LEDGER_MISMATCH")
+    if not ledger.is_file() or ledger.stat().st_size == 0:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_LEDGER_MISSING")
+    try:
+        payload = json.loads(ledger.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"ACCEPTANCE_MAP_VIABILITY_LEDGER_MALFORMED:{exc}") from exc
+    match = re.fullmatch(r"hde-epic([0-9]{3})", expected_path.parent.name)
+    expected_epic = f"HDE-EPIC{match.group(1)}" if match else None
+    if payload.get("epic_id") != expected_epic or payload.get("status") != Status.PASS.value:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_LEDGER_STALE_OR_MISMATCHED")
+    if expected_epic is None:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_LEDGER_MISMATCH")
+    config = HarnessConfig(expected_epic, repo_root=expected_path.parents[3])
+    if result.primary_log is None or result.manifest is None:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_CURRENT_STATE_MISSING")
+    if result.primary_log.resolve() != (config.qa_root / "checks/acceptance-map-viability/primary.log").resolve():
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_PRIMARY_MISMATCH")
+    if result.manifest.resolve() != (config.qa_root / "qa_step_logs_manifest.json").resolve():
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_MANIFEST_MISMATCH")
+    try:
+        verify_manifest_entry(config, "acceptance-map-viability")
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"ACCEPTANCE_MAP_VIABILITY_CURRENT_STATE_INVALID:{exc}") from exc
+    return ledger

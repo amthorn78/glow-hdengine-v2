@@ -461,8 +461,9 @@ def _write_viability_log() -> None:
         repo_root=ROOT,
         step_names=("acceptance_map_viability",),
     )
-    qa_harness.generate_acceptance_map_viability(config)
-    print(f"WROTE {VIABILITY_LOG_PATH.relative_to(ROOT).as_posix()}")
+    result = qa_harness.generate_acceptance_map_viability(config, publish_governed_ledger=True)
+    ledger = qa_harness.require_governed_viability(result, VIABILITY_LOG_PATH)
+    print(f"WROTE {ledger.relative_to(ROOT).as_posix()}")
 
 
 def _write_close_report(produced_at: str, live_qa: dict[str, bool], gate: dict[str, object]) -> None:
