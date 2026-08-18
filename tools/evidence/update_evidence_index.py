@@ -3355,6 +3355,8 @@ NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC035_PR01_ARTIFACT_RELS,
     *EPIC035_PR02_ARTIFACT_RELS,
     *EPIC036_PR01_ARTIFACT_RELS,
+    "audit/docdeltas/hde-epic039_doc_deltas.md",
+    "audit/qa/hde-epic039/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     *LEGACY_NON_BACKDATED_ARTIFACT_RELS,
@@ -3510,6 +3512,12 @@ def _write_path_proof(
     existing = _load_existing_proof(proof_path)
     existing_produced = _normalize_utc(existing.get("produced_at_utc"))
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
+    existing_sha_matches = existing.get("sha256") == sha256
+    try:
+        existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
+    except ValueError:
+        existing_size_matches = False
+    existing_integrity_matches = existing_sha_matches and existing_size_matches
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
     isolated_timestamp = _isolated_release_timestamp()
@@ -3517,10 +3525,6 @@ def _write_path_proof(
         requested_produced = isolated_timestamp
         requested_mtime = isolated_timestamp
     if not check and existing:
-        try:
-            existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
-        except ValueError:
-            existing_size_matches = False
         existing_fields_match = (
             set(existing) == expected_field_names
             and all(existing.get(key) == value for key, value in extra_fields.items())
@@ -3530,6 +3534,14 @@ def _write_path_proof(
             or requested_produced is None
             or existing_produced == requested_produced
         )
+        chronology_matches = True
+        if rel in NON_BACKDATED_PROOF_RELS:
+            try:
+                chronology_matches = _parse_utc_iso8601(
+                    existing_produced or ""
+                ) >= _parse_utc_iso8601(existing_mtime or "")
+            except Exception:  # noqa: BLE001
+                chronology_matches = False
         if (
             existing.get("path") == rel
             and existing.get("sha256") == sha256
@@ -3538,8 +3550,20 @@ def _write_path_proof(
             and explicit_produced_matches
             and existing_mtime is not None
             and existing_produced is not None
+            and chronology_matches
         ):
             return proof_rel, existing_produced
+    if (
+        not check
+        and existing
+        and rel in NON_BACKDATED_PROOF_RELS
+        and not existing_integrity_matches
+    ):
+        # A proof for different bytes cannot supply chronology for this capture.
+        # Explicit caller timestamps and isolated-release timestamps remain valid
+        # inputs; otherwise the staged/capture defaults below own the new proof.
+        existing_mtime = None
+        existing_produced = None
     if requested_produced and existing_mtime:
         try:
             if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
