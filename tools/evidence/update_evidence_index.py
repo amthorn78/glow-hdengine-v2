@@ -288,15 +288,18 @@ def _assert_unaliased_write_path(path: Path) -> None:
         root = _ACTIVE_WRITE_TRANSACTION.root
     else:
         root = ROOT
+    scoped_path = path if path.is_absolute() else root / path
     try:
-        relative = path.relative_to(root)
+        relative = scoped_path.relative_to(root)
     except ValueError as exc:
         raise RuntimeError(f"transaction path escapes repository: {path}") from exc
     if ".." in relative.parts:
         raise RuntimeError(f"transaction path escapes repository: {path}")
-    if path.is_symlink():
-        raise SystemExit(f"ALIASED_TRANSACTION_FILE:{path}")
-    current = path.parent
+    if scoped_path == root:
+        raise RuntimeError(f"transaction path names repository root: {path}")
+    if scoped_path.is_symlink():
+        raise SystemExit(f"ALIASED_TRANSACTION_FILE:{scoped_path}")
+    current = scoped_path.parent
     while True:
         if current.is_symlink():
             raise SystemExit(f"ALIASED_TRANSACTION_DIRECTORY:{current}")
@@ -3438,6 +3441,7 @@ def _load_mirror_roles() -> dict[tuple[str, str], str]:
 
 
 def _load_existing_proof(proof_path: Path) -> dict[str, str]:
+    _assert_unaliased_write_path(proof_path)
     if not _path_exists(proof_path):
         return {}
     data: dict[str, str] = {}

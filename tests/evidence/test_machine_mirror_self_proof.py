@@ -125,6 +125,25 @@ def test_unchanged_fast_path_rejects_file_and_parent_aliases(
     directory_alias = tmp_path / "owned-directory"
     directory_alias.symlink_to(real_directory, target_is_directory=True)
 
+    artifact = tmp_path / "artifact.log"
+    artifact.write_bytes(expected)
+    proof_target = tmp_path / "real-proof.txt"
+    proof_target.write_text(
+        "\n".join(
+            (
+                "path: artifact.log",
+                f"size_bytes: {len(expected)}",
+                f"sha256: {uei._sha256_bytes(expected)}",
+                "mtime_utc: 2026-08-17T00:00:00Z",
+                "produced_at_utc: 2026-08-17T00:00:00Z",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+    proof_alias = tmp_path / "artifact.log.path_proof.txt"
+    proof_alias.symlink_to(proof_target)
+
     monkeypatch.setattr(uei, "ROOT", tmp_path)
     monkeypatch.setattr(uei, "_STAGED_VIEW", None)
     monkeypatch.setattr(uei, "_ACTIVE_WRITE_TRANSACTION", None)
@@ -136,8 +155,22 @@ def test_unchanged_fast_path_rejects_file_and_parent_aliases(
         for check in (False, True):
             with pytest.raises(SystemExit, match=error):
                 uei._write_if_changed(path, expected, check=check)
+    for check in (False, True):
+        with pytest.raises(SystemExit, match="ALIASED_TRANSACTION_FILE"):
+            uei._write_path_proof(
+                "artifact.log",
+                sha256=uei._sha256_bytes(expected),
+                size_bytes=len(expected),
+                mtime_utc="2026-08-17T00:00:00Z",
+                produced_at="2026-08-17T00:00:00Z",
+                default_produced_at="2026-08-17T00:00:00Z",
+                check=check,
+                stat_mtime=artifact.stat().st_mtime,
+            )
 
     assert file_alias.is_symlink()
     assert directory_alias.is_symlink()
+    assert proof_alias.is_symlink()
     assert real_file.read_bytes() == expected
     assert (real_directory / "owned-file.txt").read_bytes() == expected
+    assert proof_target.is_file()
