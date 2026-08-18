@@ -1,102 +1,145 @@
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
-from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, DeterminismEnvError
 from tools.qa.qa_harness import (
     CheckResult,
     HarnessConfig,
-    collect_env_for_logging,
+    Status,
     generate_acceptance_map_viability,
+    read_primary_header,
+    record_check,
+    run_pytest_check,
     summarize_checks,
     update_manifest,
-    validate_env_pins,
-    write_bootstrap_log,
 )
 
 
 @pytest.fixture
-def harness_config(tmp_path: Path) -> HarnessConfig:
-    qa_root = tmp_path / "qa_root"
-    qa_root.mkdir(parents=True, exist_ok=True)
-    acceptance_map = tmp_path / "acceptance_map.json"
-    acceptance_map.write_text(
-        json.dumps({"tokens": [{"name": "TOKEN_A"}, {"name": "TOKEN_B"}]}),
+def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    for key, value in {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC", "APP_ENV": "test"}.items():
+        monkeypatch.setenv(key, value)
+    (tmp_path / "docs/pfcanon").mkdir(parents=True)
+    (tmp_path / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md").write_text(
+        "## **2.0 Acceptance Tokens (single-home roster)**\n"
+        "* **QA_HARNESS_DISCIPLINE_OK** — registered.\n"
+        "* **QA_HARNESS_ENTRYPOINT_SELFTEST_OK** — registered.\n"
+        "## **2.1 Next**\n",
         encoding="utf-8",
     )
-    token_matrix = qa_root / "token_evidence_matrix.md"
-    token_matrix.write_text(
-        "\n".join(
-            [
-                "| TOKEN_A | desc | evidence_a | placeholder | placeholder | implemented |",
-                "| TOKEN_B | desc | evidence_b | placeholder | placeholder | planned |",
-            ]
-        ),
-        encoding="utf-8",
-    )
-    return HarnessConfig(
-        epic_id="TEST-EPIC",
-        qa_root=qa_root,
-        acceptance_map_path=acceptance_map,
-        token_matrix_path=token_matrix,
-        step_names=("bootstrap", "acceptance_map_d3"),
-    )
+    (tmp_path / "evidence").mkdir()
+    (tmp_path / "evidence/proof.json").write_text('{"ok":true}\n', encoding="utf-8")
+    config = HarnessConfig("HDE-EPIC039", repo_root=tmp_path)
+    config.acceptance_map_path.parent.mkdir(exist_ok=True)
+    config.acceptance_map_path.write_text(json.dumps({"epic_id": "HDE-EPIC039", "tokens": [{"name": "QA_HARNESS_DISCIPLINE_OK"}]}), encoding="utf-8")
+    config.token_matrix_path.parent.mkdir(parents=True)
+    config.token_matrix_path.write_text("| token_name | owner | evidence_artifacts |\n| --- | --- | --- |\n| QA_HARNESS_DISCIPLINE_OK | PF04 | evidence/proof.json |\n", encoding="utf-8")
+    return tmp_path
 
 
-def test_validate_env_pins_blocks_missing(monkeypatch: pytest.MonkeyPatch, harness_config):
-    monkeypatch.delenv("SAFE_MODE", raising=False)
-    with pytest.raises(DeterminismEnvError):
-        validate_env_pins()
-
-    run_dir = harness_config.qa_root / "blocked-run"
-    assert not run_dir.exists()
-
-
-def test_collect_env_creates_run_directory(harness_config):
-    env_pins = collect_env_for_logging(DETERMINISM_ENV_PINS)
-    bootstrap_log = write_bootstrap_log(
-        harness_config,
-        "run-123",
-        [CheckResult("bootstrap", "OK")],
-        env_pins,
-    )
-
-    assert bootstrap_log.exists()
-    contents = bootstrap_log.read_text(encoding="utf-8")
-    assert "env:" in contents
-    assert harness_config.qa_root.joinpath("run-123").is_dir()
+def test_config_derives_canonical_paths(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    assert config.qa_root == repository / "audit/qa/hde-epic039"
+    assert config.acceptance_map_path == repository / "docs/acceptance_map_epic039.json"
+    assert config.token_matrix_path == config.qa_root / "token_evidence_matrix.md"
+    with pytest.raises(ValueError):
+        HarnessConfig("hde-epic039", repo_root=repository)
 
 
-def test_manifest_dedupes_run_entries(harness_config):
-    env_pins = collect_env_for_logging(DETERMINISM_ENV_PINS)
-    step_log = write_bootstrap_log(
-        harness_config, "dedupe-run", [CheckResult("bootstrap", "OK")], env_pins
-    )
-    steps = [("bootstrap", step_log, "PASS")]
-
-    manifest_path = update_manifest(harness_config, "dedupe-run", steps)
-    first_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert len([run for run in first_manifest["runs"] if run["run_id"] == "dedupe-run"]) == 1
-
-    manifest_path = update_manifest(harness_config, "dedupe-run", steps)
-    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert len([run for run in manifest_data["runs"] if run["run_id"] == "dedupe-run"]) == 1
+def test_exact_status_set_and_causal_rollup():
+    assert {status.value for status in Status} == {"PASS", "FAIL_BEHAVIOR", "FAIL_TOOLING", "TOOLING_BLOCKED", "PARKED"}
+    assert summarize_checks([CheckResult("ok", Status.PASS)]) is Status.PASS
+    assert summarize_checks([CheckResult("parked", Status.PARKED, "authorized deferral")]) is Status.PARKED
+    assert summarize_checks([CheckResult("blocked", Status.TOOLING_BLOCKED, "missing")]) is Status.TOOLING_BLOCKED
+    with pytest.raises(ValueError):
+        CheckResult("bad", "SUCCESS")
 
 
-def test_viability_log_matches_expected_format(harness_config):
-    log_path, token_status = generate_acceptance_map_viability(harness_config, "viability-check")
-
-    assert log_path.exists()
-    content = log_path.read_text(encoding="utf-8")
-    assert "summary:" in content
-    assert "token TOKEN_A" in content
-    assert "token TOKEN_B" in content
-    assert token_status["TOKEN_A"] == "COVERED"
-    assert token_status["TOKEN_B"] == "PLANNED"
-    assert content.splitlines()[-1].startswith("summary: COVERED=1 PLANNED=1 MISSING=0")
+@pytest.mark.parametrize("check_id", ["", "..", "a/b", "a\\b", "/absolute"])
+def test_unsafe_check_ids_are_rejected(repository: Path, check_id: str):
+    with pytest.raises(ValueError):
+        CheckResult(check_id, Status.PASS, exit_code=0)
 
 
-def test_summarize_checks_respects_failures():
-    assert summarize_checks([CheckResult("ok", "OK")]) == "summary:PASS"
-    assert summarize_checks([CheckResult("bad", "FAIL")]) == "summary:FAIL"
+def test_pf27_header_and_manifest_replace_by_check_id(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    first = CheckResult("selftest", Status.PASS, exit_code=0, command=("true",), command_provenance="test fixture")
+    log, manifest = record_check(config, first)
+    header = read_primary_header(log)
+    assert header["schema_version"] == "pf27.step_log_header.v2"
+    assert header["claimed_tokens"] == []
+    assert header["evidence_artifacts"] == ["audit/qa/hde-epic039/checks/selftest/primary.log"]
+    second = CheckResult("selftest", Status.FAIL_BEHAVIOR, "contradiction", exit_code=1, command=("false",), command_provenance="test fixture")
+    update_manifest(config, record_check(config, second)[0])
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert list(payload["checks"]) == ["selftest"]
+    assert payload["checks"]["selftest"]["status"] == "FAIL_BEHAVIOR"
+    assert "run_id" not in manifest.read_text(encoding="utf-8")
+
+
+def test_same_interpreter_and_classification(repository: Path, monkeypatch: pytest.MonkeyPatch):
+    test_file = repository / "test_sample.py"
+    test_file.write_text("def test_ok():\n    assert True\n", encoding="utf-8")
+    calls = []
+    class Done:
+        returncode = 0
+        stdout = "ok"
+        stderr = ""
+    def fake_run(command, **kwargs):
+        calls.append(tuple(command)); return Done()
+    monkeypatch.setattr("tools.qa.qa_harness.subprocess.run", fake_run)
+    result = run_pytest_check(HarnessConfig("HDE-EPIC039", repo_root=repository), "pytest", ("-q", "test_sample.py"))
+    assert calls[0] == (sys.executable, "-m", "pytest", "--version")
+    assert result.command[:3] == (sys.executable, "-m", "pytest")
+    assert result.status is Status.PASS
+    missing = run_pytest_check(HarnessConfig("HDE-EPIC039", repo_root=repository), "missing", ("missing.py",))
+    assert missing.status is Status.TOOLING_BLOCKED
+
+
+def test_viability_passes_exact_and_legacy_single_path(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    assert generate_acceptance_map_viability(config).status is Status.PASS
+    config.token_matrix_path.write_text("| token_name | owner | evidence_artifacts |\n| --- | --- | --- |\n| QA_HARNESS_DISCIPLINE_OK | PF04 | Proof title (`evidence/proof.json`) |\n", encoding="utf-8")
+    result = generate_acceptance_map_viability(config)
+    assert result.status is Status.PASS
+    assert result.primary_log and result.primary_log.stat().st_size > 0
+    manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
+    assert list(manifest["checks"]).count("acceptance-map-viability") == 1
+
+
+@pytest.mark.parametrize("reference", ["../escape.txt", "/tmp/absolute", "no path prose", "evidence/proof.json and evidence/other.json", "evidence/empty.txt", "evidence/bad.json"])
+def test_viability_rejects_bad_references(repository: Path, reference: str):
+    (repository / "evidence/other.json").write_text('{"ok":true}', encoding="utf-8")
+    (repository / "evidence/empty.txt").write_text("", encoding="utf-8")
+    (repository / "evidence/bad.json").write_text("{", encoding="utf-8")
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    config.token_matrix_path.write_text(f"| token_name | owner | evidence_artifacts |\n| --- | --- | --- |\n| QA_HARNESS_DISCIPLINE_OK | PF04 | {reference} |\n", encoding="utf-8")
+    assert generate_acceptance_map_viability(config).status is Status.FAIL_BEHAVIOR
+
+
+def test_viability_duplicate_or_orphan_tokens_fail_behavior(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    data = {"epic_id": "HDE-EPIC039", "tokens": [{"name": "QA_HARNESS_DISCIPLINE_OK"}, {"name": "QA_HARNESS_DISCIPLINE_OK"}]}
+    config.acceptance_map_path.write_text(json.dumps(data), encoding="utf-8")
+    assert generate_acceptance_map_viability(config).status is Status.FAIL_BEHAVIOR
+    data["tokens"] = [{"name": "QA_HARNESS_DISCIPLINE_OK"}]
+    config.acceptance_map_path.write_text(json.dumps(data), encoding="utf-8")
+    config.token_matrix_path.write_text(config.token_matrix_path.read_text() + "| QA_HARNESS_ENTRYPOINT_SELFTEST_OK | PF04 | evidence/proof.json |\n", encoding="utf-8")
+    assert generate_acceptance_map_viability(config).status is Status.FAIL_BEHAVIOR
+
+
+def test_missing_and_malformed_inputs_are_structured(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    config.acceptance_map_path.unlink()
+    assert generate_acceptance_map_viability(config).status is Status.TOOLING_BLOCKED
+    config.acceptance_map_path.write_text("{", encoding="utf-8")
+    assert generate_acceptance_map_viability(config).status is Status.FAIL_TOOLING
+
+
+def test_writer_failure_is_fail_tooling(repository: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr("tools.qa.qa_harness._atomic_write", lambda *_: (_ for _ in ()).throw(OSError("disk")))
+    result = generate_acceptance_map_viability(HarnessConfig("HDE-EPIC039", repo_root=repository))
+    assert result.status is Status.FAIL_TOOLING
+    assert result.primary_log is None

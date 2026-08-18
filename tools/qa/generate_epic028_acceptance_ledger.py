@@ -239,12 +239,10 @@ def _write_token_matrix() -> None:
 def _write_viability_log() -> None:
     config = qa_harness.HarnessConfig(
         epic_id=EPIC_ID,
-        qa_root=VIABILITY_LOG_PATH.parent,
-        acceptance_map_path=ACCEPTANCE_MAP_PATH,
-        token_matrix_path=TOKEN_MATRIX_PATH,
+        repo_root=ROOT,
         step_names=("acceptance_map_viability",),
     )
-    qa_harness.generate_acceptance_map_viability(config, RUN_ID)
+    qa_harness.generate_acceptance_map_viability(config)
 
 
 def _ensure_required_paths() -> None:
