@@ -4040,8 +4040,8 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
     )
 
 
-def _rebind_sanity_log_only(*, produced_default: str, check: bool) -> None:
-    """Rebind the canonical sanity log without changing evidence membership."""
+def _rebind_sanity_log_model(*, produced_default: str, check: bool) -> None:
+    """Render or validate the targeted sanity-log rebind model."""
     for updater_input in (HUMAN_INDEX, HASH_SENTINEL, MIRROR_PATH):
         _assert_unaliased_write_path(updater_input)
     try:
@@ -4217,20 +4217,26 @@ def _run_sanity_log_rebind_transaction() -> None:
     try:
         with _WriteTransaction(ROOT):
             _STAGED_VIEW = _StagedView(ROOT, produced_default)
-            _rebind_sanity_log_only(
+            _rebind_sanity_log_model(
                 produced_default=produced_default, check=False
             )
-            _rebind_sanity_log_only(
+            _rebind_sanity_log_model(
                 produced_default=produced_default, check=True
             )
             staged = dict(_STAGED_VIEW.changes)
             _STAGED_VIEW = None
             _publish_staged(staged)
-            _rebind_sanity_log_only(
+            _rebind_sanity_log_model(
                 produced_default=produced_default, check=True
             )
     finally:
         _STAGED_VIEW = None
+
+
+def _rebind_sanity_log_only() -> None:
+    """Atomically rebind the canonical sanity log without topology changes."""
+
+    _run_sanity_log_rebind_transaction()
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -4255,7 +4261,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.rebind_sanity_log:
         if args.check or args.epic_id:
             parser.error("--rebind-sanity-log cannot be combined with --check or --epic-id")
-        _run_sanity_log_rebind_transaction()
+        _rebind_sanity_log_only()
         return
 
     epic_ids = set(args.epic_id)

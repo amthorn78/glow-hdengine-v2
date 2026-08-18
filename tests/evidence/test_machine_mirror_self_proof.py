@@ -195,7 +195,7 @@ def test_sanity_rebind_rejects_aliased_inputs(tmp_path, monkeypatch):
         alias.symlink_to(target)
 
         with pytest.raises(SystemExit, match="ALIASED_TRANSACTION_FILE"):
-            uei._run_sanity_log_rebind_transaction()
+            uei._rebind_sanity_log_only()
 
         assert alias.is_symlink()
         assert target.is_file()
@@ -208,7 +208,7 @@ def test_sanity_rebind_publishes_coherent_model(tmp_path, monkeypatch):
     human_before = paths["human"].read_bytes()
     sentinel_before = paths["sentinel"].read_bytes()
 
-    uei._run_sanity_log_rebind_transaction()
+    uei._rebind_sanity_log_only()
 
     assert paths["human"].read_bytes() == human_before
     assert paths["sentinel"].read_bytes() == sentinel_before
@@ -241,7 +241,7 @@ def test_sanity_rebind_rolls_back_partial_publication(tmp_path, monkeypatch):
 
     monkeypatch.setattr(uei.os, "replace", fail_second)
     with pytest.raises(OSError, match="sanity rebind fault injection"):
-        uei._run_sanity_log_rebind_transaction()
+        uei._rebind_sanity_log_only()
 
     after = {
         path.relative_to(tmp_path): path.read_bytes()
