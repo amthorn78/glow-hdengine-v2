@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7  
-Effective Date: 2026.08.17  
+**Version:** v12.7.1  
+Effective Date: 2026.08.18  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -194,6 +194,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.5. Require budget-efficient CI remediation in HDE-EPIC039
 
 2.6 HDE-EPIC039 PR-01 Lineage
+
+2.7 HDE-EPIC039 PR-02 Lineage and Review-Process Correction
+
+2.8 Require Automated CI Budget Control and Supersede Manual Push Circuit Breakers
 
 # 2\) Numbered Addenda
 
@@ -794,7 +798,7 @@ The Product Owner therefore assigns structural, budget-efficient CI remediation 
 
 ## **2.6 HDE-EPIC039 PR-01 Lineage**
 
-### **Approval record**
+### **Approval and source record**
 
 * Repository: `amthorn78/glow-hdengine-v2`  
 * Original PR: `#387`  
@@ -803,13 +807,13 @@ The Product Owner therefore assigns structural, budget-efficient CI remediation 
 * Decision: `MERGED WORK ACCEPTABLE`  
 * At review time, `main` was identical to the final lineage endpoint and contained no later changes.
 
-### **Retained implementation decisions**
+### **Retained decisions and requirements**
 
 1. Canonical JSON is enforced only across the exact declared target inventory. The accepted inventory contains 26 targets and requires UTF-8 without BOM, recursively ASCII-sorted object keys, compact serialization, schema-valid values, and exactly one trailing LF.  
 2. Set normalization applies only to schema-declared sets. Ordered arrays remain ordered. Declared sets deduplicate identical members, reject conflicting identities, and ASCII-sort the remaining identities. The accepted gate contains six explicit declared-set rules.  
-3. Canonical-gate coverage is machine-readable and omission-resistant. The authoritative and supplemental gate families must remain coherent and must fail closed on missing targets, binding drift, noncanonical source bytes, or invalid set declarations.  
-4. The Gate and Channel schemas now have stable `$id` values. Runtime loading enforces the exact 64-Gate and 36-Channel rosters, distinct Channel endpoints, Gate-derived center projection, exact Magic-10 structures, allowed fields, input order, value bounds, timestamps, and checksum syntax.  
-5. `catalog/manifest.json` remains the current source-identity input. Its accepted version and timestamp were preserved, and its roster now includes the narrative manifest and all four narrative members.  
+3. Canonical-gate coverage is machine-readable and omission-resistant. The authoritative and supplemental gate families must remain coherent and fail closed on missing targets, binding drift, noncanonical source bytes, or invalid set declarations.  
+4. The Gate and Channel schemas have stable `$id` values. Runtime loading enforces the exact 64-Gate and 36-Channel rosters, distinct Channel endpoints, Gate-derived center projection, exact Magic-10 structures, allowed fields, input order, value bounds, timestamps, and checksum syntax.  
+5. `catalog/manifest.json` remains the current source-identity input. Its accepted `version=1.0.0` and `built_at_utc=2025-12-26T00:00:00Z` values were preserved. Its roster includes the narrative manifest and all four narrative members.  
 6. Narrative pack identity is derived from the exact LF-terminated bytes of `catalog/narratives/manifest.json`, not from reserialized JSON.  
 7. The Product-Owner-approved direction-native narrative migration is retained as an explicit scope amendment:  
    * 360 registry rows and 360 templates;  
@@ -821,21 +825,330 @@ The Product Owner therefore assigns structural, budget-efficient CI remediation 
 10. Retired EPIC032 evidence producers operate as fixed-roster verifiers only, refuse source-tree writes, and remain excluded from current attestation closure.  
 11. Governed outputs remain bound through path proofs, the Human Evidence Index, the Machine Mirror, checksum sentinels, and the byte-identical HDE-EPIC039 Doc-Delta pair.
 
+### **Epic, task, and status effects**
+
+* PF09.1 task: `HDE-CALC002`  
+* Subtask `HDE-CALC002.2`, Canonical JSON rules:  
+  * source-reported status: `Consolidation pending`;  
+  * supported recommendation: change to `Done`.  
+* Subtask `HDE-CALC002.3`, Arrays-as-sets semantics:  
+  * source-reported status: `Consolidation pending`;  
+  * supported recommendation: change to `Done`.  
+* The PR lineage did not edit PF09. These status recommendations remain unperformed governance updates.
+
 ### **Required canon drainage**
 
-* **PF12 §6.4:** Reconcile the section with §§6.2.1–6.2.2. Remove the frozen/current equality requirement. Define checked-in EPIC022 surfaces as frozen historical captures, current validation as manifest/member validation, and current release derivatives as external attestation outputs.  
-* **PF12 §8.1:** Replace the stale “Current-to-required gaps” posture. Record the stable schema `$id` values and the implemented exact Gate, Channel, center-projection, Magic-10, and manifest guards.  
-* **PF12 §8.2:** Replace the stale defect inventory. Record that distinct Channel endpoints and center projection are enforced; the governed catalogs are canonical; and the arrays-as-sets report is promoted and bound through the Human Index, Machine Mirror, and path proofs.  
-* **PF17 §4.2:** Update repository posture to state that the root manifest includes the narrative manifest and all four required members, and that pack identity uses the exact LF-terminated narrative-manifest bytes.  
-* **PF09.1 `HDE-CALC002.2`:** Change status from `Consolidation pending` to `Done` when the separate PF09 governance update is performed.  
-* **PF09.1 `HDE-CALC002.3`:** Change status from `Consolidation pending` to `Done` when the separate PF09 governance update is performed.
+* **PF12 §6.4, Evidence and CI hooks:** Reconcile the section with §§6.2.1–6.2.2. Remove the frozen/current equality requirement. Define checked-in EPIC022 surfaces as frozen historical captures, current validation as manifest/member validation, and current release derivatives as external attestation outputs.  
+* **PF12 §8.1, Catalog schema and closed-domain validation \[Required-Now\]:** Replace the stale “Current-to-required gaps” posture. Record the stable schema `$id` values and the implemented exact Gate, Channel, center-projection, Magic-10, and manifest guards.  
+* **PF12 §8.2, Topology, set, canonical-byte, and projection integrity \[Required-Now\]:** Replace the stale defect inventory. Record that distinct Channel endpoints and center projection are enforced, the governed catalogs are canonical, and the arrays-as-sets report is promoted and bound through the Human Index, Machine Mirror, and path proofs.  
+* **PF17 §4.2, `pack_sha` & `release_id` Linkage:** Update repository posture to state that the root manifest includes the narrative manifest and all four required members and that pack identity uses the exact LF-terminated narrative-manifest bytes.  
+* **PF09.1, `HDE-CALC002.2`:** Record the reviewed current proof and change the status from `Consolidation pending` to `Done`.  
+* **PF09.1, `HDE-CALC002.3`:** Record the reviewed declared-set proof and change the status from `Consolidation pending` to `Done`.
 
-These PF09 status changes were supported by the review but were not made by the PR lineage.
+None of these permanent-canon or PF09 changes was performed by the reviewed lineage.
 
-### **CI and scope boundaries**
+### **Deferred obligations and unresolved work**
 
-* Hosted CI was inspected but was not acceptance authority for this lineage. The remaining failure occurred in obsolete HDE-EPIC038 administrative test bindings assigned to HDE-EPIC039 PR-04.  
+* Obsolete HDE-EPIC038 administrative focused-test and CI bindings remain assigned to HDE-EPIC039 PR-04.  
+* Hosted CI must not substitute for current-file and governed-artifact inspection while that subsystem remains unresolved.
+
+### **Scope boundaries and nonclaims**
+
+* Hosted CI was inspected but was not acceptance authority for this lineage. The Original PR run did not execute repository code. The Remedial PR test job stopped in the obsolete HDE-EPIC038 administrative subsystem before reaching the applicable general test lane.  
 * The acceptance decision does not constitute QA execution, token satisfaction, OPS completion, deployment, epic closeout, or an already-completed PF09 status change.  
 * The accepted lineage did not change public routes, compatibility payload contracts, Human Design calculations or meanings, scoring behavior, OPS state, PF files, or frozen historical evidence bytes.
+
+### **Evidence and traceability**
+
+* Four current canonical-gate logs contained 31 records each, all with PASS status.  
+* The structured gate recorded 26 exact targets, six declared-set rules, and no failures.  
+* All 19 inspected path proofs matched current bytes and sizes.  
+* The Human Evidence Index and Machine Mirror each contained 559 records, including six aligned HDE-EPIC039 records.  
+* The narrative pack contained 360 registry rows and 360 templates, with 120 rows for each exact perspective and two governed suppressions.  
+* The Original PR reported 140 focused closed-rails tests passing.  
+* The Remedial PR reported its focused historical-evidence verification tests passing.  
+* The current release-identity checker delegates to manifest-only validation while frozen EPIC022 evidence retains its historical identity.
+
+## **2.7 HDE-EPIC039 PR-02 Lineage and Review-Process Correction**
+
+### **Approval and source record**
+
+* Repository: `amthorn78/glow-hdengine-v2`  
+* Original PR: `#389`  
+* Remedial PR: `#390`  
+* Implementation source: `r5-implementation-plan-hde-epic039.md`  
+* Lifecycle baseline: `4da8093ebee76a8d4033744dc3c3c9c76c2a4c34`  
+* Reviewed final endpoint: `b5569460ff2cfeefccf2d6a0a27dcdef32c68891`  
+* Decision: `MERGED WORK ACCEPTABLE`  
+* At review time, `main` was identical to the final lineage endpoint. No intervening or later non-lineage commit affected the reviewed state.  
+* The reassessment relied on GitHub metadata, current repository files, the Approved Plan, and final-head CI. It did not rely on the previously requested transient Codex report for acceptance.
+
+### **Retained decisions and requirements**
+
+1. `tools/evidence/update_evidence_index.py` is the sole active public writer for the governed D2 evidence skeleton and its orientation/index companions.  
+2. Evidence publication must:  
+   * compute one final staged model;  
+   * use staged bytes for hashing, sizes, Mirror roles, path proofs, and orientation rendering;  
+   * publish the complete changed set once through a same-filesystem transaction;  
+   * protect against aliased write paths;  
+   * roll back additions, removals, replacements, and post-publication validation failures;  
+   * revalidate the published filesystem state;  
+   * converge without an updater-to-orientation-to-updater repair rerun.  
+3. `tools/evidence/orientation_demo.py` retains direct, non-writing check behavior. Compatibility write mode delegates to the canonical updater and must not independently mutate the governed orientation artifact.  
+4. Active updater-to-orientation-to-updater repair sequences are removed from supported workflow and generator paths. Supported callers use one updater write followed by read-only checks.  
+5. Machine Mirror publication must preserve:  
+   * self-record body-hash semantics that exclude the self-record line;  
+   * complete-file size in the self-record;  
+   * complete-file SHA-256 in the sibling proof and checksum sentinel;  
+   * coherent Mirror rows, self-record, complete-file proof, checksum, and checksum proof.  
+6. Mirror validation must fail when required Mirror files are missing or the complete-file checksum does not match. Final-LF validation includes the complete governed D2 companion set.  
+7. Governed path-proof chronology must never claim production before the later modification of the artifact it proves.  
+8. Both HDE-EPIC039 Doc-Delta paths are protected by `NON_BACKDATED_PROOF_RELS`. Check mode rejects backdated chronology. When governed artifact bytes or size change, the updater must treat the proof as a fresh chronology capture instead of reusing stale timestamps.  
+9. The canonical and QA HDE-EPIC039 Doc-Delta bodies remain byte-identical. Their proofs, Machine Mirror rows, self-record, checksum, and checksum proof must remain coherent in the same change.  
+10. Historical HDE-EPIC038 artifacts and roles remain preserved. PR-02 boundedly quarantined obsolete HDE-EPIC038 CI controls instead of rewriting or falsely satisfying them.  
+11. PR-02’s CI change is limited to the D2 lane:  
+* focused PR-02 atomic-ledger tests remain active;  
+* six obsolete HDE-EPIC038 controls remain explicitly dormant;  
+* read-only updater, orientation, Mirror-schema, path, hash, and final-LF validation remains active;  
+* dormant controls must not produce false-green evidence.
+
+### **Root cause and remediation boundary**
+
+Original PR \#389 refreshed both HDE-EPIC039 Doc-Delta bodies and hashes while retaining proof chronology in which `produced_at_utc` preceded the later artifact `mtime_utc`.
+
+The defect existed because:
+
+* the two HDE-EPIC039 Doc-Delta paths were absent from `NON_BACKDATED_PROOF_RELS`;  
+* changed artifact bytes could initially retain stale proof times;  
+* Original PR’s tests covered transaction and fixed-point behavior but not HDE-EPIC039 chronology.
+
+Remedial PR \#390:
+
+* added both paths to the non-backdating policy;  
+* rejected invalid unchanged chronology;  
+* treated changed hash or size as a fresh capture;  
+* refreshed both proofs and their Mirror/checksum companions;  
+* added same-size and size-changing regression coverage;  
+* preserved check-mode nonmutation and fixed-point behavior.
+
+The current proofs and corresponding Mirror rows use the corrected timestamp `2026-08-17T00:50:47Z`.
+
+### **Epic, task, and status effects**
+
+* PF09.1 task: `HDE-CALC003`  
+* `HDE-CALC003.10`, Indexing & parity CI gates:  
+  * current status: `Partial`;  
+  * status recommendation: no change.  
+* `HDE-CALC003.11`, Evidence index touch discipline:  
+  * current status: `Partial`;  
+  * status recommendation: no change.
+
+PR-02 materially strengthens both subtasks but does not complete their broader PF09 scope. Repository implementation does not itself move PF09 status.
+
+### **Required canon drainage**
+
+* **PF14 §1.3.1, Evidence jobs (single-writer tools), and §1.3.2, Evidence change workflow:** Reconcile orientation writer ownership. Permanent canon must consistently state that the canonical evidence updater owns governed orientation rendering and publication, while `orientation_demo.py` provides checking and delegates compatibility writes. Remove the conflicting requirement for an independent orientation write.  
+* **PF04 §2.0.6, Evidence & indexing:** Reconcile Machine Mirror self-record hash-basis wording with PF12 §8.3. The self-record SHA is calculated over the canonical Mirror body excluding the self-record line; the self-record retains complete-file size; and the sibling proof and checksum retain the complete-file SHA-256.
+
+These canon changes remain unperformed. Neither drainage item changes the `Partial` status of `HDE-CALC003.10` or `HDE-CALC003.11`.
+
+### **Deferred obligations and unresolved work**
+
+* PR-02 did not complete HDE-EPIC039 PR-04’s workflow-efficiency scope.  
+* Dual `push` and `pull_request` triggers, the seven-job graph, repeated setup, superseded-run behavior, change awareness, and complete workflow-efficiency remediation remain PR-04 work.  
+* The lineage incurred 15 post-opening CI-triggering updates: 14 on PR \#389 and one on PR \#390.  
+* PR \#389 exceeded the PF10 §2.4 five-update circuit breaker by nine updates without a recorded continuation, remote-only-validation, or urgent-safety exception.  
+* This is a historical process breach and avoidable hosted-CI cost. It cannot be repaired by another repository edit and does not create a development-remediation task or block the accepted PR-02 lineage.  
+* The required implementation-report update count is operational transparency only. It is not a governed evidence artifact, acceptance condition, or closeout condition.
+
+### **Review-process correction**
+
+The earlier post-merge review incorrectly delegated GitHub- and repository-observable facts into a transient Codex report and then treated the absence of a persistent destination for that report as remediation.
+
+Every material fact requested in that report was directly obtainable from GitHub PR metadata, diffs, workflow results, current repository files, and the Approved Plan. The report request created work that could not become a repository change and obscured whether an actual development defect existed.
+
+Future reviews must obtain repository-observable facts directly from the repository and available GitHub evidence. They must not create report-only remediation or require operator capture when no code, canon, governed-artifact, status, or other persistent change is necessary. When no actionable development defect remains, the review must reassess the approval decision from repository reality instead of manufacturing a documentation task.
+
+### **Scope boundaries and nonclaims**
+
+* Both final lineage heads passed their seven-job GitHub Actions runs.  
+* No local test suite or QA workflow was run by the post-merge review.  
+* Exact-head CI and current-file inspection supported the acceptance decision but do not constitute a separate QA PASS.  
+* No token or gate satisfaction, PF09 movement, OPS completion, deployment, or epic closeout is claimed.  
+* PR-02 did not delete historical evidence, expand later-phase evidence scope, or claim completion of PR-04.
+
+### **Evidence and traceability**
+
+* Original PR \#389 workflow run `32088066440`, run 3412: all seven jobs succeeded.  
+* Remedial PR \#390 workflow run `32096570061`, run 3418: all seven jobs succeeded.  
+* Current Doc-Delta bodies are byte-identical.  
+* Current proofs have equal, non-backdated `mtime_utc` and `produced_at_utc` values.  
+* Current Mirror rows, self-record, complete-file proof, checksum, and checksum proof form a coherent chain.  
+* Governing implementation surfaces:  
+  * `tools/evidence/update_evidence_index.py`  
+  * `tools/evidence/orientation_demo.py`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `audit/docdeltas/hde-epic039_doc_deltas.md`  
+  * `audit/qa/hde-epic039/00_meta/doc_deltas.md`
+
+### **Relationship to existing PF10 guidance**
+
+* PF10 §2.4 remains authoritative for autonomous-agent push consolidation, update-count reporting, and the five-update circuit breaker. This lineage breached that process without invalidating the merged implementation.  
+* PF10 §§2.3 and 2.5 remain authoritative for continuing-risk CI placement and mandatory budget-efficient HDE-EPIC039 remediation.  
+* This addendum records PR-02’s bounded D2 CI result and preserves the remaining structural CI obligation for PR-04. It does not supersede or weaken §§2.3, 2.4, or 2.5.
+
+## **2.8 Require Automated CI Budget Control and Supersede Manual Push Circuit Breakers**
+
+### **Decision summary**
+
+CI budgeting governance is meaningful only when implemented through durable, automated repository or CI behavior.
+
+Manual push-count limits, agent self-reporting, operator pause requirements, implementation-report disclosures, and after-the-fact process findings do not control hosted expenditure. They must not be treated as CI budget enforcement, acceptance conditions, remediation tasks, or approval blockers.
+
+CI budget control must be built into the development and validation system so that avoidable hosted work is prevented, cancelled, narrowed, consolidated, or made inapplicable automatically.
+
+### **Normative rule**
+
+1. CI budget requirements must have an automated enforcement surface.  
+   A CI budget requirement is enforceable only when it is implemented through one or more of:  
+   * tracked workflow configuration;  
+   * repository-owned validation tooling;  
+   * automated trigger selection;  
+   * automated concurrency and superseded-run cancellation;  
+   * automated change-aware job selection;  
+   * reusable workflow or setup consolidation;  
+   * deterministic caching or artifact reuse;  
+   * automated lane separation;  
+   * required-check aggregation with truthful applicability handling;  
+   * an authorized repository setting.  
+2. Manual behavior rules are not CI budget controls.  
+   Instructions to batch pushes, wait for feedback, count remote updates, pause after a threshold, explain repeated pushes, or obtain operator permission may be advisory development practices. They must not be represented as effective budget governance unless an automated system enforces the relevant behavior.  
+3. The five-update circuit breaker is removed.  
+   There is no authoritative five-update threshold, required pause before a sixth update, continuation authorization, push-count report, exception report, or consolidation report.  
+   A pull request is not noncompliant merely because it received more than five remote updates.  
+4. Push counts are observations, not violations.  
+   Historical or current update counts may be inspected to identify inefficient workflow behavior or justify structural remediation. A count alone does not establish:  
+   * a process breach;  
+   * an approval blocker;  
+   * a remediation task;  
+   * a required report;  
+   * a governance failure;  
+   * an exception requiring Product Owner approval.  
+5. No report-only CI remediation is permitted.  
+   When GitHub metadata, workflow runs, repository files, or current configuration already expose the relevant facts, reviewers and implementation agents must inspect those sources directly.  
+   They must not require the operator or another agent to create a transient report that has no repository, workflow, setting, canon, board, or other persistent action attached to it.  
+6. A CI-budget finding must identify an actionable automated change.  
+   A material CI-budget finding must identify:  
+   * the avoidable hosted execution;  
+   * the repository or authorized setting surface capable of controlling it;  
+   * the automated behavior required;  
+   * the protection that must remain;  
+   * a method for verifying the resulting execution shape.  
+7. If no automated or durable implementation exists within authorized scope, the observation must not be converted into a remediation task or acceptance blocker.  
+8. CI development must minimize hosted experimentation.  
+   CI changes must be developed through static inspection, local workflow validation, targeted tests, reusable repository tooling, and existing run metadata whenever possible.  
+   Hosted CI must not become the ordinary debugging loop for the CI workflow itself. Remote-only behavior may require bounded hosted validation, but no manual push limit substitutes for efficient implementation design.  
+9. Duplicate execution must be prevented structurally.  
+   An ordinary pull-request head must not receive duplicate equivalent full suites merely because event triggers overlap. The workflow must automatically prevent, separate, or narrow overlapping execution while preserving every independently justified boundary.  
+10. Superseded work must be controlled automatically.  
+    When a newer pull-request head makes an older run incapable of establishing current merge readiness, the workflow must cancel, short-circuit, or avoid expensive superseded execution whenever that can be done safely.  
+    Agents are not responsible for manually timing pushes around an inefficient workflow as the primary budget-control mechanism.  
+11. Expensive validation must be selected automatically.  
+    Heavy jobs must be event-aware and change-aware. Documentation-only, audit-only, evidence-only, historical-record-only, or otherwise unrelated changes must not run unrelated heavy validation.  
+    Applicability decisions must be deterministic and must preserve required-check continuity.  
+12. Repeated setup and validation must be reduced through implementation.  
+    Repeated checkout, dependency installation, environment construction, test collection, validator execution, matrices, and artifact transfer must be consolidated, cached, reused, narrowed, or removed when a safe deterministic implementation provides equivalent protection.  
+13. Automated efficiency must preserve truthful protection.  
+    CI budget automation must not:  
+    * skip an applicable required check;  
+    * leave a required status pending or absent;  
+    * hide failed or unexecuted applicable work behind a green summary;  
+    * rely on stale or unverifiable caches;  
+    * weaken exact-head validation;  
+    * bypass branch protection;  
+    * misclassify an affected change as irrelevant.  
+14. Final-head assurance remains mandatory.  
+    The exact candidate presented for merge must receive every applicable required protection. Earlier green commits do not validate a later head.  
+15. Cost improvement must be established from observable execution behavior.  
+    Verification must use repository configuration, workflow topology, current GitHub run behavior, and exact-head results to establish:  
+    * elimination of duplicate full-suite eligibility;  
+    * cancellation or short-circuiting of superseded work;  
+    * narrowing of irrelevant heavy jobs;  
+    * reduction of repeated setup and validation;  
+    * preservation of deterministic required-check conclusions;  
+    * preservation of final-candidate protection.  
+16. A separate operator-supplied implementation report is not required when these facts are directly observable.
+
+### **Plan, implementation, and review effect**
+
+Any plan, prompt, implementation, review, or completion decision addressing CI budgeting must translate the budget concern into an automated repository or authorized-setting outcome.
+
+It must not attempt to satisfy CI budgeting through:
+
+* manual push limits;  
+* agent promises;  
+* operator pause gates;  
+* push-count disclosures;  
+* exception narratives;  
+* transient reports;  
+* documentation-only remediation;  
+* findings that identify no implementable automated control.
+
+Reviewers must evaluate the actual workflow and current GitHub behavior. Repo reality is controlling. A reviewer must not manufacture a report-only task when the relevant facts can be obtained from GitHub or the repository.
+
+### **HDE-EPIC039 effect**
+
+HDE-EPIC039 PR-04 remains responsible for the structural CI-efficiency work already assigned to it, including:
+
+* overlapping trigger behavior;  
+* duplicate equivalent suite prevention;  
+* superseded-run cancellation or short-circuiting;  
+* change-aware and event-aware execution;  
+* required-check continuity;  
+* lane separation;  
+* repeated setup and validation;  
+* truthful exact-head assurance.
+
+HDE-EPIC039 CI remediation is not complete until its applicable budget controls are implemented and verifiable through automated behavior.
+
+### **Supersession and relationship to existing addenda**
+
+This addendum supersedes PF10 §2.4 in full.
+
+The following §2.4 requirements are no longer authoritative:
+
+* the five-update circuit breaker;  
+* the required pause before a sixth update;  
+* operator authorization to continue beyond the threshold;  
+* mandatory push-count reporting;  
+* mandatory remote-only or urgent-safety exception reporting;  
+* characterizing excessive update counts as an independently enforceable process breach;  
+* using manual agent discipline as CI budget enforcement.
+
+PF10 §2.5 remains authoritative for structural, budget-efficient CI remediation, required-check continuity, duplicate-run prevention, superseded-run control, change awareness, lane separation, repeated-work reduction, and exact-final-head protection.
+
+This addendum supersedes §2.5 only where §2.5:
+
+* treats the manual remote-push discipline from §2.4 as a required budget-control mechanism;  
+* requires a separate implementation report for facts directly observable from repository and GitHub state;  
+* permits report production to substitute for automated remediation.
+
+PF10 §2.7’s characterization of the 15 lineage updates as a PF10 §2.4 process breach is superseded. The update count remains evidence that structural CI efficiency matters, but it creates no violation, remediation task, report requirement, or acceptance consequence.
+
+### **Required canon drainage**
+
+* **HDE-Governance:** Establish automation-backed CI cost stewardship and prohibit manual reporting or push-count thresholds as enforcement substitutes.  
+* **Epic Process Guide:** Replace manual CI-budget circuit breakers with requirements for actionable repository or authorized-setting remediation.  
+* **Plan Templates:** Require CI-budget findings to identify an automated control surface, protected risk, and verifiable execution outcome.  
+* **Glow QA Guide:** Require direct inspection of workflow and GitHub evidence, truthful applicability handling, superseded-run control, and exact-head assurance without report-only remediation.
+
+### **Scope boundaries and nonclaims**
+
+* This addendum does not authorize workflow edits, repository-setting changes, branch-protection changes, merges, QA execution, OPS execution, or deployment.  
+* It does not remove or weaken required CI.  
+* It does not require a particular YAML structure, job name, cache implementation, concurrency syntax, or change-detection mechanism.  
+* The authorized implementation task must select the smallest safe, repository-grounded automated design.
 
 \<eof\>
