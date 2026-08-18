@@ -282,18 +282,19 @@ def _capture_transaction_preimage(path: Path) -> None:
 def _assert_unaliased_write_path(path: Path) -> None:
     """Reject aliased updater outputs before any unchanged-byte fast path."""
 
+    # Path's direct filesystem operations always resolve relative names from
+    # CWD. Derive that actual lexical target before selecting its policy scope.
+    scoped_path = path if path.is_absolute() else Path.cwd() / path
     if _STAGED_VIEW is not None:
         root = _STAGED_VIEW.root
     elif _ACTIVE_WRITE_TRANSACTION is not None:
         root = _ACTIVE_WRITE_TRANSACTION.root
     else:
         root = ROOT
-        if path.is_absolute() and not path.is_relative_to(root):
-            # Standalone helper tests and callers may use an absolute scratch
-            # path without an active repository transaction. Preserve that
-            # behavior while still checking its complete lexical parent chain.
-            root = Path(path.anchor)
-    scoped_path = path if path.is_absolute() else root / path
+        if not scoped_path.is_relative_to(root):
+            # Standalone helper tests and callers may use a scratch path. Keep
+            # that behavior while checking its complete lexical parent chain.
+            root = Path(scoped_path.anchor)
     try:
         relative = scoped_path.relative_to(root)
     except ValueError as exc:

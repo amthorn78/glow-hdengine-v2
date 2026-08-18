@@ -287,6 +287,16 @@ def test_unchanged_fast_path_rejects_file_and_parent_aliases(
     proof_alias = tmp_path / "artifact.log.path_proof.txt"
     proof_alias.symlink_to(proof_target)
 
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit, match="ALIASED_TRANSACTION_DIRECTORY"):
+        uei._write_if_changed(
+            directory_alias.relative_to(tmp_path) / "owned-file.txt",
+            expected,
+            check=False,
+        )
+    with pytest.raises(SystemExit, match="ALIASED_TRANSACTION_FILE"):
+        uei._load_existing_proof(proof_alias.relative_to(tmp_path))
+
     standalone_missing = tmp_path / "standalone-missing.txt"
     with pytest.raises(SystemExit) as exc_info:
         uei._write_if_changed(standalone_missing, expected, check=True)
