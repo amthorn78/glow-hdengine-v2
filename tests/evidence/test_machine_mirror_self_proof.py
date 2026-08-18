@@ -144,6 +144,11 @@ def test_unchanged_fast_path_rejects_file_and_parent_aliases(
     proof_alias = tmp_path / "artifact.log.path_proof.txt"
     proof_alias.symlink_to(proof_target)
 
+    standalone_missing = tmp_path / "standalone-missing.txt"
+    with pytest.raises(SystemExit) as exc_info:
+        uei._write_if_changed(standalone_missing, expected, check=True)
+    assert str(exc_info.value) == f"STALE:{standalone_missing}"
+
     monkeypatch.setattr(uei, "ROOT", tmp_path)
     monkeypatch.setattr(uei, "_STAGED_VIEW", None)
     monkeypatch.setattr(uei, "_ACTIVE_WRITE_TRANSACTION", None)
