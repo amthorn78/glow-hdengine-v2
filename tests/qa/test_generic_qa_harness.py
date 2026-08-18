@@ -29,8 +29,9 @@ def _matrix_row(
     token: str = "QA_HARNESS_DISCIPLINE_OK",
     ci: str = "python tools/check.py",
     qa: str = "checks/acceptance-map-viability/primary.log",
+    status: str = "Implemented",
 ) -> str:
-    return f"| {token} | PF04 | {evidence} | {ci} | {qa} | Implemented | fixture |\n"
+    return f"| {token} | PF04 | {evidence} | {ci} | {qa} | {status} | fixture |\n"
 
 
 @pytest.fixture
@@ -71,6 +72,7 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
                     {
                         "name": "QA_HARNESS_DISCIPLINE_OK",
                         "owner_pf": "PF04",
+                        "status": "implemented",
                         "evidence_titles": ["evidence/proof.json"],
                     }
                 ],
@@ -412,21 +414,29 @@ def test_viability_duplicate_or_orphan_tokens_fail_behavior(repository: Path):
             {
                 "name": "QA_HARNESS_DISCIPLINE_OK",
                 "owner_pf": "PF04",
+                "status": "implemented",
                 "evidence_titles": ["evidence/proof.json"],
             },
             {
                 "name": "QA_HARNESS_DISCIPLINE_OK",
                 "owner_pf": "PF04",
+                "status": "implemented",
                 "evidence_titles": ["evidence/proof.json"],
             },
         ],
     }
     config.acceptance_map_path.write_text(json.dumps(data), encoding="utf-8")
-    assert generate_acceptance_map_viability(config).status is Status.FAIL_BEHAVIOR
+    duplicate = generate_acceptance_map_viability(config)
+    assert duplicate.status is Status.FAIL_BEHAVIOR
+    assert (
+        duplicate.token_status["QA_HARNESS_DISCIPLINE_OK"]
+        == "DUPLICATE_ACCEPTANCE_TOKEN"
+    )
     data["tokens"] = [
         {
             "name": "QA_HARNESS_DISCIPLINE_OK",
             "owner_pf": "PF04",
+            "status": "implemented",
             "evidence_titles": ["evidence/proof.json"],
         }
     ]
@@ -446,6 +456,7 @@ def test_viability_requires_matching_acceptance_owner_pf(
     config = HarnessConfig("HDE-EPIC039", repo_root=repository)
     token = {
         "name": "QA_HARNESS_DISCIPLINE_OK",
+        "status": "implemented",
         "evidence_titles": ["evidence/proof.json"],
     }
     if owner_pf is not None:
@@ -457,6 +468,55 @@ def test_viability_requires_matching_acceptance_owner_pf(
     result = generate_acceptance_map_viability(config)
     assert result.status is Status.FAIL_BEHAVIOR
     assert "owner_pf" in result.status_reason
+    assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] != "VALID"
+    if owner_pf == "PF19":
+        assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] == "OWNER_MISMATCH"
+
+
+@pytest.mark.parametrize(
+    ("map_status", "matrix_status", "expected", "disposition"),
+    [
+        ("implemented", "Implemented", Status.PASS, "VALID"),
+        ("covered", "Covered", Status.PASS, "VALID"),
+        ("satisfied", "Satisfied", Status.PASS, "VALID"),
+        ("planned", "Implemented", Status.FAIL_BEHAVIOR, "STATUS_MISMATCH"),
+        (None, "Implemented", Status.FAIL_BEHAVIOR, "INVALID_ACCEPTANCE_STATUS"),
+        ("done", "Implemented", Status.FAIL_BEHAVIOR, "INVALID_ACCEPTANCE_STATUS"),
+        ("implemented", "done", Status.FAIL_BEHAVIOR, "INVALID_MATRIX_STATUS"),
+        ("implemented", "", Status.FAIL_BEHAVIOR, "INVALID_MATRIX_STATUS"),
+        ("planned", "Planned", Status.TOOLING_BLOCKED, "PLANNED"),
+        (
+            "token_incomplete",
+            "Token-incomplete",
+            Status.TOOLING_BLOCKED,
+            "TOKEN_INCOMPLETE",
+        ),
+    ],
+)
+def test_viability_normalizes_and_compares_acceptance_posture(
+    repository: Path,
+    map_status: str | None,
+    matrix_status: str,
+    expected: Status,
+    disposition: str,
+):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    if map_status is None:
+        payload["tokens"][0].pop("status")
+    else:
+        payload["tokens"][0]["status"] = map_status
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER
+        + _matrix_row("evidence/proof.json", status=matrix_status),
+        encoding="utf-8",
+    )
+
+    result = generate_acceptance_map_viability(config)
+
+    assert result.status is expected
+    assert result.token_status["QA_HARNESS_DISCIPLINE_OK"] == disposition
 
 
 def test_missing_and_malformed_inputs_are_structured(repository: Path):

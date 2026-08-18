@@ -119,6 +119,7 @@ class AcceptanceTokenEntry:
     name: str
     owner_pf: str
     evidence_titles: tuple[str, ...]
+    status: str | None
 
 
 @dataclass(frozen=True)
@@ -1088,6 +1089,22 @@ def _normalized_cell(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
 
 
+COMPLETE_ACCEPTANCE_POSTURES = frozenset({"implemented", "covered", "satisfied"})
+ACCEPTANCE_POSTURES = COMPLETE_ACCEPTANCE_POSTURES | frozenset(
+    {"planned", "token_incomplete"}
+)
+
+
+def _normalized_acceptance_posture(value: object) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    stripped = value.strip()
+    if not re.fullmatch(r"[A-Za-z]+(?:[ _-]+[A-Za-z]+)*", stripped):
+        return None
+    normalized = re.sub(r"[ _-]+", "_", stripped.lower())
+    return normalized if normalized in ACCEPTANCE_POSTURES else None
+
+
 def _is_matrix_header(cells: Sequence[str]) -> bool:
     if len(cells) != 7:
         return False
@@ -1136,7 +1153,7 @@ def _matrix_rows(path: Path) -> tuple[dict[str, MatrixRow], str]:
         name = cells[0]
         if not TOKEN_RE.fullmatch(name) or name in rows:
             return {}, f"malformed or duplicate matrix token row: {name}"
-        if any(not cells[index] for index in (1, 2, 3, 4, 5, 6)):
+        if any(not cells[index] for index in (1, 2, 3, 4, 6)):
             return {}, f"matrix token row has an empty required column: {name}"
         try:
             evidence = _split_reference_items(
@@ -1709,8 +1726,9 @@ def _apply_pytest_collection(
                 reason=f"temporary pytest collection root failed: {exc}",
             )
         return ()
+    request_items = tuple(requests.items())
     with temporary as root:
-        for diagnostic_index, request in requests.items():
+        for request_offset, (diagnostic_index, request) in enumerate(request_items):
             selector_results: list[tuple[Status, str]] = []
             for selector in request.selectors:
                 test_file = selector.split("::", 1)[0]
@@ -1740,6 +1758,8 @@ def _apply_pytest_collection(
                         f"pytest node was not collected exactly: {selector}"
                     )
                 selector_results.append((status, selector_reason))
+                if status is not Status.PASS:
+                    break
             statuses = [status for status, _ in selector_results]
             final = _status_rollup(statuses)
             if final is not Status.PASS:
@@ -1751,6 +1771,17 @@ def _apply_pytest_collection(
                 diagnostics[diagnostic_index] = replace(
                     diagnostics[diagnostic_index], status=final, reason=reason
                 )
+                blocked_reason = (
+                    "pytest collection not executed after controlling "
+                    f"{final.value}: {reason}"
+                )
+                for pending_index, _ in request_items[request_offset + 1 :]:
+                    diagnostics[pending_index] = replace(
+                        diagnostics[pending_index],
+                        status=Status.TOOLING_BLOCKED,
+                        reason=blocked_reason,
+                    )
+                break
     return tuple(receipts)
 
 
@@ -1815,6 +1846,7 @@ def evaluate_acceptance_map_viability(
     )
     entries: list[AcceptanceTokenEntry] = []
     matrix: dict[str, MatrixRow] = {}
+    token_posture_disposition: dict[str, str] = {}
 
     registry, registry_error = _governance_tokens(config)
     if registry is None:
@@ -1873,6 +1905,15 @@ def evaluate_acceptance_map_viability(
                         )
                     )
                     continue
+                posture = _normalized_acceptance_posture(item.get("status"))
+                if posture is None:
+                    issues.append(
+                        (
+                            Status.FAIL_BEHAVIOR,
+                            f"acceptance token {name} has a missing or invalid status",
+                        )
+                    )
+                    token_posture_disposition[name] = "INVALID_ACCEPTANCE_STATUS"
                 if not isinstance(owner_pf, str) or not owner_pf.strip():
                     issues.append(
                         (
@@ -1897,13 +1938,23 @@ def evaluate_acceptance_map_viability(
                     )
                     continue
                 entries.append(
-                    AcceptanceTokenEntry(name, owner_pf.strip(), tuple(evidence_titles))
+                    AcceptanceTokenEntry(
+                        name,
+                        owner_pf.strip(),
+                        tuple(evidence_titles),
+                        posture,
+                    )
                 )
             names = [entry.name for entry in entries]
             if len(names) != len(set(names)):
                 issues.append(
                     (Status.FAIL_BEHAVIOR, "acceptance map has duplicate token names")
                 )
+                for name in names:
+                    if names.count(name) > 1:
+                        token_posture_disposition[name] = (
+                            "DUPLICATE_ACCEPTANCE_TOKEN"
+                        )
 
     if (
         not config.token_matrix_path.is_file()
@@ -1935,6 +1986,37 @@ def evaluate_acceptance_map_viability(
                     f"acceptance map and matrix owner_pf disagree for {entry.name}",
                 )
             )
+            token_posture_disposition.setdefault(entry.name, "OWNER_MISMATCH")
+        if matrix_row is None:
+            continue
+        matrix_posture = _normalized_acceptance_posture(matrix_row.status)
+        if matrix_posture is None:
+            issues.append(
+                (
+                    Status.FAIL_BEHAVIOR,
+                    f"matrix token {entry.name} has a missing or invalid status",
+                )
+            )
+            token_posture_disposition[entry.name] = "INVALID_MATRIX_STATUS"
+        elif entry.status is None:
+            pass
+        elif entry.status != matrix_posture:
+            issues.append(
+                (
+                    Status.FAIL_BEHAVIOR,
+                    "acceptance map and matrix status disagree for "
+                    f"{entry.name}: {entry.status} != {matrix_posture}",
+                )
+            )
+            token_posture_disposition[entry.name] = "STATUS_MISMATCH"
+        elif entry.status not in COMPLETE_ACCEPTANCE_POSTURES:
+            issues.append(
+                (
+                    Status.TOOLING_BLOCKED,
+                    f"acceptance token {entry.name} is not implemented: {entry.status}",
+                )
+            )
+            token_posture_disposition[entry.name] = entry.status.upper()
     if registry is not None:
         for name in sorted(entry_names - registry):
             issues.append(
@@ -2020,6 +2102,8 @@ def evaluate_acceptance_map_viability(
             token_status[name] = "MISSING_MATRIX"
         elif name not in entry_names:
             token_status[name] = "ORPHAN_MATRIX"
+        elif name in token_posture_disposition:
+            token_status[name] = token_posture_disposition[name]
         else:
             token_diagnostics = [item.status for item in broken if item.token == name]
             token_status[name] = (
@@ -2065,7 +2149,9 @@ def evaluate_acceptance_map_viability(
         executed_command = tuple(command for command, _ in collection_receipts)
         exit_code = collection_receipts[-1][1]
         command_provenance = (
-            "Exact ordered pytest collection argv executed by the viability walker"
+            "Exact ordered pytest collection argv executed by the viability walker; "
+            "collection stops at the first controlling non-PASS and exit_code is "
+            "the last completed command result"
         )
     elif final_status is Status.PASS:
         executed_command = proof_command or (sys.executable, *sys.argv)

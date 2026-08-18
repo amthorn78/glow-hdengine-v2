@@ -27,6 +27,7 @@ def _repo(root: Path) -> None:
                         "evidence_titles": ["proof.txt"],
                         "name": "QA_HARNESS_DISCIPLINE_OK",
                         "owner_pf": "PF04",
+                        "status": "implemented",
                     }
                 ],
             }

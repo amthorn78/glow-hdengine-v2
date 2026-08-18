@@ -77,6 +77,7 @@ def _configure(
                     {
                         "name": TOKEN,
                         "owner_pf": "PF04",
+                        "status": "implemented",
                         "evidence_titles": list(evidence_titles),
                     }
                 ],
@@ -504,6 +505,129 @@ def test_collection_receipts_are_ordered_and_exclude_unlaunched_commands(
     assert result.status is Status.FAIL_TOOLING
     assert result.command == calls[0]
     assert result.exit_code == 0
+
+
+def test_collection_stops_on_controlling_failure_and_blocks_pending_requests(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    for name in ("test_one.py", "test_two.py", "test_three.py"):
+        path = repository / "tests" / name
+        path.parent.mkdir(exist_ok=True)
+        path.write_text("def test_ok():\n    pass\n", encoding="utf-8")
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        ci="pytest tests/test_one.py; pytest tests/test_two.py",
+    )
+    governance = repository / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md"
+    governance.write_text(
+        governance.read_text(encoding="utf-8").replace(
+            "## **2.1 Next**",
+            "* **QA\\_HARNESS\\_ENTRYPOINT\\_SELFTEST\\_OK** — declared.\n"
+            "## **2.1 Next**",
+        ),
+        encoding="utf-8",
+    )
+    acceptance = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    acceptance["tokens"].append(
+        {
+            "name": "QA_HARNESS_ENTRYPOINT_SELFTEST_OK",
+            "owner_pf": "PF04",
+            "status": "implemented",
+            "evidence_titles": ["evidence/proof.json"],
+        }
+    )
+    config.acceptance_map_path.write_text(json.dumps(acceptance), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        config.token_matrix_path.read_text(encoding="utf-8")
+        + _matrix_row(
+            token="QA_HARNESS_ENTRYPOINT_SELFTEST_OK",
+            ci="pytest tests/test_three.py",
+        ),
+        encoding="utf-8",
+    )
+    calls: list[tuple[str, ...]] = []
+
+    class Done:
+        def __init__(self, returncode: int, test_file: str):
+            self.returncode = returncode
+            self.stdout = (
+                f"{test_file}::test_ok\n" if returncode == 0 else "collection error\n"
+            )
+            self.stderr = (
+                "ImportError while importing test module" if returncode else ""
+            )
+
+    def fake_run(command, **kwargs):
+        del kwargs
+        frozen = tuple(command)
+        calls.append(frozen)
+        test_file = next(value for value in frozen if value.startswith("tests/"))
+        return Done(2 if len(calls) == 2 else 0, test_file)
+
+    monkeypatch.setattr("tools.qa.qa_harness.subprocess.run", fake_run)
+    result, ledger = evaluate_acceptance_map_viability(config)
+    payload = json.loads(ledger)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert result.command == tuple(calls)
+    assert result.exit_code == 2
+    assert len(calls) == 2
+    assert (
+        payload["token_status"]["QA_HARNESS_ENTRYPOINT_SELFTEST_OK"]
+        == "TOOLING_BLOCKED"
+    )
+    pending = [
+        item
+        for item in payload["broken_references"]
+        if item["token"] == "QA_HARNESS_ENTRYPOINT_SELFTEST_OK"
+    ]
+    assert len(pending) == 1
+    assert pending[0]["status"] == "TOOLING_BLOCKED"
+    assert "not executed after controlling FAIL_TOOLING" in pending[0]["reason"]
+
+
+def test_exact_node_miss_stops_later_collection_requests(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    for name in ("test_one.py", "test_two.py"):
+        path = repository / "tests" / name
+        path.parent.mkdir(exist_ok=True)
+        path.write_text("def test_ok():\n    pass\n", encoding="utf-8")
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        ci=(
+            "pytest tests/test_one.py::test_missing; "
+            "pytest tests/test_two.py"
+        ),
+    )
+    calls: list[tuple[str, ...]] = []
+
+    class Done:
+        returncode = 0
+        stdout = "tests/test_one.py::test_ok\n"
+        stderr = ""
+
+    def fake_run(command, **kwargs):
+        del kwargs
+        calls.append(tuple(command))
+        return Done()
+
+    monkeypatch.setattr("tools.qa.qa_harness.subprocess.run", fake_run)
+    result, ledger = evaluate_acceptance_map_viability(config)
+    payload = json.loads(ledger)
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert result.command == calls[0]
+    assert result.exit_code == 0
+    assert len(calls) == 1
+    reasons = [item["reason"] for item in payload["broken_references"]]
+    assert any("pytest node was not collected exactly" in reason for reason in reasons)
+    assert any(
+        "not executed after controlling TOOLING_BLOCKED" in reason
+        for reason in reasons
+    )
 
 
 def test_collection_launch_failure_before_completion_records_no_command(
