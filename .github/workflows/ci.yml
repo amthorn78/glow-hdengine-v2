@@ -55,7 +55,8 @@ jobs:
             tests/evidence/test_machine_mirror_self_proof.py \
             tests/evidence/test_orientation_demo.py \
             tests/evidence/test_hde_epic038_closeout.py::test_dev02_orientation_compatibility_write_is_idempotent_after_updater \
-            tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_recovers_missing_closeout_proofs_in_one_write
+            tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_recovers_missing_closeout_proofs_in_one_write \
+            tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_rolls_back_after_reused_semantic_primary_drift
       - name: Verify downloaded exact-source release attestation
         if: ${{ false }}
         shell: bash
@@ -175,6 +176,8 @@ jobs:
       - run: ci/checks/check_final_lf.sh
       # These legacy suites intentionally build ephemeral EPIC020/021 artifacts.
       # The committed closure has already been verified read-only above.
+      # Frozen HDE-EPIC038 closeout and architecture-snapshot tests remain
+      # quarantined here pending their removal in PR04.
       - name: Run legacy EPIC020/021 evidence tests in isolated exact-head worktree
         shell: bash
         run: |
@@ -195,6 +198,7 @@ jobs:
               tests/evidence \
               tests/ops/test_evidence_index.py \
               tests/ops/test_hde_epic038_ops03.py \
+              --ignore=tests/evidence/test_architecture_snapshot.py \
               --ignore=tests/evidence/test_hde_epic038_closeout.py
           )
           cleanup
