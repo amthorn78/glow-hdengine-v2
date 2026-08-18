@@ -35,6 +35,9 @@ def test_generator_wrapper_binds_verified_returned_ledger(
             command=("fixture-check",),
             command_provenance="Explicitly created",
             exit_code=0,
+            evidence_artifacts=(
+                f"audit/qa/hde-epic{number}/acceptance_map_viability.log",
+            ),
         ),
     )
     result = ViabilityResult(Status.PASS, "", primary, manifest, ledger, {})
@@ -348,6 +351,11 @@ def _configure_epic027_publication_paths(module, tmp_path: Path, monkeypatch) ->
         "CLOSE_MANIFEST_PATH",
         tmp_path / "audit/EPIC-027_MANIFEST.json",
     )
+    monkeypatch.setattr(
+        module,
+        "DOC_DELTA_PATH",
+        qa_root / "00_meta/doc_deltas.md",
+    )
 
 
 def test_epic027_viability_has_no_planned_gate_exemptions(
@@ -379,6 +387,9 @@ def test_epic027_viability_has_no_planned_gate_exemptions(
             command=("fixture-check",),
             command_provenance="Explicitly created",
             exit_code=0,
+            evidence_artifacts=(
+                "audit/qa/hde-epic027/acceptance_map_viability.log",
+            ),
         ),
     )
     result = ViabilityResult(
@@ -472,8 +483,14 @@ def test_epic027_close_manifest_binds_current_qa_manifest(
 
     module._write_close_manifest("2026-08-18T00:00:00Z")
 
-    assert captured[0][1]["key_outputs"]["qa_step_manifest"] == (
+    assert captured[0][1]["key_outputs"]["step_logs_manifest"] == (
         "audit/qa/hde-epic027/qa_step_logs_manifest.json"
+    )
+    assert captured[0][1]["key_outputs"]["acceptance_viability"] == (
+        "audit/qa/hde-epic027/acceptance_map_viability.log"
+    )
+    assert captured[0][1]["key_outputs"]["doc_deltas"] == (
+        "audit/qa/hde-epic027/00_meta/doc_deltas.md"
     )
 
 
@@ -628,6 +645,9 @@ def test_epic027_final_viability_preserves_gate_receipts_in_flat_manifest(
                 command=("fixture-check",),
                 command_provenance="Explicitly created",
                 exit_code=0,
+                evidence_artifacts=(
+                    "audit/qa/hde-epic027/acceptance_map_viability.log",
+                ),
             ),
             additional_files=((config.viability_ledger_path, ledger_content),),
         )
@@ -782,6 +802,7 @@ def test_epic027_refreshes_canonical_proofs_before_index_write_and_check(
         ],
         ("proof", result.primary_log, "2026-08-18T00:00:00Z"),
         ("proof", result.manifest, "2026-08-18T00:00:00Z"),
+        ("proof", module.DOC_DELTA_PATH, "2026-08-18T00:00:00Z"),
         ("proof", module.CLOSE_REPORT_PATH, "2026-08-18T00:00:00Z"),
         ("proof", module.CLOSE_MANIFEST_PATH, "2026-08-18T00:00:00Z"),
         ("updater", ()),

@@ -12,6 +12,7 @@ from tools.qa.qa_harness import (
     generate_acceptance_map_viability,
     read_primary_header,
     record_check,
+    require_governed_viability,
     run_pytest_check,
     summarize_checks,
     update_manifest,
@@ -380,6 +381,36 @@ def test_generator_only_viability_ledger_matches_primary_evaluation(repository: 
         result.primary_log.read_text(encoding="utf-8").splitlines()[1]
     )
     assert ledger == primary_evaluation
+    assert read_primary_header(result.primary_log)["evidence_artifacts"] == [
+        "audit/qa/hde-epic039/checks/acceptance-map-viability/primary.log",
+        "audit/qa/hde-epic039/acceptance_map_viability.log",
+    ]
+    assert require_governed_viability(result, config.viability_ledger_path) == (
+        config.viability_ledger_path
+    )
+
+
+def test_governed_viability_admission_rejects_unbound_ledger(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    result = generate_acceptance_map_viability(config, publish_governed_ledger=True)
+    primary_lines = result.primary_log.read_text(encoding="utf-8").splitlines()
+    header = json.loads(primary_lines[0])
+    header["evidence_artifacts"].remove(
+        "audit/qa/hde-epic039/acceptance_map_viability.log"
+    )
+    result.primary_log.write_text(
+        "\n".join(
+            (
+                json.dumps(header, sort_keys=True, separators=(",", ":")),
+                *primary_lines[1:],
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SystemExit, match="ACCEPTANCE_MAP_VIABILITY_LEDGER_UNBOUND"):
+        require_governed_viability(result, config.viability_ledger_path)
 
 
 @pytest.mark.parametrize(

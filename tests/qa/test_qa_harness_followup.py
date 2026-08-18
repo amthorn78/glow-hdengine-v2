@@ -824,7 +824,11 @@ def test_governed_ledger_self_output_requires_explicit_publication_plan(
     blocked, _ = evaluate_acceptance_map_viability(config)
     planned, _ = evaluate_acceptance_map_viability(config, planned_governed_ledger=True)
     assert blocked.status is Status.TOOLING_BLOCKED
+    assert blocked.evidence_artifacts == ()
     assert planned.status is Status.PASS
+    assert planned.evidence_artifacts == (
+        "audit/qa/hde-epic039/acceptance_map_viability.log",
+    )
 
 
 def test_referenced_manifest_with_broken_nested_log_is_fail_tooling(repository: Path):

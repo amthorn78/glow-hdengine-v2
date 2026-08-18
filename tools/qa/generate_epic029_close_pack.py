@@ -1103,8 +1103,8 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool], gate: dict
     key_outputs = {
         "acceptance_map": "docs/acceptance_map_epic029.json",
         "token_matrix": "audit/qa/hde-epic029/token_evidence_matrix.md",
-        "acceptance_map_viability": "audit/qa/hde-epic029/acceptance_map_viability.log",
-        "qa_step_manifest": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
+        "acceptance_viability": "audit/qa/hde-epic029/acceptance_map_viability.log",
+        "step_logs_manifest": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
         "conjunction_json_surface_inventory": "audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md",
         "dev_harness_binding_coverage": "audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md",
         "doc_deltas": "audit/docdeltas/hde-epic029_doc_deltas.md",

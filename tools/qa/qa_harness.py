@@ -2190,6 +2190,11 @@ def evaluate_acceptance_map_viability(
         command_provenance=command_provenance,
         exit_code=exit_code,
         output=evaluation_content,
+        evidence_artifacts=(
+            (_repo_relative(config, config.viability_ledger_path),)
+            if planned_governed_ledger
+            else ()
+        ),
         intended_tokens=(),
         pf_refs=(
             "PF04-Canon-HDE-Governance",
@@ -2288,8 +2293,12 @@ def require_governed_viability(result: ViabilityResult, expected_path: Path) -> 
         raise SystemExit("ACCEPTANCE_MAP_VIABILITY_MANIFEST_MISMATCH")
     try:
         verify_manifest_entry(config, "acceptance-map-viability")
+        primary_header = read_primary_header(result.primary_log)
     except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
         raise SystemExit(
             f"ACCEPTANCE_MAP_VIABILITY_CURRENT_STATE_INVALID:{exc}"
         ) from exc
+    ledger_reference = _repo_relative(config, ledger)
+    if ledger_reference not in primary_header["evidence_artifacts"]:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_LEDGER_UNBOUND")
     return ledger

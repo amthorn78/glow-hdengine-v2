@@ -546,6 +546,11 @@ EPIC027_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC027",
     },
     {
+        "artifact_key": "epic027.doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic027/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
         "artifact_key": "epic027.close_report",
         "discovered_physical_path": "audit/EPIC-027_close_report.md",
         "epic_id": "HDE-EPIC027",

@@ -75,6 +75,28 @@ EPIC029_TARGETS = [
     ),
 ]
 
+EPIC027_TARGETS = [
+    ("epic027.acceptance_map", "docs/acceptance_map_epic027.json"),
+    (
+        "epic027.token_matrix",
+        "audit/qa/hde-epic027/token_evidence_matrix.md",
+    ),
+    (
+        "epic027.acceptance_map_viability",
+        "audit/qa/hde-epic027/acceptance_map_viability.log",
+    ),
+    (
+        "epic027.qa_step_logs_manifest",
+        "audit/qa/hde-epic027/qa_step_logs_manifest.json",
+    ),
+    (
+        "epic027.doc_deltas",
+        "audit/qa/hde-epic027/00_meta/doc_deltas.md",
+    ),
+    ("epic027.close_report", "audit/EPIC-027_close_report.md"),
+    ("epic027.manifest", "audit/EPIC-027_MANIFEST.json"),
+]
+
 EPIC021_TARGETS = [
     ("epic021.acceptance_map", "docs/acceptance_map_epic021.json"),
     (
@@ -188,6 +210,10 @@ def test_evidence_index_has_required_epic021_artifacts():
     _assert_targets_present(EPIC021_TARGETS)
 
 
+def test_evidence_index_has_required_epic027_artifacts():
+    _assert_targets_present(EPIC027_TARGETS)
+
+
 def test_epic029_primary_roster_matches_canonical_bindings():
     roster = update_evidence_index.EPIC029_PRIMARY_ARTIFACTS
     actual = [
@@ -197,6 +223,19 @@ def test_epic029_primary_roster_matches_canonical_bindings():
 
     assert actual == EPIC029_TARGETS
     assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC029"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+
+
+def test_epic027_primary_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC027_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC027_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC027"}
     assert len({key for key, _ in actual}) == len(actual)
     assert len({path for _, path in actual}) == len(actual)
 

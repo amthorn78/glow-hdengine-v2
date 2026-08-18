@@ -396,6 +396,25 @@ def test_close_pack_names_required_rails_and_same_run_receipts():
 
     assert "## Acceptance and evidence pointers" in report
     assert "## QA Rails — Open/Close (Final PR)" in report
+    required_outputs = {
+        "acceptance_map": "docs/acceptance_map_epic021.json",
+        "token_matrix": "audit/qa/hde-epic021/token_evidence_matrix.md",
+        "acceptance_viability": (
+            "audit/qa/hde-epic021/acceptance_map_viability.log"
+        ),
+        "step_logs_manifest": (
+            "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+        ),
+        "doc_deltas": "audit/docdeltas/hde-epic021_doc_deltas.md",
+        "close_report": "audit/EPIC-021_close_report.md",
+        "close_manifest": "audit/EPIC-021_MANIFEST.json",
+    }
+    assert {
+        key: manifest["key_outputs"][key] for key in required_outputs
+    } == required_outputs
+    assert not (
+        epic021_qa.RETIRED_CLOSE_OUTPUT_KEYS & manifest["key_outputs"].keys()
+    )
     expected_logs = {
         "qa_log_acceptance_map_viability": (
             "audit/qa/hde-epic021/checks/acceptance-map-viability/primary.log"

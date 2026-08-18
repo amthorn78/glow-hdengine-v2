@@ -38,6 +38,23 @@ README_PATH = QA_ROOT / "README.md"
 CLOSE_REPORT_PATH = ROOT / "audit/EPIC-021_close_report.md"
 CLOSE_MANIFEST_PATH = ROOT / "audit/EPIC-021_MANIFEST.json"
 
+REQUIRED_CLOSE_OUTPUTS = {
+    "acceptance_map": "docs/acceptance_map_epic021.json",
+    "token_matrix": "audit/qa/hde-epic021/token_evidence_matrix.md",
+    "acceptance_viability": (
+        "audit/qa/hde-epic021/acceptance_map_viability.log"
+    ),
+    "step_logs_manifest": (
+        "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+    ),
+    "doc_deltas": "audit/docdeltas/hde-epic021_doc_deltas.md",
+    "close_report": "audit/EPIC-021_close_report.md",
+    "close_manifest": "audit/EPIC-021_MANIFEST.json",
+}
+RETIRED_CLOSE_OUTPUT_KEYS = frozenset(
+    {"acceptance_map_viability", "qa_step_manifest"}
+)
+
 LIVE_QA_TESTS = (
     "tests/qa/test_generic_qa_harness.py",
     "tests/qa/test_qa_harness_followup.py",
@@ -394,13 +411,7 @@ def _close_manifest_content(captured_at_utc: str) -> str:
         "closeout_dir": f"audit/qa/{EPIC_SLUG}",
         "epic_id": EPIC_ID,
         "key_outputs": {
-            "acceptance_map": "docs/acceptance_map_epic021.json",
-            "acceptance_map_viability": (
-                "audit/qa/hde-epic021/acceptance_map_viability.log"
-            ),
-            "close_manifest": "audit/EPIC-021_MANIFEST.json",
-            "close_report": "audit/EPIC-021_close_report.md",
-            "doc_deltas": "audit/docdeltas/hde-epic021_doc_deltas.md",
+            **REQUIRED_CLOSE_OUTPUTS,
             "qa_log_acceptance_map_viability": (
                 "audit/qa/hde-epic021/checks/acceptance-map-viability/primary.log"
             ),
@@ -420,10 +431,6 @@ def _close_manifest_content(captured_at_utc: str) -> str:
             "qa_log_precommit": (
                 "audit/qa/hde-epic021/checks/po-precommit/primary.log"
             ),
-            "qa_step_manifest": (
-                "audit/qa/hde-epic021/qa_step_logs_manifest.json"
-            ),
-            "token_matrix": "audit/qa/hde-epic021/token_evidence_matrix.md",
         },
         "qa_epic_root": f"audit/qa/{EPIC_SLUG}",
         "qa_step_count": 6,
@@ -500,7 +507,19 @@ def _validate_close_pack() -> None:
             _close_report_content(captured_at_utc)
         ):
             raise ValueError("close report is not canonical")
-        for relative_path in manifest["key_outputs"].values():
+        key_outputs = manifest["key_outputs"]
+        if not isinstance(key_outputs, dict):
+            raise ValueError("close key_outputs is not a named object")
+        for key, relative_path in REQUIRED_CLOSE_OUTPUTS.items():
+            if key_outputs.get(key) != relative_path:
+                raise ValueError(f"close output binding mismatch: {key}")
+        retired_keys = RETIRED_CLOSE_OUTPUT_KEYS.intersection(key_outputs)
+        if retired_keys:
+            raise ValueError(
+                "retired close output binding present: "
+                + ",".join(sorted(retired_keys))
+            )
+        for relative_path in key_outputs.values():
             output = ROOT / relative_path
             if not output.is_file() or output.stat().st_size == 0:
                 raise ValueError(f"close output unavailable: {relative_path}")

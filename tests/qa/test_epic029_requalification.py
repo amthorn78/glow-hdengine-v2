@@ -584,6 +584,7 @@ def test_viability_joins_requalified_family_with_same_timestamp(
         output=ledger,
         evidence_artifacts=(
             "audit/qa/hde-epic029/checks/acceptance-map-viability/primary.log",
+            "audit/qa/hde-epic029/acceptance_map_viability.log",
         ),
     )
     viability_path = tmp_path / "audit/qa/hde-epic029/acceptance_map_viability.log"
@@ -620,6 +621,43 @@ def test_viability_joins_requalified_family_with_same_timestamp(
             .splitlines()[0]
         )
         assert header["timestamp_utc"] == timestamp
+        if check_id == "acceptance-map-viability":
+            assert header["evidence_artifacts"] == [
+                "audit/qa/hde-epic029/checks/acceptance-map-viability/primary.log",
+                "audit/qa/hde-epic029/acceptance_map_viability.log",
+            ]
+
+
+def test_dormant_close_manifest_writer_uses_canonical_binding_keys(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: list[dict[str, object]] = []
+    monkeypatch.setattr(
+        epic029,
+        "_write_json",
+        lambda _path, payload: captured.append(payload),
+    )
+
+    epic029._write_close_manifest(
+        "2026-08-18T00:00:00Z",
+        {check_id: True for check_id in epic029.REQUALIFICATION_CHECK_IDS},
+        {
+            "codespaces": "closed",
+            "local_dev": "closed",
+            "closure_mode": "binding-equivalence",
+            "row_closure_status": {"HDE-CONJ001.4": "closed"},
+        },
+    )
+
+    key_outputs = captured[0]["key_outputs"]
+    assert key_outputs["acceptance_viability"] == (
+        "audit/qa/hde-epic029/acceptance_map_viability.log"
+    )
+    assert key_outputs["step_logs_manifest"] == (
+        "audit/qa/hde-epic029/qa_step_logs_manifest.json"
+    )
+    assert "acceptance_map_viability" not in key_outputs
+    assert "qa_step_manifest" not in key_outputs
 
 
 @pytest.mark.parametrize(

@@ -31,6 +31,7 @@ TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
 VIABILITY_LOG_PATH = QA_ROOT / "acceptance_map_viability.log"
 CLOSE_REPORT_PATH = ROOT / "audit" / "EPIC-027_close_report.md"
 CLOSE_MANIFEST_PATH = ROOT / "audit" / "EPIC-027_MANIFEST.json"
+DOC_DELTA_PATH = QA_ROOT / "00_meta" / "doc_deltas.md"
 
 FINAL_MIRROR_SCHEMA_COMMAND = (
     "ci/checks/check_mirror_schema.sh",
@@ -93,6 +94,7 @@ def _wrapper_write_paths() -> tuple[Path, ...]:
         VIABILITY_LOG_PATH,
         manifest,
         viability_primary,
+        DOC_DELTA_PATH,
         CLOSE_REPORT_PATH,
         CLOSE_MANIFEST_PATH,
     )
@@ -793,8 +795,9 @@ def _write_close_manifest(produced_at: str) -> None:
     key_outputs = {
         "acceptance_map": "docs/acceptance_map_epic027.json",
         "token_matrix": "audit/qa/hde-epic027/token_evidence_matrix.md",
-        "acceptance_map_viability": "audit/qa/hde-epic027/acceptance_map_viability.log",
-        "qa_step_manifest": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
+        "acceptance_viability": "audit/qa/hde-epic027/acceptance_map_viability.log",
+        "step_logs_manifest": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
+        "doc_deltas": "audit/qa/hde-epic027/00_meta/doc_deltas.md",
         "close_report": "audit/EPIC-027_close_report.md",
         "close_manifest": "audit/EPIC-027_MANIFEST.json",
         "d1_compat_identity_hash": "artifacts/compat/identity_hash.txt",
@@ -843,6 +846,7 @@ def _ensure_required_paths() -> None:
         ROOT / "artifacts/writer/conjunction_writer_summary.json",
         ROOT / "artifacts/audit/cli/two_run_identity.log",
         ROOT / "audit/gates/determinism/env_pins.log",
+        DOC_DELTA_PATH,
     ]
     missing = [p.relative_to(ROOT).as_posix() for p in required if not p.exists()]
     if missing:
@@ -886,6 +890,7 @@ def _refresh_governed_bindings(
         *gate_primary_logs,
         result.primary_log,
         result.manifest,
+        DOC_DELTA_PATH,
         CLOSE_REPORT_PATH,
         CLOSE_MANIFEST_PATH,
     ]:
