@@ -187,6 +187,90 @@ def test_same_interpreter_and_classification(
     assert missing.status is Status.TOOLING_BLOCKED
 
 
+@pytest.mark.parametrize(
+    "pytest_args",
+    [
+        ("-q", "-k", "expression", "test_sample.py"),
+        ("-q", "-m", "not slow", "test_sample.py"),
+        ("-q", "-p", "no:cacheprovider", "test_sample.py"),
+    ],
+)
+def test_pytest_preflight_skips_admitted_option_values(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pytest_args: tuple[str, ...],
+):
+    test_file = repository / "test_sample.py"
+    test_file.write_text("def test_ok():\n    assert True\n", encoding="utf-8")
+    calls = []
+
+    class Done:
+        returncode = 0
+        stdout = "ok"
+        stderr = ""
+
+    def fake_run(command, **kwargs):
+        calls.append((tuple(command), kwargs))
+        return Done()
+
+    monkeypatch.setattr("tools.qa.qa_harness.subprocess.run", fake_run)
+
+    result = run_pytest_check(
+        HarnessConfig("HDE-EPIC039", repo_root=repository),
+        "pytest-options",
+        pytest_args,
+    )
+
+    assert result.status is Status.PASS
+    assert [command for command, _ in calls] == [
+        (sys.executable, "-m", "pytest", "--version"),
+        (sys.executable, "-m", "pytest", *pytest_args),
+    ]
+    assert result.command == tuple(command for command, _ in calls)
+
+
+@pytest.mark.parametrize(
+    ("pytest_args", "reason"),
+    [
+        (("-q", "-k"), "lacks its expression"),
+        (
+            ("-q", "-p", "arbitrary_plugin", "test_sample.py"),
+            "admits only -p no:cacheprovider",
+        ),
+        (
+            ("-q", "--basetemp", "/tmp/foreign", "test_sample.py"),
+            "uses unsupported option: --basetemp",
+        ),
+    ],
+)
+def test_pytest_preflight_rejects_unbounded_option_controls_without_execution(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    pytest_args: tuple[str, ...],
+    reason: str,
+):
+    (repository / "test_sample.py").write_text(
+        "def test_ok():\n    assert True\n", encoding="utf-8"
+    )
+    calls = []
+    monkeypatch.setattr(
+        "tools.qa.qa_harness.subprocess.run",
+        lambda *args, **kwargs: calls.append((args, kwargs)),
+    )
+
+    result = run_pytest_check(
+        HarnessConfig("HDE-EPIC039", repo_root=repository),
+        "pytest-options",
+        pytest_args,
+    )
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert reason in result.status_reason
+    assert result.command == ()
+    assert result.exit_code is None
+    assert calls == []
+
+
 def test_pytest_readiness_launch_failure_records_no_executed_command(
     repository: Path, monkeypatch: pytest.MonkeyPatch
 ):

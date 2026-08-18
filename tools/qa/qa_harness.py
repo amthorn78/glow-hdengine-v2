@@ -711,6 +711,50 @@ def _verify_flat_manifest(
         verify_manifest_entry(config, check_id)
 
 
+def _parse_pytest_arguments(
+    pytest_args: Sequence[str],
+    *,
+    subject: str,
+) -> tuple[tuple[str, ...], tuple[str, ...], str]:
+    """Partition the closed pytest grammar into selectors and exact options."""
+    selectors: list[str] = []
+    options: list[str] = []
+    arguments = tuple(pytest_args)
+    argument_index = 0
+    while argument_index < len(arguments):
+        argument = arguments[argument_index]
+        if argument in {"-q", "--quiet", "--collect-only"}:
+            options.append(argument)
+            argument_index += 1
+            continue
+        if argument == "-p":
+            if (
+                argument_index + 1 >= len(arguments)
+                or arguments[argument_index + 1] != "no:cacheprovider"
+            ):
+                return (), (), f"{subject} admits only -p no:cacheprovider"
+            options.extend((argument, arguments[argument_index + 1]))
+            argument_index += 2
+            continue
+        if argument in {"-k", "-m"}:
+            if argument_index + 1 >= len(arguments):
+                return (), (), f"{subject} option {argument} lacks its expression"
+            options.extend((argument, arguments[argument_index + 1]))
+            argument_index += 2
+            continue
+        if (argument.startswith("-k") or argument.startswith("-m")) and len(
+            argument
+        ) > 2:
+            options.append(argument)
+            argument_index += 1
+            continue
+        if argument.startswith("-"):
+            return (), (), f"{subject} uses unsupported option: {argument}"
+        selectors.append(argument)
+        argument_index += 1
+    return tuple(selectors), tuple(options), ""
+
+
 def run_pytest_check(
     config: HarnessConfig,
     check_id: str,
@@ -721,7 +765,21 @@ def run_pytest_check(
 ) -> CheckResult:
     command = (sys.executable, "-m", "pytest", *pytest_args)
     readiness_command = (sys.executable, "-m", "pytest", "--version")
-    entrypoints = [arg for arg in pytest_args if not arg.startswith("-")]
+    entrypoints, _, option_error = _parse_pytest_arguments(
+        pytest_args,
+        subject="pytest invocation",
+    )
+    if option_error:
+        return CheckResult(
+            check_id,
+            Status.TOOLING_BLOCKED,
+            option_error,
+            check_name,
+            (),
+            "Not executed",
+            None,
+            intended_tokens=(),
+        )
     missing = [
         arg
         for arg in entrypoints
@@ -1478,48 +1536,12 @@ def _ci_diagnostic(
             ),
             None,
         )
-    selectors_list: list[str] = []
-    options: list[str] = []
-    arguments = tuple(pytest_args or ())
-    argument_index = 0
-    option_error = ""
-    while argument_index < len(arguments):
-        argument = arguments[argument_index]
-        if argument in {"-q", "--quiet", "--collect-only"}:
-            options.append(argument)
-            argument_index += 1
-            continue
-        if argument == "-p":
-            if (
-                argument_index + 1 >= len(arguments)
-                or arguments[argument_index + 1] != "no:cacheprovider"
-            ):
-                option_error = "pytest locator admits only -p no:cacheprovider"
-                break
-            options.extend((argument, arguments[argument_index + 1]))
-            argument_index += 2
-            continue
-        if argument in {"-k", "-m"}:
-            if argument_index + 1 >= len(arguments):
-                option_error = f"pytest locator option {argument} lacks its expression"
-                break
-            options.extend((argument, arguments[argument_index + 1]))
-            argument_index += 2
-            continue
-        if (argument.startswith("-k") or argument.startswith("-m")) and len(
-            argument
-        ) > 2:
-            options.append(argument)
-            argument_index += 1
-            continue
-        if argument.startswith("-"):
-            option_error = f"pytest locator uses unsupported option: {argument}"
-            break
-        if ".py" not in argument:
-            option_error = "pytest locator contains unsupported positional prose"
-            break
-        selectors_list.append(argument)
-        argument_index += 1
+    selectors, options, option_error = _parse_pytest_arguments(
+        tuple(pytest_args or ()),
+        subject="pytest locator",
+    )
+    if not option_error and any(".py" not in selector for selector in selectors):
+        option_error = "pytest locator contains unsupported positional prose"
     if option_error:
         return (
             ReferenceDiagnostic(
@@ -1532,7 +1554,6 @@ def _ci_diagnostic(
             ),
             None,
         )
-    selectors = tuple(selectors_list)
     if not selectors:
         return (
             ReferenceDiagnostic(

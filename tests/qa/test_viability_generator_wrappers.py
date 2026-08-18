@@ -490,10 +490,23 @@ def test_epic027_gate_receipts_are_pf27_v2_and_manifest_bound(
         return module.subprocess.CompletedProcess(command, 0, "gate passed\n", "")
 
     monkeypatch.setattr(module.subprocess, "run", pass_gate)
+    record_family = module.qa_harness.record_check_family
+    family_calls = []
+
+    def record_family_spy(config, results, **kwargs):
+        family_calls.append(tuple(result.check_id for result in results))
+        return record_family(config, results, **kwargs)
+
+    monkeypatch.setattr(
+        module.qa_harness,
+        "record_check_family",
+        record_family_spy,
+    )
 
     primary_logs = module._run_governed_gates()
 
     assert primary_logs == _epic027_gate_primaries(tmp_path)
+    assert family_calls == [module.GATE_CHECK_IDS]
     manifest = json.loads(
         (module.QA_ROOT / "qa_step_logs_manifest.json").read_text(encoding="utf-8")
     )
@@ -824,11 +837,11 @@ def test_epic027_main_finalizes_only_after_gate_and_output_verification(
     assert module.main() == 0
     assert events == [
         "_ensure_required_paths",
-        "_invalidate_close_pair",
         "_write_acceptance_map",
         "_write_token_matrix",
         "_preflight_acceptance_map_viability",
         "_run_governed_gates",
+        "_invalidate_close_pair",
         "_write_viability_log",
         "_write_close_manifest",
         "_write_close_report",
@@ -931,6 +944,10 @@ def test_epic027_gate_failure_halts_main_before_viability_and_close_pair(
     module.CLOSE_MANIFEST_PATH.write_text("{}\n", encoding="utf-8")
 
     def fail_gates():
+        assert module.CLOSE_REPORT_PATH.read_text(encoding="utf-8") == (
+            "stale close report\n"
+        )
+        assert module.CLOSE_MANIFEST_PATH.read_text(encoding="utf-8") == "{}\n"
         events.append("gates")
         raise SystemExit("GATE_FAIL_TOOLING:gate_update_evidence_index_write")
 

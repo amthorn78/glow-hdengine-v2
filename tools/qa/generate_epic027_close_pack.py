@@ -696,22 +696,31 @@ def _prepare_gate_receipt_manifest(config: qa_harness.HarnessConfig) -> Path:
 def _run_governed_gates() -> tuple[Path, ...]:
     config = qa_harness.HarnessConfig(epic_id=EPIC_ID, repo_root=ROOT)
     _prepare_gate_receipt_manifest(config)
-    primary_logs: list[Path] = []
+    results: list[qa_harness.CheckResult] = []
     for check_id, command in GATE_COMMANDS:
         result = _run_gate_command(check_id, command)
-        try:
-            primary, _ = qa_harness.record_check(config, result)
-        except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
-            raise SystemExit(
-                f"GATE_RECEIPT_PUBLICATION_FAILED:{check_id}:{exc}"
-            ) from exc
-        primary_logs.append(primary)
-        print(f"WROTE {_gate_evidence_path(primary)}")
+        results.append(result)
         if result.status is not qa_harness.Status.PASS:
-            raise SystemExit(
-                f"GATE_{result.status.value}:{check_id}:{result.status_reason}"
-            )
-    return tuple(primary_logs)
+            break
+
+    try:
+        primary_logs, _ = qa_harness.record_check_family(config, tuple(results))
+    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+        failed_check_id = results[-1].check_id
+        raise SystemExit(
+            f"GATE_RECEIPT_PUBLICATION_FAILED:{failed_check_id}:{exc}"
+        ) from exc
+    for primary in primary_logs:
+        print(f"WROTE {_gate_evidence_path(primary)}")
+
+    final_result = results[-1]
+    if final_result.status is not qa_harness.Status.PASS:
+        raise SystemExit(
+            "GATE_"
+            f"{final_result.status.value}:{final_result.check_id}:"
+            f"{final_result.status_reason}"
+        )
+    return primary_logs
 
 
 def _preflight_acceptance_map_viability() -> None:
@@ -925,11 +934,11 @@ def main() -> int:
 
     with _WrapperWriteTransaction():
         QA_ROOT.mkdir(parents=True, exist_ok=True)
-        _invalidate_close_pair()
         _write_acceptance_map()
         _write_token_matrix()
         _preflight_acceptance_map_viability()
         gate_primary_logs = _run_governed_gates()
+        _invalidate_close_pair()
         result = _write_viability_log()
         _write_close_manifest(produced_at)
         _write_close_report(produced_at)
