@@ -21,9 +21,6 @@ jobs:
       ALLOW_NETWORK: "0"
       APP_ENV: dev
       PYTHONDONTWRITEBYTECODE: "1"
-      # The frozen HDE-EPIC038 closeout CI is invalid and is removed in PR04.
-      # Keep its exact-receipt machinery dormant while PR-02 proves its own scope.
-      RUN_LEGACY_HDE_EPIC038_CI: "0"
     # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
       - uses: actions/checkout@v4
@@ -33,14 +30,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      # The frozen HDE-EPIC038 closeout CI is invalid and is removed in PR04.
+      # Keep its exact-receipt machinery dormant while PR-02 proves its own scope.
       - name: Download exact-head release attestation
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         uses: actions/download-artifact@v4
         with:
           name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ runner.temp }}/hde-epic038-private-receipt/release-attestation
       - name: Check HDE-EPIC038 DEV-01 doc-delta pair
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         shell: bash
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas
       - name: Run HDE-EPIC039 PR-02 atomic evidence-ledger tests
@@ -58,7 +57,7 @@ jobs:
             tests/evidence/test_hde_epic038_closeout.py::test_dev02_orientation_compatibility_write_is_idempotent_after_updater \
             tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_recovers_missing_closeout_proofs_in_one_write
       - name: Verify downloaded exact-source release attestation
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -82,14 +81,14 @@ jobs:
       # attestation job below. Historical checked-in evidence remains immutable.
       - run: python tools/order/generate_ordering_artifacts.py --check
       - name: Check frozen HDE-EPIC038 QA state
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
       - name: Check HDE-EPIC038 DEV-01 token matrix
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
       - name: Produce conditional private HDE-EPIC038 execution receipt
         id: epic038_receipt
-        if: env.RUN_LEGACY_HDE_EPIC038_CI == '1'
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
