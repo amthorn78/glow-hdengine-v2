@@ -8,6 +8,7 @@ import pytest
 from pathlib import Path
 
 from tools.evidence import update_evidence_index
+from tools.qa import epic021_qa
 
 
 COMPAT_TARGETS = [
@@ -74,6 +75,64 @@ EPIC029_TARGETS = [
     ),
 ]
 
+EPIC021_TARGETS = [
+    ("epic021.acceptance_map", "docs/acceptance_map_epic021.json"),
+    (
+        "epic021.token_matrix",
+        "audit/qa/hde-epic021/token_evidence_matrix.md",
+    ),
+    (
+        "epic021.acceptance_map_viability",
+        "audit/qa/hde-epic021/acceptance_map_viability.log",
+    ),
+    (
+        "epic021.qa_step_logs_manifest",
+        "audit/qa/hde-epic021/qa_step_logs_manifest.json",
+    ),
+    (
+        "epic021.doc_deltas",
+        "audit/docdeltas/hde-epic021_doc_deltas.md",
+    ),
+    (
+        "epic021.doc_delta_capture",
+        "audit/qa/hde-epic021/00_meta/doc_deltas.md",
+    ),
+    (
+        "epic021.qa_readme",
+        "audit/qa/hde-epic021/README.md",
+    ),
+    ("epic021.close_report", "audit/EPIC-021_close_report.md"),
+    ("epic021.manifest", "audit/EPIC-021_MANIFEST.json"),
+    (
+        "audit.qa.hde_epic021.checks.d00_bootstrap.primary.log",
+        "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic021.checks.po_epic021_live_qa.primary.log",
+        "audit/qa/hde-epic021/checks/po-epic021-live-qa/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic021.checks.bootstrap_tooling_classification.primary.log",
+        "audit/qa/hde-epic021/checks/bootstrap-tooling-classification/primary.log",
+    ),
+    (
+        "epic021.bootstrap_tooling_failure",
+        "audit/qa/hde-epic021/00_meta/bootstrap_tooling_failure.log",
+    ),
+    (
+        "audit.qa.hde_epic021.checks.po_precommit.primary.log",
+        "audit/qa/hde-epic021/checks/po-precommit/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic021.checks.po_postcommit.primary.log",
+        "audit/qa/hde-epic021/checks/po-postcommit/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic021.checks.acceptance_map_viability.primary.log",
+        "audit/qa/hde-epic021/checks/acceptance-map-viability/primary.log",
+    ),
+]
+
 
 def _assert_targets_present(targets):
     idx_path = Path("docs/evidence/INDEX.json")
@@ -125,6 +184,10 @@ def test_evidence_index_has_required_repo_artifacts():
     _assert_targets_present(REPO_TARGETS)
 
 
+def test_evidence_index_has_required_epic021_artifacts():
+    _assert_targets_present(EPIC021_TARGETS)
+
+
 def test_epic029_primary_roster_matches_canonical_bindings():
     roster = update_evidence_index.EPIC029_PRIMARY_ARTIFACTS
     actual = [
@@ -136,6 +199,32 @@ def test_epic029_primary_roster_matches_canonical_bindings():
     assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC029"}
     assert len({key for key, _ in actual}) == len(actual)
     assert len({path for _, path in actual}) == len(actual)
+
+
+def test_epic021_primary_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC021_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC021_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC021"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+    indexed_tokens = {
+        token for entry in roster for token in entry.get("tokens", [])
+    }
+    assert indexed_tokens == {token["name"] for token in epic021_qa.TOKENS}
+
+
+def test_epic021_roster_flows_to_human_index_loader():
+    loaded = {
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in update_evidence_index._load_human_index()
+    }
+
+    assert set(EPIC021_TARGETS) <= loaded
 
 
 def test_epic029_roster_flows_to_human_and_machine_renderers(

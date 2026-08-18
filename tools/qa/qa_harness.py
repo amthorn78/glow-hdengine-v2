@@ -784,19 +784,7 @@ def run_pytest_check(
             readiness.returncode,
             intended_tokens=tuple(intended_tokens),
         )
-    status = (
-        Status.PASS
-        if completed.returncode == 0
-        else (
-            Status.TOOLING_BLOCKED
-            if completed.returncode == 5
-            else (
-                Status.FAIL_TOOLING
-                if completed.returncode in {2, 3, 4}
-                else Status.FAIL_BEHAVIOR
-            )
-        )
-    )
+    status = classify_pytest_returncode(completed.returncode)
     reason = (
         ""
         if status is Status.PASS
@@ -828,6 +816,19 @@ def run_pytest_check(
             "PF27-Canon-Plan-Templates",
         ),
     )
+
+
+def classify_pytest_returncode(returncode: int) -> Status:
+    """Map an actual pytest process result to the PF19 causal status."""
+    if not isinstance(returncode, int) or isinstance(returncode, bool):
+        raise ValueError("pytest returncode must be an integer")
+    if returncode == 0:
+        return Status.PASS
+    if returncode == 5:
+        return Status.TOOLING_BLOCKED
+    if returncode in {2, 3, 4} or returncode < 0:
+        return Status.FAIL_TOOLING
+    return Status.FAIL_BEHAVIOR
 
 
 def _publish_with_rollback(

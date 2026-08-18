@@ -8,6 +8,7 @@ from tools.qa.qa_harness import (
     CheckResult,
     HarnessConfig,
     Status,
+    classify_pytest_returncode,
     generate_acceptance_map_viability,
     read_primary_header,
     record_check,
@@ -492,3 +493,24 @@ def test_publication_rolls_back_when_manifest_write_fails(
         )
     assert manifest.read_text(encoding="utf-8") == original
     assert not (config.qa_root / "checks/current/primary.log").exists()
+
+
+@pytest.mark.parametrize(
+    ("returncode", "expected"),
+    [
+        (0, Status.PASS),
+        (1, Status.FAIL_BEHAVIOR),
+        (2, Status.FAIL_TOOLING),
+        (3, Status.FAIL_TOOLING),
+        (4, Status.FAIL_TOOLING),
+        (5, Status.TOOLING_BLOCKED),
+        (-9, Status.FAIL_TOOLING),
+    ],
+)
+def test_pytest_returncode_classification_is_causal(returncode, expected):
+    assert classify_pytest_returncode(returncode) is expected
+
+
+def test_pytest_returncode_classification_rejects_non_integer():
+    with pytest.raises(ValueError, match="integer"):
+        classify_pytest_returncode(True)

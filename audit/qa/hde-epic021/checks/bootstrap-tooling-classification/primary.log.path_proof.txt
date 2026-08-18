@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic021/checks/bootstrap-tooling-classification/primary.log
+size_bytes: 2821
+sha256: b7a66cd2012ef211650b0af5091d2fbcbfca149db5ad6bb4d622fd89efea0652
+mtime_utc: 2026-08-18T17:30:11Z
+produced_at_utc: 2026-08-18T17:30:11Z

@@ -3,6 +3,9 @@ from pathlib import Path
 
 import pytest
 
+from tools.qa import epic021_qa
+from tools.qa.qa_harness import HarnessConfig, Status, evaluate_acceptance_map_viability
+
 QA_ROOT = Path("audit/qa/hde-epic021")
 
 
@@ -57,3 +60,45 @@ def test_matrix_and_acceptance_map_align():
             assert matrix_entry["evidence"], f"matrix evidence missing for {name}"
             evidence_titles = map_entry.get("evidence_titles") or []
             assert any(title.strip() for title in evidence_titles), f"acceptance map evidence missing for {name}"
+
+
+def test_canonical_renderer_uses_the_complete_current_roster():
+    payload = json.loads(epic021_qa._acceptance_map_content())
+    names = {token["name"] for token in payload["tokens"]}
+    assert len(names) == 21
+    assert {
+        "CLI_READER_PARITY_OK",
+        "QA_HARNESS_DISCIPLINE_OK",
+        "QA_BOOTSTRAP_OK",
+        "QA_BOOTSTRAP_TOOLING_FAIL",
+        "QA_ACCEPTANCE_MAP_VIABILITY_OK",
+    } <= names
+    assert not names & {
+        "PR_OPENED_OK",
+        "CLI_READER_EMITTER_PARITY_OK",
+        "CLI_SERIALIZER_GUARD_OK",
+        "SANITY_PIPELINE_LOGGED_OK",
+        "QA_STEP_LOGS_CONSOLIDATED_OK",
+        "PF04-DD-QA-BOOTSTRAP-TOKENS",
+        "PF19-DD-QA-PLAN-VIABILITY-TOKENS",
+    }
+    matrix = epic021_qa._token_matrix_content()
+    assert "<run-id>" not in matrix
+    assert "step_*" not in matrix
+    assert "`" not in matrix
+    assert all(
+        len(line.strip().strip("|").split("|")) == 7
+        for line in matrix.splitlines()
+        if line.startswith("|")
+    )
+
+
+def test_current_acceptance_inputs_are_strictly_viable():
+    result, content = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC021"), planned_governed_ledger=True
+    )
+    payload = json.loads(content)
+    assert result.status is Status.PASS, payload["broken_references"]
+    assert payload["broken_references"] == []
+    assert len(payload["token_status"]) == 21
+    assert set(payload["token_status"].values()) == {"VALID"}
