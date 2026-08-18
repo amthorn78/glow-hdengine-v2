@@ -5,7 +5,11 @@ from __future__ import annotations
 import datetime as _dt
 import hashlib
 import json
+import os
+import stat as _stat
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,11 +23,168 @@ from tools.qa import qa_harness
 EPIC_ID = "HDE-EPIC028"
 EPIC_SLUG = "hde-epic028"
 RUN_ID = "epic028-reader-ledger"
+FINAL_MIRROR_SCHEMA_COMMAND = (
+    "ci/checks/check_mirror_schema.sh",
+    "artifacts/evidence_index.jsonl",
+)
 
 QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 ACCEPTANCE_MAP_PATH = ROOT / "docs" / "acceptance_map_epic028.json"
 TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
 VIABILITY_LOG_PATH = QA_ROOT / "acceptance_map_viability.log"
+
+
+def _path_proof_path(path: Path) -> Path:
+    return path.with_name(f"{path.name}.path_proof.txt")
+
+
+def _updater_graph_paths() -> tuple[Path, ...]:
+    primaries = (
+        ROOT / "docs/evidence/INDEX.json",
+        ROOT / "docs/evidence/INDEX.sha256",
+        ROOT / "artifacts/evidence_index.jsonl",
+        ROOT / "artifacts/evidence_index.jsonl.sha256",
+        ROOT / "audit/gates/topology/orientation_demo.txt",
+    )
+    registered_proofs: tuple[Path, ...] = ()
+    if update_evidence_index.ROOT.absolute() == ROOT.absolute():
+        registered_proofs = tuple(
+            ROOT / f"{entry['discovered_physical_path']}.path_proof.txt"
+            for entry in update_evidence_index._load_human_index()
+        )
+    return (
+        *primaries,
+        *(_path_proof_path(path) for path in primaries),
+        *registered_proofs,
+    )
+
+
+def _wrapper_write_paths() -> tuple[Path, ...]:
+    manifest = QA_ROOT / "qa_step_logs_manifest.json"
+    viability_primary = QA_ROOT / "checks/acceptance-map-viability/primary.log"
+    governed = (
+        ACCEPTANCE_MAP_PATH,
+        TOKEN_MATRIX_PATH,
+        VIABILITY_LOG_PATH,
+        manifest,
+        viability_primary,
+    )
+    paths = {
+        *governed,
+        *(_path_proof_path(path) for path in governed),
+        *_updater_graph_paths(),
+    }
+    return tuple(sorted(paths, key=lambda path: path.as_posix()))
+
+
+class _WrapperWriteTransaction:
+    """Restore the complete wrapper-owned family after any failed finalization."""
+
+    def __init__(self) -> None:
+        self._preimages: dict[Path, tuple[bytes, int] | None] = {}
+        self._new_directories: set[Path] = set()
+
+    @staticmethod
+    def _relative(path: Path) -> None:
+        try:
+            path.absolute().relative_to(ROOT.absolute())
+        except ValueError as exc:
+            raise RuntimeError(f"WRAPPER_TRANSACTION_PATH_OUTSIDE_ROOT:{path}") from exc
+
+    def _inspect_parent_chain(self, path: Path) -> None:
+        parents: list[Path] = []
+        parent = path.parent
+        while parent != ROOT:
+            self._relative(parent)
+            parents.append(parent)
+            parent = parent.parent
+        for candidate in reversed(parents):
+            if candidate.is_symlink():
+                raise RuntimeError(
+                    f"WRAPPER_TRANSACTION_PARENT_SYMLINK:{candidate}"
+                )
+            if candidate.exists():
+                if not candidate.is_dir():
+                    raise RuntimeError(
+                        f"WRAPPER_TRANSACTION_PARENT_NOT_DIRECTORY:{candidate}"
+                    )
+            else:
+                self._new_directories.add(candidate)
+
+    def __enter__(self) -> "_WrapperWriteTransaction":
+        if ROOT.is_symlink() or not ROOT.is_dir():
+            raise RuntimeError("WRAPPER_TRANSACTION_ROOT_INVALID")
+        for path in _wrapper_write_paths():
+            self._relative(path)
+            self._inspect_parent_chain(path)
+            if path.is_symlink():
+                raise RuntimeError(f"WRAPPER_TRANSACTION_TARGET_SYMLINK:{path}")
+            if path.exists():
+                if not path.is_file():
+                    raise RuntimeError(
+                        f"WRAPPER_TRANSACTION_TARGET_NOT_REGULAR:{path}"
+                    )
+                self._preimages[path] = (
+                    path.read_bytes(),
+                    _stat.S_IMODE(path.stat().st_mode),
+                )
+            else:
+                self._preimages[path] = None
+        return self
+
+    @staticmethod
+    def _restore_file(path: Path, content: bytes, mode: int) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{path.name}.rollback.", dir=path.parent
+        )
+        temporary = Path(temporary_name)
+        try:
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(content)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(temporary, mode)
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+    @staticmethod
+    def _remove_new_target(path: Path) -> None:
+        if path.is_symlink() or path.is_file():
+            path.unlink(missing_ok=True)
+        elif path.exists():
+            path.rmdir()
+
+    def _rollback(self) -> None:
+        for path, preimage in self._preimages.items():
+            if preimage is None:
+                self._remove_new_target(path)
+                continue
+            if path.is_symlink():
+                path.unlink()
+            elif path.exists() and not path.is_file():
+                path.rmdir()
+            content, mode = preimage
+            self._restore_file(path, content, mode)
+        for directory in sorted(
+            self._new_directories,
+            key=lambda path: len(path.parts),
+            reverse=True,
+        ):
+            if directory.is_symlink():
+                directory.unlink()
+            elif directory.exists():
+                directory.rmdir()
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        if exc_value is None:
+            return False
+        try:
+            self._rollback()
+        except BaseException as rollback_error:  # noqa: BLE001
+            raise RuntimeError("EPIC028_WRAPPER_ROLLBACK_FAILED") from rollback_error
+        return False
 
 TOKENS: list[dict[str, object]] = [
     {
@@ -236,7 +397,7 @@ def _write_token_matrix() -> None:
     _write_text(TOKEN_MATRIX_PATH, "\n".join(lines) + "\n")
 
 
-def _write_viability_log() -> None:
+def _write_viability_log() -> qa_harness.ViabilityResult:
     config = qa_harness.HarnessConfig(
         epic_id=EPIC_ID,
         repo_root=ROOT,
@@ -244,6 +405,48 @@ def _write_viability_log() -> None:
     )
     result = qa_harness.generate_acceptance_map_viability(config, publish_governed_ledger=True)
     qa_harness.require_governed_viability(result, VIABILITY_LOG_PATH)
+    return result
+
+
+def _refresh_governed_bindings(
+    result: qa_harness.ViabilityResult,
+    produced_at: str,
+) -> None:
+    if result.status is not qa_harness.Status.PASS:
+        raise SystemExit(
+            f"ACCEPTANCE_MAP_VIABILITY_{result.status.value}:{result.status_reason}"
+        )
+    if result.primary_log is None or result.manifest is None:
+        raise SystemExit("ACCEPTANCE_MAP_VIABILITY_CURRENT_STATE_MISSING")
+
+    for path in [
+        ACCEPTANCE_MAP_PATH,
+        TOKEN_MATRIX_PATH,
+        VIABILITY_LOG_PATH,
+        result.primary_log,
+        result.manifest,
+    ]:
+        _write_path_proof(path, produced_at)
+
+    update_evidence_index.main([])
+    update_evidence_index.main(["--check"])
+    _run_final_mirror_schema_check()
+
+
+def _run_final_mirror_schema_check() -> None:
+    try:
+        proc = subprocess.run(
+            FINAL_MIRROR_SCHEMA_COMMAND,
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            shell=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise SystemExit(f"FINAL_MIRROR_SCHEMA_FAIL_TOOLING:{exc}") from exc
+    if proc.returncode != 0:
+        raise SystemExit(f"FINAL_MIRROR_SCHEMA_FAILED:{proc.returncode}")
 
 
 def _ensure_required_paths() -> None:
@@ -276,12 +479,11 @@ def main() -> int:
     produced_at = _utc_now()
     _ensure_required_paths()
 
-    _write_acceptance_map()
-    _write_token_matrix()
-    _write_viability_log()
-
-    for path in [ACCEPTANCE_MAP_PATH, TOKEN_MATRIX_PATH, VIABILITY_LOG_PATH]:
-        _write_path_proof(path, produced_at)
+    with _WrapperWriteTransaction():
+        _write_acceptance_map()
+        _write_token_matrix()
+        result = _write_viability_log()
+        _refresh_governed_bindings(result, produced_at)
 
     return 0
 

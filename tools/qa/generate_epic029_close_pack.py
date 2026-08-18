@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
-"""Generate EPIC029 offline acceptance + close-pack binding artifacts."""
+"""Generate and requalify the EPIC029 offline close pack.
+
+The three close-pack QA checks are a current-state evidence family.  Their
+historical bracket logs are retained only as preimages for a complete-family
+replacement; neither those logs nor the legacy manifest is an authority for a
+new result.
+"""
 from __future__ import annotations
 
+import argparse
+import contextlib
 import datetime as _dt
 import hashlib
 import json
+import os
+import re
+import subprocess
 import sys
+import tempfile
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -13,7 +27,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
-from tools.evidence import update_evidence_index
 from tools.qa import qa_harness
 
 EPIC_ID = "HDE-EPIC029"
@@ -61,6 +74,571 @@ LIVE_QA_CHECKS = {
     "po-precommit": QA_ROOT / "checks" / "po-precommit" / "primary.log",
     "po-postcommit": QA_ROOT / "checks" / "po-postcommit" / "primary.log",
 }
+
+REQUALIFICATION_CHECK_IDS = (
+    "po-epic-close-live-qa",
+    "po-precommit",
+    "po-postcommit",
+)
+LIVE_QA_TESTS = (
+    "tests/adapter/test_dev_sampler_http.py",
+    "tests/http/test_dev_conjunction_http.py",
+    "tests/http/test_endpoint_catalog.py",
+)
+PRECOMMIT_SCRIPTS = (
+    "ci/checks/check_env_pins.sh",
+    "ci/checks/check_cli_help.sh",
+    "ci/checks/check_final_lf.sh",
+)
+SANITY_PIPELINE_PATH = "tools/evidence/run_sanity_pipeline.py"
+SANITY_LOG_REL = "audit/gates/sanity_pipeline/sanity_pipeline.log"
+EVIDENCE_INDEX_CHECK = ("tools/evidence/update_evidence_index.py", "--check")
+STAGED_INPUT_GENERATORS = (
+    "tools/config/generate_config_artifacts.py",
+    "tools/config/generate_bundles.py",
+)
+STAGED_INPUT_OUTPUTS = (
+    "artifacts/registry/registry_report.json",
+    "artifacts/config_bundles/be_bundle.json",
+    "artifacts/config_bundles/fe_bundle.json",
+)
+CAPTURED_EXECUTION_ENV = (
+    ("ALLOW_NETWORK", "0"),
+    ("APP_ENV", "dev"),
+    ("LANG", "C"),
+    ("LC_ALL", "C"),
+    ("SAFE_MODE", "1"),
+    ("TZ", "UTC"),
+)
+SANITY_STAGE_NAMES = (
+    "01 Environment pins",
+    "02 Identity and release provenance",
+    "03 Canonical JSON",
+    "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks",
+    "05 A7 Catalog transport",
+    "06 CI rails",
+    "07 Direct DB selection contract",
+    "08 Direct DB posture artifacts",
+    "09 BodyGraph policy",
+    "10 Architecture snapshot",
+    "11 Configured-v2 mapped-cache local evidence",
+    "12 Historical bridge evidence integrity",
+    "13 OPS-02 mapped-cache packet validation",
+    "14 OPS-03 direct DB posture packet validation",
+    "15 Human Index and Machine Mirror refresh",
+    "16 Evidence-path validation",
+    "17 Mirror schema and index/mirror hash validation",
+    "18 Topology orientation validation",
+    "19 Final-LF validation",
+)
+PYTEST_PASS_RE = re.compile(r"(?m)^\s*(?P<count>[0-9]+) passed(?:[, ]|$)")
+
+
+@dataclass(frozen=True)
+class RequalificationCheck:
+    """One governed check and its fixed, ordered, non-shell commands."""
+
+    check_id: str
+    check_name: str
+    commands: tuple[tuple[str, ...], ...]
+    intended_tokens: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class CommandReceipt:
+    """Unmodified result of one current execution."""
+
+    argv: tuple[str, ...]
+    returncode: int | None
+    stdout: str
+    stderr: str
+    process_error: str = ""
+    semantic_artifact: bytes | None = None
+
+
+@dataclass(frozen=True)
+class RequalificationRun:
+    """Complete result family plus the receipts used to classify it."""
+
+    results: tuple[qa_harness.CheckResult, ...]
+    executions: tuple[tuple[str, tuple[CommandReceipt, ...]], ...]
+
+    def result_for(self, check_id: str) -> qa_harness.CheckResult:
+        return next(result for result in self.results if result.check_id == check_id)
+
+    def receipts_for(self, check_id: str) -> tuple[CommandReceipt, ...]:
+        return next(receipts for current_id, receipts in self.executions if current_id == check_id)
+
+
+@dataclass(frozen=True)
+class StagedCandidateFile:
+    rel: str
+    content: bytes
+    mode: int
+
+
+CommandRunner = Callable[[Sequence[str], Path, Mapping[str, str]], subprocess.CompletedProcess[str]]
+
+
+def requalification_checks(python_executable: str | None = None) -> tuple[RequalificationCheck, ...]:
+    """Return the only admitted EPIC029 current-state requalification family."""
+
+    python = python_executable or sys.executable
+    return (
+        RequalificationCheck(
+            check_id="po-epic-close-live-qa",
+            check_name="EPIC029 current functional close bundle",
+            commands=(
+                (python, "-m", "pytest", "--version"),
+                (
+                    python,
+                    "-m",
+                    "pytest",
+                    "--collect-only",
+                    "-q",
+                    "-p",
+                    "no:cacheprovider",
+                    *LIVE_QA_TESTS,
+                ),
+                (
+                    python,
+                    "-m",
+                    "pytest",
+                    "-q",
+                    "-p",
+                    "no:cacheprovider",
+                    *LIVE_QA_TESTS,
+                ),
+            ),
+            intended_tokens=("TESTS_PASS_OK",),
+        ),
+        RequalificationCheck(
+            check_id="po-precommit",
+            check_name="EPIC029 current precommit checklist",
+            commands=tuple((script,) for script in PRECOMMIT_SCRIPTS),
+            intended_tokens=("QA_PRECOMMIT_CHECKLIST_OK",),
+        ),
+        RequalificationCheck(
+            check_id="po-postcommit",
+            check_name="EPIC029 current postcommit release-sanity checklist",
+            commands=((python, SANITY_PIPELINE_PATH),),
+            intended_tokens=("QA_POSTCOMMIT_CHECKLIST_OK",),
+        ),
+    )
+
+
+def _closed_execution_env(environ: Mapping[str, str] | None = None) -> dict[str, str]:
+    source = os.environ if environ is None else environ
+    runtime_bin = str(Path(sys.executable).parent)
+    inherited_path = source.get("PATH", "")
+    return {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "PATH": runtime_bin + (os.pathsep + inherited_path if inherited_path else ""),
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "SAFE_MODE": "1",
+        "TZ": "UTC",
+    }
+
+
+def _default_command_runner(
+    argv: Sequence[str], cwd: Path, env: Mapping[str, str]
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        tuple(argv),
+        cwd=cwd,
+        env=dict(env),
+        capture_output=True,
+        text=True,
+        check=False,
+        shell=False,
+        timeout=1800,
+    )
+
+
+def _required_requalification_paths() -> tuple[str, ...]:
+    return (*LIVE_QA_TESTS, *PRECOMMIT_SCRIPTS, SANITY_PIPELINE_PATH)
+
+
+def _validate_requalification_root(root: Path) -> None:
+    root = root.resolve()
+    if not root.is_dir():
+        raise ValueError("requalification root is unavailable")
+    missing = [rel for rel in _required_requalification_paths() if not (root / rel).is_file()]
+    if missing:
+        raise ValueError(f"requalification entrypoints unavailable: {','.join(missing)}")
+
+
+def _execute_command(
+    argv: Sequence[str],
+    *,
+    root: Path,
+    env: Mapping[str, str],
+    runner: CommandRunner,
+) -> CommandReceipt:
+    command = tuple(argv)
+    try:
+        completed = runner(command, root, env)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return CommandReceipt(command, None, "", "", f"{type(exc).__name__}: {exc}")
+    artifact = None
+    if command[-1:] == (SANITY_PIPELINE_PATH,):
+        try:
+            artifact = (root / SANITY_LOG_REL).read_bytes()
+        except OSError:
+            artifact = None
+    return CommandReceipt(
+        argv=command,
+        returncode=completed.returncode,
+        stdout=completed.stdout or "",
+        stderr=completed.stderr or "",
+        semantic_artifact=artifact,
+    )
+
+
+def _render_receipts(receipts: Sequence[CommandReceipt]) -> str:
+    sections = [qa_harness.NONCLAIM_EXPLANATION]
+    for index, receipt in enumerate(receipts, start=1):
+        sections.append(
+            json.dumps(
+                {
+                    "argv": list(receipt.argv),
+                    "command_index": index,
+                    "process_error": receipt.process_error,
+                    "returncode": receipt.returncode,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+        )
+        sections.extend(("[stdout]", receipt.stdout.rstrip("\n"), "[stderr]", receipt.stderr.rstrip("\n")))
+        if receipt.semantic_artifact is not None:
+            sections.extend(
+                (
+                    "[semantic_artifact]",
+                    receipt.semantic_artifact.decode("utf-8", errors="replace").rstrip("\n"),
+                    "[semantic_artifact_sha256] "
+                    + hashlib.sha256(receipt.semantic_artifact).hexdigest(),
+                )
+            )
+    return "\n".join(sections).rstrip("\n") + "\n"
+
+
+def _first_process_failure(receipts: Sequence[CommandReceipt]) -> CommandReceipt | None:
+    return next(
+        (
+            receipt
+            for receipt in receipts
+            if receipt.process_error or receipt.returncode is None or receipt.returncode != 0
+        ),
+        None,
+    )
+
+
+def _classify_live_qa(receipts: Sequence[CommandReceipt]) -> tuple[qa_harness.Status, str]:
+    if not receipts:
+        return qa_harness.Status.FAIL_TOOLING, "pytest readiness command was not executed"
+    if receipts[0].process_error or receipts[0].returncode is None:
+        return qa_harness.Status.FAIL_TOOLING, "pytest readiness process malfunction"
+    if receipts[0].returncode != 0:
+        return qa_harness.Status.TOOLING_BLOCKED, "pytest readiness check failed"
+    readiness_output = receipts[0].stdout + receipts[0].stderr
+    if "pytest" not in readiness_output.lower():
+        return qa_harness.Status.FAIL_TOOLING, "pytest readiness receipt lacks version identity"
+    if len(receipts) != 3:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest command was not executed"
+    collection_receipt = receipts[1]
+    if collection_receipt.process_error or collection_receipt.returncode is None:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest collection process malfunction"
+    if collection_receipt.returncode != 0:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest collection failed"
+    collected_nodes = {
+        line.strip()
+        for line in collection_receipt.stdout.splitlines()
+        if "::" in line
+    }
+    if not collected_nodes or any(
+        not any(node.startswith(f"{test_path}::") for node in collected_nodes)
+        for test_path in LIVE_QA_TESTS
+    ):
+        return (
+            qa_harness.Status.FAIL_TOOLING,
+            "functional pytest collection omits a required test module",
+        )
+
+    test_receipt = receipts[2]
+    if test_receipt.process_error or test_receipt.returncode is None:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest process malfunction"
+    if test_receipt.returncode in {2, 3, 4, 5} or test_receipt.returncode < 0:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest collection or tooling failed"
+    if test_receipt.returncode != 0:
+        return qa_harness.Status.FAIL_BEHAVIOR, "functional pytest assertions failed"
+    output = test_receipt.stdout + test_receipt.stderr
+    summary = PYTEST_PASS_RE.search(output)
+    if summary is None:
+        return qa_harness.Status.FAIL_TOOLING, "functional pytest PASS summary is missing"
+    if int(summary.group("count")) != len(collected_nodes):
+        return (
+            qa_harness.Status.FAIL_TOOLING,
+            "functional pytest PASS count disagrees with exact collection",
+        )
+    return qa_harness.Status.PASS, ""
+
+
+def _classify_precommit(receipts: Sequence[CommandReceipt]) -> tuple[qa_harness.Status, str]:
+    failure = _first_process_failure(receipts)
+    if failure is not None:
+        if failure.process_error or failure.returncode is None or (failure.returncode or 0) < 0:
+            return qa_harness.Status.FAIL_TOOLING, "precommit checklist process malfunction"
+        failure_index = receipts.index(failure)
+        if failure_index == 0:
+            return qa_harness.Status.TOOLING_BLOCKED, "environment-pins prerequisite failed"
+        if failure_index == 1:
+            return qa_harness.Status.FAIL_BEHAVIOR, "CLI help contract failed"
+        return qa_harness.Status.FAIL_TOOLING, "final-LF evidence gate failed"
+    if len(receipts) != len(PRECOMMIT_SCRIPTS):
+        return qa_harness.Status.FAIL_TOOLING, "precommit checklist family is incomplete"
+    if "[env-pins] OK:" not in receipts[0].stdout:
+        return qa_harness.Status.FAIL_TOOLING, "environment-pins receipt lacks its success predicate"
+    return qa_harness.Status.PASS, ""
+
+
+def _sanity_log_semantics(payload: bytes | None) -> tuple[qa_harness.Status, str]:
+    if payload is None:
+        return qa_harness.Status.FAIL_TOOLING, "sanity pipeline did not produce its governed result"
+    try:
+        lines = payload.decode("utf-8").splitlines()
+    except UnicodeDecodeError:
+        return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result is not UTF-8"
+    required_prefix = (
+        "run:sanity-pipeline",
+        "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
+        "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC",
+        "env_pins:audit/gates/determinism/env_pins.log",
+        "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true",
+    )
+    if tuple(lines[: len(required_prefix)]) != required_prefix:
+        return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result header is malformed"
+    expected_pass_lines = list(required_prefix)
+    for name in SANITY_STAGE_NAMES:
+        expected_pass_lines.append(f"check {name}:OK")
+        if name == "12 Historical bridge evidence integrity":
+            expected_pass_lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
+    expected_pass_lines.extend(("first_failed_stage:NONE", "summary:PASS"))
+    if lines == expected_pass_lines:
+        return qa_harness.Status.PASS, ""
+    if "summary:FAIL" in lines:
+        return qa_harness.Status.FAIL_TOOLING, "release-sanity evidence pipeline failed"
+    return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result is internally inconsistent"
+
+
+def _classify_postcommit(receipts: Sequence[CommandReceipt]) -> tuple[qa_harness.Status, str]:
+    if len(receipts) != 1:
+        return qa_harness.Status.FAIL_TOOLING, "release-sanity command was not executed exactly once"
+    receipt = receipts[0]
+    if receipt.process_error or receipt.returncode is None or receipt.returncode < 0:
+        return qa_harness.Status.FAIL_TOOLING, "release-sanity process malfunction"
+    semantic_status, reason = _sanity_log_semantics(receipt.semantic_artifact)
+    if receipt.returncode == 0 and semantic_status is qa_harness.Status.PASS:
+        return qa_harness.Status.PASS, ""
+    return qa_harness.Status.FAIL_TOOLING, reason or "release-sanity exit/result disagreement"
+
+
+def _classify_check(
+    definition: RequalificationCheck, receipts: Sequence[CommandReceipt]
+) -> qa_harness.CheckResult:
+    classifiers = {
+        "po-epic-close-live-qa": _classify_live_qa,
+        "po-precommit": _classify_precommit,
+        "po-postcommit": _classify_postcommit,
+    }
+    status, reason = classifiers[definition.check_id](receipts)
+    executed = tuple(
+        receipt
+        for receipt in receipts
+        if not receipt.process_error and receipt.returncode is not None
+    )
+    command: tuple[str, ...] | tuple[tuple[str, ...], ...]
+    if len(executed) == 1:
+        command = executed[0].argv
+    elif executed:
+        command = tuple(receipt.argv for receipt in executed)
+    else:
+        command = ()
+    exit_code = executed[-1].returncode if executed else None
+    evidence_path = f"audit/qa/{EPIC_SLUG}/checks/{definition.check_id}/primary.log"
+    return qa_harness.CheckResult(
+        check_id=definition.check_id,
+        status=status,
+        status_reason=reason,
+        check_name=definition.check_name,
+        command=command,
+        command_provenance=(
+            "EPIC029 exact executed non-shell argv receipts"
+            if executed
+            else "Not executed"
+        ),
+        exit_code=exit_code,
+        output=_render_receipts(receipts),
+        evidence_artifacts=(evidence_path,),
+        intended_tokens=(
+            () if status is qa_harness.Status.TOOLING_BLOCKED else definition.intended_tokens
+        ),
+        pf_refs=(
+            "PF14-Canon-HDE-Mechanics-Guide",
+            "PF19-Canon-Glow-QA-Guide",
+            "PF27-Canon-Plan-Templates",
+        ),
+        captured_env=CAPTURED_EXECUTION_ENV,
+    )
+
+
+def _run_requalification_checks(
+    root: Path,
+    definitions: Sequence[RequalificationCheck],
+    *,
+    runner: CommandRunner = _default_command_runner,
+    environ: Mapping[str, str] | None = None,
+) -> RequalificationRun:
+    root = root.resolve()
+    _validate_requalification_root(root)
+    env = _closed_execution_env(environ)
+    results: list[qa_harness.CheckResult] = []
+    executions: list[tuple[str, tuple[CommandReceipt, ...]]] = []
+    for definition in definitions:
+        receipts: list[CommandReceipt] = []
+        for command in definition.commands:
+            receipt = _execute_command(command, root=root, env=env, runner=runner)
+            receipts.append(receipt)
+            if receipt.process_error or receipt.returncode != 0:
+                break
+        frozen_receipts = tuple(receipts)
+        results.append(_classify_check(definition, frozen_receipts))
+        executions.append((definition.check_id, frozen_receipts))
+    return RequalificationRun(tuple(results), tuple(executions))
+
+
+def run_requalification_family(
+    root: Path,
+    *,
+    runner: CommandRunner = _default_command_runner,
+    environ: Mapping[str, str] | None = None,
+    python_executable: str | None = None,
+) -> RequalificationRun:
+    """Execute and classify every EPIC029 check without publishing evidence."""
+
+    return _run_requalification_checks(
+        root,
+        requalification_checks(python_executable),
+        runner=runner,
+        environ=environ,
+    )
+
+
+def run_preseal_requalification(
+    root: Path,
+    *,
+    runner: CommandRunner = _default_command_runner,
+    environ: Mapping[str, str] | None = None,
+    python_executable: str | None = None,
+) -> RequalificationRun:
+    """Run the two checks that do not depend on the evidence-graph preseal."""
+
+    return _run_requalification_checks(
+        root,
+        requalification_checks(python_executable)[:2],
+        runner=runner,
+        environ=environ,
+    )
+
+
+def require_preseal_requalification(run: RequalificationRun) -> None:
+    expected = REQUALIFICATION_CHECK_IDS[:2]
+    ids = tuple(result.check_id for result in run.results)
+    if ids != expected:
+        raise RuntimeError("EPIC029 preseal requalification is incomplete or out of order")
+    failures = [
+        f"{result.check_id}={result.status.value}:{result.status_reason}"
+        for result in run.results
+        if result.status is not qa_harness.Status.PASS
+    ]
+    if failures:
+        raise RuntimeError("EPIC029_PRESEAL_REQUALIFICATION_FAILED:" + ";".join(failures))
+
+
+def run_postcommit_requalification(
+    root: Path,
+    preseal: RequalificationRun,
+    *,
+    runner: CommandRunner = _default_command_runner,
+    environ: Mapping[str, str] | None = None,
+    python_executable: str | None = None,
+) -> RequalificationRun:
+    """Run postcommit only after a truthful complete-path graph preseal."""
+
+    require_preseal_requalification(preseal)
+    post = _run_requalification_checks(
+        root,
+        requalification_checks(python_executable)[2:],
+        runner=runner,
+        environ=environ,
+    )
+    return RequalificationRun(
+        (*preseal.results, *post.results),
+        (*preseal.executions, *post.executions),
+    )
+
+
+def require_complete_requalification(run: RequalificationRun) -> None:
+    ids = tuple(result.check_id for result in run.results)
+    if ids != REQUALIFICATION_CHECK_IDS:
+        raise RuntimeError("EPIC029 requalification family is incomplete or out of order")
+    failures = [
+        f"{result.check_id}={result.status.value}:{result.status_reason}"
+        for result in run.results
+        if result.status is not qa_harness.Status.PASS
+    ]
+    if failures:
+        raise RuntimeError("EPIC029_REQUALIFICATION_FAILED:" + ";".join(failures))
+
+
+def verify_postcommit_fixed_point(
+    root: Path,
+    first_run: RequalificationRun,
+    *,
+    runner: CommandRunner = _default_command_runner,
+    environ: Mapping[str, str] | None = None,
+    python_executable: str | None = None,
+) -> None:
+    """Require a second exact sanity run to reproduce the first receipt bytes."""
+
+    definition = next(
+        item
+        for item in requalification_checks(python_executable)
+        if item.check_id == "po-postcommit"
+    )
+    env = _closed_execution_env(environ)
+    receipt = _execute_command(definition.commands[0], root=root.resolve(), env=env, runner=runner)
+    second_result = _classify_check(definition, (receipt,))
+    if second_result.status is not qa_harness.Status.PASS:
+        raise RuntimeError(
+            "EPIC029_POSTCOMMIT_SEAL_FAILED:"
+            f"{second_result.status.value}:{second_result.status_reason}"
+        )
+    first_receipts = first_run.receipts_for("po-postcommit")
+    if first_receipts != (receipt,):
+        raise RuntimeError("EPIC029_POSTCOMMIT_NOT_FIXED_POINT")
+
+
+def live_qa_status_from_requalification(run: RequalificationRun) -> dict[str, bool]:
+    """Derive close-pack readiness only from freshly classified results."""
+
+    return {
+        check_id: run.result_for(check_id).status is qa_harness.Status.PASS
+        for check_id in REQUALIFICATION_CHECK_IDS
+    }
 
 
 def _has_path_proof(path: Path) -> bool:
@@ -116,39 +694,10 @@ def _write_json(path: Path, payload: object) -> None:
     _write_text(path, json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n")
 
 
-def _write_path_proof(path: Path, produced_at: str) -> None:
-    rel = path.relative_to(ROOT).as_posix()
-    stat = path.stat()
-    update_evidence_index._write_path_proof(
-        rel=rel,
-        sha256=_sha256(path),
-        size_bytes=stat.st_size,
-        mtime_utc=update_evidence_index._isoformat_from_timestamp(stat.st_mtime),
-        produced_at=produced_at,
-        default_produced_at=produced_at,
-        check=False,
-        stat_mtime=stat.st_mtime,
-    )
-    print(f"WROTE {rel}.path_proof.txt")
-
-
 def _missing_required_paths() -> list[str]:
     required = [SURFACE_INVENTORY_PATH, ROOT / "artifacts" / "writer" / "conjunction_write_readback.log", ROOT / "artifacts" / "writer" / "conjunction_writer_summary.json"]
     required += [OPS_ROOT / name for name in OPS_REQUIRED]
     return [path.relative_to(ROOT).as_posix() for path in required if not path.exists()]
-
-
-def _live_qa_status() -> dict[str, bool]:
-    status: dict[str, bool] = {}
-    for check_id, path in LIVE_QA_CHECKS.items():
-        if not path.exists():
-            status[check_id] = False
-            continue
-        text = path.read_text(encoding="utf-8")
-        lines = [line.strip() for line in text.splitlines() if line.strip()]
-        exit_code_line = next((line for line in reversed(lines) if line.startswith("[exit_code]")), "")
-        status[check_id] = exit_code_line == "[exit_code] 0"
-    return status
 
 
 def _ops_binding_disposition_status() -> dict[str, str]:
@@ -345,6 +894,28 @@ def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool
     _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "sequencing_gate": gate, "tokens": _tokens(live_qa, index_status, gate)})
 
 
+def _require_protected_acceptance_map(
+    live_qa: dict[str, bool],
+    index_status: dict[str, bool],
+    gate: dict[str, object],
+) -> None:
+    """Verify the preserved map already binds the current closure facts exactly."""
+
+    expected = {
+        "epic_id": EPIC_ID,
+        "sequencing_gate": gate,
+        "tokens": _tokens(live_qa, index_status, gate),
+    }
+    try:
+        actual = qa_harness._loads_json_strict(
+            ACCEPTANCE_MAP_PATH.read_text(encoding="utf-8")
+        )
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise RuntimeError(f"EPIC029_PROTECTED_ACCEPTANCE_MAP_INVALID:{exc}") from exc
+    if actual != expected:
+        raise RuntimeError("EPIC029_PROTECTED_ACCEPTANCE_MAP_STALE_OR_MISMATCHED")
+
+
 def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> None:
     gate_open = bool(gate["ready_for_close_binding"])
     lines = [
@@ -355,15 +926,15 @@ def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool],
         "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
-        f"| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | Bound by close-pack generator outputs | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Doc-delta and drain-target ledgers are generated and bound for close-pack readiness.' if gate_open else 'Deferred pending required readiness inputs.'} |",
-        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_updated']) else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if (gate_open and index_status['evidence_index_updated']) else 'Deferred pending required readiness inputs.'} |",
-        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['machine_mirror_updated']) else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if (gate_open and index_status['machine_mirror_updated']) else 'Deferred pending required readiness inputs.'} |",
-        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_hash']) else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if (gate_open and index_status['evidence_index_hash']) else 'Deferred pending required readiness inputs.'} |",
-        f"| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh (via sanity pipeline) | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Determinism env pins evidence remains present for closed-rails posture.' if gate_open else 'Deferred pending required readiness inputs.'} |",
-        f"| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | tools/evidence/run_canonical_json_gate.py (governed) | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Canonical JSON gate evidence is bound without introducing new token names.' if gate_open else 'Deferred pending required readiness inputs.'} |",
-        f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | Existing epic-close live QA output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Planned'} | {'Bound to existing live QA primary log.' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Deferred pending required readiness inputs.'} |",
-        f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | Existing precommit checklist output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-precommit']) else 'Planned'} | {'Bound to existing precommit primary log.' if (gate_open and live_qa['po-precommit']) else 'Deferred pending required readiness inputs.'} |",
-        f"| QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-postcommit/primary.log | Existing postcommit checklist output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-postcommit']) else 'Planned'} | {'Bound to existing postcommit primary log.' if (gate_open and live_qa['po-postcommit']) else 'Deferred pending required readiness inputs.'} |",
+        f"| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | python tools/qa/generate_epic029_close_pack.py | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Doc-delta and drain-target ledgers are generated and bound for close-pack readiness.' if gate_open else 'Deferred pending required readiness inputs.'} |",
+        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_updated']) else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if (gate_open and index_status['evidence_index_updated']) else 'Deferred pending required readiness inputs.'} |",
+        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['machine_mirror_updated']) else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if (gate_open and index_status['machine_mirror_updated']) else 'Deferred pending required readiness inputs.'} |",
+        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_hash']) else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if (gate_open and index_status['evidence_index_hash']) else 'Deferred pending required readiness inputs.'} |",
+        f"| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Determinism env pins evidence remains present for closed-rails posture.' if gate_open else 'Deferred pending required readiness inputs.'} |",
+        f"| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | python tools/evidence/run_canonical_json_gate.py --check-only | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Canonical JSON gate evidence is bound without introducing new token names.' if gate_open else 'Deferred pending required readiness inputs.'} |",
+        f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | python -m pytest -q -p no:cacheprovider {' '.join(LIVE_QA_TESTS)} | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Planned'} | {'Bound to a fresh complete-family requalification result.' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Deferred pending current requalification.'} |",
+        f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | {'; '.join(PRECOMMIT_SCRIPTS)} | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-precommit']) else 'Planned'} | {'Bound to a fresh ordered non-shell requalification result.' if (gate_open and live_qa['po-precommit']) else 'Deferred pending current requalification.'} |",
+        f"| QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-postcommit/primary.log | python {SANITY_PIPELINE_PATH} | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-postcommit']) else 'Planned'} | {'Bound to a fresh release-sanity result and verified fixed point.' if (gate_open and live_qa['po-postcommit']) else 'Deferred pending current requalification.'} |",
         "",
         "## PF09 scope bindings (status-only; not acceptance tokens)",
         "",
@@ -434,27 +1005,6 @@ def _write_docdeltas() -> None:
     )
 
 
-def _write_qa_step_manifest(live_qa: dict[str, bool]) -> None:
-    checks = {
-        "po-epic-close-live-qa": {
-            "check_id": "po-epic-close-live-qa",
-            "log_path": "checks/po-epic-close-live-qa/primary.log",
-            "status": "PASS" if live_qa["po-epic-close-live-qa"] else "MISSING",
-        },
-        "po-precommit": {
-            "check_id": "po-precommit",
-            "log_path": "checks/po-precommit/primary.log",
-            "status": "PASS" if live_qa["po-precommit"] else "MISSING",
-        },
-        "po-postcommit": {
-            "check_id": "po-postcommit",
-            "log_path": "checks/po-postcommit/primary.log",
-            "status": "PASS" if live_qa["po-postcommit"] else "MISSING",
-        },
-    }
-    _write_json(QA_STEP_MANIFEST_PATH, {"epic_id": EPIC_ID, "checks": checks})
-
-
 def _write_viability_log() -> None:
     config = qa_harness.HarnessConfig(
         epic_id=EPIC_ID,
@@ -470,7 +1020,10 @@ def _write_close_report(produced_at: str, live_qa: dict[str, bool], gate: dict[s
     qa_lines = []
     for check_id, exists in live_qa.items():
         rel = LIVE_QA_CHECKS[check_id].relative_to(ROOT).as_posix()
-        qa_lines.append(f"- `{rel}`: {'present' if exists else 'missing'}")
+        qa_lines.append(
+            f"- `{rel}`: "
+            f"{'freshly requalified PASS' if exists else 'current requalification did not PASS'}"
+        )
 
     hde_conj001_4_closed = gate["row_closure_status"]["HDE-CONJ001.4"] == "closed"
     hde_conj001_4_line = (
@@ -570,9 +1123,9 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool], gate: dict
         "qa_step_count": len(live_qa),
         "qa_step_manifest_path": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
         "qa_summary_lines": [
-            f"po-epic-close-live-qa={'recorded' if live_qa['po-epic-close-live-qa'] else 'missing'}",
-            f"po-precommit={'recorded' if live_qa['po-precommit'] else 'missing'}",
-            f"po-postcommit={'recorded' if live_qa['po-postcommit'] else 'missing'}",
+            f"po-epic-close-live-qa={'requalified' if live_qa['po-epic-close-live-qa'] else 'not_pass'}",
+            f"po-precommit={'requalified' if live_qa['po-precommit'] else 'not_pass'}",
+            f"po-postcommit={'requalified' if live_qa['po-postcommit'] else 'not_pass'}",
             f"codespaces={gate['codespaces']}",
             f"local_dev={gate['local_dev']}",
             f"closure_mode={gate['closure_mode']}",
@@ -590,69 +1143,528 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool], gate: dict
     _write_json(CLOSE_MANIFEST_PATH, payload)
 
 
-def _write_path_proofs(produced_at: str) -> None:
-    governed = [
-        DOC_DELTAS_PATH,
-        DRAIN_TARGETS_PATH,
-        OPS_ROOT / "commands.txt",
-        OPS_ROOT / "stdout.log",
-        OPS_ROOT / "stderr.log",
-        OPS_ROOT / "exit_codes.txt",
-        OPS_ROOT / "codespaces_dev_sampler_url.md",
-        OPS_ROOT / "local_dev_sampler_url.md",
-        OPS_ROOT / "binding_disposition.md",
-        OPS_ROOT / "created_files_sha256.txt",
-        ACCEPTANCE_MAP_PATH,
-        TOKEN_MATRIX_PATH,
-        VIABILITY_LOG_PATH,
-        QA_STEP_MANIFEST_PATH,
-        SURFACE_INVENTORY_PATH,
-        DEV_HARNESS_BINDING_COVERAGE_PATH,
-        CLOSE_REPORT_PATH,
-        CLOSE_MANIFEST_PATH,
-    ]
-    for path in governed:
-        _write_path_proof(path, produced_at)
-
-
-def _verify_manifest_paths() -> None:
-    payload = json.loads(CLOSE_MANIFEST_PATH.read_text(encoding="utf-8"))
+def _verify_manifest_paths(root: Path = ROOT) -> None:
+    payload = json.loads(
+        (root / "audit/EPIC-029_MANIFEST.json").read_text(encoding="utf-8")
+    )
     missing: list[str] = []
     for rel in sorted(set(payload["key_outputs"].values())):
-        if not (ROOT / rel).exists():
+        if not (root / rel).exists():
             missing.append(rel)
     if missing:
         raise SystemExit(f"DANGLING_MANIFEST_PATHS:{','.join(missing)}")
 
 
-def main() -> int:
+def _run_required_command(argv: Sequence[str], root: Path) -> CommandReceipt:
+    receipt = _execute_command(
+        argv,
+        root=root.resolve(),
+        env=_closed_execution_env(),
+        runner=_default_command_runner,
+    )
+    if receipt.process_error or receipt.returncode != 0:
+        detail = receipt.process_error or receipt.stderr.strip() or receipt.stdout.strip()
+        raise RuntimeError(f"REQUIRED_COMMAND_FAILED:{list(argv)!r}:{detail}")
+    return receipt
+
+
+def _refresh_staged_generated_inputs(root: Path) -> None:
+    """Refresh current generated inputs before sealing the evidence graph."""
+
+    for script in STAGED_INPUT_GENERATORS:
+        _run_required_command((sys.executable, script), root)
+
+
+def _publish_initial_requalification(
+    run: RequalificationRun, produced_at: str
+) -> qa_harness.HarnessConfig:
+    config = qa_harness.HarnessConfig(
+        epic_id=EPIC_ID,
+        repo_root=ROOT,
+        step_names=("acceptance_map_viability",),
+    )
+    qa_harness.record_check_family(
+        config,
+        run.results,
+        replace_legacy_family_ids=REQUALIFICATION_CHECK_IDS,
+        captured_at_utc=produced_at,
+    )
+    return config
+
+
+def _provisional_result(check_id: str, reason: str) -> qa_harness.CheckResult:
+    if check_id not in {"po-postcommit", "acceptance-map-viability"}:
+        raise ValueError("unsupported provisional EPIC029 check")
+    return qa_harness.CheckResult(
+        check_id=check_id,
+        status=qa_harness.Status.TOOLING_BLOCKED,
+        status_reason=reason,
+        check_name=(
+            "EPIC029 postcommit graph preseal"
+            if check_id == "po-postcommit"
+            else "Acceptance-map viability graph preseal"
+        ),
+        command=(),
+        command_provenance="Not executed",
+        exit_code=None,
+        output=qa_harness.NONCLAIM_EXPLANATION + "\n",
+        evidence_artifacts=(
+            f"audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log",
+        ),
+        intended_tokens=(),
+        pf_refs=(
+            "PF19-Canon-Glow-QA-Guide",
+            "PF27-Canon-Plan-Templates",
+        ),
+    )
+
+
+def _publish_truthful_preseal(
+    preseal: RequalificationRun,
+    produced_at: str,
+) -> qa_harness.HarnessConfig:
+    """Create every registered path without synthesizing a PASS result."""
+
+    require_preseal_requalification(preseal)
+    post_reason = "postcommit awaits an updater-bound evidence-graph preseal"
+    viability_reason = "acceptance-map viability awaits current postcommit requalification"
+    post = _provisional_result("po-postcommit", post_reason)
+    viability = _provisional_result("acceptance-map-viability", viability_reason)
+    ledger_content = json.dumps(
+        {
+            "epic_id": EPIC_ID,
+            "status": qa_harness.Status.TOOLING_BLOCKED.value,
+            "status_reason": viability_reason,
+            "token_status": {},
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ) + "\n"
+    config = qa_harness.HarnessConfig(
+        epic_id=EPIC_ID,
+        repo_root=ROOT,
+        step_names=("acceptance_map_viability",),
+    )
+    family = (*preseal.results, post, viability)
+    shape, checks = qa_harness._manifest_shape(
+        config, qa_harness._manifest_payload(config)
+    )
+    if shape == "wrapped-checks" and set(checks) == set(REQUALIFICATION_CHECK_IDS):
+        qa_harness.record_check_family(
+            config,
+            family,
+            additional_files=((VIABILITY_LOG_PATH, ledger_content),),
+            replace_legacy_family_ids=REQUALIFICATION_CHECK_IDS,
+            admit_new_check_ids=("acceptance-map-viability",),
+            captured_at_utc=produced_at,
+        )
+    elif shape == "flat-checks" and set(checks) == {
+        *REQUALIFICATION_CHECK_IDS,
+        "acceptance-map-viability",
+    }:
+        qa_harness.record_check_family(
+            config,
+            family,
+            additional_files=((VIABILITY_LOG_PATH, ledger_content),),
+            captured_at_utc=produced_at,
+        )
+    else:
+        raise ValueError("EPIC029 manifest is not an admitted requalification shape")
+    return config
+
+
+def _publish_complete_requalification_after_preseal(
+    config: qa_harness.HarnessConfig,
+    run: RequalificationRun,
+    produced_at: str,
+) -> None:
+    require_complete_requalification(run)
+    # The existing provisional viability entry remains explicitly non-PASS
+    # until pure current-state evaluation succeeds below.
+    qa_harness.record_check_family(
+        config,
+        run.results,
+        captured_at_utc=produced_at,
+    )
+
+
+def _publish_viability_with_requalification(
+    config: qa_harness.HarnessConfig,
+    run: RequalificationRun,
+    produced_at: str,
+) -> None:
+    viability, ledger_content = qa_harness.evaluate_acceptance_map_viability(
+        config,
+        planned_governed_ledger=True,
+    )
+    if viability.status is not qa_harness.Status.PASS:
+        raise RuntimeError(
+            "ACCEPTANCE_MAP_VIABILITY_"
+            f"{viability.status.value}:{viability.status_reason}"
+        )
+    qa_harness.record_check_family(
+        config,
+        (*run.results, viability),
+        additional_files=((VIABILITY_LOG_PATH, ledger_content),),
+        captured_at_utc=produced_at,
+    )
+    for check_id in (*REQUALIFICATION_CHECK_IDS, viability.check_id):
+        qa_harness.verify_manifest_entry(config, check_id)
+    payload = json.loads(VIABILITY_LOG_PATH.read_text(encoding="utf-8"))
+    if payload.get("epic_id") != EPIC_ID or payload.get("status") != "PASS":
+        raise RuntimeError("acceptance-map viability ledger verification failed")
+    _verify_viability_pair(ROOT)
+
+
+def _verify_viability_pair(root: Path) -> None:
+    ledger = root / f"audit/qa/{EPIC_SLUG}/acceptance_map_viability.log"
+    primary = (
+        root
+        / f"audit/qa/{EPIC_SLUG}/checks/acceptance-map-viability/primary.log"
+    )
+    try:
+        ledger_bytes = ledger.read_bytes()
+        primary_bytes = primary.read_bytes()
+    except OSError as exc:
+        raise RuntimeError("acceptance-map viability pair is unavailable") from exc
+    if not ledger_bytes or b"\n" not in primary_bytes:
+        raise RuntimeError("acceptance-map viability pair is malformed")
+    _, primary_body = primary_bytes.split(b"\n", 1)
+    if primary_body != ledger_bytes:
+        raise RuntimeError("acceptance-map viability primary and ledger disagree")
+
+
+def _materialize_staged_close_pack() -> int:
+    """Build and seal a candidate only inside a disposable Git worktree."""
+
+    if not (ROOT / ".git").exists():
+        raise RuntimeError("EPIC029 requalification requires a real Git worktree")
+    missing = _missing_required_paths()
+    if missing:
+        raise RuntimeError(f"MISSING_REQUIRED_INPUTS:{','.join(missing)}")
+
+    produced_at = _utc_now()
+    # Release sanity checks these canonical generated inputs before its
+    # evidence-index stage. Refresh them first so the preseal indexes the
+    # exact bytes that the postcommit predicate later validates.
+    _refresh_staged_generated_inputs(ROOT)
+    preseal = run_preseal_requalification(ROOT)
+    config = _publish_truthful_preseal(preseal, produced_at)
+    # The updater registry requires all four current receipt paths.  The
+    # truthful preseal above supplies them without claiming postcommit or
+    # viability PASS, allowing the first sanity run to inspect a coherent
+    # disposable graph.
+    _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
+    run = run_postcommit_requalification(ROOT, preseal)
+    require_complete_requalification(run)
+    live_qa = live_qa_status_from_requalification(run)
+    index_status = _evidence_index_status()
+    if not all(index_status.values()):
+        raise RuntimeError("EPIC029_EVIDENCE_GRAPH_PRECONDITION_FAILED")
+
+    _publish_complete_requalification_after_preseal(config, run, produced_at)
+    gate = _pf09_row_closure_gate(live_qa, index_status)
+    if not gate["ready_for_close_binding"]:
+        raise RuntimeError("EPIC029_CLOSE_BINDING_GATE_CLOSED")
+    _require_protected_acceptance_map(live_qa, index_status, gate)
+    _write_token_matrix(live_qa, index_status, gate)
+    _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
+    _publish_viability_with_requalification(config, run, produced_at)
+
+    # Bind the newly generated family before the second release-sanity seal.
+    _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
+    verify_postcommit_fixed_point(ROOT, run)
+    _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), ROOT)
+    _verify_manifest_paths()
+    return 0
+
+
+def _git_command(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            ("git", "-C", str(root), *args),
+            capture_output=True,
+            text=True,
+            check=False,
+            shell=False,
+            timeout=120,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise RuntimeError(f"Git worktree operation failed: {exc}") from exc
+
+
+def _require_clean_git_head(root: Path) -> None:
+    probe = _git_command(root, "rev-parse", "--is-inside-work-tree")
+    if probe.returncode != 0 or probe.stdout.strip() != "true":
+        raise RuntimeError("EPIC029 orchestration requires a real Git worktree")
+    status = _git_command(root, "status", "--porcelain=v1", "--untracked-files=all")
+    if status.returncode != 0:
+        raise RuntimeError(f"Git cleanliness preflight failed: {status.stderr.strip()}")
+    if status.stdout:
+        raise RuntimeError("EPIC029 orchestration requires a clean HEAD worktree")
+
+
+@contextlib.contextmanager
+def _staging_worktree(root: Path) -> Iterator[Path]:
+    with tempfile.TemporaryDirectory(prefix="epic029-requalification-") as temp_dir:
+        stage = Path(temp_dir) / "worktree"
+        added = _git_command(root, "worktree", "add", "--detach", str(stage), "HEAD")
+        if added.returncode != 0:
+            raise RuntimeError(f"Unable to create staging worktree: {added.stderr.strip()}")
+        body_error: BaseException | None = None
+        try:
+            yield stage
+        except BaseException as exc:
+            body_error = exc
+            raise
+        finally:
+            removed = _git_command(root, "worktree", "remove", "--force", str(stage))
+            if removed.returncode != 0 and body_error is None:
+                raise RuntimeError(
+                    f"Unable to remove staging worktree: {removed.stderr.strip()}"
+                )
+
+
+def _publication_allowlist() -> set[str]:
+    qa_paths = {
+        f"audit/qa/{EPIC_SLUG}/token_evidence_matrix.md",
+        f"audit/qa/{EPIC_SLUG}/acceptance_map_viability.log",
+        f"audit/qa/{EPIC_SLUG}/qa_step_logs_manifest.json",
+        *{
+            f"audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log"
+            for check_id in (*REQUALIFICATION_CHECK_IDS, "acceptance-map-viability")
+        },
+    }
+    graph_paths = {
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "audit/gates/topology/orientation_demo.txt",
+    }
+    staged_input_paths = set(STAGED_INPUT_OUTPUTS)
+    preserved_primary_proofs = {
+        "docs/acceptance_map_epic029.json.path_proof.txt",
+        "audit/EPIC-029_close_report.md.path_proof.txt",
+        "audit/EPIC-029_MANIFEST.json.path_proof.txt",
+    }
+    primary_paths = qa_paths | graph_paths | staged_input_paths
+    return (
+        primary_paths
+        | {f"{path}.path_proof.txt" for path in primary_paths}
+        | preserved_primary_proofs
+    )
+
+
+def _is_protected_stage_path(rel: str) -> bool:
+    admitted_proof_refreshes = {
+        "docs/acceptance_map_epic029.json.path_proof.txt",
+        "audit/EPIC-029_close_report.md.path_proof.txt",
+        "audit/EPIC-029_MANIFEST.json.path_proof.txt",
+    }
+    if rel in admitted_proof_refreshes:
+        return False
+    primary_rel = rel.removesuffix(".path_proof.txt")
+    exact = {
+        "docs/acceptance_map_epic029.json",
+        "audit/EPIC-029_close_report.md",
+        "audit/EPIC-029_MANIFEST.json",
+        f"audit/qa/{EPIC_SLUG}/00_meta/dev_harness_binding_coverage.md",
+        SANITY_LOG_REL,
+    }
+    return (
+        primary_rel in exact
+        or primary_rel.startswith("docs/pfcanon/")
+        or primary_rel.startswith("audit/docdeltas/")
+        or primary_rel.startswith(f"audit/ops/{EPIC_SLUG}/")
+        or re.match(rf"audit/qa/{EPIC_SLUG}/checks/po-00[1-8]/", primary_rel)
+        is not None
+    )
+
+
+def _candidate_paths(stage: Path) -> tuple[str, ...]:
+    status = _git_command(stage, "status", "--porcelain=v1", "-z", "--untracked-files=all")
+    if status.returncode != 0:
+        raise RuntimeError(f"Unable to inspect staged outputs: {status.stderr.strip()}")
+    candidates: list[str] = []
+    for record in status.stdout.split("\0"):
+        if not record:
+            continue
+        if len(record) < 4 or record[2] != " ":
+            raise RuntimeError("Malformed staged Git status record")
+        state = record[:2]
+        rel = record[3:]
+        if any(marker in state for marker in "DRCT"):
+            raise RuntimeError(f"Staged generation attempted a non-file replacement: {rel}")
+        candidate = Path(rel)
+        if candidate.is_absolute() or ".." in candidate.parts:
+            raise RuntimeError(f"Unsafe staged output path: {rel}")
+        candidates.append(candidate.as_posix())
+    protected = sorted(rel for rel in set(candidates) if _is_protected_stage_path(rel))
+    if protected:
+        raise RuntimeError(f"PROTECTED_STAGE_MUTATION:{','.join(protected)}")
+    unexpected = sorted(set(candidates) - _publication_allowlist())
+    if unexpected:
+        raise RuntimeError(f"UNEXPECTED_STAGED_OUTPUTS:{','.join(unexpected)}")
+    return tuple(sorted(set(candidates)))
+
+
+def _write_bytes_atomically(path: Path, data: bytes, mode: int) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    temp_path = Path(temp_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temp_path, mode)
+        os.replace(temp_path, path)
+    finally:
+        temp_path.unlink(missing_ok=True)
+
+
+def _capture_staged_candidate(
+    stage: Path, paths: Sequence[str]
+) -> tuple[StagedCandidateFile, ...]:
+    captured: list[StagedCandidateFile] = []
+    for rel in paths:
+        source = stage / rel
+        if not source.is_file() or source.is_symlink():
+            raise RuntimeError(f"Staged output is not a regular file: {rel}")
+        content = source.read_bytes()
+        if not content:
+            raise RuntimeError(f"Staged output is empty: {rel}")
+        captured.append(
+            StagedCandidateFile(
+                rel=rel,
+                content=content,
+                mode=source.stat().st_mode & 0o777,
+            )
+        )
+    return tuple(captured)
+
+
+def _publish_captured_candidate(
+    candidate: Sequence[StagedCandidateFile], root: Path
+) -> None:
+    originals: dict[str, tuple[bytes, int] | None] = {}
+    published: list[str] = []
+    for staged_file in candidate:
+        rel = staged_file.rel
+        target = root / rel
+        if target.is_symlink() or (target.exists() and not target.is_file()):
+            raise RuntimeError(f"Publication target is not a regular file: {rel}")
+        ancestor = target.parent
+        while ancestor != root:
+            if ancestor.is_symlink():
+                raise RuntimeError(f"Publication target has an aliased parent: {rel}")
+            if ancestor == ancestor.parent:
+                raise RuntimeError(f"Publication target escapes source root: {rel}")
+            ancestor = ancestor.parent
+        originals[rel] = (
+            (target.read_bytes(), target.stat().st_mode & 0o777) if target.exists() else None
+        )
+    try:
+        for staged_file in candidate:
+            rel = staged_file.rel
+            _write_bytes_atomically(
+                root / rel,
+                staged_file.content,
+                staged_file.mode,
+            )
+            published.append(rel)
+        for staged_file in candidate:
+            if (root / staged_file.rel).read_bytes() != staged_file.content:
+                rel = staged_file.rel
+                raise RuntimeError(f"Post-publication byte verification failed: {rel}")
+        config = qa_harness.HarnessConfig(EPIC_ID, repo_root=root)
+        for check_id in (*REQUALIFICATION_CHECK_IDS, "acceptance-map-viability"):
+            qa_harness.verify_manifest_entry(config, check_id)
+        _verify_viability_pair(root)
+        _verify_manifest_paths(root)
+        _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), root)
+    except BaseException:
+        for rel in reversed(published):
+            target = root / rel
+            original = originals[rel]
+            if original is None:
+                target.unlink(missing_ok=True)
+            else:
+                _write_bytes_atomically(target, original[0], original[1])
+        raise
+
+
+def _publish_staged_candidate(stage: Path, root: Path, paths: Sequence[str]) -> None:
+    """Compatibility wrapper for already isolated unit-test candidates."""
+
+    _publish_captured_candidate(_capture_staged_candidate(stage, paths), root)
+
+
+def _orchestrate_from_clean_head() -> int:
+    _require_clean_git_head(ROOT)
+    try:
+        sanity_preimage = (ROOT / SANITY_LOG_REL).read_bytes()
+    except OSError as exc:
+        raise RuntimeError("Canonical sanity-log preimage is unavailable") from exc
+    if not sanity_preimage:
+        raise RuntimeError("Canonical sanity-log preimage is empty")
+    candidate: tuple[StagedCandidateFile, ...]
+    staged_stdout = ""
+    with _staging_worktree(ROOT) as stage:
+        command = (
+            sys.executable,
+            "tools/qa/generate_epic029_close_pack.py",
+            "--staged-materialization",
+        )
+        completed = subprocess.run(
+            command,
+            cwd=stage,
+            env=_closed_execution_env(),
+            capture_output=True,
+            text=True,
+            check=False,
+            shell=False,
+        )
+        if completed.returncode != 0:
+            if completed.stdout:
+                print(completed.stdout, end="")
+            if completed.stderr:
+                print(completed.stderr, end="", file=sys.stderr)
+            raise RuntimeError(
+                f"EPIC029 staged requalification failed with exit code {completed.returncode}"
+            )
+        try:
+            staged_sanity = (stage / SANITY_LOG_REL).read_bytes()
+        except OSError as exc:
+            raise RuntimeError("Staged sanity-log result is unavailable") from exc
+        if staged_sanity != sanity_preimage:
+            raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED")
+        paths = _candidate_paths(stage)
+        candidate = _capture_staged_candidate(stage, paths)
+        staged_stdout = completed.stdout
+    if staged_stdout:
+        print(staged_stdout, end="")
+    _require_clean_git_head(ROOT)
+    _publish_captured_candidate(candidate, ROOT)
+    return 0
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--staged-materialization", action="store_true", help=argparse.SUPPRESS)
+    args = parser.parse_args(list(argv or ()))
     try:
         ensure_determinism_env(apply=True)
     except DeterminismEnvError as exc:
         print(str(exc), file=sys.stderr)
         return 1
-
-    missing = _missing_required_paths()
-    if missing:
-        raise SystemExit(f"MISSING_REQUIRED_INPUTS:{','.join(missing)}")
-
-    produced_at = _utc_now()
-    live_qa = _live_qa_status()
-    index_status = _evidence_index_status()
-    gate = _pf09_row_closure_gate(live_qa, index_status)
-
-    _write_acceptance_map(live_qa, index_status, gate)
-    _write_token_matrix(live_qa, index_status, gate)
-    _write_qa_step_manifest(live_qa)
-    _write_viability_log()
-    _write_dev_harness_binding_coverage(live_qa, gate)
-    _write_docdeltas()
-    _write_close_report(produced_at, live_qa, gate)
-    _write_close_manifest(produced_at, live_qa, gate)
-    _write_path_proofs(produced_at)
-    _verify_manifest_paths()
-    return 0
+    try:
+        return _materialize_staged_close_pack() if args.staged_materialization else _orchestrate_from_clean_head()
+    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))

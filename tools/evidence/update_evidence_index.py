@@ -469,6 +469,58 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC029_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic029.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic029.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic029/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic029/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.close_report",
+        "discovered_physical_path": "audit/EPIC-029_close_report.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.manifest",
+        "discovered_physical_path": "audit/EPIC-029_MANIFEST.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic029.checks.acceptance_map_viability.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic029/checks/acceptance-map-viability/primary.log",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic029.checks.po_epic_close_live_qa.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic029.checks.po_precommit.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic029/checks/po-precommit/primary.log",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic029.checks.po_postcommit.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic029/checks/po-postcommit/primary.log",
+        "epic_id": "HDE-EPIC029",
+    },
+]
 
 
 EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
@@ -3741,6 +3793,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC024_PRIMARY_ARTIFACTS,
             *EPIC027_PRIMARY_ARTIFACTS,
             *EPIC028_PRIMARY_ARTIFACTS,
+            *EPIC029_PRIMARY_ARTIFACTS,
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *EPIC031_PR01_PRIMARY_ARTIFACTS,
             *EPIC031_PR02_PRIMARY_ARTIFACTS,

@@ -40,6 +40,40 @@ REPO_TARGETS = [
     ("cli.showcompat.reader_cli_parity", "artifacts/cli/reader_cli_parity.bytes"),
 ]
 
+EPIC029_TARGETS = [
+    ("epic029.acceptance_map", "docs/acceptance_map_epic029.json"),
+    (
+        "epic029.token_matrix",
+        "audit/qa/hde-epic029/token_evidence_matrix.md",
+    ),
+    (
+        "epic029.acceptance_map_viability",
+        "audit/qa/hde-epic029/acceptance_map_viability.log",
+    ),
+    (
+        "epic029.qa_step_logs_manifest",
+        "audit/qa/hde-epic029/qa_step_logs_manifest.json",
+    ),
+    ("epic029.close_report", "audit/EPIC-029_close_report.md"),
+    ("epic029.manifest", "audit/EPIC-029_MANIFEST.json"),
+    (
+        "audit.qa.hde_epic029.checks.acceptance_map_viability.primary.log",
+        "audit/qa/hde-epic029/checks/acceptance-map-viability/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic029.checks.po_epic_close_live_qa.primary.log",
+        "audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic029.checks.po_precommit.primary.log",
+        "audit/qa/hde-epic029/checks/po-precommit/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic029.checks.po_postcommit.primary.log",
+        "audit/qa/hde-epic029/checks/po-postcommit/primary.log",
+    ),
+]
+
 
 def _assert_targets_present(targets):
     idx_path = Path("docs/evidence/INDEX.json")
@@ -89,6 +123,68 @@ def test_evidence_index_has_required_compat_artifacts():
 
 def test_evidence_index_has_required_repo_artifacts():
     _assert_targets_present(REPO_TARGETS)
+
+
+def test_epic029_primary_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC029_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC029_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC029"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+
+
+def test_epic029_roster_flows_to_human_and_machine_renderers(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    loaded = {
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in update_evidence_index._load_human_index()
+    }
+    assert set(EPIC029_TARGETS) <= loaded
+
+    mirror_path = tmp_path / update_evidence_index.MIRROR_REL
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    monkeypatch.setattr(update_evidence_index, "MIRROR_PATH", mirror_path)
+    monkeypatch.setattr(update_evidence_index, "_load_mirror_roles", lambda: {})
+    monkeypatch.setattr(update_evidence_index, "_read_bytes", lambda _path: b"fixture\n")
+    monkeypatch.setattr(update_evidence_index, "_size_bytes", lambda _path: 8)
+
+    proof_requests = []
+
+    def record_proof(rel, **_kwargs):
+        proof_requests.append(rel)
+        return f"{rel}.path_proof.txt", "2026-08-18T00:00:00Z"
+
+    monkeypatch.setattr(update_evidence_index, "_write_path_proof", record_proof)
+    entries = [
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": update_evidence_index.MIRROR_REL,
+        },
+        *update_evidence_index.EPIC029_PRIMARY_ARTIFACTS,
+    ]
+
+    rendered, _ = update_evidence_index._render_mirror(
+        entries,
+        produced_default="2026-08-18T00:00:00Z",
+        check=True,
+    )
+    records = [json.loads(line) for line in rendered.splitlines()]
+    by_lookup = {
+        (record["artifact_key"], record["discovered_physical_path"]): record
+        for record in records
+    }
+
+    assert set(EPIC029_TARGETS) <= by_lookup.keys()
+    assert proof_requests == [path for _, path in EPIC029_TARGETS]
+    for key, path in EPIC029_TARGETS:
+        assert by_lookup[(key, path)]["proof_anchor"] == f"{path}.path_proof.txt"
 
 
 def test_historical_bridge_inventory_is_nonclaiming_in_both_indexes():
