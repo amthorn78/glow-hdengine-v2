@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log
 size_bytes: 1106
-sha256: 81042690dac5ecd18aa7c949ba3c262089c0dda2b79e9872139a624cc777d615
-mtime_utc: 2026-08-19T00:27:45Z
-produced_at_utc: 2026-08-19T00:27:42Z
+sha256: afabf4d895ac87d9791f7fab70d688e80c4638a345f1be3f204f2c581f55a2ae
+mtime_utc: 2026-08-19T01:00:39Z
+produced_at_utc: 2026-08-19T01:00:35Z

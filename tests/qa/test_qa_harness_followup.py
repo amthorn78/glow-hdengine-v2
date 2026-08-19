@@ -199,6 +199,20 @@ def _matrix_row(
     return f"| {token} | PF04 | {evidence} | {ci} | {qa} | Implemented | fixture |\n"
 
 
+def _emulate_modern_non_strict_loop_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+    loop_path: Path,
+) -> None:
+    original_resolve = Path.resolve
+
+    def resolve(path: Path, strict: bool = False) -> Path:
+        if not strict and path == loop_path:
+            return path
+        return original_resolve(path, strict=strict)
+
+    monkeypatch.setattr(Path, "resolve", resolve)
+
+
 @pytest.fixture
 def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     for key, value in {
@@ -872,7 +886,9 @@ def test_registered_symlinked_acceptance_evidence_cannot_pass(repository: Path):
     assert "not an approved governed-primary symlink" in result.status_reason
 
 
-def test_cyclic_acceptance_evidence_alias_fails_causally(repository: Path):
+def test_cyclic_acceptance_evidence_alias_fails_causally(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
     alias = repository / "evidence/loop.json"
     alias.symlink_to(alias.name)
     config = _configure(
@@ -881,11 +897,50 @@ def test_cyclic_acceptance_evidence_alias_fails_causally(repository: Path):
         evidence_titles=("evidence/loop.json",),
         evidence="evidence/loop.json",
     )
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, alias)
 
     result, _ = evaluate_acceptance_map_viability(config)
 
     assert result.status is Status.FAIL_TOOLING
-    assert "reference cannot be resolved safely" in result.status_reason
+    assert "symlink loop detected" in result.status_reason
+
+
+def test_reentering_acceptance_evidence_alias_fails_before_modern_resolve(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    alias = repository / "evidence/loop.json"
+    alias.symlink_to(f"../../{repository.name}/evidence/loop.json")
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("evidence/loop.json",),
+        evidence="evidence/loop.json",
+    )
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, alias)
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "symlink target traverses above repository root" in result.status_reason
+
+
+def test_cyclic_evidence_graph_path_fails_without_resolve_loop_errors(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    alias = repository / "evidence/loop.json"
+    alias.write_text('{"ok":true}\n', encoding="utf-8")
+    _write_evidence_graph(repository, {"evidence/loop.json": ("fixture.loop",)})
+    alias.unlink()
+    alias.symlink_to(alias.name)
+    config = _configure(repository, "HDE-EPIC039")
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, alias)
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "ledger path cannot be resolved safely: symlink loop detected" in (
+        result.status_reason
+    )
 
 
 def test_symlinked_human_index_cannot_govern_acceptance(repository: Path):
@@ -1865,15 +1920,52 @@ def test_missing_or_prose_ci_locators_are_tooling_blocked(
     assert result.status is expected
 
 
-def test_cyclic_ci_script_alias_fails_causally(repository: Path):
+def test_cyclic_ci_script_alias_fails_causally(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
     script = repository / "tools/loop.py"
     script.symlink_to(script.name)
     config = _configure(repository, "HDE-EPIC039", ci="python tools/loop.py")
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, script)
 
     result, _ = evaluate_acceptance_map_viability(config)
 
     assert result.status is Status.FAIL_TOOLING
-    assert "command path cannot be resolved safely" in result.status_reason
+    assert "symlink loop detected" in result.status_reason
+
+
+def test_reentering_ci_script_alias_fails_before_modern_resolve(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    script = repository / "tools/loop.py"
+    script.symlink_to(f"../../{repository.name}/tools/loop.py")
+    config = _configure(repository, "HDE-EPIC039", ci="python tools/loop.py")
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, script)
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "symlink target traverses above repository root" in result.status_reason
+
+
+def test_absolute_external_ci_symlink_loop_fails_before_modern_resolve(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    script = repository / "tools/loop.py"
+    external = repository.parent / f"{repository.name}-external-loop.py"
+    external.symlink_to(script)
+    script.symlink_to(external)
+    config = _configure(repository, "HDE-EPIC039", ci="python tools/loop.py")
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, script)
+
+    try:
+        result, _ = evaluate_acceptance_map_viability(config)
+
+        assert result.status is Status.FAIL_BEHAVIOR
+        assert "reference escapes repository" in result.status_reason
+    finally:
+        script.unlink(missing_ok=True)
+        external.unlink(missing_ok=True)
 
 
 @pytest.mark.parametrize(
@@ -1893,16 +1985,19 @@ def test_invalid_qa_locators_fail_causally(
     assert result.status is expected
 
 
-def test_cyclic_qa_locator_alias_fails_causally(repository: Path):
+def test_cyclic_qa_locator_alias_fails_causally(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
     qa_log = repository / "audit/qa/hde-epic039/checks/loop/primary.log"
     qa_log.parent.mkdir(parents=True, exist_ok=True)
     qa_log.symlink_to(qa_log.name)
     config = _configure(repository, "HDE-EPIC039", qa="checks/loop/primary.log")
+    _emulate_modern_non_strict_loop_resolution(monkeypatch, qa_log)
 
     result, _ = evaluate_acceptance_map_viability(config)
 
     assert result.status is Status.FAIL_TOOLING
-    assert "QA locator cannot be resolved safely" in result.status_reason
+    assert "symlink loop detected" in result.status_reason
 
 
 def test_declared_planned_qa_output_is_valid(repository: Path):

@@ -229,6 +229,8 @@ _STRING_METADATA_FIELDS = frozenset(
 _ALLOWED_GOVERNED_PRIMARY_SYMLINKS = {
     "docs/ENDPOINTS_CATALOG.json": "../artifacts/audit/ENDPOINTS_CATALOG.json",
 }
+_MAX_SYMLINK_HOPS = 40
+_SYMLINK_REPOSITORY_ESCAPE = "symlink target escapes repository"
 
 
 def _stat_fingerprint(metadata: os.stat_result) -> tuple[int, int, int, int, int]:
@@ -239,6 +241,64 @@ def _stat_fingerprint(metadata: os.stat_result) -> tuple[int, int, int, int, int
         metadata.st_mtime_ns,
         metadata.st_ctime_ns,
     )
+
+
+def _repo_symlink_resolution_error(repo_root: Path, path: Path) -> str:
+    """Detect unsafe in-repository symlink expansion without following links."""
+
+    try:
+        relative = path.relative_to(repo_root)
+    except ValueError:
+        return ""
+    pending = list(relative.parts)
+    current = repo_root
+    visited: set[tuple[Path, tuple[str, ...]]] = set()
+    hops = 0
+    while pending:
+        component = pending.pop(0)
+        if component in {"", "."}:
+            continue
+        if component == "..":
+            if current == repo_root:
+                return "symlink target traverses above repository root"
+            current = current.parent
+            continue
+        candidate = current / component
+        try:
+            candidate.relative_to(repo_root)
+        except ValueError:
+            return ""
+        try:
+            metadata = os.lstat(candidate)
+        except (FileNotFoundError, NotADirectoryError):
+            return ""
+        except OSError as exc:
+            return f"symlink path inspection failed: {exc}"
+        if not stat_module.S_ISLNK(metadata.st_mode):
+            current = candidate
+            continue
+        hops += 1
+        resolution_state = (candidate, tuple(pending))
+        if resolution_state in visited or hops > _MAX_SYMLINK_HOPS:
+            return (
+                "symlink loop detected at "
+                f"{candidate.relative_to(repo_root).as_posix()}"
+            )
+        visited.add(resolution_state)
+        try:
+            target = Path(os.readlink(candidate))
+        except OSError as exc:
+            return f"symlink target inspection failed: {exc}"
+        if target.is_absolute():
+            try:
+                target_relative = target.relative_to(repo_root)
+            except ValueError:
+                return _SYMLINK_REPOSITORY_ESCAPE
+            current = repo_root
+            pending[:0] = target_relative.parts
+        else:
+            pending[:0] = target.parts
+    return ""
 
 
 def _read_stable_repo_file_bytes(
@@ -537,6 +597,13 @@ def _lexical_graph_path(config: HarnessConfig, value: object) -> str:
         or pure.as_posix() != value
     ):
         raise ValueError("ledger path is not a canonical lexical repository path")
+    loop_reason = _repo_symlink_resolution_error(
+        config.repo_root, config.repo_root / pure
+    )
+    if loop_reason:
+        if loop_reason == _SYMLINK_REPOSITORY_ESCAPE:
+            raise ValueError("ledger path escapes repository")
+        raise ValueError(f"ledger path cannot be resolved safely: {loop_reason}")
     try:
         target = (config.repo_root / pure).resolve()
     except (OSError, RuntimeError) as exc:
@@ -2421,7 +2488,13 @@ def _extract_reference_path(value: object) -> tuple[PurePosixPath | None, Status
 
 
 def _repo_target(config: HarnessConfig, pure: PurePosixPath) -> Path:
-    target = (config.repo_root / pure).resolve()
+    lexical = config.repo_root / pure
+    loop_reason = _repo_symlink_resolution_error(config.repo_root, lexical)
+    if loop_reason:
+        if loop_reason == _SYMLINK_REPOSITORY_ESCAPE:
+            raise ValueError("reference escapes repository")
+        raise RuntimeError(loop_reason)
+    target = lexical.resolve()
     try:
         target.relative_to(config.repo_root)
     except ValueError as exc:
