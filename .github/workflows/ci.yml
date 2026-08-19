@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Classify affected CI lanes
@@ -43,7 +44,8 @@ jobs:
             --base "$BASE_SHA" \
             --head "$HEAD_SHA" \
             --event-name "${{ github.event_name }}" \
-            --github-output "$GITHUB_OUTPUT"
+            --github-output "$GITHUB_OUTPUT" \
+            --changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"
 
       - name: Set up Python 3.12
         id: python_setup
@@ -62,10 +64,41 @@ jobs:
           -r requirements-dev.txt
           -e .
 
+      - name: Verify pytest readiness
+        id: pytest_readiness
+        if: ${{ steps.classify.outputs.needs_python == 'true' }}
+        run: python -m pytest --version
+
       - name: Verify closed deterministic environment
         id: env_pins
         if: ${{ steps.classify.outputs.needs_python == 'true' }}
         run: ci/checks/check_env_pins.sh
+
+      - name: Run changed-test coverage in isolation
+        id: changed_tests
+        if: ${{ steps.classify.outputs.changed_tests == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed_test_source="$RUNNER_TEMP/hde-changed-test-source"
+          changed_test_manifest="$RUNNER_TEMP/ci-changed-test-targets.txt"
+          cleanup() {
+            git worktree remove --force "$changed_test_source" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          test -f "$changed_test_manifest"
+          mapfile -t changed_test_targets < "$changed_test_manifest"
+          (( ${#changed_test_targets[@]} > 0 ))
+          git worktree add --detach "$changed_test_source" "$(git rev-parse HEAD)"
+          (
+            cd "$changed_test_source"
+            unset GH_TOKEN
+            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+            export PYTHONPATH="$changed_test_source"
+            python -m pytest -q -- "${changed_test_targets[@]}"
+          )
+          cleanup
+          trap - EXIT
 
       - name: Run product mechanics and ordering lane
         id: product_lane
@@ -213,6 +246,8 @@ jobs:
           python tools/evidence/build_release_attestation.py \
             --verify "$attestation_root" \
             --require-clean
+          # No active release or deployment workflow consumes this bundle.
+          # Keep it ephemeral instead of adding an unconsumed artifact transfer.
           git diff --exit-code
           test -z "$(git status --short --untracked-files=all)"
 
@@ -225,7 +260,10 @@ jobs:
           NEEDS_PYTHON: ${{ steps.classify.outputs.needs_python }}
           PYTHON_SETUP_OUTCOME: ${{ steps.python_setup.outcome }}
           DEPENDENCIES_OUTCOME: ${{ steps.dependencies.outcome }}
+          PYTEST_READINESS_OUTCOME: ${{ steps.pytest_readiness.outcome }}
           ENV_PINS_OUTCOME: ${{ steps.env_pins.outcome }}
+          CHANGED_TESTS: ${{ steps.classify.outputs.changed_tests }}
+          CHANGED_TESTS_OUTCOME: ${{ steps.changed_tests.outcome }}
           PRODUCT: ${{ steps.classify.outputs.product }}
           PRODUCT_OUTCOME: ${{ steps.product_lane.outcome }}
           COMPAT: ${{ steps.classify.outputs.compat }}
@@ -266,7 +304,9 @@ jobs:
           fi
           require_outcome "$NEEDS_PYTHON" "$PYTHON_SETUP_OUTCOME" python-setup
           require_outcome "$NEEDS_PYTHON" "$DEPENDENCIES_OUTCOME" dependencies
+          require_outcome "$NEEDS_PYTHON" "$PYTEST_READINESS_OUTCOME" pytest-readiness
           require_outcome "$NEEDS_PYTHON" "$ENV_PINS_OUTCOME" environment-pins
+          require_outcome "$CHANGED_TESTS" "$CHANGED_TESTS_OUTCOME" changed-tests
           require_outcome "$PRODUCT" "$PRODUCT_OUTCOME" product
           require_outcome "$COMPAT" "$COMPAT_OUTCOME" compatibility
           require_outcome "$DB" "$DB_OUTCOME" database

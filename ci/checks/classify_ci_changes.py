@@ -161,6 +161,7 @@ class Classification:
     flags: dict[str, bool]
     reason: str
     path_count: int
+    test_targets: tuple[str, ...] = ()
 
 
 def _full(reason: str, path_count: int) -> Classification:
@@ -185,6 +186,31 @@ def _normalized_path(raw: str) -> str:
     if normalized in {"", "."}:
         raise ValueError("changed path is empty")
     return normalized
+
+
+def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
+    """Return exact changed test modules, or fail safely to the full test tree.
+
+    A test helper, fixture, conftest, symlink, or deleted path can affect tests
+    outside its nearest directory. Without a repository dependency map, the
+    only truthful target for those less-common changes is the complete suite.
+    """
+    direct_modules: set[str] = set()
+    for path in sorted({_normalized_path(raw) for raw in paths}):
+        rel = PurePosixPath(path)
+        if not rel.parts or rel.parts[0] != "tests":
+            continue
+        candidate = repo_root / path
+        if (
+            candidate.is_file()
+            and not candidate.is_symlink()
+            and rel.suffix == ".py"
+            and rel.name.startswith("test_")
+        ):
+            direct_modules.add(path)
+            continue
+        return ("tests",)
+    return tuple(sorted(direct_modules))
 
 
 def _contains_component(path: str, component: str) -> bool:
@@ -362,10 +388,23 @@ def classify_git_change(repo_root: Path, base: str, head: str) -> Classification
     base_sha = _validate_sha(base, allow_zero=True)
     head_sha = _validate_sha(head)
     if set(base_sha) == {"0"}:
-        return _full("unavailable_base_full_validation", 0)
+        unavailable = _full("unavailable_base_full_validation", 0)
+        return Classification(
+            flags=unavailable.flags,
+            reason=unavailable.reason,
+            path_count=unavailable.path_count,
+            test_targets=("tests",),
+        )
     if base_sha == head_sha:
         return _full("identical_refs_full_validation", 0)
-    return classify_paths(git_changed_paths(repo_root, base_sha, head_sha))
+    paths = git_changed_paths(repo_root, base_sha, head_sha)
+    result = classify_paths(paths)
+    return Classification(
+        flags=result.flags,
+        reason=result.reason,
+        path_count=result.path_count,
+        test_targets=result.test_targets or changed_test_targets(repo_root, paths),
+    )
 
 
 def write_github_output(path: Path, classification: Classification) -> None:
@@ -373,8 +412,17 @@ def write_github_output(path: Path, classification: Classification) -> None:
     with path.open("a", encoding="utf-8", newline="\n") as stream:
         for name in (*LANES, "needs_python"):
             stream.write(f"{name}={'true' if classification.flags[name] else 'false'}\n")
+        stream.write(
+            f"changed_tests={'true' if classification.test_targets else 'false'}\n"
+        )
         stream.write(f"reason={classification.reason}\n")
         stream.write(f"path_count={classification.path_count}\n")
+
+
+def write_changed_test_targets(path: Path, targets: Iterable[str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = "".join(f"{target}\n" for target in targets)
+    path.write_text(body, encoding="utf-8", newline="\n")
 
 
 def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
@@ -388,6 +436,15 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         type=Path,
         default=Path(os.environ["GITHUB_OUTPUT"]) if os.environ.get("GITHUB_OUTPUT") else None,
     )
+    parser.add_argument(
+        "--changed-tests-output",
+        type=Path,
+        default=(
+            Path(os.environ["RUNNER_TEMP"]) / "ci-changed-test-targets.txt"
+            if os.environ.get("RUNNER_TEMP")
+            else None
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -396,11 +453,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.github_output is None:
         print("CI_CHANGE_CLASSIFIER_GITHUB_OUTPUT_MISSING", file=sys.stderr)
         return 2
+    if args.changed_tests_output is None:
+        print("CI_CHANGE_CLASSIFIER_CHANGED_TESTS_OUTPUT_MISSING", file=sys.stderr)
+        return 2
     try:
         classification = classify_git_change(
             args.repo_root.resolve(), args.base, args.head
         )
         write_github_output(args.github_output, classification)
+        write_changed_test_targets(
+            args.changed_tests_output,
+            classification.test_targets,
+        )
     except (OSError, RuntimeError, UnicodeError, ValueError) as exc:
         print(f"CI_CHANGE_CLASSIFIER_ERROR:{exc}", file=sys.stderr)
         return 2

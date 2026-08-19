@@ -63,8 +63,10 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert "\n  test:\n" in text
     assert "needs:" not in text
     assert text.count("actions/checkout@v4") == 1
+    assert text.count("persist-credentials: false") == 1
     assert text.count("actions/setup-python@v5") == 1
     assert text.count("python -m pip install") == 1
+    assert text.count("python -m pytest --version") == 1
     assert f"ref: {exact_head}" in text
     assert "actions/upload-artifact" not in text
     assert "actions/download-artifact" not in text
@@ -80,6 +82,8 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert "tests/ops/test_hde_epic038_ops03.py" not in text
     for step_id in (
         "classify",
+        "pytest_readiness",
+        "changed_tests",
         "product_lane",
         "compat_lane",
         "db_lane",
@@ -93,6 +97,18 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert "if: ${{ always() }}" in text
     assert "APPLICABLE_CI_LANE_NOT_SUCCESSFUL" in text
     assert "CI_APPLICABILITY_AND_EXACT_HEAD_OK" in text
+    assert '--changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"' in text
+    assert "if: ${{ steps.classify.outputs.changed_tests == 'true' }}" in text
+    assert 'changed_test_source="$RUNNER_TEMP/hde-changed-test-source"' in text
+    assert 'python -m pytest -q -- "${changed_test_targets[@]}"' in text
+    assert 'require_outcome "$NEEDS_PYTHON" "$PYTEST_READINESS_OUTCOME" pytest-readiness' in text
+    assert 'require_outcome "$CHANGED_TESTS" "$CHANGED_TESTS_OUTCOME" changed-tests' in text
+
+    install = text.index("      - name: Install applicable validation dependencies")
+    readiness = text.index("      - name: Verify pytest readiness")
+    changed_tests = text.index("      - name: Run changed-test coverage in isolation")
+    lanes = text.index("      - name: Run product mechanics and ordering lane")
+    assert install < readiness < changed_tests < lanes
 
 
 @pytest.mark.parametrize(
@@ -116,6 +132,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["tools/evidence/update_evidence_index.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/generate_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
         (["tests/evidence/test_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
+        (["tests/adapter/test_env_guard_prod_variants.py"], {"product", "compat", "release"}, "selected_lanes"),
         ([".github/workflows/ci.yml"], set(classifier.LANES), "selected_lanes"),
         (["ci/checks/classify_ci_changes.py"], set(classifier.LANES), "selected_lanes"),
         (["new-surface.bin"], set(classifier.LANES), "unknown_path_full_validation"),
@@ -143,6 +160,84 @@ def _git(repo: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
+def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    adapter = repo / "tests/adapter"
+    unit = repo / "tests/unit"
+    adapter.mkdir(parents=True)
+    unit.mkdir(parents=True)
+    (adapter / "test_env_guard_prod_variants.py").write_text(
+        "def test_guard(): pass\n",
+        encoding="utf-8",
+    )
+    (unit / "conftest.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (unit / "test_unit.py").write_text(
+        "def test_unit(): pass\n",
+        encoding="utf-8",
+    )
+
+    direct_targets = classifier.changed_test_targets(
+        repo,
+        (
+            "tests/adapter/test_env_guard_prod_variants.py",
+            "tests/unit/test_unit.py",
+            "engine/runtime/identity.py",
+        ),
+    )
+
+    assert direct_targets == (
+        "tests/adapter/test_env_guard_prod_variants.py",
+        "tests/unit/test_unit.py",
+    )
+
+    fixture = adapter / "fixtures/input.json"
+    fixture.parent.mkdir()
+    fixture.write_text("{}\n", encoding="utf-8")
+    helper = unit / "helpers.py"
+    helper.write_text("VALUE = 1\n", encoding="utf-8")
+    symlink = unit / "test_link.py"
+    symlink.symlink_to(unit / "test_unit.py")
+
+    for ambiguous_path in (
+        "tests/unit/conftest.py",
+        "tests/unit/helpers.py",
+        "tests/adapter/fixtures/input.json",
+        "tests/deleted/test_removed.py",
+        "tests/unit/test_link.py",
+    ):
+        assert classifier.changed_test_targets(repo, (ambiguous_path,)) == (
+            "tests",
+        )
+
+
+def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> None:
+    for paths in ((), ("new-surface.bin",), (".github/workflows/ci.yml",)):
+        established_full = classifier.classify_paths(paths)
+        assert all(established_full.flags[lane] for lane in classifier.LANES)
+        assert established_full.test_targets == ()
+
+
+def test_change_classifier_writes_changed_test_execution_contract(
+    tmp_path: Path,
+) -> None:
+    github_output = tmp_path / "github-output"
+    changed_tests = tmp_path / "changed-tests"
+    result = classifier.Classification(
+        flags=classifier._empty_flags(),
+        reason="selected_lanes",
+        path_count=1,
+        test_targets=("tests/adapter/test_env_guard_prod_variants.py",),
+    )
+
+    classifier.write_github_output(github_output, result)
+    classifier.write_changed_test_targets(changed_tests, result.test_targets)
+
+    assert "changed_tests=true\n" in github_output.read_text(encoding="utf-8")
+    assert changed_tests.read_text(encoding="utf-8") == (
+        "tests/adapter/test_env_guard_prod_variants.py\n"
+    )
+
+
 def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -164,9 +259,22 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     unavailable_base = classifier.classify_git_change(repo, "0" * 40, docs_head)
     assert all(unavailable_base.flags[lane] for lane in classifier.LANES)
     assert unavailable_base.reason == "unavailable_base_full_validation"
+    assert unavailable_base.test_targets == ("tests",)
     identical = classifier.classify_git_change(repo, docs_head, docs_head)
     assert all(identical.flags[lane] for lane in classifier.LANES)
     assert identical.reason == "identical_refs_full_validation"
+    assert identical.test_targets == ()
+
+    workflow = repo / ".github/workflows/ci.yml"
+    workflow.parent.mkdir(parents=True)
+    workflow.write_text("name: ci\n", encoding="utf-8")
+    _git(repo, "add", workflow.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "change CI topology")
+    workflow_head = _git(repo, "rev-parse", "HEAD")
+    workflow_change = classifier.classify_git_change(repo, docs_head, workflow_head)
+    assert all(workflow_change.flags[lane] for lane in classifier.LANES)
+    assert workflow_change.reason == "selected_lanes"
+    assert workflow_change.test_targets == ()
 
     source = repo / "engine/db/adapter.py"
     source.parent.mkdir(parents=True)
@@ -174,19 +282,37 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "add", source.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "database")
     product_head = _git(repo, "rev-parse", "HEAD")
-    product = classifier.classify_git_change(repo, docs_head, product_head)
+    product = classifier.classify_git_change(repo, workflow_head, product_head)
     assert {lane for lane in classifier.LANES if product.flags[lane]} == {
         "product",
         "db",
         "release",
     }
 
+    changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
+    changed_test.parent.mkdir(parents=True)
+    changed_test.write_text("def test_guard(): pass\n", encoding="utf-8")
+    _git(repo, "add", changed_test.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "add unlisted adapter regression")
+    test_head = _git(repo, "rev-parse", "HEAD")
+    changed_test_result = classifier.classify_git_change(
+        repo,
+        product_head,
+        test_head,
+    )
+    assert {
+        lane for lane in classifier.LANES if changed_test_result.flags[lane]
+    } == {"product", "compat", "release"}
+    assert changed_test_result.test_targets == (
+        "tests/adapter/test_env_guard_prod_variants.py",
+    )
+
     renamed = repo / "docs/adapter.md"
     renamed.parent.mkdir(exist_ok=True)
     _git(repo, "mv", source.relative_to(repo).as_posix(), renamed.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "rename source into docs")
     rename_head = _git(repo, "rev-parse", "HEAD")
-    rename = classifier.classify_git_change(repo, product_head, rename_head)
+    rename = classifier.classify_git_change(repo, test_head, rename_head)
     assert {lane for lane in classifier.LANES if rename.flags[lane]} == {
         "product",
         "db",
