@@ -191,9 +191,11 @@ def _normalized_path(raw: str) -> str:
 def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
     """Return exact changed test modules, or fail safely to the full test tree.
 
-    A test helper, fixture, conftest, symlink, or deleted path can affect tests
-    outside its nearest directory. Without a repository dependency map, the
-    only truthful target for those less-common changes is the complete suite.
+    A test helper, fixture, conftest, symlink, or deleted support path can
+    affect tests outside its nearest directory. Without a repository
+    dependency map, the only truthful target for those less-common changes is
+    the complete suite. Removed standalone test modules are not executable at
+    the candidate head and continue to select only their ordinary owner lanes.
     """
     direct_modules: set[str] = set()
     for path in sorted({_normalized_path(raw) for raw in paths}):
@@ -201,14 +203,17 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         if not rel.parts or rel.parts[0] != "tests":
             continue
         candidate = repo_root / path
-        if (
-            candidate.is_file()
-            and not candidate.is_symlink()
-            and rel.suffix == ".py"
-            and rel.name.startswith("test_")
-        ):
-            direct_modules.add(path)
-            continue
+        is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
+        if is_test_module:
+            if candidate.is_symlink():
+                return ("tests",)
+            if not candidate.exists():
+                # A removed standalone test cannot be executed at the
+                # candidate head. Its path still selects its owning lanes.
+                continue
+            if candidate.is_file():
+                direct_modules.add(path)
+                continue
         return ("tests",)
     return tuple(sorted(direct_modules))
 

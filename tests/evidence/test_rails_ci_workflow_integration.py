@@ -202,12 +202,16 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
         "tests/unit/conftest.py",
         "tests/unit/helpers.py",
         "tests/adapter/fixtures/input.json",
-        "tests/deleted/test_removed.py",
+        "tests/deleted/helpers.py",
         "tests/unit/test_link.py",
     ):
         assert classifier.changed_test_targets(repo, (ambiguous_path,)) == (
             "tests",
         )
+    assert classifier.changed_test_targets(
+        repo,
+        ("tests/deleted/test_removed.py",),
+    ) == ()
 
 
 def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> None:
@@ -307,12 +311,26 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         "tests/adapter/test_env_guard_prod_variants.py",
     )
 
+    changed_test.unlink()
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-m", "remove standalone adapter regression")
+    deleted_test_head = _git(repo, "rev-parse", "HEAD")
+    deleted_test_result = classifier.classify_git_change(
+        repo,
+        test_head,
+        deleted_test_head,
+    )
+    assert {
+        lane for lane in classifier.LANES if deleted_test_result.flags[lane]
+    } == {"product", "compat", "release"}
+    assert deleted_test_result.test_targets == ()
+
     renamed = repo / "docs/adapter.md"
     renamed.parent.mkdir(exist_ok=True)
     _git(repo, "mv", source.relative_to(repo).as_posix(), renamed.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "rename source into docs")
     rename_head = _git(repo, "rev-parse", "HEAD")
-    rename = classifier.classify_git_change(repo, test_head, rename_head)
+    rename = classifier.classify_git_change(repo, deleted_test_head, rename_head)
     assert {lane for lane in classifier.LANES if rename.flags[lane]} == {
         "product",
         "db",
