@@ -27,7 +27,7 @@
     "release_id": {"$ref": "#/$defs/sha256"},
     "manifest_sha256": {"$ref": "#/$defs/sha256"},
     "validation_result": {"const": "PASS"},
-    "release_admission": {"const": "PR06R_B_FINAL_PASS"},
+    "release_admission": {"const": "EXACT_SOURCE_SANITY_PASS"},
     "pipeline_stop": {"type": "null"},
     "rails": {
       "type": "object",
@@ -57,13 +57,11 @@
       "prefixItems": [
         {"const": "builder_executes_no_ops"},
         {"const": "no_database_write"},
-        {"const": "no_deployment_or_migration"},
-        {"const": "no_qa_pass_or_acceptance"},
-        {"const": "no_pf09_status_movement"}
+        {"const": "no_deployment_or_migration"}
       ],
       "items": false,
-      "minItems": 5,
-      "maxItems": 5
+      "minItems": 3,
+      "maxItems": 3
     }
   },
   "$defs": {

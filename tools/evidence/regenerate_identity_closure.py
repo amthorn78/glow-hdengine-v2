@@ -120,9 +120,6 @@ BODYGRAPH_POLICY_OUTPUTS = (
     "artifacts/bodygraph/source_invariance/ba.json",
     "artifacts/bodygraph/source_invariance/summary.json",
 )
-ARCHITECTURE_OUTPUTS = (
-    "artifacts/architecture/architecture_snapshot.keys_only.json",
-)
 MAPPED_CACHE_OUTPUTS = (
     "artifacts/bodygraph/v2_mapped_cache/write_transcript.json",
     "artifacts/bodygraph/v2_mapped_cache/read_back_transcript.json",
@@ -165,8 +162,8 @@ class ClosureStep:
 
 
 # This is the single declared write/check graph for deterministic local release
-# artifacts that must exist before OPS-03.  The release pipeline consumes these
-# bytes in check mode; it must never discover and repair stale primaries itself.
+# artifacts. The release pipeline consumes these bytes in check mode; it must
+# never discover and repair stale primaries itself.
 CLOSURE_STEPS = (
     ClosureStep(
         "config_artifacts",
@@ -252,12 +249,6 @@ CLOSURE_STEPS = (
         ("tools/evidence/generate_bodygraph_policy_proofs.py",),
         ("tools/evidence/generate_bodygraph_policy_proofs.py", "--check"),
         BODYGRAPH_POLICY_OUTPUTS,
-    ),
-    ClosureStep(
-        "architecture_snapshot",
-        ("tools/evidence/generate_architecture_snapshot.py",),
-        ("tools/evidence/generate_architecture_snapshot.py", "--check"),
-        ARCHITECTURE_OUTPUTS,
     ),
     ClosureStep(
         "mapped_cache",
@@ -373,8 +364,6 @@ def _check_closure() -> None:
         "pytest",
         "tests/evidence/test_aux_preview_identity_parity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
-        "tests/qa/test_epic022_acceptance_scaffold.py",
-        "tests/qa/test_epic022_close_pack_ready.py",
         "-q",
     )
 

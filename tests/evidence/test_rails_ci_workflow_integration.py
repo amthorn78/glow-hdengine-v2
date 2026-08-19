@@ -7,11 +7,14 @@ from pathlib import Path
 
 import pytest
 
+from ci.checks import classify_ci_changes as classifier
 from ci.checks import run_rails_job_definitions as runner
+from tools.evidence import build_release_attestation as attestation
 from tools.evidence import generate_rails_gate_evidence as producer
+from tools.evidence import regenerate_identity_closure as release_closure
+from tools.evidence import run_sanity_pipeline as release_sanity
 
 ROOT = Path(__file__).resolve().parents[2]
-CMD = "python ci/checks/run_rails_job_definitions.py ci/jobs/rails_closed_refusal.yml ci/jobs/rails_open_conformance.yml ci/jobs/logs_keys_only_redaction.yml"
 DEFS = [
     ROOT / "ci/jobs/rails_closed_refusal.yml",
     ROOT / "ci/jobs/rails_open_conformance.yml",
@@ -25,17 +28,202 @@ def _repo_state() -> tuple[str, str]:
     return (str(diff.returncode), status.stdout)
 
 
-def test_workflow_contains_closed_default_rails_policy_job() -> None:
+def test_workflow_contains_one_conditional_closed_default_rails_lane() -> None:
     text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    assert "rails-policy-gates:" in text
-    assert text.count(CMD) == 1
-    start = text.index("  rails-policy-gates:")
-    end = text.index("  sanity-pipeline:", start)
-    job = text[start:end]
+    assert "  rails-policy-gates:" not in text
+    assert "  sanity-pipeline:" not in text
+    assert "id: rails_lane" in text
+    assert "if: ${{ steps.classify.outputs.rails == 'true' }}" in text
+    assert text.count("python ci/checks/run_rails_job_definitions.py") == 1
+    start = text.index("      - name: Run rails policy and secret-safety lane")
+    end = text.index("      - name: Run governed evidence integrity lane", start)
+    lane = text[start:end]
+    for definition in (
+        "ci/jobs/rails_closed_refusal.yml",
+        "ci/jobs/rails_open_conformance.yml",
+        "ci/jobs/logs_keys_only_redaction.yml",
+    ):
+        assert lane.count(definition) == 1
     for needle in ["LC_ALL: C", "LANG: C", "TZ: UTC", 'SAFE_MODE: "1"', 'ALLOW_NETWORK: "0"']:
-        assert needle in job
-    assert "secrets:" not in job
-    assert "${{ secrets." not in job.lower()
+        assert needle in text
+    assert "secrets:" not in lane
+    assert "${{ secrets." not in lane.lower()
+
+
+def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
+    text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    exact_head = "${{ github.event.pull_request.head.sha || github.sha }}"
+
+    assert "  pull_request:" in text
+    assert "  push:\n    branches:\n      - main" in text
+    assert "permissions:\n  contents: read" in text
+    assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in text
+    assert "group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}" in text
+    assert text.count("\n    runs-on:") == 1
+    assert "\n  test:\n" in text
+    assert "needs:" not in text
+    assert text.count("actions/checkout@v4") == 1
+    assert text.count("actions/setup-python@v5") == 1
+    assert text.count("python -m pip install") == 1
+    assert f"ref: {exact_head}" in text
+    assert "actions/upload-artifact" not in text
+    assert "actions/download-artifact" not in text
+    assert "ALLOW_NETWORK=1" not in text
+    assert "tools.evidence.epic020_bundle" not in text
+    assert "test_epic020_bundle_index_integration.py" not in text
+    assert "tools/evidence/update_evidence_index.py --epic-id" not in text
+    assert "tools/evidence/update_evidence_index.py --check" in text
+    assert "generate_hde_" + "epic038_closeout" not in text
+    assert "check_hde_epic038_" + "qa_current_state" not in text
+    assert "EPIC038_" + "CLOSEOUT" not in text
+    assert "tests/evidence/test_architecture_snapshot.py" in text
+    assert "tests/ops/test_hde_epic038_ops03.py" not in text
+    for step_id in (
+        "classify",
+        "product_lane",
+        "compat_lane",
+        "db_lane",
+        "rails_lane",
+        "evidence_lane",
+        "qa_lane",
+        "release_lane",
+        "final_audit",
+    ):
+        assert f"id: {step_id}" in text
+    assert "if: ${{ always() }}" in text
+    assert "APPLICABLE_CI_LANE_NOT_SUCCESSFUL" in text
+    assert "CI_APPLICABILITY_AND_EXACT_HEAD_OK" in text
+
+
+@pytest.mark.parametrize(
+    ("paths", "expected_lanes", "expected_reason"),
+    [
+        (["README.md"], set(), "documentation_only"),
+        (["docs/plans/hde-epic038.md"], set(), "documentation_only"),
+        (["audit/history/closed-run.json"], {"evidence"}, "selected_lanes"),
+        (["audit/ops/hde-epic038/ops-03/result.json"], {"evidence"}, "selected_lanes"),
+        (["artifacts/architecture/architecture_snapshot.keys_only.json"], {"evidence"}, "selected_lanes"),
+        (["artifacts/epic020/bundles/capture.json"], {"evidence"}, "selected_lanes"),
+        (["artifacts/runs/closed-run.json"], {"evidence"}, "selected_lanes"),
+        (["artifacts/db_bridge/health.json"], {"evidence"}, "selected_lanes"),
+        (["audit/qa/hde-epic039/00_meta/doc_deltas.md"], {"evidence"}, "selected_lanes"),
+        (["engine/history/replay.py"], {"product", "release"}, "selected_lanes"),
+        (["engine/db/adapter.py"], {"product", "db", "release"}, "selected_lanes"),
+        (["adapter/http_reader.py"], {"product", "compat", "release"}, "selected_lanes"),
+        (["engine/bodygraph/vendor_client.py"], {"product", "rails", "release"}, "selected_lanes"),
+        (["tools/qa/qa_harness.py"], {"evidence", "qa"}, "selected_lanes"),
+        (["tools/evidence/run_sanity_pipeline.py"], {"evidence", "release"}, "selected_lanes"),
+        (["tools/evidence/update_evidence_index.py"], {"evidence", "release"}, "selected_lanes"),
+        (["tools/evidence/generate_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
+        (["tests/evidence/test_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
+        ([".github/workflows/ci.yml"], set(classifier.LANES), "selected_lanes"),
+        (["ci/checks/classify_ci_changes.py"], set(classifier.LANES), "selected_lanes"),
+        (["new-surface.bin"], set(classifier.LANES), "unknown_path_full_validation"),
+    ],
+)
+def test_change_classifier_selects_expected_execution_scenarios(
+    paths: list[str], expected_lanes: set[str], expected_reason: str
+) -> None:
+    result = classifier.classify_paths(paths)
+    enabled = {lane for lane in classifier.LANES if result.flags[lane]}
+    assert enabled == expected_lanes
+    assert result.flags["needs_python"] is bool(expected_lanes)
+    assert result.reason == expected_reason
+    assert result.path_count == len(paths)
+
+
+def _git(repo: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    return result.stdout.strip()
+
+
+def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    (repo / "README.md").write_text("first\n", encoding="utf-8")
+    _git(repo, "add", "README.md")
+    _git(repo, "commit", "-m", "base")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    (repo / "README.md").write_text("second\n", encoding="utf-8")
+    _git(repo, "add", "README.md")
+    _git(repo, "commit", "-m", "docs")
+    docs_head = _git(repo, "rev-parse", "HEAD")
+    docs = classifier.classify_git_change(repo, base, docs_head)
+    assert not any(docs.flags[lane] for lane in classifier.LANES)
+    assert docs.reason == "documentation_only"
+    unavailable_base = classifier.classify_git_change(repo, "0" * 40, docs_head)
+    assert all(unavailable_base.flags[lane] for lane in classifier.LANES)
+    assert unavailable_base.reason == "unavailable_base_full_validation"
+    identical = classifier.classify_git_change(repo, docs_head, docs_head)
+    assert all(identical.flags[lane] for lane in classifier.LANES)
+    assert identical.reason == "identical_refs_full_validation"
+
+    source = repo / "engine/db/adapter.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("VALUE = 1\n", encoding="utf-8")
+    _git(repo, "add", source.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "database")
+    product_head = _git(repo, "rev-parse", "HEAD")
+    product = classifier.classify_git_change(repo, docs_head, product_head)
+    assert {lane for lane in classifier.LANES if product.flags[lane]} == {
+        "product",
+        "db",
+        "release",
+    }
+
+    renamed = repo / "docs/adapter.md"
+    renamed.parent.mkdir(exist_ok=True)
+    _git(repo, "mv", source.relative_to(repo).as_posix(), renamed.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "rename source into docs")
+    rename_head = _git(repo, "rev-parse", "HEAD")
+    rename = classifier.classify_git_change(repo, product_head, rename_head)
+    assert {lane for lane in classifier.LANES if rename.flags[lane]} == {
+        "product",
+        "db",
+        "release",
+    }
+
+
+def test_change_classifier_covers_release_chain_sources_and_outputs() -> None:
+    for path in sorted(classifier._RELEASE_IMPLEMENTATION_PATHS):
+        assert classifier.classify_paths([path]).flags["release"], path
+
+    commands = [
+        command
+        for step in release_closure.CLOSURE_STEPS
+        for command in (step.write, step.check)
+    ] + [
+        command
+        for step in release_sanity.default_steps()
+        for command in step.commands
+    ]
+    command_paths = {
+        argument
+        for command in commands
+        for argument in command
+        if not Path(argument).is_absolute()
+        and (ROOT / argument).is_file()
+    }
+    assert command_paths
+    for path in sorted(command_paths):
+        assert classifier.classify_paths([path]).flags["release"], path
+
+    consumed = set(attestation.REQUIRED_EVIDENCE) | set(
+        release_closure.ATTESTATION_GENERATED_OUTPUTS
+    )
+    assert consumed
+    for path in sorted(consumed):
+        assert classifier.classify_paths([path]).flags["release"], path
 
 
 def test_job_definitions_are_reusable_secret_free_and_live_forbidden() -> None:

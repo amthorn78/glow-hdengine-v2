@@ -154,16 +154,12 @@ SANITY_STAGE_NAMES = (
     "07 Direct DB selection contract",
     "08 Direct DB posture artifacts",
     "09 BodyGraph policy",
-    "10 Architecture snapshot",
-    "11 Configured-v2 mapped-cache local evidence",
-    "12 Historical bridge evidence integrity",
-    "13 OPS-02 mapped-cache packet validation",
-    "14 OPS-03 direct DB posture packet validation",
-    "15 Human Index and Machine Mirror refresh",
-    "16 Evidence-path validation",
-    "17 Mirror schema and index/mirror hash validation",
-    "18 Topology orientation validation",
-    "19 Final-LF validation",
+    "10 Configured-v2 mapped-cache behavior",
+    "11 Human Index and Machine Mirror refresh",
+    "12 Evidence-path validation",
+    "13 Mirror schema and index/mirror hash validation",
+    "14 Topology orientation validation",
+    "15 Final-LF validation",
 )
 PYTEST_PASS_RE = re.compile(r"(?m)^\s*(?P<count>[0-9]+) passed(?:[, ]|$)")
 
@@ -757,18 +753,15 @@ def _sanity_log_semantics(payload: bytes | None) -> tuple[qa_harness.Status, str
         return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result is not UTF-8"
     required_prefix = (
         "run:sanity-pipeline",
-        "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
+        "pipeline_identity:hde-release-sanity-v1",
         "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC",
         "env_pins:audit/gates/determinism/env_pins.log",
-        "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true",
     )
     if tuple(lines[: len(required_prefix)]) != required_prefix:
         return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result header is malformed"
     expected_pass_lines = list(required_prefix)
     for name in SANITY_STAGE_NAMES:
         expected_pass_lines.append(f"check {name}:OK")
-        if name == "12 Historical bridge evidence integrity":
-            expected_pass_lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
     expected_pass_lines.extend(("first_failed_stage:NONE", "summary:PASS"))
     if lines == expected_pass_lines:
         return qa_harness.Status.PASS, ""

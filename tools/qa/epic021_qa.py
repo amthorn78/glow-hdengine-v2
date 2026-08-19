@@ -217,7 +217,7 @@ TOKENS = (
         "audit/gates/sanity_pipeline/sanity_pipeline.log",
         "python tools/evidence/run_sanity_pipeline.py",
         "checks/po-postcommit/primary.log",
-        "The current canonical nineteen-stage sanity receipt is resolvable and indexed.",
+        "The current canonical fifteen-stage sanity receipt is resolvable and indexed.",
     ),
     _token(
         "CLI_NO_ALT_JSON_OK",
@@ -1270,16 +1270,13 @@ def _sanity_status(payload: bytes | None) -> tuple[qa_harness.Status, str]:
         return qa_harness.Status.FAIL_TOOLING, "sanity pipeline result is not UTF-8"
     prefix = (
         "run:sanity-pipeline",
-        "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
+        "pipeline_identity:hde-release-sanity-v1",
         "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC",
         "env_pins:audit/gates/determinism/env_pins.log",
-        "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true",
     )
     expected = list(prefix)
     for name in SANITY_STAGE_NAMES:
         expected.append(f"check {name}:OK")
-        if name == "12 Historical bridge evidence integrity":
-            expected.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
     expected.extend(("first_failed_stage:NONE", "summary:PASS"))
     if lines == expected:
         return qa_harness.Status.PASS, ""
@@ -1293,13 +1290,6 @@ def _sanity_status(payload: bytes | None) -> tuple[qa_harness.Status, str]:
                 for index, name in enumerate(SANITY_STAGE_NAMES):
                     status = "OK" if index < failure_index else "FAIL"
                     failed_expected.append(f"check {name}:{status}")
-                    if (
-                        name == "12 Historical bridge evidence integrity"
-                        and status == "OK"
-                    ):
-                        failed_expected.append(
-                            "stage_result:12:HISTORICAL_INTEGRITY_OK"
-                        )
                     if index > failure_index:
                         failed_expected.append(
                             f"not_executed {name}:"

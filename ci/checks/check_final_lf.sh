@@ -15,25 +15,6 @@ required_files=(
   audit/gates/topology/orientation_demo.txt.path_proof.txt
   artifacts/runtime/env_matrix.snapshot.json
   artifacts/runtime/env_matrix.snapshot.json.path_proof.txt
-  audit/qa/hde-epic038/token_evidence_matrix.md
-  audit/qa/hde-epic038/token_evidence_matrix.md.path_proof.txt
-)
-
-planned_files=(
-  audit/EPIC-038_close_report.md
-  audit/EPIC-038_close_report.md.path_proof.txt
-  audit/EPIC-038_MANIFEST.json
-  audit/EPIC-038_MANIFEST.json.path_proof.txt
-  docs/acceptance_map_epic038.json
-  docs/acceptance_map_epic038.json.path_proof.txt
-  audit/qa/hde-epic038/acceptance_map_viability.log
-  audit/qa/hde-epic038/acceptance_map_viability.log.path_proof.txt
-  audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
-  audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md.path_proof.txt
-  audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
-  audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log.path_proof.txt
-  audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log
-  audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log.path_proof.txt
 )
 
 check_file() {
@@ -55,12 +36,6 @@ check_file() {
 
 for f in "${required_files[@]}"; do
   check_file "$f"
-done
-
-for f in "${planned_files[@]}"; do
-  if [[ -f "$f" ]]; then
-    check_file "$f"
-  fi
 done
 
 exit $fail

@@ -1,5 +1,5 @@
 path: audit/gates/sanity_pipeline/sanity_pipeline.log
-size_bytes: 1143
-sha256: 09cb8bba3449fa919ee877be0af88448922b4839e2017b1c4d2470abe688b142
+size_bytes: 799
+sha256: 88d787c11d58e3bd56e1d57008ef4cc2241510f9449c2fc9ce6eb1131ad3cdd7
 mtime_utc: 2026-01-21T21:32:02Z
 produced_at_utc: 2026-07-24T03:28:42Z

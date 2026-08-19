@@ -1,4 +1,4 @@
-# HDE-EPIC039 PR-01 Doc Deltas
+# HDE-EPIC039 Doc Deltas
 
 ## Governed surfaces
 
@@ -25,3 +25,11 @@ These PR-02 changes do not claim QA PASS, acceptance, token satisfaction, PF09 s
 - Requalified the active EPIC021 executable and close-pack family through the generic check-centric harness, including current receipts, manifest, viability, acceptance bindings, Doc-Delta pair, and evidence-graph companions; the current EPIC027, EPIC028, and EPIC029 generator, close-manifest, viability, and related governed-artifact families were also requalified. Historical run evidence remains immutable and non-gating. (PF06 — Epic Process Guide, §0.5; PF14 — HDE Mechanics Guide, §1.6.3; PF19 — Glow QA Guide, §§2.2.5, 4.4.5; PF27 — Plan Templates, §Executable helper boundary; PF10 — HDE Build Notes, §§2.7–2.8.)
 
 These PR-03 changes do not claim `QA_HARNESS_DISCIPLINE_OK`, `QA_HARNESS_ENTRYPOINT_SELFTEST_OK`, any other token satisfaction, QA PASS, acceptance, PF09 status movement, OPS or Live QA execution, deployment, or epic closeout. They do not create HDE-EPIC039 QA verdict artifacts or change public behavior.
+
+## PR-04 Calcination Pass 6 CI remediation
+
+- Reclassified the complete execution-ref CI graph by continuing product and delivery risk, removed the withdrawn HDE-EPIC038 DEV-01/DEV-02 closeout, token-matrix, private-receipt, authenticated-consumption, and source-feedback machinery, and retired only its current governed registrations while preserving HDE-EPIC038 implementation history, QA history, failure evidence, nonclaims, and immutable historical artifacts. The canonical release manifest remains governed under a generic current-release identity. (PF10 — HDE Build Notes, §§2.3, 2.8.)
+- Replaced overlapping all-branch push and pull-request eligibility with one exact-head pull-request boundary plus default-branch push protection, automatic superseded-PR cancellation, a repository-owned fail-closed change classifier, one shared dependency setup, affected-surface validation lanes, and one stable truthful `test` conclusion. Retired the self-referential EPIC020 bundle/index build from active CI while preserving its frozen captures; the generic index, mirror, proof, hash, path, and orientation checks remain read-only. Documentation-only and historical-record-only changes avoid unrelated heavy validation; unknown, workflow, dependency, or classifier changes select the full safe set. (PF10 — HDE Build Notes, §§2.5, 2.8.)
+- Narrowed the existing release-attestation and sanity mechanics to their continuing exact-source, clean-tree, closed-rails, canonical-byte, secret-safety, mapped-cache, database, runtime, and release risks; removed HDE-EPIC038 administrative identity from the generic admission path and kept frozen OPS evidence in its historical/audit boundary. The reusable current-state QA subsystem accepted through PR #391 and corrected through PR #392 remains intact and is exercised with its canonical paths, five-state classification, same-interpreter pytest behavior, governed-reference checks, viability checks, and current-state publication semantics. (PF10 — HDE Build Notes, §§2.3, 2.5, 2.9.)
+
+These PR-04 changes do not claim HDE-EPIC038 completion or closeout, HDE-EPIC039 completion, QA PASS, acceptance, token satisfaction, PF09 movement, OPS or Live QA execution, deployment, release execution, database or migration work, or epic closeout. They do not alter public routes, payload contracts, Human Design mechanics, database state, or release identity.

@@ -1,5 +1,7 @@
 import json
 import os
+from pathlib import Path
+import shutil
 import subprocess
 import sys
 import sysconfig
@@ -16,6 +18,8 @@ PAIR = '{"left":{"birthdate":"1990-01-10","birthtime":"14:05","location":"Chicag
 
 
 CONJUNCTION_PAIR = '{"left":{"person_uid":"left-user"},"right":{"person_uid":"right-user"}}'
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _cli_env() -> dict[str, str]:
@@ -42,9 +46,20 @@ def _assert_canonical_bytes(data: bytes) -> dict:
     return payload
 
 
-def _run_hdctl(args: list[str], *, stdin: bytes | None = None) -> subprocess.CompletedProcess:
-    base = [sys.executable, "scripts/hdctl.py"]
-    return subprocess.run(base + args, input=stdin, capture_output=True, env=_cli_env())
+def _run_hdctl(
+    args: list[str],
+    *,
+    stdin: bytes | None = None,
+    cwd: os.PathLike[str] | None = None,
+) -> subprocess.CompletedProcess:
+    base = [sys.executable, str(REPO_ROOT / "scripts/hdctl.py")]
+    return subprocess.run(
+        base + args,
+        input=stdin,
+        capture_output=True,
+        env=_cli_env(),
+        cwd=cwd,
+    )
 
 
 def test_showcompat_stdout_is_canonical():
@@ -94,6 +109,11 @@ def test_reader_dump_and_admin_sidecars_are_canonical(tmp_path: os.PathLike[str]
 
 
 def test_aux_preview_admin_out_is_canonical(tmp_path: os.PathLike[str]):
+    runtime_root = tmp_path / "runtime"
+    shutil.copytree(
+        REPO_ROOT / "catalog" / "narratives",
+        runtime_root / "catalog" / "narratives",
+    )
     admin_out = tmp_path / "aux_admin.json"
     result = _run_hdctl(
         [
@@ -106,11 +126,13 @@ def test_aux_preview_admin_out_is_canonical(tmp_path: os.PathLike[str]):
             "shared",
             "--admin-out",
             str(admin_out),
-        ]
+        ],
+        cwd=runtime_root,
     )
 
     assert result.returncode == 0
     assert result.stderr == b""
+    assert (runtime_root / "narratives").is_dir()
     _assert_canonical_bytes(admin_out.read_bytes())
 
 

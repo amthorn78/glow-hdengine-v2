@@ -115,17 +115,11 @@ HISTORICAL_ONLY_PHRASES = (
 HTTP_MARKERS = ("requests.", "urllib.request", "httpx.", "urlopen", "http://", "https://")
 HISTORICAL_READERS = {
     "tools/evidence/update_evidence_index.py",
-    "tools/evidence/run_sanity_pipeline.py",
 }
 AUTHORIZED_PSYCOPG_IMPORT_PATHS = frozenset(
     {"engine/db/providers/psycopg_provider.py"}
 )
 OPS03_RAW_PSYCOPG_OWNER = "scripts/ops/hde_epic038_ops03.py"
-HISTORICAL_VALIDATION_ROSTERS = {
-    "tools/evidence/run_sanity_pipeline.py": frozenset(
-        {"HISTORICAL_BRIDGE_PRIMARY_SHA256"}
-    ),
-}
 _BRIDGE_TRANSPORT_PATTERN = re.compile(
     r"(?:^|[^a-z0-9])(?:pg[-_]?bridge|db[-_]?bridge|"
     r"bridge[-_](?:url|uri|endpoint|host|base(?:[-_]?url)?))"
@@ -256,41 +250,12 @@ def _active_bridge_guidance(relative: str, line: str) -> bool:
     )
 
 
-def _assignment_target_names(node: ast.AST) -> tuple[str, ...]:
-    return tuple(name for name, _value in _assignment_bindings(node))
-
-
 def _historical_reader_path_lines(relative: str, text: str) -> frozenset[int]:
-    """Return only bridge-path literal lines owned by a historical validation roster."""
+    """Return bridge-path literal lines owned by the historical index reader."""
 
     if relative not in HISTORICAL_READERS:
         return frozenset()
-    if relative not in HISTORICAL_VALIDATION_ROSTERS:
-        # The canonical updater owns historical record classification. Preserve its
-        # existing exemption until PR-06R-B migrates those rows atomically.
-        return frozenset(range(1, len(text.splitlines()) + 1))
-    try:
-        tree = ast.parse(text)
-    except SyntaxError:
-        return frozenset()
-    roster_names = HISTORICAL_VALIDATION_ROSTERS[relative]
-    lines: set[int] = set()
-    for node in tree.body:
-        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
-            continue
-        if not roster_names.intersection(_assignment_target_names(node)):
-            continue
-        value = node.value
-        if value is None:
-            continue
-        for child in ast.walk(value):
-            if (
-                isinstance(child, ast.Constant)
-                and isinstance(child.value, str)
-                and any(marker in child.value for marker in FORBIDDEN_ACTIVE_PATH_TEXT)
-            ):
-                lines.add(child.lineno)
-    return frozenset(lines)
+    return frozenset(range(1, len(text.splitlines()) + 1))
 
 
 def _is_os_module(node: ast.AST, os_names: set[str]) -> bool:

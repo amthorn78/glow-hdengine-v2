@@ -78,6 +78,68 @@ def _snapshot(repo: Path) -> dict[str, tuple[bytes, int]]:
     }
 
 
+def test_orientation_compatibility_write_is_idempotent_after_updater(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    before = _snapshot(repo)
+    _success(_run(repo, "tools/evidence/orientation_demo.py"))
+    assert _snapshot(repo) == before
+    _checks(repo)
+    assert _snapshot(repo) == before
+
+
+def test_updater_recovers_missing_generic_catalog_proof_in_one_write(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    primary = repo / "catalog/manifest.json"
+    proof = repo / "catalog/manifest.json.path_proof.txt"
+    primary_before = (
+        primary.read_bytes(),
+        stat.S_IMODE(primary.stat().st_mode),
+        primary.stat().st_mtime_ns,
+    )
+    proof.unlink()
+
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert proof.is_file()
+    assert (
+        primary.read_bytes(),
+        stat.S_IMODE(primary.stat().st_mode),
+        primary.stat().st_mtime_ns,
+    ) == primary_before
+
+    entries = json.loads(
+        (repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    catalog_entries = [
+        entry
+        for entry in entries
+        if entry["discovered_physical_path"] == "catalog/manifest.json"
+    ]
+    assert [entry["artifact_key"] for entry in catalog_entries] == [
+        "catalog_manifest"
+    ]
+    assert "epic_id" not in catalog_entries[0]
+    assert "record_type" not in catalog_entries[0]
+
+    proof_before_checks = (
+        proof.read_bytes(),
+        stat.S_IMODE(proof.stat().st_mode),
+    )
+    _checks(repo)
+    assert (
+        proof.read_bytes(),
+        stat.S_IMODE(proof.stat().st_mode),
+    ) == proof_before_checks
+
+
 def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)

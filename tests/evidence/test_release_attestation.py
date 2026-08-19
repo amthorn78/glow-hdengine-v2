@@ -12,13 +12,30 @@ from tools.evidence import regenerate_identity_closure as closure
 from tools.cli import generate_cli_conformance_artifacts as cli_conformance
 
 
-def test_attestation_ci_job_is_bound_to_the_exact_pr_head():
+def test_attestation_ci_lane_is_bound_to_exact_candidate_head():
     workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
-    job = workflow[workflow.index("  sanity-pipeline:") :]
     exact_head = "${{ github.event.pull_request.head.sha || github.sha }}"
+    lane_start = workflow.index(
+        "      - name: Build and verify exact-source release attestation"
+    )
+    lane_end = workflow.index(
+        "      - name: Verify truthful applicability and clean candidate tree",
+        lane_start,
+    )
+    lane = workflow[lane_start:lane_end]
 
-    assert f"ref: {exact_head}" in job
-    assert f"name: hde-release-attestation-{exact_head}" in job
+    assert f"ref: {exact_head}" in workflow
+    assert "id: release_lane" in lane
+    assert "if: ${{ steps.classify.outputs.release == 'true' }}" in lane
+    assert 'release_test_source="$RUNNER_TEMP/hde-release-regression-tests"' in lane
+    assert 'git worktree add --detach "$release_test_source"' in lane
+    assert 'export PYTHONPATH="$release_test_source"' in lane
+    assert 'git worktree remove --force "$release_test_source"' in lane
+    assert lane.count('test -z "$(git status --short --untracked-files=all)"') == 2
+    assert '--output "$attestation_root"' in lane
+    assert '--verify "$attestation_root"' in lane
+    assert "actions/upload-artifact" not in workflow
+    assert "actions/download-artifact" not in workflow
 
 
 def test_output_root_must_be_external_empty_directory(tmp_path):
@@ -241,11 +258,11 @@ def test_isolated_write_boundary_allows_only_declared_outputs():
 
 
 def test_declared_output_roster_is_exact_owned_and_stable():
-    assert len(closure.DECLARED_PRODUCER_OUTPUTS) == 98
-    assert len(set(closure.DECLARED_PRODUCER_OUTPUTS)) == 98
-    assert len(closure.ATTESTATION_PRIMARY_OUTPUTS) == 98
-    assert len(closure.ATTESTATION_PATH_PROOF_TARGETS) == 89
-    assert len(closure.ATTESTATION_GENERATED_OUTPUTS) == 187
+    assert len(closure.DECLARED_PRODUCER_OUTPUTS) == 97
+    assert len(set(closure.DECLARED_PRODUCER_OUTPUTS)) == 97
+    assert len(closure.ATTESTATION_PRIMARY_OUTPUTS) == 97
+    assert len(closure.ATTESTATION_PATH_PROOF_TARGETS) == 88
+    assert len(closure.ATTESTATION_GENERATED_OUTPUTS) == 185
     assert closure.ATTESTATION_GENERATED_OUTPUTS == tuple(
         sorted(set(closure.ATTESTATION_GENERATED_OUTPUTS))
     )
@@ -381,7 +398,7 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "PR06R_B_FINAL_PASS",
+        "release_admission": "EXACT_SOURCE_SANITY_PASS",
         "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [record],
@@ -391,8 +408,6 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
             "builder_executes_no_ops",
             "no_database_write",
             "no_deployment_or_migration",
-            "no_qa_pass_or_acceptance",
-            "no_pf09_status_movement",
         ],
     }
     monkeypatch.setattr(builder, "REQUIRED_EVIDENCE", (record["path"],))
@@ -450,7 +465,7 @@ def _write_minimal_bundle(tmp_path, monkeypatch):
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "PR06R_B_FINAL_PASS",
+        "release_admission": "EXACT_SOURCE_SANITY_PASS",
         "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [file_row],
@@ -460,8 +475,6 @@ def _write_minimal_bundle(tmp_path, monkeypatch):
             "builder_executes_no_ops",
             "no_database_write",
             "no_deployment_or_migration",
-            "no_qa_pass_or_acceptance",
-            "no_pf09_status_movement",
         ],
     }
     raw = builder._canonical_bytes(payload)
@@ -534,14 +547,15 @@ def test_bundle_verifier_rejects_symlinked_evidence_root(tmp_path, monkeypatch):
         builder.verify_attestation(real_root)
 
 
-def test_workflow_publishes_external_attestation_without_source_closure_write():
+def test_workflow_validates_external_attestation_without_source_closure_write():
     workflow = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
 
     assert "build_release_attestation.py" in workflow
-    assert 'runner.temp }}/hde-release-attestation' in workflow
-    assert "actions/upload-artifact@v4" in workflow
-    assert "Run canonical JSON gate (closed rails)" in workflow
-    assert '--verify "$RUNNER_TEMP/hde-release-attestation"' in workflow
+    assert 'attestation_root="$RUNNER_TEMP/hde-release-attestation"' in workflow
+    assert '--output "$attestation_root"' in workflow
+    assert '--verify "$attestation_root"' in workflow
+    assert "actions/upload-artifact" not in workflow
+    assert "actions/download-artifact" not in workflow
     assert "regenerate_identity_closure.py --check" not in workflow
     assert "regenerate_identity_closure.py\n" not in workflow
     mirror_gate = Path("ci/checks/check_mirror_schema.sh").read_text(
@@ -560,6 +574,22 @@ def test_direct_closure_cli_refuses_source_tree_execution(monkeypatch):
     monkeypatch.delenv("HDE_ISOLATED_RELEASE_BUILD", raising=False)
     with pytest.raises(SystemExit, match="SOURCE_TREE_RELEASE_CLOSURE_REFUSED"):
         closure.main([])
+
+
+def test_release_closure_does_not_currentize_frozen_architecture_snapshot():
+    assert "architecture_snapshot" not in {step.name for step in closure.CLOSURE_STEPS}
+    assert (
+        "artifacts/architecture/architecture_snapshot.keys_only.json"
+        not in closure.ATTESTATION_GENERATED_OUTPUTS
+    )
+
+
+def test_release_closure_does_not_run_epic_closeout_assertions():
+    source = Path("tools/evidence/regenerate_identity_closure.py").read_text(
+        encoding="utf-8"
+    )
+    assert "tests/qa/test_epic022_acceptance_scaffold.py" not in source
+    assert "tests/qa/test_epic022_close_pack_ready.py" not in source
 
 
 def test_direct_release_evidence_write_cli_refuses_source_tree(monkeypatch):
