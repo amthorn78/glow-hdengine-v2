@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.1  
-Effective Date: 2026.08.18  
+**Version:** v12.7.2  
+Effective Date: 2026.08.19  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -198,6 +198,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.7 HDE-EPIC039 PR-02 Lineage and Review-Process Correction
 
 2.8 Require Automated CI Budget Control and Supersede Manual Push Circuit Breakers
+
+2.9 HDE-EPIC039 PR-03 Lineage
 
 # 2\) Numbered Addenda
 
@@ -1150,5 +1152,87 @@ PF10 §2.7’s characterization of the 15 lineage updates as a PF10 §2.4 proces
 * It does not remove or weaken required CI.  
 * It does not require a particular YAML structure, job name, cache implementation, concurrency syntax, or change-detection mechanism.  
 * The authorized implementation task must select the smallest safe, repository-grounded automated design.
+
+## **2.9 HDE-EPIC039 PR-03 Lineage** 
+
+### **Approval and source record**
+
+* **Source:** Post-Merge Comprehensive PR Lineage Review for PR-03, implementation source `r5-implementation-plan-hde-epic039.md`.  
+* **Repository:** `amthorn78/glow-hdengine-v2`.  
+* **Decision:** `MERGED WORK ACCEPTABLE`.  
+* **Lineage:** Original PR \#391 followed contiguously by Remedial PR \#392.  
+* **Lifecycle baseline:** `14990f06464e3c242ffc77547985ceb7e63fe0d0`.  
+* **PR \#391 endpoint:** merge commit `8fec07027ed66e37ec83334c63b00c67b1bbaa10`.  
+* **PR \#392 and final reviewed endpoint:** merge commit `a82d6624ab8f32221b90d0bd6112d2163716e546`.  
+* At review, `main` was exactly the PR \#392 merge commit. No intervening or post-lineage commit affected the reviewed result.  
+* The subsystem introduced by PR \#391 is approved, intentional, and preserve-required. PR \#392 preserved it while correcting bounded defects. No rollback, disablement, reduction, or removal is authorized.  
+* This reassessment and scope approval supersede the earlier destructive remediation proposal.
+
+### **Retained decisions and requirements**
+
+The accepted subsystem comprises generic QA orchestration, canonical epic-derived paths, five-state classification, same-interpreter pytest execution, governed-reference validation, acceptance-map viability, current-state evidence publication, bounded epic adapters, and supporting tests.
+
+The continuing contracts are:
+
+* Generated QA and acceptance paths derive canonically from epic identity.  
+* The exact result-status vocabulary is `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, and `PARKED`.  
+* Pytest executes through the active interpreter using `sys.executable -m pytest`.  
+* The PF04 token roster must load successfully and contain named, unique tokens.  
+* Governed references must be validated deterministically; unsafe paths or references must be rejected.  
+* Classifications must be deterministic and causal.  
+* `PASS` is permitted only when the applicable map, epic, token, reference, log, and manifest conditions are satisfied. Placeholder or unevaluated conditions cannot produce `PASS`.  
+* Generic mechanics belong in `tools/qa/qa_harness.py`; bounded epic-specific configuration, execution, and publication orchestration may remain in epic adapters and are not unauthorized duplication.  
+* Mutable publication behavior must be exercised through isolated fixtures or detached worktrees rather than the authoritative checkout.  
+* Generated close and acceptance manifests use stable identities and must not contain `RUN_ID` or `run_id`.  
+* Frozen historical evidence remains immutable, while approved current-state logs, flat manifests, receipts, indexes, mirrors, reports, close packs, and proof companions may be requalified and replaced. Current-state publication surfaces are not reclassified as immutable historical runs merely because they contain evidence.  
+* Human Index and Machine Mirror registrations must maintain matching path sets.  
+* The two HDE-EPIC039 Doc-Delta bodies must remain byte-identical and correctly bound by their proof companions.
+
+PR \#392 established the accepted remediation boundary:
+
+* Added generic `supersede_check_ids` handling, including identifier validation, rejection of fresh/superseded overlap, and idempotent removal of superseded manifest entries.  
+* Removed bespoke EPIC021 bootstrap-supersession logic and delegated it to the generic harness without removing the EPIC021 execution path.  
+* Removed prohibited `run_id` fields from the affected EPIC027 and EPIC028 acceptance and close-manifest outputs.  
+* Corrected EPIC028 close-pack processing to support flat and wrapped manifest representations and accurate step counting.  
+* Corrected EPIC029 by removing `run_id`, preventing the generated close manifest from becoming its own causal input, staging the report and manifest before evidence-index refresh, and expanding the controlled publication allowlist.  
+* Republished affected current-state evidence after those corrections without claiming HDE-EPIC039 completion.
+
+Rolling back PR \#392 would reintroduce run-oriented manifest identity, duplicate EPIC021 supersession ownership, incorrect flat-manifest counting, and the EPIC029 output-as-input defect.
+
+### **Epic, task, and status effects**
+
+The lineage maps to PF09.1 — HDE Build Checklist — Calcination, task `HDE-CALC003`:
+
+* `HDE-CALC003.13`: `Partial`; no status change recommended or performed. The lineage establishes canonical same-interpreter pytest execution but not completion of the wider phased item.  
+* `HDE-CALC003.14`: `Partial`; no status change recommended or performed. PR \#392 corrected run-oriented identity in affected generated manifests but did not establish PF09 completion.  
+* `HDE-CALC003.15`: `Partial`; no status change recommended or performed. The lineage strengthened five-state classification, missing-token handling, acceptance-map viability, and phantom-PASS prevention without establishing wider phased completion.
+
+Implementation of the reviewed subsystem and remediation is accepted. PF09 movement remains separate governance work.
+
+### **Deferred obligations and unresolved work**
+
+* Wider Calcination completion remains outstanding because `HDE-CALC003.13`, `.14`, and `.15` remain `Partial`.  
+* HDE-EPIC039 Live QA, acceptance, OPS, token satisfaction, deployment, PF09 movement, and epic closeout remain outside this approval.  
+* The review reported no remaining findings and assigned no further subsystem remediation.  
+* Permanent PF-Canon drainage targets were not assessed because no complete task-relevant permanent PF target was available. No PF destination or completed canon change may be inferred from this review.
+
+### **Scope boundaries and nonclaims**
+
+* Approval of PR \#391 and PR \#392 does not establish HDE-EPIC039 QA execution or QA PASS, token satisfaction, OPS completion, deployment, PF09 advancement, permanent-canon drainage, or epic closeout.  
+* No PF-Canon edit or PF09 status change was performed.  
+* Reviewer-side Live QA or other externally mutating QA was not run because the review was read-only. Acceptance relied on exact-endpoint CI, complete final-file inspection, and governed-evidence inspection.  
+* Current-state evidence replacement is approved within the subsystem. Frozen historical evidence remains protected.  
+* The complete lineage path scan found no changed path under an explicit `history`, `historical`, `runs`, or `run-*` directory boundary. The reviewed current logs, manifests, receipts, indexes, mirrors, and proofs therefore remain current-state surfaces rather than immutable per-run history.  
+* PR \#392 did not destroy the PR \#391 subsystem. The principal harness, EPIC021 execution path, EPIC027/028/029 generators, current-state publication logic, and supporting tests remained present at the reviewed endpoint.
+
+### **Evidence and traceability**
+
+* PR \#391: 15 commits, 157 changed files, merge `8fec07027ed66e37ec83334c63b00c67b1bbaa10`; all 25 review threads resolved; GitHub Actions run `32208134472` completed all seven visible jobs successfully.  
+* PR \#392: 2 commits, 72 changed files, merge `a82d6624ab8f32221b90d0bd6112d2163716e546`; GitHub Actions run `32269525154` completed all seven visible jobs successfully.  
+* The lineage touched 166 unique paths. The complete changed-path scan produced zero explicit historical-run boundary matches.  
+* Principal inspected implementation surfaces: `.github/workflows/ci.yml`, `tools/qa/qa_harness.py`, `tools/qa/epic021_qa.py`, and the EPIC027, EPIC028, and EPIC029 generators and tests.  
+* Human Index and Machine Mirror contained 596 records each with exact path-set parity.  
+* The HDE-EPIC039 Doc-Delta bodies were byte-identical at blob `70d335...`; both proof companions recorded SHA-256 `868ce684...` and size 4,537 bytes.  
+* The HDE-EPIC039 Doc-Delta posture explicitly withheld Live QA, OPS, acceptance-token, deployment, PF09-completion, and epic-closeout claims.
 
 \<eof\>
