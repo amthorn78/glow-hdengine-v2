@@ -34,7 +34,6 @@ from tools.qa import qa_harness
 
 EPIC_ID = "HDE-EPIC029"
 EPIC_SLUG = "hde-epic029"
-RUN_ID = "epic029-close"
 PF09_TASK_ID = "HDE-CONJ009"
 PF09_SUBTASK_ID = "HDE-CONJ009.1"
 PF09_SCOPE = [
@@ -365,7 +364,6 @@ def _causal_input_paths() -> tuple[str, ...]:
         "tools/qa/generate_epic029_close_pack.py",
         "tools/qa/qa_harness.py",
         "tools/evidence/update_evidence_index.py",
-        "audit/EPIC-029_MANIFEST.json",
         SANITY_LOG_REL,
         *_required_requalification_paths(),
         *STAGED_INPUT_GENERATORS,
@@ -1522,7 +1520,6 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool], gate: dict
             "hde_conj001_4_recommendation=supportable_from_repo_evidence_done_after_ops01_normalization",
             "pf09_report_only_recommendations=yes_no_pf_edits",
         ],
-        "run_id": RUN_ID,
         "scope": "repo_side_governed_evidence_closeout_report_only_pf09_recommendations",
     }
     _write_json(CLOSE_MANIFEST_PATH, payload)
@@ -1825,6 +1822,8 @@ def _materialize_staged_close_pack() -> int:
     _write_acceptance_map(live_qa, index_status, gate)
     _verify_acceptance_map(ACCEPTANCE_MAP_PATH, live_qa, index_status, gate)
     _write_token_matrix(live_qa, index_status, gate)
+    _write_close_report(produced_at, live_qa, gate)
+    _write_close_manifest(produced_at, live_qa, gate)
     _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
     viability_receipt = _publish_viability_with_requalification(
         config, run, produced_at
@@ -1924,8 +1923,15 @@ def _publication_allowlist() -> set[str]:
         "audit/EPIC-029_MANIFEST.json.path_proof.txt",
         f"{DOC_DELTAS_REL}.path_proof.txt",
         f"{DRAIN_TARGETS_REL}.path_proof.txt",
+        # The canonical updater refreshes this EPIC028 close-family companion
+        # while staging the already-authorized cross-epic requalification.
+        "audit/ops/hde-epic028/ops-01/created_files_sha256.txt.path_proof.txt",
     }
     primary_paths = qa_paths | graph_paths | staged_input_paths | {ACCEPTANCE_MAP_REL}
+    primary_paths |= {
+        "audit/EPIC-029_close_report.md",
+        "audit/EPIC-029_MANIFEST.json",
+    }
     return (
         primary_paths
         | {f"{path}.path_proof.txt" for path in primary_paths}
@@ -1951,8 +1957,6 @@ def _is_protected_stage_path(rel: str) -> bool:
         return False
     primary_rel = rel.removesuffix(".path_proof.txt")
     exact = {
-        "audit/EPIC-029_close_report.md",
-        "audit/EPIC-029_MANIFEST.json",
         f"audit/qa/{EPIC_SLUG}/00_meta/dev_harness_binding_coverage.md",
         SANITY_LOG_REL,
     }

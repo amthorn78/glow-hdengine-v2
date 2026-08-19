@@ -2227,12 +2227,14 @@ def record_check(
     result: CheckResult,
     *,
     additional_files: Sequence[tuple[Path, str]] = (),
+    supersede_check_ids: Sequence[str] = (),
 ) -> tuple[Path, Path]:
     """Preflight and coherently publish one primary log and the flat manifest."""
     logs, manifest = record_check_family(
         config,
         (result,),
         additional_files=additional_files,
+        supersede_check_ids=supersede_check_ids,
     )
     return logs[0], manifest
 
@@ -2245,6 +2247,7 @@ def record_check_family(
     coherence_verifier: Callable[[], None] | None = None,
     replace_legacy_family_ids: Sequence[str] = (),
     admit_new_check_ids: Sequence[str] = (),
+    supersede_check_ids: Sequence[str] = (),
     captured_at_utc: str | None = None,
 ) -> tuple[tuple[Path, ...], Path]:
     """Publish a complete current-state family with all verification in-boundary."""
@@ -2271,6 +2274,11 @@ def record_check_family(
         for check_id in replace_legacy_family_ids
     }
     admitted_ids = {validate_check_id(check_id) for check_id in admit_new_check_ids}
+    superseded_ids = {
+        _validate_legacy_check_id(check_id) for check_id in supersede_check_ids
+    }
+    if superseded_ids & set(result_ids):
+        raise ValueError("a freshly recorded check cannot also be superseded")
     if replacement_ids & admitted_ids:
         raise ValueError("replacement and admitted check IDs must be disjoint")
     if replacement_ids:
@@ -2286,6 +2294,10 @@ def record_check_family(
                 "admitted check IDs require a bounded legacy-family replacement"
             )
         checks = _preflight_manifest(config)
+        # Supersession is intentionally idempotent: after the first successful
+        # migration, later wrapper executions see only the canonical check ID.
+        for check_id in superseded_ids:
+            checks.pop(check_id, None)
     family_timestamp = _validate_timestamp(captured_at_utc or _utc_now())
     rendered: list[tuple[Path, str]] = []
     logs: list[Path] = []

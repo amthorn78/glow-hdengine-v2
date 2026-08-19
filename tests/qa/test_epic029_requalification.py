@@ -299,6 +299,16 @@ def test_staged_inputs_are_refreshed_before_graph_preseal(
         "_write_token_matrix",
         lambda *_args: events.append("write-token-matrix"),
     )
+    monkeypatch.setattr(
+        epic029,
+        "_write_close_report",
+        lambda *_args: events.append("write-close-report"),
+    )
+    monkeypatch.setattr(
+        epic029,
+        "_write_close_manifest",
+        lambda *_args: events.append("write-close-manifest"),
+    )
     monkeypatch.setattr(epic029, "_publish_viability_with_requalification", lambda *_args: None)
     monkeypatch.setattr(epic029, "verify_postcommit_fixed_point", lambda *_args: None)
     monkeypatch.setattr(epic029, "_verify_close_pack_convergence", lambda *_args: None)
@@ -312,10 +322,12 @@ def test_staged_inputs_are_refreshed_before_graph_preseal(
         "updater",
         "run-postcommit",
     ]
-    assert events[5:9] == [
+    assert events[5:11] == [
         "write-acceptance-map",
         "verify-acceptance-map",
         "write-token-matrix",
+        "write-close-report",
+        "write-close-manifest",
         "updater",
     ]
 
@@ -449,8 +461,6 @@ def test_truthful_preseal_creates_every_registered_path_before_first_sanity(
     inherited = (
         "docs/acceptance_map_epic029.json",
         "audit/qa/hde-epic029/token_evidence_matrix.md",
-        "audit/EPIC-029_close_report.md",
-        "audit/EPIC-029_MANIFEST.json",
     )
     for rel in inherited:
         path = tmp_path / rel
@@ -489,7 +499,7 @@ def test_truthful_preseal_creates_every_registered_path_before_first_sanity(
             )
         },
     }
-    assert len(registered) == 10
+    assert len(registered) == 8
     assert all((tmp_path / rel).is_file() for rel in registered)
     manifest = json.loads(
         (tmp_path / "audit/qa/hde-epic029/qa_step_logs_manifest.json").read_text(
@@ -1344,8 +1354,10 @@ def test_publication_allowlist_admits_exact_generated_and_proof_surfaces() -> No
     assert "audit/qa/hde-epic029/acceptance_map_viability.log" in allowed
     assert epic029.ACCEPTANCE_MAP_REL in allowed
     assert epic029.ACCEPTANCE_MAP_PROOF_REL in allowed
-    assert "audit/EPIC-029_close_report.md" not in allowed
-    assert "audit/EPIC-029_MANIFEST.json" not in allowed
+    assert "audit/EPIC-029_close_report.md" in allowed
+    assert "audit/EPIC-029_close_report.md.path_proof.txt" in allowed
+    assert "audit/EPIC-029_MANIFEST.json" in allowed
+    assert "audit/EPIC-029_MANIFEST.json.path_proof.txt" in allowed
     assert epic029.DOC_DELTAS_REL not in allowed
     assert epic029.DRAIN_TARGETS_REL not in allowed
     assert f"{epic029.DOC_DELTAS_REL}.path_proof.txt" in allowed
@@ -1423,8 +1435,6 @@ def test_candidate_discovery_rejects_unregistered_cross_epic_proof(
 @pytest.mark.parametrize(
     "protected_path",
     [
-        "audit/EPIC-029_close_report.md",
-        "audit/EPIC-029_MANIFEST.json",
         "audit/docdeltas/hde-epic029_doc_deltas.md",
         "audit/ops/hde-epic029/ops-01/stdout.log",
         "audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md",
@@ -1516,7 +1526,7 @@ def test_causal_input_contract_includes_config_sources_and_close_manifest() -> N
 
     assert set(epic029.STAGED_CONFIG_SOURCE_INPUTS) <= causal
     assert set(epic029.UPDATER_BOOTSTRAP_PRIMARY_PATHS) <= causal
-    assert "audit/EPIC-029_MANIFEST.json" in causal
+    assert "audit/EPIC-029_MANIFEST.json" not in causal
     assert set(epic029._close_binding_input_paths()) <= causal
 
 

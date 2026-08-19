@@ -22,7 +22,6 @@ from tools.qa import qa_harness
 
 EPIC_ID = "HDE-EPIC028"
 EPIC_SLUG = "hde-epic028"
-RUN_ID = "epic028-reader-ledger"
 FINAL_MIRROR_SCHEMA_COMMAND = (
     "ci/checks/check_mirror_schema.sh",
     "artifacts/evidence_index.jsonl",

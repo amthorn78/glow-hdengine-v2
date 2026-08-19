@@ -22,7 +22,6 @@ from tools.qa import qa_harness
 
 EPIC_ID = "HDE-EPIC027"
 EPIC_SLUG = "hde-epic027"
-RUN_ID = "epic027-close"
 
 QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 QA_CHECKS_ROOT = QA_ROOT / "checks"
@@ -852,7 +851,6 @@ def _write_close_manifest(produced_at: str) -> None:
             "epic_id": EPIC_ID,
             "key_outputs": key_outputs,
             "qa_epic_root": f"audit/qa/{EPIC_SLUG}",
-            "run_id": RUN_ID,
             "subtask_id": "HDE-CONJ009.2",
             "task_id": "HDE-CONJ009",
         },

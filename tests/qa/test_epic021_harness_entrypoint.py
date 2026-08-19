@@ -189,6 +189,19 @@ def test_wrapper_delegates_to_current_state_harness(
     assert result["viability"].governed_ledger == ledger
     assert json.loads(ledger.read_text(encoding="utf-8"))["status"] == "PASS"
 
+    # The legacy ID is absent after the first publication. A current-state
+    # wrapper must remain safely repeatable rather than treating that absence
+    # as a migration error.
+    repeated = run_epic021_qa(repo_root=tmp_path)
+    assert repeated["bootstrap"].status is Status.PASS
+    assert repeated["viability"].status is Status.PASS
+    repeated_manifest = json.loads(
+        (
+            tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert set(repeated_manifest) == {"d00-bootstrap", "acceptance-map-viability"}
+
 
 @pytest.mark.parametrize("posture", ("unset", "open"))
 def test_imported_wrapper_rejects_invalid_rails_before_execution_or_write(
@@ -221,8 +234,8 @@ def test_imported_wrapper_rejects_invalid_rails_before_execution_or_write(
         lambda *_args, **_kwargs: forbidden("subprocess"),
     )
     monkeypatch.setattr(
-        epic021_qa,
-        "_record_bootstrap_with_legacy_supersession",
+        epic021_qa.qa_harness,
+        "record_check",
         lambda *_args, **_kwargs: forbidden("governed-write"),
     )
 
@@ -285,192 +298,6 @@ def test_outer_transaction_restores_bytes_modes_and_new_targets(
     assert existing.stat().st_mode & 0o777 == 0o640
     assert not created.exists()
     assert not created.parent.exists()
-
-
-def _legacy_bootstrap_binding(root: Path) -> tuple[HarnessConfig, Path, Path]:
-    config = HarnessConfig("HDE-EPIC021", repo_root=root)
-    relative = "audit/qa/hde-epic021/checks/D00_bootstrap/primary.log"
-    primary = root / relative
-    primary.parent.mkdir(parents=True)
-    primary.write_text(
-        json.dumps(
-            {
-                "captured_env": {},
-                "check_id": "D00_bootstrap",
-                "check_name": "historical EPIC021 bootstrap",
-                "claimed_tokens": [],
-                "command": ["python", "-V"],
-                "command_provenance": "historical test fixture",
-                "evidence_artifacts": [relative],
-                "exit_code": 0,
-                "intended_tokens": [],
-                "pf_refs": [],
-                "schema_version": "pf27.step_log_header.v2",
-                "status": "PASS",
-                "status_reason": "",
-                "timestamp_utc": "2026-08-18T00:00:00Z",
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (config.qa_root / "qa_step_logs_manifest.json").write_text(
-        json.dumps(
-            {
-                "D00_bootstrap": {
-                    "check_id": "D00_bootstrap",
-                    "log_path": relative,
-                    "status": "PASS",
-                }
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    proof = primary.with_name("primary.log.path_proof.txt")
-    proof.write_bytes(b"historical proof\n")
-    return config, primary, proof
-
-
-def test_legacy_bootstrap_binding_is_superseded_idempotently_without_rewrite(
-    tmp_path: Path,
-):
-    config, primary, proof = _legacy_bootstrap_binding(tmp_path)
-    manifest = config.qa_root / "qa_step_logs_manifest.json"
-    primary_before = primary.read_bytes()
-    proof_before = proof.read_bytes()
-
-    epic021_qa._supersede_legacy_bootstrap_manifest(config)
-    first_manifest = manifest.read_bytes()
-    epic021_qa._supersede_legacy_bootstrap_manifest(config)
-
-    assert json.loads(first_manifest) == {}
-    assert manifest.read_bytes() == first_manifest
-    assert primary.read_bytes() == primary_before
-    assert proof.read_bytes() == proof_before
-
-
-def test_wrapper_replaces_legacy_binding_but_preserves_historical_bytes(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
-    _repo(tmp_path)
-    _, primary, proof = _legacy_bootstrap_binding(tmp_path)
-    primary_before = primary.read_bytes()
-    proof_before = proof.read_bytes()
-
-    class Done:
-        returncode = 0
-        stdout = "passed"
-        stderr = ""
-
-    monkeypatch.setattr(
-        "tools.qa.qa_harness.subprocess.run", lambda *args, **kwargs: Done()
-    )
-    run_epic021_qa(repo_root=tmp_path)
-
-    manifest = json.loads(
-        (
-            tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
-        ).read_text(encoding="utf-8")
-    )
-    assert set(manifest) == {"d00-bootstrap", "acceptance-map-viability"}
-    assert primary.read_bytes() == primary_before
-    assert proof.read_bytes() == proof_before
-
-
-def test_wrapper_restores_exact_legacy_manifest_when_lowercase_write_is_blocked(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
-    _repo(tmp_path)
-    _, primary, proof = _legacy_bootstrap_binding(tmp_path)
-    manifest = tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
-    manifest_before = manifest.read_bytes()
-    primary_before = primary.read_bytes()
-    proof_before = proof.read_bytes()
-    lowercase = tmp_path / "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
-    lowercase.parent.mkdir(parents=True)
-    blocked_target = tmp_path / "blocked-bootstrap.log"
-    blocked_target.write_bytes(b"do not replace\n")
-    lowercase.symlink_to(blocked_target)
-
-    class Done:
-        returncode = 0
-        stdout = "passed"
-        stderr = ""
-
-    monkeypatch.setattr(
-        "tools.qa.qa_harness.subprocess.run", lambda *args, **kwargs: Done()
-    )
-
-    with pytest.raises(ValueError, match="publication output cannot be a symlink"):
-        run_epic021_qa(repo_root=tmp_path)
-
-    assert manifest.read_bytes() == manifest_before
-    assert primary.read_bytes() == primary_before
-    assert proof.read_bytes() == proof_before
-    assert lowercase.is_symlink()
-    assert blocked_target.read_bytes() == b"do not replace\n"
-
-
-def test_legacy_bootstrap_supersession_rolls_back_with_outer_transaction(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
-    config, primary, proof = _legacy_bootstrap_binding(tmp_path)
-    manifest = config.qa_root / "qa_step_logs_manifest.json"
-    before = {
-        path: path.read_bytes()
-        for path in (manifest, primary, proof)
-    }
-    monkeypatch.setattr(epic021_qa, "ROOT", tmp_path)
-    monkeypatch.setattr(
-        epic021_qa,
-        "_wrapper_write_paths",
-        lambda: (manifest, primary, proof),
-    )
-
-    with pytest.raises(RuntimeError, match="injected"):
-        with epic021_qa._WrapperWriteTransaction():
-            epic021_qa._supersede_legacy_bootstrap_manifest(config)
-            raise RuntimeError("injected")
-
-    assert {path: path.read_bytes() for path in before} == before
-
-
-def test_legacy_bootstrap_supersession_rejects_dual_current_authority(
-    tmp_path: Path,
-):
-    config, legacy_primary, _ = _legacy_bootstrap_binding(tmp_path)
-    current_relative = "audit/qa/hde-epic021/checks/d00-bootstrap/primary.log"
-    current_primary = tmp_path / current_relative
-    current_primary.parent.mkdir(parents=True)
-    current_header = json.loads(
-        legacy_primary.read_text(encoding="utf-8").splitlines()[0]
-    )
-    current_header["check_id"] = "d00-bootstrap"
-    current_header["check_name"] = "current EPIC021 bootstrap"
-    current_header["evidence_artifacts"] = [current_relative]
-    current_primary.write_text(
-        json.dumps(current_header, sort_keys=True, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
-    manifest = config.qa_root / "qa_step_logs_manifest.json"
-    checks = json.loads(manifest.read_text(encoding="utf-8"))
-    checks["d00-bootstrap"] = {
-        "check_id": "d00-bootstrap",
-        "log_path": current_relative,
-        "status": "PASS",
-    }
-    manifest.write_text(
-        json.dumps(checks, sort_keys=True, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(RuntimeError, match="EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING"):
-        epic021_qa._supersede_legacy_bootstrap_manifest(config)
 
 
 def test_main_rolls_back_input_writes_when_finalization_fails(
@@ -547,11 +374,6 @@ def test_fresh_postcommit_is_sealed_before_viability_and_failure_rolls_back(
         epic021_qa.qa_harness,
         "run_pytest_check",
         lambda _config, check_id, *_args, **_kwargs: passed(check_id),
-    )
-    monkeypatch.setattr(
-        epic021_qa,
-        "_record_bootstrap_with_legacy_supersession",
-        lambda *_args: (tmp_path / "bootstrap.log", tmp_path / "manifest.json"),
     )
     monkeypatch.setattr(
         epic021_qa,
@@ -946,3 +768,18 @@ def test_close_input_capture_rejects_symlink_alias(
 
     with pytest.raises(ValueError, match="cannot be captured safely"):
         epic021_qa._capture_close_input(alias, subject="test close manifest")
+
+
+
+def test_doc_delta_pair_is_byte_identical_and_pf_referenced():
+    primary = Path("audit/docdeltas/hde-epic021_doc_deltas.md").read_bytes()
+    capture = Path("audit/qa/hde-epic021/00_meta/doc_deltas.md").read_bytes()
+    assert primary == capture
+    assert b"PF14" in primary
+    assert b"PF06" in primary
+
+
+def test_only_lowercase_bootstrap_is_current_authority():
+    checks = Path("audit/qa/hde-epic021/checks")
+    assert (checks / "d00-bootstrap/primary.log").is_file()
+    assert not (checks / "D00_bootstrap").exists()
