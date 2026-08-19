@@ -1,13 +1,15 @@
 
 from __future__ import annotations
-from pathlib import Path
+
 import importlib
+
 
 def test_env_guard_artifact_bytes_and_perms(tmp_path, monkeypatch):
     mod = importlib.import_module("scripts.emit_env_guard_artifact")
+    p = tmp_path / "artifacts/hotfix/env_guard_import_ok.txt"
+    monkeypatch.setattr(mod, "ARTIFACT", p)
     mod.main()  # emit
 
-    p = Path("artifacts/hotfix/env_guard_import_ok.txt")
     assert p.exists(), "artifact missing"
     data = p.read_bytes()
 

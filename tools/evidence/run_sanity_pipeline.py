@@ -34,6 +34,12 @@ class SanityStep:
             object.__setattr__(self, "commands", tuple(tuple(item) for item in command))
 
 
+# PF10 — HDE Build Notes, §2.3 places only continuing current-source risks in
+# this generic release lane. The former nineteen-stage HDE-EPIC038 family is
+# not a current admission surface: architecture is protected independently in
+# product CI, and its historical-bridge/OPS packet stages remain audit history.
+# This result therefore makes no HDE-EPIC038, QA, acceptance, PF09, OPS,
+# deployment, or closeout claim.
 STAGE_NAMES = (
     "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
     "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",

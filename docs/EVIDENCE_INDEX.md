@@ -248,7 +248,7 @@ supportability by themselves, production deployment, or epic closeout.
 * `artifacts/bodygraph/v2_mapped_cache/` — bounded configured-v2 mapped-cache local evidence for explicit upsert, mapped-payload-only write/read-back, idempotence, closed-rails zero I/O, legacy fallback, and production-like refusal.
 * `audit/ops/hde-epic038/ops-02/` — retained historical bounded mapped-cache OPS packet; not a current release-admission input.
 * `audit/ops/hde-epic038/ops-03/` — retained historical bounded read-only direct PostgreSQL OPS packet; not a current release-admission input.
-* `audit/gates/sanity_pipeline/sanity_pipeline.log` — current fifteen-stage generic release-sanity log; final attestation admission is `EXACT_SOURCE_SANITY_PASS` only when exact-source verification and all stages pass.
+* `audit/gates/sanity_pipeline/sanity_pipeline.log` — current fifteen-stage generic release-sanity log; final attestation admission uses PF12's canon-owned v1 compatibility value `PR06R_B_FINAL_PASS` only when exact-source verification and all stages pass. That wire value is not a QA, acceptance, PF09, OPS, deployment, or closeout claim.
 
 ## Env-matrix (selection-only)
 * `artifacts/runtime/env_matrix.snapshot.json`

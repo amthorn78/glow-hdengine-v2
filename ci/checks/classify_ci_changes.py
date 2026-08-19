@@ -2,8 +2,8 @@
 """Classify an exact Git change into the smallest safe CI lane set.
 
 The classifier is deliberately repository-owned and fail-safe. Known paths select
-only the lanes whose protected inputs they can affect. Unknown paths and Git
-events without a usable comparison base select every lane rather than silently
+only the lanes whose protected inputs they can affect. Unclassified paths and Git
+events without a usable comparison base fail explicitly rather than silently
 skipping protection.
 """
 from __future__ import annotations
@@ -82,11 +82,16 @@ _RELEASE_EVIDENCE_PREFIXES = (
 )
 _RELEASE_IMPLEMENTATION_PATHS = {
     "ci/checks/check_evidence_index_hash.sh",
+    "ci/checks/check_env_pins.sh",
     "ci/checks/check_final_lf.sh",
     "ci/checks/check_mirror_schema.sh",
     "ci/checks/run_rails_job_definitions.py",
     "scripts/release_id_recompute.py",
     "tests/evidence/test_internal_version_manifest_captures.py",
+    "tools/cli/generate_cli_conformance_artifacts.py",
+    "tools/cli/generate_showcompat_artifacts.py",
+    "tools/config/generate_bundles.py",
+    "tools/config/generate_config_artifacts.py",
     "tools/evidence/build_release_attestation.py",
     "tools/evidence/generate_a7_transport_proofs.py",
     "tools/evidence/generate_bodygraph_policy_proofs.py",
@@ -111,6 +116,14 @@ _RELEASE_IMPLEMENTATION_PATHS = {
 _ARCHITECTURE_ANALYSIS_PATHS = {
     "tests/evidence/test_architecture_snapshot.py",
     "tools/evidence/generate_architecture_snapshot.py",
+}
+_WORKFLOW_CONTROL_PATH_LANES = {
+    "ci/checks/check_env_pins.sh": set(LANES),
+    "ci/checks/check_cli_help.sh": {"compat"},
+    "ci/checks/run_rails_job_definitions.py": {"rails", "release"},
+    "tools/cli/emitter_symbol_proof.py": {"compat"},
+    "tools/cli/serializer_grep_guard.py": {"compat"},
+    "tools/order/generate_ordering_artifacts.py": {"product"},
 }
 _RAILS_MARKERS = (
     "open_rails",
@@ -154,6 +167,140 @@ _PRODUCT_PREFIXES = (
     "scripts/",
     "sql/",
 )
+_SCHEMA_LANE_PREFIXES = (
+    ("schemas/hde_release_attestation", {"release"}),
+    ("schemas/architecture_snapshot", {"evidence"}),
+    (
+        "schemas/hde_epic038_direct_db_selection",
+        {"db", "evidence", "release"},
+    ),
+    ("schemas/hde_epic038_ops03_", {"evidence"}),
+)
+_HISTORICAL_BACKUP_PATHS = {
+    "engine/config/provider_loader.bak2",
+    "engine/config/provider_loader.py.bak.1758996879",
+    "engine/serializer/canon.py.bak.20251022212047",
+    "scripts/card_close.sh.bak",
+    "scripts/hdctl.backup.py",
+    "scripts/hdctl.py.bak",
+}
+_NARRATIVE_TEST_OWNERS = (
+    "tests/unit/test_narratives_router.py",
+    "tests/unit/test_narratives_loader.py",
+    "tests/cli/test_aux_preview.py",
+)
+_PRODUCT_TEST_OWNER_PATHS = {
+    "adapter/http_reader.py": (
+        "tests/adapter/test_compat_http_dev.py",
+        "tests/adapter/test_compat_http_parity.py",
+        "tests/http/test_compat_endpoint_contract.py",
+    ),
+    "engine/__init__.py": ("tests/runtime/test_identity.py",),
+    "engine/constants.py": ("tests/mech/test_constants.py",),
+    "engine/bodygraph/vendor_client.py": (
+        "tests/bodygraph/test_vendor_client.py",
+    ),
+    "scripts/cut_release_manifest.py": ("tests/scripts/test_cut_release_manifest.py",),
+    "scripts/emit_env_guard_artifact.py": (
+        "tests/artifacts/test_env_guard_artifact_bytes.py",
+    ),
+    "scripts/ensure_env.py": ("tests/invariance/test_determinism_env_helper.py",),
+    "scripts/probe_internal_version.py": (
+        "tests/transport/test_internal_version_contract.py",
+    ),
+    "scripts/release_id_tools.py": (
+        "tests/scripts/test_release_id_recompute.py",
+    ),
+}
+_PRODUCT_TEST_OWNER_PREFIXES = (
+    ("catalog/narratives/", _NARRATIVE_TEST_OWNERS),
+    ("engine/narratives/", _NARRATIVE_TEST_OWNERS),
+    ("engine/db/", ("tests/db",)),
+    ("engine/order/", ("tests/order", "tests/mech/test_order_properties.py")),
+    ("engine/serializer/", ("tests/cli/test_serializer_guards.py",)),
+    ("migrations/", ("tests/db",)),
+    ("sql/", ("tests/db",)),
+    (
+        "schemas/hde_release_attestation",
+        (
+            "tests/evidence/test_release_attestation.py",
+            "tests/evidence/test_release_manifest_content_binding.py",
+        ),
+    ),
+    ("schemas/architecture", ("tests/evidence/test_architecture_snapshot.py",)),
+    (
+        "schemas/hde_epic038_direct_db_selection",
+        ("tests/evidence/test_hde_epic038_direct_db_selection.py",),
+    ),
+)
+_EVIDENCE_GENERATOR_TEST_OWNERS = {
+    "tools/evidence/generate_architecture_snapshot.py": (
+        "tests/evidence/test_architecture_snapshot.py",
+    ),
+    "tools/evidence/generate_hde_epic037_v2_adapter.py": (
+        "tests/evidence/test_hde_epic037_v2_adapter.py",
+    ),
+    "tools/evidence/generate_narrative_registry_diff.py": _NARRATIVE_TEST_OWNERS,
+}
+_QA_TEST_OWNERS = (
+    "tests/qa/test_generic_qa_harness.py",
+    "tests/qa/test_qa_harness_followup.py",
+    "tests/qa/test_epic021_harness_entrypoint.py",
+    "tests/qa/test_epic021_acceptance_alignment.py",
+    "tests/qa/test_tooling_bootstrap.py",
+    "tests/qa/test_viability_generator_wrappers.py",
+    "tests/qa/test_epic029_requalification.py",
+)
+_SAFE_TEST_SUPPORT_PREFIXES = {
+    "tests/db/": ("tests/db",),
+    "tests/order/": ("tests/order",),
+    "tests/qa/": _QA_TEST_OWNERS,
+}
+_FIXED_LANE_TEST_DIRECTORIES = {
+    "tests/db": "db",
+    "tests/order": "product",
+}
+_FIXED_LANE_TEST_PROVIDERS = {
+    **{path: "compat" for path in (
+        "tests/adapter/test_compat_http_dev.py",
+        "tests/adapter/test_compat_http_parity.py",
+        "tests/adapter/test_jsonschema.py",
+        "tests/cli/test_cli_canonical_bytes.py",
+        "tests/cli/test_cli_usage_and_errors.py",
+        "tests/cli/test_errors_parity.py",
+        "tests/cli/test_serializer_guards.py",
+        "tests/cli/test_showcompat_parity_and_identity.py",
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/transport/test_internal_version_contract.py",
+    )},
+    **{path: "db" for path in (
+        "tests/bodygraph/test_bg_resolve_v2_mapped_cache.py",
+        "tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py",
+        "tests/bodygraph/test_ingest.py",
+        "tests/ops/test_capture_rails_open_scope.py",
+        "tests/ops/test_http_logging.py",
+        "tests/unit/test_check_direct_db_contract.py",
+    )},
+    "tests/evidence/test_architecture_snapshot.py": "product",
+    "tests/mech/test_order_properties.py": "product",
+    "tests/evidence/test_rails_ci_workflow_integration.py": "rails",
+    **{path: "evidence" for path in (
+        "tests/evidence/test_evidence_index_missing_state.py",
+        "tests/evidence/test_evidence_skeleton.py",
+        "tests/evidence/test_machine_mirror_self_proof.py",
+        "tests/evidence/test_orientation_demo.py",
+        "tests/ops/test_evidence_index.py",
+        "tests/qa/test_epic020_qa_docs.py",
+    )},
+    **{path: "qa" for path in _QA_TEST_OWNERS},
+    **{path: "release" for path in (
+        "tests/evidence/test_release_attestation.py",
+        "tests/evidence/test_release_manifest_content_binding.py",
+        "tests/evidence/test_sanity_pipeline.py",
+        "tests/runtime/test_identity.py",
+    )},
+}
+_UNKNOWN_SOURCE_SUFFIXES = {".py", ".sh", ".sql"}
 
 
 @dataclass(frozen=True)
@@ -188,34 +335,201 @@ def _normalized_path(raw: str) -> str:
     return normalized
 
 
-def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
-    """Return exact changed test modules, or fail safely to the full test tree.
+def _is_backup_record(path: str) -> bool:
+    return path in _HISTORICAL_BACKUP_PATHS
 
-    A test helper, fixture, conftest, symlink, or deleted support path can
-    affect tests outside its nearest directory. Without a repository
-    dependency map, the only truthful target for those less-common changes is
-    the complete suite. Removed standalone test modules are not executable at
-    the candidate head and continue to select only their ordinary owner lanes.
+
+def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
+    selected_lanes = _lanes_for_path(source_path)
+    if selected_lanes is None:
+        return False
+    provider = _FIXED_LANE_TEST_PROVIDERS.get(target)
+    if provider is None:
+        provider = next(
+            (
+                lane
+                for directory, lane in _FIXED_LANE_TEST_DIRECTORIES.items()
+                if target == directory or target.startswith(f"{directory}/")
+            ),
+            None,
+        )
+    return provider in selected_lanes if provider is not None else False
+
+
+def _registered_owner_test_paths() -> set[str]:
+    paths = set(_FIXED_LANE_TEST_PROVIDERS)
+    for targets in _PRODUCT_TEST_OWNER_PATHS.values():
+        paths.update(targets)
+    for _prefix, targets in _PRODUCT_TEST_OWNER_PREFIXES:
+        paths.update(targets)
+    for targets in _EVIDENCE_GENERATOR_TEST_OWNERS.values():
+        paths.update(targets)
+    return paths
+
+
+def _validated_owner_targets(
+    repo_root: Path,
+    source_path: str,
+    targets: Iterable[str],
+    *,
+    error_code: str,
+) -> tuple[str, ...]:
+    validated: list[str] = []
+    for target in targets:
+        candidate = repo_root / target
+        if not candidate.exists() or candidate.is_symlink():
+            raise ValueError(f"{error_code}:{source_path}:{target}")
+        if not _fixed_lane_covers_test_target(source_path, target):
+            validated.append(target)
+    return tuple(validated)
+
+
+def _product_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve a bounded behavioral owner or fail until one is registered.
+
+    The repository contains legacy source surfaces whose broad test trees are
+    not safe ordinary-PR fallbacks. Their changes intentionally fail with the
+    exact unmapped path rather than claiming coverage from an unrelated lane.
     """
-    direct_modules: set[str] = set()
-    for path in sorted({_normalized_path(raw) for raw in paths}):
+    if not path.startswith(_PRODUCT_PREFIXES):
+        return ()
+    if (
+        path.endswith(".path_proof.txt")
+        or path.endswith(".REMOVED.md")
+        or _is_backup_record(path)
+        or path in _RELEASE_IMPLEMENTATION_PATHS
+        or path.startswith("schemas/hde_epic038_ops03_")
+    ):
+        return ()
+    targets = _PRODUCT_TEST_OWNER_PATHS.get(path)
+    if targets is None:
+        targets = next(
+            (
+                owner_targets
+                for prefix, owner_targets in _PRODUCT_TEST_OWNER_PREFIXES
+                if path.startswith(prefix)
+            ),
+            None,
+        )
+    if targets is None:
+        raise ValueError(f"CI_PRODUCT_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_PRODUCT_OWNER_TEST_INVALID",
+    )
+
+
+def _evidence_generator_owner_targets(
+    repo_root: Path,
+    path: str,
+    *,
+    changed_paths: set[str] | None = None,
+) -> tuple[str, ...]:
+    rel = PurePosixPath(path)
+    if (
+        len(rel.parts) < 3
+        or rel.parts[:2] != ("tools", "evidence")
+        or rel.suffix != ".py"
+        or not rel.name.startswith("generate_")
+    ):
+        return ()
+    targets = _EVIDENCE_GENERATOR_TEST_OWNERS.get(path)
+    if targets is not None:
+        return _validated_owner_targets(
+            repo_root,
+            path,
+            targets,
+            error_code="CI_EVIDENCE_OWNER_TEST_INVALID",
+        )
+    if not (repo_root / path).exists() and changed_paths is not None:
+        conventional_owner = (
+            f"tests/evidence/test_{rel.stem.removeprefix('generate_')}.py"
+        )
+        if (
+            conventional_owner in changed_paths
+            and not (repo_root / conventional_owner).exists()
+        ):
+            # A paired generator/owner removal is an explicit subsystem
+            # disposition. Generator-only deletion remains fail-closed.
+            return ()
+    raise ValueError(f"CI_EVIDENCE_OWNER_TEST_MISSING:{path}")
+
+
+def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    targets = next(
+        (
+            owner_targets
+            for prefix, owner_targets in _SAFE_TEST_SUPPORT_PREFIXES.items()
+            if path.startswith(prefix)
+        ),
+        None,
+    )
+    if targets is None:
+        raise ValueError(f"CI_TEST_SUPPORT_OWNER_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_TEST_SUPPORT_OWNER_INVALID",
+    )
+
+
+def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
+    """Return exact changed tests plus repository-owned behavioral owners.
+
+    Product source and evidence-generator changes must execute tests that own
+    their behavior, not merely turn on a lane with an unrelated fixed roster.
+    Ambiguous test support files use bounded, known-collectable owner suites;
+    an unmapped source fails classification rather than reporting false green.
+    Removed standalone test modules are not executable at the candidate head.
+    """
+    targets: set[str] = set()
+    normalized_paths = sorted({_normalized_path(raw) for raw in paths})
+    changed_paths = set(normalized_paths)
+    for path in normalized_paths:
         rel = PurePosixPath(path)
-        if not rel.parts or rel.parts[0] != "tests":
+        if (
+            path.endswith(".path_proof.txt")
+            or path.endswith(".REMOVED.md")
+            or _is_backup_record(path)
+        ):
             continue
-        candidate = repo_root / path
-        is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
-        if is_test_module:
-            if candidate.is_symlink():
-                return ("tests",)
-            if not candidate.exists():
-                # A removed standalone test cannot be executed at the
-                # candidate head. Its path still selects its owning lanes.
+        if _lanes_for_path(path) == set():
+            continue
+        if rel.parts and rel.parts[0] == "tests":
+            candidate = repo_root / path
+            is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
+            if (
+                is_test_module
+                and candidate.exists()
+                and candidate.is_file()
+                and not candidate.is_symlink()
+            ):
+                if not _fixed_lane_covers_test_target(path, path):
+                    targets.add(path)
                 continue
-            if candidate.is_file():
-                direct_modules.add(path)
+            if is_test_module and not candidate.exists():
+                if path in _registered_owner_test_paths():
+                    raise ValueError(f"CI_REGISTERED_OWNER_TEST_DELETED:{path}")
                 continue
-        return ("tests",)
-    return tuple(sorted(direct_modules))
+            targets.update(_test_support_owner_targets(repo_root, path))
+            continue
+        targets.update(_product_owner_targets(repo_root, path))
+        targets.update(
+            _evidence_generator_owner_targets(
+                repo_root,
+                path,
+                changed_paths=changed_paths,
+            )
+        )
+        if (
+            PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
+            and _lanes_for_path(path) is None
+        ):
+            raise ValueError(f"CI_SOURCE_OWNER_TEST_MISSING:{path}")
+    return tuple(sorted(targets))
 
 
 def _contains_component(path: str, component: str) -> bool:
@@ -223,9 +537,35 @@ def _contains_component(path: str, component: str) -> bool:
 
 
 def _lanes_for_path(path: str) -> set[str] | None:
-    """Return known lanes for one path, or ``None`` for fail-safe full CI."""
+    """Return known lanes for one path, or ``None`` to fail classification."""
     if path in _FULL_VALIDATION_PATHS or path.startswith(_FULL_VALIDATION_PREFIXES):
         return set(LANES)
+
+    if path.endswith(".REMOVED.md"):
+        return set()
+
+    if _is_backup_record(path):
+        return {"evidence"}
+
+    if path.endswith(".path_proof.txt"):
+        lanes = {"evidence"}
+        if (
+            path.startswith(_RELEASE_EVIDENCE_PREFIXES)
+            or path.startswith("artifacts/evidence_index")
+            or path.startswith("docs/ENDPOINTS_CATALOG.json")
+        ):
+            lanes.add("release")
+        return lanes
+
+    if path.startswith("docs/ENDPOINTS_CATALOG.json"):
+        return {"evidence", "release"}
+
+    schema_lanes = next(
+        (lanes for prefix, lanes in _SCHEMA_LANE_PREFIXES if path.startswith(prefix)),
+        None,
+    )
+    if schema_lanes is not None:
+        return set(schema_lanes)
 
     if path.startswith(_DOCUMENTATION_PREFIXES):
         return set()
@@ -239,6 +579,10 @@ def _lanes_for_path(path: str) -> set[str] | None:
         )
     ):
         return {"evidence"}
+
+    workflow_control_lanes = _WORKFLOW_CONTROL_PATH_LANES.get(path)
+    if workflow_control_lanes is not None:
+        return set(workflow_control_lanes)
 
     if path in _RELEASE_IMPLEMENTATION_PATHS:
         return {"evidence", "release"}
@@ -265,7 +609,7 @@ def _lanes_for_path(path: str) -> set[str] | None:
             lanes.add("release")
         return lanes
 
-    if path.startswith("ci/jobs/") and "rails" in path:
+    if path.startswith("ci/jobs/"):
         return {"rails", "release"}
     if path.startswith("ci/checks/"):
         if "direct_db" in path:
@@ -293,6 +637,11 @@ def _lanes_for_path(path: str) -> set[str] | None:
     if path.startswith("reports/"):
         return {"evidence"}
 
+    if path in _DOCUMENT_PATHS or (
+        PurePosixPath(path).suffix.lower() in _DOCUMENT_SUFFIXES
+    ):
+        return set()
+
     if path.startswith("tests/"):
         lanes = {"product"}
         if any(marker in f"/{path}" for marker in _COMPAT_MARKERS):
@@ -315,11 +664,6 @@ def _lanes_for_path(path: str) -> set[str] | None:
             lanes.add("rails")
         return lanes
 
-    if path in _DOCUMENT_PATHS or (
-        path.startswith("docs/") and PurePosixPath(path).suffix.lower() in _DOCUMENT_SUFFIXES
-    ) or PurePosixPath(path).suffix.lower() in _DOCUMENT_SUFFIXES:
-        return set()
-
     return None
 
 
@@ -332,7 +676,7 @@ def classify_paths(paths: Iterable[str]) -> Classification:
     for path in normalized:
         lanes = _lanes_for_path(path)
         if lanes is None:
-            return _full("unknown_path_full_validation", len(normalized))
+            raise ValueError(f"CI_CHANGE_SURFACE_UNCLASSIFIED:{path}")
         selected.update(lanes)
 
     flags = _empty_flags()
@@ -393,13 +737,7 @@ def classify_git_change(repo_root: Path, base: str, head: str) -> Classification
     base_sha = _validate_sha(base, allow_zero=True)
     head_sha = _validate_sha(head)
     if set(base_sha) == {"0"}:
-        unavailable = _full("unavailable_base_full_validation", 0)
-        return Classification(
-            flags=unavailable.flags,
-            reason=unavailable.reason,
-            path_count=unavailable.path_count,
-            test_targets=("tests",),
-        )
+        raise RuntimeError("CI_CHANGE_BASE_UNAVAILABLE")
     if base_sha == head_sha:
         return _full("identical_refs_full_validation", 0)
     paths = git_changed_paths(repo_root, base_sha, head_sha)

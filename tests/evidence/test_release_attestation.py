@@ -31,7 +31,9 @@ def test_attestation_ci_lane_is_bound_to_exact_candidate_head():
     assert 'git worktree add --detach "$release_test_source"' in lane
     assert 'export PYTHONPATH="$release_test_source"' in lane
     assert 'git worktree remove --force "$release_test_source"' in lane
-    assert lane.count('test -z "$(git status --short --untracked-files=all)"') == 2
+    # The detached test source, pre-build candidate, and post-build candidate
+    # must each remain clean.
+    assert lane.count('test -z "$(git status --short --untracked-files=all)"') == 3
     assert '--output "$attestation_root"' in lane
     assert '--verify "$attestation_root"' in lane
     assert "actions/upload-artifact" not in workflow
@@ -171,10 +173,12 @@ def test_isolated_console_entrypoint_is_installed_from_tracked_package(
 
     assert len(calls) == 3
     assert calls[0][-1] == str(package_source)
+    assert "--no-cache-dir" in calls[0]
     assert "--no-index" in calls[0]
     assert "--no-build-isolation" in calls[0]
     assert "--system-site-packages" not in calls[1]
     assert calls[2][-1].endswith(".whl")
+    assert "--no-cache-dir" in calls[2]
     assert "--no-index" in calls[2]
     assert not (package_source / ".attestation-bin").exists()
     assert (scripts / ("hdctl.exe" if builder.os.name == "nt" else "hdctl")).is_file()
@@ -381,6 +385,24 @@ def test_tracked_source_copy_must_match_recorded_snapshot(tmp_path):
         builder._require_exact_source_copy(destination, tracked, snapshot)
 
 
+def test_v1_schema_preserves_the_pf12_wire_contract():
+    schema = json.loads(builder.SCHEMA_PATH.read_text(encoding="utf-8"))
+    nonclaims = schema["properties"]["nonclaims"]
+
+    assert schema["$id"] == builder.SCHEMA == "hde.release_attestation.v1"
+    assert schema["properties"]["release_admission"] == {
+        "const": "PR06R_B_FINAL_PASS"
+    }
+    assert [item["const"] for item in nonclaims["prefixItems"]] == [
+        "builder_executes_no_ops",
+        "no_database_write",
+        "no_deployment_or_migration",
+        "no_qa_pass_or_acceptance",
+        "no_pf09_status_movement",
+    ]
+    assert nonclaims["minItems"] == nonclaims["maxItems"] == 5
+
+
 def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
     monkeypatch,
 ):
@@ -398,7 +420,7 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "EXACT_SOURCE_SANITY_PASS",
+        "release_admission": "PR06R_B_FINAL_PASS",
         "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [record],
@@ -408,6 +430,8 @@ def test_attestation_contract_rejects_unknown_keys_and_identity_mismatch(
             "builder_executes_no_ops",
             "no_database_write",
             "no_deployment_or_migration",
+            "no_qa_pass_or_acceptance",
+            "no_pf09_status_movement",
         ],
     }
     monkeypatch.setattr(builder, "REQUIRED_EVIDENCE", (record["path"],))
@@ -465,7 +489,7 @@ def _write_minimal_bundle(tmp_path, monkeypatch):
         "release_id": "d" * 64,
         "manifest_sha256": "d" * 64,
         "validation_result": "PASS",
-        "release_admission": "EXACT_SOURCE_SANITY_PASS",
+        "release_admission": "PR06R_B_FINAL_PASS",
         "pipeline_stop": None,
         "rails": dict(builder.CLOSED_RAILS),
         "files": [file_row],
@@ -475,6 +499,8 @@ def _write_minimal_bundle(tmp_path, monkeypatch):
             "builder_executes_no_ops",
             "no_database_write",
             "no_deployment_or_migration",
+            "no_qa_pass_or_acceptance",
+            "no_pf09_status_movement",
         ],
     }
     raw = builder._canonical_bytes(payload)

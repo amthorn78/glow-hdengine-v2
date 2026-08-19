@@ -348,6 +348,7 @@ def _install_packaged_console_entrypoint(
             "pip",
             "wheel",
             "--disable-pip-version-check",
+            "--no-cache-dir",
             "--no-index",
             "--no-deps",
             "--no-build-isolation",
@@ -414,6 +415,7 @@ def _install_packaged_console_entrypoint(
             "pip",
             "install",
             "--disable-pip-version-check",
+            "--no-cache-dir",
             "--no-index",
             "--no-deps",
             str(wheel),
@@ -779,7 +781,9 @@ def build_attestation(
                 "release_id": release_id,
                 "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
                 "validation_result": "PASS",
-                "release_admission": "EXACT_SOURCE_SANITY_PASS",
+                # PF12 §6.2.1 owns this v1 compatibility literal. It does not
+                # claim QA, acceptance, PF09 movement, OPS, or deployment.
+                "release_admission": "PR06R_B_FINAL_PASS",
                 "pipeline_stop": None,
                 "rails": dict(sorted(CLOSED_RAILS.items())),
                 "files": file_rows,
@@ -789,6 +793,8 @@ def build_attestation(
                     "builder_executes_no_ops",
                     "no_database_write",
                     "no_deployment_or_migration",
+                    "no_qa_pass_or_acceptance",
+                    "no_pf09_status_movement",
                 ],
             }
             _validate_payload(payload)

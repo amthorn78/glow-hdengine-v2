@@ -1,6 +1,6 @@
 # Release-attestation scaling decision
 
-Status: implemented; the current generic exact-source admission supersedes the HDE-EPIC038-specific final admission, while permanent PF-Canon drainage remains downstream.
+Status: implemented; generic exact-source mechanics supersede the HDE-EPIC038-specific administrative pipeline while PF12's `PR06R_B_FINAL_PASS` v1 compatibility literal remains unchanged and claim-free. Permanent PF-Canon drainage remains downstream.
 
 ## Problem
 
@@ -42,9 +42,9 @@ No edge points from the external attestation back into tracked source.
 
 ## Current attestation boundary
 
-The current external attestation records final admission as `EXACT_SOURCE_SANITY_PASS` only when the source commit is exact, the tracked-tree and manifest-derived release identity verify, the wheel-installed entry point is exercised, and all fifteen generic release-sanity stages pass with no pipeline stop. It validates current release mechanics under closed rails; it does not rerun or admit frozen OPS packets, perform Railway discovery, write a database, or deploy production.
+The current external attestation records PF12's canon-owned `hde.release_attestation.v1` compatibility value `PR06R_B_FINAL_PASS` only when the source commit is exact, the tracked-tree and manifest-derived release identity verify, the wheel-installed entry point is exercised, and all fifteen generic release-sanity stages pass with no pipeline stop. The compatibility literal preserves the existing wire contract; it does not claim QA PASS, acceptance, PF09 movement, OPS, deployment, or epic closeout. The builder validates current release mechanics under closed rails; it does not rerun or admit frozen OPS packets, perform Railway discovery, write a database, or deploy production.
 
-The earlier PR-A stage-14 stop and downstream PR-06R-B wording remain historical implementation context only. Current documentation and release validation refer to the generic exact-source fifteen-stage attestation.
+The earlier PR-A stage-14 stop remains historical implementation context. PF10 — HDE Build Notes, §2.3 takes the former HDE-EPIC038 nineteen-stage family out of current release admission: generic architecture assertions run in product CI, and retired transport-history/OPS packet checks remain audit history. Current validation therefore uses the generic exact-source fifteen-stage chain while retaining `PR06R_B_FINAL_PASS` solely as PF12's required v1 wire value; neither the current log nor that compatibility literal claims HDE-EPIC038 completion, QA PASS, acceptance, PF09 movement, OPS, deployment, or closeout.
 
 Permanent PF04/PF09/PF12 release-evidence wording and historical EPIC022 canonical-path semantics require later human drainage. This implementation does not edit PF-Canon or move any status.
 

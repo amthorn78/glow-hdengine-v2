@@ -74,7 +74,7 @@ jobs:
         if: ${{ steps.classify.outputs.needs_python == 'true' }}
         run: ci/checks/check_env_pins.sh
 
-      - name: Run changed-test coverage in isolation
+      - name: Run affected behavioral tests in isolation
         id: changed_tests
         if: ${{ steps.classify.outputs.changed_tests == 'true' }}
         shell: bash
@@ -95,7 +95,9 @@ jobs:
             unset GH_TOKEN
             export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
             export PYTHONPATH="$changed_test_source"
-            python -m pytest -q -- "${changed_test_targets[@]}"
+            python -m pytest -q -p no:cacheprovider -- "${changed_test_targets[@]}"
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
           )
           cleanup
           trap - EXIT
@@ -119,8 +121,8 @@ jobs:
         run: |
           set -euo pipefail
           ci/checks/check_cli_help.sh
-          python tools/cli/serializer_grep_guard.py
-          python tools/cli/emitter_symbol_proof.py
+          python tools/cli/serializer_grep_guard.py --output "$RUNNER_TEMP/serializer_grep_guard.log"
+          python tools/cli/emitter_symbol_proof.py --output "$RUNNER_TEMP/emitter_symbol_proof.txt"
           python -m pytest -q \
             tests/adapter/test_jsonschema.py \
             tests/cli/test_cli_usage_and_errors.py \
@@ -207,6 +209,8 @@ jobs:
               tests/qa/test_tooling_bootstrap.py \
               tests/qa/test_viability_generator_wrappers.py \
               tests/qa/test_epic029_requalification.py
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
           )
           cleanup
           trap - EXIT
@@ -236,6 +240,8 @@ jobs:
               tests/evidence/test_release_attestation.py \
               tests/evidence/test_release_manifest_content_binding.py \
               tests/evidence/test_sanity_pipeline.py
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
           )
           cleanup
           trap - EXIT

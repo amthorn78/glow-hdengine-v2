@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -75,6 +76,14 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert "test_epic020_bundle_index_integration.py" not in text
     assert "tools/evidence/update_evidence_index.py --epic-id" not in text
     assert "tools/evidence/update_evidence_index.py --check" in text
+    assert (
+        'python tools/cli/serializer_grep_guard.py --output '
+        '"$RUNNER_TEMP/serializer_grep_guard.log"'
+    ) in text
+    assert (
+        'python tools/cli/emitter_symbol_proof.py --output '
+        '"$RUNNER_TEMP/emitter_symbol_proof.txt"'
+    ) in text
     assert "generate_hde_" + "epic038_closeout" not in text
     assert "check_hde_epic038_" + "qa_current_state" not in text
     assert "EPIC038_" + "CLOSEOUT" not in text
@@ -100,15 +109,41 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert '--changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"' in text
     assert "if: ${{ steps.classify.outputs.changed_tests == 'true' }}" in text
     assert 'changed_test_source="$RUNNER_TEMP/hde-changed-test-source"' in text
-    assert 'python -m pytest -q -- "${changed_test_targets[@]}"' in text
+    assert (
+        'python -m pytest -q -p no:cacheprovider -- "${changed_test_targets[@]}"'
+        in text
+    )
+    changed_test_step = text[
+        text.index("      - name: Run affected behavioral tests in isolation") :
+        text.index("      - name: Run product mechanics and ordering lane")
+    ]
+    assert "git diff --exit-code" in changed_test_step
+    assert 'git status --short --untracked-files=all' in changed_test_step
+    qa_step = text[
+        text.index("      - name: Run approved generic QA subsystem lane in isolation") :
+        text.index("      - name: Build and verify exact-source release attestation")
+    ]
+    release_step = text[
+        text.index("      - name: Build and verify exact-source release attestation") :
+        text.index("      - name: Verify truthful applicability and clean candidate tree")
+    ]
+    for isolated_step in (qa_step, release_step):
+        assert "git diff --exit-code" in isolated_step
+        assert 'git status --short --untracked-files=all' in isolated_step
     assert 'require_outcome "$NEEDS_PYTHON" "$PYTEST_READINESS_OUTCOME" pytest-readiness' in text
     assert 'require_outcome "$CHANGED_TESTS" "$CHANGED_TESTS_OUTCOME" changed-tests' in text
 
     install = text.index("      - name: Install applicable validation dependencies")
     readiness = text.index("      - name: Verify pytest readiness")
-    changed_tests = text.index("      - name: Run changed-test coverage in isolation")
+    changed_tests = text.index("      - name: Run affected behavioral tests in isolation")
     lanes = text.index("      - name: Run product mechanics and ordering lane")
     assert install < readiness < changed_tests < lanes
+
+    workflow_targets = set(re.findall(r"tests/[A-Za-z0-9_./-]+", text))
+    fixed_targets = set(classifier._FIXED_LANE_TEST_DIRECTORIES) | set(
+        classifier._FIXED_LANE_TEST_PROVIDERS
+    )
+    assert workflow_targets == fixed_targets
 
 
 @pytest.mark.parametrize(
@@ -123,7 +158,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["artifacts/runs/closed-run.json"], {"evidence"}, "selected_lanes"),
         (["artifacts/db_bridge/health.json"], {"evidence"}, "selected_lanes"),
         (["audit/qa/hde-epic039/00_meta/doc_deltas.md"], {"evidence"}, "selected_lanes"),
-        (["engine/history/replay.py"], {"product", "release"}, "selected_lanes"),
+        (["engine/narratives/router.py"], {"product", "release"}, "selected_lanes"),
         (["engine/db/adapter.py"], {"product", "db", "release"}, "selected_lanes"),
         (["adapter/http_reader.py"], {"product", "compat", "release"}, "selected_lanes"),
         (["engine/bodygraph/vendor_client.py"], {"product", "rails", "release"}, "selected_lanes"),
@@ -132,10 +167,23 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["tools/evidence/update_evidence_index.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/generate_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
         (["tests/evidence/test_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
+        (["ci/checks/run_rails_job_definitions.py"], {"rails", "release"}, "selected_lanes"),
         (["tests/adapter/test_env_guard_prod_variants.py"], {"product", "compat", "release"}, "selected_lanes"),
+        (["engine/canon/__init__.py.REMOVED.md"], set(), "documentation_only"),
+        (["engine/config/provider_loader.bak2"], {"evidence"}, "selected_lanes"),
+        (["engine/serializer/canon.py.bak.20251022212047"], {"evidence"}, "selected_lanes"),
+        (["scripts/card_close.sh.bak"], {"evidence"}, "selected_lanes"),
+        (["scripts/hdctl.backup.py"], {"evidence"}, "selected_lanes"),
+        (["catalog/manifest.json.path_proof.txt"], {"evidence"}, "selected_lanes"),
+        (["schemas/hde_release_attestation.v1.json"], {"release"}, "selected_lanes"),
+        (["schemas/architecture_snapshot.keys_only.v1.json"], {"evidence"}, "selected_lanes"),
+        (["schemas/hde_epic038_direct_db_selection.v1.json"], {"db", "evidence", "release"}, "selected_lanes"),
+        (["schemas/hde_epic038_ops03_result_summary.v1.json"], {"evidence"}, "selected_lanes"),
+        (["audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt"], {"evidence", "release"}, "selected_lanes"),
+        (["tests/transport/headers/aux_text_200.snap.path_proof.txt"], {"evidence"}, "selected_lanes"),
+        (["tests/README.md"], set(), "documentation_only"),
         ([".github/workflows/ci.yml"], set(classifier.LANES), "selected_lanes"),
         (["ci/checks/classify_ci_changes.py"], set(classifier.LANES), "selected_lanes"),
-        (["new-surface.bin"], set(classifier.LANES), "unknown_path_full_validation"),
     ],
 )
 def test_change_classifier_selects_expected_execution_scenarios(
@@ -181,7 +229,6 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
         (
             "tests/adapter/test_env_guard_prod_variants.py",
             "tests/unit/test_unit.py",
-            "engine/runtime/identity.py",
         ),
     )
 
@@ -193,29 +240,145 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
     fixture = adapter / "fixtures/input.json"
     fixture.parent.mkdir()
     fixture.write_text("{}\n", encoding="utf-8")
-    helper = unit / "helpers.py"
-    helper.write_text("VALUE = 1\n", encoding="utf-8")
-    symlink = unit / "test_link.py"
-    symlink.symlink_to(unit / "test_unit.py")
+    symlink = adapter / "test_link.py"
+    symlink.symlink_to(adapter / "test_env_guard_prod_variants.py")
 
     for ambiguous_path in (
-        "tests/unit/conftest.py",
-        "tests/unit/helpers.py",
         "tests/adapter/fixtures/input.json",
-        "tests/deleted/helpers.py",
-        "tests/unit/test_link.py",
+        "tests/adapter/test_link.py",
     ):
-        assert classifier.changed_test_targets(repo, (ambiguous_path,)) == (
-            "tests",
-        )
+        with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
+            classifier.changed_test_targets(repo, (ambiguous_path,))
+    with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
+        classifier.changed_test_targets(ROOT, ("tests/unit/helpers.py",))
+    with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
+        classifier.changed_test_targets(repo, ("tests/deleted/helpers.py",))
     assert classifier.changed_test_targets(
         repo,
         ("tests/deleted/test_removed.py",),
     ) == ()
+    with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
+        classifier.changed_test_targets(
+            repo,
+            ("tests/unit/test_narratives_router.py",),
+        )
+
+
+def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
+    active_suffixes = {".json", ".py", ".sh", ".sql"}
+    blocked: set[str] = set()
+    handled: set[str] = set()
+    for prefix in classifier._PRODUCT_PREFIXES:
+        root = ROOT / prefix
+        if not root.exists():
+            continue
+        for candidate in root.rglob("*"):
+            if (
+                not candidate.is_file()
+                or candidate.is_symlink()
+                or candidate.suffix.lower() not in active_suffixes
+            ):
+                continue
+            rel = candidate.relative_to(ROOT).as_posix()
+            try:
+                classifier._product_owner_targets(ROOT, rel)
+            except ValueError as exc:
+                assert str(exc).startswith("CI_PRODUCT_OWNER_TEST_MISSING:"), rel
+                blocked.add(rel)
+            else:
+                handled.add(rel)
+    assert handled
+    assert blocked
+    assert "adapter/http_reader.py" in handled
+    assert "engine/bodygraph/vendor_client.py" in handled
+    assert "engine/serializer/canon.py" in handled
+    assert "engine/errors/__init__.py" in blocked
+    assert "adapter/cache_keys.py" in blocked
+
+    assert classifier._EVIDENCE_GENERATOR_TEST_OWNERS
+    for rel in sorted(classifier._EVIDENCE_GENERATOR_TEST_OWNERS):
+        assert (ROOT / rel).is_file()
+        classifier._evidence_generator_owner_targets(ROOT, rel)
+
+
+def test_behavioral_owner_examples_cover_router_and_epic037_generator(
+    tmp_path: Path,
+) -> None:
+    assert classifier.changed_test_targets(
+        ROOT, ("engine/narratives/router.py",)
+    ) == tuple(sorted(classifier._NARRATIVE_TEST_OWNERS))
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/evidence/generate_hde_epic037_v2_adapter.py",)
+    ) == ("tests/evidence/test_hde_epic037_v2_adapter.py",)
+    with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(ROOT, ("engine/new_surface/module.py",))
+
+    repo = tmp_path / "repo"
+    generator = repo / "tools/evidence/generate_unowned_surface.py"
+    generator.parent.mkdir(parents=True)
+    generator.write_text("VALUE = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="CI_EVIDENCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            repo, ("tools/evidence/generate_unowned_surface.py",)
+        )
+    generator.unlink()
+    with pytest.raises(ValueError, match="CI_EVIDENCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            repo, ("tools/evidence/generate_unowned_surface.py",)
+        )
+    removed_generator = "tools/evidence/generate_retired_subsystem.py"
+    removed_owner = "tests/evidence/test_retired_subsystem.py"
+    assert classifier.changed_test_targets(
+        repo, (removed_generator, removed_owner)
+    ) == ()
+    with pytest.raises(ValueError, match="CI_EVIDENCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(repo, (removed_generator,))
+    with pytest.raises(ValueError, match="CI_EVIDENCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            repo, ("tools/evidence/nested/generate_unowned_surface.py",)
+        )
+    with pytest.raises(ValueError, match="CI_EVIDENCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            ROOT, ("tools/evidence/generate_epic023_orientation_artifacts.py",)
+        )
+    with pytest.raises(ValueError, match="CI_SOURCE_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(ROOT, ("server/new_runtime.py",))
+    with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(ROOT, ("engine/errors/runtime.py",))
+    assert classifier.changed_test_targets(
+        ROOT, ("scripts/probe_internal_version.py",)
+    ) == ("tests/transport/test_internal_version_contract.py",)
+    assert classifier.changed_test_targets(
+        ROOT, ("tests/ops/test_http_logging.py",)
+    ) == ("tests/ops/test_http_logging.py",)
+    assert classifier.changed_test_targets(
+        ROOT, ("engine/serializer/canon.py",)
+    ) == ()
+    with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            ROOT, ("scripts/db/verify_backup_restore.py",)
+        )
+    with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            ROOT, ("engine/runtime/worker.backup.py",)
+        )
+    assert classifier.changed_test_targets(
+        ROOT,
+        (
+            "engine/canon/__init__.py.REMOVED.md",
+            "engine/config/provider_loader.bak2",
+            "scripts/hdctl.backup.py",
+            "catalog/manifest.json.path_proof.txt",
+            "tests/transport/headers/aux_text_200.snap.path_proof.txt",
+            "tests/README.md",
+        ),
+    ) == ()
+    with pytest.raises(ValueError, match="CI_CHANGE_SURFACE_UNCLASSIFIED"):
+        classifier.classify_paths(("new-surface.bin",))
 
 
 def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> None:
-    for paths in ((), ("new-surface.bin",), (".github/workflows/ci.yml",)):
+    for paths in ((), (".github/workflows/ci.yml",)):
         established_full = classifier.classify_paths(paths)
         assert all(established_full.flags[lane] for lane in classifier.LANES)
         assert established_full.test_targets == ()
@@ -260,10 +423,8 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     docs = classifier.classify_git_change(repo, base, docs_head)
     assert not any(docs.flags[lane] for lane in classifier.LANES)
     assert docs.reason == "documentation_only"
-    unavailable_base = classifier.classify_git_change(repo, "0" * 40, docs_head)
-    assert all(unavailable_base.flags[lane] for lane in classifier.LANES)
-    assert unavailable_base.reason == "unavailable_base_full_validation"
-    assert unavailable_base.test_targets == ("tests",)
+    with pytest.raises(RuntimeError, match="CI_CHANGE_BASE_UNAVAILABLE"):
+        classifier.classify_git_change(repo, "0" * 40, docs_head)
     identical = classifier.classify_git_change(repo, docs_head, docs_head)
     assert all(identical.flags[lane] for lane in classifier.LANES)
     assert identical.reason == "identical_refs_full_validation"
@@ -282,8 +443,12 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
 
     source = repo / "engine/db/adapter.py"
     source.parent.mkdir(parents=True)
+    (repo / "tests/db").mkdir(parents=True)
+    (repo / "tests/db/test_adapter.py").write_text(
+        "def test_adapter(): pass\n", encoding="utf-8"
+    )
     source.write_text("VALUE = 1\n", encoding="utf-8")
-    _git(repo, "add", source.relative_to(repo).as_posix())
+    _git(repo, "add", source.relative_to(repo).as_posix(), "tests/db/test_adapter.py")
     _git(repo, "commit", "-m", "database")
     product_head = _git(repo, "rev-parse", "HEAD")
     product = classifier.classify_git_change(repo, workflow_head, product_head)
@@ -292,6 +457,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         "db",
         "release",
     }
+    assert product.test_targets == ()
 
     changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
     changed_test.parent.mkdir(parents=True)
@@ -336,6 +502,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         "db",
         "release",
     }
+    assert rename.test_targets == ()
 
 
 def test_change_classifier_covers_release_chain_sources_and_outputs() -> None:
@@ -368,6 +535,22 @@ def test_change_classifier_covers_release_chain_sources_and_outputs() -> None:
     assert consumed
     for path in sorted(consumed):
         assert classifier.classify_paths([path]).flags["release"], path
+
+
+def test_every_active_workflow_command_input_has_an_applicable_lane() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    command_paths = {
+        match
+        for match in re.findall(
+            r"(?:ci|scripts|tools)/[A-Za-z0-9_./-]+\.(?:py|sh|yml)",
+            workflow,
+        )
+        if (ROOT / match).is_file()
+    }
+    assert command_paths
+    for path in sorted(command_paths):
+        result = classifier.classify_paths((path,))
+        assert any(result.flags[lane] for lane in classifier.LANES), path
 
 
 def test_job_definitions_are_reusable_secret_free_and_live_forbidden() -> None:
