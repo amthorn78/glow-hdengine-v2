@@ -4,7 +4,7 @@
 This EPIC029 closeout refresh is bounded to repo-side governed evidence and report-only status recommendations for the controlling conjunction rows.
 
 ## Capture timestamp
-- `2026-04-14T11:34:21Z`
+- `2026-08-19T04:35:31Z`
 
 ## PF09 mapping used
 - Task: `HDE-CONJ009`
@@ -33,9 +33,9 @@ This EPIC029 closeout refresh is bounded to repo-side governed evidence and repo
 - Supportable from repo evidence: HDE-CONJ001.4 -> Done, contingent on the normalized OPS-01 binding-equivalence family now present in repo
 
 ## Epic-close Live QA outputs
-- `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`: present
-- `audit/qa/hde-epic029/checks/po-precommit/primary.log`: present
-- `audit/qa/hde-epic029/checks/po-postcommit/primary.log`: present
+- `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`: freshly requalified PASS
+- `audit/qa/hde-epic029/checks/po-precommit/primary.log`: freshly requalified PASS
+- `audit/qa/hde-epic029/checks/po-postcommit/primary.log`: freshly requalified PASS
 
 ## Canonical EPIC029 close-pack artifacts
 - `docs/acceptance_map_epic029.json`

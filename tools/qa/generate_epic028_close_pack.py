@@ -17,7 +17,6 @@ from tools.evidence import update_evidence_index
 
 EPIC_ID = "HDE-EPIC028"
 EPIC_SLUG = "hde-epic028"
-RUN_ID = "epic028-close"
 PF09_TASK_ID = "HDE-COAG007"
 PF09_SUBTASK_ID = "HDE-COAG007.3"
 
@@ -159,7 +158,6 @@ def _write_close_manifest(produced_at: str, qa_manifest: dict[str, object], po01
         "qa_step_count": len(qa_manifest.get("checks", {})),
         "qa_step_manifest_path": f"audit/qa/{EPIC_SLUG}/qa_step_logs_manifest.json",
         "qa_summary_lines": po010_lines,
-        "run_id": RUN_ID,
         "scope": "packaging_and_evidence_surfacing_only",
     }
     _write_json(CLOSE_MANIFEST_PATH, payload)

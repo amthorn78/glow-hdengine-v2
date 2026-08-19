@@ -4,7 +4,7 @@
 This close-pack is a packaging and evidence-surfacing baseline only. It does not re-open implementation scope, does not modify QA verdicts, and does not assert merge provenance.
 
 ## Capture timestamp
-- `2026-04-05T16:11:39Z`
+- `2026-08-19T04:24:22Z`
 
 ## PF09 mapping used
 - Task: `HDE-COAG007`
@@ -26,7 +26,6 @@ This close-pack is a packaging and evidence-surfacing baseline only. It does not
 
 ## QA RCA summary (embedded)
 - PO-010 final summary confirms repo-supported completion only and no formal close-pack claim by the QA step.
-- Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths.
 - `repo_supported_completion_only: yes`
 - `canon_drain_complete: no_claim`
 - `formal_close_pack_complete: no_claim`
@@ -41,13 +40,4 @@ This close-pack is a packaging and evidence-surfacing baseline only. It does not
 - `po_009=recorded`
 
 ## Step-log inventory referenced from qa_step_logs_manifest.json
-- `audit/qa/hde-epic028/checks/d0/primary.log`
-- `audit/qa/hde-epic028/checks/po-001/primary.log`
-- `audit/qa/hde-epic028/checks/po-002/primary.log`
-- `audit/qa/hde-epic028/checks/po-003/primary.log`
-- `audit/qa/hde-epic028/checks/po-004/primary.log`
-- `audit/qa/hde-epic028/checks/po-005/primary.log`
-- `audit/qa/hde-epic028/checks/po-006/primary.log`
-- `audit/qa/hde-epic028/checks/po-007/primary.log`
-- `audit/qa/hde-epic028/checks/po-008/primary.log`
-- `audit/qa/hde-epic028/checks/po-009/primary.log`
+

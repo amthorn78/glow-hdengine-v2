@@ -1786,3 +1786,56 @@ def test_wrapper_transaction_includes_every_updater_registered_proof(
         tmp_path / "artifacts/registered/source.txt.path_proof.txt"
         in module._wrapper_write_paths()
     )
+
+
+@pytest.mark.parametrize(
+    ("module_name", "args"),
+    (
+        ("tools.qa.generate_epic027_close_pack", ("2026-08-19T00:00:00Z",)),
+        (
+            "tools.qa.generate_epic028_close_pack",
+            ("2026-08-19T00:00:00Z", {"checks": {}}, []),
+        ),
+        (
+            "tools.qa.generate_epic029_close_pack",
+            (
+                "2026-08-19T00:00:00Z",
+                {
+                    "po-epic-close-live-qa": True,
+                    "po-precommit": True,
+                    "po-postcommit": True,
+                },
+                {
+                    "codespaces": "closed",
+                    "local_dev": "closed",
+                    "closure_mode": "binding-equivalence",
+                    "row_closure_status": {"HDE-CONJ001.4": "closed"},
+                },
+            ),
+        ),
+    ),
+)
+def test_active_close_manifest_generators_have_no_run_identity(
+    module_name: str, args: tuple[object, ...], monkeypatch: pytest.MonkeyPatch
+):
+    module = importlib.import_module(module_name)
+    captured: list[object] = []
+    monkeypatch.setattr(module, "_write_json", lambda _path, payload: captured.append(payload))
+
+    module._write_close_manifest(*args)
+
+    rendered = json.dumps(captured[0], sort_keys=True)
+    assert "run_id" not in rendered
+    assert not hasattr(module, "RUN_ID")
+
+
+def test_active_acceptance_ledger_has_no_run_identity_constant():
+    module = importlib.import_module("tools.qa.generate_epic028_acceptance_ledger")
+    assert not hasattr(module, "RUN_ID")
+
+
+@pytest.mark.parametrize("number", ("027", "028", "029"))
+def test_checked_in_current_close_manifests_have_no_run_identity(number: str):
+    payload = json.loads(Path(f"audit/EPIC-{number}_MANIFEST.json").read_text(encoding="utf-8"))
+    assert "run_id" not in payload
+    assert "RUN_ID" not in json.dumps(payload, sort_keys=True)

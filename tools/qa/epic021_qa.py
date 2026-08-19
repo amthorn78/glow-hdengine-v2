@@ -439,34 +439,27 @@ def _doc_delta_content() -> str:
     return """# HDE-EPIC021 Current-State Acceptance Migration — Doc Deltas
 
 This QA slice records later PF-Canon drainage targets only. It does not edit PF-Canon,
-move a PF09/PF20 status, or rewrite historical EPIC021 evidence.
+move a PF09/PF20 status, claim token satisfaction, or rewrite historical EPIC021 run evidence.
 
-- Normalize `CLI_READER_EMITTER_PARITY_OK` to `CLI_READER_PARITY_OK`.
-- Retire `CLI_SERIALIZER_GUARD_OK`; retain its guard evidence under `CLI_NO_ALT_JSON_OK`.
-- Normalize `QA_STEP_LOGS_CONSOLIDATED_OK` to `QA_HARNESS_DISCIPLINE_OK`.
-- Retire `SANITY_PIPELINE_LOGGED_OK`; bind its intent through `SANITY_PIPELINE_OK`
-  and `QA_HARNESS_DISCIPLINE_OK`.
-- Replace run-id and `step_*` acceptance mechanics with stable
+- Normalize `CLI_READER_EMITTER_PARITY_OK` to `CLI_READER_PARITY_OK`, and retire
+  `CLI_SERIALIZER_GUARD_OK` while retaining its guard evidence under
+  `CLI_NO_ALT_JSON_OK`. (PF04 — HDE Governance, §2.0.)
+- Normalize `QA_STEP_LOGS_CONSOLIDATED_OK` to `QA_HARNESS_DISCIPLINE_OK`, and
+  retire `SANITY_PIPELINE_LOGGED_OK` while binding its intent through
+  `SANITY_PIPELINE_OK` and `QA_HARNESS_DISCIPLINE_OK`. (PF04 — HDE Governance, §2.0.)
+- Replace active run identity and `step_*` acceptance mechanics with stable
   `checks/<check_id>/primary.log` receipts, a flat check-keyed manifest, and the
-  governed root viability ledger.
-- Supersede the nonconforming uppercase `D00_bootstrap` current binding with
-  the plan-owned `d00-bootstrap` check. Preserve the former receipt and proof
-  as unindexed historical evidence rather than a second current authority.
-
-The historical run directories remain unchanged and non-gating.
+  governed root viability ledger. (PF14 — HDE Mechanics Guide, §1.6.3.)
+- Keep only the plan-owned lowercase `d00-bootstrap` receipt in the current
+  canonical checks namespace; immutable historical run directories remain unchanged
+  and non-gating. (PF14 — HDE Mechanics Guide, §1.6.3.)
+- Publish this exact document at both the draft and epic-scoped capture paths.
+  (PF06 — Epic Process Guide, §0.5.)
 """
 
 
 def _doc_delta_capture_content() -> str:
-    return """# HDE-EPIC021 Doc-Delta Capture
-
-Primary delta: `audit/docdeltas/hde-epic021_doc_deltas.md`.
-
-Captured migration findings: deprecated token names, retired pseudo-token labels,
-historical run-id placeholders, the legacy runs-envelope manifest, and the stale
-root viability report. This capture is traceability metadata; the primary delta
-above is the `DOC_DELTA_PRESENT_OK` binding.
-"""
+    return _doc_delta_content()
 
 
 def _close_manifest_content(captured_at_utc: str) -> str:
@@ -1561,64 +1554,6 @@ def _write_acceptance_inputs() -> None:
     qa_harness._atomic_write(README_PATH, _readme_content())
 
 
-def _supersede_legacy_bootstrap_manifest(config: qa_harness.HarnessConfig) -> None:
-    """Retire the uppercase current binding without rewriting its history."""
-    manifest_path = config.qa_root / "qa_step_logs_manifest.json"
-    if not manifest_path.exists():
-        return
-    checks = qa_harness._preflight_manifest(config)
-    if LEGACY_BOOTSTRAP_CHECK_ID not in checks:
-        return
-    if BOOTSTRAP_CHECK_ID in checks:
-        raise RuntimeError("EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING")
-    migrated = dict(checks)
-    migrated.pop(LEGACY_BOOTSTRAP_CHECK_ID)
-    qa_harness._publish_with_rollback(
-        ((manifest_path, qa_harness._manifest_content(migrated)),),
-        lambda: qa_harness._verify_flat_manifest(config, migrated),
-        repo_root=config.repo_root,
-    )
-
-
-def _record_bootstrap_with_legacy_supersession(
-    config: qa_harness.HarnessConfig,
-    bootstrap: qa_harness.CheckResult,
-) -> tuple[Path, Path]:
-    """Publish the lowercase bootstrap and retire its legacy binding atomically."""
-    if bootstrap.check_id != BOOTSTRAP_CHECK_ID:
-        raise ValueError("EPIC021_BOOTSTRAP_CHECK_ID_MISMATCH")
-    checks = qa_harness._preflight_manifest(config)
-    if LEGACY_BOOTSTRAP_CHECK_ID in checks and BOOTSTRAP_CHECK_ID in checks:
-        raise RuntimeError("EPIC021_BOOTSTRAP_DUAL_CURRENT_BINDING")
-    checks.pop(LEGACY_BOOTSTRAP_CHECK_ID, None)
-
-    bootstrap_log, bootstrap_content = qa_harness._primary_log_content(
-        config, bootstrap
-    )
-    checks[BOOTSTRAP_CHECK_ID] = {
-        "check_id": BOOTSTRAP_CHECK_ID,
-        "log_path": qa_harness._repo_relative(config, bootstrap_log),
-        "status": bootstrap.status.value,
-    }
-    manifest = config.qa_root / "qa_step_logs_manifest.json"
-
-    def verify_publication() -> None:
-        qa_harness._verify_written_primary(
-            bootstrap_log, BOOTSTRAP_CHECK_ID, bootstrap.status
-        )
-        qa_harness._verify_flat_manifest(config, checks)
-
-    qa_harness._publish_with_rollback(
-        (
-            (bootstrap_log, bootstrap_content),
-            (manifest, qa_harness._manifest_content(checks)),
-        ),
-        verify_publication,
-        repo_root=config.repo_root,
-    )
-    return bootstrap_log, manifest
-
-
 def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
     """Execute EPIC021's concrete bootstrap and governed viability definitions."""
     ensure_determinism_env()
@@ -1633,8 +1568,8 @@ def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
         ("-q", BOOTSTRAP_TEST),
         check_name="EPIC021 tooling bootstrap",
     )
-    bootstrap_log, manifest = _record_bootstrap_with_legacy_supersession(
-        config, bootstrap
+    bootstrap_log, manifest = qa_harness.record_check(
+        config, bootstrap, supersede_check_ids=(LEGACY_BOOTSTRAP_CHECK_ID,)
     )
     viability = qa_harness.generate_acceptance_map_viability(
         config, publish_governed_ledger=True
@@ -1690,7 +1625,9 @@ def _execute_current_family() -> dict[str, object]:
         check_name="EPIC021 tooling bootstrap",
         intended_tokens=("QA_BOOTSTRAP_OK",),
     )
-    _record_bootstrap_with_legacy_supersession(config, bootstrap)
+    qa_harness.record_check(
+        config, bootstrap, supersede_check_ids=(LEGACY_BOOTSTRAP_CHECK_ID,)
+    )
     _require_pass(bootstrap)
 
     tooling_classification = _tooling_classification_result(root=ROOT)
