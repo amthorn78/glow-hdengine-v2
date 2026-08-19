@@ -1,3 +1,4 @@
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -9,6 +10,7 @@ from tools.qa.qa_harness import (
     HarnessConfig,
     Status,
     classify_pytest_returncode,
+    evaluate_acceptance_map_viability,
     generate_acceptance_map_viability,
     read_primary_header,
     record_check,
@@ -23,6 +25,119 @@ MATRIX_HEADER = (
     "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |\n"
     "| --- | --- | --- | --- | --- | --- | --- |\n"
 )
+FIXED_TIMESTAMP = "2026-01-01T00:00:00Z"
+
+
+def _write_evidence_graph(
+    root: Path, bindings: dict[str, tuple[str, ...]]
+) -> None:
+    human_rows: list[dict[str, object]] = []
+    mirror_rows: list[dict[str, object]] = []
+    for path, artifact_keys in bindings.items():
+        payload = (root / path).read_bytes()
+        digest = hashlib.sha256(payload).hexdigest()
+        size = len(payload)
+        proof = root / f"{path}.path_proof.txt"
+        proof.parent.mkdir(parents=True, exist_ok=True)
+        proof.write_text(
+            "\n".join(
+                (
+                    f"path: {path}",
+                    f"size_bytes: {size}",
+                    f"sha256: {digest}",
+                    f"mtime_utc: {FIXED_TIMESTAMP}",
+                    f"produced_at_utc: {FIXED_TIMESTAMP}",
+                    "",
+                )
+            ),
+            encoding="utf-8",
+        )
+        for artifact_key in artifact_keys:
+            human_rows.append(
+                {
+                    "artifact_key": artifact_key,
+                    "discovered_physical_path": path,
+                }
+            )
+            mirror_rows.append(
+                {
+                    "artifact_key": artifact_key,
+                    "discovered_physical_path": path,
+                    "produced_at_utc": FIXED_TIMESTAMP,
+                    "proof_anchor": f"{path}.path_proof.txt",
+                    "role": "snapshot",
+                    "sha256": digest,
+                    "size_bytes": size,
+                }
+            )
+    human_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    mirror_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    body_bytes = b"".join(
+        (json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n").encode(
+            "utf-8"
+        )
+        for row in mirror_rows
+    )
+    body_sha = hashlib.sha256(body_bytes).hexdigest()
+    self_record: dict[str, object] = {
+        "artifact_key": "index.machine_mirror",
+        "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        "produced_at_utc": FIXED_TIMESTAMP,
+        "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
+        "role": "self_record",
+        "sha256": body_sha,
+        "size_bytes": 0,
+    }
+    mirror_rows.append(self_record)
+    mirror_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    while True:
+        mirror_bytes = b"".join(
+            (json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n").encode(
+                "utf-8"
+            )
+            for row in mirror_rows
+        )
+        if self_record["size_bytes"] == len(mirror_bytes):
+            break
+        self_record["size_bytes"] = len(mirror_bytes)
+    human_rows.append(
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        }
+    )
+    human_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    human_index = root / "docs/evidence/INDEX.json"
+    human_index.parent.mkdir(parents=True, exist_ok=True)
+    human_index.write_text(
+        json.dumps(human_rows, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    mirror = root / "artifacts/evidence_index.jsonl"
+    mirror.parent.mkdir(parents=True, exist_ok=True)
+    mirror.write_bytes(mirror_bytes)
+    (root / "artifacts/evidence_index.jsonl.path_proof.txt").write_text(
+        "\n".join(
+            (
+                "path: artifacts/evidence_index.jsonl",
+                f"size_bytes: {len(mirror_bytes)}",
+                f"sha256: {hashlib.sha256(mirror_bytes).hexdigest()}",
+                f"mirror_body_sha256: {body_sha}",
+                f"mtime_utc: {FIXED_TIMESTAMP}",
+                f"produced_at_utc: {FIXED_TIMESTAMP}",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
 
 
 def _matrix_row(
@@ -62,6 +177,9 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     )
     (tmp_path / "evidence").mkdir()
     (tmp_path / "evidence/proof.json").write_text('{"ok":true}\n', encoding="utf-8")
+    _write_evidence_graph(
+        tmp_path, {"evidence/proof.json": ("fixture.primary_evidence",)}
+    )
     (tmp_path / "tools").mkdir()
     (tmp_path / "tools/check.py").write_text("raise SystemExit(0)\n", encoding="utf-8")
     config = HarnessConfig("HDE-EPIC039", repo_root=tmp_path)
@@ -447,6 +565,343 @@ def test_viability_passes_exact_and_legacy_single_path(repository: Path):
     assert list(manifest).count("acceptance-map-viability") == 1
 
 
+def test_governance_binding_does_not_promote_ci_or_qa_locators(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    indexed_paths = {
+        row["discovered_physical_path"]
+        for row in json.loads(
+            (repository / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+        )
+    }
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert "tools/check.py" not in indexed_paths
+    assert (
+        "audit/qa/hde-epic039/checks/acceptance-map-viability/primary.log"
+        not in indexed_paths
+    )
+    assert result.status is Status.PASS
+
+
+def test_existing_unindexed_acceptance_evidence_cannot_pass(repository: Path):
+    unindexed = repository / "evidence/unindexed.txt"
+    unindexed.write_text("present but not governed\n", encoding="utf-8")
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = ["evidence/unindexed.txt"]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row("evidence/unindexed.txt"), encoding="utf-8"
+    )
+
+    result, ledger = evaluate_acceptance_map_viability(config)
+    broken = json.loads(ledger)["broken_references"]
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert {
+        item["source_field"]
+        for item in broken
+        if item["resolved_path"] == "evidence/unindexed.txt"
+    } == {"acceptance_map.evidence_titles", "matrix.evidence_artifacts"}
+    assert all("Human Index and Machine Mirror" in item["reason"] for item in broken)
+
+
+def test_governance_graph_requires_exact_key_set_parity(repository: Path):
+    mirror = repository / "artifacts/evidence_index.jsonl"
+    rows = [
+        json.loads(line) for line in mirror.read_text(encoding="utf-8").splitlines()
+    ]
+    row = next(item for item in rows if item["role"] != "self_record")
+    row["artifact_key"] = "fixture.contradictory_alias"
+    mirror.write_text(
+        "".join(
+            json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n"
+            for item in rows
+        ),
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "key/path bindings disagree" in result.status_reason
+
+
+def test_governance_graph_requires_self_record_for_ordinary_evidence(
+    repository: Path,
+):
+    human_path = repository / "docs/evidence/INDEX.json"
+    human = [
+        row
+        for row in json.loads(human_path.read_text(encoding="utf-8"))
+        if row["artifact_key"] != "index.machine_mirror"
+    ]
+    human_path.write_text(
+        json.dumps(human, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    mirror_path = repository / "artifacts/evidence_index.jsonl"
+    mirror = [
+        json.loads(line)
+        for line in mirror_path.read_text(encoding="utf-8").splitlines()
+        if json.loads(line)["artifact_key"] != "index.machine_mirror"
+    ]
+    mirror_path.write_text(
+        "".join(
+            json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
+            for row in mirror
+        ),
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "exactly one canonical self-record" in result.status_reason
+
+
+def test_governance_graph_rejects_unrelated_global_parity_gap(repository: Path):
+    other = repository / "evidence/other.txt"
+    other.write_text("other\n", encoding="utf-8")
+    human_path = repository / "docs/evidence/INDEX.json"
+    human = json.loads(human_path.read_text(encoding="utf-8"))
+    human.append(
+        {
+            "artifact_key": "fixture.unpaired",
+            "discovered_physical_path": "evidence/other.txt",
+        }
+    )
+    human.sort(key=lambda row: (row["artifact_key"], row["discovered_physical_path"]))
+    human_path.write_text(
+        json.dumps(human, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "key/path bindings disagree" in result.status_reason
+    assert "fixture.unpaired" in result.status_reason
+
+
+def test_governance_graph_allows_matching_multi_key_path(repository: Path):
+    _write_evidence_graph(
+        repository,
+        {
+            "evidence/proof.json": (
+                "fixture.alias_a",
+                "fixture.alias_b",
+            )
+        },
+    )
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is Status.PASS
+
+
+def test_acceptance_evidence_rejects_noncanonical_dot_alias(repository: Path):
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = ["evidence/./proof.json"]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row("evidence/./proof.json"), encoding="utf-8"
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_BEHAVIOR
+    assert "traverses or is absolute" in result.status_reason
+
+
+def test_planned_acceptance_output_rejects_symlink_alias(repository: Path):
+    planned = repository / (
+        "audit/qa/hde-epic039/checks/acceptance-map-viability/primary.log"
+    )
+    planned.parent.mkdir(parents=True, exist_ok=True)
+    planned.symlink_to((repository / "evidence/proof.json").resolve())
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [
+        planned.relative_to(repository).as_posix()
+    ]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(planned.relative_to(repository).as_posix()),
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_BEHAVIOR
+    assert "planned output is aliased" in result.status_reason
+
+
+def test_planned_acceptance_output_rejects_existing_directory(repository: Path):
+    planned = repository / (
+        "audit/qa/hde-epic039/checks/acceptance-map-viability/primary.log"
+    )
+    planned.mkdir(parents=True)
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [
+        planned.relative_to(repository).as_posix()
+    ]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(planned.relative_to(repository).as_posix()),
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_BEHAVIOR
+    assert "non-regular file" in result.status_reason
+
+
+def test_missing_sibling_path_proof_is_tooling_blocked(repository: Path):
+    (repository / "evidence/proof.json.path_proof.txt").unlink()
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert "sibling path proof is missing" in result.status_reason
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [("missing", Status.TOOLING_BLOCKED), ("malformed", Status.FAIL_TOOLING)],
+)
+def test_evidence_graph_failure_classification_is_causal(
+    repository: Path, mutation: str, expected: Status
+):
+    human_index = repository / "docs/evidence/INDEX.json"
+    if mutation == "missing":
+        human_index.unlink()
+    else:
+        human_index.write_text("{", encoding="utf-8")
+
+    result, _ = evaluate_acceptance_map_viability(
+        HarnessConfig("HDE-EPIC039", repo_root=repository)
+    )
+
+    assert result.status is expected
+
+
+def test_path_proof_cannot_be_primary_acceptance_evidence(repository: Path):
+    proof_path = "evidence/proof.json.path_proof.txt"
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [proof_path]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(proof_path), encoding="utf-8"
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "cannot be primary acceptance evidence" in result.status_reason
+
+
+def test_graph_snapshot_is_refreshed_for_each_evaluation(repository: Path):
+    path = "evidence/newly-governed.txt"
+    (repository / path).write_text("new\n", encoding="utf-8")
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [path]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(path), encoding="utf-8"
+    )
+
+    first, _ = evaluate_acceptance_map_viability(config)
+    _write_evidence_graph(repository, {path: ("fixture.newly_governed",)})
+    second, _ = evaluate_acceptance_map_viability(config)
+
+    assert first.status is Status.TOOLING_BLOCKED
+    assert second.status is Status.PASS
+
+
+@pytest.mark.parametrize(
+    "source_field",
+    ["acceptance_map.evidence_titles", "matrix.evidence_artifacts"],
+)
+def test_planned_output_cannot_substitute_for_governed_acceptance_evidence(
+    repository: Path, source_field: str
+):
+    planned = "audit/qa/hde-epic039/checks/acceptance-map-viability/primary.log"
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    if source_field == "acceptance_map.evidence_titles":
+        payload["tokens"][0]["evidence_titles"] = [planned]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    if source_field == "matrix.evidence_artifacts":
+        config.token_matrix_path.write_text(
+            MATRIX_HEADER + _matrix_row(planned), encoding="utf-8"
+        )
+
+    result, ledger = evaluate_acceptance_map_viability(config)
+    broken = json.loads(ledger)["broken_references"]
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert any(
+        item["source_field"] == source_field
+        and item["resolved_path"] == planned
+        and "missing or empty" in item["reason"]
+        for item in broken
+    )
+
+
+def test_planned_acceptance_output_exception_is_exact(repository: Path):
+    adjacent = "audit/qa/hde-epic039/checks/acceptance-map-viability/adjacent.log"
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [adjacent]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(adjacent), encoding="utf-8"
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert "missing or empty" in result.status_reason
+
+
+def test_machine_mirror_checksum_has_no_acceptance_evidence_exception(
+    repository: Path,
+):
+    checksum = "artifacts/evidence_index.jsonl.sha256"
+    (repository / checksum).write_text(
+        "0" * 64 + "  artifacts/evidence_index.jsonl\n", encoding="utf-8"
+    )
+    config = HarnessConfig("HDE-EPIC039", repo_root=repository)
+    payload = json.loads(config.acceptance_map_path.read_text(encoding="utf-8"))
+    payload["tokens"][0]["evidence_titles"] = [checksum]
+    config.acceptance_map_path.write_text(json.dumps(payload), encoding="utf-8")
+    config.token_matrix_path.write_text(
+        MATRIX_HEADER + _matrix_row(checksum), encoding="utf-8"
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert "absent from the Human Index and Machine Mirror" in result.status_reason
+
+
 def test_pf04_declaration_forms_ignore_explanatory_prose(repository: Path):
     from tools.qa.qa_harness import _governance_tokens
 
@@ -465,6 +920,13 @@ def test_pf04_declaration_forms_ignore_explanatory_prose(repository: Path):
 def test_viability_validates_each_semicolon_delimited_reference(repository: Path):
     config = HarnessConfig("HDE-EPIC039", repo_root=repository)
     (repository / "evidence/second.txt").write_text("second\n", encoding="utf-8")
+    _write_evidence_graph(
+        repository,
+        {
+            "evidence/proof.json": ("fixture.primary_evidence",),
+            "evidence/second.txt": ("fixture.second_evidence",),
+        },
+    )
     config.token_matrix_path.write_text(
         MATRIX_HEADER
         + _matrix_row("evidence/proof.json; Proof (`evidence/second.txt`)"),

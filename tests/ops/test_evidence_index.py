@@ -55,6 +55,14 @@ EPIC029_TARGETS = [
         "epic029.qa_step_logs_manifest",
         "audit/qa/hde-epic029/qa_step_logs_manifest.json",
     ),
+    (
+        "epic029.doc_deltas",
+        "audit/docdeltas/hde-epic029_doc_deltas.md",
+    ),
+    (
+        "epic029.drain_targets",
+        "audit/docdeltas/hde-epic029_drain_targets.md",
+    ),
     ("epic029.close_report", "audit/EPIC-029_close_report.md"),
     ("epic029.manifest", "audit/EPIC-029_MANIFEST.json"),
     (
@@ -95,6 +103,60 @@ EPIC027_TARGETS = [
     ),
     ("epic027.close_report", "audit/EPIC-027_close_report.md"),
     ("epic027.manifest", "audit/EPIC-027_MANIFEST.json"),
+    (
+        "audit.qa.hde_epic027.checks.gate_update_evidence_index_write.primary.log",
+        "audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_orientation_demo_write.primary.log",
+        "audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_update_evidence_index_check.primary.log",
+        "audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_orientation_demo_check.primary.log",
+        "audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_evidence_paths_validation.primary.log",
+        "audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_lf_endings.primary.log",
+        "audit/qa/hde-epic027/checks/gate_lf_endings/primary.log",
+    ),
+    (
+        "audit.qa.hde_epic027.checks.gate_mirror_schema.primary.log",
+        "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
+    ),
+]
+
+EPIC028_TARGETS = [
+    ("epic028.acceptance_map", "docs/acceptance_map_epic028.json"),
+    (
+        "epic028.token_matrix",
+        "audit/qa/hde-epic028/token_evidence_matrix.md",
+    ),
+    (
+        "epic028.acceptance_map_viability",
+        "audit/qa/hde-epic028/acceptance_map_viability.log",
+    ),
+    (
+        "epic028.qa_step_logs_manifest",
+        "audit/qa/hde-epic028/qa_step_logs_manifest.json",
+    ),
+    ("epic028.close_report", "audit/EPIC-028_close_report.md"),
+    ("epic028.manifest", "audit/EPIC-028_MANIFEST.json"),
+    (
+        "epic028.ops01.created_files_sha256",
+        "audit/ops/hde-epic028/ops-01/created_files_sha256.txt",
+    ),
+    (
+        "audit.qa.hde_epic028.checks.acceptance_map_viability.primary.log",
+        "audit/qa/hde-epic028/checks/acceptance-map-viability/primary.log",
+    ),
 ]
 
 EPIC021_TARGETS = [
@@ -214,6 +276,14 @@ def test_evidence_index_has_required_epic027_artifacts():
     _assert_targets_present(EPIC027_TARGETS)
 
 
+def test_evidence_index_has_required_epic028_artifacts():
+    _assert_targets_present(EPIC028_TARGETS)
+
+
+def test_evidence_index_has_required_epic029_artifacts():
+    _assert_targets_present(EPIC029_TARGETS)
+
+
 def test_epic029_primary_roster_matches_canonical_bindings():
     roster = update_evidence_index.EPIC029_PRIMARY_ARTIFACTS
     actual = [
@@ -236,6 +306,19 @@ def test_epic027_primary_roster_matches_canonical_bindings():
 
     assert actual == EPIC027_TARGETS
     assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC027"}
+    assert len({key for key, _ in actual}) == len(actual)
+    assert len({path for _, path in actual}) == len(actual)
+
+
+def test_epic028_primary_roster_matches_canonical_bindings():
+    roster = update_evidence_index.EPIC028_PRIMARY_ARTIFACTS
+    actual = [
+        (entry["artifact_key"], entry["discovered_physical_path"])
+        for entry in roster
+    ]
+
+    assert actual == EPIC028_TARGETS
+    assert {entry["epic_id"] for entry in roster} == {"HDE-EPIC028"}
     assert len({key for key, _ in actual}) == len(actual)
     assert len({path for _, path in actual}) == len(actual)
 

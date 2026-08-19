@@ -48,6 +48,10 @@ GATE_COMMANDS: list[tuple[str, list[str]]] = [
     ("gate_mirror_schema", list(FINAL_MIRROR_SCHEMA_COMMAND)),
 ]
 GATE_CHECK_IDS = tuple(check_id for check_id, _ in GATE_COMMANDS)
+GRAPH_SEAL_COMMANDS = tuple(
+    tuple(command)
+    for _, command in GATE_COMMANDS
+)
 
 
 def _path_proof_path(path: Path) -> Path:
@@ -243,8 +247,8 @@ TOKENS: list[dict[str, object]] = [
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
         "evidence_titles": [
-            "artifacts/proofs/cli_reader_parity.txt",
-            "docs/ENDPOINTS_CATALOG.json",
+            "artifacts/cli/reader_dump.json",
+            "artifacts/cli/reader_cli_parity.bytes",
         ],
     },
     {
@@ -289,6 +293,7 @@ TOKENS: list[dict[str, object]] = [
             "artifacts/proofs/success_get.txt",
             "artifacts/proofs/success_head.txt",
             "artifacts/proofs/success_304.txt",
+            "artifacts/proofs/success_encoding_invariance.txt",
         ],
     },
     {
@@ -315,7 +320,6 @@ TOKENS: list[dict[str, object]] = [
         "status": "implemented",
         "evidence_titles": [
             "audit/gates/determinism/env_pins.log",
-            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
         ],
     },
     {
@@ -325,7 +329,6 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log",
         ],
     },
     {
@@ -334,7 +337,6 @@ TOKENS: list[dict[str, object]] = [
         "status": "implemented",
         "evidence_titles": [
             "docs/evidence/INDEX.sha256",
-            "audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log",
         ],
     },
     {
@@ -344,7 +346,6 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
         ],
     },
     {
@@ -354,7 +355,6 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log",
         ],
     },
     {
@@ -362,7 +362,6 @@ TOKENS: list[dict[str, object]] = [
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
         "evidence_titles": [
-            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
         ],
@@ -372,8 +371,8 @@ TOKENS: list[dict[str, object]] = [
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
         "evidence_titles": [
-            "audit/qa/hde-epic027/checks/gate_lf_endings/primary.log",
-            "audit/qa/hde-epic027/acceptance_map_viability.log",
+            "docs/acceptance_map_epic027.json",
+            "audit/qa/hde-epic027/token_evidence_matrix.md",
         ],
     },
 ]
@@ -401,11 +400,15 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "CLI_READER_PARITY_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "artifacts/proofs/cli_reader_parity.txt; docs/ENDPOINTS_CATALOG.json",
-        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "evidence_artifacts": "artifacts/cli/reader_dump.json; artifacts/cli/reader_cli_parity.bytes",
+        "ci_tests_jobs": (
+            "python -m pytest "
+            "tests/http/test_reader_a7_transport.py::"
+            "test_showcompat_dump_reader_matches_http_reader_for_same_normalized_pair"
+        ),
         "qa_root_logs": "acceptance_map_viability.log",
         "status": "Implemented",
-        "notes": "D1 parity family bound to existing proof artifacts.",
+        "notes": "D1 parity family bound to governed artifacts and an exact current CLI/HTTP byte-parity test.",
     },
     {
         "token_name": "A7_GET_QUOTED_ETAG_OK",
@@ -446,7 +449,7 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "A7_ENCODING_INVARIANCE_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "artifacts/proofs/success_get.txt; artifacts/proofs/success_head.txt; artifacts/proofs/success_304.txt",
+        "evidence_artifacts": "artifacts/proofs/success_get.txt; artifacts/proofs/success_head.txt; artifacts/proofs/success_304.txt; artifacts/proofs/success_encoding_invariance.txt",
         "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
         "qa_root_logs": "acceptance_map_viability.log",
         "status": "Implemented",
@@ -473,7 +476,7 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "ENV_RAILS_POLICY_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "audit/gates/determinism/env_pins.log; audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
+        "evidence_artifacts": "audit/gates/determinism/env_pins.log",
         "ci_tests_jobs": "ci/checks/check_env_pins.sh",
         "qa_root_logs": "checks/gate_mirror_schema/primary.log",
         "status": "Implemented",
@@ -518,7 +521,7 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "CI_CHECK_MIRROR_SCHEMA_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "artifacts/evidence_index.jsonl; docs/evidence/INDEX.json",
+        "evidence_artifacts": "docs/evidence/INDEX.json; artifacts/evidence_index.jsonl",
         "ci_tests_jobs": "ci/checks/check_mirror_schema.sh",
         "qa_root_logs": "checks/gate_mirror_schema/primary.log",
         "status": "Implemented",
@@ -725,7 +728,33 @@ def _run_governed_gates() -> tuple[Path, ...]:
     return primary_logs
 
 
+def _seal_governed_gate_receipts() -> None:
+    """Seal freshly published gate receipts before unplanned viability reads."""
+
+    for command in GRAPH_SEAL_COMMANDS:
+        try:
+            proc = subprocess.run(
+                command,
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+                shell=False,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise SystemExit(
+                f"GATE_RECEIPT_GRAPH_SEAL_FAIL_TOOLING:{command[1]}:{exc}"
+            ) from exc
+        if proc.returncode != 0:
+            raise SystemExit(
+                f"GATE_RECEIPT_GRAPH_SEAL_FAILED:{command[1]}:"
+                f"{proc.returncode}"
+            )
+
+
 def _preflight_acceptance_map_viability() -> None:
+    update_evidence_index.main([])
+    update_evidence_index.main(["--check"])
     config = qa_harness.HarnessConfig(
         epic_id=EPIC_ID,
         repo_root=ROOT,
@@ -835,13 +864,15 @@ def _ensure_required_paths() -> None:
         ROOT / "artifacts/compat/identity_hash.txt",
         ROOT / "artifacts/compat/AB.json",
         ROOT / "artifacts/compat/BA.json",
-        ROOT / "artifacts/proofs/cli_reader_parity.txt",
+        ROOT / "artifacts/cli/reader_dump.json",
+        ROOT / "artifacts/cli/reader_cli_parity.bytes",
         ROOT / "docs/ENDPOINTS_CATALOG.json",
         ROOT / "docs/ENDPOINTS_CATALOG.json.sha256",
         ROOT / "artifacts/proofs/endpoints_env_gate_proof.log",
         ROOT / "artifacts/proofs/success_get.txt",
         ROOT / "artifacts/proofs/success_head.txt",
         ROOT / "artifacts/proofs/success_304.txt",
+        ROOT / "artifacts/proofs/success_encoding_invariance.txt",
         ROOT / "artifacts/writer/conjunction_write_readback.log",
         ROOT / "artifacts/writer/conjunction_writer_summary.json",
         ROOT / "artifacts/audit/cli/two_run_identity.log",
@@ -943,6 +974,7 @@ def main() -> int:
         _write_token_matrix()
         _preflight_acceptance_map_viability()
         gate_primary_logs = _run_governed_gates()
+        _seal_governed_gate_receipts()
         _invalidate_close_pair()
         result = _write_viability_log()
         _write_close_manifest(produced_at)

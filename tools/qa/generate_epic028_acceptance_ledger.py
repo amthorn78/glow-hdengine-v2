@@ -235,19 +235,16 @@ TOKENS: list[dict[str, object]] = [
         "name": "READER_200_CTYPE_JSON_UTF8_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
-        "evidence_titles": ["artifacts/proofs/success_get.txt", "tests/http/test_reader_a7_transport.py"],
-    },
-    {
-        "name": "MAGIC10_DOMAIN_CLOSED_OK",
-        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "status": "implemented",
-        "evidence_titles": ["catalog/magic10.json", "tests/categories/test_registry_and_purity.py"],
+        "evidence_titles": ["artifacts/proofs/success_get.txt"],
     },
     {
         "name": "PREFS_KEYSET_10_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
-        "evidence_titles": ["tests/http/test_compat_endpoint_contract.py", "engine/compat/categories.py"],
+        "evidence_titles": [
+            "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log",
+            "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json",
+        ],
     },
 ]
 
@@ -318,29 +315,20 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "READER_200_CTYPE_JSON_UTF8_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "artifacts/proofs/success_get.txt; tests/http/test_reader_a7_transport.py",
+        "evidence_artifacts": "artifacts/proofs/success_get.txt",
         "ci_tests_jobs": "python -m pytest -q tests/http/test_reader_a7_transport.py",
         "qa_root_logs": "acceptance_map_viability.log",
         "status": "Implemented",
         "notes": "Reader 200 contract asserts six-key envelope and JSON UTF-8 content-type.",
     },
     {
-        "token_name": "MAGIC10_DOMAIN_CLOSED_OK",
-        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "catalog/magic10.json; tests/categories/test_registry_and_purity.py",
-        "ci_tests_jobs": "python -m pytest -q tests/categories/test_registry_and_purity.py",
-        "qa_root_logs": "acceptance_map_viability.log",
-        "status": "Implemented",
-        "notes": "Magic10 registry/domain closure proof reused from existing category tests.",
-    },
-    {
         "token_name": "PREFS_KEYSET_10_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "engine/compat/categories.py; tests/http/test_compat_endpoint_contract.py",
-        "ci_tests_jobs": "python -m pytest -q tests/http/test_compat_endpoint_contract.py",
+        "evidence_artifacts": "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log; audit/qa/hde-epic030/pr-01/zero_weight_handoff.json",
+        "ci_tests_jobs": "python -m pytest -q tests/unit/test_viewer_prefs_normalization.py::test_viewer_prefs_require_exact_magic10_weight_keys",
         "qa_root_logs": "acceptance_map_viability.log",
         "status": "Implemented",
-        "notes": "Viewer prefs keyset contract is bound to compat endpoint contract tests.",
+        "notes": "Viewer prefs exact-keyset behavior is bound to normalization evidence and a missing/extra-key validator.",
     },
 ]
 
@@ -458,11 +446,8 @@ def _ensure_required_paths() -> None:
         ROOT / "artifacts" / "proofs" / "success_304.txt",
         ROOT / "artifacts" / "proofs" / "success_encoding_invariance.txt",
         ROOT / "artifacts" / "proofs" / "endpoints_env_gate_proof.log",
-        ROOT / "catalog" / "magic10.json",
-        ROOT / "engine" / "compat" / "categories.py",
-        ROOT / "tests" / "http" / "test_reader_a7_transport.py",
-        ROOT / "tests" / "http" / "test_compat_endpoint_contract.py",
-        ROOT / "tests" / "categories" / "test_registry_and_purity.py",
+        ROOT / "audit" / "qa" / "hde-epic030" / "pr-01" / "invalid_viewer_prefs.log",
+        ROOT / "audit" / "qa" / "hde-epic030" / "pr-01" / "zero_weight_handoff.json",
     }
     missing = [path.relative_to(ROOT).as_posix() for path in sorted(required) if not path.exists()]
     if missing:

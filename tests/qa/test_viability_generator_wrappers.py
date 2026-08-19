@@ -14,6 +14,13 @@ MODULES = (
 )
 
 
+def _write_fixture_paths(root: Path, relative_paths: set[str]) -> None:
+    for relative_path in relative_paths:
+        path = root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("fixture\n", encoding="utf-8")
+
+
 @pytest.mark.parametrize("module_name", MODULES)
 def test_generator_wrapper_binds_verified_returned_ledger(
     module_name: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -422,19 +429,25 @@ def test_epic027_preflight_admits_only_planned_gate_outputs(
 ):
     module = importlib.import_module("tools.qa.generate_epic027_close_pack")
     _configure_epic027_publication_paths(module, tmp_path, monkeypatch)
-    observed = []
+    events = []
     result = CheckResult("acceptance-map-viability", Status.PASS)
+    monkeypatch.setattr(
+        module.update_evidence_index,
+        "main",
+        lambda argv: events.append(("updater", tuple(argv))),
+    )
     monkeypatch.setattr(
         module.qa_harness,
         "evaluate_acceptance_map_viability",
-        lambda config, **kwargs: observed.append((config, kwargs))
+        lambda config, **kwargs: events.append(("viability", config, kwargs))
         or (result, "{}\n"),
     )
 
     module._preflight_acceptance_map_viability()
 
-    assert len(observed) == 1
-    config, kwargs = observed[0]
+    assert [event[0] for event in events] == ["updater", "updater", "viability"]
+    assert events[:2] == [("updater", ()), ("updater", ("--check",))]
+    _, config, kwargs = events[2]
     assert tuple(config.step_names) == module.GATE_CHECK_IDS
     assert kwargs == {"planned_governed_ledger": True}
 
@@ -450,6 +463,7 @@ def test_epic027_preflight_requires_pass(
 ):
     module = importlib.import_module("tools.qa.generate_epic027_close_pack")
     _configure_epic027_publication_paths(module, tmp_path, monkeypatch)
+    monkeypatch.setattr(module.update_evidence_index, "main", lambda argv: None)
     monkeypatch.setattr(
         module.qa_harness,
         "evaluate_acceptance_map_viability",
@@ -468,6 +482,344 @@ def test_epic027_preflight_requires_pass(
         match=f"ACCEPTANCE_MAP_VIABILITY_PREFLIGHT_{status.value}:blocked",
     ):
         module._preflight_acceptance_map_viability()
+
+
+def test_epic027_preflight_stops_before_viability_when_seal_check_is_stale(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    module = importlib.import_module("tools.qa.generate_epic027_close_pack")
+    _configure_epic027_publication_paths(module, tmp_path, monkeypatch)
+    events = []
+
+    def stale_check(argv):
+        events.append(("updater", tuple(argv)))
+        if argv == ["--check"]:
+            raise SystemExit("STALE:docs/evidence/INDEX.json")
+
+    monkeypatch.setattr(module.update_evidence_index, "main", stale_check)
+    monkeypatch.setattr(
+        module.qa_harness,
+        "evaluate_acceptance_map_viability",
+        lambda config, **kwargs: events.append(("viability", config, kwargs)),
+    )
+
+    with pytest.raises(SystemExit, match="STALE:docs/evidence/INDEX.json"):
+        module._preflight_acceptance_map_viability()
+
+    assert events == [("updater", ()), ("updater", ("--check",))]
+
+
+def test_epic027_evidence_uses_indexed_artifacts_and_separate_gate_receipts():
+    module = importlib.import_module("tools.qa.generate_epic027_close_pack")
+    tokens = {token["name"]: token for token in module.TOKENS}
+    rows = {row["token_name"]: row for row in module.TOKEN_MATRIX_ROWS}
+
+    assert tokens["CLI_READER_PARITY_OK"]["evidence_titles"] == [
+        "artifacts/cli/reader_dump.json",
+        "artifacts/cli/reader_cli_parity.bytes",
+    ]
+    assert rows["CLI_READER_PARITY_OK"]["evidence_artifacts"] == (
+        "artifacts/cli/reader_dump.json; artifacts/cli/reader_cli_parity.bytes"
+    )
+    assert rows["CLI_READER_PARITY_OK"]["ci_tests_jobs"] == (
+        "python -m pytest "
+        "tests/http/test_reader_a7_transport.py::"
+        "test_showcompat_dump_reader_matches_http_reader_for_same_normalized_pair"
+    )
+    assert tokens["A7_ENCODING_INVARIANCE_OK"]["evidence_titles"][-1] == (
+        "artifacts/proofs/success_encoding_invariance.txt"
+    )
+    assert tokens["CI_CHECK_FINAL_LF_OK"]["evidence_titles"] == [
+        "docs/acceptance_map_epic027.json",
+        "audit/qa/hde-epic027/token_evidence_matrix.md",
+    ]
+
+    gate_evidence_prefix = "audit/qa/hde-epic027/checks/gate_"
+    assert all(
+        not any(
+            path.startswith(gate_evidence_prefix) and path.endswith("/primary.log")
+            for path in token["evidence_titles"]
+        )
+        for token in module.TOKENS
+    )
+    assert all(
+        gate_evidence_prefix not in row["evidence_artifacts"]
+        for row in module.TOKEN_MATRIX_ROWS
+    )
+
+    expected_receipts = {
+        "ENV_RAILS_POLICY_OK": "checks/gate_mirror_schema/primary.log",
+        "EVIDENCE_INDEX_UPDATED_OK": (
+            "checks/gate_update_evidence_index_write/primary.log"
+        ),
+        "EVIDENCE_INDEX_HASH_OK": (
+            "checks/gate_update_evidence_index_check/primary.log"
+        ),
+        "EVIDENCE_INDEX_MIRROR_OK": "checks/gate_mirror_schema/primary.log",
+        "EVIDENCE_PATHS_VALIDATED_OK": (
+            "checks/gate_evidence_paths_validation/primary.log"
+        ),
+        "CI_CHECK_MIRROR_SCHEMA_OK": "checks/gate_mirror_schema/primary.log",
+        "CI_CHECK_FINAL_LF_OK": "checks/gate_lf_endings/primary.log",
+    }
+    assert {
+        name: rows[name]["qa_root_logs"] for name in expected_receipts
+    } == expected_receipts
+
+
+def test_epic027_cli_reader_parity_cannot_regress_to_stored_file_gate_only():
+    module = importlib.import_module("tools.qa.generate_epic027_close_pack")
+    row = next(
+        row
+        for row in module.TOKEN_MATRIX_ROWS
+        if row["token_name"] == "CLI_READER_PARITY_OK"
+    )
+
+    assert row["evidence_artifacts"] == (
+        "artifacts/cli/reader_dump.json; artifacts/cli/reader_cli_parity.bytes"
+    )
+    assert "run_canonical_json_gate.py" not in row["ci_tests_jobs"]
+    assert row["ci_tests_jobs"].endswith(
+        "tests/http/test_reader_a7_transport.py::"
+        "test_showcompat_dump_reader_matches_http_reader_for_same_normalized_pair"
+    )
+
+
+def test_epic028_evidence_uses_governed_artifacts_and_keeps_tests_as_jobs():
+    module = importlib.import_module("tools.qa.generate_epic028_acceptance_ledger")
+    tokens = {token["name"]: token for token in module.TOKENS}
+    rows = {row["token_name"]: row for row in module.TOKEN_MATRIX_ROWS}
+
+    expected = {
+        "READER_200_CTYPE_JSON_UTF8_OK": [
+            "artifacts/proofs/success_get.txt",
+        ],
+        "PREFS_KEYSET_10_OK": [
+            "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log",
+            "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json",
+        ],
+    }
+    for name, evidence in expected.items():
+        assert tokens[name]["evidence_titles"] == evidence
+        assert rows[name]["evidence_artifacts"] == "; ".join(evidence)
+
+    forbidden_evidence = {
+        "catalog/magic10.json",
+        "engine/compat/categories.py",
+        "tests/categories/test_registry_and_purity.py",
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/http/test_reader_a7_transport.py",
+    }
+    assert all(
+        forbidden_evidence.isdisjoint(token["evidence_titles"])
+        for token in module.TOKENS
+    )
+    assert all(
+        forbidden_evidence.isdisjoint(row["evidence_artifacts"].split("; "))
+        for row in module.TOKEN_MATRIX_ROWS
+    )
+    assert rows["READER_200_CTYPE_JSON_UTF8_OK"]["ci_tests_jobs"] == (
+        "python -m pytest -q tests/http/test_reader_a7_transport.py"
+    )
+    assert rows["PREFS_KEYSET_10_OK"]["ci_tests_jobs"] == (
+        "python -m pytest -q tests/unit/test_viewer_prefs_normalization.py::"
+        "test_viewer_prefs_require_exact_magic10_weight_keys"
+    )
+
+
+def test_epic028_executable_roster_excludes_historical_unclaimed_magic10():
+    module = importlib.import_module("tools.qa.generate_epic028_acceptance_ledger")
+    token_names = {token["name"] for token in module.TOKENS}
+    matrix_names = {row["token_name"] for row in module.TOKEN_MATRIX_ROWS}
+
+    # PF09.4 assigns no EPIC028 implementation row to this token.  PF20 records
+    # it as plan-era history and also records that the actual PF10 result never
+    # claimed it.  Keep that history intact without promoting it in the current
+    # executable Reader-side ledger.
+    assert "MAGIC10_DOMAIN_CLOSED_OK" not in token_names
+    assert "MAGIC10_DOMAIN_CLOSED_OK" not in matrix_names
+    assert len(token_names) == 9
+    assert token_names == matrix_names
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    (
+        "tools.qa.generate_epic027_close_pack",
+        "tools.qa.generate_epic028_acceptance_ledger",
+    ),
+)
+def test_acceptance_map_and_matrix_evidence_bindings_are_exactly_aligned(
+    module_name: str,
+):
+    module = importlib.import_module(module_name)
+    tokens = {token["name"]: token for token in module.TOKENS}
+    rows = {row["token_name"]: row for row in module.TOKEN_MATRIX_ROWS}
+
+    assert set(tokens) == set(rows)
+    for name, token in tokens.items():
+        assert token["evidence_titles"] == rows[name]["evidence_artifacts"].split(
+            "; "
+        )
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    (
+        "tools.qa.generate_epic027_close_pack",
+        "tools.qa.generate_epic028_acceptance_ledger",
+    ),
+)
+def test_acceptance_evidence_has_human_mirror_and_proof_bindings(module_name: str):
+    module = importlib.import_module(module_name)
+    human_rows = json.loads(
+        (module.ROOT / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    mirror_rows = [
+        json.loads(line)
+        for line in (
+            module.ROOT / "artifacts/evidence_index.jsonl"
+        ).read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    evidence_paths = {
+        path
+        for token in module.TOKENS
+        for path in token["evidence_titles"]
+    }
+
+    for relative_path in evidence_paths:
+        human_keys = {
+            row["artifact_key"]
+            for row in human_rows
+            if row["discovered_physical_path"] == relative_path
+        }
+        matching_mirror = [
+            row
+            for row in mirror_rows
+            if row["discovered_physical_path"] == relative_path
+        ]
+        mirror_keys = {row["artifact_key"] for row in matching_mirror}
+        expected_proof = f"{relative_path}.path_proof.txt"
+
+        assert human_keys
+        assert human_keys == mirror_keys
+        assert all(row["proof_anchor"] == expected_proof for row in matching_mirror)
+        assert (module.ROOT / expected_proof).is_file()
+
+
+def test_epic028_prefs_keyset_evidence_matches_exact_magic10_validation():
+    module = importlib.import_module("tools.qa.generate_epic028_acceptance_ledger")
+    from engine.compat.categories import CATEGORIES_ORDER_V1
+    from engine.validation.viewer_prefs import validate_viewer_prefs
+
+    weights = {category: 1 for category in CATEGORIES_ORDER_V1}
+    valid = {"top_category": CATEGORIES_ORDER_V1[0], "weights": weights}
+    missing = {
+        "top_category": CATEGORIES_ORDER_V1[0],
+        "weights": dict(tuple(weights.items())[:-1]),
+    }
+    extra = {
+        "top_category": CATEGORIES_ORDER_V1[0],
+        "weights": {**weights, "not-a-magic10-category": 1},
+    }
+
+    assert validate_viewer_prefs(valid) is None
+    assert validate_viewer_prefs(missing) is not None
+    assert validate_viewer_prefs(extra) is not None
+
+    invalid_log = (
+        module.ROOT
+        / "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log"
+    ).read_text(encoding="utf-8")
+    assert "missing_weights: PASS\n" in invalid_log
+    normalized = json.loads(
+        (
+            module.ROOT
+            / "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json"
+        ).read_text(encoding="utf-8")
+    )["viewer_prefs_normalized"]
+    assert set(normalized["weights"]) == set(CATEGORIES_ORDER_V1)
+
+
+def test_epic027_required_paths_use_canonical_cli_parity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    module = importlib.import_module("tools.qa.generate_epic027_close_pack")
+    _configure_epic027_publication_paths(module, tmp_path, monkeypatch)
+    canonical_cli_artifacts = {
+        "artifacts/cli/reader_dump.json",
+        "artifacts/cli/reader_cli_parity.bytes",
+    }
+    _write_fixture_paths(
+        tmp_path,
+        {
+            "artifacts/compat/identity_hash.txt",
+            "artifacts/compat/AB.json",
+            "artifacts/compat/BA.json",
+            "docs/ENDPOINTS_CATALOG.json",
+            "docs/ENDPOINTS_CATALOG.json.sha256",
+            "artifacts/proofs/endpoints_env_gate_proof.log",
+            "artifacts/proofs/success_get.txt",
+            "artifacts/proofs/success_head.txt",
+            "artifacts/proofs/success_304.txt",
+            "artifacts/proofs/success_encoding_invariance.txt",
+            "artifacts/writer/conjunction_write_readback.log",
+            "artifacts/writer/conjunction_writer_summary.json",
+            "artifacts/audit/cli/two_run_identity.log",
+            "audit/gates/determinism/env_pins.log",
+            "audit/qa/hde-epic027/00_meta/doc_deltas.md",
+        },
+    )
+
+    with pytest.raises(SystemExit, match="artifacts/cli/reader_cli_parity.bytes"):
+        module._ensure_required_paths()
+
+    _write_fixture_paths(tmp_path, canonical_cli_artifacts)
+    module._ensure_required_paths()
+    assert not (tmp_path / "artifacts/proofs/cli_reader_parity.txt").exists()
+
+
+def test_epic028_required_paths_use_governed_prefs_artifacts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    module = importlib.import_module("tools.qa.generate_epic028_acceptance_ledger")
+    _configure_epic028_publication_paths(module, tmp_path, monkeypatch)
+    governed_prefs_artifacts = {
+        "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log",
+        "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json",
+    }
+    _write_fixture_paths(
+        tmp_path,
+        {
+            "docs/ENDPOINTS_CATALOG.json",
+            "docs/ENDPOINTS_CATALOG.json.sha256",
+            "artifacts/proofs/success_get.txt",
+            "artifacts/proofs/success_head.txt",
+            "artifacts/proofs/success_304.txt",
+            "artifacts/proofs/success_encoding_invariance.txt",
+            "artifacts/proofs/endpoints_env_gate_proof.log",
+        },
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        module._ensure_required_paths()
+    assert governed_prefs_artifacts == set(
+        str(exc_info.value).removeprefix("MISSING_REQUIRED_PROOFS:").split(",")
+    )
+
+    _write_fixture_paths(tmp_path, governed_prefs_artifacts)
+    module._ensure_required_paths()
+    assert not (tmp_path / "catalog/magic10.json").exists()
+    assert not (tmp_path / "artifacts/thresholds/magic10_config.json").exists()
+    assert not (
+        tmp_path / "artifacts/engine/order/categories_iter.snapshot.json"
+    ).exists()
+    assert not (tmp_path / "engine/compat/categories.py").exists()
+    assert not (tmp_path / "tests/http/test_reader_a7_transport.py").exists()
 
 
 def test_epic027_close_manifest_binds_current_qa_manifest(
@@ -552,6 +904,70 @@ def test_epic027_gate_receipts_are_pf27_v2_and_manifest_bound(
         tuple(command) for _, command in module.GATE_COMMANDS
     ]
     assert all(kwargs["shell"] is False for _, kwargs in calls)
+
+
+def test_epic027_fresh_gate_receipts_are_sealed_before_unplanned_viability(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    module = importlib.import_module("tools.qa.generate_epic027_close_pack")
+    _configure_epic027_publication_paths(module, tmp_path, monkeypatch)
+    events = []
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda command, **kwargs: module.subprocess.CompletedProcess(
+            command,
+            0,
+            "gate passed\n",
+            "",
+        ),
+    )
+    gate_primary_logs = module._run_governed_gates()
+    assert gate_primary_logs == _epic027_gate_primaries(tmp_path)
+    assert all(path.is_file() for path in gate_primary_logs)
+    registered = {
+        entry["discovered_physical_path"]
+        for entry in module.update_evidence_index.EPIC027_PRIMARY_ARTIFACTS
+    }
+    assert {
+        path.relative_to(tmp_path).as_posix()
+        for path in gate_primary_logs
+    } <= registered
+
+    def run(command, **kwargs):
+        events.append(("seal", command, kwargs))
+        return module.subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(module.subprocess, "run", run)
+    module._seal_governed_gate_receipts()
+
+    assert [event[1] for event in events] == list(module.GRAPH_SEAL_COMMANDS)
+    assert all(event[2]["cwd"] == tmp_path for event in events)
+    assert all(event[2]["shell"] is False for event in events)
+
+    def publish_viability(config, **kwargs):
+        events.append(("viability", tuple(config.step_names), kwargs))
+        return ViabilityResult(Status.PASS, "", None, None, None, {})
+
+    monkeypatch.setattr(
+        module.qa_harness,
+        "generate_acceptance_map_viability",
+        publish_viability,
+    )
+    monkeypatch.setattr(
+        module.qa_harness,
+        "require_governed_viability",
+        lambda result, ledger: ledger,
+    )
+    module._write_viability_log()
+
+    assert events[-1] == (
+        "viability",
+        (),
+        {"publish_governed_ledger": True},
+    )
 
 
 @pytest.mark.parametrize(
@@ -844,6 +1260,11 @@ def test_epic027_main_finalizes_only_after_gate_and_output_verification(
     )
     monkeypatch.setattr(
         module,
+        "_seal_governed_gate_receipts",
+        lambda: events.append("_seal_governed_gate_receipts"),
+    )
+    monkeypatch.setattr(
+        module,
         "_write_viability_log",
         lambda: events.append("_write_viability_log") or result,
     )
@@ -862,6 +1283,7 @@ def test_epic027_main_finalizes_only_after_gate_and_output_verification(
         "_write_token_matrix",
         "_preflight_acceptance_map_viability",
         "_run_governed_gates",
+        "_seal_governed_gate_receipts",
         "_invalidate_close_pair",
         "_write_viability_log",
         "_write_close_manifest",
@@ -1091,6 +1513,11 @@ def test_epic027_main_stops_after_gates_before_close_pair_on_viability_non_pass(
         lambda: downstream_calls.append("_run_governed_gates")
         or gate_primary_logs,
     )
+    monkeypatch.setattr(
+        module,
+        "_seal_governed_gate_receipts",
+        lambda: downstream_calls.append("_seal_governed_gate_receipts"),
+    )
 
     with pytest.raises(SystemExit, match=f"ACCEPTANCE_MAP_VIABILITY_{status.value}"):
         module.main()
@@ -1098,6 +1525,7 @@ def test_epic027_main_stops_after_gates_before_close_pair_on_viability_non_pass(
     assert downstream_calls == [
         "_preflight_acceptance_map_viability",
         "_run_governed_gates",
+        "_seal_governed_gate_receipts",
     ]
 
 
@@ -1151,7 +1579,10 @@ def _assert_wrapper_write_family_restored(module, preimages, directories) -> Non
     } == directories
 
 
-@pytest.mark.parametrize("phase", ["gate", "viability", "updater", "schema"])
+@pytest.mark.parametrize(
+    "phase",
+    ["gate", "seal", "viability", "updater", "schema"],
+)
 def test_epic027_outer_transaction_rolls_back_complete_family_at_each_phase(
     phase: str,
     tmp_path: Path,
@@ -1197,6 +1628,11 @@ def test_epic027_outer_transaction_rolls_back_complete_family_at_each_phase(
             raise SystemExit("INJECTED_VIABILITY")
         return result
 
+    def seal():
+        if phase == "seal":
+            _mutate_wrapper_write_family(paths)
+            raise SystemExit("INJECTED_SEAL")
+
     def updater(argv):
         if phase == "updater":
             _mutate_wrapper_write_family(paths)
@@ -1208,6 +1644,7 @@ def test_epic027_outer_transaction_rolls_back_complete_family_at_each_phase(
             raise SystemExit("INJECTED_SCHEMA")
 
     monkeypatch.setattr(module, "_run_governed_gates", gates)
+    monkeypatch.setattr(module, "_seal_governed_gate_receipts", seal)
     monkeypatch.setattr(module, "_write_viability_log", viability)
     monkeypatch.setattr(module.update_evidence_index, "main", updater)
     monkeypatch.setattr(module, "_run_final_mirror_schema_check", schema)

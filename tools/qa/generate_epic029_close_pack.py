@@ -10,17 +10,19 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import ctypes
 import datetime as _dt
 import hashlib
 import json
 import os
 import re
+import secrets
 import stat
 import subprocess
 import sys
 import tempfile
 from collections.abc import Callable, Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,7 +47,9 @@ QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 OPS_ROOT = ROOT / "audit" / "ops" / EPIC_SLUG / "ops-01"
 CLOSURE_MODE = "binding-equivalence"
 
-ACCEPTANCE_MAP_PATH = ROOT / "docs" / "acceptance_map_epic029.json"
+ACCEPTANCE_MAP_REL = "docs/acceptance_map_epic029.json"
+ACCEPTANCE_MAP_PROOF_REL = f"{ACCEPTANCE_MAP_REL}.path_proof.txt"
+ACCEPTANCE_MAP_PATH = ROOT / ACCEPTANCE_MAP_REL
 TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
 VIABILITY_LOG_PATH = QA_ROOT / "acceptance_map_viability.log"
 QA_STEP_MANIFEST_PATH = QA_ROOT / "qa_step_logs_manifest.json"
@@ -55,6 +59,8 @@ DEV_HARNESS_BINDING_COVERAGE_PATH = QA_ROOT / "00_meta" / "dev_harness_binding_c
 
 DOC_DELTAS_PATH = ROOT / "audit" / "docdeltas" / "hde-epic029_doc_deltas.md"
 DRAIN_TARGETS_PATH = ROOT / "audit" / "docdeltas" / "hde-epic029_drain_targets.md"
+DOC_DELTAS_REL = "audit/docdeltas/hde-epic029_doc_deltas.md"
+DRAIN_TARGETS_REL = "audit/docdeltas/hde-epic029_drain_targets.md"
 
 CLOSE_REPORT_PATH = ROOT / "audit" / "EPIC-029_close_report.md"
 CLOSE_MANIFEST_PATH = ROOT / "audit" / "EPIC-029_MANIFEST.json"
@@ -102,6 +108,34 @@ STAGED_INPUT_OUTPUTS = (
     "artifacts/registry/registry_report.json",
     "artifacts/config_bundles/be_bundle.json",
     "artifacts/config_bundles/fe_bundle.json",
+)
+# These EPIC027 gate primaries predate their updater registration.  A detached
+# EPIC029 materialization may therefore be the first canonical updater run to
+# create their proof siblings.  Only the updater-owned proofs are publishable;
+# the retained primary logs remain immutable inputs outside this allowlist.
+UPDATER_BOOTSTRAP_PRIMARY_PATHS = tuple(
+    f"audit/qa/hde-epic027/checks/{check_id}/primary.log"
+    for check_id in (
+        "gate_update_evidence_index_write",
+        "gate_orientation_demo_write",
+        "gate_update_evidence_index_check",
+        "gate_orientation_demo_check",
+        "gate_evidence_paths_validation",
+        "gate_lf_endings",
+        "gate_mirror_schema",
+    )
+)
+UPDATER_BOOTSTRAP_PROOF_PATHS = tuple(
+    f"{path}.path_proof.txt" for path in UPDATER_BOOTSTRAP_PRIMARY_PATHS
+)
+STAGED_CONFIG_SOURCE_INPUTS = (
+    "catalog/gates_v1.json",
+    "catalog/channels_v1.json",
+    "catalog/magic10.json",
+    "catalog/magic10_caps.json",
+    "catalog/magic10_seeds.json",
+    "catalog/manifest.json",
+    "math/thresholds.json",
 )
 CAPTURED_EXECUTION_ENV = (
     ("ALLOW_NETWORK", "0"),
@@ -172,6 +206,14 @@ class RequalificationRun:
 
 
 @dataclass(frozen=True)
+class ViabilityReceipt:
+    """Frozen viability evaluation reused by the convergence replay."""
+
+    result: qa_harness.CheckResult
+    ledger_content: str
+
+
+@dataclass(frozen=True)
 class StagedCandidateFile:
     rel: str
     content: bytes
@@ -185,6 +227,38 @@ class PublicationTargetPreimage:
     kind: str
     content: bytes | None
     mode: int | None
+    identity: tuple[int, ...] | None = field(default=None, compare=False)
+
+
+@dataclass(frozen=True)
+class CausalInputSnapshot:
+    """One literal repository input captured without following aliases."""
+
+    rel: str
+    kind: str
+    content: bytes | None
+    executable_mode: int | None
+
+
+@dataclass
+class HeldPublicationTarget:
+    """A publication target whose canonical parent directory is held open."""
+
+    rel: str
+    leaf: str
+    parent_fd: int
+    parent_identity: tuple[int, int]
+
+
+@dataclass(frozen=True)
+class PublishedSwap:
+    """Recoverable result of one atomic publication exchange."""
+
+    rel: str
+    backup_leaf: str | None
+    installed_identity: tuple[int, ...]
+    installed_fd: int
+    backup_preimage: PublicationTargetPreimage | None
 
 
 CommandRunner = Callable[[Sequence[str], Path, Mapping[str, str]], subprocess.CompletedProcess[str]]
@@ -270,6 +344,267 @@ def _default_command_runner(
 
 def _required_requalification_paths() -> tuple[str, ...]:
     return (*LIVE_QA_TESTS, *PRECOMMIT_SCRIPTS, SANITY_PIPELINE_PATH)
+
+
+def _close_binding_input_paths() -> tuple[str, ...]:
+    """Return the exact retained evidence inputs that decide close eligibility."""
+
+    return (
+        f"audit/qa/{EPIC_SLUG}/00_meta/conjunction_json_surface_inventory.md",
+        "artifacts/writer/conjunction_write_readback.log",
+        "artifacts/writer/conjunction_writer_summary.json",
+        *(f"audit/ops/{EPIC_SLUG}/ops-01/{name}" for name in OPS_REQUIRED),
+    )
+
+
+def _causal_input_paths() -> tuple[str, ...]:
+    """Return bounded decision inputs and direct detached-run entrypoints."""
+
+    paths = {
+        "engine/runtime/determinism_env.py",
+        "tools/qa/generate_epic029_close_pack.py",
+        "tools/qa/qa_harness.py",
+        "tools/evidence/update_evidence_index.py",
+        "audit/EPIC-029_MANIFEST.json",
+        SANITY_LOG_REL,
+        *_required_requalification_paths(),
+        *STAGED_INPUT_GENERATORS,
+        *STAGED_CONFIG_SOURCE_INPUTS,
+        *_close_binding_input_paths(),
+        *UPDATER_BOOTSTRAP_PRIMARY_PATHS,
+    }
+    return tuple(sorted(paths))
+
+
+def _canonical_relative_parts(rel: str) -> tuple[str, ...]:
+    candidate = Path(rel)
+    if (
+        not rel
+        or candidate.is_absolute()
+        or candidate.as_posix() != rel
+        or any(part in {"", ".", ".."} for part in candidate.parts)
+    ):
+        raise RuntimeError(f"Unsafe repository-relative path: {rel}")
+    return candidate.parts
+
+
+def _open_held_parent(root: Path, rel: str) -> HeldPublicationTarget:
+    """Open every parent component without following symlinks."""
+
+    parts = _canonical_relative_parts(rel)
+    directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    current_fd = os.open(root, directory_flags | nofollow)
+    try:
+        for component in parts[:-1]:
+            next_fd = os.open(
+                component,
+                directory_flags | nofollow,
+                dir_fd=current_fd,
+            )
+            os.close(current_fd)
+            current_fd = next_fd
+        metadata = os.fstat(current_fd)
+        return HeldPublicationTarget(
+            rel=rel,
+            leaf=parts[-1],
+            parent_fd=current_fd,
+            parent_identity=(metadata.st_dev, metadata.st_ino),
+        )
+    except BaseException:
+        os.close(current_fd)
+        raise
+
+
+def _held_parent_is_current(root: Path, target: HeldPublicationTarget) -> bool:
+    """Return whether the literal source path still names the held parent."""
+
+    try:
+        current = _open_held_parent(root, target.rel)
+    except OSError:
+        return False
+    try:
+        return current.parent_identity == target.parent_identity
+    finally:
+        os.close(current.parent_fd)
+
+
+def _stable_regular_bytes(
+    parent_fd: int,
+    leaf: str,
+    *,
+    expected_metadata: os.stat_result | None = None,
+) -> tuple[bytes, os.stat_result]:
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(leaf, os.O_RDONLY | nofollow, dir_fd=parent_fd)
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise RuntimeError("not a regular file")
+        if expected_metadata is not None and not _same_file_identity(
+            expected_metadata,
+            before,
+        ):
+            raise RuntimeError("file identity changed before it was read")
+        chunks: list[bytes] = []
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            chunks.append(chunk)
+        after = os.fstat(descriptor)
+        content = b"".join(chunks)
+        if not _same_file_identity(before, after) or len(content) != after.st_size:
+            raise RuntimeError("file changed while it was being read")
+        return content, after
+    finally:
+        os.close(descriptor)
+
+
+def _same_file_identity(left: os.stat_result, right: os.stat_result) -> bool:
+    return _file_identity(left) == _file_identity(right)
+
+
+def _file_identity(metadata: os.stat_result) -> tuple[int, ...]:
+    """Return the complete generation fingerprint used for destructive ownership."""
+
+    return (
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_mode,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+        metadata.st_nlink,
+    )
+
+
+def _same_publication_generation(
+    left: PublicationTargetPreimage,
+    right: PublicationTargetPreimage,
+) -> bool:
+    return (
+        left.kind == right.kind
+        and left.content == right.content
+        and left.mode == right.mode
+        and left.identity == right.identity
+    )
+
+
+def _same_renamed_generation(
+    renamed: PublicationTargetPreimage,
+    original: PublicationTargetPreimage,
+) -> bool:
+    """Compare a parked inode while allowing rename-induced ctime changes."""
+
+    return (
+        renamed.kind == original.kind
+        and renamed.content == original.content
+        and renamed.mode == original.mode
+        and renamed.identity is not None
+        and original.identity is not None
+        and renamed.identity[:2] == original.identity[:2]
+    )
+
+
+def _snapshot_held_path(target: HeldPublicationTarget) -> CausalInputSnapshot:
+    try:
+        metadata = os.stat(target.leaf, dir_fd=target.parent_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return CausalInputSnapshot(target.rel, "missing", None, None)
+    if stat.S_ISLNK(metadata.st_mode):
+        return CausalInputSnapshot(
+            target.rel,
+            "symlink",
+            os.fsencode(os.readlink(target.leaf, dir_fd=target.parent_fd)),
+            None,
+        )
+    if stat.S_ISDIR(metadata.st_mode):
+        return CausalInputSnapshot(target.rel, "directory", None, None)
+    if not stat.S_ISREG(metadata.st_mode):
+        return CausalInputSnapshot(target.rel, "other", None, None)
+    try:
+        content, stable_metadata = _stable_regular_bytes(
+            target.parent_fd,
+            target.leaf,
+            expected_metadata=metadata,
+        )
+    except RuntimeError as exc:
+        raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{target.rel}:{exc}") from exc
+    current_metadata = os.stat(
+        target.leaf,
+        dir_fd=target.parent_fd,
+        follow_symlinks=False,
+    )
+    if not _same_file_identity(stable_metadata, current_metadata):
+        raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{target.rel}:path changed")
+    return CausalInputSnapshot(
+        target.rel,
+        "file",
+        content,
+        (
+            stable_metadata.st_mode & 0o111
+            if target.rel in PRECOMMIT_SCRIPTS
+            else None
+        ),
+    )
+
+
+def _snapshot_causal_input(root: Path, rel: str) -> CausalInputSnapshot:
+    try:
+        target = _open_held_parent(root, rel)
+    except FileNotFoundError:
+        return CausalInputSnapshot(rel, "missing", None, None)
+    except NotADirectoryError:
+        return CausalInputSnapshot(rel, "aliased_or_non_directory_parent", None, None)
+    except OSError as exc:
+        return CausalInputSnapshot(
+            rel,
+            f"unavailable_parent:{exc.errno}",
+            None,
+            None,
+        )
+    try:
+        if not _held_parent_is_current(root, target):
+            return CausalInputSnapshot(rel, "aliased_parent", None, None)
+        snapshot = _snapshot_held_path(target)
+        if not _held_parent_is_current(root, target):
+            raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{rel}:parent changed")
+        return snapshot
+    finally:
+        os.close(target.parent_fd)
+
+
+def _capture_causal_inputs(
+    root: Path,
+    paths: Sequence[str] | None = None,
+) -> tuple[CausalInputSnapshot, ...]:
+    selected = tuple(_causal_input_paths() if paths is None else paths)
+    snapshots = tuple(_snapshot_causal_input(root, rel) for rel in selected)
+    invalid = [item for item in snapshots if item.kind != "file"]
+    if invalid:
+        detail = ",".join(f"{item.rel}={item.kind}" for item in invalid)
+        raise RuntimeError(f"EPIC029_CAUSAL_INPUT_INVALID:{detail}")
+    return snapshots
+
+
+def _require_causal_inputs_equal(
+    expected: Sequence[CausalInputSnapshot],
+    actual: Sequence[CausalInputSnapshot],
+    *,
+    phase: str,
+) -> None:
+    expected_map = {item.rel: item for item in expected}
+    actual_map = {item.rel: item for item in actual}
+    if set(expected_map) != set(actual_map):
+        raise RuntimeError(f"EPIC029_CAUSAL_INPUT_SET_CHANGED:{phase}")
+    changed = sorted(
+        rel for rel in expected_map if expected_map[rel] != actual_map[rel]
+    )
+    if changed:
+        raise RuntimeError(
+            f"EPIC029_CAUSAL_INPUT_CHANGED:{phase}:{','.join(changed)}"
+        )
 
 
 def _validate_requalification_root(root: Path) -> None:
@@ -859,14 +1194,14 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[
             "status": "implemented" if (gate_open and index_status["evidence_index_hash"]) else "token_incomplete",
             "evidence_titles": [
                 "docs/evidence/INDEX.sha256",
-                "artifacts/evidence_index.jsonl.sha256",
+                "artifacts/evidence_index.jsonl",
             ],
         },
         {
             "name": "ENV_RAILS_POLICY_OK",
             "owner_pf": "PF10 — HDE Build Notes §Closed Rails",
             "status": "implemented" if gate_open else "token_incomplete",
-            "evidence_titles": ["artifacts/proofs/env_pins.txt"],
+            "evidence_titles": ["audit/gates/determinism/env_pins.log"],
         },
         {
             "name": "JSON_CANONICAL_CHECK_OK",
@@ -900,30 +1235,70 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[
     ]
 
 
-def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> None:
-    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "sequencing_gate": gate, "tokens": _tokens(live_qa, index_status, gate)})
-
-
-def _require_protected_acceptance_map(
+def _acceptance_map_payload(
     live_qa: dict[str, bool],
     index_status: dict[str, bool],
     gate: dict[str, object],
-) -> None:
-    """Verify the preserved map already binds the current closure facts exactly."""
-
-    expected = {
+) -> dict[str, object]:
+    return {
         "epic_id": EPIC_ID,
         "sequencing_gate": gate,
         "tokens": _tokens(live_qa, index_status, gate),
     }
-    try:
-        actual = qa_harness._loads_json_strict(
-            ACCEPTANCE_MAP_PATH.read_text(encoding="utf-8")
+
+
+def _render_acceptance_map(
+    live_qa: dict[str, bool],
+    index_status: dict[str, bool],
+    gate: dict[str, object],
+) -> bytes:
+    return (
+        json.dumps(
+            _acceptance_map_payload(live_qa, index_status, gate),
+            sort_keys=True,
+            separators=(",", ":"),
         )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _write_acceptance_map(
+    live_qa: dict[str, bool],
+    index_status: dict[str, bool],
+    gate: dict[str, object],
+) -> None:
+    content = _render_acceptance_map(live_qa, index_status, gate).decode("utf-8")
+    _write_text(ACCEPTANCE_MAP_PATH, content)
+
+
+def _verify_canonical_acceptance_map(path: Path) -> dict[str, object]:
+    try:
+        actual_bytes = path.read_bytes()
+        actual = qa_harness._loads_json_strict(actual_bytes.decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
-        raise RuntimeError(f"EPIC029_PROTECTED_ACCEPTANCE_MAP_INVALID:{exc}") from exc
+        raise RuntimeError(f"EPIC029_ACCEPTANCE_MAP_INVALID:{exc}") from exc
+    if not isinstance(actual, dict):
+        raise RuntimeError("EPIC029_ACCEPTANCE_MAP_INVALID:root must be an object")
+    canonical = (
+        json.dumps(actual, sort_keys=True, separators=(",", ":")) + "\n"
+    ).encode("utf-8")
+    if actual_bytes != canonical:
+        raise RuntimeError("EPIC029_ACCEPTANCE_MAP_NONCANONICAL")
+    return actual
+
+
+def _verify_acceptance_map(
+    path: Path,
+    live_qa: dict[str, bool],
+    index_status: dict[str, bool],
+    gate: dict[str, object],
+) -> None:
+    """Require canonical bytes and the exact current closure payload."""
+
+    actual = _verify_canonical_acceptance_map(path)
+    expected = _acceptance_map_payload(live_qa, index_status, gate)
     if actual != expected:
-        raise RuntimeError("EPIC029_PROTECTED_ACCEPTANCE_MAP_STALE_OR_MISMATCHED")
+        raise RuntimeError("EPIC029_ACCEPTANCE_MAP_STALE_OR_MISMATCHED")
 
 
 def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> None:
@@ -939,8 +1314,8 @@ def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool],
         f"| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | python tools/qa/generate_epic029_close_pack.py | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Doc-delta and drain-target ledgers are generated and bound for close-pack readiness.' if gate_open else 'Deferred pending required readiness inputs.'} |",
         f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_updated']) else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if (gate_open and index_status['evidence_index_updated']) else 'Deferred pending required readiness inputs.'} |",
         f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['machine_mirror_updated']) else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if (gate_open and index_status['machine_mirror_updated']) else 'Deferred pending required readiness inputs.'} |",
-        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_hash']) else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if (gate_open and index_status['evidence_index_hash']) else 'Deferred pending required readiness inputs.'} |",
-        f"| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Determinism env pins evidence remains present for closed-rails posture.' if gate_open else 'Deferred pending required readiness inputs.'} |",
+        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_hash']) else 'Planned'} | {'Bound to the Human Index sentinel and governed Machine Mirror self-record/path-proof integrity.' if (gate_open and index_status['evidence_index_hash']) else 'Deferred pending required readiness inputs.'} |",
+        f"| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | audit/gates/determinism/env_pins.log | ci/checks/check_env_pins.sh | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Determinism env pins evidence remains present for closed-rails posture.' if gate_open else 'Deferred pending required readiness inputs.'} |",
         f"| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | python tools/evidence/run_canonical_json_gate.py --check-only | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Canonical JSON gate evidence is bound without introducing new token names.' if gate_open else 'Deferred pending required readiness inputs.'} |",
         f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | python -m pytest -q -p no:cacheprovider {' '.join(LIVE_QA_TESTS)} | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Planned'} | {'Bound to a fresh complete-family requalification result.' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Deferred pending current requalification.'} |",
         f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | {'; '.join(PRECOMMIT_SCRIPTS)} | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-precommit']) else 'Planned'} | {'Bound to a fresh ordered non-shell requalification result.' if (gate_open and live_qa['po-precommit']) else 'Deferred pending current requalification.'} |",
@@ -1302,7 +1677,7 @@ def _publish_viability_with_requalification(
     config: qa_harness.HarnessConfig,
     run: RequalificationRun,
     produced_at: str,
-) -> None:
+) -> ViabilityReceipt:
     viability, ledger_content = qa_harness.evaluate_acceptance_map_viability(
         config,
         planned_governed_ledger=True,
@@ -1312,6 +1687,35 @@ def _publish_viability_with_requalification(
             "ACCEPTANCE_MAP_VIABILITY_"
             f"{viability.status.value}:{viability.status_reason}"
         )
+    receipt = ViabilityReceipt(viability, ledger_content)
+    _replay_viability_receipt(config, run, produced_at, receipt)
+    return receipt
+
+
+def _replay_viability_receipt(
+    config: qa_harness.HarnessConfig,
+    run: RequalificationRun,
+    produced_at: str,
+    receipt: ViabilityReceipt,
+) -> None:
+    """Publish one already evaluated viability receipt without re-executing it.
+
+    Viability evaluation runs pytest collection and records the exact executed
+    command, including a freshly allocated private ``--basetemp`` directory.
+    Re-evaluating during convergence would therefore create different primary
+    log bytes even when every causal input is unchanged.  The convergence pass
+    must replay the receipt whose PASS was already evaluated against the
+    current presealed graph, just as it replays the frozen requalification run.
+    """
+
+    viability = receipt.result
+    ledger_content = receipt.ledger_content
+    if viability.check_id != "acceptance-map-viability":
+        raise RuntimeError("ACCEPTANCE_MAP_VIABILITY_RECEIPT_ID_MISMATCH")
+    if viability.status is not qa_harness.Status.PASS:
+        raise RuntimeError("ACCEPTANCE_MAP_VIABILITY_RECEIPT_NOT_PASS")
+    if viability.output != ledger_content:
+        raise RuntimeError("ACCEPTANCE_MAP_VIABILITY_RECEIPT_BODY_MISMATCH")
     qa_harness.record_check_family(
         config,
         (*run.results, viability),
@@ -1342,6 +1746,48 @@ def _verify_viability_pair(root: Path) -> None:
     _, primary_body = primary_bytes.split(b"\n", 1)
     if primary_body != ledger_bytes:
         raise RuntimeError("acceptance-map viability primary and ledger disagree")
+
+
+def _capture_convergence_state(
+    root: Path,
+) -> dict[str, PublicationTargetPreimage]:
+    state = _capture_publication_preimages(root)
+    invalid = sorted(
+        f"{rel}={snapshot.kind}"
+        for rel, snapshot in state.items()
+        if snapshot.kind != "file" or not snapshot.content
+    )
+    if invalid:
+        raise RuntimeError(
+            f"EPIC029_CONVERGENCE_OUTPUT_INVALID:{','.join(invalid)}"
+        )
+    return state
+
+
+def _verify_close_pack_convergence(
+    config: qa_harness.HarnessConfig,
+    run: RequalificationRun,
+    produced_at: str,
+    live_qa: dict[str, bool],
+    index_status: dict[str, bool],
+    gate: dict[str, object],
+    viability_receipt: ViabilityReceipt,
+) -> None:
+    """Replay receipt-derived writers and require byte/mode convergence."""
+
+    before = _capture_convergence_state(ROOT)
+    _write_acceptance_map(live_qa, index_status, gate)
+    _verify_acceptance_map(ACCEPTANCE_MAP_PATH, live_qa, index_status, gate)
+    _write_token_matrix(live_qa, index_status, gate)
+    _replay_viability_receipt(config, run, produced_at, viability_receipt)
+    _run_required_command(
+        (sys.executable, "tools/evidence/update_evidence_index.py"),
+        ROOT,
+    )
+    after = _capture_convergence_state(ROOT)
+    changed = sorted(rel for rel in before if before[rel] != after[rel])
+    if changed:
+        raise RuntimeError(f"EPIC029_CLOSE_PACK_NOT_FIXED_POINT:{','.join(changed)}")
 
 
 def _materialize_staged_close_pack() -> int:
@@ -1376,15 +1822,28 @@ def _materialize_staged_close_pack() -> int:
     gate = _pf09_row_closure_gate(live_qa, index_status)
     if not gate["ready_for_close_binding"]:
         raise RuntimeError("EPIC029_CLOSE_BINDING_GATE_CLOSED")
-    _require_protected_acceptance_map(live_qa, index_status, gate)
+    _write_acceptance_map(live_qa, index_status, gate)
+    _verify_acceptance_map(ACCEPTANCE_MAP_PATH, live_qa, index_status, gate)
     _write_token_matrix(live_qa, index_status, gate)
     _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
-    _publish_viability_with_requalification(config, run, produced_at)
+    viability_receipt = _publish_viability_with_requalification(
+        config, run, produced_at
+    )
 
     # Bind the newly generated family before the second release-sanity seal.
     _run_required_command((sys.executable, "tools/evidence/update_evidence_index.py"), ROOT)
     verify_postcommit_fixed_point(ROOT, run)
+    _verify_close_pack_convergence(
+        config,
+        run,
+        produced_at,
+        live_qa,
+        index_status,
+        gate,
+        viability_receipt,
+    )
     _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), ROOT)
+    _verify_acceptance_map(ACCEPTANCE_MAP_PATH, live_qa, index_status, gate)
     _verify_manifest_paths()
     return 0
 
@@ -1461,29 +1920,37 @@ def _publication_allowlist() -> set[str]:
     }
     staged_input_paths = set(STAGED_INPUT_OUTPUTS)
     preserved_primary_proofs = {
-        "docs/acceptance_map_epic029.json.path_proof.txt",
         "audit/EPIC-029_close_report.md.path_proof.txt",
         "audit/EPIC-029_MANIFEST.json.path_proof.txt",
+        f"{DOC_DELTAS_REL}.path_proof.txt",
+        f"{DRAIN_TARGETS_REL}.path_proof.txt",
     }
-    primary_paths = qa_paths | graph_paths | staged_input_paths
+    primary_paths = qa_paths | graph_paths | staged_input_paths | {ACCEPTANCE_MAP_REL}
     return (
         primary_paths
         | {f"{path}.path_proof.txt" for path in primary_paths}
         | preserved_primary_proofs
+        | set(UPDATER_BOOTSTRAP_PROOF_PATHS)
     )
 
 
 def _is_protected_stage_path(rel: str) -> bool:
+    generated_acceptance_paths = {
+        ACCEPTANCE_MAP_REL,
+        ACCEPTANCE_MAP_PROOF_REL,
+    }
+    if rel in generated_acceptance_paths:
+        return False
     admitted_proof_refreshes = {
-        "docs/acceptance_map_epic029.json.path_proof.txt",
         "audit/EPIC-029_close_report.md.path_proof.txt",
         "audit/EPIC-029_MANIFEST.json.path_proof.txt",
+        f"{DOC_DELTAS_REL}.path_proof.txt",
+        f"{DRAIN_TARGETS_REL}.path_proof.txt",
     }
     if rel in admitted_proof_refreshes:
         return False
     primary_rel = rel.removesuffix(".path_proof.txt")
     exact = {
-        "docs/acceptance_map_epic029.json",
         "audit/EPIC-029_close_report.md",
         "audit/EPIC-029_MANIFEST.json",
         f"audit/qa/{EPIC_SLUG}/00_meta/dev_harness_binding_coverage.md",
@@ -1526,37 +1993,381 @@ def _candidate_paths(stage: Path) -> tuple[str, ...]:
     return tuple(sorted(set(candidates)))
 
 
-def _write_bytes_atomically(path: Path, data: bytes, mode: int) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
-    temp_path = Path(temp_name)
+def _write_temp_bytes_held_at(
+    target: HeldPublicationTarget,
+    data: bytes,
+    mode: int,
+) -> tuple[str, int]:
+    """Write one temp file while retaining an fd that pins its inode."""
+
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    temp_leaf = f".{target.leaf}.{os.getpid()}.{secrets.token_hex(8)}"
+    descriptor = os.open(
+        temp_leaf,
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | nofollow,
+        0o600,
+        dir_fd=target.parent_fd,
+    )
+    complete = False
     try:
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.chmod(temp_path, mode)
-        os.replace(temp_path, path)
+        view = memoryview(data)
+        offset = 0
+        while offset < len(view):
+            offset += os.write(descriptor, view[offset:])
+        os.fchmod(descriptor, mode)
+        os.fsync(descriptor)
+        complete = True
+        result = (temp_leaf, descriptor)
+        descriptor = -1
+        return result
     finally:
-        temp_path.unlink(missing_ok=True)
+        if not complete:
+            try:
+                opened = os.fstat(descriptor)
+                named = os.stat(
+                    temp_leaf,
+                    dir_fd=target.parent_fd,
+                    follow_symlinks=False,
+                )
+                if _same_file_identity(named, opened):
+                    os.unlink(temp_leaf, dir_fd=target.parent_fd)
+            except (FileNotFoundError, OSError):
+                pass
+        if descriptor >= 0:
+            os.close(descriptor)
+
+
+def _renameat2(
+    parent_fd: int,
+    source_leaf: str,
+    target_leaf: str,
+    flags: int,
+) -> None:
+    libc = ctypes.CDLL(None, use_errno=True)
+    renameat2 = getattr(libc, "renameat2", None)
+    if renameat2 is None:
+        raise RuntimeError("renameat2 is required for race-safe EPIC029 publication")
+    renameat2.argtypes = (
+        ctypes.c_int,
+        ctypes.c_char_p,
+        ctypes.c_int,
+        ctypes.c_char_p,
+        ctypes.c_uint,
+    )
+    renameat2.restype = ctypes.c_int
+    result = renameat2(
+        parent_fd,
+        os.fsencode(source_leaf),
+        parent_fd,
+        os.fsencode(target_leaf),
+        flags,
+    )
+    if result != 0:
+        error_number = ctypes.get_errno()
+        raise OSError(error_number, os.strerror(error_number))
+
+
+def _held_leaf(target: HeldPublicationTarget, leaf: str) -> HeldPublicationTarget:
+    return HeldPublicationTarget(
+        rel=target.rel,
+        leaf=leaf,
+        parent_fd=target.parent_fd,
+        parent_identity=target.parent_identity,
+    )
+
+
+def _publication_target_preimage_at(
+    target: HeldPublicationTarget,
+) -> PublicationTargetPreimage:
+    try:
+        metadata = os.stat(
+            target.leaf,
+            dir_fd=target.parent_fd,
+            follow_symlinks=False,
+        )
+    except FileNotFoundError:
+        return PublicationTargetPreimage("missing", None, None)
+    if stat.S_ISREG(metadata.st_mode):
+        content, stable_metadata = _stable_regular_bytes(
+            target.parent_fd,
+            target.leaf,
+            expected_metadata=metadata,
+        )
+        current_metadata = os.stat(
+            target.leaf,
+            dir_fd=target.parent_fd,
+            follow_symlinks=False,
+        )
+        if not _same_file_identity(stable_metadata, current_metadata):
+            raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{target.rel}:path changed")
+        return PublicationTargetPreimage(
+            "file",
+            content,
+            stable_metadata.st_mode & 0o777,
+            _file_identity(stable_metadata),
+        )
+    if stat.S_ISLNK(metadata.st_mode):
+        link_target = os.fsencode(os.readlink(target.leaf, dir_fd=target.parent_fd))
+        after = os.stat(target.leaf, dir_fd=target.parent_fd, follow_symlinks=False)
+        if not _same_file_identity(metadata, after):
+            raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{target.rel}")
+        return PublicationTargetPreimage(
+            "symlink",
+            link_target,
+            after.st_mode & 0o777,
+            _file_identity(after),
+        )
+    if stat.S_ISDIR(metadata.st_mode):
+        return PublicationTargetPreimage(
+            "directory",
+            None,
+            metadata.st_mode & 0o777,
+            _file_identity(metadata),
+        )
+    return PublicationTargetPreimage(
+        "other",
+        None,
+        metadata.st_mode & 0o777,
+        _file_identity(metadata),
+    )
+
+
+def _publish_swap_at(
+    target: HeldPublicationTarget,
+    staged_file: StagedCandidateFile,
+    expected: PublicationTargetPreimage,
+) -> PublishedSwap:
+    """Park, verify, and install without overwriting an occupied leaf."""
+
+    candidate_leaf, candidate_fd = _write_temp_bytes_held_at(
+        target,
+        staged_file.content,
+        staged_file.mode,
+    )
+    candidate_target = _held_leaf(target, candidate_leaf)
+    candidate_metadata = os.fstat(candidate_fd)
+    candidate_preimage = PublicationTargetPreimage(
+        "file",
+        staged_file.content,
+        candidate_metadata.st_mode & 0o777,
+        _file_identity(candidate_metadata),
+    )
+    candidate_identity = candidate_preimage.identity
+    assert candidate_identity is not None
+
+    backup_leaf: str | None = None
+    parked_preimage: PublicationTargetPreimage | None = None
+    candidate_installed = False
+    ownership_transferred = False
+    try:
+        named_candidate = _publication_target_preimage_at(candidate_target)
+        if not _same_publication_generation(named_candidate, candidate_preimage):
+            raise RuntimeError(f"PUBLICATION_PRIVATE_CANDIDATE_CHANGED:{target.rel}")
+        if expected.kind == "file":
+            backup_leaf = (
+                f".{target.leaf}.preimage.{os.getpid()}.{secrets.token_hex(8)}"
+            )
+            _renameat2(target.parent_fd, target.leaf, backup_leaf, 1)
+            os.fsync(target.parent_fd)
+            parked_preimage = _publication_target_preimage_at(
+                _held_leaf(target, backup_leaf)
+            )
+            if not _same_renamed_generation(parked_preimage, expected):
+                raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{target.rel}")
+        elif expected.kind != "missing":
+            raise RuntimeError(f"Publication target is not a regular file: {target.rel}")
+
+        _renameat2(target.parent_fd, candidate_leaf, target.leaf, 1)
+        candidate_installed = True
+        os.fsync(target.parent_fd)
+        installed = _publication_target_preimage_at(target)
+        if not _same_renamed_generation(installed, candidate_preimage):
+            raise RuntimeError(f"PUBLICATION_CANDIDATE_CHANGED:{target.rel}")
+        installed_metadata = os.fstat(candidate_fd)
+        if installed.identity != _file_identity(installed_metadata):
+            raise RuntimeError(f"PUBLICATION_CANDIDATE_FD_CHANGED:{target.rel}")
+        ownership_transferred = True
+        return PublishedSwap(
+            target.rel,
+            backup_leaf,
+            installed.identity,
+            candidate_fd,
+            parked_preimage,
+        )
+    except BaseException as exc:
+        recovery_conflict = ""
+        if candidate_installed:
+            try:
+                conflict = _rollback_swap_at(
+                    target,
+                    PublishedSwap(
+                        target.rel,
+                        backup_leaf,
+                        candidate_identity,
+                        candidate_fd,
+                        parked_preimage,
+                    ),
+                    candidate_preimage,
+                    expected,
+                )
+                if conflict:
+                    recovery_conflict = conflict
+                else:
+                    backup_leaf = None
+                    candidate_installed = False
+            except BaseException as rollback_exc:
+                recovery_conflict = (
+                    "installed_recovery:"
+                    f"{type(rollback_exc).__name__}:{rollback_exc}"
+                )
+        elif backup_leaf is not None:
+            backup_target = _held_leaf(target, backup_leaf)
+            try:
+                current_backup = _publication_target_preimage_at(backup_target)
+                if parked_preimage is None or not _same_publication_generation(
+                    current_backup,
+                    parked_preimage,
+                ):
+                    recovery_conflict = f"parked_changed={backup_leaf}"
+                else:
+                    _renameat2(target.parent_fd, backup_leaf, target.leaf, 1)
+                    os.fsync(target.parent_fd)
+                    backup_leaf = None
+            except BaseException as recovery_exc:
+                recovery_conflict = (
+                    f"park_recovery={backup_leaf}:"
+                    f"{type(recovery_exc).__name__}:{recovery_exc}"
+                )
+        if recovery_conflict:
+            raise RuntimeError(
+                f"{exc};PUBLICATION_PARK_RECOVERY_INCOMPLETE:"
+                f"{target.rel}:{recovery_conflict}"
+            ) from exc
+        raise
+    finally:
+        if not ownership_transferred:
+            os.close(candidate_fd)
+        if not candidate_installed:
+            try:
+                current_candidate = _publication_target_preimage_at(candidate_target)
+                if _same_publication_generation(current_candidate, candidate_preimage):
+                    os.unlink(candidate_leaf, dir_fd=target.parent_fd)
+            except BaseException:
+                pass
+
+
+def _rollback_swap_at(
+    target: HeldPublicationTarget,
+    swap: PublishedSwap,
+    owned: PublicationTargetPreimage,
+    original: PublicationTargetPreimage,
+) -> str:
+    """Park current bytes and restore only through non-overwriting renames."""
+
+    def restore_parked_candidate(reason: str) -> str:
+        try:
+            current = _publication_target_preimage_at(parked_target)
+            if not _same_publication_generation(current, parked):
+                return f"{reason};owned_parking_changed={parked_leaf}"
+            _renameat2(target.parent_fd, parked_leaf, target.leaf, 1)
+            os.fsync(target.parent_fd)
+            return reason
+        except BaseException as recovery_exc:
+            return (
+                f"{reason};owned_recovery={parked_leaf}:"
+                f"{type(recovery_exc).__name__}:{recovery_exc}"
+            )
+
+    parked_leaf = f".{target.leaf}.rollback.{os.getpid()}.{secrets.token_hex(8)}"
+    try:
+        _renameat2(target.parent_fd, target.leaf, parked_leaf, 1)
+    except FileNotFoundError:
+        return f"target_missing;backup={swap.backup_leaf or 'none'}"
+    os.fsync(target.parent_fd)
+    parked_target = _held_leaf(target, parked_leaf)
+    try:
+        parked = _publication_target_preimage_at(parked_target)
+    except BaseException as parked_exc:
+        return (
+            f"parked_unreadable={parked_leaf}:"
+            f"{type(parked_exc).__name__}:{parked_exc}"
+        )
+    installed_owned = (
+        parked.kind == "file"
+        and parked.content == owned.content
+        and parked.mode == owned.mode
+        and parked.identity is not None
+        and parked.identity[:2] == swap.installed_identity[:2]
+    )
+    if not installed_owned:
+        try:
+            _renameat2(target.parent_fd, parked_leaf, target.leaf, 1)
+            os.fsync(target.parent_fd)
+            return f"content_changed;backup={swap.backup_leaf or 'none'}"
+        except FileExistsError:
+            return (
+                f"content_changed_recovery={parked_leaf};"
+                f"backup={swap.backup_leaf or 'none'}"
+            )
+
+    if original.kind == "missing":
+        current_parked = _publication_target_preimage_at(parked_target)
+        if not _same_publication_generation(current_parked, parked):
+            return f"owned_parking_changed={parked_leaf}"
+        os.unlink(parked_leaf, dir_fd=target.parent_fd)
+        os.fsync(target.parent_fd)
+        return ""
+
+    if (
+        original.kind != "file"
+        or swap.backup_leaf is None
+        or swap.backup_preimage is None
+    ):
+        return restore_parked_candidate(
+            f"original_backup_unavailable={parked_leaf}"
+        )
+    backup_target = _held_leaf(target, swap.backup_leaf)
+    try:
+        backup = _publication_target_preimage_at(backup_target)
+    except BaseException as backup_exc:
+        return restore_parked_candidate(
+            f"original_backup_unreadable={swap.backup_leaf}:"
+            f"{type(backup_exc).__name__}:{backup_exc};parked={parked_leaf}"
+        )
+    if not _same_publication_generation(backup, swap.backup_preimage):
+        return restore_parked_candidate(
+            f"original_backup_changed={swap.backup_leaf};parked={parked_leaf}"
+        )
+    try:
+        _renameat2(target.parent_fd, swap.backup_leaf, target.leaf, 1)
+    except FileExistsError:
+        return (
+            f"restore_occupied={parked_leaf};backup={swap.backup_leaf}"
+        )
+    current_parked = _publication_target_preimage_at(parked_target)
+    if not _same_publication_generation(current_parked, parked):
+        return f"owned_parking_changed={parked_leaf}"
+    os.unlink(parked_leaf, dir_fd=target.parent_fd)
+    os.fsync(target.parent_fd)
+    return ""
 
 
 def _publication_target_preimage(root: Path, rel: str) -> PublicationTargetPreimage:
-    target = root / rel
     try:
-        metadata = target.lstat()
+        target = _open_held_parent(root, rel)
     except FileNotFoundError:
         return PublicationTargetPreimage("missing", None, None)
-    mode = metadata.st_mode & 0o777
-    if stat.S_ISREG(metadata.st_mode):
-        return PublicationTargetPreimage("file", target.read_bytes(), mode)
-    if stat.S_ISLNK(metadata.st_mode):
-        return PublicationTargetPreimage(
-            "symlink",
-            os.fsencode(os.readlink(target)),
-            mode,
-        )
-    return PublicationTargetPreimage("other", None, mode)
+    except OSError:
+        return PublicationTargetPreimage("aliased_or_unavailable_parent", None, None)
+    try:
+        if not _held_parent_is_current(root, target):
+            return PublicationTargetPreimage("aliased_parent", None, None)
+        preimage = _publication_target_preimage_at(target)
+        if not _held_parent_is_current(root, target):
+            raise RuntimeError(f"UNSTABLE_REPOSITORY_READ:{rel}:parent changed")
+        return preimage
+    finally:
+        os.close(target.parent_fd)
 
 
 def _capture_publication_preimages(
@@ -1573,19 +2384,51 @@ def _capture_staged_candidate(
 ) -> tuple[StagedCandidateFile, ...]:
     captured: list[StagedCandidateFile] = []
     for rel in paths:
-        source = stage / rel
-        if not source.is_file() or source.is_symlink():
-            raise RuntimeError(f"Staged output is not a regular file: {rel}")
-        content = source.read_bytes()
-        if not content:
-            raise RuntimeError(f"Staged output is empty: {rel}")
-        captured.append(
-            StagedCandidateFile(
-                rel=rel,
-                content=content,
-                mode=source.stat().st_mode & 0o777,
+        try:
+            target = _open_held_parent(stage, rel)
+        except OSError as exc:
+            raise RuntimeError(
+                f"Staged output has an aliased or unavailable parent: {rel}"
+            ) from exc
+        try:
+            if not _held_parent_is_current(stage, target):
+                raise RuntimeError(f"Staged output has an aliased parent: {rel}")
+            try:
+                metadata = os.stat(
+                    target.leaf,
+                    dir_fd=target.parent_fd,
+                    follow_symlinks=False,
+                )
+            except FileNotFoundError as exc:
+                raise RuntimeError(f"Staged output is missing: {rel}") from exc
+            if not stat.S_ISREG(metadata.st_mode):
+                raise RuntimeError(f"Staged output is not a regular file: {rel}")
+            content, stable_metadata = _stable_regular_bytes(
+                target.parent_fd,
+                target.leaf,
+                expected_metadata=metadata,
             )
-        )
+            current = os.stat(
+                target.leaf,
+                dir_fd=target.parent_fd,
+                follow_symlinks=False,
+            )
+            if (
+                not _same_file_identity(stable_metadata, current)
+                or not _held_parent_is_current(stage, target)
+            ):
+                raise RuntimeError(f"Staged output changed while captured: {rel}")
+            if not content:
+                raise RuntimeError(f"Staged output is empty: {rel}")
+            captured.append(
+                StagedCandidateFile(
+                    rel=rel,
+                    content=content,
+                    mode=stable_metadata.st_mode & 0o777,
+                )
+            )
+        finally:
+            os.close(target.parent_fd)
     return tuple(captured)
 
 
@@ -1595,6 +2438,7 @@ def _publish_captured_candidate(
     *,
     expected_preimages: Mapping[str, PublicationTargetPreimage] | None = None,
     expected_revision: str | None = None,
+    source_stability_verifier: Callable[[], None] | None = None,
 ) -> None:
     def require_expected_head() -> None:
         if (
@@ -1603,77 +2447,237 @@ def _publish_captured_candidate(
         ):
             raise RuntimeError("EPIC029_SOURCE_HEAD_CHANGED")
 
-    originals: dict[str, tuple[bytes, int] | None] = {}
-    preflight: dict[str, PublicationTargetPreimage] = {}
-    published: list[str] = []
-    require_expected_head()
-    for staged_file in candidate:
-        rel = staged_file.rel
-        target = root / rel
-        if target.is_symlink() or (target.exists() and not target.is_file()):
-            raise RuntimeError(f"Publication target is not a regular file: {rel}")
-        ancestor = target.parent
-        while ancestor != root:
-            if ancestor.is_symlink():
-                raise RuntimeError(f"Publication target has an aliased parent: {rel}")
-            if ancestor == ancestor.parent:
-                raise RuntimeError(f"Publication target escapes source root: {rel}")
-            ancestor = ancestor.parent
-        current = _publication_target_preimage(root, rel)
-        if expected_preimages is not None:
-            expected = expected_preimages.get(rel)
-            if expected is None or current != expected:
-                raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
-        if current.kind not in {"file", "missing"}:
-            raise RuntimeError(f"Publication target is not a regular file: {rel}")
-        preflight[rel] = current
-        originals[rel] = (
-            (current.content or b"", current.mode or 0)
-            if current.kind == "file"
-            else None
-        )
-    try:
+    def require_source_stability() -> None:
         require_expected_head()
+        if source_stability_verifier is not None:
+            source_stability_verifier()
+        require_expected_head()
+
+    candidate_by_rel: dict[str, StagedCandidateFile] = {}
+    for staged_file in candidate:
+        _canonical_relative_parts(staged_file.rel)
+        if staged_file.rel not in _publication_allowlist():
+            raise RuntimeError(f"Unexpected publication target: {staged_file.rel}")
+        if staged_file.rel in candidate_by_rel:
+            raise RuntimeError(f"Duplicate publication target: {staged_file.rel}")
+        candidate_by_rel[staged_file.rel] = staged_file
+
+    originals: dict[str, PublicationTargetPreimage] = {}
+    preflight: dict[str, PublicationTargetPreimage] = {}
+    held_targets: dict[str, HeldPublicationTarget] = {}
+    swaps: dict[str, PublishedSwap] = {}
+    published: list[str] = []
+    publication_committed = False
+
+    def require_held_targets_current() -> None:
+        changed = sorted(
+            rel
+            for rel, target in held_targets.items()
+            if not _held_parent_is_current(root, target)
+        )
+        if changed:
+            raise RuntimeError(
+                f"PUBLICATION_PARENT_CHANGED:{','.join(changed)}"
+            )
+
+    try:
+        require_source_stability()
         for staged_file in candidate:
             rel = staged_file.rel
-            require_expected_head()
-            if _publication_target_preimage(root, rel) != preflight[rel]:
+            try:
+                target = _open_held_parent(root, rel)
+            except OSError as exc:
+                raise RuntimeError(
+                    f"Publication target has an aliased or unavailable parent: {rel}"
+                ) from exc
+            held_targets[rel] = target
+            if not _held_parent_is_current(root, target):
+                raise RuntimeError(f"Publication target has an aliased parent: {rel}")
+            current = _publication_target_preimage_at(target)
+            if expected_preimages is not None:
+                expected = expected_preimages.get(rel)
+                if expected is None or not _same_publication_generation(
+                    current,
+                    expected,
+                ):
+                    raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
+            if current.kind not in {"file", "missing"}:
+                raise RuntimeError(f"Publication target is not a regular file: {rel}")
+            preflight[rel] = current
+            originals[rel] = current
+
+        require_source_stability()
+        require_held_targets_current()
+        for staged_file in candidate:
+            rel = staged_file.rel
+            target = held_targets[rel]
+            require_source_stability()
+            require_held_targets_current()
+            if not _same_publication_generation(
+                _publication_target_preimage_at(target),
+                preflight[rel],
+            ):
                 raise RuntimeError(f"PUBLICATION_TARGET_CHANGED:{rel}")
-            require_expected_head()
+            require_source_stability()
+            require_held_targets_current()
+            swap = _publish_swap_at(
+                target,
+                staged_file,
+                preflight[rel],
+            )
+            swaps[rel] = swap
             published.append(rel)
-            _write_bytes_atomically(
-                root / rel,
+            require_source_stability()
+            require_held_targets_current()
+        for staged_file in candidate:
+            require_source_stability()
+            require_held_targets_current()
+            rel = staged_file.rel
+            current = _publication_target_preimage_at(held_targets[rel])
+            swap = swaps[rel]
+            if not (
+                current.kind == "file"
+                and current.content == staged_file.content
+                and current.mode == staged_file.mode
+                and current.identity == swap.installed_identity
+            ):
+                raise RuntimeError(f"Post-publication byte verification failed: {rel}")
+            require_source_stability()
+        if any(
+            staged_file.rel in {ACCEPTANCE_MAP_REL, ACCEPTANCE_MAP_PROOF_REL}
+            for staged_file in candidate
+        ):
+            require_source_stability()
+            require_held_targets_current()
+            _verify_canonical_acceptance_map(root / ACCEPTANCE_MAP_REL)
+            require_source_stability()
+        config = qa_harness.HarnessConfig(EPIC_ID, repo_root=root)
+        for check_id in (*REQUALIFICATION_CHECK_IDS, "acceptance-map-viability"):
+            require_source_stability()
+            require_held_targets_current()
+            qa_harness.verify_manifest_entry(config, check_id)
+            require_source_stability()
+        require_source_stability()
+        require_held_targets_current()
+        _verify_viability_pair(root)
+        require_source_stability()
+        require_held_targets_current()
+        _verify_manifest_paths(root)
+        require_source_stability()
+        require_held_targets_current()
+        _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), root)
+        require_source_stability()
+        require_held_targets_current()
+        for staged_file in candidate:
+            rel = staged_file.rel
+            current = _publication_target_preimage_at(held_targets[rel])
+            swap = swaps[rel]
+            if not (
+                current.kind == "file"
+                and current.content == staged_file.content
+                and current.mode == staged_file.mode
+                and current.identity == swap.installed_identity
+            ):
+                raise RuntimeError(f"PUBLICATION_FINAL_CANDIDATE_CHANGED:{rel}")
+        require_source_stability()
+        require_held_targets_current()
+        for rel in published:
+            swap = swaps[rel]
+            if swap.backup_leaf is None:
+                continue
+            backup = _held_leaf(held_targets[rel], swap.backup_leaf)
+            if (
+                swap.backup_preimage is None
+                or not _same_publication_generation(
+                    _publication_target_preimage_at(backup),
+                    swap.backup_preimage,
+                )
+            ):
+                raise RuntimeError(f"PUBLICATION_BACKUP_CHANGED:{rel}")
+        publication_committed = True
+        cleanup_errors: list[str] = []
+        for rel in published:
+            swap = swaps[rel]
+            if swap.backup_leaf is None:
+                continue
+            target = held_targets[rel]
+            try:
+                backup = _publication_target_preimage_at(
+                    _held_leaf(target, swap.backup_leaf)
+                )
+                if (
+                    swap.backup_preimage is None
+                    or not _same_publication_generation(
+                        backup,
+                        swap.backup_preimage,
+                    )
+                ):
+                    cleanup_errors.append(f"{rel}=backup_changed:{swap.backup_leaf}")
+                    continue
+                os.unlink(swap.backup_leaf, dir_fd=target.parent_fd)
+                os.fsync(target.parent_fd)
+            except BaseException as cleanup_exc:
+                cleanup_errors.append(
+                    f"{rel}={swap.backup_leaf}:"
+                    f"{type(cleanup_exc).__name__}:{cleanup_exc}"
+                )
+        if cleanup_errors:
+            raise RuntimeError(
+                "PUBLICATION_COMMITTED_CLEANUP_INCOMPLETE:"
+                + ";".join(cleanup_errors)
+            )
+        require_source_stability()
+        require_held_targets_current()
+        for staged_file in candidate:
+            rel = staged_file.rel
+            current = _publication_target_preimage_at(held_targets[rel])
+            swap = swaps[rel]
+            if not (
+                current.kind == "file"
+                and current.content == staged_file.content
+                and current.mode == staged_file.mode
+                and current.identity == swap.installed_identity
+            ):
+                raise RuntimeError(f"PUBLICATION_COMMITTED_TARGET_CHANGED:{rel}")
+    except BaseException as exc:
+        if publication_committed:
+            raise
+        rollback_conflicts: list[str] = []
+        rollback_errors: list[str] = []
+        for rel in reversed(published):
+            target = held_targets[rel]
+            original = originals[rel]
+            staged_file = candidate_by_rel[rel]
+            owned = PublicationTargetPreimage(
+                "file",
                 staged_file.content,
                 staged_file.mode,
             )
-            require_expected_head()
-        for staged_file in candidate:
-            require_expected_head()
-            if (root / staged_file.rel).read_bytes() != staged_file.content:
-                rel = staged_file.rel
-                raise RuntimeError(f"Post-publication byte verification failed: {rel}")
-            require_expected_head()
-        config = qa_harness.HarnessConfig(EPIC_ID, repo_root=root)
-        for check_id in (*REQUALIFICATION_CHECK_IDS, "acceptance-map-viability"):
-            require_expected_head()
-            qa_harness.verify_manifest_entry(config, check_id)
-            require_expected_head()
-        require_expected_head()
-        _verify_viability_pair(root)
-        require_expected_head()
-        _verify_manifest_paths(root)
-        require_expected_head()
-        _run_required_command((sys.executable, *EVIDENCE_INDEX_CHECK), root)
-        require_expected_head()
-    except BaseException:
-        for rel in reversed(published):
-            target = root / rel
-            original = originals[rel]
-            if original is None:
-                target.unlink(missing_ok=True)
-            else:
-                _write_bytes_atomically(target, original[0], original[1])
+            try:
+                if not _held_parent_is_current(root, target):
+                    rollback_conflicts.append(f"{rel}=parent_changed")
+                    continue
+                conflict = _rollback_swap_at(
+                    target,
+                    swaps[rel],
+                    owned,
+                    original,
+                )
+                if conflict:
+                    rollback_conflicts.append(f"{rel}={conflict}")
+            except Exception as rollback_exc:
+                rollback_errors.append(
+                    f"{rel}={type(rollback_exc).__name__}:{rollback_exc}"
+                )
+        if rollback_conflicts or rollback_errors:
+            detail = ";".join((*rollback_conflicts, *rollback_errors))
+            raise RuntimeError(f"{exc};EPIC029_ROLLBACK_INCOMPLETE:{detail}") from exc
         raise
+    finally:
+        for swap in swaps.values():
+            os.close(swap.installed_fd)
+        for target in held_targets.values():
+            os.close(target.parent_fd)
 
 
 def _publish_staged_candidate(stage: Path, root: Path, paths: Sequence[str]) -> None:
@@ -1684,16 +2688,25 @@ def _publish_staged_candidate(stage: Path, root: Path, paths: Sequence[str]) -> 
 
 def _orchestrate_from_head() -> int:
     revision = _require_git_head(ROOT)
+    causal_paths = _causal_input_paths()
+    source_causal_preimage = _capture_causal_inputs(ROOT, causal_paths)
     publication_preimages = _capture_publication_preimages(ROOT)
-    try:
-        sanity_preimage = (ROOT / SANITY_LOG_REL).read_bytes()
-    except OSError as exc:
-        raise RuntimeError("Canonical sanity-log preimage is unavailable") from exc
+    sanity_preimage = next(
+        item.content
+        for item in source_causal_preimage
+        if item.rel == SANITY_LOG_REL
+    )
     if not sanity_preimage:
         raise RuntimeError("Canonical sanity-log preimage is empty")
     candidate: tuple[StagedCandidateFile, ...]
     staged_stdout = ""
     with _staging_worktree(ROOT, revision) as stage:
+        staged_causal_preimage = _capture_causal_inputs(stage, causal_paths)
+        _require_causal_inputs_equal(
+            source_causal_preimage,
+            staged_causal_preimage,
+            phase="source-vs-detached-preflight",
+        )
         command = (
             sys.executable,
             "tools/qa/generate_epic029_close_pack.py",
@@ -1716,30 +2729,62 @@ def _orchestrate_from_head() -> int:
             raise RuntimeError(
                 f"EPIC029 staged requalification failed with exit code {completed.returncode}"
             )
-        try:
-            staged_sanity = (stage / SANITY_LOG_REL).read_bytes()
-        except OSError as exc:
-            raise RuntimeError("Staged sanity-log result is unavailable") from exc
+        staged_causal_postimage = _capture_causal_inputs(stage, causal_paths)
+        _require_causal_inputs_equal(
+            staged_causal_preimage,
+            staged_causal_postimage,
+            phase="detached-materialization",
+        )
+        staged_sanity = next(
+            item.content
+            for item in staged_causal_postimage
+            if item.rel == SANITY_LOG_REL
+        )
         if staged_sanity != sanity_preimage:
             raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED")
-        paths = _candidate_paths(stage)
+        paths = tuple(
+            sorted(
+                {
+                    *_candidate_paths(stage),
+                    ACCEPTANCE_MAP_REL,
+                    ACCEPTANCE_MAP_PROOF_REL,
+                }
+            )
+        )
         candidate = _capture_staged_candidate(stage, paths)
         staged_stdout = completed.stdout
     if staged_stdout:
         print(staged_stdout, end="")
-    try:
-        current_sanity = (ROOT / SANITY_LOG_REL).read_bytes()
-    except OSError as exc:
-        raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED") from exc
+    source_causal_postimage = _capture_causal_inputs(ROOT, causal_paths)
+    _require_causal_inputs_equal(
+        source_causal_preimage,
+        source_causal_postimage,
+        phase="source-during-materialization",
+    )
+    current_sanity = next(
+        item.content
+        for item in source_causal_postimage
+        if item.rel == SANITY_LOG_REL
+    )
     if current_sanity != sanity_preimage:
         raise RuntimeError("EPIC029_SANITY_LOG_PREIMAGE_CHANGED")
     if _require_git_head(ROOT) != revision:
         raise RuntimeError("EPIC029_SOURCE_HEAD_CHANGED")
+
+    def require_source_causal_stability() -> None:
+        current = _capture_causal_inputs(ROOT, causal_paths)
+        _require_causal_inputs_equal(
+            source_causal_preimage,
+            current,
+            phase="source-during-publication",
+        )
+
     _publish_captured_candidate(
         candidate,
         ROOT,
         expected_preimages=publication_preimages,
         expected_revision=revision,
+        source_stability_verifier=require_source_causal_stability,
     )
     return 0
 

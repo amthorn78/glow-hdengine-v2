@@ -1322,7 +1322,11 @@ def _record_bootstrap_with_legacy_supersession(
 
 def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
     """Execute EPIC021's concrete bootstrap and governed viability definitions."""
-    config = qa_harness.HarnessConfig(EPIC_ID, repo_root=repo_root)
+    config = qa_harness.HarnessConfig(
+        EPIC_ID,
+        repo_root=repo_root,
+        step_names=(BOOTSTRAP_CHECK_ID,),
+    )
     bootstrap = qa_harness.run_pytest_check(
         config,
         BOOTSTRAP_CHECK_ID,
@@ -1438,6 +1442,11 @@ def _execute_current_family() -> dict[str, object]:
     postcommit, first_sanity = _postcommit_result(root=ROOT)
     qa_harness.record_check(config, postcommit)
     _require_pass(postcommit)
+
+    # The fresh postcommit receipt and manifest entry are viability evidence.
+    # Seal and verify those exact bytes before evaluating their governance.
+    _write_graph()
+    _verify_graph()
 
     viability = qa_harness.generate_acceptance_map_viability(
         config, publish_governed_ledger=True

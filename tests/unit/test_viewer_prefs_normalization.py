@@ -39,6 +39,25 @@ def test_invalid_viewer_prefs_fail_closed() -> None:
     assert validate_viewer_prefs(prefs) is not None
 
 
+def test_viewer_prefs_require_exact_magic10_weight_keys() -> None:
+    valid = _valid_prefs()
+    weights = valid["weights"]
+    assert isinstance(weights, dict)
+
+    missing = {
+        "top_category": valid["top_category"],
+        "weights": dict(tuple(weights.items())[:-1]),
+    }
+    extra = {
+        "top_category": valid["top_category"],
+        "weights": {**weights, "not-a-magic10-category": 1},
+    }
+
+    assert validate_viewer_prefs(valid) is None
+    assert validate_viewer_prefs(missing) is not None
+    assert validate_viewer_prefs(extra) is not None
+
+
 def test_zero_weight_handoff_to_sampler_exclusion() -> None:
     prefs = _valid_prefs()
     weights = prefs["weights"]

@@ -560,6 +560,41 @@ EPIC027_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "discovered_physical_path": "audit/EPIC-027_MANIFEST.json",
         "epic_id": "HDE-EPIC027",
     },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_update_evidence_index_write.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_orientation_demo_write.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_update_evidence_index_check.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_orientation_demo_check.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_evidence_paths_validation.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_lf_endings.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_lf_endings/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
+        "artifact_key": "audit.qa.hde_epic027.checks.gate_mirror_schema.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
+        "epic_id": "HDE-EPIC027",
+    },
 ]
 
 EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
@@ -598,6 +633,11 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "discovered_physical_path": "audit/ops/hde-epic028/ops-01/created_files_sha256.txt",
         "epic_id": "HDE-EPIC028",
     },
+    {
+        "artifact_key": "audit.qa.hde_epic028.checks.acceptance_map_viability.primary.log",
+        "discovered_physical_path": "audit/qa/hde-epic028/checks/acceptance-map-viability/primary.log",
+        "epic_id": "HDE-EPIC028",
+    },
 ]
 
 EPIC029_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
@@ -619,6 +659,16 @@ EPIC029_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic029.qa_step_logs_manifest",
         "discovered_physical_path": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic029_doc_deltas.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.drain_targets",
+        "discovered_physical_path": "audit/docdeltas/hde-epic029_drain_targets.md",
         "epic_id": "HDE-EPIC029",
     },
     {

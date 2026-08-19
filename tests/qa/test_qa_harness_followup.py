@@ -1,8 +1,10 @@
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
+from tools.qa import qa_harness
 from tools.qa.qa_harness import (
     CheckResult,
     HarnessConfig,
@@ -18,6 +20,173 @@ MATRIX_HEADER = (
     "| --- | --- | --- | --- | --- | --- | --- |\n"
 )
 TOKEN = "QA_HARNESS_DISCIPLINE_OK"
+FIXED_TIMESTAMP = "2026-01-01T00:00:00Z"
+
+
+def _write_evidence_graph(
+    root: Path, bindings: dict[str, tuple[str, ...]]
+) -> None:
+    human_rows: list[dict[str, object]] = []
+    mirror_rows: list[dict[str, object]] = []
+    for path, artifact_keys in bindings.items():
+        payload = (root / path).read_bytes()
+        digest = hashlib.sha256(payload).hexdigest()
+        size = len(payload)
+        proof = root / f"{path}.path_proof.txt"
+        proof.parent.mkdir(parents=True, exist_ok=True)
+        proof.write_text(
+            "\n".join(
+                (
+                    f"path: {path}",
+                    f"size_bytes: {size}",
+                    f"sha256: {digest}",
+                    f"mtime_utc: {FIXED_TIMESTAMP}",
+                    f"produced_at_utc: {FIXED_TIMESTAMP}",
+                    "",
+                )
+            ),
+            encoding="utf-8",
+        )
+        for artifact_key in artifact_keys:
+            human_rows.append(
+                {
+                    "artifact_key": artifact_key,
+                    "discovered_physical_path": path,
+                }
+            )
+            mirror_rows.append(
+                {
+                    "artifact_key": artifact_key,
+                    "discovered_physical_path": path,
+                    "produced_at_utc": FIXED_TIMESTAMP,
+                    "proof_anchor": f"{path}.path_proof.txt",
+                    "role": "snapshot",
+                    "sha256": digest,
+                    "size_bytes": size,
+                }
+            )
+    human_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    mirror_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    body_bytes = b"".join(
+        (json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n").encode(
+            "utf-8"
+        )
+        for row in mirror_rows
+    )
+    body_sha = hashlib.sha256(body_bytes).hexdigest()
+    self_record: dict[str, object] = {
+        "artifact_key": "index.machine_mirror",
+        "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        "produced_at_utc": FIXED_TIMESTAMP,
+        "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
+        "role": "self_record",
+        "sha256": body_sha,
+        "size_bytes": 0,
+    }
+    mirror_rows.append(self_record)
+    mirror_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    while True:
+        mirror_bytes = b"".join(
+            (json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n").encode(
+                "utf-8"
+            )
+            for row in mirror_rows
+        )
+        if self_record["size_bytes"] == len(mirror_bytes):
+            break
+        self_record["size_bytes"] = len(mirror_bytes)
+    human_rows.append(
+        {
+            "artifact_key": "index.machine_mirror",
+            "discovered_physical_path": "artifacts/evidence_index.jsonl",
+        }
+    )
+    human_rows.sort(
+        key=lambda row: (row["artifact_key"], row["discovered_physical_path"])
+    )
+    human_index = root / "docs/evidence/INDEX.json"
+    human_index.parent.mkdir(parents=True, exist_ok=True)
+    human_index.write_text(
+        json.dumps(human_rows, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    mirror = root / "artifacts/evidence_index.jsonl"
+    mirror.parent.mkdir(parents=True, exist_ok=True)
+    mirror.write_bytes(mirror_bytes)
+    (root / "artifacts/evidence_index.jsonl.path_proof.txt").write_text(
+        "\n".join(
+            (
+                "path: artifacts/evidence_index.jsonl",
+                f"size_bytes: {len(mirror_bytes)}",
+                f"sha256: {hashlib.sha256(mirror_bytes).hexdigest()}",
+                f"mirror_body_sha256: {body_sha}",
+                f"mtime_utc: {FIXED_TIMESTAMP}",
+                f"produced_at_utc: {FIXED_TIMESTAMP}",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+
+
+def _write_self_record_graph(root: Path) -> None:
+    mirror_path = "artifacts/evidence_index.jsonl"
+    body_sha = hashlib.sha256(b"").hexdigest()
+    record: dict[str, object] = {
+        "artifact_key": "index.machine_mirror",
+        "discovered_physical_path": mirror_path,
+        "produced_at_utc": FIXED_TIMESTAMP,
+        "proof_anchor": f"{mirror_path}.path_proof.txt",
+        "role": "self_record",
+        "sha256": body_sha,
+        "size_bytes": 0,
+    }
+    while True:
+        mirror_bytes = (
+            json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+        ).encode("utf-8")
+        if record["size_bytes"] == len(mirror_bytes):
+            break
+        record["size_bytes"] = len(mirror_bytes)
+    mirror = root / mirror_path
+    mirror.parent.mkdir(parents=True, exist_ok=True)
+    mirror.write_bytes(mirror_bytes)
+    human = root / "docs/evidence/INDEX.json"
+    human.parent.mkdir(parents=True, exist_ok=True)
+    human.write_text(
+        json.dumps(
+            [
+                {
+                    "artifact_key": "index.machine_mirror",
+                    "discovered_physical_path": mirror_path,
+                }
+            ],
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (root / f"{mirror_path}.path_proof.txt").write_text(
+        "\n".join(
+            (
+                f"path: {mirror_path}",
+                f"size_bytes: {len(mirror_bytes)}",
+                f"sha256: {hashlib.sha256(mirror_bytes).hexdigest()}",
+                f"mirror_body_sha256: {body_sha}",
+                f"mtime_utc: {FIXED_TIMESTAMP}",
+                f"produced_at_utc: {FIXED_TIMESTAMP}",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
 
 
 def _matrix_row(
@@ -52,6 +221,9 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     )
     (tmp_path / "evidence").mkdir()
     (tmp_path / "evidence/proof.json").write_text('{"ok":true}\n', encoding="utf-8")
+    _write_evidence_graph(
+        tmp_path, {"evidence/proof.json": ("fixture.primary_evidence",)}
+    )
     (tmp_path / "tools").mkdir()
     (tmp_path / "tools/check.py").write_text("raise SystemExit(0)\n", encoding="utf-8")
     return tmp_path
@@ -90,6 +262,796 @@ def _configure(
         MATRIX_HEADER + _matrix_row(evidence, ci=ci, qa=qa), encoding="utf-8"
     )
     return config
+
+
+def test_normal_governance_binding_rejects_stale_artifact_bytes(repository: Path):
+    config = _configure(repository, "HDE-EPIC039")
+    (repository / "evidence/proof.json").write_text(
+        '{"ok":false}\n', encoding="utf-8"
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "hash/size" in result.status_reason
+
+
+def test_normal_governance_binding_rejects_wrong_proof_anchor(repository: Path):
+    config = _configure(repository, "HDE-EPIC039")
+    mirror = repository / "artifacts/evidence_index.jsonl"
+    records = [
+        json.loads(line) for line in mirror.read_text(encoding="utf-8").splitlines()
+    ]
+    record = next(item for item in records if item["role"] != "self_record")
+    record["proof_anchor"] = "evidence/not-the-sibling.path_proof.txt"
+    mirror.write_text(
+        "".join(
+            json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n"
+            for item in records
+        ),
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "proof_anchor" in result.status_reason
+
+
+def test_normal_governance_binding_rejects_duplicate_proof_field(repository: Path):
+    config = _configure(repository, "HDE-EPIC039")
+    proof = repository / "evidence/proof.json.path_proof.txt"
+    proof.write_text(
+        proof.read_text(encoding="utf-8")
+        + "sha256: "
+        + hashlib.sha256((repository / "evidence/proof.json").read_bytes()).hexdigest()
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "duplicate field" in result.status_reason
+
+
+def test_normal_governance_binding_allows_informational_proof_field(
+    repository: Path,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    proof = repository / "evidence/proof.json.path_proof.txt"
+    proof.write_text(
+        proof.read_text(encoding="utf-8") + "capture_note: fixture-only\n",
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.PASS
+
+
+def test_governance_binding_rejects_external_proof_symlink(repository: Path):
+    config = _configure(repository, "HDE-EPIC039")
+    proof = repository / "evidence/proof.json.path_proof.txt"
+    outside = repository.parent / f"{repository.name}-external-proof.txt"
+    outside.write_bytes(proof.read_bytes())
+    proof.unlink()
+    proof.symlink_to(outside)
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "sibling path proof is not a regular repository file" in result.status_reason
+
+
+def test_governance_binding_rejects_aliased_proof_parent(repository: Path):
+    real = repository / "real-evidence"
+    real.mkdir()
+    (real / "proof.json").write_text('{"ok":true}\n', encoding="utf-8")
+    (repository / "aliased-evidence").symlink_to(real, target_is_directory=True)
+    _write_evidence_graph(
+        repository,
+        {"aliased-evidence/proof.json": ("fixture.aliased_evidence",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("aliased-evidence/proof.json",),
+        evidence="aliased-evidence/proof.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "parent path is aliased" in result.status_reason
+
+
+def test_governance_binding_rejects_transient_proof_symlink_swap(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    config = _configure(repository, "HDE-EPIC039")
+    proof = repository / "evidence/proof.json.path_proof.txt"
+    outside = repository.parent / f"{repository.name}-transient-proof.txt"
+    outside.write_bytes(proof.read_bytes())
+    original_reader = qa_harness._read_stable_repo_file_bytes
+    swapped = False
+
+    def swap_during_secure_open(
+        repo_root: Path, path: Path, *, subject: str
+    ) -> tuple[Status, str, bytes | None]:
+        nonlocal swapped
+        if path != proof or swapped:
+            return original_reader(repo_root, path, subject=subject)
+        swapped = True
+        original_bytes = proof.read_bytes()
+        proof.unlink()
+        proof.symlink_to(outside)
+        try:
+            return original_reader(repo_root, path, subject=subject)
+        finally:
+            proof.unlink()
+            proof.write_bytes(original_bytes)
+
+    monkeypatch.setattr(
+        qa_harness, "_read_stable_repo_file_bytes", swap_during_secure_open
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "sibling path proof could not be opened without following aliases" in (
+        result.status_reason
+    )
+
+
+def test_self_record_proof_is_validated_before_ordinary_evidence_passes(
+    repository: Path,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    proof = repository / "artifacts/evidence_index.jsonl.path_proof.txt"
+    proof.write_text(
+        "\n".join(
+            "mirror_body_sha256: " + "0" * 64
+            if line.startswith("mirror_body_sha256: ")
+            else line
+            for line in proof.read_text(encoding="utf-8").splitlines()
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "path proof body hash" in result.status_reason
+
+
+@pytest.mark.parametrize(
+    ("ledger", "field", "value"),
+    [
+        ("human", "tokens", "NOT_A_LIST"),
+        ("human", "tokens", None),
+        ("human", "produced_at_utc", None),
+        ("human", "sha256", None),
+        ("human", "size_bytes", None),
+        ("mirror", "epic_id", []),
+        ("mirror", "notes", {"not": "text"}),
+        ("mirror", "schema_version", 1),
+        ("mirror", "tokens", None),
+    ],
+)
+def test_governance_graph_rejects_invalid_optional_metadata_types(
+    repository: Path, ledger: str, field: str, value: object
+):
+    config = _configure(repository, "HDE-EPIC039")
+    if ledger == "human":
+        path = repository / "docs/evidence/INDEX.json"
+        rows = json.loads(path.read_text(encoding="utf-8"))
+        row = next(item for item in rows if item["artifact_key"] != "index.machine_mirror")
+        row[field] = value
+        path.write_text(
+            json.dumps(rows, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+    else:
+        path = repository / "artifacts/evidence_index.jsonl"
+        rows = [
+            json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+        ]
+        row = next(item for item in rows if item["role"] != "self_record")
+        row[field] = value
+        path.write_text(
+            "".join(
+                json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n"
+                for item in rows
+            ),
+            encoding="utf-8",
+        )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert f"{field} metadata" in result.status_reason
+
+
+def test_governance_graph_allows_minimal_historical_human_rows(repository: Path):
+    config = _configure(repository, "HDE-EPIC039")
+    rows = json.loads(
+        (repository / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+
+    assert all(
+        set(row) == {"artifact_key", "discovered_physical_path"} for row in rows
+    )
+    result, _ = evaluate_acceptance_map_viability(config)
+    assert result.status is Status.PASS
+
+
+@pytest.mark.parametrize("mutation", ["pretty", "reordered"])
+def test_governance_graph_rejects_noncanonical_human_index(
+    repository: Path,
+    mutation: str,
+):
+    path = repository / "docs/evidence/INDEX.json"
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    if mutation == "pretty":
+        content = json.dumps(rows, sort_keys=True, indent=2) + "\n"
+        expected_reason = "is not canonical JSON with a final LF"
+    else:
+        content = (
+            json.dumps(list(reversed(rows)), sort_keys=True, separators=(",", ":"))
+            + "\n"
+        )
+        expected_reason = "records are not sorted by key/path"
+    path.write_text(content, encoding="utf-8")
+
+    result, _ = evaluate_acceptance_map_viability(
+        _configure(repository, "HDE-EPIC039")
+    )
+
+    assert result.status is Status.FAIL_TOOLING
+    assert expected_reason in result.status_reason
+
+
+def test_governance_validator_rechecks_artifact_bytes_within_evaluation(
+    repository: Path,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    target = repository / "evidence/proof.json"
+    validator = qa_harness._EvidenceGovernanceValidator(config)
+
+    first = validator.validate("evidence/proof.json", target, target.read_bytes())
+    target.write_text('{"ok":false}\n', encoding="utf-8")
+    second = validator.validate("evidence/proof.json", target, target.read_bytes())
+
+    assert first == (Status.PASS, "")
+    assert second[0] is Status.FAIL_TOOLING
+    assert "changed path identity or bytes" in second[1]
+
+
+def test_governance_validator_final_stability_check_rejects_late_change(
+    repository: Path,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    target = repository / "evidence/proof.json"
+    validator = qa_harness._EvidenceGovernanceValidator(config)
+
+    assert validator.validate(
+        "evidence/proof.json", target, target.read_bytes()
+    ) == (Status.PASS, "")
+    target.write_text('{"ok":false}\n', encoding="utf-8")
+    stability = validator.verify_stability()
+
+    assert stability[0] is Status.FAIL_TOOLING
+    assert "changed during evaluation" in stability[1]
+
+
+def test_governance_validator_rechecks_proof_bytes_within_evaluation(
+    repository: Path,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    target = repository / "evidence/proof.json"
+    proof = repository / "evidence/proof.json.path_proof.txt"
+    validator = qa_harness._EvidenceGovernanceValidator(config)
+
+    first = validator.validate("evidence/proof.json", target, target.read_bytes())
+    proof.write_text(
+        proof.read_text(encoding="utf-8") + "capture_note: changed\n",
+        encoding="utf-8",
+    )
+    second = validator.validate("evidence/proof.json", target, target.read_bytes())
+
+    assert first == (Status.PASS, "")
+    assert second[0] is Status.FAIL_TOOLING
+    assert "proof changed during evaluation" in second[1]
+
+
+def test_json_validation_and_governance_use_the_same_captured_bytes(
+    repository: Path, monkeypatch: pytest.MonkeyPatch
+):
+    target = repository / "evidence/proof.json"
+    governed_invalid = b"not-json\n"
+    target.write_bytes(governed_invalid)
+    _write_evidence_graph(
+        repository, {"evidence/proof.json": ("fixture.primary_evidence",)}
+    )
+    target.write_text('{"ok":true}\n', encoding="utf-8")
+    config = _configure(repository, "HDE-EPIC039")
+    original = qa_harness._validate_json_evidence_bytes
+
+    def validate_then_swap(payload: bytes) -> None:
+        original(payload)
+        target.write_bytes(governed_invalid)
+
+    monkeypatch.setattr(qa_harness, "_validate_json_evidence_bytes", validate_then_swap)
+    diagnostic = qa_harness._file_diagnostic(
+        config,
+        token=TOKEN,
+        source_field="acceptance_map.evidence_titles",
+        item_index=1,
+        value="evidence/proof.json",
+        planned_paths=set(),
+        referenced_manifests=set(),
+        require_governance=True,
+        governance_validator=qa_harness._EvidenceGovernanceValidator(config),
+    )
+
+    assert diagnostic.status is Status.FAIL_TOOLING
+    assert diagnostic.reason == "acceptance evidence changed bytes during evaluation"
+
+
+@pytest.mark.parametrize("missing_side", ["human", "mirror"])
+def test_governance_binding_requires_membership_in_both_ledgers(
+    repository: Path, missing_side: str
+):
+    other = repository / "evidence/other.txt"
+    other.write_text("other\n", encoding="utf-8")
+    _write_evidence_graph(
+        repository,
+        {
+            "evidence/other.txt": ("fixture.other",),
+            "evidence/proof.json": ("fixture.primary_evidence",),
+        },
+    )
+    if missing_side == "human":
+        path = repository / "docs/evidence/INDEX.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = [
+            row
+            for row in payload
+            if row["discovered_physical_path"] != "evidence/proof.json"
+        ]
+        path.write_text(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+    else:
+        path = repository / "artifacts/evidence_index.jsonl"
+        payload = [
+            json.loads(line)
+            for line in path.read_text(encoding="utf-8").splitlines()
+        ]
+        payload = [
+            row
+            for row in payload
+            if row["discovered_physical_path"] != "evidence/proof.json"
+        ]
+        path.write_text(
+            "".join(
+                json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
+                for row in payload
+            ),
+            encoding="utf-8",
+        )
+    config = _configure(repository, "HDE-EPIC039")
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "key/path bindings disagree" in result.status_reason
+
+
+def test_governance_membership_uses_lexical_declared_path(repository: Path):
+    alias = repository / "evidence/alias.json"
+    alias.symlink_to("proof.json")
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("evidence/alias.json",),
+        evidence="evidence/alias.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "not an approved governed-primary symlink" in result.status_reason
+
+
+def test_canonical_endpoint_catalog_symlink_can_be_governed_evidence(
+    repository: Path,
+):
+    target = repository / "artifacts/audit/ENDPOINTS_CATALOG.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text('{"endpoints":[]}\n', encoding="utf-8")
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to("../artifacts/audit/ENDPOINTS_CATALOG.json")
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.PASS
+
+
+def test_canonical_endpoint_catalog_target_symlink_cannot_pass(repository: Path):
+    target = repository / "artifacts/audit/ENDPOINTS_CATALOG.json"
+    alternate = repository / "artifacts/audit/alternate.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    alternate.write_text('{"endpoints":[]}\n', encoding="utf-8")
+    target.symlink_to(alternate.name)
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to("../artifacts/audit/ENDPOINTS_CATALOG.json")
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "target is not a regular file" in result.status_reason
+
+
+def test_canonical_endpoint_catalog_target_parent_alias_cannot_pass(
+    repository: Path,
+):
+    real_audit = repository / "artifacts/real-audit"
+    real_audit.mkdir(parents=True)
+    (real_audit / "ENDPOINTS_CATALOG.json").write_text(
+        '{"endpoints":[]}\n', encoding="utf-8"
+    )
+    (repository / "artifacts/audit").symlink_to(
+        real_audit.name, target_is_directory=True
+    )
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to("../artifacts/audit/ENDPOINTS_CATALOG.json")
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "without following aliases" in result.status_reason
+
+
+def test_canonical_endpoint_catalog_retarget_during_evaluation_fails(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    target = repository / "artifacts/audit/ENDPOINTS_CATALOG.json"
+    alternate = repository / "artifacts/audit/alternate.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text('{"endpoints":[]}\n', encoding="utf-8")
+    alternate.write_bytes(target.read_bytes())
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to("../artifacts/audit/ENDPOINTS_CATALOG.json")
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+    original = qa_harness._validate_json_evidence_bytes
+
+    def validate_then_retarget(payload: bytes) -> None:
+        original(payload)
+        catalog.unlink()
+        catalog.symlink_to("../artifacts/audit/alternate.json")
+
+    monkeypatch.setattr(
+        qa_harness,
+        "_validate_json_evidence_bytes",
+        validate_then_retarget,
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "not an approved governed-primary symlink" in result.status_reason
+
+
+def test_canonical_endpoint_catalog_target_replacement_during_evaluation_fails(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    target = repository / "artifacts/audit/ENDPOINTS_CATALOG.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text('{"endpoints":[]}\n', encoding="utf-8")
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to("../artifacts/audit/ENDPOINTS_CATALOG.json")
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+    original = qa_harness._validate_json_evidence_bytes
+    replaced = False
+
+    def validate_then_replace_target(payload: bytes) -> None:
+        nonlocal replaced
+        original(payload)
+        if replaced:
+            return
+        replaced = True
+        replacement = target.with_name("ENDPOINTS_CATALOG.replacement.json")
+        replacement.write_bytes(payload)
+        replacement.replace(target)
+
+    monkeypatch.setattr(
+        qa_harness,
+        "_validate_json_evidence_bytes",
+        validate_then_replace_target,
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "changed path identity or bytes" in result.status_reason
+
+
+def test_canonical_endpoint_catalog_external_symlink_fails(repository: Path):
+    external = repository.parent / f"{repository.name}-external-catalog.json"
+    external.write_text('{"endpoints":[]}\n', encoding="utf-8")
+    catalog = repository / "docs/ENDPOINTS_CATALOG.json"
+    catalog.symlink_to(external)
+    _write_evidence_graph(
+        repository,
+        {"docs/ENDPOINTS_CATALOG.json": ("fixture.endpoint_catalog",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("docs/ENDPOINTS_CATALOG.json",),
+        evidence="docs/ENDPOINTS_CATALOG.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_BEHAVIOR
+    assert "reference escapes repository" in result.status_reason
+
+
+def test_registered_symlinked_acceptance_evidence_cannot_pass(repository: Path):
+    alias = repository / "evidence/alias.json"
+    alias.symlink_to("proof.json")
+    _write_evidence_graph(
+        repository,
+        {"evidence/alias.json": ("fixture.aliased_evidence",)},
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("evidence/alias.json",),
+        evidence="evidence/alias.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "not an approved governed-primary symlink" in result.status_reason
+
+
+def test_cyclic_acceptance_evidence_alias_fails_causally(repository: Path):
+    alias = repository / "evidence/loop.json"
+    alias.symlink_to(alias.name)
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("evidence/loop.json",),
+        evidence="evidence/loop.json",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "reference cannot be resolved safely" in result.status_reason
+
+
+def test_symlinked_human_index_cannot_govern_acceptance(repository: Path):
+    human_index = repository / "docs/evidence/INDEX.json"
+    external_index = repository.parent / f"{repository.name}-external-index.json"
+    external_index.write_bytes(human_index.read_bytes())
+    human_index.unlink()
+    human_index.symlink_to(external_index)
+    config = _configure(repository, "HDE-EPIC039")
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "without following aliases" in result.status_reason
+
+
+def test_internally_aliased_machine_mirror_cannot_govern_acceptance(
+    repository: Path,
+):
+    mirror = repository / "artifacts/evidence_index.jsonl"
+    alternate = repository / "artifacts/evidence_index.actual.jsonl"
+    mirror.rename(alternate)
+    mirror.symlink_to(alternate.name)
+    config = _configure(repository, "HDE-EPIC039")
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "without following aliases" in result.status_reason
+
+
+@pytest.mark.parametrize(
+    "input_name",
+    ["pf04", "acceptance_map", "matrix", "pf04_source_set"],
+)
+def test_viability_rechecks_all_causal_inputs_before_pass(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    input_name: str,
+):
+    config = _configure(repository, "HDE-EPIC039")
+    original_apply = qa_harness._apply_pytest_collection
+
+    def mutate_after_collection(*args: object, **kwargs: object):
+        receipts = original_apply(*args, **kwargs)
+        if input_name == "pf04_source_set":
+            extra = repository / "docs/pfcanon/PF04-Canon-HDE-Governance-v999.md"
+            extra.write_text("additional source\n", encoding="utf-8")
+        else:
+            paths = {
+                "pf04": repository
+                / "docs/pfcanon/PF04-Canon-HDE-Governance-v1.md",
+                "acceptance_map": config.acceptance_map_path,
+                "matrix": config.token_matrix_path,
+            }
+            path = paths[input_name]
+            path.write_bytes(path.read_bytes() + b"\n")
+        return receipts
+
+    monkeypatch.setattr(
+        qa_harness,
+        "_apply_pytest_collection",
+        mutate_after_collection,
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "changed during acceptance evaluation" in result.status_reason
+
+
+def test_machine_mirror_self_record_uses_body_and_full_file_hashes(
+    repository: Path,
+):
+    _write_self_record_graph(repository)
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("artifacts/evidence_index.jsonl",),
+        evidence="artifacts/evidence_index.jsonl",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+    record = json.loads(
+        (repository / "artifacts/evidence_index.jsonl").read_text(encoding="utf-8")
+    )
+    proof = {
+        key: value
+        for key, value in (
+            line.split(": ", 1)
+            for line in (
+                repository / "artifacts/evidence_index.jsonl.path_proof.txt"
+            ).read_text(encoding="utf-8").splitlines()
+        )
+    }
+
+    assert result.status is Status.PASS
+    assert record["sha256"] == hashlib.sha256(b"").hexdigest()
+    assert proof["sha256"] != record["sha256"]
+    assert proof["mirror_body_sha256"] == record["sha256"]
+
+
+@pytest.mark.parametrize(
+    ("mutation", "reason"),
+    [
+        ("row_body", "self-record body hash"),
+        ("row_size", "self-record size"),
+        ("proof_full", "path proof hash/size"),
+        ("proof_body", "path proof body hash"),
+    ],
+)
+def test_machine_mirror_self_record_rejects_incoherent_hash_or_size(
+    repository: Path, mutation: str, reason: str
+):
+    _write_self_record_graph(repository)
+    mirror = repository / "artifacts/evidence_index.jsonl"
+    proof = repository / "artifacts/evidence_index.jsonl.path_proof.txt"
+    if mutation.startswith("row_"):
+        record = json.loads(mirror.read_text(encoding="utf-8"))
+        if mutation == "row_body":
+            record["sha256"] = "0" * 64
+        else:
+            record["size_bytes"] += 1
+        mirror.write_text(
+            json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+        replacements = {
+            "sha256": hashlib.sha256(mirror.read_bytes()).hexdigest(),
+            "size_bytes": str(mirror.stat().st_size),
+        }
+        proof.write_text(
+            "\n".join(
+                (
+                    f"{key}: {replacements.get(key, value)}"
+                    for key, value in (
+                        line.split(": ", 1)
+                        for line in proof.read_text(encoding="utf-8").splitlines()
+                    )
+                )
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    else:
+        field = "sha256" if mutation == "proof_full" else "mirror_body_sha256"
+        lines = proof.read_text(encoding="utf-8").splitlines()
+        proof.write_text(
+            "\n".join(
+                f"{field}: {'0' * 64}" if line.startswith(f"{field}: ") else line
+                for line in lines
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        evidence_titles=("artifacts/evidence_index.jsonl",),
+        evidence="artifacts/evidence_index.jsonl",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert reason in result.status_reason
 
 
 def _write_v1(config: HarnessConfig, check_id: str, *, status: str = "PASS") -> Path:
@@ -762,6 +1724,66 @@ def test_pytest_locator_options_are_preserved_during_collection(
         assert result.command == ()
 
 
+def test_exact_node_locator_with_quiet_flag_uses_one_quiet_collection_command(
+    repository: Path,
+):
+    test_file = repository / "tests/test_sample.py"
+    test_file.parent.mkdir()
+    test_file.write_text(
+        "def test_exact():\n    pass\n\ndef test_other():\n    pass\n",
+        encoding="utf-8",
+    )
+    result, _ = evaluate_acceptance_map_viability(
+        _configure(
+            repository,
+            "HDE-EPIC039",
+            ci="python -m pytest -q tests/test_sample.py::test_exact",
+        )
+    )
+
+    assert result.status is Status.PASS
+    assert result.command and isinstance(result.command[0], str)
+    assert result.command.count("-q") == 1
+    assert "--quiet" not in result.command
+    assert result.command.count("--collect-only") == 1
+    assert result.command[-1] == "tests/test_sample.py"
+
+
+def test_collection_normalization_preserves_selector_options(
+    repository: Path,
+):
+    test_file = repository / "tests/test_sample.py"
+    test_file.parent.mkdir()
+    test_file.write_text(
+        "def test_exact():\n    pass\n\ndef test_other():\n    pass\n",
+        encoding="utf-8",
+    )
+    result, _ = evaluate_acceptance_map_viability(
+        _configure(
+            repository,
+            "HDE-EPIC039",
+            ci=(
+                "python -m pytest --quiet --collect-only -k test_exact "
+                "-m 'not slow' -p no:cacheprovider "
+                "tests/test_sample.py::test_exact"
+            ),
+        )
+    )
+
+    assert result.status is Status.PASS
+    assert result.command and isinstance(result.command[0], str)
+    assert result.command.count("-q") == 1
+    assert "--quiet" not in result.command
+    assert result.command.count("--collect-only") == 1
+    assert result.command.count("-p") == 1
+    assert result.command[result.command.index("-p") + 1] == "no:cacheprovider"
+    assert result.command[result.command.index("-k") + 1] == "test_exact"
+    marker_index = max(
+        index for index, argument in enumerate(result.command) if argument == "-m"
+    )
+    assert result.command[marker_index + 1] == "not slow"
+
+
 @pytest.mark.parametrize(
     "ci",
     [
@@ -843,6 +1865,17 @@ def test_missing_or_prose_ci_locators_are_tooling_blocked(
     assert result.status is expected
 
 
+def test_cyclic_ci_script_alias_fails_causally(repository: Path):
+    script = repository / "tools/loop.py"
+    script.symlink_to(script.name)
+    config = _configure(repository, "HDE-EPIC039", ci="python tools/loop.py")
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "command path cannot be resolved safely" in result.status_reason
+
+
 @pytest.mark.parametrize(
     ("locator", "expected"),
     [
@@ -860,6 +1893,18 @@ def test_invalid_qa_locators_fail_causally(
     assert result.status is expected
 
 
+def test_cyclic_qa_locator_alias_fails_causally(repository: Path):
+    qa_log = repository / "audit/qa/hde-epic039/checks/loop/primary.log"
+    qa_log.parent.mkdir(parents=True, exist_ok=True)
+    qa_log.symlink_to(qa_log.name)
+    config = _configure(repository, "HDE-EPIC039", qa="checks/loop/primary.log")
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "QA locator cannot be resolved safely" in result.status_reason
+
+
 def test_declared_planned_qa_output_is_valid(repository: Path):
     config = _configure(
         repository,
@@ -869,6 +1914,84 @@ def test_declared_planned_qa_output_is_valid(repository: Path):
     )
     result, _ = evaluate_acceptance_map_viability(config)
     assert result.status is Status.PASS
+
+
+def test_existing_unindexed_qa_log_cannot_pass(repository: Path):
+    qa_log = repository / "audit/qa/hde-epic039/checks/arbitrary/primary.log"
+    qa_log.parent.mkdir(parents=True, exist_ok=True)
+    qa_log.write_text("arbitrary nonempty bytes\n", encoding="utf-8")
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        qa="checks/arbitrary/primary.log",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.TOOLING_BLOCKED
+    assert "absent from the Human Index and Machine Mirror" in result.status_reason
+
+
+def test_existing_governed_qa_log_can_pass(repository: Path):
+    qa_path = "audit/qa/hde-epic039/checks/governed/primary.log"
+    qa_log = repository / qa_path
+    qa_log.parent.mkdir(parents=True, exist_ok=True)
+    qa_log.write_text("governed QA receipt\n", encoding="utf-8")
+    _write_evidence_graph(
+        repository,
+        {
+            "evidence/proof.json": ("fixture.primary_evidence",),
+            qa_path: ("fixture.qa_log",),
+        },
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        qa="checks/governed/primary.log",
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.PASS
+
+
+def test_existing_governed_qa_log_is_rechecked_before_pass(
+    repository: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    qa_path = "audit/qa/hde-epic039/checks/governed/primary.log"
+    qa_log = repository / qa_path
+    qa_log.parent.mkdir(parents=True, exist_ok=True)
+    qa_log.write_text("governed QA receipt\n", encoding="utf-8")
+    _write_evidence_graph(
+        repository,
+        {
+            "evidence/proof.json": ("fixture.primary_evidence",),
+            qa_path: ("fixture.qa_log",),
+        },
+    )
+    config = _configure(
+        repository,
+        "HDE-EPIC039",
+        qa="checks/governed/primary.log",
+    )
+    original_apply = qa_harness._apply_pytest_collection
+
+    def mutate_after_collection(*args: object, **kwargs: object):
+        receipts = original_apply(*args, **kwargs)
+        qa_log.write_text("changed QA receipt\n", encoding="utf-8")
+        return receipts
+
+    monkeypatch.setattr(
+        qa_harness,
+        "_apply_pytest_collection",
+        mutate_after_collection,
+    )
+
+    result, _ = evaluate_acceptance_map_viability(config)
+
+    assert result.status is Status.FAIL_TOOLING
+    assert "acceptance evidence changed during evaluation" in result.status_reason
 
 
 def test_governed_ledger_self_output_requires_explicit_publication_plan(
