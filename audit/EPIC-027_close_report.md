@@ -4,7 +4,7 @@
 HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction D1, D3, and D4 proof families into canonical acceptance ledgers and close-pack outputs.
 
 ## Capture timestamp
-- `2026-03-18T07:47:24Z`
+- `2026-08-19T02:11:39Z`
 
 ## Reused proof families (no reimplementation)
 - D1 compat family: `artifacts/compat/identity_hash.txt`
@@ -15,6 +15,7 @@ HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing 
 - `docs/acceptance_map_epic027.json`
 - `audit/qa/hde-epic027/token_evidence_matrix.md`
 - `audit/qa/hde-epic027/acceptance_map_viability.log`
+- `audit/qa/hde-epic027/qa_step_logs_manifest.json`
 - `audit/EPIC-027_MANIFEST.json`
 - `audit/EPIC-027_close_report.md`
 

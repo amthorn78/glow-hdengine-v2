@@ -1,13 +1,17 @@
+import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
-from adapter.http_reader import create_app
+from adapter import http_reader
+from engine.serializer.canon import sercanon
 
 
 def _client():
-    app = create_app()
+    app = http_reader.create_app()
     app.config.update(TESTING=True)
     return app.test_client()
 
@@ -22,6 +26,103 @@ def _reader_query_params() -> dict[str, str]:
         "a_tz": "UTC",
         "b_tz": "UTC",
     }
+
+
+def _assert_canonical_lf_bytes(raw: bytes) -> None:
+    assert raw.endswith(b"\n")
+    assert not raw.endswith(b"\n\n")
+    assert b"\r" not in raw
+    assert sercanon(json.loads(raw)) == raw
+
+
+def test_showcompat_dump_reader_matches_http_reader_for_same_normalized_pair(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    repo_root = Path(__file__).resolve().parents[2]
+    pair_path = tmp_path / "pair.json"
+    pair_path.write_text(
+        json.dumps(
+            {
+                "left": {
+                    "birthdate": "1990-01-10",
+                    "birthtime": "14:05",
+                    "location": "Chicago, US",
+                },
+                "right": {
+                    "birthdate": "1992-03-04",
+                    "birthtime": "08:15",
+                    "location": "Berlin, DE",
+                },
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    cli_reader_path = tmp_path / "reader.json"
+    admin_dir = tmp_path / "admin"
+    rails = {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC",
+    }
+    for name, value in rails.items():
+        monkeypatch.setenv(name, value)
+    cli_env = os.environ.copy()
+    cli_env.update(rails)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/hdctl.py",
+            "showcompat",
+            "--pair-file",
+            str(pair_path),
+            "--dump-reader",
+            str(cli_reader_path),
+            "--dump-admin-dir",
+            str(admin_dir),
+        ],
+        cwd=repo_root,
+        env=cli_env,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr.decode("utf-8", errors="replace")
+    assert result.stderr == b""
+
+    cli_reader = cli_reader_path.read_bytes()
+    _assert_canonical_lf_bytes(cli_reader)
+
+    # The CLI's governed admin sidecars are its normalized chart pair. Point the
+    # HTTP path guard at only that private directory, then ask /reader to emit
+    # the same pair through the current HTTP adapter.
+    left_chart = admin_dir / "pair.left.bodygraph.json"
+    right_chart = admin_dir / "pair.right.bodygraph.json"
+    assert left_chart.is_file()
+    assert right_chart.is_file()
+    monkeypatch.setattr(http_reader, "ALLOWED_ROOT", admin_dir.resolve())
+
+    response = _client().get(
+        "/reader",
+        query_string={
+            "v": "1",
+            "a": str(left_chart),
+            "b": str(right_chart),
+            "a_tz": "UTC",
+            "b_tz": "UTC",
+        },
+        headers={"Accept-Encoding": "identity"},
+    )
+
+    assert response.status_code == 200
+    _assert_canonical_lf_bytes(response.data)
+    assert response.data == cli_reader
 
 
 @pytest.mark.epic025

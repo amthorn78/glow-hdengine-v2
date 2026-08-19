@@ -150,6 +150,71 @@ def test_explicit_produced_at_change_rewrites_unchanged_proof(
 
 
 @pytest.mark.parametrize(
+    "rel",
+    sorted(update_evidence_index.EPIC021_CURRENT_ARTIFACT_RELS),
+)
+def test_epic021_byte_changes_refresh_proof_chronology(
+    tmp_path,
+    monkeypatch,
+    rel,
+):
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    old_bytes = b"historical bytes\n"
+    new_bytes = b"fresh current-state bytes\n"
+    artifact = tmp_path / rel
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(new_bytes)
+    proof_path = tmp_path / f"{rel}.path_proof.txt"
+    proof_path.write_text(
+        "\n".join(
+            (
+                f"path: {rel}",
+                f"size_bytes: {len(old_bytes)}",
+                f"sha256: {hashlib.sha256(old_bytes).hexdigest()}",
+                "mtime_utc: 2026-08-17T00:00:00Z",
+                "produced_at_utc: 2026-08-17T00:00:00Z",
+                "",
+            )
+        ),
+        encoding="utf-8",
+    )
+    kwargs = {
+        "rel": rel,
+        "sha256": hashlib.sha256(new_bytes).hexdigest(),
+        "size_bytes": len(new_bytes),
+        "mtime_utc": None,
+        "produced_at": None,
+        "default_produced_at": "2026-08-18T00:00:00Z",
+        "stat_mtime": _dt.datetime(
+            2026, 8, 18, tzinfo=_dt.timezone.utc
+        ).timestamp(),
+    }
+
+    _, produced_at = update_evidence_index._write_path_proof(
+        check=False,
+        **kwargs,
+    )
+    proof = update_evidence_index._load_existing_proof(proof_path)
+    assert produced_at == "2026-08-18T00:00:00Z"
+    assert proof["sha256"] == hashlib.sha256(new_bytes).hexdigest()
+    assert proof["produced_at_utc"] == proof["mtime_utc"]
+
+    corrected = proof_path.read_bytes()
+    update_evidence_index._write_path_proof(check=True, **kwargs)
+    update_evidence_index._write_path_proof(
+        check=False,
+        **{
+            **kwargs,
+            "default_produced_at": "2099-01-01T00:00:00Z",
+            "stat_mtime": _dt.datetime(
+                2099, 1, 1, tzinfo=_dt.timezone.utc
+            ).timestamp(),
+        },
+    )
+    assert proof_path.read_bytes() == corrected
+
+
+@pytest.mark.parametrize(
     ("rel", "old_bytes", "new_bytes"),
     [
         (rel, old_bytes, new_bytes)

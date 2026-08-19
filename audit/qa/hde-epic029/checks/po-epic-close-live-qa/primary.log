@@ -1,6 +1,38 @@
-[check_id] po-epic-close-live-qa
-[timestamp_utc] 2026-04-10T21:07:22Z
-[command] /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/adapter/test_dev_sampler_http.py tests/http/test_dev_conjunction_http.py tests/http/test_endpoint_catalog.py
-..............                                                           [100%]
-14 passed in 1.39s
-[exit_code] 0
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-epic-close-live-qa","check_name":"EPIC029 current functional close bundle","claimed_tokens":[],"command":[["/tmp/pr391-ledger-venv/bin/python","-m","pytest","--version"],["/tmp/pr391-ledger-venv/bin/python","-m","pytest","--collect-only","-q","-p","no:cacheprovider","tests/adapter/test_dev_sampler_http.py","tests/http/test_dev_conjunction_http.py","tests/http/test_endpoint_catalog.py"],["/tmp/pr391-ledger-venv/bin/python","-m","pytest","-q","-p","no:cacheprovider","tests/adapter/test_dev_sampler_http.py","tests/http/test_dev_conjunction_http.py","tests/http/test_endpoint_catalog.py"]],"command_provenance":"EPIC029 exact executed non-shell argv receipts","evidence_artifacts":["audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log"],"exit_code":0,"intended_tokens":["TESTS_PASS_OK"],"pf_refs":["PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-08-19T02:07:53Z"}
+token_claim_posture: intended tokens are recorded but not claimed by this PR-03 receipt
+{"argv":["/tmp/pr391-ledger-venv/bin/python","-m","pytest","--version"],"command_index":1,"process_error":"","returncode":0}
+[stdout]
+pytest 8.4.2
+[stderr]
+
+{"argv":["/tmp/pr391-ledger-venv/bin/python","-m","pytest","--collect-only","-q","-p","no:cacheprovider","tests/adapter/test_dev_sampler_http.py","tests/http/test_dev_conjunction_http.py","tests/http/test_endpoint_catalog.py"],"command_index":2,"process_error":"","returncode":0}
+[stdout]
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_happy_path_and_canonical
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_determinism
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_seed_only_changes_seed
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_rejected_in_prod
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_rejected_when_app_env_missing
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_rejected_when_app_env_empty
+tests/adapter/test_dev_sampler_http.py::test_dev_sampler_post_only
+tests/http/test_dev_conjunction_http.py::test_dev_conjunction_endpoints_gate_in_prod
+tests/http/test_dev_conjunction_http.py::test_dev_conjunction_endpoints_closed_rails_refusal
+tests/http/test_dev_conjunction_http.py::test_dev_conjunction_endpoints_open_rails_success[dev]
+tests/http/test_dev_conjunction_http.py::test_dev_conjunction_endpoints_open_rails_success[test]
+tests/http/test_dev_conjunction_http.py::test_dev_conjunction_endpoints_open_rails_success[local]
+tests/http/test_dev_conjunction_http.py::test_dev_writer_conjunction_is_idempotent_bytes
+tests/http/test_dev_conjunction_http.py::test_dev_writer_conjunction_invalid_input_uses_typed_error
+tests/http/test_dev_conjunction_http.py::test_dev_writer_conjunction_retired_db_config_uses_typed_error
+tests/http/test_endpoint_catalog.py::test_endpoint_catalog_schema_is_strict_and_valid
+tests/http/test_endpoint_catalog.py::test_all_endpoint_methods_are_strings_and_internal_is_boolean
+tests/http/test_endpoint_catalog.py::test_internal_version_remains_a7_ineligible_get_and_head
+tests/http/test_endpoint_catalog.py::test_dev_writer_route_id_is_cataloged
+tests/http/test_endpoint_catalog.py::test_internal_dev_sampler_cataloged_as_internal_non_a7_dev_harness
+
+20 tests collected in 0.19s
+[stderr]
+
+{"argv":["/tmp/pr391-ledger-venv/bin/python","-m","pytest","-q","-p","no:cacheprovider","tests/adapter/test_dev_sampler_http.py","tests/http/test_dev_conjunction_http.py","tests/http/test_endpoint_catalog.py"],"command_index":3,"process_error":"","returncode":0}
+[stdout]
+....................                                                     [100%]
+20 passed in 0.28s
+[stderr]

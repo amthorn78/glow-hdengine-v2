@@ -1,5 +1,5 @@
 path: artifacts/epic020/bundles/INTVER_200_CTYPE_JSON_UTF8_OK.manifest.json
 size_bytes: 1318
-sha256: def29ad651ce6030a3daf7ac40f55a107ee9c1928e0497cfbc69186581503e12
+sha256: 792839e5bf2ea3e056298e5da3dbf3dad095d1fb030cedebecde84d3dc50b488
 mtime_utc: 2025-12-06T04:12:03Z
 produced_at_utc: 2025-12-06T04:11:16Z

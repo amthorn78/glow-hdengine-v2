@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic027/checks/gate_lf_endings/primary.log
+size_bytes: 1057
+sha256: 0c92f22c99fed977eef0c9da15c4f8cc0630d2b4bb25858cb17b6410c6666eca
+mtime_utc: 2026-08-19T02:11:42Z
+produced_at_utc: 2026-08-19T02:11:39Z

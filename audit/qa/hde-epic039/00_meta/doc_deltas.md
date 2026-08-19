@@ -18,3 +18,10 @@ This implementation evidence makes no claim of token satisfaction, QA PASS, acce
 - Replaced active repair-style updater/orientation/updater sequences with one updater publication followed by read-only checks, and extended the existing hash and final-LF controls across the complete D2 ledger skeleton. (PF05 — HDE CLI/API/Vendor Ref, §0.4; PF10 — HDE Build Notes, Addenda 2.3–2.5; PF14 — HDE Mechanics Guide, §1.3.)
 
 These PR-02 changes do not claim QA PASS, acceptance, token satisfaction, PF09 status movement, OPS completion, deployment, or epic closeout.
+
+## PR-03 reusable current-state QA harness
+
+- Hardened the generic QA harness around canonical epic-derived paths, stable check identities, the closed five-status model, same-interpreter pytest execution, PF27-v2 atomic primary logs, deterministic current-state manifests, and causally classified acceptance-map viability with PF04 token-roster and evidence-reference validation. (PF04 — HDE Governance, §2.0; PF14 — HDE Mechanics Guide, §§1.6.1–1.6.3; PF19 — Glow QA Guide, §§2.2.5, 4.4.5; PF27 — Plan Templates, §Step-log header schema expectations (required; v2).)
+- Reduced the EPIC021 entrypoint to concrete check definitions and generic delegation, migrated current generic-viability callers without regenerating their historical outputs, and isolated harness tests in temporary repository fixtures. (PF14 — HDE Mechanics Guide, §1.6.3; PF19 — Glow QA Guide, §§2.2.5, 4.4.5; PF27 — Plan Templates, §Executable helper boundary; PF10 — HDE Build Notes, §§2.7–2.8.)
+
+These PR-03 changes do not claim `QA_HARNESS_DISCIPLINE_OK`, `QA_HARNESS_ENTRYPOINT_SELFTEST_OK`, any other token satisfaction, QA PASS, acceptance, PF09 status movement, OPS or Live QA execution, deployment, or epic closeout. They do not create HDE-EPIC039 QA verdict artifacts or change public behavior.

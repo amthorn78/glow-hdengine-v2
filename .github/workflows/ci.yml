@@ -193,7 +193,13 @@ jobs:
             unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ROOT _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
             export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
             export PYTHONPATH="$legacy_source"
-            EPIC021_QA_RUN_ID=ci-selftest-epic021 python -m pytest tests/qa/test_epic021_harness_entrypoint.py
+            python -m pytest \
+              tests/qa/test_generic_qa_harness.py \
+              tests/qa/test_qa_harness_followup.py \
+              tests/qa/test_epic021_harness_entrypoint.py \
+              tests/qa/test_tooling_bootstrap.py \
+              tests/qa/test_viability_generator_wrappers.py \
+              tests/qa/test_epic029_requalification.py
             python -m pytest \
               tests/evidence \
               tests/ops/test_evidence_index.py \

@@ -1,8 +1,12 @@
+from pathlib import Path
+
 import pytest
 
 from adapter.http_reader import app
 from engine.cli import main as cli_main
 from engine.narratives import emit_public_aux, get_pack
+from engine.narratives import state as narrative_state
+from engine.narratives.loader import load_pack
 from engine.narratives.router import route_keys
 
 
@@ -16,9 +20,14 @@ DETERMINISM_PINS = {
 
 
 @pytest.fixture(autouse=True)
-def _rails(monkeypatch: pytest.MonkeyPatch) -> None:
+def _rails(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     for key, value in DETERMINISM_PINS.items():
         monkeypatch.setenv(key, value)
+    monkeypatch.setattr(
+        narrative_state,
+        "_PACK",
+        load_pack(Path("catalog/narratives"), tmp_path / "narratives"),
+    )
 
 
 def _find_suppressed_tuple():
@@ -27,17 +36,19 @@ def _find_suppressed_tuple():
         record = pack.keys.get(key)
         if record is None:
             continue
-        perspectives = ["shared"] if record.perspective == "shared" else list(record.directions)
-        for perspective in perspectives:
-            routed = route_keys(record.category, record.band, perspective)
-            lookup = "shared_key" if perspective == "shared" else "personal_key"
-            target = routed.get(lookup)
-            if target == key:
-                return {
-                    "category": record.category,
-                    "band": record.band,
-                    "perspective": perspective,
-                }
+        perspective = record.perspective
+        pack.primary_by_perspective[
+            (record.category, record.band, perspective)
+        ] = record
+        routed = route_keys(record.category, record.band, perspective)
+        lookup = "shared_key" if perspective == "shared" else "personal_key"
+        if routed.get(lookup) != key:
+            continue
+        return {
+            "category": record.category,
+            "band": record.band,
+            "perspective": perspective,
+        }
     raise AssertionError("suppressed tuple not found")
 
 
