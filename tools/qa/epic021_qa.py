@@ -294,6 +294,70 @@ TOKENS = (
 )
 
 
+@dataclass(frozen=True)
+class _TokenRecord:
+    owner_pf: str
+    evidence_artifacts: tuple[str, ...]
+    ci_tests_jobs: tuple[str, ...]
+    qa_root_logs: tuple[str, ...]
+    status: str
+
+
+def _sorted_unique(
+    values: Sequence[str], *, field: str, token_name: str
+) -> tuple[str, ...]:
+    if not values or any(
+        not isinstance(value, str) or not value.strip() for value in values
+    ):
+        raise ValueError(f"token {token_name} has malformed {field}")
+    stripped = tuple(value.strip() for value in values)
+    if len(stripped) != len(set(stripped)):
+        raise ValueError(f"token {token_name} has duplicate {field}")
+    return tuple(sorted(stripped))
+
+
+def _defined_token_rows() -> dict[str, _TokenRecord]:
+    rows: dict[str, _TokenRecord] = {}
+    for token in TOKENS:
+        name = token["name"]
+        if name in rows:
+            raise ValueError(f"duplicate EPIC021 token definition: {name}")
+        rows[name] = _TokenRecord(
+            token["owner_pf"],
+            _sorted_unique(
+                token["evidence_artifacts"].split(";"),
+                field="evidence_artifacts",
+                token_name=name,
+            ),
+            _sorted_unique(
+                token["ci_tests_jobs"].split(";"),
+                field="ci_tests_jobs",
+                token_name=name,
+            ),
+            _sorted_unique(
+                token["qa_root_logs"].split(";"),
+                field="qa_root_logs",
+                token_name=name,
+            ),
+            token["status"].lower(),
+        )
+    return rows
+
+
+def _manifest_token_records() -> list[dict[str, object]]:
+    return [
+        {
+            "ci_tests_jobs": list(row.ci_tests_jobs),
+            "evidence_artifacts": list(row.evidence_artifacts),
+            "name": name,
+            "owner_pf": row.owner_pf,
+            "qa_root_logs": list(row.qa_root_logs),
+            "status": row.status,
+        }
+        for name, row in sorted(_defined_token_rows().items())
+    ]
+
+
 def _acceptance_map_content() -> str:
     payload = {
         "epic_id": EPIC_ID,
@@ -441,6 +505,7 @@ def _close_manifest_content(captured_at_utc: str) -> str:
             "current_state_qa_requalification;"
             "historical_close_event_not_rewritten"
         ),
+        "tokens": _manifest_token_records(),
     }
     return json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
 
@@ -495,17 +560,247 @@ def _write_close_pack(captured_at_utc: str) -> None:
     )
 
 
+def _acceptance_map_token_rows(
+    captured_bytes: bytes,
+) -> tuple[tuple[str, ...], dict[str, _TokenRecord]]:
+    try:
+        payload = qa_harness._loads_json_strict(captured_bytes.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ValueError(f"acceptance map cannot be parsed: {exc}") from exc
+    if not isinstance(payload, dict) or payload.get("epic_id") != EPIC_ID:
+        raise ValueError("acceptance map epic identity is malformed or mismatched")
+    tokens = payload.get("tokens")
+    if not isinstance(tokens, list) or not tokens:
+        raise ValueError("acceptance map tokens must be a non-empty list")
+
+    roster: list[str] = []
+    rows: dict[str, _TokenRecord] = {}
+    for index, item in enumerate(tokens, start=1):
+        if not isinstance(item, dict):
+            raise TypeError(f"acceptance token entry {index} is not an object")
+        name = item.get("name")
+        owner_pf = item.get("owner_pf")
+        evidence = item.get("evidence_titles")
+        status = qa_harness._normalized_acceptance_posture(item.get("status"))
+        if not isinstance(name, str) or not qa_harness.TOKEN_RE.fullmatch(name):
+            raise ValueError(f"acceptance token entry {index} has an invalid name")
+        if name in rows:
+            raise ValueError(f"duplicate acceptance token: {name}")
+        if not isinstance(owner_pf, str) or not owner_pf.strip():
+            raise ValueError(f"acceptance token {name} has an invalid owner_pf")
+        if (
+            not isinstance(evidence, list)
+            or not evidence
+            or any(
+                not isinstance(value, str) or not value.strip() for value in evidence
+            )
+        ):
+            raise ValueError(f"acceptance token {name} has invalid evidence_titles")
+        if status is None:
+            raise ValueError(f"acceptance token {name} has an invalid status")
+        roster.append(name)
+        rows[name] = _TokenRecord(
+            owner_pf.strip(),
+            _sorted_unique(
+                evidence,
+                field="evidence_titles",
+                token_name=name,
+            ),
+            (),
+            (),
+            status,
+        )
+    return tuple(roster), rows
+
+
+def _token_matrix_rows(
+    path: Path, captured_bytes: bytes
+) -> tuple[tuple[str, ...], dict[str, _TokenRecord]]:
+    matrix, error = qa_harness._matrix_rows(path, captured_bytes=captured_bytes)
+    if error:
+        raise ValueError(f"token matrix cannot be parsed: {error}")
+    rows: dict[str, _TokenRecord] = {}
+    for name, row in matrix.items():
+        status = qa_harness._normalized_acceptance_posture(row.status)
+        if status is None:
+            raise ValueError(f"matrix token {name} has an invalid status")
+        rows[name] = _TokenRecord(
+            row.owner_pf.strip(),
+            _sorted_unique(
+                row.evidence_artifacts,
+                field="evidence_artifacts",
+                token_name=name,
+            ),
+            _sorted_unique(
+                row.ci_tests_jobs,
+                field="ci_tests_jobs",
+                token_name=name,
+            ),
+            _sorted_unique(
+                row.qa_root_logs,
+                field="qa_root_logs",
+                token_name=name,
+            ),
+            status,
+        )
+    return tuple(matrix), rows
+
+
+def _manifest_token_rows(
+    manifest: Mapping[str, object],
+) -> tuple[tuple[str, ...], dict[str, _TokenRecord]]:
+    tokens = manifest.get("tokens")
+    if not isinstance(tokens, list) or not tokens:
+        raise ValueError("close manifest tokens must be a non-empty list")
+    roster: list[str] = []
+    rows: dict[str, _TokenRecord] = {}
+    required_fields = {
+        "ci_tests_jobs",
+        "evidence_artifacts",
+        "name",
+        "owner_pf",
+        "qa_root_logs",
+        "status",
+    }
+    for index, item in enumerate(tokens, start=1):
+        if not isinstance(item, dict) or set(item) != required_fields:
+            raise ValueError(
+                f"close manifest token entry {index} has a malformed schema"
+            )
+        name = item.get("name")
+        owner_pf = item.get("owner_pf")
+        status = qa_harness._normalized_acceptance_posture(item.get("status"))
+        if (
+            not isinstance(name, str)
+            or not qa_harness.TOKEN_RE.fullmatch(name)
+            or name in rows
+        ):
+            raise ValueError(f"close manifest token entry {index} has an invalid name")
+        if not isinstance(owner_pf, str) or not owner_pf.strip():
+            raise ValueError(f"close manifest token {name} has an invalid owner_pf")
+        if status is None:
+            raise ValueError(f"close manifest token {name} has an invalid status")
+        roster.append(name)
+        rows[name] = _TokenRecord(
+            owner_pf.strip(),
+            _manifest_reference_list(item, "evidence_artifacts", name),
+            _manifest_reference_list(item, "ci_tests_jobs", name),
+            _manifest_reference_list(item, "qa_root_logs", name),
+            status,
+        )
+    if tuple(roster) != tuple(sorted(roster)):
+        raise ValueError("close manifest token roster is not ASCII-sorted")
+    return tuple(roster), rows
+
+
+def _manifest_reference_list(
+    item: Mapping[str, object], field: str, token_name: str
+) -> tuple[str, ...]:
+    values = item.get(field)
+    if not isinstance(values, list):
+        raise TypeError(f"close manifest token {token_name} has malformed {field}")
+    normalized = _sorted_unique(values, field=field, token_name=token_name)
+    if tuple(values) != normalized:
+        raise ValueError(
+            f"close manifest token {token_name} {field} is not ASCII-sorted"
+        )
+    return normalized
+
+
+def _validate_acceptance_lockstep(
+    manifest: Mapping[str, object],
+    viability: Mapping[str, object],
+    *,
+    acceptance_map_bytes: bytes,
+    token_matrix_bytes: bytes,
+    token_matrix_path: Path = TOKEN_MATRIX_PATH,
+) -> None:
+    expected_rows = _defined_token_rows()
+    map_roster, map_rows = _acceptance_map_token_rows(acceptance_map_bytes)
+    matrix_roster, matrix_rows = _token_matrix_rows(
+        token_matrix_path, token_matrix_bytes
+    )
+    manifest_roster, manifest_rows = _manifest_token_rows(manifest)
+
+    rosters = (set(map_roster), set(matrix_roster), set(manifest_roster))
+    if not (rosters[0] == rosters[1] == rosters[2]):
+        raise ValueError("map, matrix, and close manifest token rosters disagree")
+    for name in sorted(rosters[0]):
+        map_row = map_rows[name]
+        matrix_row = matrix_rows[name]
+        manifest_row = manifest_rows[name]
+        if (
+            map_row.owner_pf != matrix_row.owner_pf
+            or map_row.evidence_artifacts != matrix_row.evidence_artifacts
+            or map_row.status != matrix_row.status
+        ):
+            raise ValueError(
+                f"acceptance map and token matrix bindings disagree for {name}"
+            )
+        if matrix_row != manifest_row:
+            raise ValueError(
+                f"token matrix and close manifest records disagree for {name}"
+            )
+    if matrix_rows != expected_rows:
+        raise ValueError("acceptance records disagree with current token definitions")
+
+    expected_disposition = {name: "VALID" for name in sorted(rosters[0])}
+    if viability.get("epic_id") != EPIC_ID:
+        raise ValueError("close viability epic identity is malformed or mismatched")
+    if viability.get("acceptance_map_path") != REQUIRED_CLOSE_OUTPUTS["acceptance_map"]:
+        raise ValueError("close viability acceptance_map_path is not canonical")
+    if viability.get("token_status") != expected_disposition:
+        raise ValueError("close viability token_status is not the exact current roster")
+    if viability.get("token_reference_disposition") != expected_disposition:
+        raise ValueError(
+            "close viability token_reference_disposition is not the exact current roster"
+        )
+
+
+def _capture_close_input(path: Path, *, subject: str) -> bytes:
+    status, reason, payload = qa_harness._read_stable_repo_file_bytes(
+        ROOT, path, subject=subject
+    )
+    if status is not qa_harness.Status.PASS or payload is None:
+        raise ValueError(
+            f"{subject} cannot be captured safely: {status.value}: {reason}"
+        )
+    return payload
+
+
 def _validate_close_pack() -> None:
     try:
-        manifest = json.loads(CLOSE_MANIFEST_PATH.read_text(encoding="utf-8"))
+        manifest_bytes = _capture_close_input(
+            CLOSE_MANIFEST_PATH, subject="EPIC021 close manifest"
+        )
+        acceptance_map_bytes = _capture_close_input(
+            ACCEPTANCE_MAP_PATH, subject="EPIC021 acceptance map"
+        )
+        token_matrix_bytes = _capture_close_input(
+            TOKEN_MATRIX_PATH, subject="EPIC021 token matrix"
+        )
+        viability_bytes = _capture_close_input(
+            VIABILITY_LOG_PATH, subject="EPIC021 viability ledger"
+        )
+        close_report_bytes = _capture_close_input(
+            CLOSE_REPORT_PATH, subject="EPIC021 close report"
+        )
+        manifest = qa_harness._loads_json_strict(manifest_bytes.decode("utf-8"))
+        if not isinstance(manifest, dict):
+            raise TypeError("close manifest is not an object")
         captured_at_utc = manifest["captured_at_utc"]
-        if CLOSE_MANIFEST_PATH.read_text(encoding="utf-8") != (
-            _close_manifest_content(captured_at_utc)
-        ):
+        viability = qa_harness._loads_json_strict(viability_bytes.decode("utf-8"))
+        if not isinstance(viability, dict):
+            raise TypeError("close viability is not an object")
+        _validate_acceptance_lockstep(
+            manifest,
+            viability,
+            acceptance_map_bytes=acceptance_map_bytes,
+            token_matrix_bytes=token_matrix_bytes,
+        )
+        if manifest_bytes.decode("utf-8") != _close_manifest_content(captured_at_utc):
             raise ValueError("close manifest is not canonical")
-        if CLOSE_REPORT_PATH.read_text(encoding="utf-8") != (
-            _close_report_content(captured_at_utc)
-        ):
+        if close_report_bytes.decode("utf-8") != _close_report_content(captured_at_utc):
             raise ValueError("close report is not canonical")
         key_outputs = manifest["key_outputs"]
         if not isinstance(key_outputs, dict):
@@ -523,12 +818,9 @@ def _validate_close_pack() -> None:
             output = ROOT / relative_path
             if not output.is_file() or output.stat().st_size == 0:
                 raise ValueError(f"close output unavailable: {relative_path}")
-        viability = json.loads(VIABILITY_LOG_PATH.read_text(encoding="utf-8"))
         if (
             viability.get("status") != qa_harness.Status.PASS.value
             or viability.get("broken_references") != []
-            or len(viability.get("token_status", {})) != len(TOKENS)
-            or set(viability["token_status"].values()) != {"VALID"}
         ):
             raise ValueError("close viability is not exact PASS")
         step_manifest = json.loads(
@@ -547,7 +839,14 @@ def _validate_close_pack() -> None:
             for entry in step_manifest.values()
         ):
             raise ValueError("close step manifest is not exact six-check PASS")
-    except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        KeyError,
+        OSError,
+        TypeError,
+        UnicodeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         raise RuntimeError(f"EPIC021_CLOSE_PACK_INVALID:{exc}") from exc
 
 

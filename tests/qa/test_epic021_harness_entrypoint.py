@@ -669,3 +669,217 @@ def test_close_pack_names_required_rails_and_same_run_receipts():
     assert {
         key: manifest["key_outputs"][key] for key in expected_logs
     } == expected_logs
+
+    assert manifest["tokens"] == epic021_qa._manifest_token_records()
+    assert [record["name"] for record in manifest["tokens"]] == sorted(
+        token["name"] for token in epic021_qa.TOKENS
+    )
+    assert all(
+        set(record)
+        == {
+            "ci_tests_jobs",
+            "evidence_artifacts",
+            "name",
+            "owner_pf",
+            "qa_root_logs",
+            "status",
+        }
+        for record in manifest["tokens"]
+    )
+
+
+def _acceptance_lockstep_fixture(
+    tmp_path: Path,
+) -> tuple[dict[str, object], dict[str, object], Path, Path]:
+    acceptance_map = tmp_path / "acceptance_map.json"
+    token_matrix = tmp_path / "token_evidence_matrix.md"
+    acceptance_map.write_text(epic021_qa._acceptance_map_content(), encoding="utf-8")
+    token_matrix.write_text(epic021_qa._token_matrix_content(), encoding="utf-8")
+    manifest = json.loads(epic021_qa._close_manifest_content("2026-08-18T00:00:00Z"))
+    disposition = {token["name"]: "VALID" for token in epic021_qa.TOKENS}
+    viability = {
+        "acceptance_map_path": "docs/acceptance_map_epic021.json",
+        "epic_id": epic021_qa.EPIC_ID,
+        "token_reference_disposition": dict(disposition),
+        "token_status": dict(disposition),
+    }
+    return manifest, viability, acceptance_map, token_matrix
+
+
+def _validate_fixture_lockstep(
+    manifest: dict[str, object],
+    viability: dict[str, object],
+    acceptance_map: Path,
+    token_matrix: Path,
+) -> None:
+    epic021_qa._validate_acceptance_lockstep(
+        manifest,
+        viability,
+        acceptance_map_bytes=acceptance_map.read_bytes(),
+        token_matrix_bytes=token_matrix.read_bytes(),
+        token_matrix_path=token_matrix,
+    )
+
+
+def test_close_acceptance_bindings_validate_exact_lockstep(tmp_path: Path):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+
+    _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+@pytest.mark.parametrize("mutation", ("omission", "extra", "substitution"))
+def test_close_manifest_rejects_nonexact_token_roster(tmp_path: Path, mutation: str):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    records = manifest["tokens"]
+    assert isinstance(records, list)
+    if mutation == "omission":
+        records.pop()
+    elif mutation == "extra":
+        extra = dict(records[-1])
+        extra["name"] = "ZZZ_EPIC021_EXTRA_TOKEN_OK"
+        records.append(extra)
+    else:
+        records[0]["name"] = "AAA_EPIC021_SUBSTITUTED_TOKEN_OK"
+
+    with pytest.raises(ValueError, match="token rosters disagree"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+def test_close_manifest_rejects_token_evidence_contradiction(tmp_path: Path):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    records = manifest["tokens"]
+    assert isinstance(records, list)
+    records[0]["evidence_artifacts"] = ["contradictory-proof.txt"]
+
+    with pytest.raises(ValueError, match="matrix and close manifest records disagree"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+def test_close_manifest_rejects_map_matrix_evidence_contradiction(tmp_path: Path):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    lines = token_matrix.read_text(encoding="utf-8").splitlines()
+    token_name = epic021_qa.TOKENS[0]["name"]
+    for index, line in enumerate(lines):
+        if line.startswith(f"| {token_name} |"):
+            cells = line.split("|")
+            cells[3] = " contradictory-proof.txt "
+            lines[index] = "|".join(cells)
+            break
+    else:  # pragma: no cover - canonical fixture invariant
+        raise AssertionError(f"missing matrix row: {token_name}")
+    token_matrix.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="map and token matrix bindings disagree"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+def test_close_manifest_rejects_map_matrix_status_contradiction(tmp_path: Path):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    payload = json.loads(acceptance_map.read_text(encoding="utf-8"))
+    payload["tokens"][0]["status"] = "planned"
+    acceptance_map.write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="map and token matrix bindings disagree"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    (
+        ("status", "planned"),
+        ("ci_tests_jobs", ["python -m pytest contradictory_test.py"]),
+        ("qa_root_logs", ["checks/contradictory/primary.log"]),
+    ),
+)
+def test_close_manifest_rejects_status_test_and_qa_binding_drift(
+    tmp_path: Path, field: str, replacement: object
+):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    records = manifest["tokens"]
+    assert isinstance(records, list)
+    records[0][field] = replacement
+
+    with pytest.raises(ValueError, match="matrix and close manifest records disagree"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+def test_close_manifest_rejects_duplicate_token_records(tmp_path: Path):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    records = manifest["tokens"]
+    assert isinstance(records, list)
+    records.append(dict(records[-1]))
+
+    with pytest.raises(ValueError, match="invalid name"):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+@pytest.mark.parametrize("field", ("token_status", "token_reference_disposition"))
+@pytest.mark.parametrize("mutation", ("omission", "substitution"))
+def test_close_manifest_rejects_nonexact_viability_token_keys(
+    tmp_path: Path, field: str, mutation: str
+):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    dispositions = viability[field]
+    assert isinstance(dispositions, dict)
+    removed = next(iter(dispositions))
+    dispositions.pop(removed)
+    if mutation == "substitution":
+        dispositions["EPIC021_SUBSTITUTED_TOKEN_OK"] = "VALID"
+
+    with pytest.raises(ValueError, match=field):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement", "message"),
+    (
+        ("epic_id", "HDE-EPIC999", "epic identity"),
+        (
+            "acceptance_map_path",
+            "docs/acceptance_map_epic999.json",
+            "acceptance_map_path",
+        ),
+    ),
+)
+def test_close_manifest_rejects_wrong_viability_identity(
+    tmp_path: Path, field: str, replacement: str, message: str
+):
+    manifest, viability, acceptance_map, token_matrix = _acceptance_lockstep_fixture(
+        tmp_path
+    )
+    viability[field] = replacement
+
+    with pytest.raises(ValueError, match=message):
+        _validate_fixture_lockstep(manifest, viability, acceptance_map, token_matrix)
+
+
+def test_close_input_capture_rejects_symlink_alias(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    target = tmp_path / "manifest-target.json"
+    target.write_text("{}\n", encoding="utf-8")
+    alias = tmp_path / "manifest.json"
+    alias.symlink_to(target.name)
+    monkeypatch.setattr(epic021_qa, "ROOT", tmp_path)
+
+    with pytest.raises(ValueError, match="cannot be captured safely"):
+        epic021_qa._capture_close_input(alias, subject="test close manifest")

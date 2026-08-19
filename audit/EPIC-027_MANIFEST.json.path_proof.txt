@@ -1,5 +1,5 @@
 path: audit/EPIC-027_MANIFEST.json
 size_bytes: 2002
-sha256: 8ef4ee4085e938f209a91f0cbbdbb1433fecb6102c67260275e672abfcf66387
-mtime_utc: 2026-08-19T01:00:42Z
-produced_at_utc: 2026-08-19T01:00:35Z
+sha256: ec3d1216ced3e7b6da2ca795ee079f8fa79658b7336b0e62bc552873605abb08
+mtime_utc: 2026-08-19T01:40:23Z
+produced_at_utc: 2026-08-19T01:40:17Z
