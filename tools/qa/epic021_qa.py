@@ -1621,6 +1621,7 @@ def _record_bootstrap_with_legacy_supersession(
 
 def run_epic021_qa(*, repo_root: Path | None = None) -> dict[str, object]:
     """Execute EPIC021's concrete bootstrap and governed viability definitions."""
+    ensure_determinism_env()
     config = qa_harness.HarnessConfig(
         EPIC_ID,
         repo_root=repo_root,

@@ -1698,6 +1698,23 @@ def _read_supported_primary_header(
     return data
 
 
+def _require_v2_primary_self_binding(
+    config: HarnessConfig,
+    check_id: str,
+    header: Mapping[str, object],
+) -> None:
+    if header.get("schema_version") != "pf27.step_log_header.v2":
+        return
+    expected = (
+        config.qa_root / "checks" / check_id / "primary.log"
+    ).relative_to(config.repo_root).as_posix()
+    evidence_artifacts = header.get("evidence_artifacts")
+    if not isinstance(evidence_artifacts, list) or expected not in evidence_artifacts:
+        raise ValueError(
+            "PF27 v2 evidence_artifacts omit the canonical own primary log"
+        )
+
+
 def _manifest_entry_log_path(
     config: HarnessConfig,
     check_id: str,
@@ -1782,6 +1799,7 @@ def _normalize_manifest_checks(
         entry = checks[check_id]
         log = _manifest_entry_log_path(config, check_id, entry)
         header = _read_supported_primary_header(log, expected_check_id=check_id)
+        _require_v2_primary_self_binding(config, check_id, header)
         assert isinstance(entry, dict)
         allowed_fields = {
             "check_id",
@@ -1865,6 +1883,7 @@ def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
     expected = config.qa_root / "checks" / check_id / "primary.log"
     if log_path.resolve() != expected.resolve():
         raise ValueError("non-canonical primary log path")
+    _require_v2_primary_self_binding(config, check_id, header)
     path = config.qa_root / "qa_step_logs_manifest.json"
     checks = _preflight_manifest(config)
     checks[check_id] = {
@@ -1890,6 +1909,7 @@ def verify_manifest_entry(config: HarnessConfig, check_id: str) -> dict[str, str
     entry = payload[check_id]
     log = config.repo_root / entry["log_path"]
     header = _read_supported_primary_header(log, expected_check_id=check_id)
+    _require_v2_primary_self_binding(config, check_id, header)
     if entry != {
         "check_id": check_id,
         "log_path": _repo_relative(config, log),

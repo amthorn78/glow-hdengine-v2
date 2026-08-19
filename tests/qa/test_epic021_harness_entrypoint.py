@@ -9,6 +9,20 @@ from tools.evidence import run_sanity_pipeline
 from tools.qa.epic021_qa import run_epic021_qa
 from tools.qa.qa_harness import HarnessConfig, Status
 
+CLOSED_RAILS = {
+    "ALLOW_NETWORK": "0",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC",
+}
+
+
+@pytest.fixture(autouse=True)
+def enforce_closed_rails(monkeypatch: pytest.MonkeyPatch) -> None:
+    for key, value in CLOSED_RAILS.items():
+        monkeypatch.setenv(key, value)
+
 
 def _repo(root: Path) -> None:
     (root / "docs/pfcanon").mkdir(parents=True)
@@ -150,6 +164,7 @@ def test_wrapper_delegates_to_current_state_harness(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
     _repo(tmp_path)
+    assert epic021_qa.ensure_determinism_env() == CLOSED_RAILS
 
     class Done:
         returncode = 0
@@ -173,6 +188,54 @@ def test_wrapper_delegates_to_current_state_harness(
     assert result["governed_ledger"] == ledger
     assert result["viability"].governed_ledger == ledger
     assert json.loads(ledger.read_text(encoding="utf-8"))["status"] == "PASS"
+
+
+@pytest.mark.parametrize("posture", ("unset", "open"))
+def test_imported_wrapper_rejects_invalid_rails_before_execution_or_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    posture: str,
+):
+    _repo(tmp_path)
+    if posture == "unset":
+        for key in CLOSED_RAILS:
+            monkeypatch.delenv(key, raising=False)
+    else:
+        monkeypatch.setenv("SAFE_MODE", "0")
+        monkeypatch.setenv("ALLOW_NETWORK", "1")
+
+    before = {
+        path.relative_to(tmp_path).as_posix(): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    observed: list[str] = []
+
+    def forbidden(boundary: str) -> None:
+        observed.append(boundary)
+        raise AssertionError(f"invalid rails crossed {boundary} boundary")
+
+    monkeypatch.setattr(
+        epic021_qa.qa_harness.subprocess,
+        "run",
+        lambda *_args, **_kwargs: forbidden("subprocess"),
+    )
+    monkeypatch.setattr(
+        epic021_qa,
+        "_record_bootstrap_with_legacy_supersession",
+        lambda *_args, **_kwargs: forbidden("governed-write"),
+    )
+
+    with pytest.raises(epic021_qa.DeterminismEnvError, match="env pins mismatch"):
+        run_epic021_qa(repo_root=tmp_path)
+
+    after = {
+        path.relative_to(tmp_path).as_posix(): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    assert observed == []
+    assert after == before
 
 
 def test_wrapper_never_creates_checkout_qa_files(

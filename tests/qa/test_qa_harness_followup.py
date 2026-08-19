@@ -1304,6 +1304,39 @@ def test_manifest_key_entry_and_header_identity_must_agree(repository: Path):
         record_check(config, _pass("current"))
 
 
+@pytest.mark.parametrize("consumer", ["preflight", "verify"])
+@pytest.mark.parametrize("self_bound", [False, True])
+def test_v2_manifest_receipt_requires_exact_primary_self_binding(
+    repository: Path, consumer: str, self_bound: bool
+):
+    config = _configure(repository, "HDE-EPIC039")
+    log, _ = record_check(config, _pass("current"))
+    lines = log.read_text(encoding="utf-8").splitlines()
+    header = json.loads(lines[0])
+    if not self_bound:
+        header["evidence_artifacts"] = ["evidence/unrelated.log"]
+        log.write_text(
+            "\n".join(
+                (
+                    json.dumps(header, sort_keys=True, separators=(",", ":")),
+                    *lines[1:],
+                    "",
+                )
+            ),
+            encoding="utf-8",
+        )
+
+    def consume():
+        if consumer == "preflight":
+            return qa_harness._preflight_manifest(config)["current"]
+        return qa_harness.verify_manifest_entry(config, "current")
+    if self_bound:
+        assert consume()["status"] == "PASS"
+    else:
+        with pytest.raises(ValueError, match="canonical own primary log"):
+            consume()
+
+
 def test_transition_rejects_invalid_header_status(repository: Path):
     config = _configure(repository, "HDE-EPIC027")
     _write_v1(config, "po-001", status="SUCCESS")
