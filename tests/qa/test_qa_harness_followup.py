@@ -2307,9 +2307,13 @@ def test_unmocked_epic027_viability_wrapper_uses_shared_evaluator(
         qa="acceptance_map_viability.log",
         step_names=("acceptance_map_viability",),
     )
-    monkeypatch.setattr(module, "ROOT", repository)
-    monkeypatch.setattr(module, "VIABILITY_LOG_PATH", config.viability_ledger_path)
-    module._write_viability_log()
+    protected = repository.parent / "authoritative-checkout"
+    protected.mkdir()
+    monkeypatch.setattr(module, "ROOT", protected)
+
+    result = module.run_viability(repo_root=repository)
+
+    assert result.status is Status.PASS
     assert config.viability_ledger_path.is_file()
     payload = json.loads((config.qa_root / "qa_step_logs_manifest.json").read_text())
     assert payload["acceptance-map-viability"]["status"] == "PASS"

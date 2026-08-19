@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log
-size_bytes: 1174
-sha256: 111bad7c3726f65056f3be45153b237878dfc85620728bb602a7b9a261b99ba9
-mtime_utc: 2026-08-19T04:24:00Z
-produced_at_utc: 2026-08-19T04:23:50Z

@@ -1,1 +1,1 @@
-ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl
+ci/checks/check_mirror_schema.sh

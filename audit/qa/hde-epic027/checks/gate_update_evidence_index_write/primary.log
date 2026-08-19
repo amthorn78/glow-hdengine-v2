@@ -1,5 +1,6 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"gate_update_evidence_index_write","check_name":"EPIC027 governed gate: gate_update_evidence_index_write","claimed_tokens":[],"command":["python","tools/evidence/update_evidence_index.py"],"command_provenance":"Executed exact non-shell argv; exit code returned by subprocess","evidence_artifacts":["audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log","audit/qa/hde-epic027/checks/gate_update_evidence_index_write/command_used.txt","audit/qa/hde-epic027/checks/gate_update_evidence_index_write/rc.txt","audit/qa/hde-epic027/checks/gate_update_evidence_index_write/stdout.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-08-19T04:24:00Z"}
-command_capture:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/command_used.txt
-stdout_capture:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/stdout.log
-stderr_capture:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/stderr.log
-exit_code_capture:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/rc.txt
+check_id:gate_update_evidence_index_write
+status:PASS
+command:python tools/evidence/update_evidence_index.py
+stdout_log:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/stdout.log
+stderr_log:audit/qa/hde-epic027/checks/gate_update_evidence_index_write/stderr.log
+rc:0

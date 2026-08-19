@@ -43,6 +43,9 @@ UTC_TIMESTAMP_RE = re.compile(
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 ADMITTED_ENV_KEYS = frozenset((*DETERMINISM_ENV_PINS.keys(), "APP_ENV"))
 NONCLAIM_EXPLANATION = "token_claim_posture: intended tokens are recorded but not claimed by this PR-03 receipt"
+FROZEN_EVIDENCE_INVENTORY = Path(__file__).with_name(
+    "frozen_evidence_hde_epic039.json"
+)
 
 
 class Status(str, Enum):
@@ -82,6 +85,294 @@ class HarnessConfig:
         object.__setattr__(
             self, "viability_ledger_path", self.qa_root / "acceptance_map_viability.log"
         )
+
+
+def require_disjoint_repository_root(
+    candidate_root: Path,
+    *,
+    protected_root: Path,
+) -> Path:
+    """Require a fully disjoint workspace before an epic wrapper may act."""
+
+    candidate = candidate_root.resolve()
+    protected = protected_root.resolve()
+    if not candidate.is_dir():
+        raise ValueError("candidate repository root is unavailable")
+    if (
+        candidate == protected
+        or protected in candidate.parents
+        or candidate in protected.parents
+    ):
+        raise ValueError(
+            "historical QA execution requires a repository disjoint from the "
+            "authoritative checkout"
+        )
+    return candidate
+
+
+def _git_blob_sha1(payload: bytes) -> str:
+    framed = b"blob " + str(len(payload)).encode("ascii") + b"\0" + payload
+    try:
+        digest = hashlib.sha1(framed, usedforsecurity=False)
+    except TypeError:  # pragma: no cover - older Python compatibility
+        digest = hashlib.sha1(framed)
+    return digest.hexdigest()
+
+
+def _load_frozen_evidence_inventory(
+    inventory_path: Path = FROZEN_EVIDENCE_INVENTORY,
+) -> Mapping[str, object]:
+    try:
+        payload = json.loads(inventory_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"frozen evidence inventory is unreadable: {exc}") from exc
+    if not isinstance(payload, dict) or payload.get("schema_version") != "1.0":
+        raise ValueError("frozen evidence inventory has an unsupported schema")
+    return payload
+
+
+def _validated_frozen_inventory_path(value: object) -> str:
+    if (
+        not isinstance(value, str)
+        or not EXACT_RELATIVE_PATH_RE.fullmatch(value)
+        or any(part in {".", ".."} for part in value.split("/"))
+    ):
+        raise ValueError("frozen evidence inventory contains an invalid path")
+    return value
+
+
+def _validated_frozen_inventory(
+    inventory: Mapping[str, object],
+) -> tuple[dict[str, str], tuple[str, ...]]:
+    historical = inventory.get("frozen_historical")
+    drift = inventory.get("unrelated_drift")
+    authorized = inventory.get("authorized_current_state_paths")
+    companions = inventory.get("index_mirror_companion_paths")
+    counts = inventory.get("classification_counts")
+    if (
+        not isinstance(historical, dict)
+        or not isinstance(drift, dict)
+        or not isinstance(authorized, list)
+        or not isinstance(companions, list)
+        or not isinstance(counts, dict)
+    ):
+        raise ValueError("frozen evidence inventory categories are malformed")
+
+    historical_files = historical.get("restore_files")
+    forbidden_paths = historical.get("delete_paths")
+    transient_paths = historical.get("transient_absent_paths")
+    drift_files = drift.get("restore_files")
+    if (
+        not isinstance(historical_files, dict)
+        or not isinstance(drift_files, dict)
+        or not isinstance(forbidden_paths, list)
+        or not isinstance(transient_paths, list)
+    ):
+        raise ValueError("frozen evidence inventory path sets are malformed")
+
+    def validated_files(value: Mapping[object, object]) -> dict[str, str]:
+        result: dict[str, str] = {}
+        for raw_path, raw_blob in value.items():
+            rel = _validated_frozen_inventory_path(raw_path)
+            if not isinstance(raw_blob, str) or not re.fullmatch(
+                r"[0-9a-f]{40}", raw_blob
+            ):
+                raise ValueError(
+                    "frozen evidence inventory contains an invalid file row"
+                )
+            result[rel] = raw_blob
+        return result
+
+    historical_rows = validated_files(historical_files)
+    drift_rows = validated_files(drift_files)
+    absent_rows = tuple(
+        _validated_frozen_inventory_path(value) for value in forbidden_paths
+    )
+    transient_rows = tuple(
+        _validated_frozen_inventory_path(value) for value in transient_paths
+    )
+    authorized_rows = tuple(
+        _validated_frozen_inventory_path(value) for value in authorized
+    )
+    companion_rows = tuple(
+        _validated_frozen_inventory_path(value) for value in companions
+    )
+    path_sequences = (
+        absent_rows,
+        transient_rows,
+        authorized_rows,
+        companion_rows,
+    )
+    if any(len(rows) != len(set(rows)) for rows in path_sequences):
+        raise ValueError("frozen evidence inventory contains duplicate paths")
+
+    historical_set = set(historical_rows)
+    drift_set = set(drift_rows)
+    absent_set = set(absent_rows)
+    transient_set = set(transient_rows)
+    authorized_set = set(authorized_rows)
+    companion_set = set(companion_rows)
+    classified_sets = (
+        historical_set,
+        drift_set,
+        absent_set,
+        transient_set,
+        authorized_set,
+        companion_set,
+    )
+    if any(
+        left & right
+        for index, left in enumerate(classified_sets)
+        for right in classified_sets[index + 1 :]
+    ):
+        raise ValueError("frozen evidence inventory classifications overlap")
+
+    expected_counts = {
+        "frozen_restore_files": len(historical_rows),
+        "frozen_delete_paths": len(absent_rows),
+        "transient_absent_paths": len(transient_rows),
+        "frozen_historical_paths": (
+            len(historical_rows) + len(absent_rows) + len(transient_rows)
+        ),
+        "unrelated_drift_restore_files": len(drift_rows),
+        "authorized_current_state_paths": len(authorized_rows),
+        "index_mirror_companion_paths": len(companion_rows),
+        "net_artifact_paths": (
+            len(historical_rows)
+            + len(absent_rows)
+            + len(drift_rows)
+            + len(authorized_rows)
+            + len(companion_rows)
+        ),
+        "lineage_artifact_paths": (
+            len(historical_rows)
+            + len(absent_rows)
+            + len(transient_rows)
+            + len(drift_rows)
+            + len(authorized_rows)
+            + len(companion_rows)
+        ),
+    }
+    if counts != expected_counts:
+        raise ValueError("frozen evidence inventory classification counts disagree")
+
+    return (
+        {**historical_rows, **drift_rows},
+        tuple(sorted((*absent_rows, *transient_rows))),
+    )
+
+
+def frozen_evidence_violations(
+    repo_root: Path,
+    *,
+    inventory_path: Path = FROZEN_EVIDENCE_INVENTORY,
+) -> tuple[str, ...]:
+    """Return exact-byte or forbidden-path violations without mutating the tree."""
+
+    root = repo_root.resolve()
+    if not root.is_dir():
+        raise ValueError("repository root is unavailable")
+    inventory = _load_frozen_evidence_inventory(inventory_path)
+    expected_files, forbidden_paths = _validated_frozen_inventory(inventory)
+    violations: list[str] = []
+    for rel, expected_blob in sorted(expected_files.items()):
+        status, reason, content = _read_stable_repo_file_bytes(
+            root,
+            root / rel,
+            subject=f"frozen evidence {rel}",
+        )
+        if status is not Status.PASS or content is None:
+            violations.append(f"{rel}: {reason or status.value}")
+            continue
+        actual_blob = _git_blob_sha1(content)
+        if actual_blob != expected_blob:
+            violations.append(
+                f"{rel}: expected Git blob {expected_blob}, found {actual_blob}"
+            )
+
+    for rel in forbidden_paths:
+        path = root / rel
+        alias_error = _repo_symlink_resolution_error(root, path)
+        if alias_error:
+            violations.append(f"{rel}: {alias_error}")
+        elif os.path.lexists(path):
+            violations.append(f"{rel}: baseline-absent path exists")
+    return tuple(violations)
+
+
+def require_frozen_evidence(
+    repo_root: Path,
+    *,
+    inventory_path: Path = FROZEN_EVIDENCE_INVENTORY,
+) -> None:
+    """Fail closed unless every pre-lineage artifact is byte-exact or absent."""
+
+    violations = frozen_evidence_violations(
+        repo_root,
+        inventory_path=inventory_path,
+    )
+    if violations:
+        raise RuntimeError("FROZEN_EVIDENCE_VIOLATION:" + " | ".join(violations))
+
+
+def close_manifest_checks(
+    qa_manifest: Mapping[str, object],
+) -> Mapping[str, object]:
+    """Return a canonical flat check mapping without reading or writing evidence."""
+
+    if not isinstance(qa_manifest, dict) or any(
+        not isinstance(check_id, str)
+        or not CHECK_RE.fullmatch(check_id)
+        or not isinstance(entry, dict)
+        or entry.get("check_id") != check_id
+        for check_id, entry in qa_manifest.items()
+    ):
+        raise ValueError("QA_STEP_MANIFEST_CHECKS_INVALID")
+    return qa_manifest
+
+
+def run_free_close_manifest_payload(
+    epic_id: str,
+    captured_at_utc: str,
+    key_outputs: Mapping[str, str],
+    *,
+    qa_manifest: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Build one status-free close-manifest shape without publication mechanics."""
+
+    match = EPIC_RE.fullmatch(epic_id)
+    if not match:
+        raise ValueError("epic_id must match HDE-EPIC<NNN>")
+    _validate_timestamp(captured_at_utc)
+    if not isinstance(key_outputs, Mapping) or not key_outputs:
+        raise ValueError("close manifest key_outputs must be a non-empty mapping")
+    normalized_outputs: dict[str, str] = {}
+    for key, value in key_outputs.items():
+        if (
+            not isinstance(key, str)
+            or not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", key)
+            or not isinstance(value, str)
+            or not EXACT_RELATIVE_PATH_RE.fullmatch(value)
+            or any(part in {".", ".."} for part in value.split("/"))
+        ):
+            raise ValueError("close manifest key_outputs are malformed")
+        normalized_outputs[key] = value
+
+    epic_slug = f"hde-epic{match.group(1)}"
+    payload: dict[str, object] = {
+        "captured_at_utc": captured_at_utc,
+        "closeout_dir": f"audit/qa/{epic_slug}",
+        "epic_id": epic_id,
+        "key_outputs": normalized_outputs,
+        "qa_epic_root": f"audit/qa/{epic_slug}",
+        "qa_step_manifest_path": (
+            f"audit/qa/{epic_slug}/qa_step_logs_manifest.json"
+        ),
+        "scope": "read_only_reference_only",
+    }
+    if qa_manifest is not None:
+        payload["qa_step_count"] = len(close_manifest_checks(qa_manifest))
+    return payload
 
 
 @dataclass(frozen=True)

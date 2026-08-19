@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log
-size_bytes: 1198
-sha256: 5fe7c45256c7bd940b2099980682a0a5073585634152a6b4afc9121a4a89598e
-mtime_utc: 2026-08-19T04:24:00Z
-produced_at_utc: 2026-08-19T04:23:50Z

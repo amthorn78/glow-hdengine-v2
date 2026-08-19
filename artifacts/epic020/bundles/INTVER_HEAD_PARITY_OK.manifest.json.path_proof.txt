@@ -1,5 +1,5 @@
 path: artifacts/epic020/bundles/INTVER_HEAD_PARITY_OK.manifest.json
 size_bytes: 954
-sha256: c0e2e42f081513ce6571c54362d70f24342ece834de502378e52492d2bacefb1
+sha256: 92fd138186902ffe729b6172e1e01984fa8f8cb2fb8f91ca0d09eff238fd447c
 mtime_utc: 2025-12-06T04:12:03Z
 produced_at_utc: 2025-12-06T04:11:16Z

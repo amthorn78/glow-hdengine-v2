@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic021/00_meta/bootstrap_tooling_failure.log
-size_bytes: 185
-sha256: 4f168c0f3c67251322a5ef6b76db7d28a9101dee4fd5479446a51110db9e3d89
-mtime_utc: 2026-08-18T16:56:56Z
-produced_at_utc: 2026-08-18T16:56:56Z
