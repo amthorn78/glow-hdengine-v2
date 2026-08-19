@@ -200,18 +200,18 @@ jobs:
               tests/qa/test_qa_harness_freeze_guards.py \
               tests/qa/test_tooling_bootstrap.py \
               tests/qa/test_viability_generator_wrappers.py
-            python -m pytest \
-              tests/evidence \
-              tests/ops/test_evidence_index.py \
-              tests/ops/test_hde_epic038_ops03.py \
-              --ignore=tests/evidence/test_architecture_snapshot.py \
-              --ignore=tests/evidence/test_hde_epic038_closeout.py
             git diff --check
             git diff --exit-code
             if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
               git status --short --untracked-files=all
               exit 1
             fi
+            python -m pytest \
+              tests/evidence \
+              tests/ops/test_evidence_index.py \
+              tests/ops/test_hde_epic038_ops03.py \
+              --ignore=tests/evidence/test_architecture_snapshot.py \
+              --ignore=tests/evidence/test_hde_epic038_closeout.py
           )
           cleanup
           trap - EXIT
@@ -221,6 +221,10 @@ jobs:
         run: |
           git diff --check
           git diff --exit-code
+          if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+            git status --short --untracked-files=all
+            exit 1
+          fi
       - name: Publish private exact-head HDE-EPIC038 execution receipt
         id: epic038_receipt_artifact
         if: steps.epic038_receipt.outputs.produced == 'true'
