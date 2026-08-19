@@ -2294,12 +2294,8 @@ def record_check_family(
                 "admitted check IDs require a bounded legacy-family replacement"
             )
         checks = _preflight_manifest(config)
-        absent_superseded = superseded_ids - set(checks)
-        if absent_superseded and checks:
-            raise ValueError(
-                "superseded check IDs are absent from the current manifest: "
-                + ",".join(sorted(absent_superseded))
-            )
+        # Supersession is intentionally idempotent: after the first successful
+        # migration, later wrapper executions see only the canonical check ID.
         for check_id in superseded_ids:
             checks.pop(check_id, None)
     family_timestamp = _validate_timestamp(captured_at_utc or _utc_now())

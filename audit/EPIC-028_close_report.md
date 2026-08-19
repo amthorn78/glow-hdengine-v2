@@ -4,7 +4,7 @@
 This close-pack is a packaging and evidence-surfacing baseline only. It does not re-open implementation scope, does not modify QA verdicts, and does not assert merge provenance.
 
 ## Capture timestamp
-- `2026-08-19T04:24:22Z`
+- `2026-08-19T15:09:16Z`
 
 ## PF09 mapping used
 - Task: `HDE-COAG007`
@@ -40,4 +40,14 @@ This close-pack is a packaging and evidence-surfacing baseline only. It does not
 - `po_009=recorded`
 
 ## Step-log inventory referenced from qa_step_logs_manifest.json
-
+- `audit/qa/hde-epic028/checks/acceptance-map-viability/primary.log`
+- `audit/qa/hde-epic028/checks/d0/primary.log`
+- `audit/qa/hde-epic028/checks/po-001/primary.log`
+- `audit/qa/hde-epic028/checks/po-002/primary.log`
+- `audit/qa/hde-epic028/checks/po-003/primary.log`
+- `audit/qa/hde-epic028/checks/po-004/primary.log`
+- `audit/qa/hde-epic028/checks/po-005/primary.log`
+- `audit/qa/hde-epic028/checks/po-006/primary.log`
+- `audit/qa/hde-epic028/checks/po-007/primary.log`
+- `audit/qa/hde-epic028/checks/po-008/primary.log`
+- `audit/qa/hde-epic028/checks/po-009/primary.log`

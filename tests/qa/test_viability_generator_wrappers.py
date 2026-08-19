@@ -1839,3 +1839,19 @@ def test_checked_in_current_close_manifests_have_no_run_identity(number: str):
     payload = json.loads(Path(f"audit/EPIC-{number}_MANIFEST.json").read_text(encoding="utf-8"))
     assert "run_id" not in payload
     assert "RUN_ID" not in json.dumps(payload, sort_keys=True)
+
+
+def test_epic028_close_pack_counts_canonical_flat_manifest(monkeypatch: pytest.MonkeyPatch):
+    module = importlib.import_module("tools.qa.generate_epic028_close_pack")
+    flat = {
+        "acceptance-map-viability": {"status": "PASS"},
+        "d0": {"status": "PASS"},
+        "po-001": {"status": "PASS"},
+    }
+    captured: list[object] = []
+    monkeypatch.setattr(module, "_write_json", lambda _path, payload: captured.append(payload))
+
+    module._write_close_manifest("2026-08-19T00:00:00Z", flat, [])
+
+    assert captured[0]["qa_step_count"] == 3
+    assert module._manifest_checks(flat) is flat

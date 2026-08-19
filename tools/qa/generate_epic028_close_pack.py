@@ -92,8 +92,17 @@ def _read_step_manifest() -> dict[str, object]:
     return payload
 
 
+def _manifest_checks(qa_manifest: dict[str, object]) -> dict[str, object]:
+    """Return checks from either the retained wrapper or canonical flat shape."""
+    wrapped = qa_manifest.get("checks")
+    checks = wrapped if wrapped is not None else qa_manifest
+    if not isinstance(checks, dict):
+        raise SystemExit("QA_STEP_MANIFEST_CHECKS_INVALID")
+    return checks
+
+
 def _write_close_report(produced_at: str, qa_manifest: dict[str, object], po010_lines: list[str]) -> None:
-    checks = qa_manifest.get("checks", {})
+    checks = _manifest_checks(qa_manifest)
     ordered_check_ids = sorted(str(check_id) for check_id in checks.keys())
     check_lines = "\n".join(f"- `audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log`" for check_id in ordered_check_ids)
     po010_block = "\n".join(f"- `{line}`" for line in po010_lines)
@@ -155,7 +164,7 @@ def _write_close_manifest(produced_at: str, qa_manifest: dict[str, object], po01
         "pf09_subtask_id": PF09_SUBTASK_ID,
         "pf09_task_id": PF09_TASK_ID,
         "qa_epic_root": f"audit/qa/{EPIC_SLUG}",
-        "qa_step_count": len(qa_manifest.get("checks", {})),
+        "qa_step_count": len(_manifest_checks(qa_manifest)),
         "qa_step_manifest_path": f"audit/qa/{EPIC_SLUG}/qa_step_logs_manifest.json",
         "qa_summary_lines": po010_lines,
         "scope": "packaging_and_evidence_surfacing_only",

@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic028/ops-01/created_files_sha256.txt
 size_bytes: 414
-sha256: 3ee9858be131c06d02b4d21d74850de28f5ed45b2a533108921ec014c780f49e
+sha256: fa4b74cf92f0972a44c608992e632f4aeee9fa1690920870006d8fd3321801b0
 mtime_utc: 2026-04-04T19:54:03Z
 produced_at_utc: 2026-04-04T19:56:08Z

@@ -189,6 +189,19 @@ def test_wrapper_delegates_to_current_state_harness(
     assert result["viability"].governed_ledger == ledger
     assert json.loads(ledger.read_text(encoding="utf-8"))["status"] == "PASS"
 
+    # The legacy ID is absent after the first publication. A current-state
+    # wrapper must remain safely repeatable rather than treating that absence
+    # as a migration error.
+    repeated = run_epic021_qa(repo_root=tmp_path)
+    assert repeated["bootstrap"].status is Status.PASS
+    assert repeated["viability"].status is Status.PASS
+    repeated_manifest = json.loads(
+        (
+            tmp_path / "audit/qa/hde-epic021/qa_step_logs_manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert set(repeated_manifest) == {"d00-bootstrap", "acceptance-map-viability"}
+
 
 @pytest.mark.parametrize("posture", ("unset", "open"))
 def test_imported_wrapper_rejects_invalid_rails_before_execution_or_write(
