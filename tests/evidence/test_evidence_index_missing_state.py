@@ -92,14 +92,14 @@ def test_orientation_compatibility_write_is_idempotent_after_updater(
     assert _snapshot(repo) == before
 
 
-def test_updater_recovers_missing_generic_catalog_proof_in_one_write(
+def test_updater_recovers_missing_governed_doc_delta_proof_in_one_write(
     tmp_path: Path,
 ) -> None:
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
 
-    primary = repo / "catalog/manifest.json"
-    proof = repo / "catalog/manifest.json.path_proof.txt"
+    primary = repo / "audit/docdeltas/hde-epic039_doc_deltas.md"
+    proof = repo / "audit/docdeltas/hde-epic039_doc_deltas.md.path_proof.txt"
     primary_before = (
         primary.read_bytes(),
         stat.S_IMODE(primary.stat().st_mode),
@@ -118,16 +118,15 @@ def test_updater_recovers_missing_generic_catalog_proof_in_one_write(
     entries = json.loads(
         (repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
     )
-    catalog_entries = [
+    primary_entries = [
         entry
         for entry in entries
-        if entry["discovered_physical_path"] == "catalog/manifest.json"
+        if entry["discovered_physical_path"]
+        == "audit/docdeltas/hde-epic039_doc_deltas.md"
     ]
-    assert [entry["artifact_key"] for entry in catalog_entries] == [
-        "catalog_manifest"
+    assert [entry["artifact_key"] for entry in primary_entries] == [
+        "epic039.pr01.doc_delta"
     ]
-    assert "epic_id" not in catalog_entries[0]
-    assert "record_type" not in catalog_entries[0]
 
     proof_before_checks = (
         proof.read_bytes(),
@@ -138,6 +137,53 @@ def test_updater_recovers_missing_generic_catalog_proof_in_one_write(
         proof.read_bytes(),
         stat.S_IMODE(proof.stat().st_mode),
     ) == proof_before_checks
+
+
+def test_manifest_only_release_cut_stays_outside_the_evidence_graph(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    manifest = repo / "catalog/manifest.json"
+    historical_proof = repo / "catalog/manifest.json.path_proof.txt"
+    manifest_before = manifest.read_bytes()
+    proof_before = historical_proof.read_bytes()
+    skeleton_before = _snapshot(repo)
+
+    _success(
+        _run(
+            repo,
+            "scripts/cut_release_manifest.py",
+            "--version",
+            "1.0.1",
+            "--built-at-utc",
+            "2026-08-20T00:00:00Z",
+        )
+    )
+    assert manifest.read_bytes() != manifest_before
+    assert historical_proof.read_bytes() == proof_before
+    assert _snapshot(repo) == skeleton_before
+
+    human_entries = json.loads(
+        (repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    mirror_entries = [
+        json.loads(line)
+        for line in (repo / "artifacts/evidence_index.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line
+    ]
+    for entries in (human_entries, mirror_entries):
+        assert not any(
+            entry["discovered_physical_path"] == "catalog/manifest.json"
+            for entry in entries
+        )
+
+    _checks(repo)
+    assert _snapshot(repo) == skeleton_before
+    assert historical_proof.read_bytes() == proof_before
 
 
 def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:

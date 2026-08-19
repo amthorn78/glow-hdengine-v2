@@ -113,6 +113,7 @@ _RELEASE_IMPLEMENTATION_PATHS = {
     "tools/evidence/update_evidence_index.py",
     "tools/evidence/validate_evidence_paths.py",
 }
+_RELEASE_IDENTITY_INPUT_PATHS = {"catalog/manifest.json"}
 _ARCHITECTURE_ANALYSIS_PATHS = {
     "tests/evidence/test_architecture_snapshot.py",
     "tools/evidence/generate_architecture_snapshot.py",
@@ -190,6 +191,10 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/cli/test_aux_preview.py",
 )
 _PRODUCT_TEST_OWNER_PATHS = {
+    "catalog/manifest.json": (
+        "tests/runtime/test_identity.py",
+        "tests/evidence/test_release_manifest_content_binding.py",
+    ),
     "adapter/http_reader.py": (
         "tests/adapter/test_compat_http_dev.py",
         "tests/adapter/test_compat_http_parity.py",
@@ -559,6 +564,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
 
     if path.startswith("docs/ENDPOINTS_CATALOG.json"):
         return {"evidence", "release"}
+
+    if path in _RELEASE_IDENTITY_INPUT_PATHS:
+        return {"release"}
 
     schema_lanes = next(
         (lanes for prefix, lanes in _SCHEMA_LANE_PREFIXES if path.startswith(prefix)),

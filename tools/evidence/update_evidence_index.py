@@ -2934,14 +2934,10 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
     return entries
 
 
-CATALOG_MANIFEST_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
-    {
-        "artifact_key": "catalog_manifest",
-        "discovered_physical_path": "catalog/manifest.json",
-        "schema_version": "1.0",
-        "notes": "Canonical current release source input; exact-head derived attestation remains an external CI artifact",
-    },
-]
+MUTABLE_RELEASE_SOURCE_INDEX_KEYS = {
+    ("catalog_manifest", "catalog/manifest.json"),
+    ("epic038.release.catalog_manifest", "catalog/manifest.json"),
+}
 
 EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
@@ -3679,6 +3675,8 @@ def _load_human_index() -> list[dict[str, object]]:
             entry.get("artifact_key"),
             entry.get("discovered_physical_path"),
         )
+        not in MUTABLE_RELEASE_SOURCE_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC021_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
@@ -3743,7 +3741,6 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
-            *CATALOG_MANIFEST_PRIMARY_ARTIFACTS,
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
             *_load_epic038_pr03_entries(),

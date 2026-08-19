@@ -158,6 +158,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["artifacts/runs/closed-run.json"], {"evidence"}, "selected_lanes"),
         (["artifacts/db_bridge/health.json"], {"evidence"}, "selected_lanes"),
         (["audit/qa/hde-epic039/00_meta/doc_deltas.md"], {"evidence"}, "selected_lanes"),
+        (["catalog/manifest.json"], {"release"}, "selected_lanes"),
         (["engine/narratives/router.py"], {"product", "release"}, "selected_lanes"),
         (["engine/db/adapter.py"], {"product", "db", "release"}, "selected_lanes"),
         (["adapter/http_reader.py"], {"product", "compat", "release"}, "selected_lanes"),
@@ -354,6 +355,13 @@ def test_behavioral_owner_examples_cover_router_and_epic037_generator(
     assert classifier.changed_test_targets(
         ROOT, ("engine/serializer/canon.py",)
     ) == ()
+    assert classifier.changed_test_targets(
+        ROOT, ("catalog/manifest.json",)
+    ) == ()
+    assert all(
+        classifier._FIXED_LANE_TEST_PROVIDERS[target] == "release"
+        for target in classifier._PRODUCT_TEST_OWNER_PATHS["catalog/manifest.json"]
+    )
     with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
         classifier.changed_test_targets(
             ROOT, ("scripts/db/verify_backup_restore.py",)
@@ -382,6 +390,40 @@ def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> Non
         established_full = classifier.classify_paths(paths)
         assert all(established_full.flags[lane] for lane in classifier.LANES)
         assert established_full.test_targets == ()
+
+
+def test_manifest_only_git_change_selects_release_owners(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    for relative in classifier._PRODUCT_TEST_OWNER_PATHS["catalog/manifest.json"]:
+        owner = repo / relative
+        owner.parent.mkdir(parents=True, exist_ok=True)
+        owner.write_text("def test_owner(): pass\n", encoding="utf-8")
+    (repo / "README.md").write_text("base\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    manifest = repo / "catalog/manifest.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text("{}\n", encoding="utf-8")
+    _git(repo, "add", "catalog/manifest.json")
+    _git(repo, "commit", "-m", "release cut")
+    head = _git(repo, "rev-parse", "HEAD")
+
+    result = classifier.classify_git_change(repo, base, head)
+    assert {lane for lane in classifier.LANES if result.flags[lane]} == {"release"}
+    assert result.test_targets == ()
+    assert {
+        lane
+        for lane in classifier.LANES
+        if classifier.classify_paths(
+            ("catalog/manifest.json", "catalog/manifest.json.path_proof.txt")
+        ).flags[lane]
+    } == {"evidence", "release"}
 
 
 def test_change_classifier_writes_changed_test_execution_contract(
