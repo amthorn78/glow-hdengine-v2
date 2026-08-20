@@ -92,7 +92,7 @@ def _env_for_subprocess() -> dict[str, str]:
     env = os.environ.copy()
     for key, value in DETERMINISM_ENV_PINS.items():
         env[key] = value
-    env.setdefault("APP_ENV", "dev")
+    env["APP_ENV"] = "dev"
     return env
 
 

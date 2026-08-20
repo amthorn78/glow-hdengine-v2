@@ -168,6 +168,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["adapter/http_reader.py"], {"product", "compat", "release"}, "selected_lanes"),
         (["engine/bodygraph/vendor_client.py"], {"product", "rails", "release"}, "selected_lanes"),
         (["tools/qa/qa_harness.py"], {"evidence", "qa"}, "selected_lanes"),
+        (["tools/qa/run_hde_epic024_harness.py"], {"evidence", "qa"}, "selected_lanes"),
         (["tools/evidence/run_sanity_pipeline.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/update_evidence_index.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/generate_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
@@ -304,6 +305,115 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
     for rel in sorted(classifier._EVIDENCE_GENERATOR_TEST_OWNERS):
         assert (ROOT / rel).is_file()
         classifier._evidence_generator_owner_targets(ROOT, rel)
+
+
+def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
+    tmp_path: Path,
+) -> None:
+    tracked = {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "tools/qa").rglob("*")
+        if path.is_file()
+        and not path.is_symlink()
+        and path.suffix.lower() == ".py"
+    }
+    assert (
+        set(classifier._QA_TOOL_TEST_OWNERS)
+        | classifier._QA_TOOLS_REQUIRING_OWNER
+    ) == tracked
+    assert not (
+        set(classifier._QA_TOOL_TEST_OWNERS)
+        & classifier._QA_TOOLS_REQUIRING_OWNER
+    )
+    assert all(
+        classifier._QA_TOOL_OWNERSHIP_TEST in owners
+        for owners in classifier._QA_TOOL_TEST_OWNERS.values()
+    )
+
+    for source, owners in sorted(classifier._QA_TOOL_TEST_OWNERS.items()):
+        assert owners, source
+        for owner in owners:
+            assert (ROOT / owner).is_file(), (source, owner)
+            assert not (ROOT / owner).is_symlink(), (source, owner)
+        expected = tuple(
+            owner
+            for owner in owners
+            if not classifier._fixed_lane_covers_test_target(source, owner)
+        )
+        assert classifier._qa_tool_owner_targets(ROOT, source) == expected
+
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/qa/run_hde_epic024_harness.py",)
+    ) == (
+        "tests/qa/test_epic024_bootstrap_status.py",
+        classifier._QA_TOOL_OWNERSHIP_TEST,
+    )
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/qa/token_roster_validate.py",)
+    ) == (
+        "tests/qa/test_epic023_acceptance_alignment.py",
+        classifier._QA_TOOL_OWNERSHIP_TEST,
+    )
+    for source in sorted(classifier._QA_TOOLS_REQUIRING_OWNER):
+        with pytest.raises(ValueError, match="CI_QA_OWNER_TEST_MISSING"):
+            classifier.changed_test_targets(ROOT, (source,))
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/qa/qa_harness.py",)
+    ) == (classifier._QA_TOOL_OWNERSHIP_TEST,)
+
+    unowned = tmp_path / "repo/tools/qa/new_harness.py"
+    unowned.parent.mkdir(parents=True)
+    unowned.write_text("VALUE = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="CI_QA_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            tmp_path / "repo", ("tools/qa/new_harness.py",)
+        )
+    unowned_upper = unowned.with_suffix(".PY")
+    unowned_upper.write_text("VALUE = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="CI_QA_OWNER_TEST_MISSING"):
+        classifier.changed_test_targets(
+            tmp_path / "repo", ("tools/qa/new_harness.PY",)
+        )
+
+    with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
+        classifier.changed_test_targets(
+            tmp_path / "repo", ("tests/qa/test_epic024_bootstrap_status.py",)
+        )
+
+
+def test_qa_tool_git_change_selects_its_exact_behavioral_owner(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    source = repo / "tools/qa/run_hde_epic024_harness.py"
+    owner = repo / "tests/qa/test_epic024_bootstrap_status.py"
+    ownership_guard = repo / classifier._QA_TOOL_OWNERSHIP_TEST
+    source.parent.mkdir(parents=True)
+    owner.parent.mkdir(parents=True)
+    source.write_text("VALUE = 1\n", encoding="utf-8")
+    owner.write_text("def test_owner(): pass\n", encoding="utf-8")
+    ownership_guard.write_text("def test_registry(): pass\n", encoding="utf-8")
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    source.write_text("VALUE = 2\n", encoding="utf-8")
+    _git(repo, "add", source.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "change EPIC024 harness")
+    head = _git(repo, "rev-parse", "HEAD")
+
+    result = classifier.classify_git_change(repo, base, head)
+    assert {lane for lane in classifier.LANES if result.flags[lane]} == {
+        "evidence",
+        "qa",
+    }
+    assert result.test_targets == (
+        "tests/qa/test_epic024_bootstrap_status.py",
+        classifier._QA_TOOL_OWNERSHIP_TEST,
+    )
 
 
 def test_behavioral_owner_examples_cover_router_and_epic037_generator(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -119,6 +120,74 @@ def enforce_env_pins(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LC_ALL", "C")
     monkeypatch.setenv("LANG", "C")
     monkeypatch.setenv("TZ", "UTC")
+
+
+def test_token_roster_cli_reports_exact_missing_tokens(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    pf04 = tmp_path / "PF04.md"
+    pf20 = tmp_path / "PF20.md"
+    pf04.write_text("ALPHA_OK\n", encoding="utf-8")
+    pf20.write_text(
+        "**Epic ID:** HDE-EPIC023\nALPHA_OK BETA_OK\n"
+        "**Epic ID:** HDE-EPIC024\nGAMMA_OK\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "token_roster_validate.py",
+            "--epic",
+            "HDE-EPIC023",
+            "--pf04",
+            str(pf04),
+            "--pf20",
+            str(pf20),
+        ],
+    )
+
+    assert token_roster_validate.main() == 10
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["epic_tokens_ok"] == ["ALPHA_OK", "BETA_OK"]
+    assert payload["missing_in_pf04"] == ["BETA_OK"]
+    assert payload["pf04_sha256"] == token_roster_validate.sha256_file(pf04)
+    assert payload["pf20_sha256"] == token_roster_validate.sha256_file(pf20)
+
+    pf04.write_text("ALPHA_OK BETA_OK\n", encoding="utf-8")
+    assert token_roster_validate.main() == 0
+    assert json.loads(capsys.readouterr().out)["missing_in_pf04"] == []
+
+
+def test_token_roster_cli_fails_closed_for_unknown_epic(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    pf04 = tmp_path / "PF04.md"
+    pf20 = tmp_path / "PF20.md"
+    pf04.write_text("ALPHA_OK\n", encoding="utf-8")
+    pf20.write_text("**Epic ID:** HDE-EPIC023\nALPHA_OK\n", encoding="utf-8")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "token_roster_validate.py",
+            "--epic",
+            "HDE-EPIC999",
+            "--pf04",
+            str(pf04),
+            "--pf20",
+            str(pf20),
+        ],
+    )
+
+    assert token_roster_validate.main() == 3
+    assert json.loads(capsys.readouterr().out) == {
+        "error": "EPIC_ID_NOT_FOUND: HDE-EPIC999"
+    }
 
 
 def test_epic023_acceptance_alignment_and_bindings() -> None:

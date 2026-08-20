@@ -257,6 +257,55 @@ _QA_TEST_OWNERS = (
     "tests/qa/test_viability_generator_wrappers.py",
     "tests/qa/test_epic029_requalification.py",
 )
+_QA_TOOL_OWNERSHIP_TEST = "tests/qa/test_qa_tool_ownership.py"
+_QA_TOOL_TEST_OWNERS = {
+    "tools/qa/__init__.py": (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/epic021_qa.py": (
+        "tests/qa/test_epic021_harness_entrypoint.py",
+        "tests/qa/test_epic021_acceptance_alignment.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/examples/__init__.py": (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/examples/d13_refactored_example.py": (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/generate_epic027_close_pack.py": (
+        "tests/qa/test_qa_harness_followup.py",
+        "tests/qa/test_viability_generator_wrappers.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/generate_epic028_acceptance_ledger.py": (
+        "tests/qa/test_viability_generator_wrappers.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/generate_epic028_close_pack.py": (
+        "tests/qa/test_viability_generator_wrappers.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/generate_epic029_close_pack.py": (
+        "tests/qa/test_viability_generator_wrappers.py",
+        "tests/qa/test_epic029_requalification.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/qa_harness.py": _QA_TEST_OWNERS + (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/refresh_epic024_step_logs_manifest.py": (
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/run_hde_epic024_harness.py": (
+        "tests/qa/test_epic024_bootstrap_status.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/step_log_header.py": (_QA_TOOL_OWNERSHIP_TEST,),
+    "tools/qa/token_roster_validate.py": (
+        "tests/qa/test_epic023_acceptance_alignment.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+}
+_QA_TOOLS_REQUIRING_OWNER = {
+    # These source-writing administrative close-pack generators have no
+    # continuing executable consumer or focused regression owner.  Changes
+    # remain deliberately fail-closed until that ownership is established.
+    "tools/qa/generate_epic025_close_pack.py",
+    "tools/qa/generate_epic026_close_pack.py",
+}
 _SAFE_TEST_SUPPORT_PREFIXES = {
     "tests/db/": ("tests/db",),
     "tests/order/": ("tests/order",),
@@ -403,6 +452,8 @@ def _registered_owner_test_paths() -> set[str]:
         paths.update(targets)
     for targets in _EVIDENCE_GENERATOR_TEST_OWNERS.values():
         paths.update(targets)
+    for targets in _QA_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
     return paths
 
 
@@ -496,6 +547,32 @@ def _evidence_generator_owner_targets(
     raise ValueError(f"CI_EVIDENCE_OWNER_TEST_MISSING:{path}")
 
 
+def _qa_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    """Resolve exact behavioral owners for repository QA tooling.
+
+    The fixed QA lane protects the approved generic harness subsystem, while
+    older bounded adapters and helpers have their own focused tests.  An
+    unregistered Python tool fails classification instead of receiving a green
+    conclusion from unrelated QA tests.
+    """
+    rel = PurePosixPath(path)
+    if (
+        len(rel.parts) < 3
+        or rel.parts[:2] != ("tools", "qa")
+        or rel.suffix.lower() != ".py"
+    ):
+        return ()
+    targets = _QA_TOOL_TEST_OWNERS.get(path)
+    if targets is None:
+        raise ValueError(f"CI_QA_OWNER_TEST_MISSING:{path}")
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        targets,
+        error_code="CI_QA_OWNER_TEST_INVALID",
+    )
+
+
 def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     targets = next(
         (
@@ -563,6 +640,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
                 changed_paths=changed_paths,
             )
         )
+        targets.update(_qa_tool_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
             and _lanes_for_path(path) is None
