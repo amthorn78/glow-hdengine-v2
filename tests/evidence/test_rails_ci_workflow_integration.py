@@ -151,6 +151,10 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     [
         (["README.md"], set(), "documentation_only"),
         (["docs/plans/hde-epic038.md"], set(), "documentation_only"),
+        (["docs/adr/hde/body_graphs_adr.md"], {"evidence"}, "selected_lanes"),
+        (["docs/run/EPIC011_TEST_IDENTITIES.md"], {"evidence"}, "selected_lanes"),
+        (["docs/run/PROD_ENDPOINTS.json"], {"evidence"}, "selected_lanes"),
+        (["notes/d6_vendor_live_qa_discovery.md"], {"evidence"}, "selected_lanes"),
         (["audit/history/closed-run.json"], {"evidence"}, "selected_lanes"),
         (["audit/ops/hde-epic038/ops-03/result.json"], {"evidence"}, "selected_lanes"),
         (["artifacts/architecture/architecture_snapshot.keys_only.json"], {"evidence"}, "selected_lanes"),
@@ -390,6 +394,57 @@ def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> Non
         established_full = classifier.classify_paths(paths)
         assert all(established_full.flags[lane] for lane in classifier.LANES)
         assert established_full.test_targets == ()
+
+
+def test_every_current_governed_primary_selects_evidence() -> None:
+    governed = classifier._load_governed_primary_paths(ROOT)
+    assert {
+        "docs/adr/hde/body_graphs_adr.md",
+        "docs/run/EPIC011_TEST_IDENTITIES.md",
+        "docs/run/PROD_ENDPOINTS.json",
+        "notes/d6_vendor_live_qa_discovery.md",
+    } <= governed
+    for path in governed:
+        result = classifier.classify_paths((path,), governed_paths=governed)
+        assert result.flags["evidence"], path
+
+    ordinary_doc = classifier.classify_paths(
+        ("docs/run/RUN_PROD_QA.md",),
+        governed_paths=governed,
+    )
+    assert not any(ordinary_doc.flags[lane] for lane in classifier.LANES)
+    assert ordinary_doc.reason == "documentation_only"
+
+
+def test_governed_document_git_change_selects_evidence(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    primary = repo / "docs/run/PROD_ENDPOINTS.json"
+    index = repo / "docs/evidence/INDEX.json"
+    index.parent.mkdir(parents=True)
+    primary.parent.mkdir(parents=True, exist_ok=True)
+    primary.write_text("{}\n", encoding="utf-8")
+    index.write_text(
+        '[{"artifact_key":"run.prod_endpoints",'
+        '"discovered_physical_path":"docs/run/PROD_ENDPOINTS.json"}]\n',
+        encoding="utf-8",
+    )
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "base")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    primary.write_text('{"updated":true}\n', encoding="utf-8")
+    _git(repo, "add", "docs/run/PROD_ENDPOINTS.json")
+    _git(repo, "commit", "-m", "update governed run input")
+    head = _git(repo, "rev-parse", "HEAD")
+
+    result = classifier.classify_git_change(repo, base, head)
+    assert {lane for lane in classifier.LANES if result.flags[lane]} == {
+        "evidence"
+    }
+    assert result.test_targets == ()
 
 
 def test_manifest_only_git_change_selects_release_owners(tmp_path: Path) -> None:

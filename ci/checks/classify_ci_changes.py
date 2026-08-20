@@ -9,6 +9,7 @@ skipping protection.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -338,6 +339,39 @@ def _normalized_path(raw: str) -> str:
     if normalized in {"", "."}:
         raise ValueError("changed path is empty")
     return normalized
+
+
+def _load_governed_primary_paths(repo_root: Path) -> frozenset[str]:
+    """Load current Human Index paths for change-aware evidence selection.
+
+    A governed primary can live under an otherwise documentation-only prefix.
+    Reading the candidate's committed Human Index keeps that boundary durable
+    without turning every ordinary document into evidence work.
+    """
+    index_path = repo_root / "docs/evidence/INDEX.json"
+    if not index_path.exists():
+        return frozenset()
+    if index_path.is_symlink() or not index_path.is_file():
+        raise ValueError("CI_GOVERNED_INDEX_INVALID")
+    try:
+        payload = json.loads(index_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError("CI_GOVERNED_INDEX_INVALID") from exc
+    if not isinstance(payload, list):
+        raise ValueError("CI_GOVERNED_INDEX_INVALID")
+
+    paths: set[str] = set()
+    for entry in payload:
+        if not isinstance(entry, dict):
+            raise ValueError("CI_GOVERNED_INDEX_INVALID")
+        raw = entry.get("discovered_physical_path")
+        if not isinstance(raw, str):
+            raise ValueError("CI_GOVERNED_INDEX_INVALID")
+        try:
+            paths.add(_normalized_path(raw))
+        except ValueError as exc:
+            raise ValueError("CI_GOVERNED_INDEX_INVALID") from exc
+    return frozenset(paths)
 
 
 def _is_backup_record(path: str) -> bool:
@@ -675,14 +709,27 @@ def _lanes_for_path(path: str) -> set[str] | None:
     return None
 
 
-def classify_paths(paths: Iterable[str]) -> Classification:
+def classify_paths(
+    paths: Iterable[str],
+    *,
+    governed_paths: Iterable[str] | None = None,
+) -> Classification:
     normalized = sorted({_normalized_path(path) for path in paths})
     if not normalized:
         return _full("empty_change_set_full_validation", 0)
 
+    governed = (
+        _load_governed_primary_paths(ROOT)
+        if governed_paths is None
+        else frozenset(_normalized_path(path) for path in governed_paths)
+    )
+
     selected: set[str] = set()
     for path in normalized:
         lanes = _lanes_for_path(path)
+        if path in governed:
+            lanes = set(lanes or ())
+            lanes.add("evidence")
         if lanes is None:
             raise ValueError(f"CI_CHANGE_SURFACE_UNCLASSIFIED:{path}")
         selected.update(lanes)
@@ -749,7 +796,10 @@ def classify_git_change(repo_root: Path, base: str, head: str) -> Classification
     if base_sha == head_sha:
         return _full("identical_refs_full_validation", 0)
     paths = git_changed_paths(repo_root, base_sha, head_sha)
-    result = classify_paths(paths)
+    result = classify_paths(
+        paths,
+        governed_paths=_load_governed_primary_paths(repo_root),
+    )
     return Classification(
         flags=result.flags,
         reason=result.reason,
