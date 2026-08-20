@@ -177,7 +177,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["catalog/manifest.json"], {"release"}, "selected_lanes"),
         (["engine/narratives/router.py"], {"product", "release"}, "selected_lanes"),
         (["engine/db/adapter.py"], {"product", "db", "release"}, "selected_lanes"),
-        (["adapter/http_reader.py"], {"product", "compat", "release"}, "selected_lanes"),
+        (["adapter/http_reader.py"], {"product", "compat", "db", "release"}, "selected_lanes"),
         (["engine/bodygraph/vendor_client.py"], {"product", "rails", "release"}, "selected_lanes"),
         (["tools/qa/qa_harness.py"], {"evidence", "qa"}, "selected_lanes"),
         (["tools/qa/run_hde_epic024_harness.py"], {"evidence", "qa"}, "selected_lanes"),
@@ -319,66 +319,74 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
         classifier._evidence_generator_owner_targets(ROOT, rel)
 
 
-def test_http_reader_owner_registry_covers_active_direct_consumers() -> None:
-    direct_consumers: set[str] = set()
-    for candidate in (ROOT / "tests").rglob("test_*.py"):
-        if not candidate.is_file() or candidate.is_symlink():
-            continue
+def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> None:
+    direct_importers: set[str] = set()
+    for candidate in sorted((ROOT / "tests").rglob("test_*.py")):
         tree = ast.parse(candidate.read_text(encoding="utf-8"))
-        imports_reader = any(
-            (
+        for node in ast.walk(tree):
+            imports_reader = (
                 isinstance(node, ast.Import)
                 and any(
                     alias.name == "adapter.http_reader" for alias in node.names
                 )
-            )
-            or (
+            ) or (
                 isinstance(node, ast.ImportFrom)
                 and (
                     node.module == "adapter.http_reader"
                     or (
                         node.module == "adapter"
-                        and any(alias.name == "http_reader" for alias in node.names)
+                        and any(
+                            alias.name == "http_reader" for alias in node.names
+                        )
                     )
                 )
-            )
-            or (
+            ) or (
                 isinstance(node, ast.Call)
-                and isinstance(node.func, ast.Attribute)
-                and node.func.attr == "import_module"
-                and node.args
-                and isinstance(node.args[0], ast.Constant)
-                and node.args[0].value == "adapter.http_reader"
+                and any(
+                    isinstance(argument, ast.Constant)
+                    and argument.value == "adapter.http_reader"
+                    for argument in node.args
+                )
             )
-            for node in ast.walk(tree)
-        )
-        if imports_reader:
-            direct_consumers.add(candidate.relative_to(ROOT).as_posix())
+            if imports_reader:
+                direct_importers.add(candidate.relative_to(ROOT).as_posix())
+                break
 
-    owners = set(classifier._HTTP_READER_TEST_OWNERS)
-    assert direct_consumers
-    assert direct_consumers <= owners
+    assert direct_importers == set(classifier._HTTP_READER_TEST_OWNERS) - {
+        "tests/adapter/test_dev_sampler_http.py",
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/transport/test_ops_rails_refusal.py",
+    }
     assert {
-        "tests/adapter/test_diagnostic_writer.py",
-        "tests/http/test_reader_a7_transport.py",
-    } <= owners
-    for owner in owners:
-        path = ROOT / owner
-        assert path.is_file(), owner
-        assert not path.is_symlink(), owner
-
-    expected_direct = tuple(
-        sorted(
-            owner
-            for owner in owners
-            if not classifier._fixed_lane_covers_test_target(
-                "adapter/http_reader.py", owner
-            )
+        target
+        for target in classifier._HTTP_READER_TEST_OWNERS
+        if classifier._fixed_lane_covers_test_target(
+            "adapter/http_reader.py", target
         )
-    )
+    } == {
+        "tests/adapter/test_compat_http_dev.py",
+        "tests/adapter/test_compat_http_parity.py",
+        "tests/db/test_conn_env_only.py",
+        "tests/db/test_no_import_time_connect.py",
+        "tests/http/test_compat_endpoint_contract.py",
+        "tests/runtime/test_identity.py",
+        "tests/transport/test_internal_version_contract.py",
+    }
     assert classifier.changed_test_targets(
-        ROOT, ("adapter/http_reader.py",)
-    ) == expected_direct
+        ROOT,
+        ("adapter/http_reader.py",),
+    ) == (
+        "tests/adapter/test_dev_sampler_http.py",
+        "tests/adapter/test_diagnostic_writer.py",
+        "tests/cli/test_aux_preview.py",
+        "tests/compat/test_abba_parity.py",
+        "tests/http/test_dev_conjunction_http.py",
+        "tests/http/test_endpoint_catalog.py",
+        "tests/http/test_reader_a7_transport.py",
+        "tests/transport/test_aux_narrative.py",
+        "tests/transport/test_ops_rails_refusal.py",
+        "tests/transport/test_writers_errors_headers.py",
+    )
 
 
 def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(

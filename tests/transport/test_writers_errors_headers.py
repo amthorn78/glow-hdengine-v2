@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from adapter.http_reader import app
+from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 
 pytestmark = pytest.mark.epic020
 
@@ -38,6 +39,9 @@ def _headers(resp):
 
 
 def test_writers_errors_headers(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
     for key, value in {
         "APP_ENV": "dev",
         "SAFE_MODE": "1",

@@ -203,6 +203,7 @@ _DB_MARKERS = (
     "mapped_cache",
     "ops03",
 )
+_DB_AWARE_PRODUCT_PATHS = {"adapter/http_reader.py"}
 _PRODUCT_PREFIXES = (
     "adapter/",
     "catalog/",
@@ -240,8 +241,8 @@ _NARRATIVE_TEST_OWNERS = (
 _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_compat_http_dev.py",
     "tests/adapter/test_compat_http_parity.py",
-    "tests/adapter/test_dev_sampler_http.py",
     "tests/adapter/test_diagnostic_writer.py",
+    "tests/adapter/test_dev_sampler_http.py",
     "tests/cli/test_aux_preview.py",
     "tests/compat/test_abba_parity.py",
     "tests/db/test_conn_env_only.py",
@@ -1004,7 +1005,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
         marked_path = f"/{path}"
         if any(marker in marked_path for marker in _COMPAT_MARKERS):
             lanes.add("compat")
-        if any(marker in marked_path for marker in _DB_MARKERS):
+        if path in _DB_AWARE_PRODUCT_PATHS or any(
+            marker in marked_path for marker in _DB_MARKERS
+        ):
             lanes.add("db")
         if any(marker in path for marker in _RAILS_MARKERS):
             lanes.add("rails")
