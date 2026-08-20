@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import os
 import re
 import subprocess
@@ -319,44 +318,10 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
         classifier._evidence_generator_owner_targets(ROOT, rel)
 
 
-def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> None:
-    direct_importers: set[str] = set()
-    for candidate in sorted((ROOT / "tests").rglob("test_*.py")):
-        tree = ast.parse(candidate.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            imports_reader = (
-                isinstance(node, ast.Import)
-                and any(
-                    alias.name == "adapter.http_reader" for alias in node.names
-                )
-            ) or (
-                isinstance(node, ast.ImportFrom)
-                and (
-                    node.module == "adapter.http_reader"
-                    or (
-                        node.module == "adapter"
-                        and any(
-                            alias.name == "http_reader" for alias in node.names
-                        )
-                    )
-                )
-            ) or (
-                isinstance(node, ast.Call)
-                and any(
-                    isinstance(argument, ast.Constant)
-                    and argument.value == "adapter.http_reader"
-                    for argument in node.args
-                )
-            )
-            if imports_reader:
-                direct_importers.add(candidate.relative_to(ROOT).as_posix())
-                break
-
-    assert direct_importers == set(classifier._HTTP_READER_TEST_OWNERS) - {
-        "tests/adapter/test_dev_sampler_http.py",
-        "tests/http/test_compat_endpoint_contract.py",
-        "tests/transport/test_ops_rails_refusal.py",
-    }
+def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
+    tmp_path: Path,
+) -> None:
+    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
     assert {
         target
         for target in classifier._HTTP_READER_TEST_OWNERS
@@ -380,6 +345,7 @@ def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> Non
         "tests/adapter/test_diagnostic_writer.py",
         "tests/cli/test_aux_preview.py",
         "tests/compat/test_abba_parity.py",
+        guard,
         "tests/http/test_dev_conjunction_http.py",
         "tests/http/test_endpoint_catalog.py",
         "tests/http/test_reader_a7_transport.py",
@@ -387,6 +353,28 @@ def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> Non
         "tests/transport/test_ops_rails_refusal.py",
         "tests/transport/test_writers_errors_headers.py",
     )
+
+    repo = tmp_path / "repo"
+    new_consumer = "tests/http/test_new_reader_case.py"
+    registered_consumer = "tests/http/test_reader_a7_transport.py"
+    for path, body in (
+        (guard, "def test_registry(): pass\n"),
+        (new_consumer, "import adapter.http_reader\n\ndef test_reader(): pass\n"),
+        (registered_consumer, "def test_reader_no_longer_imports(): pass\n"),
+    ):
+        candidate = repo / path
+        candidate.parent.mkdir(parents=True, exist_ok=True)
+        candidate.write_text(body, encoding="utf-8")
+
+    assert classifier.changed_test_targets(repo, (new_consumer,)) == (
+        guard,
+        new_consumer,
+    )
+    assert classifier.changed_test_targets(repo, (registered_consumer,)) == (
+        guard,
+        registered_consumer,
+    )
+    assert not classifier.classify_paths((new_consumer,)).flags["rails"]
 
 
 def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
@@ -632,7 +620,7 @@ def test_non_generator_evidence_helpers_have_exact_fail_closed_owners(
 
 
 def test_fail_safe_full_validation_runs_the_supplemental_behavioral_gap() -> None:
-    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    expected = classifier._full_validation_test_targets()
     empty = classifier.classify_paths(())
     assert all(empty.flags[lane] for lane in classifier.LANES)
     assert empty.test_targets == expected
@@ -678,20 +666,35 @@ def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None
     }
     supplemental = set(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
     inactive = classifier._FULL_VALIDATION_INACTIVE_TESTS
+    registered = classifier._registered_owner_test_paths()
+    full_targets = set(classifier._full_validation_test_targets())
+    fixed_registered = {
+        target
+        for target in registered
+        if classifier._fixed_lane_test_provider(target) is not None
+    }
+    non_file_registered = {
+        target for target in registered if not (ROOT / target).is_file()
+    }
 
     assert configured
     assert not fixed & supplemental
     assert not fixed & inactive
     assert not supplemental & inactive
     assert configured == fixed | supplemental | inactive
-    for path in supplemental | inactive:
+    assert not fixed_registered & full_targets
+    assert registered == fixed_registered | full_targets
+    assert non_file_registered == set(classifier._FIXED_LANE_TEST_DIRECTORIES)
+    assert "tests/scripts/test_release_id_recompute.py" in full_targets
+    assert classifier._HTTP_READER_OWNERSHIP_GUARD in full_targets
+    for path in full_targets | inactive:
         candidate = ROOT / path
         assert candidate.is_file(), path
         assert not candidate.is_symlink(), path
 
 
 def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
-    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    expected = classifier._full_validation_test_targets()
     full_paths = set(classifier._FULL_VALIDATION_PATHS) | {
         ".github/workflows/ci.yml"
     }
@@ -829,9 +832,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "config", "user.email", "ci-classifier@example.invalid")
     _git(repo, "config", "user.name", "CI classifier test")
     (repo / "README.md").write_text("first\n", encoding="utf-8")
-    _materialize_test_targets(
-        repo, classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS
-    )
+    _materialize_test_targets(repo, classifier._full_validation_test_targets())
     _git(repo, "add", "README.md")
     _git(repo, "add", "tests")
     _git(repo, "commit", "-m", "base")
@@ -855,9 +856,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     )
     assert all(identical.flags[lane] for lane in classifier.LANES)
     assert identical.reason == "identical_refs_full_validation"
-    assert identical.test_targets == tuple(
-        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
-    )
+    assert identical.test_targets == classifier._full_validation_test_targets()
 
     workflow = repo / ".github/workflows/ci.yml"
     workflow.parent.mkdir(parents=True)
@@ -870,9 +869,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     )
     assert all(workflow_change.flags[lane] for lane in classifier.LANES)
     assert workflow_change.reason == "selected_lanes"
-    assert workflow_change.test_targets == tuple(
-        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
-    )
+    assert workflow_change.test_targets == classifier._full_validation_test_targets()
 
     source = repo / "engine/db/adapter.py"
     source.parent.mkdir(parents=True)
@@ -895,7 +892,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     assert product.test_targets == ()
 
     changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
-    changed_test.parent.mkdir(parents=True)
+    changed_test.parent.mkdir(parents=True, exist_ok=True)
     changed_test.write_text("def test_guard(): pass\n", encoding="utf-8")
     _git(repo, "add", changed_test.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "add unlisted adapter regression")

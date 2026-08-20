@@ -9,6 +9,7 @@ skipping protection.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import re
@@ -238,6 +239,7 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/unit/test_narratives_loader.py",
     "tests/cli/test_aux_preview.py",
 )
+_HTTP_READER_OWNERSHIP_GUARD = "tests/evidence/test_http_reader_ci_ownership.py"
 _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_compat_http_dev.py",
     "tests/adapter/test_compat_http_parity.py",
@@ -247,6 +249,7 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/compat/test_abba_parity.py",
     "tests/db/test_conn_env_only.py",
     "tests/db/test_no_import_time_connect.py",
+    _HTTP_READER_OWNERSHIP_GUARD,
     "tests/http/test_compat_endpoint_contract.py",
     "tests/http/test_dev_conjunction_http.py",
     "tests/http/test_endpoint_catalog.py",
@@ -257,6 +260,11 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/transport/test_ops_rails_refusal.py",
     "tests/transport/test_writers_errors_headers.py",
 )
+_HTTP_READER_INDIRECT_TEST_OWNERS = {
+    "tests/adapter/test_dev_sampler_http.py",
+    "tests/http/test_compat_endpoint_contract.py",
+    "tests/transport/test_ops_rails_refusal.py",
+}
 _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
@@ -524,7 +532,7 @@ def _full(reason: str, path_count: int) -> Classification:
         flags=flags,
         reason=reason,
         path_count=path_count,
-        test_targets=tuple(sorted(_FULL_VALIDATION_SUPPLEMENTAL_TESTS)),
+        test_targets=_full_validation_test_targets(),
     )
 
 
@@ -583,10 +591,7 @@ def _is_backup_record(path: str) -> bool:
     return path in _HISTORICAL_BACKUP_PATHS
 
 
-def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
-    selected_lanes = _lanes_for_path(source_path)
-    if selected_lanes is None:
-        return False
+def _fixed_lane_test_provider(target: str) -> str | None:
     provider = _FIXED_LANE_TEST_PROVIDERS.get(target)
     if provider is None:
         provider = next(
@@ -597,6 +602,14 @@ def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
             ),
             None,
         )
+    return provider
+
+
+def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
+    selected_lanes = _lanes_for_path(source_path)
+    if selected_lanes is None:
+        return False
+    provider = _fixed_lane_test_provider(target)
     return provider in selected_lanes if provider is not None else False
 
 
@@ -615,6 +628,24 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _QA_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     return paths
+
+
+def _full_validation_test_targets() -> tuple[str, ...]:
+    """Return every active registered owner not supplied by a fixed lane.
+
+    The repository's configured pytest roots are intentionally narrower than
+    the complete owner registry.  Full-validation inputs therefore run the
+    explicit supplement plus every registered owner outside the fixed lanes,
+    without rediscovering unsafe legacy tests or duplicating fixed providers.
+    """
+    return tuple(
+        sorted(
+            target
+            for target in _registered_owner_test_paths()
+            if target not in _FULL_VALIDATION_INACTIVE_TESTS
+            and _fixed_lane_test_provider(target) is None
+        )
+    )
 
 
 def _validated_owner_targets(
@@ -646,7 +677,7 @@ def _full_validation_owner_targets(repo_root: Path, path: str) -> tuple[str, ...
     return _validated_owner_targets(
         repo_root,
         path,
-        _FULL_VALIDATION_SUPPLEMENTAL_TESTS,
+        _full_validation_test_targets(),
         error_code="CI_FULL_VALIDATION_TEST_INVALID",
     )
 
@@ -809,6 +840,43 @@ def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     )
 
 
+def _test_module_imports_http_reader(candidate: Path) -> bool:
+    """Return whether a test module directly imports the HTTP reader."""
+    try:
+        tree = ast.parse(candidate.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, SyntaxError) as exc:
+        raise ValueError(
+            f"CI_HTTP_READER_OWNER_SCAN_INVALID:{candidate.as_posix()}"
+        ) from exc
+    return any(
+        (
+            isinstance(node, ast.Import)
+            and any(
+                alias.name == "adapter.http_reader" for alias in node.names
+            )
+        )
+        or (
+            isinstance(node, ast.ImportFrom)
+            and (
+                node.module == "adapter.http_reader"
+                or (
+                    node.module == "adapter"
+                    and any(alias.name == "http_reader" for alias in node.names)
+                )
+            )
+        )
+        or (
+            isinstance(node, ast.Call)
+            and any(
+                isinstance(argument, ast.Constant)
+                and argument.value == "adapter.http_reader"
+                for argument in node.args
+            )
+        )
+        for node in ast.walk(tree)
+    )
+
+
 def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
     """Return exact changed tests plus repository-owned behavioral owners.
 
@@ -843,6 +911,21 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
                 and candidate.is_file()
                 and not candidate.is_symlink()
             ):
+                if (
+                    path != _HTTP_READER_OWNERSHIP_GUARD
+                    and (
+                        path in _HTTP_READER_TEST_OWNERS
+                        or _test_module_imports_http_reader(candidate)
+                    )
+                ):
+                    targets.update(
+                        _validated_owner_targets(
+                            repo_root,
+                            path,
+                            (_HTTP_READER_OWNERSHIP_GUARD,),
+                            error_code="CI_HTTP_READER_OWNER_GUARD_INVALID",
+                        )
+                    )
                 if not _fixed_lane_covers_test_target(path, path):
                     targets.add(path)
                 continue
