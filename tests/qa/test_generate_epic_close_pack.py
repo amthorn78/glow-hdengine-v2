@@ -448,6 +448,72 @@ def test_closed_report_body_grammar_admits_nonstructural_lines(line: str) -> Non
     close_pack._require_report_structure(source)
 
 
+@pytest.mark.parametrize(
+    "control",
+    (
+        "\x00",
+        "\t",
+        "\x1b",
+        "\x7f",
+        "\x85",
+        "\u061c",
+        "\u200e",
+        "\u2028",
+        "\u2029",
+        "\u202e",
+        "\u2066",
+        "\u206f",
+        "\ud800",
+    ),
+)
+def test_schema_and_runtime_reject_report_text_controls(control: str) -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
+    source = _valid_source()
+    source["report_sections"][0]["body_lines"][0] = f"tracked{control}text"
+    assert not Draft202012Validator(schema).is_valid(source)
+    with pytest.raises(close_pack.ClosePackError, match="REPORT_SECTION_AMBIGUOUS"):
+        close_pack._require_report_structure(source)
+
+
+@pytest.mark.parametrize("field", ("heading", "body"))
+def test_schema_and_runtime_reject_final_lf_in_report_text(field: str) -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
+    source = _valid_source()
+    if field == "heading":
+        source["report_sections"][0]["heading"] += "\n"
+    else:
+        source["report_sections"][0]["body_lines"][0] += "\n"
+    assert not Draft202012Validator(schema).is_valid(source)
+    with pytest.raises(close_pack.ClosePackError, match="REPORT_SECTION_AMBIGUOUS"):
+        close_pack._require_report_structure(source)
+
+
+def test_report_body_remains_unicode_capable() -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
+    source = _valid_source()
+    source["report_sections"][0]["body_lines"][0] = (
+        "Tracked résumé evidence remains deterministic."
+    )
+    assert Draft202012Validator(schema).is_valid(source)
+    close_pack._require_report_structure(source)
+
+
+@pytest.mark.parametrize("control", ("\x00", "\n", "\ud800", "\u202e"))
+def test_writer_rejects_report_control_without_outputs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    control: str,
+) -> None:
+    source = _valid_source()
+    source["report_sections"][0]["body_lines"][0] = f"tracked text{control}"
+    repo = _init_repo(tmp_path, source=source)
+    assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 1
+    assert "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID" in capsys.readouterr().err
+    assert not (repo / REPORT_REL).exists()
+    assert not (repo / MANIFEST_REL).exists()
+
+
 def test_writer_runtime_defense_rejects_reserved_body_heading_without_outputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

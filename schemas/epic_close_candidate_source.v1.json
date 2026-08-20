@@ -156,7 +156,7 @@
       "type": "string"
     },
     "causal_report_body_line": {
-      "description": "A deterministic report body line that cannot create or hide an H1/H2 section channel.",
+      "description": "A deterministic control-free report body line that cannot create or hide an H1/H2 section channel.",
       "allOf": [
         {
           "$ref": "#/$defs/causal_single_line"
@@ -182,7 +182,9 @@
     "single_line": {
       "maxLength": 1024,
       "minLength": 1,
-      "pattern": "^[^\\r\\n]+$",
+      "not": {
+        "pattern": "[\\u0000-\\u001F\\u007F-\\u009F\\u00AD\\u061C\\u180E\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u206F\\uD800-\\uDFFF\\uFEFF\\uFFF9-\\uFFFB]"
+      },
       "type": "string"
     }
   }

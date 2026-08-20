@@ -74,6 +74,8 @@ REPORT_HEADING_RE = re.compile(
 # closed custom-section body grammar so the generated section topology is unique.
 REPORT_BODY_PROHIBITED_RE = re.compile(
     r"(?:"
+    r"[\x00-\x1f\x7f-\x9f\u00ad\u061c\u180e\u200b-\u200f"
+    r"\u2028-\u202e\u2060-\u206f\ud800-\udfff\ufeff\ufff9-\ufffb]|"
     r"^[ \t]*#{1,2}(?:[ \t]+|$)|"
     r"^[ \t]*(?:`{3,}|~{3,})|"
     r"^[ \t]*(?:=+|-+)[ \t]*$|"
