@@ -237,16 +237,31 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/unit/test_narratives_loader.py",
     "tests/cli/test_aux_preview.py",
 )
+_HTTP_READER_TEST_OWNERS = (
+    "tests/adapter/test_compat_http_dev.py",
+    "tests/adapter/test_compat_http_parity.py",
+    "tests/adapter/test_dev_sampler_http.py",
+    "tests/adapter/test_diagnostic_writer.py",
+    "tests/cli/test_aux_preview.py",
+    "tests/compat/test_abba_parity.py",
+    "tests/db/test_conn_env_only.py",
+    "tests/db/test_no_import_time_connect.py",
+    "tests/http/test_compat_endpoint_contract.py",
+    "tests/http/test_dev_conjunction_http.py",
+    "tests/http/test_endpoint_catalog.py",
+    "tests/http/test_reader_a7_transport.py",
+    "tests/runtime/test_identity.py",
+    "tests/transport/test_aux_narrative.py",
+    "tests/transport/test_internal_version_contract.py",
+    "tests/transport/test_ops_rails_refusal.py",
+    "tests/transport/test_writers_errors_headers.py",
+)
 _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
     ),
-    "adapter/http_reader.py": (
-        "tests/adapter/test_compat_http_dev.py",
-        "tests/adapter/test_compat_http_parity.py",
-        "tests/http/test_compat_endpoint_contract.py",
-    ),
+    "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
     "engine/__init__.py": ("tests/runtime/test_identity.py",),
     "engine/constants.py": ("tests/mech/test_constants.py",),
     "engine/bodygraph/vendor_client.py": (

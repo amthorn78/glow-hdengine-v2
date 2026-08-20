@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 import re
 import subprocess
@@ -316,6 +317,68 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
     for rel in sorted(classifier._EVIDENCE_GENERATOR_TEST_OWNERS):
         assert (ROOT / rel).is_file()
         classifier._evidence_generator_owner_targets(ROOT, rel)
+
+
+def test_http_reader_owner_registry_covers_active_direct_consumers() -> None:
+    direct_consumers: set[str] = set()
+    for candidate in (ROOT / "tests").rglob("test_*.py"):
+        if not candidate.is_file() or candidate.is_symlink():
+            continue
+        tree = ast.parse(candidate.read_text(encoding="utf-8"))
+        imports_reader = any(
+            (
+                isinstance(node, ast.Import)
+                and any(
+                    alias.name == "adapter.http_reader" for alias in node.names
+                )
+            )
+            or (
+                isinstance(node, ast.ImportFrom)
+                and (
+                    node.module == "adapter.http_reader"
+                    or (
+                        node.module == "adapter"
+                        and any(alias.name == "http_reader" for alias in node.names)
+                    )
+                )
+            )
+            or (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "import_module"
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and node.args[0].value == "adapter.http_reader"
+            )
+            for node in ast.walk(tree)
+        )
+        if imports_reader:
+            direct_consumers.add(candidate.relative_to(ROOT).as_posix())
+
+    owners = set(classifier._HTTP_READER_TEST_OWNERS)
+    assert direct_consumers
+    assert direct_consumers <= owners
+    assert {
+        "tests/adapter/test_diagnostic_writer.py",
+        "tests/http/test_reader_a7_transport.py",
+    } <= owners
+    for owner in owners:
+        path = ROOT / owner
+        assert path.is_file(), owner
+        assert not path.is_symlink(), owner
+
+    expected_direct = tuple(
+        sorted(
+            owner
+            for owner in owners
+            if not classifier._fixed_lane_covers_test_target(
+                "adapter/http_reader.py", owner
+            )
+        )
+    )
+    assert classifier.changed_test_targets(
+        ROOT, ("adapter/http_reader.py",)
+    ) == expected_direct
 
 
 def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
