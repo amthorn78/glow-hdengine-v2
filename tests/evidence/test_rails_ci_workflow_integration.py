@@ -157,6 +157,89 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert workflow_targets == fixed_targets
 
 
+def test_manual_closeout_validation_is_isolated_read_only_and_exact_head() -> None:
+    manual_path = ROOT / ".github/workflows/epic-closeout-validation.yml"
+    text = manual_path.read_text(encoding="utf-8")
+    ordinary = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    assert re.findall(r"(?m)^  [a-z_]+:\s*$", text.split("permissions:", 1)[0]) == [
+        "  workflow_dispatch:"
+    ]
+    for forbidden_trigger in (
+        "pull_request:",
+        "push:",
+        "workflow_run:",
+        "repository_dispatch:",
+        "release:",
+        "schedule:",
+    ):
+        assert forbidden_trigger not in text
+    assert re.findall(r"(?m)^[ \t]*permissions:[ \t]*$", text) == ["permissions:"]
+    assert re.findall(r"(?m)^[ \t]*contents:[ \t]+read[ \t]*$", text) == [
+        "  contents: read"
+    ]
+    assert re.search(r"(?m)^[ \t]*[A-Za-z_-]+:[ \t]+write[ \t]*$", text) is None
+    assert re.findall(r"(?m)^  [a-z0-9_-]+:\s*$", text.split("jobs:\n", 1)[1]) == [
+        "  validate-closeout-candidate:"
+    ]
+    assert text.count("timeout-minutes: 15") == 1
+    assert text.count('GIT_OPTIONAL_LOCKS: "0"') == 1
+    assert text.count('GIT_NO_LAZY_FETCH: "1"') == 1
+    assert text.count("actions/checkout@v4") == 1
+    assert text.count("persist-credentials: false") == 1
+    assert "ref: ${{ inputs.git_ref }}" in text
+    assert "^[0-9a-f]{40,64}$" in text
+    assert '${#CANDIDATE_SOURCE} <= 512' in text
+    assert (
+        '[[ "$CANDIDATE_SOURCE" =~ '
+        '^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$ ]]'
+    ) in text
+    assert '""|/*|*\\\\*|*//*|.|..|./*|*/./*|*/.|../*|*/../*|*/..)' in text
+    assert (
+        'test "$(git ls-files --error-unmatch -- "$CANDIDATE_SOURCE")" = '
+        '"$CANDIDATE_SOURCE"'
+    ) in text
+    assert 'test -f "$CANDIDATE_SOURCE"' in text
+    assert 'test ! -L "$CANDIDATE_SOURCE"' in text
+    assert text.count('test "$(git rev-parse --verify HEAD)" = "$SELECTED_REF"') == 2
+    assert text.count("git diff --exit-code") == 2
+    assert text.count('git status --short --untracked-files=all') == 2
+    validation_step = text[
+        text.index("      - name: Validate exact committed closeout candidate without writing") :
+        text.index("      - name: Run retained read-only evidence checks")
+    ]
+    assert validation_step.count("python tools/qa/generate_epic_close_pack.py") == 1
+    assert validation_step.count('--source "$CANDIDATE_SOURCE"') == 1
+    assert validation_step.count("--check") == 1
+    assert "--write" not in text
+    for command in (
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/orientation_demo.py --check",
+        "ci/checks/check_evidence_index_hash.sh",
+        "python tools/evidence/validate_evidence_paths.py",
+        "ci/checks/check_mirror_schema.sh",
+        "ci/checks/check_final_lf.sh",
+    ):
+        assert text.count(command) == 1
+    for forbidden in (
+        "actions/upload-artifact",
+        "actions/download-artifact",
+        "receipt",
+        "git push",
+        "git commit",
+        "gh pr",
+        "GITHUB_TOKEN",
+        "secrets.",
+        "ALLOW_NETWORK=1",
+    ):
+        assert forbidden not in text
+
+    assert ordinary.count("\n  test:\n") == 1
+    assert ordinary.count("actions/checkout@v4") == 1
+    assert "epic-closeout-validation" not in ordinary
+    assert "workflow_dispatch:" not in ordinary
+
+
 @pytest.mark.parametrize(
     ("paths", "expected_lanes", "expected_reason"),
     [
@@ -180,6 +263,7 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["engine/bodygraph/vendor_client.py"], {"product", "rails", "release"}, "selected_lanes"),
         (["tools/qa/qa_harness.py"], {"evidence", "qa"}, "selected_lanes"),
         (["tools/qa/run_hde_epic024_harness.py"], {"evidence", "qa"}, "selected_lanes"),
+        (["tools/qa/generate_epic_close_pack.py"], {"evidence", "qa"}, "selected_lanes"),
         (["tools/evidence/run_sanity_pipeline.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/update_evidence_index.py"], {"evidence", "release"}, "selected_lanes"),
         (["tools/evidence/generate_architecture_snapshot.py"], {"evidence", "product"}, "selected_lanes"),
@@ -196,10 +280,12 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
         (["schemas/architecture_snapshot.keys_only.v1.json"], {"evidence"}, "selected_lanes"),
         (["schemas/hde_epic038_direct_db_selection.v1.json"], {"db", "evidence", "release"}, "selected_lanes"),
         (["schemas/hde_epic038_ops03_result_summary.v1.json"], {"evidence"}, "selected_lanes"),
+        (["schemas/epic_close_candidate_source.v1.json"], {"product", "compat", "release"}, "selected_lanes"),
         (["audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt"], {"evidence", "release"}, "selected_lanes"),
         (["tests/transport/headers/aux_text_200.snap.path_proof.txt"], {"evidence"}, "selected_lanes"),
         (["tests/README.md"], set(), "documentation_only"),
         ([".github/workflows/ci.yml"], set(classifier.LANES), "selected_lanes"),
+        ([".github/workflows/epic-closeout-validation.yml"], set(classifier.LANES), "selected_lanes"),
         (["ci/checks/classify_ci_changes.py"], set(classifier.LANES), "selected_lanes"),
     ],
 )
@@ -328,6 +414,7 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
     assert "adapter/http_reader.py" in handled
     assert "engine/bodygraph/vendor_client.py" in handled
     assert "engine/serializer/canon.py" in handled
+    assert "schemas/epic_close_candidate_source.v1.json" in handled
     assert "engine/errors/__init__.py" in blocked
     assert "adapter/cache_keys.py" in blocked
 
@@ -545,6 +632,15 @@ def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
     assert classifier.changed_test_targets(
         ROOT, ("tools/qa/qa_harness.py",)
     ) == (classifier._QA_TOOL_OWNERSHIP_TEST,)
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/qa/generate_epic_close_pack.py",)
+    ) == (
+        "tests/qa/test_generate_epic_close_pack.py",
+        classifier._QA_TOOL_OWNERSHIP_TEST,
+    )
+    assert classifier.changed_test_targets(
+        ROOT, ("schemas/epic_close_candidate_source.v1.json",)
+    ) == ("tests/qa/test_generate_epic_close_pack.py",)
 
     unowned = tmp_path / "repo/tools/qa/new_harness.py"
     unowned.parent.mkdir(parents=True)

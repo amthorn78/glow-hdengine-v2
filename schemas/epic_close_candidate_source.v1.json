@@ -1,0 +1,165 @@
+{
+  "$id": "schemas/epic_close_candidate_source.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "epic_id": {
+      "pattern": "^HDE-EPIC[0-9]{3}$",
+      "type": "string"
+    },
+    "evidence_inputs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "$ref": "#/$defs/causal_binding"
+          },
+          "path": {
+            "$ref": "#/$defs/causal_repository_path"
+          }
+        },
+        "required": [
+          "binding",
+          "path"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "key_outputs": {
+      "additionalProperties": false,
+      "properties": {
+        "close_manifest": {
+          "$ref": "#/$defs/repository_path"
+        },
+        "close_report": {
+          "$ref": "#/$defs/repository_path"
+        }
+      },
+      "required": [
+        "close_manifest",
+        "close_report"
+      ],
+      "type": "object"
+    },
+    "nonclaims": {
+      "items": {
+        "enum": [
+          "no_epic_closeout_or_pf09_movement",
+          "no_hosted_feedback_or_external_attestation",
+          "no_ops_live_qa_deployment_or_release",
+          "no_public_contract_runtime_or_data_change",
+          "no_qa_acceptance_or_token_satisfaction"
+        ]
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "plan_path": {
+      "$ref": "#/$defs/causal_repository_path"
+    },
+    "report_sections": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "body_lines": {
+            "items": {
+              "$ref": "#/$defs/causal_single_line"
+            },
+            "maxItems": 128,
+            "minItems": 1,
+            "type": "array"
+          },
+          "heading": {
+            "$ref": "#/$defs/causal_single_line"
+          }
+        },
+        "required": [
+          "heading",
+          "body_lines"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "epic_close_candidate_source.v1"
+    }
+  },
+  "required": [
+    "schema_version",
+    "epic_id",
+    "plan_path",
+    "evidence_inputs",
+    "report_sections",
+    "key_outputs",
+    "nonclaims"
+  ],
+  "type": "object",
+  "$defs": {
+    "causal_binding": {
+      "allOf": [
+        {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9_.-]*$",
+          "type": "string"
+        },
+        {
+          "not": {
+            "$ref": "#/$defs/feedback_dependency"
+          }
+        }
+      ]
+    },
+    "causal_repository_path": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/repository_path"
+        },
+        {
+          "not": {
+            "$ref": "#/$defs/feedback_dependency"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[Cc][Aa][Tt][Aa][Ll][Oo][Gg]/[Mm][Aa][Nn][Ii][Ff][Ee][Ss][Tt]\\.[Jj][Ss][Oo][Nn](?:$|[./])"
+          }
+        }
+      ]
+    },
+    "causal_single_line": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/single_line"
+        },
+        {
+          "not": {
+            "$ref": "#/$defs/feedback_dependency"
+          }
+        }
+      ]
+    },
+    "feedback_dependency": {
+      "pattern": "(^|[^A-Za-z0-9])([Rr][Uu][Nn][^A-Za-z0-9\\r\\n]*[Ii][Dd]|[Rr][Ee][Cc][Ee][Ii][Pp][Tt]|[Aa][Tt][Tt][Ee][Ss][Tt][Aa][Tt][Ii][Oo][Nn]|[Hh][Oo][Ss][Tt][Ee][Dd][^A-Za-z0-9\\r\\n]*[Rr][Ee][Ss][Uu][Ll][Tt]|[Ll][Aa][Tt][Ee][Rr][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt]|[Ss][Oo][Uu][Rr][Cc][Ee][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt]|[Rr][Ee][Ll][Ee][Aa][Ss][Ee][^A-Za-z0-9\\r\\n]*[Ii][Dd])([^A-Za-z0-9]|$)"
+    },
+    "repository_path": {
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$",
+      "type": "string"
+    },
+    "single_line": {
+      "maxLength": 1024,
+      "minLength": 1,
+      "pattern": "^[^\\r\\n]+$",
+      "type": "string"
+    }
+  }
+}
