@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import ast
-import importlib.util
+import hashlib
 import json
 import os
 import re
@@ -24,11 +24,6 @@ from typing import Iterable, Sequence
 ROOT = Path(__file__).resolve().parents[2]
 LANES = ("product", "compat", "db", "rails", "evidence", "qa", "release")
 SHA_RE = re.compile(r"[0-9a-fA-F]{40,64}\Z")
-_STATIC_STRING_VALUE_LIMIT = 128
-_STATIC_STRING_LENGTH_LIMIT = 4096
-_STATIC_STRING_EXPRESSION_LIMIT = 2048
-_STATIC_ALIAS_ASSIGNMENT_LIMIT = 4096
-_STATIC_ALIAS_NODE_LIMIT = 8192
 
 _FULL_VALIDATION_PREFIXES = (
     ".github/",
@@ -77,26 +72,6 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/transport/test_ops_rails_refusal.py",
     "tests/transport/test_writers_errors_headers.py",
 )
-_SOURCE_WRITING_INACTIVE_TESTS = frozenset(
-    {
-        "tests/compliance/test_log_shape_snapshot.py",
-        "tests/compliance/test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.py",
-    }
-)
-_STALE_BRIDGE_INACTIVE_TESTS = frozenset(
-    {
-        "tests/adapter/test_headers_and_determinism.py",
-        "tests/adapter/test_reader_parity.py",
-        "tests/compliance/test_429_retry_after_mapping_seconds_and_date.py",
-        "tests/compliance/test_override_guard_engine_env_and_app_env_alias.py",
-        "tests/compliance/test_preset_schema_gate_legacy_missing_both_present.py",
-        "tests/compliance/test_reader_etag_and_conditional.py",
-        "tests/compliance/test_reader_etag_compression_invariance.py",
-    }
-)
-_UNCONFIGURED_INACTIVE_TESTS = (
-    _SOURCE_WRITING_INACTIVE_TESTS | _STALE_BRIDGE_INACTIVE_TESTS
-)
 _FULL_VALIDATION_INACTIVE_TESTS = {
     # Administrative or source-writing checks that are intentionally outside
     # the current behavioral suite. Direct edits fail closed until a current
@@ -106,7 +81,7 @@ _FULL_VALIDATION_INACTIVE_TESTS = {
     "tests/qa/test_epic021_scaffolding.py",
     "tests/qa/test_epic022_acceptance_scaffold.py",
     "tests/qa/test_epic022_close_pack_ready.py",
-} | set(_UNCONFIGURED_INACTIVE_TESTS)
+}
 _HISTORICAL_PREFIXES = (
     ".audit_src/",
     "_archive/",
@@ -265,14 +240,17 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/unit/test_narratives_loader.py",
     "tests/cli/test_aux_preview.py",
 )
+_HTTP_READER_MODULE = "adapter.http_reader"
+_HTTP_READER_TEST_IMPORT_MODULE = "ci.checks.import_http_reader_for_tests"
+_HTTP_READER_TEST_IMPORT_SEAM = (
+    "ci/checks/import_http_reader_for_tests.py"
+)
 _HTTP_READER_OWNERSHIP_GUARD = "tests/evidence/test_http_reader_ci_ownership.py"
 _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_compat_http_dev.py",
     "tests/adapter/test_compat_http_parity.py",
-    "tests/adapter/test_compat_writer_transport.py",
     "tests/adapter/test_diagnostic_writer.py",
     "tests/adapter/test_dev_sampler_http.py",
-    "tests/adapter/test_gate_auth.py",
     "tests/cli/test_aux_preview.py",
     "tests/compat/test_abba_parity.py",
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
@@ -289,82 +267,24 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/transport/test_ops_rails_refusal.py",
     "tests/transport/test_writers_errors_headers.py",
 )
-_HTTP_READER_INDIRECT_OWNER_BRIDGES = {
-    "tests/adapter/test_compat_writer_transport.py": (
-        "adapter.app",
-        "adapter.wsgi",
-        "adapter.http_reader",
-    ),
-    "tests/adapter/test_dev_sampler_http.py": (
-        "adapter.factory",
-        "adapter.http_reader",
-    ),
-    "tests/adapter/test_gate_auth.py": (
-        "adapter.app",
-        "adapter.wsgi",
-        "adapter.http_reader",
-    ),
-    "tests/compliance/test_logging_filter_keys_only_and_redactions.py": (
-        "adapter.wsgi",
-        "adapter.http_reader",
-    ),
-    "tests/http/test_compat_endpoint_contract.py": (
-        "adapter.factory",
-        "adapter.http_reader",
-    ),
-    "tests/transport/test_ops_rails_refusal.py": (
-        "adapter.wsgi",
-        "adapter.http_reader",
-    ),
+_HTTP_READER_INDIRECT_TEST_OWNERS = {
+    "tests/adapter/test_dev_sampler_http.py",
+    "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+    "tests/http/test_compat_endpoint_contract.py",
+    "tests/transport/test_ops_rails_refusal.py",
 }
-_HTTP_READER_INDIRECT_TEST_OWNERS = frozenset(
-    _HTTP_READER_INDIRECT_OWNER_BRIDGES
-)
-_HTTP_READER_BRIDGE_TOPOLOGY = {
-    "adapter.app": ("adapter.wsgi", "adapter.http_reader"),
-    "adapter.factory": ("adapter.http_reader",),
-    "adapter.wsgi": ("adapter.http_reader",),
-    "tests._helpers.app_import": ("adapter.wsgi", "adapter.http_reader"),
+_HTTP_READER_DYNAMIC_TEST_OWNERS = {
+    "tests/db/test_conn_env_only.py",
+    "tests/db/test_no_import_time_connect.py",
 }
-_HTTP_READER_BRIDGE_MODULES = frozenset(_HTTP_READER_BRIDGE_TOPOLOGY)
-_HTTP_READER_INDIRECT_NON_OWNERS = frozenset(
-    {
-        "tests/_helpers/app_import.py",
-        "tests/adapter/test_env_guard_import_purity.py",
-        "tests/adapter/test_headers_and_determinism.py",
-        "tests/adapter/test_jsonschema.py",
-        "tests/adapter/test_reader_parity.py",
-        "tests/adapter/test_readyz.py",
-        "tests/compliance/test_429_retry_after_mapping_seconds_and_date.py",
-        "tests/compliance/test_log_shape_snapshot.py",
-        "tests/compliance/test_override_guard_engine_env_and_app_env_alias.py",
-        "tests/compliance/test_preset_schema_gate_legacy_missing_both_present.py",
-        "tests/compliance/test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.py",
-        "tests/compliance/test_reader_etag_and_conditional.py",
-        "tests/compliance/test_reader_etag_compression_invariance.py",
-    }
-)
-_HTTP_READER_DIRECT_NON_OWNER_SHA256 = {
-    # This preserved OPS regression wraps the built-in importer to prove a
-    # fail-closed source-identity boundary; its indeterminate wrapper is not a
-    # Reader consumer.  Exact-byte binding prevents the exception from drifting.
-    "tests/ops/test_hde_epic038_ops03.py": (
-        "17ae39cd98dcefef701f4de0ea3e3572162d6dca97e9d8db871132c44a4a743f"
-    ),
-    # This fixed QA-lane module parametrically imports an explicit bounded
-    # roster of QA generators.  Its variable dynamic import is deliberately
-    # classified fail-closed.  Binding the exception to exact reviewed bytes
-    # prevents the path disposition from concealing a later Reader consumer.
-    "tests/qa/test_viability_generator_wrappers.py": (
-        "c6a0dc4f1f61afd2bc79ca6ecd6b492490d1b14b2321fc3c416b2c62292052eb"
-    ),
+_HTTP_READER_DYNAMIC_TEST_OWNER_SHA256 = {
+    "tests/db/test_conn_env_only.py": "f66e19f653f90be9c3cf29fb4a8dad0e4d67930b208df52152677df789c53b2d",
+    "tests/db/test_no_import_time_connect.py": "ccf5863a8df173ab2c825fe5f981192dca1b7ccb3b9d1178adf1e1e1ebce526e",
 }
-_HTTP_READER_DIRECT_NON_OWNERS = frozenset(
-    _HTTP_READER_DIRECT_NON_OWNER_SHA256
-)
-_HTTP_READER_DISPOSITION_PATHS = frozenset(_HTTP_READER_TEST_OWNERS) | (
-    _HTTP_READER_INDIRECT_NON_OWNERS | _HTTP_READER_DIRECT_NON_OWNERS
-)
+_HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
+    # This indirect owner validates Reader's public log-route identifier.
+    "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+}
 _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
@@ -940,165 +860,7 @@ def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     )
 
 
-def _is_pytest_test_module(path: str | PurePosixPath) -> bool:
-    """Return whether a path matches pytest's active module-name policy."""
-    name = PurePosixPath(path).name
-    return name.endswith(".py") and (
-        name.startswith("test_") or name.endswith("_test.py")
-    )
-
-
-def _bounded_static_strings(values: Iterable[str]) -> set[str]:
-    bounded: set[str] = set()
-    for value in values:
-        if len(value) > _STATIC_STRING_LENGTH_LIMIT:
-            raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-        bounded.add(value)
-        if len(bounded) > _STATIC_STRING_VALUE_LIMIT:
-            raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-    return bounded
-
-
-def _bounded_string_product(left: set[str], right: set[str]) -> set[str]:
-    if len(left) * len(right) > _STATIC_STRING_VALUE_LIMIT:
-        raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-    return _bounded_static_strings(
-        prefix + suffix for prefix in left for suffix in right
-    )
-
-
-def _static_string_values(
-    node: ast.expr,
-    constants: dict[str, set[str]],
-) -> set[str]:
-    if isinstance(node, ast.Constant) and isinstance(node.value, str):
-        return _bounded_static_strings((node.value,))
-    if isinstance(node, ast.Name):
-        return set(constants.get(node.id, set()))
-    if isinstance(node, ast.NamedExpr):
-        return _static_string_values(node.value, constants)
-    if isinstance(node, ast.IfExp):
-        return _bounded_static_strings(
-            _static_string_values(node.body, constants)
-            | _static_string_values(node.orelse, constants)
-        )
-    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
-        left = _static_string_values(node.left, constants)
-        right = _static_string_values(node.right, constants)
-        return _bounded_string_product(left, right)
-    if isinstance(node, ast.JoinedStr):
-        parts = {""}
-        for value in node.values:
-            if isinstance(value, ast.Constant) and isinstance(value.value, str):
-                values = {value.value}
-            elif (
-                isinstance(value, ast.FormattedValue)
-                and value.format_spec is None
-                and value.conversion in {-1, ord("s")}
-            ):
-                values = _static_string_values(value.value, constants)
-            else:
-                return set()
-            if not values:
-                return set()
-            parts = _bounded_string_product(parts, values)
-        return parts
-    return set()
-
-
-def _static_call_argument_expressions(
-    node: ast.Call,
-    *,
-    position: int,
-    keyword: str,
-) -> list[ast.expr]:
-    values: list[ast.expr] = []
-    if len(node.args) > position:
-        values.append(node.args[position])
-    values.extend(
-        item.value for item in node.keywords if item.arg == keyword
-    )
-    return values
-
-
-def _static_call_argument_values(
-    node: ast.Call,
-    *,
-    position: int,
-    keyword: str,
-    constants: dict[str, set[str]],
-) -> set[str]:
-    return {
-        resolved
-        for value in _static_call_argument_expressions(
-            node, position=position, keyword=keyword
-        )
-        for resolved in _static_string_values(value, constants)
-    }
-
-
-def _importlib_call_module_names(
-    node: ast.Call,
-    constants: dict[str, set[str]],
-) -> set[str]:
-    names = _static_call_argument_values(
-        node, position=0, keyword="name", constants=constants
-    )
-    packages = _static_call_argument_values(
-        node, position=1, keyword="package", constants=constants
-    )
-    resolved: set[str] = set()
-    for name in names:
-        if not name.startswith("."):
-            resolved.add(name)
-            continue
-        for package in packages:
-            try:
-                resolved.add(importlib.util.resolve_name(name, package))
-            except (ImportError, ValueError):
-                continue
-    return resolved
-
-
-def _static_collection_string_values(
-    node: ast.expr,
-    constants: dict[str, set[str]],
-) -> set[str]:
-    if isinstance(node, (ast.List, ast.Set, ast.Tuple)):
-        return _bounded_static_strings(
-            item
-            for element in node.elts
-            for item in _static_string_values(element, constants)
-        )
-    return _static_string_values(node, constants)
-
-
-def _builtin_call_module_names(
-    node: ast.Call,
-    constants: dict[str, set[str]],
-) -> set[str]:
-    names = _static_call_argument_values(
-        node, position=0, keyword="name", constants=constants
-    )
-    fromlist = _bounded_static_strings(
-        item
-        for expression in _static_call_argument_expressions(
-            node, position=3, keyword="fromlist"
-        )
-        for item in _static_collection_string_values(expression, constants)
-    )
-    resolved = set(names)
-    if names and fromlist:
-        resolved.update(
-            _bounded_string_product(
-                _bounded_static_strings(name + "." for name in names),
-                {item for item in fromlist if item != "*"},
-            )
-        )
-    return resolved
-
-
-def _parse_python_source(candidate: Path) -> ast.Module:
+def _parse_test_module(candidate: Path) -> ast.Module:
     try:
         return ast.parse(candidate.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, SyntaxError) as exc:
@@ -1107,775 +869,152 @@ def _parse_python_source(candidate: Path) -> ast.Module:
         ) from exc
 
 
-def _import_statement_imports(node: ast.AST, module_name: str) -> bool:
-    parent, separator, leaf = module_name.rpartition(".")
-    if isinstance(node, ast.Import):
-        return any(alias.name == module_name for alias in node.names)
-    if not isinstance(node, ast.ImportFrom) or node.level != 0:
-        return False
-    return node.module == module_name or (
-        bool(separator)
-        and node.module == parent
-        and any(alias.name == leaf for alias in node.names)
-    )
-
-
-def _assignment_names(target: ast.expr) -> set[str]:
-    if isinstance(target, ast.Name):
-        return {target.id}
-    if isinstance(target, (ast.List, ast.Tuple)):
-        return {
-            name
-            for item in target.elts
-            for name in _assignment_names(item)
-        }
-    return set()
-
-
-def _assignment_bindings(
-    target: ast.expr,
-    value: ast.expr,
-) -> Iterable[tuple[str, ast.expr]]:
-    """Yield statically positional name/value bindings for an assignment."""
-    if isinstance(target, ast.Name):
-        yield target.id, value
-        return
-    if (
-        isinstance(target, (ast.List, ast.Tuple))
-        and isinstance(value, (ast.List, ast.Tuple))
-        and len(target.elts) == len(value.elts)
-    ):
-        for child_target, child_value in zip(target.elts, value.elts):
-            yield from _assignment_bindings(child_target, child_value)
-        return
-    if isinstance(target, (ast.List, ast.Tuple)):
-        # A non-literal iterable cannot be positionally resolved here.  Bind
-        # every target to the RHS as a conservative alias may-flow so a trusted
-        # import callable cannot disappear through one unpacking step.
-        for name in _assignment_names(target):
-            yield name, value
-
-
-def _module_scope_statements(
-    statements: Iterable[ast.stmt],
-) -> Iterable[ast.stmt]:
-    for statement in statements:
-        yield statement
-        nested: list[list[ast.stmt]] = []
-        if isinstance(statement, (ast.If, ast.For, ast.AsyncFor, ast.While)):
-            nested.extend((statement.body, statement.orelse))
-        elif isinstance(statement, (ast.With, ast.AsyncWith)):
-            nested.append(statement.body)
-        elif isinstance(statement, _ast_try_node_types()):
-            nested.extend(
-                (
-                    statement.body,
-                    statement.orelse,
-                    statement.finalbody,
-                    *(handler.body for handler in statement.handlers),
-                )
-            )
-        elif isinstance(statement, ast.Match):
-            nested.extend(case.body for case in statement.cases)
-        for body in nested:
-            yield from _module_scope_statements(body)
-
-
-def _ast_try_node_types() -> tuple[type[ast.AST], ...]:
-    """Return try-node classes without requiring Python 3.11 TryStar."""
-    try_star = getattr(ast, "TryStar", None)
-    if isinstance(try_star, type):
-        return (ast.Try, try_star)
-    return (ast.Try,)
-
-
-def _module_binding_counts(tree: ast.Module) -> dict[str, int]:
-    counts: dict[str, int] = {}
-
-    def bind(name: str) -> None:
-        counts[name] = counts.get(name, 0) + 1
-
-    for statement in _module_scope_statements(tree.body):
-        if isinstance(statement, ast.Import):
-            for alias in statement.names:
-                bind(alias.asname or alias.name.partition(".")[0])
-        elif isinstance(statement, ast.ImportFrom):
-            for alias in statement.names:
-                if alias.name != "*":
-                    bind(alias.asname or alias.name)
-        elif isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            bind(statement.name)
-        elif isinstance(statement, ast.Assign):
-            for target in statement.targets:
-                for name in _assignment_names(target):
-                    bind(name)
-        elif isinstance(statement, (ast.AnnAssign, ast.AugAssign)):
-            for name in _assignment_names(statement.target):
-                bind(name)
-        elif isinstance(statement, (ast.For, ast.AsyncFor)):
-            for name in _assignment_names(statement.target):
-                bind(name)
-        elif isinstance(statement, (ast.With, ast.AsyncWith)):
-            for item in statement.items:
-                if item.optional_vars is not None:
-                    for name in _assignment_names(item.optional_vars):
-                        bind(name)
-    return counts
-
-
-def _module_string_constants(
-    tree: ast.Module,
-    required_names: set[str],
-) -> tuple[dict[str, set[str]], set[str]]:
-    expressions: dict[str, list[ast.expr]] = {}
-    for statement in ast.walk(tree):
-        if isinstance(statement, ast.Assign):
-            for target in statement.targets:
-                for name, value in _assignment_bindings(
-                    target, statement.value
-                ):
-                    expressions.setdefault(name, []).append(value)
-        elif (
-            isinstance(statement, ast.AnnAssign)
-            and isinstance(statement.target, ast.Name)
-            and statement.value is not None
-        ):
-            expressions.setdefault(statement.target.id, []).append(
-                statement.value
-            )
-        elif (
-            isinstance(statement, ast.NamedExpr)
-            and isinstance(statement.target, ast.Name)
-        ):
-            expressions.setdefault(statement.target.id, []).append(
-                statement.value
-            )
-        elif (
-            isinstance(statement, ast.AugAssign)
-            and isinstance(statement.target, ast.Name)
-            and isinstance(statement.op, ast.Add)
-        ):
-            expressions.setdefault(statement.target.id, []).append(
-                ast.BinOp(
-                    left=ast.Name(id=statement.target.id, ctx=ast.Load()),
-                    op=ast.Add(),
-                    right=statement.value,
-                )
-            )
-
-    selected_names = set(required_names)
-    pending = list(required_names)
-    while pending:
-        name = pending.pop()
-        for value in expressions.get(name, ()):
-            for child in ast.walk(value):
-                if isinstance(child, ast.Name) and child.id not in selected_names:
-                    selected_names.add(child.id)
-                    pending.append(child.id)
-    selected = {
-        name: expressions[name]
-        for name in selected_names
-        if name in expressions
-    }
-
-    if sum(len(values) for values in selected.values()) > (
-        _STATIC_STRING_EXPRESSION_LIMIT
-    ):
-        raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-
-    constants: dict[str, set[str]] = {}
-    # A bounded fixed-point handles simple cross-name aliases and repeated
-    # assignments while conservatively retaining every statically possible
-    # value across scopes.  The expression count, rather than only the number
-    # of names, bounds the longest resolvable assignment chain.
-    iteration_limit = sum(len(values) for values in selected.values()) + 1
-    for _ in range(iteration_limit):
-        changed = False
-        for name, values in selected.items():
-            resolved = _bounded_static_strings(
-                item
-                for value in values
-                for item in _static_string_values(value, constants)
-            )
-            current = constants.setdefault(name, set())
-            additions = resolved - current
-            if additions:
-                current.update(_bounded_static_strings(additions | current))
-                changed = True
-        if not changed:
-            break
-    complete_names: set[str] = set()
-    for _ in range(len(selected) + 1):
-        additions = {
-            name
-            for name, values in selected.items()
-            if values
-            and all(
-                _static_string_expression_is_complete(value, complete_names)
-                for value in values
-            )
-        } - complete_names
-        if not additions:
-            break
-        complete_names.update(additions)
-    return constants, complete_names
-
-
-def _static_string_expression_is_complete(
-    node: ast.expr,
-    complete_names: set[str],
-) -> bool:
-    if isinstance(node, ast.Constant):
-        return isinstance(node.value, str)
-    if isinstance(node, ast.Name):
-        return node.id in complete_names
-    if isinstance(node, ast.NamedExpr):
-        return _static_string_expression_is_complete(
-            node.value, complete_names
-        )
-    if isinstance(node, ast.IfExp):
-        return _static_string_expression_is_complete(
-            node.body, complete_names
-        ) and _static_string_expression_is_complete(
-            node.orelse, complete_names
-        )
+def _constant_string_expression(
+    node: ast.AST,
+) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.Constant) and isinstance(node.value, bytes):
+        try:
+            return node.value.decode("utf-8")
+        except UnicodeDecodeError:
+            return None
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
-        return _static_string_expression_is_complete(
-            node.left, complete_names
-        ) and _static_string_expression_is_complete(
-            node.right, complete_names
-        )
+        left = _constant_string_expression(node.left)
+        right = _constant_string_expression(node.right)
+        if left is not None and right is not None:
+            return left + right
     if isinstance(node, ast.JoinedStr):
-        return all(
-            (
-                isinstance(value, ast.Constant)
-                and isinstance(value.value, str)
-            )
-            or (
+        parts: list[str] = []
+        for value in node.values:
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                parts.append(value.value)
+            elif (
                 isinstance(value, ast.FormattedValue)
+                and value.conversion == -1
                 and value.format_spec is None
-                and value.conversion in {-1, ord("s")}
-                and _static_string_expression_is_complete(
-                    value.value, complete_names
-                )
-            )
-            for value in node.values
-        )
-    return False
-
-
-def _static_collection_expression_is_complete(
-    node: ast.expr,
-    complete_names: set[str],
-) -> bool:
-    if isinstance(node, (ast.List, ast.Set, ast.Tuple)):
-        return all(
-            _static_string_expression_is_complete(item, complete_names)
-            for item in node.elts
-        )
-    return _static_string_expression_is_complete(node, complete_names)
-
-
-def _extend_dynamic_import_aliases(
-    tree: ast.Module,
-    binding_counts: dict[str, int],
-    *,
-    importlib_names: set[str],
-    import_module_names: set[str],
-    builtins_names: set[str],
-    builtin_import_names: set[str],
-    pytest_names: set[str],
-    importorskip_names: set[str],
-) -> None:
-    raw_assignments: list[tuple[str, ast.expr]] = []
-    for statement in ast.walk(tree):
-        if isinstance(statement, ast.Assign):
-            for target in statement.targets:
-                for name, value in _assignment_bindings(
-                    target, statement.value
-                ):
-                    raw_assignments.append((name, value))
-        elif (
-            isinstance(statement, ast.AnnAssign)
-            and isinstance(statement.target, ast.Name)
-            and statement.value is not None
-        ):
-            raw_assignments.append((statement.target.id, statement.value))
-        elif (
-            isinstance(statement, ast.NamedExpr)
-            and isinstance(statement.target, ast.Name)
-        ):
-            raw_assignments.append((statement.target.id, statement.value))
-
-    if len(raw_assignments) > _STATIC_ALIAS_ASSIGNMENT_LIMIT:
-        raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-    assignments: list[tuple[str, tuple[ast.expr, ...]]] = []
-    dependents: dict[str, set[int]] = {}
-    node_count = 0
-    for name, value in raw_assignments:
-        candidates = tuple(_possible_alias_values(value))
-        node_count += len(candidates)
-        if node_count > _STATIC_ALIAS_NODE_LIMIT:
-            raise ValueError("CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED")
-        index = len(assignments)
-        assignments.append((name, candidates))
-        for candidate in candidates:
-            if isinstance(candidate, ast.Name):
-                dependents.setdefault(candidate.id, set()).add(index)
-
-    queue = list(range(len(assignments)))
-    queued = set(queue)
-    cursor = 0
-    while cursor < len(queue):
-        index = queue[cursor]
-        cursor += 1
-        queued.discard(index)
-        name, possible_values = assignments[index]
-        before = (
-            name in importlib_names,
-            name in import_module_names,
-            name in builtins_names,
-            name in builtin_import_names,
-            name in pytest_names,
-            name in importorskip_names,
-        )
-        for value in possible_values:
-            if isinstance(value, ast.Name):
-                if value.id in importlib_names:
-                    importlib_names.add(name)
-                if value.id in import_module_names:
-                    import_module_names.add(name)
-                if value.id in builtins_names:
-                    builtins_names.add(name)
-                if value.id in builtin_import_names or (
-                    value.id == "__import__"
-                    and binding_counts.get("__import__", 0) == 0
-                ):
-                    builtin_import_names.add(name)
-                if value.id in pytest_names:
-                    pytest_names.add(name)
-                if value.id in importorskip_names:
-                    importorskip_names.add(name)
-            elif isinstance(value, ast.Attribute):
-                providers = _dynamic_import_provider_kinds(
+            ):
+                resolved = _constant_string_expression(
                     value.value,
-                    importlib_names=importlib_names,
-                    builtins_names=builtins_names,
-                    pytest_names=pytest_names,
                 )
-                if "importlib" in providers and value.attr == "import_module":
-                    import_module_names.add(name)
-                if "builtins" in providers and value.attr == "__import__":
-                    builtin_import_names.add(name)
-                if "pytest" in providers and value.attr == "importorskip":
-                    importorskip_names.add(name)
-            elif isinstance(value, ast.Call):
-                kinds = _dynamic_import_getattr_kinds(
-                    value,
-                    importlib_names=importlib_names,
-                    builtins_names=builtins_names,
-                    pytest_names=pytest_names,
-                )
-                if "importlib" in kinds:
-                    import_module_names.add(name)
-                if "builtin" in kinds:
-                    builtin_import_names.add(name)
-                if "pytest" in kinds:
-                    importorskip_names.add(name)
-        after = (
-            name in importlib_names,
-            name in import_module_names,
-            name in builtins_names,
-            name in builtin_import_names,
-            name in pytest_names,
-            name in importorskip_names,
-        )
-        if before == after:
-            continue
-        for dependent in dependents.get(name, ()):
-            if dependent not in queued:
-                queue.append(dependent)
-                queued.add(dependent)
-
-
-def _possible_alias_values(value: ast.expr) -> Iterable[ast.expr]:
-    """Yield expression nodes that may carry a trusted callable alias."""
-    yield from (
-        node for node in ast.walk(value) if isinstance(node, ast.expr)
-    )
-
-
-def _dynamic_import_provider_kinds(
-    value: ast.expr,
-    *,
-    importlib_names: set[str],
-    builtins_names: set[str],
-    pytest_names: set[str],
-) -> set[str]:
-    providers: set[str] = set()
-    pending: list[ast.expr] = [value]
-    visited = 0
-    while pending:
-        node = pending.pop()
-        visited += 1
-        if visited > _STATIC_ALIAS_NODE_LIMIT:
-            raise ValueError(
-                "CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED"
-            )
-        if isinstance(node, ast.Name):
-            if node.id in importlib_names:
-                providers.add("importlib")
-            if node.id in builtins_names:
-                providers.add("builtins")
-            if node.id in pytest_names:
-                providers.add("pytest")
-        elif isinstance(node, ast.NamedExpr):
-            pending.append(node.value)
-        elif isinstance(node, ast.IfExp):
-            pending.extend((node.body, node.orelse))
-        elif isinstance(node, ast.BoolOp):
-            pending.extend(node.values)
-        elif isinstance(node, ast.Subscript):
-            pending.append(node.value)
-        elif isinstance(node, (ast.List, ast.Set, ast.Tuple)):
-            pending.extend(node.elts)
-        elif isinstance(node, ast.Dict):
-            pending.extend(node.values)
-        elif isinstance(node, ast.Starred):
-            pending.append(node.value)
-        elif (
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Name)
-            and node.func.id == "getattr"
-            and len(node.args) >= 3
-        ):
-            # A present default is a possible provider value even when the
-            # inspected object and attribute are unrelated.
-            pending.append(node.args[2])
-    return providers
-
-
-def _dynamic_import_getattr_kinds(
-    function: ast.expr,
-    *,
-    importlib_names: set[str],
-    builtins_names: set[str],
-    pytest_names: set[str],
-) -> set[str]:
-    """Return import-call kinds exposed by a bounded ``getattr`` call.
-
-    A nonliteral attribute on a trusted provider is intentionally treated as
-    ambiguous and therefore import-capable.  The surrounding call still has
-    to target the governed module (or itself be indeterminate) before the
-    ownership guard is selected.
-    """
-    if not (
-        isinstance(function, ast.Call)
-        and isinstance(function.func, ast.Name)
-        and function.func.id == "getattr"
-        and len(function.args) >= 2
-    ):
-        return set()
-    providers = _dynamic_import_provider_kinds(
-        function.args[0],
-        importlib_names=importlib_names,
-        builtins_names=builtins_names,
-        pytest_names=pytest_names,
-    )
-    attribute_node = function.args[1]
-    attribute = (
-        attribute_node.value
-        if isinstance(attribute_node, ast.Constant)
-        and isinstance(attribute_node.value, str)
-        else None
-    )
-    kinds: set[str] = set()
-    if "importlib" in providers and attribute in {None, "import_module"}:
-        kinds.add("importlib")
-    if "builtins" in providers and attribute in {None, "__import__"}:
-        kinds.add("builtin")
-    if "pytest" in providers and attribute in {None, "importorskip"}:
-        kinds.add("pytest")
-    return kinds
-
-
-def _dynamic_import_call_kinds(
-    function: ast.expr,
-    binding_counts: dict[str, int],
-    *,
-    importlib_names: set[str],
-    import_module_names: set[str],
-    builtins_names: set[str],
-    builtin_import_names: set[str],
-    pytest_names: set[str],
-    importorskip_names: set[str],
-) -> set[str]:
-    kinds: set[str] = set()
-    pending: list[ast.expr] = [function]
-    visited = 0
-    while pending:
-        node = pending.pop()
-        visited += 1
-        if visited > _STATIC_ALIAS_NODE_LIMIT:
-            raise ValueError(
-                "CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED"
-            )
-        if isinstance(node, ast.Call):
-            kinds.update(
-                _dynamic_import_getattr_kinds(
-                    node,
-                    importlib_names=importlib_names,
-                    builtins_names=builtins_names,
-                    pytest_names=pytest_names,
-                )
-            )
-            if (
-                isinstance(node.func, ast.Name)
-                and node.func.id == "getattr"
-                and len(node.args) >= 3
-            ):
-                pending.append(node.args[2])
-        elif isinstance(node, ast.Subscript):
-            pending.append(node.value)
-        elif isinstance(node, (ast.List, ast.Set, ast.Tuple)):
-            pending.extend(node.elts)
-        elif isinstance(node, ast.Dict):
-            pending.extend(node.values)
-        elif isinstance(node, ast.NamedExpr):
-            pending.append(node.value)
-        elif isinstance(node, ast.IfExp):
-            pending.extend((node.body, node.orelse))
-        elif isinstance(node, ast.BoolOp):
-            pending.extend(node.values)
-        elif isinstance(node, ast.Starred):
-            pending.append(node.value)
-        elif isinstance(node, ast.Name):
-            if node.id in import_module_names:
-                kinds.add("importlib")
-            if node.id in builtin_import_names or (
-                node.id == "__import__"
-                and binding_counts.get("__import__", 0) == 0
-            ):
-                kinds.add("builtin")
-            if node.id in importorskip_names:
-                kinds.add("pytest")
-        elif isinstance(node, ast.Attribute):
-            providers = _dynamic_import_provider_kinds(
-                node.value,
-                importlib_names=importlib_names,
-                builtins_names=builtins_names,
-                pytest_names=pytest_names,
-            )
-            if "importlib" in providers and node.attr == "import_module":
-                kinds.add("importlib")
-            if "builtins" in providers and node.attr == "__import__":
-                kinds.add("builtin")
-            if "pytest" in providers and node.attr == "importorskip":
-                kinds.add("pytest")
-    return kinds
-
-
-def _dynamic_import_call_is_indeterminate(
-    node: ast.Call,
-    kind: str,
-    constants: dict[str, set[str]],
-    complete_names: set[str],
-) -> bool:
-    if any(keyword.arg is None for keyword in node.keywords):
-        return True
-    name_expressions = _static_call_argument_expressions(
-        node,
-        position=0,
-        keyword="modname" if kind == "pytest" else "name",
-    )
-    if not name_expressions:
-        return False
-    if not all(
-        _static_string_expression_is_complete(expression, complete_names)
-        for expression in name_expressions
-    ):
-        return True
-    if kind == "importlib":
-        names = {
-            item
-            for expression in name_expressions
-            for item in _static_string_values(expression, constants)
-        }
-        if any(name.startswith(".") for name in names):
-            package_expressions = _static_call_argument_expressions(
-                node, position=1, keyword="package"
-            )
-            if not package_expressions:
-                # importlib rejects a relative name without a package before
-                # importing anything; this is conclusively not a consumer.
-                return False
-            return not all(
-                _static_string_expression_is_complete(
-                    expression, complete_names
-                )
-                for expression in package_expressions
-            )
-    if kind == "builtin":
-        fromlist_expressions = _static_call_argument_expressions(
-            node, position=3, keyword="fromlist"
-        )
-        return bool(fromlist_expressions) and not all(
-            _static_collection_expression_is_complete(
-                expression, complete_names
-            )
-            for expression in fromlist_expressions
-        )
-    return False
-
-
-def _python_module_statically_imports(
-    candidate: Path, module_name: str
-) -> bool:
-    """Return whether a module has a direct top-level absolute import."""
-    tree = _parse_python_source(candidate)
-    return any(
-        _import_statement_imports(node, module_name) for node in tree.body
-    )
-
-
-def _python_module_imports(candidate: Path, module_name: str) -> bool:
-    """Return whether source may import an exact module through known APIs.
-
-    This is deliberately a bounded may-analysis: a recognized import API or
-    module-name binding that is also reassigned remains a consumer.  That
-    conservative ambiguity policy can over-classify but cannot hide applicable
-    Reader protection.
-    """
-    tree = _parse_python_source(candidate)
-    binding_counts = _module_binding_counts(tree)
-    importlib_names: set[str] = set()
-    import_module_names: set[str] = set()
-    builtins_names: set[str] = set()
-    builtin_import_names: set[str] = set()
-    pytest_names: set[str] = set()
-    importorskip_names: set[str] = set()
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                if _import_statement_imports(node, module_name):
-                    return True
-                bound_name = alias.asname or alias.name.partition(".")[0]
-                if alias.name == "importlib" or (
-                    alias.asname is None
-                    and alias.name.startswith("importlib.")
-                ):
-                    importlib_names.add(
-                        bound_name if alias.asname is not None else "importlib"
-                    )
-                elif alias.name == "builtins":
-                    builtins_names.add(bound_name)
-                elif alias.name == "pytest" or (
-                    alias.asname is None and alias.name.startswith("pytest.")
-                ):
-                    pytest_names.add(
-                        bound_name if alias.asname is not None else "pytest"
-                    )
-        elif isinstance(node, ast.ImportFrom) and node.level == 0:
-            if _import_statement_imports(node, module_name):
-                return True
-            for alias in node.names:
-                bound_name = alias.asname or alias.name
-                if node.module == "importlib" and alias.name == "import_module":
-                    import_module_names.add(bound_name)
-                elif node.module == "builtins" and alias.name == "__import__":
-                    builtin_import_names.add(bound_name)
-                elif node.module == "pytest" and alias.name == "importorskip":
-                    importorskip_names.add(bound_name)
-
-    _extend_dynamic_import_aliases(
-        tree,
-        binding_counts,
-        importlib_names=importlib_names,
-        import_module_names=import_module_names,
-        builtins_names=builtins_names,
-        builtin_import_names=builtin_import_names,
-        pytest_names=pytest_names,
-        importorskip_names=importorskip_names,
-    )
-
-    relevant_calls: list[tuple[ast.Call, str]] = []
-    required_names: set[str] = set()
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        kinds = _dynamic_import_call_kinds(
-            node.func,
-            binding_counts,
-            importlib_names=importlib_names,
-            import_module_names=import_module_names,
-            builtins_names=builtins_names,
-            builtin_import_names=builtin_import_names,
-            pytest_names=pytest_names,
-            importorskip_names=importorskip_names,
-        )
-        if not kinds:
-            continue
-        for kind in sorted(kinds):
-            relevant_calls.append((node, kind))
-            expressions = _static_call_argument_expressions(
-                node,
-                position=0,
-                keyword="modname" if kind == "pytest" else "name",
-            )
-            if kind == "importlib":
-                expressions.extend(
-                    _static_call_argument_expressions(
-                        node, position=1, keyword="package"
-                    )
-                )
-            elif kind == "builtin":
-                expressions.extend(
-                    _static_call_argument_expressions(
-                        node, position=3, keyword="fromlist"
-                    )
-                )
-            required_names.update(
-                child.id
-                for expression in expressions
-                for child in ast.walk(expression)
-                if isinstance(child, ast.Name)
-            )
-
-    if not relevant_calls:
-        return False
-    constants, complete_names = _module_string_constants(tree, required_names)
-    for node, kind in relevant_calls:
-        if kind == "importlib":
-            argument_names = _importlib_call_module_names(node, constants)
-        elif kind == "builtin":
-            argument_names = _builtin_call_module_names(node, constants)
-        else:
-            argument_names = _static_call_argument_values(
-                node,
-                position=0,
-                keyword="modname" if kind == "pytest" else "name",
-                constants=constants,
-            )
-        if module_name in argument_names:
-            return True
-        if _dynamic_import_call_is_indeterminate(
-            node, kind, constants, complete_names
-        ):
-            return True
-    return False
+                if resolved is None:
+                    return None
+                parts.append(resolved)
+            else:
+                return None
+        return "".join(parts)
+    return None
 
 
 def _test_module_imports_http_reader(candidate: Path) -> bool:
-    """Return whether test Python directly imports the HTTP reader."""
-    return _python_module_imports(candidate, "adapter.http_reader")
+    """Return whether a test has an absolute static Reader import.
 
-
-def _test_module_imports_http_reader_bridge(candidate: Path) -> bool:
-    """Return whether test Python imports a governed Reader bridge."""
+    Dynamic Reader tests use the repository-owned seam below. Keeping these
+    two source shapes separate makes ownership discovery deterministic without
+    attempting to interpret arbitrary Python execution.
+    """
+    tree = _parse_test_module(candidate)
     return any(
-        _python_module_imports(candidate, module)
-        for module in _HTTP_READER_BRIDGE_MODULES
+        (
+            isinstance(node, ast.Import)
+            and any(
+                alias.name == _HTTP_READER_MODULE
+                or alias.name.startswith(f"{_HTTP_READER_MODULE}.")
+                for alias in node.names
+            )
+        )
+        or (
+            isinstance(node, ast.ImportFrom)
+            and node.level == 0
+            and (
+                node.module == _HTTP_READER_MODULE
+                or (node.module or "").startswith(
+                    f"{_HTTP_READER_MODULE}."
+                )
+                or (
+                    node.module == "adapter"
+                    and any(alias.name == "http_reader" for alias in node.names)
+                )
+            )
+        )
+        for node in ast.walk(tree)
+    )
+
+
+def _test_module_imports_http_reader_seam(candidate: Path) -> bool:
+    """Return whether Python source imports the canonical Reader test seam."""
+    tree = _parse_test_module(candidate)
+    return any(
+        (
+            isinstance(node, ast.Import)
+            and any(
+                alias.name == _HTTP_READER_TEST_IMPORT_MODULE
+                or alias.name.startswith(
+                    f"{_HTTP_READER_TEST_IMPORT_MODULE}."
+                )
+                for alias in node.names
+            )
+        )
+        or (
+            isinstance(node, ast.ImportFrom)
+            and node.level == 0
+            and (
+                node.module == _HTTP_READER_TEST_IMPORT_MODULE
+                or (
+                    node.module == "ci.checks"
+                    and any(
+                        alias.name == "import_http_reader_for_tests"
+                        for alias in node.names
+                    )
+                )
+            )
+        )
+        for node in ast.walk(tree)
+    )
+
+
+def _test_module_references_http_reader(candidate: Path) -> bool:
+    """Return whether source contains a statically foldable Reader string.
+
+    This deliberately narrow companion catches ordinary importlib, patch,
+    monkeypatch, and exec-style references regardless of the resolver spelling.
+    Dynamic ownership must use the canonical seam; a genuinely non-importing
+    reference needs an explicit reviewed exception.
+    """
+    tree = _parse_test_module(candidate)
+    for node in ast.walk(tree):
+        value = _constant_string_expression(node)
+        if value is not None and _HTTP_READER_MODULE in value:
+            return True
+    return False
+
+
+def _validate_http_reader_dynamic_owner(candidate: Path, path: str) -> None:
+    """Bind the two approved dynamic owners to their reviewed exact bytes."""
+    expected = _HTTP_READER_DYNAMIC_TEST_OWNER_SHA256.get(path)
+    if expected is None:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED:{path}")
+    try:
+        actual = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    except OSError as exc:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_INVALID:{path}") from exc
+    if actual != expected:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_REVIEW_REQUIRED:{path}")
+
+
+def _http_reader_control_owner_targets(
+    repo_root: Path, path: str
+) -> tuple[str, ...]:
+    if path != _HTTP_READER_TEST_IMPORT_SEAM:
+        return ()
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        (
+            *sorted(_HTTP_READER_DYNAMIC_TEST_OWNERS),
+            _HTTP_READER_OWNERSHIP_GUARD,
+        ),
+        error_code="CI_HTTP_READER_SEAM_OWNER_INVALID",
     )
 
 
@@ -1893,6 +1032,14 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
     changed_paths = set(normalized_paths)
     for path in normalized_paths:
         rel = PurePosixPath(path)
+        if (
+            rel.parts
+            and rel.parts[0] == "tests"
+            and (repo_root / path).is_symlink()
+        ):
+            if path in _registered_owner_test_paths():
+                raise ValueError(f"CI_REGISTERED_OWNER_TEST_INVALID:{path}")
+            raise ValueError(f"CI_TEST_TARGET_INVALID:{path}")
         if path in _FULL_VALIDATION_INACTIVE_TESTS:
             raise ValueError(f"CI_INACTIVE_TEST_REQUIRES_DISPOSITION:{path}")
         if (
@@ -1906,50 +1053,104 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         targets.update(_full_validation_owner_targets(repo_root, path))
         if rel.parts and rel.parts[0] == "tests":
             candidate = repo_root / path
-            if candidate.is_symlink():
-                raise ValueError(f"CI_TEST_SYMLINK_UNSUPPORTED:{path}")
-            is_test_module = _is_pytest_test_module(rel)
-            is_regular_python = (
-                rel.suffix == ".py"
-                and candidate.exists()
+            is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
+            is_python = rel.suffix.lower() == ".py"
+            candidate_is_file = (
+                candidate.exists()
                 and candidate.is_file()
             )
-            imports_http_reader = (
-                is_regular_python
-                and path != _HTTP_READER_OWNERSHIP_GUARD
-                and _test_module_imports_http_reader(candidate)
-            )
-            imports_http_reader_bridge = (
-                is_regular_python
-                and path != _HTTP_READER_OWNERSHIP_GUARD
-                and _test_module_imports_http_reader_bridge(candidate)
-            )
-            if path != _HTTP_READER_OWNERSHIP_GUARD and (
-                imports_http_reader
-                or imports_http_reader_bridge
-                or path in _HTTP_READER_DISPOSITION_PATHS
-            ):
-                targets.update(
-                    _validated_owner_targets(
-                        repo_root,
-                        path,
-                        (_HTTP_READER_OWNERSHIP_GUARD,),
-                        error_code="CI_HTTP_READER_OWNER_GUARD_INVALID",
+            if is_python and candidate.exists() and not candidate_is_file:
+                if path in _registered_owner_test_paths():
+                    raise ValueError(
+                        f"CI_REGISTERED_OWNER_TEST_INVALID:{path}"
+                    )
+                raise ValueError(f"CI_TEST_PYTHON_TARGET_INVALID:{path}")
+            if (
+                candidate_is_file
+                and is_python
+                and (
+                    rel.suffix != ".py"
+                    or (
+                        rel.name.lower().startswith("test_")
+                        and not rel.name.startswith("test_")
                     )
                 )
+            ):
+                raise ValueError(f"CI_TEST_PYTHON_NAME_NONCANONICAL:{path}")
+            static_owner = False
+            seam_importer = False
+            reader_reference = False
+            if is_python and candidate_is_file:
+                static_owner = _test_module_imports_http_reader(candidate)
+                seam_importer = _test_module_imports_http_reader_seam(candidate)
+                reader_reference = _test_module_references_http_reader(candidate)
+                if static_owner and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if reader_reference and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if seam_importer and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if (
+                    seam_importer
+                    and path not in _HTTP_READER_DYNAMIC_TEST_OWNERS
+                    and path != _HTTP_READER_OWNERSHIP_GUARD
+                ):
+                    raise ValueError(
+                        f"CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED:{path}"
+                    )
+                if (
+                    reader_reference
+                    and not static_owner
+                    and path not in _HTTP_READER_DYNAMIC_TEST_OWNERS
+                    and path not in _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS
+                    and path != _HTTP_READER_OWNERSHIP_GUARD
+                ):
+                    raise ValueError(
+                        f"CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW:{path}"
+                    )
             if (
                 is_test_module
-                and is_regular_python
+                and candidate_is_file
             ):
+                if path in _HTTP_READER_DYNAMIC_TEST_OWNERS:
+                    _validate_http_reader_dynamic_owner(candidate, path)
+                if (
+                    path != _HTTP_READER_OWNERSHIP_GUARD
+                    and (
+                        path in _HTTP_READER_TEST_OWNERS
+                        or static_owner
+                        or path in _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS
+                    )
+                ):
+                    targets.update(
+                        _validated_owner_targets(
+                            repo_root,
+                            path,
+                            (_HTTP_READER_OWNERSHIP_GUARD,),
+                            error_code="CI_HTTP_READER_OWNER_GUARD_INVALID",
+                        )
+                    )
                 if not _fixed_lane_covers_test_target(path, path):
                     targets.add(path)
                 continue
-            if is_test_module and not candidate.exists():
+            if is_test_module and not candidate_is_file:
                 if path in _registered_owner_test_paths():
+                    if candidate.exists():
+                        raise ValueError(
+                            f"CI_REGISTERED_OWNER_TEST_INVALID:{path}"
+                        )
                     raise ValueError(f"CI_REGISTERED_OWNER_TEST_DELETED:{path}")
-                continue
+                if not candidate.exists():
+                    continue
             targets.update(_test_support_owner_targets(repo_root, path))
             continue
+        targets.update(_http_reader_control_owner_targets(repo_root, path))
         targets.update(_product_owner_targets(repo_root, path))
         targets.update(
             _evidence_generator_owner_targets(
@@ -1998,6 +1199,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
         ):
             lanes.add("release")
         return lanes
+
+    if path == _HTTP_READER_TEST_IMPORT_SEAM:
+        return {"db"}
 
     if path.startswith("docs/ENDPOINTS_CATALOG.json"):
         return {"evidence", "release"}

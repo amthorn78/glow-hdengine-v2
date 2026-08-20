@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import os
 import re
 import subprocess
@@ -260,15 +259,25 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
     fixture.write_text("{}\n", encoding="utf-8")
     symlink = adapter / "test_link.py"
     symlink.symlink_to(adapter / "test_env_guard_prod_variants.py")
+    support_symlink = adapter / "fixtures_link"
+    support_symlink.symlink_to(fixture.parent, target_is_directory=True)
+    noncanonical_test = adapter / "test_reader.PY"
+    noncanonical_test.write_text(
+        f"import {classifier._HTTP_READER_MODULE}\n",
+        encoding="utf-8",
+    )
 
     with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
         classifier.changed_test_targets(
-            repo, ("tests/adapter/fixtures/input.json",)
+            repo,
+            ("tests/adapter/fixtures/input.json",),
         )
-    with pytest.raises(
-        ValueError, match="CI_TEST_SYMLINK_UNSUPPORTED"
-    ):
+    with pytest.raises(ValueError, match="CI_TEST_TARGET_INVALID"):
         classifier.changed_test_targets(repo, ("tests/adapter/test_link.py",))
+    with pytest.raises(ValueError, match="CI_TEST_TARGET_INVALID"):
+        classifier.changed_test_targets(repo, ("tests/adapter/fixtures_link",))
+    with pytest.raises(ValueError, match="CI_TEST_PYTHON_NAME_NONCANONICAL"):
+        classifier.changed_test_targets(repo, ("tests/adapter/test_reader.PY",))
     with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
         classifier.changed_test_targets(ROOT, ("tests/unit/helpers.py",))
     with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
@@ -282,864 +291,12 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
             repo,
             ("tests/unit/test_narratives_router.py",),
         )
-
-
-@pytest.mark.parametrize(
-    ("name", "expected"),
-    (
-        ("test_reader.py", True),
-        ("reader_test.py", True),
-        ("test_.py", True),
-        ("_test.py", True),
-        ("reader_tests.py", False),
-        ("contest_reader.py", False),
-        ("conftest.py", False),
-        ("test_reader.txt", False),
-    ),
-)
-def test_pytest_module_policy_matches_repository_collection(
-    name: str, expected: bool, pytestconfig: pytest.Config
-) -> None:
-    assert tuple(pytestconfig.getini("python_files")) == (
-        "test_*.py",
-        "*_test.py",
-    )
-    assert classifier._is_pytest_test_module(name) is expected
-
-
-@pytest.mark.parametrize(
-    "source",
-    (
-        "import adapter.http_reader\n",
-        "import adapter.http_reader as reader\n",
-        "from adapter.http_reader import create_app\n",
-        "from adapter import http_reader\n",
-        (
-            "import importlib\n"
-            'importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(name="adapter.http_reader")\n'
-        ),
-        (
-            "import importlib as loader\n"
-            'loader.import_module(name="adapter.http_reader")\n'
-        ),
-        (
-            "from importlib import import_module\n"
-            'import_module(name="adapter.http_reader")\n'
-        ),
-        (
-            "from importlib import import_module as load\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(".http_reader", "adapter")\n'
-        ),
-        (
-            "from importlib import import_module as load\n"
-            'load(name=".http_reader", package="adapter")\n'
-        ),
-        (
-            "import importlib\n"
-            'MODULE = "adapter.http_reader"\n'
-            "importlib.import_module(MODULE)\n"
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module("adapter." + "http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'LEAF = "http_reader"\n'
-            'importlib.import_module(f"adapter.{LEAF}")\n'
-        ),
-        (
-            "import importlib\n"
-            'MODULE = "adapter.http_reader" if FLAG else "adapter.other"\n'
-            "importlib.import_module(MODULE)\n"
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(MODULE := "adapter.http_reader")\n'
-        ),
-        (
-            'MODULE = "adapter"\n'
-            'MODULE += ".http_reader"\n'
-            "import importlib\n"
-            "importlib.import_module(MODULE)\n"
-        ),
-        (
-            "import importlib\n"
-            'MODULE = "adapter"\n'
-            'MODULE = MODULE + ".http"\n'
-            'MODULE = MODULE + "_reader"\n'
-            "importlib.import_module(MODULE)\n"
-        ),
-        (
-            "import importlib\n"
-            "import importlib\n"
-            'importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "from importlib import import_module\n"
-            "from importlib import import_module\n"
-            'import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import pytest\n"
-            "import pytest\n"
-            'pytest.importorskip("adapter.http_reader")\n'
-        ),
-        (
-            "try:\n"
-            "    import importlib as loader\n"
-            "except ImportError:\n"
-            "    import importlib as loader\n"
-            'loader.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "load = importlib.import_module\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "load, unused = importlib.import_module, None\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "load = importlib.import_module if FLAG else fallback\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "(importlib.import_module if FLAG else fallback)(\n"
-            '    "adapter.http_reader"\n'
-            ")\n"
-        ),
-        (
-            "import importlib\n"
-            '(load := importlib.import_module)("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "loader = importlib\n"
-            'loader.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "importlib = object()\n"
-            "def load_reader():\n"
-            "    import importlib\n"
-            '    return importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "load = object()\n"
-            "def load_reader():\n"
-            "    from importlib import import_module as load\n"
-            '    return load("adapter.http_reader")\n'
-        ),
-        (
-            "def load_reader():\n"
-            "    import importlib\n"
-            "    load = importlib.import_module\n"
-            '    return load("adapter.http_reader")\n'
-        ),
-        (
-            "def load_reader():\n"
-            "    import importlib\n"
-            "    loader: object = importlib\n"
-            '    return loader.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "def load_reader():\n"
-            '    module_name = "adapter.http_reader"\n'
-            "    return importlib.import_module(module_name)\n"
-        ),
-        (
-            "import importlib\n"
-            "def load_reader():\n"
-            '    prefix = "adapter."\n'
-            '    leaf = "http_reader"\n'
-            "    return importlib.import_module(prefix + leaf)\n"
-        ),
-        (
-            "import importlib\n"
-            "load = importlib.import_module\n"
-            'load("adapter.http_reader")\n'
-            "def helper():\n"
-            "    load = object()\n"
-            "    return load\n"
-        ),
-        (
-            "try:\n"
-            "    import importlib as loader\n"
-            "except ImportError:\n"
-            "    loader = fallback\n"
-            'loader.import_module("adapter.http_reader")\n'
-        ),
-        '__import__(name="adapter.http_reader")\n',
-        '__import__("adapter", fromlist=["http_reader"])\n',
-        (
-            "import importlib.util\n"
-            'importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            '(loader := importlib).import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "(importlib if FLAG else fallback).import_module(\n"
-            '    "adapter.http_reader"\n'
-            ")\n"
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(**{"name": "adapter.http_reader"})\n'
-        ),
-        (
-            "import importlib\n"
-            'getattr(importlib, "import_module")("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "LOADERS = [importlib.import_module]\n"
-            'LOADERS[0]("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "PROVIDERS = [importlib]\n"
-            'PROVIDERS[0].import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'ATTR = "import_" + "module"\n'
-            'getattr(importlib, ATTR)("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'ATTR = "import_" + "module"\n'
-            "load = getattr(importlib, ATTR)\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "(importlib or fallback).import_module(\n"
-            '    "adapter.http_reader"\n'
-            ")\n"
-        ),
-        (
-            "import importlib\n"
-            "PROVIDERS = [importlib]\n"
-            '(*PROVIDERS,)[0].import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "getattr(\n"
-            "    object(),\n"
-            '    "missing",\n'
-            "    importlib.import_module,\n"
-            ')("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(".http_reader", **{"package": "adapter"})\n'
-        ),
-        '__import__("adapter", **{"fromlist": ("http_reader",)})\n',
-        (
-            "import builtins as builtins_alias\n"
-            'builtins_alias.__import__("adapter.http_reader")\n'
-        ),
-        (
-            "from builtins import __import__ as load\n"
-            'load(name="adapter.http_reader")\n'
-        ),
-        (
-            "import pytest as pt\n"
-            'pt.importorskip(modname="adapter.http_reader")\n'
-        ),
-        (
-            "from pytest import importorskip as load\n"
-            'load("adapter.http_reader")\n'
-        ),
-    ),
-)
-def test_http_reader_import_scanner_accepts_bounded_import_forms(
-    tmp_path: Path, source: str
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(source, encoding="utf-8")
-
-    assert classifier._test_module_imports_http_reader(candidate)
-
-
-@pytest.mark.parametrize(
-    "source",
-    (
-        'record("adapter.http_reader")\n',
-        'logger.info("adapter.http_reader")\n',
-        (
-            "import importlib\n"
-            'importlib.import_module(name="adapter.other")\n'
-        ),
-        (
-            "import pytest\n"
-            'pytest.importorskip(modname="adapter.other")\n'
-        ),
-        'MODULE = "adapter.http_reader"\n',
-        'loader.import_module("adapter.http_reader")\n',
-        (
-            "import importlib\n"
-            'importlib.import_module(".http_reader", "other")\n'
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(name=".http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'getattr(importlib, "reload")("adapter.http_reader")\n'
-        ),
-        (
-            "def __import__(name):\n"
-            "    return name\n"
-            '__import__("adapter.http_reader")\n'
-        ),
-    ),
-)
-def test_http_reader_import_scanner_rejects_unrelated_string_calls(
-    tmp_path: Path, source: str
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(source, encoding="utf-8")
-
-    assert not classifier._test_module_imports_http_reader(candidate)
-
-
-@pytest.mark.parametrize(
-    "source",
-    (
-        (
-            "import importlib\n"
-            "importlib = FakeLoader()\n"
-            'importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "from importlib import import_module as load\n"
-            "def load(name):\n"
-            "    return name\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            'MODULE = "adapter.http_reader"\n'
-            'MODULE = "adapter.other"\n'
-            "import importlib\n"
-            "importlib.import_module(MODULE)\n"
-        ),
-    ),
-)
-def test_http_reader_import_scanner_conservatively_accepts_ambiguity(
-    tmp_path: Path, source: str
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(source, encoding="utf-8")
-
-    assert classifier._test_module_imports_http_reader(candidate)
-
-
-@pytest.mark.parametrize(
-    "source",
-    (
-        (
-            "import importlib\n"
-            'OVERRIDE = ""\n'
-            'name = OVERRIDE or "adapter.http_reader"\n'
-            "importlib.import_module(name)\n"
-        ),
-        (
-            "PARTS = (\"http_reader\",)\n"
-            '__import__("adapter", fromlist=PARTS)\n'
-        ),
-        (
-            "import importlib\n"
-            'name = "%s.%s" % ("adapter", "http_reader")\n'
-            "importlib.import_module(name)\n"
-        ),
-        (
-            "import importlib\n"
-            "LOADERS = (importlib.import_module, None)\n"
-            "load, unused = LOADERS\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib.util\n"
-            'importlib.import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            '(loader := importlib).import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "(importlib if FLAG else fallback).import_module(\n"
-            '    "adapter.http_reader"\n'
-            ")\n"
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(**{"name": "adapter.http_reader"})\n'
-        ),
-        (
-            "import importlib\n"
-            'getattr(importlib, "import_module")("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "LOADERS = [importlib.import_module]\n"
-            'LOADERS[0]("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(".http_reader", **{"package": "adapter"})\n'
-        ),
-        '__import__("adapter", **{"fromlist": ("http_reader",)})\n',
-    ),
-)
-def test_http_reader_import_scanner_fails_closed_on_indeterminate_imports(
-    tmp_path: Path,
-    source: str,
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(source, encoding="utf-8")
-
-    assert classifier._test_module_imports_http_reader(candidate)
-
-
-def test_http_reader_import_scanner_fails_closed_on_invalid_python(
-    tmp_path: Path,
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text("def broken(:\n", encoding="utf-8")
-
-    with pytest.raises(ValueError, match="CI_HTTP_READER_OWNER_SCAN_INVALID"):
-        classifier._test_module_imports_http_reader(candidate)
-
-
-def test_http_reader_import_scanner_fails_closed_on_analysis_budget(
-    tmp_path: Path,
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(
-        "A = 'a'\n"
-        "A = 'b'\n"
-        "B = A + A\n"
-        "C = B + B\n"
-        "D = C + C\n"
-        "import importlib\n"
-        "importlib.import_module(D)\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(
-        ValueError,
-        match="CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED",
-    ):
-        classifier._test_module_imports_http_reader(candidate)
-
-
-def test_http_reader_import_scanner_fails_closed_on_alias_budget(
-    tmp_path: Path,
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    limit = classifier._STATIC_ALIAS_ASSIGNMENT_LIMIT
-    assignments = [
-        f"alias_{index} = alias_{index + 1}"
-        for index in range(limit)
-    ]
-    assignments.append(f"alias_{limit} = importlib.import_module")
-    candidate.write_text(
-        "\n".join(
-            ["import importlib", *assignments, 'alias_0("adapter.http_reader")']
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(
-        ValueError,
-        match="CI_HTTP_READER_STATIC_ANALYSIS_BUDGET_EXCEEDED",
-    ):
-        classifier._test_module_imports_http_reader(candidate)
-
-
-def test_http_reader_import_scanner_ignores_unrelated_large_strings(
-    tmp_path: Path,
-) -> None:
-    candidate = tmp_path / "candidate.py"
-    candidate.write_text(
-        "PAYLOAD = " + repr("x" * 4097) + "\n",
-        encoding="utf-8",
-    )
-
-    assert not classifier._test_module_imports_http_reader(candidate)
-
-
-def test_http_reader_bridge_liveness_requires_top_level_static_imports(
-    tmp_path: Path,
-) -> None:
-    live = tmp_path / "live.py"
-    live.write_text("import adapter.factory\n", encoding="utf-8")
-    unreachable = tmp_path / "unreachable.py"
-    unreachable.write_text(
-        "if False:\n    import adapter.factory\n", encoding="utf-8"
-    )
-    dynamic = tmp_path / "dynamic.py"
-    dynamic.write_text(
-        "import importlib\n"
-        'importlib.import_module("adapter.factory")\n',
-        encoding="utf-8",
-    )
-
-    assert classifier._python_module_statically_imports(
-        live, "adapter.factory"
-    )
-    assert not classifier._python_module_statically_imports(
-        unreachable, "adapter.factory"
-    )
-    assert not classifier._python_module_statically_imports(
-        dynamic, "adapter.factory"
-    )
-
-
-def test_module_scope_walker_does_not_require_python_311_try_star(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.delattr(ast, "TryStar", raising=False)
-    tree = ast.parse("try:\n    import importlib\nexcept ImportError:\n    pass\n")
-
-    statements = tuple(classifier._module_scope_statements(tree.body))
-
-    assert any(isinstance(statement, ast.Try) for statement in statements)
-    assert any(isinstance(statement, ast.Import) for statement in statements)
-
-
-@pytest.mark.parametrize(
-    ("path", "expected_exact_target"),
-    (
-        ("tests/qa/test_reader.py", True),
-        ("tests/qa/reader_test.py", True),
-        ("tests/db/test_reader.py", False),
-        ("tests/db/reader_test.py", False),
-        ("tests/http/test_reader.py", True),
-        ("tests/http/reader_test.py", True),
-    ),
-)
-def test_http_reader_consumer_scheduling_follows_pytest_module_policy(
-    tmp_path: Path,
-    path: str,
-    expected_exact_target: bool,
-) -> None:
-    repo = tmp_path / "repo"
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    for target, source in (
-        (guard, "def test_registry(): pass\n"),
-        (
-            path,
-            "import importlib\n"
-            'MODULE = "adapter." + "http_reader"\n'
-            "reader = importlib.import_module(\n"
-            "    name=MODULE\n"
-            ")\n",
-        ),
-    ):
-        candidate = repo / target
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(source, encoding="utf-8")
-
-    expected = [guard]
-    if expected_exact_target:
-        expected.append(path)
-    assert classifier.changed_test_targets(repo, (path,)) == tuple(
-        sorted(expected)
-    )
-
-
-@pytest.mark.parametrize(
-    "bridge",
-    (
-        "adapter.app",
-        "adapter.factory",
-        "adapter.wsgi",
-        "tests._helpers.app_import",
-    ),
-)
-def test_http_reader_bridge_consumer_schedules_ownership_guard(
-    tmp_path: Path,
-    bridge: str,
-) -> None:
-    repo = tmp_path / "repo"
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    consumer = "tests/qa/test_bridge_consumer.py"
-    for target, source in (
-        (guard, "def test_registry(): pass\n"),
-        (consumer, f"from {bridge} import create_app\n"),
-    ):
-        candidate = repo / target
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(source, encoding="utf-8")
-
-    assert classifier.changed_test_targets(repo, (consumer,)) == (
-        guard,
-        consumer,
-    )
-
-
-@pytest.mark.parametrize(
-    "source",
-    (
-        (
-            "import importlib\n"
-            'name = "adapter.http_reader" if FLAG else "adapter.other"\n'
-            "importlib.import_module(name)\n"
-        ),
-        (
-            "import importlib\n"
-            'importlib.import_module(name := "adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "load, unused = importlib.import_module, None\n"
-            'load("adapter.http_reader")\n'
-        ),
-        '__import__("adapter", fromlist=["http_reader"])\n',
-        (
-            "import importlib\n"
-            'OVERRIDE = ""\n'
-            'name = OVERRIDE or "adapter.http_reader"\n'
-            "importlib.import_module(name)\n"
-        ),
-        (
-            "PARTS = (\"http_reader\",)\n"
-            '__import__("adapter", fromlist=PARTS)\n'
-        ),
-        (
-            "import importlib\n"
-            'name = "%s.%s" % ("adapter", "http_reader")\n'
-            "importlib.import_module(name)\n"
-        ),
-        (
-            "import importlib\n"
-            "LOADERS = (importlib.import_module, None)\n"
-            "load, unused = LOADERS\n"
-            'load("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "PROVIDERS = [importlib]\n"
-            'PROVIDERS[0].import_module("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            'ATTR = "import_" + "module"\n'
-            'getattr(importlib, ATTR)("adapter.http_reader")\n'
-        ),
-        (
-            "import importlib\n"
-            "getattr(\n"
-            "    object(),\n"
-            '    "missing",\n'
-            "    importlib.import_module,\n"
-            ')("adapter.http_reader")\n'
-        ),
-    ),
-)
-def test_bounded_reader_import_forms_schedule_ownership_guard(
-    tmp_path: Path,
-    source: str,
-) -> None:
-    repo = tmp_path / "repo"
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    consumer = "tests/qa/test_bounded_reader_consumer.py"
-    for target, body in (
-        (guard, "def test_registry(): pass\n"),
-        (consumer, source),
-    ):
-        candidate = repo / target
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(body, encoding="utf-8")
-
-    assert classifier.changed_test_targets(repo, (consumer,)) == (
-        guard,
-        consumer,
-    )
-
-
-def test_http_reader_nonowner_disposition_lifecycle_schedules_guard(
-    tmp_path: Path,
-) -> None:
-    repo = tmp_path / "repo"
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    nonowner = "tests/adapter/test_env_guard_import_purity.py"
-    for target, source in (
-        (guard, "def test_registry(): pass\n"),
-        (nonowner, "def test_no_longer_imports_bridge(): pass\n"),
-    ):
-        candidate = repo / target
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(source, encoding="utf-8")
-
-    assert classifier.changed_test_targets(repo, (nonowner,)) == (
-        nonowner,
-        guard,
-    )
-    (repo / nonowner).unlink()
-    assert classifier.changed_test_targets(repo, (nonowner,)) == (guard,)
-
-
-def test_http_reader_support_consumer_selects_guard_and_normal_owners(
-    tmp_path: Path,
-) -> None:
-    repo = tmp_path / "repo"
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    support = "tests/qa/conftest.py"
-    _materialize_test_targets(repo, classifier._QA_TEST_OWNERS)
-    for path, source in (
-        (guard, "def test_registry(): pass\n"),
-        (support, "import adapter.http_reader\n"),
-    ):
-        candidate = repo / path
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(source, encoding="utf-8")
-
-    assert classifier.changed_test_targets(repo, (support,)) == (guard,)
-    (repo / support).write_text("VALUE = 1\n", encoding="utf-8")
-    assert classifier.changed_test_targets(repo, (support,)) == ()
-
-
-@pytest.mark.parametrize("name", ("test_reader.py", "reader_test.py"))
-@pytest.mark.parametrize("dangling", (False, True))
-def test_test_python_symlinks_fail_closed(
-    tmp_path: Path,
-    name: str,
-    dangling: bool,
-) -> None:
-    repo = tmp_path / "repo"
-    target = repo / "tests/http/target.py"
-    target.parent.mkdir(parents=True)
-    if not dangling:
-        target.write_text("VALUE = 1\n", encoding="utf-8")
-    link = target.with_name(name)
-    link.symlink_to(target)
-
-    with pytest.raises(
-        ValueError, match="CI_TEST_SYMLINK_UNSUPPORTED"
-    ):
+    registered_link = unit / "test_narratives_router.py"
+    registered_link.symlink_to(unit / "test_unit.py")
+    with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_INVALID"):
         classifier.changed_test_targets(
-            repo, (link.relative_to(repo).as_posix(),)
-        )
-
-
-def test_test_directory_symlink_fails_closed(tmp_path: Path) -> None:
-    repo = tmp_path / "repo"
-    target = repo / "tests/http"
-    target.mkdir(parents=True)
-    link = repo / "tests/qa/linked"
-    link.parent.mkdir(parents=True)
-    link.symlink_to(target, target_is_directory=True)
-
-    with pytest.raises(ValueError, match="CI_TEST_SYMLINK_UNSUPPORTED"):
-        classifier.changed_test_targets(
-            repo, (link.relative_to(repo).as_posix(),)
-        )
-
-
-def test_http_reader_git_lifecycle_is_fail_closed(tmp_path: Path) -> None:
-    repo = tmp_path / "repo"
-    repo.mkdir()
-    _git(repo, "init")
-    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
-    _git(repo, "config", "user.name", "CI classifier test")
-    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
-    registered = "tests/http/test_reader_a7_transport.py"
-    for path, source in (
-        (guard, "def test_registry(): pass\n"),
-        (registered, "def test_registered(): pass\n"),
-    ):
-        candidate = repo / path
-        candidate.parent.mkdir(parents=True, exist_ok=True)
-        candidate.write_text(source, encoding="utf-8")
-    _git(repo, "add", "tests")
-    _git(repo, "commit", "-m", "base ownership")
-    base = _git(repo, "rev-parse", "HEAD")
-
-    suffix = "tests/http/reader_test.py"
-    (repo / suffix).write_text(
-        "import adapter.http_reader\n\ndef test_reader(): pass\n",
-        encoding="utf-8",
-    )
-    _git(repo, "add", suffix)
-    _git(repo, "commit", "-m", "add suffix reader test")
-    added = _git(repo, "rev-parse", "HEAD")
-    assert classifier.classify_git_change(
-        repo, base, added, event_name="push"
-    ).test_targets == (guard, suffix)
-
-    (repo / suffix).write_text(
-        "import adapter.http_reader\n\ndef test_reader_updated(): pass\n",
-        encoding="utf-8",
-    )
-    _git(repo, "add", suffix)
-    _git(repo, "commit", "-m", "modify suffix reader test")
-    modified = _git(repo, "rev-parse", "HEAD")
-    assert classifier.classify_git_change(
-        repo, added, modified, event_name="push"
-    ).test_targets == (guard, suffix)
-
-    copied = "tests/qa/copied_reader_test.py"
-    copied_path = repo / copied
-    copied_path.parent.mkdir(parents=True, exist_ok=True)
-    copied_path.write_text(
-        (repo / suffix).read_text(encoding="utf-8"), encoding="utf-8"
-    )
-    _git(repo, "add", copied)
-    _git(repo, "commit", "-m", "copy reader test")
-    copied_head = _git(repo, "rev-parse", "HEAD")
-    assert classifier.classify_git_change(
-        repo, modified, copied_head, event_name="push"
-    ).test_targets == (guard, copied)
-
-    renamed = "tests/qa/test_copied_reader.py"
-    _git(repo, "mv", copied, renamed)
-    _git(repo, "commit", "-m", "rename reader test")
-    renamed_head = _git(repo, "rev-parse", "HEAD")
-    assert classifier.classify_git_change(
-        repo, copied_head, renamed_head, event_name="push"
-    ).test_targets == (guard, renamed)
-
-    link = "tests/http/link_test.py"
-    (repo / link).symlink_to(repo / suffix)
-    _git(repo, "add", link)
-    _git(repo, "commit", "-m", "add reader test symlink")
-    linked_head = _git(repo, "rev-parse", "HEAD")
-    with pytest.raises(
-        ValueError, match="CI_TEST_SYMLINK_UNSUPPORTED"
-    ):
-        classifier.classify_git_change(
-            repo, renamed_head, linked_head, event_name="push"
-        )
-
-    (repo / registered).unlink()
-    _git(repo, "add", "-A")
-    _git(repo, "commit", "-m", "delete registered reader owner")
-    deleted_head = _git(repo, "rev-parse", "HEAD")
-    with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
-        classifier.classify_git_change(
-            repo, linked_head, deleted_head, event_name="push"
+            repo,
+            ("tests/unit/test_narratives_router.py",),
         )
 
 
@@ -1203,10 +360,8 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
         ROOT,
         ("adapter/http_reader.py",),
     ) == (
-        "tests/adapter/test_compat_writer_transport.py",
         "tests/adapter/test_dev_sampler_http.py",
         "tests/adapter/test_diagnostic_writer.py",
-        "tests/adapter/test_gate_auth.py",
         "tests/cli/test_aux_preview.py",
         "tests/compat/test_abba_parity.py",
         "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
@@ -1222,14 +377,55 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
     repo = tmp_path / "repo"
     new_consumer = "tests/http/test_new_reader_case.py"
     registered_consumer = "tests/http/test_reader_a7_transport.py"
+    seam_consumer = "tests/http/test_dynamic_reader_case.py"
+    raw_consumer = "tests/http/test_raw_dynamic_reader_case.py"
+    concatenated_consumer = "tests/http/test_concatenated_reader_case.py"
+    support_consumer = "tests/qa/reader_helper.py"
+    static_support_consumer = "tests/qa/static_reader_helper.py"
+    innocent_literal = "tests/http/test_reader_name_constant.py"
+    dynamic_owners = sorted(classifier._HTTP_READER_DYNAMIC_TEST_OWNERS)
+    module = classifier._HTTP_READER_MODULE
     for path, body in (
         (guard, "def test_registry(): pass\n"),
-        (new_consumer, "import adapter.http_reader\n\ndef test_reader(): pass\n"),
+        (new_consumer, f"import {module}\n\ndef test_reader(): pass\n"),
         (registered_consumer, "def test_reader_no_longer_imports(): pass\n"),
+        (
+            seam_consumer,
+            f"from {classifier._HTTP_READER_TEST_IMPORT_MODULE} "
+            "import import_http_reader_for_test\n\n"
+            "def test_reader(): return import_http_reader_for_test()\n",
+        ),
+        (
+            raw_consumer,
+            "import importlib\n\n"
+            f"importlib.import_module(name={module!r})\n",
+        ),
+        (
+            concatenated_consumer,
+            "import importlib\n\n"
+            "importlib.import_module('adapter.' + 'http_reader')\n",
+        ),
+        (
+            support_consumer,
+            "import importlib\n"
+            "importlib.import_module('adapter.' + 'http_reader')\n",
+        ),
+        (
+            static_support_consumer,
+            f"from {module} import create_app\n",
+        ),
+        (innocent_literal, f"EXPECTED = {module!r}\n\ndef test_name(): pass\n"),
     ):
         candidate = repo / path
         candidate.parent.mkdir(parents=True, exist_ok=True)
         candidate.write_text(body, encoding="utf-8")
+    for owner in dynamic_owners:
+        candidate = repo / owner
+        candidate.parent.mkdir(parents=True, exist_ok=True)
+        candidate.write_text(
+            (ROOT / owner).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
 
     assert classifier.changed_test_targets(repo, (new_consumer,)) == (
         guard,
@@ -1239,6 +435,60 @@ def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
         guard,
         registered_consumer,
     )
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED",
+    ):
+        classifier.changed_test_targets(repo, (seam_consumer,))
+    assert classifier.changed_test_targets(repo, (dynamic_owners[0],)) == (
+        guard,
+    )
+    reviewed_owner = repo / dynamic_owners[0]
+    reviewed_bytes = reviewed_owner.read_bytes()
+    reviewed_owner.write_bytes(reviewed_bytes + b"\n# changed owner shape\n")
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_OWNER_REVIEW_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (dynamic_owners[0],))
+    reviewed_owner.write_bytes(reviewed_bytes)
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (raw_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (concatenated_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_SUPPORT_OWNER_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (support_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_SUPPORT_OWNER_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (static_support_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (innocent_literal,))
+
+    seam_path = classifier._HTTP_READER_TEST_IMPORT_SEAM
+    seam = repo / seam_path
+    seam.parent.mkdir(parents=True, exist_ok=True)
+    seam.write_text("def import_http_reader_for_test(): pass\n", encoding="utf-8")
+    assert classifier.changed_test_targets(repo, (seam_path,)) == (guard,)
+    seam_classification = classifier.classify_paths((seam_path,))
+    assert {
+        lane
+        for lane in classifier.LANES
+        if seam_classification.flags[lane]
+    } == {"db"}
     assert not classifier.classify_paths((new_consumer,)).flags["rails"]
 
 
@@ -1403,11 +653,6 @@ def test_behavioral_owner_examples_cover_router_and_epic037_generator(
     assert classifier.changed_test_targets(
         ROOT, ("tests/ops/test_http_logging.py",)
     ) == ("tests/ops/test_http_logging.py",)
-    for source_writer in classifier._SOURCE_WRITING_INACTIVE_TESTS:
-        with pytest.raises(
-            ValueError, match="CI_INACTIVE_TEST_REQUIRES_DISPOSITION"
-        ):
-            classifier.changed_test_targets(ROOT, (source_writer,))
     assert classifier.changed_test_targets(
         ROOT, ("engine/serializer/canon.py",)
     ) == ()
@@ -1551,11 +796,7 @@ def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None
     assert not fixed & supplemental
     assert not fixed & inactive
     assert not supplemental & inactive
-    assert classifier._UNCONFIGURED_INACTIVE_TESTS <= inactive
-    assert not configured & classifier._UNCONFIGURED_INACTIVE_TESTS
-    assert configured == fixed | supplemental | (
-        inactive - classifier._UNCONFIGURED_INACTIVE_TESTS
-    )
+    assert configured == fixed | supplemental | inactive
     assert not fixed_registered & full_targets
     assert registered == fixed_registered | full_targets
     assert non_file_registered == set(classifier._FIXED_LANE_TEST_DIRECTORIES)
@@ -1784,13 +1025,33 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         "tests/adapter/test_env_guard_prod_variants.py",
     )
 
+    reader_consumer = repo / "tests/http/test_new_reader_case.py"
+    reader_consumer.parent.mkdir(parents=True, exist_ok=True)
+    reader_consumer.write_text(
+        f"import {classifier._HTTP_READER_MODULE}\n\ndef test_reader(): pass\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", reader_consumer.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "add Reader regression")
+    reader_head = _git(repo, "rev-parse", "HEAD")
+    reader_result = classifier.classify_git_change(
+        repo,
+        test_head,
+        reader_head,
+        event_name="push",
+    )
+    assert reader_result.test_targets == (
+        classifier._HTTP_READER_OWNERSHIP_GUARD,
+        reader_consumer.relative_to(repo).as_posix(),
+    )
+
     changed_test.unlink()
     _git(repo, "add", "-A")
     _git(repo, "commit", "-m", "remove standalone adapter regression")
     deleted_test_head = _git(repo, "rev-parse", "HEAD")
     deleted_test_result = classifier.classify_git_change(
         repo,
-        test_head,
+        reader_head,
         deleted_test_head,
         event_name="push",
     )
