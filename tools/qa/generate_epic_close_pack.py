@@ -65,9 +65,24 @@ MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 RESERVED_HEADINGS = frozenset(
     {"source bindings", "output bindings", "explicit nonclaims"}
 )
-REPORT_ATX_H2_RE = re.compile(r" {0,3}##[ \t]+(?P<label>.*)\Z")
-REPORT_ATX_CLOSING_HASHES_RE = re.compile(r"[ \t]+#+[ \t]*\Z")
-REPORT_SETEXT_H2_RE = re.compile(r" {0,3}-+[ \t]*\Z")
+REPORT_HEADING_RE = re.compile(
+    r"(?!.*(?:^|[^A-Za-z0-9])_)(?!.*_(?:[^A-Za-z0-9]|$))"
+    r"[A-Za-z0-9](?:[A-Za-z0-9 _.,:;()/+'-]*[A-Za-z0-9)])?\Z"
+)
+# Body lines are intentionally not a general CommonMark surface.  H1/H2,
+# containers, fences, reference definitions, and raw HTML belong outside the
+# closed custom-section body grammar so the generated section topology is unique.
+REPORT_BODY_PROHIBITED_RE = re.compile(
+    r"(?:"
+    r"^[ \t]*#{1,2}(?:[ \t]+|$)|"
+    r"^[ \t]*(?:`{3,}|~{3,})|"
+    r"^[ \t]*(?:=+|-+)[ \t]*$|"
+    r"^[ \t]*(?:>|[-+*][ \t]+|[0-9]{1,9}[.)][ \t]+)|"
+    r"^[ \t]*\[[^\]\r\n]+\]:|"
+    r"[<>]"
+    r")",
+    re.IGNORECASE,
+)
 CLOSED_RAILS = {
     "ALLOW_NETWORK": "0",
     "APP_ENV": "dev",
@@ -1952,53 +1967,29 @@ def _require_feedback_free_source(
 
 
 def _normalized_report_heading(value: str) -> str:
-    without_closing_hashes = REPORT_ATX_CLOSING_HASHES_RE.sub("", value)
-    return re.sub(
-        r"[ \t]+", " ", without_closing_hashes.strip(" \t")
-    ).casefold()
-
-
-def _normalized_setext_heading(value: str) -> str | None:
-    leading_spaces = len(value) - len(value.lstrip(" "))
-    if leading_spaces > 3 or value[leading_spaces:].startswith("\t"):
-        return None
     return re.sub(r"[ \t]+", " ", value.strip(" \t")).casefold()
 
 
-def _is_reserved_report_h2(value: str) -> bool:
-    match = REPORT_ATX_H2_RE.fullmatch(value)
-    return match is not None and _normalized_report_heading(
-        match.group("label")
-    ) in RESERVED_HEADINGS
-
-
-def _has_reserved_setext_h2(lines: Sequence[str]) -> bool:
-    for label, underline in zip(lines, lines[1:]):
-        if REPORT_SETEXT_H2_RE.fullmatch(underline) is None:
-            continue
-        normalized = _normalized_setext_heading(label)
-        if normalized in RESERVED_HEADINGS:
-            return True
-    return False
+def _report_body_structure_is_ambiguous(lines: Sequence[str]) -> bool:
+    return any(REPORT_BODY_PROHIBITED_RE.search(line) is not None for line in lines)
 
 
 def _require_report_structure(source: Mapping[str, Any]) -> None:
+    raw_headings = [str(section["heading"]) for section in source["report_sections"]]
     headings = [
-        _normalized_report_heading(str(section["heading"]))
-        for section in source["report_sections"]
+        _normalized_report_heading(heading) for heading in raw_headings
     ]
-    reserved_body_heading = any(
-        _is_reserved_report_h2(str(line))
-        for section in source["report_sections"]
-        for line in section["body_lines"]
-    ) or any(
-        _has_reserved_setext_h2([str(line) for line in section["body_lines"]])
+    ambiguous_body_structure = any(
+        _report_body_structure_is_ambiguous(
+            [str(line) for line in section["body_lines"]]
+        )
         for section in source["report_sections"]
     )
     if (
         len(headings) != len(set(headings))
         or any(heading in RESERVED_HEADINGS for heading in headings)
-        or reserved_body_heading
+        or any(REPORT_HEADING_RE.fullmatch(heading) is None for heading in raw_headings)
+        or ambiguous_body_structure
     ):
         raise _fail("REPORT_SECTION_AMBIGUOUS")
 

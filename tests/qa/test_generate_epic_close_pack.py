@@ -362,48 +362,88 @@ def test_schema_rejects_feedback_dependencies_in_every_causal_role(
 
 
 @pytest.mark.parametrize(
-    "line",
+    "lines",
     (
-        "## Source bindings",
-        "## Output bindings",
-        "## Explicit nonclaims",
-        "  ## sOuRcE\tBiNdInGs ## \t",
+        ["# HDE-EPIC123 Close Candidate"],
+        ["## Source bindings"],
+        ["## **Source bindings**"],
+        ["    ## Output bindings"],
+        ["Source bindings", "---"],
+        ["Source bindings", "    ---"],
+        ["```markdown", "## Source bindings", "```"],
+        ["- Source bindings", "    ---"],
+        ["1. Scope", "    ## Output bindings"],
+        ["> " * 17 + "## Explicit nonclaims"],
+        ["[source]: docs/source.md"],
+        ["<h2>Source bindings</h2>"],
+        ["prefix <h2", "class=canonical>Source bindings"],
+        ["See <https://example.invalid/path>."],
     ),
 )
-def test_schema_rejects_reserved_headings_embedded_in_body_lines(line: str) -> None:
+def test_schema_and_runtime_reject_structural_report_body_lines(
+    lines: list[str],
+) -> None:
     schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
     source = _valid_source()
-    source["report_sections"][0]["body_lines"][0] = line
+    source["report_sections"][0]["body_lines"] = lines
     assert not Draft202012Validator(schema).is_valid(source)
+    with pytest.raises(close_pack.ClosePackError, match="REPORT_SECTION_AMBIGUOUS"):
+        close_pack._require_report_structure(source)
+
+
+@pytest.mark.parametrize(
+    "heading",
+    (
+        "**Source bindings**",
+        "[Output bindings](#output-bindings)",
+        "[Source bindings]",
+        "<em>Explicit nonclaims</em>",
+    ),
+)
+def test_schema_and_runtime_reject_markup_in_dedicated_report_headings(
+    heading: str,
+) -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
+    source = _valid_source()
+    source["report_sections"][0]["heading"] = heading
+    assert not Draft202012Validator(schema).is_valid(source)
+    with pytest.raises(close_pack.ClosePackError, match="REPORT_SECTION_AMBIGUOUS"):
+        close_pack._require_report_structure(source)
+
+
+@pytest.mark.parametrize(
+    "heading",
+    (
+        "API_v2 posture",
+        "PR-05 scope",
+        "Validation posture (bounded)",
+        "Plan/path alignment",
+    ),
+)
+def test_dedicated_heading_allows_plain_text_punctuation(heading: str) -> None:
+    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
+    source = _valid_source()
+    source["report_sections"][0]["heading"] = heading
+    assert Draft202012Validator(schema).is_valid(source)
+    close_pack._require_report_structure(source)
 
 
 @pytest.mark.parametrize(
     "line",
     (
         "Source bindings remain deterministic prose.",
+        "**Source bindings** remain deterministic prose.",
         "### Source bindings",
-        "## Supporting details",
+        "### **Source bindings**",
+        "Use `tracked bytes` deterministically.",
+        "A [local plan](docs/plans/epic.md) remains tracked prose.",
+        "    Indented plain text remains nonstructural.",
     ),
 )
-def test_reserved_body_heading_guard_is_role_specific(line: str) -> None:
+def test_closed_report_body_grammar_admits_nonstructural_lines(line: str) -> None:
     schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
     source = _valid_source()
     source["report_sections"][0]["body_lines"][0] = line
-    assert Draft202012Validator(schema).is_valid(source)
-    close_pack._require_report_structure(source)
-
-
-@pytest.mark.parametrize(
-    "lines",
-    (
-        ["Source bindings ##", "---"],
-        ["    Source bindings", "---"],
-    ),
-)
-def test_setext_guard_preserves_nonreserved_markdown(lines: list[str]) -> None:
-    schema = json.loads((ROOT / close_pack.SCHEMA_REL).read_text(encoding="utf-8"))
-    source = _valid_source()
-    source["report_sections"][0]["body_lines"] = lines
     assert Draft202012Validator(schema).is_valid(source)
     close_pack._require_report_structure(source)
 
@@ -423,11 +463,29 @@ def test_writer_runtime_defense_rejects_reserved_body_heading_without_outputs(
     assert not (repo / MANIFEST_REL).exists()
 
 
+def test_writer_schema_rejects_structural_body_before_outputs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    source = _valid_source()
+    source["report_sections"][0]["body_lines"] = [
+        "```markdown",
+        "## Source bindings",
+        "```",
+    ]
+    repo = _init_repo(tmp_path, source=source)
+    assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 1
+    assert "EPIC_CLOSE_PACK_ERROR:SOURCE_SCHEMA_INVALID" in capsys.readouterr().err
+    assert not (repo / REPORT_REL).exists()
+    assert not (repo / MANIFEST_REL).exists()
+
+
 @pytest.mark.parametrize(
     "mutation",
-    ("reserved-heading-closing-hashes", "reserved-setext-h2"),
+    ("reserved-heading-closing-hashes", "duplicate-heading-closing-hashes"),
 )
-def test_reserved_heading_aliases_fail_before_publication(
+def test_report_heading_aliases_fail_before_publication(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -437,8 +495,25 @@ def test_reserved_heading_aliases_fail_before_publication(
     if mutation == "reserved-heading-closing-hashes":
         source["report_sections"][0]["heading"] = "Source bindings ##"
     else:
-        source["report_sections"][0]["body_lines"] = ["Source bindings", "---"]
+        source["report_sections"][1]["heading"] = "Delivered scope ##"
     repo = _init_repo(tmp_path, source=source)
+    monkeypatch.setattr(close_pack, "_validate_source", lambda payload, schema: payload)
+    assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 1
+    assert "EPIC_CLOSE_PACK_ERROR:REPORT_SECTION_AMBIGUOUS" in capsys.readouterr().err
+    assert not (repo / REPORT_REL).exists()
+    assert not (repo / MANIFEST_REL).exists()
+
+
+def test_shortcut_reference_reserved_heading_fails_runtime_defense(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    source = _valid_source()
+    source["report_sections"][0]["heading"] = "[Source bindings]"
+    source["report_sections"][0]["body_lines"] = ["[Source bindings]: /local"]
+    repo = _init_repo(tmp_path, source=source)
+    monkeypatch.setattr(close_pack, "_validate_source", lambda payload, schema: payload)
     assert _run(repo, monkeypatch, "--source", SOURCE_REL, "--write") == 1
     assert "EPIC_CLOSE_PACK_ERROR:REPORT_SECTION_AMBIGUOUS" in capsys.readouterr().err
     assert not (repo / REPORT_REL).exists()
