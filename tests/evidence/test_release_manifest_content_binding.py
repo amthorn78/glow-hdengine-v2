@@ -178,7 +178,6 @@ def test_closure_roster_covers_release_dependent_local_derivatives():
         ("tools/evidence/generate_determinism_gate_proofs.py",),
         ("tools/evidence/generate_open_rails_abba_proof.py",),
         ("tools/evidence/generate_a7_transport_proofs.py",),
-        ("tools/evidence/generate_architecture_snapshot.py",),
         ("tools/evidence/generate_v2_mapped_cache_evidence.py",),
         ("tools/evidence/update_evidence_index.py",),
         ("tools/evidence/orientation_demo.py",),

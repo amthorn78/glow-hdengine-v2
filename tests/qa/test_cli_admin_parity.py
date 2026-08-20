@@ -44,7 +44,6 @@ def _run(pair: dict, outdir: pathlib.Path, env: dict[str, str]) -> dict:
 
 
 def test_admin_parity(tmp_path: pathlib.Path):
-    subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], check=True, capture_output=True)
     env = _cli_env()
 
     left = {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"}

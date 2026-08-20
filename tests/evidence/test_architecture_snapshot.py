@@ -1,18 +1,19 @@
-import hashlib,json,os,subprocess,pytest
+import json
 from pathlib import Path
+import pytest
+
+from tools.evidence import generate_architecture_snapshot as architecture
+
 ROOT=Path(__file__).resolve().parents[2]
-ENV={**os.environ,'SAFE_MODE':'1','ALLOW_NETWORK':'0','LC_ALL':'C','LANG':'C','TZ':'UTC'}
-def run(a): return subprocess.run(['python',*a],cwd=ROOT,env=ENV,check=True,capture_output=True,text=True)
-def test_architecture_snapshot_taxonomy_schema_and_check():
-    paths=['artifacts/architecture/architecture_snapshot.keys_only.json','schemas/architecture_snapshot.keys_only.v1.json']
-    run(['tools/evidence/generate_architecture_snapshot.py','--check'])
-    run(['tools/evidence/generate_architecture_snapshot.py']); h1={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
-    run(['tools/evidence/generate_architecture_snapshot.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
-    run(['tools/evidence/generate_architecture_snapshot.py','--check']); assert h2=={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
-    p=json.loads((ROOT/paths[0]).read_text()); assert set(p['taxonomy'])=={'allowed','forbidden','unknown','out_of_scope'}; assert p['verdict']==p['analyzer_verdict']=='pass'; assert p['unknown_count']==0
+def test_current_architecture_analysis_is_read_only_and_fail_closed():
+    frozen=ROOT/'artifacts/architecture/architecture_snapshot.keys_only.json'
+    before=frozen.read_bytes()
+    p=architecture.analyze(); architecture.validate(p)
+    assert frozen.read_bytes()==before
+    assert set(p['taxonomy'])=={'allowed','forbidden','unknown','out_of_scope'}; assert p['verdict']==p['analyzer_verdict']=='pass'; assert p['unknown_count']==0
     compat=[r for r in p['routes'] if r['path']=='engine/http/compat_handler.py']
     assert compat and compat[0]['classification']=='allowed'
-    raw=(ROOT/paths[0]).read_text(); assert 'DATABASE_URL' not in raw and 'birthdate' not in raw and 'Authorization' not in raw
+    raw=json.dumps(p, sort_keys=True); assert 'DATABASE_URL' not in raw and 'birthdate' not in raw and 'Authorization' not in raw
     wsgi=[row for row in p['routes'] if row['path']=='adapter/wsgi.py']
     assert {(row['method'], row['route_path']) for row in wsgi} >= {
         ('get','/internal/healthz'), ('get','/internal/readyz')

@@ -234,21 +234,21 @@ These labels describe the currently checked-in bytes and their capture-time mean
 The HDE-EPIC038 current contract is direct-only tooling under
 `tools/evidence/generate_hde_epic038_direct_db_selection.py` and
 `schemas/hde_epic038_direct_db_selection.v1.json`, with the tracked primary at
-`artifacts/runtime/direct_db_selection.snapshot.json`. The admitted OPS-03 packet
-lives under `audit/ops/hde-epic038/ops-03/` and is validation-owned by
-`tools/evidence/hde_epic038_ops03.py`; it represents bounded read-only direct
-PostgreSQL posture only. These records do not establish QA PASS, PF09 movement,
+`artifacts/runtime/direct_db_selection.snapshot.json`. The historical OPS-03 packet
+lives under `audit/ops/hde-epic038/ops-03/` and remains interpretable through
+`tools/evidence/hde_epic038_ops03.py`; it records bounded read-only direct
+PostgreSQL posture but is not a current release-admission input. These records do not establish QA PASS, PF09 movement,
 supportability by themselves, production deployment, or epic closeout.
 
 
 ## HDE-EPIC038 current Distillation evidence orientation
 * `artifacts/runtime/direct_db_selection.snapshot.json` — direct-only `DATABASE_URL`/`psycopg` selection and retired-key pre-I/O refusal evidence.
 * `artifacts/audit/env/env_snapshot.json` — environment snapshot `schema: v3`; deterministic rails and config-key presence only, no secret values.
-* `artifacts/architecture/architecture_snapshot.keys_only.json` — keys-only architecture snapshot; DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.
+* `artifacts/architecture/architecture_snapshot.keys_only.json` — frozen HDE-EPIC038 keys-only architecture snapshot; current source is analyzed without refreshing this capture, and DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.
 * `artifacts/bodygraph/v2_mapped_cache/` — bounded configured-v2 mapped-cache local evidence for explicit upsert, mapped-payload-only write/read-back, idempotence, closed-rails zero I/O, legacy fallback, and production-like refusal.
-* `audit/ops/hde-epic038/ops-02/` — retained bounded mapped-cache OPS packet; validated by release sanity without rerun.
-* `audit/ops/hde-epic038/ops-03/` — admitted bounded read-only direct PostgreSQL OPS packet; validated by release sanity without rerun.
-* `audit/gates/sanity_pipeline/sanity_pipeline.log` — current nineteen-stage release-sanity log; final attestation admission is `PR06R_B_FINAL_PASS` only when exact-source verification and all stages pass.
+* `audit/ops/hde-epic038/ops-02/` — retained historical bounded mapped-cache OPS packet; not a current release-admission input.
+* `audit/ops/hde-epic038/ops-03/` — retained historical bounded read-only direct PostgreSQL OPS packet; not a current release-admission input.
+* `audit/gates/sanity_pipeline/sanity_pipeline.log` — current fifteen-stage generic release-sanity log; final attestation admission uses PF12's canon-owned v1 compatibility value `PR06R_B_FINAL_PASS` only when exact-source verification and all stages pass. That wire value is not a QA, acceptance, PF09, OPS, deployment, or closeout claim.
 
 ## Env-matrix (selection-only)
 * `artifacts/runtime/env_matrix.snapshot.json`

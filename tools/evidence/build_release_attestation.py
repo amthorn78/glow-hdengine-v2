@@ -348,6 +348,7 @@ def _install_packaged_console_entrypoint(
             "pip",
             "wheel",
             "--disable-pip-version-check",
+            "--no-cache-dir",
             "--no-index",
             "--no-deps",
             "--no-build-isolation",
@@ -414,6 +415,7 @@ def _install_packaged_console_entrypoint(
             "pip",
             "install",
             "--disable-pip-version-check",
+            "--no-cache-dir",
             "--no-index",
             "--no-deps",
             str(wheel),
@@ -663,7 +665,7 @@ def build_attestation(
             )
             _run_stage(
                 scratch,
-                "pr06r_b_final_sanity_pass",
+                "release_sanity",
                 (sys.executable, "tools/evidence/run_sanity_pipeline_gate.py"),
                 transcript,
                 attestation_bin=attestation_bin,
@@ -755,10 +757,10 @@ def build_attestation(
             sanity = (
                 scratch / "audit/gates/sanity_pipeline/sanity_pipeline.log"
             ).read_text(encoding="utf-8")
-            expected_tail = "check 19 Final-LF validation:OK\nfirst_failed_stage:NONE\nsummary:PASS\n"
+            expected_tail = "check 15 Final-LF validation:OK\nfirst_failed_stage:NONE\nsummary:PASS\n"
             if (
                 "summary:FAIL" in sanity
-                or "check 14 OPS-03 direct DB posture packet validation:OK" not in sanity
+                or "pipeline_identity:hde-release-sanity-v1" not in sanity
                 or not sanity.endswith(expected_tail)
             ):
                 raise AttestationBuildError("final_sanity_pass_missing")
@@ -779,6 +781,8 @@ def build_attestation(
                 "release_id": release_id,
                 "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
                 "validation_result": "PASS",
+                # PF12 §6.2.1 owns this v1 compatibility literal. It does not
+                # claim QA, acceptance, PF09 movement, OPS, or deployment.
                 "release_admission": "PR06R_B_FINAL_PASS",
                 "pipeline_stop": None,
                 "rails": dict(sorted(CLOSED_RAILS.items())),

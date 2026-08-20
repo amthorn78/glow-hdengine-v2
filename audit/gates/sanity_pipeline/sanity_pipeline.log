@@ -1,8 +1,7 @@
 run:sanity-pipeline
-pipeline_identity:HDE-EPIC038-PR06-release-sanity
+pipeline_identity:hde-release-sanity-v1
 env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
 env_pins:audit/gates/determinism/env_pins.log
-ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true
 check 01 Environment pins:OK
 check 02 Identity and release provenance:OK
 check 03 Canonical JSON:OK
@@ -12,16 +11,11 @@ check 06 CI rails:OK
 check 07 Direct DB selection contract:OK
 check 08 Direct DB posture artifacts:OK
 check 09 BodyGraph policy:OK
-check 10 Architecture snapshot:OK
-check 11 Configured-v2 mapped-cache local evidence:OK
-check 12 Historical bridge evidence integrity:OK
-stage_result:12:HISTORICAL_INTEGRITY_OK
-check 13 OPS-02 mapped-cache packet validation:OK
-check 14 OPS-03 direct DB posture packet validation:OK
-check 15 Human Index and Machine Mirror refresh:OK
-check 16 Evidence-path validation:OK
-check 17 Mirror schema and index/mirror hash validation:OK
-check 18 Topology orientation validation:OK
-check 19 Final-LF validation:OK
+check 10 Configured-v2 mapped-cache behavior:OK
+check 11 Human Index and Machine Mirror refresh:OK
+check 12 Evidence-path validation:OK
+check 13 Mirror schema and index/mirror hash validation:OK
+check 14 Topology orientation validation:OK
+check 15 Final-LF validation:OK
 first_failed_stage:NONE
 summary:PASS

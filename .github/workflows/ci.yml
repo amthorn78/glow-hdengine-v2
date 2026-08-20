@@ -1,18 +1,21 @@
 name: ci
-on: [push, pull_request]
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
-    needs:
-      - compat-conj-pr01-closure
-      - epic020
-      - compat-http-epic020
-      - epic020-evidence-bundles
-      - rails-policy-gates
-      - sanity-pipeline
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
     env:
       LC_ALL: C
       LANG: C
@@ -21,296 +24,106 @@ jobs:
       ALLOW_NETWORK: "0"
       APP_ENV: dev
       PYTHONDONTWRITEBYTECODE: "1"
-    # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out exact candidate head
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      # The frozen HDE-EPIC038 closeout CI is invalid and is removed in PR04.
-      # Keep its exact-receipt machinery dormant while PR-02 proves its own scope.
-      - name: Download exact-head release attestation
-        if: ${{ false }}
-        uses: actions/download-artifact@v4
-        with:
-          name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}
-          path: ${{ runner.temp }}/hde-epic038-private-receipt/release-attestation
-      - name: Check HDE-EPIC038 DEV-01 doc-delta pair
-        if: ${{ false }}
-        shell: bash
-        run: python tools/evidence/generate_hde_epic038_closeout.py --check-doc-deltas
-      - name: Run HDE-EPIC039 PR-02 atomic evidence-ledger tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install -r requirements-dev.txt
-          python -m pip install -r requirements.txt
-          python -m pytest --version
-          python -m pytest -q \
-            tests/evidence/test_evidence_index_missing_state.py \
-            tests/evidence/test_evidence_skeleton.py \
-            tests/evidence/test_machine_mirror_self_proof.py \
-            tests/evidence/test_orientation_demo.py \
-            tests/evidence/test_hde_epic038_closeout.py::test_dev02_orientation_compatibility_write_is_idempotent_after_updater \
-            tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_recovers_missing_closeout_proofs_in_one_write \
-            tests/evidence/test_hde_epic038_closeout.py::test_dev02_updater_rolls_back_after_reused_semantic_primary_drift
-      - name: Verify downloaded exact-source release attestation
-        if: ${{ false }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          chmod 700 "$RUNNER_TEMP/hde-epic038-private-receipt"
-          python tools/evidence/build_release_attestation.py --verify "$RUNNER_TEMP/hde-epic038-private-receipt/release-attestation" --require-clean
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: python -m pip install -e .
-      - run: ci/checks/check_env_pins.sh
-      - run: ci/checks/check_cli_help.sh
-      - name: Verify immutable release input without derived-tree writes
-        run: |
-          git diff --exit-code
-          python scripts/release_id_recompute.py --check-manifest-only
-          python -m pytest -q tests/runtime/test_identity.py
-          git diff --exit-code
-      # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
-      - run: python tools/cli/serializer_grep_guard.py
-      - run: python tools/cli/emitter_symbol_proof.py
-      # Current release-bound canonical captures are rebuilt in the isolated
-      # attestation job below. Historical checked-in evidence remains immutable.
-      - run: python tools/order/generate_ordering_artifacts.py --check
-      - name: Check frozen HDE-EPIC038 QA state
-        if: ${{ false }}
-        run: python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
-      - name: Check HDE-EPIC038 DEV-01 token matrix
-        if: ${{ false }}
-        run: python tools/evidence/generate_hde_epic038_closeout.py --check-token-matrix
-      - name: Produce conditional private HDE-EPIC038 execution receipt
-        id: epic038_receipt
-        if: ${{ false }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          primaries=(
-            audit/EPIC-038_close_report.md
-            audit/EPIC-038_MANIFEST.json
-            docs/acceptance_map_epic038.json
-            audit/qa/hde-epic038/acceptance_map_viability.log
-            audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md
-            audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log
-            audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log
-          )
-          present=0
-          missing=()
-          for path in "${primaries[@]}"; do
-            if [[ -f "$path" ]]; then
-              present=$((present + 1))
-            else
-              missing+=("$path")
-            fi
-          done
-          if (( present == 0 )); then
-            echo "HDE-EPIC038 DEV-03 closeout family absent; private execution receipt not applicable."
-            python tools/evidence/update_evidence_index.py --check
-          elif (( present != ${#primaries[@]} )); then
-            printf 'INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:%s\n' "$(IFS=,; echo "${missing[*]}")"
-            exit 1
-          else
-            receipt_root="$RUNNER_TEMP/hde-epic038-private-receipt"
-            receipt_source="$RUNNER_TEMP/hde-epic038-receipt-source"
-            cleanup() {
-              git worktree remove --force "$receipt_source" >/dev/null 2>&1 || true
-            }
-            trap cleanup EXIT
-            git worktree add --detach "$receipt_source" "$(git rev-parse HEAD)"
-            (
-              cd "$receipt_source"
-              unset _HDE_EPIC038_PRIVATE_CI_ROOT
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_hde_epic038_qa_current_state.py --require-finalized
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --preflight
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m pytest -q tests/evidence/test_hde_epic038_closeout.py
-            )
-            _HDE_EPIC038_PRIVATE_CI_ROOT="$receipt_root" python -c 'from tools.evidence import generate_hde_epic038_closeout as closeout; closeout._write_private_ci_receipt()'
-            cleanup
-            trap - EXIT
-            echo "produced=true" >> "$GITHUB_OUTPUT"
-          fi
-      - run: python tools/evidence/orientation_demo.py --check
-      - name: Run PO-006 token registry validity check + report (gated)
-        run: |
-          set +e
-          python tools/evidence/check_po_006_token_registry_validity.py check --check
-          check_status=$?
-          python tools/evidence/check_po_006_token_registry_validity.py report
-          report_status=$?
-          set -e
-          cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_summary.md || true
-          cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_report.json || true
-          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/primary.log || true
-          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_comparison.json || true
-          if [ "$check_status" -ne 0 ]; then
-            exit "$check_status"
-          fi
-          exit "$report_status"
-      - run: python tools/evidence/refresh_step_logs_manifest.py --check
-      - run: ci/checks/check_evidence_index_hash.sh
-      - run: python ci/checks/check_direct_db_contract.py
-      - name: Run direct PostgreSQL contract suites
-        run: |
-          python -m pytest \
-            tests/db \
-            tests/unit/test_check_direct_db_contract.py \
-            tests/bodygraph/test_bg_resolve_v2_mapped_cache.py \
-            tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py \
-            tests/bodygraph/test_ingest.py \
-            tests/ops/test_capture_rails_open_scope.py \
-            tests/ops/test_http_logging.py
-      - name: Validate governed evidence paths
-        run: python tools/evidence/validate_evidence_paths.py
-      - run: ci/checks/check_mirror_schema.sh
-      - run: ci/checks/check_final_lf.sh
-      # These legacy suites intentionally build ephemeral EPIC020/021 artifacts.
-      # The committed closure has already been verified read-only above.
-      # Frozen HDE-EPIC038 closeout and architecture-snapshot tests remain
-      # quarantined here pending their removal in PR04.
-      - name: Run legacy EPIC020/021 evidence tests in isolated exact-head worktree
-        shell: bash
-        run: |
-          set -euo pipefail
-          legacy_source="$RUNNER_TEMP/hde-legacy-evidence-tests"
-          cleanup() {
-            git worktree remove --force "$legacy_source" >/dev/null 2>&1 || true
-          }
-          trap cleanup EXIT
-          git worktree add --detach "$legacy_source" "$(git rev-parse HEAD)"
-          (
-            cd "$legacy_source"
-            unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ROOT _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
-            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
-            export PYTHONPATH="$legacy_source"
-            python -m pytest \
-              tests/qa/test_generic_qa_harness.py \
-              tests/qa/test_qa_harness_followup.py \
-              tests/qa/test_epic021_harness_entrypoint.py \
-              tests/qa/test_tooling_bootstrap.py \
-              tests/qa/test_viability_generator_wrappers.py \
-              tests/qa/test_epic029_requalification.py
-            python -m pytest \
-              tests/evidence \
-              tests/ops/test_evidence_index.py \
-              tests/ops/test_hde_epic038_ops03.py \
-              --ignore=tests/evidence/test_architecture_snapshot.py \
-              --ignore=tests/evidence/test_hde_epic038_closeout.py
-          )
-          cleanup
-          trap - EXIT
-      - run: python -m pytest tests/order tests/mech/test_order_properties.py
-      - run: python -m pytest tests/cli/test_serializer_guards.py
-      - name: Confirm receipt-free exact-head tree is clean
-        run: |
-          git diff --check
-          git diff --exit-code
-      - name: Publish private exact-head HDE-EPIC038 execution receipt
-        id: epic038_receipt_artifact
-        if: steps.epic038_receipt.outputs.produced == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: hde-epic038-execution-receipt-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/hde-epic038-private-receipt
-          if-no-files-found: error
-          retention-days: 30
-          overwrite: false
-      - name: Authenticate and consume private HDE-EPIC038 execution artifact
-        if: steps.epic038_receipt.outputs.produced == 'true'
+
+      - name: Classify affected CI lanes
+        id: classify
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID: ${{ steps.epic038_receipt_artifact.outputs.artifact-id }}
-          _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST: ${{ steps.epic038_receipt_artifact.outputs.artifact-digest }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
-          authenticated_source="$RUNNER_TEMP/hde-epic038-authenticated-source"
+          python3 ci/checks/classify_ci_changes.py \
+            --base "$BASE_SHA" \
+            --head "$HEAD_SHA" \
+            --event-name "${{ github.event_name }}" \
+            --github-output "$GITHUB_OUTPUT" \
+            --changed-tests-output "$RUNNER_TEMP/ci-changed-test-targets.txt"
+
+      - name: Set up Python 3.12
+        id: python_setup
+        if: ${{ steps.classify.outputs.needs_python == 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install applicable validation dependencies
+        id: dependencies
+        if: ${{ steps.classify.outputs.needs_python == 'true' }}
+        run: >-
+          python -m pip install
+          'setuptools>=68' wheel
+          -r requirements.txt
+          -r requirements-dev.txt
+          -e .
+
+      - name: Verify pytest readiness
+        id: pytest_readiness
+        if: ${{ steps.classify.outputs.needs_python == 'true' }}
+        run: python -m pytest --version
+
+      - name: Verify closed deterministic environment
+        id: env_pins
+        if: ${{ steps.classify.outputs.needs_python == 'true' }}
+        run: ci/checks/check_env_pins.sh
+
+      - name: Run affected behavioral tests in isolation
+        id: changed_tests
+        if: ${{ steps.classify.outputs.changed_tests == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed_test_source="$RUNNER_TEMP/hde-changed-test-source"
+          changed_test_manifest="$RUNNER_TEMP/ci-changed-test-targets.txt"
           cleanup() {
-            git worktree remove --force "$authenticated_source" >/dev/null 2>&1 || true
+            git worktree remove --force "$changed_test_source" >/dev/null 2>&1 || true
           }
           trap cleanup EXIT
-          git worktree add --detach "$authenticated_source" "$(git rev-parse HEAD)"
+          test -f "$changed_test_manifest"
+          mapfile -t changed_test_targets < "$changed_test_manifest"
+          (( ${#changed_test_targets[@]} > 0 ))
+          git worktree add --detach "$changed_test_source" "$(git rev-parse HEAD)"
           (
-            cd "$authenticated_source"
-            unset _HDE_EPIC038_PRIVATE_CI_ROOT
-            SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py
-            (
-              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
-            )
-            SAFE_MODE=1 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hde_epic038_closeout.py --check
-            (
-              unset GH_TOKEN _HDE_EPIC038_PRIVATE_CI_ARTIFACT_ID _HDE_EPIC038_PRIVATE_CI_ARTIFACT_DIGEST
-              SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
-            )
+            cd "$changed_test_source"
+            unset GH_TOKEN
+            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+            export PYTHONPATH="$changed_test_source"
+            python -m pytest -q -p no:cacheprovider -- "${changed_test_targets[@]}"
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
           )
           cleanup
           trap - EXIT
-      - name: Confirm authenticated exact-head receipt fixed point is clean
+
+      - name: Run product mechanics and ordering lane
+        id: product_lane
+        if: ${{ steps.classify.outputs.product == 'true' }}
+        shell: bash
         run: |
-          git diff --check
-          git diff --exit-code
-  compat-conj-pr01-closure:
-    name: PR-01 compat conjunction closure (independent lane)
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: ci/checks/check_env_pins.sh
-      - name: Run compat-only identity-hash closure assertions
+          set -euo pipefail
+          python tools/order/generate_ordering_artifacts.py --check
+          python -m pytest -q \
+            tests/order \
+            tests/mech/test_order_properties.py \
+            tests/evidence/test_architecture_snapshot.py
+
+      - name: Run CLI and compatibility lane
+        id: compat_lane
+        if: ${{ steps.classify.outputs.compat == 'true' }}
+        shell: bash
         run: |
-          python -m pytest -q tests/http/test_compat_endpoint_contract.py::test_conjunction_identity_hash_artifact_matches_canonical_bytes
-          python -m pytest -q tests/ops/test_evidence_index.py::test_evidence_index_has_required_compat_artifacts
-  epic020:
-    name: epic020 acceptance suites (closed rails)
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: ci/checks/check_env_pins.sh
-      - name: Run EPIC020 determinism-rails acceptance tests
-        run: |
-          python -m pytest \
+          set -euo pipefail
+          ci/checks/check_cli_help.sh
+          python tools/cli/serializer_grep_guard.py --output "$RUNNER_TEMP/serializer_grep_guard.log"
+          python tools/cli/emitter_symbol_proof.py --output "$RUNNER_TEMP/emitter_symbol_proof.txt"
+          python -m pytest -q \
             tests/adapter/test_jsonschema.py \
             tests/cli/test_cli_usage_and_errors.py \
             tests/cli/test_errors_parity.py \
@@ -318,124 +131,205 @@ jobs:
             tests/cli/test_showcompat_parity_and_identity.py \
             tests/cli/test_serializer_guards.py \
             tests/transport/test_internal_version_contract.py \
-            tests/qa/test_epic020_qa_docs.py
-  compat-http-epic020:
-    name: EPIC020 compat HTTP coverage (closed rails)
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-      APP_ENV: dev
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: ci/checks/check_env_pins.sh
-      - name: Run complete compat HTTP contract suite
-        run: |
-          python -m pytest -q \
             tests/http/test_compat_endpoint_contract.py \
             tests/adapter/test_compat_http_dev.py \
             tests/adapter/test_compat_http_parity.py
-  epic020-evidence-bundles:
-    name: EPIC020 evidence bundles and index (closed rails)
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-      APP_ENV: ci
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: ci/checks/check_env_pins.sh
-      - run: python -m tools.evidence.epic020_bundle build --epic-id HDE-EPIC020
-      - run: python tools/evidence/update_evidence_index.py --epic-id HDE-EPIC020
-      - run: ci/checks/check_mirror_schema.sh
-      - run: python -m pytest tests/evidence/test_epic020_bundle_index_integration.py
-  rails-policy-gates:
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-      APP_ENV: dev
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: python -m pytest --version
-      - run: python ci/checks/run_rails_job_definitions.py ci/jobs/rails_closed_refusal.yml ci/jobs/rails_open_conformance.yml ci/jobs/logs_keys_only_redaction.yml
-  sanity-pipeline:
-    runs-on: ubuntu-latest
-    env:
-      LC_ALL: C
-      LANG: C
-      TZ: UTC
-      SAFE_MODE: "1"
-      ALLOW_NETWORK: "0"
-      APP_ENV: dev
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -U pip
-      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
-      - run: python -m pip install -e .
-      - run: python -m pip install pytest
-      - run: python -m pip install 'setuptools>=68' wheel
-      - name: Build PR-06R-B release attestation outside the source tree
-        run: >-
-          python tools/evidence/build_release_attestation.py
-          --output "$RUNNER_TEMP/hde-release-attestation"
-          --require-clean
-      - name: Run canonical JSON gate (closed rails)
-        run: >-
-          python tools/evidence/build_release_attestation.py
-          --verify "$RUNNER_TEMP/hde-release-attestation"
-          --require-clean
-      - name: Publish exact-head release attestation
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: hde-release-attestation-${{ github.event.pull_request.head.sha || github.sha }}
-          path: ${{ runner.temp }}/hde-release-attestation
-          if-no-files-found: error
-          retention-days: 30
+
+      - name: Run database and runtime-contract lane
+        id: db_lane
+        if: ${{ steps.classify.outputs.db == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python ci/checks/check_direct_db_contract.py
+          python -m pytest -q \
+            tests/db \
+            tests/unit/test_check_direct_db_contract.py \
+            tests/bodygraph/test_bg_resolve_v2_mapped_cache.py \
+            tests/bodygraph/test_hde_epic038_mapped_cache_smoke.py \
+            tests/bodygraph/test_ingest.py \
+            tests/ops/test_capture_rails_open_scope.py \
+            tests/ops/test_http_logging.py
+
+      - name: Run rails policy and secret-safety lane
+        id: rails_lane
+        if: ${{ steps.classify.outputs.rails == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python ci/checks/run_rails_job_definitions.py \
+            ci/jobs/rails_closed_refusal.yml \
+            ci/jobs/rails_open_conformance.yml \
+            ci/jobs/logs_keys_only_redaction.yml
+          python -m pytest -q tests/evidence/test_rails_ci_workflow_integration.py
+
+      - name: Run governed evidence integrity lane
+        id: evidence_lane
+        if: ${{ steps.classify.outputs.evidence == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/evidence/update_evidence_index.py --check
+          python tools/evidence/orientation_demo.py --check
+          python tools/evidence/refresh_step_logs_manifest.py --check
+          ci/checks/check_evidence_index_hash.sh
+          python tools/evidence/validate_evidence_paths.py
+          ci/checks/check_mirror_schema.sh
+          ci/checks/check_final_lf.sh
+          python -m pytest -q \
+            tests/evidence/test_evidence_index_missing_state.py \
+            tests/evidence/test_evidence_skeleton.py \
+            tests/evidence/test_machine_mirror_self_proof.py \
+            tests/evidence/test_orientation_demo.py \
+            tests/ops/test_evidence_index.py \
+            tests/qa/test_epic020_qa_docs.py
+
+      - name: Run approved generic QA subsystem lane in isolation
+        id: qa_lane
+        if: ${{ steps.classify.outputs.qa == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          qa_source="$RUNNER_TEMP/hde-generic-qa-tests"
+          cleanup() {
+            git worktree remove --force "$qa_source" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          git worktree add --detach "$qa_source" "$(git rev-parse HEAD)"
+          (
+            cd "$qa_source"
+            unset GH_TOKEN
+            export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PYTHONDONTWRITEBYTECODE=1
+            export PYTHONPATH="$qa_source"
+            python -m pytest -q \
+              tests/qa/test_generic_qa_harness.py \
+              tests/qa/test_qa_harness_followup.py \
+              tests/qa/test_epic021_harness_entrypoint.py \
+              tests/qa/test_epic021_acceptance_alignment.py \
+              tests/qa/test_tooling_bootstrap.py \
+              tests/qa/test_viability_generator_wrappers.py \
+              tests/qa/test_epic029_requalification.py
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
+          )
+          cleanup
+          trap - EXIT
+
+      - name: Build and verify exact-source release attestation
+        id: release_lane
+        if: ${{ steps.classify.outputs.release == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          attestation_root="$RUNNER_TEMP/hde-release-attestation"
+          release_test_source="$RUNNER_TEMP/hde-release-regression-tests"
+          cleanup() {
+            git worktree remove --force "$release_test_source" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          test ! -e "$attestation_root"
+          test ! -e "$release_test_source"
+          git diff --exit-code
+          python scripts/release_id_recompute.py --check-manifest-only
+          git worktree add --detach "$release_test_source" "$(git rev-parse HEAD)"
+          (
+            cd "$release_test_source"
+            export PYTHONPATH="$release_test_source"
+            python -m pytest -q \
+              tests/runtime/test_identity.py \
+              tests/evidence/test_release_attestation.py \
+              tests/evidence/test_release_manifest_content_binding.py \
+              tests/evidence/test_sanity_pipeline.py
+            git diff --exit-code
+            test -z "$(git status --short --untracked-files=all)"
+          )
+          cleanup
+          trap - EXIT
+          test -z "$(git status --short --untracked-files=all)"
+          python tools/evidence/build_release_attestation.py \
+            --output "$attestation_root" \
+            --require-clean
+          python tools/evidence/build_release_attestation.py \
+            --verify "$attestation_root" \
+            --require-clean
+          # No active release or deployment workflow consumes this bundle.
+          # Keep it ephemeral instead of adding an unconsumed artifact transfer.
+          git diff --exit-code
+          test -z "$(git status --short --untracked-files=all)"
+
+      - name: Verify truthful applicability and clean candidate tree
+        id: final_audit
+        if: ${{ always() }}
+        shell: bash
+        env:
+          CLASSIFY_OUTCOME: ${{ steps.classify.outcome }}
+          NEEDS_PYTHON: ${{ steps.classify.outputs.needs_python }}
+          PYTHON_SETUP_OUTCOME: ${{ steps.python_setup.outcome }}
+          DEPENDENCIES_OUTCOME: ${{ steps.dependencies.outcome }}
+          PYTEST_READINESS_OUTCOME: ${{ steps.pytest_readiness.outcome }}
+          ENV_PINS_OUTCOME: ${{ steps.env_pins.outcome }}
+          CHANGED_TESTS: ${{ steps.classify.outputs.changed_tests }}
+          CHANGED_TESTS_OUTCOME: ${{ steps.changed_tests.outcome }}
+          PRODUCT: ${{ steps.classify.outputs.product }}
+          PRODUCT_OUTCOME: ${{ steps.product_lane.outcome }}
+          COMPAT: ${{ steps.classify.outputs.compat }}
+          COMPAT_OUTCOME: ${{ steps.compat_lane.outcome }}
+          DB: ${{ steps.classify.outputs.db }}
+          DB_OUTCOME: ${{ steps.db_lane.outcome }}
+          RAILS: ${{ steps.classify.outputs.rails }}
+          RAILS_OUTCOME: ${{ steps.rails_lane.outcome }}
+          EVIDENCE: ${{ steps.classify.outputs.evidence }}
+          EVIDENCE_OUTCOME: ${{ steps.evidence_lane.outcome }}
+          QA: ${{ steps.classify.outputs.qa }}
+          QA_OUTCOME: ${{ steps.qa_lane.outcome }}
+          RELEASE: ${{ steps.classify.outputs.release }}
+          RELEASE_OUTCOME: ${{ steps.release_lane.outcome }}
+        run: |
+          set -uo pipefail
+          failed=0
+
+          require_outcome() {
+            flag=$1
+            outcome=$2
+            label=$3
+            if [[ "$flag" == "true" && "$outcome" != "success" ]]; then
+              echo "APPLICABLE_CI_LANE_NOT_SUCCESSFUL:$label:$outcome" >&2
+              failed=1
+            elif [[ "$flag" == "false" && "$outcome" != "skipped" ]]; then
+              echo "INAPPLICABLE_CI_LANE_NOT_SKIPPED:$label:$outcome" >&2
+              failed=1
+            elif [[ "$flag" != "true" && "$flag" != "false" ]]; then
+              echo "CI_LANE_APPLICABILITY_INVALID:$label:$flag" >&2
+              failed=1
+            fi
+          }
+
+          if [[ "$CLASSIFY_OUTCOME" != "success" ]]; then
+            echo "CI_CHANGE_CLASSIFICATION_NOT_SUCCESSFUL:$CLASSIFY_OUTCOME" >&2
+            failed=1
+          fi
+          require_outcome "$NEEDS_PYTHON" "$PYTHON_SETUP_OUTCOME" python-setup
+          require_outcome "$NEEDS_PYTHON" "$DEPENDENCIES_OUTCOME" dependencies
+          require_outcome "$NEEDS_PYTHON" "$PYTEST_READINESS_OUTCOME" pytest-readiness
+          require_outcome "$NEEDS_PYTHON" "$ENV_PINS_OUTCOME" environment-pins
+          require_outcome "$CHANGED_TESTS" "$CHANGED_TESTS_OUTCOME" changed-tests
+          require_outcome "$PRODUCT" "$PRODUCT_OUTCOME" product
+          require_outcome "$COMPAT" "$COMPAT_OUTCOME" compatibility
+          require_outcome "$DB" "$DB_OUTCOME" database
+          require_outcome "$RAILS" "$RAILS_OUTCOME" rails
+          require_outcome "$EVIDENCE" "$EVIDENCE_OUTCOME" evidence
+          require_outcome "$QA" "$QA_OUTCOME" qa
+          require_outcome "$RELEASE" "$RELEASE_OUTCOME" release
+
+          git diff --check || failed=1
+          git diff --exit-code || failed=1
+          status=$(git status --short --untracked-files=all)
+          if [[ -n "$status" ]]; then
+            echo "CI_CANDIDATE_TREE_NOT_CLEAN" >&2
+            echo "$status" >&2
+            failed=1
+          fi
+          if (( failed != 0 )); then
+            exit 1
+          fi
+          echo "CI_APPLICABILITY_AND_EXACT_HEAD_OK"

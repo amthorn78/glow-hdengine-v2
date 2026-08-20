@@ -2070,59 +2070,6 @@ def test_final_validator_rejects_each_checksum_input_mutation(authorization):
     checksum_path.write_text("\n".join(original_lines) + "\n", encoding="ascii")
 
 
-def test_missing_ops03_fails_final_pipeline_at_mandatory_stage14(
-    tmp_path,
-    monkeypatch,
-):
-    from tools.evidence import run_sanity_pipeline as sanity
-
-    log = tmp_path / "sanity.log"
-    calls = []
-
-    def pass_command(command):
-        calls.append(command)
-        return subprocess.CompletedProcess(command, 0, b"", b"")
-
-    for key, value in sanity.DETERMINISM_ENV_PINS.items():
-        monkeypatch.setenv(key, value)
-    monkeypatch.setattr(sanity, "SANITY_LOG", log)
-    monkeypatch.setattr(sanity, "_run_command", pass_command)
-    monkeypatch.setattr(sanity, "validate_pr05_path_proof_prerequisites", lambda: None)
-    monkeypatch.setattr(sanity, "validate_direct_selection_contract", lambda: None)
-    monkeypatch.setattr(sanity, "validate_historical_bridge_evidence", lambda: None)
-    monkeypatch.setattr(sanity, "validate_ops02_package", lambda: None)
-    monkeypatch.setattr(
-        sanity,
-        "validate_ops03_tracked_packet",
-        lambda: (_ for _ in ()).throw(
-            RuntimeError("missing OPS-03 packet")
-        ),
-    )
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 0)
-
-    steps = sanity.default_steps()
-    assert len(steps) == 19
-    assert steps[13].commands == (("__validate_ops03__",),)
-    assert sanity.run_pipeline(log_path=log) == 1
-    lines = log.read_text(encoding="utf-8").splitlines()
-    assert [line for line in lines if line.startswith("check ")] == [
-        f"check {name}:{'OK' if index < 13 else 'FAIL'}"
-        for index, name in enumerate(sanity.STAGE_NAMES)
-    ]
-    for name in sanity.STAGE_NAMES[14:]:
-        assert (
-            f"not_executed {name}:"
-            f"earlier_mandatory_failure={sanity.STAGE_NAMES[13]}"
-            in lines
-        )
-    assert not any(
-        command in calls for step in steps[14:] for command in step.commands
-    )
-    assert f"first_failed_stage:{sanity.STAGE_NAMES[13]}" in lines
-    assert "summary:FAIL" in lines
-    assert "summary:PASS" not in lines
-
-
 @pytest.mark.parametrize(
     "ignored_path",
     ("engine/shadow/native.so", "engine/shadow/native.pyd", "jsonschema.py"),

@@ -16,7 +16,6 @@ def _cli_env() -> dict[str, str]:
 
 
 def test_hdctl_and_module_help():
-    subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], check=True, capture_output=True)
     env = _cli_env()
     r1 = subprocess.run(["hdctl", "--help"], capture_output=True, text=True, env=env)
     r2 = subprocess.run([sys.executable, "-m", "engine.cli", "--help"], capture_output=True, text=True, env=env)

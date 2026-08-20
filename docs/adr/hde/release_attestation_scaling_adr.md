@@ -1,6 +1,6 @@
 # Release-attestation scaling decision
 
-Status: implemented and superseded by HDE-EPIC038 final external-attestation admission; permanent PF-Canon drainage remains downstream.
+Status: implemented; generic exact-source mechanics supersede the HDE-EPIC038-specific administrative pipeline while PF12's `PR06R_B_FINAL_PASS` v1 compatibility literal remains unchanged and claim-free. Permanent PF-Canon drainage remains downstream.
 
 ## Problem
 
@@ -14,8 +14,8 @@ The content hash was not the defect. The defect was making generated attestation
 2. Runtime identity derives its release ID once from that packaged canonical file. No generated release-ID source constant exists.
 3. `scripts/cut_release_manifest.py` is the only normal release-cut writer. It requires an explicit version and UTC build time, refreshes the declared file hashes, and changes only the manifest.
 4. Source validation is read-only: `scripts/release_id_recompute.py --check-manifest-only`.
-5. `tools/evidence/build_release_attestation.py` copies the tracked source into a temporary Git repository, runs the release-attestation closure there, proves a read-only fixed point, and verifies the final nineteen-stage release-sanity gate for exact-source admission.
-6. The strict `hde.release_attestation.v1` bundle is written only to an explicitly external empty directory. CI verifies it and publishes it with `actions/upload-artifact`.
+5. `tools/evidence/build_release_attestation.py` copies the tracked source into a temporary Git repository, runs the release-attestation closure there, proves a read-only fixed point, and verifies the final fifteen-stage generic release-sanity gate for exact-source admission.
+6. The strict `hde.release_attestation.v1` bundle is written only to an explicitly external empty directory. CI builds and verifies it in one exact-head job without transferring the ephemeral bundle.
 7. Direct execution of `regenerate_identity_closure.py` in the source checkout is refused.
 8. Existing checked-in EPIC022 release artifacts remain frozen capture-time records. They are not current runtime identity inputs and are not rewritten for later releases.
 9. Git does not preserve filesystem mtimes, so clone-local `stat().st_mtime` is not evidence. Path-proof validity is determined by exact path, SHA-256, size, required companion fields, and UTC timestamp shape. `mtime_utc` remains capture-time provenance and seeds newly written proofs, but a later clone or cache restore cannot invalidate content-bound evidence or trigger a proof rewrite.
@@ -40,11 +40,11 @@ No edge points from the external attestation back into tracked source.
 - `catalog` is package data, so installed wheels and source checkouts consume byte-identical manifest content.
 - Public Reader/CLI identity bytes remain unchanged for the current manifest.
 
-## Final HDE-EPIC038 attestation boundary
+## Current attestation boundary
 
-The current external attestation records final admission as `PR06R_B_FINAL_PASS` only when the source commit is exact, the tracked-tree and manifest-derived release identity verify, the wheel-installed entry point is exercised, and all nineteen release-sanity stages pass with no pipeline stop. It validates committed evidence and admitted OPS packets; it does not rerun OPS, perform Railway discovery, write a database, deploy production, move PF09 status, claim QA PASS, or close HDE-EPIC038.
+The current external attestation records PF12's canon-owned `hde.release_attestation.v1` compatibility value `PR06R_B_FINAL_PASS` only when the source commit is exact, the tracked-tree and manifest-derived release identity verify, the wheel-installed entry point is exercised, and all fifteen generic release-sanity stages pass with no pipeline stop. The compatibility literal preserves the existing wire contract; it does not claim QA PASS, acceptance, PF09 movement, OPS, deployment, or epic closeout. The builder validates current release mechanics under closed rails; it does not rerun or admit frozen OPS packets, perform Railway discovery, write a database, or deploy production.
 
-The earlier PR-A stage-14 stop remains historical implementation context only. Current documentation and release validation should refer to the final exact-source nineteen-stage attestation rather than treating PR-A or downstream PR-06R-B wording as current workflow.
+The earlier PR-A stage-14 stop remains historical implementation context. PF10 — HDE Build Notes, §2.3 takes the former HDE-EPIC038 nineteen-stage family out of current release admission: generic architecture assertions run in product CI, and retired transport-history/OPS packet checks remain audit history. Current validation therefore uses the generic exact-source fifteen-stage chain while retaining `PR06R_B_FINAL_PASS` solely as PF12's required v1 wire value; neither the current log nor that compatibility literal claims HDE-EPIC038 completion, QA PASS, acceptance, PF09 movement, OPS, deployment, or closeout.
 
 Permanent PF04/PF09/PF12 release-evidence wording and historical EPIC022 canonical-path semantics require later human drainage. This implementation does not edit PF-Canon or move any status.
 
@@ -52,4 +52,4 @@ For this exact portability defect, the authorized repo decision `SUPERSEDES` the
 
 ## Rollback
 
-Revert the isolated builder, runtime manifest derivation, release-cut command, workflow publication, and this repo ADR together. Do not restore CI that repairs the source checkout. If external publication is unavailable, fail the release attestation job while leaving the manifest and source immutable.
+Revert the isolated builder, runtime manifest derivation, release-cut command, workflow verification, and this repo ADR together. Do not restore CI that repairs the source checkout. If external bundle verification is unavailable, fail the release attestation job while leaving the manifest and source immutable.

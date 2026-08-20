@@ -437,7 +437,7 @@ def test_historical_reader_cannot_hide_active_retired_key_consumption(tmp_path):
     )
 
 
-def test_release_pipeline_allows_only_owned_historical_bridge_hash_roster(tmp_path):
+def test_release_pipeline_has_no_historical_bridge_reader_exception(tmp_path):
     _minimal_tree(tmp_path)
     _write(
         tmp_path,
@@ -446,28 +446,9 @@ def test_release_pipeline_allows_only_owned_historical_bridge_hash_roster(tmp_pa
         "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
         "}\n",
     )
-    assert check.scan(tmp_path) == ()
-
-
-def test_release_pipeline_historical_allowance_does_not_hide_execution(tmp_path):
-    _minimal_tree(tmp_path)
-    _write(
-        tmp_path,
-        "tools/evidence/run_sanity_pipeline.py",
-        "from pathlib import Path\n"
-        "HISTORICAL_BRIDGE_PRIMARY_SHA256 = {\n"
-        "    'artifacts/db_bridge/health.json': 'a' * 64,\n"
-        "}\n"
-        "def execute_bridge_artifact():\n"
-        "    return Path('artifacts/db_bridge/query_select_1.json').read_bytes()\n",
-    )
     violations = check.scan(tmp_path)
-    assert not any(
-        "tools/evidence/run_sanity_pipeline.py:3:active_retired_path" in row
-        for row in violations
-    )
     assert any(
-        "tools/evidence/run_sanity_pipeline.py:6:active_retired_path:artifacts/db_bridge/"
+        "tools/evidence/run_sanity_pipeline.py:2:active_retired_path:artifacts/db_bridge/"
         in row
         for row in violations
     )

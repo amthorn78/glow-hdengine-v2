@@ -1,4 +1,6 @@
 import json
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -21,6 +23,135 @@ def test_bootstrap_missing_pytest_maps_to_tooling_failure():
 def test_bootstrap_exit_code_one_still_counts_as_behavior_failure():
     stderr = "E   AssertionError: failed test\n"
     assert _status_from_bootstrap(1, stderr) == "FAIL_BEHAVIOR"
+
+
+def test_subprocess_environment_forces_closed_rails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for key in harness.DETERMINISM_ENV_PINS:
+        monkeypatch.setenv(key, "poisoned")
+    monkeypatch.setenv("APP_ENV", "prod")
+
+    env = harness._env_for_subprocess()
+
+    assert {
+        key: env[key] for key in harness.DETERMINISM_ENV_PINS
+    } == harness.DETERMINISM_ENV_PINS
+    assert env["APP_ENV"] == "dev"
+
+
+def test_check_specs_have_unique_closed_rails_execution_contract() -> None:
+    checks = harness._check_specs()
+    check_ids = [check.check_id for check in checks]
+    assert check_ids == [
+        "D00_bootstrap_pytest",
+        "D01_env_pins_gate",
+        "D02_canonical_json_gate",
+        "D03_showcompat_artifacts",
+        "D04_sampler_evidence",
+        "D05_arrays_as_sets",
+        "D06_tests_pass",
+        "D07_sanity_pipeline",
+        "D08_update_evidence_index",
+        "D09_generate_evidence_index_snapshot",
+        "D10_check_evidence_index_hash",
+        "D11_check_mirror_schema",
+        "D12_check_final_lf",
+        "D17_token_matrix",
+        "D18_acceptance_map",
+        "D15_doc_deltas",
+        "D16_close_pack",
+        "D19_step_logs_manifest",
+        "D13_acceptance_map_viability",
+        "D14_harness_selftest",
+    ]
+    assert len(check_ids) == len(set(check_ids))
+    assert {
+        check.check_id for check in checks if check.command is None
+    } == {
+        "D13_acceptance_map_viability",
+        "D14_harness_selftest",
+        "D15_doc_deltas",
+        "D16_close_pack",
+        "D17_token_matrix",
+        "D18_acceptance_map",
+        "D19_step_logs_manifest",
+    }
+    command_text = " ".join(
+        part
+        for check in checks
+        for part in (check.command or ())
+    ).lower()
+    for forbidden in (
+        "allow_network=1",
+        "safe_mode=0",
+        "http://",
+        "https://",
+        "curl",
+    ):
+        assert forbidden not in command_text
+
+
+def test_run_command_passes_closed_env_and_classifies_bootstrap_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[object, ...]] = []
+    env = {
+        **harness.DETERMINISM_ENV_PINS,
+        "APP_ENV": "dev",
+        "PATH": "/runtime/bin",
+    }
+
+    def fake_run(argv: list[str], **kwargs: object) -> SimpleNamespace:
+        calls.append((argv, kwargs))
+        return SimpleNamespace(
+            returncode=1,
+            stdout="pytest bootstrap stdout\n",
+            stderr="ModuleNotFoundError: No module named 'pytest'\n",
+        )
+
+    captured_log: dict[str, object] = {}
+
+    def fake_write_primary_log(**kwargs: object) -> Path:
+        captured_log.update(kwargs)
+        return tmp_path / "primary.log"
+
+    monkeypatch.setattr(harness.subprocess, "run", fake_run)
+    monkeypatch.setattr(harness, "_write_primary_log", fake_write_primary_log)
+    check = harness.CheckSpec(
+        check_id="D00_bootstrap_pytest",
+        command=["python", "-m", "pytest", "--version"],
+        description="bootstrap",
+        evidence_outputs=(),
+    )
+
+    status, exit_code, log_path = harness._run_command(check, env)
+
+    assert (status, exit_code, log_path) == (
+        "FAIL_TOOLING",
+        1,
+        tmp_path / "primary.log",
+    )
+    assert calls == [
+        (
+            ["python", "-m", "pytest", "--version"],
+            {
+                "capture_output": True,
+                "text": True,
+                "env": env,
+            },
+        )
+    ]
+    assert captured_log == {
+        "check_id": "D00_bootstrap_pytest",
+        "command": "python -m pytest --version",
+        "status": "FAIL_TOOLING",
+        "exit_code": 1,
+        "evidence_outputs": (),
+        "stdout": "pytest bootstrap stdout\n",
+        "stderr": "ModuleNotFoundError: No module named 'pytest'\n",
+    }
 
 
 def test_renderers_preserve_bootstrap_status_byte_identity():

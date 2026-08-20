@@ -3,8 +3,26 @@ import json
 import pytest
 
 from adapter.http_reader import create_app
+from engine.compat import compute as compat_compute
 from engine.db.adapter import RETIRED_DB_TRANSPORT_KEYS
 from engine.compat.identity import dev_compat_identity
+
+
+@pytest.fixture(autouse=True)
+def _isolate_external_resolution(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+
+    real_resolver = compat_compute.resolve_bodygraph
+
+    def _guarded_resolver(*args, **kwargs):
+        rails = kwargs.get("env") or {}
+        if rails.get("SAFE_MODE") == "0" and rails.get("ALLOW_NETWORK") == "1":
+            pytest.fail("open-rails conjunction attempted external resolution")
+        return real_resolver(*args, **kwargs)
+
+    monkeypatch.setattr(compat_compute, "resolve_bodygraph", _guarded_resolver)
 
 
 def _client(monkeypatch, app_env: str):

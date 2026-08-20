@@ -11,6 +11,13 @@ from engine.db.errors import RetiredBridgeConfiguration
 from engine.serializer import canon
 
 
+@pytest.fixture(autouse=True)
+def _clear_ambient_db_transport(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    for name in RETIRED_DB_TRANSPORT_KEYS:
+        monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture()
 def client(monkeypatch):
     monkeypatch.setenv("HDE_TEST_TOKEN_ADMIN", "admin-token")

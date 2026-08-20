@@ -78,6 +78,114 @@ def _snapshot(repo: Path) -> dict[str, tuple[bytes, int]]:
     }
 
 
+def test_orientation_compatibility_write_is_idempotent_after_updater(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    before = _snapshot(repo)
+    _success(_run(repo, "tools/evidence/orientation_demo.py"))
+    assert _snapshot(repo) == before
+    _checks(repo)
+    assert _snapshot(repo) == before
+
+
+def test_updater_recovers_missing_governed_doc_delta_proof_in_one_write(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    primary = repo / "audit/docdeltas/hde-epic039_doc_deltas.md"
+    proof = repo / "audit/docdeltas/hde-epic039_doc_deltas.md.path_proof.txt"
+    primary_before = (
+        primary.read_bytes(),
+        stat.S_IMODE(primary.stat().st_mode),
+        primary.stat().st_mtime_ns,
+    )
+    proof.unlink()
+
+    _success(_run(repo, "tools/evidence/update_evidence_index.py"))
+    assert proof.is_file()
+    assert (
+        primary.read_bytes(),
+        stat.S_IMODE(primary.stat().st_mode),
+        primary.stat().st_mtime_ns,
+    ) == primary_before
+
+    entries = json.loads(
+        (repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    primary_entries = [
+        entry
+        for entry in entries
+        if entry["discovered_physical_path"]
+        == "audit/docdeltas/hde-epic039_doc_deltas.md"
+    ]
+    assert [entry["artifact_key"] for entry in primary_entries] == [
+        "epic039.pr01.doc_delta"
+    ]
+
+    proof_before_checks = (
+        proof.read_bytes(),
+        stat.S_IMODE(proof.stat().st_mode),
+    )
+    _checks(repo)
+    assert (
+        proof.read_bytes(),
+        stat.S_IMODE(proof.stat().st_mode),
+    ) == proof_before_checks
+
+
+def test_manifest_only_release_cut_stays_outside_the_evidence_graph(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)
+
+    manifest = repo / "catalog/manifest.json"
+    historical_proof = repo / "catalog/manifest.json.path_proof.txt"
+    manifest_before = manifest.read_bytes()
+    proof_before = historical_proof.read_bytes()
+    skeleton_before = _snapshot(repo)
+
+    _success(
+        _run(
+            repo,
+            "scripts/cut_release_manifest.py",
+            "--version",
+            "1.0.1",
+            "--built-at-utc",
+            "2026-08-20T00:00:00Z",
+        )
+    )
+    assert manifest.read_bytes() != manifest_before
+    assert historical_proof.read_bytes() == proof_before
+    assert _snapshot(repo) == skeleton_before
+
+    human_entries = json.loads(
+        (repo / "docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    mirror_entries = [
+        json.loads(line)
+        for line in (repo / "artifacts/evidence_index.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line
+    ]
+    for entries in (human_entries, mirror_entries):
+        assert not any(
+            entry["discovered_physical_path"] == "catalog/manifest.json"
+            for entry in entries
+        )
+
+    _checks(repo)
+    assert _snapshot(repo) == skeleton_before
+    assert historical_proof.read_bytes() == proof_before
+
+
 def test_updater_recovers_complete_missing_state_in_one_write(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     shutil.copytree(ROOT, repo, copy_function=shutil.copy2, ignore=IGNORES)

@@ -23,15 +23,12 @@ def _repository_fixture(root: Path) -> None:
 def _sanity_pass_bytes() -> bytes:
     lines = [
         "run:sanity-pipeline",
-        "pipeline_identity:HDE-EPIC038-PR06-release-sanity",
+        "pipeline_identity:hde-release-sanity-v1",
         "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC",
         "env_pins:audit/gates/determinism/env_pins.log",
-        "ops_evidence:retained_integrity_provenance_secret_safe_only;historical_nonclaim=true;not_rerun=true",
     ]
     for name in epic029.SANITY_STAGE_NAMES:
         lines.append(f"check {name}:OK")
-        if name == "12 Historical bridge evidence integrity":
-            lines.append("stage_result:12:HISTORICAL_INTEGRITY_OK")
     lines.extend(("first_failed_stage:NONE", "summary:PASS", ""))
     return "\n".join(lines).encode("utf-8")
 
@@ -803,8 +800,8 @@ def test_zero_exit_with_malformed_sanity_result_is_tooling_failure(tmp_path: Pat
     [
         lambda body: body + b"summary:FAIL\n",
         lambda body: body.replace(
-            b"check 10 Architecture snapshot:OK\n",
-            b"check 10 Architecture snapshot:OK\ncheck 10 Architecture snapshot:OK\n",
+            b"check 10 Configured-v2 mapped-cache behavior:OK\n",
+            b"check 10 Configured-v2 mapped-cache behavior:OK\ncheck 10 Configured-v2 mapped-cache behavior:OK\n",
         ),
     ],
 )

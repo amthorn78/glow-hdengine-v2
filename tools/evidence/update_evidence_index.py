@@ -2934,284 +2934,10 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
     return entries
 
 
-EPIC038_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
-    {
-        "artifact_key": "epic038.doc_deltas",
-        "discovered_physical_path": "audit/docdeltas/hde-epic038_doc_deltas.md",
-        "epic_id": "HDE-EPIC038",
-        "record_type": "epic038_doc_delta",
-        "schema_version": "1.0",
-        "notes": "Primary draft/staging binding for DOC_DELTA_PRESENT_OK; governed presence is nonclaiming",
-    },
-    {
-        "artifact_key": "epic038.qa_meta_doc_deltas",
-        "discovered_physical_path": "audit/qa/hde-epic038/00_meta/doc_deltas.md",
-        "epic_id": "HDE-EPIC038",
-        "record_type": "epic038_doc_delta_capture",
-        "schema_version": "1.0",
-        "notes": "Supporting QA capture for the HDE-EPIC038 doc-delta pair; not the primary token surface and not a token claim",
-    },
-    {
-        "artifact_key": "epic038.release.catalog_manifest",
-        "discovered_physical_path": "catalog/manifest.json",
-        "epic_id": "HDE-EPIC038",
-        "record_type": "epic038_release_identity_source",
-        "schema_version": "1.0",
-        "notes": "Canonical current release source input; exact-head derived attestation remains an external CI artifact and this record makes no token claim",
-    },
-    {
-        "artifact_key": "epic038.token_matrix",
-        "discovered_physical_path": "audit/qa/hde-epic038/token_evidence_matrix.md",
-        "epic_id": "HDE-EPIC038",
-        "record_type": "epic038_token_matrix",
-        "schema_version": "1.0",
-        "notes": "Deterministic DEV-01 nonclaiming token binding matrix; independent Gate B review required",
-    },
-    {
-        "artifact_key": "epic038.qa_step_logs_manifest",
-        "discovered_physical_path": "audit/qa/hde-epic038/qa_step_logs_manifest.json",
-        "epic_id": "HDE-EPIC038",
-        "record_type": "epic038_qa_step_logs_manifest",
-        "schema_version": "1.0",
-        "notes": "HDE-EPIC038 current-state QA step-log manifest; tokenless coverage index only, not acceptance or closeout",
-    },
-]
-
-EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
-    {"artifact_key": "epic038.close_report", "discovered_physical_path": "audit/EPIC-038_close_report.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_report", "schema_version": "1.0", "tokens": ["TESTS_PASS_OK"]},
-    {"artifact_key": "epic038.manifest", "discovered_physical_path": "audit/EPIC-038_MANIFEST.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_close_manifest", "schema_version": "1.0"},
-    {"artifact_key": "epic038.acceptance_map", "discovered_physical_path": "docs/acceptance_map_epic038.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map", "schema_version": "1.0"},
-    {"artifact_key": "epic038.acceptance_map_viability", "discovered_physical_path": "audit/qa/hde-epic038/acceptance_map_viability.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_acceptance_map_viability", "schema_version": "1.0"},
-    {"artifact_key": "epic038.closeout_remediation_ledger", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md", "epic_id": "HDE-EPIC038", "record_type": "epic038_closeout_remediation_ledger", "schema_version": "1.0"},
-    {"artifact_key": "epic038.qa_precommit_checklist", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_qa_precommit_checklist", "schema_version": "1.0", "tokens": ["QA_PRECOMMIT_CHECKLIST_OK"]},
-    {"artifact_key": "epic038.qa_postcommit_checklist", "discovered_physical_path": "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_qa_postcommit_checklist", "schema_version": "1.0", "tokens": ["QA_POSTCOMMIT_CHECKLIST_OK"]},
-]
-
-EPIC038_CLOSEOUT_KEY_OUTPUTS = {
-    "acceptance_map": "docs/acceptance_map_epic038.json",
-    "acceptance_map_viability": "audit/qa/hde-epic038/acceptance_map_viability.log",
-    "close_manifest": "audit/EPIC-038_MANIFEST.json",
-    "close_report": "audit/EPIC-038_close_report.md",
-    "closeout_remediation_ledger": "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md",
-    "qa_postcommit_checklist": "audit/qa/hde-epic038/00_meta/qa_postcommit_checklist.log",
-    "qa_precommit_checklist": "audit/qa/hde-epic038/00_meta/qa_precommit_checklist.log",
-    "token_matrix": "audit/qa/hde-epic038/token_evidence_matrix.md",
+MUTABLE_RELEASE_SOURCE_INDEX_KEYS = {
+    ("catalog_manifest", "catalog/manifest.json"),
+    ("epic038.release.catalog_manifest", "catalog/manifest.json"),
 }
-
-EPIC038_CLOSEOUT_FAMILY_KEYS = frozenset(
-    str(entry["artifact_key"]) for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
-)
-EPIC038_CLOSEOUT_FAMILY_PATHS = frozenset(
-    str(entry["discovered_physical_path"])
-    for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
-)
-
-
-def _load_epic038_json(path: Path, *, label: str) -> dict[str, object]:
-    def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
-        result: dict[str, object] = {}
-        for key, value in pairs:
-            if key in result:
-                raise ValueError(f"duplicate JSON key: {key}")
-            result[key] = value
-        return result
-
-    try:
-        payload = json.loads(
-            path.read_text(encoding="utf-8"), object_pairs_hook=_unique_object
-        )
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
-        raise SystemExit(f"INVALID_EPIC038_{label}") from exc
-    if not isinstance(payload, dict):
-        raise SystemExit(f"INVALID_EPIC038_{label}")
-    return payload
-
-
-def _epic038_closeout_package_bytes() -> dict[str, bytes]:
-    from tools.evidence import generate_hde_epic038_closeout as closeout
-
-    if dict(closeout.KEY_OUTPUTS) != EPIC038_CLOSEOUT_KEY_OUTPUTS:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_KEY_OUTPUT_CONTRACT")
-    package: dict[str, bytes] = {}
-    try:
-        for package_path in closeout.PACKAGE_PATHS:
-            relative = (
-                package_path.as_posix()
-                if isinstance(package_path, Path)
-                else str(package_path)
-            )
-            package[relative] = (ROOT / relative).read_bytes()
-    except OSError as exc:
-        raise SystemExit("INCOMPLETE_EPIC038_CLOSEOUT_PACKAGE") from exc
-    return package
-
-
-def _validate_epic038_closeout_bindings() -> None:
-    manifest = _load_epic038_json(
-        ROOT / "audit/EPIC-038_MANIFEST.json", label="CLOSE_MANIFEST"
-    )
-    acceptance_map = _load_epic038_json(
-        ROOT / "docs/acceptance_map_epic038.json", label="ACCEPTANCE_MAP"
-    )
-    if (
-        manifest.get("epic_id") != "HDE-EPIC038"
-        or manifest.get("schema_version") != "1.0"
-        or manifest.get("key_outputs") != EPIC038_CLOSEOUT_KEY_OUTPUTS
-    ):
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_BINDINGS")
-    if (
-        acceptance_map.get("artifact_key") != "epic038.acceptance_map"
-        or acceptance_map.get("epic_id") != "HDE-EPIC038"
-        or acceptance_map.get("schema_version") != "1.0"
-    ):
-        raise SystemExit("INVALID_EPIC038_ACCEPTANCE_MAP_BINDINGS")
-
-    decision = manifest.get("decision")
-    if decision not in {"SATISFIED", "NOT SATISFIED"}:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION")
-    if acceptance_map.get("decision") != decision:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION_COHERENCE")
-
-    roster = manifest.get("token_roster")
-    token_status = manifest.get("token_status")
-    records = acceptance_map.get("records")
-    if (
-        not isinstance(roster, list)
-        or not roster
-        or any(not isinstance(token, str) or not token for token in roster)
-        or len(roster) != len(set(roster))
-        or not isinstance(token_status, dict)
-        or set(token_status) != set(roster)
-        or not isinstance(records, list)
-        or [record.get("token") for record in records if isinstance(record, dict)]
-        != roster
-        or any(not isinstance(record, dict) for record in records)
-        or any(
-            record.get("status") != token_status.get(record.get("token"))
-            for record in records
-            if isinstance(record, dict)
-        )
-        or acceptance_map.get("minimum_follow_up")
-        != manifest.get("minimum_follow_up")
-    ):
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_ROSTER_COHERENCE")
-
-    for output_path in EPIC038_CLOSEOUT_KEY_OUTPUTS.values():
-        if not (ROOT / output_path).is_file():
-            raise SystemExit(f"MISSING_EPIC038_CLOSEOUT_OUTPUT:{output_path}")
-
-    try:
-        report = (ROOT / "audit/EPIC-038_close_report.md").read_text(
-            encoding="utf-8"
-        )
-        viability = (
-            ROOT / "audit/qa/hde-epic038/acceptance_map_viability.log"
-        ).read_text(encoding="utf-8")
-        ledger = (
-            ROOT
-            / "audit/qa/hde-epic038/00_meta/closeout_remediation_ledger.md"
-        ).read_text(encoding="utf-8")
-    except (OSError, UnicodeError) as exc:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_TEXT_ARTIFACT") from exc
-    if (
-        f"Final decision: {decision}" not in report
-        or f"DECISION: {decision}" not in viability
-    ):
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_DECISION_COHERENCE")
-
-    ledger_prefix = "# HDE-EPIC038 Closeout Remediation Ledger\n\n```json\n"
-    ledger_suffix = "\n```\n"
-    if not ledger.startswith(ledger_prefix) or not ledger.endswith(ledger_suffix):
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER")
-    try:
-        ledger_payload = json.loads(
-            ledger[len(ledger_prefix) : -len(ledger_suffix)]
-        )
-    except json.JSONDecodeError as exc:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER") from exc
-    if (
-        not isinstance(ledger_payload, dict)
-        or ledger_payload.get("artifact_key")
-        != "epic038.closeout_remediation_ledger"
-        or ledger_payload.get("epic_id") != "HDE-EPIC038"
-        or ledger_payload.get("schema")
-        != "hde.epic038.closeout_remediation_ledger.v1"
-        or not isinstance(ledger_payload.get("entries"), list)
-    ):
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_LEDGER")
-
-    # Keep the updater and producer on one exact package-surface contract.
-    # Full current-byte validation runs after updater-owned proofs and indexes
-    # have been refreshed; doing it here would prevent canonical self-repair.
-    from tools.evidence import generate_hde_epic038_closeout as closeout
-
-    previous_root = closeout.ROOT
-    closeout.ROOT = ROOT
-    try:
-        closeout.validate_package_structure(_epic038_closeout_package_bytes())
-    except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_PACKAGE_STRUCTURE") from exc
-    finally:
-        closeout.ROOT = previous_root
-
-
-def _validate_epic038_closeout_package() -> None:
-    """Validate the complete package after canonical updater convergence work."""
-    activation_paths = [
-        ROOT / str(entry["discovered_physical_path"])
-        for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
-    ]
-    if not any(path.is_file() or path.is_symlink() for path in activation_paths):
-        return
-
-    from tools.evidence import generate_hde_epic038_closeout as closeout
-
-    previous_root = closeout.ROOT
-    closeout.ROOT = ROOT
-    try:
-        closeout._validate_package_for_canonical_updater(
-            _epic038_closeout_package_bytes()
-        )
-    except (KeyError, OSError, TypeError, UnicodeError, ValueError) as exc:
-        raise SystemExit("INVALID_EPIC038_CLOSEOUT_PACKAGE") from exc
-    finally:
-        closeout.ROOT = previous_root
-
-
-def _load_epic038_closeout_entries() -> list[dict[str, object]]:
-    """Activate the DEV-03 family as a unit; a partial family is never valid."""
-    paths = [ROOT / str(e["discovered_physical_path"]) for e in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
-    present = [path.is_file() for path in paths]
-    proof_paths = [
-        ROOT / f"{entry['discovered_physical_path']}.path_proof.txt"
-        for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS
-    ]
-    aliased = [
-        path.relative_to(ROOT).as_posix()
-        for path in (*paths, *proof_paths)
-        if path.is_symlink()
-    ]
-    if aliased:
-        raise SystemExit("ALIASED_EPIC038_CLOSEOUT_FAMILY:" + ",".join(aliased))
-    proof_present = [path.is_file() for path in proof_paths]
-    if not any(present) and not any(proof_present):
-        return []
-    if not all(present):
-        missing = [str(e["discovered_physical_path"]) for e, exists in zip(EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS, present) if not exists]
-        raise SystemExit("INCOMPLETE_EPIC038_CLOSEOUT_FAMILY:" + ",".join(missing))
-    if any(proof_present) and not all(proof_present):
-        missing_proofs = [
-            path.relative_to(ROOT).as_posix()
-            for path, exists in zip(proof_paths, proof_present)
-            if not exists
-        ]
-        raise SystemExit(
-            "INCOMPLETE_EPIC038_CLOSEOUT_PROOF_FAMILY:"
-            + ",".join(missing_proofs)
-        )
-    _validate_epic038_closeout_bindings()
-    return [dict(entry) for entry in EPIC038_CLOSEOUT_PRIMARY_ARTIFACTS]
-
 
 EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
@@ -3949,10 +3675,9 @@ def _load_human_index() -> list[dict[str, object]]:
             entry.get("artifact_key"),
             entry.get("discovered_physical_path"),
         )
+        not in MUTABLE_RELEASE_SOURCE_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC021_SUPERSEDED_INDEX_KEYS
-        and entry.get("artifact_key") not in EPIC038_CLOSEOUT_FAMILY_KEYS
-        and entry.get("discovered_physical_path")
-        not in EPIC038_CLOSEOUT_FAMILY_PATHS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
@@ -4016,8 +3741,6 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
-            *_load_epic038_closeout_entries(),
-            *EPIC038_QA_PRIMARY_ARTIFACTS,
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
             *_load_epic038_pr03_entries(),
@@ -4605,7 +4328,6 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.check:
         _run_once(check=True)
-        _validate_epic038_closeout_package()
         return
 
     # Converge in one invocation with a bounded fixed-point loop.
@@ -4644,11 +4366,6 @@ def main(argv: list[str] | None = None) -> None:
             _STAGED_VIEW = None
             _publish_staged(staged)
             _run_once(check=True)
-            # The legacy closeout validator reads its registered companions
-            # directly from the filesystem. Validate only after publication,
-            # while the rollback transaction is still active, so it observes
-            # one coherent ledger without gaining a second staged-read model.
-            _validate_epic038_closeout_package()
     finally:
         _STAGED_VIEW = None
 

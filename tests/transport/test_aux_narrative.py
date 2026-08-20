@@ -1,47 +1,88 @@
 import hashlib
+import json
+import shutil
+from pathlib import Path
 
 import pytest
 
 from adapter.http_reader import app
-from engine.narratives import get_pack
+from engine.narratives import MISSING_NARRATIVE_KEY, get_pack
+from engine.narratives import state as narrative_state
+from engine.narratives.loader import load_pack
 from engine.narratives.router import route_keys
+from engine.serializer.canon import sercanon
 
 pytestmark = pytest.mark.epic010
+ROOT = Path(__file__).resolve().parents[2]
 
 
-def _find_suppressed_tuple() -> tuple[dict[str, str], str]:
-    pack = get_pack()
-    for key in pack.suppression_map:
-        record = pack.keys.get(key)
-        if record is None:
-            continue
-        if record.perspective == "shared":
-            perspectives = ["shared"]
-        else:
-            perspectives = list(record.directions)
-        for perspective in perspectives:
-            routed = route_keys(record.category, record.band, perspective)
-            lookup = "shared_key" if perspective == "shared" else "personal_key"
-            target = routed.get(lookup)
-            if target == key:
-                return (
-                    {
-                        "category": record.category,
-                        "band": record.band,
-                        "perspective": perspective,
-                    },
-                    key,
-                )
-            if target == "missing_narrative_key":
-                return (
-                    {
-                        "category": record.category,
-                        "band": record.band,
-                        "perspective": perspective,
-                    },
-                    "missing_narrative_key",
-                )
-    raise AssertionError("unable to locate suppressed tuple in narrative pack")
+@pytest.fixture(autouse=True)
+def _isolated_current_pack(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    pack = load_pack(ROOT / "catalog/narratives", tmp_path / "mounted")
+    monkeypatch.setattr(narrative_state, "_PACK", pack)
+    return pack
+
+
+def _load_pack_with_suppressed_shared_slots(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    slots: set[int],
+):
+    catalog = tmp_path / "sealed" / "catalog" / "narratives"
+    shutil.copytree(ROOT / "catalog/narratives", catalog)
+
+    current = get_pack()
+    query = {
+        "category": "harmony",
+        "band": "Cool",
+        "perspective": "shared",
+    }
+    suppressed = {
+        record.key
+        for record in current.keys.values()
+        if record.category_slug == query["category"]
+        and record.band == query["band"]
+        and record.perspective == query["perspective"]
+        and record.slot in slots
+    }
+    assert len(suppressed) == len(slots)
+
+    suppression_path = catalog / "suppression_map.json"
+    suppression = json.loads(suppression_path.read_bytes())
+    suppression.update(
+        {
+            key: {
+                "notes": "test-only sealed suppression",
+                "policy_reason": "conflict",
+            }
+            for key in suppressed
+        }
+    )
+    suppression_bytes = sercanon(suppression, sort_keys=True)
+    suppression_path.write_bytes(suppression_bytes)
+    suppression_sha = hashlib.sha256(suppression_bytes).hexdigest()
+    suppression_path.with_suffix(".json.sha256").write_text(
+        f"{suppression_sha}\n", encoding="utf-8"
+    )
+
+    manifest_path = catalog / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    entry = next(
+        item
+        for item in manifest["files"]
+        if item["path"] == "catalog/narratives/suppression_map.json"
+    )
+    entry.update(sha256=suppression_sha, size_bytes=len(suppression_bytes))
+    manifest_bytes = sercanon(manifest, sort_keys=True)
+    manifest_path.write_bytes(manifest_bytes)
+    manifest_path.with_suffix(".json.sha256").write_text(
+        f"{hashlib.sha256(manifest_bytes).hexdigest()}\n", encoding="utf-8"
+    )
+
+    pack = load_pack(catalog, tmp_path / "suppressed-mounted")
+    assert pack.mount_path.is_relative_to(tmp_path)
+    monkeypatch.setattr(narrative_state, "_PACK", pack)
+    return pack, query
 
 
 @pytest.mark.parametrize("path", ["/aux/narrative", "/api/aux/narrative"])
@@ -63,7 +104,9 @@ def test_aux_narrative_success_minimal_tuple(path):
     assert "authorization" in vary.lower()
     assert "accept-encoding" in vary.lower()
     assert resp.headers.get("X-Narrative-Pack-Sha") == pack.pack_sha
-    assert resp.headers.get("X-Narrative-Composition", "").startswith("harmony.cool")
+    assert resp.headers.get("X-Narrative-Composition", "").startswith(
+        "nar.harmony.cool"
+    )
     expected_etag = "\"" + hashlib.sha256(resp.data).hexdigest() + "\""
     assert resp.headers.get("ETag") == expected_etag
 
@@ -91,9 +134,29 @@ def test_aux_narrative_tolerates_internal_parameters():
     assert enriched.data == minimal.data
 
 
-def test_aux_narrative_suppressed_posture_public_surface():
-    pack = get_pack()
-    suppressed_tuple, expected_composition = _find_suppressed_tuple()
+def test_aux_narrative_catalog_suppression_falls_forward(
+    tmp_path, monkeypatch
+):
+    pack, query = _load_pack_with_suppressed_shared_slots(
+        tmp_path, monkeypatch, {1, 2}
+    )
+    expected = route_keys(**query)["shared_key"]
+    assert expected.endswith(".3.sage-01")
+
+    response = app.test_client().get(
+        "/api/aux/narrative", query_string={**query, "v": "1"}
+    )
+    assert response.status_code == 200
+    assert response.data
+    assert response.headers.get("X-Narrative-Pack-Sha") == pack.pack_sha
+    assert response.headers.get("X-Narrative-Composition") == expected
+
+
+def test_aux_narrative_suppressed_posture_public_surface(tmp_path, monkeypatch):
+    pack, suppressed_tuple = _load_pack_with_suppressed_shared_slots(
+        tmp_path, monkeypatch, {1, 2, 3}
+    )
+    assert route_keys(**suppressed_tuple)["shared_key"] == MISSING_NARRATIVE_KEY
     client = app.test_client()
     query = {**suppressed_tuple, "v": "1"}
 
@@ -108,7 +171,7 @@ def test_aux_narrative_suppressed_posture_public_surface():
         assert "authorization" in vary.lower()
         assert "accept-encoding" in vary.lower()
         assert resp.headers.get("X-Narrative-Pack-Sha") == pack.pack_sha
-        assert resp.headers.get("X-Narrative-Composition") == expected_composition
+        assert resp.headers.get("X-Narrative-Composition") == MISSING_NARRATIVE_KEY
         assert "X-Narrative-Key" not in resp.headers
         policy_header = resp.headers.get("X-Narrative-Policy")
         assert policy_header in (None, "suppressed")
@@ -136,7 +199,7 @@ def test_aux_narrative_alias_byte_identity_text_case():
 
 @pytest.mark.parametrize("path", ["/aux/narrative", "/api/aux/narrative"])
 @pytest.mark.parametrize("scenario", ["text", "suppressed"])
-def test_aux_narrative_two_run_identity(path, scenario, monkeypatch):
+def test_aux_narrative_two_run_identity(path, scenario, tmp_path, monkeypatch):
     monkeypatch.setenv("LC_ALL", "C")
     monkeypatch.setenv("LANG", "C")
     monkeypatch.setenv("TZ", "UTC")
@@ -151,7 +214,9 @@ def test_aux_narrative_two_run_identity(path, scenario, monkeypatch):
             "v": "1",
         }
     else:
-        suppressed_tuple, _ = _find_suppressed_tuple()
+        _, suppressed_tuple = _load_pack_with_suppressed_shared_slots(
+            tmp_path, monkeypatch, {1, 2, 3}
+        )
         query = {**suppressed_tuple, "v": "1"}
 
     first = client.get(path, query_string=query)

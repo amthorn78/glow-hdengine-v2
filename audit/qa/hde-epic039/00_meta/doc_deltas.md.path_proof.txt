@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic039/00_meta/doc_deltas.md
-size_bytes: 4537
-sha256: 868ce6847a38d7c9ef9e531828d9338b43cf9cd8b535473e943ad3e0d01ecec8
-mtime_utc: 2026-08-19T04:22:37Z
-produced_at_utc: 2026-08-19T04:22:37Z
+size_bytes: 10780
+sha256: 14d40dc7f146bbd95f8b0ca0f494e09d680b15bf53682ac4c855e883306c7470
+mtime_utc: 2026-08-20T01:51:28Z
+produced_at_utc: 2026-08-20T01:51:28Z
