@@ -65,6 +65,9 @@ MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 RESERVED_HEADINGS = frozenset(
     {"source bindings", "output bindings", "explicit nonclaims"}
 )
+REPORT_ATX_H2_RE = re.compile(r" {0,3}##[ \t]+(?P<label>.*)\Z")
+REPORT_ATX_CLOSING_HASHES_RE = re.compile(r"[ \t]+#+[ \t]*\Z")
+REPORT_SETEXT_H2_RE = re.compile(r" {0,3}-+[ \t]*\Z")
 CLOSED_RAILS = {
     "ALLOW_NETWORK": "0",
     "APP_ENV": "dev",
@@ -1948,6 +1951,58 @@ def _require_feedback_free_source(
             raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
 
 
+def _normalized_report_heading(value: str) -> str:
+    without_closing_hashes = REPORT_ATX_CLOSING_HASHES_RE.sub("", value)
+    return re.sub(
+        r"[ \t]+", " ", without_closing_hashes.strip(" \t")
+    ).casefold()
+
+
+def _normalized_setext_heading(value: str) -> str | None:
+    leading_spaces = len(value) - len(value.lstrip(" "))
+    if leading_spaces > 3 or value[leading_spaces:].startswith("\t"):
+        return None
+    return re.sub(r"[ \t]+", " ", value.strip(" \t")).casefold()
+
+
+def _is_reserved_report_h2(value: str) -> bool:
+    match = REPORT_ATX_H2_RE.fullmatch(value)
+    return match is not None and _normalized_report_heading(
+        match.group("label")
+    ) in RESERVED_HEADINGS
+
+
+def _has_reserved_setext_h2(lines: Sequence[str]) -> bool:
+    for label, underline in zip(lines, lines[1:]):
+        if REPORT_SETEXT_H2_RE.fullmatch(underline) is None:
+            continue
+        normalized = _normalized_setext_heading(label)
+        if normalized in RESERVED_HEADINGS:
+            return True
+    return False
+
+
+def _require_report_structure(source: Mapping[str, Any]) -> None:
+    headings = [
+        _normalized_report_heading(str(section["heading"]))
+        for section in source["report_sections"]
+    ]
+    reserved_body_heading = any(
+        _is_reserved_report_h2(str(line))
+        for section in source["report_sections"]
+        for line in section["body_lines"]
+    ) or any(
+        _has_reserved_setext_h2([str(line) for line in section["body_lines"]])
+        for section in source["report_sections"]
+    )
+    if (
+        len(headings) != len(set(headings))
+        or any(heading in RESERVED_HEADINGS for heading in headings)
+        or reserved_body_heading
+    ):
+        raise _fail("REPORT_SECTION_AMBIGUOUS")
+
+
 def _derived_paths(epic_id: str) -> tuple[str, str]:
     match = EPIC_RE.fullmatch(epic_id)
     if match is None:
@@ -1994,11 +2049,7 @@ def _load_model(
     }:
         raise _fail("OUTPUT_BINDING_MISMATCH")
 
-    headings = [section["heading"].casefold() for section in source["report_sections"]]
-    if len(headings) != len(set(headings)) or any(
-        heading in RESERVED_HEADINGS for heading in headings
-    ):
-        raise _fail("REPORT_SECTION_AMBIGUOUS")
+    _require_report_structure(source)
 
     plan_rel = _canonical_relative_path(source["plan_path"])
     plan_input = _capture_input(

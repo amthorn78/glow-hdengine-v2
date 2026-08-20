@@ -69,7 +69,7 @@
         "properties": {
           "body_lines": {
             "items": {
-              "$ref": "#/$defs/causal_single_line"
+              "$ref": "#/$defs/causal_report_body_line"
             },
             "maxItems": 128,
             "minItems": 1,
@@ -154,6 +154,18 @@
       "maxLength": 512,
       "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$",
       "type": "string"
+    },
+    "causal_report_body_line": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/causal_single_line"
+        },
+        {
+          "not": {
+            "pattern": "^ {0,3}##[ \\t]+(?:[Ss][Oo][Uu][Rr][Cc][Ee][ \\t]+[Bb][Ii][Nn][Dd][Ii][Nn][Gg][Ss]|[Oo][Uu][Tt][Pp][Uu][Tt][ \\t]+[Bb][Ii][Nn][Dd][Ii][Nn][Gg][Ss]|[Ee][Xx][Pp][Ll][Ii][Cc][Ii][Tt][ \\t]+[Nn][Oo][Nn][Cc][Ll][Aa][Ii][Mm][Ss])(?:[ \\t]+#+)?[ \\t]*$"
+          }
+        }
+      ]
     },
     "single_line": {
       "maxLength": 1024,
