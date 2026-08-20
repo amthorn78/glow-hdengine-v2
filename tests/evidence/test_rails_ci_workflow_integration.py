@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import os
 import re
 import subprocess
@@ -260,13 +259,25 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
     fixture.write_text("{}\n", encoding="utf-8")
     symlink = adapter / "test_link.py"
     symlink.symlink_to(adapter / "test_env_guard_prod_variants.py")
+    support_symlink = adapter / "fixtures_link"
+    support_symlink.symlink_to(fixture.parent, target_is_directory=True)
+    noncanonical_test = adapter / "test_reader.PY"
+    noncanonical_test.write_text(
+        f"import {classifier._HTTP_READER_MODULE}\n",
+        encoding="utf-8",
+    )
 
-    for ambiguous_path in (
-        "tests/adapter/fixtures/input.json",
-        "tests/adapter/test_link.py",
-    ):
-        with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
-            classifier.changed_test_targets(repo, (ambiguous_path,))
+    with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
+        classifier.changed_test_targets(
+            repo,
+            ("tests/adapter/fixtures/input.json",),
+        )
+    with pytest.raises(ValueError, match="CI_TEST_TARGET_INVALID"):
+        classifier.changed_test_targets(repo, ("tests/adapter/test_link.py",))
+    with pytest.raises(ValueError, match="CI_TEST_TARGET_INVALID"):
+        classifier.changed_test_targets(repo, ("tests/adapter/fixtures_link",))
+    with pytest.raises(ValueError, match="CI_TEST_PYTHON_NAME_NONCANONICAL"):
+        classifier.changed_test_targets(repo, ("tests/adapter/test_reader.PY",))
     with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
         classifier.changed_test_targets(ROOT, ("tests/unit/helpers.py",))
     with pytest.raises(ValueError, match="CI_TEST_SUPPORT_OWNER_MISSING"):
@@ -276,6 +287,13 @@ def test_change_classifier_builds_safe_direct_test_targets(tmp_path: Path) -> No
         ("tests/deleted/test_removed.py",),
     ) == ()
     with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_DELETED"):
+        classifier.changed_test_targets(
+            repo,
+            ("tests/unit/test_narratives_router.py",),
+        )
+    registered_link = unit / "test_narratives_router.py"
+    registered_link.symlink_to(unit / "test_unit.py")
+    with pytest.raises(ValueError, match="CI_REGISTERED_OWNER_TEST_INVALID"):
         classifier.changed_test_targets(
             repo,
             ("tests/unit/test_narratives_router.py",),
@@ -319,44 +337,10 @@ def test_product_source_owner_policy_is_explicit_and_fail_closed() -> None:
         classifier._evidence_generator_owner_targets(ROOT, rel)
 
 
-def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> None:
-    direct_importers: set[str] = set()
-    for candidate in sorted((ROOT / "tests").rglob("test_*.py")):
-        tree = ast.parse(candidate.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            imports_reader = (
-                isinstance(node, ast.Import)
-                and any(
-                    alias.name == "adapter.http_reader" for alias in node.names
-                )
-            ) or (
-                isinstance(node, ast.ImportFrom)
-                and (
-                    node.module == "adapter.http_reader"
-                    or (
-                        node.module == "adapter"
-                        and any(
-                            alias.name == "http_reader" for alias in node.names
-                        )
-                    )
-                )
-            ) or (
-                isinstance(node, ast.Call)
-                and any(
-                    isinstance(argument, ast.Constant)
-                    and argument.value == "adapter.http_reader"
-                    for argument in node.args
-                )
-            )
-            if imports_reader:
-                direct_importers.add(candidate.relative_to(ROOT).as_posix())
-                break
-
-    assert direct_importers == set(classifier._HTTP_READER_TEST_OWNERS) - {
-        "tests/adapter/test_dev_sampler_http.py",
-        "tests/http/test_compat_endpoint_contract.py",
-        "tests/transport/test_ops_rails_refusal.py",
-    }
+def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
+    tmp_path: Path,
+) -> None:
+    guard = classifier._HTTP_READER_OWNERSHIP_GUARD
     assert {
         target
         for target in classifier._HTTP_READER_TEST_OWNERS
@@ -380,6 +364,8 @@ def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> Non
         "tests/adapter/test_diagnostic_writer.py",
         "tests/cli/test_aux_preview.py",
         "tests/compat/test_abba_parity.py",
+        "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+        guard,
         "tests/http/test_dev_conjunction_http.py",
         "tests/http/test_endpoint_catalog.py",
         "tests/http/test_reader_a7_transport.py",
@@ -387,6 +373,123 @@ def test_http_reader_owner_registry_selects_nonduplicated_active_suites() -> Non
         "tests/transport/test_ops_rails_refusal.py",
         "tests/transport/test_writers_errors_headers.py",
     )
+
+    repo = tmp_path / "repo"
+    new_consumer = "tests/http/test_new_reader_case.py"
+    registered_consumer = "tests/http/test_reader_a7_transport.py"
+    seam_consumer = "tests/http/test_dynamic_reader_case.py"
+    raw_consumer = "tests/http/test_raw_dynamic_reader_case.py"
+    concatenated_consumer = "tests/http/test_concatenated_reader_case.py"
+    support_consumer = "tests/qa/reader_helper.py"
+    static_support_consumer = "tests/qa/static_reader_helper.py"
+    innocent_literal = "tests/http/test_reader_name_constant.py"
+    dynamic_owners = sorted(classifier._HTTP_READER_DYNAMIC_TEST_OWNERS)
+    module = classifier._HTTP_READER_MODULE
+    for path, body in (
+        (guard, "def test_registry(): pass\n"),
+        (new_consumer, f"import {module}\n\ndef test_reader(): pass\n"),
+        (registered_consumer, "def test_reader_no_longer_imports(): pass\n"),
+        (
+            seam_consumer,
+            f"from {classifier._HTTP_READER_TEST_IMPORT_MODULE} "
+            "import import_http_reader_for_test\n\n"
+            "def test_reader(): return import_http_reader_for_test()\n",
+        ),
+        (
+            raw_consumer,
+            "import importlib\n\n"
+            f"importlib.import_module(name={module!r})\n",
+        ),
+        (
+            concatenated_consumer,
+            "import importlib\n\n"
+            "importlib.import_module('adapter.' + 'http_reader')\n",
+        ),
+        (
+            support_consumer,
+            "import importlib\n"
+            "importlib.import_module('adapter.' + 'http_reader')\n",
+        ),
+        (
+            static_support_consumer,
+            f"from {module} import create_app\n",
+        ),
+        (innocent_literal, f"EXPECTED = {module!r}\n\ndef test_name(): pass\n"),
+    ):
+        candidate = repo / path
+        candidate.parent.mkdir(parents=True, exist_ok=True)
+        candidate.write_text(body, encoding="utf-8")
+    for owner in dynamic_owners:
+        candidate = repo / owner
+        candidate.parent.mkdir(parents=True, exist_ok=True)
+        candidate.write_text(
+            (ROOT / owner).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    assert classifier.changed_test_targets(repo, (new_consumer,)) == (
+        guard,
+        new_consumer,
+    )
+    assert classifier.changed_test_targets(repo, (registered_consumer,)) == (
+        guard,
+        registered_consumer,
+    )
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED",
+    ):
+        classifier.changed_test_targets(repo, (seam_consumer,))
+    assert classifier.changed_test_targets(repo, (dynamic_owners[0],)) == (
+        guard,
+    )
+    reviewed_owner = repo / dynamic_owners[0]
+    reviewed_bytes = reviewed_owner.read_bytes()
+    reviewed_owner.write_bytes(reviewed_bytes + b"\n# changed owner shape\n")
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_OWNER_REVIEW_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (dynamic_owners[0],))
+    reviewed_owner.write_bytes(reviewed_bytes)
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (raw_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (concatenated_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_SUPPORT_OWNER_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (support_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_SUPPORT_OWNER_REQUIRED",
+    ):
+        classifier.changed_test_targets(repo, (static_support_consumer,))
+    with pytest.raises(
+        ValueError,
+        match="CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW",
+    ):
+        classifier.changed_test_targets(repo, (innocent_literal,))
+
+    seam_path = classifier._HTTP_READER_TEST_IMPORT_SEAM
+    seam = repo / seam_path
+    seam.parent.mkdir(parents=True, exist_ok=True)
+    seam.write_text("def import_http_reader_for_test(): pass\n", encoding="utf-8")
+    assert classifier.changed_test_targets(repo, (seam_path,)) == (guard,)
+    seam_classification = classifier.classify_paths((seam_path,))
+    assert {
+        lane
+        for lane in classifier.LANES
+        if seam_classification.flags[lane]
+    } == {"db"}
+    assert not classifier.classify_paths((new_consumer,)).flags["rails"]
 
 
 def test_qa_tool_owner_policy_is_exhaustive_and_deduplicated(
@@ -632,7 +735,7 @@ def test_non_generator_evidence_helpers_have_exact_fail_closed_owners(
 
 
 def test_fail_safe_full_validation_runs_the_supplemental_behavioral_gap() -> None:
-    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    expected = classifier._full_validation_test_targets()
     empty = classifier.classify_paths(())
     assert all(empty.flags[lane] for lane in classifier.LANES)
     assert empty.test_targets == expected
@@ -678,20 +781,35 @@ def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None
     }
     supplemental = set(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
     inactive = classifier._FULL_VALIDATION_INACTIVE_TESTS
+    registered = classifier._registered_owner_test_paths()
+    full_targets = set(classifier._full_validation_test_targets())
+    fixed_registered = {
+        target
+        for target in registered
+        if classifier._fixed_lane_test_provider(target) is not None
+    }
+    non_file_registered = {
+        target for target in registered if not (ROOT / target).is_file()
+    }
 
     assert configured
     assert not fixed & supplemental
     assert not fixed & inactive
     assert not supplemental & inactive
     assert configured == fixed | supplemental | inactive
-    for path in supplemental | inactive:
+    assert not fixed_registered & full_targets
+    assert registered == fixed_registered | full_targets
+    assert non_file_registered == set(classifier._FIXED_LANE_TEST_DIRECTORIES)
+    assert "tests/scripts/test_release_id_recompute.py" in full_targets
+    assert classifier._HTTP_READER_OWNERSHIP_GUARD in full_targets
+    for path in full_targets | inactive:
         candidate = ROOT / path
         assert candidate.is_file(), path
         assert not candidate.is_symlink(), path
 
 
 def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
-    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    expected = classifier._full_validation_test_targets()
     full_paths = set(classifier._FULL_VALIDATION_PATHS) | {
         ".github/workflows/ci.yml"
     }
@@ -829,9 +947,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "config", "user.email", "ci-classifier@example.invalid")
     _git(repo, "config", "user.name", "CI classifier test")
     (repo / "README.md").write_text("first\n", encoding="utf-8")
-    _materialize_test_targets(
-        repo, classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS
-    )
+    _materialize_test_targets(repo, classifier._full_validation_test_targets())
     _git(repo, "add", "README.md")
     _git(repo, "add", "tests")
     _git(repo, "commit", "-m", "base")
@@ -855,9 +971,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     )
     assert all(identical.flags[lane] for lane in classifier.LANES)
     assert identical.reason == "identical_refs_full_validation"
-    assert identical.test_targets == tuple(
-        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
-    )
+    assert identical.test_targets == classifier._full_validation_test_targets()
 
     workflow = repo / ".github/workflows/ci.yml"
     workflow.parent.mkdir(parents=True)
@@ -870,9 +984,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     )
     assert all(workflow_change.flags[lane] for lane in classifier.LANES)
     assert workflow_change.reason == "selected_lanes"
-    assert workflow_change.test_targets == tuple(
-        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
-    )
+    assert workflow_change.test_targets == classifier._full_validation_test_targets()
 
     source = repo / "engine/db/adapter.py"
     source.parent.mkdir(parents=True)
@@ -895,7 +1007,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     assert product.test_targets == ()
 
     changed_test = repo / "tests/adapter/test_env_guard_prod_variants.py"
-    changed_test.parent.mkdir(parents=True)
+    changed_test.parent.mkdir(parents=True, exist_ok=True)
     changed_test.write_text("def test_guard(): pass\n", encoding="utf-8")
     _git(repo, "add", changed_test.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "add unlisted adapter regression")
@@ -913,13 +1025,33 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         "tests/adapter/test_env_guard_prod_variants.py",
     )
 
+    reader_consumer = repo / "tests/http/test_new_reader_case.py"
+    reader_consumer.parent.mkdir(parents=True, exist_ok=True)
+    reader_consumer.write_text(
+        f"import {classifier._HTTP_READER_MODULE}\n\ndef test_reader(): pass\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", reader_consumer.relative_to(repo).as_posix())
+    _git(repo, "commit", "-m", "add Reader regression")
+    reader_head = _git(repo, "rev-parse", "HEAD")
+    reader_result = classifier.classify_git_change(
+        repo,
+        test_head,
+        reader_head,
+        event_name="push",
+    )
+    assert reader_result.test_targets == (
+        classifier._HTTP_READER_OWNERSHIP_GUARD,
+        reader_consumer.relative_to(repo).as_posix(),
+    )
+
     changed_test.unlink()
     _git(repo, "add", "-A")
     _git(repo, "commit", "-m", "remove standalone adapter regression")
     deleted_test_head = _git(repo, "rev-parse", "HEAD")
     deleted_test_result = classifier.classify_git_change(
         repo,
-        test_head,
+        reader_head,
         deleted_test_head,
         event_name="push",
     )

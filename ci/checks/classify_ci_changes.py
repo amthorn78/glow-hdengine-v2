@@ -9,6 +9,8 @@ skipping protection.
 from __future__ import annotations
 
 import argparse
+import ast
+import hashlib
 import json
 import os
 import re
@@ -238,6 +240,12 @@ _NARRATIVE_TEST_OWNERS = (
     "tests/unit/test_narratives_loader.py",
     "tests/cli/test_aux_preview.py",
 )
+_HTTP_READER_MODULE = "adapter.http_reader"
+_HTTP_READER_TEST_IMPORT_MODULE = "ci.checks.import_http_reader_for_tests"
+_HTTP_READER_TEST_IMPORT_SEAM = (
+    "ci/checks/import_http_reader_for_tests.py"
+)
+_HTTP_READER_OWNERSHIP_GUARD = "tests/evidence/test_http_reader_ci_ownership.py"
 _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_compat_http_dev.py",
     "tests/adapter/test_compat_http_parity.py",
@@ -245,8 +253,10 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/adapter/test_dev_sampler_http.py",
     "tests/cli/test_aux_preview.py",
     "tests/compat/test_abba_parity.py",
+    "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
     "tests/db/test_conn_env_only.py",
     "tests/db/test_no_import_time_connect.py",
+    _HTTP_READER_OWNERSHIP_GUARD,
     "tests/http/test_compat_endpoint_contract.py",
     "tests/http/test_dev_conjunction_http.py",
     "tests/http/test_endpoint_catalog.py",
@@ -257,6 +267,24 @@ _HTTP_READER_TEST_OWNERS = (
     "tests/transport/test_ops_rails_refusal.py",
     "tests/transport/test_writers_errors_headers.py",
 )
+_HTTP_READER_INDIRECT_TEST_OWNERS = {
+    "tests/adapter/test_dev_sampler_http.py",
+    "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+    "tests/http/test_compat_endpoint_contract.py",
+    "tests/transport/test_ops_rails_refusal.py",
+}
+_HTTP_READER_DYNAMIC_TEST_OWNERS = {
+    "tests/db/test_conn_env_only.py",
+    "tests/db/test_no_import_time_connect.py",
+}
+_HTTP_READER_DYNAMIC_TEST_OWNER_SHA256 = {
+    "tests/db/test_conn_env_only.py": "f66e19f653f90be9c3cf29fb4a8dad0e4d67930b208df52152677df789c53b2d",
+    "tests/db/test_no_import_time_connect.py": "ccf5863a8df173ab2c825fe5f981192dca1b7ccb3b9d1178adf1e1e1ebce526e",
+}
+_HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
+    # This indirect owner validates Reader's public log-route identifier.
+    "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+}
 _PRODUCT_TEST_OWNER_PATHS = {
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
@@ -524,7 +552,7 @@ def _full(reason: str, path_count: int) -> Classification:
         flags=flags,
         reason=reason,
         path_count=path_count,
-        test_targets=tuple(sorted(_FULL_VALIDATION_SUPPLEMENTAL_TESTS)),
+        test_targets=_full_validation_test_targets(),
     )
 
 
@@ -583,10 +611,7 @@ def _is_backup_record(path: str) -> bool:
     return path in _HISTORICAL_BACKUP_PATHS
 
 
-def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
-    selected_lanes = _lanes_for_path(source_path)
-    if selected_lanes is None:
-        return False
+def _fixed_lane_test_provider(target: str) -> str | None:
     provider = _FIXED_LANE_TEST_PROVIDERS.get(target)
     if provider is None:
         provider = next(
@@ -597,6 +622,14 @@ def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
             ),
             None,
         )
+    return provider
+
+
+def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
+    selected_lanes = _lanes_for_path(source_path)
+    if selected_lanes is None:
+        return False
+    provider = _fixed_lane_test_provider(target)
     return provider in selected_lanes if provider is not None else False
 
 
@@ -615,6 +648,24 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _QA_TOOL_TEST_OWNERS.values():
         paths.update(targets)
     return paths
+
+
+def _full_validation_test_targets() -> tuple[str, ...]:
+    """Return every active registered owner not supplied by a fixed lane.
+
+    The repository's configured pytest roots are intentionally narrower than
+    the complete owner registry.  Full-validation inputs therefore run the
+    explicit supplement plus every registered owner outside the fixed lanes,
+    without rediscovering unsafe legacy tests or duplicating fixed providers.
+    """
+    return tuple(
+        sorted(
+            target
+            for target in _registered_owner_test_paths()
+            if target not in _FULL_VALIDATION_INACTIVE_TESTS
+            and _fixed_lane_test_provider(target) is None
+        )
+    )
 
 
 def _validated_owner_targets(
@@ -646,7 +697,7 @@ def _full_validation_owner_targets(repo_root: Path, path: str) -> tuple[str, ...
     return _validated_owner_targets(
         repo_root,
         path,
-        _FULL_VALIDATION_SUPPLEMENTAL_TESTS,
+        _full_validation_test_targets(),
         error_code="CI_FULL_VALIDATION_TEST_INVALID",
     )
 
@@ -809,6 +860,164 @@ def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     )
 
 
+def _parse_test_module(candidate: Path) -> ast.Module:
+    try:
+        return ast.parse(candidate.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, SyntaxError) as exc:
+        raise ValueError(
+            f"CI_HTTP_READER_OWNER_SCAN_INVALID:{candidate.as_posix()}"
+        ) from exc
+
+
+def _constant_string_expression(
+    node: ast.AST,
+) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.Constant) and isinstance(node.value, bytes):
+        try:
+            return node.value.decode("utf-8")
+        except UnicodeDecodeError:
+            return None
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left = _constant_string_expression(node.left)
+        right = _constant_string_expression(node.right)
+        if left is not None and right is not None:
+            return left + right
+    if isinstance(node, ast.JoinedStr):
+        parts: list[str] = []
+        for value in node.values:
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                parts.append(value.value)
+            elif (
+                isinstance(value, ast.FormattedValue)
+                and value.conversion == -1
+                and value.format_spec is None
+            ):
+                resolved = _constant_string_expression(
+                    value.value,
+                )
+                if resolved is None:
+                    return None
+                parts.append(resolved)
+            else:
+                return None
+        return "".join(parts)
+    return None
+
+
+def _test_module_imports_http_reader(candidate: Path) -> bool:
+    """Return whether a test has an absolute static Reader import.
+
+    Dynamic Reader tests use the repository-owned seam below. Keeping these
+    two source shapes separate makes ownership discovery deterministic without
+    attempting to interpret arbitrary Python execution.
+    """
+    tree = _parse_test_module(candidate)
+    return any(
+        (
+            isinstance(node, ast.Import)
+            and any(
+                alias.name == _HTTP_READER_MODULE
+                or alias.name.startswith(f"{_HTTP_READER_MODULE}.")
+                for alias in node.names
+            )
+        )
+        or (
+            isinstance(node, ast.ImportFrom)
+            and node.level == 0
+            and (
+                node.module == _HTTP_READER_MODULE
+                or (node.module or "").startswith(
+                    f"{_HTTP_READER_MODULE}."
+                )
+                or (
+                    node.module == "adapter"
+                    and any(alias.name == "http_reader" for alias in node.names)
+                )
+            )
+        )
+        for node in ast.walk(tree)
+    )
+
+
+def _test_module_imports_http_reader_seam(candidate: Path) -> bool:
+    """Return whether Python source imports the canonical Reader test seam."""
+    tree = _parse_test_module(candidate)
+    return any(
+        (
+            isinstance(node, ast.Import)
+            and any(
+                alias.name == _HTTP_READER_TEST_IMPORT_MODULE
+                or alias.name.startswith(
+                    f"{_HTTP_READER_TEST_IMPORT_MODULE}."
+                )
+                for alias in node.names
+            )
+        )
+        or (
+            isinstance(node, ast.ImportFrom)
+            and node.level == 0
+            and (
+                node.module == _HTTP_READER_TEST_IMPORT_MODULE
+                or (
+                    node.module == "ci.checks"
+                    and any(
+                        alias.name == "import_http_reader_for_tests"
+                        for alias in node.names
+                    )
+                )
+            )
+        )
+        for node in ast.walk(tree)
+    )
+
+
+def _test_module_references_http_reader(candidate: Path) -> bool:
+    """Return whether source contains a statically foldable Reader string.
+
+    This deliberately narrow companion catches ordinary importlib, patch,
+    monkeypatch, and exec-style references regardless of the resolver spelling.
+    Dynamic ownership must use the canonical seam; a genuinely non-importing
+    reference needs an explicit reviewed exception.
+    """
+    tree = _parse_test_module(candidate)
+    for node in ast.walk(tree):
+        value = _constant_string_expression(node)
+        if value is not None and _HTTP_READER_MODULE in value:
+            return True
+    return False
+
+
+def _validate_http_reader_dynamic_owner(candidate: Path, path: str) -> None:
+    """Bind the two approved dynamic owners to their reviewed exact bytes."""
+    expected = _HTTP_READER_DYNAMIC_TEST_OWNER_SHA256.get(path)
+    if expected is None:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED:{path}")
+    try:
+        actual = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    except OSError as exc:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_INVALID:{path}") from exc
+    if actual != expected:
+        raise ValueError(f"CI_HTTP_READER_DYNAMIC_OWNER_REVIEW_REQUIRED:{path}")
+
+
+def _http_reader_control_owner_targets(
+    repo_root: Path, path: str
+) -> tuple[str, ...]:
+    if path != _HTTP_READER_TEST_IMPORT_SEAM:
+        return ()
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        (
+            *sorted(_HTTP_READER_DYNAMIC_TEST_OWNERS),
+            _HTTP_READER_OWNERSHIP_GUARD,
+        ),
+        error_code="CI_HTTP_READER_SEAM_OWNER_INVALID",
+    )
+
+
 def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ...]:
     """Return exact changed tests plus repository-owned behavioral owners.
 
@@ -823,6 +1032,14 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
     changed_paths = set(normalized_paths)
     for path in normalized_paths:
         rel = PurePosixPath(path)
+        if (
+            rel.parts
+            and rel.parts[0] == "tests"
+            and (repo_root / path).is_symlink()
+        ):
+            if path in _registered_owner_test_paths():
+                raise ValueError(f"CI_REGISTERED_OWNER_TEST_INVALID:{path}")
+            raise ValueError(f"CI_TEST_TARGET_INVALID:{path}")
         if path in _FULL_VALIDATION_INACTIVE_TESTS:
             raise ValueError(f"CI_INACTIVE_TEST_REQUIRES_DISPOSITION:{path}")
         if (
@@ -837,21 +1054,103 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
         if rel.parts and rel.parts[0] == "tests":
             candidate = repo_root / path
             is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
+            is_python = rel.suffix.lower() == ".py"
+            candidate_is_file = (
+                candidate.exists()
+                and candidate.is_file()
+            )
+            if is_python and candidate.exists() and not candidate_is_file:
+                if path in _registered_owner_test_paths():
+                    raise ValueError(
+                        f"CI_REGISTERED_OWNER_TEST_INVALID:{path}"
+                    )
+                raise ValueError(f"CI_TEST_PYTHON_TARGET_INVALID:{path}")
+            if (
+                candidate_is_file
+                and is_python
+                and (
+                    rel.suffix != ".py"
+                    or (
+                        rel.name.lower().startswith("test_")
+                        and not rel.name.startswith("test_")
+                    )
+                )
+            ):
+                raise ValueError(f"CI_TEST_PYTHON_NAME_NONCANONICAL:{path}")
+            static_owner = False
+            seam_importer = False
+            reader_reference = False
+            if is_python and candidate_is_file:
+                static_owner = _test_module_imports_http_reader(candidate)
+                seam_importer = _test_module_imports_http_reader_seam(candidate)
+                reader_reference = _test_module_references_http_reader(candidate)
+                if static_owner and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if reader_reference and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if seam_importer and not is_test_module:
+                    raise ValueError(
+                        f"CI_HTTP_READER_SUPPORT_OWNER_REQUIRED:{path}"
+                    )
+                if (
+                    seam_importer
+                    and path not in _HTTP_READER_DYNAMIC_TEST_OWNERS
+                    and path != _HTTP_READER_OWNERSHIP_GUARD
+                ):
+                    raise ValueError(
+                        f"CI_HTTP_READER_DYNAMIC_OWNER_UNREGISTERED:{path}"
+                    )
+                if (
+                    reader_reference
+                    and not static_owner
+                    and path not in _HTTP_READER_DYNAMIC_TEST_OWNERS
+                    and path not in _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS
+                    and path != _HTTP_READER_OWNERSHIP_GUARD
+                ):
+                    raise ValueError(
+                        f"CI_HTTP_READER_DYNAMIC_IMPORT_REQUIRES_REVIEW:{path}"
+                    )
             if (
                 is_test_module
-                and candidate.exists()
-                and candidate.is_file()
-                and not candidate.is_symlink()
+                and candidate_is_file
             ):
+                if path in _HTTP_READER_DYNAMIC_TEST_OWNERS:
+                    _validate_http_reader_dynamic_owner(candidate, path)
+                if (
+                    path != _HTTP_READER_OWNERSHIP_GUARD
+                    and (
+                        path in _HTTP_READER_TEST_OWNERS
+                        or static_owner
+                        or path in _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS
+                    )
+                ):
+                    targets.update(
+                        _validated_owner_targets(
+                            repo_root,
+                            path,
+                            (_HTTP_READER_OWNERSHIP_GUARD,),
+                            error_code="CI_HTTP_READER_OWNER_GUARD_INVALID",
+                        )
+                    )
                 if not _fixed_lane_covers_test_target(path, path):
                     targets.add(path)
                 continue
-            if is_test_module and not candidate.exists():
+            if is_test_module and not candidate_is_file:
                 if path in _registered_owner_test_paths():
+                    if candidate.exists():
+                        raise ValueError(
+                            f"CI_REGISTERED_OWNER_TEST_INVALID:{path}"
+                        )
                     raise ValueError(f"CI_REGISTERED_OWNER_TEST_DELETED:{path}")
-                continue
+                if not candidate.exists():
+                    continue
             targets.update(_test_support_owner_targets(repo_root, path))
             continue
+        targets.update(_http_reader_control_owner_targets(repo_root, path))
         targets.update(_product_owner_targets(repo_root, path))
         targets.update(
             _evidence_generator_owner_targets(
@@ -900,6 +1199,9 @@ def _lanes_for_path(path: str) -> set[str] | None:
         ):
             lanes.add("release")
         return lanes
+
+    if path == _HTTP_READER_TEST_IMPORT_SEAM:
+        return {"db"}
 
     if path.startswith("docs/ENDPOINTS_CATALOG.json"):
         return {"evidence", "release"}
