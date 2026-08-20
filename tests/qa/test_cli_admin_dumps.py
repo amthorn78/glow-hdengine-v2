@@ -33,7 +33,6 @@ def _assert_mode_0600(path: pathlib.Path) -> None:
 
 
 def test_file_inputs_and_admin_dumps(tmp_path: pathlib.Path):
-    subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], check=True, capture_output=True)
     env = _cli_env()
 
     left = {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"}
@@ -97,4 +96,3 @@ def test_file_inputs_and_admin_dumps(tmp_path: pathlib.Path):
     assert "overall" in proof
     assert "signals" in proof
     assert "constants" in proof
-

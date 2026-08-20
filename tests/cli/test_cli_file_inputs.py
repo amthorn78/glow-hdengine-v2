@@ -31,7 +31,6 @@ def _sha(data: bytes) -> str:
 
 
 def test_pair_file_and_ab_file_modes(tmp_path: pathlib.Path):
-    subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], check=True, capture_output=True)
     a = {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"}
     b = {"birthdate": "1992-03-04", "birthtime": "08:15", "location": "Berlin, DE"}
     pair = {"left": a, "right": b}

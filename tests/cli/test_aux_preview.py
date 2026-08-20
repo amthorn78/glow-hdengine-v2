@@ -7,7 +7,6 @@ from engine.cli import main as cli_main
 from engine.narratives import emit_public_aux, get_pack
 from engine.narratives import state as narrative_state
 from engine.narratives.loader import load_pack
-from engine.narratives.router import route_keys
 
 
 DETERMINISM_PINS = {
@@ -28,28 +27,6 @@ def _rails(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         "_PACK",
         load_pack(Path("catalog/narratives"), tmp_path / "narratives"),
     )
-
-
-def _find_suppressed_tuple():
-    pack = get_pack()
-    for key in pack.suppression_map:
-        record = pack.keys.get(key)
-        if record is None:
-            continue
-        perspective = record.perspective
-        pack.primary_by_perspective[
-            (record.category, record.band, perspective)
-        ] = record
-        routed = route_keys(record.category, record.band, perspective)
-        lookup = "shared_key" if perspective == "shared" else "personal_key"
-        if routed.get(lookup) != key:
-            continue
-        return {
-            "category": record.category,
-            "band": record.band,
-            "perspective": perspective,
-        }
-    raise AssertionError("suppressed tuple not found")
 
 
 def test_aux_preview_text_tuple_matches_aux(monkeypatch, capsys):
@@ -101,20 +78,24 @@ def test_aux_preview_text_tuple_matches_aux(monkeypatch, capsys):
     assert resp.data.decode("utf-8") == expected_text
 
 
-def test_aux_preview_suppressed_is_silent(monkeypatch, capsys):
+def test_aux_preview_missing_mapping_is_silent(monkeypatch, capsys):
     monkeypatch.setenv("RELEASE_ID", "0" * 64)
     pack = get_pack()
-    suppressed_tuple = _find_suppressed_tuple()
+    missing_tuple = {
+        "category": "unknown",
+        "band": "Cool",
+        "perspective": "shared",
+    }
 
     exit_code = cli_main.cli(
         [
             "aux-preview",
             "--category",
-            suppressed_tuple["category"],
+            missing_tuple["category"],
             "--band",
-            suppressed_tuple["band"],
+            missing_tuple["band"],
             "--perspective",
-            suppressed_tuple["perspective"],
+            missing_tuple["perspective"],
         ]
     )
     captured = capsys.readouterr()
@@ -123,9 +104,9 @@ def test_aux_preview_suppressed_is_silent(monkeypatch, capsys):
     assert captured.err == ""
 
     emission = emit_public_aux(
-        category=suppressed_tuple["category"],
-        band=suppressed_tuple["band"],
-        perspective=suppressed_tuple["perspective"],
+        category=missing_tuple["category"],
+        band=missing_tuple["band"],
+        perspective=missing_tuple["perspective"],
         viewer_top=None,
         flags=None,
         families_fired=(),

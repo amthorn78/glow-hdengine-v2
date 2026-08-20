@@ -29,6 +29,13 @@ def _repo_state() -> tuple[str, str]:
     return (str(diff.returncode), status.stdout)
 
 
+def _materialize_test_targets(repo: Path, targets: tuple[str, ...]) -> None:
+    for target in targets:
+        path = repo / target
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("def test_placeholder(): pass\n", encoding="utf-8")
+
+
 def test_workflow_contains_one_conditional_closed_default_rails_lane() -> None:
     text = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "  rails-policy-gates:" not in text
@@ -65,10 +72,14 @@ def test_workflow_has_one_truthful_exact_head_summary_topology() -> None:
     assert "needs:" not in text
     assert text.count("actions/checkout@v4") == 1
     assert text.count("persist-credentials: false") == 1
+    assert text.count("fetch-depth: 0") == 1
     assert text.count("actions/setup-python@v5") == 1
     assert text.count("python -m pip install") == 1
     assert text.count("python -m pytest --version") == 1
     assert f"ref: {exact_head}" in text
+    assert "BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}" in text
+    assert "HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}" in text
+    assert '--event-name "${{ github.event_name }}"' in text
     assert "actions/upload-artifact" not in text
     assert "actions/download-artifact" not in text
     assert "ALLOW_NETWORK=1" not in text
@@ -405,7 +416,9 @@ def test_qa_tool_git_change_selects_its_exact_behavioral_owner(
     _git(repo, "commit", "-m", "change EPIC024 harness")
     head = _git(repo, "rev-parse", "HEAD")
 
-    result = classifier.classify_git_change(repo, base, head)
+    result = classifier.classify_git_change(
+        repo, base, head, event_name="push"
+    )
     assert {lane for lane in classifier.LANES if result.flags[lane]} == {
         "evidence",
         "qa",
@@ -499,11 +512,133 @@ def test_behavioral_owner_examples_cover_router_and_epic037_generator(
         classifier.classify_paths(("new-surface.bin",))
 
 
-def test_established_full_lanes_do_not_duplicate_the_complete_test_tree() -> None:
-    for paths in ((), (".github/workflows/ci.yml",)):
-        established_full = classifier.classify_paths(paths)
-        assert all(established_full.flags[lane] for lane in classifier.LANES)
-        assert established_full.test_targets == ()
+def test_non_generator_evidence_helpers_have_exact_fail_closed_owners(
+    tmp_path: Path,
+) -> None:
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/evidence/strict_json_schema.py",)
+    ) == (
+        classifier._EVIDENCE_HELPER_OWNERSHIP_TEST,
+        "tests/ops/test_hde_epic038_ops03.py",
+    )
+    assert classifier.changed_test_targets(
+        ROOT, ("tools/evidence/run_sanity_pipeline.py",)
+    ) == (classifier._EVIDENCE_HELPER_OWNERSHIP_TEST,)
+
+    for source in sorted(classifier._EVIDENCE_HELPERS_REQUIRING_OWNER):
+        with pytest.raises(
+            ValueError, match="CI_EVIDENCE_HELPER_OWNER_MISSING"
+        ):
+            classifier.changed_test_targets(ROOT, (source,))
+
+    repo = tmp_path / "repo"
+    helper = repo / "tools/evidence/new_helper.py"
+    helper.parent.mkdir(parents=True)
+    helper.write_text("VALUE = 1\n", encoding="utf-8")
+    for path in (
+        "tools/evidence/new_helper.py",
+        "tools/evidence/new_helper.PY",
+        "tools/evidence/Generate_unowned.py",
+    ):
+        with pytest.raises(
+            ValueError,
+            match="CI_EVIDENCE_(?:OWNER_TEST|HELPER_OWNER)_MISSING",
+        ):
+            classifier.changed_test_targets(repo, (path,))
+
+    removed_helper = "tools/evidence/check_retired_surface.py"
+    removed_owner = "tests/evidence/test_check_retired_surface.py"
+    assert classifier.changed_test_targets(
+        repo, (removed_helper, removed_owner)
+    ) == ()
+    with pytest.raises(ValueError, match="CI_EVIDENCE_HELPER_OWNER_MISSING"):
+        classifier.changed_test_targets(repo, (removed_helper,))
+
+    with pytest.raises(ValueError, match="CI_EVIDENCE_HELPER_OWNER_INVALID"):
+        classifier.changed_test_targets(
+            repo, ("tools/evidence/strict_json_schema.py",)
+        )
+
+
+def test_fail_safe_full_validation_runs_the_supplemental_behavioral_gap() -> None:
+    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    empty = classifier.classify_paths(())
+    assert all(empty.flags[lane] for lane in classifier.LANES)
+    assert empty.test_targets == expected
+
+    known_full = classifier.classify_paths((".github/workflows/ci.yml",))
+    assert all(known_full.flags[lane] for lane in classifier.LANES)
+    assert known_full.test_targets == ()
+    assert classifier.changed_test_targets(
+        ROOT, (".github/workflows/ci.yml",)
+    ) == expected
+
+
+def test_full_validation_roster_is_exhaustive_nonoverlapping_and_owned() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "--collect-only",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+        ],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+        timeout=120,
+    )
+    configured = {
+        line.split("::", 1)[0]
+        for line in result.stdout.splitlines()
+        if line.startswith("tests/") and "::" in line
+    }
+    fixed = {
+        path
+        for path in configured
+        if path in classifier._FIXED_LANE_TEST_PROVIDERS
+        or any(
+            path == directory or path.startswith(f"{directory}/")
+            for directory in classifier._FIXED_LANE_TEST_DIRECTORIES
+        )
+    }
+    supplemental = set(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
+    inactive = classifier._FULL_VALIDATION_INACTIVE_TESTS
+
+    assert configured
+    assert not fixed & supplemental
+    assert not fixed & inactive
+    assert not supplemental & inactive
+    assert configured == fixed | supplemental | inactive
+    for path in supplemental | inactive:
+        candidate = ROOT / path
+        assert candidate.is_file(), path
+        assert not candidate.is_symlink(), path
+
+
+def test_full_validation_inputs_run_the_supplemental_behavioral_gap() -> None:
+    expected = tuple(sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS))
+    full_paths = set(classifier._FULL_VALIDATION_PATHS) | {
+        ".github/workflows/ci.yml"
+    }
+    for path in sorted(full_paths):
+        result = classifier.classify_paths((path,))
+        assert all(result.flags[lane] for lane in classifier.LANES), path
+        assert classifier.changed_test_targets(ROOT, (path,)) == expected
+
+    direct_test = "tests/adapter/test_env_guard_prod_variants.py"
+    assert classifier.changed_test_targets(
+        ROOT, ("requirements.txt", direct_test)
+    ) == tuple(sorted(set(expected) | {direct_test}))
+
+    for path in sorted(classifier._FULL_VALIDATION_INACTIVE_TESTS):
+        with pytest.raises(
+            ValueError, match="CI_INACTIVE_TEST_REQUIRES_DISPOSITION"
+        ):
+            classifier.changed_test_targets(ROOT, (path,))
 
 
 def test_every_current_governed_primary_selects_evidence() -> None:
@@ -550,7 +685,9 @@ def test_governed_document_git_change_selects_evidence(tmp_path: Path) -> None:
     _git(repo, "commit", "-m", "update governed run input")
     head = _git(repo, "rev-parse", "HEAD")
 
-    result = classifier.classify_git_change(repo, base, head)
+    result = classifier.classify_git_change(
+        repo, base, head, event_name="push"
+    )
     assert {lane for lane in classifier.LANES if result.flags[lane]} == {
         "evidence"
     }
@@ -579,7 +716,9 @@ def test_manifest_only_git_change_selects_release_owners(tmp_path: Path) -> None
     _git(repo, "commit", "-m", "release cut")
     head = _git(repo, "rev-parse", "HEAD")
 
-    result = classifier.classify_git_change(repo, base, head)
+    result = classifier.classify_git_change(
+        repo, base, head, event_name="push"
+    )
     assert {lane for lane in classifier.LANES if result.flags[lane]} == {"release"}
     assert result.test_targets == ()
     assert {
@@ -619,7 +758,11 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "config", "user.email", "ci-classifier@example.invalid")
     _git(repo, "config", "user.name", "CI classifier test")
     (repo / "README.md").write_text("first\n", encoding="utf-8")
+    _materialize_test_targets(
+        repo, classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS
+    )
     _git(repo, "add", "README.md")
+    _git(repo, "add", "tests")
     _git(repo, "commit", "-m", "base")
     base = _git(repo, "rev-parse", "HEAD")
 
@@ -627,15 +770,23 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "add", "README.md")
     _git(repo, "commit", "-m", "docs")
     docs_head = _git(repo, "rev-parse", "HEAD")
-    docs = classifier.classify_git_change(repo, base, docs_head)
+    docs = classifier.classify_git_change(
+        repo, base, docs_head, event_name="push"
+    )
     assert not any(docs.flags[lane] for lane in classifier.LANES)
     assert docs.reason == "documentation_only"
     with pytest.raises(RuntimeError, match="CI_CHANGE_BASE_UNAVAILABLE"):
-        classifier.classify_git_change(repo, "0" * 40, docs_head)
-    identical = classifier.classify_git_change(repo, docs_head, docs_head)
+        classifier.classify_git_change(
+            repo, "0" * 40, docs_head, event_name="push"
+        )
+    identical = classifier.classify_git_change(
+        repo, docs_head, docs_head, event_name="push"
+    )
     assert all(identical.flags[lane] for lane in classifier.LANES)
     assert identical.reason == "identical_refs_full_validation"
-    assert identical.test_targets == ()
+    assert identical.test_targets == tuple(
+        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
+    )
 
     workflow = repo / ".github/workflows/ci.yml"
     workflow.parent.mkdir(parents=True)
@@ -643,10 +794,14 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "add", workflow.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "change CI topology")
     workflow_head = _git(repo, "rev-parse", "HEAD")
-    workflow_change = classifier.classify_git_change(repo, docs_head, workflow_head)
+    workflow_change = classifier.classify_git_change(
+        repo, docs_head, workflow_head, event_name="push"
+    )
     assert all(workflow_change.flags[lane] for lane in classifier.LANES)
     assert workflow_change.reason == "selected_lanes"
-    assert workflow_change.test_targets == ()
+    assert workflow_change.test_targets == tuple(
+        sorted(classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS)
+    )
 
     source = repo / "engine/db/adapter.py"
     source.parent.mkdir(parents=True)
@@ -658,7 +813,9 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "add", source.relative_to(repo).as_posix(), "tests/db/test_adapter.py")
     _git(repo, "commit", "-m", "database")
     product_head = _git(repo, "rev-parse", "HEAD")
-    product = classifier.classify_git_change(repo, workflow_head, product_head)
+    product = classifier.classify_git_change(
+        repo, workflow_head, product_head, event_name="push"
+    )
     assert {lane for lane in classifier.LANES if product.flags[lane]} == {
         "product",
         "db",
@@ -676,6 +833,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         repo,
         product_head,
         test_head,
+        event_name="push",
     )
     assert {
         lane for lane in classifier.LANES if changed_test_result.flags[lane]
@@ -692,6 +850,7 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
         repo,
         test_head,
         deleted_test_head,
+        event_name="push",
     )
     assert {
         lane for lane in classifier.LANES if deleted_test_result.flags[lane]
@@ -703,13 +862,146 @@ def test_change_classifier_executes_against_exact_git_refs(tmp_path: Path) -> No
     _git(repo, "mv", source.relative_to(repo).as_posix(), renamed.relative_to(repo).as_posix())
     _git(repo, "commit", "-m", "rename source into docs")
     rename_head = _git(repo, "rev-parse", "HEAD")
-    rename = classifier.classify_git_change(repo, deleted_test_head, rename_head)
+    rename = classifier.classify_git_change(
+        repo, deleted_test_head, rename_head, event_name="push"
+    )
     assert {lane for lane in classifier.LANES if rename.flags[lane]} == {
         "product",
         "db",
         "release",
     }
     assert rename.test_targets == ()
+
+
+def test_pull_request_classification_uses_merge_base_not_base_tip(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    (repo / "README.md").write_text("root\n", encoding="utf-8")
+    _git(repo, "add", "README.md")
+    _git(repo, "commit", "-m", "root")
+    root = _git(repo, "rev-parse", "HEAD")
+
+    _git(repo, "checkout", "-b", "feature")
+    feature_doc = repo / "docs/run/feature.md"
+    feature_doc.parent.mkdir(parents=True)
+    feature_doc.write_text("feature\n", encoding="utf-8")
+    _git(repo, "add", "docs/run/feature.md")
+    _git(repo, "commit", "-m", "feature docs")
+    feature_head = _git(repo, "rev-parse", "HEAD")
+
+    _git(repo, "checkout", "-b", "advanced-main", root)
+    base_only = repo / "engine/new_on_main.py"
+    base_only.parent.mkdir(parents=True)
+    base_only.write_text("VALUE = 1\n", encoding="utf-8")
+    _git(repo, "add", "engine/new_on_main.py")
+    _git(repo, "commit", "-m", "advance main")
+    base_tip = _git(repo, "rev-parse", "HEAD")
+    _git(repo, "checkout", "feature")
+
+    pull_request = classifier.classify_git_change(
+        repo,
+        base_tip,
+        feature_head,
+        event_name="pull_request",
+    )
+    assert pull_request.reason == "documentation_only"
+    assert not any(pull_request.flags[lane] for lane in classifier.LANES)
+    assert pull_request.test_targets == ()
+
+    with pytest.raises(ValueError, match="CI_PRODUCT_OWNER_TEST_MISSING"):
+        classifier.classify_git_change(
+            repo,
+            base_tip,
+            feature_head,
+            event_name="push",
+        )
+    with pytest.raises(ValueError, match="CI_CHANGE_EVENT_UNSUPPORTED"):
+        classifier.classify_git_change(
+            repo,
+            root,
+            feature_head,
+            event_name="workflow_dispatch",
+        )
+
+
+def test_classifier_main_forwards_event_name(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    observed: dict[str, str] = {}
+
+    def fake_classify(repo_root, base, head, *, event_name):
+        observed.update(
+            repo_root=str(repo_root),
+            base=base,
+            head=head,
+            event_name=event_name,
+        )
+        return classifier.Classification(
+            flags=classifier._empty_flags(),
+            reason="documentation_only",
+            path_count=1,
+        )
+
+    monkeypatch.setattr(classifier, "classify_git_change", fake_classify)
+    github_output = tmp_path / "github-output"
+    changed_tests = tmp_path / "changed-tests"
+    assert classifier.main(
+        [
+            "--base",
+            "1" * 40,
+            "--head",
+            "2" * 40,
+            "--event-name",
+            "pull_request",
+            "--repo-root",
+            str(tmp_path),
+            "--github-output",
+            str(github_output),
+            "--changed-tests-output",
+            str(changed_tests),
+        ]
+    ) == 0
+    assert observed == {
+        "repo_root": str(tmp_path.resolve()),
+        "base": "1" * 40,
+        "head": "2" * 40,
+        "event_name": "pull_request",
+    }
+
+
+def test_pull_request_classification_fails_without_a_merge_base(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.email", "ci-classifier@example.invalid")
+    _git(repo, "config", "user.name", "CI classifier test")
+    (repo / "README.md").write_text("first root\n", encoding="utf-8")
+    _git(repo, "add", "README.md")
+    _git(repo, "commit", "-m", "first root")
+    first = _git(repo, "rev-parse", "HEAD")
+
+    _git(repo, "switch", "--orphan", "unrelated")
+    (repo / "README.md").unlink(missing_ok=True)
+    (repo / "OTHER.md").write_text("second root\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-m", "second root")
+    second = _git(repo, "rev-parse", "HEAD")
+
+    with pytest.raises(RuntimeError, match="CI_CHANGE_MERGE_BASE_UNAVAILABLE"):
+        classifier.classify_git_change(
+            repo,
+            first,
+            second,
+            event_name="pull_request",
+        )
 
 
 def test_change_classifier_covers_release_chain_sources_and_outputs() -> None:

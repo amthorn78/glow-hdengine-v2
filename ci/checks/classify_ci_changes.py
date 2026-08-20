@@ -34,6 +34,52 @@ _FULL_VALIDATION_PATHS = {
     "requirements.txt",
     "tests/evidence/test_rails_ci_workflow_integration.py",
 }
+_FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
+    "tests/categories/test_registry_and_purity.py",
+    "tests/cli/test_aux_preview.py",
+    "tests/cli/test_bg_resolve.py",
+    "tests/cli/test_cli_file_inputs.py",
+    "tests/cli/test_cli_install_help.py",
+    "tests/cli/test_dev_sampler_cli.py",
+    "tests/cli/test_showcompat_sources.py",
+    "tests/config/test_alias_policy_enforcement.py",
+    "tests/config/test_config_artifacts.py",
+    "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+    "tests/config/test_manifest_schema.py",
+    "tests/config/test_registry_report.py",
+    "tests/config/test_registry_report_determinism.py",
+    "tests/config/test_registry_report_indexing.py",
+    "tests/config/test_typed_bundles.py",
+    "tests/evidence/test_evidence_tool_ownership.py",
+    "tests/invariance/test_bytes_identity.py",
+    "tests/invariance/test_determinism_env_helper.py",
+    "tests/invariance/test_locale_tz.py",
+    "tests/m10/test_defs_order.py",
+    "tests/m10/test_m10_symmetry_identity.py",
+    "tests/m10/test_thresholds_rounding.py",
+    "tests/mech/test_arrays_as_sets.py",
+    "tests/mech/test_constants.py",
+    "tests/qa/test_cli_admin_dumps.py",
+    "tests/qa/test_cli_admin_parity.py",
+    "tests/qa/test_epic023_acceptance_alignment.py",
+    "tests/qa/test_epic024_bootstrap_status.py",
+    "tests/qa/test_qa_tool_ownership.py",
+    "tests/support/test_change_gates.py",
+    "tests/transport/test_a7_transport_proofs.py",
+    "tests/transport/test_aux_narrative.py",
+    "tests/transport/test_ops_rails_refusal.py",
+    "tests/transport/test_writers_errors_headers.py",
+)
+_FULL_VALIDATION_INACTIVE_TESTS = {
+    # Administrative or source-writing checks that are intentionally outside
+    # the current behavioral suite. Direct edits fail closed until a current
+    # consumer and safe execution owner are established.
+    "tests/cli/test_cli_env_pins_epic021.py",
+    "tests/config/test_config_acceptance_map.py",
+    "tests/qa/test_epic021_scaffolding.py",
+    "tests/qa/test_epic022_acceptance_scaffold.py",
+    "tests/qa/test_epic022_close_pack_ready.py",
+}
 _HISTORICAL_PREFIXES = (
     ".audit_src/",
     "_archive/",
@@ -248,6 +294,95 @@ _EVIDENCE_GENERATOR_TEST_OWNERS = {
     ),
     "tools/evidence/generate_narrative_registry_diff.py": _NARRATIVE_TEST_OWNERS,
 }
+_EVIDENCE_HELPER_OWNERSHIP_TEST = (
+    "tests/evidence/test_evidence_tool_ownership.py"
+)
+_EVIDENCE_HELPER_TEST_OWNERS = {
+    "tools/evidence/build_release_attestation.py": (
+        "tests/evidence/test_release_attestation.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/check_d23_evidence_index_snapshot_contract.py": (
+        "tests/evidence/test_d23_evidence_index_snapshot_contract.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/check_epic024_acceptance_map_viability.py": (
+        "tests/evidence/test_epic024_acceptance_map_viability.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/check_epic024_evidence_path_binding_validation.py": (
+        "tests/evidence/test_epic024_evidence_path_binding_validation.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/check_lf_endings.py": (
+        "tests/evidence/test_evidence_index_missing_state.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/check_po_006_token_registry_validity.py": (
+        "tests/evidence/test_po_006_token_registry_validity.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/epic020_bundle.py": (
+        "tests/tools/test_epic020_bundle_tool.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/hde_epic038_ops03.py": (
+        "tests/ops/test_hde_epic038_ops03.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/orientation_demo.py": (
+        "tests/evidence/test_orientation_demo.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/refresh_epic024_step_logs_manifest.py": (
+        "tests/evidence/test_refresh_epic024_step_logs_manifest.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/refresh_step_logs_manifest.py": (
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/regenerate_identity_closure.py": (
+        "tests/evidence/test_release_manifest_content_binding.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/retained_evidence_safety.py": (
+        "tests/evidence/test_retained_evidence_safety.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/run_canonical_json_gate.py": (
+        "tests/evidence/test_canonical_json_gate_check_outputs.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/run_sanity_pipeline.py": (
+        "tests/evidence/test_sanity_pipeline.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/run_sanity_pipeline_gate.py": (
+        "tests/evidence/test_sanity_pipeline.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/strict_json_schema.py": (
+        "tests/ops/test_hde_epic038_ops03.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/update_evidence_index.py": (
+        "tests/evidence/test_evidence_index_missing_state.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+    "tools/evidence/validate_evidence_paths.py": (
+        "tests/evidence/test_evidence_index_missing_state.py",
+        _EVIDENCE_HELPER_OWNERSHIP_TEST,
+    ),
+}
+_EVIDENCE_HELPERS_REQUIRING_OWNER = {
+    # These helpers have no safe focused behavioral owner in the ordinary PR
+    # environment. Changes fail closed until that ownership is established.
+    "tools/evidence/hdapi_v2_boundary_analyzer.py",
+    "tools/evidence/run_cli_guardrail.py",
+    "tools/evidence/run_env_pins_gate.py",
+    "tools/evidence/run_sampler_evidence.py",
+    "tools/evidence/run_showcompat_artifacts.py",
+}
 _QA_TEST_OWNERS = (
     "tests/qa/test_generic_qa_harness.py",
     "tests/qa/test_qa_harness_followup.py",
@@ -369,7 +504,12 @@ class Classification:
 def _full(reason: str, path_count: int) -> Classification:
     flags = {lane: True for lane in LANES}
     flags["needs_python"] = True
-    return Classification(flags=flags, reason=reason, path_count=path_count)
+    return Classification(
+        flags=flags,
+        reason=reason,
+        path_count=path_count,
+        test_targets=tuple(sorted(_FULL_VALIDATION_SUPPLEMENTAL_TESTS)),
+    )
 
 
 def _empty_flags() -> dict[str, bool]:
@@ -445,12 +585,16 @@ def _fixed_lane_covers_test_target(source_path: str, target: str) -> bool:
 
 
 def _registered_owner_test_paths() -> set[str]:
-    paths = set(_FIXED_LANE_TEST_PROVIDERS)
+    paths = set(_FIXED_LANE_TEST_PROVIDERS) | set(
+        _FULL_VALIDATION_SUPPLEMENTAL_TESTS
+    )
     for targets in _PRODUCT_TEST_OWNER_PATHS.values():
         paths.update(targets)
     for _prefix, targets in _PRODUCT_TEST_OWNER_PREFIXES:
         paths.update(targets)
     for targets in _EVIDENCE_GENERATOR_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _EVIDENCE_HELPER_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _QA_TOOL_TEST_OWNERS.values():
         paths.update(targets)
@@ -472,6 +616,23 @@ def _validated_owner_targets(
         if not _fixed_lane_covers_test_target(source_path, target):
             validated.append(target)
     return tuple(validated)
+
+
+def _is_full_validation_path(path: str) -> bool:
+    return path in _FULL_VALIDATION_PATHS or path.startswith(
+        _FULL_VALIDATION_PREFIXES
+    )
+
+
+def _full_validation_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    if not _is_full_validation_path(path):
+        return ()
+    return _validated_owner_targets(
+        repo_root,
+        path,
+        _FULL_VALIDATION_SUPPLEMENTAL_TESTS,
+        error_code="CI_FULL_VALIDATION_TEST_INVALID",
+    )
 
 
 def _product_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
@@ -521,8 +682,8 @@ def _evidence_generator_owner_targets(
     if (
         len(rel.parts) < 3
         or rel.parts[:2] != ("tools", "evidence")
-        or rel.suffix != ".py"
-        or not rel.name.startswith("generate_")
+        or rel.suffix.lower() != ".py"
+        or not rel.name.lower().startswith("generate_")
     ):
         return ()
     targets = _EVIDENCE_GENERATOR_TEST_OWNERS.get(path)
@@ -545,6 +706,46 @@ def _evidence_generator_owner_targets(
             # disposition. Generator-only deletion remains fail-closed.
             return ()
     raise ValueError(f"CI_EVIDENCE_OWNER_TEST_MISSING:{path}")
+
+
+def _evidence_helper_owner_targets(
+    repo_root: Path,
+    path: str,
+    *,
+    changed_paths: set[str] | None = None,
+) -> tuple[str, ...]:
+    """Resolve non-generator evidence helpers to focused behavioral owners."""
+    rel = PurePosixPath(path)
+    if (
+        len(rel.parts) < 3
+        or rel.parts[:2] != ("tools", "evidence")
+        or rel.suffix.lower() != ".py"
+        or rel.name.lower().startswith("generate_")
+    ):
+        return ()
+    targets = _EVIDENCE_HELPER_TEST_OWNERS.get(path)
+    if targets is not None:
+        return _validated_owner_targets(
+            repo_root,
+            path,
+            targets,
+            error_code="CI_EVIDENCE_HELPER_OWNER_INVALID",
+        )
+    if not (repo_root / path).exists() and changed_paths is not None:
+        owner_stems = {rel.stem}
+        if rel.stem.startswith("check_"):
+            owner_stems.add(rel.stem.removeprefix("check_"))
+        conventional_owners = {
+            f"tests/evidence/test_{stem}.py" for stem in owner_stems
+        }
+        if any(
+            owner in changed_paths and not (repo_root / owner).exists()
+            for owner in conventional_owners
+        ):
+            # A paired helper/owner removal is an explicit subsystem
+            # disposition. Helper-only deletion remains fail-closed.
+            return ()
+    raise ValueError(f"CI_EVIDENCE_HELPER_OWNER_MISSING:{path}")
 
 
 def _qa_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
@@ -606,6 +807,8 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
     changed_paths = set(normalized_paths)
     for path in normalized_paths:
         rel = PurePosixPath(path)
+        if path in _FULL_VALIDATION_INACTIVE_TESTS:
+            raise ValueError(f"CI_INACTIVE_TEST_REQUIRES_DISPOSITION:{path}")
         if (
             path.endswith(".path_proof.txt")
             or path.endswith(".REMOVED.md")
@@ -614,6 +817,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
             continue
         if _lanes_for_path(path) == set():
             continue
+        targets.update(_full_validation_owner_targets(repo_root, path))
         if rel.parts and rel.parts[0] == "tests":
             candidate = repo_root / path
             is_test_module = rel.suffix == ".py" and rel.name.startswith("test_")
@@ -640,6 +844,13 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
                 changed_paths=changed_paths,
             )
         )
+        targets.update(
+            _evidence_helper_owner_targets(
+                repo_root,
+                path,
+                changed_paths=changed_paths,
+            )
+        )
         targets.update(_qa_tool_owner_targets(repo_root, path))
         if (
             PurePosixPath(path).suffix.lower() in _UNKNOWN_SOURCE_SUFFIXES
@@ -655,7 +866,7 @@ def _contains_component(path: str, component: str) -> bool:
 
 def _lanes_for_path(path: str) -> set[str] | None:
     """Return known lanes for one path, or ``None`` to fail classification."""
-    if path in _FULL_VALIDATION_PATHS or path.startswith(_FULL_VALIDATION_PREFIXES):
+    if _is_full_validation_path(path):
         return set(LANES)
 
     if path.endswith(".REMOVED.md"):
@@ -829,6 +1040,32 @@ def _validate_sha(raw: str, *, allow_zero: bool = False) -> str:
     return value.lower()
 
 
+def _comparison_base(
+    repo_root: Path,
+    base: str,
+    head: str,
+    *,
+    event_name: str,
+) -> str:
+    if event_name == "push":
+        return base
+    if event_name != "pull_request":
+        raise ValueError(f"CI_CHANGE_EVENT_UNSUPPORTED:{event_name}")
+    result = subprocess.run(
+        ["git", "merge-base", base, head],
+        cwd=repo_root,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("CI_CHANGE_MERGE_BASE_UNAVAILABLE")
+    try:
+        return _validate_sha(result.stdout.strip())
+    except ValueError as exc:
+        raise RuntimeError("CI_CHANGE_MERGE_BASE_UNAVAILABLE") from exc
+
+
 def git_changed_paths(repo_root: Path, base: str, head: str) -> tuple[str, ...]:
     result = subprocess.run(
         [
@@ -866,14 +1103,26 @@ def git_changed_paths(repo_root: Path, base: str, head: str) -> tuple[str, ...]:
     return tuple(paths)
 
 
-def classify_git_change(repo_root: Path, base: str, head: str) -> Classification:
+def classify_git_change(
+    repo_root: Path,
+    base: str,
+    head: str,
+    *,
+    event_name: str,
+) -> Classification:
     base_sha = _validate_sha(base, allow_zero=True)
     head_sha = _validate_sha(head)
     if set(base_sha) == {"0"}:
         raise RuntimeError("CI_CHANGE_BASE_UNAVAILABLE")
     if base_sha == head_sha:
         return _full("identical_refs_full_validation", 0)
-    paths = git_changed_paths(repo_root, base_sha, head_sha)
+    comparison_base = _comparison_base(
+        repo_root,
+        base_sha,
+        head_sha,
+        event_name=event_name,
+    )
+    paths = git_changed_paths(repo_root, comparison_base, head_sha)
     result = classify_paths(
         paths,
         governed_paths=_load_governed_primary_paths(repo_root),
@@ -937,7 +1186,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
     try:
         classification = classify_git_change(
-            args.repo_root.resolve(), args.base, args.head
+            args.repo_root.resolve(),
+            args.base,
+            args.head,
+            event_name=args.event_name,
         )
         write_github_output(args.github_output, classification)
         write_changed_test_targets(
