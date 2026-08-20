@@ -688,7 +688,12 @@ def test_noncanonical_loose_object_header_at_canonical_path_fails(
     assert object_id == close_pack._git_blob_id(b"x", algorithm)
     object_path = repo / ".git/objects" / object_id[:2] / object_id[2:]
     assert object_path.is_file()
-    object_path.write_bytes(zlib.compress(b"blob 01\0x"))
+    original_mode = stat.S_IMODE(object_path.stat().st_mode)
+    object_path.chmod(original_mode | stat.S_IWUSR)
+    try:
+        object_path.write_bytes(zlib.compress(b"blob 01\0x"))
+    finally:
+        object_path.chmod(original_mode)
     index_path = repo / ".git/index"
     index_before = _read_noatime(index_path)
 
