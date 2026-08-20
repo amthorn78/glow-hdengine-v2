@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.2  
-Effective Date: 2026.08.19  
+**Version:** v12.7.3  
+Effective Date: 2026.08.20  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -200,6 +200,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.8 Require Automated CI Budget Control and Supersede Manual Push Circuit Breakers
 
 2.9 HDE-EPIC039 PR-03 Lineage
+
+2.10 HDE-EPIC039 PR-04 Automated CI Remediation and HDE-EPIC038 Closeout-Layer Removal
 
 # 2\) Numbered Addenda
 
@@ -1234,5 +1236,139 @@ Implementation of the reviewed subsystem and remediation is accepted. PF09 movem
 * Human Index and Machine Mirror contained 596 records each with exact path-set parity.  
 * The HDE-EPIC039 Doc-Delta bodies were byte-identical at blob `70d335...`; both proof companions recorded SHA-256 `868ce684...` and size 4,537 bytes.  
 * The HDE-EPIC039 Doc-Delta posture explicitly withheld Live QA, OPS, acceptance-token, deployment, PF09-completion, and epic-closeout claims.
+
+## **2.10 HDE-EPIC039 PR-04 CI Remediation Lineage and HDE-CALC003.21 Completion Recommendation**
+
+### **Approval and source record**
+
+* **Approval type:** Post-Merge Comprehensive PR Lineage Review.  
+* **Implementation source:** `r5-implementation-plan-hde-epic039.md`, PR-04.  
+* **Repository:** `amthorn78/glow-hdengine-v2`; default and reviewed branch `main`.  
+* **Decision:** `MERGED WORK ACCEPTABLE`.  
+* **Lineage:** Original PR \#394, **Implement HDE-EPIC039 PR-04 CI remediation**, followed contiguously by Remedial PR \#395, **Close final HDE-EPIC039 PR-04 CI ownership gaps**.  
+* **Lifecycle baseline:** `e947e40bfe089b9a2bf56045ac496918a844c963`.  
+* **PR \#394 endpoint:** `347ad40f3b02cc0e2083135b3a2f401a6dc8a06c`, merged 2026-08-20T02:24:55Z.  
+* **PR \#395 and final reviewed endpoint:** `e9de6ade4aabbec654e8e9cb5519596da1399c4e`, merged 2026-08-20T13:41:01Z.  
+* At review, `main` was exactly the PR \#395 merge commit. No intervening or post-lineage commit affected the reviewed result.  
+* All 72 lifecycle-touched paths were inspected: 67 required files remained present and five required HDE-EPIC038-only deletions remained absent.  
+* No implementation, safety, evidence, validation, ancestry, later-change, or unresolved-review blocker remained.
+
+### **Retained decisions and requirements**
+
+The accepted PR-04
+
+## **2.10 HDE-EPIC039 PR-04 Automated CI Remediation and HDE-EPIC038 Closeout-Layer Removal**
+
+### **Approval and source record**
+
+* **Approval type:** Post-Merge Comprehensive PR Lineage Review.  
+* **Decision:** `MERGED WORK ACCEPTABLE`.  
+* **Repository:** `amthorn78/glow-hdengine-v2`.  
+* **Implementation source:** `r5-implementation-plan-hde-epic039.md`, PR-04.  
+* **Lineage:** Original PR \#394, `Implement HDE-EPIC039 PR-04 CI remediation`, followed contiguously by Remedial PR \#395, `Close final HDE-EPIC039 PR-04 CI ownership gaps`.  
+* **Lifecycle baseline:** `e947e40bfe089b9a2bf56045ac496918a844c963`.  
+* **PR \#394 endpoint:** `347ad40f3b02cc0e2083135b3a2f401a6dc8a06c`.  
+* **Final reviewed endpoint:** PR \#395 merge `e9de6ade4aabbec654e8e9cb5519596da1399c4e`.  
+* At review, `main` was exactly the final endpoint, with no intervening or post-lineage change affecting the result.  
+* All 72 lineage-touched paths were inspected: 67 remained present and the five required HDE-EPIC038-only deletions remained absent.  
+* No implementation, safety, evidence, validation, ancestry, later-change, or unresolved-review blocker remained.
+
+### **Retained decisions and requirements**
+
+PR \#394 removed the withdrawn HDE-EPIC038 closeout layer while preserving shared infrastructure and historical evidence. The accepted deletions are:
+
+* `tools/evidence/generate_hde_epic038_closeout.py`  
+* `tools/evidence/check_hde_epic038_qa_current_state.py`  
+* `tests/evidence/test_hde_epic038_closeout.py`  
+* `tests/evidence/test_hde_epic038_qa_current_state.py`  
+* `tests/evidence/test_hde_epic038_release_sanity.py`
+
+Active closeout-family updater bindings, private-receipt handling, authenticated receipt consumption, network-enabled generation, source writeback, and lifecycle-only CI bindings were also removed. Historical HDE-EPIC038 implementation, QA, failure, OPS, and formal-closeout nonclaim records remain preserve-required.
+
+The accepted CI architecture is:
+
+* One stable external `test` check operating on the exact candidate head.  
+* Automatic cancellation of superseded PR heads.  
+* One checkout, setup, and installation path.  
+* Seven deterministic, change-aware validation lanes.  
+* No duplicate equivalent full-suite eligibility, matrix duplication, artifact transfer between jobs, source feedback, or source writeback.  
+* Heavy lanes selected by changed surface and registered behavioral ownership.  
+* Fail-closed behavior when classification or ownership is missing, incomplete, noncanonical, unsafe, or ambiguous.  
+* An always-running final audit that reports the truthful aggregate result and emits `CI_APPLICABILITY_AND_EXACT_HEAD_OK` only when applicability and exact-head validation succeed.  
+* Stable required-check identity; no repository-settings change is required.
+
+PR \#394 established this architecture but left two defects: full validation did not derive from every registered behavioral owner, and Reader ownership lacked a complete standalone guard.
+
+PR \#395 established the final remediation boundary by:
+
+* Deriving full-validation targets from all registered behavioral owners.  
+* Adding the bounded Reader import seam `ci/checks/import_http_reader_for_tests.py`.  
+* Enforcing an exact Reader owner roster selected from Reader source, registered consumers, static imports, route literals, and the canonical dynamic seam.  
+* Pinning the two reviewed dynamic database owners to source hashes.  
+* Rejecting noncanonical, symlinked, or unregistered Reader consumers.  
+* Adding standalone Reader-ownership and classifier coverage.  
+* Refreshing only affected HDE-EPIC039 Doc-Delta, Machine Mirror, checksum, and proof bindings.
+
+Continuing generic controls were narrowed to actual consumers rather than removed:
+
+* `hde-release-sanity-v1` remains a generic 15-stage closed-rails chain with `ALLOW_NETWORK=0`, no failed stage, and `summary:PASS`.  
+* Release identity remains `hde.release_attestation.v1` / `PR06R_B_FINAL_PASS`.  
+* Hosted source-writing and network-enabled closeout execution remain prohibited.  
+* The PR \#391/\#392 generic QA subsystem remains present and preserve-required, including `tools/qa/qa_harness.py` and the EPIC021 and EPIC027/028/029 surfaces. PR-04 adapted continuing consumers to the generic sanity result without rolling back, disabling, reducing, or removing that subsystem.  
+* HDE-EPIC039 Doc-Delta bodies must remain byte-identical, and Human Index, Machine Mirror, checksums, and path proofs must remain coherent within the same change.
+
+### **Epic, task, and status effects**
+
+* **Epic:** `HDE-EPIC039`.  
+* **PF09 task:** `HDE-CALC003`.  
+* **PF09 subtask:** `HDE-CALC003.21 — HDE-EPIC038 closeout subsystem removal and CI-cost cleanup`.  
+* **Source-reported canonical subtask status:** `Not done`.  
+* **Status recommendation:** Change `HDE-CALC003.21` to `Done`.  
+* **Performed status action:** None. The reviewed PRs did not edit PF09.  
+* The implementation and evidence satisfy the exact subtask requirements: the withdrawn epic-specific layer and active bindings are removed, shared generic primitives and historical records are preserved, CI is automated and budget-efficient, both ownership gaps are closed, and exact-head evidence is complete.  
+* Parent `HDE-CALC003` remains `Partial`; no parent-task advancement is recommended.
+
+### **Required canon drainage**
+
+* **Target:** `PF09.1-Canon-HDE-Build-Checklist-Calcination`, section `### **Subtask HDE-CALC003.21 — HDE-EPIC038 closeout subsystem removal and CI-cost cleanup**`.  
+* **Required change:** Change only the subtask status from `Not done` to `Done`.  
+* **Reason:** The \#394→\#395 lineage proves removal of the withdrawn HDE-EPIC038 generator, validator, focused tests, private-receipt/authenticated-consumption/network lane, source-writeback surfaces, and lifecycle-only CI bindings while preserving shared generic primitives, protected history, release identity, the PR-03 QA subsystem, closed rails, and governed-evidence integrity.  
+* **Required permanent proof anchors:** PR \#394, PR \#395, final endpoint `e9de6ade4aabbec654e8e9cb5519596da1399c4e`, exact-head CI, the five confirmed deletions, zero active closeout-binding hits, historical preservation, and 591/591 Human/Machine parity.  
+* **Status boundary:** Keep parent `HDE-CALC003` at `Partial` and preserve all QA, acceptance, token, OPS, deployment, release-execution, PF-movement, and epic-closeout nonclaims.  
+* **Drainage state:** Unperformed. This is documentation drainage, not a remaining implementation blocker.
+
+### **Deferred obligations and unresolved work**
+
+* PF09 drainage remains to be performed.  
+* Parent-task and epic completion remain governed separately.  
+* The review reported no remaining PR-04 finding and assigned no further implementation remediation.  
+* A separate operator-supplied CI-remediation report is not required because the workflow, GitHub runs, current repository state, and governed evidence directly expose the required proof.
+
+### **Scope boundaries and nonclaims**
+
+* Acceptance of the lineage does not constitute HDE-EPIC039 Live QA, QA PASS, acceptance, token satisfaction, OPS execution or completion, deployment, release execution, PF09 movement, permanent-canon drainage, or epic closeout.  
+* Reviewer-side mutable QA and OPS were not run; the review used read-only inspection, exact-head CI, current-file verification, and governed evidence.  
+* The changes did not alter repository settings, public behavior, routes, OPS behavior, databases, release identity, or protected historical evidence.  
+* The retained sanity result demonstrates the checked generic release/sanity contract; it is not a production release or deployment claim.  
+* CI success validates the merged implementation endpoint but does not independently satisfy Live QA or acceptance governance.
+
+### **Evidence and traceability**
+
+* PR \#394: 68 files, `+3,893/−17,774`; merge `347ad40f3b02cc0e2083135b3a2f401a6dc8a06c`; Actions run `32324012382`, job `96291496604`; 368 affected tests and all seven lanes passed; all 17 review threads resolved.  
+* PR \#395: 14 files, `+758/−107`; merge `e9de6ade4aabbec654e8e9cb5519596da1399c4e`; Actions run `32335500506`, job `96324181196`; 734 affected targets, all seven lanes, 407 generic-QA tests, and 52 release tests passed.  
+* Active-scope search for `generate_hde_epic038_closeout`, `check_hde_epic038_qa_current_state`, and `_HDE_EPIC038_PRIVATE_CI`: zero hits.  
+* Protected-path scan for `audit/qa/hde-epic038/` and `audit/ops/hde-epic038/`: zero lineage-touched paths; historical records remained present.  
+* Human Index and Machine Mirror: 591/591 rows with identical path sets.  
+* Human Index SHA-256: `c224093eb0e1885b8afc667cbc5f3e6d143c57d99d5cc2930f716095ae715bfb`.  
+* Machine Mirror whole-file SHA-256: `bcf4dfe0c55bb2b55069f3dc06ce44f3b403a0a6844f19503a2d4acd11b72d85`; body SHA-256: `5a21069b7c0761ddfa45231c83bf2dea19a9f8e5fb13772f2887e2ae2636a656`.  
+* HDE-EPIC039 Doc-Delta bodies: identical blob `62da3d2728cb6995b6c4607a66011987058d028f`, 11,343 bytes, SHA-256 `206dcd7afaac42da9407dc0e2e1820f616d4aa2ad8e8221ec0477a45dafdc933`.  
+* Sanity evidence: `hde-release-sanity-v1`, 15 stages, `summary:PASS`; topology evidence: `total_artifacts: 591`, `status: ok`.
+
+### **Relationship to existing PF10 guidance**
+
+* This addendum implements PF10 §2.8’s requirement that CI-budget governance be automated through CI architecture and efficiency rather than manual push circuit breakers or report-only controls.  
+* Observable GitHub and repository facts satisfy §2.8’s proof lane; no separate transient implementation report is required.  
+* The lineage preserves PF10 §2.9’s approved PR \#391/\#392 QA subsystem and complies with its prohibition on rollback, disablement, reduction, or removal.  
+* The exact-head graph, change-aware lane selection, and validation evidence operate under the continuing CI-classification and validation guidance in PF10 §§2.3 and 2.5.
 
 \<eof\>
