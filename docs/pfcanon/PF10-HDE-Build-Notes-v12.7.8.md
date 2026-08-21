@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.7  
+**Version:** v12.7.8  
 Effective Date: 2026.08.21  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -206,6 +206,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.11 HDE-EPIC039 PR-05 Authorized Scope Expansions and Proof-Boundary Decisions
 
 2.12 HDE-EPIC039 PR-05 Generic Feedback-Free Closeout Lifecycle
+
+2.13 Require Epic PR and OPS Assessments to Decide and Evidence Mapped PF09 Row Closure
 
 # 2\) Numbered Addenda
 
@@ -1658,5 +1660,176 @@ This establishes implementation and terminal-state reachability for the subtask.
 * Manifest-last committed validity, stable manifest→report→manifest verification, fail-closed recovery, temporary-repository terminal-state testing, and the tracked-symlink access-time exception retain the boundaries authorized in §2.11.  
 * The implementation preserves the established generic QA subsystem and PR-04’s automated, budget-efficient one-job ordinary-CI architecture.  
 * The closed source schema and output bindings coexist with the continuing artifact and schema ownership rules in PF12 §6.2.2; no broader PF12 revision is established by this approval.
+
+## **2.13 Require Epic PR and OPS Assessments to Decide and Evidence Mapped PF09 Row Closure**
+
+Timestamp: 082126 19:08  
+Details:
+
+### **Decision summary**
+
+Epics exist to close one or more mapped PF09 tasks or subtasks. The work required to close those rows may be performed through:
+
+* repository implementation delivered through a PR;  
+* privileged or external execution performed through an OPS task; or  
+* an approved combination of PR and OPS work.
+
+PR and OPS work are authorized and executed for the purpose of completing their assigned PF09 rows.
+
+A PR or OPS task assigned to close a PF09 row must not be approved, accepted, or treated as complete merely because its work is useful, contributory, directionally correct, or technically acceptable. The assessment must determine whether the completed PR or OPS work actually closes every PF09 row assigned to it.
+
+For each assigned row, the assessment must reach exactly one conclusion:
+
+1. **Closure supported:** The required PR and OPS work satisfies the row’s approved epic scope, and sufficient evidence exists to authorize the row for closure in PF10.  
+2. **Closure not supported:** Required PR or OPS work remains. The assessment must identify the exact unfinished work, and the affected PR or OPS task must not be approved or accepted as complete.  
+3. **Closure not yet provable:** The required work may be complete, but the assessment has not captured enough evidence to prove closure. The assessment must identify the exact missing inspection or evidence without falsely classifying it as unfinished implementation or OPS execution.
+
+An assessment must not accept epic work while leaving its assigned PF09 rows unresolved without identifying the exact condition preventing closure.
+
+### **Scope**
+
+This addendum governs:
+
+* Epic Plans and Implementation Plans that map work to PF09 tasks or subtasks.  
+* Original, remedial, and lineage PR assessments.  
+* OPS task completion assessments.  
+* Combined PR and OPS completion assessments.  
+* Post-merge reassessments.  
+* PF09 completion recommendations.  
+* Evidence supplied for manual PF10 entry.  
+* PF10 status authority during an active epic.  
+* PF09 drainage when the epic closes.
+
+This addendum does not itself authorize closure of a specific PF09 row. Each row still requires an evidence-grounded assessment of every assigned PR and OPS obligation.
+
+### **Normative live rule**
+
+1. **Every epic must target PF09 closure.**  
+   An epic must identify the exact PF09 tasks or subtasks it is intended to close. Its PR and OPS work must be mapped to those rows through the approved plan.  
+2. **Mapped PR and OPS work is completion work.**  
+   A PR or OPS task mapped to a PF09 row is not merely intended to advance, contribute to, strengthen, or partially satisfy that row. It is intended to complete the approved epic scope assigned to that row.  
+3. **The approved plan establishes the closure scope.**  
+   The assessment must evaluate the completed work against the row scope assigned by the approved Epic Plan or Implementation Plan together with applicable active PF10 guidance. It must not expand the target after execution by importing unrelated later-phase work, historical cleanup, future domain expansion, or requirements outside the approved epic scope.  
+4. **Every assigned row requires an explicit closure decision.**  
+   The assessment must identify each mapped PF09 row and state whether the completed PR work, OPS work, or combined PR and OPS work supports its closure.  
+5. **Work categories must remain distinct.**  
+   The assessment must determine whether each completion obligation belongs to:  
+   * a PR task;  
+   * an OPS task;  
+   * combined PR and OPS work;  
+   * evidence capture or inspection only; or  
+   * PF10 recording and later PF09 drainage only.  
+6. Missing OPS execution must not be mislabeled as missing repository implementation. Missing repository implementation must not be converted into an OPS task. Missing assessment evidence must not be represented as unfinished PR or OPS work.  
+7. **Implementation, OPS, and evidence gaps must be distinguished.**  
+   If closure cannot be supported, the assessment must determine whether:  
+   * required repository implementation is missing;  
+   * required OPS execution is missing;  
+   * required PR or OPS evidence has not been captured;  
+   * the work may be complete but has not been sufficiently inspected; or  
+   * only the PF10 closure record and later PF09 drainage remain.  
+8. **Incomplete PR work cannot be approved.**  
+   When required repository implementation remains, the PR must not be approved. The assessment must identify the exact unfinished implementation and the testable condition required for completion.  
+9. **Incomplete OPS work cannot be accepted.**  
+   When required OPS execution remains, the OPS task must not be accepted as complete. The assessment must identify the exact unfinished OPS outcome and the evidence required to establish completion.  
+10. **Completed work must receive closure support.**  
+    When the assigned PR and OPS obligations satisfy the approved scope, the assessment must recommend the affected PF09 rows for `Done` and provide the evidence needed for a PF10 closure-authorization addendum.  
+11. **Closure evidence is a required assessment output.**  
+    For every row recommended for closure, the assessment must provide:  
+    * the exact PF09 task or subtask ID and title;  
+    * the approved plan mapping;  
+    * every PR and OPS task assigned to the row;  
+    * the PR or complete remedial lineage that performed repository work;  
+    * the exact reviewed repository endpoint;  
+    * the completed OPS outcome, when applicable;  
+    * the implemented behavior or deliverable satisfying the row;  
+    * the material repository surfaces inspected;  
+    * the applicable tests and CI results;  
+    * the applicable OPS evidence;  
+    * the applicable governed artifacts or proof;  
+    * any relevant scope boundary or nonclaim;  
+    * the explicit status recommendation: `Done`; and  
+    * a direct statement that no PR or OPS work remains for the approved row scope.  
+12. **OPS evidence does not substitute for repository evidence.**  
+    OPS evidence may prove external or privileged execution. It does not prove that required repository implementation exists.  
+13. **Repository evidence does not substitute for OPS evidence.**  
+    A merged PR or passing CI does not prove completion of an assigned external or privileged OPS action.  
+14. **Insufficient assessment is not evidence of incomplete work.**  
+    If the reviewer has not inspected enough information to decide closure, the reviewer must obtain the missing information or report a bounded evidence gap. The reviewer must not default the row to `Partial`, withhold a closure recommendation, or invent additional PR or OPS work merely because the assessment was incomplete.  
+15. **Approval without row disposition is prohibited.**  
+    `MERGED WORK ACCEPTABLE`, `OPS COMPLETE`, `approved contribution`, `materially strengthens`, `advances`, or similar language cannot substitute for the required row-closure determination.  
+16. **PF10 records closure authority during the epic.**  
+    After the assessment supplies closure evidence, the operator manually enters that evidence into PF10 as a Build Notes addendum. The applicable PF10 addendum becomes the current authoritative record that the row is authorized for closure.  
+17. **PF09 is not edited during active epic execution.**  
+    The permanent PF09 row remains physically unchanged while the epic is active. The absence of an immediate PF09 edit does not negate an applicable PF10 closure authorization.  
+18. **PF09 drainage occurs when the epic closes.**  
+    At epic closeout, PF10 closure authorizations are drained into the applicable phased HDE Build Checklist by changing the authorized rows to `Done`. Until that drainage occurs, PF10 preserves the evidence and controls the live closure posture for the scope it explicitly addresses.  
+19. **No deferred-decision loop is permitted.**  
+    A reviewer must not approve a PR or accept an OPS task and then defer its assigned PF09 closure decision to QA, closeout, another reviewer, later documentation work, or an unspecified future assessment unless the reviewer identifies a concrete unresolved condition that genuinely prevents closure.  
+20. **QA and closeout remain distinct claims.**  
+    A PF09 closure recommendation does not by itself claim QA PASS, acceptance, deployment, token satisfaction, complete OPS execution outside the mapped scope, or epic closeout. Those claims remain governed separately. Their separate status must not be used to withhold PF09 closure when all PR and OPS work mapped to the row has been completed and sufficiently evidenced.
+
+### **Required assessment disposition**
+
+For every PF09 row mapped to PR or OPS work, the assessment must provide exactly one of these dispositions:
+
+* **CLOSURE SUPPORTED — Recommend `Done`.**  
+* **CLOSURE NOT SUPPORTED — PR work remains.**  
+* **CLOSURE NOT SUPPORTED — OPS work remains.**  
+* **CLOSURE NOT SUPPORTED — PR and OPS work remain.**  
+* **CLOSURE NOT YET PROVABLE — Additional inspection or evidence capture is required.**
+
+`Partial with no status change` is not a sufficient final assessment disposition for a row that the approved plan assigned the assessed PR or OPS work to complete.
+
+### **HDE-EPIC039 effect**
+
+The existing HDE-EPIC039 assessments for PR-02 and PR-03 accepted their implementation while withholding closure recommendations for their assigned rows.
+
+Those assessments must be corrected through a new evidence-grounded reassessment of:
+
+* `HDE-CALC003.10`  
+* `HDE-CALC003.11`  
+* `HDE-CALC003.13`  
+* `HDE-CALC003.14`  
+* `HDE-CALC003.15`
+
+For each row, the reassessment must determine whether:
+
+* required PR implementation remains;  
+* required OPS execution remains;  
+* both PR and OPS work remain;  
+* the work is complete but the prior assessment failed to capture sufficient closure evidence; or  
+* only PF10 closure recording and later PF09 drainage remain.
+
+This addendum does not itself close those five rows. It requires the reassessment needed to produce either a supported PF10 closure authorization or an exact remaining-work finding.
+
+### **Supersession**
+
+This addendum supersedes addenda 2.7 and 2.9 only to the extent that they permit accepted HDE-EPIC039 work to retain `Partial` or “no status change recommended” without identifying the exact PR, OPS, or evidence condition preventing closure.
+
+It does not supersede their verified PR lineage, accepted technical behavior, repository evidence, implementation contracts, remediation boundaries, or nonclaims.
+
+More generally, this addendum supersedes any lower-numbered PF10 guidance that permits approval or acceptance of work assigned to PF09 closure without a row-by-row closure determination and supporting evidence.
+
+### **Drain targets**
+
+* **Epic Process Guide:** Require PR and OPS approval assessments to include a disposition for every PF09 row assigned to the assessed work.  
+* **Plan Templates:** Require plans and assessments to treat mapped PF09 rows as completion targets and distinguish PR, OPS, evidence, and documentation obligations.  
+* **Technical Writing Best Practices:** Require complete, traceable, row-specific closure evidence and prohibit unsupported `Partial` dispositions.
+
+### **Evidence and source basis**
+
+The Product Owner clarified the established epic workflow:
+
+* Epic PR and OPS tasks are designed to close one or more PF09 subtasks.  
+* PR and OPS work exists for that closure purpose.  
+* Assessments must decide whether the completed work closes the assigned rows.  
+* A PR that does not complete its assigned implementation cannot be approved.  
+* An OPS task that does not complete its assigned outcome cannot be accepted.  
+* Work that does close its assigned rows must receive an evidence-grounded closure recommendation.  
+* The resulting evidence is manually entered into PF10.  
+* PF10 preserves the live closure authority during the epic.  
+* PF09 is updated only when the epic closes.
+
+HDE-EPIC039 exposed a failure to apply this workflow when implementation was accepted while multiple assigned PF09 rows were left at `Partial` without a definitive finding that identified missing PR work, missing OPS work, missing evidence, or a failure to capture an otherwise supportable closure decision.
 
 \<eof\>
