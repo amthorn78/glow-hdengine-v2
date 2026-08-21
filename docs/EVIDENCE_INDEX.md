@@ -1,6 +1,62 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
 
+## HDE-EPIC039 current Calcination evidence orientation
+
+### Canonical JSON inventory
+
+`tools/evidence/run_canonical_json_gate.py` rejects incomplete, duplicate, or unexpected scope against this exact 26-target `EXPECTED_TARGET_PATHS` inventory:
+
+1. `artifacts/audit/cli/pair.json`
+2. `artifacts/audit/cli/pair_ba.json`
+3. `artifacts/audit/cli/showcompat_ab.json`
+4. `artifacts/audit/cli/showcompat_ba.json`
+5. `artifacts/cli/ab.json`
+6. `artifacts/cli/abba_sidecar.json`
+7. `artifacts/cli/ba.json`
+8. `artifacts/cli/out.json`
+9. `artifacts/cli/out_ba.json`
+10. `artifacts/cli/reader_dump.json`
+11. `artifacts/cli/showcompat/args.json`
+12. `artifacts/cli/showcompat/stdout.json`
+13. `artifacts/cli/summary.json`
+14. `catalog/channels_v1.json`
+15. `catalog/gates_v1.json`
+16. `catalog/magic10.json`
+17. `catalog/magic10_caps.json`
+18. `catalog/magic10_seeds.json`
+19. `catalog/manifest.json`
+20. `catalog/narratives/keys.json`
+21. `catalog/narratives/manifest.json`
+22. `catalog/narratives/palettes.json`
+23. `catalog/narratives/suppression_map.json`
+24. `catalog/narratives/templates.json`
+25. `schemas/channels_v1.schema.json`
+26. `schemas/gates_v1.schema.json`
+
+Only these six `EXPECTED_SET_RULES` entries are normalized as sets; other arrays remain ordered:
+
+| Target | JSON path | Identity |
+| --- | --- | --- |
+| `catalog/channels_v1.json` | `$.channels` | `id` |
+| `catalog/channels_v1.json` | `$.channels[*].centers` | `value` |
+| `catalog/channels_v1.json` | `$.channels[*].domains` | `value` |
+| `catalog/channels_v1.json` | `$.channels[*].flags` | `value` |
+| `catalog/channels_v1.json` | `$.channels[*].gates` | `value` |
+| `catalog/manifest.json` | `$.files` | `path` |
+
+The direction-native narrative pack has 360 keys in `catalog/narratives/keys.json` and 360 templates in `catalog/narratives/templates.json`: 120 each for `shared`, `a_to_b`, and `b_to_a`. `catalog/narratives/suppression_map.json` governs two suppressions. These data changes did not alter Human Design math, scoring, public routes, payloads, or transports.
+
+### Evidence, QA, CI, and closeout capability
+
+- `tools/evidence/update_evidence_index.py` is the sole active writer for `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, `artifacts/evidence_index.jsonl.sha256`, `audit/gates/topology/orientation_demo.txt`, and proof companions. It publishes them as one convergent transaction and restores the prior state after failure. `tools/evidence/orientation_demo.py` compatibility writes delegate to the updater; updater/orientation `--check` modes and mirror checks are read-only.
+- `tools/qa/qa_harness.py` uses stable epic/check identity and the exact five statuses `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, and `PARKED`. Same-interpreter pytest readiness, execution, and collection plus current-state reference and viability checks prevent absent, empty, placeholder, stale, or unevaluated inputs from becoming PASS. See `docs/qa_harness_pattern.md`.
+- `.github/workflows/ci.yml` has one `test` job with exact-candidate-head checkout, pull-request-only cancellation of superseded runs, one applicable setup/install sequence, seven change-aware lanes, and final marker `CI_APPLICABILITY_AND_EXACT_HEAD_OK`. The canonical JSON read-only command `python tools/evidence/run_canonical_json_gate.py --check-only` is generic release-sanity stage 03 when the release lane applies; there is no standalone workflow step named “Run canonical JSON gate (closed rails).”
+- `tools/evidence/run_sanity_pipeline.py` retains the current generic fifteen-stage release-sanity chain, and `tools/evidence/build_release_attestation.py` retains exact-source external attestation. Frozen epic-specific captures remain historical evidence rather than current release-identity inputs or admission gates.
+- Active HDE-EPIC038-specific closeout generation, validation, receipt, private-variable, network, and source-feedback bindings are removed; historical records and nonclaims remain. `schemas/epic_close_candidate_source.v1.json` and `tools/qa/generate_epic_close_pack.py` define a deterministic, feedback-free candidate writer/checker. The command requires exactly one `--source` and exactly one of `--write` or `--check`, publishes `audit/EPIC-<NNN>_close_report.md` before committing `audit/EPIC-<NNN>_MANIFEST.json`, validates stable manifest→report→manifest state, rejects mixed or unstable publication, verifies exact tracked symlink bytes, and permits only the implementation-documented kernel-managed symlink-atime effect.
+- `.github/workflows/epic-closeout-validation.yml` is an isolated manual `workflow_dispatch` lane with read-only contents permission, exact-ref checkout, non-writing checks, clean-tree enforcement, no persisted credentials, no receipt or source writeback, and no automatic pull-request trigger. It complements rather than replaces ordinary `test` CI.
+- HDE-EPIC039 delivered reusable capability and companion evidence only. It did not create a real HDE-EPIC039 close candidate, close report, manifest, acceptance map, token matrix, or QA log and did not execute OPS, Live QA, acceptance, PF09 movement, deployment, Product Owner closeout, or epic closeout.
+
 ## HDE-EPIC037 evidence navigation
 
 - PR-01 field sufficiency: `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`, `audit/docdeltas/hde-epic037_doc_deltas.md`, and `audit/qa/hde-epic037/00_meta/doc_deltas.md`.
@@ -26,9 +82,9 @@
 - Closed-rails deterministic shaping/refusal and PR-06 OPS-02 binding: `audit/qa/hde-epic034/pr-05/closed_rails_check.log`, `artifacts/vendor/hdapi_v2/closed_rails_refusal.txt`, `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log`, and retained OPS-02 evidence under `audit/ops/hde-epic034/ops-02/`.
 - Acceptance/doc-delta anchors: `docs/acceptance_map_epic034.json`, `audit/docdeltas/hde-epic034_doc_deltas.md`, and `audit/qa/hde-epic034/00_meta/doc_deltas.md`. OPS-02 / PR-06 supports HDE-FERM008.2 only; it does not claim HDE-FERM008 parent completion, later HDE-FERM008 subtasks, full HumanDesignAPI v2 runtime conformance, public Reader changes, new HTTP homes, OPS execution by docs agents, or AI scope.
 
-> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
+> Publication and validation order: publish once with `python tools/evidence/update_evidence_index.py`, then validate read-only with `python tools/evidence/update_evidence_index.py --check`, `python tools/evidence/orientation_demo.py --check`, and `ci/checks/check_mirror_schema.sh`. Compatibility orientation writes delegate to the updater. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-037 + historical pointers)
+# Appendix-D — Evidence Index (HDE-EPIC039 current + historical pointers)
 
 ## EPIC033 contract-inventory evidence family (PR-01, not runtime conformance)
 * Contract inventory artifacts: `artifacts/vendor/hdapi_v2/source_inventory.json`, `artifacts/vendor/hdapi_v2/source_inventory.md`, `artifacts/vendor/hdapi_v2/openapi_validation.log`, `artifacts/vendor/hdapi_v2/known_anomalies.md`, `artifacts/vendor/hdapi_v2/endpoint_reference.csv`, and `artifacts/vendor/hdapi_v2/contract_map.json`. Each governed artifact has a sibling `.path_proof.txt`.
@@ -97,7 +153,7 @@
 * Check log: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`
 * Compare log: `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
 * Structured record: `audit/gates/json_gate/canonical/json_gate_structured_record.json`
-* All gate artifacts have co-located `.path_proof.txt` siblings and are enforced in CI (see `.github/workflows/ci.yml` step “Run canonical JSON gate (closed rails)”). The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log`.
+* All gate artifacts have co-located `.path_proof.txt` siblings. Read-only validation uses `python tools/evidence/run_canonical_json_gate.py --check-only` as stage 03 of the generic release-sanity pipeline when the change-aware release lane applies; `.github/workflows/ci.yml` has no standalone step named “Run canonical JSON gate (closed rails).” The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log`.
 
 ## Evidence index snapshot gate (closed rails)
 * Gate runner: `python tools/evidence/generate_evidence_index_snapshot.py` (use `--check` for read-only validation)
@@ -231,7 +287,7 @@
 
 These labels describe the currently checked-in bytes and their capture-time meaning. The current source paths `scripts/db_adapter/capture_adapter_introspection.py` and `scripts/ops/capture_rails_open_scope.py` have been converted to direct psycopg only, but that source conversion does not relabel or refresh the historical bytes listed above. PR-06R-A validates the converted tooling with fixtures and does not execute an open-rails database capture.
 
-The HDE-EPIC038 current contract is direct-only tooling under
+The historical HDE-EPIC038 contract is recorded by direct-only tooling under
 `tools/evidence/generate_hde_epic038_direct_db_selection.py` and
 `schemas/hde_epic038_direct_db_selection.v1.json`, with the tracked primary at
 `artifacts/runtime/direct_db_selection.snapshot.json`. The historical OPS-03 packet
@@ -241,7 +297,7 @@ PostgreSQL posture but is not a current release-admission input. These records d
 supportability by themselves, production deployment, or epic closeout.
 
 
-## HDE-EPIC038 current Distillation evidence orientation
+## Historical HDE-EPIC038 Distillation evidence orientation
 * `artifacts/runtime/direct_db_selection.snapshot.json` — direct-only `DATABASE_URL`/`psycopg` selection and retired-key pre-I/O refusal evidence.
 * `artifacts/audit/env/env_snapshot.json` — environment snapshot `schema: v3`; deterministic rails and config-key presence only, no secret values.
 * `artifacts/architecture/architecture_snapshot.keys_only.json` — frozen HDE-EPIC038 keys-only architecture snapshot; current source is analyzed without refreshing this capture, and DDL identity claims stay limited to `hde.ddl_identity_projection.v1`.

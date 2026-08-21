@@ -1,23 +1,31 @@
 # QA harness pattern (non-canonical summary)
 
-This note summarizes how epics use the shared QA harness introduced for EPIC021. PF10 — HDE-Build Notes (generic harness addendum) and PF19 — Glow QA Guide govern the authoritative process; this file is a quick reference for future epic authors.
+This is a repository-facing summary of the current generic harness in `tools/qa/qa_harness.py`. It does not itself create QA results, Live QA, acceptance, or closeout.
 
-## Define harness configuration
+## Stable identity
 
-Create a `HarnessConfig` with the epic’s identifiers and file layout, mirroring the EPIC021 setup:
+Create `HarnessConfig("HDE-EPIC<NNN>")` with the stable epic identity and optional lowercase `step_names`. The harness derives `audit/qa/hde-epic<NNN>/`, `docs/acceptance_map_epic<NNN>.json`, the token matrix, and the viability ledger from that identity. Each `check_id` must be a lowercase ASCII-safe path segment.
 
-- `epic_id`: the epic label used in logs.
-- `qa_root`: QA_ROOT base directory (e.g., `audit/qa/<epic-id>/`).
-- `acceptance_map_path`: path to the acceptance map viability log.
-- `token_matrix_path`: optional token evidence matrix path.
-- `step_names`: ordered step identifiers that drive log naming.
+Run IDs are not current-state correctness identity. Older run-ID-era wrappers and captures remain historical; new generic-harness work binds results to the stable epic and check IDs.
 
-## Provide a wrapper entrypoint
+## Governed statuses
 
-Each epic supplies a thin script (for EPIC021 this is `tools/qa/epic021_qa.py`, for EPIC024 this is `tools/qa/run_hde_epic024_harness.py`) that:
+The status set is exactly:
 
-1. Validates closed-rails pins via `engine.runtime.determinism_env.ensure_determinism_env`.
-2. Determines the run id (prefer an `EPIC*_QA_RUN_ID` environment override, otherwise fall back to the harness default such as `determine_run_id()`).
-3. Invokes the generic harness runner with the configured `HarnessConfig`.
+- `PASS` — the exact executed command or approved proof action succeeded and the required current-state validation completed.
+- `FAIL_BEHAVIOR` — an available evaluation completed and contradicted the required behavior.
+- `FAIL_TOOLING` — the evaluation mechanism, parsing, collection, or evidence writer malfunctioned.
+- `TOOLING_BLOCKED` — a required prerequisite, input, script, test, or selector is unavailable, empty, missing, or cannot be evaluated.
+- `PARKED` — the check is explicitly parked rather than evaluated as successful.
 
-EPIC021 is the first client, and EPIC024 extends the pattern with a single QA root (`audit/qa/hde-epic024/`) that records per-check logs, a token matrix, and an acceptance-map viability gate whose PASS/FAIL_BEHAVIOR status affects the harness exit code. Future epics should adopt the same pattern to keep QA_ROOT layouts, manifests, and viability tracking consistent while leaving epic-specific logic inside the harness configuration.
+Absent, empty, placeholder, stale, or unevaluated inputs never become `PASS`. A harness result is not a Live QA result unless separately authorized Live QA was actually performed.
+
+## Pytest and viability mechanics
+
+`run_pytest_check` uses the same interpreter for readiness and execution through `sys.executable -m pytest`. Reference viability resolves exact repository paths and test selectors, rejects placeholders and unsupported shell composition, performs same-interpreter collection, verifies current input stability, and fails closed when acceptance-map and token-matrix coverage or status disagree.
+
+A viability `PASS` requires an exact command or approved proof action. Publication and manifest verification occur only after evaluation; writer failure is `FAIL_TOOLING`, and close-pack consumers must refuse any non-`PASS` or stale/mismatched viability ledger.
+
+## Current client pattern
+
+`tools/qa/epic021_qa.py` is a current client of the generic harness. An epic wrapper supplies stable configuration and check definitions; it must not reintroduce run-ID correctness, collapse causal status classes, synthesize a phantom PASS, or treat repository evidence as proof that Live QA ran.
