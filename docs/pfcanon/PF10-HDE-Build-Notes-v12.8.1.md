@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.9  
+**Version:** v12.8.1  
 Effective Date: 2026.08.21  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -212,6 +212,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.14 HDE-EPIC039 D3 PF09 Row-Closure Authorization
 
 2.15 Require Closure-First PF09 Reassessment and Proof Before Creating Remedial Work
+
+2.16 HDE-EPIC039 Post-Implementation Audit Analysis and Required Evidence-Canon Drainage
 
 # 2\) Numbered Addenda
 
@@ -2299,5 +2301,129 @@ This addendum:
 * does not claim QA PASS, acceptance, token satisfaction, deployment, epic closure, or physical PF09 movement;  
 * does not require immediate permanent-canon editing; and  
 * does not permit documentation work to substitute for missing implementation or OPS work.
+
+## **2.16 HDE-EPIC039 Post-Implementation Audit Analysis and Required Evidence-Canon Drainage**
+
+### **Approval and source record**
+
+This addendum records the completed **Audit Analysis — Doc Deltas** for:
+
+* Audit Report: `post-implementation-audit-hde-epic039.md`  
+* Epic Plan: `r6-epic-plan-hde-epic039.md`  
+* Repository: `amthorn78/glow-hdengine-v2`  
+* Reviewed endpoint: `main` at `273889f1a09d609ffbf77f0c77711c6294484b8f`  
+* Applied canon: PF10 v12.7.9, PF02 v2.4.4, PF04 v2.8.1, PF12 v2.9.1, and PF14 v3.5.3  
+* Existing Issues List: none provided
+
+The analysis cross-checked the complete 10-finding audit ledger, F-001 through F-010, against the immutable repository endpoint. All 10 material repository observations were confirmed; none was contradicted.
+
+Exactly one finding, **FND-004 / authored F-004**, requires current documentation action. It produces two independent permanent-canon deltas: **MEC-001** for PF14 and **OD-001** for PF04.
+
+No PF09.x task delta, PF02 architecture delta, PF12 delta, or PF20 historical correction is supported.
+
+The Audit Report’s local `work` branch and GitHub `main` identified the same commit. The Audit Report recorded its worktree as clean. The Audit Analysis performed no repository mutation.
+
+### **Retained decisions and requirements**
+
+The 10 findings retain these dispositions:
+
+1. **FND-001 / F-001 — Presenter namespace placement:** No doc delta. Top-level `presenter/` and `engine/presenter/` coexist within PF02’s existing role-based single-home contract. `presenter/reader_v1/emitter.py` delegates final public-byte production to `engine.presenter`. Drift would require a second independent Presenter component, serializer home, or public-byte path; none was established.  
+2. **FND-002 / F-002 — Compat HTTP-handler placement:** No doc delta. `engine/http/compat_handler.py` defines the compat blueprint, while Adapter factories mount it. PF02 already establishes Adapter as the single HTTP authority without requiring every mounted handler to reside literally under `adapter/`.  
+3. **FND-003 / F-003 — CLI placement:** No doc delta. `hdctl` remains registered to `engine.cli.main:cli`; the audited CLI placement and entrypoint are aligned.  
+4. **FND-004 / F-004 — Evidence topology and conflicting canon:** Documentation action required. Evidence may span multiple governed roots, but Human Index and Machine Mirror binding remains authoritative. Permanent canon must correctly describe orientation publication ownership and Machine Mirror self-record hashing.  
+5. **FND-005 / F-005 — Pure-compute and effectful seams:** No doc delta. Deterministic sampler/core modules remain free of clock, random, network, and filesystem effects; DB, vendor, network, and file operations remain behind explicit sanctioned seams.  
+6. **FND-006 / F-006 — Vendor seam placement:** No doc delta. The active BodyGraph vendor transport remains under `engine/bodygraph/vendor_client.py`. The additional `engine/provider/` and `engine/providers/` packages do not, by their existence alone, establish a competing live vendor seam.  
+7. **FND-007 / F-007 — Database placement:** No doc delta. `engine/db/` remains the direct DB façade, `adapter/db_access.py` remains a compatibility façade, and BodyGraph-local persistence uses the canonical BodyGraph store consistently with PF02.  
+8. **FND-008 / F-008 — Root path spelling and case:** No doc delta. The expected repository-family roots remain present under their aligned lowercase names.  
+9. **FND-009 / F-009 — Multiple truth-bearing or producer roots:** No doc delta. The presence of `docs/`, `artifacts/`, `audit/`, `catalog/`, `proofs/`, `tools/`, and `scripts/` does not itself establish competing authority. Single-home authority is governed through Human Index and Machine Mirror binding rather than one physical directory.  
+10. **FND-010 / F-010 — Catalog and evidence mirrors:** No doc delta. `docs/ENDPOINTS_CATALOG.json` remains authoritative, its `artifacts/audit/ENDPOINTS_CATALOG.json` copy is byte-identical, and the Human Index and Machine Mirror remain governed through existing PF12 rules and CI checks.
+
+### **Epic, task, and status effects**
+
+* The analysis establishes no new HDE-EPIC039 implementation, remediation, OPS, or PF09 task.  
+* No PF09 task or subtask status change is recommended or performed.  
+* FND-004 concerns already-implemented behavior and unperformed permanent-canon drainage, not missing repository implementation.  
+* No new PF02 architectural correction is supported.  
+* No PF12 correction is required because PF12 §8.3 already states the correct Machine Mirror schema.  
+* No PF20 historical correction is required.  
+* Because no Existing Issues List was supplied, no issue-duplication determination was established.
+
+### **Required canon drainage**
+
+#### **MEC-001 — PF14 evidence orientation ownership**
+
+* **Target:** PF14 — HDE Mechanics Guide, §1.3.1 “Evidence jobs (single-writer tools)” and §1.3.2 “Evidence change workflow.”  
+* **Required change:** State consistently that `tools/evidence/update_evidence_index.py` exclusively owns governed orientation rendering and publication together with the Human Evidence Index, hash sentinel, Machine Mirror, Mirror checksum, and required proof companions.  
+* **Checker boundary:** Define `tools/evidence/orientation_demo.py` as a direct non-writing checker. Its compatibility write mode delegates to `update_evidence_index.py` and has no independent publication authority.  
+* **Required removal:** Remove the conflicting independent-orientation-write requirement and the updater → orientation writer → updater repair sequence.  
+* **Reason:** PF14 currently assigns orientation/index companions solely to the canonical updater while also assigning independent orientation writing to `orientation_demo.py`. Current repository behavior and PF10 §2.7 establish a single updater-owned publication transaction.  
+* **Affected finding:** FND-004 / F-004.  
+* **Status effect:** None.  
+* **Drainage posture:** Unperformed.
+
+#### **OD-001 — PF04 Machine Mirror self-record semantics**
+
+* **Target:** PF04 — HDE Governance, §2.0.6 “Evidence & indexing.”  
+* **Required change:** Correct `MACHINE_MIRROR_UPDATED_OK` and its accompanying self-record language to require:  
+  * `index.machine_mirror.sha256` to bind the canonical JSONL body excluding the self-record line;  
+  * `index.machine_mirror.size_bytes` to bind the complete Mirror file including the self-record line; and  
+  * the sibling path proof and checksum sentinel to bind the complete-file SHA-256.  
+* **Reason:** PF04’s current whole-file self-record SHA requirement conflicts with PF12 §8.3, current repository implementation, and the explicit drainage decision in PF10 §2.7.  
+* **Affected finding:** FND-004 / F-004.  
+* **Status effect:** None.  
+* **Drainage posture:** Unperformed.
+
+PF12 must remain unchanged because its existing self-record schema already supplies the correct governing semantics.
+
+### **Deferred obligations and unresolved work**
+
+The only remaining work established by this Audit Analysis is the later permanent-canon drainage of MEC-001 into PF14 and OD-001 into PF04.
+
+No repository remediation, PR, OPS task, PF09 task, PF02 revision, PF12 revision, or PF20 correction is created by the audit findings.
+
+Until drainage occurs, conflicting permanent-canon wording could incorrectly assign an independent orientation writer or require the Machine Mirror self-record to contain an impossible whole-file self-hash. PF10 §2.7 remains the controlling interim guidance for these conflicts.
+
+### **Scope boundaries and nonclaims**
+
+This record:
+
+* captures Audit Analysis conclusions and canon-drain requirements;  
+* does not rerun the underlying Reality Audit;  
+* does not authorize or perform implementation, remediation, OPS, QA, deployment, or repository mutation;  
+* does not edit PF04, PF14, or any other permanent PF document;  
+* does not create or close a PF09 row;  
+* does not claim QA PASS, token satisfaction, acceptance, deployment, epic closeout, or PF movement; and  
+* does not convert aligned repository layouts into remediation work merely because they span multiple namespaces or roots.
+
+### **Evidence and traceability**
+
+Minimum durable evidence anchors:
+
+* Reviewed repository endpoint: `273889f1a09d609ffbf77f0c77711c6294484b8f`  
+* Complete recursive tracked tree inspected: 6,953 entries  
+* Human Evidence Index records: 591  
+* Machine Mirror records: 591  
+* Machine Mirror self-record body SHA-256: `9e3b846e1e857e7b6e5a3def76941ee652b458228dd6805044ef529d2073f777`  
+* Complete Machine Mirror size: `283654`  
+* Complete-file SHA-256 recorded by path proof and checksum: `61b1c6c365b86d57c42de7a6fc0782ab8467cf19b55dae49c440b3cc709e9c78`  
+* Canonical and audit Endpoint Catalog copies: byte-identical, 2,844 bytes  
+* Writer implementation: `tools/evidence/update_evidence_index.py`  
+* Direct checker and compatibility delegate: `tools/evidence/orientation_demo.py`  
+* Human Index: `docs/evidence/INDEX.json`  
+* Machine Mirror: `artifacts/evidence_index.jsonl`  
+* Mirror proof: `artifacts/evidence_index.jsonl.path_proof.txt`  
+* Existing interim drainage authority: PF10 §2.7  
+* Correct governing Mirror schema: PF12 §8.3
+
+### **Relationship to existing PF10 guidance**
+
+This addendum does not supersede PF10 §2.7. It confirms, against current `main`, the two canon conflicts and drainage obligations already recorded there.
+
+PF10 §2.7 remains authoritative until:
+
+* PF14 is reconciled to preserve one updater-owned orientation publication transaction; and  
+* PF04 is reconciled with PF12 §8.3 for Machine Mirror self-record hash and size semantics.
+
+The remaining nine audit findings require no duplicate PF10 or permanent-canon guidance because their observed repository states are already classified or accommodated by current PF02, PF04, or PF12.
 
 \<eof\>
