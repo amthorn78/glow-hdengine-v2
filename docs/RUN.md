@@ -31,12 +31,18 @@ python tools/generate_registry_report.py
 python tools/evidence/generate_sampler_evidence.py
 python tools/evidence/generate_engine_core_evidence.py
 
-# Evidence skeleton updates (D4) and sanity pipeline (EPIC021 wiring)
+# Evidence skeleton publication (write-producing; authorized evidence work only)
 python tools/evidence/update_evidence_index.py
-python tools/evidence/orientation_demo.py
+
+# Read-only validation after publication
+python tools/evidence/update_evidence_index.py --check
+python tools/evidence/orientation_demo.py --check
+ci/checks/check_mirror_schema.sh
+
+# Broad release-sanity execution (write-producing; only when explicitly scoped)
 python tools/evidence/run_sanity_pipeline.py
 ```
-Outputs are governed and require `.path_proof.txt` plus INDEX/mirror updates; the sanity pipeline runs under closed rails and mirrors registry_report/sanity artifacts into Index/Mirror when combined with the index updater.
+`tools/evidence/update_evidence_index.py` publishes the Human Index, sentinel, Machine Mirror and checksum, orientation output, and proof companions as one convergent transaction. `tools/evidence/orientation_demo.py` has no independent write authority: compatibility write mode delegates to the updater, while `--check` is read-only. Outputs are governed and must not be hand-edited; the sanity pipeline runs under closed rails and remains outside docs-only validation unless explicitly scoped.
 - Existing checked-in EPIC022 release outputs remain frozen capture-time evidence. Current release derivatives and the legacy closure are produced only inside the external attestation build; direct source-tree closure execution is refused.
 
 ## Config & bundles (D5/D6)
@@ -79,7 +85,7 @@ LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 DEV_SAMPLER_URL="$DEV_SAMPLER
 # D6 vendor Live QA (open rails; vendor test identity, governed logs only)
 ALLOW_NETWORK=1 scripts/qa/d6_live_vendor_qa.py
 
-# EPIC021 QA harness (closed rails; optional EPIC021_QA_RUN_ID to group artifacts)
+# EPIC021 client of the generic QA harness (closed rails; stable epic/check identity)
 SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/qa/epic021_qa.py
 ```
 
@@ -87,4 +93,4 @@ Logs:
 - Dev sampler healthcheck → `notes/dev-sampler/dev_sampler_healthcheck.log`
 - Dev sampler Live QA → `audit/qa/hde-epic019/dev_sampler_http/`
 - D6 vendor Live QA → `audit/qa/hde-epic019/d6-vendor-live-qa/`
-- EPIC021 QA harness → `audit/qa/hde-epic021/` (bootstrap log, step logs, acceptance-map viability, manifest)
+- EPIC021 QA harness → `audit/qa/hde-epic021/` (bootstrap log, step logs, acceptance-map viability, manifest). Current correctness binds to stable epic/check identities and the five statuses documented in `docs/qa_harness_pattern.md`, not to a run ID.

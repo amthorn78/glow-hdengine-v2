@@ -1,5 +1,16 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC039: Calcination Pass 6 documentation alignment (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented the five landed HDE-EPIC039 workstream families: the exact canonical-JSON/narrative inventory, unified evidence publication, reusable current-state QA mechanics, change-aware ordinary CI plus generic release posture, and deterministic generic closeout-candidate capability.
+- Recorded the canonical JSON boundary as 26 governed targets with six explicitly declared arrays-as-sets rules, alongside the 360-row/template direction-native narrative pack split 120 each across `shared`, `a_to_b`, and `b_to_a` with two governed suppressions.
+
+### Changed / Fixed
+- Corrected evidence ownership so `tools/evidence/update_evidence_index.py` is the sole active skeleton writer and orientation compatibility writes delegate to it; subsequent updater, orientation, and mirror validation is described as read-only.
+- Updated agent and developer references to the generic QA harness's stable epic/check identities and five statuses, and to ordinary CI's one exact-head `test` job, automatic pull-request supersession cancellation, seven change-aware lanes, and truthful final audit marker.
+- Documented removal of active HDE-EPIC038-specific closeout, receipt, private-variable, network, and source-feedback bindings plus the epic-agnostic two-file closeout-candidate writer/checker and isolated manual validation workflow, while preserving the generic fifteen-stage release posture and historical HDE-EPIC038 evidence. No real HDE-EPIC039 candidate, report, manifest, acceptance map, token matrix, QA log, OPS, Live QA, acceptance, PF09 movement, Product Owner closeout, deployment, or epic closeout is claimed.
+
 Unreleased — HDE-EPIC038: Distillation reliability final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
