@@ -65,6 +65,7 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/qa/test_cli_admin_parity.py",
     "tests/qa/test_epic023_acceptance_alignment.py",
     "tests/qa/test_epic024_bootstrap_status.py",
+    "tests/qa/test_generate_epic_close_pack.py",
     "tests/qa/test_qa_tool_ownership.py",
     "tests/support/test_change_gates.py",
     "tests/transport/test_a7_transport_proofs.py",
@@ -290,6 +291,9 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/runtime/test_identity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
     ),
+    "schemas/epic_close_candidate_source.v1.json": (
+        "tests/qa/test_generate_epic_close_pack.py",
+    ),
     "adapter/http_reader.py": _HTTP_READER_TEST_OWNERS,
     "engine/__init__.py": ("tests/runtime/test_identity.py",),
     "engine/constants.py": ("tests/mech/test_constants.py",),
@@ -462,6 +466,10 @@ _QA_TOOL_TEST_OWNERS = {
     "tools/qa/generate_epic029_close_pack.py": (
         "tests/qa/test_viability_generator_wrappers.py",
         "tests/qa/test_epic029_requalification.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
+    "tools/qa/generate_epic_close_pack.py": (
+        "tests/qa/test_generate_epic_close_pack.py",
         _QA_TOOL_OWNERSHIP_TEST,
     ),
     "tools/qa/qa_harness.py": _QA_TEST_OWNERS + (_QA_TOOL_OWNERSHIP_TEST,),
