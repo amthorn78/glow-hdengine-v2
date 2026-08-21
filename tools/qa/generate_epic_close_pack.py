@@ -3,7 +3,10 @@
 
 The candidate source, schema, plan, and evidence inputs are exact tracked files
 at the current Git HEAD.  Write mode is the sole publication path for the two
-derived candidate files.  Check mode is deliberately read-only.
+derived candidate files.  Check mode never publishes or repairs candidate
+state.  Both modes verify every tracked mode-120000 symlink target against its
+candidate-HEAD blob; only the inspected symlink inode's unavoidable,
+kernel-managed atime may advance, and this tool never sets or restores it.
 """
 from __future__ import annotations
 
@@ -15,10 +18,8 @@ import json
 import os
 import re
 import secrets
-import shutil
 import stat
 import struct
-import subprocess
 import sys
 import zlib
 from collections.abc import Callable, Mapping, Sequence
@@ -42,11 +43,37 @@ MANIFEST_SCHEMA_VERSION = "epic_close_candidate_manifest.v1"
 EPIC_RE = re.compile(r"HDE-EPIC(?P<number>[0-9]{3})\Z")
 RELATIVE_PATH_RE = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\Z")
 SHA_RE = re.compile(r"[0-9a-f]{40,64}\Z")
-FEEDBACK_DEPENDENCY_RE = re.compile(
-    r"(?:(?<![a-z0-9])(?:run[^a-z0-9\r\n]*id|receipt|attestation|"
-    r"hosted[^a-z0-9\r\n]*result|later[^a-z0-9\r\n]*commit|"
-    r"source[^a-z0-9\r\n]*commit|release[^a-z0-9\r\n]*id)(?![a-z0-9]))",
-    re.IGNORECASE,
+FEEDBACK_DEPENDENCY_PATTERN = (
+    r"(?:^|[^A-Za-z0-9])(?:"
+    r"[Rr][Uu][Nn][^A-Za-z0-9\r\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|(?<![Tt][Ww][Oo][^A-Za-z0-9\r\n][Rr][Uu][Nn][^A-Za-z0-9\r\n])[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Rr][Ee][Ss][Uu][Ll][Tt][Ss]?|[Oo][Uu][Tt][Cc][Oo][Mm][Ee][Ss]?|[Ss][Tt][Aa][Tt][Uu][Ss](?:[Ee][Ss])?|[Cc][Oo][Nn][Cc][Ll][Uu][Ss][Ii][Oo][Nn][Ss]?|[Aa][Tt][Tt][Ee][Mm][Pp][Tt][Ss]?|[Uu][Rr][Ll][Ss]?)|"
+    r"[Rr][Ee][Cc][Ee][Ii][Pp][Tt][Ss]?|"
+    r"[Aa][Tt][Tt][Ee][Ss][Tt][Aa][Tt][Ii][Oo][Nn][Ss]?|"
+    r"(?:[Hh][Oo][Ss][Tt][Ee][Dd]|[Ww][Oo][Rr][Kk][Ff][Ll][Oo][Ww]|[Cc][Ii]|[Bb][Uu][Ii][Ll][Dd]|[Pp][Ii][Pp][Ee][Ll][Ii][Nn][Ee]|[Jj][Oo][Bb]|[Cc][Oo][Nn][Tt][Ii][Nn][Uu][Oo][Uu][Ss][^A-Za-z0-9\r\n]*[Ii][Nn][Tt][Ee][Gg][Rr][Aa][Tt][Ii][Oo][Nn])[^A-Za-z0-9\r\n]*(?:(?:[Rr][Uu][Nn]|[Jj][Oo][Bb]|[Ee][Xx][Ee][Cc][Uu][Tt][Ii][Oo][Nn]|[Cc][Hh][Ee][Cc][Kk]|[Aa][Tt][Tt][Ee][Mm][Pp][Tt]|[Vv][Aa][Ll][Ii][Dd][Aa][Tt][Ii][Oo][Nn])[^A-Za-z0-9\r\n]*)?(?:[Rr][Ee][Ss][Uu][Ll][Tt][Ss]?|[Oo][Uu][Tt][Cc][Oo][Mm][Ee][Ss]?|[Ss][Tt][Aa][Tt][Uu][Ss](?:[Ee][Ss])?|[Cc][Oo][Nn][Cc][Ll][Uu][Ss][Ii][Oo][Nn][Ss]?|[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Aa][Tt][Tt][Ee][Mm][Pp][Tt][Ss]?|[Uu][Rr][Ll][Ss]?)|"
+    r"[Ll][Aa][Tt][Ee][Rr][^A-Za-z0-9\r\n]*[Cc][Oo][Mm][Mm][Ii][Tt][Ss]?|"
+    r"[Ss][Oo][Uu][Rr][Cc][Ee][^A-Za-z0-9\r\n]*[Cc][Oo][Mm][Mm][Ii][Tt][Ss]?|"
+    r"[Cc][Oo][Mm][Mm][Ii][Tt][^A-Za-z0-9\r\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Ss][Hh][Aa]|[Hh][Aa][Ss][Hh](?:[Ee][Ss])?)|"
+    r"(?:[Gg][Ii][Tt][Hh][Uu][Bb]|[Gg][Ii][Tt]|[Hh][Ee][Aa][Dd]|[Ss][Oo][Uu][Rr][Cc][Ee])[^A-Za-z0-9\r\n]*(?:[Cc][Oo][Mm][Mm][Ii][Tt][^A-Za-z0-9\r\n]*)?(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Ss][Hh][Aa]|[Hh][Aa][Ss][Hh](?:[Ee][Ss])?)|"
+    r"[Rr][Ee][Ll][Ee][Aa][Ss][Ee][Ss]?[^A-Za-z0-9\r\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?)"
+    r")(?:[^A-Za-z0-9]|$)"
+)
+FEEDBACK_DEPENDENCY_RE = re.compile(FEEDBACK_DEPENDENCY_PATTERN)
+REPORT_SECTION_HEADINGS = (
+    "Candidate boundaries",
+    "Delivered scope",
+    "Evidence posture",
+    "Validation posture",
+)
+REPORT_BODY_LINES = (
+    "Concurrent readers fail closed while publication is unstable.",
+    "Candidate publication uses the manifest as its commit point.",
+    "Existing candidate outputs are not causal inputs.",
+    "Recovery requires a fresh derivation from tracked inputs.",
+    "Publication residue is not a candidate input.",
+    "The checker does not repair candidate outputs.",
+    "Candidate validation compares exact committed bytes.",
+    "The report and manifest are accepted only as one committed pair.",
+    "Candidate scope is bounded by the declared tracked inputs.",
+    "Tracked résumé evidence remains deterministic.",
 )
 REGULAR_GIT_MODES = frozenset({"100644", "100755"})
 OUTPUT_MODE = 0o644
@@ -62,6 +89,7 @@ MAX_GIT_TREE_ENTRIES = 2_000_000
 MAX_WORKTREE_FILE_BYTES = 128 * 1024 * 1024
 MAX_CAUSAL_INPUT_BYTES = 128 * 1024 * 1024
 MAX_OUTPUT_BYTES = 16 * 1024 * 1024
+MAX_RECOVERY_RESIDUE = 4
 RESERVED_HEADINGS = frozenset(
     {"source bindings", "output bindings", "explicit nonclaims"}
 )
@@ -224,6 +252,25 @@ class InstalledOutput:
     fingerprint: tuple[int, int, int, int, int, int]
     atime_ns: int
     backup_name: str | None
+
+
+@dataclass(frozen=True)
+class RecoveryResidue:
+    rel: str
+    output_rel: str
+    payload: bytes
+    fingerprint: tuple[int, int, int, int, int, int]
+    atime_ns: int
+
+
+@dataclass(frozen=True)
+class WritePosture:
+    needs_publication: bool
+    preimages: Mapping[str, OutputPreimage]
+    index_state: Mapping[
+        str, tuple[int, int, int, int, int, int, int, str] | None
+    ]
+    recovery_residue_paths: frozenset[str]
 
 
 def _fail(code: str) -> ClosePackError:
@@ -469,65 +516,6 @@ def _verify_git_context(context: GitContext) -> None:
             raise _fail("GIT_CONTEXT_CHANGED")
 
 
-def _run_git(location: Path | GitContext, *args: str) -> bytes:
-    candidate = shutil.which("git", path=os.defpath)
-    if candidate is None:
-        raise _fail("GIT_UNAVAILABLE")
-    try:
-        executable = Path(candidate).resolve(strict=True)
-    except OSError as exc:
-        raise _fail("GIT_UNAVAILABLE") from exc
-    if not executable.is_file() or not os.access(executable, os.X_OK):
-        raise _fail("GIT_UNAVAILABLE")
-    environment = {
-        "GIT_CONFIG_GLOBAL": os.devnull,
-        "GIT_CONFIG_NOSYSTEM": "1",
-        "GIT_OPTIONAL_LOCKS": "0",
-        "GIT_NO_LAZY_FETCH": "1",
-        "GIT_NO_REPLACE_OBJECTS": "1",
-        "GIT_TERMINAL_PROMPT": "0",
-        "LANG": "C",
-        "LC_ALL": "C",
-        "PATH": os.defpath,
-        "TZ": "UTC",
-    }
-    context = location if isinstance(location, GitContext) else None
-    if context is not None:
-        _verify_git_context(context)
-        repository_args = (
-            f"--git-dir={context.git_dir}",
-            f"--work-tree={context.root}",
-        )
-    else:
-        repository_args = ("-C", str(location))
-    try:
-        completed = subprocess.run(
-            (
-                str(executable),
-                "-c",
-                "core.fsmonitor=false",
-                "-c",
-                "core.hooksPath=/dev/null",
-                "-c",
-                "core.untrackedCache=false",
-                *repository_args,
-                *args,
-            ),
-            capture_output=True,
-            check=False,
-            env=environment,
-            shell=False,
-            timeout=30,
-        )
-    except (OSError, subprocess.SubprocessError) as exc:
-        raise _fail("GIT_UNAVAILABLE") from exc
-    if context is not None:
-        _verify_git_context(context)
-    if completed.returncode != 0:
-        raise _fail("GIT_COMMAND_FAILED")
-    return completed.stdout
-
-
 def _repository_root() -> Path:
     try:
         cwd = Path.cwd().resolve(strict=True)
@@ -707,35 +695,6 @@ def _establish_git_context(root: Path) -> GitContext:
     )
     _verify_git_context(context)
     return context
-
-
-def _verify_git_repository(context: GitContext) -> None:
-    try:
-        inside = _run_git(context, "rev-parse", "--is-inside-work-tree")
-        root = Path(
-            _run_git(context, "rev-parse", "--show-toplevel")
-            .decode("utf-8")
-            .strip()
-        ).resolve(strict=True)
-        git_dir = Path(
-            _run_git(context, "rev-parse", "--absolute-git-dir")
-            .decode("utf-8")
-            .strip()
-        ).resolve(strict=True)
-        common_dir = Path(
-            _run_git(context, "rev-parse", "--path-format=absolute", "--git-common-dir")
-            .decode("utf-8")
-            .strip()
-        ).resolve(strict=True)
-    except (ClosePackError, OSError, UnicodeDecodeError) as exc:
-        raise _fail("GIT_WORKTREE_UNAVAILABLE") from exc
-    if (
-        inside != b"true\n"
-        or root != context.root
-        or git_dir != context.git_dir
-        or common_dir != context.common_dir
-    ):
-        raise _fail("GIT_CONTEXT_INVALID")
 
 
 def _head(context: GitContext, store: _GitObjectStore | None = None) -> str:
@@ -1968,6 +1927,14 @@ def _require_feedback_free_source(
             raise _fail("FEEDBACK_DEPENDENCY_PROHIBITED")
 
 
+def _require_report_nonclaim_posture(source: Mapping[str, Any]) -> None:
+    for section in source["report_sections"]:
+        if str(section["heading"]) not in REPORT_SECTION_HEADINGS or any(
+            str(line) not in REPORT_BODY_LINES for line in section["body_lines"]
+        ):
+            raise _fail("REPORT_NONCLAIM_CONTRADICTION")
+
+
 def _normalized_report_heading(value: str) -> str:
     return re.sub(r"[ \t]+", " ", value.strip(" \t")).casefold()
 
@@ -1976,7 +1943,7 @@ def _report_body_structure_is_ambiguous(lines: Sequence[str]) -> bool:
     return any(REPORT_BODY_PROHIBITED_RE.search(line) is not None for line in lines)
 
 
-def _require_report_structure(source: Mapping[str, Any]) -> None:
+def _require_report_topology(source: Mapping[str, Any]) -> None:
     raw_headings = [str(section["heading"]) for section in source["report_sections"]]
     headings = [
         _normalized_report_heading(heading) for heading in raw_headings
@@ -1992,6 +1959,16 @@ def _require_report_structure(source: Mapping[str, Any]) -> None:
         or any(heading in RESERVED_HEADINGS for heading in headings)
         or any(REPORT_HEADING_RE.fullmatch(heading) is None for heading in raw_headings)
         or ambiguous_body_structure
+    ):
+        raise _fail("REPORT_SECTION_AMBIGUOUS")
+
+
+def _require_report_structure(source: Mapping[str, Any]) -> None:
+    _require_report_topology(source)
+    if any(
+        str(section["heading"]) not in REPORT_SECTION_HEADINGS
+        or any(str(line) not in REPORT_BODY_LINES for line in section["body_lines"])
+        for section in source["report_sections"]
     ):
         raise _fail("REPORT_SECTION_AMBIGUOUS")
 
@@ -2031,6 +2008,9 @@ def _load_model(
     if source.get("schema_version") != SOURCE_SCHEMA_VERSION:
         raise _fail("SOURCE_SCHEMA_INVALID")
     _require_feedback_free_source(source, source_rel, head)
+    _require_report_topology(source)
+    _require_report_nonclaim_posture(source)
+    _require_report_structure(source)
     if set(source["nonclaims"]) != set(NONCLAIM_TEXT):
         raise _fail("SOURCE_SCHEMA_INVALID")
 
@@ -2041,8 +2021,6 @@ def _load_model(
         "close_report": report_path,
     }:
         raise _fail("OUTPUT_BINDING_MISMATCH")
-
-    _require_report_structure(source)
 
     plan_rel = _canonical_relative_path(source["plan_path"])
     plan_input = _capture_input(
@@ -2302,6 +2280,41 @@ def _metadata_matches_with_symlink_atime_exemption(
     return True
 
 
+def _metadata_matches_with_authorized_write_changes(
+    before: Mapping[str, tuple[int, int, int, int, int, int, int]],
+    after: Mapping[str, tuple[int, int, int, int, int, int, int]],
+    tree: Mapping[str, GitTreeEntry],
+    mutable_paths: set[str],
+    parent_paths: set[str],
+) -> bool:
+    for rel in parent_paths:
+        prior = before.get(rel)
+        current = after.get(rel)
+        if prior is None or current is None:
+            return False
+        # Publication may change the containing directory's entry-allocation
+        # size, mtime, and ctime.  Its mode, atime, device, inode, and path
+        # identity remain protected; this is not a general timestamp exemption.
+        if (prior[0], prior[2], *prior[5:]) != (
+            current[0],
+            current[2],
+            *current[5:],
+        ):
+            return False
+    excluded = mutable_paths | parent_paths
+    filtered_before = {
+        rel: values for rel, values in before.items() if rel not in excluded
+    }
+    filtered_after = {
+        rel: values for rel, values in after.items() if rel not in excluded
+    }
+    return _metadata_matches_with_symlink_atime_exemption(
+        filtered_before,
+        filtered_after,
+        tree,
+    )
+
+
 def _git_blob_id(payload: bytes, algorithm: str) -> str:
     try:
         digest = hashlib.new(algorithm)
@@ -2460,13 +2473,38 @@ def _worktree_changes(root: Path, context: GitContext) -> set[str]:
                     changes.add(rel)
             elif entry.mode == "120000" and stat.S_ISLNK(mode):
                 target = _stable_symlink_read(root, rel)
-                if _git_blob_id(target, algorithm) != entry.object_id:
+                expected_target = _git_blob_payload(
+                    context,
+                    entry.object_id,
+                    store,
+                )
+                if target != expected_target:
                     changes.add(rel)
             else:
                 changes.add(rel)
         except (ClosePackError, OSError):
             raise
     return changes
+
+
+def _require_index_matches_head(
+    context: GitContext,
+    tree: Mapping[str, GitTreeEntry],
+    store: _GitObjectStore,
+) -> None:
+    try:
+        algorithm = _object_algorithm(_head(context, store))
+        index = _index_entries(context, algorithm)
+    except ClosePackError as exc:
+        raise _fail("GIT_CLEAN_STATE_UNAVAILABLE") from exc
+    if set(index) != set(tree):
+        raise _fail("GIT_INDEX_DIRTY")
+    for rel, entry in tree.items():
+        if (index[rel].mode, index[rel].object_id) != (
+            entry.mode,
+            entry.object_id,
+        ):
+            raise _fail("GIT_INDEX_DIRTY")
 
 
 def _git_control_paths(context: GitContext) -> tuple[Path, ...]:
@@ -2894,6 +2932,7 @@ def _install_staged_output(
     staged_name: str,
     expected: bytes,
     installed: list[InstalledOutput],
+    install_attempts: set[str],
 ) -> None:
     _verify_anchor_parent(anchor)
     staged_output = _capture_staged_output(
@@ -2902,6 +2941,7 @@ def _install_staged_output(
         expected,
         staged_name if anchor.preimage.existed else None,
     )
+    install_attempts.add(anchor.rel)
     if anchor.preimage.existed:
         _rename_with_flags(staged_name, anchor.name, anchor.parent_fd, RENAME_EXCHANGE)
         installed.append(staged_output)
@@ -2924,6 +2964,22 @@ def _rollback_installed_output(installed: InstalledOutput, staged_name: str) -> 
     anchor = installed.anchor
     _verify_anchor_parent(anchor)
     if installed.backup_name is not None:
+        if anchor.preimage.fingerprint is None:
+            raise _fail("OUTPUT_TARGET_CHANGED")
+        _require_named_state(
+            anchor,
+            installed.backup_name,
+            anchor.preimage.payload,
+            anchor.preimage.fingerprint,
+            anchor.preimage.atime_ns,
+        )
+        _require_named_state(
+            anchor,
+            anchor.name,
+            installed.payload,
+            installed.fingerprint,
+            installed.atime_ns,
+        )
         _rename_with_flags(
             installed.backup_name,
             anchor.name,
@@ -2938,6 +2994,13 @@ def _rollback_installed_output(installed: InstalledOutput, staged_name: str) -> 
                 installed.fingerprint,
                 installed.atime_ns,
             )
+            _require_named_state(
+                anchor,
+                anchor.name,
+                anchor.preimage.payload,
+                anchor.preimage.fingerprint,
+                anchor.preimage.atime_ns,
+            )
         except BaseException:
             _rename_with_flags(
                 installed.backup_name,
@@ -2948,6 +3011,15 @@ def _rollback_installed_output(installed: InstalledOutput, staged_name: str) -> 
             raise
         return
 
+    _require_named_state(
+        anchor,
+        anchor.name,
+        installed.payload,
+        installed.fingerprint,
+        installed.atime_ns,
+    )
+    if _directory_case_matches(anchor.parent_fd, staged_name):
+        raise _fail("OUTPUT_TARGET_CHANGED")
     _rename_with_flags(
         anchor.name,
         staged_name,
@@ -2962,6 +3034,8 @@ def _rollback_installed_output(installed: InstalledOutput, staged_name: str) -> 
             installed.fingerprint,
             installed.atime_ns,
         )
+        if _directory_case_matches(anchor.parent_fd, anchor.name):
+            raise _fail("OUTPUT_TARGET_CHANGED")
     except BaseException:
         _rename_with_flags(
             staged_name,
@@ -2972,84 +3046,238 @@ def _rollback_installed_output(installed: InstalledOutput, staged_name: str) -> 
         raise
 
 
+def _publication_boundary(_name: str) -> None:
+    """Named no-op used by tests to stop at completed durability boundaries."""
+
+
+def _sync_output_directory(anchor: OutputAnchor) -> None:
+    _verify_anchor_parent(anchor)
+    try:
+        os.fsync(anchor.parent_fd)
+    except OSError as exc:
+        raise _fail("PUBLICATION_SYNC_FAILED") from exc
+
+
+def _read_manifest_committed_pair(
+    root: Path,
+    outputs: Mapping[str, bytes],
+    report_rel: str,
+    manifest_rel: str,
+) -> dict[str, bytes]:
+    """Accept a pair only through stable manifest -> report -> manifest reads."""
+
+    if set(outputs) != {report_rel, manifest_rel}:
+        raise _fail("OUTPUT_SET_INCOMPLETE")
+    manifest_anchor: OutputAnchor | None = None
+    report_anchor: OutputAnchor | None = None
+    try:
+        manifest_anchor = _open_output_anchor(root, manifest_rel)
+        manifest_a = manifest_anchor.preimage.payload
+        if not manifest_anchor.preimage.existed:
+            raise _fail("OUTPUT_MISSING")
+        if manifest_anchor.preimage.mode != OUTPUT_MODE:
+            raise _fail("OUTPUT_MODE_MISMATCH")
+        document = _strict_json(manifest_a, code="MANIFEST_JSON_INVALID")
+        if (
+            not isinstance(document, dict)
+            or _canonical_json(document) != manifest_a
+            or manifest_a != outputs[manifest_rel]
+        ):
+            raise _fail("MANIFEST_BINDING_MISMATCH")
+        try:
+            report_binding = document["outputs"]["close_report"]
+            manifest_binding = document["outputs"]["close_manifest"]
+            epic_id = document["epic_id"]
+        except (KeyError, TypeError) as exc:
+            raise _fail("MANIFEST_BINDING_MISMATCH") from exc
+        expected_report, expected_manifest = _derived_paths(str(epic_id))
+        if (
+            document.get("schema_version") != MANIFEST_SCHEMA_VERSION
+            or expected_report != report_rel
+            or expected_manifest != manifest_rel
+            or report_binding
+            != {
+                "path": report_rel,
+                "sha256": _sha256(outputs[report_rel]),
+                "size_bytes": len(outputs[report_rel]),
+            }
+            or manifest_binding != {"path": manifest_rel}
+        ):
+            raise _fail("MANIFEST_BINDING_MISMATCH")
+
+        report_anchor = _open_output_anchor(root, report_rel)
+        if (
+            not report_anchor.preimage.existed
+            or report_anchor.preimage.mode != OUTPUT_MODE
+            or (report_anchor.parent_device, report_anchor.parent_inode)
+            != (manifest_anchor.parent_device, manifest_anchor.parent_inode)
+        ):
+            raise _fail("MANIFEST_BINDING_MISMATCH")
+        report = report_anchor.preimage.payload
+
+        manifest_b, manifest_b_metadata = _stable_anchored_read(
+            manifest_anchor.parent_fd,
+            manifest_anchor.name,
+        )
+        if (
+            manifest_a != manifest_b
+            or manifest_anchor.preimage.fingerprint
+            != _fingerprint(manifest_b_metadata)
+        ):
+            raise _fail("MANIFEST_UNSTABLE")
+        if (
+            report != outputs[report_rel]
+            or len(report) != report_binding["size_bytes"]
+            or _sha256(report) != report_binding["sha256"]
+        ):
+            raise _fail("REPORT_HASH_MISMATCH")
+        return {manifest_rel: manifest_a, report_rel: report}
+    finally:
+        if report_anchor is not None:
+            os.close(report_anchor.parent_fd)
+        if manifest_anchor is not None:
+            os.close(manifest_anchor.parent_fd)
+
+
 def _publish_pair(
     root: Path,
     outputs: Mapping[str, bytes],
+    report_rel: str,
+    manifest_rel: str,
+    expected_preimages: Mapping[str, OutputPreimage],
     verifier: Callable[[], None],
 ) -> None:
-    if len(outputs) != 2:
+    if set(outputs) != {report_rel, manifest_rel}:
         raise _fail("OUTPUT_SET_INCOMPLETE")
-    rels = sorted(outputs)
-    if len(set(rels)) != 2:
+    if report_rel == manifest_rel:
         raise _fail("OUTPUT_COLLISION")
+    rels = (report_rel, manifest_rel)
     anchors: dict[str, OutputAnchor] = {}
     staged: dict[str, str] = {}
     installed: list[InstalledOutput] = []
+    install_attempts: set[str] = set()
+    manifest_committed = False
     try:
         for rel in rels:
             anchors[rel] = _open_output_anchor(root, rel)
+            if anchors[rel].preimage != expected_preimages.get(rel):
+                raise _fail("OUTPUT_TARGET_CHANGED")
+        if (anchors[report_rel].parent_device, anchors[report_rel].parent_inode) != (
+            anchors[manifest_rel].parent_device,
+            anchors[manifest_rel].parent_inode,
+        ):
+            raise _fail("OUTPUT_PARENT_CHANGED")
+        verifier()
+
+        staged[report_rel] = _write_temp(
+            anchors[report_rel], outputs[report_rel], OUTPUT_MODE
+        )
+        _publication_boundary("report_staged")
+        verifier()
+        staged[manifest_rel] = _write_temp(
+            anchors[manifest_rel], outputs[manifest_rel], OUTPUT_MODE
+        )
+        _publication_boundary("manifest_staged")
+        verifier()
         for rel in rels:
-            staged[rel] = _write_temp(anchors[rel], outputs[rel], OUTPUT_MODE)
-        for rel in rels:
-            anchor = anchors[rel]
-            _require_anchor_preimage(anchor)
-            _install_staged_output(
-                anchor,
+            _capture_staged_output(
+                anchors[rel],
                 staged[rel],
                 outputs[rel],
-                installed,
+                staged[rel] if anchors[rel].preimage.existed else None,
             )
-        synced: set[tuple[int, int]] = set()
-        for rel in rels:
-            anchor = anchors[rel]
-            identity = (anchor.parent_device, anchor.parent_inode)
-            if identity in synced:
-                continue
-            synced.add(identity)
-            try:
-                os.fsync(anchor.parent_fd)
-            except OSError as exc:
-                raise _fail("PUBLICATION_VERIFY_FAILED") from exc
-        for rel in rels:
-            anchor = anchors[rel]
-            _verify_anchor_parent(anchor)
-            if _directory_case_matches(anchor.parent_fd, anchor.name) != [anchor.name]:
-                raise _fail("OUTPUT_CASE_AMBIGUOUS")
-            actual, _ = _stable_anchored_read(anchor.parent_fd, anchor.name)
-            metadata = os.stat(
-                anchor.name,
-                dir_fd=anchor.parent_fd,
-                follow_symlinks=False,
-            )
-            if actual != outputs[rel] or stat.S_IMODE(metadata.st_mode) != OUTPUT_MODE:
-                raise _fail("PUBLICATION_VERIFY_FAILED")
+        _publication_boundary("staged_pair_verified")
         verifier()
-        for rel, temp_name in staged.items():
-            _unlink_anchored(anchors[rel], temp_name)
+        for rel in rels:
+            _require_anchor_preimage(anchors[rel])
+
+        _require_anchor_preimage(anchors[report_rel])
+        verifier()
+        _install_staged_output(
+            anchors[report_rel],
+            staged[report_rel],
+            outputs[report_rel],
+            installed,
+            install_attempts,
+        )
+        _publication_boundary("report_installed")
+        verifier()
+        _sync_output_directory(anchors[report_rel])
+        _publication_boundary("report_directory_synced")
+        verifier()
+
+        _require_anchor_preimage(anchors[manifest_rel])
+        verifier()
+        _install_staged_output(
+            anchors[manifest_rel],
+            staged[manifest_rel],
+            outputs[manifest_rel],
+            installed,
+            install_attempts,
+        )
+        _publication_boundary("manifest_installed")
+        verifier()
+        _sync_output_directory(anchors[manifest_rel])
+        manifest_committed = True
+        _publication_boundary("manifest_directory_synced")
+        verifier()
+
+        _read_manifest_committed_pair(
+            root, outputs, report_rel, manifest_rel
+        )
+        verifier()
+        _publication_boundary("pair_verified")
+        verifier()
+        _unlink_anchored(anchors[report_rel], staged[report_rel])
+        _publication_boundary("report_residue_removed")
+        verifier()
+        _unlink_anchored(anchors[manifest_rel], staged[manifest_rel])
+        _publication_boundary("manifest_residue_removed")
+        verifier()
+        _sync_output_directory(anchors[manifest_rel])
+        _publication_boundary("cleanup_directory_synced")
+        verifier()
     except BaseException as publish_error:
         rollback_errors: list[BaseException] = []
-        for installed_output in reversed(installed):
-            try:
-                _rollback_installed_output(
-                    installed_output,
-                    staged[installed_output.anchor.rel],
-                )
-            except BaseException as exc:  # pragma: no cover - catastrophic filesystem failure
-                rollback_errors.append(exc)
-        for rel, temp_name in staged.items():
-            try:
-                _unlink_anchored(anchors[rel], temp_name)
-            except BaseException as exc:
-                rollback_errors.append(exc)
-        if rollback_errors:
-            raise _fail("PUBLICATION_ROLLBACK_INCOMPLETE") from publish_error
+        recorded_installs = {output.anchor.rel for output in installed}
+        uncertain_install = any(
+            rel in install_attempts and rel not in recorded_installs for rel in rels
+        )
+        if (
+            not manifest_committed
+            and manifest_rel not in install_attempts
+            and not uncertain_install
+        ):
+            for installed_output in reversed(installed):
+                try:
+                    _rollback_installed_output(
+                        installed_output,
+                        staged[installed_output.anchor.rel],
+                    )
+                except BaseException as exc:  # pragma: no cover - catastrophic filesystem failure
+                    rollback_errors.append(exc)
+            if not rollback_errors:
+                # Remove the manifest stage first.  If cleanup is interrupted,
+                # the remaining report stage is a state-consistent precommit
+                # residue that a fresh authorized write can classify safely.
+                for rel in (manifest_rel, report_rel):
+                    temp_name = staged.get(rel)
+                    if temp_name is None:
+                        continue
+                    try:
+                        _unlink_anchored(anchors[rel], temp_name)
+                    except BaseException as exc:
+                        rollback_errors.append(exc)
+                        break
+            if anchors:
+                try:
+                    _sync_output_directory(next(iter(anchors.values())))
+                except BaseException as exc:
+                    rollback_errors.append(exc)
+            if rollback_errors:
+                raise _fail("PUBLICATION_ROLLBACK_INCOMPLETE") from publish_error
         raise
     finally:
-        for rel, temp_name in staged.items():
-            try:
-                _unlink_anchored(anchors[rel], temp_name)
-            except BaseException:
-                pass
         for anchor in anchors.values():
             os.close(anchor.parent_fd)
 
@@ -3059,6 +3287,332 @@ def _allowed_write_status(
 ) -> None:
     if not _worktree_changes(root, context).issubset(outputs):
         raise _fail("UNEXPECTED_WRITE_RESIDUE")
+
+
+def _previous_output_payload(
+    context: GitContext,
+    store: _GitObjectStore,
+    tree: Mapping[str, GitTreeEntry],
+    rel: str,
+) -> bytes | None:
+    entry = tree.get(rel)
+    if entry is None:
+        return None
+    if entry.object_type != "blob" or entry.mode != "100644":
+        raise _fail("RECOVERY_STATE_AMBIGUOUS")
+    return _git_blob_payload(context, entry.object_id, store)
+
+
+def _classify_recovery_output(
+    root: Path,
+    rel: str,
+    expected: bytes,
+    previous: bytes | None,
+) -> tuple[str, OutputPreimage]:
+    preimage = _validate_output_target(root, rel)
+    if not preimage.existed:
+        return "absent", preimage
+    if preimage.mode != OUTPUT_MODE:
+        raise _fail("RECOVERY_STATE_AMBIGUOUS")
+    if preimage.payload == expected:
+        return "new", preimage
+    if previous is not None and preimage.payload == previous:
+        return "old", preimage
+    raise _fail("RECOVERY_STATE_AMBIGUOUS")
+
+
+def _recovery_residue(
+    root: Path,
+    context: GitContext,
+    tree: Mapping[str, GitTreeEntry],
+    outputs: Mapping[str, bytes],
+    report_rel: str,
+    manifest_rel: str,
+    previous: Mapping[str, bytes | None],
+    states: Mapping[str, str],
+) -> tuple[RecoveryResidue, ...]:
+    report_parent = PurePosixPath(report_rel).parent
+    if report_parent != PurePosixPath(manifest_rel).parent:
+        raise _fail("OUTPUT_PARENT_CHANGED")
+    parent_anchor: OutputAnchor | None = None
+    try:
+        parent_anchor = _open_output_anchor(root, report_rel)
+        names = os.listdir(parent_anchor.parent_fd)
+        _verify_anchor_parent(parent_anchor)
+    except OSError as exc:
+        raise _fail("OUTPUT_PARENT_UNAVAILABLE") from exc
+    finally:
+        if parent_anchor is not None:
+            os.close(parent_anchor.parent_fd)
+    by_name = {
+        PurePosixPath(rel).name: rel for rel in (report_rel, manifest_rel)
+    }
+    residues: list[RecoveryResidue] = []
+    for name in names:
+        output_rel = next(
+            (
+                rel
+                for canonical, rel in by_name.items()
+                if re.fullmatch(
+                    rf"\.{re.escape(canonical)}\.epic-close-pack\.[0-9a-f]{{32}}",
+                    name,
+                )
+            ),
+            None,
+        )
+        if output_rel is None:
+            continue
+        rel = (report_parent / name).as_posix()
+        if rel in tree or len(residues) >= MAX_RECOVERY_RESIDUE:
+            raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+        try:
+            metadata = (root / rel).lstat()
+        except OSError as exc:
+            raise _fail("RECOVERY_RESIDUE_AMBIGUOUS") from exc
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or stat.S_ISLNK(metadata.st_mode)
+            or metadata.st_nlink != 1
+            or metadata.st_uid != os.geteuid()
+        ):
+            raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+        payload, fingerprint = _stable_read(
+            root, rel, max_bytes=MAX_OUTPUT_BYTES
+        )
+        allowed = {outputs[output_rel]}
+        if previous[output_rel] is not None:
+            allowed.add(previous[output_rel])
+        if stat.S_IMODE(metadata.st_mode) != OUTPUT_MODE or payload not in allowed:
+            raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+        residues.append(
+            RecoveryResidue(
+                rel=rel,
+                output_rel=output_rel,
+                payload=payload,
+                fingerprint=fingerprint,
+                atime_ns=metadata.st_atime_ns,
+            )
+        )
+    ordered = tuple(sorted(residues, key=lambda item: item.rel))
+    if len({item.output_rel for item in ordered}) != len(ordered):
+        raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+    previous_present = {
+        rel: previous[rel] is not None for rel in (report_rel, manifest_rel)
+    }
+    if previous_present[report_rel] != previous_present[manifest_rel]:
+        raise _fail("RECOVERY_STATE_AMBIGUOUS")
+
+    signature_items: set[tuple[str, str]] = set()
+    for item in ordered:
+        expected = outputs[item.output_rel]
+        prior = previous[item.output_rel]
+        if prior is not None and item.payload == expected == prior:
+            generation = "same"
+        elif item.payload == expected:
+            generation = "new"
+        elif prior is not None and item.payload == prior:
+            generation = "old"
+        else:
+            raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+        signature_items.add((item.output_rel, generation))
+    signature = frozenset(signature_items)
+    empty: frozenset[tuple[str, str]] = frozenset()
+    report_new = frozenset({(report_rel, "new")})
+    manifest_new = frozenset({(manifest_rel, "new")})
+    report_old = frozenset({(report_rel, "old")})
+    manifest_old = frozenset({(manifest_rel, "old")})
+    report_same = frozenset({(report_rel, "same")})
+    manifest_same = frozenset({(manifest_rel, "same")})
+    state_pair = (states[report_rel], states[manifest_rel])
+    if previous_present[report_rel]:
+        allowed_signatures = {
+            ("old", "old"): {
+                empty,
+                report_new,
+                report_new | manifest_new,
+            },
+            ("new", "old"): {
+                empty,
+                report_old,
+                report_old | manifest_new,
+                report_same,
+                report_same | manifest_new,
+            },
+            ("new", "new"): {
+                empty,
+                report_old,
+                manifest_old,
+                report_old | manifest_old,
+                report_same,
+                manifest_same,
+                report_same | manifest_same,
+                report_same | manifest_old,
+            },
+        }
+    else:
+        allowed_signatures = {
+            ("absent", "absent"): {
+                empty,
+                report_new,
+                report_new | manifest_new,
+            },
+            ("new", "absent"): {empty, manifest_new},
+            ("new", "new"): {empty},
+        }
+    if signature not in allowed_signatures.get(state_pair, set()):
+        raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+    return ordered
+
+
+def _cleanup_recovery_residue(
+    root: Path,
+    residues: Sequence[RecoveryResidue],
+    verifier: Callable[[], None],
+) -> None:
+    if not residues:
+        return
+    verifier()
+    anchors: dict[str, OutputAnchor] = {}
+    try:
+        for output_rel in {item.output_rel for item in residues}:
+            anchors[output_rel] = _open_output_anchor(root, output_rel)
+        for item in residues:
+            anchor = anchors[item.output_rel]
+            name = PurePosixPath(item.rel).name
+            payload, metadata = _stable_anchored_read(anchor.parent_fd, name)
+            if (
+                payload != item.payload
+                or _fingerprint(metadata) != item.fingerprint
+                or metadata.st_atime_ns != item.atime_ns
+                or stat.S_IMODE(metadata.st_mode) != OUTPUT_MODE
+                or metadata.st_nlink != 1
+                or metadata.st_uid != os.geteuid()
+            ):
+                raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+            quarantine = ""
+            for _ in range(128):
+                candidate = (
+                    f".{anchor.name}.epic-close-pack.{secrets.token_hex(16)}"
+                )
+                if candidate not in os.listdir(anchor.parent_fd):
+                    quarantine = candidate
+                    break
+            if not quarantine:
+                raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+            verifier()
+            _rename_with_flags(name, quarantine, anchor.parent_fd, RENAME_NOREPLACE)
+            try:
+                _publication_boundary("recovery_residue_quarantined")
+                verifier()
+                moved, moved_metadata = _stable_anchored_read(
+                    anchor.parent_fd, quarantine
+                )
+                if (
+                    moved != item.payload
+                    or _fingerprint(moved_metadata)[:-1]
+                    != item.fingerprint[:-1]
+                    or stat.S_IMODE(moved_metadata.st_mode) != OUTPUT_MODE
+                    or moved_metadata.st_nlink != 1
+                    or moved_metadata.st_uid != os.geteuid()
+                ):
+                    raise _fail("RECOVERY_RESIDUE_AMBIGUOUS")
+            except BaseException:
+                try:
+                    verifier()
+                    _rename_with_flags(
+                        quarantine, name, anchor.parent_fd, RENAME_NOREPLACE
+                    )
+                except BaseException as restore_error:
+                    raise _fail("RECOVERY_RESIDUE_AMBIGUOUS") from restore_error
+                raise
+            verifier()
+            _unlink_anchored(anchor, quarantine)
+            _publication_boundary("recovery_residue_removed")
+        verifier()
+        _sync_output_directory(next(iter(anchors.values())))
+        _publication_boundary("recovery_directory_synced")
+    finally:
+        for anchor in anchors.values():
+            os.close(anchor.parent_fd)
+
+
+def _prepare_write_posture(
+    root: Path,
+    context: GitContext,
+    head: str,
+    outputs: Mapping[str, bytes],
+    report_rel: str,
+    manifest_rel: str,
+    index_state: Mapping[
+        str, tuple[int, int, int, int, int, int, int, str] | None
+    ],
+) -> WritePosture:
+    store = _GitObjectStore(context)
+    index_path = context.git_dir / "index"
+    if _git_control_state((index_path,)) != index_state:
+        raise _fail("GIT_CONTROL_STATE_CHANGED")
+    if _head(context, store) != head:
+        raise _fail("GIT_HEAD_CHANGED")
+    tree = _tree_entries(context, store)
+
+    def verify_recovery_context() -> None:
+        _verify_git_context(context)
+        if _head(context, store) != head:
+            raise _fail("GIT_HEAD_CHANGED")
+        if _git_control_state((index_path,)) != index_state:
+            raise _fail("GIT_CONTROL_STATE_CHANGED")
+        _require_index_matches_head(context, tree, store)
+
+    _require_index_matches_head(context, tree, store)
+    previous = {
+        rel: _previous_output_payload(context, store, tree, rel)
+        for rel in (report_rel, manifest_rel)
+    }
+    classified = {
+        rel: _classify_recovery_output(
+            root, rel, outputs[rel], previous[rel]
+        )
+        for rel in (report_rel, manifest_rel)
+    }
+    states = {rel: value[0] for rel, value in classified.items()}
+    preimages = {rel: value[1] for rel, value in classified.items()}
+    allowed_states = {
+        ("absent", "absent"),
+        ("new", "absent"),
+        ("old", "old"),
+        ("new", "old"),
+        ("new", "new"),
+    }
+    if (states[report_rel], states[manifest_rel]) not in allowed_states:
+        raise _fail("RECOVERY_STATE_AMBIGUOUS")
+    residues = _recovery_residue(
+        root,
+        context,
+        tree,
+        outputs,
+        report_rel,
+        manifest_rel,
+        previous,
+        states,
+    )
+    changes = _worktree_changes(root, context)
+    allowed_changes = {report_rel, manifest_rel, *(item.rel for item in residues)}
+    if not changes.issubset(allowed_changes):
+        raise _fail("DIRTY_TREE")
+    needs_publication = bool(changes or residues) or any(
+        states[rel] != "new" for rel in (report_rel, manifest_rel)
+    )
+    verify_recovery_context()
+    _cleanup_recovery_residue(root, residues, verify_recovery_context)
+    verify_recovery_context()
+    if not _worktree_changes(root, context).issubset({report_rel, manifest_rel}):
+        raise _fail("UNEXPECTED_WRITE_RESIDUE")
+    return WritePosture(
+        needs_publication,
+        preimages,
+        index_state,
+        frozenset(item.rel for item in residues),
+    )
 
 
 def _require_output_bytes(root: Path, rel: str, expected: bytes) -> None:
@@ -3088,40 +3642,87 @@ def _render_twice(model: CandidateModel) -> dict[str, bytes]:
 
 
 def _run_write(
-    root: Path, context: GitContext, head: str, source_rel: str
+    root: Path,
+    context: GitContext,
+    head: str,
+    source_rel: str,
+    index_state: Mapping[
+        str, tuple[int, int, int, int, int, int, int, str] | None
+    ],
 ) -> tuple[str, str]:
-    _require_clean(root, context)
+    metadata_before = _repository_metadata(root)
+    if _git_control_state((context.git_dir / "index",)) != index_state:
+        raise _fail("GIT_CONTROL_STATE_CHANGED")
+    if _head(context) != head:
+        raise _fail("GIT_HEAD_CHANGED")
     model, snapshots = _load_model(root, context, head, source_rel)
     outputs = _render_twice(model)
     _verify_snapshots(root, context, head, snapshots)
-    _require_clean(root, context)
     tree = _tree_entries(context)
     for rel in outputs:
         _require_output_case_unambiguous(tree, rel)
         _validate_output_target(root, rel)
+    posture = _prepare_write_posture(
+        root,
+        context,
+        head,
+        outputs,
+        model.report_path,
+        model.manifest_path,
+        index_state,
+    )
 
-    unchanged = True
-    for rel, expected in outputs.items():
-        try:
-            _require_output_bytes(root, rel, expected)
-        except ClosePackError:
-            unchanged = False
-            break
-    if not unchanged:
-        output_paths = set(outputs)
+    def verify_write_context() -> None:
+        _verify_snapshots(root, context, head, snapshots)
+        _verify_git_context(context)
+        if _head(context) != head:
+            raise _fail("GIT_HEAD_CHANGED")
+        if _git_control_state((context.git_dir / "index",)) != index_state:
+            raise _fail("GIT_CONTROL_STATE_CHANGED")
 
-        def verify_publication() -> None:
-            _verify_snapshots(root, context, head, snapshots)
-            _allowed_write_status(root, context, output_paths)
-            for rel, expected in outputs.items():
-                _require_output_bytes(root, rel, expected)
+    verify_write_context()
+    if posture.needs_publication:
+        _publish_pair(
+            root,
+            outputs,
+            model.report_path,
+            model.manifest_path,
+            posture.preimages,
+            verify_write_context,
+        )
 
-        _publish_pair(root, outputs, verify_publication)
-
-    _verify_snapshots(root, context, head, snapshots)
+    verify_write_context()
     _allowed_write_status(root, context, set(outputs))
-    for rel, expected in outputs.items():
-        _require_output_bytes(root, rel, expected)
+    verify_write_context()
+    accepted_before_final_guard = _read_manifest_committed_pair(
+        root, outputs, model.report_path, model.manifest_path
+    )
+    mutable_paths: set[str] = set()
+    parent_paths: set[str] = set()
+    if posture.needs_publication:
+        mutable_paths.update({model.report_path, model.manifest_path})
+        mutable_paths.update(posture.recovery_residue_paths)
+        parent_paths.update(
+            PurePosixPath(rel).parent.as_posix() for rel in mutable_paths
+        )
+    if not _metadata_matches_with_authorized_write_changes(
+        metadata_before,
+        _repository_metadata(root),
+        tree,
+        mutable_paths,
+        parent_paths,
+    ):
+        raise _fail("WRITE_MODE_MUTATION")
+    verify_write_context()
+    _allowed_write_status(root, context, set(outputs))
+    verify_write_context()
+    accepted_after_final_guard = _read_manifest_committed_pair(
+        root, outputs, model.report_path, model.manifest_path
+    )
+    if accepted_after_final_guard != accepted_before_final_guard:
+        raise _fail("OUTPUT_TARGET_CHANGED")
+    _allowed_write_status(root, context, set(outputs))
+    verify_write_context()
     return model.report_path, model.manifest_path
 
 
@@ -3144,12 +3745,14 @@ def _run_check(
         _verify_snapshots(root, context, head, snapshots)
         store = _GitObjectStore(context)
         tree = _tree_entries(context, store)
-        for rel, expected in outputs.items():
+        accepted = _read_manifest_committed_pair(
+            root, outputs, model.report_path, model.manifest_path
+        )
+        for rel in (model.report_path, model.manifest_path):
             entry = _require_tracked_regular(tree, rel)
             if entry.mode != "100644":
                 raise _fail("OUTPUT_MODE_MISMATCH")
-            _require_output_bytes(root, rel, expected)
-            if _git_blob_payload(context, entry.object_id, store) != expected:
+            if _git_blob_payload(context, entry.object_id, store) != accepted[rel]:
                 raise _fail("OUTPUT_HEAD_MISMATCH")
         _verify_snapshots(root, context, head, snapshots)
         _require_clean(root, context)
@@ -3197,7 +3800,11 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         help="tracked repository-relative candidate source",
     )
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--write", action="store_true", help="atomically publish the candidate pair")
+    mode.add_argument(
+        "--write",
+        action="store_true",
+        help="publish the manifest-committed candidate pair",
+    )
     mode.add_argument(
         "--check",
         action="store_true",
@@ -3221,13 +3828,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         root = _repository_root()
         context = _establish_git_context(root)
         if args.write:
-            _verify_git_repository(context)
+            index_state = _git_control_state((context.git_dir / "index",))
             head = _head(context)
-            paths = _run_write(root, context, head, source_rel)
+            if _git_control_state((context.git_dir / "index",)) != index_state:
+                raise _fail("GIT_CONTROL_STATE_CHANGED")
+            if _head(context) != head:
+                raise _fail("GIT_HEAD_CHANGED")
+            paths = _run_write(
+                root,
+                context,
+                head,
+                source_rel,
+                index_state,
+            )
         else:
             git_control_paths = _git_control_paths(context)
-            metadata_before = _repository_metadata(root)
             git_control_before = _git_control_state(git_control_paths)
+            metadata_before = _repository_metadata(root)
             _verify_git_context(context)
             head = _head(context)
             paths = _run_check(

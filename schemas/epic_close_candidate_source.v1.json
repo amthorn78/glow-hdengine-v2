@@ -1,6 +1,7 @@
 {
   "$id": "schemas/epic_close_candidate_source.v1.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Closed causal-source contract for the feedback-free epic closeout candidate pair. The paired checker/writer verifies every tracked mode-120000 symlink target against its candidate-HEAD blob in both check and write modes; only the inspected symlink inode's unavoidable kernel-managed atime may advance, and the tool never sets or restores it.",
   "additionalProperties": false,
   "properties": {
     "epic_id": {
@@ -148,7 +149,7 @@
       ]
     },
     "feedback_dependency": {
-      "pattern": "(^|[^A-Za-z0-9])([Rr][Uu][Nn][^A-Za-z0-9\\r\\n]*[Ii][Dd]|[Rr][Ee][Cc][Ee][Ii][Pp][Tt]|[Aa][Tt][Tt][Ee][Ss][Tt][Aa][Tt][Ii][Oo][Nn]|[Hh][Oo][Ss][Tt][Ee][Dd][^A-Za-z0-9\\r\\n]*[Rr][Ee][Ss][Uu][Ll][Tt]|[Ll][Aa][Tt][Ee][Rr][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt]|[Ss][Oo][Uu][Rr][Cc][Ee][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt]|[Rr][Ee][Ll][Ee][Aa][Ss][Ee][^A-Za-z0-9\\r\\n]*[Ii][Dd])([^A-Za-z0-9]|$)"
+      "pattern": "(?:^|[^A-Za-z0-9])(?:[Rr][Uu][Nn][^A-Za-z0-9\\r\\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|(?<![Tt][Ww][Oo][^A-Za-z0-9\\r\\n][Rr][Uu][Nn][^A-Za-z0-9\\r\\n])[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Rr][Ee][Ss][Uu][Ll][Tt][Ss]?|[Oo][Uu][Tt][Cc][Oo][Mm][Ee][Ss]?|[Ss][Tt][Aa][Tt][Uu][Ss](?:[Ee][Ss])?|[Cc][Oo][Nn][Cc][Ll][Uu][Ss][Ii][Oo][Nn][Ss]?|[Aa][Tt][Tt][Ee][Mm][Pp][Tt][Ss]?|[Uu][Rr][Ll][Ss]?)|[Rr][Ee][Cc][Ee][Ii][Pp][Tt][Ss]?|[Aa][Tt][Tt][Ee][Ss][Tt][Aa][Tt][Ii][Oo][Nn][Ss]?|(?:[Hh][Oo][Ss][Tt][Ee][Dd]|[Ww][Oo][Rr][Kk][Ff][Ll][Oo][Ww]|[Cc][Ii]|[Bb][Uu][Ii][Ll][Dd]|[Pp][Ii][Pp][Ee][Ll][Ii][Nn][Ee]|[Jj][Oo][Bb]|[Cc][Oo][Nn][Tt][Ii][Nn][Uu][Oo][Uu][Ss][^A-Za-z0-9\\r\\n]*[Ii][Nn][Tt][Ee][Gg][Rr][Aa][Tt][Ii][Oo][Nn])[^A-Za-z0-9\\r\\n]*(?:(?:[Rr][Uu][Nn]|[Jj][Oo][Bb]|[Ee][Xx][Ee][Cc][Uu][Tt][Ii][Oo][Nn]|[Cc][Hh][Ee][Cc][Kk]|[Aa][Tt][Tt][Ee][Mm][Pp][Tt]|[Vv][Aa][Ll][Ii][Dd][Aa][Tt][Ii][Oo][Nn])[^A-Za-z0-9\\r\\n]*)?(?:[Rr][Ee][Ss][Uu][Ll][Tt][Ss]?|[Oo][Uu][Tt][Cc][Oo][Mm][Ee][Ss]?|[Ss][Tt][Aa][Tt][Uu][Ss](?:[Ee][Ss])?|[Cc][Oo][Nn][Cc][Ll][Uu][Ss][Ii][Oo][Nn][Ss]?|[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Aa][Tt][Tt][Ee][Mm][Pp][Tt][Ss]?|[Uu][Rr][Ll][Ss]?)|[Ll][Aa][Tt][Ee][Rr][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt][Ss]?|[Ss][Oo][Uu][Rr][Cc][Ee][^A-Za-z0-9\\r\\n]*[Cc][Oo][Mm][Mm][Ii][Tt][Ss]?|[Cc][Oo][Mm][Mm][Ii][Tt][^A-Za-z0-9\\r\\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Ss][Hh][Aa]|[Hh][Aa][Ss][Hh](?:[Ee][Ss])?)|(?:[Gg][Ii][Tt][Hh][Uu][Bb]|[Gg][Ii][Tt]|[Hh][Ee][Aa][Dd]|[Ss][Oo][Uu][Rr][Cc][Ee])[^A-Za-z0-9\\r\\n]*(?:[Cc][Oo][Mm][Mm][Ii][Tt][^A-Za-z0-9\\r\\n]*)?(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?|[Ss][Hh][Aa]|[Hh][Aa][Ss][Hh](?:[Ee][Ss])?)|[Rr][Ee][Ll][Ee][Aa][Ss][Ee][Ss]?[^A-Za-z0-9\\r\\n]*(?:[Ii][Dd][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Ff][Ii][Ee][Rr][Ss]?|[Ii][Dd][Ee][Nn][Tt][Ii][Tt](?:[Yy]|[Ii][Ee][Ss])|[Nn][Uu][Mm][Bb][Ee][Rr][Ss]?))(?:[^A-Za-z0-9]|$)"
     },
     "repository_path": {
       "maxLength": 512,
@@ -156,10 +157,24 @@
       "type": "string"
     },
     "causal_report_body_line": {
-      "description": "A deterministic control-free report body line that cannot create or hide an H1/H2 section channel.",
+      "description": "One canonical neutral report statement from the closed writer-owned registry.",
       "allOf": [
         {
           "$ref": "#/$defs/causal_single_line"
+        },
+        {
+          "enum": [
+            "Concurrent readers fail closed while publication is unstable.",
+            "Candidate publication uses the manifest as its commit point.",
+            "Existing candidate outputs are not causal inputs.",
+            "Recovery requires a fresh derivation from tracked inputs.",
+            "Publication residue is not a candidate input.",
+            "The checker does not repair candidate outputs.",
+            "Candidate validation compares exact committed bytes.",
+            "The report and manifest are accepted only as one committed pair.",
+            "Candidate scope is bounded by the declared tracked inputs.",
+            "Tracked résumé evidence remains deterministic."
+          ]
         },
         {
           "not": {
@@ -169,10 +184,18 @@
       ]
     },
     "causal_report_heading": {
-      "description": "A plain-text custom H2 label; inline Markdown and HTML are not admitted.",
+      "description": "One canonical neutral H2 label from the closed writer-owned registry.",
       "allOf": [
         {
           "$ref": "#/$defs/causal_single_line"
+        },
+        {
+          "enum": [
+            "Candidate boundaries",
+            "Delivered scope",
+            "Evidence posture",
+            "Validation posture"
+          ]
         },
         {
           "pattern": "^(?!.*(?:^|[^A-Za-z0-9])_)(?!.*_(?:[^A-Za-z0-9]|$))[A-Za-z0-9](?:[A-Za-z0-9 _.,:;()/+'-]*[A-Za-z0-9)])?$"
