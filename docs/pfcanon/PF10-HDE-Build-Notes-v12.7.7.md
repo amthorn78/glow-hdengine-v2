@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.6  
+**Version:** v12.7.7  
 Effective Date: 2026.08.21  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -204,6 +204,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.10 HDE-EPIC039 PR-04 Automated CI Remediation and HDE-EPIC038 Closeout-Layer Removal
 
 2.11 HDE-EPIC039 PR-05 Authorized Scope Expansions and Proof-Boundary Decisions
+
+2.12 HDE-EPIC039 PR-05 Generic Feedback-Free Closeout Lifecycle
 
 # 2\) Numbered Addenda
 
@@ -1517,5 +1519,144 @@ The following remain outside PR-05 and outside this addendum's authorization:
 ### **Decision-time implementation posture**
 
 At the final authorization request, the fifth update had not been committed or pushed. Eleven tracked files were locally modified, the latest feedback-filter correction was unfinished and not yet mirrored into the schema, and the preceding test results were stale for the unfinished state. PR \#396 remained open and unmerged at remote head `8e333f4ac067149fad00e9f4f39c92e6827f2aed`. This addendum authorizes the revised scope; it does not certify those local bytes, claim that final validation passed, or claim that the fifth update was delivered.
+
+## **2.12 HDE-EPIC039 PR-05 Generic Feedback-Free Closeout Lifecycle**
+
+### **Approval and source record**
+
+* **Approval type:** Post-Merge PR Code Review and Validation.  
+* **Decision:** `MERGED CHANGE ACCEPTABLE`.  
+* **Repository:** `amthorn78/glow-hdengine-v2`.  
+* **Merged PR:** \#396.  
+* **Base:** `ba25d73c1d2078b4225c433f47ffb5032676245c`.  
+* **Exact PR head:** `2e5f8bbe26298ae5f16aed5e661ed0cc434b29f2`.  
+* **Merge endpoint:** `a74558c4027546350091deaca6958c4f7be7e618`.  
+* **Reviewed landed range:** `ba25d73c1d2078b4225c433f47ffb5032676245c..a74558c4027546350091deaca6958c4f7be7e618`.  
+* The landed change comprised 14 files, 8,618 additions, and 15 deletions.  
+* All 14 files were byte-identical at the exact PR head, merge endpoint, and source-reported current `main` HEAD `04fa6a1463ac6b5cf4d9344681cf50e77ab0fbf6`.  
+* The only later commit updated PF10 to v12.7.6 and did not overlap any PR \#396 implementation file.  
+* The review found no material correctness, scope, evidence, ancestry, or later-divergence defect.
+
+### **Retained decisions and requirements**
+
+PR \#396 implements an epic-agnostic, deterministic, feedback-free closeout-candidate lifecycle. It creates the capability to write and validate a candidate but does not create a real HDE-EPIC039 candidate or execute closeout.
+
+The accepted source and schema contract is:
+
+* `schemas/epic_close_candidate_source.v1.json` is the canonical repository-local source schema.  
+* The schema uses JSON Schema Draft 2020-12 and closed objects with `additionalProperties: false`.  
+* It governs a three-digit epic identity, tracked causal inputs, report sections, derived canonical output bindings, feedback-free constraints, closed nonclaim codes, and closed neutral report content.  
+* Full-form and aliased feedback identifiers are rejected.  
+* Repository-local source inputs determine all tracked candidate bytes before hosted validation.  
+* The implementation must not introduce HDE-EPIC038 identity, hosted-result feedback, application-network dependencies, timestamp-restoration APIs, or Git subprocess ownership.
+
+The accepted writer/checker contract in `tools/qa/generate_epic_close_pack.py` is:
+
+* Validate every tracked causal input against the exact candidate-HEAD Git blob.  
+* Render deterministically twice and require byte identity.  
+* Stage and flush both report and manifest outputs.  
+* Install the report first and the manifest last.  
+* Treat manifest installation as the committed-publication point.  
+* Validate committed output through stable manifest→report→manifest reads.  
+* Reject mixed, unstable, incomplete, or uncommitted generations.  
+* Fail closed during crash detection, interrupted publication, recovery classification, poisoned-index conditions, concurrent reads, or mismatched rerendering.  
+* Protect candidate HEAD, index, and worktree state in both write and check modes.  
+* Use direct Git object, index, and worktree verification rather than Git subprocesses.  
+* Compare tracked symlink target bytes exactly.  
+* Permit the narrowly authorized metadata exception only for access-time changes caused by inspecting a verified mode-`120000` tracked symlink. The exception applies to exact worktree verification in both check and write modes and does not excuse content, identity, mode, target, or other metadata drift.  
+* Do not restore timestamps through `os.utime`, `Path.touch`, or equivalent behavior.  
+* Keep check mode non-writing.  
+* Expose the governed behavior through the generic CLI rather than an epic-specific implementation.
+
+The accepted hosted-validation contract in `.github/workflows/epic-closeout-validation.yml` is:
+
+* `workflow_dispatch` only.  
+* Bounded exact-ref and source-path inputs.  
+* `contents: read` permission.  
+* Non-persisted credentials.  
+* Closed rails and exact-head checkout.  
+* Non-writing candidate validation through the generic checker.  
+* Governed-evidence checks.  
+* Clean-tree guards before and after validation.  
+* No receipt publication, tracked-output writeback, automatic PR or push eligibility, required-check status, deployment, or closeout action.
+
+CI integration must:
+
+* Assign the generic lifecycle tool, schema, workflow, and tests to established behavioral validation ownership through `ci/checks/classify_ci_changes.py`.  
+* Preserve fail-closed classification.  
+* Reuse the established generic QA lane rather than create a duplicate CI subsystem.  
+* Preserve PR-04’s one-job ordinary-CI architecture and keep the manual validation lane isolated from normal PR and default-branch execution.
+
+The accepted evidence contract is:
+
+* The canonical HDE-EPIC039 Doc-Delta and QA-root mirror remain byte-identical.  
+* Machine Evidence Mirror records retain their established identities while hashes, sizes, timestamps, and proof anchors are updated coherently.  
+* Mirror, checksum sentinel, path proofs, Doc-Delta bodies, and Doc-Delta proofs remain under their existing canonical updater and do not create a second evidence owner.  
+* The Doc-Delta record must preserve the implementation boundaries and all nonclaims.
+
+### **Epic, task, and status effects**
+
+* **Epic:** `HDE-EPIC039`.  
+* **PF09 task:** `HDE-CALC003`.  
+* **PF09 subtask:** `HDE-CALC003.22 — Feedback-free closeout lifecycle reachability`.  
+* **Source-reported status:** `Not done`.  
+* **Recommended status:** `Done`.  
+* **Status action performed:** None.  
+* **Parent-task status:** `HDE-CALC003` remains `Partial`.
+
+The reviewed implementation now provides the epic-agnostic writer/checker, closed source contract, exact tracked-input derivation, isolated hosted-validation surface, bounded terminal-state lifecycle tests, stable manifest commit point, feedback-failure closure, exact-head CI, and clean-tree proof required by `HDE-CALC003.22`.
+
+This establishes implementation and terminal-state reachability for the subtask. It does not execute a real closeout lifecycle or advance the parent task.
+
+### **Required canon drainage**
+
+* **Target:** `PF09.1-Canon-HDE-Build-Checklist-Calcination`.  
+* **Section:** `### **Subtask HDE-CALC003.22 — Feedback-free closeout lifecycle reachability**`.  
+* **Required change:** Change only the subtask status from `Not done` to `Done`.  
+* **Reason:** PR \#396 and its exact-head validation prove that repository-local inputs determine tracked candidate bytes before hosted validation, that hosted validation can inspect those exact bytes without writing canonical results back into tracked source, and that terminal-state reachability is covered through bounded temporary-repository and fault-injection tests.  
+* **Affected identifiers:** `HDE-EPIC039`, `HDE-CALC003`, and `HDE-CALC003.22`.  
+* **Required preservation:** Keep parent `HDE-CALC003` at `Partial`; preserve the existing subtask scope, downstream ownership notes, and all acceptance, QA, token, OPS, deployment, PF-movement, release, and closeout nonclaims.  
+* **Drainage state:** Unperformed. This is a documentation/status-drain candidate, not a remaining implementation correction.
+
+### **Deferred obligations and unresolved work**
+
+* PF09 status drainage remains to be performed.  
+* No real HDE-EPIC039 candidate source, close report, or close manifest was created.  
+* The manual hosted-validation workflow was not run because no approved real candidate existed. Its isolation and behavior were validated statically, through exact-head CI, and in temporary repositories.  
+* A future real candidate remains subject to the manual exact-ref validation contract before any separately governed adoption or closeout action.  
+* No further post-merge remediation was assigned. All review findings were nonblocking notes with no required action.
+
+### **Scope boundaries and nonclaims**
+
+* PR \#396 supplies lifecycle capability only.  
+* It does not establish token satisfaction, acceptance, Live QA, QA PASS, OPS execution or completion, deployment, release execution, PF09 movement, permanent-canon drainage, candidate adoption, or epic closeout.  
+* It does not change public contracts, routes, databases, ordinary CI eligibility, required-check settings, or the established one-job CI architecture.  
+* It does not publish validation receipts or write hosted results back into tracked source.  
+* Reviewer-side local validation and OPS were not run because the review used connector-only inspection. Exact-head GitHub CI and committed-file inspection were relied upon.  
+* The unexecuted manual workflow is not a blocker because no real candidate was within the merged scope.  
+* No HDE-EPIC038 identity, Git subprocess, timestamp-setting API, or application-network client was found in the production lifecycle implementation.
+
+### **Evidence and traceability**
+
+* Exact-head GitHub Actions run `32442577841`, workflow run \#3488, job `96656024287`: success.  
+* Final applicability output: `CI_APPLICABILITY_AND_EXACT_HEAD_OK`.  
+* Classifier-selected affected roster: 1,139 tests passed.  
+* Lifecycle module: 405 tests covering deterministic write/commit/check/rerender, SIGKILL and fault injection, concurrent readers, rollback and recovery, mixed-pair rejection, poisoned indexes, same-length symlink substitution, access-time boundaries, exact-input verification, and non-writing behavior.  
+* Established regression lanes also passed: product 20; compatibility 62 with 3 skipped and 2 expected failures; database 249; evidence 69; generic QA 407; release 52; all selected rails groups successful.  
+* All seven PR review threads were resolved.  
+* Core production tool: `tools/qa/generate_epic_close_pack.py`, Git blob `4b5e57f46f32e5e87e50eff3221fed62e340bcca`.  
+* Closed source schema: `schemas/epic_close_candidate_source.v1.json`, Git blob `10e337e96273045e457fa5f8846641b4ec6b7957`.  
+* Manual workflow: `.github/workflows/epic-closeout-validation.yml`, Git blob `959e4a6fb69198adeb86266d753e195faa06c0d7`.  
+* Canonical and QA-root Doc-Delta bodies: identical Git blob `953b759cb8ed5621b2da12423e9826cc93a5e5a3`, size 20,074 bytes, SHA-256 `feedd3dacf7693624699356417a33d5616fa9599c3975ec87ae0a4dcdcf44585`.  
+* Machine Evidence Mirror: size 283,654 bytes, SHA-256 `61b1c6c365b86d57c42de7a6fc0782ab8467cf19b55dae49c440b3cc709e9c78`.  
+* Checksum-sentinel file SHA-256: `9a2aae66714ca18990c413add42fd8c3100b5733eeae57d4b7747ecb30ab49e1`.  
+* Identical Git blobs for all 14 reviewed files at the PR head, merge endpoint, and source-reported current `main` establish that the acceptance decision applies to the committed current bytes.
+
+### **Relationship to existing PF10 guidance**
+
+* This addendum records the accepted implementation of the PR-05 scope and proof-boundary expansions authorized by PF10 §2.11.  
+* Manifest-last committed validity, stable manifest→report→manifest verification, fail-closed recovery, temporary-repository terminal-state testing, and the tracked-symlink access-time exception retain the boundaries authorized in §2.11.  
+* The implementation preserves the established generic QA subsystem and PR-04’s automated, budget-efficient one-job ordinary-CI architecture.  
+* The closed source schema and output bindings coexist with the continuing artifact and schema ownership rules in PF12 §6.2.2; no broader PF12 revision is established by this approval.
 
 \<eof\>
