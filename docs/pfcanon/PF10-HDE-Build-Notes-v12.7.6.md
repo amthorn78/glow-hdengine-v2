@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.7.3  
-Effective Date: 2026.08.20  
+**Version:** v12.7.6  
+Effective Date: 2026.08.21  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -202,6 +202,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.9 HDE-EPIC039 PR-03 Lineage
 
 2.10 HDE-EPIC039 PR-04 Automated CI Remediation and HDE-EPIC038 Closeout-Layer Removal
+
+2.11 HDE-EPIC039 PR-05 Authorized Scope Expansions and Proof-Boundary Decisions
 
 # 2\) Numbered Addenda
 
@@ -1237,26 +1239,6 @@ Implementation of the reviewed subsystem and remediation is accepted. PF09 movem
 * The HDE-EPIC039 Doc-Delta bodies were byte-identical at blob `70d335...`; both proof companions recorded SHA-256 `868ce684...` and size 4,537 bytes.  
 * The HDE-EPIC039 Doc-Delta posture explicitly withheld Live QA, OPS, acceptance-token, deployment, PF09-completion, and epic-closeout claims.
 
-## **2.10 HDE-EPIC039 PR-04 CI Remediation Lineage and HDE-CALC003.21 Completion Recommendation**
-
-### **Approval and source record**
-
-* **Approval type:** Post-Merge Comprehensive PR Lineage Review.  
-* **Implementation source:** `r5-implementation-plan-hde-epic039.md`, PR-04.  
-* **Repository:** `amthorn78/glow-hdengine-v2`; default and reviewed branch `main`.  
-* **Decision:** `MERGED WORK ACCEPTABLE`.  
-* **Lineage:** Original PR \#394, **Implement HDE-EPIC039 PR-04 CI remediation**, followed contiguously by Remedial PR \#395, **Close final HDE-EPIC039 PR-04 CI ownership gaps**.  
-* **Lifecycle baseline:** `e947e40bfe089b9a2bf56045ac496918a844c963`.  
-* **PR \#394 endpoint:** `347ad40f3b02cc0e2083135b3a2f401a6dc8a06c`, merged 2026-08-20T02:24:55Z.  
-* **PR \#395 and final reviewed endpoint:** `e9de6ade4aabbec654e8e9cb5519596da1399c4e`, merged 2026-08-20T13:41:01Z.  
-* At review, `main` was exactly the PR \#395 merge commit. No intervening or post-lineage commit affected the reviewed result.  
-* All 72 lifecycle-touched paths were inspected: 67 required files remained present and five required HDE-EPIC038-only deletions remained absent.  
-* No implementation, safety, evidence, validation, ancestry, later-change, or unresolved-review blocker remained.
-
-### **Retained decisions and requirements**
-
-The accepted PR-04
-
 ## **2.10 HDE-EPIC039 PR-04 Automated CI Remediation and HDE-EPIC038 Closeout-Layer Removal**
 
 ### **Approval and source record**
@@ -1370,5 +1352,170 @@ Continuing generic controls were narrowed to actual consumers rather than remove
 * Observable GitHub and repository facts satisfy §2.8’s proof lane; no separate transient implementation report is required.  
 * The lineage preserves PF10 §2.9’s approved PR \#391/\#392 QA subsystem and complies with its prohibition on rollback, disablement, reduction, or removal.  
 * The exact-head graph, change-aware lane selection, and validation evidence operate under the continuing CI-classification and validation guidance in PF10 §§2.3 and 2.5.
+
+## **2.11 HDE-EPIC039 PR-05 Authorized Scope Expansions and Proof-Boundary Decisions**
+
+Timestamp: 082126 04:26  
+Details:
+
+### **Approval and source record**
+
+* **Approval type:** Product Owner scope-change decisions for HDE-EPIC039 PR-05 implementation.  
+* **Epic:** `HDE-EPIC039`.  
+* **Implementation task:** `PR-05 — Implement a feedback-free generic closeout lifecycle`.  
+* **PF09 task:** `HDE-CALC003`.  
+* **PF09 subtask:** `HDE-CALC003.22 — Feedback-free closeout lifecycle reachability`.  
+* **Repository:** `amthorn78/glow-hdengine-v2`.  
+* **Implementation branch:** `codex/hde-epic039-pr05-closeout-lifecycle`.  
+* **Pull request:** PR \#396.  
+* **Decision-time remote head:** `8e333f4ac067149fad00e9f4f39c92e6827f2aed`.  
+* **Decision-time local base:** `ae26397e744ed070a521c8a7f28c642874db7c17`.  
+* **Pull-request posture:** Open, ready for review, and unmerged at the decision point.
+
+This addendum records three authorized PR-05 scope amendments:
+
+1. a narrow tracked-symlink access-time exception for exact check-mode verification;  
+2. a manifest-committed crash-consistency model replacing the unattainable claim that two independent regular-file paths can be replaced as one crash-atomic filesystem transaction, together with one consolidated fifth branch update; and  
+3. extension of the same narrow tracked-symlink access-time exception to exact write-mode verification.
+
+These decisions revise only the conflicting PR-05 proof boundaries described below. They do not authorize a real epic close candidate, Live QA, QA PASS, acceptance, token satisfaction, Product Owner closeout, OPS, deployment, release, PF09 movement, PF-Canon editing, or merge of PR \#396.
+
+### **1\. Tracked-symlink access-time boundary**
+
+#### **Problem established**
+
+PR-05 requires exact comparison of the tracked worktree against the candidate Git tree. For a tracked mode-`120000` entry, that proof requires reading the symlink target bytes rather than trusting mutable Git index stat-cache fields. On a filesystem using `relatime`, reading a stale symlink target may cause the kernel to advance the symlink inode access time. The available symlink-read interface provides no per-read no-atime control.
+
+Avoiding the target-byte read would weaken the proof model. A same-length symlink-target substitution can be concealed by a poisoned or recomputed index stat cache if the checker treats mutable index metadata as the content anchor. Requiring a `noatime` filesystem or rejecting all candidate trees containing tracked symlinks would add an environment dependency or materially contract the approved generic capability.
+
+#### **Authorized exception**
+
+PR-05 check and write modes may incur a kernel-managed access-time change only when they read the target bytes of a tracked Git mode-`120000` symlink for exact candidate-HEAD/worktree verification.
+
+The exception is limited as follows:
+
+* Only the inspected symlink inode's access time may change.  
+* The change must be an incidental kernel consequence of the exact target-byte read.  
+* PR-05 code must not call an API to set, restore, normalize, preserve, or otherwise manipulate the access time.  
+* The exception does not apply to regular files, directories, uninspected symlinks, or timestamps generally.  
+* Symlink target bytes, file mode, modification time, change time, path identity, candidate HEAD, Git index bytes, causal inputs, and unrelated repository state remain protected.  
+* Git index stat-cache equality must not replace exact target-byte verification. Expected target bytes remain anchored to the candidate-HEAD blob, and actual target bytes must be obtained through a byte-preserving symlink read.  
+* A metadata difference outside this single allowed access-time field must fail validation.
+
+The earlier authorization applied this boundary to check mode. The later authorization extends the identical boundary to write mode because both modes perform the same exact tracked-worktree verification and therefore encounter the same filesystem behavior.
+
+This exception does not convert check mode into a writer. Check mode remains prohibited from creating, repairing, replacing, touching, normalizing, or publishing repository files. The unavoidable kernel-controlled symlink access-time effect is the sole exception to the literal zero-metadata-change statement.
+
+### **2\. Manifest-committed publication and crash consistency**
+
+#### **Problem established**
+
+PR-05 retains two canonical regular-file outputs:
+
+* `audit/EPIC-###_close_report.md`  
+* `audit/EPIC-###_MANIFEST.json`
+
+Two independent directory entries cannot be replaced through one portable filesystem rename. Installing the two files through separate renames can preserve rollback for catchable exceptions, but process termination or host failure between renames can leave a mixed old/new pair. The original phrase requiring the pair to be published as one crash-atomic visible transaction was therefore not truthfully implementable while also retaining both fixed regular-file paths and prohibiting an additional commit-point artifact or indirection layer.
+
+#### **Authorized publication model**
+
+PR-05 must use the manifest as the sole validity commit point for the two-file candidate family:
+
+1. Render and validate the complete report and manifest bytes before publication.  
+2. Stage the outputs without exposing either staged file as a valid canonical candidate.  
+3. Install and durably flush the report first.  
+4. Install and durably flush the manifest last.  
+5. Treat the pair as valid only when a stable `manifest -> report -> manifest` read observes identical manifest bytes on both manifest reads and the manifest's exact report binding matches the report bytes.  
+6. Reject a mixed pair, changing manifest, missing member, stale binding, malformed member, or interrupted publication state. Check mode must fail closed and must not repair the pair.
+
+The revised guarantee is **manifest-committed validity**, not crash-atomic preservation of both prior directory entries. An uncatchable termination before the manifest commit point may leave an invalid dirty pair and is not claimed to preserve both prior files byte-for-byte. Such a state is uncommitted and must never validate as a candidate. Catchable failure handling, cleanup, rollback where safely possible, deterministic recovery, and residue control remain required.
+
+This authorization does not add a transaction descriptor, journal, generation directory, pointer, third canonical output, or changed path convention. Those broader alternatives remain outside PR-05.
+
+### **3\. Authorized fifth pull-request update**
+
+One consolidated fifth CI-triggering branch update is authorized for PR \#396. It must contain the manifest-committed publication correction, the check/write symlink access-time boundary, associated crash/recovery and metadata tests, truthful Doc-Delta wording, affected evidence companions, and the remaining source-grounded semantic review corrections.
+
+The semantic corrections include alignment of the implementation and closed schema for full-form feedback identifiers and removal of contradictory nonclaim assertions. Previously addressed formatted-heading, fence, and control-character findings must remain correctly implemented. Review threads may be resolved only when the exact pushed head supports resolution.
+
+The fifth update is a bounded delivery authorization, not an unlimited push budget:
+
+* Complete all local implementation and validation before pushing.  
+* Do not push an unfinished or partially validated state.  
+* Batch the authorized corrections into one coherent update.  
+* After the fifth push, inspect exact-head hosted CI and every remaining review thread.  
+* Do not perform a sixth CI-triggering branch update without a new explicit authorization.  
+* Do not merge PR \#396 without separate authorization.
+
+### **Consolidated implementation requirements**
+
+The retained PR-05 implementation contract is:
+
+* Keep the lifecycle epic-agnostic, deterministic, feedback-free, and derived exclusively from validated repository-local tracked inputs.  
+* Keep one closed canonical source schema, one authorized writer, and one separate non-writing checker.  
+* Keep the two canonical outputs as regular files at their derived epic-specific paths.  
+* Use the manifest-last commit protocol and stable manifest/report validation defined above.  
+* Preserve exact clean-tree and candidate-HEAD verification, including exact tracked-symlink target bytes.  
+* Allow only the bounded kernel-managed tracked-symlink access-time effect defined above.  
+* Keep evidence-ledger, mirror, checksum, sentinel, and path-proof ownership with the canonical evidence updater.  
+* Keep current release attestation external to the tracked source it attests.  
+* Keep hosted validation manual, isolated, non-required, read-only, receipt-free, network-free for application behavior, and outside ordinary pull-request full-suite triggering.  
+* Preserve the CI ownership and budget-efficiency architecture established by PR-04.  
+* Keep the HDE-EPIC039 Doc-Delta pair byte-identical and refresh only affected updater-owned companions.  
+* Do not create an HDE-EPIC039 close report, close manifest, acceptance map, token-evidence matrix, QA log, or actual close candidate as part of PR-05 implementation. Temporary-repository fixtures do not create a real epic close candidate.  
+* Do not import HDE-EPIC038 receipt feedback, run identities, mutable attestations, historical assertions, or retroactive completion semantics.
+
+### **Required validation**
+
+The final fifth-update gate must include all established PR-05 validation plus the following amendments:
+
+* Temporary-repository lifecycle coverage for deterministic write, commit, exact-head check, byte-identical rerender, and clean-tree preservation.  
+* Fault or termination injection at every material publication boundary.  
+* Concurrent-reader coverage for stable `manifest -> report -> manifest` validation.  
+* Rejection of mixed, stale, changing, missing, malformed, or hash-mismatched pairs.  
+* Catchable-failure rollback, deterministic recovery, cleanup, and residue tests.  
+* Check- and write-mode tests on a filesystem state capable of reproducing a stale symlink access-time advance, when the test environment supports that behavior.  
+* Check- and write-mode tests in which the symlink access time remains unchanged.  
+* Protected-state comparison proving that only the access time of an actually inspected tracked symlink may differ.  
+* Poisoned-index and same-length symlink-target substitution coverage proving that mutable Git stat-cache fields cannot create a false clean result.  
+* Exact preservation of candidate HEAD, Git index bytes, target bytes, mode, modification time, change time, paths, causal inputs, and unrelated state.  
+* Static or behavioral proof that PR-05 calls no timestamp-setting or access-time-restoration API.  
+* Closed-schema and implementation parity for every rejected feedback identifier and explicit nonclaim.  
+* Evidence-updater check, orientation fixed-point check, Machine Mirror and Human Evidence Index coherence, checksum and path-proof validation, Doc-Delta body identity, and final clean-tree proof.  
+* Complete local targeted and regression validation before the fifth push, followed by exact-head hosted CI inspection after that push.
+
+Earlier passing results do not validate the final fifth-update bytes after unfinished local edits. Validation must be rerun from the completed implementation state. A filesystem that does not exhibit an access-time advance during a particular test run must not be represented as proving that the kernel effect is impossible; the test must still prove the allowed-difference boundary and all protected fields.
+
+### **PF09 and status posture**
+
+* `HDE-CALC003.22` remains the exact PF09 subtask affected by PR-05.  
+* Its recorded status remains `Not done` unless and until completed implementation and evidence are reviewed and a separately authorized PF09 change is performed.  
+* Parent task `HDE-CALC003` remains `Partial`.  
+* These scope decisions do not establish supportability to `Done`, perform status movement, or authorize editing PF09.
+
+### **Scope boundaries and nonclaims**
+
+The following remain outside PR-05 and outside this addendum's authorization:
+
+* product runtime or public API changes;  
+* databases, migrations, production configuration, or repository settings;  
+* Live QA, OPS, acceptance, token claims, closeout, release, or deployment;  
+* external-system mutation beyond the separately authorized Git branch update and PR workflow;  
+* PF09 or PF-Canon editing;  
+* new canonical output paths, transaction artifacts, generation directories, or storage indirection;  
+* general timestamp exemptions or explicit timestamp restoration;  
+* weakening exact content verification by trusting mutable index stat-cache data; and  
+* unrelated refactoring, modernization, evidence families, or workflow expansion.
+
+### **Relationship to existing PF10 guidance**
+
+* Addendum 2.4 continues to govern consolidated autonomous-agent pushes. This addendum supplies the exact PR-05 exception permitting one fifth update and expressly withholds a sixth update.  
+* Addenda 2.5 and 2.8 continue to govern budget-efficient, automated CI architecture. The manual PR-05 validation lane must not restore duplicate ordinary-PR execution or manual push-circuit-breaker governance.  
+* Addendum 2.10 remains the accepted PR-04 dependency boundary. PR-05 must preserve the generic QA subsystem, CI ownership model, retained evidence controls, and removal of the obsolete HDE-EPIC038 feedback lifecycle.  
+* For PR-05 only, this addendum replaces any conflicting literal interpretation of `publish atomically` with manifest-committed validity and replaces any absolute no-timestamp-change interpretation with the narrowly defined tracked-symlink access-time exception. All other deterministic, non-writing, exact-head, clean-tree, evidence-ownership, and nonclaim requirements remain in force.
+
+### **Decision-time implementation posture**
+
+At the final authorization request, the fifth update had not been committed or pushed. Eleven tracked files were locally modified, the latest feedback-filter correction was unfinished and not yet mirrored into the schema, and the preceding test results were stale for the unfinished state. PR \#396 remained open and unmerged at remote head `8e333f4ac067149fad00e9f4f39c92e6827f2aed`. This addendum authorizes the revised scope; it does not certify those local bytes, claim that final validation passed, or claim that the fifth update was delivered.
 
 \<eof\>
