@@ -1,4 +1,17 @@
+from pathlib import Path
+
+import pytest
+
 from engine.narratives import compose_text, get_pack
+from engine.narratives import state as narrative_state
+from engine.narratives.loader import load_pack
+
+
+@pytest.fixture(autouse=True)
+def _isolated_current_pack(tmp_path, monkeypatch):
+    pack = load_pack(Path("catalog/narratives"), tmp_path / "mounted")
+    monkeypatch.setattr(narrative_state, "_PACK", pack)
+    return pack
 
 
 def test_compose_shared_success():
@@ -15,7 +28,7 @@ def test_compose_shared_success():
     )
     assert result.ok
     assert result.text is not None and "Together" in result.text
-    assert result.key.startswith("harmony.cool.shared")
+    assert result.key.startswith("nar.harmony.cool.shared")
 
 
 def test_compose_suppressed_unsorted_families():
