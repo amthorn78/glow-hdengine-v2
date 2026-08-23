@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.8.1  
-Effective Date: 2026.08.21  
+**Version:** v12.8.2  
+Effective Date: 2026.08.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2425,5 +2425,112 @@ PF10 §2.7 remains authoritative until:
 * PF04 is reconciled with PF12 §8.3 for Machine Mirror self-record hash and size semantics.
 
 The remaining nine audit findings require no duplicate PF10 or permanent-canon guidance because their observed repository states are already classified or accommodated by current PF02, PF04, or PF12.
+
+## **2.17 HDE-EPIC039 Final QA PASS and Moon Loop RCA**
+
+### **Approval and source record**
+
+Final QA assessment for **HDE-EPIC039 — Calcination Pass 6** in `amthorn78/glow-hdengine-v2`.
+
+* QA evidence endpoint: commit `16a7a628d2d375c9355ce33ffc8a07514cf486e5`.  
+* Decision: **PASS**.  
+* Developer escalation: **None**.  
+* Additional product remediation required: **None**.  
+* All planned behavioral checks reached decisive assertions and passed; the evidence records no unresolved product-behavior failure.  
+* Product Owner-authorized Moon Loops corrected QA orchestration, dependency preparation, stale-test maintenance, Codespaces compatibility, and finalization defects. They neither modified product runtime code nor weakened approved feature predicates.
+
+### **Retained decisions and requirements**
+
+HDE-EPIC039 introduced repository-local engineering capabilities, not new user-facing Human Design behavior:
+
+* deterministic canonical JSON generation;  
+* schema-declared arrays-as-sets behavior;  
+* coherent evidence-index, Machine Mirror, path-proof, and publication behavior;  
+* reusable QA status classification and viability handling;  
+* current-state rather than run-identity-based QA behavior;  
+* change-aware CI classification;  
+* retirement of the HDE-EPIC038-specific closeout subsystem;  
+* feedback-free, epic-agnostic closeout-candidate generation and validation;  
+* preservation of Human Design calculations, scoring, narratives, classifications, and public meaning.
+
+Accepted feature contracts and results:
+
+* **D1 / PO-001–PO-003:** 145 tests passed. The 26-target structured-output inventory executed deterministically and failed closed for incomplete, substituted, erased, or empty contracts. Only the six schema-declared unordered collections were normalized; member ordering was deterministic, conflicting duplicate identities were rejected, and ordered collections remained ordered. Proof preserved the exact 64-Gate and 36-Channel topology, distinct Channel endpoints and center projections, the ten-item special subset, the 360-entry direction-native narrative corpus with 120 entries per perspective, both governed narrative suppressions, deterministic calculation and serialization, required AB/BA identity, Magic10 threshold/rounding/symmetry/band behavior, and public-output shape and identity. The complete PO-003 suite passed 117 tests.  
+* **D2 / PO-004–PO-005:** 19 tests passed and two non-writing evidence-updater checks exited `0`. Coherent staged publication, rollback, final-byte validation, updater-owned refresh, Human Evidence Index/Machine Mirror agreement, path-proof integrity, chronology refresh, Mirror self-record validation, and rejection of incoherent hash/size/proof combinations were established.  
+* **D3 / PO-006–PO-008:** 40 tests passed. The exact status model remains `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, and `PARKED`, with causal precedence. The reusable harness used the active Python interpreter, preserved pytest selector options and semantic declaration forms, handled missing collection/dependencies/malformed inputs/writer and evidence-graph failures, rejected phantom PASS and stale or coherently rewritten current evidence, and treated historical records only as historical proof.  
+* **D4 / PO-009–PO-010:** 55 tests passed. Exact-head topology, change-aware and merge-base-aware classification, exhaustive deduplicated QA ownership, non-overlapping rosters, exact-ref execution, active-workflow coverage, secret-free closed rails, manual-closeout isolation, and inactivity of the retired HDE-EPIC038 automation were established. Bounded probes found no retired implementation paths, operative retired-automation references, or missing preserved generic loci.  
+* **D5 / PO-011–PO-013:** 72 tests passed. The lifecycle rejected feedback dependencies in every causal role, excluded actual HEAD and source-commit hashes from candidate identity, failed closed for unsafe schemas, treated tracked causal payloads as opaque bytes, produced idempotent committable output, checked without writing or Git subprocess use, published report first and manifest second, accepted only complete generations, recovered from interruption, rejected mixed generations, rolled back publication failures, revalidated the final worktree, and enforced a closed reusable-only schema containing exactly one candidate source and one mode. Inspection of 5,790 regular tracked files found no real HDE-EPIC039 candidate source or output, no missing reusable-capability locus, and no unexpected candidate-marker source.
+
+The Product Owner explicitly authorized the Moon Loop revisions:
+
+* “We aren't doing that. I need you to fix the script as a moon loop revision, and mention the planning defect in your report so it can fix future process.”  
+* “do an extended moon loop if needed.”
+
+The authorized revision was recorded as `moon-loop-2-extended`.
+
+The durable root cause was a planning-boundary failure: the QA plan created an execution-critical, epic-specific `audit/qa/hde-epic039/00_meta/qa_runner.py` instead of restricting QA to tracked, reviewed repository entrypoints. The generated wrapper grew from 28,086 to 48,027 bytes and combined dependency preparation, test invocation, Git inspection, Codespaces compatibility, classification, evidence and proof writing, manifest validation, repository scanning, and finalization. Embedding it as compressed executable payload caused review to emphasize hash, syntax, and declared interfaces rather than exact runtime behavior.
+
+Accepted Moon Loop remediation boundaries:
+
+1. Direct-path execution initially failed with `ModuleNotFoundError: No module named 'tools'` before creating a governed Step-0B receipt. Explicit repository-root import bootstrapping was added before repository imports.  
+2. PO-001 initially failed during collection with `ModuleNotFoundError: No module named 'flask'`; no product assertion was reached. The authorized revision synchronized `requirements.txt` and `requirements-dev.txt`, validated pytest and jsonschema readiness, and verified Flask, Gunicorn, and psycopg imports.  
+3. PO-003 initially produced 116 passing assertions and one stale expectation. `tests/unit/test_narratives_composer.py` was corrected from `harmony.cool.shared` to governed `nar.harmony.cool.shared` and moved its mounted pack beneath `tmp_path`. The complete 117-test suite then passed without product-runtime changes.  
+4. Codespaces-added `branch.main.github-pr-owner-number` metadata used an ungoverned quoted representation. A narrow in-memory compatibility treatment was added for that exact key; broader or malformed shapes remain rejected. `.git/config` was not modified, original bytes were preserved, and configuration stability was verified within each compatibility operation.  
+5. The first all-PASS finalization returned `NOT READY` because venue-managed Git metadata changed during the QA event. Finalization was narrowed to require stable source identity, stable repository content, per-operation Git-configuration stability, and a valid recorded venue-metadata digest shape, rather than event-wide byte identity for unrelated Codespaces metadata.
+
+The plan-approval process also failed to react to incomplete artifact-map fields and an unrelated HDE-EPIC098 audit reference. Hashing and compilation did not establish runtime imports, working-directory behavior, dependency closure, repository assumptions, or venue compatibility.
+
+### **Epic, task, and status effects**
+
+* HDE-EPIC039’s assigned repository-local features received final QA decision **PASS**.  
+* All 14 selected QA steps recorded `PASS`, each with exit code `0`; aggregate result was 331 passing tests.  
+* The final manifest contains all 14 expected check IDs with `PASS`.  
+* Closeout posture: `READY FOR PRODUCT OWNER QA CLOSEOUT REVIEW`.  
+* No developer escalation or additional product remediation remains.  
+* No PF09 status mutation, other PF movement, deployment, OPS completion, or epic closeout was performed or established by this assessment.
+
+### **Required canon drainage**
+
+**Unresolved QA-planning and review-process canon target — destination not supplied**
+
+Permanent process guidance must incorporate the following rules:
+
+1. QA plans must not embed compressed source, base64 executable payloads, large inline programs, newly invented runners, or substitute repository tooling.  
+2. QA must invoke tracked, reviewed, tested repository entrypoints. A missing entrypoint is an implementation-readiness gap requiring a normal PR, tests, and CI before Live QA planning.  
+3. Exact invocation forms must be smoke-validated in the named venue and working directory before plan approval, including root resolution, imports, argument parsing, dependency imports, selector collection, environment pins, and non-mutating startup.  
+4. QA readiness must reconcile repository instructions, runtime requirements, development requirements, test-only dependencies, and the complete selected selector set’s import closure; `pytest --version` alone is insufficient.  
+5. The complete selector set must be collection-tested against the exact implementation endpoint before the first governed receipt, detecting missing modules, renamed tests, stale fixtures or expectations, and unintended repository-root writes.  
+6. Tests that mount, generate, cache, or unpack content-addressed data must use temporary directories unless repository-path behavior is itself under test.  
+7. QA tooling must distinguish stable source identity and governed inputs from mutable venue metadata; venue metadata may be validated only where materially relevant and within the consuming operation.  
+8. Final QA decisions must be behavior-first: decisive assertion failure requires development escalation; tooling prevention leaves behavior unproven and requires QA remediation; authorized correction followed by complete passing assertions yields `PASS`; resolved Moon Loop actions remain RCA material and do not overturn the final product verdict.
+
+These requirements arise from the HDE-EPIC039 QA wrapper, dependency, stale-test, Codespaces, and finalization failures. They carry no performed status effect. Their permanent-canon destination was not established, and drainage remains unperformed.
+
+### **Deferred obligations and unresolved work**
+
+* Product Owner QA closeout review remains the next governance action.  
+* Permanent adoption of the preventive QA-planning and review rules remains unresolved canon drainage.  
+* No additional product remediation remains.  
+* No real HDE-EPIC039 candidate source or output was created; the accepted D5 scope remains reusable capability only.
+
+### **Scope boundaries and nonclaims**
+
+The QA evidence commit added the discovery record, RCA and Doc Delta summary, epic-specific wrapper, logs and path proofs, step manifest and proof, and the isolated stale-test correction. It did not change product runtime source.
+
+The PASS establishes the approved repository-local feature behavior. It does not by itself establish token satisfaction, OPS completion, deployment, PF09 movement, other PF-Canon movement, execution of a real closeout candidate, Product Owner closeout approval, or epic closeout.
+
+The Moon Loop defects belonged to planner-created temporary orchestration, dependency modeling, venue compatibility, test maintenance, and finalization. They were not defects in the implemented reusable QA harness, evidence updater, CI classifier, close-pack generator, or Human Design product behavior.
+
+### **Evidence and traceability**
+
+* Repository: `amthorn78/glow-hdengine-v2`.  
+* QA evidence commit: `16a7a628d2d375c9355ce33ffc8a07514cf486e5`.  
+* Aggregate: 331 tests passed; 14/14 selected checks recorded `PASS`; every selected check exited `0`.  
+* Surface totals: D1 145, D2 19, D3 40, D4 55, D5 72\.  
+* Human Design corpus proof: PO-003, 117 tests passed.  
+* D5 tracked-tree proof: 5,790 regular tracked files examined with no real HDE-EPIC039 candidate source or output.  
+* Evidence artifacts and sibling path proofs were present and internally consistent; both Doc Delta copies remained byte-identical.  
+* Final QA summary recorded no unresolved QA-ladder behavior issue and recommended `READY FOR PRODUCT OWNER QA CLOSEOUT REVIEW`.  
+* Moon Loop revision: `moon-loop-2-extended`.
 
 \<eof\>
