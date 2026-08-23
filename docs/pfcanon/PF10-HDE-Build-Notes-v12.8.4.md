@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.8.3  
+**Version:** v12.8.4  
 Effective Date: 2026.08.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -218,6 +218,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.17 HDE-EPIC039 Final QA PASS and Moon Loop RCA
 
 2.18 HDE-EPIC039 Final QA Closeout Review, Evidence Normalization, and RCA
+
+2.19 HDE-EPIC039 Epic Closure Evidence Decision and Lead Dev Retrospective
 
 # 2\) Numbered Addenda
 
@@ -2674,5 +2676,370 @@ The verdict does not perform Product Owner closeout, final acceptance, token sat
 This addendum extends PF10 §2.17 by recording the final closeout review, completed evidence normalization, remaining auditability caveats, and PF19 canon-drain proposal.
 
 It does not supersede or revise §2.17’s historical QA `PASS`, Moon Loop chronology, root-cause record, product-remediation posture, or scope boundaries. The normalization establishes current evidence coherence without manufacturing new QA history.
+
+## **2.19 HDE-EPIC039 Epic Closure Evidence Decision and Lead Dev Retrospective**
+
+### **Approval and source record**
+
+Pre-drainage Epic Closure Evidence Review and Lead Dev Epic Retrospective for **HDE-EPIC039 — Calcination Pass 6**.
+
+* Epic closure evidence decision: **HDE-EPIC039 is SATISFIED**.  
+* Alchemical phase: Calcination.  
+* Repository: `amthorn78/glow-hdengine-v2`.  
+* Reviewed endpoint: `main` at `413253570d3e03ef73725dece47cc12f60bad809`.  
+* Repository inspection: read-only Connected GitHub review; no local working-tree status was available or claimed.  
+* Active PF10 basis: `PF10-HDE-Build-Notes-v12.8.3.md`, §§2.5–2.18.  
+* Approved plans: `r6-epic-plan-hde-epic039.md`, `r5-implementation-plan-hde-epic039.md`, and `r4-qa-plan-hde-epic039.md`.  
+* Applicable PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Development board: not consulted; no board fact affects the decision.  
+* Final QA posture retained: `PASS`, followed by closeout review `READY WITH CAVEATS`.  
+* Product Owner closeout: not performed; it is the only remaining formal action required to close the epic.  
+* No additional implementation, OPS, QA rerun, evidence capture, acceptance map, token matrix, close report, close manifest, or formal candidate generation remains required.
+
+The earlier closure conclusion was erroneous and is withdrawn. It treated five absent, explicitly non-required artifacts as blockers and required a separate report or manifest to establish the conclusion this review itself was assigned to make. Every task derived solely from that circular conclusion is also withdrawn.
+
+### **Retained decisions and requirements**
+
+The approved HDE-EPIC039 scope comprised five completed workstreams:
+
+* **D1 — Canonical serialization and declared sets:** PR \#387 and remedial PR \#388, accepted endpoint `d54c005f184477ed5e5f48440f71f45b0017064c`. It established the 26-target canonical JSON inventory and six schema-declared set rules without changing Human Design meaning.  
+* **D2 — Evidence-ledger parity and touch discipline:** PR \#389 and chronology-remediation PR \#390, accepted endpoint `b5569460ff2cfeefccf2d6a0a27dcdef32c68891`. It established atomic updater-owned publication, fixed-point validation, chronology correction, Human Index/Machine Mirror parity, self-record validation, and proof coherence.  
+* **D3 — Reusable QA invocation and viability:** PR \#391 and remedial PR \#392, accepted endpoint `a82d6624ab8f32221b90d0bd6112d2163716e546`. The generic QA subsystem is approved, intentional, and preserve-required.  
+* **D4 — Retired subsystem removal and CI remediation:** PR \#394 and remedial PR \#395, accepted endpoint `e9de6ade4aabbec654e8e9cb5519596da1399c4e`. It removed the obsolete HDE-EPIC038 closeout layer and established change-aware, budget-conscious, exact-head CI.  
+* **D5 — Generic feedback-free closeout lifecycle:** PR \#396, accepted endpoint `a74558c4027546350091deaca6958c4f7be7e618`. It created a reusable writer/checker, closed source schema, stable publication boundary, interruption recovery, non-writing validation, and isolated manual workflow.
+
+All nine closure-relevant PRs, \#387, \#388, \#389, \#390, \#391, \#392, \#394, \#395, and \#396, are merged. Every accepted endpoint and QA evidence commit remains an ancestor of current `main`.
+
+Continuing decisions:
+
+* Repository-enforced CI classification and structural efficiency controls govern CI budgeting. Manual per-agent push circuit breakers are superseded for overlapping scope.  
+* A green CI conclusion must not conceal a failed or unexecuted applicable check, missing prerequisite, or ambiguous condition.  
+* D5 is capability-only. No real HDE-EPIC039 candidate, report, manifest, acceptance map, token-evidence matrix, or closeout artifact is required.  
+* Closure must be assessed from implementation, QA, governed evidence, and current repository truth before remediation is invented.  
+* Incomplete assessment is not evidence of incomplete implementation.  
+* A closure reviewer must not require a separate artifact whose only function is to restate the decision the reviewer is responsible for making.  
+* Documentation drainage and PF09 status drainage are separate administrative axes and are never implementation or closeout gates.  
+* No acceptance-token satisfaction is claimed. All final QA receipts have empty `intended_tokens` and `claimed_tokens`.  
+* No OPS task existed for this epic.  
+* PF10 and PF12 remain the controlling interim authorities for evidence-writer ownership and Machine Mirror self-record semantics until permanent drainage occurs.
+
+Final QA established:
+
+* 14/14 planned checks at `PASS`, each with exit code `0`.  
+* 331 passing tests overall.  
+* D1: 145 tests.  
+* D2: 19 tests and two non-writing updater checks at exit code `0`.  
+* D3: 40 tests.  
+* D4: 55 tests.  
+* D5: 72 tests and a 5,790-file tracked-tree inspection confirming no real HDE-EPIC039 candidate source or output.  
+* No developer escalation, product remediation, implementation gap, `NOT READY` condition, or QA-rerun requirement remains.
+
+### **Epic, task, and status effects**
+
+* **Epic substantive status:** `SATISFIED`.  
+* All nine mapped PF09 subtasks are complete in substance for the approved HDE-EPIC039 scope.  
+* Current PF09 text remains unchanged:  
+  * two rows remain `Consolidation pending`;  
+  * five rows remain `Partial`;  
+  * two rows remain `Not done`.  
+* Later movement of the nine rows to `Done` is supportable but was not performed.  
+* PF09 status drainage is irrelevant to the epic closure decision.  
+* Product Owner closeout remains the only formal closure action.  
+* PF10/PF-Canon drainage, PF09 movement, board movement, formal close-pack state, token satisfaction, acceptance, OPS, deployment, and Product Owner closeout remain separate and are not claimed complete.  
+* No closure-critical blocked or ambiguous obligation remains.
+
+### **PF09 row-closure record**
+
+#### **HDE-CALC002.2 — Canonical JSON rules**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D1.  
+* Current recorded status: `Consolidation pending`.  
+* Closure determination: **Satisfied; PF09 substantive completion posture: Supported.**  
+* Status recommendation or performed action: Change to `Done` is supported; no PF09 edit was performed.  
+* Closure predicate: Enforce canonical JSON using UTF-8, ASCII-sorted keys, consistent float serialization, no extra whitespace, deterministic bytes, and fail-closed coverage of the plan-assigned D1 targets.  
+* Mapped requirements or obligations: OBL-001; PR-01 lineage; PO-001 and PO-003.  
+* Implementation or remediation delta: PR \#387 and remedial PR \#388, endpoint `d54c005f184477ed5e5f48440f71f45b0017064c`; 26 governed targets.  
+* Behavior proof: PO-001 passed 18 tests; PO-003 passed 117 tests. D1 aggregate: 145 tests.  
+* Artifact and governed-evidence proof: `audit/qa/hde-epic039/checks/po-001/primary.log` and proof, SHA-256 `b8602075b03421c08efe16588ad76dba3ab55af19db6d2ab4acc55b65c037e19`; PO-003 log and proof, SHA-256 `18be283e35d3559e0216cedbecf3ed7463a0692631521ae347d91c2aa6ff6640`.  
+* Validation proof: Both receipts record `PASS` and exit code `0`.  
+* Dependency and ordering proof: PR \#388 completed PR \#387; the endpoint is an ancestor of current `main`.  
+* Current-state and later-work posture: Implementation and final evidence remain tracked; no later implementation or remediation is required.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC002.3 — Arrays-as-sets semantics**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D1.  
+* Current recorded status: `Consolidation pending`.  
+* Closure determination: **Satisfied; PF09 substantive completion posture: Supported.**  
+* Status recommendation or performed action: Change to `Done` is supported; no PF09 edit was performed.  
+* Closure predicate: Deduplicate and ASCII-sort only schema-declared arrays functioning as sets before hashing or comparison, preserve ordered arrays, establish deterministic identities, and reject conflicting duplicate identities.  
+* Mapped requirements or obligations: OBL-002; PR-01 lineage; PO-002 and PO-003.  
+* Implementation or remediation delta: PR \#387 and remedial PR \#388, endpoint `d54c005f184477ed5e5f48440f71f45b0017064c`; six declared set rules.  
+* Behavior proof: PO-002 passed 10 tests; PO-003 passed 117 tests.  
+* Artifact and governed-evidence proof: `audit/qa/hde-epic039/checks/po-002/primary.log` and proof, SHA-256 `1f84fd1172028b7a243e529dd5afaf526f8337436869beafc51537befe0af55f`; PO-003 log and proof, SHA-256 `18be283e35d3559e0216cedbecf3ed7463a0692631521ae347d91c2aa6ff6640`.  
+* Validation proof: Both receipts record `PASS` and exit code `0`.  
+* Dependency and ordering proof: PR \#388 completed PR \#387; the accepted endpoint remains in current `main`.  
+* Current-state and later-work posture: No later or out-of-range implementation is required.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.10 — Indexing and parity CI gates**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D2.  
+* Current recorded status: `Partial`.  
+* Closure determination: **Satisfied; PF09 substantive completion posture: Supported.**  
+* Status recommendation or performed action: Later movement to `Done` is supportable; no PF09 edit was performed.  
+* Closure predicate: Update the Human Evidence Index and Machine Mirror coherently in the same publication transaction and enforce plan-scoped parity, proof, chronology, and final-state validation.  
+* Mapped requirements or obligations: OBL-003 and OBL-012; PR-02 lineage; PO-004 and PO-005.  
+* Implementation or remediation delta: PR \#389 and chronology-remediation PR \#390, endpoint `b5569460ff2cfeefccf2d6a0a27dcdef32c68891`.  
+* Behavior proof: PO-004 passed 6 tests; PO-005 passed 13 tests; both non-writing updater checks exited `0`.  
+* Artifact and governed-evidence proof: PO-004 log SHA-256 `33722c6ae58f78ff1ae0cb78ff28eda11c30cfa6b794cb28a2711243d2839dd0`; PO-005 log SHA-256 `58e9ace4600e18afc3e828743508091a6270e14e48c25d7d8092f74c5722192a`. Current Human Index and Machine Mirror each contain 593 records with zero key/path parity differences.  
+* Validation proof: Current sentinels, checksums, sibling proofs, and orientation are coherent; orientation reports `total_artifacts: 593` and `status: ok`.  
+* Dependency and ordering proof: PR \#390 corrected PR \#389’s chronology defect; the endpoint remains in current `main`.  
+* Current-state and later-work posture: The earlier broader-row withholding was slice-local. PF10 §§2.13–2.15 limit closure to the approved plan-local burden, which current QA and repository evidence satisfy.  
+* Remaining closure gaps: None for implementation or closure.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.11 — Evidence Index/Mirror touch discipline**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D2.  
+* Current recorded status: `Partial`.  
+* Closure determination: **Satisfied; PF09 substantive completion posture: Supported.**  
+* Status recommendation or performed action: Later movement to `Done` is supportable; no PF09 edit was performed.  
+* Closure predicate: Use one authorized evidence-publication transaction under closed rails, followed by non-writing current-state validation of the Index, Mirror, sentinels, path proofs, and orientation.  
+* Mapped requirements or obligations: OBL-004 and OBL-012; PR-02 lineage; PO-004 and PO-005.  
+* Implementation or remediation delta: PR \#389 and PR \#390, endpoint `b5569460ff2cfeefccf2d6a0a27dcdef32c68891`; updater-owned staged publication and chronology correction.  
+* Behavior proof: PO-004 passed 6 tests and PO-005 passed 13 tests.  
+* Artifact and governed-evidence proof: `docs/evidence/INDEX.json` contains 593 records, SHA-256 `5ce93ed945fdf290bea173db676e3f58073ed356977f84c913dab5984905f75f`. `artifacts/evidence_index.jsonl` contains 593 records and one self-record; complete-file SHA-256 `12f21deefd2807bfa3c83adf512a73efa6b86225324938ddcd301503c9e6c4cc`; body SHA-256 `d2a4412afb63e8af7e145ff9928f6aaf77feaf591a11e960db4184e8da5bb836`. Orientation SHA-256 is `463d1ad36d9fa82612b99d027f272e5b15a4237ad8038a457873596c6aa209c6`.  
+* Validation proof: 593/593 parity, valid proofs and sentinels, one correct Mirror self-record, and orientation `status: ok`.  
+* Dependency and ordering proof: D2 precedes later QA and closeout work; the accepted endpoint and evidence family remain current.  
+* Current-state and later-work posture: PF14’s conflicting permanent wording is documentation-only; PF10 §2.7 supplies controlling interim authority.  
+* Remaining closure gaps: None for implementation or closure.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage and PF14/PF04 canon drainage remain optional later actions; neither was performed.
+
+#### **HDE-CALC003.13 — Canonical pytest invocation for QA and CI**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D3.  
+* Current recorded status: `Partial`.  
+* Closure determination: **CLOSURE SUPPORTED — Recommend Done; obligation Satisfied.**  
+* Status recommendation or performed action: Recommend `Done`; no PF09 edit was performed.  
+* Closure predicate: Ensure assigned reusable QA and CI paths invoke pytest through the active interpreter using `python -m pytest`, preserving selector semantics and same-interpreter execution.  
+* Mapped requirements or obligations: OBL-005; PR-03 lineage; PO-007.  
+* Implementation or remediation delta: PR \#391 and accepted remedial PR \#392, endpoint `a82d6624ab8f32221b90d0bd6112d2163716e546`.  
+* Behavior proof: PO-007 passed 18 tests and established semantic declaration propagation and invocation normalization.  
+* Artifact and governed-evidence proof: `audit/qa/hde-epic039/checks/po-007/primary.log` and proof, SHA-256 `f7809afdbe724e36be1deb3a172aa7a94aa603f9c75142a67bf3e6c1befdbc1f`.  
+* Validation proof: Receipt records `PASS` and exit code `0`.  
+* Dependency and ordering proof: PR \#392 is the accepted remediation to PR \#391; PF10 §2.14 records that no PR or OPS work remains.  
+* Current-state and later-work posture: `tools/qa/qa_harness.py` remains tracked and its accepted endpoint remains in current history.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.14 — QA harness discipline**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D3.  
+* Current recorded status: `Partial`.  
+* Closure determination: **CLOSURE SUPPORTED — Recommend Done; obligation Satisfied.**  
+* Status recommendation or performed action: Recommend `Done`; no PF09 edit was performed.  
+* Closure predicate: Enforce stable check identities, the exact five-state model `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, and `PARKED`, causal precedence, truthful emptiness, semantic propagation, and governed current-state evidence.  
+* Mapped requirements or obligations: OBL-006; PR-03 lineage; PO-006 and PO-007.  
+* Implementation or remediation delta: PR \#391 and PR \#392, endpoint `a82d6624ab8f32221b90d0bd6112d2163716e546`.  
+* Behavior proof: PO-006 passed 15 tests; PO-007 passed 18 tests.  
+* Artifact and governed-evidence proof: PO-006 log SHA-256 `9cd74b4150b9e9e887721794784b6b5f3abc2ecb8a53500518a5ec1ebefca907`; PO-007 log SHA-256 `f7809afdbe724e36be1deb3a172aa7a94aa603f9c75142a67bf3e6c1befdbc1f`.  
+* Validation proof: Both receipts record `PASS` and exit code `0`.  
+* Dependency and ordering proof: The accepted remediation endpoint remains in current `main`; PF10 §2.14 records no remaining PR or OPS.  
+* Current-state and later-work posture: The subsystem is preserve-required and current.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.15 — Acceptance-map and QA-harness viability**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D3.  
+* Current recorded status: `Partial`.  
+* Closure determination: **CLOSURE SUPPORTED — Recommend Done; obligation Satisfied.**  
+* Status recommendation or performed action: Recommend `Done`; no PF09 edit was performed.  
+* Closure predicate: Prove reusable acceptance-input viability mechanics, loading, current-state validation, and fail-closed handling for supplied inputs. The approved burden does not require creation of an HDE-EPIC039 acceptance map.  
+* Mapped requirements or obligations: OBL-007; PR-03 lineage; PO-008.  
+* Implementation or remediation delta: PR \#391 and PR \#392, endpoint `a82d6624ab8f32221b90d0bd6112d2163716e546`.  
+* Behavior proof: PO-008 passed 7 tests and established reusable viability plus fail-closed current-state behavior.  
+* Artifact and governed-evidence proof: `audit/qa/hde-epic039/checks/po-008/primary.log` and proof, SHA-256 `aa7545330d9d9bdcc05d4c34d7c29b8c3a5c4845cb8b45a30c35280291f151c3`.  
+* Validation proof: Receipt records `PASS` and exit code `0`.  
+* Dependency and ordering proof: PF10 §2.14 expressly closure-authorizes the row; PF10 §2.15 prevents broader PF09 wording or early artifact lists from expanding the approved plan-local burden.  
+* Current-state and later-work posture: `docs/acceptance_map_epic039.json` does not exist and is not required.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.21 — HDE-EPIC038 closeout subsystem removal and CI-cost cleanup**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D4.  
+* Current recorded status: `Not done`.  
+* Closure determination: **Satisfied; closure supported.**  
+* Status recommendation or performed action: Recommend `Done`; no PF09 edit was performed.  
+* Closure predicate: Remove the HDE-EPIC038-specific DEV-01/DEV-02 closeout generator, validators, focused tests, and private-receipt handling while preserving shared primitives and history; establish budget-efficient, truthful, exact-head, change-aware CI.  
+* Mapped requirements or obligations: OBL-008 and OBL-010; PR-04 lineage; PO-009 and PO-010.  
+* Implementation or remediation delta: PR \#394 and remedial PR \#395, endpoint `e9de6ade4aabbec654e8e9cb5519596da1399c4e`; five obsolete implementation/test paths removed.  
+* Behavior proof: PO-009 passed 51 tests; PO-010 passed 4 tests.  
+* Artifact and governed-evidence proof: PO-009 log SHA-256 `3ac76043dc47a00f653dcee8f056c3718e3c826ef1a6dd23809640cb9d1254d1`; PO-010 log SHA-256 `9bfe91a741460c5c47db87ddfbb3c1fe4b4f5708ad91987092a89677cb7d5883`.  
+* Validation proof: Both receipts record `PASS` and exit code `0`; current bounded inspection finds all five retired paths absent.  
+* Dependency and ordering proof: PR \#395 remedied PR \#394’s remaining ownership gaps; current `.github/workflows/ci.yml` and `ci/checks/classify_ci_changes.py` remain present.  
+* Current-state and later-work posture: Automated repository controls govern the continuing CI-budget posture; no additional implementation remediation remains.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+#### **HDE-CALC003.22 — Feedback-free closeout lifecycle reachability**
+
+* PF09 source: `PF09.1-Canon-HDE-Build-Checklist-Calcination-v1.1.1.md`.  
+* Row classification: Targeted for closure; D5.  
+* Current recorded status: `Not done`.  
+* Closure determination: **Satisfied; closure supported.**  
+* Status recommendation or performed action: Recommend `Done`; no PF09 edit was performed.  
+* Closure predicate: Implement and prove an epic-agnostic lifecycle in which repository-local inputs determine all tracked candidate bytes before hosted validation, with a deterministic generic writer/checker, terminal reachability, coherent publication, interruption recovery, and no receipt feedback.  
+* Mapped requirements or obligations: OBL-009; PR-05; PO-011 through PO-013.  
+* Implementation or remediation delta: PR \#396, endpoint `a74558c4027546350091deaca6958c4f7be7e618`; `tools/qa/generate_epic_close_pack.py`, `schemas/epic_close_candidate_source.v1.json`, and `.github/workflows/epic-closeout-validation.yml`.  
+* Behavior proof: PO-011 passed 31 tests; PO-012 passed 33 tests; PO-013 passed 8 tests.  
+* Artifact and governed-evidence proof: PO-011 log SHA-256 `8eaaab45d7a6e8fd8375c235d49cd9027afdeca2c7a08c40704c4abd75e2a07b`; PO-012 log SHA-256 `75e010fb2b12ce515a7017f4f6dd45d49023e802cc28c10d884aecef7780bead`; PO-013 log SHA-256 `16a15da06464ca6cbcf05e8c9fec3a7c96e9d1627904cdf3359a8c6af3199812`.  
+* Validation proof: All three receipts record `PASS` and exit code `0`; PO-013 examined 5,790 regular tracked files.  
+* Dependency and ordering proof: PF10 §§2.11–2.12 authorized the capability-only boundary before PR \#396 acceptance.  
+* Current-state and later-work posture: Generic reusable loci remain present. No real HDE-EPIC039 candidate source or output exists, which is the required scope posture rather than a completion gap.  
+* Remaining closure gaps: None.  
+* Manual PF10 or PF09 action remaining: PF09 status drainage only; nonblocking and not performed.
+
+### **Required canon drainage**
+
+#### **PF14 §§1.3.1–1.3.2 — Evidence publication ownership**
+
+* Required change: Remove conflicting independent orientation-writer requirements. State that the canonical evidence updater owns the single governed publication transaction, while `orientation_demo.py` performs read-only checking or delegates compatibility writes.  
+* Reason: Current implementation and PF10 establish updater-owned publication, while PF14 simultaneously assigns conflicting ownership.  
+* Affected identifiers: HDE-CALC003.10 and HDE-CALC003.11; all future governed evidence publication.  
+* Status effect: None.  
+* Drainage posture: `CANON MISMATCH`; unperformed and nonblocking.
+
+#### **PF04 §2.0.6 — Machine Mirror self-record semantics**
+
+* Required change: Align `MACHINE_MIRROR_UPDATED_OK` with PF12: the self-record `sha256` binds the canonical body excluding the self-record line; `size_bytes` binds the complete file; sibling proof and checksum bind the complete-file SHA-256.  
+* Reason: PF04’s whole-file self-hash wording conflicts with PF12 and current implementation.  
+* Affected identifiers: HDE-CALC003.10 and HDE-CALC003.11; all Machine Mirror publication.  
+* Status effect: None.  
+* Drainage posture: `CANON MISMATCH`; unperformed and nonblocking.
+
+#### **PF19 §3.4.8 — Exact-command QA readiness**
+
+* Required change: Require preapproval proof of the exact final invocation, named working directory and venue, repository-root resolution, imports, complete selected-test runtime and development dependency closure, and non-mutating startup for any execution-critical helper. Hash or compilation checks alone are insufficient.  
+* Reason: The generated HDE-EPIC039 QA runner compiled but initially could not execute, causing avoidable Moon Loops.  
+* Affected identifiers: HDE-EPIC039 QA RCA and future Live QA Plans.  
+* Status effect: None.  
+* Drainage posture: `CANON AMBIGUITY OR CONFLICT`; unperformed and nonblocking.
+
+#### **PF27 §10 — Anti-circular closure-review rule**
+
+* Required change: Clarify that the closure-review artifact itself makes the evidence decision and must not require a pre-existing close report, close manifest, or equivalent decision-restatement artifact unless an owning source independently requires that artifact for a distinct proof function.  
+* Reason: The withdrawn earlier review created a circular prerequisite and manufactured false blockers from explicitly excluded artifacts.  
+* Affected identifiers: HDE-EPIC039 and future epic closure reviews.  
+* Status effect: None.  
+* Drainage posture: `CANON AMBIGUITY OR CONFLICT`; unperformed and nonblocking.
+
+#### **Automated CI-budget governance**
+
+* Target destination: No exact permanent section was established; PF06 is referenced as the applicable process posture.  
+* Required change: Preserve the reusable decision that repository-enforced workflow classification, cancellation, shared setup, bounded lanes, and truthful conclusions govern CI budgeting rather than manual per-agent push counts.  
+* Reason: Manual circuit breakers are not enforceable controls and did not prevent D2’s excessive CI-triggering updates.  
+* Affected identifiers: HDE-CALC003.21 and future CI-governance work.  
+* Status effect: None.  
+* Drainage posture: `NEW CANON PROPOSAL`; destination unresolved and drainage unperformed.
+
+#### **PF10 §2.18 implementation-plan label**
+
+* Required change: Correct the Implementation Guide label from `r6` to the repository-confirmed `r5` revision if later documentary cleanup is performed.  
+* Reason: Current `docs/plans/r5-implementation-plan-hde-epic039.md` identifies itself as revision r5; PF10 §2.18 labels it r6.  
+* Affected identifier: HDE-EPIC039 plan provenance only.  
+* Status effect: None.  
+* Drainage posture: Nonblocking documentation correction; unperformed.
+
+#### **PF09.1 status drainage**
+
+* Required change: Later movement of HDE-CALC002.2, HDE-CALC002.3, HDE-CALC003.10, HDE-CALC003.11, HDE-CALC003.13, HDE-CALC003.14, HDE-CALC003.15, HDE-CALC003.21, and HDE-CALC003.22 to `Done` is supportable.  
+* Reason: All nine plan-mapped rows are complete in substance and have satisfied closure obligations.  
+* Status effect: Would alter only recorded PF09 statuses; no such change was performed.  
+* Drainage posture: Optional later documentation/status drainage; never a closure requirement.
+
+### **Deferred obligations and unresolved work**
+
+The only remaining formal action needed to close HDE-EPIC039 is the Product Owner’s closeout action. No additional technical proof is required.
+
+Nonblocking follow-up work:
+
+* Consider the PF04, PF14, PF19, and PF27 canon candidates.  
+* Consider draining the nine PF09 statuses to `Done`.  
+* Correct the PF10 §2.18 implementation-plan revision label if desired.  
+* Include direct decisive-evidence paths in future PF10 result addenda where practical.  
+* Preserve exact-command and dependency-closure readiness in future QA-plan approvals.  
+* Preserve explicit anti-circularity in future closure-review guidance.
+
+Historical auditability caveats remain:
+
+* PF10 contains the event-wide QA commit and proof-bearing summaries but does not directly enumerate all 14 final log paths.  
+* The initial PO-001 tooling-failure and PO-003 stale-test receipts were replaced and are not independently retained. Their context remains preserved in PF10, `audit/qa/hde-epic039/00_meta/discovery.json`, and `audit/qa/hde-epic039/00_meta/qa_rca_doc_delta_summary.md`.  
+* These caveats do not undermine the final accepted results or block closure.
+
+### **Scope boundaries and nonclaims**
+
+This review:
+
+* does not perform Product Owner closeout;  
+* does not perform PF09, PF10, PF-Canon, or board movement;  
+* does not claim token satisfaction, final acceptance, deployment, OPS completion, or formal close-pack completion;  
+* does not execute QA, CI, implementation, evidence generation, or remediation;  
+* does not create a real HDE-EPIC039 candidate, report, manifest, acceptance map, viability log, or token matrix;  
+* does not claim local working-tree status.
+
+The five absent paths previously treated as blockers remain absent and non-required:
+
+* `docs/acceptance_map_epic039.json`  
+* `audit/qa/hde-epic039/token_evidence_matrix.md`  
+* `audit/qa/hde-epic039/acceptance_map_viability.log`  
+* `audit/EPIC-039_close_report.md`  
+* `audit/EPIC-039_MANIFEST.json`
+
+Their absence supports the authorized capability-only and tokenless posture and does not establish unfinished implementation.
+
+### **Evidence and traceability**
+
+* Current repository endpoint: `413253570d3e03ef73725dece47cc12f60bad809`.  
+* QA evidence commit: `16a7a628d2d375c9355ce33ffc8a07514cf486e5`.  
+* QA manifest: `audit/qa/hde-epic039/qa_step_logs_manifest.json`, 14 entries, all `PASS`, size 1,557 bytes, SHA-256 `6401718ab9893ba356768e3490c059deec8945dfed476ec7f4e2098a4d85a747`.  
+* Discovery: `audit/qa/hde-epic039/00_meta/discovery.json`, status `PASS`, dependency readiness exit code `0`, venue claim `NOT CLAIMED`.  
+* QA RCA: `audit/qa/hde-epic039/00_meta/qa_rca_doc_delta_summary.md`, size 8,946 bytes, SHA-256 `a73ac026f6727cb76d422a0861c38dcade322371c66866bf896ad7be78ffadc8`.  
+* Doc Delta pair:  
+  * `audit/qa/hde-epic039/00_meta/doc_deltas.md`  
+  * `audit/docdeltas/hde-epic039_doc_deltas.md`  
+  * each is 20,074 bytes with SHA-256 `feedd3dacf7693624699356417a33d5616fa9599c3975ec87ae0a4dcdcf44585`.  
+* Human Evidence Index: 593 records; SHA-256 `5ce93ed945fdf290bea173db676e3f58073ed356977f84c913dab5984905f75f`; zero Human-only parity rows.  
+* Machine Mirror: 593 records and one self-record; full-file SHA-256 `12f21deefd2807bfa3c83adf512a73efa6b86225324938ddcd301503c9e6c4cc`; body SHA-256 `d2a4412afb63e8af7e145ff9928f6aaf77feaf591a11e960db4184e8da5bb836`.  
+* Orientation: `audit/gates/topology/orientation_demo.txt`, `total_artifacts: 593`, `status: ok`, SHA-256 `463d1ad36d9fa82612b99d027f272e5b15a4237ad8038a457873596c6aa209c6`.  
+* Current `main` is one PF10-only commit beyond the §2.18 closeout-review endpoint `932e6abcbcf29d94224f4eeb0e5a9d8cb9b9df30`; no closure-critical implementation or evidence drift was found.  
+* All 14 primary logs and 14 sibling proofs remain tracked, byte-valid, `PASS`, exit code `0`, with empty token arrays.
+
+### **Relationship to existing PF10 guidance**
+
+This addendum extends PF10 §§2.5–2.18 by making the final closure-evidence decision those addenda prepared but did not perform.
+
+It preserves:
+
+* the D1–D5 accepted implementation lineages;  
+* the Product Owner’s capability-only D5 boundary;  
+* the closure-first PF09 rules in §§2.13–2.15;  
+* the audit and canon-drain findings in §2.16;  
+* final QA `PASS` in §2.17;  
+* final QA-closeout `READY WITH CAVEATS` in §2.18.
+
+It withdraws and supersedes only the earlier external closure-review conclusion that demanded excluded decision-restatement artifacts and classified the epic as not ready on that basis. It does not perform the separate Product Owner closeout action.
 
 \<eof\>
