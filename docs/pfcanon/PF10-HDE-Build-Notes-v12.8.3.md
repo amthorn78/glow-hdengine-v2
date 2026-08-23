@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.8.2  
+**Version:** v12.8.3  
 Effective Date: 2026.08.23  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -214,6 +214,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.15 Require Closure-First PF09 Reassessment and Proof Before Creating Remedial Work
 
 2.16 HDE-EPIC039 Post-Implementation Audit Analysis and Required Evidence-Canon Drainage
+
+2.17 HDE-EPIC039 Final QA PASS and Moon Loop RCA
+
+2.18 HDE-EPIC039 Final QA Closeout Review, Evidence Normalization, and RCA
 
 # 2\) Numbered Addenda
 
@@ -2532,5 +2536,143 @@ The Moon Loop defects belonged to planner-created temporary orchestration, depen
 * Evidence artifacts and sibling path proofs were present and internally consistent; both Doc Delta copies remained byte-identical.  
 * Final QA summary recorded no unresolved QA-ladder behavior issue and recommended `READY FOR PRODUCT OWNER QA CLOSEOUT REVIEW`.  
 * Moon Loop revision: `moon-loop-2-extended`.
+
+## **2.18 HDE-EPIC039 Final QA Closeout Review, Evidence Normalization, and RCA**
+
+### **Approval and source record**
+
+Final QA Closeout Review and QA RCA for **HDE-EPIC039 — Calcination Pass 6** in `amthorn78/glow-hdengine-v2`.
+
+* Review decision: **READY WITH CAVEATS**.  
+* Historical QA decision retained from PF10 §2.17: `PASS`.  
+* Developer escalation: **None**.  
+* Additional product remediation: **None**.  
+* Additional product QA rerun: **Not supported**.  
+* Implementation Guide: `r6-implementation-plan-hde-epic039.md`, used only for goals framing.  
+* QA Plan: `r4-qa-plan-hde-epic039.md`, used only for intended-requirements framing.  
+* PF27 and PF06: not used.  
+* QA evidence commit: `16a7a628d2d375c9355ce33ffc8a07514cf486e5`.  
+* Reviewed repository endpoint: `main` at `932e6abcbcf29d94224f4eeb0e5a9d8cb9b9df30`, commit message `evidence: register HDE-EPIC039 QA closeout artifacts`, parent `0d73b0c995754e49b305f31d3f1b0e05850d0969`.  
+* Primary root-cause category: **Plan-guidance ambiguity**.
+
+The review covered PF10’s complete QA record, all 14 QA Plan steps, the current primary logs and proof companions, manifest, discovery artifact, QA RCA and Doc Delta summary, Moon Loop history, evidence-normalization commit, Human Evidence Index, Machine Mirror, sentinels, checksums, orientation report, updater registration, and focused regression test.
+
+### **Retained decisions and requirements**
+
+PF10 remains the historical source for HDE-EPIC039 QA execution, favorable outcomes, Moon Loop events, RCA, and closeout-review posture. The repository is the current source for evidence existence, tracking, readability, byte integrity, proof bindings, index and mirror registration, and remediation state. PF19 governs closeout review, coverage accounting, Moon Loop interpretation, evidence caveats, RCA posture, and evidence-only normalization.
+
+The five Implementation Guide workstreams remain fully represented by the accepted QA clusters:
+
+* D1 / PO-001–PO-003: `PASS`; 145 tests, including the complete 117-test PO-003 suite.  
+* D2 / PO-004–PO-005: `PASS`; 19 tests and two non-writing updater checks at exit code `0`.  
+* D3 / PO-006–PO-008: `PASS`; 40 tests.  
+* D4 / PO-009–PO-010: `PASS`; 55 tests.  
+* D5 / PO-011–PO-013: `PASS`; 72 tests and inspection of 5,790 regular tracked files with no real HDE-EPIC039 candidate source or output.
+
+Aggregate posture remains 331 passing tests, with all 14 selected steps at `PASS` and exit code `0`.
+
+The Product Owner-authorized Extended Moon Loop changes to the runner, dependency posture, PO-003 test setup, Codespaces compatibility, and finalizer are resolved plan-execution deviations, not unresolved product mismatches. They reduced uncertainty without changing product runtime or weakening the approved predicates:
+
+1. The direct-path runner failure was initially `TOOLING_BLOCKED`; repository-root import bootstrapping corrected it.  
+2. PO-001 initially encountered `FAIL_TOOLING` during collection because Flask readiness was absent; runtime and development dependency readiness were corrected before the final PASS receipt.  
+3. PO-003 initially carried `FAIL_BEHAVIOR` for one stale test after 116 passing assertions; the expectation was corrected to `nar.harmony.cool.shared` and isolated under `tmp_path`, after which all 117 tests passed without product-runtime changes.  
+4. Codespaces Git metadata compatibility was corrected through a narrow in-memory treatment of `branch.main.github-pr-owner-number`; `.git/config` remained unmodified and broader or malformed forms remained rejected.  
+5. The first all-PASS finalizer returned `NOT READY` because it treated venue metadata as event-wide source identity; finalization was corrected to require stable source and repository content plus per-operation Git-configuration stability.
+
+Evidence-only normalization is acceptable under PF19 §9.2.15.8 because the relied-on runtime facts were unchanged and already evidenced, no new runtime command, route behavior, environment binding, or OPS action was claimed, and the affected governed evidence family was refreshed coherently.
+
+The evidence-normalization commit did not create new QA history. It registered and normalized current evidence supporting the historical PF10 record.
+
+### **Epic, task, and status effects**
+
+* HDE-EPIC039 remains at final QA `PASS`.  
+* Final QA closeout-review recommendation is **READY WITH CAVEATS**.  
+* The former closeout evidence blocker is resolved.  
+* No `NOT READY` condition remains.  
+* Product Owner closeout review remains unperformed.  
+* No final acceptance, token satisfaction, PF09 movement, OPS completion, close-pack execution, deployment, or epic closure was performed.  
+* No implementation gap, additional product remediation, or product QA rerun is supported.
+
+All 14 QA Plan steps are fully evidenced and nonblocking:
+
+1. `step-0b-doc-delta-capture`  
+2. `PO-001`  
+3. `PO-002`  
+4. `PO-003`  
+5. `PO-004`  
+6. `PO-005`  
+7. `PO-006`  
+8. `PO-007`  
+9. `PO-008`  
+10. `PO-009`  
+11. `PO-010`  
+12. `PO-011`  
+13. `PO-012`  
+14. `PO-013`
+
+The Step-0B runner, dependency, Codespaces, and finalizer deviations and the PO-001 and PO-003 deviations were corrected under the authorized Extended Moon Loop. No final accepted-step deviation remains unresolved.
+
+### **Required canon drainage**
+
+#### **PF19 §3.4.8 — Exact-command readiness for execution-critical QA helpers**
+
+* Target: PF19 — `PF19-Canon-Glow-QA-Guide`, §3.4.8, “Rails posture for manual Live QA (EPIC017 example; generalized rule).”  
+* Source finding: FND-001.  
+* Required change: Establish that any Live QA Plan which embeds, generates, or materially rewrites an execution-critical helper must prove the exact final invocation in the named working directory and venue before approval. Readiness must cover repository-root resolution, complete selected-test import closure, runtime and development dependencies, and non-mutating startup. Hash verification or successful compilation alone must not satisfy runnability.  
+* Reason: The HDE-EPIC039 QA Plan crossed from selecting proof into creating execution-critical QA machinery and approved that machinery without exact execution, causing five avoidable Moon Loop corrections.  
+* Affected identifier: HDE-EPIC039 and future Live QA Plans governed by PF19.  
+* Status effect: None.  
+* Drainage posture: `NEW CANON PROPOSAL`; permanent consideration remains unperformed and nonblocking.
+
+### **Deferred obligations and unresolved work**
+
+* Product Owner QA closeout review remains the next governance action.  
+* Permanent consideration and possible drainage of the PF19 §3.4.8 proposal remain.  
+* Historical auditability caveats remain:  
+  * PF10 records the event-wide evidence commit and evidence-basis prose but not direct paths to the 14 primary logs, manifest, or QA RCA summary.  
+  * The initial PO-001 and PO-003 receipts were replaced and are not independently retained. Their failure context remains recorded in PF10, the discovery artifact, and the tracked QA RCA summary.  
+* These caveats do not require product remediation or a QA rerun because the final accepted evidence is tracked, readable, proof-bound, indexed, mirrored, and coherent.
+
+### **Scope boundaries and nonclaims**
+
+This closeout review was read-only and used the immutable remote commit tree. It executed no new QA or OPS command and made no repository mutation.
+
+The evidence-normalization commit changed the canonical evidence updater, one focused evidence test, and updater-owned evidence surfaces. It did not alter:
+
+* the 14 historical QA logs;  
+* the manifest;  
+* the QA RCA summary;  
+* product-runtime source;  
+* the product-behavior test suite;  
+* paths under `engine/`, `api/`, `catalog/`, or `schemas/`.
+
+No new product PASS was inferred from the normalization commit. PF10 remains the authority for the historical favorable QA result.
+
+The execution venue remains `NOT CLAIMED` and is non-material to the product decision. No open-rails product, vendor, deployment, production, public Reader, database, or service behavior was established by this closeout review.
+
+The verdict does not perform Product Owner closeout, final acceptance, token satisfaction, PF09 movement, OPS work, close-pack execution, deployment, PF-Canon drainage, or epic closure.
+
+### **Evidence and traceability**
+
+* Current repository endpoint: `932e6abcbcf29d94224f4eeb0e5a9d8cb9b9df30`.  
+* QA evidence commit: `16a7a628d2d375c9355ce33ffc8a07514cf486e5`, reachable in repository history.  
+* Discovery artifact: `audit/qa/hde-epic039/00_meta/discovery.json`.  
+* Manifest: `audit/qa/hde-epic039/qa_step_logs_manifest.json` and sibling proof.  
+* QA RCA summary: `audit/qa/hde-epic039/00_meta/qa_rca_doc_delta_summary.md` and sibling proof.  
+* Primary step evidence: the 14 `audit/qa/hde-epic039/checks/<check-id>/primary.log` files and their 14 sibling `.path_proof.txt` files.  
+* All 28 log and proof paths are tracked; every primary log’s current size and SHA-256 matches its proof.  
+* The manifest contains exactly the expected 14 check IDs, all at `PASS`.  
+* Human Evidence Index: 593 records.  
+* Machine Mirror: 593 records.  
+* Orientation report: `total_artifacts: 593`, `status: ok`.  
+* The manifest and QA RCA summary each have exactly one canonical Human Evidence Index entry and one matching Machine Mirror record; paths, sizes, SHA-256 values, and proof anchors match current bytes.  
+* Canonical and QA-root Doc Delta copies and proofs remain present and byte-valid.  
+* PF10-referenced repository evidence missing: none.
+
+### **Relationship to existing PF10 guidance**
+
+This addendum extends PF10 §2.17 by recording the final closeout review, completed evidence normalization, remaining auditability caveats, and PF19 canon-drain proposal.
+
+It does not supersede or revise §2.17’s historical QA `PASS`, Moon Loop chronology, root-cause record, product-remediation posture, or scope boundaries. The normalization establishes current evidence coherence without manufacturing new QA history.
 
 \<eof\>
