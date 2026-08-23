@@ -371,6 +371,63 @@ def test_render_mirror_refreshes_changed_epic039_chronology_without_explicit_tim
     assert proof_path.read_bytes() == corrected
 
 
+def test_epic039_qa_closeout_evidence_remains_registered():
+    expected = [
+        {
+            "artifact_key": "epic039.qa_step_logs_manifest",
+            "discovered_physical_path": "audit/qa/hde-epic039/qa_step_logs_manifest.json",
+            "epic_id": "HDE-EPIC039",
+        },
+        {
+            "artifact_key": "epic039.qa_rca",
+            "discovered_physical_path": "audit/qa/hde-epic039/00_meta/qa_rca_doc_delta_summary.md",
+            "epic_id": "HDE-EPIC039",
+        },
+    ]
+    assert update_evidence_index.EPIC039_QA_PRIMARY_ARTIFACTS == expected
+
+    human_entries = json.loads(
+        Path("docs/evidence/INDEX.json").read_text(encoding="utf-8")
+    )
+    mirror_entries = [
+        json.loads(line)
+        for line in Path("artifacts/evidence_index.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line
+    ]
+
+    for selected in expected:
+        rel = selected["discovered_physical_path"]
+        matching_human = [
+            entry
+            for entry in human_entries
+            if entry["discovered_physical_path"] == rel
+        ]
+        assert matching_human == [selected]
+
+        matching_mirror = [
+            entry
+            for entry in mirror_entries
+            if entry["discovered_physical_path"] == rel
+        ]
+        assert len(matching_mirror) == 1
+        mirror = matching_mirror[0]
+        assert mirror["artifact_key"] == selected["artifact_key"]
+        assert mirror["epic_id"] == selected["epic_id"]
+        assert mirror["role"] == "snapshot"
+        assert "tokens" not in mirror
+
+        artifact = Path(rel)
+        proof_path = Path(f"{rel}.path_proof.txt")
+        proof = update_evidence_index._load_existing_proof(proof_path)
+        artifact_sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        assert mirror["proof_anchor"] == proof_path.as_posix()
+        assert mirror["sha256"] == proof["sha256"] == artifact_sha
+        assert mirror["size_bytes"] == int(proof["size_bytes"]) == artifact.stat().st_size
+        assert mirror["produced_at_utc"] == proof["produced_at_utc"]
+
+
 def test_isolated_path_proof_uses_immutable_manifest_timestamp(
     tmp_path,
     monkeypatch,

@@ -3222,6 +3222,19 @@ for _epic039_entry in EPIC039_PR01_PRIMARY_ARTIFACTS:
     if not _epic039_entry["tokens"]:
         del _epic039_entry["tokens"]
 
+EPIC039_QA_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic039.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic039/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC039",
+    },
+    {
+        "artifact_key": "epic039.qa_rca",
+        "discovered_physical_path": "audit/qa/hde-epic039/00_meta/qa_rca_doc_delta_summary.md",
+        "epic_id": "HDE-EPIC039",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -3748,6 +3761,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
             *EPIC038_PR06_PRIMARY_ARTIFACTS,
             *EPIC039_PR01_PRIMARY_ARTIFACTS,
+            *EPIC039_QA_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
