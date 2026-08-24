@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.8.6  
+**Version:** v12.8.9  
 Effective Date: 2026.08.24  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -3042,7 +3042,1764 @@ It preserves:
 * final QA `PASS` in §2.17;  
 * final QA-closeout `READY WITH CAVEATS` in §2.18.
 
-It withdraws and supersedes only the earlier external closure-review conclusion that demanded excluded decision-restatement artifacts and classified the epic as not ready on that basis. It does not perform the separate Product Owner closeout action.
+It withdraws and supersedes only the earlier external closure-review conclusion that demanded excluded decision-restatement artifacts and classified the epic as not ready on that basis. It does not perform the separate Product Owner closeout action.n
 
-## 2.20)  Magic10 v1 Canonical Mechanics and Build Authorization
+## **2.20) Magic10 v1 Canonical Mechanics and Build Authorization**
+
+Timestamp: 082426 20:04 CEST
+
+Details: Product Owner authorization of the complete Magic10 v1 deterministic, tunable production-mechanics baseline, its canonical mathematical and engineering contracts, and its required implementation program.
+
+### **Product Owner authorization and source record**
+
+* **Authorization record:** `M10-CANON-001`  
+* **Decision:** `AUTHORIZED AND CANONICAL`  
+* **Authority:** Product Owner  
+* **Adopted at (UTC):** `2026-08-24T18:04:49Z`  
+* **Canonical machine field:** `M10-CANON-001.adopted_at_utc = 2026-08-24T18:04:49Z`  
+* **PF10 effect:** This addendum replaces the current PF10 §2.20 in full. It is the active canonical authority for every Magic10 decision, formula, configuration value and bound, mapping row, contract, task definition, acceptance criterion, sequence, exclusion, nonclaim, and drainage obligation stated below.  
+* **PF09 effect:** Every new PF09 ID, heading, output, dependency, and completion predicate below is canonically authorized for insertion and execution by its owning process. Permanent PF09-file insertion and lifecycle status remain evidence-bound drainage facts, not additional approval gates.  
+* **Research effect:** No research phase or empirical promotion gate is authorized or required. Only the bounded implementation-producing verification named below remains permissible.  
+* **Accepted source:** `Glow-HDE-Magic10-Mechanics-Proposal-v0.18.md`, SHA-256 `c937b0041ede8de9b39565349d1a1f2287bb8e54281a4fd9e2441b5ac6ab72be`  
+* **Acceptance review:** `Glow-HDE-Magic10-Mechanics-Proposal-v0.18-Engineering-Mathematical-Fidelity-Review.md`, SHA-256 `bcd947c73ddcadaf1269cfc1b46701a958e55e74c3b25be01476ab326d10a1d2`  
+* **Review disposition:** `APPROVED`; Canon readiness `Ready`; PF09 planning readiness `Ready`; zero blockers; no experiment required before implementation.  
+* **Repository truth basis:** Read-only inspection of `amthorn78/glow-hdengine-v2` at `main@e5fcff584871418ccb431f2b7c8798d0dd2d1107` on 2026-08-24.  
+* **Authority/lifecycle rule:** All content below is canonical now. A requirement may remain unexecuted, untested, undrained, undeployed, or absent from a permanent PF09 register without becoming tentative. Those are lifecycle facts, not reductions in authority.  
+* **Supersession:** This authorization supersedes the tentative status of the accepted v0.18 source and the prior PF10 §2.20. Earlier Magic10 proposal versions remain historical evidence and impose no current requirement.  
+* **Nonclaim:** Authorization establishes canonical product and build requirements. It does not by itself establish repository implementation, permanent-canon drainage, PF09 register mutation, QA PASS, OPS execution, deployment, release, board movement, acceptance, or epic closure.
+
+### **General Implementation Plan for a tunable production mechanics baseline**
+
+#### **Applicability and ownership boundary**
+
+This General Implementation Plan is used because no more-specific PF27 template controls the cross-cutting authorization. It does not replace the HDE Epic Plan, Ops Task Record, Epic Remediation Plan, Remediation Implementation Guide, Live QA Plan, or any review or closeout record. PF27 owns this reusable shape. `PF06-Canon-Epic-Process-Guide` retains process sequencing, roles, approval responsibilities, and PR-first discipline.
+
+#### **Plan identity and revision**
+
+* **Plan identity:** PF10 §2.20 Magic10 v1 Canonical Mechanics and Build Authorization  
+* **Plan type:** Product Owner-authorized PF10 Build Notes addendum incorporating the accepted General Implementation Plan  
+* **Revision:** v0.18  
+* **Date (UTC):** 2026-08-24  
+* **Prepared by:** Human Design Math Expert  
+* **Authorized by:** Product Owner  
+* **Applicable epic, issue, or work-slice identity:** Magic10 production-mechanics Canon and implementation program; canonical PF09 task additions defined in this addendum  
+* **Status:** `PO AUTHORIZED`; active canonical PF10 guidance pending execution and permanent-canon drainage  
+* **Revision base:** `Glow-HDE-Magic10-Mechanics-Proposal-v0.17.md`, SHA-256 `d5e0b30e98330a00448b25152202cc87c00f4174541d6114972c0d211fd1debd`  
+* **Accepted source:** `Glow-HDE-Magic10-Mechanics-Proposal-v0.18.md`, SHA-256 `c937b0041ede8de9b39565349d1a1f2287bb8e54281a4fd9e2441b5ac6ab72be`  
+* **Controlling review:** `Glow-HDE-Magic10-Mechanics-Proposal-v0.18-Engineering-Mathematical-Fidelity-Review.md`, decision `APPROVED`  
+* **Adoption record:** `M10-CANON-001`  
+* **Adopted at (UTC):** `2026-08-24T18:04:49Z`  
+* **Primary revision direction:** Resolve review blockers B-001 and B-002 by closing self-pair and equal-mask directional semantics, separating public idempotence from intrinsic cache identity, and moving current release work off completed historical PF09 tasks onto explicit current-attestation work  
+* **Repository inspected:** `amthorn78/glow-hdengine-v2`  
+* **Repository ref inspected:** `main@e5fcff584871418ccb431f2b7c8798d0dd2d1107`  
+* **Repository inspection time boundary:** current GitHub `main` revalidated 2026-08-24  
+* **Supersession:** This authorized addendum replaces the current PF10 §2.20 and the tentative authority state of v0.18. v0.18 replaced v0.17 on substance; earlier versions remain historical evidence and supply no implementation requirement.
+
+#### **Review-blocker closure**
+
+| Review blocker | v0.18 resolution | Decisive implementation loci | Re-review proof |
+| :---- | :---- | :---- | :---- |
+| `B-001` | Retain PF01 self-pair eligibility; short-circuit valid self-pairs before core/cache; reject same identity with unequal projections; use identity-free intrinsic pair bytes; use `(gate_mask, canonical_person_id)` only for directional orientation; compute Reader idempotence independently | §§1.2, 1.4, governed results, `M10-G007`, `M10-G008`, PF01/PF05/PF14 deltas, `tests/compat/test_magic10_identity_boundaries.py` | Both required identity cases have exact eligibility, categories, hashes, personal-key behavior, AB/BA bytes, failure behavior, and tests |
+| `B-002` | Treat `HDE-DIST002` as completed historical work; establish canonical `HDE-DIST008.2` and `.3` task requirements for current manifest validation and exact-source external attestation; prohibit historical evidence mutation and current use of `RELEASE_ID_RECOMPUTE_OK` | Current manifest/attestation contract, `M10-WS06`, PF12 delta, PF09 matrices, canonical `HDE-DIST008` task definition, `M10-D11` | Every release deliverable has a canonical nonhistorical owner, exact commands and predicates, frozen-artifact boundaries, and tests |
+
+---
+
+### **Purpose, scope, exclusions, and nonclaims**
+
+#### **Purpose**
+
+This plan turns Magic10 from an unwired set of category names and placeholder scores into a deterministic, tunable, production-directed Human Design relationship mechanic.
+
+The concrete outcome is one adopted path from two complete BodyGraphs to:
+
+1. two normalized Gate sets;  
+2. one five-state classification for each of the 36 Human Design Channels;  
+3. twenty internal signal values in PF01 half-score units;  
+4. ten intrinsic Magic10 scores in the integer range `0..100`;  
+5. ten configured bands;  
+6. one canonical result shared by Engine Core, compat, CLI, Reader projection, and admin verification.
+
+This addendum canonically establishes the full v1 formula, the full twenty-signal definition set, the full Channel mapping, default weights, two specialized Balance operations, fixed-point rounding, default bands, tuning controls, deterministic goldens, exact Canon deltas, exact repository changes, PF09 task requirements, migration, validation, cutover, and rollback.
+
+Product Owner adoption is established by `M10-CANON-001`. The formula is authorized for implementation through the owning process. No corpus study, holdout, statistical model selection, candidate registry, governance sequencer, or outside researcher is a prerequisite.
+
+#### **In scope**
+
+* Adopt a complete Glow-authored Magic10 v1 mathematical regularization grounded in the Human Design composite Channel states.  
+* Amend PF01 and PF12 so the score producer, machine configuration, and release binding have authoritative homes.  
+* Reconcile the affected architecture, interface, narrative, and user-guide Canon without duplicating formula authority.  
+* Correct the governed 36-Channel machine catalog before it becomes an input to scoring.  
+* Implement the five-state Channel kernel, twenty signal producers, two Balance operations, ten reducers, banding, configuration loading, and explanation-safe diagnostic output.  
+* Replace the UID-hash placeholder scorer and the harmony-only transitional path.  
+* Route all internal calculation surfaces through one pure Engine Core result.  
+* Preserve a bands-only, numeric-free public Reader unless a separate approved contract changes it.  
+* Add fixed-point goldens, mutation tests, AB/BA parity, two-run identity, configuration closure, integration tests, performance coverage, admin verification, cutover, and rollback.  
+* Add versioned tuning controls whose production values are immutable within a release.  
+* Establish the exact canonical PF09 task and subtask additions required to build and prove the work.
+
+#### **Out of scope**
+
+* Public relationship verdicts, ranking people, or claims that a high score means a good relationship.  
+* Medical, psychological, sexual, safety, destiny, or outcome predictions.  
+* Viewer preference weighting inside intrinsic Magic10 scores.  
+* Runtime A/B testing, caller-provided weights, user-specific formulas, hidden mutable tuning, or remote config mutation.  
+* A statistical research harness, fixed-N study, holdout corpus, multiplicity framework, candidate registry, governance ledger, or research release protocol.  
+* Base, Tone, Color, Variable, PHS, planetary-square, or aura-diagnostic mechanics.  
+* Editing permanent PF-Canon while creating this PF10 authorization document. Permanent-canon changes are named drainage deliverables; this active PF10 addendum already governs its exact scope.  
+* Deployment, board mutation, PF09 register or status mutation, QA execution, or release by the authorization action itself.
+
+#### **Non-goals**
+
+* This plan does not claim that Human Design doctrine supplies numerical compatibility effect sizes.  
+* It does not claim that the default weights are empirically proven.  
+* It does not use score-distribution attractiveness as a correctness criterion.  
+* It does not turn an isolated Channel or score into a complete relationship interpretation.  
+* It does not preserve v0.16's research machinery in reduced form.
+
+#### **Current implementation claims**
+
+At the inspected repository ref, Glow already has the 36-Channel catalog, the ten category IDs, the twenty current internal signal IDs, half-up category reduction, score clamping, and band boundaries. The HDAPI v2 adapter receives a `gates` list, but current validation accepts strings without enforcing canonical integers `1..64`, uniqueness, or a nonempty complete Gate field. The CLI and compat resolvers currently drop Gate data before scoring. The canonical mechanic therefore requires Gate-ingress normalization and caller migration, but it does not require a new vendor calculation.
+
+The inspected runtime does not yet derive the twenty signals from Human Design mechanics. The current compatibility scorer is UID/category hashing, while another transitional path produces only Type-pair harmony. The existing Magic10 calculator reduces caller-provided signals but is not supplied by a canonical Channel-state producer.
+
+#### **Nonclaims**
+
+This addendum establishes Canon adoption. It does not establish implementation completion, permanent-canon drainage, PF09 register or status mutation, QA PASS, OPS completion, deployment, release, public activation, acceptance-token satisfaction, board state, or epic closure.
+
+---
+
+### **Executive implementation decision**
+
+#### **Selected baseline**
+
+Adopt `m10-channel-state-v1.0.0` as the canonical production baseline:
+
+* one deterministic five-state result per canonical Channel;  
+* eighteen ordinary signals calculated by weighted Channel-state response;  
+* two Balance signals calculated by explicit symmetric ownership operations;  
+* exactly two signals per Magic10 category;  
+* integer-only arithmetic;  
+* one round at each signal boundary and one round at each category boundary;  
+* equal default Channel weights and equal default category-input weights;  
+* versioned configuration for later tuning;  
+* no runtime-selected or user-selected formula;  
+* one active configuration identified by the release manifest.
+
+#### **Authority boundary**
+
+Human Design doctrine establishes the 36 Channels, their Gate endpoints and themes, and the distinction among `none`, `companionship`, `dominance`, `compromise`, and `electromagnetic` composite states.
+
+Glow Product regularization establishes:
+
+* the twenty internal signals;  
+* every Channel-to-signal association;  
+* the three numeric response profiles;  
+* Channel and category weights;  
+* the two Balance operations;  
+* fixed-point scales, reducers, rounding, and bands.
+
+These Product choices are deterministic mechanics design. They are not claimed as Human Design doctrine, scientific measurements, effect sizes, relationship probabilities, or moral judgments.
+
+#### **Meaning of a Magic10 score**
+
+A score expresses how much of the configured Channel-state structure is available to one internal category construct under the adopted Glow model. It does not measure relationship quality, success, love, compatibility destiny, health, safety, or the value of either person.
+
+#### **Rejection of v0.16**
+
+The later Product Owner correction controls over the historical Head of Development review that found v0.16 internally approvable for temporary research authority. That review did not adopt v0.16, and its research-first posture is no longer the requested product direction.
+
+The following v0.16 approach is rejected and must not be carried into implementation:
+
+* research-first candidate selection;  
+* fixed-N and holdout requirements;  
+* statistical promotion gates;  
+* multiplicity and simultaneous-coverage budgets;  
+* candidate registries and selection bundles;  
+* research manifests, terminal envelopes, intake ledgers, allocation sequencers, and recovery arrays;  
+* postponing signal definitions, Channel maps, response tables, reducers, or ranges until Separation;  
+* treating implementation as blocked on an unspecified future researcher.
+
+v0.18 supplies the missing mechanics directly and replaces that apparatus with Canon deltas, configuration bytes, code tasks, deterministic tests, controlled tuning, and production cutover work.
+
+---
+
+### **Governing-source map**
+
+Applicable, active, non-superseded PF10 addenda supersede conflicting PF-Canon only for the exact scope they address; otherwise follow PF-Canon. A formally approved bounded Product Owner rescope may supersede conflicting PF-Canon only for the exact decision it adjudicates.
+
+| Topic | Exact current source title | Exact locator | How it constrains this plan |
+| :---- | :---- | :---- | :---- |
+| Magic10 arithmetic and composite state semantics | PF01-Canon-HDE-Math-Spec v1.3.6 | §5.2, §5.3, §5.4, §6.1, and Appendix E | Owns the normative equations after amendment; preserves integer half-score units, intrinsic/viewer separation, feature extraction, symmetry, and release coupling |
+| Governed artifacts and release identity | PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.1 | §2.1, §2.3, §2.5, §3.1, §5, §6, and §8.14 | Owns the mechanics configuration schema, canonical bytes, manifest membership, config artifacts, and release binding |
+| Broad Human Design mechanics | PF08-Reference-Human Design System | `The Centers` and `Channels` headings | Governs broad doctrinal structure and prevents isolated-Channel overclaiming |
+| Gate and Channel meaning | PF11-Reference-The Rave I Ching | Gate 1 through Gate 64 header pages, both endpoints per Channel | Governs exact Gate, Channel, Center, circuit, and theme facts used by the catalog target |
+| Separation build work | PF09.3-Canon-HDE-Build-Checklist-Separation | Repository Canon: `docs/pfcanon/PF09.3-Canon-HDE-Build-Checklist-Separation-v1.md`, task register following `Task HDE-SEPA004`; supplied project source: `PF09.3-Canon-HDE-Build-Checklist-Separation-v1.1.1.md` | PF10 resolution: this addendum canonically establishes `HDE-SEPA005` and `.1` through `.5`; the IDs are collision-free in both inspected registers. The version discrepancy is a permanent-canon drainage issue and cannot reopen or weaken these task definitions or block implementation. Drainage must reconcile the PF09.3 version lineage before mutating its register |
+| Conjunction build work | PF09.4-Canon-HDE-Build-Checklist-Conjunction | Task register following `Task HDE-CONJ009` | Canonical home for full calculation integration |
+| Distillation build work | PF09.6-Canon-HDE-Build-Checklist-Distillation v1.1.6 | `HDE-DIST002.1` through `.5`, `HDE-DIST004`, and the current release-attestation posture | Treats `HDE-DIST002` and its checked-in evidence as completed historical work; current manifest validation and exact-source provenance use the external attestation; this addendum canonically establishes `HDE-DIST008.1` through `.3` for new Magic10 proof and release-binding work |
+| Coagulation build and operations work | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `Task HDE-COAG003` and `Task HDE-COAG006` | Owns admin surfaces, release guards, runbooks, smoke, and authorized operational work |
+| Mechanics/components contract | PF14-Canon-HDE-Mechanics-Guide v3.5.3 | §6.1, §6.7, §7, and §9.3 at `docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.3.md` | Currently requires pure injected core configuration, `ParticipantState` and precomputed `compat_score`, the full internal result, and compat/admin routing; all conflicting mechanics require an explicit PF14 Doc Delta |
+| Architecture | PF02-Canon-HDE-Architecture-v2.4.4 | §1.1, §2.1, §2.2, §2.4, §3.1, and §3.2 | Requires one pure core owner and forbids rescoring in adapters or presenters |
+| Interfaces | PF05-Canon-HDE-CLI-API-Vendor-Ref-v2.5.1 | §4.1, §5.1.1, §5.1.2, §5.5, and §5.10 | Owns compat, CLI, Reader, and admin transport and projection contracts |
+| Narrative scope | PF17-Canon-HDE-Narratives-Guide-v1.5.2 and PF18-Reference-HDE-Narrative Deliverables v0.7 | PF17 §2.1 and §5.1; PF18 `Shared foundation` and `Notes on style and voice` | Narrative consumes governed bands or keys; it does not calculate scores |
+| Public tone | PF15-Reference-HDE-Copy Tonality Guide v1.1.1 | `Style rules (must)`, `Safety and suppression`, `Category micro-voices (Magic-10)`, and `Numbers and disclosure` | Prevents deterministic, diagnostic, fear-based, or ranking copy |
+| User documentation | PF29-Canon-HDE-Users-Guide-v1.0 | §7.1, §7.2 through §7.5, §13.2, and §16 | Updates only after actual shipped behavior exists and must preserve current-gap truth until then |
+| Plan structure | PF27-Canon-Plan-Templates-v2.0 | §12 `General Implementation Plan (Template)` | Requires source routing, repo reality, work slices, PF09 accountability, validation intent, and approval sentinel |
+
+PF14 is present, mandatory, and materially affected. Its exact repository locus is `docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.3.md`. The required PF14 delta is specified below; PF14 drainage remains a nonblocking later-drain action following this authorization and is not an implementation-completion condition. Until drainage, this addendum controls every conflict within its stated scope.
+
+---
+
+### **Observed repository reality and validated loci**
+
+#### **Pinned or approved repository identity**
+
+* Repository: `amthorn78/glow-hdengine-v2`  
+* Default branch: `main`  
+* Inspected commit: `e5fcff584871418ccb431f2b7c8798d0dd2d1107`  
+* Commit subject: `pf10 updates`  
+* Commit timestamp: 2026-08-23T06:01:32Z
+
+#### **Validated existing loci**
+
+| Locus | Observed role | Current constraint or defect |
+| :---- | :---- | :---- |
+| `catalog/channels_v1.json` | Complete 36-Channel machine catalog | Semantic classifications require authoritative correction before scoring relies on them |
+| `catalog/magic10.json` | Ten category registry | Uses harmony-first order |
+| `catalog/magic10_caps.json` | Two signal IDs per category | Contains the twenty IDs retained by this addendum |
+| `math/thresholds.json` | Clamp, band edges, rounding | Contains `0..100`, inclusive maxima `[24,49,74,100]`, and half-up rounding |
+| `engine/bodygraph/v2_adapter.py` | HDAPI v2 adaptation | Confirms only that `gates` is a list of strings; it does not enforce canonical integers `1..64`, uniqueness, or a nonempty complete Gate field |
+| `engine/bodygraph/projection.py` | Defined BodyGraph projection | Preserves its governed ten-key projection rather than arbitrary complete BodyGraph content; Gate availability must be explicit at scoring ingress |
+| `engine/bodygraph/resolver.py` | CLI/ops BodyGraph control flow | `source="auto"` and `source="db"` currently return an OK no-I/O Phase S8a stub rather than a chart; no production person-ID read resolver exists |
+| `engine/bodygraph/mapped_cache.py` | Mapped-v2 persistence and read-back | Writes and verifies by `(user_id, vendor, vendor_version, input_fingerprint)`; it does not resolve the current chart by person ID |
+| `hde.body_graphs_current` / `public.hde_body_graphs_current` | Current-row durability and read-only boundary views | One current row per `(user_id, vendor)` with `payload`; current repo code does not use the public view to resolve Reader IDs |
+| `engine/magic10/calculators.py` | Signal-to-category reduction | Has two-signal mean, half-up, clamp, and bands but no governed upstream producer |
+| `engine/compat/compute.py` | Current compat scoring | `_score_for` hashes UID and category; it is not Human Design mechanics |
+| `engine/runtime/public.py` | Public computation wrapper | Uses a Type-pair transitional source rather than full Magic10; it is not the mounted Reader route |
+| `adapter/http_reader.py` | Mounted `/reader` transport | Current GET is development-only and production returns `ERR_READER_FORBIDDEN`; POST is currently 405 |
+| `engine/compat/ts_v0.py` | Transitional Type-pair logic | Produces harmony only |
+| `engine/core/core.py` | Core scaffold | Accepts precomputed score material rather than deriving the full matrix |
+| `engine/cli/main.py` | Canonical CLI | Current payload conversion discards Gate data needed by the mechanic |
+| `engine/http/compat_handler.py` | Internal compat HTTP | Current request path reduces the pair to identifiers before scoring |
+| `engine/presenter/emitter.py` and `presenter/reader_v1/emitter.py` | Governed presentation | Must consume canonical result without calculating or rescoring |
+| `schemas/reader.v1.schema.json` | Public Reader schema | Drifts from the runtime harmony output and requires reconciliation |
+| `scripts/hd_cli.py` | Legacy static CLI path | Must not remain a scoring authority |
+| `engine/compat/categories.py` | Category ordering | Uses heat-first order, conflicting with harmony-first catalog order |
+
+#### **Observed implementation state**
+
+The upstream HDAPI payload contains the required Gate field, but the current application pipeline does not preserve a validated Gate set into compatibility scoring. The absent production work is therefore both Gate-ingress normalization and the deterministic translation from Gate sets to the twenty internal signals. The existing reduction concepts can be retained and tightened after those ingress defects are corrected.
+
+#### **Contradictions or partial findings**
+
+* The repository has two current non-Human-Design scoring paths: UID hashing and Type-pair harmony.  
+* Category order is duplicated and inconsistent across code and catalog.  
+* Reader schema and runtime output do not describe one settled contract.  
+* The current twenty signal names exist, but their mechanics are undefined.  
+* `engine/cli/main.py::_person_and_chart_from_payload`, `engine/http/compat_handler.py::_resolve_person_by_id`, and `engine/compat/compute.py::_person_from_resolved` discard or fail to resolve the Gate set required by the new mechanic.  
+* `engine/bodygraph/ingest.py::resolve_db_user_id` is a temporary arbitrary-string/UUID5 alias bridge, not a production public person-ID contract.  
+* The governed error source is `engine/compat/error_tokens.py`; the canonical Magic10 token requirements are established here, but the tokens do not exist in the inspected repository until added there and regenerated into `errors/token_map/token_map.json`.  
+* `tools/evidence/generate_epic030_pr05_category_framework_evidence.py::_build_per_channel_mechanics` assigns compromise direction by numeric Gate ordering. It is historical evidence, is non-authoritative for runtime behavior, and must receive a production no-import and symbol guard rather than silent deletion.
+
+#### **Unknown or not-found posture**
+
+* Repository Canon and the supplied project source disagree on the current PF09.3 Separation version. `M10-CANON-001` resolves the implementation-critical question by making this addendum's `HDE-SEPA005` task family authoritative. The owning drainage process must reconcile the PF09.3 version lineage before inserting or moving PF09 rows; the discrepancy does not block implementation or change any adopted work row.  
+* Current deployment state, live service state, active release identity, board state, and acceptance status were not inspected and are not inferred.
+
+#### **Repository-dependent nonclaims**
+
+Static repository inspection proves current source content only. It does not prove deployment, runtime traffic, QA PASS, OPS completion, board status, PF09 status, or release acceptance.
+
+---
+
+### **Complete Magic10 mechanics contract**
+
+#### **1\. Input contract**
+
+The application boundary first constructs two validated evaluation-party records. Each record contains the exact canonical lowercase UUID used for eligibility and directional narrative orientation plus a normalized set of active Gate IDs in `1..64` derived from a complete BodyGraph. Eligibility is decided before Engine Core or the intrinsic cache is called. Engine Core receives only eligible normalized Gate inputs, the immutable mechanics bundle, and release identity. The score producer does not call a vendor and does not use names, account IDs, UUIDs, timestamps, copy, or viewer preferences.
+
+Represent a Gate set as an unsigned 64-bit mask where Gate `g` occupies bit `g-1`. Two related but deliberately separate orders apply:
+
+* **Intrinsic scoring order:** order the two Gate masks numerically as `member_lo` and `member_hi`. Equal masks remain two equal adjacent scoring members because identity does not affect Channel states, signals, scores, bands, chart fingerprints, or `pair_key`.  
+* **Directional orientation order:** after eligibility succeeds, order the two evaluation parties by the total tuple `(gate_mask, canonical_person_id)` using numeric mask order and then ASCII UUID order. The UUID tie-break is consulted only when masks are equal. It determines which person is the `lo` or `hi` target for directional narrative keys and never enters intrinsic mathematics.
+
+This normalization guarantees that:
+
+* AB and BA produce the same intrinsic result;  
+* changing user IDs without changing Gate sets cannot change scores;  
+* owner-sensitive Balance operations remain symmetric;  
+* a distinct-person equal-mask pair has one deterministic narrative orientation;  
+* a valid self-pair is recognized before scoring or cache access;  
+* one Channel is evaluated once.
+
+##### **1.1 Gate-ingress normalization owner**
+
+Create `engine/bodygraph/gates.py` as the single pure normalization owner. `normalize_gate_mask(raw_gates)` accepts only a nonempty JSON array whose members are either integers from `1` through `64` or canonical decimal strings from `"1"` through `"64"`. Boolean values, whitespace, leading zeroes, signs, decimals, missing arrays, empty arrays, duplicates, malformed strings, and values outside `1..64` are rejected. It returns:
+
+* `gates`: an ascending tuple of unique integers;  
+* `gate_mask`: an unsigned 64-bit integer with bit `g-1` set;  
+* `gate_mask_hex`: exactly sixteen lowercase hexadecimal digits;  
+* `chart_fingerprint`: the SHA-256 of canonical bytes for an object containing exactly `schema = magic10_chart_fingerprint.v1` and `gate_mask_hex`.
+
+`engine/bodygraph/v2_adapter.py`, `engine/bodygraph/projection.py`, `engine/bodygraph/mapped_cache.py`, `engine/bodygraph/resolver.py`, `engine/cli/main.py`, `engine/http/compat_handler.py`, and `engine/compat/compute.py` must call or preserve this normalized object rather than passing raw Gate strings or reducing a chart to `person_uid`. This owner is pure; DB resolution remains in `engine/bodygraph/resolver.py`, while vendor ingest/write behavior remains separately owned by the existing ingest and mapped-cache seams.
+
+##### **1.2 Pair preimage and cache identity**
+
+This plan replaces only the PF01 preimage that includes or orders by `person_uid` for intrinsic Magic10 scoring and intrinsic cache identity. It retains PF01 §4 self-pair eligibility, PF01 §3.2 public Reader preimage hashing, and identity use at the application boundary. `magic10_pair_preimage.v1` is constructed only after the pair is valid and `eligible == true`.
+
+Define `magic10_pair_preimage.v1` as canonical JSON with exactly these fields:
+
+| Field | Exact value |
+| :---- | :---- |
+| `schema` | `magic10_pair_preimage.v1` |
+| `members` | The two `chart_fingerprint` values ordered by the numeric Gate masks as `member_lo`, `member_hi`; equal masks produce two equal adjacent values |
+| `config_id` | Active immutable mechanics configuration ID |
+| `release_id` | Active release identity |
+| `result_schema` | `magic10_result.v1` |
+
+`pair_key = sha256(canonical_bytes(preimage))`.
+
+The cache key is exactly `magic10:v1:<pair_key>`. A cached value is usable only when its embedded `pair_key`, `config_id`, `release_id`, and result-schema value equal the current request and release. A mismatch is stale, never a hit. If both valid Gate sets are available, recompute under the active release. Otherwise fail closed with `ERR_M10_STALE_RESULT`. Names, account IDs, UIDs, request IDs, timestamps, relationship history, and viewer preferences are absent from the intrinsic preimage. An ineligible self-pair creates no `pair_key`, performs no intrinsic cache lookup or write, and produces no `magic10_result.v1`.
+
+##### **1.3 Production person-to-BodyGraph resolution**
+
+The production Reader uses lowercase, hyphenated RFC 4122 UUID strings for `a_id` and `b_id`. Validation parses each value as a UUID and requires exact byte equality with its lowercase canonical rendering. The temporary arbitrary-string-to-UUID5 alias behavior in `engine/bodygraph/ingest.py::resolve_db_user_id` is not a production Reader identity contract and is not used by this route.
+
+Implement `engine/bodygraph/resolver.py::resolve_current_bodygraph(person_id, *, db)` as the one read-only application resolver. It queries `public.hde_body_graphs_current` with exact predicates `user_id = <canonical UUID>` and `vendor = 'hdapi'`, selecting `user_id`, `vendor`, `vendor_version`, `input_fingerprint`, and `payload`. It performs no vendor call and no write. The result contract is:
+
+* zero rows: `ERR_M10_PERSON_UNRESOLVED`;  
+* exactly one row: parse the stored projection, require a nonempty Gate array, and normalize it through `engine/bodygraph/gates.py`;  
+* more than one row, DB unavailability, unreadable JSON, or a row that violates the current-view identity contract: `ERR_M10_RESOLVER_UNAVAILABLE`;  
+* a resolved stored projection whose Gate array is missing, empty, malformed, duplicate, or out of range: `ERR_M10_BODYGRAPH_INCOMPLETE`.
+
+`hde.body_graphs_current` and its read-only boundary view `public.hde_body_graphs_current` currently expose one latest row per `(user_id, vendor)`. `engine/bodygraph/mapped_cache.py` continues to own write/read-back by full vendor/fingerprint identity; it is not repurposed as the person-ID resolver.
+
+The persisted scoring projection must include the normalized ascending Gate array. This changes JSON payload bytes but requires no SQL-column or view migration. Before activation, a closed-rails readiness command inventories the current `hdapi` rows and produces only counts plus redacted row identities for missing or invalid Gate arrays. If every row is ready, no data action occurs. If any row is not ready, an approved Ops Task Record must name the exact affected UUIDs and use the sanctioned chart-refresh/write seam to create current Gate-complete rows before those people are eligible for Reader scoring. The route fails closed for an incomplete row; it never invokes a vendor or silently falls back during a Reader request.
+
+##### **1.4 Eligibility, equal-mask orientation, and public identity**
+
+Eligibility follows PF01 §4 and is not superseded by the identity-free score formula. Validate each requested party and resolve its complete current projection before pair classification. Then apply this closed decision table:
+
+| Validated condition | Eligibility and failure behavior | Engine Core, intrinsic cache, and `pair_key` | Reader v1 success | Directional narrative behavior |
+| :---- | :---- | :---- | :---- | :---- |
+| Same canonical UUID and byte-identical normalized projection | `eligible: false`; this is a valid ineligible self-pair, not an error | Do not call Engine Core; no signals, ten-category matrix, `magic10_result.v1`, cache access, or `pair_key` | Emit the six-key success envelope with `categories: []` | Do not call the narrative router; no personal or shared key exists |
+| Same canonical UUID but different normalized projections | Fail closed with `ERR_READER_INVALID_CHART`; no success envelope | None | None | None |
+| Distinct canonical UUIDs and equal Gate masks | `eligible: true` | Compute the complete intrinsic result; both fingerprint members are equal and the identity-free `pair_key` is valid | Emit exactly the harmony band from the complete matrix | Order by ASCII canonical UUID as the second component of `(gate_mask, canonical_person_id)`; route `lo -> hi` and `hi -> lo` once each |
+| Distinct canonical UUIDs and different Gate masks | `eligible: true` | Compute the complete intrinsic result and identity-free `pair_key` | Emit exactly the harmony band from the complete matrix | Gate-mask order determines `lo` and `hi`; the UUID tie-break is not consulted |
+
+For production Reader, equal `a_id` and `b_id` resolve to the same current row and therefore the first row applies. The unequal-projection case remains mandatory for internal callers, fixtures, stale/mixed projection defense, and future resolver changes.
+
+`idempotence_hash` is never assigned from `pair_key`. Reader v1 computes it independently as `sha256(canonical_bytes(reader_preimage))`, where `reader_preimage` has exactly the five PF01 fields `reader_version`, `eligible`, `categories`, `meta`, and `release_id`. `pair_key` is not a public field and is not part of that preimage. With the same `meta` and `release_id`, a self-pair cannot share Reader bytes or an idempotence hash with an eligible distinct-person equal-mask pair because `eligible` and `categories` differ.
+
+The directional tuple is transient application metadata. It is not emitted in `magic10_result.v1`, is not a score operand, and is not stored under the intrinsic cache key. Reversing request order produces the same eligibility, orientation tuple, intrinsic result, symmetric key fields, Reader preimage, idempotence hash, and final bytes.
+
+#### **2\. Five-state Channel classifier**
+
+For Channel `c` with endpoint Gates `x` and `y`, define:
+
+* `A_x`, `A_y`: whether member A owns each endpoint;  
+* `B_x`, `B_y`: whether member B owns each endpoint;  
+* `A_full = A_x and A_y`;  
+* `B_full = B_x and B_y`;  
+* `A_count = A_x + A_y`;  
+* `B_count = B_x + B_y`.
+
+Apply the first matching rule:
+
+| Priority | State | Exact predicate | Owner field |
+| :---- | :---- | :---- | :---- |
+| 1 | `companionship` | `A_full and B_full` | absent |
+| 2 | `compromise` | exactly one member is full and the other has exactly one endpoint | full-Channel owner |
+| 3 | `dominance` | exactly one member is full and the other has zero endpoints | full-Channel owner |
+| 4 | `electromagnetic` | neither is full and the members exclusively own opposite endpoints | absent |
+| 5 | `none` | every other pattern | absent |
+
+An electromagnetic state requires either:
+
+* `A_x and not A_y and not B_x and B_y`; or  
+* `not A_x and A_y and B_x and not B_y`.
+
+Unmatched hanging Gates, same-end hanging Gates, and Gate repetition do not create a second contribution. After state derivation, scoring reads the state and, only for the Balance ownership operation, the normalized full-Channel owner.
+
+#### **3\. Default state-response profiles**
+
+Responses are stored as integer basis points in `0..10000`. The default values preserve the original quarter-step baseline while allowing later versioned tuning between those points.
+
+| Profile ID | none | companionship | dominance | compromise | electromagnetic | Required ordering |
+| :---- | ----: | ----: | ----: | ----: | ----: | :---- |
+| `coherence_bp_v1` | 0 | 10000 | 5000 | 2500 | 7500 | companionship \> electromagnetic \> dominance \> compromise \> none |
+| `activation_bp_v1` | 0 | 5000 | 7500 | 2500 | 10000 | electromagnetic \> dominance \> companionship \> compromise \> none |
+| `expression_bp_v1` | 0 | 7500 | 5000 | 2500 | 10000 | electromagnetic \> companionship \> dominance \> compromise \> none |
+
+Quarter-unit interpretation:
+
+| Default stored response | Normalized response |
+| ----: | ----: |
+| 0 | 0.00 |
+| 2500 | 0.25 |
+| 5000 | 0.50 |
+| 7500 | 0.75 |
+| 10000 | 1.00 |
+
+The exact values are Glow-authored defaults. Doctrine supports distinguishing the five states but does not supply these fractions.
+
+#### **4\. Twenty-signal register and default mapping**
+
+All ordinary Channel weights default to `1`. The two Balance signals use their named operations rather than a response profile.
+
+| Category | Signal ID | Exact construct | Operation or profile | Default Channel map |
+| :---- | :---- | :---- | :---- | :---- |
+| harmony | `rapport_delta` | Structural support through needs, values, care, communal bargains, and trusted transmission | `coherence_bp_v1` | `19-49`, `26-44`, `27-50`, `37-40` |
+| harmony | `resonance_strength` | Attunement through rhythm, intimacy, mood-sensitive openness, and listening or witnessing | `coherence_bp_v1` | `05-15`, `06-59`, `12-22`, `13-33` |
+| heat | `spark_intensity` | Relational charge through intimacy, shock, desire, and provocation or spirit | `activation_bp_v1` | `06-59`, `25-51`, `30-41`, `39-55` |
+| heat | `momentum_flux` | Activated movement through mutation, deeds, commitment, and change or experience | `activation_bp_v1` | `03-60`, `20-34`, `29-46`, `35-36` |
+| communication | `signal_clarity` | Capacity to formulate, organize, rationalize, or realize mental content | `expression_bp_v1` | `04-63`, `17-62`, `23-43`, `24-61`, `47-64` |
+| communication | `exchange_density` | Capacity to exchange stories, emotional expression, witnessing, intuitive awareness, and transmission | `expression_bp_v1` | `11-56`, `12-22`, `13-33`, `20-57`, `26-44` |
+| alignment | `vector_cohesion` | Coherence of direction, leadership, authentic presence, and action from conviction | `coherence_bp_v1` | `02-14`, `07-31`, `10-20`, `10-34` |
+| alignment | `axis_agreement` | Coherence of principles, values, purpose, and continuity or ambition | `coherence_bp_v1` | `19-49`, `27-50`, `28-38`, `32-54` |
+| comfort | `soothe_index` | Accessible intimacy, emotional openness, recognition of needs, and communal support | `coherence_bp_v1` | `06-59`, `12-22`, `19-49`, `37-40` |
+| comfort | `buffer_resilience` | Embodied support through rhythm, survival awareness, preservation, and instinctive power | `coherence_bp_v1` | `05-15`, `10-57`, `27-50`, `34-57` |
+| consistency | `pattern_integrity` | Repeatable rhythm, concentration, skill development, detail, and correction | `coherence_bp_v1` | `05-15`, `09-52`, `16-48`, `17-62`, `18-58` |
+| consistency | `variance_stability` | Continuity through pulse, commitment, adaptation, and complete cycles | `coherence_bp_v1` | `03-60`, `29-46`, `32-54`, `42-53` |
+| expansion | `growth_tendency` | Activation of mutation, improvement, transformation, and maturation | `activation_bp_v1` | `03-60`, `18-58`, `32-54`, `42-53` |
+| expansion | `horizon_reach` | Activation through curiosity, meaningful risk, discovery, and new experience | `activation_bp_v1` | `11-56`, `28-38`, `29-46`, `35-36` |
+| creativity | `novelty_factor` | Activation of contribution, mutation, unique insight, and initiation | `activation_bp_v1` | `01-08`, `03-60`, `23-43`, `25-51` |
+| creativity | `expression_flow` | Expression through authentic presence, storytelling, emotion, talent, and experience | `expression_bp_v1` | `10-20`, `11-56`, `12-22`, `16-48`, `35-36` |
+| drive | `willpower_current` | Activation of resources, material will, initiative, enterprise, and ambition | `activation_bp_v1` | `02-14`, `21-45`, `25-51`, `26-44`, `32-54` |
+| drive | `focus_pressure` | Activation of concentration, improvement pressure, deeds, struggle, and cycle completion | `activation_bp_v1` | `09-52`, `18-58`, `20-34`, `28-38`, `42-53` |
+| balance | `equilibrium_score` | Bilateral distribution of selected one-owner Channel mass | `twice_min_owner_mass_v1` | `02-14`, `07-31`, `21-45`, `26-44`, `32-54`, `37-40` |
+| balance | `counterweight_ratio` | Share of selected Channel mass expressed through companionship or electromagnetic completion | `companionship_em_mass_v1` | `05-15`, `06-59`, `10-20`, `13-33`, `27-50`, `39-55` |
+
+The default configuration has exactly twenty signals, ten category pairs, 90 Channel-to-signal rows, and at least one assigned Product use for every canonical Channel.
+
+#### **5\. Complete 36-Channel coverage ledger**
+
+| Channel | Circuit group | Circuit or integration family | Doctrinal anchor used for Product mapping | Assigned signals |
+| :---- | :---- | :---- | :---- | :---- |
+| `01-08` Inspiration | Individual | Knowing | Creative contribution and role-model expression | `novelty_factor` |
+| `02-14` The Beat | Individual | Knowing | Resources or power skills serving direction | `vector_cohesion`, `willpower_current`, `equilibrium_score` |
+| `03-60` Mutation | Individual | Knowing | Pulsed mutation operating through limitation | `momentum_flux`, `variance_stability`, `growth_tendency`, `novelty_factor` |
+| `04-63` Logic | Collective | Understanding (Logic) | Doubt, formulation, proof, and mental pattern testing | `signal_clarity` |
+| `05-15` Rhythm | Collective | Understanding (Logic) | Fixed patterns, extremes, and being in the flow | `resonance_strength`, `buffer_resilience`, `pattern_integrity`, `counterweight_ratio` |
+| `06-59` Mating | Tribal | Defence | Intimacy, friction, boundaries, and barrier dissolution | `resonance_strength`, `spark_intensity`, `soothe_index`, `counterweight_ratio` |
+| `07-31` The Alpha | Collective | Understanding (Logic) | Leadership and direction when recognized or chosen | `vector_cohesion`, `equilibrium_score` |
+| `09-52` Concentration | Collective | Understanding (Logic) | Stillness, focus, detail, and sustained determination | `pattern_integrity`, `focus_pressure` |
+| `10-20` Awakening | Individual | Integration | Authentic behavior and expression of the Self in the now | `vector_cohesion`, `expression_flow`, `counterweight_ratio` |
+| `10-34` Exploration | Individual | Centering | Sacral power following personal conviction | `vector_cohesion` |
+| `10-57` Perfected Form | Individual | Integration | Intuitive survival and embodied form | `buffer_resilience` |
+| `11-56` Curiosity | Collective | Sensing | Ideas, search, stories, and stimulation | `exchange_density`, `horizon_reach`, `expression_flow` |
+| `12-22` Openness | Individual | Knowing | Mood-dependent social and emotional expression | `resonance_strength`, `exchange_density`, `soothe_index`, `expression_flow` |
+| `13-33` The Prodigal | Collective | Sensing | Listening, witnessing, privacy, memory, and revelation | `resonance_strength`, `exchange_density`, `counterweight_ratio` |
+| `16-48` The Wavelength | Collective | Understanding (Logic) | Depth, skill, experimentation, repetition, and talent | `pattern_integrity`, `expression_flow` |
+| `17-62` Acceptance | Collective | Understanding (Logic) | Opinion, detail, naming, and organization | `signal_clarity`, `pattern_integrity` |
+| `18-58` Judgment | Collective | Understanding (Logic) | Correction, standards, improvement, and vitality | `pattern_integrity`, `growth_tendency`, `focus_pressure` |
+| `19-49` Synthesis | Tribal | Ego | Sensitivity to needs, support, principles, and inclusion | `rapport_delta`, `axis_agreement`, `soothe_index` |
+| `20-34` Charisma | Individual | Integration | Sacral energy becoming deeds in the now | `momentum_flux`, `focus_pressure` |
+| `20-57` The Brain Wave | Individual | Integration | Intuitive awareness expressed verbally in the now | `exchange_density` |
+| `21-45` The Money Line | Tribal | Ego | Material control, gathering, and resource allocation | `willpower_current`, `equilibrium_score` |
+| `23-43` Structuring | Individual | Knowing | Individual insight translated into expression | `signal_clarity`, `novelty_factor` |
+| `24-61` Awareness | Individual | Knowing | Inner truth, mystery, pondering, and rationalization | `signal_clarity` |
+| `25-51` Initiation | Individual | Centering | Shock, initiative, competition, and initiation | `spark_intensity`, `novelty_factor`, `willpower_current` |
+| `26-44` Surrender | Tribal | Ego | Pattern recognition, transmission, persuasion, and enterprise | `rapport_delta`, `exchange_density`, `willpower_current`, `equilibrium_score` |
+| `27-50` Preservation | Tribal | Defence | Care, values, nourishment, and custodianship | `rapport_delta`, `axis_agreement`, `buffer_resilience`, `counterweight_ratio` |
+| `28-38` Struggle | Individual | Knowing | Risk, struggle, purpose, and the value of life | `axis_agreement`, `horizon_reach`, `focus_pressure` |
+| `29-46` Discovery | Collective | Sensing | Commitment, perseverance, discovery, and experience | `momentum_flux`, `variance_stability`, `horizon_reach` |
+| `30-41` Recognition | Collective | Sensing | Desire, feeling, focused emotional energy, and experience | `spark_intensity` |
+| `32-54` Transformation | Tribal | Ego | Ambition, continuity, instinctive adaptation, and transformation | `axis_agreement`, `variance_stability`, `growth_tendency`, `willpower_current`, `equilibrium_score` |
+| `34-57` Power | Individual | Integration | Instinctive Sacral power and survival awareness | `buffer_resilience` |
+| `35-36` Transitoriness | Collective | Sensing | Change, experience, crisis, and movement through cycles | `momentum_flux`, `horizon_reach`, `expression_flow` |
+| `37-40` Community | Tribal | Ego | Friendship, loyalty, support, bargains, and community | `rapport_delta`, `soothe_index`, `equilibrium_score` |
+| `39-55` Emoting | Individual | Knowing | Provocation, mood, spirit, and emotional mutation | `spark_intensity`, `counterweight_ratio` |
+| `42-53` Maturation | Collective | Sensing | Beginnings, completion, growth, and full cycles | `variance_stability`, `growth_tendency`, `focus_pressure` |
+| `47-64` Abstraction | Collective | Sensing | Mental pressure from past images resolving into realization | `signal_clarity` |
+
+The table supplies the target circuit correction as well as the Product mapping. The scoring-relevant `catalog/channels_v1.json` machine contract is:
+
+* the top-level object contains only `channels`;  
+* each Channel row retains the existing schema fields `id`, `gates`, `centers`, `circuit_primary`, `substream`, `primary_domain`, `domains`, and `flags`;  
+* `gates` contains two distinct integers in `1..64`, in ascending numeric order;  
+* `id` byte-equals the zero-padded `NN-NN` rendering of the ascending Gate pair;  
+* `centers` contains exactly the two distinct Centers projected by those Gates in `catalog/gates_v1.json`, deduped and ASCII-sorted as a set;  
+* Channel rows are ASCII-sorted by `id` and contain exactly the closed 36-Channel roster;  
+* `circuit_primary` is one of `individual`, `collective`, or `tribal`;  
+* to minimize machine migration, `substream` is one of `knowing`, `logic`, `sensing`, `ego`, `defense`, `centering`, or `integration` and is never null;  
+* human-facing copy may render `logic` as Understanding or Logic and `defense` as Defence or Defense, but canonical bytes retain the existing machine spellings `logic` and `defense`;  
+* `primary_domain`, `domains`, and `flags` remain non-scoring Product metadata so the existing backend/frontend bundle contracts do not break. Magic10 never reads them, no default signal row depends on them, and this plan neither adopts nor corrects their interpretive meaning. Their later correction or removal requires a separate contract migration covering both bundle schemas and generated artifacts.
+
+Channel themes are checked against PF08 and both PF11 Gate pages during the Canon/config adoption slice. Assignment to a Glow signal is explicitly Product synthesis.
+
+#### **6\. Ordinary signal formula**
+
+For ordinary signal `s`:
+
+* `C_s` is its configured set of Channels;  
+* `w(c,s)` is the configured positive integer Channel weight, default `1`;  
+* `p_s` is its configured response profile;  
+* `r(p_s,t_c)` is the integer basis-point response `0..10000` for Channel state `t_c`;  
+* `W_s = sum(w(c,s))`;  
+* `N_s = sum(w(c,s) * r(p_s,t_c))`.
+
+The normalized signal is:
+
+`x_s = N_s / (10000 * W_s)`.
+
+PF01 represents an internal signal in half-score units `q_s` from `0` through `200`, where `1` means `0.5` score points. Calculate it without binary floating point:
+
+`q_s = floor((N_s + 25 * W_s) / (50 * W_s))`.
+
+This is exactly `round_half_up(200 * x_s)`.
+
+Properties:
+
+* all `none` returns `q_s = 0`;  
+* maximum response on every mapped Channel returns `q_s = 200`;  
+* one Channel contributes at most once to a given signal;  
+* reuse of a Channel across different signals is explicit Product structure, not accidental double counting;  
+* the default map never assigns one Channel to both signals of the same category;  
+* rounding occurs once, after the full weighted signal sum.
+
+#### **7\. Balance signal formulas**
+
+##### **7.1 `equilibrium_score`: `twice_min_owner_mass_v1`**
+
+Only `dominance` and `compromise` contribute. For each configured Channel, the full-Channel owner supplies `member_lo` or `member_hi`.
+
+Define:
+
+* `m_lo = sum(w_c)` for mapped dominance or compromise Channels owned by `member_lo`;  
+* `m_hi = sum(w_c)` for mapped dominance or compromise Channels owned by `member_hi`;  
+* `m = min(m_lo, m_hi)`;  
+* `W = sum(w_c)` across all mapped Channels.
+
+Then:
+
+* `x_equilibrium = 2 * m / W`;  
+* `q_equilibrium = floor((800 * m + W) / (2 * W))`.
+
+One-sided owner mass returns `0`. A perfectly split six-row default map returns `200`. Companionship, electromagnetic, and none do not enter this operation.
+
+This is a structural bilateral-distribution signal. It does not establish fairness, reciprocity, equality, care, or relationship quality.
+
+##### **7.2 `counterweight_ratio`: `companionship_em_mass_v1`**
+
+Define:
+
+* `M = sum(w_c)` for mapped Channels in `companionship` or `electromagnetic`;  
+* `W = sum(w_c)` across all mapped Channels.
+
+Then:
+
+* `x_counterweight = M / W`;  
+* `q_counterweight = floor((400 * M + W) / (2 * W))`.
+
+Dominance, compromise, and none contribute zero. This is a normalized selected-state ratio, not a relationship verdict.
+
+#### **8\. Ten-category formula**
+
+`catalog/magic10_caps.json` remains the single authority for each category's exact ordered two-signal input pair and score-point bounds. The mechanics configuration carries only the two tunable input weights in that same order. The loader requires exact closure between the caps input pairs, the flattened twenty-signal roster, and the configured signal rows.
+
+For category `k`, let `L_k` and `U_k` be the integer score-point bounds from its governed caps row. Before reduction, cap each half-score-unit input:
+
+`q_prime_i = min(2 * U_k, max(2 * L_k, q_i))`.
+
+The current default bounds are `L_k = 0` and `U_k = 100`, so valid `q_i` values are unchanged. The operation remains mandatory and prevents the addendum from silently bypassing the existing PF01 caps contract.
+
+Each category has exactly two capped inputs. Let:
+
+* `b_i` be each positive integer category-input weight, default `1`;  
+* `B_k = sum(b_i)`;  
+* `Q_k = sum(b_i * q_prime_i)`.
+
+Calculate the raw category value:
+
+`raw_score_k = floor((Q_k + B_k) / (2 * B_k))`.
+
+With two equal inputs and default bounds:
+
+`raw_score_k = floor((q_1 + q_2 + 2) / 4)`.
+
+Apply the PF01 defensive clamp exactly once:
+
+`score_k = min(100, max(0, raw_score_k))`.
+
+This is one half-up round after the weighted signal mean followed by the existing defensive clamp. A valid configuration and valid signal values cannot require the clamp.
+
+No intrinsic preset, viewer preference, bonus, dampener, additional floor or cap, correction factor, UID value, or category-specific hidden multiplier is applied.
+
+#### **9\. Category composition and order**
+
+The canonical category order and exact `catalog/magic10_caps.json` inputs are:
+
+| Order | Category | Signal 1 | Signal 2 | Default input weights |
+| ----: | :---- | :---- | :---- | :---- |
+| 1 | harmony | `rapport_delta` | `resonance_strength` | `1,1` |
+| 2 | heat | `spark_intensity` | `momentum_flux` | `1,1` |
+| 3 | communication | `signal_clarity` | `exchange_density` | `1,1` |
+| 4 | alignment | `vector_cohesion` | `axis_agreement` | `1,1` |
+| 5 | comfort | `soothe_index` | `buffer_resilience` | `1,1` |
+| 6 | consistency | `pattern_integrity` | `variance_stability` | `1,1` |
+| 7 | expansion | `growth_tendency` | `horizon_reach` | `1,1` |
+| 8 | creativity | `novelty_factor` | `expression_flow` | `1,1` |
+| 9 | drive | `willpower_current` | `focus_pressure` | `1,1` |
+| 10 | balance | `equilibrium_score` | `counterweight_ratio` | `1,1` |
+
+This harmony-first sequence replaces every duplicate code-local order.
+
+#### **10\. Bands**
+
+Default bands retain the inspected current thresholds:
+
+| Inclusive score range | Band |
+| :---- | :---- |
+| `0..24` | Cool |
+| `25..49` | Open |
+| `50..74` | Warm |
+| `75..100` | Glow |
+
+Band assignment uses the first inclusive maximum greater than or equal to the integer score. Public output remains bands-only and numeric-free unless a separately approved PF05, PF17, schema, and narrative change authorizes numbers.
+
+---
+
+### **Adjustable configuration contract**
+
+#### **Authoritative artifacts**
+
+Create:
+
+* `catalog/magic10_mechanics_v1.json`  
+* `schemas/magic10_mechanics_v1.schema.json`
+
+The configuration is canonical JSON, schema-valid, manifest-bound, and immutable within one release. Production code reads one active configuration from the governed catalog. It does not read this Markdown file.
+
+#### **Required configuration fields**
+
+| Field | Required value or contract |
+| :---- | :---- |
+| `schema` | `magic10_mechanics_config.v1` |
+| `config_id` | Immutable semantic version, initially `m10-channel-state-v1.0.0` |
+| `result_schema` | `magic10_result.v1` |
+| `response_scale` | `10000` basis points |
+| `signal_scale` | `2` half-score units per score point |
+| `sources` | Exact path and SHA-256 objects for Channels, categories, caps, and thresholds |
+| `profiles` | Exactly the three named profiles and five state keys |
+| `signals` | Exactly the twenty signal IDs, ordered by the flattened `catalog/magic10_caps.json` input roster |
+| `signals[*].operation` | `weighted_state_sum_v1`, `twice_min_owner_mass_v1`, or `companionship_em_mass_v1` |
+| `signals[*].profile_id` | Required for ordinary signals and absent for Balance operations |
+| `signals[*].channels` | Ordered unique Channel IDs with positive integer weights |
+| `category_weights` | Exactly ten category records in `catalog/magic10.json` order |
+| `category_weights[*].weights` | Exactly two integer weights aligned to the caps-owned input pair |
+| `category_weights[*].reducer` | `weighted_mean_half_unit_v1` |
+| `rounding.signal` | `round_half_up_to_half_score_unit` |
+| `rounding.category` | `round_half_up_once` |
+
+#### **Exact schema topology and canonical ordering**
+
+* The top-level object has exactly these properties and `additionalProperties: false`: `category_weights`, `config_id`, `profiles`, `response_scale`, `result_schema`, `rounding`, `schema`, `signal_scale`, `signals`, and `sources`.  
+* `sources` has exactly `caps`, `categories`, `channels`, and `thresholds`. Each source row has exactly `path` and `sha256`, with `additionalProperties: false`. The paths are respectively `catalog/magic10_caps.json`, `catalog/magic10.json`, `catalog/channels_v1.json`, and `math/thresholds.json`.  
+* `profiles` is an array ordered by ASCII `profile_id`: `activation_bp_v1`, `coherence_bp_v1`, `expression_bp_v1`.  
+* Each profile object has exactly `profile_id` and `responses`. `responses` has exactly the five state properties and no additional property.  
+* `signals` is an array ordered by flattening each `catalog/magic10_caps.json` `inputs` pair in `catalog/magic10.json` category order.  
+* Each ordinary signal object has exactly `channels`, `operation`, `profile_id`, and `signal_id`.  
+* Each Balance signal object has exactly `channels`, `operation`, and `signal_id`; `profile_id` is prohibited.  
+* Every `channels` array is ASCII-sorted by `channel_id`; each row has exactly `channel_id` and `weight`.  
+* `category_weights` is an array ordered exactly as `catalog/magic10.json`.  
+* Each category-weight object has exactly `category_id`, `reducer`, and `weights`; `weights` is an ordered two-integer array with each value in `1..3`.  
+* `catalog/magic10_caps.json` alone owns the two input signal identities and bounds. The config does not duplicate them. The loader joins each category-weight row to the caps row by `category_id` and input position.  
+* `rounding` has exactly `category` and `signal`.  
+* Object keys use the current PF12 canonical JSON serializer's key order; schema-declared array order is preserved.  
+* Generated timestamps, seeds, notes, labels, and unrecognized metadata are prohibited from the authoritative config.  
+* The active configuration is the single file at `catalog/magic10_mechanics_v1.json`. The unique `catalog/manifest.json` `files` row for that path binds its size and SHA-256. Candidate configurations are tooling inputs and are not placed in the production catalog or manifest.  
+* Every `sources.*.sha256` value must match the exact referenced bytes. A source-hash change requires a new `config_id`, so a caps-only, threshold-only, Channel-only, or category-order change changes both configuration identity and release identity.  
+* The manifest binds every path in the exact release-membership roster below. `release_id` therefore changes when any formula input, scoring owner, result contract, or production projection changes.
+
+#### **Exact release-manifest membership**
+
+`catalog/manifest.json` must contain one sorted row for each path below. Existing rows are refreshed; absent rows are added. The manifest never contains itself.
+
+| Release-bound class | Exact paths |
+| :---- | :---- |
+| Mechanics data | `catalog/magic10_mechanics_v1.json`; `catalog/channels_v1.json`; `catalog/magic10.json`; `catalog/magic10_caps.json`; `math/thresholds.json` |
+| Mechanics and result schemas | `schemas/magic10_mechanics_v1.schema.json`; `schemas/magic10_result_v1.schema.json`; `schemas/magic10_compat_result_v1.schema.json`; `schemas/channels_v1.schema.json` |
+| Intrinsic scoring owners | `engine/bodygraph/gates.py`; `engine/bodygraph/v2_adapter.py`; `engine/config/registry_loader.py`; `engine/magic10/composite.py`; `engine/magic10/signals.py`; `engine/magic10/calculators.py`; `engine/core/core.py`; `engine/compat/compute.py` |
+| Gate persistence and resolution | `engine/bodygraph/projection.py`; `engine/bodygraph/resolver.py`; `engine/bodygraph/mapped_cache.py`; `tools/bodygraph/check_magic10_gate_readiness.py` |
+| Integrated surfaces | `engine/http/compat_handler.py`; `engine/runtime/public.py`; `engine/narratives/router.py`; `engine/cli/main.py`; `adapter/http_reader.py`; `presenter/reader_v1/emitter.py` |
+| Reader and governed errors | `schemas/reader.v1.schema.json`; `adapter/schemas/error_v1.schema.json`; `engine/compat/error_tokens.py`; `errors/token_map/token_map.json` |
+
+`scripts/cut_release_manifest.py` is run under its existing contract to recalculate every listed row's SHA-256 and size. The cutter is not modified unless a bounded failing test first proves an independent cutter defect. Current release provenance does not come from the completed `HDE-DIST002` checked-in evidence family.
+
+#### **Current manifest and external release-attestation contract**
+
+The current tracked release-identity input is only `catalog/manifest.json`. For the adopted v1 Magic10 cut:
+
+* manifest `version` is exactly `1.1.0`;  
+* manifest `built_at_utc` is exactly `2026-08-24T18:04:49Z`, the immutable RFC 3339 UTC second stored by `M10-CANON-001`;  
+* `files` contains the existing required release surface plus every exact Magic10 row in the membership table above, ASCII-sorted with no duplicates or self-listing;  
+* current source validation uses `scripts/release_id_recompute.py --check-manifest-only` and `ci/checks/check_release_identity.sh`, both under `ALLOW_NETWORK=0`, `LANG=C`, `LC_ALL=C`, `SAFE_MODE=1`, and `TZ=UTC`;  
+* the runtime release ID remains `sha256(canonical_bytes(catalog/manifest.json))` and is not written to or read from a current repo-resident derivative.
+
+After the complete candidate is committed and the source tree is clean, the Implementation Agent creates an empty directory outside the source tree and runs:
+
+1. `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`;  
+2. `python tools/evidence/build_release_attestation.py --verify <external-directory> --require-clean` against the unchanged source commit.
+
+The attestation is current only when both commands exit `0` and `attestation.json` validates as `hde.release_attestation.v1` with all of these exact predicates:
+
+* `source_commit_exact == true`;  
+* `validation_result == "PASS"`;  
+* `release_id == manifest_sha256`;  
+* `release_admission == "PR06R_B_FINAL_PASS"` as the existing PF12 v1 compatibility literal;  
+* `pipeline_stop == null`;  
+* the verified source commit and source-tree digest equal the unchanged candidate;  
+* the attestation checksum, external evidence inventory, transcript binding, secret-safety checks, and final sanity tail all validate.
+
+This predicate is the plan-local completion condition `M10_CURRENT_RELEASE_ATTESTATION_MATCH`; it is not a newly claimable global token. `RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label and must not be emitted, claimed, redefined, or inferred for this work.
+
+The external bundle is attached as external PR evidence and is not copied into the repository, added to the Human Index or Machine Mirror, or included in `catalog/manifest.json`. The following checked-in families remain immutable historical captures and are neither regenerated nor relabeled as current: `artifacts/math/freeze_pack_manifest.json`, `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `artifacts/bodygraph/release_bindings.json`.
+
+#### **Tunable knobs**
+
+| Knob | Default | Allowed configuration range | Change class |
+| :---- | :---- | :---- | :---- |
+| Ordinary Channel weight | `1` | integer `1..3` | Numeric tuning |
+| State response | values in the three default tables | integer `0..10000` while profile ordering remains valid | Numeric tuning |
+| Category-input weight | `1` | integer `1..3` | Numeric tuning |
+| Channel membership in a signal | exact default map | valid unique canonical Channels, one through six per ordinary signal | Structural mechanics revision |
+| Signal profile assignment | exact default assignment | one of the three ordinary profiles | Structural mechanics revision |
+| Balance Channel membership | exact six-Channel maps | one through six valid unique canonical Channels | Structural mechanics revision |
+| Band maxima | `[24,49,74,100]` | four increasing integer maxima ending in `100` | Public-contract tuning |
+
+#### **Tuning authority and safety**
+
+* The five relationship states, twenty signal IDs, ten category IDs, two-signals-per-category structure, ordinary weighted-sum operation, two Balance operations, fixed-point scales, half-up reducers, `0..200` signal domain, and `0..100` score domain are fixed v1 invariants rather than tuning knobs.  
+* The default configuration is complete and shippable. Tuning is not an implementation prerequisite.  
+* Any numeric tuning or referenced source-byte change creates a new immutable `config_id`, new canonical bytes, new manifest entry hashes, a new release identity, regenerated goldens, and a Product Owner adoption record.  
+* A structural mechanics revision additionally requires a PF01 Doc Delta that names each changed signal row and its rationale.  
+* A band change additionally requires affected PF05, PF17, PF18, schema, and copy review before public activation.  
+* A caller cannot pass weights, profiles, bands, or a config ID.  
+* Production cannot blend two configurations.  
+* There is exactly one active configuration per release.  
+* A rollback selects a complete prior release, not a partial mixture of old code and new configuration.
+
+#### **Deterministic tuning comparison tool**
+
+Add `tools/config/compare_magic10_configs.py` in the existing `tools/config` home. It accepts two complete candidate bundles, where each bundle contains a schema-valid config plus the exact referenced Channels, categories, caps, thresholds, and result-schema bytes, together with `tests/fixtures/magic10/v1/goldens.json`. It emits:
+
+* config IDs, source hashes, result-schema hashes, and complete bundle hashes;  
+* per-fixture signal deltas;  
+* per-fixture score and band deltas;  
+* invariant validation;  
+* the exact candidate patch;  
+* no activation or production mutation.
+
+This is implementation tooling, not a statistical research harness. It makes an intentional tuning change reviewable and reproducible.
+
+#### **Loader rejection rules**
+
+The loader must reject a configuration unless:
+
+* the Channel catalog has exactly the 36 canonical IDs and valid endpoints;  
+* every configured Channel exists in the catalog;  
+* the signal key set exactly equals the flattened twenty-signal roster owned by `catalog/magic10_caps.json`;  
+* every category appears exactly once in `category_weights` and has exactly two weights aligned to its caps-owned ordered inputs;  
+* every caps bound is an integer, `0 <= min <= max <= 100`, and every capped half-score input remains in `0..200`;  
+* every ordinary signal has one through six distinct Channel rows;  
+* every Balance signal has one through six distinct Channel rows;  
+* Channel weights are integers in `1..3`;  
+* every profile has exactly five state keys;  
+* every response is an integer in `0..10000`;  
+* `none` is exactly `0`;  
+* all three required profile orderings hold;  
+* Balance operations have their required maps and no profile;  
+* one Channel appears at most once inside one signal;  
+* no Channel appears in both signals of one category;  
+* every Channel is used by at least one signal in the active configuration;  
+* signal outputs remain integer `0..200`;  
+* category outputs remain integer `0..100`;  
+* the category order equals `catalog/magic10.json`;  
+* every source path and SHA-256 matches the exact referenced bytes;  
+* the thresholds source is valid and closes `0..100`;  
+* the configuration hash matches the manifest;  
+* the release selects exactly one active mechanics config.
+
+---
+
+### **Governed result and surface contract**
+
+#### **Pure Engine Core result**
+
+Create `schemas/magic10_result_v1.schema.json` for `magic10_result.v1`. This result exists only for an eligible distinct-person pair. The top-level object has `additionalProperties: false` and exactly these required fields in canonical JSON:
+
+| Field | Exact contract |
+| :---- | :---- |
+| `schema` | Constant `magic10_result.v1` |
+| `config_id` | The injected immutable configuration ID |
+| `release_id` | Lowercase 64-hex active release identity |
+| `pair_key` | Lowercase 64-hex digest of `magic10_pair_preimage.v1` |
+| `signals` | Exactly twenty rows in flattened caps-input order |
+| `categories` | Exactly ten rows in `catalog/magic10.json` order |
+
+Each signal row has exactly `signal_id` and `q`; `q` is an integer in `0..200`. Each category row has exactly `category_id`, `score`, and `band`; `score` is an integer in `0..100`, and `band` is one of `Cool`, `Open`, `Warm`, or `Glow`. IDs, order, scores, and bands must close against the injected typed configuration, caps, and thresholds bundle.
+
+The pure result contains no names, UIDs, timestamps, viewer preferences, copy, personal keys, shared keys, request metadata, or mutable configuration handles.
+
+#### **Complete internal and admin result**
+
+Create `schemas/magic10_compat_result_v1.schema.json` for the symmetric `magic10_compat_result.v1`. It exists only for an eligible pair. `engine/narratives/router.py` is the only owner that augments the pure category rows with narrative selection. Because `route_keys(category, band, perspective)` requires an explicit `a_to_b` or `b_to_a` perspective, the application establishes the total directional order `(gate_mask, canonical_person_id)` before routing. It invokes the existing `a_to_b` route with the normalized `lo` party as `a` and `hi` party as `b`, then invokes `b_to_a` over the same normalized pair. It emits the same top-level identity fields and signal array, with each category row containing exactly:
+
+* `category_id`;  
+* `score`;  
+* `band`;  
+* required nonempty `shared_key`;  
+* required nonempty `personal_lo_to_hi_key`;  
+* required nonempty `personal_hi_to_lo_key`.
+
+The normalized `a_to_b` result is stored as `personal_lo_to_hi_key`; the normalized `b_to_a` result is stored as `personal_hi_to_lo_key`. For distinct parties with equal Gate masks, ASCII canonical UUID order decides `lo` and `hi`; request order never does. Both router calls must return the same `shared_key` or augmentation fails closed. A caller-specific projection selects its personal key by comparing its canonical UUID with the transient normalized party orientation; it may not rewrite the symmetric stored result. The router does not change `q`, score, band, order, `config_id`, `release_id`, or `pair_key`. AB and BA therefore produce byte-identical complete results. An ineligible self-pair never calls the router and has no `magic10_compat_result.v1`. The augmented result is assembled per eligible evaluation and must not be cached or retrieved solely by the identity-free intrinsic `pair_key`. This complete result is permitted only on internal/admin CLI and authenticated internal HTTP surfaces.
+
+#### **Reader v1 production projection**
+
+Reader v1 remains deliberately narrower than the internal result. Under this `M10-CANON-001` authorization, `adapter/http_reader.py` must expose the production application route `POST /api/reader?v=1`. Later PF05 and PF14 drainage records the adopted contract but does not gate implementation, QA, release authorization, or closure. The request object has exactly `a_id` and `b_id`, each an exact lowercase hyphenated UUID; inline chart, Gate, weight, config, and viewer-preference fields are prohibited. `engine/bodygraph/resolver.py::resolve_current_bodygraph` reads each complete current chart through `public.hde_body_graphs_current`, and the Gate normalizer validates it before Engine Core is called.
+
+The success response remains `reader.v1`. For an eligible distinct-person pair, it contains exactly one category row: `{"id":"harmony","band":"<Cool|Open|Warm|Glow>"}`. For a valid self-pair, it contains `eligible: false` and `categories: []`; Engine Core and the narrative router are not called. Both success forms include the existing `meta` and release identity fields required by the corrected `schemas/reader.v1.schema.json`. The presenter computes `idempotence_hash` from the canonical five-key Reader preimage after eligibility and category projection; it never copies `pair_key`. Scores, signals, state provenance, config internals, narrative keys, `pair_key`, and the other nine categories are prohibited from public bytes. The existing development file-path GET route remains development-only and non-authoritative; this `M10-CANON-001` authorization requires replacement of the current POST-405 behavior, and PF05 drainage records that adopted contract later without gating execution.
+
+`schemas/reader.v1.schema.json` remains a closed `success | error` envelope. Its success branch enforces the conditional exactly: `eligible: true` requires one harmony row, while `eligible: false` requires an empty category array. Its corrected error branch requires exactly `schema`, `ok`, `code`, and `error`, sets `additionalProperties: false`, fixes `schema` to `v1` and `ok` to `false`, and accepts the governed token/message pairs emitted by `engine.compat.errors.error_envelope()`. `adapter/schemas/error_v1.schema.json` remains the standard four-field error-envelope contract. `tests/adapter/test_http_reader_magic10.py` must validate every Reader success and failure against the applicable schema branch, prove topology and emitted-byte parity, and recompute the public idempotence hash independently from `pair_key`.
+
+This v1 route makes the adopted mechanics usable in production while preserving the current one-band public covenant. Full ten-category public exposure requires a separate versioned PF05, schema, narrative, and product decision.
+
+---
+
+### **Deterministic golden fixtures**
+
+#### **Golden M10-G001: no relationship Channels**
+
+If all 36 states are `none`:
+
+* all twenty signal wire values are `0`;  
+* all ten scores are `0`;  
+* all ten bands are Cool.
+
+#### **Golden M10-G002: homogeneous companionship kernel fixture**
+
+If every mapped state is `companionship`:
+
+| Category | Score | Band |
+| :---- | ----: | :---- |
+| harmony | 100 | Glow |
+| heat | 50 | Warm |
+| communication | 75 | Glow |
+| alignment | 100 | Glow |
+| comfort | 100 | Glow |
+| consistency | 100 | Glow |
+| expansion | 50 | Warm |
+| creativity | 63 | Warm |
+| drive | 50 | Warm |
+| balance | 50 | Warm |
+
+Balance is `50` because `equilibrium_score` receives no one-owner mass while `counterweight_ratio` is `100`. This is a kernel fixture, not a claim that an all-Channel natal chart is lawful.
+
+#### **Golden M10-G003: Balance ownership split**
+
+For the six equal-weight `equilibrium_score` Channels:
+
+* three dominance or compromise Channels owned by `member_lo` and three owned by `member_hi` produce `q_equilibrium = 200`;  
+* all six owned by one member produce `q_equilibrium = 0`;  
+* swapping members cannot change either result.
+
+#### **Golden M10-G004: sparse end-to-end Gate sets**
+
+Use:
+
+* member A Gates: `{5,19,20,34,43,49}`;  
+* member B Gates: `{9,12,15,22,23,52}`.
+
+Expected Channel states:
+
+* `05-15`: electromagnetic;  
+* `09-52`: dominance by B;  
+* `12-22`: dominance by B;  
+* `19-49`: dominance by A;  
+* `20-34`: dominance by A;  
+* `23-43`: electromagnetic;  
+* all other Channels: none.
+
+Expected signal wire values:
+
+| Signal | `q` half-score units |
+| :---- | ----: |
+| `rapport_delta` | 25 |
+| `resonance_strength` | 63 |
+| `spark_intensity` | 0 |
+| `momentum_flux` | 38 |
+| `signal_clarity` | 40 |
+| `exchange_density` | 20 |
+| `vector_cohesion` | 0 |
+| `axis_agreement` | 25 |
+| `soothe_index` | 50 |
+| `buffer_resilience` | 38 |
+| `pattern_integrity` | 50 |
+| `variance_stability` | 0 |
+| `growth_tendency` | 0 |
+| `horizon_reach` | 0 |
+| `novelty_factor` | 50 |
+| `expression_flow` | 20 |
+| `willpower_current` | 0 |
+| `focus_pressure` | 60 |
+| `equilibrium_score` | 0 |
+| `counterweight_ratio` | 33 |
+
+Expected category results:
+
+| Category | Score | Band |
+| :---- | ----: | :---- |
+| harmony | 22 | Cool |
+| heat | 10 | Cool |
+| communication | 15 | Cool |
+| alignment | 6 | Cool |
+| comfort | 22 | Cool |
+| consistency | 13 | Cool |
+| expansion | 0 | Cool |
+| creativity | 18 | Cool |
+| drive | 15 | Cool |
+| balance | 8 | Cool |
+
+AB and BA must produce the same complete signal, score, and band vectors.
+
+#### **Golden M10-G005: identity independence**
+
+Two eligible requests with identical normalized Gate masks and different user IDs must produce byte-identical intrinsic Magic10 content and the same `pair_key` under the same release. Pair IDs, request IDs, timestamps, and viewer preferences are excluded from the intrinsic preimage. This fixture does not assert that eligibility, directional narrative orientation, or public Reader bytes ignore identity.
+
+#### **Golden M10-G006: category boundary matrix**
+
+At the category-reducer fixture layer, inject direct schema-valid `q` input pairs that produce integer scores `24`, `25`, `49`, `50`, `74`, `75`, and `100`. These pairs need not be reachable from Gate sets because this golden isolates reducer and band boundaries. Expected bands are respectively Cool, Open, Open, Warm, Warm, Glow, and Glow.
+
+#### **Golden M10-G007: valid self-pair boundary**
+
+Use these fixed values:
+
+* `a_id = b_id = 00000000-0000-0000-0000-000000000001`;  
+* both resolved normalized Gate sets are `{1}` and their complete normalized projections are byte-identical;  
+* `release_id = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`;  
+* `meta.engine_tag = m10-test`;  
+* `meta.invocation_tag = m10-identity-boundary`.
+
+Expected behavior:
+
+* validation succeeds and `eligible == false`;  
+* Engine Core, the intrinsic cache, and the narrative router are not called;  
+* no `pair_key`, signal vector, category matrix, personal key, or shared key exists;  
+* Reader categories are exactly `[]`;  
+* canonical Reader preimage bytes hash to `8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15`;  
+* two runs and the vacuous AB/BA reversal produce byte-identical Reader success bodies;  
+* the condition is not converted into an error.
+
+An internal same-UUID fixture with unequal complete normalized projections instead returns `ERR_READER_INVALID_CHART`, emits no success body, and creates no `pair_key`.
+
+#### **Golden M10-G008: distinct people with equal Gate masks**
+
+Use:
+
+* `a_id = 00000000-0000-0000-0000-000000000001`;  
+* `b_id = 00000000-0000-0000-0000-000000000002`;  
+* both normalized Gate sets are `{1}`;  
+* the same `release_id` and `meta` values as M10-G007.
+
+Expected intrinsic behavior:
+
+* `eligible == true`;  
+* `gate_mask_hex == 0000000000000001` for each member;  
+* `chart_fingerprint == 7567338a3be5b35e00366bfe86f3f1ca8b89be1fd02be893abeb62a60dbc2d2b` for each member;  
+* `pair_key == 8a75eafcc4af664e073c1c4daec55f073f416af2c461039539f01717ac01d501` under config `m10-channel-state-v1.0.0`;  
+* every Channel state is `none`, every signal wire value is `0`, and every category score is `0` with band Cool.
+
+Expected orientation and surface behavior:
+
+* the first UUID is `lo` and the second is `hi` by the `(gate_mask, canonical_person_id)` tuple;  
+* with a router stub returning `m10.test.personal.lo_to_hi`, `m10.test.personal.hi_to_lo`, and common shared key `m10.test.shared.equal_mask`, those values occupy `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key` respectively;  
+* reversing request order produces byte-identical `magic10_compat_result.v1` bytes and the same caller-to-key mapping;  
+* Reader emits `eligible: true` and exactly `[{"id":"harmony","band":"Cool"}]`;  
+* canonical Reader preimage bytes hash to `ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e`;  
+* the Reader hash is independently computed and is not assigned from `pair_key`.
+
+---
+
+### **Canonical PF10 contract and required permanent-canon drainage**
+
+#### **M10-CANON-001: Product Owner adoption record**
+
+By this addendum, the Product Owner adopts as canonical:
+
+* the five-state classifier;  
+* the twenty signal constructs;  
+* the 90 default mapping rows;  
+* the three response profiles;  
+* the two Balance operations;  
+* the signal and category formulas;  
+* the caps-before-reduction operation and `catalog/magic10_caps.json` as the single input-pair authority;  
+* the Gate normalization, pair preimage, cache identity, and governed result schemas;  
+* retained PF01 self-pair eligibility, the no-score/no-cache self-pair boundary, and the independent Reader idempotence preimage;  
+* the exact lowercase-UUID/current-view BodyGraph resolver and Gate-readiness boundary;  
+* the `(gate_mask, canonical_person_id)` total orientation rule and symmetric two-direction narrative-key augmentation contract;  
+* the exact release-manifest membership roster and governed error-token additions;  
+* current external release-attestation ownership, historical `HDE-DIST002` immutability, and the explicit non-use of `RELEASE_ID_RECOMPUTE_OK` for current claims;  
+* the tuning ranges and release-binding rules;  
+* the default bands;  
+* the Reader v1 production projection and exact failure contract;  
+* the nonclaims in this addendum.
+
+This decision gate is satisfied at `2026-08-24T18:04:49Z`. No further Product Owner mechanics decision, research task, or empirical study is required before implementation. Any later change must be an explicit bounded supersession, not an executor reinterpretation.
+
+#### **PF01 Doc Delta**
+
+Add or replace the current upstream signal-generation gap with:
+
+* normalized Gate-mask input contract;  
+* `magic10_chart_fingerprint.v1`, `magic10_pair_preimage.v1`, exact `pair_key`, and UID-free pair ordering that supersede the current UID-bearing intrinsic scoring/cache preimage only;  
+* retained PF01 self-pair eligibility before scoring, including `eligible:false`, `categories:[]`, no Engine Core call, and no `pair_key` for a valid self-pair;  
+* same-identity/different-projection refusal through `ERR_READER_INVALID_CHART`;  
+* the separate `(gate_mask, canonical_person_id)` directional order, including ASCII UUID tie-breaking only for distinct equal-mask parties;  
+* independent public `idempotence_hash` computation over the five-key Reader preimage, with no equality contract to `pair_key`;  
+* exact five-state truth table and owner provenance;  
+* ordinary signal equation;  
+* both Balance equations;  
+* governed input-cap equation `q_prime_i = min(2U_i, max(2L_i, q_i))`;  
+* category reducer equation;  
+* half-up fixed-point rules;  
+* score domain and band lookup;  
+* intrinsic symmetry and identity independence;  
+* exact default config ID;  
+* viewer-preference exclusion;  
+* formula-change and tuning authority boundary;  
+* cache-key versioning and stale-result refusal.
+
+PF10 §2.20 is the sole normative equation authority for this scope now. After accurate permanent-canon drainage, PF01 becomes the permanent normative equation home; until then, conflicting PF01 language is superseded within this addendum's scope.
+
+#### **PF12 Doc Delta**
+
+Add:
+
+* `magic10_mechanics_config.v1` schema identity;  
+* `catalog/magic10_mechanics_v1.json` authoritative path;  
+* `schemas/magic10_mechanics_v1.schema.json` authoritative path;  
+* `schemas/magic10_result_v1.schema.json` and `schemas/magic10_compat_result_v1.schema.json` authoritative paths;  
+* canonical-byte and schema-closure rules;  
+* exact source-path/hash binding for Channels, categories, caps, and thresholds;  
+* `catalog/magic10_caps.json` as the single category-input and cap authority, with configuration closure rather than duplicated input identities;  
+* exact data, schema, scoring-code, resolver, surface, and governed-error manifest membership roster from this plan;  
+* active-config release projection;  
+* the current release-provenance rule: update only `catalog/manifest.json` in the tracked source, validate it through `scripts/release_id_recompute.py --check-manifest-only` and `ci/checks/check_release_identity.sh`, and produce current derivatives only through `tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`;  
+* current-attestation acceptance exactly when external `hde.release_attestation.v1` validates with `source_commit_exact: true`, `validation_result: "PASS"`, `release_id == manifest_sha256`, `release_admission: "PR06R_B_FINAL_PASS"`, `pipeline_stop: null`, and a successful `--verify <external-directory> --require-clean` against the unchanged clean source;  
+* the explicit rule that the external attestation is PR evidence, is not added to the repo-resident Index/Mirror, and does not become a `release_id` input;  
+* the explicit rule that the checked-in HDE-EPIC022 release-ID, recompute, checksums, Index/Mirror, and BodyGraph release-binding families remain frozen historical artifacts and are not regenerated, relabeled, or used for a current claim;  
+* the explicit token posture: `RELEASE_ID_RECOMPUTE_OK` remains a historical label and is not claimed by Magic10; `M10-WS06` uses the exact attestation field predicate above rather than inventing or redefining a global token;  
+* generated-artifact and golden identities;  
+* fail-closed loader behavior;  
+* full release rollback coupling.
+
+#### **PF02 Doc Delta**
+
+Name one pure Engine Core flow:
+
+`BodyGraph Gates -> Channel states -> signal wire values -> category scores -> bands -> surface projection`.
+
+Adapters, HTTP handlers, CLI code, presenters, and narrative layers may validate, call, or project this result. They may not calculate, weight, round, band, or rescore independently.
+
+#### **PF05 Doc Delta**
+
+Define:
+
+* `magic10_result.v1` and `magic10_compat_result.v1` internal output contracts;  
+* CLI full-matrix diagnostic output;  
+* internal HTTP full-matrix output;  
+* production `POST /api/reader?v=1` request shape with exactly lowercase canonical UUID `a_id` and `b_id`, resolved read-only through `public.hde_body_graphs_current` for vendor `hdapi`;  
+* Reader v1 eligible success output with exactly the harmony band and no numeric fields;  
+* Reader v1 valid self-pair success output with `eligible:false`, `categories:[]`, no intrinsic result, and no narrative keys;  
+* independent Reader `idempotence_hash` computation from the PF01 five-key public preimage rather than from `pair_key`;  
+* equal-mask distinct-person narrative orientation by ASCII canonical UUID after the Gate-mask tie;  
+* the exact error table below;  
+* numeric and diagnostic fields prohibited from public Reader output.
+
+| Condition | Canonical token | HTTP status | Public-envelope rule |
+| :---- | :---- | ----: | :---- |
+| Invalid JSON, unknown request key, missing `a_id` or `b_id`, or an identifier that is not an exact lowercase hyphenated UUID | `ERR_READER_INVALID_INPUT` | 422 | Standard error envelope; no details |
+| The same canonical identity is supplied with unequal complete normalized chart projections on an internal or future resolver path | `ERR_READER_INVALID_CHART` | 422 | Standard error envelope; no success, score, cache access, or narrative routing |
+| Person identifier cannot resolve to a complete BodyGraph | `ERR_M10_PERSON_UNRESOLVED` | 404 | Standard error envelope; do not reveal which identifier failed |
+| Reader DB resolution is unavailable, ambiguous, or violates the current-view row contract | `ERR_M10_RESOLVER_UNAVAILABLE` | 503 | `Cache-Control: no-store`; no row or DB details |
+| Reader resolves a stored BodyGraph whose Gate array is missing, empty, duplicate, malformed, noncanonical, or outside `1..64` | `ERR_M10_BODYGRAPH_INCOMPLETE` | 503 | `Cache-Control: no-store`; no partial score and no request-time vendor fallback |
+| An internal or CLI complete-chart input has no Gate array or an empty Gate array | `ERR_M10_GATES_MISSING` | 422 | Standard internal error envelope; no partial score |
+| An internal or CLI Gate value is duplicate, malformed, noncanonical, or outside `1..64` | `ERR_M10_GATES_INVALID` | 422 | Standard internal error envelope; no partial score |
+| Legacy ID-only internal call reaches scoring without sanctioned chart resolution | `ERR_M10_LEGACY_INPUT_UNSUPPORTED` | 422 | Standard error envelope; no UID-hash fallback |
+| Loaded mechanics config or source hash disagrees with the selected config | `ERR_M10_CONFIG_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Manifest membership, checksum, or release identity disagrees | `ERR_M10_MANIFEST_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Result schema identity or bytes disagree with the active release | `ERR_M10_RESULT_SCHEMA_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Cached result identity is stale and valid Gate inputs are unavailable for recomputation | `ERR_M10_STALE_RESULT` | 503 | `Cache-Control: no-store`; no legacy result |
+
+The standard error envelope has exactly `schema`, `ok`, `code`, and `error`; `schema` is `v1`, `ok` is `false`, and `code` is the token above. Public Reader calls `engine.compat.errors.error_envelope()` without its optional `details` argument. Public Reader errors contain no stack, path, UUID, Gate list, config contents, database detail, or internal diagnostic detail. The error branch of `schemas/reader.v1.schema.json` is updated in the same change to accept this exact closed shape; it is not left at the current incompatible topology. `adapter/schemas/error_v1.schema.json` remains unchanged unless its parity test exposes a real mismatch. Every new token is added to `engine/compat/error_tokens.py`, regenerated into `errors/token_map/token_map.json` through `tools/errors/generate_error_artifacts.py`, and covered by the existing CLI/HTTP parity tests plus the dedicated Reader schema-parity test.
+
+The exact governed `error` messages are:
+
+| Token | Exact message |
+| :---- | :---- |
+| `ERR_READER_INVALID_INPUT` | `invalid Reader request` |
+| `ERR_READER_INVALID_CHART` | `invalid Reader chart` |
+| `ERR_M10_PERSON_UNRESOLVED` | `BodyGraph not found` |
+| `ERR_M10_RESOLVER_UNAVAILABLE` | `BodyGraph resolver unavailable` |
+| `ERR_M10_BODYGRAPH_INCOMPLETE` | `BodyGraph is incomplete` |
+| `ERR_M10_GATES_MISSING` | `Gate data is required` |
+| `ERR_M10_GATES_INVALID` | `Gate data is invalid` |
+| `ERR_M10_LEGACY_INPUT_UNSUPPORTED` | `legacy scoring input is unsupported` |
+| `ERR_M10_CONFIG_MISMATCH` | `Magic10 configuration mismatch` |
+| `ERR_M10_MANIFEST_MISMATCH` | `Magic10 release manifest mismatch` |
+| `ERR_M10_RESULT_SCHEMA_MISMATCH` | `Magic10 result schema mismatch` |
+| `ERR_M10_STALE_RESULT` | `Magic10 cached result is stale` |
+
+#### **PF17 and PF18 drainage**
+
+Define narrative consumption of category band keys and provenance. Do not copy formulas into narrative Canon. Keep scores numeric-free in public copy unless separately authorized.
+
+#### **PF29 drainage**
+
+Update the user guide only after the implementation is shipped and verified. Describe what Magic10 categories and bands mean, their limits, and the absence of relationship guarantees.
+
+#### **PF27 later-drain statement**
+
+* **Affected PF canon home(s):** PF01, PF02, PF05, PF12, PF14, PF17, PF18, PF29, and later PF09 status rows where implementation evidence supports a change.  
+* **Exact affected locator(s):** the exact locators in the governing-source map and the exact PF09 tasks/subtasks in the accountability tables.  
+* **Current canon posture:** PF10 §2.20 now authorizes the complete formula, identity-free intrinsic preimage, equal-mask narrative tie-break, result schemas, production Reader POST, and canonical PF09 task requirements. Conflicting permanent PF01/PF12/PF14/PF05 language is superseded within this addendum's scope until accurately drained. PF01's retained self-pair rule and PF09.6's historical/current release distinction remain controlling because this addendum expressly preserves them.  
+* **Supported later-drain action:** Drain the adopted content into the named permanent homes without altering its meaning. PF09 register and status changes remain evidence-bound lifecycle actions.  
+* **Drain readiness classification:** Not yet supportable from repo evidence.  
+* **Evidence basis:** Accepted v0.18 formula, `M10-CANON-001`, the approving v0.18 engineering/mathematical-fidelity review, and read-only repository truth at `main@e5fcff584871418ccb431f2b7c8798d0dd2d1107`; no implementation or QA evidence exists.  
+* **Epic-close expectation:** after a separate canon-only drain step. That statement schedules drainage only; PF-canon drainage is never an execution, approval, implementation-completion, QA, OPS, acceptance, or epic-close condition.
+
+#### **PF14 Doc Delta**
+
+Amend `docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.3.md` so that:
+
+* §6.1 preserves pure-core configuration injection and explicitly requires the loader to inject one immutable typed mechanics bundle;  
+* §6.7 replaces the `ParticipantState.compat_score` precomputed-score contract with normalized Gate masks and `compute_core(member_a, member_b, mechanics_bundle, release_id)`;  
+* §7 recognizes `magic10_result.v1` as an eligible-pair pure result and the symmetric `magic10_compat_result.v1` as the internal/admin result carrying `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key` after `(gate_mask, canonical_person_id)` directional ordering;  
+* the application boundary retains PF01 self-pair eligibility and returns the ineligible Reader success without invoking Engine Core, cache, or narrative routing;  
+* §9.3 routes internal compat, CLI, admin, and Reader projection through the single Engine Core result without rescoring;  
+* Reader v1 remains harmony-only, bands-only, and numeric-free;  
+* equations remain single-homed in PF01 and schemas remain single-homed in PF12.
+
+The same implementation slice migrates `tests/core/test_engine_core_abba.py`, `tests/core/test_engine_core_determinism.py`, and `tests/core/test_engine_core_purity.py`. Purity remains mandatory: typed config is loaded outside Engine Core and injected; no core, composite, signal, or reducer module reads files, environment variables, clocks, network, or mutable globals.
+
+---
+
+### **Repository implementation plan**
+
+#### **New governed and implementation files**
+
+| Path | Purpose |
+| :---- | :---- |
+| `catalog/magic10_mechanics_v1.json` | Complete active formula configuration |
+| `schemas/magic10_mechanics_v1.schema.json` | Strict configuration schema |
+| `schemas/magic10_result_v1.schema.json` | Pure Engine Core result schema |
+| `schemas/magic10_compat_result_v1.schema.json` | Complete internal/admin result with required narrative keys |
+| `engine/bodygraph/gates.py` | Pure Gate normalization, mask, fingerprint, and pair-preimage helpers |
+| `engine/magic10/composite.py` | Pure 36-Channel five-state kernel |
+| `engine/magic10/signals.py` | Eighteen ordinary and two Balance signal producers |
+| `tests/m10/test_composite_states.py` | State truth table and 36-Channel coverage in the existing Magic10 test home |
+| `tests/m10/test_signal_formula.py` | Fixed-point, caps, and Balance operation tests |
+| `tests/m10/test_magic10_goldens.py` | End-to-end formula and result-schema goldens |
+| `tests/bodygraph/test_gate_normalization.py` | Gate domain, duplicate, canonical-string, mask, fingerprint, and preimage tests |
+| `tests/bodygraph/test_current_bodygraph_resolver.py` | Canonical UUID, current-view query, zero/one/many row, DB failure, stored-payload, and Gate-normalization tests |
+| `tools/bodygraph/check_magic10_gate_readiness.py` | Closed-rails read-only inventory of current `hdapi` rows with missing or invalid Gate arrays |
+| `tests/bodygraph/test_magic10_gate_readiness.py` | Proof that readiness inventory is read-only, value-minimized, deterministic, and fails closed |
+| `tests/config/test_magic10_mechanics_config.py` | Schema, closure, hash, and mutation tests |
+| `tests/compat/test_magic10_intrinsic_parity.py` | AB/BA, two-run, UID independence, and surface parity |
+| `tests/compat/test_magic10_identity_boundaries.py` | Valid self-pair short-circuit, same-identity/different-projection refusal, equal-mask UUID tie-break, directional key placement, public idempotence separation, and AB/BA bytes |
+| `tests/adapter/test_http_reader_magic10.py` | Production Reader POST request, resolution, projection, HTTP status, token, and no-detail error tests |
+| `tests/fixtures/magic10/v1/goldens.json` | Machine-readable forms of M10-G001 through M10-G008 and their exact expected outputs |
+| `tools/config/compare_magic10_configs.py` | Deterministic candidate-config diff in the existing config tooling home |
+| `tests/tools/test_compare_magic10_configs.py` | Exact comparer output, invalid-candidate rejection, and proof that comparison cannot activate a configuration |
+| `tests/tools/test_magic10_release_attestation_contract.py` | Current manifest-only checks, exact external-attestation predicates, historical-artifact immutability, and rejection of `RELEASE_ID_RECOMPUTE_OK` as a current claim |
+
+These are the canonical exact new paths. Any path change requires an explicit Product Owner-authorized supersession before implementation; an executor does not silently relocate them. No new top-level root is authorized.
+
+#### **Existing files to modify**
+
+| Path | Required change |
+| :---- | :---- |
+| `catalog/channels_v1.json` | Correct semantic classifications and freeze exact 36-Channel bytes |
+| `schemas/channels_v1.schema.json` | Enforce ascending Gate pairs, exact ID/Center projection, non-null `logic`/`defense`\-spelled substreams including `ego`, preserve the existing non-scoring metadata fields, and require canonical row order |
+| `catalog/manifest.json` | Add or refresh every row in the exact release-manifest roster through the existing manifest process |
+| `engine/config/registry_loader.py` | Strictly load, validate, hash-bind, and expose one active mechanics config |
+| `engine/config/bundles.py` | Preserve existing Channel Product metadata and frontend shape; add the mechanics config/result identities only to the governed backend bundle |
+| `docs/schemas/config_bundle_be.json` | Add the exact backend mechanics config/result identity fields without changing the existing frontend bundle contract |
+| `engine/bodygraph/v2_adapter.py` | Normalize canonical Gate strings into the one Gate-mask contract and reject missing, duplicate, malformed, or out-of-range Gates |
+| `engine/bodygraph/projection.py` | Preserve the normalized ascending Gate array in the sanctioned stored/scoring projection; do not claim arbitrary raw vendor content |
+| `engine/bodygraph/mapped_cache.py` | Persist and read back the Gate-complete projection while retaining full vendor/fingerprint write identity |
+| `engine/bodygraph/resolver.py` | Replace the no-I/O DB stub with exact lowercase-UUID, read-only `public.hde_body_graphs_current` resolution for vendor `hdapi`; preserve canonical person identity for pre-core eligibility/orientation and do not add request-time vendor fallback |
+| `engine/magic10/calculators.py` | Accept canonical signal wire values and enforce the adopted reducer only |
+| `engine/core/core.py` | Replace precomputed `compat_score` input with eligible normalized Gate inputs and an injected immutable mechanics bundle; self-pair eligibility remains outside the pure core |
+| `engine/compat/compute.py` | Replace UID/category hashing with the canonical Engine Core result |
+| `engine/cli/main.py` | Preserve Gate inputs and emit the same canonical result |
+| `engine/http/compat_handler.py` | Resolve full inputs and call Engine Core without reducing the pair to IDs |
+| `engine/runtime/public.py` | Project the canonical result rather than computing Type-pair harmony |
+| `adapter/http_reader.py` | Implement the adopted production `POST /api/reader?v=1` ID-resolution and harmony-band projection contract; retain dev GET as dev-only |
+| `engine/narratives/router.py` | Attach `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key` after total `(gate_mask, canonical_person_id)` ordering; do not route self-pairs or change mechanics outputs |
+| `presenter/reader_v1/emitter.py` | Emit eligible harmony or ineligible empty categories without score calculation and compute the five-key public idempotence hash independently from `pair_key` |
+| `schemas/reader.v1.schema.json` | Replace unrelated leader enums; enforce eligible implies exactly one harmony row and ineligible implies `categories: []`; preserve numeric-free success bytes; and correct the closed error branch to require exactly `{schema, ok, code, error}` with `schema = v1`, `ok = false`, and no additional properties |
+| `engine/compat/categories.py` | Remove duplicate heat-first authority and consume harmony-first registry order |
+| `engine/compat/error_tokens.py` | Add the exact Reader and Magic10 tokens/messages from the PF05 delta to the governed source registry |
+| `errors/token_map/token_map.json` | Regenerate the governed token snapshot; never hand-edit it |
+| `tools/config/generate_config_artifacts.py` and `tools/config/artifacts.py` | Include mechanics config identity using the validated existing config-tooling home |
+| `tests/bodygraph/test_bg_resolve_v2_mapped_cache.py` | Extend mapped-cache resolution coverage for the Gate-complete projection and exact current-row contract |
+| `tests/bodygraph/test_bg_resolve_route_policy.py` | Prove the read-only route policy, no request-time vendor fallback, and deterministic error outcomes |
+| `tests/bodygraph/test_v2_mapped_cache.py` | Prove full vendor/fingerprint write identity remains intact while the sanctioned projection gains normalized Gates |
+| `tests/bodygraph/test_resolver_vendor.py` | Prove `hdapi` vendor selection and zero-row, many-row, incomplete-row, and unavailable-resolver failure handling |
+| `tests/cli/test_bg_resolve.py` | Prove CLI resolution parity without weakening existing vendor or write rails |
+
+#### **Existing generators and release tools to run and verify**
+
+The following existing tools own their respective current manifest validation, external attestation, registry, bundle, or error outputs and are not presumed to require edits. Run them only in the stated posture:
+
+* `scripts/cut_release_manifest.py --version 1.1.0 --built-at-utc 2026-08-24T18:04:49Z` updates only the tracked canonical manifest;  
+* `scripts/release_id_recompute.py --check-manifest-only` validates the current manifest and declared source bytes without reading or writing historical derivatives;  
+* `ci/checks/check_release_identity.sh` executes the same current-manifest-only predicate under closed rails;  
+* `tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean` builds current release derivatives outside the source tree from the exact clean candidate;  
+* `tools/evidence/build_release_attestation.py --verify <external-directory> --require-clean` verifies that external bundle against the unchanged source;  
+* `tools/generate_registry_report.py`;  
+* `tools/config/generate_bundles.py`;  
+* `tools/errors/generate_error_artifacts.py`.
+
+Do not run `scripts/release_id_tools.py` against the source tree. Its write path targets the frozen checked-in release-identity family and is permitted only inside the external attestation builder's isolated tracked-source copy. Do not run `scripts/release_id_recompute.py` in write mode or use its historical-derived-output `--check` mode as current provenance.
+
+If a bounded failing test proves a real gap in one of these generators or release tools, that defect is routed through the owning PF09 work item before modification; this addendum does not invent one.
+
+#### **Direct-consumer migration inventory**
+
+These current direct or evidence consumers must be migrated, regenerated through their owners, or guarded as historical so Gate-required scoring and the result contract do not break them:
+
+| Path | Required disposition |
+| :---- | :---- |
+| `tools/evidence/run_canonical_json_gate.py` | Include both new schemas, corrected Channel schema, caps closure, thresholds hash, and canonical-byte checks |
+| `tools/evidence/generate_epic030_pr05_category_framework_evidence.py` | Preserve historical bytes; mark `_build_per_channel_mechanics` non-authoritative and add production no-import/no-symbol-use guard |
+| `tools/evidence/generate_hde_epic037_v2_to_compat.py` | Replace Type-only `_reader_chart` fixtures with complete normalized Gate fixtures |
+| `tools/evidence/generate_open_rails_abba_proof.py` | Supply resolvable complete charts and bind config/result/release identity |
+| `tools/evidence/generate_determinism_gate_proofs.py` | Add pair-preimage, complete result, and two-run byte identity |
+| `tools/presenter/generate_presenter_artifacts.py` | Consume routed keys and bands from `magic10_compat_result.v1`; never score |
+| `scripts/cli/canonical_harness.py` | Preserve Gate inputs and validate the complete internal result schema |
+| `tests/compat/test_compat_public_lf_bom.py` | Update expected canonical public bytes without adding scores |
+| `tests/compat/test_compat_public_ab_ba_identity.py` | Exercise normalized Gate fixtures and pair-key symmetry |
+| `tests/runtime/test_identity.py` | Bind config, release, result schema, and pair-key identity |
+| `tests/cli/test_showcompat_parity_and_identity.py` | Prove CLI parity with the complete internal result |
+| `tests/compat/test_hde_epic037_v2_adapter_to_compat.py` | Preserve Gates from v2 adapter through compat scoring |
+| `tests/core/test_engine_core_abba.py` | Replace precomputed asymmetric scores with asymmetric Gate masks and assert neutral AB/BA identity |
+| `tests/core/test_engine_core_determinism.py` | Assert two-run typed-result and canonical-byte identity under injected config |
+| `tests/core/test_engine_core_purity.py` | Preserve the no-I/O, no-env, no-clock, no-RNG core guard |
+| `tests/cli/test_errors_parity.py` | Close the regenerated token snapshot and existing CLI-equivalent scenarios; Reader-only conditions stay in the dedicated Reader test |
+| `adapter/schemas/error_v1.schema.json` | Keep as the standard four-field envelope contract and prove the corrected Reader error branch accepts the same emitted bytes; modify only if the parity test proves a real mismatch |
+| `tests/config/test_typed_bundles.py` | Preserve existing FE Channel metadata and prove the backend-only mechanics identity addition |
+| `tests/config/test_registry_report.py`, `tests/config/test_registry_report_determinism.py`, and `tests/config/test_registry_report_indexing.py` | Regenerate and verify the corrected Channel rows without changing historical evidence |
+| `artifacts/registry/registry_report.json` and `artifacts/config_bundles/be_bundle.json` | Regenerate through their owners; update governed path proofs/index rows through the existing process |
+| `artifacts/config_bundles/fe_bundle.json` | Regenerate and prove byte-compatible Channel metadata posture unless an independently authorized FE change exists |
+
+Historical evidence is not hand-edited to pretend it was generated by the new mechanic. Active generators are migrated and regenerate their owned current artifacts; immutable historical artifacts remain attributed history.
+
+#### **Transitional code to retire or quarantine**
+
+| Locus | Required posture |
+| :---- | :---- |
+| `engine/compat/compute.py::_score_for` | Delete the SHA-256 UID/category scoring behavior after parity migration |
+| `engine/compat/ts_v0.py` | Remove as Magic10 authority; retain only if separately required and explicitly labeled legacy |
+| `scripts/hd_cli.py` | Remove or route through canonical CLI; it cannot score independently |
+| Precomputed-score entry in `engine/core/core.py` | Replace or fail closed when full Gate inputs are required |
+| `tools/evidence/generate_epic030_pr05_category_framework_evidence.py::_build_per_channel_mechanics` | Preserve as historical evidence logic, label non-authoritative, and add a production import/symbol guard proving it is unreachable from runtime scoring |
+| Code-local category-order constants | Replace with one governed registry load |
+
+#### **End-to-end call contract**
+
+1. For ID-based calls, `engine/bodygraph/resolver.py::resolve_current_bodygraph` reads exactly one current `hdapi` row per canonical UUID and preserves that UUID with the normalized projection; inline-chart calls must provide an already sanctioned canonical identity. `engine/bodygraph/gates.py` returns validated Gate masks and chart fingerprints.  
+2. Application orchestration validates both party records and evaluates PF01 eligibility before constructing an intrinsic preimage or calling Engine Core.  
+3. A valid self-pair stops calculation and routing, then proceeds directly to the Reader presenter with `eligible:false` and `categories:[]`. Same identity with unequal projections fails as `ERR_READER_INVALID_CHART`.  
+4. For an eligible pair, orchestration establishes the transient total directional order `(gate_mask, canonical_person_id)` while retaining identity-free Gate-mask order for intrinsic math.  
+5. `engine/config/registry_loader.py` loads, validates, hash-binds, and freezes one typed mechanics bundle once outside the pure core.  
+6. Orchestration constructs `magic10_pair_preimage.v1`, derives `pair_key`, and injects the two normalized Gate objects, immutable mechanics bundle, and active `release_id` into `engine/core/core.py::compute_core`.  
+7. Composite kernel derives exactly 36 state records without file, environment, clock, network, identity, or mutable-global access.  
+8. Signal evaluator consumes the injected typed config and returns exactly twenty `q` integers; it never loads configuration.  
+9. Magic10 reducer applies caps and returns exactly ten integer scores and bands in canonical order as `magic10_result.v1`.  
+10. Using the transient directional order, `engine/narratives/router.py` calls the normalized `a_to_b` and `b_to_a` routes and attaches `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and one matching `shared_key` to form the symmetric `magic10_compat_result.v1` without rescoring.  
+11. Internal compat, CLI, and authenticated admin surfaces consume the same complete eligible result object. `adapter/http_reader.py` projects only the harmony band for an eligible pair or the empty ineligible self-pair success without fabricating a matrix.  
+12. The Reader presenter computes its public five-key preimage and `idempotence_hash` independently from `pair_key`; all presenters serialize but do not calculate compatibility.
+
+#### **Failure behavior**
+
+Fail closed before scoring when:
+
+* a Reader person identifier is not an exact lowercase canonical UUID;  
+* one canonical identity is paired with unequal complete normalized projections;  
+* the read-only current-BodyGraph resolver returns zero, more than one, unavailable, or malformed rows under its exact contract;  
+* either BodyGraph lacks a valid Gate set;  
+* the Channel catalog is incomplete or mismatched;  
+* the mechanics configuration is invalid;  
+* the config or Channel hash does not match the manifest;  
+* the active config is ambiguous;  
+* any signal or category is missing or duplicated;  
+* any arithmetic invariant fails;  
+* a legacy ID-only call attempts to invoke intrinsic scoring without resolvable BodyGraphs.
+
+Never fall back to a request-time vendor call, temporary UUID5 alias conversion, UID hashing, Type-pair harmony, zero-filled missing signals, a previous config selected implicitly, or a partial ten-category result.
+
+A valid byte-identical self-pair is not a failure. It returns the deterministic ineligible Reader success and never reaches the scorer, intrinsic cache, or narrative router.
+
+---
+
+### **Work-slice and dependency map**
+
+| Work slice ID | Lane | Purpose | Dependency producer and exact output consumed | Outputs | Owner | Completion predicate |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| `M10-WS01` | Product decision — completed | Establish the exact production mechanics, resolve the PF09.3 version conflict for implementation scope, and authorize every bounded 36/90 row | Accepted v0.18 source, approving review, and exact sources in the governing-source map | `M10-CANON-001`, embodied by this PF10 §2.20 replacement, with every formula, map, source-version decision, route, boundary, and nonclaim adopted | Product Owner with Human Design Math Expert recommendation | **Satisfied:** authorization recorded at `2026-08-24T18:04:49Z`; no open-ended research or further mechanics approval remains |
+| `M10-WS02` | Documentation/status drainage only | Drain adopted decisions into PF01, PF12, PF14, PF02, and PF05 | `M10-WS01` is satisfied by `M10-CANON-001` | Authorized Doc Deltas at exact Canon paths | Authorized Canon editor | Drain accurately reflects adopted truth; this slice is not an implementation, approval, QA, OPS, completion, or closeout prerequisite |
+| `M10-WS03` | PR implementation | Correct Channel artifacts and add mechanics/result schemas, immutable config loading, Gate normalization, and config comparison | `M10-CANON-001` is established; no permanent-canon drainage dependency | Exact files named in the repository plan for `HDE-SEPA005.1` through `.5` | Implementation Agent | Strict loaders accept the adopted bundle, reject every governed mutation, normalize Gates exactly, and comparison cannot activate production |
+| `M10-WS04` | PR implementation | Build the five-state kernel, twenty signals, caps operation, and ten reducers | `M10-WS03` produces the exact validated typed bundle, corrected 36-Channel catalog, and Gate normalizer | Pure composite, signal, caps, reducer, and `magic10_result.v1` code plus unit goldens | Implementation Agent | All five states, 36 Channels, 20 signals, ten categories, caps, and fixed-point formulas pass exact tests |
+| `M10-WS05` | PR implementation | Replace the precomputed core contract and migrate every pre-admin scoring consumer | `M10-WS04` produces the pure `magic10_result.v1` calculation; `M10-WS03` produces Gate ingress and typed config injection | Engine Core, narrative routing, compat, CLI, internal HTTP, Reader POST/projection, presenters, migrated generators, and no-legacy guards | Implementation Agent | Every named consumer uses one result; UID hashing, Type-only harmony, numeric-Gate compromise, and independent rescoring are unreachable from production |
+| `M10-WS06` | PR implementation | Bind all mechanics artifacts into the current release pack without mutating historical evidence | `M10-WS03` produces final catalog/config/schema bytes; `M10-WS05` produces final integrated code/result contracts; `M10-CANON-001` supplies `adopted_at_utc` | Canonical `catalog/manifest.json` v1.1.0, current-manifest-only checks, and exact-source external attestation under canonical `HDE-DIST008.2` and `.3` | Implementation Agent | Manifest-only checks pass; `M10_CURRENT_RELEASE_ATTESTATION_MATCH` holds; no frozen HDE-DIST002, Index/Mirror, or release-binding artifact changes |
+| `M10-WS07` | PR implementation | Add the new full-domain mechanics gate | `M10-WS05` produces integrated surfaces; `M10-WS06` produces the manifest-bound release candidate | Runnable `HDE-DIST008.1` gate and deterministic artifacts | Implementation Agent | Core, compat, CLI, internal HTTP, Reader v1, result schemas, preimage, cache identity, and all failure tokens satisfy every proof obligation |
+| `M10-WS08` | PR implementation | Add performance and load coverage | `M10-WS05` produces the integrated compute path; `M10-WS06` produces the bound release candidate | `HDE-DIST004.1` through `.4` profiles, metrics, CI jobs, and indexed outputs | Implementation Agent | Each existing Distillation performance subtask meets its own completion predicate |
+| `M10-WS09` | PR implementation | Compose and expose complete admin QA surfaces | `M10-WS07` produces domain-correct integrated output; `M10-WS08` produces accepted performance profiles | `HDE-COAG006.4`, `.1`, `.2`, `.3`, and `.5` builder, CLI, HTTP/GUI, parity, and access-control outputs | Implementation Agent | Admin surfaces compose `magic10_compat_result.v1` without calculating it and satisfy existing Coagulation contracts |
+| `M10-WS10` | PR implementation | Add final release preflight and active-config cutover guard | `M10-WS06` produces release identity; `M10-WS07` produces domain gate; `M10-WS09` produces final admin candidate | `HDE-COAG003.2` preflight plus canonical `HDE-COAG003.6` one-active-config/no-fallback guard | Implementation Agent | The final repository candidate passes preflight and rollback-pack compatibility without deployment |
+| `M10-WS11` | QA planning | Define full-product proof over the final guard-enabled candidate | `M10-WS10` produces the immutable final PR candidate and exact release identity | Approved Live QA Plan with exact check IDs and epic-scoped evidence root | QA owner | Plan covers five states, 36 Channels, 20 signals, ten categories, every surface, release binding, Reader v1, failure tokens, and rollback readiness |
+| `M10-WS12` | QA execution | Prove deterministic full-product behavior | `M10-WS11` produces the approved plan; `M10-WS10` produces the unchanged candidate under test | Governed QA evidence and verdict | QA owner | The owning QA process issues the verdict on the final candidate; this plan does not preclaim PASS |
+| `M10-WS13` | OPS | Establish Gate-ready current BodyGraphs, deploy, run bounded smoke, and conditionally roll back | `M10-WS12` produces QA evidence and a verdict on the unchanged candidate; `M10-WS10` produces the verified rollback-compatible release pack; `M10-WS03` produces the tested read-only Gate-readiness command; the Product Owner-approved Ops Task Record or equivalent explicit release authorization separately authorizes any exact-row refresh and deployment | Value-minimized readiness evidence, any authorized exact-row refresh evidence, and secret-safe deployment/smoke/conditional rollback evidence at exact paths named by the approved Ops Task Record | Product Owner or explicitly delegated operator with Implementation Agent guidance | The Ops Task Record resolves its readiness, success, or rollback condition; this plan does not preclaim acceptance, authorization, data posture, or outcome |
+| `M10-WS14` | Documentation/status drainage only | Align PF17, PF18, PF29, PF09 statuses, and user-facing documentation to verified shipped truth | `M10-WS12` provides QA truth; `M10-WS13` provides OPS truth when shipment occurs | Separately authorized drainage records | Human Design Math Expert and documentation owner | Documentation and status accurately reflect available evidence; undrained documentation is not an implementation-completion, QA, OPS, or epic-close blocker |
+
+No work slice is assigned to an imaginary research role. The Human Design Math Expert supplied the formula and row-level mechanics incorporated here. The Product Owner has decided through `M10-CANON-001`. The Implementation Agent builds. QA proves. OPS performs only separately authorized external actions.
+
+---
+
+### **HDE phased accountability and canonical PF09 task requirements**
+
+PF09 is build-only. It does not own the formula, Product decision, or Canon language. `M10-CANON-001` is satisfied, so build work must treat the complete formula and every task definition below as adopted. Later permanent-canon or PF09-file drainage is not an implementation, approval, completion, QA, OPS, acceptance, or closure gate.
+
+The IDs, headings, outputs, dependencies, and completion predicates below are canonical task requirements now and are collision-checked against the inspected PF09 versions. This addendum does not claim that the rows have already been inserted into permanent PF09 files or assigned lifecycle statuses, board epic IDs, or assignees. The owning process must drain these exact definitions without reopening their substance and must assign only real status and ownership evidence. Implementation is authorized by this PF10 addendum and is not blocked on clerical PF09 drainage.
+
+| Work item ID | PF09 disposition | Phased PF09 document | Task ID | Subtask ID | Exact canonical or existing heading | Contribution | Lifecycle nonclaim |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| `M10-PF09-01` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | None exists | Production Magic10 mechanics configuration contract | Parent for the exact Separation code, config, tooling, tests, and evidence rows below | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-02` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.1` | Corrected canonical 36-Channel catalog | Produces corrected machine bytes and catalog goldens | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-03` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.2` | Magic10 mechanics schema and default configuration | Produces the strict schema and complete adopted config | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-04` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.3` | Fail-closed mechanics configuration loader | Produces the only runtime config loader and closure validation | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-05` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.4` | Mechanics configuration identity and deterministic comparison | Produces config hashes and nonactivating config-diff tooling as release inputs | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-06` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.5` | Separation implementation tests and governed artifacts | Produces schema mutations, byte checks, closure tests, the read-only Gate-readiness command, and indexed evidence | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-07` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | None exists | Full Magic10 deterministic scoring integration | Parent for the exact Conjunction implementation rows below | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-08` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.1` | Five-state 36-Channel composite kernel | Produces the pure symmetric state vector | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-09` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.2` | Twenty governed signal producers | Produces eighteen ordinary and two Balance signals | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-10` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.3` | Ten-category Magic10 calculation | Produces reducers, clamp, bands, and canonical order | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-11` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.4` | Engine Core and pre-admin surface integration | Integrates Engine Core, compat, CLI, internal HTTP, public projection, and presenter | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-12` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.5` | Transitional scorer removal and fail-closed migration | Removes hash and Type-only scoring authority without fallback | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-13` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.6` | Integration goldens and parity | Produces full-matrix deterministic integration tests | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-14` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | None exists | Full-domain Magic10 verification and current release binding | New collision-free parent because `HDE-DIST001` and `HDE-DIST002` are Done and must not be reopened implicitly | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-14.1` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.1` | Complete deterministic Magic10 mechanics gate | Adds the full non-admin proof family without placing incomplete work under a Done parent | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-15` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.2` | Magic10 current manifest cut and validation | Adds/refreshes exact current manifest membership, fixes v1.1.0 metadata from the adoption record, and runs only current-manifest checks | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced; HDE-DIST002 remains historical |
+| `M10-PF09-16` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.3` | Magic10 exact-source external release attestation | Produces and verifies current release provenance outside the source tree and enforces `M10_CURRENT_RELEASE_ATTESTATION_MATCH` | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced; no global token or Index/Mirror claim is created |
+| `M10-PF09-20` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` existing | `HDE-DIST004.1` existing | Profiles & run shapes | Adds core and compat run shapes for the complete mechanic | Existing Not done status is not moved by this plan |
+| `M10-PF09-21` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` existing | `HDE-DIST004.2` existing | Metrics & SLO probes | Measures the integrated Magic10 path under existing SLO ownership | Existing Not done status is not moved by this plan |
+| `M10-PF09-22` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` existing | `HDE-DIST004.3` existing | Bench CI jobs | Adds the new mechanics profiles to existing performance CI | Existing Not done status is not moved by this plan |
+| `M10-PF09-23` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` existing | `HDE-DIST004.4` existing | Performance harness indexing | Indexes the governed performance outputs | Existing Not done status is not moved by this plan |
+| `M10-PF09-24` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | None exists | Admin QA surfaces (full product payload, GUI \+ CLI) | Existing parent shown for context; controlling accountability is the five subtask rows below | Existing Not done status is not moved by this plan |
+| `M10-PF09-25` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | `HDE-COAG006.4` existing | Internal admin bundle builder (composition only) | Composes the complete canonical Magic10 result without rescoring | Existing status is not moved by this plan |
+| `M10-PF09-26` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | `HDE-COAG006.1` existing | CLI full product bundle (any terminal to Railway) | Exposes the complete admin bundle through the existing CLI posture | Existing status is not moved by this plan |
+| `M10-PF09-27` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | `HDE-COAG006.2` existing | HTTP admin bundle route and GUI harness | Exposes the complete bundle through authenticated HTTP/GUI QA | Existing status is not moved by this plan |
+| `M10-PF09-28` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | `HDE-COAG006.3` existing | CLI versus HTTP admin bundle parity | Proves both admin surfaces use the same canonical result | Existing status is not moved by this plan |
+| `M10-PF09-29` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` existing | `HDE-COAG006.5` existing | Admin surfaces authentication, audit logging, and rotation rails | Preserves internal access, secret safety, and audit posture | Existing status is not moved by this plan |
+| `M10-PF09-30` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.1` existing | Build/Verify/Release/Rollback & incident runbooks | Adds Magic10 release and rollback steps to the existing runbook owner | Existing status is not moved by this plan |
+| `M10-PF09-31` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.2` existing | Pre-flight CI jobs | Runs release identity, config closure, and rollback compatibility guards | Existing status is not moved by this plan |
+| `M10-PF09-32` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.5` existing | Post-deploy smoke harness & indexing | Owns the bounded deployed smoke and its indexed evidence | Existing status is not moved by this plan |
+| `M10-PF09-33` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.6` | Magic10 active-config cutover guard | Adds the unique one-active-config and no-legacy-fallback guard; it does not re-own runbooks, preflight, smoke, or general rollback | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-PF09-34` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.7` | Authorized Magic10 deployment, smoke execution, and conditional rollback | Carries the privileged execution outcome under a separately approved Ops Task Record without re-owning the `.1` runbook or `.5` smoke harness | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced and no OPS action is authorized |
+| `M10-PF09-35` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` existing | `HDE-COAG003.8` | Magic10 BodyGraph Gate-readiness and authorized refresh | Runs the read-only current-row inventory and, only when separately authorized, refreshes exact incomplete rows through the sanctioned chart-write seam before activation | Canonical in PF10; permanent PF09 register insertion/lifecycle status, data state, and OPS execution are not evidenced |
+
+#### **Exhaustive work-slice PF09 accountability**
+
+This matrix resolves every task-like work slice and separately owned decision, QA, OPS, verification, and drainage item. Where one work slice spans several relevant subtasks, it is split into separate accountability rows rather than mapped only to a parent.
+
+| Work item ID | PF09 disposition | Phased PF09 document | Task ID | Subtask ID | Exact source heading | Contribution | Status nonclaim |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| `M10-WS01` | out of HDE phased-build scope | N/A | N/A | N/A | Product Owner mechanics adoption | Resolves source-version conflict and adopts or replaces every 36/90 row and formula term | Does not create or move PF09 status |
+| `M10-WS03.1` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.1` | Corrected canonical 36-Channel catalog | Owns scoring-relevant Channel facts/schema while preserving existing non-scoring bundle metadata | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS03.2` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.2` | Magic10 mechanics schema and default configuration | Owns config, result schemas, caps closure, and source hashes | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS03.3` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.3` | Fail-closed mechanics configuration loader | Owns immutable typed loading and Gate normalization | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS03.4` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.4` | Mechanics configuration identity and deterministic comparison | Owns nonactivating complete-bundle comparison | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS03.5` | PF09 gap | PF09.3-Canon-HDE-Build-Checklist-Separation | `HDE-SEPA005` | `HDE-SEPA005.5` | Separation implementation tests and governed artifacts | Owns mutation, ingress, closure, Gate-readiness command, and evidence tests | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS04.1` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.1` | Five-state 36-Channel composite kernel | Owns the pure symmetric state vector | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS04.2` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.2` | Twenty governed signal producers | Owns all ordinary and Balance producers | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS04.3` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.3` | Ten-category Magic10 calculation | Owns caps, reducer, banding, and pure result | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS05.1` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.4` | Engine Core and pre-admin surface integration | Owns core-contract and direct-consumer migration | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS05.2` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.5` | Transitional scorer removal and fail-closed migration | Owns no-fallback and historical-helper guards | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS05.3` | PF09 gap | PF09.4-Canon-HDE-Build-Checklist-Conjunction | `HDE-CONJ010` | `HDE-CONJ010.6` | Integration goldens and parity | Owns cross-surface, identity, result, and failure-contract tests | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS06.1` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.2` | Magic10 current manifest cut and validation | Owns v1.1.0 manifest membership, deterministic adoption timestamp, manifest-only validation, and historical-artifact no-change proof | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS06.2` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.3` | Magic10 exact-source external release attestation | Owns the external clean-source attestation, verification, exact field predicate, and non-indexed PR evidence | Canonical in PF10; permanent PF09 register insertion/lifecycle status and any global token claim are not evidenced |
+| `M10-WS07` | PF09 gap | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST008` | `HDE-DIST008.1` | Complete deterministic Magic10 mechanics gate | Owns the new full-domain proof family | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS08.1` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` | `HDE-DIST004.1` | Profiles & run shapes | Owns performance shapes | Does not move existing PF09 status |
+| `M10-WS08.2` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` | `HDE-DIST004.2` | Metrics & SLO probes | Owns metrics and SLO probes | Does not move existing PF09 status |
+| `M10-WS08.3` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` | `HDE-DIST004.3` | Bench CI jobs | Owns performance CI | Does not move existing PF09 status |
+| `M10-WS08.4` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.6-Canon-HDE-Build-Checklist-Distillation | `HDE-DIST004` | `HDE-DIST004.4` | Performance harness indexing | Owns performance indexing | Does not move existing PF09 status |
+| `M10-WS09.1` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` | `HDE-COAG006.4` | Internal admin bundle builder (composition only) | Owns complete-result composition | Does not move existing PF09 status |
+| `M10-WS09.2` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` | `HDE-COAG006.1` | CLI full product bundle (any terminal to Railway) | Owns CLI admin output | Does not move existing PF09 status |
+| `M10-WS09.3` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` | `HDE-COAG006.2` | HTTP admin bundle route and GUI harness | Owns HTTP/GUI admin output | Does not move existing PF09 status |
+| `M10-WS09.4` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` | `HDE-COAG006.3` | CLI versus HTTP admin bundle parity | Owns admin parity | Does not move existing PF09 status |
+| `M10-WS09.5` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG006` | `HDE-COAG006.5` | Admin surfaces authentication, audit logging, and rotation rails | Owns admin access controls | Does not move existing PF09 status |
+| `M10-WS10.1` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.2` | Pre-flight CI jobs | Owns existing release preflight | Does not move existing PF09 status |
+| `M10-WS10.2` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.6` | Magic10 active-config cutover guard | Owns only one-config/no-fallback proof | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced |
+| `M10-WS11` | out of HDE phased-build scope | N/A | N/A | N/A | Live QA Plan creation and approval | Plans proof for the final candidate under the PF27 QA template | Does not create or move PF09 status |
+| `M10-WS12` | out of HDE phased-build scope | N/A | N/A | N/A | Live QA execution and verdict | Executes only the separately approved QA plan | Does not create or move PF09 status |
+| `M10-WS13.1` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.1` | Build/Verify/Release/Rollback & incident runbooks | Owns the runnable release/rollback procedure | Does not move existing PF09 status |
+| `M10-WS13.2` | out of the current epic with exact phased PF09 task or subtask mapping | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.5` | Post-deploy smoke harness & indexing | Owns deployed smoke tooling/evidence | Does not move existing PF09 status |
+| `M10-WS13.PREP` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.8` | Magic10 BodyGraph Gate-readiness and authorized refresh | Owns readiness inventory and exact-row refresh outcome under the approved Ops Task Record | Canonical in PF10; permanent PF09 register insertion/lifecycle status, data state, and OPS execution are not evidenced |
+| `M10-WS13.OPS` | PF09 gap | PF09.7-Canon-HDE-Build-Checklist-Coagulation | `HDE-COAG003` | `HDE-COAG003.7` | Authorized Magic10 deployment, smoke execution, and conditional rollback | PF09 carries the privileged execution outcome; the separately approved Ops Task Record supplies exact authorization, commands, targets, stop conditions, and evidence paths | Canonical in PF10; permanent PF09 register insertion and lifecycle status are not yet evidenced and no OPS action is authorized or claimed |
+| `M10-WS14` | documentation/status drainage only | N/A | N/A | N/A | PF17/PF18/PF29/PF09 later drainage | Records verified shipped and status truth without blocking close | Does not create or move PF09 status |
+
+#### **Canonical `HDE-SEPA005` subtasks**
+
+| Canonical subtask | Heading | Implementable output |
+| :---- | :---- | :---- |
+| `HDE-SEPA005.1` | Corrected canonical 36-Channel catalog | Correct all circuit/substream rows, ascending Gate pairs, Center-set projection, schema, and row order while preserving non-scoring Product metadata and existing FE/BE bundle compatibility |
+| `HDE-SEPA005.2` | Magic10 mechanics schema and default configuration | Complete twenty-signal map, response profiles, Balance operations, caps closure, source hashes, result schemas, and strict configuration schema |
+| `HDE-SEPA005.3` | Fail-closed mechanics configuration loader | One immutable typed bundle loaded outside Engine Core, exact source/hash closure, Gate normalizer, result-schema validation, and one active config per release |
+| `HDE-SEPA005.4` | Mechanics configuration identity and deterministic comparison | Canonical configuration and source-bundle hashes, exact golden-output diff, and an explicit guarantee that comparison cannot change active production configuration |
+| `HDE-SEPA005.5` | Separation implementation tests and governed artifacts | Schema mutation matrix, Gate-ingress rejection, canonical-byte checks, catalog/caps/threshold closure, read-only current-row Gate-readiness command, and indexed evidence |
+
+#### **Canonical `HDE-CONJ010` subtasks**
+
+| Canonical subtask | Heading | Implementable output |
+| :---- | :---- | :---- |
+| `HDE-CONJ010.1` | Five-state 36-Channel composite kernel | One pure state vector with symmetric owner provenance |
+| `HDE-CONJ010.2` | Twenty governed signal producers | Eighteen weighted-state signals and two Balance operations |
+| `HDE-CONJ010.3` | Ten-category Magic10 calculation | Caps-before-reduction, exact reducer, half-up arithmetic, clamp invariant, bands, canonical order, and `magic10_result.v1` |
+| `HDE-CONJ010.4` | Engine Core and pre-admin surface integration | Replace precomputed-score input; migrate compat, CLI, internal HTTP, production Reader POST/projection, narrative routing, presenter, and current generators to one result |
+| `HDE-CONJ010.5` | Transitional scorer removal and fail-closed migration | UID hash and Type-only authority removed; historical numeric-Gate helper guarded from production; no silent fallback or runtime selector |
+| `HDE-CONJ010.6` | Integration goldens and parity | Full matrix, AB/BA, two-run, pair/cache identity, UID independence, result schemas, Reader projection, failure tokens, and internal parity |
+
+#### **Canonical `HDE-DIST008` task**
+
+`HDE-DIST008 — Full-domain Magic10 verification and current release binding` is the canonical next collision-free Distillation parent at the inspected repository ref. It is established here instead of adding children to Done tasks `HDE-DIST001` or `HDE-DIST002`. Its three canonical subtasks own new Magic10 proof, current manifest work, and current external-attestation work without reopening, regenerating, or relabeling either historical task family.
+
+`HDE-DIST008.1 — Complete deterministic Magic10 mechanics gate` has these proof obligations:
+
+* complete five-state truth table over endpoint ownership patterns;  
+* all 36 Channels exercised in every reachable state;  
+* every default Channel-to-signal row exercised;  
+* Gate normalization accepts only the exact canonical domain and rejects missing, empty, duplicate, malformed, and out-of-range inputs;  
+* all twenty signals at zero, maximum, midpoint, and half-up boundaries;  
+* both Balance operations under symmetric, one-sided, empty, and mixed ownership;  
+* caps-before-reduction and all ten category reducers at every band edge;  
+* complete-matrix atomicity;  
+* AB/BA identity;  
+* two-run identity;  
+* valid identical self-pair short-circuit with `eligible:false`, `categories:[]`, no Engine Core call, no narrative call, no cache access, and no `pair_key`;  
+* same canonical identity with unequal normalized projections rejected as `ERR_READER_INVALID_CHART`;  
+* distinct-person equal-mask intrinsic identity, including equal chart fingerprints and one identity-free `pair_key`;  
+* deterministic equal-mask personal-key orientation by ASCII canonical UUID tie-break, with AB/BA byte identity;  
+* independent public Reader idempotence over the five-key Reader preimage, including proof that a self-pair and an eligible distinct-person equal-mask pair cannot share public bytes or `idempotence_hash` under the same `meta` and `release_id`;  
+* exact pair-preimage, cache-key, config, release, and result-schema identity;  
+* config mutation rejection;  
+* manifest and release-binding rejection;  
+* CLI, internal HTTP, compat, and Reader-projection parity;  
+* absence of UID hashing and Type-only fallback;  
+* production no-import/no-symbol-use proof for the historical numeric-Gate compromise helper;  
+* exact PF05 error token and HTTP mapping for every fail-closed condition;  
+* `magic10_result.v1`, `magic10_compat_result.v1`, and corrected `reader.v1` schema closure;  
+* numeric-free public Reader proof;  
+* exact `M10-G007` and `M10-G008` identity-boundary goldens.
+
+`HDE-DIST008.2 — Magic10 current manifest cut and validation` has these implementable outputs and completion predicates:
+
+* after implementation, update only the current tracked `catalog/manifest.json` through `python scripts/cut_release_manifest.py --version 1.1.0 --built-at-utc 2026-08-24T18:04:49Z`;  
+* use the recorded `M10-CANON-001.adopted_at_utc` value `2026-08-24T18:04:49Z`, never the local execution clock;  
+* require the exact ASCII-sorted, duplicate-free release roster in this plan, including every Magic10 catalog, schema, scoring owner, resolver, surface, and governed-error file;  
+* validate the unchanged candidate with `python scripts/release_id_recompute.py --check-manifest-only` and `bash ci/checks/check_release_identity.sh`;  
+* prove that no checked-in historical release-ID, checksum, Index/Mirror, or BodyGraph release-binding artifact changed;  
+* produce no claim that `HDE-DIST002`, any `HDE-DIST002.*` subtask, or `RELEASE_ID_RECOMPUTE_OK` was rerun or re-earned.
+
+`HDE-DIST008.3 — Magic10 exact-source external release attestation` has these implementable outputs and completion predicates:
+
+* begin only from the clean, committed, unchanged candidate that passed `HDE-DIST008.2`;  
+* allocate a new empty evidence directory outside the source tree and run `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`;  
+* verify the completed bundle independently with `python tools/evidence/build_release_attestation.py --verify <external-directory> --require-clean`;  
+* require schema `hde.release_attestation.v1`, `source_commit_exact == true`, `validation_result == "PASS"`, `release_id == manifest_sha256`, `release_admission == "PR06R_B_FINAL_PASS"`, `pipeline_stop == null`, and equality of the verified source commit and source-tree digest to the unchanged candidate;  
+* require valid bundle checksum, external inventory, transcript binding, secret-safety checks, and final sanity tail;  
+* satisfy the plan-local condition `M10_CURRENT_RELEASE_ATTESTATION_MATCH`; this condition is not a global token and does not redefine or emit `RELEASE_ID_RECOMPUTE_OK`;  
+* attach the bundle only as external implementation-review evidence; do not copy it into the repository, add it to the Human Index or Machine Mirror, list it in `catalog/manifest.json`, or alter any frozen historical artifact.
+
+#### **Canonical `HDE-COAG003` additions**
+
+| Canonical subtask | Heading | Implementable output |
+| :---- | :---- | :---- |
+| `HDE-COAG003.6` | Magic10 active-config cutover guard | One-active-config, no-fallback, release-pack, and rollback-pack preflight over the final candidate |
+| `HDE-COAG003.7` | Authorized Magic10 deployment, smoke execution, and conditional rollback | Privileged execution and exact outcome evidence under a separately approved Ops Task Record, consuming the existing `.1` runbook and `.5` smoke harness without duplicating them |
+| `HDE-COAG003.8` | Magic10 BodyGraph Gate-readiness and authorized refresh | Read-only current-`hdapi` Gate inventory, exact eligibility decision, and separately authorized refresh of only named incomplete UUID rows before Reader activation |
+
+#### **Phase packaging**
+
+Use linked phase epics rather than pretending one epic can simultaneously be Separation, Conjunction, Distillation, and Coagulation. The owning board process assigns epic IDs. The dependency order is:
+
+`M10-CANON-001 satisfied -> Separation config -> Conjunction core and integration -> Distillation proof and performance -> Coagulation admin and cutover -> documentation drainage`.
+
+No Fermentation task is authorized before real post-release user feedback exists. Future feedback may justify a bounded adjustment request, but it cannot retroactively block this complete v1 implementation.
+
+---
+
+### **Implementation-producing verification only**
+
+There is no open-ended research phase.
+
+The only remaining analysis or verification work is bounded and must directly produce or validate implementation artifacts with these exact properties:
+
+| Verification item | Owner | Required output | Stop condition | Implementation dependency |
+| :---- | :---- | :---- | :---- | :---- |
+| Check each of the 36 Channel endpoint/name/theme rows against PF08 and PF11 | Human Design Math Expert | Exact corrected `catalog/channels_v1.json` rows and corresponding schema/golden deltas | All 36 implementation rows resolve to canonical source facts | Required before config bytes are frozen |
+| Verify that the default config encodes all 90 already-adopted Channel-to-signal rows exactly | Implementation Agent with Human Design Math Expert verification | Byte-exact `catalog/magic10_mechanics_v1.json` mapping plus closure and golden tests | All 90 canonical rows match this addendum with no omission, duplication, or reinterpretation | Required before default config bytes are frozen |
+| Revalidate repository loci at implementation start | Implementation Agent | Exact path map in the implementation PR | Every edited locus confirmed or safely relocated in an existing home | Required before code edits |
+| Compare an intentional future numeric tuning change | Implementation Agent and Product Owner | Schema-valid candidate config and deterministic fixture delta | Invariants close and PO adopts or rejects | Optional after the baseline works; never a blocker for v1 |
+
+Prohibited substitutes include a literature survey without a target implementation row, compatibility-score benchmarking against subjective outcomes, a fixed sample, a holdout, a candidate tournament, and a report that ends without exact config, code, test, schema, or permanent-canon output.
+
+---
+
+### **Lane separation and authorization**
+
+#### **PR implementation**
+
+Repository changes only. Each PR must identify the exact Canon authority it implements, the configuration ID, reviewable outputs, tests, and safe reversion posture. PF-Canon edits require exact separate authorization and must not be mixed into an implementation PR unless the owning process explicitly permits it.
+
+#### **OPS**
+
+No OPS action is needed to design or implement the formula. OPS is relevant only for separately authorized deployed verification, config cutover, runtime observation, or rollback. Secrets, credentials, production mutation, and live service access remain outside ordinary PR work.
+
+#### **QA planning**
+
+QA planning must cover the full domain-correctness map. A harmony-only proof, a reducer-only unit test, or a static artifact check cannot establish complete Magic10 correctness.
+
+#### **QA execution**
+
+QA execution belongs to an approved Live QA Plan and produces its own PASS, FAIL, or blocked result. This implementation plan does not issue that verdict.
+
+---
+
+### **Conditional data, privacy, security, migration, rollout, and rollback fields**
+
+#### **Data and persistence**
+
+* **Requirement:** No new personal data is required. Magic10 is computed from the two BodyGraph Gate sets already needed for chart mechanics. Persisted or cached results, if used, bind to both normalized chart fingerprints, `config_id`, `release_id`, and result-schema identity.  
+* **Owner:** Implementation Agent under the adopted PF12 artifact contract.  
+* **Validation and evidence intent:** `tests/config/test_magic10_mechanics_config.py`, `tests/m10/test_magic10_goldens.py`, `tests/bodygraph/test_current_bodygraph_resolver.py`, `tests/bodygraph/test_magic10_gate_readiness.py`, and the exact cache-isolation assertion in `tests/compat/test_magic10_intrinsic_parity.py` prove current-row resolution, value-minimized readiness, and that a result from one configuration or release cannot be served as another.  
+* **Failure boundary:** Reject stale, partial, unbound, or mismatched cached results. Recompute only from valid full Gate inputs and the one active release-bound configuration.  
+* **Nonclaim:** This addendum requires no SQL-column or view migration and does not prove that any cache or persisted BodyGraph payload has changed. A Gate-complete payload refresh, if the readiness inventory finds incomplete current rows, is separately authorized OPS under canonical `HDE-COAG003.8`.
+
+#### **Privacy and sensitive-data boundary**
+
+* **Requirement:** Intrinsic scoring excludes names, emails, account IDs, free text, relationship history, and viewer preferences. Tests use synthetic Gate sets. Logs and evidence contain configuration identity plus synthetic or redacted chart fingerprints, not unnecessary personal payloads.  
+* **Owner:** Implementation Agent for code and fixtures; QA owner for evidence handling.  
+* **Validation and evidence intent:** `tests/compat/test_magic10_intrinsic_parity.py` proves UID independence and inspects diagnostic serialization for prohibited identity fields. The future Live QA Plan must name the exact epic-scoped privacy-evidence path before QA execution.  
+* **Failure boundary:** A diagnostic, log, or evidence artifact containing unnecessary personal payloads is rejected and redacted before it may enter governed evidence.  
+* **Nonclaim:** This addendum does not constitute a privacy audit and makes no claim about existing production logs.
+
+#### **Security and authorization**
+
+* **Requirement:** Public Reader exposes only authorized projection fields and remains behind Glow's existing application/network boundary; this plan creates no direct-internet mechanics service. Full signals, state provenance, and numeric scores remain internal/admin unless PF05 and the public schema explicitly authorize them. Tuning and active-config selection are build/release operations, never request parameters or public endpoints.  
+* **Owner:** Implementation Agent for surface controls; existing `HDE-COAG006.5` for admin authentication, audit logging, and rotation rails; Product Owner for any later public-contract change.  
+* **Validation and evidence intent:** `tests/compat/test_magic10_intrinsic_parity.py` and `tests/adapter/test_http_reader_magic10.py` prove the numeric-free Reader projection, exact UUID contract, no request-time vendor fallback, and no-detail public errors. The `HDE-COAG006` Epic Plan and approved Live QA Plan must assign exact test and evidence paths for admin authentication, denied access, audit events, and secret-safe handling before those tasks execute.  
+* **Failure boundary:** Block public numeric or diagnostic fields, reject unauthenticated admin access, and prevent active-config mutation through request handling.  
+* **Nonclaim:** This addendum does not prove the current admin surfaces or authentication deployment complete.
+
+#### **Migration and compatibility**
+
+* **Requirement:** Perform one atomic release cut containing the normalized Gate ingress, immutable mechanics bundle, pure Engine Core path, complete result schemas, every migrated caller, corrected Reader v1 schema and route, manifest identity, tests, and no-legacy guards. There is no runtime feature flag, activation setting, alternate config selector, request-selected config, or shadow public result.  
+* **Owner:** Implementation Agent for repository migration; QA owner for acceptance evidence.  
+* **Validation and evidence intent:** `tests/compat/test_magic10_intrinsic_parity.py`, `tests/compat/test_magic10_identity_boundaries.py`, and `tests/m10/test_magic10_goldens.py` prove canonical routing, self-pair refusal to score, distinct-person equal-mask orientation, intrinsic UID independence, independent Reader idempotence, and complete-matrix identity. `python scripts/release_id_recompute.py --check-manifest-only`, `bash ci/checks/check_release_identity.sh`, and `tests/tools/test_magic10_release_attestation_contract.py` prove current manifest and external-attestation coupling without touching historical evidence. The approved Live QA Plan must name the exact open-rails compatibility evidence path.  
+* **Failure boundary:** Any unresolved legacy caller, partial pair input, incomplete eligible current BodyGraph, stale result, config ambiguity, or release mismatch blocks activation. No resolver, vendor, or scorer fallback is permitted.  
+* **Nonclaim:** The migration sequence below is canonical work; no caller cutover, cache invalidation, or production activation is claimed.
+
+The fail-closed sequence is:
+
+1. implement and test the complete new path without activating a second runtime selector;  
+2. migrate every scoring caller and current evidence generator to the same injected Engine Core result;  
+3. correct both the success row and the four-field error branch of `schemas/reader.v1.schema.json`, prove parity with `adapter/schemas/error_v1.schema.json`, and implement the production Reader POST route in the same release candidate;  
+4. remove reachable hash and Type-only fallback authority and add symbol/import guards;  
+5. cut one current manifest-bound candidate containing mutually compatible code, catalogs, caps, thresholds, schemas, and configuration; run manifest-only validation; then build and verify its exact-source evidence in a new external directory under canonical `HDE-DIST008.2` and `.3`, without regenerating checked-in historical evidence;  
+6. run the read-only current-BodyGraph Gate-readiness inventory; if any eligible row is incomplete, keep Reader activation blocked until the approved `HDE-COAG003.8` Ops Task Record creates and verifies a Gate-complete current row;  
+7. reject stale cached results with mismatched pair, config, release, or result-schema identity;  
+8. use the complete prior release as the only rollback target.
+
+No shadow result may silently reach public output.
+
+#### **Rollout or release posture**
+
+* **Requirement:** Release only the atomic, manifest-bound candidate after implementation and the final guard-enabled candidate complete QA. No runtime configuration selector or partial artifact cutover is permitted.  
+* **Owner:** Product Owner authorizes release; Implementation Agent owns PR preflight; QA owner controls the acceptance verdict; the explicitly delegated operator owns only the approved Ops Task Record.  
+* **Validation and evidence intent:** The required chain is the adopted `catalog/manifest.json`; `python scripts/release_id_recompute.py --check-manifest-only`; `bash ci/checks/check_release_identity.sh`; the verified external `hde.release_attestation.v1` directory produced and verified by `tools/evidence/build_release_attestation.py`; the approved Live QA Plan's exact evidence root; and the later Ops Task Record's exact evidence paths. `tests/tools/test_magic10_release_attestation_contract.py` proves the plan-specific predicates. Generic labels are not evidence paths, and the completed `HDE-DIST002` evidence family is not part of the current chain.  
+* **Failure boundary:** Release is blocked if Canon adoption, one-active-config closure, manifest identity, deterministic QA, required open-rails verification, rollback compatibility, or no-fallback proof is absent.  
+* **Nonclaim:** This addendum authorizes the canonical mechanics and build program; it does not itself authorize deployment, smoke, rollback, status movement, or release execution.
+
+Rollout requires:
+
+* satisfied `M10-CANON-001` Product Owner adoption, including the exact PF01/PF12 Doc Deltas scheduled for later nonblocking drainage;  
+* one active validated config;  
+* complete current manifest and release identity;  
+* satisfied plan-local `M10_CURRENT_RELEASE_ATTESTATION_MATCH`, with the external bundle bound to the unchanged final candidate and no mutation or relabeling of historical `HDE-DIST002` evidence;  
+* Gate-ready current `hdapi` BodyGraph rows for the explicitly eligible production population, or a fail-closed Product-approved eligibility boundary that excludes unresolved/incomplete rows without fallback;  
+* accepted closed-rails deterministic QA;  
+* bounded open-rails verification on the actual production-relevant compat/Reader path or an explicit authorized exemption;  
+* internal/admin verification of all ten categories;  
+* prior complete release selected as rollback target;  
+* explicit confirmation that no legacy fallback can activate.
+
+#### **Rollback or safe refusal**
+
+* **Requirement:** Rollback restores one complete prior release containing mutually compatible code, catalog, config, schema, and manifest bytes. If that complete target is unavailable, the service refuses the affected calculation rather than mixing versions or reinstating UID hashing.  
+* **Owner:** Product Owner or explicitly delegated operator under an approved Ops Task Record, with Implementation Agent guidance.  
+* **Validation and evidence intent:** The future Ops Task Record must name the immutable rollback release identity, target, exact commands or interface actions, success condition, trigger condition, exact evidence paths, and secret-handling rule. `bash ci/checks/check_release_identity.sh` and the rollback candidate's already-governed release evidence prove that the selected prior pack is internally complete before OPS begins; current Magic10 attestation work does not regenerate that prior evidence.  
+* **Failure boundary:** Stop and maintain safe refusal if the rollback pack is incomplete, its identity cannot be reproduced, authorization is absent, or the target cannot be resolved exactly.  
+* **Nonclaim:** No rollback target has been deployed or exercised by this addendum.
+
+---
+
+### **Deliverables and implementation-completion predicates**
+
+#### **Adoption and repository implementation deliverables**
+
+| Deliverable ID | Concrete output | Owning lane | Completion predicate | Evidence or review pointer | Nonclaim |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| `M10-D01` | Approved mechanics adoption record | Canon decision — completed | **Satisfied:** every baseline element has an explicit adopted value | This PF10 §2.20 replacement; record ID `M10-CANON-001`; adopted at `2026-08-24T18:04:49Z` | Establishes adoption but does not implement code |
+| `M10-D03` | Corrected Channel catalog | PR implementation | Exactly 36 valid canonical Channel rows and hash-bound bytes | `tests/config/test_magic10_mechanics_config.py` and `tests/m10/test_composite_states.py` | Does not prove scoring integration |
+| `M10-D04` | Mechanics config and schema | PR implementation | Exact twenty signals, 90 rows, profiles, operations, reducers, bands source, and strict closure | `tests/config/test_magic10_mechanics_config.py` | Does not activate production |
+| `M10-D05` | Five-state composite kernel | PR implementation | All reachable ownership patterns produce the exact state and owner contract | `tests/m10/test_composite_states.py` | Does not prove all surfaces use it |
+| `M10-D06` | Twenty signal producers | PR implementation | Eighteen ordinary and two Balance outputs match formula goldens | `tests/m10/test_signal_formula.py` | Does not prove public contract |
+| `M10-D07` | Ten-category Engine Core result | PR implementation | Caps, complete matrix, order, scores, bands, and `magic10_result.v1` match goldens atomically | `tests/m10/test_magic10_goldens.py` | Does not prove deployment |
+| `M10-D08` | Unified compat, CLI, Reader, and later admin integration | PR implementation | All callers consume the same result; no independent scorer remains | `tests/compat/test_magic10_intrinsic_parity.py`; the `HDE-COAG006` Epic Plan must assign exact admin-test paths before its work begins | Does not issue QA PASS |
+| `M10-D09` | Tunable config comparer | PR implementation | Two valid configs produce deterministic exact diffs without activation | `tests/tools/test_compare_magic10_configs.py` | Does not select tuning automatically |
+| `M10-D11` | Current manifest and exact-source release-preflight evidence | Repository implementation | One active config; `catalog/manifest.json` cut as v1.1.0 with the adopted timestamp; manifest-only checks pass; the clean unchanged candidate satisfies `M10_CURRENT_RELEASE_ATTESTATION_MATCH`; no legacy fallback is reachable; rollback-pack compatibility passes; and no frozen historical evidence changes | `python scripts/release_id_recompute.py --check-manifest-only`; `bash ci/checks/check_release_identity.sh`; `tests/tools/test_magic10_release_attestation_contract.py`; verified external attestation directory | Does not perform OPS, imply release, reopen `HDE-DIST002`, emit `RELEASE_ID_RECOMPUTE_OK`, or add the external bundle to repository indexes |
+
+`M10-D01` is satisfied by this addendum. Repository implementation completion now requires `M10-D03` through `M10-D09` and `M10-D11`. It is separate from QA PASS, OPS completion, PF09 status movement, deployment, release, board state, permanent-canon drainage, documentation drainage, and epic closure.
+
+#### **Separately governed outputs outside implementation completion**
+
+| Deliverable ID | Concrete output | Owning lane | Completion predicate | Evidence or review pointer | Nonclaim |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| `M10-D02` | Exact PF01, PF02, PF05, PF12, and PF14 Doc Delta package for later drainage | Canon preparation and later drainage | Every adopted equation, artifact rule, architecture seam, interface contract, and mechanics contract has one exact target locator with no duplicated authority | `M10-CANON-001` plus the five named Doc Delta sections in this plan | Actual PF-Canon editing is separately authorized, non-mandatory later drainage; it cannot gate implementation, QA, release authorization, acceptance, completion, or close |
+| `M10-D10` | Full-domain QA evidence and verdict | QA execution | The owning QA process executes its approved plan against the unchanged final candidate | Exact evidence root assigned by the approved Live QA Plan before execution | QA does not create Product acceptance, release authorization, deployment, or later OPS success |
+| `M10-D12` | Gate-readiness, authorized exact-row refresh, deployment, smoke, and conditional rollback evidence | OPS under canonical `HDE-COAG003.8` and `.7` | The Product Owner-approved Ops Task Record resolves the readiness/refresh condition before it resolves deployment/smoke success or rollback | Exact evidence paths assigned in the Ops Task Record before execution | Does not imply acceptance, authorization, data posture, epic closure, or preclaim OPS success |
+| `M10-D13` | PF17, PF18, PF29, PF09, and public-documentation drainage | Canon/documentation/status drainage | Verified shipped and status truth is recorded when separately authorized | Exact later-drain paths assigned by the authorized drainage work | Non-mandatory later drainage; it cannot gate implementation, QA, OPS, release authorization, acceptance, completion, or close |
+
+---
+
+### **Validation and test intent**
+
+#### **Static and unit validation intent**
+
+* Gate normalization accepts only the exact canonical input domain and closes mask, hex, chart fingerprint, eligible-pair preimage, and cache-key identity;  
+* eligibility is resolved before Engine Core or cache access: an identical self-pair emits `eligible:false` with no `pair_key`, while same identity with unequal normalized projections emits `ERR_READER_INVALID_CHART`;  
+* distinct-person equal-mask orientation is fixed by the `(gate_mask, canonical_person_id)` tuple and ASCII UUID tie-break without contaminating intrinsic score or cache bytes;  
+* Reader `idempotence_hash` is independently recomputable from the five-key public preimage and is never equal-by-contract to `pair_key`;  
+* current-BodyGraph resolution accepts only exact lowercase UUIDs, reads only the `hdapi` row from the public current view, performs no write/vendor fallback, and distinguishes not-found from infrastructure failure;  
+* schema validates only the closed configuration shape;  
+* `magic10_result.v1`, `magic10_compat_result.v1`, corrected `reader.v1`, and corrected Channel schemas validate exact required fields, ordering, ranges, and prohibited fields;  
+* exact twenty-signal and ten-category key sets;  
+* exact 36-Channel catalog closure;  
+* exact 90 Channel-to-signal rows and caps-owned two-input closure;  
+* exact profile keys and ordering;  
+* integer range validation;  
+* canonical order and no duplicate memberships within a signal;  
+* five-state ownership truth table;  
+* all fixed-point formula boundaries;  
+* both Balance operations;  
+* all deterministic goldens `M10-G001` through `M10-G008`, including the two identity-boundary fixtures;  
+* mutation tests for every required rejection rule;  
+* the governed error-token registry, regenerated token map, and Reader route contain every exact token/message/status pair with no unknown-token fallback.
+
+#### **Integration or contract validation intent**
+
+* complete BodyGraph Gate preservation through adapter and CLI paths;  
+* Engine Core is the only scoring owner;  
+* compat internal HTTP, CLI, admin, and public projection consume one canonical result;  
+* complete ten-category atomicity;  
+* symmetric `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and matching `shared_key` augmentation without changing the pure result, including the equal-mask UUID tie-break;  
+* harmony-first category order everywhere;  
+* AB/BA and two-run identity;  
+* eligible distinct-person same-Gate-mask intrinsic result and `pair_key` identity, with deterministic directional personal-key selection;  
+* valid self-pair ineligible success, same-identity/unequal-projection refusal, and AB/BA byte identity for both eligible orientation cases;  
+* separation of intrinsic `pair_key` from public Reader `idempotence_hash`;  
+* config/release cache isolation;  
+* current manifest-only validation, exact-source external-attestation verification, and byte-for-byte immutability of the completed historical release-evidence families;  
+* exact PF05 failure token, HTTP status, and public error-envelope mapping;  
+* public Reader remains numeric-free;  
+* no UID hash scorer, Type-only fallback, or numeric-Gate-order compromise logic remains reachable.
+
+#### **Open-rails or external validation intent**
+
+Because the work affects production calculation and Reader/compat behavior, the later Live QA Plan must include one bounded production-relevant open-rails check or an explicit authorized exemption. The check needs no relationship outcome data; it proves deployed code/config/release coupling and safe projection only.
+
+#### **Expected evidence identity and owner**
+
+QA owns the exact QA evidence identity under the existing governed QA/evidence system. PF12 owns any new schema or artifact identity. Canonical `HDE-DIST008.3` uses the repository's existing external `hde.release_attestation.v1` mechanism for current release provenance; it does not invent a parallel checked-in evidence root.
+
+#### **Failure or blocked classification intent**
+
+* Newly discovered contradiction within this adopted scope: block only the affected implementation row pending an explicit bounded Product Owner correction; no current mechanics decision is open.  
+* Catalog/config/schema mismatch: implementation failure, fail closed.  
+* Formula/golden mismatch: implementation failure.  
+* Surface parity failure: integration failure.  
+* Current manifest or external-attestation predicate failure: release preflight failure; do not substitute or refresh historical `HDE-DIST002` evidence.  
+* Open-rails credential or environment failure: classify through the owning Live QA/OPS process before treating it as product failure.  
+* Missing complete rollback target: release blocked.
+
+#### **Unexecuted-result nonclaim**
+
+No test, QA, deployment, or runtime result is claimed by this plan.
+
+#### **Domain-correctness proof map**
+
+A complete Magic10 claim requires independent proof of:
+
+* normalized input plus retained PF01 eligibility semantics;  
+* valid self-pair no-score/no-cache behavior and same-identity/unequal-projection refusal;  
+* intrinsic score/cache identity exclusion;  
+* deterministic equal-mask directional orientation without intrinsic identity contamination;  
+* independent public Reader idempotence and its distinction from `pair_key`;  
+* read-only current-BodyGraph resolution and Gate-ready data posture;  
+* five-state classifier;  
+* owner provenance;  
+* 36-Channel catalog;  
+* 90 default mapping rows;  
+* three state-response profiles;  
+* eighteen ordinary signal equations;  
+* two Balance equations;  
+* twenty signal ranges;  
+* ten category reducers;  
+* half-up rounding;  
+* ten bands;  
+* complete matrix atomicity;  
+* symmetry, determinism, and identity independence;  
+* config and current manifest closure;  
+* exact-source external release attestation and historical evidence immutability;  
+* internal surface parity;  
+* symmetric directional narrative-key augmentation;  
+* governed error-token and public-envelope closure;  
+* public projection restrictions;  
+* rollback compatibility.
+
+Harmony-only proof is insufficient.
+
+---
+
+### **Open-decision routing**
+
+None.
+
+The formula, maps, defaults, tuning bounds, Canon deltas, repository changes, PF09 task requirements, proof obligations, and rollout path are fully canonical and adopted through `M10-CANON-001`. No element is awaiting a second approval or delegated to later research.
+
+Current-row Gate readiness is an execution-time measurement and rollout condition with an explicit PF09 owner; it is not an unresolved formula, ownership, or research decision.
+
+---
+
+### **Authorization closure**
+
+* **Authorization state:** `PO AUTHORIZED — CANONICAL`  
+* **Authorization authority:** Product Owner  
+* **Authorization record:** `M10-CANON-001`  
+* **Adopted at (UTC):** `2026-08-24T18:04:49Z`  
+* **Authorized scope:** The complete content of this replacement §2.20, including every formula, default, tunable bound, mapping row, schema and interface contract, repository change, canonical PF09 task requirement, dependency, validation obligation, migration rule, release guard, rollback rule, exclusion, and nonclaim.  
+* **Replacement effect:** Replaces the current PF10 §2.20 in full and supersedes all tentative approval language in the accepted v0.18 source.
+
+This authorization establishes canonical authority and satisfies `M10-D01`/`M10-WS01`. It does not establish repository implementation, permanent-canon or PF09-file drainage, QA PASS, OPS execution, deployment, release, public activation, board movement, acceptance, or closeout state.
 
