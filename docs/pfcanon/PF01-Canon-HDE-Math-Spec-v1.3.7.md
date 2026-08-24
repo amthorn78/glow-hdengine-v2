@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.3.6
+**Version:** v1.3.7
 
 **Status:** Canon
 
-**Effective date:** 2026-08-09
+**Effective date:** 2026-08-25
 
-**Last Update Gate:** 0808 refresh 4
+**Last Update Gate:** BN 12.8.9
 
 ## **0.2 Change policy**
 
@@ -366,6 +366,8 @@ Build an object with exactly five keys (no others), each already normalized per 
 
 Do not include `idempotence_hash` in the preimage.
 
+**Separation from intrinsic Magic10 identity.** `idempotence_hash` is computed independently from `pair_key`. `pair_key` is neither a public field nor a member of the five-key Reader preimage, and no equality contract exists between the two digests. A valid self-pair produces no intrinsic `pair_key`. An eligible distinct-person equal-mask pair produces an intrinsic `pair_key`, but under the same `meta` and `release_id` its Reader preimage cannot equal the self-pair preimage because `eligible` and `categories` differ.
+
 ### **Canonical serialization (preimage & final)**
 
 Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays that represent sets are deduplicated and ASCII-sorted. All byte checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
@@ -466,43 +468,34 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 ## 4.1 Definition (normative)
 
 * **Eligibility** is a pure, mechanical pair-computability predicate indicating whether a validated normalized pair can be evaluated for public output.  
-    
 * Eligibility is not a sampler, ranking, viewer-preference, preset, moderation, consent, blocking, product-access, score, band, or relationship-state predicate.  
-    
-* After required-input and catalog validation, return `true` exactly when `A.person_uid != B.person_uid`.  
-    
-* Return `false` exactly for a valid self-pair: `A.person_uid == B.person_uid` and the two complete normalized chart projections are byte-identical under canonical serialization.  
-    
+* Each evaluation-party record contains an exact lowercase, hyphenated RFC 4122 UUID as `canonical_person_id`, a complete normalized chart projection, an ascending unique Gate tuple, an unsigned 64-bit `gate_mask`, a sixteen-character lowercase `gate_mask_hex`, and the `chart_fingerprint` defined in §5.2.  
+* Validate and resolve both complete party projections before classifying the pair.  
+* Return `false` exactly when both records have the same `canonical_person_id` and byte-identical complete normalized projections. This valid self-pair is ineligible, not erroneous.  
+* The same `canonical_person_id` with unequal complete normalized projections fails closed as `ERR_READER_INVALID_CHART`; it is not coerced to an ineligible success.  
+* Return `true` exactly when the two validated records have distinct `canonical_person_id` values, including when their Gate masks are equal.  
 * A valid distinct pair remains eligible when it has no electromagnetic Channel, a low compatibility band, or any Type combination.  
-    
+* Decide eligibility before Engine Core, intrinsic cache access, or `pair_key` construction. A valid self-pair produces no intrinsic signals, matrix, cache lookup or write, narrative route, or `pair_key`.  
 * The result is a **boolean** (`eligible: true|false`) and carries no numerics or narrative content.
 
 ## 4.2 Inputs and catalogs (concept)
 
-* **Party records.** Normalized party A and party B each contain `person_uid` and `gates`. `person_uid` MUST match `^[A-Za-z0-9._-]{1,64}$`.  
-    
-* **Gate arrays.** Every `gates` value MUST be an integer in `1..64`; each normalized array MUST be non-empty, duplicate-free, and ascending.  
-    
-* **Gate closure.** Every Gate MUST resolve exactly once in `catalog/gates_v1.json`.  
-    
-* **Channel coherence.** `catalog/channels_v1.json` MUST be closed and internally coherent for the active topology; every channel endpoint used by downstream pair mechanics MUST resolve to the Gate Catalog.  
-    
+* **Raw Gate ingress.** The Gate normalizer accepts only a nonempty JSON array whose members are integers in `1..64` or canonical decimal strings from `"1"` through `"64"`. It rejects booleans, whitespace, leading zeroes, signs, decimals, missing or empty arrays, duplicates, malformed strings, and values outside `1..64`.  
+* **Normalized Gate contract.** Normalization returns an ascending unique integer tuple, its unsigned 64-bit Gate mask with Gate `g` at bit `g-1`, a sixteen-character lowercase hexadecimal mask, and the §5.2 chart fingerprint.  
+* **Gate closure.** Every normalized Gate MUST resolve exactly once in `catalog/gates_v1.json`.  
+* **Channel coherence.** `catalog/channels_v1.json` MUST be closed and internally coherent for the active topology; every Channel endpoint used by downstream pair mechanics MUST resolve to the Gate Catalog.  
 * **Release identity.** The active lowercase 64-hex `release_id` identifies the frozen inputs used for the evaluation. All lookups are deterministic and use that active frozen surface.  
-    
 * **Excluded inputs.** No score, band, viewer preference, preset, sampler setting, clock, environment variable, network result, moderation state, application relationship state, `prompt`, or `uncertainty` value is consulted.
 
 ## 4.3 Determinism & neutrality
 
-* **Independent validation first.** Validate each normalized chart independently before pair ordering or self-pair comparison.  
-    
-* **Canonical sets.** Canonicalize each `gates` array as ascending unique integers.  
-    
-* **Order-neutral.** Order the two validated party records by ASCII `person_uid`; after canonical pair normalization, the eligibility outcome for **AB** equals that for **BA**.  
-    
-* **Equal-UID comparison.** When UIDs are equal, compare the complete canonical normalized projections. Identical projections produce `eligible:false`; unequal projections fail with `ERR_READER_INVALID_CHART`.  
-    
-* **Two-run identity:** With the same inputs and freeze pack, recomputing eligibility yields the same boolean.  
-    
+* **Independent validation first.** Validate each normalized chart independently before self-pair classification, intrinsic ordering, or directional orientation.  
+* **Eligibility first.** Apply the same-identity decision before Engine Core or intrinsic cache access.  
+* **Canonical sets.** Canonicalize each `gates` array as ascending unique integers and derive its Gate mask deterministically.  
+* **Intrinsic scoring order.** For an eligible pair, order the two Gate masks numerically as `member_lo` and `member_hi`. Equal masks remain two equal adjacent scoring members; identity does not affect Channel states, signals, scores, bands, chart fingerprints, or `pair_key`.  
+* **Directional orientation order.** After eligibility succeeds, order evaluation parties by the total tuple `(gate_mask, canonical_person_id)`, using numeric Gate-mask order and then ASCII UUID order only when masks are equal. This orientation controls directional narrative keys only and never enters intrinsic mathematics or the intrinsic cache key.  
+* **AB↔BA neutrality.** Reversing request order produces the same eligibility, intrinsic ordering, directional orientation, score result, and public projection.  
+* **Two-run identity.** With the same complete inputs and freeze pack, recomputing eligibility yields the same boolean.  
 * No time, network, random, environment, scoring, preference, or sampler source influences eligibility.
 
 ## 4.4 Public behavior
@@ -534,8 +527,7 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 ## 4.6 Non-goals / routing
 
 * No transport policy, caching, HTTP status mapping, sampler eligibility, ranking, preference weighting, moderation, consent, blocking, or product-access policy is specified here; those concerns route to their owning documents by exact title.  
-    
-* `person_uid` is the normalized internal identity consumed by this predicate. A public or birth-facing caller need not supply it when an architecture-sanctioned internal resolver derives deterministic metadata before PF01 validation.
+* `canonical_person_id` is the normalized application-boundary identity consumed by this predicate and by directional orientation only. A public or birth-facing caller need not construct it when an architecture-sanctioned resolver supplies the exact canonical identity and complete normalized projection before PF01 validation.
 
 ## 4.7 Emission rule (binary) \[Required-Now\]
 
@@ -589,79 +581,238 @@ Use **PF12-Canon-HDE-Schemas-and-Artifacts** rules: UTF-8 (no BOM), sorted keys 
 
 ## **5.2 Deterministic integer scoring model (caps; fixed-point rules)**
 
-**Scope.** This section defines the Required-Now intrinsic Magic-10 reduction from a validated normalized pair-signal map to the complete ten-category score-and-band matrix. The computation is deterministic, AB↔BA neutral, integer/fixed-point only, Human Design-grounded, and complete-or-fail-closed. Viewer preferences, presets, identifiers, hashes, and product-ranking inputs do not contribute score magnitude.
+**Scope.** This section defines the Required-Now intrinsic Magic10 v1 computation from two eligible normalized Gate sets to one complete ordered ten-category score-and-band matrix. The computation classifies all 36 canonical Channels, produces exactly twenty internal signals in half-score units, reduces them into ten scores, and applies the global bands in §5.3. It is deterministic, AB↔BA neutral, identity-independent after eligibility, integer/fixed-point only, and complete-or-fail-closed.
 
-### **5.2.1 Inputs (closed and validated)**
+The formula is Glow-authored Product synthesis grounded in Human Design composite Channel states. It does not assert empirical compatibility effect sizes, relationship quality, medical or psychological meaning, safety, destiny, ranking, or outcome prediction. Viewer preferences, caller-selected configurations, identifiers, request metadata, clocks, randomness, external I/O, and hidden mutable state do not affect intrinsic results.
 
-* **Validated pair.** Validate both normalized charts under §4, canonicalize every set-valued chart input, and order the two party projections by ASCII `person_uid`. A self-pair is ineligible and is not scored.  
-* **Category universe.** Iterate exactly the complete frozen order governed by `catalog/magic10.json`; compute one result for each ID and no others.  
-* **Signal key set.** Produce one pair-signal map whose key set is exactly the union of every `inputs` array in `catalog/magic10_caps.json`. Keys are unique and ASCII-sorted. Missing or extra signal keys are invalid.  
-* **Signal value domain.** Each value is a JSON integer in half-score units from `0..200`: `0` represents `0.0`, `1` represents `0.5`, and `200` represents `100.0`. Decimals, binary floats, booleans, non-integers, and out-of-domain values are invalid.  
-* **Excluded inputs.** No clock, randomness, network, environment value, viewer preference, preset, sampler setting, or product state is an input.  
-* **Upstream implementation boundary.** Exact Human Design mechanics that generate every governed signal remain a Required-Now implementation gap. That gap does not permit an identifier-derived score, missing signal, invented default, harmony-only substitute, or partial matrix.
+### **5.2.1 Inputs and closure**
 
-### **5.2.2 Deterministic base (governed pair signals)**
+* **Eligible normalized pair.** Apply §4 before Engine Core or intrinsic cache access. A valid self-pair is not scored and produces no intrinsic result or `pair_key`.  
+* **Gate representation.** Each member supplies an ascending unique nonempty Gate tuple, unsigned 64-bit `gate_mask`, and exactly sixteen lowercase hexadecimal digits as `gate_mask_hex`. Gate `g` occupies bit `g-1`.  
+* **Topology closure.** Every Gate resolves exactly once in `catalog/gates_v1.json`; every scoring Channel resolves exactly once in the closed 36-row `catalog/channels_v1.json`; every Channel has two distinct ascending Gate endpoints.  
+* **Mechanics configuration.** Use exactly one immutable active `magic10_mechanics_config.v1` bundle per release. The initial complete configuration is `m10-channel-state-v1.0.0`.  
+* **Category closure.** `catalog/magic10.json` owns the exact ten-category order. `catalog/magic10_caps.json` owns each category's exact ordered two-signal input pair and integer score bounds.  
+* **Threshold closure.** `math/thresholds.json` owns the `0..100` clamp, `ROUND_HALF_UP`, and inclusive maxima `[24,49,74,100]`.  
+* **Complete-or-fail-closed.** Missing, extra, duplicate, malformed, out-of-domain, unresolved, stale, or configuration-incoherent input produces no successful intrinsic matrix.
 
-**Pair identity.** Canonically serialize exactly this preimage using UTF-8 without BOM, ASCII-sorted object keys, compact separators, and one trailing LF:
+  ### **5.2.2 Chart fingerprint, intrinsic pair identity, and cache identity**
 
-`{"members":[{"gates":[...],"person_uid":"<uid_lo>"},{"gates":[...],"person_uid":"<uid_hi>"}],"release_id":"<64-lowercase-hex>","signal_scale":2,"signals":{"<ascii_signal_id>":<integer-half-units>,...},"version":"magic10-pair-v1"}`
+For each normalized member, canonically serialize an object containing exactly:
 
-* `members` is in normalized pair order, and each `gates` array is ascending and unique.  
-* `signal_scale` is the integer `2`.  
-* `signals` contains exactly the required key set with integer values in `0..200`.  
-* `pair_key = sha256(preimage_bytes).hexdigest()` in lowercase hex.  
-* `pair_key` is an identity and cache key only. It is never a seed or operand for score magnitude.
+* `schema = "magic10_chart_fingerprint.v1"`;  
+* `gate_mask_hex = "<sixteen lowercase hexadecimal digits>"`.
 
-**Per-category base.** For each category `c` in frozen order:
+Use the canonical JSON rules governed by **PF12-Canon-HDE-Schemas-and-Artifacts** and compute:
 
-1. Read its non-empty ordered input list `I_c` and integer bounds `[L_c,U_c]` from `catalog/magic10_caps.json`.  
-2. For each `i in I_c`, let `q_i` be the normalized half-unit integer and compute `q'_i = min(2*U_c,max(2*L_c,q_i))`.  
-3. Let `n = len(I_c)` and `Q = sum(q'_i)`.  
-4. Compute `base_c = floor((Q+n)/(2*n))`. For this nonnegative domain, that is exactly `round_half_up((Q/2)/n)`.  
-5. The output domain is the integer set `0..100`.
+`chart_fingerprint = sha256(canonical_bytes(chart_fingerprint_preimage))`
 
-Hashing and modulo are not part of the base function. An unknown category, empty input list, missing or extra signal, non-integer signal, or out-of-domain normalized signal fails closed.
+For an eligible pair, order the two Gate masks numerically as `member_lo` and `member_hi`. Equal masks remain two equal adjacent members; identity does not break the tie and does not enter intrinsic mathematics.
 
-### **5.2.3 Weight posture (no intrinsic weight stage)**
+Construct `magic10_pair_preimage.v1` as canonical JSON with exactly:
 
-* Current intrinsic compatibility has no weight operand: `score_c = base_c` exactly.  
-* No multiplication, division, rounding, floor, cap, correction, or preset stage occurs between `base_c` and `score_c`.  
-* Caller-supplied `viewer_prefs.weights` are sampler/ranker inputs. They MUST NOT change intrinsic Magic-10 scores or bands.  
-* Static preset weights and alternative scoring profiles are Future-Promotion. No default or legacy formula has current authority.
+| Field | Exact value |
+| ----- | ----- |
+| `schema` | `magic10_pair_preimage.v1` |
+| `members` | The two `chart_fingerprint` values ordered by numeric Gate masks as `member_lo`, `member_hi`; equal masks produce two equal adjacent values |
+| `config_id` | Active immutable mechanics configuration ID |
+| `release_id` | Active release identity |
+| `result_schema` | `magic10_result.v1` |
 
-### **5.2.4 Caps and floors (deterministic bounds)**
+Compute:
 
-* Apply each `catalog/magic10_caps.json` input bound in half-units before reduction.  
-* After the exact mean is integerized, apply only the global score clamp governed by `math/thresholds.json`.  
-* No category-level preset floor, category cap, family cap, global floor, dampener, or correction is active in the current contract.  
-* A future cap, floor, weight, or correction has no default and requires explicit Future-Promotion with a complete fixed-point contract.
+`pair_key = sha256(canonical_bytes(preimage))`
 
-### **5.2.5 Rounding rule (pinned)**
+The intrinsic cache key is exactly:
 
-Apply the operations in this exact order:
+`magic10:v1:<pair_key>`
 
-1. Validate and canonicalize inputs.  
-2. Apply per-input bounds in half-units.  
-3. Compute the exact rational mean.  
-4. Apply `round_half_up` once through `base_c = floor((Q+n)/(2*n))`.  
-5. Clamp the resulting integer to the `math/thresholds.json` score domain.  
-6. Apply the global inclusive band maxima in §5.3.
+A cached value is usable only when its embedded `pair_key`, `config_id`, `release_id`, and result-schema value match the current evaluation and release. A mismatch is stale, never a hit. If both valid Gate sets remain available, recompute under the active release; otherwise fail closed with `ERR_M10_STALE_RESULT`.
 
-Do not round after band selection and do not use binary-float intermediates.
+Names, account IDs, UUIDs, UIDs, request IDs, timestamps, relationship history, directional orientation, narrative keys, and viewer preferences are absent from the intrinsic preimage. `pair_key` is not public, is not a score operand, and has no equality contract with the Reader `idempotence_hash`.
+
+### **5.2.3 Five-state input and response profiles**
+
+Classify every canonical Channel exactly once under the closed five-state rule in §6.1. Only `dominance` and `compromise` carry the normalized full-Channel owner needed by the Balance ownership operation.
+
+Ordinary signal responses use integer basis points in `0..10000`:
+
+| Profile ID | none | companionship | dominance | compromise | electromagnetic | Required ordering |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| `coherence_bp_v1` | 0 | 10000 | 5000 | 2500 | 7500 | companionship \> electromagnetic \> dominance \> compromise \> none |
+| `activation_bp_v1` | 0 | 5000 | 7500 | 2500 | 10000 | electromagnetic \> dominance \> companionship \> compromise \> none |
+| `expression_bp_v1` | 0 | 7500 | 5000 | 2500 | 10000 | electromagnetic \> companionship \> dominance \> compromise \> none |
+
+The exact stored values `0`, `2500`, `5000`, `7500`, and `10000` represent normalized responses `0.00`, `0.25`, `0.50`, `0.75`, and `1.00`. Human Design doctrine supports distinguishing the five states but does not supply these fractions.
+
+### **5.2.4 Twenty-signal register and formulas**
+
+All ordinary Channel weights default to `1`. The two Balance signals use their named operations rather than a response profile.
+
+| Category | Signal ID | Exact construct | Operation or profile | Default Channel map |
+| ----- | ----- | ----- | ----- | ----- |
+| harmony | `rapport_delta` | Structural support through needs, values, care, communal bargains, and trusted transmission | `coherence_bp_v1` | `19-49`, `26-44`, `27-50`, `37-40` |
+| harmony | `resonance_strength` | Attunement through rhythm, intimacy, mood-sensitive openness, and listening or witnessing | `coherence_bp_v1` | `05-15`, `06-59`, `12-22`, `13-33` |
+| heat | `spark_intensity` | Relational charge through intimacy, shock, desire, and provocation or spirit | `activation_bp_v1` | `06-59`, `25-51`, `30-41`, `39-55` |
+| heat | `momentum_flux` | Activated movement through mutation, deeds, commitment, and change or experience | `activation_bp_v1` | `03-60`, `20-34`, `29-46`, `35-36` |
+| communication | `signal_clarity` | Capacity to formulate, organize, rationalize, or realize mental content | `expression_bp_v1` | `04-63`, `17-62`, `23-43`, `24-61`, `47-64` |
+| communication | `exchange_density` | Capacity to exchange stories, emotional expression, witnessing, intuitive awareness, and transmission | `expression_bp_v1` | `11-56`, `12-22`, `13-33`, `20-57`, `26-44` |
+| alignment | `vector_cohesion` | Coherence of direction, leadership, authentic presence, and action from conviction | `coherence_bp_v1` | `02-14`, `07-31`, `10-20`, `10-34` |
+| alignment | `axis_agreement` | Coherence of principles, values, purpose, and continuity or ambition | `coherence_bp_v1` | `19-49`, `27-50`, `28-38`, `32-54` |
+| comfort | `soothe_index` | Accessible intimacy, emotional openness, recognition of needs, and communal support | `coherence_bp_v1` | `06-59`, `12-22`, `19-49`, `37-40` |
+| comfort | `buffer_resilience` | Embodied support through rhythm, survival awareness, preservation, and instinctive power | `coherence_bp_v1` | `05-15`, `10-57`, `27-50`, `34-57` |
+| consistency | `pattern_integrity` | Repeatable rhythm, concentration, skill development, detail, and correction | `coherence_bp_v1` | `05-15`, `09-52`, `16-48`, `17-62`, `18-58` |
+| consistency | `variance_stability` | Continuity through pulse, commitment, adaptation, and complete cycles | `coherence_bp_v1` | `03-60`, `29-46`, `32-54`, `42-53` |
+| expansion | `growth_tendency` | Activation of mutation, improvement, transformation, and maturation | `activation_bp_v1` | `03-60`, `18-58`, `32-54`, `42-53` |
+| expansion | `horizon_reach` | Activation through curiosity, meaningful risk, discovery, and new experience | `activation_bp_v1` | `11-56`, `28-38`, `29-46`, `35-36` |
+| creativity | `novelty_factor` | Activation of contribution, mutation, unique insight, and initiation | `activation_bp_v1` | `01-08`, `03-60`, `23-43`, `25-51` |
+| creativity | `expression_flow` | Expression through authentic presence, storytelling, emotion, talent, and experience | `expression_bp_v1` | `10-20`, `11-56`, `12-22`, `16-48`, `35-36` |
+| drive | `willpower_current` | Activation of resources, material will, initiative, enterprise, and ambition | `activation_bp_v1` | `02-14`, `21-45`, `25-51`, `26-44`, `32-54` |
+| drive | `focus_pressure` | Activation of concentration, improvement pressure, deeds, struggle, and cycle completion | `activation_bp_v1` | `09-52`, `18-58`, `20-34`, `28-38`, `42-53` |
+| balance | `equilibrium_score` | Bilateral distribution of selected one-owner Channel mass | `twice_min_owner_mass_v1` | `02-14`, `07-31`, `21-45`, `26-44`, `32-54`, `37-40` |
+| balance | `counterweight_ratio` | Share of selected Channel mass expressed through companionship or electromagnetic completion | `companionship_em_mass_v1` | `05-15`, `06-59`, `10-20`, `13-33`, `27-50`, `39-55` |
+
+The default configuration contains exactly twenty signals, ten category pairs, and 90 Channel-to-signal rows. Every canonical Channel has at least one assigned Product use. No default map assigns one Channel to both signals of the same category.
+
+#### **Ordinary signals: `weighted_state_sum_v1`**
+
+For ordinary signal `s`:
+
+* `C_s` is its configured Channel set;  
+* `w(c,s)` is the configured positive integer Channel weight, default `1`;  
+* `p_s` is its configured response profile;  
+* `r(p_s,t_c)` is the integer basis-point response for Channel state `t_c`;  
+* `W_s = sum(w(c,s))`;  
+* `N_s = sum(w(c,s) * r(p_s,t_c))`.
+
+The normalized signal is:
+
+`x_s = N_s / (10000 * W_s)`
+
+Represent the signal as an integer `q_s` in half-score units from `0..200`, where `1` means `0.5` score points:
+
+`q_s = floor((N_s + 25 * W_s) / (50 * W_s))`
+
+This is exactly `round_half_up(200 * x_s)`. Round once after the complete weighted signal sum. All `none` returns `0`; maximum response on every mapped Channel returns `200`.
+
+#### **Balance signal: `equilibrium_score` through `twice_min_owner_mass_v1`**
+
+Only `dominance` and `compromise` contribute. For each configured Channel, the full-Channel owner supplies `member_lo` or `member_hi`.
+
+Define:
+
+* `m_lo = sum(w_c)` for mapped dominance or compromise Channels owned by `member_lo`;  
+* `m_hi = sum(w_c)` for mapped dominance or compromise Channels owned by `member_hi`;  
+* `m = min(m_lo, m_hi)`;  
+* `W = sum(w_c)` across all mapped Channels.
+
+Then:
+
+`x_equilibrium = 2 * m / W`
+
+`q_equilibrium = floor((800 * m + W) / (2 * W))`
+
+One-sided owner mass returns `0`. A perfectly split six-row default map returns `200`. Companionship, electromagnetic, and none do not contribute. This signal describes structural bilateral distribution, not fairness, reciprocity, equality, care, or relationship quality.
+
+#### **Balance signal: `counterweight_ratio` through `companionship_em_mass_v1`**
+
+Define:
+
+* `M = sum(w_c)` for mapped Channels in `companionship` or `electromagnetic`;  
+* `W = sum(w_c)` across all mapped Channels.
+
+Then:
+
+`x_counterweight = M / W`
+
+`q_counterweight = floor((400 * M + W) / (2 * W))`
+
+Dominance, compromise, and none contribute zero. This is a normalized selected-state ratio, not a relationship verdict.
+
+### **5.2.5 Ten-category reduction, caps, rounding, and bands**
+
+The canonical category order and exact caps-owned input pairs are:
+
+| Order | Category | Signal 1 | Signal 2 | Default input weights |
+| ----- | ----- | ----- | ----- | ----- |
+| 1 | harmony | `rapport_delta` | `resonance_strength` | `1,1` |
+| 2 | heat | `spark_intensity` | `momentum_flux` | `1,1` |
+| 3 | communication | `signal_clarity` | `exchange_density` | `1,1` |
+| 4 | alignment | `vector_cohesion` | `axis_agreement` | `1,1` |
+| 5 | comfort | `soothe_index` | `buffer_resilience` | `1,1` |
+| 6 | consistency | `pattern_integrity` | `variance_stability` | `1,1` |
+| 7 | expansion | `growth_tendency` | `horizon_reach` | `1,1` |
+| 8 | creativity | `novelty_factor` | `expression_flow` | `1,1` |
+| 9 | drive | `willpower_current` | `focus_pressure` | `1,1` |
+| 10 | balance | `equilibrium_score` | `counterweight_ratio` | `1,1` |
+
+For category `k`, let `L_k` and `U_k` be its integer score-point bounds from `catalog/magic10_caps.json`. Cap each half-score-unit input before reduction:
+
+`q_prime_i = min(2 * U_k, max(2 * L_k, q_i))`
+
+The current bounds are `L_k = 0` and `U_k = 100`, so valid `q_i` values are unchanged.
+
+Each category has exactly two capped inputs. Let:
+
+* `b_i` be each positive integer category-input weight, default `1`;  
+* `B_k = sum(b_i)`;  
+* `Q_k = sum(b_i * q_prime_i)`.
+
+Calculate:
+
+`raw_score_k = floor((Q_k + B_k) / (2 * B_k))`
+
+With two equal inputs:
+
+`raw_score_k = floor((q_1 + q_2 + 2) / 4)`
+
+Apply the defensive clamp exactly once:
+
+`score_k = min(100, max(0, raw_score_k))`
+
+This is one half-up round after the weighted signal mean, followed by the existing defensive clamp. Apply the global inclusive band maxima in §5.3 after the clamp. Do not use binary-floating-point intermediates.
+
+No intrinsic preset, viewer preference, bonus, dampener, extra floor or cap, correction factor, UID value, category-specific hidden multiplier, or caller-selected configuration is applied.
 
 ### **5.2.6 Determinism and neutrality**
 
-* **AB↔BA parity.** Scoring consumes the same validated canonical pair and pair-signal map for AB and BA; the complete ordered score vector is identical.  
-* **Two-run identity.** The same normalized pair, active `release_id`, catalogs, and signals produce the same complete ordered matrix.  
-* **No hidden sources.** Scoring does not use wall-clock time, randomness, external I/O, environment values, locale-dependent collation, platform-dependent float accumulation, identifiers as score seeds, viewer preferences, or presets.
+* **AB↔BA parity.** Reversing request order produces the same numeric Gate-mask order, five-state Channel vector, signal vector, category scores, bands, chart fingerprints, and `pair_key`.  
+* **Identity independence.** Changing distinct eligible party identities without changing normalized Gate masks cannot change intrinsic content or `pair_key`.  
+* **Equal-mask behavior.** Distinct eligible parties with equal masks retain two equal intrinsic members and compute the complete result. The transient UUID tie-break affects directional narrative orientation only.  
+* **Two-run identity.** The same eligible Gate masks, active configuration, release identity, and frozen inputs produce the same complete ordered result.  
+* **One evaluation.** Every Channel is classified once, every signal is produced once, and every category is reduced once in its canonical order.  
+* **No hidden sources.** Intrinsic math performs no network or vendor call and consumes no wall clock, randomness, environment state, locale-dependent ordering, mutable remote configuration, identifiers as score seeds, viewer preference, or relationship history.
 
-### **5.2.7 Validation (binary)**
+  ### **5.2.7 Validation and failure behavior**
 
-* **Matrix completeness.** Compute exactly one score and one band for every Magic-10 ID in frozen order, with no extras or duplicates.  
-* **Atomicity.** All ten results use the same normalized pair, active `release_id`, signal map, catalogs, arithmetic rules, and evaluation run. If any required category, signal, catalog row, score, or band is invalid or unavailable, return no successful matrix.  
-* **Domain.** Every score is an integer in `0..100`; every band is derived only by §5.3.  
-* **Clamp and rounding proof.** Governed examples cover half-unit midpoints and the `0` and `100` boundaries.  
-* **Parity proof.** AB and BA yield identical vectors; two identical runs yield identical vectors. Static definitions or test files do not establish a PASS.
+* Validate complete closure among the 36-Channel catalog, three profiles, twenty ordered signal rows, ten caps-owned pairs, ten category-weight rows, thresholds, configuration source hashes, result schema, and active release identity.  
+* Require exactly twenty unique signal IDs in flattened caps-input order and exactly ten unique category results in `catalog/magic10.json` order.  
+* Require every ordinary signal to use one valid named profile and one through six unique canonical Channels. Require each Balance signal to use its exact named operation and one through six unique canonical Channels.  
+* Require each ordinary Channel weight and category-input weight to be an integer in `1..3`; reject booleans, zero, negative, fractional, missing, or extra values.  
+* Require every response to be an integer in `0..10000` and preserve each profile's required ordering.  
+* Require every signal wire value to be an integer in `0..200`, every score to be an integer in `0..100`, and every band to derive only from §5.3.  
+* Validate the exact deterministic fixtures in §9, including all-none, homogeneous companionship, Balance ownership, sparse Gate sets, identity independence, category boundaries, a valid self-pair, and distinct people with equal Gate masks.  
+* AB and BA MUST yield identical intrinsic vectors and `pair_key`; two identical runs MUST yield identical intrinsic results.  
+* If any required input, catalog row, mapping, profile, operation, source hash, configuration value, score, band, or cache identity is unavailable or invalid, emit no successful intrinsic matrix. Static definitions and checked-in tests do not establish a PASS.
+
+  ### **5.2.8 Configuration, tuning, and change control**
+
+The default active configuration is complete and shippable; tuning is not an implementation prerequisite.
+
+| Knob | Default | Allowed configuration range | Change class |
+| ----- | ----- | ----- | ----- |
+| Ordinary Channel weight | `1` | integer `1..3` | Numeric tuning |
+| State response | values in the three default tables | integer `0..10000` while profile ordering remains valid | Numeric tuning |
+| Category-input weight | `1` | integer `1..3` | Numeric tuning |
+| Channel membership in a signal | exact default map | valid unique canonical Channels, one through six per ordinary signal | Structural mechanics revision |
+| Signal profile assignment | exact default assignment | one of the three ordinary profiles | Structural mechanics revision |
+| Balance Channel membership | exact six-Channel maps | one through six valid unique canonical Channels | Structural mechanics revision |
+| Band maxima | `[24,49,74,100]` | four increasing integer maxima ending in `100` | Public-contract tuning |
+
+The five relationship states, twenty signal IDs, ten category IDs, two-signals-per-category structure, ordinary weighted-sum operation, two Balance operations, fixed-point scales, half-up reducers, `0..200` signal domain, and `0..100` score domain are fixed v1 invariants, not tuning knobs.
+
+Any numeric tuning or referenced governed-source byte change requires a new immutable `config_id`, new canonical configuration bytes, a new manifest cut, a new `release_id`, regenerated deterministic goldens, and an explicit Product Owner adoption record. A structural mechanics revision additionally requires a PF01 Doc Delta naming every changed signal row and its rationale. A band change additionally requires review of affected public contracts before activation.
+
+Callers cannot pass weights, profiles, bands, or a configuration ID. Production cannot blend configurations and selects exactly one active configuration per release. Rollback selects one complete prior release rather than mixing old code and new configuration.
 
 ### **5.2.8 Change control**
 
@@ -739,9 +890,11 @@ At minimum, PF01 computation depends on these governed inputs:
 * **Topology catalogs.** `catalog/gates_v1.json` and `catalog/channels_v1.json`, with canonical Gate membership, center IDs derived from Gate rows, and canonical `NN-NN` Channel identities.  
 * **Feature constants.** The exact denominator and limit contract in §5.4.2 when consumed by PF01 feature math.  
 * **Direct Motor→Throat set.** The governed four-Channel set in §5.4.2.1 when serialized for consumption.  
-* **Seeds.** A governed Seeds catalog may be an admin/test release input, but Seeds do not enter the intrinsic §5.2 score formula.
+* **Seeds.** A governed Seeds catalog may be an admin/test release input, but Seeds do not enter the intrinsic §5.2 score formula.  
+* **Active Magic10 mechanics configuration.** The Required-Now v1 formula uses one immutable release-bound configuration at `catalog/magic10_mechanics_v1.json`, initially identified by `config_id = "m10-channel-state-v1.0.0"`. Its governed bytes bind the §5.2 profiles, signal rows, Channel weights, category-input weights, operations, fixed-point scales, source hashes, and rounding declarations. **PF12-Canon-HDE-Schemas-and-Artifacts** owns its exact path, schema, canonical-byte contract, and manifest membership.  
+* **Configuration release coupling.** Production selects exactly one active mechanics configuration per release; callers cannot select or blend configurations. Any governed configuration or referenced source-byte change requires a new immutable `config_id`, manifest cut, and `release_id`; a structural mechanics change also requires a PF01 Doc Delta.
 
-**Future-Promotion boundary.** No current governed Presets catalog, Feature Registry, alternative category-weight artifact, preset-specific threshold artifact, or advanced token-aggregation artifact exists. If one is later promoted, **PF12-Canon-HDE-Schemas-and-Artifacts** owns its exact path, schema, and manifest membership; PF01 owns only its fully authorized math.
+**Future-Promotion boundary.** No current governed Presets catalog, Feature Registry, preset-specific threshold artifact, or advanced token-aggregation artifact exists. The active Magic10 mechanics configuration is the Required-Now production formula bundle, not a preset or alternative scoring profile. If a distinct preset or advanced aggregation artifact is later promoted, **PF12-Canon-HDE-Schemas-and-Artifacts** owns its exact path, schema, and manifest membership; PF01 owns only its fully authorized math.
 
 **Non-content.** HTTP headers, caching and writer policy, CLI streams, validator matrices, evidence-path inventories, and operational procedures are not PF01 math.
 
@@ -922,9 +1075,9 @@ This subsection does not add a second active scoring formula after §5.2. For th
 
 **Normative/postponed behavior (v1).**
 
-* **SR requirement, XR postponed.** `alpha = 1.0` declares an all-SR posture if the future blend surface is promoted; current intrinsic scoring remains `score_c = base_c` under §5.2.  
+* **SR requirement, XR postponed.** `alpha = 1.0` declares an all-SR posture if the future blend surface is promoted; current intrinsic scoring remains the complete §5.2 v1 formula, with no separate SR reducer or XR blend.  
 * **Hysteresis armed for future XR.** A one-point guard at the Open↔Warm boundary is defined for future use **only when `alpha < 1.0`**; with `alpha = 1.0` it is inert and not applied.  
-* **Static implementation posture.** No SR/XR blend, `alpha`, or hysteresis implementation was found in the pinned scoring loci. Exact upstream mechanics for the `resonance_strength` pair signal also remain an implementation gap.
+* **Current formula boundary.** `resonance_strength` is the ordinary §5.2 signal produced from `05-15`, `06-59`, `12-22`, and `13-33` through `coherence_bp_v1`. No separate SR/XR blend, `alpha`, or hysteresis stage is active in the canonical v1 formula.
 
 **Pack membership in v1 (governance rule).**
 
@@ -974,22 +1127,42 @@ Detect electromagnetic relationships between two normalized charts and produce b
 * **Closed vocabularies.** Outputs draw only from validated catalog IDs and bounded booleans or enums; no free text and no arbitrary keys.  
 * **Numeric-free feature identity.** EM and HG emit no independent score, count, bonus, token, or category weight. Downstream logic may consume each EM Channel identity at most once.
 
-### **Detection (normative rules)**
+  ### **Detection (normative rules)**
 
-For each canonical Channel `C={g1,g2}`, let `A=(A_g1,A_g2)` and `B=(B_g1,B_g2)` be the endpoint-presence bits after chart and pair normalization.
+For each canonical Channel `c` with endpoint Gates `x` and `y`, define:
 
-* **Electromagnetic predicate.** `C` is electromagnetic exactly when `(A=(1,0) and B=(0,1)) or (A=(0,1) and B=(1,0))`. Each person contributes exactly one different endpoint, and neither person owns both endpoints.  
-* **Derived-stage relationship.** Derive each person's hanging-Gate records under §6.2, join only reciprocal records for the same Channel with opposite present endpoints, and emit one EM identity for that Channel.  
-* **Ownership classification.**  
-  * Exclusive opposite halves produce EM.  
-  * One person owning both endpoints while the other owns neither produces dominance by the full-channel owner.  
-  * One person owning both endpoints while the other owns exactly one produces compromise; the full-channel owner owns the Channel and the other person's present endpoint is the compromised Gate.  
-  * Both people owning both endpoints produces companionship.  
-  * Matching same-end halves, one unmatched half, or two endpoints contributed by the same person do not produce EM.  
-* **Gate-to-Channel resolution.** Each detected EM must resolve to exactly one validated Channel row. Ambiguous or unmapped combinations fail closed with a typed error.  
-* **De-duplication.** A canonical Channel contributes at most once to the EM feature set.  
+* `A_x`, `A_y`: whether member A owns each endpoint;  
+* `B_x`, `B_y`: whether member B owns each endpoint;  
+* `A_full = A_x and A_y`;  
+* `B_full = B_x and B_y`;  
+* `A_count = A_x + A_y`;  
+* `B_count = B_x + B_y`.
+
+Apply the first matching rule:
+
+| Priority | State | Exact predicate | Owner field |
+| ----- | ----- | ----- | ----- |
+| 1 | `companionship` | `A_full and B_full` | absent |
+| 2 | `compromise` | exactly one member is full and the other has exactly one endpoint | full-Channel owner |
+| 3 | `dominance` | exactly one member is full and the other has zero endpoints | full-Channel owner |
+| 4 | `electromagnetic` | neither is full and the members exclusively own opposite endpoints | absent |
+| 5 | `none` | every other pattern | absent |
+
+For `dominance` and `compromise`, normalize the owner as `member_lo` or `member_hi` after intrinsic numeric Gate-mask ordering. All other states omit the owner field.
+
+An electromagnetic state requires exactly one of:
+
+* `A_x and not A_y and not B_x and B_y`;  
+* `not A_x and A_y and B_x and not B_y`.
+
+The hanging-Gate process in §6.2 is a derived detection stage for the same classifier. It may join only reciprocal records for the same Channel with opposite present endpoints and must emit the same single electromagnetic Channel identity. It creates no independent contribution.
+
+Unmatched hanging Gates, same-end hanging Gates, one unmatched half, and Gate repetition resolve to `none` unless a higher-priority full-Channel rule applies. A Channel is classified exactly once.
+
+* **Gate-to-Channel resolution.** Every classified Channel must resolve to exactly one validated Channel row. Ambiguous or unmapped combinations fail closed with a typed error.  
+* **De-duplication.** A canonical Channel contributes at most once to the five-state vector and at most once to any configured signal row.  
 * **Canonical `channel_id`.** The Channel Catalog identity is `"<lowGate>-<highGate>"`, with numeric endpoints in ascending order and zero-padded to two digits (`01..64`). Example: Gates `{8,1}` resolve to `"01-08"`.  
-* **Sorting.** The EM Channel list must be duplicate-free and ASCII-sorted by canonical `channel_id`.
+* **Sorting.** Channel-state rows and the derived EM Channel list must be duplicate-free and ASCII-sorted by canonical `channel_id`.
 
 ### **Throat flags (normative)**
 
@@ -1690,6 +1863,158 @@ No current over-concentration factor, trigger, floor, cap, bonus, correction, or
 * AB↔BA parity holds on the complete intrinsic ten-category scores and bands after pair normalization.  
 * Two identical runs with the same normalized inputs and governed frozen data produce byte-identical internal results.  
 * Reader/CLI public-byte parity is not proved here; the corresponding Reader-envelope requirement is governed in §10 and its owning interface canon.
+
+### **Canonical Magic10 v1 goldens**
+
+#### **M10-G001: no relationship Channels**
+
+If all 36 Channel states are `none`:
+
+* all twenty signal wire values are `0`;  
+* all ten scores are `0`;  
+* all ten bands are Cool.
+
+#### **M10-G002: homogeneous companionship kernel fixture**
+
+If every mapped state is `companionship`:
+
+| Category | Score | Band |
+| ----- | ----- | ----- |
+| harmony | 100 | Glow |
+| heat | 50 | Warm |
+| communication | 75 | Glow |
+| alignment | 100 | Glow |
+| comfort | 100 | Glow |
+| consistency | 100 | Glow |
+| expansion | 50 | Warm |
+| creativity | 63 | Warm |
+| drive | 50 | Warm |
+| balance | 50 | Warm |
+
+Balance is `50` because `equilibrium_score` receives no one-owner mass while `counterweight_ratio` is `100`. This is a kernel fixture, not a claim that an all-Channel natal chart is lawful.
+
+#### **M10-G003: Balance ownership split**
+
+For the six equal-weight `equilibrium_score` Channels:
+
+* three dominance or compromise Channels owned by `member_lo` and three owned by `member_hi` produce `q_equilibrium = 200`;  
+* all six owned by one member produce `q_equilibrium = 0`;  
+* swapping members cannot change either result.
+
+#### **M10-G004: sparse end-to-end Gate sets**
+
+Use:
+
+* member A Gates: `{5,19,20,34,43,49}`;  
+* member B Gates: `{9,12,15,22,23,52}`.
+
+Expected Channel states:
+
+* `05-15`: electromagnetic;  
+* `09-52`: dominance by B;  
+* `12-22`: dominance by B;  
+* `19-49`: dominance by A;  
+* `20-34`: dominance by A;  
+* `23-43`: electromagnetic;  
+* all other Channels: none.
+
+Expected signal wire values:
+
+| Signal | `q` half-score units |
+| ----- | ----- |
+| `rapport_delta` | 25 |
+| `resonance_strength` | 63 |
+| `spark_intensity` | 0 |
+| `momentum_flux` | 38 |
+| `signal_clarity` | 40 |
+| `exchange_density` | 20 |
+| `vector_cohesion` | 0 |
+| `axis_agreement` | 25 |
+| `soothe_index` | 50 |
+| `buffer_resilience` | 38 |
+| `pattern_integrity` | 50 |
+| `variance_stability` | 0 |
+| `growth_tendency` | 0 |
+| `horizon_reach` | 0 |
+| `novelty_factor` | 50 |
+| `expression_flow` | 20 |
+| `willpower_current` | 0 |
+| `focus_pressure` | 60 |
+| `equilibrium_score` | 0 |
+| `counterweight_ratio` | 33 |
+
+Expected category results:
+
+| Category | Score | Band |
+| ----- | ----- | ----- |
+| harmony | 22 | Cool |
+| heat | 10 | Cool |
+| communication | 15 | Cool |
+| alignment | 6 | Cool |
+| comfort | 22 | Cool |
+| consistency | 13 | Cool |
+| expansion | 0 | Cool |
+| creativity | 18 | Cool |
+| drive | 15 | Cool |
+| balance | 8 | Cool |
+
+AB and BA must produce the same complete signal, score, and band vectors.
+
+#### **M10-G005: identity independence**
+
+Two eligible requests with identical normalized Gate masks and different user IDs must produce byte-identical intrinsic Magic10 content and the same `pair_key` under the same release. Pair IDs, request IDs, timestamps, and viewer preferences are excluded from the intrinsic preimage. This fixture does not assert that eligibility, directional narrative orientation, or public Reader bytes ignore identity.
+
+#### **M10-G006: category boundary matrix**
+
+At the category-reducer fixture layer, inject direct schema-valid `q` input pairs that produce integer scores `24`, `25`, `49`, `50`, `74`, `75`, and `100`. These pairs need not be reachable from Gate sets because this golden isolates reducer and band boundaries. Expected bands are respectively Cool, Open, Open, Warm, Warm, Glow, and Glow.
+
+#### **M10-G007: valid self-pair boundary**
+
+Use:
+
+* `a_id = b_id = 00000000-0000-0000-0000-000000000001`;  
+* both resolved normalized Gate sets are `{1}` and their complete normalized projections are byte-identical;  
+* `release_id = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`;  
+* `meta.engine_tag = m10-test`;  
+* `meta.invocation_tag = m10-identity-boundary`.
+
+Expected behavior:
+
+* validation succeeds and `eligible == false`;  
+* Engine Core, the intrinsic cache, and the narrative router are not called;  
+* no `pair_key`, signal vector, category matrix, personal key, or shared key exists;  
+* Reader categories are exactly `[]`;  
+* canonical Reader preimage bytes hash to `8214324eb0129ff1dc213a5d53bd9d7b3758a351032c5258f7ba28eace7adc15`;  
+* two runs and the vacuous AB/BA reversal produce byte-identical Reader success bodies;  
+* the condition is not converted into an error.
+
+An internal same-UUID fixture with unequal complete normalized projections instead returns `ERR_READER_INVALID_CHART`, emits no success body, and creates no `pair_key`.
+
+#### **M10-G008: distinct people with equal Gate masks**
+
+Use:
+
+* `a_id = 00000000-0000-0000-0000-000000000001`;  
+* `b_id = 00000000-0000-0000-0000-000000000002`;  
+* both normalized Gate sets are `{1}`;  
+* the same `release_id` and `meta` values as M10-G007.
+
+Expected intrinsic behavior:
+
+* `eligible == true`;  
+* `gate_mask_hex == 0000000000000001` for each member;  
+* `chart_fingerprint == 7567338a3be5b35e00366bfe86f3f1ca8b89be1fd02be893abeb62a60dbc2d2b` for each member;  
+* `pair_key == 8a75eafcc4af664e073c1c4daec55f073f416af2c461039539f01717ac01d501` under config `m10-channel-state-v1.0.0`;  
+* every Channel state is `none`, every signal wire value is `0`, and every category score is `0` with band Cool.
+
+Expected orientation and surface behavior:
+
+* the first UUID is `lo` and the second is `hi` by the `(gate_mask, canonical_person_id)` tuple;  
+* with a router stub returning `m10.test.personal.lo_to_hi`, `m10.test.personal.hi_to_lo`, and common shared key `m10.test.shared.equal_mask`, those values occupy `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key` respectively;  
+* reversing request order produces byte-identical `magic10_compat_result.v1` bytes and the same caller-to-key mapping;  
+* Reader emits `eligible: true` and exactly `[{"id":"harmony","band":"Cool"}]`;  
+* canonical Reader preimage bytes hash to `ae435ccc1f9d2043b4ee825f48c54ea421276d49d159b19271e46b24c04f2f6e`;  
+* the Reader hash is independently computed and is not assigned from `pair_key`.
 
 ## **9.6 Pack closure and release identity**
 
