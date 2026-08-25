@@ -3,10 +3,10 @@
 ## **0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref  
-**Version:** v2.5.1  
+**Version:** v2.5.2  
 **Status:** Canon  
-**Effective date:** 2026-08-12  
-**Last Update Gate:** 0808 refresh 5  
+**Effective date:** 2026-08-25  
+**Last Update Gate:** BN 12.8.9   
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -104,7 +104,7 @@
     
 * **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface (JSON, no cache, no ETag) used for engine identity and rails snapshots. Header and refusal posture are governed by HDE-Governance §10.5; bytes live in the internal-ops section of Reader transport.  
     
-* **Production Reader surface — Speculative.** Future public endpoint for Glow App. When enabled, public header and conditional-delivery rules will be owned in §5.2/§5.3; until then, behavior is dev/ops-only.  
+* **Production Reader surface — Required-Now.** `POST /api/reader?v=1` is the adopted production application route. It accepts only the closed two-UUID request in §5.1, resolves BodyGraphs read-only, and projects either the one-band eligible Reader v1 success or the empty ineligible self-pair success. The existing file-path GET Reader remains development-only and non-authoritative.  
     
   ---
 
@@ -662,50 +662,21 @@ All JSON surfaces:
 
 On success, and **in the absence of explicit reader-dump overrides**, `showcompat` **MUST** write a single LF-terminated compat JSON object to **stdout**, and **MUST NOT** print the Reader v1 envelope directly to stdout.
 
-**Envelope (informative outline).**  
-Compat JSON is a single object, canonically emitted, whose high-level shape is:
+**Closed governed result contracts (normative).**
 
-`{`
+`magic10_result.v1` exists only for an eligible distinct-person pair. Its top-level object has `additionalProperties: false` and exactly `schema`, `config_id`, `release_id`, `pair_key`, `signals`, and `categories`. `schema` is `magic10_result.v1`; `release_id` and `pair_key` are lowercase 64-hex; `signals` has exactly twenty rows in flattened caps-input order; and `categories` has exactly ten rows in `catalog/magic10.json` order.
 
-`"a": { <A_FIELDS> },`
+Each signal row has exactly `signal_id` and `q`, with integer `q` in `0..200`. Each pure category row has exactly `category_id`, integer `score` in `0..100`, and `band` in `{Cool, Open, Warm, Glow}`. The pure result contains no names, UIDs, timestamps, viewer preferences, copy, personal keys, shared keys, request metadata, or mutable configuration handles.
 
-`"b": { <B_FIELDS> },`
+`magic10_compat_result.v1` is the symmetric complete internal/admin result and also exists only for an eligible pair. It has the same top-level identity fields and signal array, with `schema` fixed to `magic10_compat_result.v1`. Each category row has exactly `category_id`, `score`, `band`, required nonempty `shared_key`, required nonempty `personal_lo_to_hi_key`, and required nonempty `personal_hi_to_lo_key`.
 
-`"viewer_prefs": { <VIEWER_PREF_FIELDS> },`
+The narrative router augments, but does not rescore or otherwise change, the pure result. It orders parties by `(gate_mask, canonical_person_id)`; for distinct equal-mask parties, ASCII canonical UUID order decides `lo` and `hi`. The normalized `a_to_b` key is `personal_lo_to_hi_key`, the normalized `b_to_a` key is `personal_hi_to_lo_key`, and both calls must return the same `shared_key` or augmentation fails closed. A caller-specific projection selects its personal key by comparing its canonical UUID with the transient normalized orientation and may not rewrite the symmetric stored result. The router does not change `q`, score, band, order, `config_id`, `release_id`, or `pair_key`. Reversing request order produces byte-identical complete-result bytes. The augmented result is assembled per eligible evaluation and must not be cached or retrieved solely by the identity-free intrinsic `pair_key`. A valid self-pair has no `magic10_result.v1` or `magic10_compat_result.v1`.
 
-`"compat": {`
+**CLI full-matrix diagnostic.**
 
-```
-`"categories": [ <CATEGORY_ENTRIES> ],`
+For an eligible pair, ordinary `hdctl showcompat` stdout is one canonical `magic10_compat_result.v1` document. It has no enclosing `a`, `b`, `viewer_prefs`, `compat`, or CLI-identity `meta` wrapper. This numeric full-matrix result is restricted to internal/admin CLI use and must never be substituted for Reader v1 public bytes.
 
-`"meta": { <COMPAT_META_FIELDS> }`
-```
-
-`}`
-
-`}`
-
-*The exact internal schema (fields for scores, bands, narrative keys per category, and identity fields) is owned by this document (later sections) and the HDE-Mechanics Guide (titles-only), and is **not** the Reader v1 envelope.*
-
-**Semantics.**
-
-* `a` / `b` describe the pair participants and resolved BodyGraphs for this compat run.  
-    
-* `viewer_prefs` captures viewer-preference inputs where applicable (for example `top_category` and weights across the Magic-10 set). In pre-App QA contexts it is expected to be present but neutral (equal weights) unless the test explicitly varies it.  
-    
-* `viewer_prefs` MUST be validated and normalized before compat computation. Normalization preserves Magic-10 weight semantics and exposes the normalized weight for a candidate top category to the sampler/ranker handoff; the sampler/ranker remains the behavior owner for excluding candidates whose top category has viewer weight 0\.  
-    
-* Compat computation MUST NOT create a second zero-weight exclusion home in the CLI or presenter, and this normalization/handoff rule does not create a new route or public contract.  
-    
-* `compat.categories[*]` carries per-category compat details (including scores, bands, and narrative selection keys) for the full Magic-10 set; the **public** Reader envelope continues to expose only `"harmony"` and bands (§5.1).  
-    
-* `compat.meta` carries **CLI/local compat identity**, not the prod engine identity:  
-    
-  * In CLI contexts (including dev Codespaces), `meta.engine_tag`, `meta.invocation_tag`, and `meta.release_id` describe the **engine instance and invocation used by the CLI** (for example `hdengine-dev`, `INV-LOCAL`, or an all-zero `release_id` in early QA).  
-      
-  * These values **may differ** from the prod Reader identity reported by `/internal/version` on Railway (`engine_tag: "hdengine@prod"`, non-zero `release_id`, etc.). The authoritative source for prod engine identity remains the `/internal/version` ops endpoint and the Reader v1 envelope on Railway, as governed by **HDE-Governance** and **HDE-Mechanics Guide** (titles-only).  
-      
-  * QA and tooling **must not** treat compat.meta as proving the identity of a remote prod engine; it is a local/CLI identity context used for debugging and evidence tagging.
+Existing viewer-preference validation and normalization remain input-side handoffs for sampler/ranker workflows, including preservation of weight-0 semantics; viewer preferences do not enter intrinsic scoring, add fields to either governed result, or create a second CLI/presenter zero-weight exclusion home. CLI-local identity context, when needed for evidence tagging, remains separate from the complete-result bytes and does not establish remote production identity.
 
 **Streams.**
 
@@ -2089,49 +2060,30 @@ The Reader v1 success body contains exactly these six top‑level keys — no ex
     
 * `idempotence_hash` — lowercase 64‑hex string.
 
+### **5.1.0 Production POST request and resolution (normative)**
+
+`POST /api/reader?v=1` accepts one JSON object with exactly `a_id` and `b_id`. Each value must be an exact lowercase canonical hyphenated RFC 4122 UUID. Unknown keys and inline charts, Gates, weights, profiles, bands, configuration IDs, and viewer preferences are prohibited.
+
+The application resolves each UUID read-only through `public.hde_body_graphs_current` with `user_id` equal to the canonical UUID and `vendor = 'hdapi'`, selecting the current `user_id`, `vendor`, `vendor_version`, `input_fingerprint`, and `payload`. Reader resolution performs no write, request-time vendor call, arbitrary-string UUID5 conversion, or silent fallback. A resolved Gate array must be present, nonempty, unique, canonical, and within `1..64` before Engine Core is called.
+
+Eligibility is decided after both complete projections resolve and before Engine Core, narrative routing, or intrinsic cache access. The same canonical UUID with byte-identical normalized projections is a valid ineligible self-pair. The same canonical UUID with unequal complete normalized projections fails closed. For distinct parties, directional narrative order is `(gate_mask, canonical_person_id)`; ASCII canonical UUID order is used only to break an equal Gate-mask tie. Request order never controls narrative orientation.
+
 ### 5.1.1 CLI and admin compatibility surfaces (normative)
 
 * The Reader v1 success envelope above is the **only** public compat payload exposed by the Reader API. It remains six‑key and numeric‑free.  
     
-* The compat engine also produces a richer **compat JSON** structure (scores, bands, narrative keys, and per‑category metadata) used for admin/test workflows. This richer JSON is **not** the Reader v1 envelope.
+* The compat engine produces the pure `magic10_result.v1` and the symmetric complete `magic10_compat_result.v1` defined in §4.1.3. Neither is the Reader v1 envelope.
 
 **hdctl showcompat (CLI admin harness).**
 
-In v1, `hdctl showcompat` behaves as follows (normative; see §4.1 for full details):
+In v1, `hdctl showcompat`:
 
-* Resolves the pair inputs and viewer preferences (via DB/vendor/file/STDIN as specified in §4.1).  
-    
-* Computes full compat JSON, including:  
-    
-  * per‑category `band` and numeric scores, and  
-      
-  * narrative selection keys per category (for Aux/Narratives).
+* resolves and normalizes the pair inputs under §4.1;  
+* invokes the governed result path without using viewer preferences or person identity as intrinsic score inputs;  
+* emits the complete `magic10_compat_result.v1` to stdout for an eligible pair as one LF-terminated canonical JSON document; and  
+* emits no `a`/`b`/`viewer_prefs` wrapper or public Reader payload on ordinary stdout.
 
-Emits that compat JSON to **stdout** as a single LF‑terminated canonical JSON document of the form:
-
-`{`
-
-`"a": {…},`
-
-`"b": {…},`
-
-`"viewer_prefs": {…},`
-
-`"compat": {`
-
-```
-`"categories": [ … ],`
-
-`"meta": { … }`
-```
-
-`}`
-
-`}`
-
-* The exact schema (fields and enums) is owned by this document’s later compat sections and **HDE‑Mechanics Guide** (titles‑only). Compat JSON is an **admin/test surface only**; it is not a public Reader payload.  
-    
-* When `--dump-reader <path>` is provided, `showcompat` also writes the Reader v1 success envelope bytes to `<path>` via the same `emit_reader_public_envelope` path as the Reader API. These bytes must obey the six‑key covenant above and the canonical JSON rules in §6.1.
+The complete result is an internal/admin surface only. When `--dump-reader <path>` is provided, `showcompat` also writes the six-key Reader v1 success envelope to `<path>` through the Reader presenter. Those bytes remain governed by §5.1.2 and §6.1 and are distinct from the complete internal result.
 
 ### 5.1.2 Reader v1 envelope bytes (normative)
 
@@ -2158,31 +2110,25 @@ When the Reader v1 envelope is produced (either by the Reader API on a Catalog J
       
   * `id` comes from the Magic‑10 closed set (HDE‑Schemas & Artifacts §2.6; HDE‑Math‑Spec §5.1).  
       
-  * In v1 Alpha:  
+  * In v1:  
       
     * if `eligible == true`: emit exactly one item `{"id": "harmony", "band": …}`;  
         
-    * if `eligible == false`: `categories` MAY be `[]`.
+    * if `eligible == false`: `categories` MUST be `[]`. Engine Core, the intrinsic cache, and the narrative router are not called; no `pair_key`, intrinsic result, or narrative key exists.
 
 
-* Be byte‑identical across Reader and CLI for the same underlying compat result and environment (when CLI produces the envelope via `--dump-reader`).
+* Be byte-identical across Reader and CLI for the same underlying compat result and environment when CLI produces the envelope via `--dump-reader`.
 
 Richer compat JSON (including numeric scores and narrative selection keys) is restricted to **admin/test artifacts** (for example, `hdctl showcompat` compat JSON on stdout, admin sidecars, and Aux preview inputs). These admin surfaces **must not** extend or change the Reader v1 public envelope; the six‑key envelope remains numeric‑free and field‑closed.
 
 ### 5.1.3 Emission algorithm (success case; titles‑only)
 
-The emission algorithm for the Reader v1 envelope is unchanged and remains:
+The Reader v1 success emission algorithm is:
 
-1. **Build preimage** as defined in HDE‑Math‑Spec §3 (fields owned there; do not restate here). The preimage excludes `idempotence_hash`.  
+1. **Build the five-key public preimage.** After eligibility and category projection, build an object with exactly `reader_version`, `eligible`, `categories`, `meta`, and `release_id`. It excludes `idempotence_hash` and `pair_key`; never copy `pair_key` into the public hash.  
      
-2. **Canonicalize & hash.**  
+2. **Canonicalize & hash.** Serialize the preimage with the single shared emitter and canonical JSON rules (§6.1) to obtain `preimage_bytes`. Compute `idempotence_hash = sha256(preimage_bytes)` as lowercase 64-hex.  
      
-   * Serialize the preimage with the single shared emitter and canonical JSON rules (§6.1) to obtain `preimage_bytes`.  
-       
-   * Compute `idempotence_hash = sha256(preimage_bytes)` (lowercase 64‑hex).
-
-   
-
 3. **Finalize.**  
      
    * Add `idempotence_hash` to the envelope.  
@@ -2271,9 +2217,51 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
    
 
-2. No other fields may appear in the public error\_v1 envelope.  
-     
-3. **Canonical error token map (`ERR_*`) and aliases.**  
+2. No other fields may appear in the public error\_v1 envelope.
+
+3. **Magic10 Reader and internal failure contract (normative).**
+
+   1. For Reader v1, the standard error envelope has exactly `schema`, `ok`, `code`, and `error`; `schema` is `v1`, `ok` is `false`, and `code` and `error` are the governed pair below. Public Reader invokes `engine.compat.errors.error_envelope()` without `details`. No stack, path, UUID, Gate list, configuration contents, database detail, or internal diagnostic detail appears.
+
+| Condition | Canonical token | HTTP status | Public-envelope rule |
+| ----- | ----- | ----- | ----- |
+| Invalid JSON, unknown request key, missing `a_id` or `b_id`, or an identifier that is not an exact lowercase hyphenated UUID | `ERR_READER_INVALID_INPUT` | 422 | Standard error envelope; no details |
+| The same canonical identity is supplied with unequal complete normalized chart projections on an internal or future resolver path | `ERR_READER_INVALID_CHART` | 422 | Standard error envelope; no success, score, cache access, or narrative routing |
+| Person identifier cannot resolve to a complete BodyGraph | `ERR_M10_PERSON_UNRESOLVED` | 404 | Standard error envelope; do not reveal which identifier failed |
+| Reader DB resolution is unavailable, ambiguous, or violates the current-view row contract | `ERR_M10_RESOLVER_UNAVAILABLE` | 503 | `Cache-Control: no-store`; no row or DB details |
+| Reader resolves a stored BodyGraph whose Gate array is missing, empty, duplicate, malformed, noncanonical, or outside `1..64` | `ERR_M10_BODYGRAPH_INCOMPLETE` | 503 | `Cache-Control: no-store`; no partial score and no request-time vendor fallback |
+| An internal or CLI complete-chart input has no Gate array or an empty Gate array | `ERR_M10_GATES_MISSING` | 422 | Standard internal error envelope; no partial score |
+| An internal or CLI Gate value is duplicate, malformed, noncanonical, or outside `1..64` | `ERR_M10_GATES_INVALID` | 422 | Standard internal error envelope; no partial score |
+| Legacy ID-only internal call reaches scoring without sanctioned chart resolution | `ERR_M10_LEGACY_INPUT_UNSUPPORTED` | 422 | Standard error envelope; no UID-hash fallback |
+| Loaded mechanics config or source hash disagrees with the selected config | `ERR_M10_CONFIG_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Manifest membership, checksum, or release identity disagrees | `ERR_M10_MANIFEST_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Result schema identity or bytes disagree with the active release | `ERR_M10_RESULT_SCHEMA_MISMATCH` | 503 | `Cache-Control: no-store`; no result body |
+| Cached result identity is stale and valid Gate inputs are unavailable for recomputation | `ERR_M10_STALE_RESULT` | 503 | `Cache-Control: no-store`; no legacy result |
+
+   2. The exact governed `error` messages are:
+
+| Token | Exact message |
+| ----- | ----- |
+| `ERR_READER_INVALID_INPUT` | `invalid Reader request` |
+| `ERR_READER_INVALID_CHART` | `invalid Reader chart` |
+| `ERR_M10_PERSON_UNRESOLVED` | `BodyGraph not found` |
+| `ERR_M10_RESOLVER_UNAVAILABLE` | `BodyGraph resolver unavailable` |
+| `ERR_M10_BODYGRAPH_INCOMPLETE` | `BodyGraph is incomplete` |
+| `ERR_M10_GATES_MISSING` | `Gate data is required` |
+| `ERR_M10_GATES_INVALID` | `Gate data is invalid` |
+| `ERR_M10_LEGACY_INPUT_UNSUPPORTED` | `legacy scoring input is unsupported` |
+| `ERR_M10_CONFIG_MISMATCH` | `Magic10 configuration mismatch` |
+| `ERR_M10_MANIFEST_MISMATCH` | `Magic10 release manifest mismatch` |
+| `ERR_M10_RESULT_SCHEMA_MISMATCH` | `Magic10 result schema mismatch` |
+| `ERR_M10_STALE_RESULT` | `Magic10 cached result is stale` |
+
+   3. The error branch of `schemas/reader.v1.schema.json` MUST enforce this exact closed topology and the governed token/message pairs. Every new token MUST be registered in `engine/compat/error_tokens.py` and regenerated into `errors/token_map/token_map.json` through `tools/errors/generate_error_artifacts.py`. `adapter/schemas/error_v1.schema.json` remains unchanged unless its parity check proves a mismatch.
+
+   
+
+   
+
+4. **Canonical error token map (`ERR_*`) and aliases.**  
      
    1. Canonical error tokens are defined in a governed **error token map** (for example `ERROR_TOKEN_MAP` in the engine) and are emitted as **UPPER\_SNAKE** strings in the `code` field, such as:  
         
@@ -2422,7 +2410,7 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 
 ---
 
-## **5.5 Compat v1 (dev-only) route & parity harness \[Implemented (dev-only)\]**
+## **5.5 Compat v1 (dev-only) route & parity harness \[PartiallyImplemented; Required−Now\]**
 
 **Purpose (informative).** Provide a development-only endpoint for exercising the Compatibility Engine and producing acceptance evidence. This route exists solely for operator/testing workflows; it is **not** a public Reader contract and **may contain numerics** (internal surface). **A7 proofs do not run here**; the proof surface is the **Catalog JSON success route** (see §5.6).
 
@@ -2439,7 +2427,7 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 * **Validation and environment gating.**  
   * Reject invalid or empty `a_id`/`b_id` before any person resolution; do not allow empty strings to propagate into server errors.  
   * The compatibility namespace is exactly `/api/compat/v1` and its descendants and MUST NOT match unrelated prefixes such as `/api/compat/v10`. Resolve production posture by trimming and case-folding a nonempty `APP_ENV` first and otherwise `ENGINE_ENV`; `prod`, `production`, and `live` resolve to production-like posture. In any resolved production-like posture, every method on the exact namespace or any descendant MUST fail closed with status `404`, presenter-backed `error_v1` `code=ERR_NOT_FOUND`, and `Cache-Control: no-store`; `HEAD` carries no body. This guard applies before compatibility computation so the internal surface remains hidden.  
-* **Success body (dev/internal).** Returns the §7A pair contract and bytes for the public Reader v1 payload.
+* **Success body (dev/internal; authenticated).** After the production-excluding environment gate and internal authentication, `POST /api/compat/v1` returns the canonical `magic10_compat_result.v1` defined in §4.1.3 for an eligible pair. It does not return or wrap Reader v1 bytes. Full signals, scores, and narrative keys remain internal/admin-only. A valid self-pair has no complete result, and this route must not fabricate a matrix.
 
 **Error body.** Typed, numeric-free **error\_v1** envelope as defined in §5.2: `{"schema":"v1","ok":false,"code":"<ERR_*>", "error":"<message>", ...}`. For this route, the canonical codes include:
 
@@ -2466,7 +2454,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 ### **Parity (clarified)**
 
 * **Public parity lives in §5.4** (`/reader?v=1` ↔ Reader-v1 bytes written by `hdctl showcompat --dump-reader <path>`). Ordinary `showcompat` stdout is the distinct compat envelope.  
-* **Compat v1 parity (optional/when enabled).** If a dev-only CLI admin sidecar or file-backed internal output is enabled, its bytes **MUST** match `POST /api/compat/v1` for identical inputs. (Admin sidecar is disabled by default; enabling it requires a Doc-Delta and refreshed evidence.)
+* **Compat v1 parity (normative).** For the same eligible normalized inputs, active configuration, and release, `hdctl showcompat` stdout and authenticated `POST /api/compat/v1` MUST emit byte-identical canonical `magic10_compat_result.v1` bytes. Both surfaces consume the same complete result and neither may calculate, weight, round, band, augment, or rescore independently.
 
 ### **Evidence (records-only; titles-only; indexed via PF12)**
 
@@ -2490,6 +2478,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 | Route | Methods defined by PF05/runtime | Transport posture | A7 |
 | :---- | :---- | :---- | :---- |
 | `/reader` | `GET`, `HEAD` | internal dev-harness; explicit `APP_ENV=dev`; production public enablement is a separate change | eligible |
+| `/api/reader` | `POST` | production application Reader v1; closed two-UUID request; read-only current-`hdapi` BodyGraph resolution | not eligible |
 | `/api/compat/v1` | `GET`, `POST`, `HEAD`, `OPTIONS` | internal admin; production-excluding environment gate; writer `no-store`, no `ETag` | not eligible |
 | `/aux/narrative` | `GET` | canonical public narrative surface; `classification:"public_aux"`; `internal:false`; `env_gate:"not_applicable_public"` | not eligible |
 | `/api/aux/narrative` | `GET` | conditional `/api` alias of `/aux/narrative`, represented by the canonical record's `aliases` array | not eligible |
