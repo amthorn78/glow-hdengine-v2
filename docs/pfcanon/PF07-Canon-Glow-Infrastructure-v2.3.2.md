@@ -1,10 +1,10 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v2.3.1  
+**Version:** v2.3.2  
 **Status:** Canon  
-**Effective date:** 2026-08-11  
-**Last Update Gate:** 0808 refresh 3  
+**Effective date:** 2026-08-25  
+**Last Update Gate:** BN 12.8.9  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ---
@@ -633,12 +633,13 @@ PF07 remains the single home for provider/project/service names, stable base URL
 * **Build artifact:** container image (Railway) — **TBD**  
 * **Linked database (shared):** instance **ample-illumination/production/postgres** · schema **hde**  
 * **Vendor credential boundary (names-only):** `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` belong to the HD Engine infrastructure boundary. Glow app integration should consume HD Engine outputs through a controlled integration surface and should not require direct HumanDesignAPI credentials. Any future cross-service invocation must preserve secret isolation unless a future ADR or canon update explicitly changes this boundary.  
+* **Magic10 service topology (names-only):** Magic10 remains within the existing HD Engine application/network boundary and creates no direct-internet mechanics service. Public versus internal/admin field exposure remains owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Schemas & Artifacts**.  
 * **Database binding (names-only):** `DATABASE_URL` → direct PostgreSQL through the Glow-owned psycopg provider (sole active HDE database transport). See §7.0 and §8 Config keys.  
 * **Start command (inventory):** see **§10** (canonical Railway command kept verbatim)  
 * **External surfaces (titles-only):**  
   * **Endpoint Catalog (JSON success)** — discovery/proofs live in **HDE-CLI-API-Vendor-Ref** (A7 success routes); Catalog is **internal-only** and **env-gated**; capture headers-only **env-gate** proof (routing only).  
   * **Ops identity** — `/internal/version` (ops-only; posture in **HDE-Governance**).  
-  * **Catalog JSON success route (names-only):** `GET /reader` (env-gated; currently **dev**; Reader v1 is selected via query parameter `v=1`, with no route-path change). When the Reader blueprint is mounted under an `/api` prefix in a given runtime configuration, `/api/reader` is an alias of the same Reader surface (not a distinct contract and not a separate proof surface). There is no `/api/reader-proof/v1` route and it MUST NOT be referenced. The Endpoint Catalog is **internal-only** and **env-gated**; proofs target the cataloged JSON success route for the configured mount (`/reader`, or `/api/reader` only when that is the configured mount). Bytes live in **HDE-CLI-API-Vendor-Ref**; A7 policy & invariants live in **HDE-Governance**.  
+  * **Reader v1 route posture (names-only):** The canonical production target is `POST /api/reader?v=1`. The checked-in `GET /reader?v=1` file-path surface remains development-only and non-authoritative; when the Reader blueprint is mounted under `/api`, `/api/reader` is the mounted form rather than a separate contract. There is no `/api/reader-proof/v1` route and it MUST NOT be referenced. The Endpoint Catalog remains internal-only and env-gated, and catalog-driven proofs use the cataloged success route for the configured mount. Route bytes, request/response shapes, projection, A7 policy, and invariants live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**.  
   * Aux narrative surface (names-only): /aux/narrative (served from the same adapter HTTP surface family as Reader).  
   * **Compat HTTP surface (internal/admin; names-only):** `/api/compat/v1` (cataloged as internal/admin and env-gated; contract details live by title in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**).  
   * Dev-only conjunction endpoints (names-only; dev/test/local only):  
@@ -987,11 +988,11 @@ Inventory-only. List schema names and key objects per application. No DDL, types
   * `meta` — singleton engine/provenance row *(read-only at runtime)*  
   * `public_results` — append-only store for public compatibility envelopes \+ minimal metadata  
   * **body\_graphs**: durable BodyGraph rows (vendor, version, input\_fingerprint, payload, created\_at, refreshed\_at, ttl\_at)  
-  * **body\_graphs\_current**: view of latest valid per user/vendor
+  * **`hde.body_graphs_current`**: view of latest valid per user/vendor  
+  * **`public.hde_body_graphs_current`**: checked-in read-only boundary-view declaration over `hde.body_graphs_current`; the canonical Reader target resolves exact current `hdapi` rows through this public view  
+  * **Primary/unique keys (names-only).** `meta_pkey`, `public_results_pkey`
 
 
-* **Primary/unique keys (names-only).** `meta_pkey`, `public_results_pkey`  
-    
 * **Partitioning policy (name-only, if used).** **TBD**  
     
 * **Roles & grants (names-only).**  
@@ -1147,8 +1148,8 @@ These names are retained only as compatibility history and have no active PF07 e
 **Deprecated / unused (engine mode-free)**  
 Recorded here to avoid drift; **not consumed by the Engine**. The Engine exposes no runtime modes; source selection is owned by Adapter/CLI.
 
+* **Magic10 runtime selector:** none. Magic10 has no runtime feature flag, activation setting, alternate configuration selector, request-selected configuration, or shadow public result. Exactly one release-bound configuration is active; this is not an environment-key surface.  
 * `ENGINE_DATA_MODE` — OPEN/TBD (dev: may be direct; prod: cached)  
-    
 * `ENGINE_REFRESH_POLICY` — OPEN/TBD (scheduled | explicit | hybrid)  
     
   ---
@@ -1240,6 +1241,12 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 
 **LOG\_LEVEL**  
 • OPEN/TBD (all envs)
+
+**Magic10 mechanics configuration (artifact-backed; no environment key)**
+
+* **Required canonical target:** `catalog/magic10_mechanics_v1.json`.  
+* Exactly one active configuration is selected per release through `catalog/manifest.json`; the artifact is immutable within that release.  
+* PF07 records the path and the absence of an environment-key binding. Schema, canonical-byte, manifest-membership, and active-selection semantics live in **HDE-Schemas & Artifacts**
 
 **Loader selector**  
 • `PACK_SHA`: OPEN/TBD (active narratives pack identity; file-backed runtime)
