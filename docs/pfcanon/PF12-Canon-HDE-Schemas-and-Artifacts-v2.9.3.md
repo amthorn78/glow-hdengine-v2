@@ -2,16 +2,11 @@
 
 ## 0.1 Header
 
-**Title:** PF12-Canon-HDE-Schemas-and-Artifacts
-
-**Version:** v2.9.2
-
-**Status:** Canon
-
-**Effective date:** 2026-08-25
-
-**Last Update Gate:** BN 12.8.9
-
+**Title:** PF12-Canon-HDE-Schemas-and-Artifacts  
+**Version:** v2.9.3  
+**Status:** Canon  
+**Effective date:** 2026-08-25  
+**Last Update Gate:** Token retirement  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## 0.2 Scope & single homes \[Required-Now\]
@@ -166,7 +161,13 @@ A read-only repository audit MAY identify existing governed artifacts, evidence 
 
 Scoring, thresholds, deterministic preimage arithmetic, Reader and CLI transport bytes, vendor shaping, architecture boundaries, and governance-token semantics are routed by title to HDE-Math-Spec, HDE-CLI-API-Vendor-Ref, HDE Architecture, and HDE-Governance. PF12 does not restate their owned bytes.
 
-HDE-Governance owns the Token Registry and acceptance-token semantics. PF12 binds token names to artifact families and paths through names-only acceptance hints. The phased HDE Build Checklist consumes established token names and does not create them.
+HDE-Governance owns historical Token Registry interpretation and any semantics for an explicitly scoped exceptional token cross-reference. For new work, exact-source evidence and scoped decisions are the primary acceptance model. Acceptance tokens are legacy-compatible, historical, optional indexing metadata. They are not acceptance authority or a required drift-control mechanism.
+
+PF12 names-only token bindings, token-aware evidence families, and token fields are compatibility surfaces. They MUST NOT require new token issuance, a complete roster, per-step intended-token or claimed-token declarations, or a token-evidence matrix as a prerequisite for a new plan, implementation, review, QA, acceptance, or closure record. Existing token IDs and historical bindings remain governed in their original scope and MUST NOT be reinterpreted, reassigned, deleted, or bulk-rewritten.
+
+Existing token fields MAY remain where required for backward compatibility. Where a governing schema already permits an empty token array, or requires a token field whose valid value may be empty, that empty array remains valid. No PF12 schema or artifact migration is required solely to retire mandatory token use.
+
+A future scoped record MAY use a bounded token or equivalent cross-reference only when existing PF, ADR, epic, task, acceptance-criterion, test, PR, commit, workflow, schema, or artifact identifiers cannot provide the needed traceability. This exception does not reactivate a universal token system.
 
 Epic-Process-Guide owns PR workflow. PF12 defines which catalogs, manifests, ledgers, proofs, and companions must remain synchronized, not the mechanics for managing the PR.
 
@@ -2740,35 +2741,35 @@ Process and CI posture:
     
 - Acceptance sentinel gating behavior is defined in PF12 front-matter and Governance (titles-only).
 
-Canonical evidence-path binding validation (MUST).
+Exact-source evidence-path binding validation (MUST).
 
-When any acceptance token is claimed as satisfied (in an Epic Plan, acceptance map/manifest, or token\_evidence\_matrix), every token→evidence binding MUST be validated against PF12’s Evidence Catalog and any fixed canonical paths it defines.
+When a current acceptance or completion record relies on a PF12-governed artifact family, its binding MUST be traceable, as applicable, through:
 
-If the Evidence Catalog defines a fixed canonical path for a token’s evidence surface, then the Plan/matrix/acceptance artifacts MUST bind to that exact path.
+* repository identity and the exact Git commit SHA;  
+* base, candidate or head, merge, and post-merge identities when a PR is used;  
+* the PR number and immutable review or conversation record when a PR is used;  
+* the workflow name, run identifier or URL, exact tested SHA, conclusion, and applicable check set;  
+* stable PF, ADR, epic, task, acceptance-criterion, test, schema, or artifact identifiers;  
+* the exact governed artifact path and SHA-256 digest where artifact integrity is material;  
+* every required manifest, Human Evidence Index, Machine Evidence Mirror, path proof, tool version, and configuration reference;  
+* the applicable decision-maker, decision scope, and decision time; and  
+* any exception or waiver identity, owner, scope, reason, and expiry.
 
-Any binding to a non-canonical path is a mechanical blocker and MUST be corrected before approval/merge. If a non-canonical path is truly required, it MUST be routed via an explicit decision process and drained into the correct canonical home; do not silently substitute paths.
+The record MUST NOT duplicate information that GitHub or a governed repository artifact already records reliably. A PR, commit, workflow run, or existing governed artifact MAY carry the evidence directly. PF12 creates no replacement token database or universal new evidence form.
+
+Optional token compatibility.
+
+When a preserved historical record or an explicitly chosen bounded token cross-reference claims a token, every token-to-evidence binding MUST be validated against PF12’s Evidence Catalog and its fixed canonical paths. A binding to a non-canonical path is invalid and MUST be corrected before it supports acceptance. If a different path is genuinely required, route it through an explicit decision and drain it into the correct canonical home.
+
+This conditional validation does not require a token, complete roster, token-evidence matrix, or token-aware acceptance map. Absence of those token surfaces MUST NOT block otherwise sufficient exact-source evidence.
+
+When a governed historical token-evidence matrix remains in use, it MUST agree with the Human Evidence Index, Machine Evidence Mirror, and governed path proof for every artifact it binds. The matrix remains optional compatibility metadata and is not an acceptance authority.
 
 Primary evidence vs path-proof transcripts (clarification).
 
-Acceptance artifacts (Epic Plans, acceptance maps/manifests, token/evidence matrices) MUST bind tokens to the primary governed artifact paths listed in the Evidence Catalog.
+Exact-source records and optional token bindings MUST identify the primary governed artifact path listed in the Evidence Catalog. `*.path_proof.txt` files remain required integrity transcripts where PF12 requires them, but they are not primary evidence targets. The governed linkage to a path proof is through the Machine Evidence Mirror `proof_anchor` for the primary artifact.
 
-\*.path\_proof.txt files are required integrity transcripts. They MUST exist and stay in sync, but they are not primary evidence targets.
-
-Therefore, acceptance artifacts MUST NOT bind tokens directly to \*.path\_proof.txt as their evidence surface. The only approved linkage to a path-proof is via the Machine Mirror proof\_anchor for the primary artifact.
-
-Minimum required artifacts that MUST agree when a token is claimed
-
-For every claimed token, the following MUST be mutually consistent (same artifact\_key / same discovered\_physical\_path, and the same bytes-hash and size at the Index/Mirror/proof level):
-
-- The Epic Plan’s required-evidence list entry (titles/paths only, per deliverable).  
-    
-- The token\_evidence\_matrix row for the token.  
-    
-- The Human Evidence Index entry in docs/evidence/INDEX.json.  
-    
-- The Machine Evidence Mirror record in artifacts/evidence\_index.jsonl for the same (artifact\_key, discovered\_physical\_path).  
-    
-- The governed path-proof referenced by the mirror record’s proof\_anchor.
+No repository, commit, PR, workflow, hash, manifest, index, mirror, path proof, attestation, token, or decision record proves every other fact by itself. When required exact-source metadata or governed evidence is unavailable, the affected acceptance or completion claim remains unavailable or blocked.
 
 Shared/global evidence dependencies (do not assume implicit).
 
@@ -2818,27 +2819,18 @@ Plans SHOULD avoid wildcards in required-evidence lines even when a canon-define
 
 If a tool produces a high-churn set of member logs, the plan MAY treat the governed output as a single primary artifact (for example, a manifest or bundle) and state that member files are referenced by that primary artifact, provided the plan names the primary governed artifact by exact path and filename and keeps evidence binding deterministic. Member files SHOULD be referenced by the manifest/bundle rather than being individually required in the plan’s evidence-output lines unless the Evidence Catalog explicitly promotes them as primary governed evidence surfaces.
 
-Acceptance map — token identity and shape (clarification).
+Acceptance map — legacy token compatibility shape (clarification).
 
-This section clarifies how acceptance tokens are identified inside acceptance-map artifacts. This prevents token identity drift when acceptance maps are rendered as tables.
+These rules apply only when an existing token-aware acceptance map is preserved or a future explicitly bounded token cross-reference uses one. They do not require a new acceptance map, top-level token array, token roster, token-evidence matrix, or universal replacement form for tokenless work.
 
-Rule (normative).
+An existing token-aware acceptance-map artifact MUST preserve its governing schema. If that schema requires a top-level `tokens` array, retain the field. An empty array remains valid wherever the governing schema already permits it or requires the field to exist with a valid empty value.
 
-In acceptance maps, tokens are identified by the tokens\[\].name field (case-sensitive, exact-match), not by any display label or table header text.
+For each token entry that is present:
 
-Acceptance-map artifacts MUST include a top-level tokens array.
-
-Each tokens\[\] entry MUST be an object.
-
-Each tokens\[\] entry MUST include a name field whose value is a non-empty string.
-
-tokens\[\].token\_name MAY be present as an alias/display label for compatibility, but it is non-authoritative; downstream validators MUST NOT require token\_name and MUST NOT use it as the token’s identity.
-
-Implications for QA validators and plans.
-
-QA plans and validators MUST derive token identity from tokens\[\].name.
-
-QA plans and validators MUST NOT guess field keys or treat matrix/table header labels (for example token\_name) as tokens.
+* the entry MUST be an object;  
+* `tokens[].name` MUST be a non-empty string and remains the case-sensitive authoritative token identity;  
+* `tokens[].token_name` MAY remain as a compatibility alias or display label, but validators MUST NOT require it or use it as token identity; and  
+* validators MUST NOT guess token field keys or treat matrix or table headers as token identities.
 
 ---
 
@@ -2856,7 +2848,7 @@ In any PR that changes governed evidence artifacts or their indexing, you MUST u
     
 - The governed sibling \*.path\_proof.txt transcripts for every changed index/mirror file above
 
-And you MUST assert the mirror/index tokens named in §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, etc.) on every change.
+Prove each parity update through the exact repository and commit identity, exact governed paths and SHA-256 digests, and the applicable current validator or workflow result. No mirror or index acceptance-token assertion is required. A preserved historical or explicitly scoped token claim MAY reference registered mirror or index token names, but that optional metadata does not replace the exact-source proof.
 
 Whole-family same-change closeout rule (MUST).
 
@@ -5827,7 +5819,7 @@ Every Doc-Delta MUST state:
 - whether frozen inputs or `catalog/manifest.json` bytes change;  
 - the prior and computed `release_id`, or an explicit statement that the prior `release_id` remains valid;  
 - the required Human Evidence Index, Machine Evidence Mirror, checksum, sentinel, and path-proof updates;  
-- acceptance-token impact using names registered by HDE-Governance, without redefining token semantics;  
+- any preserved legacy or explicitly scoped token impact, when applicable, using names registered by HDE-Governance and without redefining token semantics; absence of such an active scoped token cross-reference requires no token declaration, roster, claim, or matrix, and backward-compatible token arrays retained in the template remain empty;  
 - each required validation behavior, its verified executable entrypoint, its result, and its evidence path;  
 - each unresolved decision as `[OPEN]`, with an owner and next step; and  
 - the pull request and commit identifier when available.
