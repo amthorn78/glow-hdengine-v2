@@ -4,9 +4,9 @@
 
 **Title:** PF19-Canon-Glow-QA-Guide  
 **Status:** Canon  
-**Version:** v2.9.6  
-**Effective date:** 2026-08-13  
-**Last Update Gate:** 0808 refresh 6  
+**Version:** v2.9.7  
+**Effective date:** 2026-08-25  
+**Last Update Gate:** BN 12.8.9  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## 0.2 Purpose & scope
@@ -428,7 +428,17 @@ An authorized authoring phase MAY run canonical writers to prepare governed arti
   * The nineteen-stage log and the exact-head external attestation are distinct evidence surfaces. Neither surface, alone or together, establishes QA PASS, acceptance-token satisfaction, OPS completion, PF09 status movement, release admission, or closeout by implication.  
 * Enforce generated development and packaging cleanliness.  
   * Local `.venv` trees and generated `*.egg-info` metadata MUST remain ignored and untracked.  
-  * A tracked virtual-environment root or tracked generated package metadata is repository contamination and MUST fail source-inventory or clean-tree validation.
+  * A tracked virtual-environment root or tracked generated package metadata is repository contamination and MUST fail source-inventory or clean-tree validation.  
+* Keep iterative local validation, remote-only validation, and exact-final-head confirmation distinct. Remote-only validation belongs only to conditions that cannot be proven locally; it MUST NOT replace iterative local checks or exact-final-head protection.  
+* Classify automated controls by continuing product and delivery risk and by lane.  
+  * Required PR CI MUST protect continuing product and delivery risk independently of epic administration.  
+  * Release and security, QA and audit, and closeout validation are distinct lanes. Evidence generation, audit work, or closeout work MUST NOT substitute for ordinary required PR CI or become required PR CI solely because it was required during one epic.  
+* CI-budget control MUST be automated and durable. Manual push counts, agent promises, operator pause gates, exception narratives, transient reports, and documentation-only remediation MUST NOT serve as enforcement substitutes.  
+  * Automated control MUST prevent or short-circuit duplicate, superseded, irrelevant, and unnecessarily repeated work while preserving every applicable protection.  
+  * Applicability MUST be deterministic and truthful. A stable required-check conclusion may be green only when every applicable protection passed or the check deterministically established that it did not apply.  
+  * The exact candidate presented for merge MUST receive every applicable required protection. An earlier green commit does not validate a later head.  
+* Review CI-budget and exact-head claims by directly inspecting the pinned workflow and configuration plus the relevant GitHub run behavior. Do not require a separate report when those facts are directly observable, and do not allow a report to substitute for automated remediation.  
+* These requirements do not mandate a particular YAML structure, job name, cache implementation, concurrency syntax, or change-detection mechanism.
 
 PF19 defines the required sequence at the QA level. PF09 — HDE-Build Checklist, PF12 — HDE-Schemas & Artifacts, and HDE-Mechanics Guide provide the concrete tool names, schemas, artifact ownership, and CI job definitions.
 
@@ -1009,6 +1019,23 @@ Entrypoint existence preflight (normative; plan-validity blocker). Before execut
 
 If either check fails, treat it as a plan validity blocker. Do not classify it as a runtime behavior failure. Stop and repair the plan and/or environment wiring before continuing Live QA.
 
+Execution-critical helper readiness (normative; preapproval blocker). If a Live QA Plan embeds, generates, or materially rewrites an execution-critical helper, the exact final helper and invocation MUST be smoke-validated before plan approval in the named venue and working directory.
+
+The preapproval proof MUST establish:
+
+* repository-root resolution;  
+* runtime imports and argument parsing;  
+* complete selected-selector collection and import closure;  
+* runtime, development, and test-only dependency readiness;  
+* applicable environment pins; and  
+* non-mutating startup.
+
+Hash verification or successful compilation alone does not establish runnability.
+
+QA plans MUST invoke tracked, reviewed, tested repository entrypoints. A plan MUST NOT embed compressed source, base64 executable payloads, large inline programs, newly invented runners, or substitute repository tooling. A missing required entrypoint is an implementation-readiness gap that MUST route through the normal PR, test, and CI path before Live QA planning.
+
+Before the first governed receipt, collection-test the complete selected selector set against the exact implementation endpoint. Tests that mount, generate, cache, or unpack content-addressed data MUST use temporary directories unless repository-path behavior is itself under test. Readiness checks MUST distinguish stable source identity and governed inputs from mutable venue metadata; validate venue metadata only where it is materially relevant and within the consuming operation.
+
 Hard boundary: no scope expansion. In-session remediation MUST NOT:
 
 * add new features or acceptance criteria  
@@ -1212,6 +1239,22 @@ Non-blocking review constraints (do not fail the plan for these):
 * A substantive blocker is allowed only when an independent non-syntax defect survives faithful normalization. The finding MUST state the syntax-normalized intended operation, the governing requirement or contract, the independent evidence proving the remaining defect, and the material harm.  
 * A mixed finding MUST be separated. Discard the syntax component and evaluate only the independently proven non-syntax component.  
 * Plans may be approved without repairing syntax. During execution, the operator may normalize syntax when the semantic contract remains unchanged, and the governed evidence MUST capture the exact command actually executed, command provenance, reason for normalization, produced artifacts, exit code, output, and final verdict.
+
+Execution-trace requirement (normative). Before classifying a command-related implementation or behavior defect, trace and distinguish:
+
+* the plan or prose representation;  
+* the acceptance-map or token-matrix declaration;  
+* parser input;  
+* wrapper input;  
+* test-fixture input;  
+* the normalized semantic operation;  
+* the actual subprocess command;  
+* the actual interpreter or executable;  
+* the actual working directory and rails posture;  
+* resulting output and exit code; and  
+* the governed evidence recording the execution.
+
+A substantive defect exists only when an independently proven problem survives the trace and materially violates approved behavior. Parser compatibility, wrapper normalization, command aliases, interpreter-invocation form, and test fixtures are not defects merely because their representation differs from the final executed command. If the trace is incomplete, record a proof gap or tooling condition; do not invent remediation.
 
 Reviewer hygiene rules (clarification):
 
@@ -7029,6 +7072,26 @@ Durable QA learnings are as follows:
 * HDE-EPIC037 PO-007 was a bounded live runtime smoke, not broad platform proof. It may support the exercised open-rails `bg:resolve --source vendor --dry-run` runtime result, mapped ChartResult adapter status, redacted request posture, mapped-no-raw-vendor-payload cache posture, and status-ok evidence. It does not by itself prove production deployment, durable mapped-cache writes, broad HumanDesignAPI v2 platform conformance, public Reader expansion, app-side credential ownership, PF09 status movement, PO closeout, board update, or epic closeout.  
 * HDE-EPIC037 final QA pass review accepted a package caveat only because current governed repo evidence supplied the proof. Zero-byte or unreadable uploaded package entries were not treated as proof. The durable QA posture is to validate current repo evidence, preserve the package caveat, and use readable governed repo artifacts only when they match the same check, proof target, evidence root, and nonclaim boundaries.  
 * HDE-EPIC037 final QA closeout review was ready with caveats. The root cause category was evidence posture and proof-boundary fragility, not an unresolved product runtime defect. The closeout trace could be satisfied for review while still preserving separate follow-up for PF09 status drainage, PO closeout, board update, formal close-pack completion, merge provenance, PF-canon drainage, durable mapped-cache persistence, and production write reopening.
+
+Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, PF29 workflow text, mapped-cache implementation work, production upsert authorization, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, PF27, or PF29 doc deltas. PF19 records QA posture and review learnings only.
+
+## **13.18 HDE-EPIC039 — QA learnings snapshot for reusable QA orchestration, exact-head CI, Moon Loop correction, evidence normalization, and closure-axis separation**
+
+PF19 records the HDE-EPIC039 final QA, closeout review, evidence normalization, Moon Loop RCA, and Lead Dev closure-evidence review only as an event-bounded QA reference. This entry does not convert historical PF10 evidence into current repository proof or new acceptance criteria.
+
+Classification posture: recorded decisions and status are `H`; reusable QA learnings are `L`. This entry does not establish current requirements; the PF10 drain targets identify the applicable non-history owner sections.
+
+Durable QA learnings are as follows:
+
+* The recorded final QA posture was `PASS`: all 14 selected checks recorded `PASS`, each with exit code `0`, for 331 passing tests. The subsequent closeout review recorded `READY WITH CAVEATS`, no developer escalation, no additional product remediation, and no supported product QA rerun. Those outcomes did not perform Product Owner closeout, PF09 movement, OPS completion, deployment, acceptance-token satisfaction, or epic closeout.  
+* The reusable QA subsystem preserved five exact statuses—`PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, and `PARKED`—with causal precedence, same-interpreter pytest invocation, selector semantics, governed current-state evidence, and rejection of phantom PASS. Historical receipts remained historical proof rather than run identity.  
+* The CI lesson was structural and exact-head: continuing controls must be automated, change-aware, budget-conscious, and truthful; manual push counts and report-only remediation are not enforcement substitutes. Required checks must not hide failed or unexecuted applicable work, and an earlier green commit does not validate a later head. PF10 routes the corresponding current rule to §2.2.11.  
+* The Moon Loop corrections concerned planner-created QA orchestration, repository-root imports, dependency readiness, a stale test expectation, Codespaces venue metadata, and finalization boundaries. They did not modify product runtime code or weaken approved feature predicates. Final disposition remained behavior-first: decisive assertion failures route to development; tooling prevention leaves behavior unproven; an authorized correction followed by complete passing assertions may support `PASS` while the correction remains RCA history.  
+* Execution-critical QA helpers must be reviewed for exact runnable behavior, not only hash or compilation posture. PF10 routes the helper-readiness rule to §3.4.8 and the command-trace rule to §3.4.10; this entry retains the event trigger only.  
+* Evidence-only normalization did not create new QA history where the relied-on runtime facts were unchanged, no new runtime, route, environment, or OPS outcome was claimed, and the affected evidence family was coherently refreshed. The current normalization rule remains in §9.2.15.8.  
+* The later closure-evidence review recorded substantive status `SATISFIED` while leaving Product Owner closeout unperformed. Closure evidence, QA disposition, PF09 status drainage, PF-Canon drainage, formal close-pack state, acceptance-token posture, Product Owner closeout, board movement, OPS, deployment, and epic closeout remained separate axes. Explicitly non-required capability-only artifacts were not blockers, and no separate decision-restatement artifact was required to make the assigned evidence decision.
+
+Known non-goals: this entry does not redefine canonical JSON mechanics, arrays-as-sets semantics, evidence publication or Machine Mirror mechanics, exact repository paths, commands, tests, hashes, artifacts, PF09 row text or status, close-pack bytes, token semantics, workflow syntax, implementation state, deployment state, or current repository state. PF19 records the QA posture and review learnings only.
 
 Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, PF29 workflow text, mapped-cache implementation work, production upsert authorization, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, PF27, or PF29 doc deltas. PF19 records QA posture and review learnings only.
 
