@@ -3,10 +3,10 @@
 ## 0.1 Document Control
 
 **Title:** PF17-Canon-HDE-Narratives-Guide  
-**Version:** v1.5.2  
+**Version:** v1.5.3  
 **Status:** Canon  
-**Effective** **date**: 2026-08-11  
-**Last Update Gate:** 0808 refresh 2  
+**Effective** **date**: 2026-08-25  
+**Last Update Gate:** BN 12.8.9  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -600,7 +600,11 @@ For an exact `{category, band, perspective}`, resolve up to three `template_key`
 * `perspective=a_to_b` → A-to-B directional candidates.  
 * `perspective=b_to_a` → B-to-A directional candidates.
 
+**Integrated Magic10 directional order.** After eligibility succeeds, order the two evaluation parties by the total tuple `(gate_mask, canonical_person_id)`, using numeric Gate-mask order and ASCII canonical UUID order only when the masks are equal. This order determines the `lo` and `hi` targets for directional narrative keys and never enters intrinsic mathematics.
+
 For a given viewer, each category still yields two narrative keys: the shared key and that viewer’s directional private key. `personal` may remain a derived narrative-kind label but is not a request or pack-key perspective.
+
+**Integrated Magic10 augmentation boundary.** Within the normalized pair, `perspective=a_to_b` routes `lo` to `hi`, and `perspective=b_to_a` routes `hi` to `lo`. For distinct equal-mask parties, ASCII canonical UUID order decides `lo` and `hi`; request order never does. Both directional routes must return the same `shared_key` or augmentation fails closed. A caller-specific projection selects its personal key by comparing its canonical UUID with the transient normalized orientation and must not rewrite the symmetric result. Narrative routing does not change `q`, score, band, category order, `config_id`, `release_id`, or `pair_key`. A valid ineligible self-pair never calls the narrative router and produces no personal or shared key. The augmented result is assembled per eligible evaluation, must not be cached or retrieved solely by the identity-free intrinsic `pair_key`, and is permitted only on internal/admin CLI and authenticated internal HTTP surfaces.
 
 **Missing-key sentinel (fail-closed).** Missing group coverage or no eligible candidate resolves internally to `missing_narrative_key`. This sentinel is not a fallback template and never selects alternate prose. It supplies the valid-identity Suppressed `composition_id` preimage and is omitted from the public Suppressed object.
 
@@ -840,7 +844,7 @@ Format validity alone is insufficient. A syntactically valid but wrong digest is
 
 **Runtime (titles-only).** Sealed narrative packs are served from `/narratives/<pack_sha>/<PACK_MEMBER>`. Runtime loading and atomic activation are owned by HDE Architecture and HDE-Mechanics Guide; pack and release identity are owned by HDE-Schemas & Artifacts.
 
-**Repository posture.** At the pinned commit, `catalog/manifest.json` omits the narrative manifest and all four required narrative members, while the loader derives a digest from reserialized manifest JSON without the governed final LF. The checked-in state therefore does not establish this required coupling or identity recipe.
+**Repository posture.** At the pinned commit, `catalog/manifest.json` includes `catalog/narratives/manifest.json` and all four required narrative members. The loader requires the checked-in narrative JSON bytes to equal canonical bytes with exactly one trailing LF and derives `pack_sha` from the byte-identical narrative-manifest bytes. The checked-in state therefore establishes the required manifest membership and exact-byte identity recipe.
 
 **Routing (titles-only).**
 
@@ -903,7 +907,7 @@ The coverage proof is keys-only and no-prose. It verifies:
 * key-level suppression eligibility; and  
 * `missing_narrative_key` for a valid-identity no-candidate result, without fallback prose.
 
-For each viewer, the derived ten-by-two result contains one shared key and that viewer’s directional private key per category.
+**Repository pack posture.** At the pinned commit, the checked-in narrative pack contains 360 registry rows and 360 templates, with 120 rows for each exact perspective: `shared`, `a_to_b`, and `b_to_a`. The registry and router preserve these exact perspective values without silent normalization. The checked-in suppression map contains two governed conflict suppressions for source paragraphs containing the prohibited token `blame`. This static inventory does not establish runtime conformance, test passage, QA PASS, or acceptance.
 
 **Parity semantics.**
 
@@ -989,10 +993,16 @@ Missing, unsupported, duplicate, partial, or identity-invalid state must not be 
 **Posture (unchanged).**  
 Reader v1 public JSON remains numeric-free (bands-only) and contains no narrative text. Narrative text appears only on the Aux narrative surface and in admin CLI preview.
 
+**Numeric-output gate.** Numeric public output requires a separately approved PF05, PF17, schema, and narrative change.
+
 This guide does not restate payload shapes or header matrices; it links by title only. Payload bytes live in **PF05 — CLI/API**; transport/A7 policy lives in **PF04 — Governance**; the bands-only Reader covenant is defined in **PF01 — Math Spec**.
+
+**Band-change dependency.** A band change requires review of the affected PF05, PF17, PF18, schema, and copy contracts before public activation.
 
 **Implications.**  
 Reader v1 keeps its existing public contract (six-key, numeric-free success body). Any narrative-related exposure continues to route through Aux/CLI, not Reader v1.
+
+**Public expansion gate.** Full ten-category public exposure requires a separate versioned PF05, schema, narrative, and product decision.
 
 **A7 proof surface (route-only).**  
 When Reader success routes are proven, proofs run only on a cataloged JSON success route (Endpoint Catalog, PF05). The Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod — capture a headers-only env-gate proof. `/internal/version` is ops-only and not A7-eligible.
