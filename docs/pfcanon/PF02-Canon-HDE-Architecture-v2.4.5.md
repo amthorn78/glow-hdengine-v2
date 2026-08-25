@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
-**Version:** v2.4.4
+**Version:** v2.4.5
 
 **Status:** Canon  
-**Effective date:** 2026-08-11
+**Effective date:** 2026-08-25
 
-**Last Update Gate:** 0808 refresh 4
+**Last Update Gate:** BN 12.8.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -401,10 +401,10 @@ It remains **contract-free** and routes bytes and schemas by **title only**.
    Adapter/CLI calls Engine functions in-process.  
      
    * Engine modules (including `engine.core.core` and `engine.sampler.core`) run pure: **no I/O, clocks, environment reads, randomness, or import-time side effects**.  
-       
    * They accept **normalized data structures** and return **normalized results** (including pair normalization for AB↔BA neutrality).  
-       
-   * Side effects are forbidden.
+   * Side effects are forbidden.  
+   * **Magic-10 pure Engine Core flow:** `BodyGraph Gates -> Channel states -> signal wire values -> category scores -> bands -> surface projection`.  
+   * Adapter, HTTP handlers, CLI, Presenter, and narrative layers MAY validate, call, or project this result. They MUST NOT calculate, weight, round, band, or rescore independently.
 
    
 
