@@ -1,20 +1,20 @@
 # **0\. Front Matter**
 
-**Title:** PF06-Canon-Epic-Process-Guide
+**Title:** PF06-Canon-Change-Process-Guide
 
-**Version:** v2.4.5
+**Version:** v2.4.7
 
 **Status:** Canon
 
-**Effective date**: 2026-08-12
+**Effective date**: 2026-08-25
 
-**Last Update Gate:** 0808 Refresh 4
+**Last Update Gate:** BN 12.8.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## 0.1 Purpose and scope
 
-This guide defines the epic delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic. It sets Close to be PR-first. CodEx MUST open the pull request and attach the close pack and the acceptance tokens (PASS) list.
+This guide defines the change delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. It sets Close to be PR-first. CodEx MUST open the pull request and attach the close pack and the acceptance tokens (PASS) list.
 
 This is process guidance only. It does not constrain execution environments, repository tooling, transport bytes, or payload bytes. Those remain in their canonical homes.
 
@@ -79,6 +79,36 @@ Subtask-level mapping is required when a relevant subtask exists. Parent-task-on
 
 Reviewers MUST reject plans, retrospectives, closeout reviews, remediation guides, QA-readiness reports, and Scrum/PO handoffs that create unaccounted task-like backlog. This is a scope-accountability requirement, not a documentation-drainage requirement.
 
+PF09 closure-first assessment.
+
+For every PF09 row that an approved Epic Plan or Implementation Plan assigns to completed PR, OPS, or combined epic work for closure, the reviewer MUST identify the exact phased PF09 document, row ID, title, physical status, approved plan scope, mapped PR and OPS lineage, and current evidence before creating remedial work. The approved plan together with applicable active PF10 defines the bounded row scope. A broader PF09 description, later-phase work, historical cleanup, future expansion, unrelated stale artifacts, physical PF09 drainage, permanent-canon drainage, QA PASS, acceptance, deployment, closeout, or an explicitly excluded requirement MUST NOT retroactively enlarge that scope.
+
+The reviewer MUST inspect current repository reality at one exact endpoint for every current implementation or evidence claim, distinguish implementation gaps, OPS gaps, evidence-inspection gaps, closure-recording gaps, and later-drain documentation, and decide row closure posture before considering remediation. The reviewer MUST NOT design remediation and then search for evidence to justify it. When the operator asks whether a row can be closed, the reviewer MUST answer `Yes` or `No` before explaining the evidence.
+
+Each mapped row MUST receive exactly one disposition:
+
+* **CLOSURE SUPPORTED — Recommend `Done`.**  
+* **CLOSURE NOT SUPPORTED — PR work remains.**  
+* **CLOSURE NOT SUPPORTED — OPS work remains.**  
+* **CLOSURE NOT SUPPORTED — PR and OPS work remain.**  
+* **CLOSURE NOT YET PROVABLE — Additional inspection or evidence capture is required.**
+
+An unchanged physical PF09 status, a missing PF10 closure addendum, an earlier assessment that identified no exact remaining work, incomplete reviewer inspection, surface command syntax, parser-compatible forms, test fixtures, historical transcripts, undrained documentation, or a row description broader than the approved assignment is not evidence that implementation or OPS work remains. The assessment MUST distinguish missing repository implementation, missing OPS execution, missing evidence capture, insufficient inspection, PF10 closure recording, and later PF09 drainage.
+
+A remedial PR may be proposed only when the assessment identifies the exact PF09 row and approved scope, the required repository behavior or deliverable, the exact inspected endpoint and implementation surface, direct evidence that current implementation fails the requirement, a complete execution trace when the finding concerns a command, parser, wrapper, harness, workflow, generator, or evidence producer, reconciliation with any accepted original or remedial lineage, confirmation that the alleged defect is not merely syntax-origin, rendering-origin, historical, test-fixture-only, documentation-only, or outside approved scope, the smallest bounded correction, and a testable done condition. If any element is absent, the reviewer MUST NOT create a remedial PR.
+
+A remedial OPS task may be proposed only when closure requires a specific external or privileged outcome that repository implementation cannot provide. The assessment MUST identify the exact mapped row and approved OPS obligation, the required external or privileged outcome, current evidence that the outcome has not occurred, why repository implementation cannot satisfy it, and the exact evidence that will prove completion. A missing PF10 record, unchanged PF09 status, missing reviewer evidence, repository defect, or documentation delta MUST NOT be converted into OPS work.
+
+When evidence is insufficient, the reviewer MUST identify and retrieve or inspect the missing proof when permitted, use `CLOSURE NOT YET PROVABLE` if the gap remains, and avoid assigning PR or OPS work unless the completed inspection independently proves that work remains. Incomplete assessment is not evidence of incomplete implementation.
+
+When PF10 records that an original or remedial lineage is accepted, preserve-required, supported by applicable passing CI, has no remaining review finding, and has no further remediation assignment, a later defect finding MUST state what evidence was previously unavailable, whether the repository changed, whether the earlier assessment overlooked an in-scope defect, why the new finding is behavioral rather than syntactic or documentary, how it prevents row closure, and why existing evidence cannot support closure. Without that reconciliation, the accepted lineage MUST NOT be converted into new implementation work.
+
+For every mapped row, the assessment MUST state the exact phased PF09 document; row ID, title, and physical status; approved plan mapping; mapped PR tasks and complete original and remedial lineage; mapped OPS tasks or `None`; exact reviewed repository endpoint; implemented behavior or completed OPS outcome; material implementation and evidence surfaces; applicable tests and CI; governed evidence; exact remaining PR work, OPS work, and evidence inspection or `None`; live PF10 disposition; physical PF09 drainage posture; and the mandatory closure-first disposition.
+
+When closure is supported, the assessment MUST recommend `Done`, state directly that no PR or OPS work remains, and provide paste-ready evidence for a PF10 closure-authorization addendum in the same assessment cycle. PF10 records accepted implementation, OPS outcomes, supersession, evidence, and live closure authority during the active epic. Physical PF09 status remains unchanged until epic closeout drainage, and that temporary difference is not unfinished work.
+
+If later inspection disproves an earlier finding, the reviewer MUST state the error and its analytical or evidentiary cause, withdraw every downstream PR, OPS, documentation, or plan task based solely on it, redo the affected row assessment from the controlling sources, and issue the corrected closure disposition. A superseded analytical mistake MUST NOT become project scope through repetition.
+
 Runtime-conformance sequencing for multi-slice epics. When an epic is trying to move a runtime or vendor surface from unsupported, insufficient, or nonclaim posture into bounded support, the plan SHOULD sequence proof from narrowest truth to broadest binding: first prove schema, field, or adapter insufficiency; then implement the pure mapping or adapter layer; then wire the runtime path; then prove internal compatibility; then run any required PO-only open-rails smoke; then bind parent or aggregate evidence. A parent-level evidence binding PR should be last when it depends on earlier PR slices and OPS evidence.
 
 Parent binding does not rerun OPS. A parent-binding or aggregate-evidence PR may consume PO-produced OPS evidence, but it MUST NOT claim to have executed OPS, completed OPS, made live vendor calls, moved PF09 status, produced QA PASS, or performed closeout unless those actions happened as separate authorized actions with their own evidence. The parent-binding artifact MUST state whether it binds existing OPS evidence, reruns nothing, and preserves the relevant nonclaims.
@@ -92,6 +122,18 @@ The Lead Developer gates; the Product Owner is the sole merger and uses squash o
 Implementation Agents and other non-CodEx process roles do not run git and do not create PRs.
 
 The repository MUST protect `main` and MUST enforce the governed required checks before merge. Squash merging MUST be enabled as the sole pull-request merge method; merge commits and rebase merging MUST be disabled.
+
+Automated CI budget control.
+
+Required CI MUST protect a current, continuing product or delivery risk independently of an epic’s closeout, evidence package, token record, reviewer convenience, or historical administrative state. Release or security automation, QA or audit automation, and epic-closeout automation MUST remain in their justified lanes. Epic-closeout preparation or validation MUST NOT become ordinary required PR CI unless a specific control independently protects the merge boundary. A permanent CI control MUST NOT test historical epic administration or require hosted results to be written back into tracked source.
+
+CI-budget governance MUST use an actionable automated repository or authorized-setting control. Valid enforcement surfaces include tracked workflow configuration, repository-owned validation tooling, automated trigger or job selection, concurrency or superseded-run cancellation, change-aware execution, reusable workflow or setup consolidation, deterministic caching or artifact reuse, automated lane separation, truthful required-check aggregation, or an authorized repository setting.
+
+Manual push counts, agent promises, pause thresholds, operator continuation approval, push-count reports, exception narratives, transient reports, and documentation-only remediation are not CI-budget controls, acceptance conditions, remediation tasks, or approval blockers. There is no five-update circuit breaker. A CI-budget finding MUST identify the avoidable hosted execution, the automated control surface, the required behavior, the protection that must remain, and a method for verifying the resulting execution shape. If no durable automated implementation exists within authorized scope, the observation MUST NOT be converted into remediation or an acceptance blocker.
+
+Automated budget control MUST structurally prevent duplicate equivalent full suites for one ordinary pull-request head, safely cancel, short-circuit, or avoid superseded expensive work, select heavy validation by event and change relevance, reduce repeated setup and validation, preserve truthful required-check continuity, and validate the exact final candidate head. It MUST NOT skip applicable protection, leave a required status pending or absent, hide failure behind a green summary, use stale or unverifiable caches, bypass branch protection, or misclassify an affected change as irrelevant.
+
+When a material structural CI-cost defect is within an epic’s approved remediation scope, the epic MUST implement and verify the automated correction. It MUST NOT defer that correction as an optional optimization or report-only follow-up. Reviewers MUST inspect repository and GitHub evidence directly when available and MUST NOT manufacture a transient report whose facts are already observable.
 
 Re-run proofs only on qualifying drift (green-freeze).
 
@@ -2675,13 +2717,25 @@ This does not relax structural requirements. Missing required sections, missing 
 
 Review-loop severity discipline.
 
+Before assigning a Blocker, requiring plan revision, or selecting a negative approval outcome, the reviewer MUST identify the exact defect, the separate material consequence under the applicable materiality rule, and the complete controlling source or verified repository fact establishing that consequence. If any of the three is missing, the issue is not a Blocker and MUST NOT change the approval decision.
+
 A planning artifact MUST NOT be returned as REVISE AND RESUBMIT solely for template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table order, heading style, punctuation, spacing, bold markers, missing titles-only polish, or similar presentation defects.
 
 A blocker requires material harm to truth, proof, acceptance, execution, source authority, portability, implementation scope, PF09 completion mapping, evidence identity, evidence trust, OPS or PR boundary, public or private surface posture, canon conflict handling, or closeout truth.
 
-If no material harm exists, classify the issue as Nit, Suggestion, or Caveat.
+A template labeled Normative, Required, or MUST establishes the required field, section, structure, or meaning. It does not make every example value, placeholder, sentinel, punctuation choice, or wording pattern byte-exact unless complete controlling authority separately establishes an exact-literal or machine-readable requirement.
+
+When a required field or structural block is present, truthful, unambiguous, and functionally equivalent to the template posture, a wording difference is non-blocking. A literal mismatch may block only when complete controlling authority requires the exact literal, a verified machine consumer depends on it, the mismatch changes a canonical identifier, token, schema value, artifact identity, status, date truth, scope, authority, execution behavior, evidence meaning, acceptance posture, or closeout truth, or the mismatch creates a real ambiguity that cannot be safely resolved without changing the artifact.
+
+If no material harm exists, omit the issue or classify it only under the review contract’s non-gating editorial category, such as Suggestion, Nit, Note, or Non-issue. Any recorded nonmaterial item MUST state that no correction is required and MUST NOT become a Caveat, Blocker, approval condition, reference-cleanup requirement, ADR or Tracked Issue revision, canon-authoring requirement, or resubmission trigger.
+
+When no material blocker or material caveat exists, nonmaterial findings MUST NOT prevent the strongest positive approval outcome allowed by the review contract.
 
 Reviewers who block must state the material harm.
+
+A review that blocks solely on a nonmaterial conformance difference is invalid to that extent. The blocker and every dependent required fix, ADR or Tracked Issue disposition, summary statement, and final decision MUST be withdrawn, or the review MUST be rerun from the unchanged source. The invalid blocker MUST NOT be used to revise the artifact or create another approval cycle.
+
+This discipline does not protect any defect with a demonstrated material consequence.
 
 CA-vetted or audit-vetted fact labels are not blockers when the plan embeds the needed fact and the downstream actor can proceed without external CA, audit files, attachments, chat history, or implementation guides. They become blockers only when the artifact requires that external source or uses provenance wording to smuggle in unproven requirements.
 
@@ -2813,6 +2867,14 @@ Reviewer safety posture (no guesswork)
 * Reviewers MUST NOT propose or accept invented repo paths, command invocations, route paths, or token names as “probably right.” Require validation or mark as a blocker.  
     
 * When quoting or redlining plan content, do not silently change escapes that affect execution semantics. If you normalize presentation-only escapes for readability, do it explicitly and ensure the quoted or pasted text preserves semantic meaning.
+
+Approval-review invalidation for reviewer-created technical design.
+
+If required-fix text in a source-bound approval review contains an execution-critical identifier or technical design that the permitted sources do not establish, that finding is invalid. An output contract requiring exact fixes, complete decisions, or paste-ready wording does not cure the defect.
+
+Every ADR or Tracked Issue disposition, approval recommendation, final decision, or other dependent finding that relies on the invalid finding is also invalid. When unsupported reviewer-created design is systemic or affects the final approval posture, the entire review MUST be discarded and rerun from the unchanged source inputs. It MUST NOT be repaired through post hoc justification.
+
+An invalid review MUST NOT be used to revise a plan, authorize implementation, create QA or OPS work, establish evidence obligations, satisfy acceptance, or support closeout.
 
 Simplified QA planning posture (planning-time expectations)
 
