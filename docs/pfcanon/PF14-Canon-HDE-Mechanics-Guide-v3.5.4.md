@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.5.3  
+**Version:** v3.5.4  
 **Status:** Canon  
-**Effective date:** 2026-08-12  
-**Last Update Gate:** 0808 refresh 6  
+**Effective date:** 2026-08-25  
+**Last Update Gate:** BN 12.8.9  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -485,7 +485,7 @@ Focused-owner allocation (normative).
 * General Presenter comparisons MUST be stdout-only when the caller does not supply a diagnostic log path. Mutable diagnostic comparisons MUST use caller-supplied task-scoped paths and MUST NOT default to the governed shared-history primary.  
 * A retired broad evidence generator MUST remain non-writing, perform no import-time generation or delegation for side effects, return nonzero, and emit a stable diagnostic directing callers to the focused generators. Active invocations MUST migrate to focused owners; historical references remain provenance.  
 * Current database-selection evidence MUST use the direct-only focused producer. Superseded bridge-era generators, dedicated bridge receipts, and direct-versus-bridge current-proof claims MUST NOT be restored or presented as active owners.  
-* Sibling path proofs, the Human Evidence Index, the Human Index hash sentinel, the Machine Mirror, the Mirror checksum, and orientation/index companions remain solely owned by the canonical evidence updater.  
+* The canonical evidence updater exclusively owns the single governed publication transaction for the topology orientation report, the Human Evidence Index, the Human Index hash sentinel, the Machine Mirror, the Mirror checksum, and all required proof companions.  
 * Focused write-set tests MUST prove disjoint primary ownership, read-only check behavior, failure atomicity, no implicit governed diagnostic destination, and fixed-point output across every allowed producer order.  
 * Unknown active invocations, overlapping write sets, direct companion writes, stale current keys, wrong shared-history bytes, mutable shared-history defaults, or updater divergence MUST fail closed.
 
@@ -498,12 +498,14 @@ Ordering generator.
 * A single ordering generator tool (for example, tools/order/generate\_ordering\_artifacts.py) is the single writer for ordering artifacts under artifacts/engine/order/\*\* (for example, sorted snapshots, ordering logs, ABBA evidence).
 
 Evidence skeleton tools.  
-tools/evidence/update\_evidence\_index.py is the single writer for:
+ `tools/evidence/update_evidence_index.py` is the exclusive publisher for:
 
-* docs/evidence/INDEX.json (Human Index, titles/paths only),  
-* docs/evidence/INDEX.sha256 (hash sentinel),  
-* artifacts/evidence\_index.jsonl (Machine Mirror), and  
-* governed \*.path\_proof.txt transcripts for artifacts listed in this guide.
+* `audit/gates/topology/orientation_demo.txt` and its required proof companion,  
+* `docs/evidence/INDEX.json` (Human Index, titles/paths only),  
+* `docs/evidence/INDEX.sha256` (Human Index hash sentinel),  
+* `artifacts/evidence_index.jsonl` (Machine Mirror),  
+* `artifacts/evidence_index.jsonl.sha256` (Mirror checksum), and  
+* the required governed `*.path_proof.txt` companions for updater-owned artifacts listed in this guide.
 
 Evidence generator direct-invocation posture (normative). Repo-owned evidence generators MUST be directly runnable from the repository root using their documented Python invocation without requiring callers to set PYTHONPATH. If a generator imports repo modules, it MUST establish repository-root importability before those imports and fail as tooling if it cannot.
 
@@ -554,7 +556,7 @@ In addition to per-artifact entries, tools/evidence/update\_evidence\_index.py M
 
 Index \+ Mirror parity checks (§1.3) MUST treat bundle rows and manifests as first-class governed artifacts: manifests must be valid JSON/JSONL, conform to the HDE-Schemas & Artifacts bundle manifest schema, contain no unknown keys, and obey any bundle-level invariants (for example, member count and deterministic ordering) defined there.
 
-tools/evidence/orientation\_demo.py owns the topology orientation demo artifact (audit/gates/topology/orientation\_demo.txt) and its path-proof and MUST NOT be bypassed by ad-hoc edits.
+`tools/evidence/orientation_demo.py` is the direct non-writing checker for the topology orientation demo artifact (`audit/gates/topology/orientation_demo.txt`) and its path proof. Its compatibility write mode MUST delegate to `tools/evidence/update_evidence_index.py` and has no independent publication authority. The checker MUST NOT be bypassed by ad-hoc edits.
 
 Evidence bundle generator.  
 A dedicated bundle generator tool (titles-only here; concrete name and path live in the repo) is responsible for:
@@ -566,13 +568,16 @@ A dedicated bundle generator tool (titles-only here; concrete name and path live
 The bundle generator MUST run under the same determinism pins as other evidence tools (LC\_ALL=C, LANG=C, TZ=UTC, plus any rails pins from §1.2) and MUST NOT hand-edit existing governed artifacts. Its outputs (bundles and manifests) are consumed by tools/evidence/update\_evidence\_index.py as described above.
 
 Orientation demo and evidence skeleton coupling (normative).  
-Mechanics treats the topology orientation demo as part of the same evidence skeleton as the Human Evidence Index and Machine Mirror. The following coupling rules apply:
+ Mechanics treats the topology orientation demo as part of the same governed evidence-skeleton publication transaction as the Human Evidence Index and Machine Mirror.
 
-* Any PR that runs tools/evidence/update\_evidence\_index.py in write mode to change governed evidence under docs/evidence/**, artifacts/**, or audit/\*\* MUST also run tools/evidence/orientation\_demo.py in write mode in the same PR and commit the updated audit/gates/topology/orientation\_demo.txt and its \*.path\_proof.txt before invoking either tool’s \--check mode.  
-* Index/Mirror changes without a matching, freshly generated orientation demo are out of spec and MUST be treated as drift: tools/evidence/orientation\_demo.py \--check is expected to fail with an orientation-drift error in such cases, and CI MUST NOT be forced green by skipping or bypassing the orientation demo.  
-* Evidence harnesses and scripts that wrap tools/evidence/update\_evidence\_index.py as a single job (for example, error evidence generators, sampler/core evidence generators, bundle generators, or combined evidence pipelines) MUST treat tools/evidence/orientation\_demo.py as part of the same single-writer chain for the evidence skeleton: when they refresh governed artifacts and the Index/Mirror, they MUST also refresh the orientation demo in that same job and PR.
+* `tools/evidence/update_evidence_index.py` MUST render and publish the orientation demo, Human Evidence Index, Human Index hash sentinel, Machine Mirror, Mirror checksum, and required proof companions as one updater-owned transaction.  
+* `tools/evidence/orientation_demo.py --check` MUST validate the committed orientation report directly and without writing.  
+* A compatibility write invocation of `tools/evidence/orientation_demo.py` MUST delegate to `tools/evidence/update_evidence_index.py`; it MUST NOT write the orientation report or its proof independently.  
+* Evidence harnesses, bundle generators, and combined evidence pipelines that refresh governed evidence MUST use the canonical updater as the only evidence-skeleton publisher and then use the orientation checker to detect mismatch or drift.
 
-This clarification does not change which tools are allowed to write governed evidence; it makes explicit that tools/evidence/update\_evidence\_index.py, the bundle generator, and tools/evidence/orientation\_demo.py together own the evidence skeleton for both per-artifact and bundle-level families, so that the topology orientation demo always reflects the current governed evidence skeleton and orientation-drift is caught and fixed in the same change that expands or shrinks the skeleton.
+Index or Mirror changes without the updater-published orientation report and required companions are governed-evidence drift. CI MUST NOT be forced green by bypassing either the updater transaction or the direct checker.
+
+This coupling establishes one updater-owned publication transaction. It does not authorize an updater → independent orientation writer → updater repair sequence or any second publication owner.
 
 Mechanics MUST NOT hand-edit governed evidence artifacts (ordering artifacts, bundles, manifests, Index, mirror, path-proofs, topology orientation demo). Manual editing is reserved for canonical Doc-Delta work in PF documents; repository artifacts are tool-generated only.
 
@@ -2052,7 +2057,7 @@ Contract. The Engine Core is pure compute (ops, scoring, aggregation). It perfor
 
 ## **6.1 Inputs & state (explicit only)**
 
-Explicit parameters. All data (composite, feature flags, constants, viewer\_prefs) is passed by value or via a typed config object. No hidden sources. Do not read files, environment variables, or the clock; do not mutate module globals or singletons. Preconditions satisfied upstream. Alias normalization, tz resolution, and ingestion occur before the core (titles-only to HDE-Schemas & Artifacts §2.1 / HDE-CLI-API-Vendor-Ref §3.2).
+Explicit parameters. Engine Core receives only eligible normalized Gate inputs, one immutable typed mechanics bundle, and the active release identity. The mechanics loader MUST load, validate, hash-bind, and freeze the bundle outside Engine Core and inject that bundle into every calculation. Engine Core MUST NOT load configuration or select a default configuration. Names, account identifiers, canonical person identifiers, timestamps, copy, viewer preferences, and mutable configuration handles MUST NOT become intrinsic scoring inputs. Core, composite, signal, and reducer modules MUST NOT read files, environment variables, clocks, network resources, or mutable globals. Eligibility, alias normalization, time-zone resolution, ingestion, current-BodyGraph resolution, and Gate normalization occur upstream (titles-only to HDE-Schemas & Artifacts and HDE-CLI-API-Vendor-Ref).
 
 ## **6.2 Determinism pins**
 
@@ -2080,39 +2085,39 @@ Routing (titles-only). Numeric rules & public rounding/banding: HDE-Math-Spec. C
 
 ## **6.7 Canonical Engine Core module and tests**
 
-Scope (normative). The Dissolution engine work for tasks HDE-DISS004.1–.3 realizes the Deterministic Engine Core described in this section as a pure-compute module under the engine.core package. Mechanics records the canonical implementation and test harness here so that future changes stay aligned with §6.1–§6.6.
+Scope (normative). This section states the required Magic10 Engine Core contract under the `engine.core` package. It supersedes the precomputed-score scaffold for this scope and does not claim repository implementation, test passage, or task completion.
 
-Canonical module and entrypoint. The Engine Core module lives at engine/core/core.py and exports frozen dataclasses and helpers that implement the pure-compute contract in §6:
+Canonical module and entrypoint. The Engine Core module remains `engine/core/core.py`. Its input and result types MUST implement this pure-compute contract:
 
-* ParticipantState — frozen dataclass capturing the normalized state per party (for example, person identifier, compat score, band, and an immutable traits tuple).  
-    
-* CoreConfig — frozen dataclass carrying Engine Core configuration, including band\_priority, which defaults to the canonical band ordering (for example, the BANDS tuple from compat thresholds).  
-    
-* PerspectiveBreakdown — frozen dataclass capturing perspective-specific metrics for one party (for example, party-local score, delta, and any supporting breakdowns).  
-    
-* CoreResult — frozen dataclass aggregating neutral metrics, ordered identifiers and bands, perspective breakdowns for both parties, and any shared-traits summary.
+* `ParticipantState` — where retained as the member input type, a frozen value carrying normalized Gate-mask material for one eligible scoring member. It MUST NOT carry or consume a precomputed `compat_score` as the Magic10 score source.  
+* `mechanics_bundle` — the one immutable typed mechanics bundle loaded and frozen outside Engine Core. The core MUST consume the injected bundle and MUST NOT load, select, mutate, or replace configuration.  
+* `release_id` — the active release identity injected with the mechanics bundle.  
+* `magic10_result.v1` — the eligible-pair pure result. Exact fields and schema remain single-homed in HDE-Schemas & Artifacts.
 
-The canonical Engine Core entrypoint is engine.core.core.compute\_core. Mechanics and tests MUST treat this symbol as the single home for Engine Core behavior when evaluating the determinism and neutrality requirements in §6.2 and the acceptance checks in §6.5.
+The canonical Engine Core entrypoint is `engine.core.core.compute_core`. Its required call contract is exactly `compute_core(member_a, member_b, mechanics_bundle, release_id)`.
 
-Neutral metrics, ordering, and shared traits. Neutral metrics are computed as symmetric functions of the two parties. In particular, the neutral compat score is an integer average of the two compat scores, and shared traits are derived via set intersection (using the existing canonical set helper and ID comparator) so that the shared traits tuple is identical for normalized AB and BA inputs.
+Only eligible normalized Gate inputs may reach this entrypoint. Intrinsic scoring order is the numeric order of the two Gate masks as `member_lo` and `member_hi`; equal masks remain two equal adjacent scoring members. Canonical person identity, request order, viewer preferences, narrative keys, and public presentation fields MUST NOT enter intrinsic mathematics or the intrinsic cache preimage.
 
-Identifier and band ordering use the deterministic ordering utilities from the Engine’s comparators and thresholds:
+Neutral Channel states, signals, category scores, bands, result identity, and ordering MUST be derived from the two normalized Gate inputs and the injected immutable mechanics bundle. AB and BA MUST produce the same pure result, and repeated calls over the same four explicit arguments MUST produce the same result. Directional `(gate_mask, canonical_person_id)` ordering and narrative-key attachment occur outside Engine Core and MUST NOT alter the pure result.
 
-* Party identifiers are canonicalized via compare\_ids. When both identifiers are equal, the pair is mapped to the ABBA\_CANONICAL\_PAIR constant so that self-pairs have a fixed canonical representation.  
-    
-* Band pairs are ordered via a \_band\_rank function derived from CoreConfig.band\_priority and then by band name, ensuring that for a fixed configuration, ordered\_bands is identical for compute\_core(A,B, config) and compute\_core(B,A, config) and deterministic across runs.
+Dedicated Engine Core test suite (closed rails). The existing Engine Core test files MUST migrate with the Magic10 contract.
 
-These behaviors are normative for Engine Core; any future Engine Core changes MUST preserve AB↔BA neutrality and two-run identity as defined in §6.2.
+Purity tests in `tests/core/test_engine_core_purity.py` MUST prove that typed configuration is loaded outside Engine Core and injected. They MUST reject file, environment-variable, clock, network, randomness, process, and mutable-global access by the core, composite, signal, and reducer modules. Import-time behavior MUST remain side-effect free.
 
-Dedicated Engine Core test suite (closed rails). Purity tests live under tests/core/test\_engine\_core\_purity.py and MUST:
+AB↔BA tests in `tests/core/test_engine_core_abba.py` MUST:
 
-* import and reload engine.core.core under ensure\_determinism\_env(apply=True) to enforce determinism pins and closed rails  
-    
-* use AST-based checks to reject imports whose root module is in {os, time, datetime, random, socket, subprocess}  
-    
-* scan the module source text for forbidden snippets such as "os.environ", "time.", "datetime.", "random.", and "socket."
+* construct eligible normalized Gate-mask members and one immutable typed mechanics bundle;  
+* call `compute_core(member_a, member_b, mechanics_bundle, release_id)` in both AB and BA order;  
+* assert equality of the complete pure `magic10_result.v1`; and  
+* cover distinct eligible members with equal Gate masks without introducing person identity into intrinsic calculation.
 
-Successful execution of these guards under the specified rails provides the required proof that the Engine Core performs no file, network, clock, RNG, or env access and does not introduce import-time side effects, satisfying the “no I/O/clocks/globals” requirement in §6.1 and §6.5. Checked-in guard definitions alone do not prove passage.
+Determinism tests in `tests/core/test_engine_core_determinism.py` MUST:
+
+* call the exact four-argument entrypoint twice with identical normalized members, immutable mechanics bundle, and release identity;  
+* assert complete result equality and deterministic canonical serialization where serialization is exercised; and  
+* prove that configuration is injected explicitly and cannot be replaced by an implicit default.
+
+These test definitions establish the required proof surface only. Checked-in definitions do not prove execution or passage.
 
 AB↔BA behavior tests live under tests/core/test\_engine\_core\_abba.py and MUST:
 
@@ -2134,7 +2139,7 @@ Determinism and JSON-compatibility tests live under tests/core/test\_engine\_cor
 
 Successful execution of these tests provides the Engine Core’s two-run identity and JSON-compatibility proof under the determinism posture in §6.2 and §6.3. A passing run demonstrates that CoreResult is safe for use with the canonical serializer and evidence tooling described elsewhere in this guide; checked-in test definitions alone do not prove passage. The Engine Core evidence artifacts themselves remain wired in a later epic.
 
-Evidence wiring (future epic). This subsection records the Engine Core’s pure-compute module and test harness only. The evidence artifacts and Machine Mirror records listed in §6.6 remain the long-term target for Engine Core evidence, but their wiring is explicitly assigned to a later epic (HDE-DISS004.4) and is not part of the mechanics recorded for the behavior-only work on HDE-DISS004.1–.3.
+Evidence wiring (separately governed). The complete deterministic Magic10 mechanics gate is assigned to `HDE-DIST008.1` in HDE-Build Checklist. This subsection records the required pure-compute module and test contract only. It does not claim test execution, evidence publication, QA PASS, task status movement, release binding, or completion.
 
 # 7\) Category Framework (internal) \[Required-Now\]
 
@@ -2150,13 +2155,15 @@ Public vs internal. Category subtotals and narrative keys are internal/admin art
 
 ## **7.2 Compatibility Engine (pair) — contract**
 
-Inputs (typed; titles-only). a, b — each is either an ID or a full person payload (HDE-CLI-API-Vendor-Ref Reader schema). Do not mix ID and payload for the same party; mixed forms ⇒ typed invalid\_input (HDE-CLI-API-Vendor-Ref error catalog, titles-only). viewer\_prefs — top\_category ∈ Magic-10 and weights for all ten categories as integers 0..100 (key set must equal Magic-10). Zero-weight rule: if a viewer assigns 0 to a category, candidates whose \#1 equals that category are excluded. (Titles-only: HDE-Math-Spec §5.1; HDE-Schemas & Artifacts §2.6; HDE-CLI-API-Vendor-Ref.)
+Inputs (typed; titles-only). Engine Core receives two eligible normalized Gate-mask members, one immutable typed mechanics bundle, and the active release identity. Canonical person identity remains outside intrinsic scoring and is used only by the application boundary for eligibility and deterministic directional narrative orientation. Names, account identifiers, timestamps, copy, and viewer preferences are not scoring inputs.
 
-Execution (internal math; titles-only). Subtotaling. Compute per-category integer subtotals (0..100) via the Feature Framework and pack-frozen constants (HDE-Math-Spec §5.4.2; see channel semantics in §7.1; core is I/O-free per §6). Banding. Map each subtotal to a band using inclusive-high thresholds (24/49/74/100) with round\_half\_up (HDE-Math-Spec §5.3). Narrative keys. Select {personal\_key, shared\_key} per category from governed ledgers; if absent, flag missing\_narrative\_key (no implicit fallback).
+Execution (internal mechanics; titles-only). `compute_core(member_a, member_b, mechanics_bundle, release_id)` evaluates the complete Channel state, signal, category, score, and band contract once. Equations, fixed-point operations, and numeric boundaries remain single-homed in HDE-Math-Spec.
 
-Outputs (admin/test surface only; titles-only). categories\[10\] in canonical Magic-10 order, each { id, score:int, band, personal\_key, shared\_key }; plus meta{ engine\_tag, release\_id }. Public Reader continues to emit bands-only. Contract bytes & schema are owned by HDE-CLI-API-Vendor-Ref and must be produced by the allow-listed presenter/emitter (§4). Do not embed JSON samples in this guide.
+Pure result. `magic10_result.v1` exists only for an eligible distinct-person pair. It carries the complete twenty-signal and ten-category pure result, including category scores and bands, but no person identity, viewer preference, copy, or narrative keys. Exact schema and canonical-byte rules remain single-homed in HDE-Schemas & Artifacts.
 
-Determinism & acceptance (binary). AB↔BA parity & two-run identity. With identical inputs, subtotals, bands, and any admin snapshots are identical across (A,B) vs (B,A) and across runs; any emitted admin JSON is canonical (UTF-8/no-BOM, sorted keys, compact, one LF; arrays deduped & ASCII-sorted; LC\_ALL=C). Order. Category arrays appear in the frozen Magic-10 order; tests assert this via §5 comparators. Typed errors. Mixed input forms ⇒ invalid\_input; unknown IDs or malformed viewer\_prefs ⇒ invalid\_input (HDE-CLI-API-Vendor-Ref error catalog, titles-only). Evidence (records-only; path-agnostic). ABBA fingerprint consumption (HDE-Math-Spec Appendix E), two-run logs, canonical-compare logs; register mirror entries and update the human Evidence Index in the same change (HDE-Governance Appendix D: Evidence Index; HDE-Schemas & Artifacts mirror).
+Complete internal/admin result. `magic10_compat_result.v1` augments the pure result after the application establishes total directional order by `(gate_mask, canonical_person_id)`. Each category carries `personal_lo_to_hi_key`, `personal_hi_to_lo_key`, and `shared_key`. Narrative routing MUST NOT recalculate or alter signals, scores, bands, ordering, configuration identity, release identity, or intrinsic result identity. Distinct people with equal Gate masks use canonical-person-ID order only as the directional tie-break.
+
+Determinism. AB and BA MUST produce the same pure result and the same symmetric complete internal/admin result. Repeated calls over the same normalized inputs, immutable mechanics bundle, and release identity MUST produce identical results. Public Reader projection remains separate and numeric-free.
 
 ## **7.3 Band thresholds and tuning (admin)**
 
@@ -2492,7 +2499,13 @@ Token semantics and acceptance are owned by HDE-Governance and Glow QA Guide (ti
 
 ## **9.2 Reader (cataloged success surface) \[Implemented\]**
 
-Route. GET /reader?v=1 is the governed Reader success-proof surface in current scope and the cataloged Reader success surface used for Reader success-body, Endpoint Catalog/env-gate, and A7 transport work. In current local capture posture, this route is exercised with APP\_ENV=dev; rails remain closed (SAFE\_MODE=1, ALLOW\_NETWORK=0; no vendor I/O).
+Production application boundary (required; implementation not claimed). `POST /api/reader?v=1` is the production Reader v1 application route. The boundary validates and resolves the two canonical person identifiers, preserves their normalized Gate projections, and applies PF01 eligibility before constructing an intrinsic preimage or invoking Engine Core, intrinsic cache, or narrative routing.
+
+A valid self-pair with the same canonical identity and byte-identical normalized projection returns the ineligible Reader success with `eligible: false` and `categories: []`. It MUST NOT invoke Engine Core, create a `pair_key`, access the intrinsic cache, or call the narrative router. The same canonical identity with unequal normalized projections fails closed rather than being scored.
+
+An eligible distinct-person pair invokes Engine Core once. Reader v1 projects only the harmony band from the complete canonical result. Public success bytes remain harmony-only, bands-only, and numeric-free; scores, signals, configuration internals, state provenance, narrative keys, and intrinsic `pair_key` remain non-public. The Reader idempotence hash remains independently derived from the public Reader preimage rather than copied from `pair_key`.
+
+Development-only capture route. `GET /reader?v=1` remains a development-only, non-authoritative local evidence surface. It does not replace or prove the production POST contract. Local capture continues under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) with no vendor I/O.
 
 Emitter. Uses the allow-listed shared presenter/emitter (see §4 and §8.2); tests must not bypass the shared emitter.
 
@@ -2510,7 +2523,7 @@ Optional GET semantics (for local evidence only). If optional GET captures are t
 * HEAD: status 200; no body; validators mirror 200; Content-Type \== GET; Content-Length \== len(identity 200 body) (LF-terminated, pre-compression)  
 * 304: only after prior 200-with-body; no body; omit Content-Type and omit Content-Length; validators mirror cached 200  
 * Encoding invariance (optional evidence): for the same canonical body, ETag identity and effective Content-Length are stable across accepted encodings (identity/gzip/br)  
-* POST (dev harness): non-conditional; never returns 304
+* Production POST: non-conditional; never returns 304\. The development-only GET route remains a separate local evidence surface.
 
 Acceptance (routing only). Acceptance is governed by HDE-Governance and Glow QA Guide (titles-only). This section does not list token names. Mechanics must have acceptance proofs for this route and any local capture harness that exercises it:
 
@@ -2573,6 +2586,12 @@ Input validation (POST; required). The compat handler MUST validate the provided
 CORS disabled on dev harness.
 
 Ownership (titles-only). Production transport matrices and public payload bytes are owned by PF05-Canon-HDE-CLI-API-Vendor-Ref / HDE-Governance. Mechanics enforces wiring/determinism (single emitter, canonical JSON, AB↔BA/two-run) and does not duplicate public schemas or bytes.
+
+Magic10 result routing (required; implementation not claimed). Engine Core is the single scoring owner. Internal compat, CLI, authenticated admin, and Reader projection MUST consume the same canonical Engine Core result and MUST NOT calculate or recalculate Channel states, signals, category scores, bands, configuration identity, release identity, or intrinsic result identity.
+
+For an eligible pair, the narrative router may augment the pure result into the symmetric internal/admin result after total `(gate_mask, canonical_person_id)` directional ordering. That augmentation MUST NOT rescore or mutate the pure mechanics result. Presenters and emitters serialize or project the canonical result only.
+
+Reader projects the harmony band from the canonical result. A valid ineligible self-pair bypasses Engine Core, intrinsic cache, and narrative routing and proceeds directly to the Reader presenter with the empty ineligible success.
 
 Conjunction compute contract (internal; required). The engine MUST provide an internal conjunction computation surface (conjunction\_public) that produces a deterministic JSON envelope suitable for canonical emission.
 
