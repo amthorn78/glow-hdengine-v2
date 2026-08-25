@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.9.1
+**Version:** v2.9.2
 
 **Status:** Canon
 
-**Effective date:** 2026-08-08
+**Effective date:** 2026-08-25
 
-**Last Update Gate:** BN 12.6.2 A28-44
+**Last Update Gate:** BN 12.8.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1202,6 +1202,17 @@ Centers are derived from the Gate Catalog. No separate Centers catalog or schema
 
 **Required contract.** A Channel `id` is the two distinct Gate IDs in numeric ascending order, zero-padded as `NN-NN`. The two values in `gates` MUST equal the values encoded by `id`, and both Gates MUST exist in the Gate Catalog. The two Channel centers MUST be distinct and, when treated as a set, MUST equal the centers derived from the two Gate rows. Positional equality between `gates` and `centers` is not required. Collections declared as sets, including Channel `centers`, `domains`, and `flags`, are normalized under §4.2 before comparison or derived emission.
 
+For the Magic-10 v1 scoring-bound Channel contract:
+
+* the top-level object contains only `channels`;  
+* every row retains exactly `id`, `gates`, `centers`, `circuit_primary`, `substream`, `primary_domain`, `domains`, and `flags`;  
+* Channel rows are ASCII-sorted by `id` and contain exactly the closed 36-Channel roster;  
+* `circuit_primary` is exactly one of `individual`, `collective`, or `tribal`;  
+* `substream` is exactly one of `knowing`, `logic`, `sensing`, `ego`, `defense`, `centering`, or `integration` and MUST NOT be null; and  
+* `primary_domain`, `domains`, and `flags` remain non-scoring Product metadata. Magic-10 MUST NOT read them, and no default signal row may depend on them.
+
+Human-facing copy MAY render `logic` as Understanding or Logic and `defense` as Defence or Defense. Canonical bytes retain the machine spellings `logic` and `defense`. Any later correction or removal of the non-scoring Product metadata requires a separate contract migration covering the affected bundle schemas and generated artifacts.
+
 The closed Channel-ID set, in ASCII order, is:
 
 `01-08`, `02-14`, `03-60`, `04-63`, `05-15`, `06-59`, `07-31`, `09-52`, `10-20`, `10-34`, `10-57`, `11-56`, `12-22`, `13-33`, `16-48`, `17-62`, `18-58`, `19-49`, `20-34`, `20-57`, `21-45`, `23-43`, `24-61`, `25-51`, `26-44`, `27-50`, `28-38`, `29-46`, `30-41`, `32-54`, `34-57`, `35-36`, `37-40`, `39-55`, `42-53`, `47-64`.
@@ -1288,6 +1299,119 @@ Each member and the pack manifest have sibling `.sha256` sidecars in the checked
 
 The root Freeze-Pack Manifest MUST list the narratives pack manifest and all four required members exactly once before a release may claim that the pack is coupled to its `release_id`. A pack present in the repository but omitted from `catalog/manifest.json` is not proven part of that manifest's release identity. Validation MUST report the gap rather than infer coupling.
 
+## **2.9 Magic-10 v1 mechanics configuration and result contracts**
+
+### **Authoritative configuration identity**
+
+The authoritative active Magic-10 v1 mechanics configuration is `catalog/magic10_mechanics_v1.json`. Its owning schema is `schemas/magic10_mechanics_v1.schema.json`, and its configuration schema identity is `magic10_mechanics_config.v1`.
+
+The configuration MUST be canonical JSON under §4, schema-valid, manifest-bound, and immutable within one release. Production code reads exactly one active configuration from this governed catalog path and MUST NOT use this Markdown document, a candidate tuning bundle, a generated evidence snapshot, or a caller-supplied config ID as an alternate configuration source.
+
+The initial `config_id` is `m10-channel-state-v1.0.0`. The configuration’s top-level object has `additionalProperties: false` and exactly these properties:
+
+* `category_weights`  
+* `config_id`  
+* `profiles`  
+* `response_scale`  
+* `result_schema`  
+* `rounding`  
+* `schema`  
+* `signal_scale`  
+* `signals`  
+* `sources`
+
+The fixed identity and scale values are:
+
+* `schema`: `magic10_mechanics_config.v1`;  
+* `result_schema`: `magic10_result.v1`;  
+* `response_scale`: `10000`;  
+* `signal_scale`: `2`;  
+* `rounding.signal`: `round_half_up_to_half_score_unit`; and  
+* `rounding.category`: `round_half_up_once`.
+
+`sources` has exactly `caps`, `categories`, `channels`, and `thresholds`. Each source row has exactly `path` and `sha256`, with no additional property. The exact paths are:
+
+* `caps` → `catalog/magic10_caps.json`;  
+* `categories` → `catalog/magic10.json`;  
+* `channels` → `catalog/channels_v1.json`; and  
+* `thresholds` → `math/thresholds.json`.
+
+Every source hash MUST equal the SHA-256 digest of the exact referenced bytes. A change to any referenced caps, category-order, Channel, or threshold bytes requires a new immutable `config_id`, new canonical configuration bytes, refreshed manifest membership, and a new `release_id`.
+
+### **Closed configuration shape**
+
+`profiles` is ordered by ASCII `profile_id` and contains exactly `activation_bp_v1`, `coherence_bp_v1`, and `expression_bp_v1`. Each profile has exactly `profile_id` and `responses`; `responses` has exactly the five relationship-state properties and no additional property.
+
+`signals` contains exactly the twenty signal IDs obtained by flattening each `catalog/magic10_caps.json` input pair in `catalog/magic10.json` category order.
+
+An ordinary signal row has exactly `channels`, `operation`, `profile_id`, and `signal_id`. A Balance signal row has exactly `channels`, `operation`, and `signal_id`; `profile_id` is prohibited. Every `channels` array is ASCII-sorted by `channel_id`; each member has exactly `channel_id` and `weight`.
+
+`category_weights` contains exactly ten rows in `catalog/magic10.json` order. Each row has exactly `category_id`, `reducer`, and `weights`. `reducer` is `weighted_mean_half_unit_v1`; `weights` is an ordered two-integer array whose values are each in `1..3`.
+
+`catalog/magic10_caps.json` is the sole authority for each category’s ordered two-signal input pair and score bounds. The mechanics configuration MUST NOT duplicate those signal identities. The loader joins each category-weight row to the caps row by `category_id` and input position.
+
+Generated timestamps, seeds, notes, labels, and unrecognized metadata are prohibited from the authoritative configuration. Schema-declared array order is preserved; object keys use PF12 canonical JSON order.
+
+### **Tuning and loader closure**
+
+The allowed v1 tuning ranges are:
+
+* ordinary Channel weight: integer `1..3`;  
+* state response: integer `0..10000`, while the required profile ordering remains valid;  
+* category-input weight: integer `1..3`;  
+* Channel membership: one through six unique canonical Channels per ordinary signal;  
+* signal profile assignment: one of the three ordinary profiles;  
+* Balance Channel membership: one through six unique canonical Channels; and  
+* band maxima: four strictly increasing integers ending in `100`, initially `[24,49,74,100]`.
+
+The five relationship states, twenty signal IDs, ten category IDs, two-signals-per-category structure, ordinary weighted-sum operation, two Balance operations, fixed-point scales, half-up reducers, `0..200` signal domain, and `0..100` category-score domain are fixed v1 invariants, not tuning knobs.
+
+The loader MUST reject the active configuration unless:
+
+* the Channel catalog has exactly the closed 36-Channel roster and valid endpoint projections;  
+* every configured Channel exists in that catalog;  
+* the signal key set exactly equals the flattened caps-owned twenty-signal roster;  
+* every category appears exactly once and has two weights aligned to its caps-owned ordered inputs;  
+* caps bounds are integers satisfying `0 <= min <= max <= 100`;  
+* ordinary and Balance signal Channel lists each contain one through six unique valid rows;  
+* Channel weights are integers in `1..3`;  
+* every profile has exactly five state keys, every response is an integer in `0..10000`, and `none` is exactly `0`;  
+* the three required profile orderings hold;  
+* Balance operations have their required maps and no profile;  
+* no Channel appears twice within one signal or in both signals of one category;  
+* every Channel is used by at least one signal;  
+* signal and category outputs remain within `0..200` and `0..100`;  
+* category order equals `catalog/magic10.json`;  
+* every source path and hash matches the exact referenced bytes;  
+* thresholds close the full `0..100` domain;  
+* the configuration hash matches the manifest; and  
+* the release selects exactly one active mechanics configuration.
+
+A caller cannot pass weights, profiles, bands, or a configuration ID. Production MUST NOT blend configurations.
+
+### **Governed result schemas**
+
+The pure Engine Core result schema is `schemas/magic10_result_v1.schema.json`, with result identity `magic10_result.v1`. It exists only for an eligible distinct-person pair. Its top-level object has `additionalProperties: false` and exactly:
+
+* `schema`;  
+* `config_id`;  
+* `release_id`;  
+* `pair_key`;  
+* `signals`; and  
+* `categories`.
+
+`schema` is the constant `magic10_result.v1`. `release_id` and `pair_key` are lowercase 64-hex identities. `signals` contains exactly twenty rows in flattened caps-input order; each row has exactly `signal_id` and integer `q` in `0..200`. `categories` contains exactly ten rows in `catalog/magic10.json` order; each row has exactly `category_id`, integer `score` in `0..100`, and `band` equal to `Cool`, `Open`, `Warm`, or `Glow`.
+
+The pure result contains no names, UIDs, timestamps, viewer preferences, copy, personal keys, shared keys, request metadata, or mutable configuration handles.
+
+The complete internal/admin result schema is `schemas/magic10_compat_result_v1.schema.json`, with result identity `magic10_compat_result.v1`. It retains the same top-level identity fields and signal array. Each category row contains exactly `category_id`, `score`, `band`, required nonempty `shared_key`, required nonempty `personal_lo_to_hi_key`, and required nonempty `personal_hi_to_lo_key`.
+
+Narrative augmentation MUST NOT change signal values, category scores, bands, ordering, `config_id`, `release_id`, or `pair_key`. The complete result is confined to internal/admin CLI and authenticated internal HTTP surfaces.
+
+### **Release rollback coupling**
+
+A rollback MUST select one complete prior release containing mutually compatible code, catalog, configuration, schema, and manifest bytes. If that complete target is unavailable or its identity cannot be reproduced, the affected calculation or surface MUST fail closed. A rollback MUST NOT mix prior code with current configuration or current schemas, rewrite user identity into the intrinsic result, or silently serve a stale result under a different configuration or release identity.
+
 # 3\. Catalog Validation & Integrity \[Required-Now\]
 
 This section defines the required validation and integrity contract for the current catalog surfaces in §2. Declarative schemas, executable validators, and companion checks together form the gate. A required rule is not evidence that the current repository already enforces it; implementation status and remaining gaps are stated explicitly below and routed to §§8.1–8.2 for validation ownership and evidence.
@@ -1323,7 +1447,7 @@ Schema and executable validation govern data shape, values, identity, and cross-
 - Cross-catalog membership, identity projection, derived-field equality, graph degree, and multiplicity rules that JSON Schema cannot express MUST be enforced by companion checks.  
 - A schema SHOULD encode a constrained composite identity directly. If it does not encode the full projection, a companion check MUST enforce the remainder.
 
-At the pinned repository state, both current topology schemas declare the required draft but omit `$id`. Schema-hygiene conformance is therefore incomplete until stable `$id` values are added and validated.
+At the pinned repository state, both current topology schemas declare JSON Schema 2020-12 and their exact stable repository-path `$id` values: `schemas/gates_v1.schema.json` and `schemas/channels_v1.schema.json`. The former `$id` omission is closed. This fact does not by itself prove CI wiring, complete companion validation, or conformance of a future schema introduced by a later governed contract.
 
 ### Enforcement
 
@@ -1640,6 +1764,23 @@ The manifest MUST include every input whose bytes participate in the current rel
 
 Do not list logs, evidence reports, JSONL mirrors, generated registry or configuration reports, or schema files unless a later governed release contract deliberately promotes their bytes to frozen runtime inputs. A checksum sidecar is required only when its owning artifact family explicitly requires one; its existence alone does not make it a frozen input.
 
+### **Magic-10 v1 promoted release inputs**
+
+For the Magic-10 v1 release contract, preserve every legitimate existing release member and add or refresh exactly these promoted paths:
+
+| Release-bound class | Exact paths |
+| ----- | ----- |
+| Mechanics data | `catalog/magic10_mechanics_v1.json`; `catalog/channels_v1.json`; `catalog/magic10.json`; `catalog/magic10_caps.json`; `math/thresholds.json` |
+| Mechanics and result schemas | `schemas/magic10_mechanics_v1.schema.json`; `schemas/magic10_result_v1.schema.json`; `schemas/magic10_compat_result_v1.schema.json`; `schemas/channels_v1.schema.json` |
+| Intrinsic scoring owners | `engine/bodygraph/gates.py`; `engine/bodygraph/v2_adapter.py`; `engine/config/registry_loader.py`; `engine/magic10/composite.py`; `engine/magic10/signals.py`; `engine/magic10/calculators.py`; `engine/core/core.py`; `engine/compat/compute.py` |
+| Gate persistence and resolution | `engine/bodygraph/projection.py`; `engine/bodygraph/resolver.py`; `engine/bodygraph/mapped_cache.py`; `tools/bodygraph/check_magic10_gate_readiness.py` |
+| Integrated surfaces | `engine/http/compat_handler.py`; `engine/runtime/public.py`; `engine/narratives/router.py`; `engine/cli/main.py`; `adapter/http_reader.py`; `presenter/reader_v1/emitter.py` |
+| Reader and governed errors | `schemas/reader.v1.schema.json`; `adapter/schemas/error_v1.schema.json`; `engine/compat/error_tokens.py`; `errors/token_map/token_map.json` |
+
+The manifest `files` array MUST contain exactly one row for each promoted path, with the complete array ASCII-sorted by path. Existing rows are refreshed; absent promoted rows are added; `catalog/manifest.json` MUST NOT list itself.
+
+For the adopted v1 Magic-10 cut, manifest `version` is `1.1.0` and `built_at_utc` is `2026-08-24T18:04:49Z`. `scripts/cut_release_manifest.py` remains the owning manifest cutter for recalculating the exact hash and size of every listed member.
+
 ### Manifest and member form
 
 The manifest MUST itself satisfy §4. Each member follows §5.2: validate the member's owning format, then compare its exact on-disk hash and size.
@@ -1693,7 +1834,9 @@ Do not compute `release_id` from a malformed, incomplete, noncanonical, duplicat
 
 ### Current repository posture
 
-At the pinned repository snapshot, `catalog/manifest.json` contains eight entries. It omits both topology catalogs and all five required narrative JSON files named in §5.1. The tracked `artifacts/math/freeze_pack_manifest.json` is also not byte-identical to the current manifest. The refreshed manifest contract is therefore not repo-conformant, and no PASS is claimed.
+At the pinned repository snapshot, `catalog/manifest.json` is canonical JSON with `version: "1.0.0"`, `built_at_utc: "2025-12-26T00:00:00Z"`, and 15 unique ASCII-sorted members. It includes both topology catalogs and the narratives manifest plus all four required narrative members. The former eight-entry and missing-member posture is closed.
+
+This inspected manifest is the pre-Magic-10 v1.1.0 baseline. HDE Build Notes separately requires the promoted Magic-10 roster, `version: "1.1.0"`, and `built_at_utc: "2026-08-24T18:04:49Z"` for that release cut. No conformance or PASS for the later contract is claimed from the inspected v1.0.0 manifest.
 
 ### Acceptance hints
 
@@ -1757,6 +1900,32 @@ The builder MUST refuse a symlinked output root, an output inside the source rep
 
 Checked-in release evidence remains historical capture evidence, not a runtime identity input, and MUST NOT be relabeled as a current attestation. Configuration evidence and derived configuration bundles MUST NOT acquire incidental manifest digests, release IDs, or frozen-source identities merely because a release is cut.
 
+#### **Magic-10 v1 current-attestation predicate**
+
+For the Magic-10 v1 release cut, current tracked release identity is derived only from `catalog/manifest.json`. Validate the unchanged tracked candidate through:
+
+* `python scripts/release_id_recompute.py --check-manifest-only`; and  
+* `bash ci/checks/check_release_identity.sh`.
+
+Run current validation under `ALLOW_NETWORK=0`, `LANG=C`, `LC_ALL=C`, `SAFE_MODE=1`, and `TZ=UTC`.
+
+After the complete candidate is committed and the source tree is clean, create an empty directory outside the source tree and run:
+
+1. `python tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean`;  
+2. `python tools/evidence/build_release_attestation.py --verify <external-directory> --require-clean` against the unchanged source commit.
+
+The attestation is current only when both commands exit `0` and `attestation.json` validates as `hde.release_attestation.v1` with all of these predicates:
+
+* `source_commit_exact == true`;  
+* `validation_result == "PASS"`;  
+* `release_id == manifest_sha256`;  
+* `release_admission == "PR06R_B_FINAL_PASS"`;  
+* `pipeline_stop == null`;  
+* the verified source commit and source-tree digest equal the unchanged candidate; and  
+* the attestation checksum, external evidence inventory, transcript binding, secret-safety checks, and final sanity tail validate.
+
+This exact predicate is the plan-local completion condition `M10_CURRENT_RELEASE_ATTESTATION_MATCH`. It is not a new global acceptance token. The external bundle is PR evidence only: it MUST remain outside the repository, MUST NOT enter `catalog/manifest.json`, the Human Evidence Index, or the Machine Evidence Mirror, and MUST NOT become a `release_id` input.
+
 ### **6.2.2 Acyclic release-attestation and close-pack lifecycle**
 
 Any future PF12-governed close-pack lifecycle that binds `release_id` or current release provenance MUST preserve the acyclic dependency direction in §6.2.1. All tracked candidate close-pack bytes MUST be complete from tracked repository inputs before hosted CI validates those exact bytes. The lifecycle MUST NOT require a hosted-CI fact that becomes available only after the exact candidate source state is committed to be written back into, or used to derive, the tracked source it attests.
@@ -1789,31 +1958,39 @@ A change outside the manifest's frozen-input set does not change `release_id` un
 
 ## 6.4 Evidence and CI hooks
 
-These are the required release-identity surfaces:
+These are the current release-identity validation and attestation surfaces:
 
 | Surface | Contract |
-| :---- | :---- |
-| `artifacts/math/freeze_pack_manifest.json` | Byte-identical evidence copy of the canonical `catalog/manifest.json`; no alternate payload semantics. |
-| `scripts/release_id_recompute.py` | Recompute and validation entrypoint for manifest bytes, member hashes and sizes, derived evidence, and `release_id`. |
-| `artifacts/math/release_id_recompute.log` | Recompute evidence log. |
-| `artifacts/math/release_id.txt` | Exactly one lowercase 64-hex `release_id` followed by one LF. |
-| `artifacts/math/checksums_audit.log` | Per-entry exact-byte hash, size, presence, and failure results. |
-| `artifacts/math/manifest_snapshot.json` | Canonical JSON containing the complete manifest object, `release_id`, and `produced_at_utc` copied from manifest `built_at_utc`; evidence only. |
-| `artifacts/proofs/env_pins.txt` | Names and values of the deterministic environment pins used by the release checks. |
+| ----- | ----- |
+| `catalog/manifest.json` | Sole tracked current release-identity input. Runtime `release_id` is the SHA-256 digest of its valid canonical bytes. |
+| `scripts/release_id_recompute.py --check-manifest-only` | Read-only current manifest/member validation. It MUST NOT refresh or compare historical checked-in release evidence as a current-equality predicate. |
+| `ci/checks/check_release_identity.sh` | Current release-identity gate over the canonical manifest and its declared member bytes. |
+| `tools/evidence/build_release_attestation.py --output <external-empty-directory> --require-clean` | Creates current release derivatives outside the source repository after the exact candidate is committed and clean. |
+| `tools/evidence/build_release_attestation.py --verify <external-directory> --require-clean` | Verifies the external attestation against the unchanged clean candidate. |
+| `schemas/hde_release_attestation.v1.json` | Successful external attestation schema. |
+| `schemas/hde_release_attestation_failure.v1.json` | External attestation failure schema. |
 
-`audit/gates/release/release_id.txt` is deprecated and MUST NOT be used.
+Current validation MUST operate on `catalog/manifest.json` and its declared member bytes. The tracked source MUST NOT be mutated to incorporate a hosted-CI fact or current external derivative.
 
-Mode semantics are normative:
+For a Magic-10 current-release claim, the external `hde.release_attestation.v1` MUST validate with `source_commit_exact: true`, `validation_result: "PASS"`, `release_id == manifest_sha256`, `release_admission: "PR06R_B_FINAL_PASS"`, and `pipeline_stop: null`. Verification through `--verify <external-directory> --require-clean` MUST succeed against the unchanged clean candidate.
 
-- `--check` is fail-closed, returns nonzero on any mismatch, and MUST NOT write or repair governed artifacts.  
-- Write mode without `--check` MAY rewrite derived artifacts only in an isolated release-build workspace and MUST return zero only when the post-write state is clean.  
-- Regression coverage MUST exercise both modes in an isolated temporary workspace so the source working tree is not mutated.
+The external attestation is PR evidence only. It MUST NOT be copied into the repository, added to `catalog/manifest.json`, added to the Human Evidence Index or Machine Evidence Mirror, or used as a `release_id` input.
 
-The required identity gate entrypoint is `ci/checks/check_release_identity.sh`, which is a Python entrypoint despite its suffix. It MUST run `scripts/release_id_recompute.py --check`, enforce the §5 manifest contract, require byte equality between the manifest and freeze-pack evidence copy, verify the recorded `release_id`, and fail closed on missing, empty, stale, or inconsistent required surfaces.
+For purposes of a current Magic-10 release claim, these checked-in HDE-EPIC022 surfaces remain frozen historical captures:
 
-Run all generation and checks under §4.3. Prove two-run identity for the same inputs. Evidence registration, Human Index and Machine Mirror parity, path proofs, and any family-owned checksum sidecars remain governed by §8.6; this section does not create blanket sidecar requirements.
+* `artifacts/math/freeze_pack_manifest.json`;  
+* `artifacts/math/release_id.txt`;  
+* `artifacts/math/release_id_recompute.log`;  
+* `artifacts/math/checksums_audit.log`;  
+* `artifacts/math/manifest_snapshot.json`;  
+* `docs/evidence/INDEX.json`;  
+* `docs/evidence/INDEX.sha256`;  
+* `artifacts/evidence_index.jsonl`; and  
+* `artifacts/bodygraph/release_bindings.json`.
 
-The current tracked manifest and freeze-pack evidence copy do not satisfy these requirements. Static file presence or a historical PASS line does not establish current conformance.
+They MUST NOT be regenerated, rewritten, relabeled, or compared with the current manifest to manufacture current equality or current attestation. Static presence or a historical PASS line proves only historical capture.
+
+`RELEASE_ID_RECOMPUTE_OK` remains a historical EPIC022 label. Magic-10 MUST NOT emit, claim, redefine, or infer it as a current token. Its plan-local current-release condition is the exact external-attestation predicate stated above..
 
 ### Acceptance hints
 
@@ -1868,16 +2045,31 @@ A failure MUST make the invoking workflow fail. This section defines ownership a
 
 ### Current-to-required gaps
 
-The two current schemas are not verified as wired into a current catalog-validation command or workflow. They declare draft 2020-12 but omit `$id`. Conformance requires exact values `$id: "schemas/gates_v1.schema.json"` and `$id: "schemas/channels_v1.schema.json"`. The Channel schema pattern `^\d{2}-\d{2}$` alone does not prove range, min-first orientation, or distinct endpoints.
+At the pinned repository baseline:
 
-The loader does not independently enforce schema cardinality/additional-property rules, exact topology cardinalities, distinct gate/center pairs, declared-center derivation, exact caps values/keys, seed timestamp/checksum/extra-key rules, strict manifest path safety, viewer-preference exact top-level keys, boolean rejection, or canonical on-disk bytes. Schema execution and the required companion validation remediations cannot be skipped.
+* `schemas/gates_v1.schema.json` and `schemas/channels_v1.schema.json` declare JSON Schema 2020-12 and their exact stable repository-path `$id` values;  
+* the loader enforces the exact 64-Gate and 36-Channel rosters;  
+* Channel endpoints are distinct and agree with the canonical min-first Channel ID;  
+* declared Channel centers are checked against the Centers projected from the Gate catalog;  
+* the frozen Magic-10 order, caps key coverage, input order, integer bounds, and allowed shapes are checked; and  
+* manifest parsing rejects malformed structure, unsafe paths, duplicates, out-of-order paths, and other fail-closed identity defects.
 
-The following PF12 paths are reserved target evidence outputs. Their names are requirements, not proof that the files exist or pass. Do not mark them PASS until they are generated, validated, indexed, mirrored, and path-proved:
+The former `$id`, distinct-endpoint, and Gate-derived-center omissions are not current gaps.
 
-- `artifacts/catalog/catalog_schema_validation.log`  
-- `artifacts/catalog/domain_closure_report.log`
+The Magic-10 v1 contract creates these remaining schema and loader obligations:
 
-When promoted, add each to `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same change, using the §8.3 record/path-proof discipline.
+* revise `schemas/channels_v1.schema.json` so `substream` is non-null and exactly one of `knowing`, `logic`, `sensing`, `ego`, `defense`, `centering`, or `integration`;  
+* add and enforce `schemas/magic10_mechanics_v1.schema.json` for `magic10_mechanics_config.v1`;  
+* add and enforce `schemas/magic10_result_v1.schema.json` for `magic10_result.v1`;  
+* add and enforce `schemas/magic10_compat_result_v1.schema.json` for `magic10_compat_result.v1`; and  
+* make the loader validate and hash-bind exactly one active `catalog/magic10_mechanics_v1.json` against Channels, categories, caps, thresholds, and the current manifest.
+
+The required evidence-output names remain:
+
+* `artifacts/catalog/catalog_schema_validation.log`; and  
+* `artifacts/catalog/domain_closure_report.log`.
+
+Their names are requirements, not proof that they exist or pass. Do not claim workflow wiring, schema conformance, or PASS until the applicable files and checks are generated, validated, indexed, mirrored, and path-proved.
 
 ### Acceptance hints (names-only)
 
@@ -1912,19 +2104,24 @@ Manifest completeness and `release_id` remain owned by §§5–6. Human Index, M
 
 ### Current-to-required gaps
 
-`tests/test_catalog_canon.py` is present but is not a valid current gate: it imports absent `core.catalog.loader` and `core.stable.sercanon` modules and invokes absent `scripts._emit_canon_checksums`; it is also outside default `pytest.ini` discovery. Migrate it to the current `engine/*` owners, or remove it only after equivalent current tests cover all intended assertions.
+At the pinned repository baseline:
 
-The current loader does not check distinct Channel endpoints or Gate-derived center equality. Current source data is coherent on those points, but validation is missing. `catalog/channels_v1.json` has 23 set-order defects under the existing normalization tool: 15 `centers` arrays and eight `domains` arrays.
+* runtime loading rejects duplicate or non-distinct Channel endpoints;  
+* Channel IDs are checked against their ascending Gate pairs;  
+* declared Channel centers are checked against the exact set projected from the Gate catalog;  
+* `catalog/gates_v1.json`, `catalog/channels_v1.json`, `catalog/magic10_caps.json`, and `catalog/magic10_seeds.json` are canonical JSON with exactly one final LF; and  
+* `artifacts/canonical/arrays_as_sets_report.log` is promoted under a matching Human Evidence Index row, Machine Evidence Mirror row, and sibling path proof.
 
-`catalog/gates_v1.json` and `catalog/channels_v1.json` lack final LF and are not recursively key-sorted. `catalog/magic10_caps.json` and `catalog/magic10_seeds.json` are not recursively key-sorted. Normalize these four catalog files in one Doc-Delta/release change. The two topology schemas also omit recursive canonical key order; because they are not current manifest inputs, either canonicalize them when adding `$id` or document a source-schema formatting exception—do not claim present §4 conformance by implication.
+The earlier endpoint, center-projection, catalog-byte, and unindexed arrays-as-sets defects are not current gaps.
 
-`artifacts/canonical/arrays_as_sets_report.log` demonstrates defects and normalization behavior, not universal conformance; it is outside default test discovery and is not currently registered in the Human Index or Machine Mirror. Treat it as diagnostic until deliberately promoted. The deterministic registry report inherits the §8.1–§8.2 gaps and is not, by itself, topology or release-completeness proof.
+Magic-10 v1 still requires one coherent integrity cut covering the corrected scoring-bound Channel classifications, the authoritative mechanics configuration, its three new owning schemas, exact source hashes, manifest membership, generated configuration identity, and deterministic golden identity. Those future bytes MUST satisfy the canonical, declared-set, topology, loader, manifest, and release rules in this document before conformance is claimed.
 
-The following PF12 paths remain reserved target evidence outputs. Generate or refresh them only after the checks exist, then index, mirror, and path-prove them under §8.3:
+These names remain reserved target outputs unless and until their owning checks generate and govern them:
 
-- `artifacts/topology/topology_coherence_report.log`  
-- `artifacts/canonical/arrays_as_sets_report.log`  
-- `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+* `artifacts/topology/topology_coherence_report.log`; and  
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`.
+
+Do not treat the current promoted arrays-as-sets report, static file presence, or canonical source bytes as proof of the unimplemented Magic-10 v1 contract or whole-release PASS.
 
 ### Acceptance hints (names-only)
 
@@ -4724,6 +4921,16 @@ Role and artifact\_key:
 - Mirror artifact\_key: "config.magic10" (names-only).  
     
 - Mirror role: "snapshot".
+
+#### **Magic-10 v1 authoritative-config boundary**
+
+`artifacts/thresholds/magic10_config.json` remains a generated evidence snapshot with artifact key `config.magic10`. It is not the authoritative Magic-10 v1 mechanics configuration, a caller-selectable configuration, or an independent release-identity input.
+
+The authoritative mechanics configuration is `catalog/magic10_mechanics_v1.json`, governed by `schemas/magic10_mechanics_v1.schema.json` and identity `magic10_mechanics_config.v1`. The generated snapshot MAY project the validated active mechanics identity through its owning schema and generator, but it MUST NOT duplicate or override the authoritative formulas, source hashes, `config_id`, result identities, or manifest binding.
+
+`tools/config/generate_config_artifacts.py` and `tools/config/artifacts.py` remain the existing configuration-tooling home for this generated projection. They MUST fail closed on an absent, invalid, ambiguous, or hash-mismatched active mechanics configuration and MUST NOT activate a candidate configuration.
+
+The governed Magic-10 v1 golden identity is `tests/fixtures/magic10/v1/goldens.json`. It contains machine-readable forms of `M10-G001` through `M10-G008` and their exact expected outputs. It is a deterministic verification input, not a second formula authority, generated `config.magic10` payload, Human Index or Machine Mirror entry by implication, or release-manifest member outside the exact promoted roster.
 
 Generation and env rails (titles-only):
 
