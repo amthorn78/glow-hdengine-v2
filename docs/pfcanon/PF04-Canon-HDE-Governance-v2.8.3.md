@@ -3,10 +3,10 @@
 ## 0.1 Header
 
 **Title:** PF04-Canon-HDE-Governance  
-**Version:** v2.8.2  
+**Version:** v2.8.3  
 **Status:** Canon  
 **Effective date:** 2026-08-25  
-**Last Update Gate:** BN 12.8.9  
+**Last Update Gate:** Token retirement  
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ## 0.2 Scope & boundaries \[Required-Now\]
@@ -65,8 +65,8 @@ This document defines **governance, validation, and operational policy** for the
 
 **Single homes.**
 
-* **Token roster.**  
-  All governance tokens are listed **once** in §2.0 **Acceptance Tokens**. Other sections refer to §2.0 and do not restate token lists.  
+* **Legacy token catalog.**  
+* §2.0 is the single historical compatibility catalog for existing governance-token names and semantics. Tokens are optional indexing metadata and are not an acceptance authority or a prerequisite for planning, implementation, review, QA, acceptance, or closure.  
     
 * **Evidence Index & Machine Mirror (PF12-Canon-HDE-Schemas-and-Artifacts single home).**  
   **PF12-Canon-HDE-Schemas-and-Artifacts** is the single home for:  
@@ -299,7 +299,7 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 **Governance stance.**
 
-* Governance may tighten tests, add acceptance tokens, and require new evidence artifacts **without** changing preserved wire contracts.  
+* Governance may tighten tests, define acceptance criteria, and require new evidence artifacts **without** changing preserved wire contracts. A new acceptance token is exceptional and may be introduced only through the bounded opt-in rule in §2.0.0.  
     
 * Any change to a preserved surface’s contract must be treated as **out of scope** for EPIC-011 and routed through a future Epic. **PF20-Reference-HDE-Phased Epics** supplies historical context only and does not control current planning.
 
@@ -311,43 +311,60 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 ## **2.0 Acceptance Tokens (single-home roster) \[Required-Now\]**
 
-**Single home for governance tokens.** This roster centralizes token semantics; the bytes and tests live elsewhere and are referenced by title only. Other sections must reference §2.0 and must not restate token lists. Supersession: PF10 uses independently scoped numbered addenda; the highest-numbered applicable addendum governs only overlapping or explicitly superseded scope, while unrelated addenda and distinct unsuperseded portions remain authoritative. All token names are case-sensitive.
+**Current acceptance model.** Exact-source evidence and scoped decisions are the primary traceability model for current acceptance and completion claims. PF10 uses independently scoped numbered addenda; the highest-numbered applicable addendum governs only overlapping or explicitly superseded scope, while unrelated addenda and distinct unsuperseded portions remain authoritative.
 
-**Token Registry.** This section is the **Token Registry** for HDE acceptance tokens. Token names and semantics are **owned here**. **HDE-Schemas and Artifacts** mirrors these names and attaches acceptance hints to concrete artifacts; it does **not** change semantics. **HDE-Build Checklist** is strictly **consumer-only**: it lists and groups tokens by phase and Epic but may not introduce new token names. Any new acceptance token must be defined in this section first and then mirrored into **HDE-Schemas and Artifacts** and **HDE-Build Checklist** by title.
+Every current acceptance or completion claim MUST bind, as applicable, to:
 
-**Derived token roster exports (consumer-only).** Repo-generated token-roster exports (for example, `reports/qa_acceptance_tokens.json`) are derived/consumer artifacts and may lag, simplify, or omit PF04 Token Registry details. If a derived export disagrees with §2.0, PF04 governs. Treat export drift as consumer drift and fix the exporter/pipeline; do not mint, rename, or retire acceptance tokens based on derived exports.
+* repository identity and exact Git commit SHA;  
+* PR number, base SHA, candidate or head SHA, merge SHA, and immutable review record when a PR is used;  
+* workflow name, run identifier or URL, exact tested SHA, conclusion, and applicable check set;  
+* stable PF, ADR, epic, task, acceptance-criterion, test, schema, or artifact identifiers;  
+* exact governed artifact paths and SHA-256 digests where integrity is material;  
+* applicable manifests, indexes, mirrors, path proofs, tool versions, and configuration references;  
+* the QA or approval decision, decision-maker, scope, and time; and  
+* any exception or waiver identity, owner, scope, reason, and expiry.
 
-**Canonical spelling in derived exports (no alias masking).** Derived token roster exports MUST preserve the canonical token spellings from §2.0. Exports that emit only legacy/alias token names MUST be treated as invalid consumer output; do not “map” aliases to canonical tokens as a substitute for correcting the exporter, because alias-only exports can mask missing canonical tokens.
+A PR, commit, workflow run, governed report, manifest, index, or closeout artifact MAY carry this evidence directly. Records MUST NOT duplicate information that GitHub or a governed repository artifact already records reliably. Governance creates no replacement token database and no universal new evidence form.
+
+**Claim separation.** Repository presence, CI result, QA verdict, operator or role acceptance, and completion or closure are distinct states and MUST NOT be collapsed. Landing a commit on `main`, including an operator-authored direct push, establishes repository reality only. It does not by itself establish CI PASS, QA PASS, acceptance, PF09 completion, OPS completion, deployment, release readiness, epic closure, or production readiness.
+
+A current canonical artifact on `main` governs its declared artifact-content lane. That authority remains separate from implementation conformance, repository validation, QA acceptance, and closure.
+
+**Direct-to-`main` authority and evidence.** The Product Owner retains authority to push directly to `main`. An agent MUST NOT infer that authority from this section; agent direct-main mutation requires an explicit current operator instruction covering the exact change. The normal direct-main lane is bounded documentation, metadata, or administrative correction selected by the Product Owner, although the Product Owner may explicitly authorize a broader change.
+
+A direct-main route changes the mutation path, not the applicable correctness, evidence, QA, security, privacy, canon, or closure standard. The post-write commit MUST be identified by its exact SHA; its diff and applicable push-triggered CI result are the minimum repository evidence. A valid applicability classifier MAY select a reduced lane set, and irrelevant lanes need not be rerun solely to imitate a full-PR process.
+
+Pending or failing push CI MUST be reported truthfully. The commit MUST NOT be described as CI-green or accepted. A failure on `main` MUST be surfaced and corrected or explicitly accepted as a bounded known exception; it MUST NOT be hidden by a legacy token, historical PASS, or operator authorship.
+
+**PR candidate fidelity.** When a PR is used, acceptance MUST bind to the exact reviewed candidate. The PR number and head SHA must be recorded or directly retrievable, relied-upon CI must identify that same SHA, and review findings and resolutions must remain in the PR or a governed linked artifact. A later push creates a later candidate. Earlier proof remains historical unless an explicit comparison proves the relevant reviewed content unchanged. The PR head, merge SHA, and post-merge `main` SHA must remain distinguishable.
+
+**QA decision fidelity.** A QA verdict MUST identify the exact repository and candidate SHA, scope and governing acceptance criteria, relied-upon checks and evidence, results and failures, decision-maker and time, and every limitation, exclusion, waiver, or unresolved condition. Existing workflow metadata, reports, manifests, indexes, and closeout artifacts MAY carry that evidence; a token claim or token/evidence matrix is not required.
+
+A QA verdict remains historical for its tested candidate. It is current for a later candidate only after applicable QA is rerun or an explicit scope-equivalence check proves that no relevant input, dependency, requirement, implementation surface, test, configuration, or evidence artifact changed. Filename similarity, unchanged token labels, an agent summary, or a “docs only” characterization is not sufficient equivalence proof.
+
+**Drift and staleness.** Before substantive work, resolve the current relevant repository ref and inspect the current authoritative files and repository state. Before mutation, verify that the working base has not been materially superseded; compare and reconcile any advance of `main` or prove it immaterial. Before an acceptance or completion claim, recheck the candidate SHA, relevant files, applicable workflow result, evidence integrity, and decision scope.
+
+A later commit does not erase historical evidence, but historical PASS does not automatically transfer. Evidence may carry forward only through explicit comparison and an applicable classifier or governed equivalence proof. Changed canon or acceptance criteria require renewed conformance analysis even when code bytes are unchanged.
+
+**Layered integrity.** A commit identifies a repository tree; a PR identifies a proposed change and review relationship; a workflow run identifies checks executed against a stated commit; hashes and path proofs bind artifacts to bytes and paths; manifests and indexes declare artifact sets and relationships; attestations record defined provenance; and authorized decisions establish acceptance within a stated scope. No one identifier proves every fact. Existing release-attestation, Evidence Index, Machine Mirror, path-proof, exact-source, provenance, deterministic-validation, and strict-claim controls remain in force.
 
 ---
 
 ### **2.0.0 Token admission & lifecycle (value-only)**
 
-**Role.** This section defines the governance for admitting new Acceptance Tokens and for maintaining the Token Registry.
+**Role.** This section defines the legacy-compatibility and bounded opt-in posture for Acceptance Tokens.
 
-**Supersession.** The Token Registry is normative. It overrides informal usage in plans, PRs, and downstream docs.
+**Legacy compatibility.** Existing token names and their historical semantics remain readable in this catalog. Existing token IDs MUST NOT be reinterpreted, reassigned, or deleted from historical records. Existing token evidence remains attributable to the candidate and proof that established it and does not become current acceptance for a later repository state.
 
-**Types.** The registry contains:
+**No default issuance.** New QA acceptance tokens MUST NOT be created by default. A complete token roster, per-step intended-token or claimed-token declarations, and a token/evidence matrix MUST NOT be prerequisites for planning, implementation, review, QA execution, acceptance, or closure. Their absence MUST NOT block otherwise sufficient exact-source evidence.
 
-1. **Acceptance tokens** (gated PASS/FAIL)  
-     
-2. **Execution harness tokens** (operational invariants for harness behavior)  
-     
-3. **Non-token markers** (labels that are explicitly not acceptance gates)
+**Schema compatibility.** Token-aware tools and schemas MAY remain. Empty token arrays remain valid where a governing schema requires the fields. No bulk rewrite of historical plans, logs, reports, indexes, or audit artifacts is required, and no code migration is required merely to retire mandatory token issuance.
 
-**Registry enforcement.** A token name is invalid for acceptance maps/manifests/evidence unless it is (a) registered here (§2.0), or (b) minted as a numbered addendum entry in PF10 (Glow HD Engine Build Notes). Plans may request new tokens via ADR, but those names MUST be clearly marked as requests until the token is minted in PF10 (or registered here).
+**Bounded opt-in.** A plan MAY explicitly opt into a bounded token or equivalent cross-reference only when an existing PF, ADR, epic, task, test, or acceptance-criterion identifier cannot provide the necessary traceability. The plan must identify that insufficiency and the bounded scope of the cross-reference. This exception does not reactivate a universal token system.
 
-**Terms (planning usage).** A token is an atomic PASS/FAIL acceptance predicate with a canonical name. A token claim is a plan's commitment to produce governed evidence that proves the token. An obligation is a concrete requirement stated without minting a new token name. Minting is the act of introducing a new token into PF10 addenda and draining it into this registry.
+**Catalog semantics when used.** Existing names are case-sensitive. An optional token reference may be used only where the bound artifact, validator, QA step, or evidence family directly proves its cataloged semantics. A token name does not replace exact candidate identity, governed evidence, or an authorized scoped decision.
 
-**No token invention.** Plans and acceptance artifacts MUST NOT mint, claim, or require new "guard tokens" unless the token exists in this Token Registry (§2.0) or has been minted as a numbered addendum entry in PF10 (pending drainage into §2.0).
-
-**Guard proof tokens.** Some guard proofs are required deliverables but are not acceptance gates.
-
-* **Evidence-only unless tokenized.** Guard proofs are required deliverables and MUST be mechanically generated and reviewable, but they MUST NOT create new token obligations unless Governance explicitly registers a token name and semantics for that guard proof in §2.0 (or mints it via PF10 addenda pending drainage into §2.0).  
-    
-* **No token invention.** Plans and acceptance artifacts MUST NOT mint, claim, or require new “guard tokens” unless the token exists in this Token Registry or has been minted as a numbered PF10 addendum pending drainage into §2.0.  
-    
-* **Future tokenization path.** If a guard proof must become a gated acceptance token, it must be explicitly admitted via governance and added to the registry with clear semantics.
+**Guard proofs.** Guard proofs are evidence obligations, not token obligations by default. They remain mechanically generated and reviewable when required, but do not require token issuance unless the bounded opt-in rule above is satisfied.
 
 **Retired database-bridge token and proof-label posture.** `DEV_DB_BRIDGE_FALLBACK_OK` is retired from current claimability. `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are non-token historical proof labels only; they are not current bridge, transport, or acceptance predicates.
 
@@ -357,23 +374,17 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 * OPS-03 and any other bounded direct-only OPS evidence family do not mint, satisfy, replace, or expand an acceptance token by implication. OPS evidence remains subject to its explicit nonclaims and the general OPS-versus-QA and OPS-versus-acceptance separation rules.  
 * Any future acceptance token for a distinct supported database-transport predicate MUST be expressly admitted through this Token Registry or minted by a numbered PF10 addendum before an acceptance artifact may claim it.
 
-**Review-time requests vs close-out claims.** Planning-time requests for new tokens are allowed, but acceptance claims at epic close must reference registered tokens and governed evidence.
+**Review-time requests vs close-out claims.** Acceptance and completion claims MUST bind exact-source evidence and the applicable scoped decision. A bounded token requested or used under §2.0.0 does not replace those bindings.
 
-**Operational discovery, open-rails, Codex Audit, and OPS evidence non-token posture.** Operational discovery, bounded OPS evidence, PO-authorized open-rails evidence, and read-only repo-reality observations may support planning, implementation, QA design, review, or later-drain supportability, but they do not mint, satisfy, or expand acceptance tokens by themselves. If an operational fact can be safely discovered and recorded without exposing secrets, Governance does not require a new acceptance token merely to permit discovery.
+**Operational discovery, open-rails, Codex Audit, and OPS evidence posture.** Operational discovery, bounded OPS evidence, PO-authorized open-rails evidence, and read-only repository observations MAY support planning, implementation, QA design, review, or drainage. They do not by themselves prove QA PASS, OPS completion, live-vendor truth, PF09 status movement, epic closure, PF-canon drainage, or acceptance.
 
-Codex Audit observations and other read-only repo-reality observations may support bounded repo-reality facts when properly labeled, but they do not by themselves prove QA PASS, OPS completion, live vendor truth, PF09 status movement, epic closure, PF-canon drainage, or acceptance-token satisfaction. Governance review blocks only when such evidence is overclaimed as token, acceptance, closure, live-vendor, PF09, OPS-completion, or canon authority.
+If such an observation supports a current repository claim, validate the claim against the current exact repository state before using it as fact. If it must support acceptance, bind it to the exact candidate, governing criterion, evidence, and authorized decision rather than converting it into a token.
 
-If a discovery proof, open-rails proof, Codex Audit observation, OPS evidence bundle, or repo-reality proof must become a gated acceptance token, the token must be admitted through this registry or minted in a numbered PF10 addendum before any plan, acceptance map, matrix, closeout artifact, or evidence log claims that token.
+**Optional token semantic-fit rule.** When an existing token is used as a bounded cross-reference, it may be claimed only where the bound artifact, validator, QA step, or evidence family directly proves its cataloged semantics. Proximity within the same PR, epic, evidence bundle, or acceptance record is insufficient.
 
-**Token claim semantic-fit rule.** Registering a token name does not make that token reusable for every artifact in the same PR, epic, proof family, evidence bundle, or acceptance map. A token may be claimed only where the bound artifact, validator, QA step, or evidence family directly proves the registered token semantics.
+Generic privacy, logging, canonical-JSON, path-proof, Evidence Index, Machine Mirror, and rails labels must bind to the exact proof family that proves those predicates. Artifacts that record only scope, nonclaims, route selection, field sufficiency, adapter mapping, parent binding, or documentation deltas may record those facts without claiming unrelated tokens.
 
-Generic privacy, logging, no-payload, no-I/O, canonical-JSON, path-proof, Evidence Index, Machine Mirror, and rails tokens must bind to the exact proof family that proves those predicates. Vendor field-sufficiency snapshots, adapter-contract snapshots, route-policy snapshots, parent-binding logs, nonclaim artifacts, doc-delta records, or acceptance maps MUST NOT claim `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, or similar registered tokens unless the artifact itself or its paired validator directly proves the relevant no-payload logging, keys-only logging, privacy-redaction, or no-external-I/O predicate.
-
-If an artifact records only scope, nonclaims, route selection, field sufficiency, adapter mapping, compatibility posture, parent evidence binding, or documentation deltas, it may record those facts without claiming unrelated generic governance tokens. Token arrays, token/evidence matrices, acceptance maps, evidence-index metadata, and closeout-support artifacts must preserve this semantic-fit boundary.
-
-**Command syntax and helper-code non-token posture.** Command syntax, helper-code syntax, heredoc form, rendered escape characters, indentation damage, copied-chat formatting, command literalness, and paste-readiness are not acceptance-token conditions by themselves. Acceptance tokens depend on governed proof, evidence identity, proof target identity, executed-result truth, registered token semantics, and the required evidence family, not on literal plan-command bytes unless the plan or owning PF home explicitly makes exact command bytes the proof target.
-
-A syntax, escape, helper-code, or command-literal issue may affect a token only when it changes or obscures the proof target, evidence family, artifact identity, executed result, rails posture, secret-safety posture, token semantics, PF09 scope, or public/private boundary. A reviewer who claims token impact from syntax or command-literal damage carries the burden to identify the separate non-syntax harm. If no such harm is proven, the issue is an in-flight normalization note, operator caution, caveat, suggestion, or nit, not a token failure.
+**Command syntax and helper-code posture.** Command syntax, heredoc form, rendered escapes, indentation, copied-chat formatting, literalness, and paste-readiness are not acceptance conditions by themselves. They affect acceptance only when they change or obscure the proof target, evidence family, artifact identity, executed result, rails posture, secret-safety posture, PF09 scope, public/private boundary, or other governing acceptance criterion. Without that separate material harm, the issue is an in-flight normalization note, operator caution, caveat, suggestion, or nit.
 
 ### **2.0.1 Determinism & identity**
 
@@ -872,46 +883,15 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 
 **PF04 vs Glow QA Guide vs Reality Audits.**
 
-* PF04 §2.0 remains the **single home for governance acceptance tokens**. Token names and semantics are defined here once.  
-    
-* **Glow QA Guide** maintains a **QA Acceptance Tokens library** that organizes these tokens for QA use. For QA Acceptance Tokens, PF19 acts as the **operational registry** and must:  
-    
-  * reference token names exactly as they are defined in this section, and  
-      
-  * record QA-facing semantics and wiring without introducing new or divergent meanings.
+* PF04 §2.0 is the historical compatibility home for existing governance-token names and semantics. Retaining a name here does not make it a current acceptance authority or mandatory control.  
+* **Glow QA Guide** MAY organize existing names for legacy QA use without introducing divergent meanings. It MUST NOT require a complete roster, universal token/evidence matrix, or token claim when exact-source evidence is sufficient.  
+* **HDE-Build Checklist** and **HDE-Phased Epics** MAY preserve historical token references but MUST NOT treat them as prerequisites for new work.  
+* Existing token IDs and historical evidence retain their original identity, scope, and meaning. They MUST NOT be reinterpreted, reassigned, deleted, or promoted into current acceptance for later repository states.  
+* A bounded token or equivalent cross-reference MAY be used only under §2.0.0. Its use does not reactivate universal token issuance or token wiring.
 
+**PF23 remains a separate axis.** A PF23 consult may support planning-time reality analysis but is not Live QA evidence, acceptance authority, or completion proof by itself. Decisions to run, waive, or narrow a PF23 audit do not weaken exact-source evidence, QA, integrity, or claim-separation requirements.
 
-* **HDE-Build Checklist** and **HDE-Phased Epics** are **consumers only**. They group and schedule tokens for phases and epics but must not introduce new token names, aliases, or synonyms for the same behavior.  
-    
-* **Reality Audits** (PF23) are a **separate axis**. Decisions to run, waive, or narrow a PF23 audit for a specific plan or epic:  
-    
-  * do **not** change which QA tokens exist,  
-      
-  * do **not** change how those tokens must be named, and  
-      
-  * do **not** relax the required wiring from tokens to tests, CI jobs, Live QA steps, or evidence.
-
-
-* PF23 scope is local to the audited epic or plan and must never weaken the semantics or governance posture of tokens defined in this section or in the Glow QA Guide’s QA Acceptance Tokens library.
-
-**Single-home restatement.**
-
-* PF04 §2.0 is the **governance single home**: every acceptance token (including QA Acceptance Tokens) is introduced here first and is mirrored by **HDE-Schemas & Artifacts**, **Glow QA Guide**, and **HDE-Build Checklist** by title only.  
-    
-* Glow QA Guide is the **QA single home** for the QA Acceptance Tokens library: it must list every QA token used in acceptance maps and manifests, with semantics aligned to this section, and may not introduce new QA Acceptance Tokens that are absent from PF04. Any new QA Acceptance Token requires:  
-    
-  * a PF04 Doc-Delta entry in §9 that adds the token to this roster, and  
-      
-  * corresponding updates in Glow QA Guide, HDE-Schemas & Artifacts, and HDE-Build Checklist in the same change.
-
-**PF23 consult is planning-time trace only (no execution-time QA artifacts; no `REALITY_AUDIT_OK`).**
-
-A PF23 consult is a *planning-time trace posture* (what loci were consulted while reasoning about risk/behavior), not a Live QA execution artifact and not acceptance evidence by itself.
-
-* Plans and implementations MUST NOT mint, claim, or reference any acceptance token such as `REALITY_AUDIT_OK` unless and until Governance explicitly registers such a token in §2.0.  
-* Live QA Plans and Live QA execution MUST NOT require or produce PF23 consult artifacts under QA\_ROOT (including `audit/qa/<epic-id>/00_meta/pf23_consult.md`).  
-* If a trace anchor is desired, the Live QA Plan MAY include a short “PF23 Anchors consulted” note in the plan body (names-only; no operator commands; no required Deliverables).  
-  Any acceptance roster that includes `REALITY_AUDIT_OK` is non-conforming; treat that as an invalid acceptance configuration.
+PF23 consults MUST NOT be represented as `REALITY_AUDIT_OK` or another acceptance token. Live QA Plans and Live QA execution MUST NOT require PF23 consult artifacts under QA\_ROOT. A plan MAY include a names-only “PF23 Anchors consulted” note with no operator commands and no required Deliverables.
 
 **PF23 consult scope (planning allowed and required; PR analysis disallowed).**
 
@@ -975,7 +955,7 @@ When PF23 is out of scope (PR analysis), reviewers MUST rely on the owning PF ca
 
 ### **2.0.19 QA bootstrap & harness (EPIC021+)**
 
-These tokens govern **QA tooling bootstrap**, **QA\_ROOT harness discipline**, and **acceptance-map / QA-plan viability** for epics. They are QA Acceptance Tokens in the sense of §2.0.18: PF04 owns their names and governance semantics; **Glow QA Guide** owns the QA library entries and detailed harness procedures; **HDE-Build Checklist** and **HDE-Phased Epics** consume them in phase tasks and epic records.
+The named entries in this subsection preserve legacy-compatible labels for QA tooling bootstrap, QA\_ROOT harness discipline, and QA-plan viability. Their underlying QA, evidence-integrity, and failure-classification requirements remain enforceable through exact-source evidence, but new work is not required to claim these names or create an acceptance map or token/evidence matrix solely because the catalog retains them. Any such artifact is required only by a separate current scoped requirement or an explicit bounded opt-in under §2.0.0.
 
 **Canonical QA\_ROOT naming (normative).**  
 Within §2.0.19, `<epic-id>` refers to the canonical epic QA root slug `hde-epic<NNN>`, where `<NNN>` is the zero-padded 3-digit epic number. Epic QA root directories MUST be lower-case and MUST use this canonical pattern:
@@ -1194,14 +1174,11 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
 
 * **Acceptance.**  
     
-  * `QA_ACCEPTANCE_MAP_VIABILITY_OK` is **satisfied** only when:  
-      
-    * every token listed in the epic’s acceptance map appears as a row in the token/evidence matrix, and vice versa, with no “orphan” tokens,  
-    * the matrix rows for the epic’s QA Acceptance Tokens have no `"e.g."`/`"TBD"` placeholders and enumerate tests, CI jobs, QA\_ROOT logs, and evidence artifacts, as required by §9.7.2, and  
-    * the viability log for the epic under QA\_ROOT exists, is non-empty, and indicates that all tokens in scope are wired and evidenced (PF19 owns the detailed viability thresholds and failure patterns).  
-    * the current-epic acceptance binding is single-home across three authoritative governed artifacts only: the epic acceptance map at its canonical docs path, the epic token/evidence matrix under QA\\\_ROOT, and the epic viability log under QA\\\_ROOT. Step-scoped snapshots or convenience copies MAY be produced for review, but they are not alternate homes and MUST NOT be used as acceptance binding sources.  
-    * the machine mirror MUST contain matching rows for all three authoritative binding artifacts before a step or closeout record claims that the current-epic acceptance binding is coherent.  
-    * no alternate acceptance-map home is authoritative. If an alternate or convenience copy exists, it is non-binding and MUST NOT be used to satisfy acceptance-map presence or acceptance-binding coherence claims.
+  * **QA\_ACCEPTANCE\_MAP\_VIABILITY\_OK (legacy compatibility only)** — The name and its historical semantics remain readable for records that already used it. New work MUST NOT be required to create a governed acceptance map, token/evidence matrix, viability log, or matching Machine Mirror rows solely to claim this legacy token.
+
+     Current QA-plan viability and coverage MUST instead be traceable through the exact candidate identity, governing acceptance criteria, concrete checks and step evidence, applicable results and failures, decision record, and any limitations or unresolved conditions. A project MAY continue using an existing acceptance map, matrix, or viability artifact when a separate current requirement or bounded opt-in makes it applicable, but the artifact does not replace the underlying exact-source proof.
+
+  * Ownership: Governance (legacy interpretation and exact-source acceptance posture); **Glow QA Guide** (QA procedure and verdict details); **HDE-Schemas & Artifacts** (schemas and integrity controls for governed artifacts that are actually used); **HDE-Build Checklist** and **HDE-Phased Epics** (historical references and applicable work routing).
 
 
 * Ownership: Governance (viability semantics and coupling to tokens/acceptance maps); **Glow QA Guide** (viability harness behavior and log format); **HDE-Schemas & Artifacts** (artifact family and Index/mirror mapping for token/evidence matrix and viability logs); **HDE-Build Checklist** (Calcination and later-phase tasks that wire acceptance maps and matrix artifacts); **HDE-Phased Epics** (D-goals and epic-level acceptance maps referencing this token).  
@@ -1284,14 +1261,14 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
       * a `PF09 pointers:` line listing the relevant PF09 pointer IDs,  
       * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and  
       * an `ADR status line:` line identifying the ADR governing the TI claim,  
-    * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or claims `QA_LIVE_QA_RUN_OK`).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (`PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`), and the closeout impact for that step,  
-    * **Accepted execution-deviation accounting (required).** When a step recorded in the coverage ledger as \`PASS\` materially diverged from the approved QA Plan but was still accepted, the closeout record MUST preserve the step’s coverage status and add a separate deviation note for that step.  
-    * **Deviation note content (minimum).** The deviation note MUST identify the deviation type (for example a bounded Moon Loop rerun, a rails change, or a step-local dependency-preflight correction), the governing approval or PF10 addendum that accepted it, and the reason the accepted deviation did not change the acceptance target or the step’s closeout impact.  
-    * **Original-versus-accepted receipt accounting (required for remediated steps).** When a planned QA receipt fails and a later remediation receipt becomes the accepted final basis, the coverage ledger, step-log manifest, closeout record, or equivalent review surface MUST distinguish the original planned receipt from the accepted remediation receipt. It MUST preserve the original failed receipt as context, identify which receipt is the final accepted basis, and avoid overwriting or collapsing both receipts into a single undifferentiated PASS row.  
-    * **Step evidence rule for closeout.** For any step recorded as \`PASS\`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only, summary-only, or result-JSON-only PASS statements are insufficient.  
-      * When a closeout review asks the reviewer to approve an executed step cluster as \`PASS\`, the review record MUST surface the manifest entry, primary-log header, \`captured\_env\`, \`evidence\_artifacts\`, \`intended\_tokens\`, \`claimed\_tokens\`, and path-proof binding for every executed step in that cluster, or state why an explicitly equivalent governed proof is used.  
-      * A result JSON that records \`PASS\` MAY be a supporting artifact, but it is not sufficient by itself when manifest, primary-header, rail, token, or path-proof trust is missing or unsurfaced.  
-    * **Token/evidence matrix pointer (required when in-scope QA tokens exist).** The closeout record MUST point to the epic’s token/evidence matrix artifact and MUST identify any in-scope QA token rows that remain blocked, incomplete, or not applicable.  
+    * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or otherwise requires Live QA).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (\`PASS\`, \`FAIL\`, \`BLOCKED\`, or \`NOT\_RUN\`), and the closeout impact for that step,    
+    * \***Accepted execution-deviation accounting (required).** When a step recorded in the coverage ledger as \`PASS\` materially diverged from the approved QA Plan but was still accepted, the closeout record MUST preserve the step’s coverage status and add a separate deviation note for that step.    
+    * **Deviation note content (minimum).** The deviation note MUST identify the deviation type (for example a bounded Moon Loop rerun, a rails change, or a step-local dependency-preflight correction), the governing approval or PF10 addendum that accepted it, and the reason the accepted deviation did not change the acceptance target or the step’s closeout impact.    
+    * **Original-versus-accepted receipt accounting (required for remediated steps).** When a planned QA receipt fails and a later remediation receipt becomes the accepted final basis, the coverage ledger, step-log manifest, closeout record, or equivalent review surface MUST distinguish the original planned receipt from the accepted remediation receipt. It MUST preserve the original failed receipt as context, identify which receipt is the final accepted basis, and avoid overwriting or collapsing both receipts into a single undifferentiated PASS row.    
+    * **Step evidence rule for closeout.** For any step recorded as \`PASS\`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only, summary-only, or result-JSON-only PASS statements are insufficient.    
+    * When a closeout review asks the reviewer to approve an executed step cluster as \`PASS\`, the review record MUST surface the manifest entry, primary-log header, \`captured\_env\`, \`evidence\_artifacts\`, governing PF, ADR, or acceptance-criterion identifiers, candidate SHA, and path-proof binding for every executed step in that cluster, or state why explicitly equivalent governed proof is used.    
+    *  A result JSON that records \`PASS\` MAY be a supporting artifact, but it is not sufficient by itself when manifest, primary-header, rails, exact-candidate, acceptance-criteria, or path-proof trust is missing or unsurfaced.    
+    * **Acceptance-evidence cross-reference (conditional).** If an epic uses a governed acceptance map, token/evidence matrix, or equivalent bounded cross-reference, the closeout record MUST point to it and identify every applicable entry that remains blocked, incomplete, or not applicable. No such artifact is required solely because a historical process used one.    
     * **Closeout review inputs posture (required).** When a closeout recommendation is issued, the closeout record MUST state the source-of-truth posture used for that recommendation. At minimum:  
       * PF10 is primary for epic-specific recorded implementation, remediation, QA execution, closeout, and documented supersession of earlier closeout wording.  
       * PF19 is the QA process and RCA basis where PF10 is silent. PF19 governs QA evidence posture, current-state check roots, documentation drainage posture, and closeout readiness interpretation when PF10 does not provide an epic-specific event record.  
@@ -2460,7 +2437,7 @@ If a governed SLO is breached for a success route or ops surface, apply the miti
 
 ### Acceptance tokens (names‑only; rostered in §2.0).
 
-Register SLO/bench tokens as they are introduced; they are merge‑gating and must obey PF12 index/mirror discipline.
+SLO and benchmark acceptance MUST bind to the governed criterion, exact candidate SHA, applicable result, and exact artifact paths and digests. PF12 index, mirror, and path-proof discipline remains mandatory where those artifacts participate in acceptance. An existing token MAY be retained as an optional legacy cross-reference, but new SLO or benchmark tokens are not created by default and are not a merge-gating prerequisite.
 
 ### Routing (titles‑only).
 
@@ -2886,13 +2863,13 @@ Admin credentials themselves (for example, admin tokens) **must never** appear i
 
 ### **8.3.5 Token coupling**
 
-The **ADMIN\_AUTH\_REQUIRED\_OK** token in §2.0.17 is **satisfied** only when:
+The admin-auth acceptance criterion MUST bind to the exact candidate and governed evidence that proves:
 
 * Both CLI and HTTP admin bundle surfaces are protected by admin authentication as described above.  
-    
 * QA harnesses demonstrate that unauthenticated and mis-authenticated calls fail closed with typed, numeric-free errors and never return bundles.  
-    
-* Evidence of the active auth posture (titles and paths only) is present in the Evidence Index and machine mirror in the same PR as any change to admin auth behavior.
+* Evidence of the active auth posture (titles and paths only) is present in the Evidence Index and Machine Mirror in the same change as any change to admin auth behavior.
+
+`ADMIN_AUTH_REQUIRED_OK` MAY remain as an optional legacy cross-reference, but its presence or absence does not replace or block the exact-source proof above.
 
 Routing for admin auth mechanics (credential shape, header names, GUI auth flows) lives in **HDE-CLI-API-Vendor-Ref**, **HDE-Mechanics Guide**, **Glow Infrastructure**, and **Glow QA Guide** (titles-only). PF04 owns the governance: admin surfaces are **never open**, and any change to their auth posture is a **normative change** that requires a Doc-Delta and updated evidence.
 
@@ -2971,7 +2948,7 @@ Every normative change **MUST** add a short “Doc-Delta” entry to **§9.3.1 P
 
 * **Scope** (one line): what changed, at a glance.  
 * **Targets** (anchors/sections by title).  
-* **Acceptance impact:** which tokens are affected (names-only; token roster lives in §2.0).  
+* **Acceptance impact:** which governed acceptance criteria or decisions are affected, using their exact PF, ADR, epic, task, test, schema, or artifact identifiers; list legacy token cross-references only when they are actually used.  
 * **Evidence impact:** which artifacts/paths were added/rotated/removed (titles only).  
 * **Freeze-pack impact:** whether `release_id` changed (PF12 owns bytes).
 
@@ -3090,202 +3067,96 @@ A7 transport proofs **must** run on a **Catalog JSON success** route (not `/inte
 
 ### **9.7.1 Scope**
 
-These rails apply to any implementation plan, Epic Plan, QA plan, or epic record that introduces or consumes QA Acceptance Tokens (including tokens referenced in acceptance maps, manifests, tests, CI jobs, Live QA steps, or evidence artifacts).
+These rails apply to implementation plans, Epic Plans, QA plans, epic records, acceptance artifacts, and closeout records that define acceptance criteria, make acceptance or completion claims, or bind governed evidence.
 
 They bind reviewers at two distinct decision points:
 
-* **Stage A — Plan Approval (ASK OK):** governs whether a plan is approved to begin implementation. At this stage, plans are execution indexes (pointers) and must not rebuild canonical token libraries, evidence schemas, or QA playbooks. Titles-only references are sufficient.  
-    
-* **Stage B — QA Ledger Completion (token fidelity \+ evidence wiring):** governs whether the epic is token-complete and ready for epic-level acceptance / close gates. At this stage, token naming, evidence wiring, indexing, and proofs must be complete and non-placeholder.
+* **Stage A — Plan Approval (ASK OK):** determines whether the plan identifies executable scope, governing source identifiers, proof obligations, evidence families, and checkable PASS/FAIL criteria. Plans are execution indexes and do not reproduce canonical schemas or QA playbooks.  
+* **Stage B — Acceptance-Evidence Completion:** determines whether the exact candidate, applicable criteria, checks, evidence, results, limitations, and authorized decisions are complete enough for the claimed acceptance or close gate.
 
-Stage A plan approval MUST NOT be blocked on PF19/PF19-adjacent registry drainage work (Glow QA Guide token library updates), nor on post-implementation QA execution artifacts; those requirements are enforced at Stage B.
+Stage A MUST NOT be blocked on a complete token roster, token/evidence matrix, per-step token declarations, post-implementation QA artifacts, or registry-drainage work. Those artifacts are required only when a separate current scoped requirement or bounded opt-in makes them applicable.
 
-*Important:* PF23 reality-audit scope is an independent axis from QA token strictness. Waiving or narrowing a PF23 audit does not relax token naming, acceptance mapping, evidence wiring, or other canon-backed rails.
+PF23 reality-audit scope remains an independent planning axis. Waiving or narrowing PF23 does not relax exact-source identity, evidence integrity, QA, safety, or claim-separation requirements.
 
-### **9.7.2 Token/evidence matrix (QA ledger; not embedded in the plan)**
+### **9.7.2 Acceptance-evidence ledger (form-neutral; not embedded in the plan)**
 
-A token/evidence matrix is a per-epic QA ledger artifact used to demonstrate (and later audit) how each in-scope QA Acceptance Token is enforced and proven end-to-end.
+Acceptance evidence is form-neutral. A PR, commit, workflow run, QA record, governed report, manifest, index, mirror, closeout artifact, or bounded cross-reference MAY carry it directly. No universal token/evidence matrix or replacement registry is required.
 
-* The matrix is a standalone artifact and MUST NOT be embedded inside an Epic Plan. Plans may include a single pointer line to the matrix location, but MUST NOT duplicate the matrix content.  
-    
-* **Stage A (ASK OK):** Plan approval MUST NOT be blocked on the absence of an in-plan matrix. If a matrix is expected for this epic, the plan may include a placeholder pointer line (example: `Token/Evidence Matrix: audit/qa/<epic-id>/token_evidence_matrix.md`) indicating where it will be authored during implementation/QA/closeout.  
-    
-* **Stage B (QA Ledger Completion):** Before an epic is considered token-complete (and before any reviewer asserts epic-level acceptance for in-scope QA tokens), reviewers MUST verify that the matrix exists and is complete for all in-scope QA tokens. No token row may contain placeholder cells (“e.g.”, “TBD”, or implicit gaps).
+* **Stage A:** Plan approval MUST NOT be blocked on the absence of an in-plan or standalone matrix. The plan must identify the applicable source criteria, candidate or deliverable scope, proof obligations, expected evidence families, and PASS/FAIL posture.  
+* **Stage B:** Before an acceptance or completion claim, reviewers MUST verify the exact repository and candidate identity, applicable criteria, relied-upon checks and results, governed evidence, decision-maker and decision time, and every limitation, exclusion, waiver, or unresolved condition.  
+* Evidence references MUST be concrete and non-placeholder when relied upon.  
+* Records MUST NOT duplicate information that GitHub or an existing governed artifact already records reliably.  
+* A bounded token or equivalent cross-reference MAY be used under §2.0.0, but it does not replace exact-source proof and does not make a universal matrix mandatory.
 
-For each in-scope token row, the matrix MUST include, at minimum:
+When PF09 scope is recorded, the record MUST represent every in-scope task and subtask truthfully, including unresolved or incomplete items. A claim that a criterion is implemented, covered, satisfied, or accepted is valid only when the governed evidence exists and the linked check or decision supports that exact claim.
 
-* governance token name as defined in PF04 §2.0 (verbatim),  
-    
-* corresponding QA Acceptance Token entry in Glow QA Guide (same name; no aliases),  
-    
-* acceptance map name (must match; no local aliases),  
-    
-* tests that exercise the token’s behavior (unit/integration),  
-    
-* CI jobs that enforce it under closed rails,  
-    
-* Live QA steps that demonstrate it (if applicable),  
-    
-* evidence artifacts (repo-relative paths) generated by those tests/steps, and  
-    
-* Evidence Index and Machine Mirror entries (artifact\_key, epic\_id, tokens, proof\_anchor), as required by the evidence schema.
+Acceptance records MUST bind to primary governed artifacts and the validators, tests, or QA records that produce or verify them. A `*.path_proof.txt` file is an integrity companion, not the primary behavior evidence. Reused governed proof families must be identified directly; slice-local substitutes or generic index-discipline evidence are insufficient when the underlying proof family materially supports the claim.
 
-**Scope-binding versus token posture.** Acceptance maps and the governance-token column of the token/evidence matrix MUST contain only canonical governance token names. They MUST NOT mint epic-local token names, and they MUST NOT use PF09 task or subtask IDs as substitute token names. If a close slice needs to record bound PF09 scope, that scope MUST be recorded in a separate status-only or scope-binding section, or in related closeout or manifest artifacts, not as acceptance tokens.
+### **9.7.3 Identifier fidelity and optional legacy cross-references**
 
-**Complete scope-binding posture.** When a close slice records PF09 scope bindings, it MUST represent the full in-scope PF09 task and subtask set for that slice truthfully, including any unresolved or not-complete items. Omission of an in-scope PF09 binding is non-conforming.
+Plans and proofs MUST use stable source identifiers already owned by the applicable PF, ADR, epic, task, acceptance criterion, test, schema, artifact, PR, commit, or workflow. They MUST NOT invent local aliases that obscure the governing source.
 
-**Temporary-token claim rule.** A token MAY be marked implemented, covered, satisfied, or equivalent in the acceptance map or token/evidence matrix only when the governed evidence artifacts at the bound canonical paths already exist and the linked validator run, checklist log, or QA primary log actually shows PASS. Planned, expected, or missing future evidence is insufficient.
+Existing legacy token names are case-sensitive when used. A token reference must use its cataloged spelling and semantic scope, but its absence is not a defect when exact-source evidence is sufficient. New tokens are not created by default. Any bounded opt-in must satisfy §2.0.0 and MUST NOT reactivate universal roster or matrix requirements.
 
-**No implied scope completion.** Promoting a token to implemented or covered does not by itself promote any separate PF09 task or subtask to complete. When accepted Ops evidence or other governed evidence still shows part of the mapped PF09 scope as unresolved, not yet closed, or not complete, the acceptance artifacts and related closeout surfaces MUST preserve that unresolved status explicitly.
-
-**Binding posture (proof anchors; acceptance artifacts).** In the token/evidence matrix and acceptance maps, tokens MUST bind to the **primary governed artifacts** and the **validator runs/tests** that produce or verify them. Tokens MUST NOT bind directly to `*.path_proof.txt` files as primary evidence surfaces. Path proofs are still required and merge-gating, but they are referenced via the machine mirror record’s `proof_anchor` for the bound artifact and are validated by the evidence index/mirror checks.
-
-**Reuse-first acceptance-ledger binding.**
-
-* If an epic acceptance or close slice depends on already-governed proof families, the acceptance map and token/evidence matrix MUST bind those reused proof families directly.  
-    
-* Binding only global evidence-skeleton or index-discipline tokens is insufficient when additional in-scope governed proof families materially support the claimed close slice.  
-    
-* The token/evidence matrix MUST identify the reused primary governed artifacts and the validator runs/tests or QA\_ROOT log anchors that establish each reused token, rather than replacing the reused family with slice-local substitute proofs.  
-    
-* The viability log MUST count those reused tokens as in scope and MUST NOT report full coverage while omitting them from the acceptance map or token/evidence matrix.
-
-If any required cell is missing at Stage B, the epic is not token-complete and MUST NOT be closed as accepted.
-
-### **9.7.3 Token naming and single-name usage**
-
-Token names are governance artifacts. Plans and proofs MUST consume a single canonical spelling for each token, and MUST NOT mint local synonyms.
-
-* Any token used in an acceptance map, manifest, evidence artifact, epic plan, or epic record MUST use the exact governance spelling from PF04 §2.0. During drainage windows, a newly minted token MAY be referenced only if it has been minted as a numbered addendum in PF10 (Glow HD Engine Build Notes) and the spelling is copied exactly from that addendum, pending drainage into PF04 §2.0.  
-    
-* Token inventory step (required). Before a plan is finalized, the plan owner MUST inventory every token name used in the plan and verify that each is present in PF04 §2.0 or in an applicable PF10 addendum, and that spelling matches exactly.  
-    
-* **Planning artifact ownership (Tracked Issues, ADR stubs).** Tracked Issues and ADR stubs are PO-owned planning artifacts. Agents MAY draft suggestions, but the PO is the owner and final maintainer for these artifacts.  
-    
-* Explicit non-canonical spellings (ban list; normalize on sight). The following spellings MUST NOT appear as claimed tokens in new plans or acceptance artifacts:  
-    
-  * `AB_BA_PARITY_OK` and `CLI_AB_BA_PARITY_OK` (normalize to `COMPOSITE_ABBA_IDENTITY_OK`).  
-      
-  * `CLI_READER_EMITTER_PARITY_OK` (normalize to `CLI_READER_PARITY_OK`).  
-      
-  * `CANON_JSON_OK` (normalize to `JSON_CANONICAL_CHECK_OK`).  
-      
-  * `CATEGORY_FRAMEWORK_OK` is not a token name. Use `MAGIC10_DOMAIN_CLOSED_OK` (domain closure) or `PREFS_KEYSET_10_OK` (keyset contract), depending on intent.
-
-
-* Compatibility keyset contract posture. Plans MUST NOT mint a new "compat keyset contract" token. Prove the intent under existing tokens (e.g., `PREFS_KEYSET_10_OK`) and express any extra requirements as obligations or evidence requirements.  
-    
-* PF14 is not a token registry. Epic-specific guides may choose a spelling during drainage, but the governance spelling wins and all claims must converge on the governance spelling (see §9.7.6).  
-    
-* If an epic needs a new acceptance token, that need MUST be recorded as an ADR during planning. If approved, the token MUST be minted in PF10 as a numbered addendum before any plan claims it. The token remains canonical in PF10 until it is drained into PF04 §2.0 (Doc-Delta).
+Planning artifacts owned by the Product Owner, including Tracked Issues and ADR stubs, remain PO-owned. Agents MAY draft suggestions, but the Product Owner remains the final maintainer.
 
 ### **9.7.4 Blocking status and downgrades (stage-aware; no silent relaxation)**
 
-Stage A and Stage B have different blocking standards. A plan must explicitly mark its stage. Reviewers must not silently relax blockers.
+Stage A and Stage B have different blocking standards. A plan must state its stage, and reviewers MUST NOT silently relax blockers.
 
-**Stage A — Plan Approval (PRE-IMPLEMENTATION) blockers include:**
+**Stage A — Plan Approval blockers include:**
 
-* placeholder or non-canonical token names (e.g., “TBD\_TOKEN\_OK”, “SOMETHING\_OK”, “CATEGORY\_FRAMEWORK\_OK”)  
-    
-* token naming disputes left unresolved: the plan must choose a single token spelling for the epic via ADR, or defer the token  
-    
-* acceptance claims that are not tokenizable (no token name) or that are not tied to governed evidence  
-    
-* claiming acceptance or evidence that violates SAFE-rails (e.g., requiring vendor HTTP access for acceptance; claiming evidence from forbidden sources)  
-    
-* prohibited-character violations in any planning document under review: Unicode ellipsis character (U+2026), or any instance of three consecutive U+002E FULL STOP characters.
+* missing or ambiguous governing source, scope, acceptance criterion, proof obligation, evidence identity, or PASS/FAIL predicate;  
+* an acceptance claim that cannot be tied to a stable source identifier and governed evidence;  
+* unsafe or prohibited rails behavior;  
+* a required repo locus asserted without allowed proof or discovery-first posture; and  
+* prohibited-character violations, including a Unicode ellipsis character (U+2026) or three consecutive U+002E FULL STOP characters.
 
-**Stage B — QA Ledger Completion (IMPLEMENTED \+ EVIDENCE OK) blockers include:**
+**Stage B — Acceptance-Evidence Completion blockers include:**
 
-* prohibited-character violations in any planning document or QA Ledger artifact under review: Unicode ellipsis character (U+2026), or any instance of three consecutive U+002E FULL STOP characters.  
-    
-* tokens used in acceptance maps/manifests/evidence that are neither registered in PF04 §2.0 nor minted (with exact spelling) in an applicable PF10 addendum,  
-    
-* evidence file paths that are not under canonical roots or do not exist  
-    
-* evidence artifacts that are not mechanically generated (hand-edited evidence)  
-    
-* token→evidence matrix cells left implicit (“we probably did it”, “it’s in the logs”, “TBD”)  
-    
-* results that claim “plausibly proven” for any gated token without a governed evidence artifact  
-    
-* a PR or remediation slice that leaves one or more assigned HDE-Build Checklist subtasks unresolved without an explicit per-subtask explanation that names each affected subtask ID, states exactly what was completed, states exactly what remains incomplete, describes the blocking condition or limiting constraint, explains why completion was not possible within the approved PR scope, and cites the concrete repo-grounded evidence or test result for that conclusion  
-    
-* silent omission of unresolved assigned subtasks, partial completion without that explanation, or any claim that the PR is complete while assigned subtasks remain unresolved
+* evidence paths outside canonical roots, paths that do not exist, or evidence artifacts that are required to be mechanical but were hand-edited;  
+* placeholder, missing, ambiguous, or internally contradictory evidence bindings;  
+* a PASS or acceptance claim without governed evidence for the exact candidate and applicable criterion;  
+* a missing, failing, or unexecuted applicable check concealed by a summary or aggregator;  
+* silent omission of unresolved assigned PF09 tasks or subtasks; and  
+* a completion claim while assigned scope remains unresolved without an exact-ID explanation of what completed, what remains, the limiting condition, and the concrete repository-grounded proof.
 
-**Downgrades.** A blocker may only be downgraded if:
+**Downgrades.** A blocker may be downgraded only when the rationale is explicit and the downgrade does not violate canonical acceptance rails. Uncertainty requiring discovery must produce an explicit reconciliation step and re-check gate.
 
-* the plan explicitly marks a downgrade rationale, and  
-    
-* the downgrade does not violate canonical acceptance rails.
-
-Downgrades must be explicit and logged. If a blocker is downgraded due to uncertainty (e.g., a path must be discovered during implementation), the plan must mark an explicit recon step and a re-check gate.
-
-**No silent relaxation.** If a reviewer chooses not to block on a known blocker (e.g., because it is a known-but-accepted deviation), the initial report should say so.
+**No silent relaxation.** If a reviewer does not block on a known deviation, the report MUST state the deviation, its bounded acceptance basis, and the claim limits that remain.
 
 ### **9.7.5 PF23 scope waivers (local, non-transitive)**
 
-If the Product Owner or governance chooses to waive or narrow a canon requirement for a particular plan (for example, deciding that PF23 audits are out of scope for a given implementation plan), reviewers MUST:
+If the Product Owner or Governance waives or narrows PF23 for a particular plan, reviewers MUST record the local scope directive and state that PF04 exact-source identity, evidence integrity, QA, safety, epic-scope, and claim-separation rails remain fully in force.
 
-* record that as a local scope directive (e.g., “PF23 audits are not part of this plan’s workflow”), and  
-    
-* explicitly state that other rails (PF04/PF19 token governance, evidence rules, epic D-goals, build rails) remain fully in force.
+A PF23 waiver or narrowing does not authorize a token claim, relax an acceptance criterion, transfer historical proof to a later candidate, or turn repository observation into QA or closure evidence.
 
-Such PF23 scope waivers MUST NOT be interpreted as permission to relax token naming, acceptance mapping, evidence wiring, or any other canon-backed rails.
+### **9.7.6 Re-grounding before asserting an identifier gap**
 
-### **9.7.6 Re-grounding before asserting “no canonical token name”**
+Before asserting that no stable identifier exists for a requirement or QA behavior, a reviewer MUST recheck the applicable PF, ADR, epic, task, acceptance criterion, test, schema, artifact, PR, workflow, and current scoped approval records.
 
-Before any reviewer asserts that “no canonical token name exists yet” for a QA behavior, they MUST:
-
-1. re-check the QA Acceptance Tokens library in Glow QA Guide, and  
-     
-2. re-read any epic-specific approvals or remediation guides that apply to the epic or defect in question, especially where those documents already chose a token name and semantics for that behavior.
-
-If any such approval or remediation guide defines a token name and semantics for a behavior in scope for the current plan, that spelling is treated as the canonical spelling for this epic’s planning and review purposes. It MUST be used consistently across the plan and any acceptance maps/manifests/evidence authored under the plan, until the naming is drained into PF04 and Glow QA Guide via Doc-Delta.
+If one of those sources already identifies the requirement, use that exact identifier. A bounded token or equivalent cross-reference MAY be introduced only under §2.0.0 when those existing identifiers cannot provide necessary traceability. Its exact spelling and semantics apply only within the approved scope and do not reactivate universal token issuance, roster coverage, or matrix requirements.
 
 ### **9.7.7 Plan approval gate (anti-thrash; token scope disciplined)**
 
 Plan acceptance is a governance act. It must not thrash on low-signal edits, and it must not allow token drift.
 
 * **Approval-submission sentinel.** Any planning artifact submitted for approval MUST include the explicit `ASK OK?` approval sentinel. This applies to approval-submitted Epic Plans, Implementation Plans, QA Plans, remediation plans, and other plan-form artifacts that request approval before execution.  
-    
   * The presence of `ASK OK?` is required and non-blocking by default for approval-submitted plans.  
   * Reviewers MUST NOT classify `ASK OK?` as stray text, formatting noise, or a blocker merely because it appears in the plan.  
   * Missing the required approval sentinel remains a blocker.  
-  * The in-plan `ASK OK?` approval-submission sentinel is distinct from a reviewer response final decision line such as `ASK OK` or `REVISE AND RESUBMIT`.
-
-
-* **Plans are pointers.** Epic plans are a pointer map, not a full SOP.  
-    
-* **Token value and budget discipline.** Plans should use only meaningful acceptance tokens. Do not add tokens "just in case."  
-    
-* **QA planning is post-implementation.** Stage A plans should not attempt to specify the entire QA script. They should specify what must be proven (tokens), and which evidence artifacts will be generated, with pointers to playbooks where relevant.  
-    
-* **Implementation planning must not require extensive QA evidence.** Epic Implementation Plans and Implementation Guides MUST NOT require the production of extensive QA evidence artifacts. These planning artifacts MAY state QA objectives and closeout proof obligations, but they MUST NOT embed a full QA runbook or require that QA evidence be generated as part of implementation planning.  
-    
-* **QA planning is separate.** QA planning and QA evidence production are owned by the Live QA Plan and QA execution artifacts. The Live QA Plan is where step intents, evidence expectations, and PASS/FAIL posture are specified and where governed QA evidence is produced and indexed.  
-    
-* **Ops tasks are not QA tasks.** Ops tasks are implementation tasks that change the runtime environment and cannot be performed by code changes alone (for example: service configuration, environment variable changes, secrets management, privileged infrastructure actions). Ops tasks MUST be tracked and evidenced as implementation work, not as QA work.  
-    
-  * Ops task completion evidence may be required for a feature to function, but it does not satisfy QA verification. QA verification still requires functional proof and the required QA evidence outputs defined in QA planning.
-
-
-* **Separation rule (no category mixing).** Planning artifacts MUST keep these categories distinct:  
-    
-  * Implementation work and deliverables (code and implementation changes)  
-  * Ops tasks (environment changes)  
-  * QA planning (verification plan and evidence posture)  
-  * QA execution (functional runs and governed QA evidence)
-
-
-* **No hidden acceptance.** Plans must not embed ungoverned acceptance claims in prose. All acceptance claims must be surfaced as tokens.  
-    
-* **No scope laundering.** Plans must not offload difficult decisions to "implementation" while still claiming Stage B acceptance closure.  
-    
-* **No plan-local token minting.** A plan must not invent new token names or introduce local synonyms. If a new token is needed, it must be minted via the governance process.  
-    
-* **No "proof by intent."** Plans must not treat "we will test" or "we will validate" as evidence. Plans must name evidence artifacts and where they will live.  
-    
+  * The in-plan `ASK OK?` sentinel is distinct from a reviewer response decision such as `ASK OK` or `REVISE AND RESUBMIT`.  
+* **Plans are pointers.** Epic plans are pointer maps, not full SOPs.  
+* **Identifier and evidence proportionality.** Plans SHOULD use existing PF, ADR, epic, task, acceptance-criterion, test, schema, artifact, PR, commit, and workflow identities. They MUST NOT introduce a token or equivalent cross-reference “just in case.”  
+* **QA planning is post-implementation.** Stage A plans SHOULD specify what must be proven, the governing criteria, expected evidence families, and applicable playbooks rather than attempting to embed an entire QA script.  
+* **Implementation planning must not require extensive QA evidence.** Epic Implementation Plans and Implementation Guides MAY state QA objectives and closeout proof obligations but MUST NOT embed a full QA runbook or require QA evidence production as implementation work.  
+* **QA planning is separate.** The Live QA Plan owns step intent, evidence expectations, and PASS/FAIL posture; QA execution produces the governed evidence.  
+* **Ops tasks are not QA tasks.** Runtime-environment changes that cannot be made by code alone are implementation or OPS work, not QA work. Their completion evidence does not replace functional QA proof.  
+* **Separation rule.** Planning artifacts MUST keep implementation work, OPS tasks, QA planning, and QA execution distinct.  
+* **No hidden acceptance.** Plans MUST surface acceptance claims through the applicable exact source identifiers, evidence obligations, and decision scope.  
+* **No scope laundering.** Plans MUST NOT defer unresolved decisions to implementation while claiming Stage B acceptance or closure.  
+* **No plan-local token issuance.** A plan MUST NOT invent a token or local synonym. Any bounded cross-reference must satisfy §2.0.0.  
+* **No proof by intent.** “We will test” or “we will validate” is not evidence. Plans must identify the proof obligation and the governed evidence family or decisive receipt that will establish it.  
 * **Retrieval-first, proof-first review posture.** AI reviewers MUST NOT approve, block, downgrade, or assert drift for planning, remediation, QA, repo audit, closeout, or related review artifacts from memory, partial snippets, truncated excerpts, display-layer artifacts, or guessed repo reality.  
     
   * Source order: use PF10 first where it explicitly speaks; then read the current artifact under review end-to-end; then consult the owning PF canon home for each specific issue; then use repo-reality proof for any claimed path, command, endpoint, environment variable, test ID, artifact path, or component home.  
@@ -3348,33 +3219,21 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
 * **Quote and redline posture.** IG Approved quotes, CA vetted quotes, PF proof excerpts, Doc A placement lines, Doc B review quotes, redline placement quotes, First line, Last line, Disambiguation line, and proof excerpts MUST be evaluated against raw source text. If the only difference is assistant-rendered escaping, the quote or placement proof is source-equivalent. A redline to remove escape characters is allowed only when the raw target document, raw Doc A source, or raw governed artifact actually contains the unwanted escape character.  
     
 * **QA and acceptance classification posture.** QA plans, review artifacts, Live QA results, acceptance maps, token/evidence matrices, closeout reports, PR reviews, implementation plan reviews, and Codex prompts MUST NOT classify display-layer escape artifacts as `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, acceptance failure, path-proof failure, canonical path failure, token spelling failure, quote-verbatim failure, PF locator failure, implementation blocker, or closeout blocker. If raw source verification proves a substantive defect, classify the real underlying issue, not the display rendering.  
-    
 * **Codex prompt posture.** Codex prompts MUST treat escaped display text as non-authoritative unless the escaped text is inside a raw source file that Codex opens. Codex MUST NOT create alternate escaped paths or filenames, rename paths, remediate paths, or fix commands solely because assistant-rendered prompt text displayed backslashes.  
-    
 * **Reviewer self-check before escape-related issues.** Before issuing any issue that mentions escaped characters, backslashes, markdown escaping, rendered paths, rendered shell syntax, or rendered code syntax, the reviewer MUST remove the apparent rendering escapes mentally, re-read the command, path, token, artifact identity, or proof obligation, and ask whether the issue would still be a blocker if the escape characters vanished. If not, the reviewer MUST NOT emit the issue.  
-    
 * **Author obligation limit.** If the command identity, artifact identity, path identity, token identity, evidence identity, and proof obligation are clear after ignoring rendered escapes, the plan passes that review dimension. Reviewers MUST NOT ask the Product Owner or plan author to revise rendered escape characters, and MUST NOT use them as evidence of non-runnability, non-portability, or invalid proof posture.  
-    
 * **Substantive defects remain blocking.** This posture does not allow broken plans to pass. A blocker remains valid when the substantive issue is independent of rendering escapes and concerns missing or ambiguous command identity, an unproven repo locus, a missing required deliverable, a missing PASS or FAIL criterion, a required non-attached non-PF source, contradiction with PF10 or controlling PF canon, assignment of QA execution where only planning is allowed, unsafe public-surface or provider-rails posture, or a proof target that remains unclear after ignoring rendered escapes.  
-    
 * **Formatting exceptions (still blocking).** This non-blocking posture does not apply to formatting or text that changes meaning, hides required content, breaks execution, prevents verification, violates prohibited-character rules (see §9.7.4), or affects any of the following:  
-    
   * Missing or incorrect required fields, required section order, required adjacency, PF09.x documents, task IDs, subtask IDs, PF14 references, dispositions, token spellings, path strings, endpoint strings, command strings, schemas, JSON, or code.  
   * Commands or code expressly required by an owning contract to run as written, when the defect changes command identity, proof target, artifact family, PASS/FAIL predicate, or intended output.  
   * Evidence outputs, filenames, or required lowercase ASCII paths.  
   * Portability rules (for example references to external attachments).  
   * Quoted-carryover blocks that must be verbatim (for example “IG Approved” or “CA vetted” quote lines).  
-  * Any statement of obligation (MUST/SHOULD) or acceptance posture.
-
-
-* **Template-hygiene materiality rule.** A planning artifact, implementation plan, QA plan, remediation guide, review artifact, or closeout planning artifact MUST NOT be blocked solely for template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table order, section phrasing, path labels used only for planning, titles-only polish, or section-locator precision unless the defect materially changes source-of-truth authority, implementation scope, PF09 completion mapping, acceptance-token truth, evidence identity, evidence trust, Codex portability, OPS/PR boundary, execution safety, public/private surface posture, canon conflict handling, or closeout truth.  
-    
-* **Acceptance-token review materiality.** Missing token-inventory rows should be corrected, but they are blockers only when they create token overclaim, missing acceptance truth, unregistered token usage, canonical token-spelling drift, or a missing governed evidence obligation. A missing token row is not a blocker by itself when the plan does not overclaim the token and the relevant evidence family is otherwise scoped.  
-    
-* **Valid blocker classes remain material.** The following remain blockers when proven: contradiction with active PF10 guidance; an ADR left open after PF10 resolves the exact topic; routing a topic to a new PF10 addendum when an applicable PF10 addendum already exists; claiming an unregistered token as an acceptance token; marking work Already Implemented without embedded proof or an allowed proof form; requiring Codex to consult CA, audit files, attachments, chat history, implementation guides, or other non-PF sources; requiring OPS work inside Codex PR work; asserting an existing repo locus without allowed proof or discovery-first posture; creating or widening public surface scope without canon support; making PF23 a deliverable, token source, blocker source, or acceptance authority; or using PF20 as current planning, token, evidence, acceptance, rails, or required-now authority.  
-    
+  * Any statement of obligation (MUST/SHOULD) or acceptance posture.  
+* **Template-hygiene materiality rule.** A planning artifact, implementation plan, QA plan, remediation guide, review artifact, or closeout planning artifact MUST NOT be blocked solely for template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table order, section phrasing, planning-only path labels, titles-only polish, or section-locator precision unless the defect materially changes source-of-truth authority, implementation scope, PF09 completion mapping, acceptance truth, exact-source identity, evidence trust, Codex portability, OPS/PR boundary, execution safety, public/private posture, canon-conflict handling, or closeout truth.  
+* **Acceptance-reference materiality.** Missing legacy token or cross-reference inventory rows may be corrected, but they are blockers only when they create an acceptance overclaim, obscure a governing criterion, introduce an invalid bounded cross-reference, or omit a required governed evidence obligation. An absent token row, roster, or matrix is not a blocker when exact-source evidence is otherwise sufficient.  
+* **Valid blocker classes remain material.** Proven blockers include contradiction with active PF10 guidance; an unresolved source-authority conflict; unsupported Already Implemented or acceptance claims; reliance on unavailable non-PF material as execution authority; OPS work inside Codex PR work; an asserted repo locus without allowed proof or discovery-first posture; unsupported public-surface expansion; PF23 used as a deliverable or acceptance authority; PF20 used as current planning authority; unsafe execution; ambiguous candidate identity; missing applicable evidence; and acceptance or closeout claims that collapse distinct repository, CI, QA, approval, or lifecycle states.  
 * **Epic Plan review boundary.** Epic Plans are planning records. They are not QA Plans, Live QA runbooks, close reports, implementation patches, or evidence inventories. Epic Plan review should not block on QA-runbook-level precision, close-pack-level evidence path completeness, or template inventory polish unless the prompt or PF canon explicitly makes that information necessary for current planning truth.  
-    
 * **Implementation Plan review boundary.** Implementation Plans must be more concrete than Epic Plans, but formatting defects are not blockers unless they create real Codex or OPS ambiguity. If a plan tells Codex to consult CA or an audit, that is a blocker. If the plan embeds the needed fact and Codex can proceed without external documents, CA or audit provenance wording is not a blocker. If an Already Implemented claim relies on CA, the plan should embed enough proof in the plan itself. Imperfect CA quote-block formatting is not a blocker when the fact is clear, self-contained, and not used to smuggle in requirements.  
     
 * **Audit provenance planning-context boundary.** Audit provenance may appear in Epic Plans, Implementation Plans, QA Guides, QA Plans, review artifacts, and retrospectives as planning context, risk context, discovery context, source-trace context, rationale for a Tracked Issue or ADR stub, rationale for a workstream, rationale for a QA proof obligation, rationale for a repo-validation check, or rationale for PF-canon drainage. A reviewer MUST NOT block an artifact solely because it includes audit provenance in that contextual role.  
@@ -3417,11 +3276,9 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
     
 * **Live QA Plan review burden.** A reviewer who blocks a Live QA Plan MUST state the operational harm. Invalid blocker framing includes objections that only say the command is not paste-ready, the heredoc syntax is wrong, the Python indentation is wrong, the shell line would not run exactly as written, the command includes escaped hyphens or escaped redirection, the markdown escaped the command, the helper code is syntactically invalid, the code block would need cleanup before running, the example command is not exact, the tool invocation style should be different, the command should use another interpreter, the plan has command syntax defects, the plan has source-byte escape defects, the plan is not executable as pasted, the QA-created helper needs formatting normalization, or the reviewer can prove the raw text has escape characters. These findings may be recorded as execution notes, operator cautions, or in-flight normalization notes only, unless a separate non-syntax truth/proof defect is proven.  
     
-* **Evidence-bound QA steps (Live QA Plans).** Every required acceptance token MUST have at least one explicit QA step that produces evidence for that token, and each QA step MUST either map to a required token or be explicitly labeled as non-blocking informational only.  
-    
+* **Evidence-bound QA steps (Live QA Plans).** Every required acceptance criterion MUST have at least one explicit QA step or governed evidence path that proves it, and each QA step MUST identify the criterion or proof obligation it evaluates or be explicitly labeled as non-blocking informational only.  
 * **Prefer standard playbooks.** Where a suitable QA playbook exists in the Glow QA Guide (PF19), Live QA Plans SHOULD reuse it. Novel steps SHOULD be proposed for inclusion rather than remaining one-off.  
-    
-* **Acceptance criteria must be tokenized.** Acceptance claims in plans MUST be expressed using governance token names (PF04 §2.0 and, when applicable, newly minted PF10 addenda tokens). Freeform acceptance language is not a substitute for token claims.
+* **Acceptance criteria must use stable source identifiers.** Acceptance claims in plans MUST identify their governing PF, ADR, epic, task, acceptance criterion, test, schema, or artifact source. Freeform acceptance language alone is insufficient. A legacy token MAY be included as an optional bounded cross-reference, but token issuance or tokenization is not a prerequisite.
 
 ### **9.7.8 Evidence bundle cross-check for local-bundle deliverables**
 
@@ -3436,10 +3293,9 @@ When a deliverable claims a **local bundle** of governed artifacts under a speci
 **Titles-only references allowed, but completeness remains required.** If the plan references a canonical bundle definition section by title instead of listing all paths, it MUST still list:
 
 * any overrides, exclusions, or additions, and  
-    
 * any shared/global evidence required outside the local bundle root.
 
-**Consistency requirement.** The token\_evidence\_matrix, Evidence Index, machine mirror, and path-proofs MUST reflect the same canonical paths for any evidence referenced by acceptance.
+**Consistency requirement.** Every acceptance record or optional bounded cross-reference, the Evidence Index, Machine Mirror, and required path proofs MUST reflect the same canonical paths for evidence referenced by acceptance.
 
 ### **9.7.9 Canonical evidence-path binding validation (acceptance integrity)**
 
@@ -3701,95 +3557,34 @@ Non-canonical plan naming (do not require unless canon explicitly reinstates):
 
 **Indexing discipline (when used for acceptance).** If an epic’s acceptance artifacts bind to this report as decisive evidence, the artifact MUST follow the standard evidence skeleton discipline (co-located `*.path_proof.txt` \+ Evidence Index \+ machine mirror updates in the same PR as any byte change)
 
-### 9.7.10 Token roster validation (preflight) and no midflight additions
+### **9.7.10 Exact-source acceptance-reference validation and no midflight token issuance**
 
-**Token roster validation (acceptance-claim gate; not a Live QA plan-approval blocker by default).**  
-Token name validation is case- and spelling-exact. Aliases and near-matches are not permitted.
+**Exact-source validation.** Every acceptance identifier used in a plan, QA record, acceptance artifact, or closeout claim MUST resolve to its current authoritative source and applicable scope. Candidate-dependent evidence MUST bind to the exact candidate SHA.
 
-**What must validate (when present).**  
-Any token name that appears in:
+**Live QA planning posture.** Live QA plans MUST NOT require per-step token claims, a complete token roster, or a token/evidence matrix as a prerequisite for approval or execution. They must identify governing acceptance criteria, proof obligations, decisive receipts, evidence families, and PASS/FAIL posture.
 
-* the plan’s acceptance roster (Stage A, if present), and  
-    
-* the token/evidence matrix (Stage B, when present), and  
-    
-* any epic record acceptance roster that the plan is claiming against (titles-only), and  
-    
-* any step log / close artifact that claims a token,
+**Optional legacy-token validation.** When a legacy token is actually used, its name is case- and spelling-exact and MUST be validated against §2.0. An invalid or unregistered token claim is non-conforming, but the behavior MAY be proven directly through its existing PF, ADR, epic, task, acceptance-criterion, test, schema, or artifact identity.
 
-MUST be validated against the canonical Token Registry in §2.0.
+**No midflight token invention.** When behavior must be enforced and no token exists, state it as a sourced acceptance criterion or mechanical requirement and prove it through governed evidence. Do not create a token merely to satisfy a historical template.
 
-**Live QA planning posture (token load reduction).**  
-Live QA plans MUST NOT require per-step token claims and MUST NOT require a full token roster in the plan body as a prerequisite for approval. Tokens are an optional indexing layer for QA execution. Token roster drift discovered during planning is recorded as a `CAVEAT:` item (see §9.8) and is not a plan-approval blocker unless token validity is required to determine pass/fail for a specific check.
+**Bounded opt-in.** A new token or equivalent cross-reference may be proposed only under §2.0.0. The record must identify why existing source identifiers are insufficient, define the bounded semantics and scope, and bind the cross-reference to its governing evidence. Until approved, it is a request and MUST NOT be claimed as acceptance.
 
-**Unregistered acceptance token (canon gap; bridge posture).**  
-If an epic acceptance roster references a token name that is not present in §2.0, classify it as `UNREGISTERED_ACCEPTANCE_TOKEN` for that epic until drained. Live QA evidence collection may proceed for behavior verification, but:
+**Review source-retrieval guard.** A reviewer MUST retrieve the complete authoritative source passages before asserting identifier drift, semantic conflict, or an invalid optional-token claim.
 
-* the plan MUST NOT claim that token in step logs, matrices, acceptance maps, or close-pack checks, and  
-    
-* the plan MUST record the gap in the plan’s Doc-Delta Capture output as a blocking canon gap (no substitution/renaming).
+### **9.7.11 Acceptance artifact hygiene (form-neutral; no placeholders or ambiguous duplicates)**
 
-**Mechanical blocker (token claims).**  
-If any token is claimed in the plan’s matrix, acceptance artifacts, or step logs and is not present in the canonical Token Registry, that claim is mechanically invalid for acceptance and MUST be corrected. Reviewers must not “interpret” intent.
+This subsection governs any acceptance map, matrix, manifest, QA ledger, closeout record, or equivalent acceptance artifact that is actually used. It does not require a universal artifact type.
 
-**Review source-retrieval guard (no excerpt-based claims).**  
-A reviewer MUST NOT assert token roster drift (missing/wrong token names or token semantics mismatch) unless they have retrieved the full epic acceptance roster section and the relevant Token Registry entries for the tokens in question.
+**PF23 consult representation.** A PF23 consult is planning trace, not an acceptance token or Live QA Deliverable. `REALITY_AUDIT_OK` is not a valid acceptance claim.
 
-**No midflight token invention.**  
-During an Epic planning revise/resubmit loop, the plan MUST NOT introduce new **acceptance tokens** (in-scope gating tokens) unless:
+**No placeholders in relied-upon evidence.** When an acceptance artifact is used for Stage B:
 
-1. explicitly requested by Lead review, or  
-     
-2. required due to a clearly identified canon gap.
+* governing source identifiers and candidate identities MUST be exact;  
+* relied-upon evidence references MUST be concrete repo-relative paths or governed artifact keys;  
+* `"TBD"`, `"pending"`, empty-object markers, template variables, and implicit “it exists somewhere” references are non-conforming; and  
+* duplicate entries for the same criterion or bounded cross-reference MUST NOT create ambiguity about which entry governs.
 
-Default posture when a behavior must be enforced but no token exists: state it as a **non-token mechanical requirement** under the deliverable and prove it via tests/evidence, rather than tokenizing it.
-
-**If a new token is genuinely required, it must be routed, not invented.**  
-A plan may propose a new token only when all of the following are true:
-
-* An ADR is present in the plan’s ADR list stating: token name, one-sentence semantics, intended evidence surface(s), and drain targets.  
-    
-* The ADR is a canon-resolution instrument (not a restatement or commentary). If the topic is already canonized (e.g., PF10 or an owning PF-Canon home), the ADR MUST be removed and the Plan/Remediation MUST cite the canon directly.  
-    
-* The ADR MUST NOT cite HDE-Phased Epics as the authority for token semantics, evidence surfaces/path proofs, or QA log schema/validator requirements.  
-    
-* A conflict check is performed against existing canonical tokens (no duplicates, synonyms, or near matches).  
-    
-* The token is registered via Doc-Delta in §2.0 before it can be required as an acceptance claim (i.e., before it can appear as an in-scope gating token). Until then, it must be treated as deferred or as a request, not as a claimed acceptance token.
-
-### **9.7.11 Acceptance artifact hygiene (no placeholders; no duplicate rows)**
-
-This subsection governs the **acceptance artifacts** themselves (acceptance maps and token/evidence matrices), independent of whether the Epic Plan embeds them (it must not; see §9.7.2).
-
-**PF23 consult representation (non-token).**  
-PF23 consult MUST NOT be represented as an acceptance token (forbid `REALITY_AUDIT_OK`). PF23 consult is planning-time trace only: Live QA Plans and Live QA execution MUST NOT require or produce PF23 consult artifacts under QA\_ROOT (including `audit/qa/<epic-id>/00_meta/pf23_consult.md`). If a trace anchor is desired, include a names-only “PF23 Anchors” list in the plan body (no operator commands; no required Deliverables).
-
-**No placeholders once evidence exists (Stage B).**  
-When a token is **in-scope (gating)** for an epic (Stage B readiness), the acceptance artifacts MUST NOT contain placeholder evidence references. Treat any of the following as placeholders and therefore non-conforming for in-scope tokens:
-
-* `"TBD"`, `"pending"`, `"PR1 scaffold"`, `"{}"` (or empty object markers)  
-    
-* template variables such as `{scenario}` or any other pattern that is not a concrete path or artifact key  
-    
-* implicit “it exists somewhere” references without explicit paths
-
-For in-scope tokens, evidence lists MUST contain only **concrete, repo-relative paths** (and, where applicable, the canonical `artifact_key` bindings governed by HDE-Schemas & Artifacts).
-
-**Uniqueness (single-authoritative rows).**  
-Each acceptance token name MUST appear **at most once** in:
-
-* the token/evidence matrix for the epic, and  
-    
-* the acceptance map for the epic.
-
-Duplicate rows for the same token are a mechanical blocker because they create ambiguity about which row governs closeout.
-
-**CI-safe guard posture (allowed).**  
-It is permitted (and recommended) to enforce these rules with CI-safe scaffold tests that assert:
-
-* token names are unique in each acceptance artifact, and  
-    
-* in-scope tokens have no placeholders and point only to concrete artifacts that exist on disk.
+**CI-safe guard posture.** A project MAY enforce these rules with deterministic scaffold checks for the acceptance artifacts it actually uses. Such checks do not require creating a token roster or matrix where none is otherwise applicable.
 
 **Planning posture — mandatory Reality Audits consult (components \+ pathnames).**  
 This rule applies to all planning artifacts, including (non-exhaustive): QA plans, remediation guides/task plans, implementation guides, EPIC records, and any stepwise runbooks produced in support of an EPIC.
@@ -3984,27 +3779,21 @@ Remediation guides and task plans may include a short “Evidence inventory revi
 ### **9.8.1 Scope**
 
 **Routing note (templates and step-log header schema).**  
-Live QA plan template headings/structure and the minimum step-log header schema are owned by **Plan Templates** (titles-only). This document does not define a competing header schema field list; it defines governance posture (what counts as a blocker, what evidence is required, and how token claims behave when present).
+ Live QA plan template headings, structure, and minimum step-log header schema are owned by **Plan Templates** (titles-only). This document defines governance posture: what counts as a blocker, what evidence is required, and how exact-source and optional legacy-token references behave.
 
-Governance rules for the **Plan Templates**\-owned primary step-log reference and token fields (not a complete header schema; empty lists allowed):
+Governance rules for the **Plan Templates**\-owned primary step-log reference and legacy token fields:
 
-* `pf_refs` (MUST be present; `[]` allowed)  
-    
-* `intended_tokens` (MUST be present; `[]` allowed)  
-    
-* `claimed_tokens` (MUST be present; `[]` allowed)
+* `pf_refs` MUST be present; `[]` is allowed.  
+* `intended_tokens` and `claimed_tokens` are legacy-compatible fields. They are required only when the governing schema requires them or an active bounded token roster applies to the step. Empty arrays remain valid.  
+* When no active scoped token roster exists and the schema does not require those fields, their absence is not an evidence-format deviation or acceptance blocker.
 
-When a step claims no tokens, both `intended_tokens` and `claimed_tokens` MUST still appear as empty lists (`[]`).
+**Intended vs claimed alignment when legacy fields are used.**
 
-**Intended vs claimed token alignment.**
+* Every value in `claimed_tokens` MUST also appear in `intended_tokens`.  
+* A step MUST NOT introduce an unplanned token claim.  
+* If the two fields differ, the step record MUST explain the delta before the token cross-reference is treated as clean.
 
-* When `claimed_tokens` is non-empty, every token in `claimed_tokens` MUST also appear in `intended_tokens`.  
-    
-* A step MUST NOT introduce unplanned token claims.  
-    
-* If `intended_tokens` and `claimed_tokens` differ, the step record MUST explicitly explain the delta. Without that explanation, the step MUST NOT be treated as a clean `PASS`.
-
-If any of the required keys above are omitted, that omission MUST be recorded explicitly as an evidence-format deviation (do not treat omission as “implicitly empty”).
+These optional fields do not replace the step’s exact candidate identity, governing criteria, checks, evidence, results, limitations, or decision record.
 
 These rails apply to any document that defines **stepwise QA execution**, including:
 
@@ -4173,7 +3962,7 @@ If a functional change touches a vendor seam, the functional Live QA step MUST e
 
 **Requirements (binary):**
 
-* **Git discipline (strict)**. All referenced deliverables MUST be committed under the audit roots unless a token explicitly allows a local-only artifact. Deliverables MUST be path-addressable.  
+* **Git discipline (strict).** All referenced deliverables MUST be committed under the audit roots unless the governing PF, ADR, approved plan, or explicit scoped exception authorizes a local-only artifact. Deliverables MUST be path-addressable.  
     
 * **Deliverable naming**. Deliverables must be deterministic and include enough scope in the filename to prevent collisions across steps.  
     
@@ -4195,15 +3984,11 @@ Binary means: If a required deliverable is missing, the check is mechanically in
 
 **Plan-level intended-token rosters vs step-local proof obligations.**
 
-* A Runbook Check Matrix or similar plan-level intended-token roster MAY list intended tokens for a step without making token-by-token proof lines mandatory in the step report.  
-    
-* When a step’s Deliverables list and PASS or FAIL criteria are deliverable-based, reviewers MUST judge the step using those step-local obligations and the governed step evidence actually captured for that step.  
-    
-* In that posture, the absence of token-by-token proof lines in the step report is a documentation clarity issue and is non-blocking.  
-    
-* If the step report or the step’s PASS or FAIL criteria explicitly require token-by-token proof lines, those lines become required evidence for that step.  
-    
-* This rule does not relax the governed `intended_tokens` and `claimed_tokens` alignment rules for step records.
+* A Runbook Check Matrix, legacy token roster, or similar plan-level cross-reference MAY list intended identifiers for a step without making token-by-token proof lines mandatory.  
+* When a step’s Deliverables and PASS/FAIL criteria are evidence-based, reviewers MUST judge the step using those step-local obligations and the governed evidence captured for the exact candidate.  
+* Absence of token-by-token proof lines is non-blocking unless the step or an active bounded roster explicitly requires them.  
+* When a step explicitly requires bounded cross-reference proof lines, those lines become required evidence for that step.  
+* `intended_tokens` and `claimed_tokens` alignment applies only when those legacy fields are present under an applicable schema or active bounded roster.
 
 **Conditional deliverables and branch-specific evidence.**
 
