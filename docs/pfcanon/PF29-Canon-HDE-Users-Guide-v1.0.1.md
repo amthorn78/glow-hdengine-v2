@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v1.0
+**Version:** v1.0.1
 
 **Status:** Canon
 
-**Effective date:** 2026-08-11
+**Effective date:** 2026-08-25
 
-**Last Update Gate:** 0808 refresh 1
+**Last Update Gate:** BN 12.8.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -369,7 +369,11 @@ Use these category IDs in viewer preferences:
      
 9. drive  
      
-10. balance
+10. Balance
+
+**Current scoring limitation \[Currentgap\]:** The implemented compat scorer derives each category score from a SHA-256 hash of the normalized pair key and category, then applies viewer-weight adjustment. The HDAPI v2 adapter checks `gates` only as a list of strings; it does not enforce canonical integers `1..64`, uniqueness, or a nonempty complete Gate field. Current CLI and HTTP compat paths reduce the pair to identifiers before scoring, so the scorer receives no validated Gate set or Gate-derived Magic10 signals. A separate transitional Reader computation derives only a `harmony` band from Type/Strategy features.
+
+Until the authorized Gate- and Channel-state-based Magic10 v1 mechanic is shipped and verified, treat these current scores and bands as placeholder or transitional development behavior rather than that mechanic.
 
 ## **7.2 Local HTTP compat \[Implemented\] \[Dev or QA only\]**
 
@@ -401,7 +405,9 @@ Production boundary:
 
 POST /api/compat/v1 is not production-public in the current repository. It returns 404 when APP\_ENV resolves to prod, production, or live, or when APP\_ENV is empty and ENGINE\_ENV resolves to one of those values. Production compat computation, when needed, must be treated as internal/server-side or CLI/operator workflow, not a public HTTP claim.
 
-**Current repository discrepancy \[Current gap\]:** the checked-in guard blocks the production aliases above but does not enforce the documented local, dev, test, or QA allowlist; arbitrary other environment values are treated as non-production. This records static implementation posture and does not expand the supported environments.
+**Current repository discrepancy \[Current gap\]:** `adapter/http_reader.py` treats a missing APP\_ENV as dev at the Reader guard. This does not weaken the explicit APP\_ENV=dev requirement above; it records checked-in behavior only and does not prove runtime exposure.
+
+**Additional current repository discrepancy \[Current gap\]:** `POST /reader` is not supported by the mounted Reader v1 route; current code returns HTTP 405 with `method_not_allowed`. The mounted public computation derives only the `harmony` band from Type/Strategy features, while the checked-in Reader schema enumerates different category IDs. The schema and transitional runtime output therefore do not describe one settled full Magic10 contract.
 
 ## **7.3 CLI compat from payload files \[Implemented\]**
 
