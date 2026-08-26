@@ -2,23 +2,23 @@
 
 **Title:** PF06-Canon-Change-Process-Guide
 
-**Version:** v2.4.8
+**Version:** v2.5.1
 
 **Status:** Canon
 
-**Effective date**: 2026-08-25
+**Effective date**: 2026-08-26
 
-**Last Update Gate:** BN 12.8.9
+**Last Update Gate:** redlines-PF06-Canon-Change-Process-Guide-v2.4.8-from-token\_retirement\_and\_exact\_source\_acceptance\_adr
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
-## 0.1 Purpose and scope
+## **0.1 Purpose and scope**
 
 This guide defines the change delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. The normal route for code-bearing epic or CRD work is PR-based, while an explicit current Product Owner instruction may authorize a bounded direct-to-`main` route. Close requires the applicable exact-source evidence, close-pack material, and authorized decisions; a PASS acceptance-token list is not required.
 
 This is process guidance only. It does not constrain execution environments, repository tooling, transport bytes, or payload bytes. Those remain in their canonical homes.
 
-## 0.2 Policy and principles
+## **0.2 Policy and principles**
 
 Mutation route is explicit.
 
@@ -55,6 +55,8 @@ Every current acceptance or completion claim MUST be traceable, as applicable, t
 Repository presence, applicable CI result, QA decision, operator or role acceptance, and lifecycle completion or closure are separate states. Landing a commit or canonical file on `main` establishes repository reality and, for a current canonical artifact, authority in its declared content lane. It does not by itself establish CI PASS, QA PASS, acceptance, PF09 completion, OPS completion, deployment, release readiness, epic closure, or production readiness.
 
 The Product Owner retains direct-to-`main` authority. An agent MUST NOT infer that permission; a current operator instruction MUST cover the exact mutation. A direct-main route changes the mutation path, not the applicable correctness, evidence, QA, security, privacy, canon, or closure standard. Record the exact post-write SHA and diff and the applicable push-triggered CI result. Pending or failing validation MUST be stated as such. A failure on `main` MUST be corrected or explicitly accepted as a bounded known exception.
+
+When the current workflow's applicability classifier validly selects a reduced lane set, a passing final applicability audit is sufficient machine evidence for that CI scope. Irrelevant lanes need not be rerun merely to imitate a traditional full-PR process.
 
 Before substantive work, resolve and record the current relevant ref and inspect the current authoritative files and repository state. Before mutation, verify that the working base has not been materially superseded; reconcile any movement or prove it immaterial. Before acceptance or completion language, recheck the candidate SHA, relevant files, applicable workflow result, evidence integrity, and decision scope. Historical PASS does not transfer automatically to a later candidate. Changed canon or acceptance criteria require renewed conformance analysis, and changed implementation or evidence-producing surfaces require appropriate review and validation.
 
@@ -147,38 +149,28 @@ When a material structural CI-cost defect is within an epic’s approved remedia
 
 Re-run proofs only on qualifying drift (green-freeze).
 
-Evidence parity in the same PR.
+Evidence parity in the same authorized mutation set.
 
-Whenever proofs or artifacts change, update in the same PR:
+Whenever proofs or artifacts change, update in the same authorized mutation set:
 
 * The human Evidence Index (docs/evidence/INDEX.json)  
-    
 * The hash sentinel  
-    
 * The machine JSONL mirror (artifacts/evidence\_index.jsonl)
 
 The machine mirror is:
 
 * Records-only  
-    
 * Canonical JSONL (UTF-8, sorted keys, compact, exactly one trailing LF)  
-    
 * Strict: rejects unknown keys
 
 Each mirror record includes:
 
 * artifact\_key  
-    
 * role  
-    
 * sha256  
-    
 * size\_bytes  
-    
 * produced\_at\_utc  
-    
 * discovered\_physical\_path  
-    
 * proof\_anchor (to a co-located path-proof)
 
 Repo-doc and docs-only changes must be evidence-backed.
@@ -186,15 +178,12 @@ Repo-doc and docs-only changes must be evidence-backed.
 Any claim about CLI behavior, output bytes, tokens, governed artifacts, or system mechanics MUST be supported by at least one of:
 
 * a canon pointer (title-only) to the relevant rule.  
-    
 * a targeted test run output referenced in the PR summary.  
-    
 * an existing governed evidence artifact path already committed under governed roots.
 
 Additional docs-only constraints:
 
 * Treat "contract changes" (even docs-only ones) as requiring a tight evidence posture. Tests, proofs, and artifacts should be captured in the same PR bundle whenever possible.  
-    
 * If a docs-only PR is approved without captured CI/test output, the PR summary or review pack MUST (1) state that verification was diff-only, (2) cite the best available canon pointer or governed evidence path for each non-obvious claim, and (3) record any search method used to look for missing proof.
 
 Copy/paste command safety (docs-only and discovery PRs).
@@ -204,9 +193,7 @@ Interactive-terminal safety (no shell-closing blocks).
 When a plan, runbook, or repo doc includes a command block intended for an operator to paste into an interactive terminal:
 
 * The block MUST NOT terminate the operator shell session (for example by using exit as part of enforcement).  
-    
 * If strict enforcement requires exit semantics, the enforcement MUST run in an isolated subshell and report PASS/FAIL (and exit code) without closing the parent shell.  
-    
 * If a shell-terminating block is genuinely required (rare), it MUST be explicitly labeled as non-interactive and an interactive-safe alternative MUST be provided.
 
 When repo docs include commands intended for copy/paste use:
@@ -214,17 +201,13 @@ When repo docs include commands intended for copy/paste use:
 Commands MUST be truthy and CI-traceable:
 
 * If a command is intended to run a CI check or governed script, document the CI-style invocation as the default.  
-    
 * Do not present multiple conflicting invocations as co-equal. Any compatibility alternative MUST be explicitly labeled optional and must state when/why it is needed.  
-    
 * Example (mirror schema validation): default to ci/checks/check\_mirror\_schema.sh artifacts/evidence\_index.jsonl (CI-style direct invocation). python ci/checks/check\_mirror\_schema.sh artifacts/evidence\_index.jsonl is an optional compatibility fallback (the script has a Python shebang).
 
 The default command shown MUST be safe and non-epic-specific.
 
 * Do not include unrelated epic IDs, unrelated flags, or “example” values in the default command.  
-    
 * Any epic-specific selector (for example an \--epic-id flag) MUST be explicitly labeled optional and MUST NOT be presented as the default.  
-    
 * If a command is conditional on local repo state, environment, or path existence, the doc MUST state the condition and the safe fallback.
 
 Decision-bounded placement (no invented “fits at” paths).
@@ -232,17 +215,14 @@ Decision-bounded placement (no invented “fits at” paths).
 When a doc references a future artifact placement or a not-yet-decided path:
 
 * It MUST be labeled TBD and constrained to the smallest set of plausible options.  
-    
-* It MUST NOT be presented as a single fixed “would fit at \<x\>” path unless the placement is already governed by an existing canonical rule or governed artifact family.
+* It MUST NOT be presented as a single fixed “would fit at \\” path unless the placement is already governed by an existing canonical rule or governed artifact family.
 
 Review source-retrieval guard (no excerpt-based claims).
 
 Reviewers MUST NOT assert canon violations or contradictions about:
 
 * token rosters (missing/wrong tokens, token semantics mismatch), or  
-    
 * Live QA rails posture / evidence posture, or  
-    
 * transport bytes / CLI contract expectations,
 
 unless they have fully retrieved the governing canonical passages being referenced (the relevant roster section(s) and the relevant registry / rails / contract entries).
@@ -261,9 +241,7 @@ Build Notes reference posture (living addenda).
 When referencing Build Notes in reviews, plans, or Doc Delta notes:
 
 * Do not reference Build Notes by version strings.  
-    
 * Prefer referencing by addendum number \+ addendum title.  
-    
 * Do not treat Build Notes section numbers as durable anchors for external enforcement.
 
 When PF10 or a closeout artifact records more than one QA pass, QA review, final review, or pass-like addendum for the same epic, each entry MUST be distinguishable by addendum number and addendum title or by another stable source-order label. Reviews and closeout summaries MUST NOT rely on repeated labels such as “QA Pass 2” alone when that label appears more than once for the same epic. If duplicate labels exist, cite source order and state the chronology explicitly.
@@ -273,9 +251,7 @@ Canon mismatch posture (docs-only PRs).
 If a docs-only PR documents current repo behavior that appears to diverge from a canonical PF home (for example CLI exit codes vs HDE-CLI-API-Vendor-Ref), the PR MUST:
 
 * state plainly that the text reflects repo-tested behavior (citing the test/evidence used), and  
-    
 * state that the PF doc remains the single home for the normative contract (titles only), and  
-    
 * include a Doc-Delta note routing the reconciliation into the canonical home (update canon or update code) rather than implying “canon is satisfied.”
 
 Docs-only PRs MUST NOT claim “conforms to PF-Canon” when the PR’s own evidence indicates an implementation-vs-canon mismatch.
@@ -285,21 +261,15 @@ Docs-only PRs MUST NOT introduce unverified assumptions (for example inventing u
 A7 proof surface (when applicable).
 
 * Run HTTP success-path proofs only on a cataloged JSON success route from the Endpoint Catalog.  
-    
 * The /internal/version endpoint is ops-only and not A7-eligible.
 
 Single homes.
 
 * Public transport & CLI/Reader bytes → HDE-CLI-API-Vendor-Ref.  
-    
 * Governance & token semantics → HDE-Governance.  
-    
 * Deterministic serializer/idempotence → HDE-Math-Spec.  
-    
 * Architecture & single-emitter rules → HDE Architecture.  
-    
 * Evidence index & mirror schema → HDE-Schemas & Artifacts.  
-    
 * Infra and environment names → Glow Infrastructure.
 
 PF14 scope guard (doc roles).
@@ -309,7 +279,6 @@ HDE-Mechanics Guide (PF14) is a components and operational-surface reference. It
 For HD Engine epics:
 
 * “Prod” is the production HD Engine service and its production database as defined in Glow Infrastructure.  
-    
 * PF06 does not redefine environment semantics and treats those names as the single home.
 
 When epic docs or QA plans talk about “prod via Codespaces”:
@@ -364,40 +333,27 @@ Ops evidence is not a substitute for QA evidence. Ops completion evidence may be
 Separation rule (no category mixing). Planning artifacts MUST keep these categories distinct and explicitly labeled:
 
 * Implementation work and deliverables (code and implementation changes)  
-    
 * Ops tasks (environment changes)  
-    
 * QA planning (verification plan and evidence posture)  
-    
 * QA execution (functional runs and governed QA evidence)
 
 Ops task record format (required fields). Every Ops task record MUST include:
 
 * Task ID (stable; referenced consistently)  
-    
 * Owner: PO  
-    
 * Facilitator: IA  
-    
 * Target system/service (name only; no secrets)  
-    
 * Intent / desired end state (what changes; what “done” looks like)  
-    
 * Constraints / safety rails (what must remain true while executing)  
-    
 * Success criteria (observable outcomes; not assumptions)  
-    
 * Evidence to capture (what artifact(s) prove the change; where stored)  
-    
 * Rollback intent (what “revert” means at a high level)  
-    
 * Secret handling note (explicitly: no plaintext secrets in docs or evidence)
 
 Evidence posture (required). Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase audit path such as:
 
-* audit/ops/\<epic-id\>/ for Ops execution evidence, or  
-    
-* audit/qa/\<epic-id\>/ when the evidence is part of QA execution.
+* audit/ops/\\/ for Ops execution evidence, or  
+* audit/qa/\\/ when the evidence is part of QA execution.
 
 Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence must be presence-only, redacted, or hashed, while still being sufficient to verify that the intended state was reached.
 
@@ -437,7 +393,7 @@ When older governed evidence has a historical shape caveat, the revalidation rev
 
 Ops closeout packaging run (OPS-01). When an epic uses an Ops task to surface already-produced close-pack artifacts and closure evidence, the run MUST remain packaging and evidence only:
 
-* no reopened implementation work  \* no QA verdict changes  
+* no reopened implementation work \* no QA verdict changes  
 * no canon-drain claim  
 * no merge-provenance claim
 
@@ -489,7 +445,7 @@ If the remediation repairs a prior Ops evidence defect, the repaired bundle MUST
 
 A packaging-only Ops remediation may support close-pack surfacing or evidence-provenance closure only for the bounded task it was approved to perform. It MUST NOT be used to imply new implementation completion, QA rerun completion, PF09 status change, PF-canon drain completion, or epic closure unless those claims are separately approved and proven.
 
-## 0.3 Participants and responsibilities
+## **0.3 Participants and responsibilities**
 
 * Implementation Agent (ChatGPT). Runs each epic end to end, prepares CRD-ready drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and every applicable governed evidence companion land in the authorized mutation set, and escalates blockers to the Lead Developer. Does not run git or create PRs.  
 * Lead Developer (AI). Defines intent and scope, approves the CRD and Implementation Plan once, performs the gate review when a PR route is used, and otherwise steps out during CodEx execution.  
@@ -499,7 +455,7 @@ A packaging-only Ops remediation may support close-pack surfacing or evidence-pr
 * Scrum Master (AI). Is informed after the applicable repository-adoption event; records authorized close and updates boards and the sprint report.  
 * Communication rule. AIs do not contact one another directly. The Product Owner routes all messages.
 
-## 0.4 4 Execution posture and flow (route-aware)
+## **0.4 4 Execution posture and flow (route-aware)**
 
 * Lead Dev publishes the Implementation Guide to the Implementation Agent (IA).  
 * IA sends CodEx an audit request with explicit report formats and any verbatim components or schemas required.  
@@ -509,20 +465,22 @@ A packaging-only Ops remediation may support close-pack surfacing or evidence-pr
 * IA either requests changes or records the supported disposition.  
 * For a PR route, CodEx opens or amends the exact-slice PR and includes code, Doc-Delta, and every applicable evidence companion.  
 * For a direct-main route, CodEx acts only under an explicit current operator instruction covering the exact mutation and records the exact post-write SHA, diff, and applicable push-triggered CI result.  
+* Direct-main residual-risk posture. Because unrestricted direct mutation intentionally permits an incorrect change to land before applicable push CI detects it, this workflow provides no preventive guarantee equivalent to a mechanically enforced pre-write gate. Mitigation depends on exact-SHA traceability, applicable push-triggered CI, scope-aware claim-time revalidation, fail-closed claims, and correction or an explicitly accepted bounded exception. Product Owner authority MUST NOT be silently extended to agents. Documentation-only classification does not eliminate semantic risk; canon and contract changes still require impact analysis. This posture depends on available GitHub history and workflow metadata and on continuing governed evidence-integrity controls. The Product Owner accepts these residual risks as the necessary tradeoff for the current operator-led agent workflow.  
 * If a required execution-time capability or authorization is unavailable, the workflow is blocked. CodEx MUST NOT claim an action occurred, silently substitute another actor, or omit required content.  
 * Machine mirror requirements remain records-only canonical JSONL, exactly one LF per line, unknown keys rejected, and a proof\_anchor on each record when the owning canon requires a mirror update.  
 * Lead Dev PR gate review, when applicable, verifies the exact candidate, applicable checks and acceptance criteria, required proof surfaces, and same-change-set evidence parity.  
 * For a PR route, the PO performs any supported squash merge and notifies the Scrum Master. For direct-main, repository adoption is the exact post-write `main` commit and remains separate from QA, acceptance, and closure.  
 * Closure: IA files the Closure Report; boards and sprint reports are updated through their owning processes; suites green-freeze until a qualifying change lands.  
+* Exact-source policy supersession and rollback. The retired mandatory-token posture may be superseded only by a later explicit Product Owner decision or a later authoritative artifact that directly replaces this subject. Reactivating mandatory token issuance requires an explicit decision stating why native exact-source identifiers and evidence are insufficient; historical token tooling alone does not constitute rollback. If exact-source metadata or governed evidence is unavailable, affected acceptance and closure claims fail closed and confidence MUST NOT be recreated through invented tokens or reconstructed claims.  
 * Determinism pins for determinism-sensitive capture and CI checks: set LC\_ALL=C, LANG=C, TZ=UTC to keep bytes stable. Do not add non-canonical “extra pins” as requirements.
 
-### 0.4.1 Live QA discovery and RCA (execution requirements)
+### **0.4.1 Live QA discovery and RCA (execution requirements)**
 
 Live QA via a QA harness is a required Close Gate stage for every epic. See §3.5.2.8 for the harness-run and evidence-landing requirements.
 
 These requirements are execution and Close Gate deliverables. They MUST NOT be treated as prerequisites for Epic Plan approval and MUST NOT force a detailed Live QA runbook into PLAN/CRD or Implementation planning.
 
-#### 0.4.1.1 Mandatory D0 Discovery artifact
+#### **0.4.1.1 Mandatory D0 Discovery artifact**
 
 Before running any Live QA steps that exercise behavior or vendor flows, the epic MUST produce at least one Discovery artifact that captures the baseline execution context and rails posture for the Live QA session.
 
@@ -539,7 +497,7 @@ Evidence posture (normative)
 * When the Discovery artifact is step-scoped, it MUST land under the stable check directory for that step. Re-runs refresh the same governed location rather than creating a new run root.  
 * The Discovery artifact MUST be generated by commands and MUST NOT be hand-edited. (Titles-only; concrete schemas/paths are owned by the QA template and artifacts specifications.)
 
-#### 0.4.1.2 Mandatory QA RCA & Doc Delta summary
+#### **0.4.1.2 Mandatory QA RCA & Doc Delta summary**
 
 Every Live QA epic MUST produce a QA RCA & Doc Delta summary as part of execution deliverables, regardless of whether large gaps are observed.
 
@@ -563,51 +521,28 @@ Minimum required contents
 At minimum, the summary MUST:
 
 * State the key Live QA findings in reader-usable language (not just raw logs).  
-    
 * If no substantial gaps are found, it MUST say so explicitly (example: “No new PF-Canon deltas identified for this epic”).  
-    
 * For each substantive failure or anomaly, classify it as one of: FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED, and include a one-line reason.  
-    
 * When a step is blocked because the approved plan depends on unavailable or non-product inputs, the summary MUST classify the outcome as TOOLING\_BLOCKED with a planning-defect or input-availability reason, not as FAIL\_BEHAVIOR.  
-    
 * In that case the summary MUST name which expected artifacts were not produced because the blocking precondition was not met, and it MUST state that those artifacts were not expected for that run.  
-    
 * The summary MUST record the precise rerun condition for the blocked step, for example that rerun is deferred until valid product inputs become available.  
-    
 * When a check includes more than one attempt in the same governed step directory, the summary MUST distinguish attempt history from the final governing outcome.  
-    
 * If an earlier attempt failed but a later rerun under the required rails and determinism posture produced the complete governed evidence set and satisfied the approved PASS criteria, the later rerun MAY govern the step outcome.  
-    
 * In that case the summary MUST name the superseded earlier attempt, classify why it failed, and state plainly which later attempt produced the final accepted evidence.  
-    
 * The earlier failed attempt remains part of the record and MUST NOT be hidden, but it is not a close blocker by itself once the later rerun is clearly evidenced and the approved criteria are met.  
-    
 * Provide minimal evidence pointers for each substantive finding (step log(s), artifact(s), validator outputs). (Titles-only here; concrete paths are owned by the QA plan template.)  
-    
 * Map each substantive finding that implies a change in behavior, infrastructure, or process to explicit PF-Canon doc deltas by title (examples: HDE Phased Epics, HDE-Build Checklist, Glow QA Guide, HDE-Mechanics Guide, Glow Infrastructure, HDE-Schemas & Artifacts).  
-    
 * Identify follow-on epics/cards expected to carry those PF updates when they are deferred.  
-    
 * When the QA RCA & Doc Delta summary is used to support epic-close readiness, it MUST state the source-of-truth posture for the review. The summary MUST name the primary epic-specific execution source, the canon homes used for closeout interpretation, and any Implementation Guide or QA Plan inputs that were used only for framing.  
-    
 * When a Live QA Plan exists, the summary MUST include explicit Coverage vs QA Plan accounting in plan order using stable step identifiers. For each planned step, it MUST record whether the step is Fully evidenced, Partially evidenced, or Not evidenced, whether governed evidence pointers exist, any material mismatch between the planned step and the recorded step, and the closeout impact.  
-    
 * When the primary epic-specific execution source is a PF10 addendum or other guidance record, the summary MUST state whether that source carries direct evidence-pointer lines or only evidence-basis prose.  
-    
 * If the decisive source is evidence-light, the summary MUST label it as evidence-light guidance and SHOULD pair it with the governing evidence-backed lines that make the closeout reasoning auditable.  
-    
 * Coverage vs QA Plan MUST separately surface any accepted plan-execution deviation, even when the step is Fully evidenced and PASS. Examples include bounded Moon Loop reruns, rails changes, and step-local dependency-preflight corrections. Coverage status alone is not sufficient when accepted execution materially diverged from the approved plan.  
-    
 * When closeout depends on runtime functional proof, the summary MUST state whether same-run runtime proof exists across the changed runtime surfaces required by the approved plan, and it MUST name the governed artifacts that prove presence or absence of those runtime surfaces.  
-    
 * The summary MUST include an explicit closeout-readiness recommendation. This recommendation is a closure-oriented review result and MUST remain distinct from the final SATISFIED or NOT SATISFIED decision recorded in the close report.  
-    
 * When a QA closeout or acceptance-reporting summary is limited to repo-supported completion, it MUST say so explicitly.  
-    
 * It MUST distinguish, as separate states, repo-supported completion, canon-drain completion, and formal close-pack completion.  
-    
 * If canon-drain completion or formal close-pack completion is not proven, the summary MUST mark those states as no-claim or equivalent explicit non-claim wording rather than implying completion.  
-    
 * A repo-supported completion summary MUST distinguish blocked steps from recorded or completed steps in the current run and MUST NOT be phrased as though formal merge or close is already proven unless that stronger proof is actually present.
 
 Location (normative)  
@@ -617,7 +552,7 @@ If the QA RCA & Doc Delta summary is maintained as a separate governed artifact,
 
 The level of detail is proportional to the findings (brief when no deltas, more extensive when multiple PF docs are impacted). When the run is clean, this summary may be only a few lines.
 
-#### 0.4.1.3 Execution gate
+#### **0.4.1.3 Execution gate**
 
 For Live QA epics, the Close Gate (§3.5) MUST confirm:
 
@@ -626,7 +561,7 @@ For Live QA epics, the Close Gate (§3.5) MUST confirm:
 
 If either the Discovery artifact or the QA RCA & Doc Delta summary is missing, the epic MUST NOT be treated as fully accepted, even if code/tests/CI tokens are green.
 
-## 0.5 Routing and evidence discipline
+## **0.5 Routing and evidence discipline**
 
 Single homes (titles-only)
 
@@ -734,7 +669,7 @@ Plan-compliant PASS is required for Moon Loop reruns (mandatory). If a Moon Loop
 If the remediation required is not “minimal” (multiple files, structural changes, or unclear scope), stop the Moon Loop and escalate to a normal remediation plan.
 
 Same-PR parity (mandatory)  
-When proofs or artifacts change, update all three in the same PR that carries the change:
+When proofs or artifacts change, update all three in the same authorized mutation set that carries the change:
 
 * the human Evidence Index docs/evidence/INDEX.json,  
 * the hash sentinel docs/evidence/INDEX.sha256 (merge-gating), and  
@@ -754,18 +689,14 @@ The following files are governed artifacts and MUST each have a co-located path-
 * `artifacts/evidence_index.jsonl.sha256`  
 * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
 
-Whenever either INDEX.json or INDEX.sha256 changes, their corresponding \*.path\_proof.txt files MUST be refreshed in the same PR. The canonical evidence updater is expected to refresh these proofs during normal runs and to fail in check mode if they are stale.
+Whenever either INDEX.json or INDEX.sha256 changes, their corresponding \*.path\_proof.txt files MUST be refreshed in the same authorized mutation set. The canonical evidence updater is expected to refresh these proofs during normal runs and to fail in check mode if they are stale.
 
 Path-proof anchor posture (clarifying): Path-proof transcripts exist to carry size\_bytes and sha256 metadata for the governed file bytes. When refreshing \*.path\_proof.txt, prefer the structured record form produced by canonical tooling, including fields:
 
 * path  
-    
 * size\_bytes  
-    
 * sha256  
-    
 * mtime\_utc  
-    
 * produced\_at\_utc
 
 Mirror hygiene (PF12-Canon-HDE-Schemas-and-Artifacts) The mirror is records-only canonical JSONL (UTF-8, compact, exactly one LF), unknown-keys rejected, ASCII field order, sort-before-write, single mirror file.
@@ -833,7 +764,7 @@ Endpoint Catalog single home (titles-only)
 The only authoritative Catalog path is docs/ENDPOINTS\_CATALOG.json (canonical JSON; one LF) with docs/ENDPOINTS\_CATALOG.json.sha256. The Catalog records endpoint metadata, including non-A7 internal routes. Its success\_endpoints list identifies JSON success routes; /internal/\* routes are excluded from A7 eligibility. A7 proofs must run on a Catalog success route, and an env-gate headers proof is required.
 
 Reader A7 proof JSON (machine-checkable)  
-Epics that ship Reader A7 must produce a single proof JSON (records-only, canonical) containing: route\_path, env\_gate, GET/HEAD/after-304 header captures, ETag, vary\_has\_auth, vary\_has\_accept\_encoding, and encoding\_invariance\_ok. Proof JSON and indices update occur in the same PR.
+Epics that ship Reader A7 must produce a single proof JSON (records-only, canonical) containing: route\_path, env\_gate, GET/HEAD/after-304 header captures, ETag, vary\_has\_auth, vary\_has\_accept\_encoding, and encoding\_invariance\_ok. Proof JSON and indices update occur in the same authorized mutation set.
 
 CRD routing  
 Thoth receives the CRD only. Keep process artifacts (PLAN/CRD/Doc-Delta) titles-only and route to single homes for bytes/evidence.
@@ -874,9 +805,7 @@ Plan path provenance (no fabricated required paths)
 A PLAN, CRD, or QA Plan MUST NOT reference a file path as required unless one of the following is true:
 
 * Canon-defined — the path (or path pattern) is explicitly defined by PF canon, or  
-    
 * Audit-proven — the path’s existence is already proven by an existing, canon-recognized audit artifact family, or  
-    
 * QA-created — the plan includes inline, explicit creation instructions and validation for the path.
 
 If a path is not canon-defined and not audit-proven, it MUST either be created under QA with explicit instructions and justification, or it MUST NOT appear in the plan.
@@ -956,9 +885,7 @@ Review posture: any required reliance on an unapproved environment variable name
 If QA must create a file that has no prior canonical existence, the relevant step MUST include:
 
 * exact mkdir \-p and write instructions (no placeholders),  
-    
 * a one-line purpose (what the file proves and why it exists),  
-    
 * explicit PASS and FAIL predicates tied to the file’s contents.
 
 QA may create folders/files only under audit/\*\* or artifacts/**. Any instruction that implies creating or writing outside audit/** or artifacts/\*\* is nonconforming.
@@ -972,7 +899,6 @@ If a QA plan requires creating a file, it MUST name the exact repo-relative path
 Required creation clarity:
 
 * How — explicit, runnable creation instructions that produce the file at that path and create parent directories when needed  
-    
 * Why — one sentence stating the proof obligation, deliverable posture, or required outcome the file satisfies
 
 Evidence-bearing created files MUST be reproducible. The plan MUST include enough creation detail to reproduce the file deterministically and unambiguously, including required inputs and the stable structure or content it must contain.
@@ -985,32 +911,29 @@ Repo-path correctness (code deliverables). When a plan lists a repo code path as
 
 Helper scripts (non-substitutive). Helper scripts created to collect or format evidence MAY be added, but they MUST NOT substitute for required deliverables and MUST NOT change PASS/FAIL predicates unless the plan is revised.
 
-Epic number (\<NNN\>)  
-is the zero-padded 3-digit epic number (example: 022). When an epic ID is HDE-EPIC022, then \<NNN\> is 022\.
+Epic number (\\)  
+is the zero-padded 3-digit epic number (example: 022). When an epic ID is HDE-EPIC022, then \\ is 022\.
 
 Close-pack filenames (canonical)  
 Epic close-pack artifacts MUST use:
 
-* audit/EPIC-\<NNN\>\_close\_report.md  
-    
-* audit/EPIC-\<NNN\>\_MANIFEST.json
+* audit/EPIC-\\\_close\_report.md  
+* audit/EPIC-\\\_MANIFEST.json
 
 Close-pack path-proof siblings (required)  
 The close report and manifest are governed artifacts and MUST each have a co-located path-proof transcript:
 
-* audit/EPIC-\<NNN\>\_close\_report.md.path\_proof.txt  
-    
-* audit/EPIC-\<NNN\>\_MANIFEST.json.path\_proof.txt
+* audit/EPIC-\\\_close\_report.md.path\_proof.txt  
+* audit/EPIC-\\\_MANIFEST.json.path\_proof.txt
 
 Close-pack validation checks MUST verify that the path-proof transcripts exist and match the on-disk bytes of their parent artifacts.
 
 Do not create parallel close-pack artifacts under alternate spellings (examples of disallowed alternates: EPIC022, EPIC\_022, `audit/epic-022/<SUBPATH>`).
 
 Close-pack manifest key\_outputs is a named binding map (object).  
-audit/EPIC-\<NNN\>\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where:
+audit/EPIC-\\\_MANIFEST.json MUST include key\_outputs as a JSON object (map) where:
 
 * each key is a stable pointer name (string), and  
-    
 * each value is a repo-relative artifact path (string).
 
 key\_outputs MUST NOT be a list.
@@ -1020,23 +943,22 @@ Close-pack validation checks MUST validate the named bindings (keys \+ exact pat
 Epic QA root (canonical)  
 Epic QA root directories MUST be lower-case and MUST use:
 
-* audit/qa/hde-epic\<NNN\>/ (example: audit/qa/hde-epic022/)
+* audit/qa/hde-epic\\/ (example: audit/qa/hde-epic022/)
 
-When this guide uses audit/qa//, it means the epic QA root audit/qa/hde-epic\<NNN\>/.
+When this guide uses audit/qa//, it means the epic QA root audit/qa/hde-epic\\/.
 
 Plans and implementations MUST NOT introduce parallel alternate spellings for the same epic (examples of disallowed alternates: audit/QA/, audit/qa/HDE-EPIC022/, audit/qa/hde-epic022-v2/).
 
 Doc-Delta surfaces (draft \+ epic-scoped capture)  
 Doc-deltas use a two-surface pair. In the Plan and PR, both surfaces MUST use concrete filenames (no placeholders).
 
-1. Draft / staging surface (token binding surface).  
+1. Draft / staging surface (exact-source evidence binding surface).  
    A doc-delta draft MUST live under:  
-   audit/docdeltas/hde-epic\<NNN\>\_doc\_deltas.md  
-   Where hde-epic\<NNN\> is the canonical lowercase epic QA slug (for example hde-epic022). This draft surface is the primary surface for doc-delta evidence binding when a doc-delta deliverable is claimed.  
-     
+   audit/docdeltas/hde-epic\\\_doc\_deltas.md  
+   Where hde-epic\\ is the canonical lowercase epic QA slug (for example hde-epic022). This draft surface is the primary surface for doc-delta evidence binding when a doc-delta deliverable is claimed.  
 2. Epic-scoped capture surface (stable QA record).  
    The epic MUST also capture an epic-scoped doc-delta record under:  
-   audit/qa/hde-epic\<NNN\>/00\_meta/doc\_deltas.md
+   audit/qa/hde-epic\\/00\_meta/doc\_deltas.md
 
 This capture file is the stable record surface for the epic’s QA and closeout narrative. It MUST NOT be replaced by a placeholder reference.
 
@@ -1074,7 +996,6 @@ Allowed documentation posture inside plans (informational only). Plans MAY inclu
 How plans MUST express reality and existence confirmation. If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST express confirmation in one of these allowed forms:
 
 * PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.  
-    
 * Repo-local evidence (required when PF is silent or insufficient): capture confirmation as repo-local evidence (for example: deterministic command output recorded into an audit artifact, a governed gate log, a QA step-log entry, or a test/probe result). The plan MUST NOT require turning that result into a PF update.
 
 Review posture (blocking condition). Any plan that mandates a PF document update (including Reality Audits) as part of PR or OPS deliverables MUST be treated as non-portable and returned for revision.
@@ -1083,7 +1004,7 @@ Before drafting any QA Plan or Implementation Plan for a Live QA epic, they MUST
 
 * Read Glow Infrastructure, HDE-Build Notes, Glow QA Guide, and HDE Phased Epics (by title) to collect:  
   * environment and infrastructure facts  
-  * QA tokens  
+  * applicable governing requirements, acceptance criteria, tests, and evidence identifiers  
   * epic D-goals and exclusions  
 * Use canonical infra/env values (for example, production service name, base URL, and DB instance/schema) from those documents directly, instead of treating them as unknowns.  
 * PF23 consultation is required during QA planning whenever a Live QA Plan is drafted, reviewed, or approved.  
@@ -1127,8 +1048,8 @@ Before drafting any QA Plan or Implementation Plan for a Live QA epic, they MUST
 * Post-Audit ADRs (decision capture). When an audit or plan reveals recurring ambiguity that cannot be resolved by retrieving the governing PF-Canon passages, the Implementation Agent SHOULD capture the ambiguity as a Post-Audit ADR and route it to the Product Owner for adjudication.  
 * ADRs are clarification artifacts, not acceptance criteria. They MUST NOT introduce new acceptance tokens, new QA obligations, or new gates.  
 * ADR minimum sections (paste-ready headings; fill all fields; keep each section brief):  
-  * ADR-\<EPIC\>-\<DOMAIN\>-\<NNN\> — \<title\>  
-  * Date: \<YYYY-MM-DD\>  
+  * ADR-\\-\\-\\ — \\  
+  * Date: \\  
   * Status: Proposed | Accepted  
   * Decision owner: Product Owner (final), Lead Dev or Implementation Agent (draft)  
   * Context (include audit pointer(s) and plan pointer(s))  
@@ -1167,7 +1088,7 @@ Preferred posture: exercise the real codepath using a deterministic failure trig
 
 Allowed fallback: if real-codepath deterministic triggering is not feasible, use a deterministic stub layer only to the extent required to produce the canon error envelope and parity artifacts (no live I/O).
 
-Acceptance proof MUST consist of stored parity artifacts for both sides of the parity claim (Reader/HTTP and CLI) and must be indexable under governed evidence surfaces (human index \+ machine mirror in the same PR).
+Acceptance proof MUST consist of stored parity artifacts for both sides of the parity claim (Reader/HTTP and CLI) and must be indexable under governed evidence surfaces (human index \+ machine mirror in the same authorized mutation set).
 
 Determinism pins (for example locale/time settings) apply to determinism-sensitive jobs.
 
@@ -1239,7 +1160,7 @@ These checks MUST NOT be treated as part of the PO’s Live QA workload. These c
 Codespaces rails in PO Live QA: In the context of PO Live QA:
 
 * Codespaces is, by default, an artifact sink and offline analysis console (see §0.6.3).  
-* Codespaces MAY temporarily open rails (for example setting SAFE\_MODE=0, ALLOW\_NETWORK=1, base URL pointing to production) only when:    \* the goal of that step is to exercise a live vendor flow as described above  
+* Codespaces MAY temporarily open rails (for example setting SAFE\_MODE=0, ALLOW\_NETWORK=1, base URL pointing to production) only when: \* the goal of that step is to exercise a live vendor flow as described above  
   * the rail-opening is documented (env vars set, commands logged, and artifacts captured under audit/qa//logs/)
 
 Showcompat source and rails posture (Live QA)
@@ -1280,7 +1201,7 @@ Under governed roots (for example audit/**, docs/**, artifacts/\*\*), mixed-case
 
 Remediation posture (when drift exists). If mixed-case directories exist, they are treated as legacy drift and MUST be normalized to lowercase, not copied forward into new work.
 
-Evidence discipline for renames. Any renames that affect governed artifact paths MUST be accompanied by the required index and mirror updates (Human Evidence Index, Machine Mirror, and path-proofs) in the same PR, per the evidence discipline.
+Evidence discipline for renames. Any renames that affect governed artifact paths MUST be accompanied by the required index and mirror updates (Human Evidence Index, Machine Mirror, and path-proofs) in the same authorized mutation set, per the evidence discipline.
 
 ### **0.6.7 Mechanical evidence (Live QA)**
 
@@ -1294,7 +1215,7 @@ Per-step evidence expectations are defined below. KISS minimum outputs (required
 
 Each Live QA check/step MUST produce exactly one primary step log for that check (the default evidence artifact for the check), at:
 
-* audit/qa//checks/\<check\_id\>/primary.log
+* audit/qa//checks/\\/primary.log
 
 Each Live QA run MUST produce a step-logs manifest, at:
 
@@ -1470,7 +1391,7 @@ Evidence-only QA branch acceptance token names and semantics are defined by PF04
 
 ---
 
-# 1\) EPIC PLAN → CRD (Lead Dev)
+# **1\) EPIC PLAN → CRD (Lead Dev)**
 
 ## **1.1 Workflow at a glance**
 
@@ -1524,19 +1445,16 @@ For epics delivered through multiple PRs:
 /internal/version auth posture is not canon (non-invention). This guide treats /internal/version as an identity handshake artifact, but it does not canonize:
 
 * its access-control semantics (public vs operator-network gated vs auth-header required)  
-    
 * the expected failure mode when access is missing/invalid
 
 Until that auth posture is canonized:
 
 * Plans, remediation guides, and operational tooling MUST NOT state /internal/version auth requirements as canon.  
-    
 * Any statement about auth posture MUST be explicitly labeled Observed Evidence (non-PF) and MUST be secret-free (presence-only, redacted, or hashed).
 
 Evidence required to canonize auth posture (secret-free). To support an eventual canon decision, capture and store (under a lowercase audit path) the status line and headers for the production deployment context(s) under both conditions:
 
 * with no auth header  
-    
 * with an auth header only if one is explicitly sourced for this run (value redacted or presence-only noted)
 
 Auth headers are optional until canonized. Plans and runbooks MUST NOT require an auth header/token for /internal/version unless the plan also specifies its sourcing explicitly (for example, as an Ops task output owned by the PO). If no auth header exists or no sourcing chain exists, record that fact as Observed Evidence (non-PF) and proceed with the unauthenticated capture. Do not treat “missing auth token” as proof that the endpoint is inaccessible or “ops not implemented.”
@@ -1546,7 +1464,6 @@ This evidence is required input for the canon decision and MUST NOT be replaced 
 Name prod surfaces by title. The PLAN/CRD MUST name (by title, routing to Glow Infrastructure as the single home):
 
 * the production HD Engine service and base URL  
-    
 * the production DB instance/schema
 
 Do not invent new environment labels.
@@ -1554,38 +1471,32 @@ Do not invent new environment labels.
 Clarify Codespaces role. The PLAN/CRD MUST state explicitly:
 
 * Codespaces is a QA console that runs CLI/HTTP commands against the production service and DB.  
-    
 * Codespaces is not a production environment in its own right.
 
 Describe the prod handshake and artifact location (identity-only). The PLAN/CRD MUST describe (at a high level):
 
 * an identity/pre-flight handshake step  
-    
 * where its artifact will live
 
-Example: Step 0: curl the production /internal/version endpoint from Codespaces and store the output under audit/qa/\<epic-id\>/logs/ before running deeper QA.
+Example: Step 0: curl the production /internal/version endpoint from Codespaces and store the output under audit/qa/\\/logs/ before running deeper QA.
 
 This handshake is identity-only:
 
 * It proves the QA console can reach the production HD Engine.  
-    
 * It records which engine\_tag, build\_commit, invocation\_tag, invocation\_sha256, emitter\_sha256, and release\_id were live at the time of QA.
 
-Live QA plans MUST NOT use /internal/version to satisfy any behavior D-goals (for example compat math, narratives, vendor ingest, admin bundle). Those goals require separate behavior steps that exercise prod-facing behavior surfaces and produce their own artifacts under audit/qa/\<epic-id\>/\<SUBPATH\>.
+Live QA plans MUST NOT use /internal/version to satisfy any behavior D-goals (for example compat math, narratives, vendor ingest, admin bundle). Those goals require separate behavior steps that exercise prod-facing behavior surfaces and produce their own artifacts under audit/qa/\\/\\.
 
 PLAN/CRD entries that refer to “prod via Codespaces” without these clarifications are incomplete and MUST be updated before the epic moves into implementation or Live QA.
 
 Vendor-first Live QA using “prod via Codespaces”. For epics that intend to run vendor-first Live QA (per §0.6.4 and §1.1.6) using the “prod via Codespaces” pattern above, the PLAN/CRD MUST ALSO ensure:
 
-* The current Epic Plan acceptance roster explicitly declares this posture by title (for example: “Live QA will exercise vendor-backed behavior in prod via Codespaces → Railway, with artifacts under audit/qa/\<epic-id\>/\<SUBPATH\>”).  
-    
+* The current Epic Plan acceptance criteria and evidence requirements explicitly declare this posture by title (for example: “Live QA will exercise vendor-backed behavior in prod via Codespaces → Railway, with artifacts under audit/qa/\\/\\”).  
 * The Live QA plan includes at least one vendor-focused step that:  
-    
-  * uses or references the prod identity handshake artifact (for example the /internal/version capture under audit/qa/\<epic-id\>/logs/) to anchor which engine instance is under test  
-      
-  * demonstrates a vendor-backed end-to-end flow (for example vendor-backed resolve or compat) executed against the production HD Engine service, with its own mechanical artifacts captured under audit/qa/\<epic-id\>/\<SUBPATH\> as required by §1.1.4–§1.1.6.
+  * uses or references the prod identity handshake artifact (for example the /internal/version capture under audit/qa/\\/logs/) to anchor which engine instance is under test  
+  * demonstrates a vendor-backed end-to-end flow (for example vendor-backed resolve or compat) executed against the production HD Engine service, with its own mechanical artifacts captured under audit/qa/\\/\\ as required by §1.1.4–§1.1.6.
 
-This identity \+ vendor step does not change the identity-only semantics of /internal/version: the handshake remains a pre-flight proof of “which engine is live,” while the vendor-backed flow is what satisfies the vendor behavior portion of the D-goals and is recorded in the current Epic Plan acceptance roster.
+This identity \+ vendor step does not change the identity-only semantics of /internal/version: the handshake remains a pre-flight proof of “which engine is live,” while the vendor-backed flow is what satisfies the vendor behavior portion of the D-goals and is recorded in the current Epic Plan acceptance criteria and evidence record.
 
 ### **1.1.4 Live QA mechanical evidence expectations**
 
@@ -1596,16 +1507,14 @@ QA planning is a separate deliverable. Implementation Plans and Implementation G
 The Epic PLAN/CRD MUST provide:
 
 * titles-only acceptance intent  
-    
 * the QA posture (e.g., “Live QA required”)  
-    
-* a pointer to the QA Plan (titles-only reference) and the epic QA root (audit/qa/\<epic-id\>/)
+* a pointer to the QA Plan (titles-only reference) and the epic QA root (audit/qa/\\/)
 
 QA Plan posture (execution-time). For each Live QA step, the QA Plan MUST specify:
 
 * Command(s) to run (copy/paste runnable; no guessing).  
 * Pass/fail checks (what is asserted, and what constitutes failure).  
-* Deliverables: exact file artifacts to be produced or updated, with stable step-scoped paths under audit/qa/\<epic-id\>/checks/\<check\_id\>/.  
+* Deliverables: exact file artifacts to be produced or updated, with stable step-scoped paths under audit/qa/\\/checks/\\/.  
 * Re-runs MUST refresh the same check directory and MUST NOT create per-run directories or fresh-run roots.  
 * Any required context (env assumptions, flags discovered in D0, required fixtures), expressed as concrete preconditions.  
 * If a Live QA step depends on product-managed IDs, fixtures, or other runtime inputs that may be unavailable, the plan MUST state how availability is proven before execution and MUST define BLOCKED as the outcome when those inputs are absent or are not valid product inputs.  
@@ -1629,11 +1538,8 @@ Repo-resident loci may be named only when proven by allowed provenance sources u
 Unknown loci must be handled by a discovery step, not by placeholders. When a check depends on an unproven repo-resident locus, the step MUST:
 
 * state the discovery intent  
-    
 * state the discovery acceptance criterion  
-    
 * require recording the discovered locus string verbatim into the step evidence before using it  
-    
 * define PASS, FAIL, and BLOCKED outcomes for discovery itself
 
 Vetoed patterns. Live QA Plans MUST NOT use placeholder or example routes, file paths, module names, test IDs, or command strings as scaffolding for unknown repo reality.
@@ -1643,9 +1549,7 @@ Command-line minimalism (required)
 The plan SHOULD describe:
 
 * the goal of the action  
-    
 * the observable outputs that matter  
-    
 * the evidence that must be captured
 
 The executor MUST record the exact commands actually used into the step evidence at runtime. If the plan includes an exact command string, that string MUST be provenance-proven under the QA-planning locus provenance lock above.
@@ -1657,7 +1561,6 @@ QA planning QoS guardrails (iteration pressure). When Live QA plan iteration cou
 Prompt-family separation (AUTHORING vs REVIEW). Every QA prompt used in this process MUST declare its mode in its header as one of:
 
 * AUTHORING — allowed to draft or restructure plan text, step definitions, deliverables blocks, scripts, and runbooks.  
-    
 * REVIEW — allowed to evaluate evidence and plan coherence, quote existing plan text, and request plan changes. REVIEW mode MUST NOT invent new commands, runbooks, or evidence pointers.
 
 REVIEW-mode remediation exception (verbatim-only). If remediation requires quoting commands, the REVIEW-mode prompt MAY include only command snippets copied verbatim from the approved plan text (including caveats). The prompt MUST label the snippet as verbatim and MUST NOT introduce new flags, paths, or steps.
@@ -1696,9 +1599,7 @@ Plans MUST NOT list steps that are not defined as executable steps in the plan b
 Minor target-label mismatches inside a step are plan defects, not automatic step failures, when all of the following are true:
 
 * the step title or intent identifies one concrete target,  
-    
 * the Inputs section names that same concrete target, and  
-    
 * the captured evidence proves that same target.
 
 When those conditions are met, the reviewer MUST record the mismatch as a wording caveat or doc-delta item and MUST NOT fail the step on that mismatch alone.
@@ -1714,7 +1615,6 @@ Any referenced log/proof that is required evidence for an executed, in-scope ste
 If a plan’s SOURCE EXCERPT or runnable command block writes additional check-scoped files beyond the Deliverables list, each such file MUST be classified in the plan as one of:
 
 * required deliverable — counted for missing-evidence review and eligible to affect PASS or FAIL.  
-    
 * auxiliary capture — retained in the step evidence stream but explicitly non-gating.
 
 Auxiliary captures MUST NOT expand the step’s required-deliverables set or its PASS criteria unless the plan also names them in the Deliverables block or the PASS/FAIL block.
@@ -1732,9 +1632,7 @@ Template semantics for deferred steps (NOT RUN / DEFERRED). If a plan template o
 Closure/rollup steps that roll up evidence-path existence MUST separate these states:
 
 * PRESENT — the artifact exists at the referenced path.  
-    
 * MISSING — the producing step is executed and the artifact should exist, but does not.  
-    
 * NOT RUN / DEFERRED — the producing step has not executed; no artifact is expected yet.
 
 No dangling links rule for deferred steps. A plan or close-pack rollup MUST NOT present absent future-step file paths as evidence pointers in a way that implies file existence. If listing future-step paths at all, list them only as NOT RUN / DEFERRED entries until the producing step has executed.
@@ -1764,7 +1662,7 @@ Doc Delta Capture (when Codespaces is used). When Live QA execution uses Codespa
 
 A Step-0 “Codespaces snapshot” MAY be captured as an optional diagnostic convenience record, but it MUST be explicitly labeled non-gating and MUST NOT be required for plan approval or execution.
 
-No manual-result placeholders (hard rule). Live QA plans and runbooks MUST NOT include instructions that require the operator to manually fill results (for example “Result: (fill PASS/FAIL/SKIPPED)” or equivalent). Step outcomes must be determined mechanically from the step’s commands and the resulting artifacts under audit/qa/\<epic-id\>/\<SUBPATH\>.
+No manual-result placeholders (hard rule). Live QA plans and runbooks MUST NOT include instructions that require the operator to manually fill results (for example “Result: (fill PASS/FAIL/SKIPPED)” or equivalent). Step outcomes must be determined mechanically from the step’s commands and the resulting artifacts under audit/qa/\\/\\.
 
 If a plan cannot express a step outcome as commands \+ checks \+ deliverables, that step is non-conforming and must be rewritten or removed.
 
@@ -1797,7 +1695,6 @@ No non-canonical QA scripts or wrappers in Live QA plans (baseline commands only
 If a step needs “tooling,” it MUST be either:
 
 * a canon-named entrypoint by explicit path (for example a repo script or CI check that is already established as a governed surface)  
-    
 * an inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory for that run (no hidden dependencies)
 
 Any plan that references a non-canon script path as a “required surface” is non-conforming and must be revised to validate the governed artifact surface directly using baseline commands.
@@ -1807,21 +1704,17 @@ A Live QA step does not require a dedicated per-check helper or wrapper when the
 When a step reuses the same governed header or manifest workflow already used by earlier checks, the plan or report MUST make that reuse explicit enough to verify:
 
 * the exact commands or writer path used for the update  
-    
 * the specific governed artifacts refreshed for that step  
-    
 * that the step’s manifest entry and sibling path-proof were refreshed for that step
 
 Absence of a dedicated helper is a planning or convenience gap, not an automatic blocker, when the approved PASS or FAIL predicates and the governed artifact updates can still be confirmed directly from the recorded workflow.
 
 “Baseline commands” means explicit shell/Python one-liners, direct invocation of canon tools, tee for logs, and explicit file writes, with no reliance on opaque runners.
 
-Command/Entrypoint provenance (no invented executable entrypoints). Plans and runbooks MUST NOT require an executable entrypoint (for example: python \-m \<module\>, bash \<script.sh\>, ./\<tool\>) unless one of the following is true:
+Command/Entrypoint provenance (no invented executable entrypoints). Plans and runbooks MUST NOT require an executable entrypoint (for example: python \-m \\, bash \\, ./\\) unless one of the following is true:
 
 * Repo-proven — the entrypoint is a real, versioned repo surface and its existence is confirmed at the specified path / module name at execution time, or  
-    
 * Canon-defined — the entrypoint is explicitly defined by PF canon as a required tool surface, or  
-    
 * Explicitly created — the plan includes explicit creation instructions (for example: an OPS step that creates an ephemeral helper under /tmp).
 
 Evidence roots are not code roots. audit/\*\* and artifacts/\*\* are evidence roots. A plan MUST NOT invoke scripts from those roots unless the plan explicitly creates them in-step. (Writing governed evidence outputs under audit/\*\* or artifacts/\*\* is expected.)
@@ -1830,9 +1723,8 @@ QA vs remediation separation. Remediation plans MAY include code changes that mo
 
 Preflight existence checks (mandatory). Any OPS step that invokes a repo script, binary, or module MUST include a check that proves it exists before attempting the run. Examples:
 
-* For Python modules: python \-c "import \<module\>; print('OK')"  
-    
-* For scripts: test \-f \<path\> && test \-x \<path\> || (echo "MISSING"; exit 2\)
+* For Python modules: python \-c "import \\; print('OK')"  
+* For scripts: test \-f \\ && test \-x \\ || (echo "MISSING"; exit 2\)
 
 If the entrypoint does not exist, the run is TOOLING\_BLOCKED (not FAIL\_BEHAVIOR). The operator MUST stop and capture the transcript as evidence.
 
@@ -1842,11 +1734,11 @@ For Live QA work, runtime behavior and governed evidence artifacts are not the s
 
 Behavior execution phase: Run the system/endpoint/harness step that exercises the behavior being tested. Treat this phase as producing signals (responses, logs, outputs) that inform what evidence must be captured, but do not treat “it worked when I ran it” as the evidence artifact.
 
-Artifact capture \+ analysis phase: Capture governed evidence artifacts under audit/qa/\<epic-id\>/\<SUBPATH\> (and related required closeout artifacts). Perform analysis offline (e.g., in Codespace), producing the required summaries, diffs, and verification notes as governed artifacts.
+Artifact capture \+ analysis phase: Capture governed evidence artifacts under audit/qa/\\/\\ (and related required closeout artifacts). Perform analysis offline (e.g., in Codespace), producing the required summaries, diffs, and verification notes as governed artifacts.
 
 Rule: A Live QA step is not complete unless the artifact phase produces the specified deliverables in the QA root (or other governed locations referenced by Evidence Index/Machine Mirror), even if the behavior phase “looked correct” during execution.
 
-#### 1.1.5A Production-affecting open-rails Live QA requirement
+#### **1.1.5A Production-affecting open-rails Live QA requirement**
 
 For any epic that can affect real production functionality, QA readiness and closeout review MUST account for at least one bounded open-rails Live QA step that proves relevant production-facing behavior in the deployed or PO-approved live target, unless an explicit exemption is approved and recorded.
 
@@ -1896,38 +1788,23 @@ PR, OPS, and QA sequencing MUST support bounded live proof when required. Open-r
 When a PLAN or CRD describes PO Live QA (a Live QA session that requires PO time), it MUST:
 
 * Declare PO Live QA as vendor-first. Clearly state that PO Live QA for this epic is a short, focused session whose primary goal is to exercise live vendor behavior against the production HD Engine and capture mechanical evidence of that behavior.  
-    
 * Label vendor vs non-vendor steps. For all Live QA steps, classify them into:  
-    
   * Vendor-focused (class 3): steps that exercise vendor-backed flows (for example vendor-backed BodyGraph resolution, compat, vendor error behavior).  
-      
   * Ops/identity (class 1): connectivity and identity checks (for example /internal/version).  
-      
-  * Internal functional/determinism (class 2): serializer/guard/sanity/determinism checks that can run under CI/QA without involving the PO.
-
-
+  * Internal functional/determinism (class 2): serializer/guard/sanity/determinism checks that can run under CI/QA without involving the PO.  
 * Identify the PO workload explicitly. Identify the subset of Live QA steps that the PO is expected to run in a Live QA session:  
-    
   * This subset MUST consist only of vendor-focused steps.  
-      
-  * Ops/identity and internal functional/determinism steps MUST be marked as preconditions or CI/QA responsibilities, not PO Live QA workload. They may be referenced as “pre-flight / internal” work but not scheduled into PO’s Live QA time.
-
-
+  * Ops/identity and internal functional/determinism steps MUST be marked as preconditions or CI/QA responsibilities, not PO Live QA workload. They may be referenced as “pre-flight / internal” work but not scheduled into PO’s Live QA time.  
 * Tie vendor steps to mechanical vendor evidence. For each vendor-focused PO step:  
-    
   * Specify the behavior run context (prod-facing environment), per §1.1.5.  
-      
   * Require the owning Live QA Plan to specify the artifact capture and analysis commands, including the exact paths and filenames under `audit/qa/<epic-id>/<SUBPATH>`. Codespaces-specific commands and venue provenance are required only when Codespaces is material to the approved proof; otherwise use an allowed execution environment that satisfies the plan’s evidence contract.  
-      
-  * Ensure that artifacts for vendor steps are clearly identifiable as vendor evidence (for example via a vendor-specific subdirectory or filename convention) so that they can be referenced from the current Epic Plan acceptance roster and from QA token guidance in Glow QA Guide (titles-only).
+  * Ensure that artifacts for vendor steps are clearly identifiable as vendor evidence (for example via a vendor-specific subdirectory or filename convention) so that they can be bound to the applicable stable acceptance criteria, tests, and evidence requirements in the current Epic Plan and Glow QA Guide (titles-only).
 
 Plans that:
 
 * describe PO Live QA without labeling vendor vs non-vendor steps  
-    
 * assign ops/identity or internal determinism steps to the PO’s Live QA workload  
-    
-* omit mechanical vendor evidence expectations for PO-run vendor steps under audit/qa/\<epic-id\>/\<SUBPATH\>
+* omit mechanical vendor evidence expectations for PO-run vendor steps under audit/qa/\\/\\
 
 are incomplete and must be corrected before PO Live QA is scheduled.
 
@@ -1957,9 +1834,7 @@ CLI bytes live in the CLI spec.
 All CLI commands, flags, and subcommands used in QA Plans MUST be traceable to at least one of:
 
 * HDE-CLI-API-Vendor-Ref (the single home for CLI/Reader bytes)  
-    
 * a governed CLI test harness or script in the repo  
-    
 * a CodEx audit snippet that lists the CLI shape as discovered behavior for this repo
 
 QA Plans MUST NOT introduce new CLI spellings or flags “by habit” (for example a generic \--version check) that are not present in those sources.
@@ -1969,7 +1844,6 @@ D0 CLI presence checks must be minimal and spec-backed.
 When D0 includes a “CLI presence” or “CLI baseline” step, that step MUST:
 
 * use command shapes that are explicitly documented as supported (for example a shell-level presence check or a help/usage invocation taken from the CLI spec or CodEx audit)  
-    
 * phrase the Expected Outcome in terms of what PF-Canon actually requires (for example “CLI is installed and runnable under the pinned rails for later steps”), not in terms of extra behavior that is not a canonical requirement
 
 D0 steps MUST NOT assert stronger expectations (for example “must print a version string” or a particular banner) unless those behaviors are explicitly tied to PF-Canon requirements or epic acceptance tokens by title.
@@ -1979,9 +1853,7 @@ Plan authors MUST copy, not invent, CLI shapes.
 Implementation Agents and QA Plan authors MUST derive every CLI command used in a QA Plan from:
 
 * the CLI spec  
-    
 * an existing test or harness  
-    
 * a CodEx audit report for this repo
 
 Implementation Agents and QA Plan authors MUST copy those shapes exactly (command name, flags, argument structure), adjusting only concrete values like file paths or epic IDs.
@@ -1989,7 +1861,6 @@ Implementation Agents and QA Plan authors MUST copy those shapes exactly (comman
 Any time a Plan adds a new CLI usage that is not already present in those sources, the Plan MUST treat that as a spec gap and do one of:
 
 * update the CLI spec first  
-    
 * remove or replace the command with a canon-backed equivalent
 
 Plan reviewers MUST treat non-traceable CLI commands as blocking.
@@ -1997,13 +1868,11 @@ Plan reviewers MUST treat non-traceable CLI commands as blocking.
 During PLAN/CRD review for epics that include CLI steps (especially Live QA epics), Lead Dev and QA reviewers MUST:
 
 * spot-check CLI commands in the Plan against HDE-CLI-API-Vendor-Ref, tests, or CodEx audit output  
-    
 * treat any CLI command or flag that cannot be traced to one of those sources as a blocking issue
 
 Plans with non-traceable CLI commands MUST be corrected before approval by doing one of:
 
 * replace the command with a canon-backed usage  
-    
 * first add the missing behavior to the CLI spec and tests, and then update the Plan to match
 
 Interaction with other sections: This section refines §0.6.1 “Canon-first planning” for CLI usage: CLI behavior in QA Plans must come from the CLI spec, tests, or CodEx audit, not from generic assumptions.
@@ -2011,13 +1880,11 @@ Interaction with other sections: This section refines §0.6.1 “Canon-first pla
 It complements §1.1.5–§1.1.7 by ensuring that:
 
 * CLI steps used for behavior runs and artifact capture follow documented command shapes  
-    
 * D3 CLI guard runs in Live QA (when present) still respect the CI vs open-rails distinction while using canon-backed commands
 
 Plans are non-conforming and MUST be revised before PLAN/CRD approval or Live QA scheduling if they:
 
 * rely on CLI commands or flags that are not present in any PF-Canon CLI spec, test harness, or CodEx audit  
-    
 * assert Expected Outcomes that go beyond PF-Canon requirements without naming the corresponding tokens or docs by title
 
 ### **1.1.9 Exact-source acceptance and legacy-token compatibility**
@@ -2071,13 +1938,11 @@ Close-pack presence remains a baseline artifact requirement when close scope app
 When a deliverable claims a local bundle of governed artifacts under a directory (example: artifacts/ops/internal\_version/\*), the PLAN MUST explicitly state:
 
 * the complete required bundle paths (titles-only, full paths, no byte restatement), sourced from the canonical bundle definition  
-    
 * any shared or global governed artifacts required for acceptance that live outside the local bundle root, including canonical paths
 
 If the plan references a canonical bundle definition section by title instead of listing all paths, it must still list:
 
 * any overrides, exclusions, or additions  
-    
 * any shared/global evidence outside the local bundle root
 
 #### **1.1.10.4 Canonical evidence-path binding validation (acceptance integrity)**
@@ -2087,7 +1952,6 @@ Path-proofs are required, but not primary token evidence. Co-located \*.path\_pr
 However:
 
 * Token/evidence bindings (token/evidence matrices, acceptance maps, and PLAN required evidence lists) MUST bind tokens to the primary artifact(s) and the validator tests.  
-    
 * Token/evidence bindings MUST NOT list \*.path\_proof.txt files as the primary evidence surface for a token. Path-proofs may be referenced only as the proof\_anchor for a bound primary artifact.
 
 Every acceptance token to artifact binding that appears in an Epic Plan and in the token/evidence matrix MUST be validated against the canonical evidence catalog before approval or merge.
@@ -2109,11 +1973,8 @@ A PR may not be accepted on a duplicate-key collision by changing downstream dis
 Evidence-path authority order (normative). When determining the authoritative path-of-record or token → artifact binding for governed evidence, resolve conflicts using this authority order (highest wins):
 
 * repo manifests  
-    
 * audit manifests  
-    
 * rendered reports  
-    
 * QA plan text (intent only; never acceptance authority)
 
 Path-proof constraint (no fallback acceptance). This authority order does not relax path-proof requirements. If the highest-authority binding cannot be proven (missing artifact, missing path proof, or hash mismatch), treat it as a tooling or process failure and remediate the binding or regenerate the evidence before claiming acceptance.
@@ -2123,7 +1984,6 @@ Determinism env pins is a single canonical evidence surface.
 When DETERMINISM\_ENV\_PINS\_OK is claimed, the only valid evidence surface is:
 
 * audit/gates/determinism/env\_pins.log  
-    
 * audit/gates/determinism/env\_pins.log.path\_proof.txt
 
 DETERMINISM\_ENV\_PINS\_OK MUST NOT be bound to artifacts/proofs/env\_pins.txt (or any other similarly named file).
@@ -2131,11 +1991,8 @@ DETERMINISM\_ENV\_PINS\_OK MUST NOT be bound to artifacts/proofs/env\_pins.txt (
 When DETERMINISM\_ENV\_PINS\_OK is claimed, all acceptance ledgers and indices MUST bind to the canonical log path, and parity MUST be consistent across:
 
 * token/evidence matrix row  
-    
 * docs/evidence/INDEX.json  
-    
 * artifacts/evidence\_index.jsonl  
-    
 * the proof\_anchor path-proof
 
 Any deviation is a mechanical blocker: fix the binding, do not reinterpret.
@@ -2151,13 +2008,11 @@ Tool entrypoint naming (repo-proven): When a PLAN references the showcompat arti
 Canonical path (normative): Evidence index snapshot artifacts MUST use the gate-family path:
 
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json  
-    
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json.path\_proof.txt
 
 EPIC-local posture:
 
-* The EPIC-local variant under audit/qa/\<epic-id\>/\<SUBPATH\>/evidence\_index\_snapshot.json is non-authoritative; it MAY exist for compatibility or run-local context, but it MUST NOT be treated as canonical closure evidence.  
-    
+* The EPIC-local variant under audit/qa/\\/\\/evidence\_index\_snapshot.json is non-authoritative; it MAY exist for compatibility or run-local context, but it MUST NOT be treated as canonical closure evidence.  
 * Implementation Plans, QA plans, acceptance maps, and close-pack manifests MUST bind to the gate-family path above (not the EPIC-local variant).
 
 Canonical JSON gate directory is a single canonical evidence family (no dual-home binding).
@@ -2167,9 +2022,7 @@ Canonical directory (normative): Canonical JSON gate artifacts MUST live under: 
 Canonical JSON gate artifact surfaces (normative; D19/D20 validate-existing steps):
 
 * audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson  
-    
 * audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson  
-    
 * audit/gates/json\_gate/canonical/json\_gate\_structured\_record.json
 
 Naming posture (normative): Do not accept wrapper bundles or alternate filenames for canonical JSON gate artifacts. Use the canon-defined filenames above.
@@ -2179,15 +2032,12 @@ Path proof posture (normative): Each artifact above MUST be accompanied by its c
 Validation posture:
 
 * Each \*.ndjson log MUST parse as JSON-per-line.  
-    
 * Each \*.ndjson log must include at least one record with status="pass" (i.e. the gate log is required to exist and the check must have executed; it cannot be a pure non-execution stub).  
-    
 * The structured record (json\_gate\_structured\_record.json) MUST parse as JSON; schema and required fields are owned by the canonical artifacts/specification doc (titles only).
 
 Legacy directory posture:
 
 * audit/gates/canonical\_json/ (including audit/gates/canonical\_json/json\_canonical\_check.log) is legacy/non-authoritative naming; do not treat it as the canonical JSON gate evidence family, and MUST NOT require it in Implementation Plans unless the owning canon explicitly reinstates it.  
-    
 * audit/gates/canonical/ is legacy/compat-only; do not treat it as the canonical JSON gate evidence family.
 
 If tooling emits only to a legacy path, treat as a tooling defect; do not bind to it.
@@ -2195,7 +2045,6 @@ If tooling emits only to a legacy path, treat as a tooling defect; do not bind t
 No dual-home acceptance binding:
 
 * Acceptance maps, token/evidence matrices, and close-pack manifests MUST bind to the same canonical JSON gate family. Bind to audit/gates/json\_gate/canonical/ only.  
-    
 * Any deviation is a mechanical blocker: fix the binding, do not reinterpret.
 
 Snapshot-and-verify acceptance-binding checks are allowed when the step is verifying an already-existing current-epic binding rather than regenerating it.
@@ -2217,13 +2066,9 @@ Any binding to a non-canonical path is a mechanical blocker and must be correcte
 When a token is claimed as satisfied, the following artifacts MUST agree (paths and keys must match):
 
 * Epic Plan required evidence list (per deliverable)  
-    
 * token/evidence matrix row for the token  
-    
 * docs/evidence/INDEX.json entry for the bound artifact  
-    
 * artifacts/evidence\_index.jsonl mirror record for the same artifact\_key and discovered\_physical\_path  
-    
 * the path-proof file referenced by proof\_anchor
 
 This validation is enforced as a human review checklist line (pass/fail). An automated validator may be added, but the rule does not depend on automation.
@@ -2309,7 +2154,7 @@ When closure is claimed by equivalence or substitution rather than by an indepen
 
 Review and closeout classification MUST distinguish runtime or implementation failure from documentation or evidence failure. Reviewers MUST NOT demand a new runtime rerun unless runtime facts are actually missing, changed, or contradicted.
 
-### 1.1.11 Plan review rules (content-first; blockers vs caveats)
+### **1.1.11 Plan review rules (content-first; blockers vs caveats)**
 
 Scope  
 Plan review evaluates execution feasibility, deterministic pass/fail, and evidence wiring. Plan review MUST NOT gate on presentation-only formatting.
@@ -2321,21 +2166,13 @@ Header styling is not part of structural adherence. Reviewers MUST NOT request r
 Review stability and no-moving-target discipline applies to diff-first approval loops for Epic Plans, Implementation Plans, Live QA Plans, remediation plans, and closeout reviews.
 
 * Full-gate first pass is required. Before issuing the first approval decision on an artifact, apply the full active review gate set to the full artifact, not a partial subset.  
-    
 * Gate freeze across the same review loop. After the first review on a given artifact line, do not introduce a new blocker from already-visible unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior tooling or read failure prevented the text from being fully visible.  
-    
 * Coupled-constraint rule. If a reviewer requires more explicitness, the same review MUST also declare the coupled constraints that the added explicitness triggers, including provenance, command-string, path and locus, creation-ownership, schema or header, lowercase or naming, and portability constraints.  
-    
 * Unchanged-text blocker rule. Any blocker first raised against unchanged text in a later revision MUST state the trigger that makes it newly raisable. If no valid trigger exists, classify the issue as Review Drift.  
-    
 * Review Drift handling. When a blocker was already visible in an earlier reviewed revision, label it Review Drift, state plainly that it was visible earlier, and consolidate any other same-scope pre-existing blockers in that same review.  
-    
 * Contradictory review prohibition. Do not alternate between too implicit and too explicit on the same requirement family unless the supporting canon constraint was already cited earlier or the later problem was created by newly changed text.  
-    
 * Read-failure and truncation handling. If an issue was missed because of truncation, partial retrieval, or other read failure, treat it as reviewer-side or tooling-side failure. Re-run the full sweep after full retrieval before issuing a new decision.  
-    
 * Non-author penalty rule. Do not frame omitted earlier blockers from unchanged text as author-created churn or as a fresh author-side defect cycle.  
-    
 * Approval integrity. This discipline does not require approving a real blocker. It requires that review be stable, complete, and non-contradictory, and that any later-discovered blocker be handled under the rules above.
 
 This does not relax structural requirements. Missing required sections, missing required end markers, missing required gates, missing required pointers to HDE-Build Checklist or HDE-Mechanics Guide when required by this guide or the template, invalid/non-PF references, and ungrounded existence claims remain valid blockers.
@@ -2488,9 +2325,7 @@ Portable formatting note (inline code-like values)
 Reviewer safety posture (no guesswork)
 
 * If a plan view is truncated, garbled, or otherwise unreadable, treat it as a read failure and request a clean re-open of the source text. Do not infer missing content. If an authorized omission marker occurs in a relied-on passage, retrieve the complete source material needed to establish authority, meaning, placement, and proof. If a prohibited ellipsis form creates ambiguity in a material passage, resolve it against the source before relying on the passage, then redo dependent conclusions.  
-    
 * Reviewers MUST NOT propose or accept invented repo paths, command invocations, route paths, or token names as “probably right.” Require validation or mark as a blocker.  
-    
 * When quoting or redlining plan content, do not silently change escapes that affect execution semantics. If you normalize presentation-only escapes for readability, do it explicitly and ensure the quoted or pasted text preserves semantic meaning.
 
 Approval-review invalidation for reviewer-created technical design.
@@ -2504,7 +2339,6 @@ An invalid review MUST NOT be used to revise a plan, authorize implementation, c
 Simplified QA planning posture (planning-time expectations)
 
 * Epic planning does not require a step-by-step QA playbook. Reviewers MUST NOT block on the absence of a full step list at PLAN time.  
-    
 * If a plan does specify QA steps, each step MUST define a concrete pass predicate and point to a governed evidence output (single primary file or manifest) so that acceptance is deterministic. Steps MUST reference real repo entrypoints and registered routes; missing tooling is resolved by PR work, not by QA-time script creation.
 
 A QA plan is not approval-ready if any executable step depends on undeclared or unchecked tooling.
@@ -2572,13 +2406,11 @@ When those conditions are met, classify the event as an accepted plan-execution 
 Deferrals and Tracked Issues (no silent drops)
 
 * Any deferred scope item MUST be recorded as a Tracked Issue with explicit disposition and a destination epic ID.  
-    
 * Deferred items MUST NOT be claimed as accepted or satisfied in the current epic.
 
 Non-goals (for review)
 
 * This section does not require exhaustive QA runbooks during epic planning.  
-    
 * This section does not change token semantics; it clarifies review gates for plan portability and determinism.
 
 ## **1.2 PLAN: Machine header (paste and fill, then post)**
@@ -2594,24 +2426,24 @@ PF06 retains the process boundaries in this H1: complete the current-state canon
 Transition posture. PF27-Canon-Plan-Templates is the selected canonical owner of the `Change Request Document (CRD) Template`. The local field copy below remains controlling until PF27 contains that complete destination contract.
 
 epic\_id: "HDE-EPIC0XX"  
- crd\_id: "HDE-CRD0XX"  
- type: CRD  
- scope\_mode: FULL | PATCH | VERIFY  
- acceptance\_criteria:
+crd\_id: "HDE-CRD0XX"  
+type: CRD  
+scope\_mode: FULL | PATCH | VERIFY  
+acceptance\_criteria:
 
-* "\<STABLE\_REQUIREMENT\_OR\_CRITERION\_ID\>"
+* "\\"
 
 evidence\_minima:
 
-* "\<TEST, CHECK, WORKFLOW, OR GOVERNED ARTIFACT IDENTITY AND PASS/FAIL PREDICATE\>"
+* "\\"
 
 candidate\_identity:
 
-* "\<REPOSITORY AND EXACT SHA; INCLUDE PR BASE/HEAD/MERGE IDENTITIES WHEN A PR IS USED\>"
+* "\\"
 
 ops\_endpoints:
 
-* "\<OPS\_ENDPOINT\_1\>"
+* "\\"
 
 notes\_for\_coder:
 
@@ -2649,7 +2481,7 @@ notes: Never emit ETag for writers/errors.
 
 TypeScript implementations MUST conform to the canonical JSON byte contract in PF12-Canon-HDE-Schemas-and-Artifacts and byte-match the service emitter. PF06 does not define a separate TypeScript serialization algorithm. This capsule is a routing example only; no implementation or runtime conformance is asserted here.
 
-# 2\) IMPLEMENTATION GUIDE (Lead Dev; posted immediately after CRD)
+# **2\) IMPLEMENTATION GUIDE (Lead Dev; posted immediately after CRD)**
 
 Define how work proceeds after CRD approval in a way CodEx can execute with minimal inference. Lead Dev approves once and later performs the PR gate only when the authorized route uses a PR. Each issued guide MUST identify the exact repository baseline and selected mutation route, resolve whether CodEx can read PF documents, and include all execution-critical material required by that access posture.
 
@@ -2677,7 +2509,7 @@ The affected machine blocks use YAML\_1\_2\_2\_RESTRICTED\_CORE:
 8. Keys are closed. Duplicate or unknown keys fail validation.  
 9. Directives, custom tags, anchors, aliases, merge keys, complex keys, implicit timestamps, and multiple YAML documents are prohibited.  
 10. Comments, Markdown escapes, Markdown bullets, HTML, and inline-code markup are prohibited inside a machine block.  
-11. Template placeholders use \<UPPER\_SNAKE\_CASE\>.  
+11. Template placeholders use \\.  
 12. An issued or approval-ready artifact contains no placeholder, plain TBD, empty required string, or comment surrogate.  
 13. Assessment fields use the double-quoted strings "true", "false", "unassessed", or "not\_applicable"; they do not use implied booleans.  
 14. "not\_applicable" requires a scope-grounded explanation in the associated human section.  
@@ -2709,7 +2541,7 @@ execution_flow:
 
 In an issued guide, epic\_id and alchemical\_phase are required exact values. Include slice\_id when the guide governs less than the complete epic; omit it only for a complete-epic guide. Resolve codex\_can\_see\_pf\_docs to "true" or "false" and provide all execution-critical material required by the resolved posture.
 
-The execution flow is ordered and non-empty. It does not make Reader, A7, narrative, identity, database, close-pack, evidence-index, or acceptance-token requirements universal. Apply those requirements only when the approved scope and their current owners make them applicable. Close-pack files and the final PASS roster are required only for the close PR. Acceptance names and semantics come from PF04-Canon-HDE-Governance; governed artifact schemas and paths come from PF12-Canon-HDE-Schemas-and-Artifacts.
+The execution flow is ordered and non-empty. It does not make Reader, A7, narrative, identity, database, close-pack, evidence-index, or acceptance-token requirements universal. Apply those requirements only when the approved scope and their current owners make them applicable. Close-pack files are required only for the final close mutation set. A final PASS-token roster is not required. Acceptance must use the applicable stable governing criteria and exact-source evidence identities; governed artifact schemas and paths come from PF12-Canon-HDE-Schemas-and-Artifacts.
 
 ## **2.2 Audit (CodEx)**
 
@@ -2718,51 +2550,31 @@ Goal. Establish that the codebase can host the change without violating canon, a
 Checklist (titles only for references; IA supplies exact formats/snippets as needed):
 
 * Serializer posture. One single import path for the canonical serializer (equivalent to canon\_serializer\_v1); flag duplicates or ad-hoc JSON dumps. (HDE-Math-Spec; HDE Architecture — single-emitter rule)  
-    
 * Idempotence posture. Preimage \+ newline stance match HDE-Math-Spec (fields & ordering; trailing LF) and hashing stance matches SHA-256 over the LF-terminated canonical body.  
-    
 * Public transport (success path, A7). Satisfiable only on a cataloged JSON success route (Endpoint Catalog by title); not on /internal/version. Confirm feasibility of:  
-    
   * Strong, quoted ETag over LF-terminated body  
-      
-  * HEAD 200 mirroring validators, Content-Type \== GET, Content-Length \== len(identity 200 body)  
-      
+  * HEAD 200 mirroring validators, Content-Type \\== GET, Content-Length \\== len(identity 200 body)  
   * 304 only after prior 200, omitting both Content-Type and Content-Length  
-      
   * Vary: Authorization, Accept-Encoding supported  
-      
-  * Encoding invariance feasible (ETag and effective Content-Length stable across accepted encodings). (HDE-Governance — A7; CLI/API Vendor Ref — transport bytes)
-
-
+  * Encoding invariance feasible (ETag and effective Content-Length stable across accepted encodings). (HDE-Governance — A7; CLI/API Vendor Ref — transport bytes)  
 * Endpoint Catalog posture (if A7 in scope). Catalog is internal-only and env-gated per entry; non-prod entries unreachable in prod. Confirm a practical strategy for headers-only env-gate proof. (Governance; CLI/API Vendor Ref; Schemas & Artifacts — index path)  
-    
 * Composite success proof JSON. Plan to emit a records-only composite proof (reader\_success\_get\_head\_304.json) and validate it against the PF12 composite proof schema (titles-only pointer). (Schemas & Artifacts)  
-    
 * Writers/Errors transport. Writers are no-store, never 304; error responses carry Content-Type: application/json; charset=utf-8 and no ETag. (Governance — writers)  
-    
 * Rails closed refusal. On closed rails, refusal is typed numeric-free JSON, no-store, no ETag/Vary/Content-Encoding; confirm plan for the single-file refusal proof shape (headers block → blank line → one-line canonical JSON body). (Governance; Schemas & Artifacts)  
-    
 * Logs & security. Keys-only logging (no payload bodies, no secrets); redaction & validation posture aligns with Governance; CI grep-guards exist.  
-    
-* Aux narrative (if in scope). A7-equivalent success path feasible (deterministic text, strong ETag on LF-text); suppression \= 200 with no body and no ETag; policy header supported. (Narratives Guide; Governance)  
-    
+* Aux narrative (if in scope). A7-equivalent success path feasible (deterministic text, strong ETag on LF-text); suppression \\= 200 with no body and no ETag; policy header supported. (Narratives Guide; Governance)  
 * Direct database transport. Confirm that DATABASE\_URL is the sole active database endpoint, direct PostgreSQL through the Glow-owned psycopg provider is the only selectable transport, retired bridge keys fail before provider selection without logging values, and unavailable direct access fails closed without alternate transport. Plan to capture artifacts/runtime/direct\_db\_selection.snapshot.json; diagnostics remain keys-only and secret-free. (HDE-Governance; HDE-Schemas & Artifacts)  
-    
-* Evidence parity & PR readiness (PF12 single home). Human Evidence Index (docs/evidence/INDEX.json), hash sentinel (docs/evidence/INDEX.sha256), and machine mirror (artifacts/evidence\_index.jsonl) exist or can be emitted in the same PR; mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one LF), unknown-keys rejected, ASCII field order, sort-before-write, single mirror file, and supports a proof\_anchor pointing to a co-located path-proof file. CI has—or will add—parity/unknown-key checks. (Schemas & Artifacts; Build Notes)  
-    
+* Evidence parity & mutation readiness (PF12 single home). Human Evidence Index (docs/evidence/INDEX.json), hash sentinel (docs/evidence/INDEX.sha256), and machine mirror (artifacts/evidence\_index.jsonl) exist or can be emitted in the same authorized mutation set; mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one LF), unknown-keys rejected, ASCII field order, sort-before-write, single mirror file, and supports a proof\_anchor pointing to a co-located path-proof file. CI has—or will add—parity/unknown-key checks. (Schemas & Artifacts; Build Notes)  
 * Governed locations only. All evidence under audit/**, artifacts/**, and docs/\*\*; no transient/generator paths. (HDE-Schemas & Artifacts)  
-    
 * Negative or no-hit audit proof. When an audit uses absence as proof, it MUST record the exact search scope, string set or predicate, source searched, and result. A concrete repeatable negative result MAY be accepted as proof; reviewers MUST NOT demand a rerun or fallback audit solely because the proof is negative.  
-    
 * Rerun is required only when the search method, scope, source, or relied-on passage is incomplete, ambiguous, contradicted, or not retrievable.  
-    
-* Gaps & proposals. List missing components/schemas; propose minimal fixes or scoped improvements; call out any risks that would block CodEx from opening a PR and satisfying tokens.
+* Gaps & proposals. List missing components/schemas; propose minimal fixes or scoped improvements; call out any risks that would block CodEx from using the expressly authorized mutation route and satisfying the applicable governing acceptance criteria.
 
 Output fields (CodEx fills; IA provides this structure):
 
 audit:  
-serializer\_path: "\<module.path\>"  
-duplicates: \["\<offending.symbol\>", "\<another.symbol\>"\]  
+serializer\_path: "\\"  
+duplicates: \["\\", "\\"\]  
 det\_serializer\_ok: true|false
 
 idempotence\_ok: true|false
@@ -2793,9 +2605,9 @@ machine\_mirror\_wired: true|false
 mirror\_schema\_ok: true|false  
 path\_proofs\_ok: true|false
 
-missing\_components: \["\<title\>", "\<another.title\>"\]  
-proposed\_fixes: \["\<short\_fix\>", "\<another\_fix\>"\]  
-blockers: \["\<risk\_1\>", "\<risk\_2\>"\]
+missing\_components: \["\\", "\\"\]  
+proposed\_fixes: \["\\", "\\"\]  
+blockers: \["\\", "\\"\]
 
 ### **Findings → Doc Delta Map (required; single sink)**
 
@@ -2882,17 +2694,16 @@ Doc Delta Proposals — PF canon (include only if any delta is YES)
 
 DELTA-001 —
 
-Target doc: \<PF doc title\>  
-Target section: \<heading text or §X.Y\>  
+Target doc: \\  
+Target section: \\  
 Delta (actionable; 1–3 bullets):
 
-* \<delta bullet\>  
-  Why (one sentence): \<one sentence\>  
+* \\  
+  Why (one sentence): \\  
   Evidence pointer(s):  
-    
-* \<pointer\>  
+* \\  
   PF proof excerpt (required if a section is cited; verbatim lines):  
-  \<1–5 verbatim PF lines\>
+  \\\<1–5 verbatim PF lines\\\>
 
 Doc-delta proposals are targets-only. Do not restate transport bytes, schemas, or token tables in audit output.
 
@@ -2915,11 +2726,8 @@ Goal. Review proposed change style and safety against canon, given IA-supplied f
 Checklist:
 
 * No numerics in a governed public payload or narrative when the owning public-surface contract requires numeric-free bytes.  
-    
 * Writer and error responses follow their current owning governance and transport semantics.  
-    
 * Deterministic paths use no unapproved RNG or time source.  
-    
 * No additional public interface appears beyond the interfaces\_public boundary in the approved plan.
 
 ```
@@ -2959,16 +2767,16 @@ Test predicates use explicit assessment states and are never preset to "true". A
 
 artifacts\_recorded contains exact existing pointers only when artifacts were actually recorded; bare sample filenames are not current artifact claims. Every detailed-change-report sequence remains present in a completed result. Use \[\] for a truthfully empty category rather than omitting it or inventing an entry.
 
-# 3\) IMPLEMENTATION PLAN (Implementation Agent; Lead Dev approves once, then steps out)
+# **3\) IMPLEMENTATION PLAN (Implementation Agent; Lead Dev approves once, then steps out)**
 
 ## **3.1 Machine header**
 
 {  
 "type": "IMPLEMENTATION\_PLAN",  
 "epic\_id": "EPIC-?.?",  
-"crd\_link": "\<pointer\>",  
-"digest": "\<≤1 page: how tasks satisfy proofs and surface/contract constraints\>",  
-"assumptions": \["\<assumption\_1\>"\],  
+"crd\_link": "\\",  
+"digest": "\\\<≤1 page: how tasks satisfy proofs and surface/contract constraints\>",  
+"assumptions": \["\\"\],  
 "context\_header": "D=\_\_ W=\_\_ IFC=\_\_ CU=\_\_ POC=\_\_ IC=\_\_ ESC=\_\_ APPLY\_STEPS=\_\_ VERIFY\_CHECKS=\_\_ Ambiguities=\_\_",  
 "code\_capsules\_finalized": \[  
 {"id": "canon\_serializer\_v1", "status": "approved"},  
@@ -2976,24 +2784,29 @@ artifacts\_recorded contains exact existing pointers only when artifacts were ac
 {"id": "serializer\_ts\_v1", "status": "approved"}  
 \],  
 "codex\_inputs": {  
-"verbatim\_payloads": \["\<components\>", "\<schemas\>", "\<formats/snippets\>"\], // CodEx can read PF docs; still paste execution-critical material verbatim to keep an unambiguous in-session reference  
-"instructions": "\<clear WHAT, scope limits, and acceptance expectations\>",  
+"verbatim\_payloads": \["\\", "\\", "\\"\], // CodEx can read PF docs; still paste execution-critical material verbatim to keep an unambiguous in-session reference  
+"instructions": "\\",  
 "freedom\_within\_scope": "CodEx may adapt/fix within scope; must report all changes at end",  
 "reporting\_requirements": "Return detailed\_change\_report \+ artifacts/evidence"  
 },  
-"pr\_expectations": {  
-"template\_required": true,  
-"acceptance\_tokens": \[  
-"\<CURRENT\_REGISTERED\_TOKEN\_NAME\>"  
+"mutation\_expectations": {  
+"authorized\_route": "\\",  
+"template\_required": true, // applies when authorized\_route is PR  
+"acceptance\_criteria": \[  
+"\\"  
 \],  
+"evidence\_requirements": \[  
+"\\"  
+\],  
+"acceptance\_tokens": \[\],  
 "close\_pack\_files": \[  
-"audit/EPIC-\<ID\>\_close\_report.md",  
-"audit/EPIC-\<ID\>\_MANIFEST.json"  
+"audit/EPIC-\\\_close\_report.md",  
+"audit/EPIC-\\\_MANIFEST.json"  
 \]  
 }  
 }
 
-Populate acceptance\_tokens only with current registry-valid names from PF04-Canon-HDE-Governance that apply to the approved scope. Express an unregistered requirement as a plain obligation rather than inventing or claiming a token. Serializer, A7, CLI/Reader, /internal/version, and evidence-index requirements are conditional on the approved scope and their owning canon.
+Keep acceptance\_tokens empty by default. A future plan MAY opt into one bounded token only when existing PF, ADR, epic, task, acceptance-criterion, test, PR, commit, workflow, or artifact identifiers cannot provide the necessary traceability. Such use is exceptional, does not reactivate a universal roster, and does not replace the stable acceptance criteria or exact-source evidence requirements above. Serializer, A7, CLI/Reader, /internal/version, and evidence-index requirements remain conditional on approved scope and owning canon.
 
 CodEx portability rule (Implementation Plan codex\_inputs)
 
@@ -3002,63 +2815,61 @@ The final implementation prompt given to CodEx MUST be self-contained. Do not re
 ## **3.2 Tasks (repeat per task; keep atomic)**
 
 task:  
-name: "\<atomic task name\>"  
-description: "\<what changes conceptually\>"  
-inputs: \["\<docs or modules\>"\]  
-dependencies: \["\<tasks\>"\]  
+name: "\\"  
+description: "\\"  
+inputs: \["\\"\]  
+dependencies: \["\\"\]  
 expected\_observables:  
-\- "\<what will be true if task succeeds\>"  
-proof\_coverage: \["\<CURRENT\_REGISTERED\_TOKEN\_OR\_PLAIN\_OBLIGATION\>"\]  
-validation\_text: "\<how success will be reasoned and later reported\>"  
+\- "\\"  
+proof\_coverage: \["\\"\]  
+validation\_text: "\\"  
 capsules\_used: \["canon\_serializer\_v1", "strong\_etag\_v1"\]
 
 ## **3.3 Blockers and resolutions**
 
 blockers:
 
-* item: "\<description\>"  
-  resolution: "\<resolve|waive|defer\>"
+* item: "\\"  
+  resolution: "\\"
 
 ## **3.4 Approval**
 
 ip\_approval:  
 lead\_dev\_decision: "APPROVED"  
-notes: "\<optional\>"  
+notes: "\\"  
 lead\_dev\_steps\_out: true
 
-From this point, CodEx and IA proceed per the approved IP. Lead Dev returns only to gate the PR.
+From this point, CodEx and IA proceed per the approved IP. Lead Dev returns for the PR gate only when the expressly authorized mutation route uses a PR.
 
-## **3.5 Close Gate (PR-first)**
+## **3.5 Close Gate (route-aware)**
 
 ### **3.5.1 Requirement**
 
-For every epic, work is delivered PR-first via Codex.
+The normal code-bearing epic route is PR-first via Codex. The Product Owner MAY explicitly authorize direct-to-`main` mutation for the exact change. An agent MUST NOT infer direct-main permission.
 
-Codex opens PRs automatically for each epic slice and pushes code \+ Doc-Delta \+ evidence in the same PR.
+For a PR route, Codex opens PRs for the authorized epic slices and pushes code, Doc-Delta, and applicable evidence in the same PR. A multi-PR epic MAY use up to 10 PRs, and each PR MUST be self-contained and follow the PR-route parity rules in §0.2.
 
-An epic MAY use up to 10 PRs to deliver its full scope; each PR MUST be self-contained and follow the PR-first and parity rules in §0.2.
+For direct-main, record the exact current operator authorization, post-write SHA, diff, and applicable push-triggered CI result. Landing on `main` does not by itself establish CI PASS, QA PASS, acceptance, or closure.
 
-Assigned HDE-Build Checklist scope is binding for each PR. When the approved Implementation Plan, remediation plan, or review scope assigns specific HDE-Build Checklist tasks or subtasks to a PR, that PR MUST either complete every assigned subtask or explain each unresolved assigned subtask in detail before the PR can be treated as complete.
+Assigned HDE-Build Checklist scope is binding for every authorized mutation set. Each assigned task or subtask MUST be completed or explicitly accounted for before the mutation set can be treated as complete.
 
-The explanation MUST identify each affected task ID and subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved PR scope, and cite the repo evidence, test result, or other concrete basis for that conclusion.
+The account MUST identify each affected task ID and subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved scope, and cite the repo evidence, test result, or other concrete basis for that conclusion.
 
 Silent omission, partial completion without this explanation, or a completeness claim that ignores unresolved assigned subtasks is non-conforming.
 
-The Product Owner (PO) is the sole merger (squash on PASS).
+For a PR route, the Product Owner is the sole merger and uses squash on a supported PASS.
 
-Epic-level acceptance (as recorded in HDE Phased Epics) occurs only after:
+Epic-level acceptance occurs only after:
 
-* all required PRs for that epic have merged  
-    
-* the Close Gate has been satisfied
+* every required mutation slice for the epic has been adopted into the authoritative repository state  
+* the Close Gate has been satisfied for the exact final candidate  
+* the authorized lifecycle decision has been recorded
 
 HDE Phased Epics is historical-only: the epic record is added there once, at epic close, as the final archived entry. In-flight epics MUST NOT be recorded there.
 
-The Close Gate applies to the PR that carries the epic close-out (close PR).
+The Close Gate applies to the mutation set that carries epic closeout. All earlier mutation sets remain subject to their route-specific exact-source, parity, review, and evidence requirements.
 
-All earlier PRs in the series must still be PR-first and parity-clean.
-
-Only the close PR is required to carry the full close-pack and final PASS roster described below.
+Only the close mutation set is required to carry the full close pack and final exact-source acceptance record. A final PASS-token roster is not required.
 
 Feedback-free terminal lifecycle.
 
@@ -3088,16 +2899,15 @@ An exceptional closure record MUST NOT relabel a failed or absent ordinary close
 
 The close PR MUST include the epic close-pack (canonical filenames):
 
-* audit/EPIC-\<NNN\>\_close\_report.md  
-    
-* audit/EPIC-\<NNN\>\_MANIFEST.json
+* audit/EPIC-\\\_close\_report.md  
+* audit/EPIC-\\\_MANIFEST.json
 
-Where \<NNN\> is the zero-padded 3-digit epic number (see §0.5.1).
+Where \\ is the zero-padded 3-digit epic number (see §0.5.1).
 
-The close PR MUST also include:
+The close mutation set MUST also include:
 
-* a PASS tokens section (final status; titles only; see §0.2 Baseline PR tokens (titles-only) and the PLAN/CRD machine headers)  
-* PASS roster token validity (registry-bound): the PASS tokens section MUST list only canonical acceptance token names that exist in the acceptance token registry. Any unregistered token reference MUST be marked Unknown and MUST NOT be recorded as PASS until registered (or explicitly waived via closure override).  
+* an exact-source acceptance evidence section that binds each current governing requirement or acceptance criterion to the exact final candidate, relied-upon checks or governed evidence, applicable results and limitations, and authorized decision  
+* when a future plan explicitly opts into one bounded legacy-compatible token because native identifiers are insufficient, that token's exact identity and evidence binding; a complete roster is not required and an unregistered label MUST NOT be represented as acceptance authority  
 * an explicit verification statement that the close-pack baseline artifacts exist at the canonical filenames listed above  
 * a tracked-issue closeout mapping in the close report for any TI-\* items cited by the epic (example: TI-002): each TI item MUST map to either (a) PF09 subtask pointers (repo path plus section heading) that demonstrate closure, or (b) an ADR status line in the close report that records Deferred with drain targets so closure is unambiguous.  
 * an explicit binary closure decision in the close report: SATISFIED or NOT SATISFIED.  
@@ -3128,58 +2938,45 @@ The OPS-02 execution bundle MUST include, at minimum, commands.txt, repo\_root.t
 
 The primary provenance artifact MUST state the governed artifact path being bound, the in-session command family, the venue or Codespaces context used, the repo root and commit linkage, and the non-claim boundaries for the run.
 
-#### **3.5.2.2 Core determinism and parity tokens**
+#### **3.5.2.2 Core determinism and parity evidence**
 
-The close PR MUST demonstrate the applicable serializer or canonical-bytes, CLI/Reader parity, and two-run identity predicates through current registry-valid acceptance names from PF04-Canon-HDE-Governance. It MUST NOT claim DET\_SERIALIZER\_OK or another unregistered convenience name. The exact roster remains scope-bound and must be resolved from the current registry when the close artifact is authored.
+The close mutation set MUST demonstrate the applicable serializer or canonical-bytes, CLI/Reader parity, and two-run identity predicates through stable governing requirement, test, check, and governed evidence identities. A token roster is not required. One bounded legacy-compatible token MAY appear only when a future plan explicitly opts into it because those native identifiers are insufficient; an unregistered convenience label MUST NOT be represented as acceptance authority.
 
-#### **3.5.2.3 Index and mirror trio (same PR)**
+#### **3.5.2.3 Index and mirror trio (same authorized mutation set)**
 
-The close PR MUST update the Evidence Index and machine mirror in the same PR, satisfying:
+When changed governed evidence, changed governed artifacts, or the current close contract triggers the trio, the same authorized mutation set MUST update and verify:
 
-* EVIDENCE\_INDEX\_UPDATED\_OK  
-    
-* EVIDENCE\_INDEX\_HASH\_OK  
-    
-* MACHINE\_MIRROR\_UPDATED\_OK
+* the Human Evidence Index at docs/evidence/INDEX.json  
+* the hash sentinel at docs/evidence/INDEX.sha256  
+* the Machine Mirror at artifacts/evidence\_index.jsonl
 
 #### **3.5.2.4 Repo-docs and evidence updates (same PR)**
 
 The close PR MUST update, in the same PR:
 
 * Human Evidence Index: docs/evidence/INDEX.json  
-    
 * Index hash sentinel: docs/evidence/INDEX.sha256 (hash MUST match bytes of INDEX.json)  
-    
 * Machine mirror: artifacts/evidence\_index.jsonl
 
 Machine mirror requirements (titles-only; enforceable):
 
 * records-only canonical JSONL  
-    
 * exactly one trailing LF  
-    
 * unknown keys rejected  
-    
 * ASCII field order  
-    
 * sort-before-write  
-    
 * single mirror file  
-    
 * each record has discovered\_physical\_path \+ proof\_anchor to a co-located path-proof
 
 Also required in the close PR (titles-only; as applicable):
 
 * Repo index and acceptance crib notes  
-    
 * Doc-Delta note (if applicable)
 
 If the close PR includes generated acceptance-ledger artifacts or generated close-pack artifacts, reviewability requires more than path presence. The close PR MUST make all of the following explicit and auditable in the same PR:
 
 * whether the acceptance map, token-evidence matrix, and viability log bind the full intended proof-family roster for the slice or only a reduced subset  
-    
 * whether any reused proof families are explicitly named as reused bindings rather than implied by narrative summary  
-    
 * whether the close report and manifest describe only work that was actually executed in that run
 
 If a close report, manifest, or generated review artifact claims that the Human Evidence Index, hash sentinel, Machine Mirror, path-proofs, or validator or gate outputs were refreshed or re-validated, that claim MUST be backed by same-run governed execution evidence in the PR. Narrative assertions of execution are non-conforming unless the executed workflow evidence is present.
@@ -3204,27 +3001,23 @@ If a generator or close-binding rule is intended to support later PF09 closure, 
 
 When the current evidence does not yet satisfy those explicit proof markers or required environment closures, the regenerated outputs MUST preserve the blocked or incomplete-planned posture and MUST NOT imply that later work is already complete.
 
-#### **3.5.2.5 A7 tokens (when A7 is in scope — Catalog success route)**
+#### **3.5.2.5 A7 evidence predicates (when A7 is in scope — Catalog success route)**
 
-When A7 is in scope for the epic, the close PR MUST satisfy the relevant A7 tokens (titles only), including:
+When A7 is in scope for the epic, the close mutation set MUST bind governed evidence to the applicable A7 predicates, including:
 
-* A7\_GET\_QUOTED\_ETAG\_OK  
-    
-* A7\_HEAD\_PARITY\_OK  
-    
-* A7\_304\_OMITS\_CT\_CL\_OK  
-    
-* A7\_VARY\_AUTH\_AE\_OK  
-    
-* A7\_ENCODING\_INVARIANCE\_OK  
-    
-* ENDPOINTS\_CATALOG\_INTERNAL\_OK  
-    
-* A7\_TRANSPORT\_PROOF\_OK
+* quoted strong ETag behavior for GET  
+* HEAD parity  
+* 304 omission of Content-Type and Content-Length  
+* required Vary: Authorization and Accept-Encoding posture  
+* encoding invariance  
+* Endpoint Catalog internal-route posture  
+* the governed A7 transport proof
 
-#### **3.5.2.6 /internal/version tokens (when in scope — ops surface)**
+No A7 token roster is required.
 
-When /internal/version is in scope, the close PR MUST use the current canonical /internal/version acceptance names and semantics from PF04-Canon-HDE-Governance. Deprecated INTVER\_\* aliases MUST NOT be emitted or required. The applicable roster MUST cover the current Content-Type, HEAD parity, conditionals-ignored, no-ETag, and no-store predicates without inventing a combined convenience token.
+#### **3.5.2.6 /internal/version evidence predicates (when in scope — ops surface)**
+
+When /internal/version is in scope, the close mutation set MUST bind the current Content-Type, HEAD parity, conditionals-ignored, no-ETag, and no-store predicates to stable governing requirement, check, test, and governed evidence identities. A token roster is not required. Deprecated INTVER\_\* aliases MUST NOT be emitted or required, and a combined convenience label MUST NOT be represented as acceptance authority.
 
 The /internal/version proof surface requires an explicit invariant checklist before emitting any \_OK tokens.
 
@@ -3233,51 +3026,31 @@ Any remediation guide, QA step, or probe tool that produces governed /internal/v
 Canon-critical invariants (minimum set) are listed below.
 
 * A) Transport  
-    
   * GET MUST return 200\.  
-      
   * HEAD MUST return 200 and satisfy parity expectations.  
-      
   * Conditional requests (If-None-Match, If-Modified-Since) MUST NOT yield 304; they MUST return 200\.  
-      
-  * Canonical token name for this invariant: INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK.  
-      
-  * Alias names (for example INTERNAL\_VERSION\_COND\_200\_NO\_304\_OK) are non-canon and MUST NOT be used.
-
-
+  * Optional legacy-compatible registry name for this invariant, when a scoped compatibility need explicitly uses one: INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK.  
+  * Alias names (for example INTERNAL\_VERSION\_COND\_200\_NO\_304\_OK) are non-canon and MUST NOT be used.  
 * B) Headers  
-    
   * Cache-Control: no-store MUST be present.  
-      
   * Content-Type: application/json; charset=utf-8 MUST be present.  
-      
   * ETag MUST be absent.  
-      
   * Last-Modified MUST be absent.  
-      
-  * Header capture parsing note (non-blocking diagnostics). Raw header capture files may include non-header diagnostic lines (for example curl warnings). Any parser or reviewer MUST ignore lines that are not the HTTP status line or a Key: value header line. Presence of diagnostic lines is non-blocking as long as the required status line and required header predicates are satisfied.
-
-
+  * Header capture parsing note (non-blocking diagnostics). Raw header capture files may include non-header diagnostic lines (for example curl warnings). Any parser or reviewer MUST ignore lines that are not the HTTP status line or a Key: value header line. Presence of diagnostic lines is non-blocking as long as the required status line and required header predicates are satisfied.  
 * C) Body (identity payload)  
-    
   * Body MUST be fixed-schema JSON with exactly these keys (no extras): engine\_tag, build\_commit, invocation\_tag, invocation\_sha256, emitter\_sha256, release\_id.  
-      
   * Body bytes MUST satisfy the canon identity-bytes posture where applicable to the proof surface (canonical bytes, including LF termination).
 
 Token emission gating (no false OK) is listed below.
 
 * A tool MUST NOT emit any \*\_OK token unless the corresponding invariant has been verified against the same captured bytes that are being written as governed artifacts for that run.  
-    
 * If the run status is FAIL\_TOOLING (or equivalent), the tool MUST NOT emit \*\_OK tokens for invariants that did not pass.  
-    
 * The tool MUST NOT emit integrity success tokens (for example two-run identity success) unless those checks demonstrably passed on the produced artifacts.
 
 Coupling requirement (anti-mixed-target and anti-redirect drift) is listed below.
 
 * For each probe run, the emitted tokens, captured headers, captured body, and any two-run identity digest MUST refer to the same resolved target/response chain.  
-    
 * If coupling cannot be established, the run MUST fail and MUST NOT emit \*\_OK tokens.  
-    
 * When a coupling \+ two-run identity proof log is produced for /internal/version, it MUST be a governed artifact (single log) and must be index and mirror bound in the same PR.
 
 #### **3.5.2.7 A7 artifacts (when A7 is in scope; titles only)**
@@ -3285,27 +3058,17 @@ Coupling requirement (anti-mixed-target and anti-redirect drift) is listed below
 When A7 is in scope, the close PR MUST include the governed A7 artifacts (titles only):
 
 * Endpoint Catalog file \+ checksum:  
-    
   * docs/ENDPOINTS\_CATALOG.json  
-      
-  * docs/ENDPOINTS\_CATALOG.json.sha256
-
-
+  * docs/ENDPOINTS\_CATALOG.json.sha256  
 * Env-gate headers-only proof:  
-    
-  * artifacts/proofs/endpoints\_env\_gate\_proof.log
-
-
+  * artifacts/proofs/endpoints\_env\_gate\_proof.log  
 * Composite success proof JSON (records-only; PF12 schema-validated):  
-    
   * artifacts/proofs/reader\_success\_get\_head\_304.json
 
 Covers:
 
 * success headers for GET / HEAD / 304  
-    
 * writers and errors posture  
-    
 * encoding-invariance capture
 
 #### **3.5.2.8 Live QA via harness (required for epic closeout)**
@@ -3322,45 +3085,32 @@ Functional proof requirement (functional changes)
 If an epic changes a functional feature (runtime behavior, user-visible outputs, integration seams, or data flow), the Live QA plan MUST include at least one functional proof step that exercises the changed behavior in the harness and produces governed evidence. Static artifacts alone (schemas, diffs, logs without a proof step) are not sufficient.
 
 * This includes functional changes to CLI surfaces, adapter-to-engine behavior, engine-to-vendor calls, vendor-to-engine handling, and engine-to-user outputs.  
-    
 * If the epic touches the vendor seam, the plan MUST include at least one vendor-focused PO step that hits the seam and records observable outputs (request signature, response shape, and any user-visible outputs), without leaking secrets.  
-    
 * If strict closed-rails posture blocks functional proof, the plan MAY open rails explicitly as a bounded exception. The plan MUST name the rails opening, justify it, keep it minimal, and capture it in the evidence artifacts.  
-    
 * Evidence requirements for the proof step:  
-    
   * What was exercised (titles-only description of the functional path)  
-      
   * The command or endpoint identity used (and where it is defined)  
-      
   * The explicit PASS/FAIL predicate  
-      
   * Pointers to the primary evidence file(s)  
-      
-  * Rails posture (names-only) and any pins required for determinism
-
-
+  * Rails posture (names-only) and any pins required for determinism  
 * Exemption boundary: truly non-functional-only epics (docs, refactors with no behavior changes, schema-only updates with no runtime behavior changes) MAY omit functional proof, but the exemption MUST be explicitly justified and validated by the IG.
 
 Live QA plan exists (titles-only). The epic MUST have a Live QA plan (runbook) that specifies:
 
-* the QA harness invocation (for example \--epic \<id\> or equivalent)  
-    
+* the QA harness invocation (for example \--epic \\ or equivalent)  
 * closed-rails posture (env pins)  
-    
-* expected evidence under audit/qa/\<epic-id\>/checks/\<check\_id\>/ (stable check-scoped evidence; no per-run nesting, no run-id directories, and no operator-selected fresh-run root)
+* expected evidence under audit/qa/\\/checks/\\/ (stable check-scoped evidence; no per-run nesting, no run-id directories, and no operator-selected fresh-run root)
 
-If the epic claims QA Acceptance Tokens, the plan must name the QA ledger artifacts by path. This includes the token/evidence matrix location (titles-only semantics) and any other governed ledgers required for close.
+If the epic claims QA acceptance, the plan MUST name the applicable governed QA ledger artifacts by path and bind each governing acceptance criterion, check, exact candidate identity, and authorized verdict to its evidence. A token/evidence matrix is not required.
 
 Acceptance-map viability is a Close Gate input. If the Live QA harness produces an acceptance-map viability check, that check MUST be meaningful (not default-PASS) and MUST block epic closeout readiness when it fails; the harness run MUST surface that failure (including influencing the harness exit status) so Close Gate work does not proceed on a false PASS.
 
 Mandatory D0 Discovery artifact and QA RCA summary are present. The epic MUST satisfy the Live QA execution deliverables in §0.4.1:
 
 * a governed D0 Discovery artifact under the epic’s QA tree  
-    
 * a QA RCA and Doc Delta summary (as part of the close report or as a governed artifact referenced by it)
 
-Execution environment and venue materiality. Every governed Live QA execution MUST use an environment permitted by the governing Live QA Plan or applicable QA authority, execute the required governed harness, and produce governed, reproducible evidence under audit/qa/\<epic-id\>/checks/\<check\_id\>/ using the stable check-scoped layout.
+Execution environment and venue materiality. Every governed Live QA execution MUST use an environment permitted by the governing Live QA Plan or applicable QA authority, execute the required governed harness, and produce governed, reproducible evidence under audit/qa/\\/checks/\\/ using the stable check-scoped layout.
 
 GitHub Codespaces remains the canonical and preferred shared HDE QA console. Canonical and preferred do not mean exclusive or mandatory for every epic.
 
@@ -3388,26 +3138,24 @@ When venue is material, at least one governed artifact MUST bind the exact check
 
 A venue substitution is material only when venue is a proof axis, the substitution changes a material dependency, target, rails, network, secret, or runtime condition, or the governing plan forbids substitution for a supported reason. Otherwise, substitution is acceptable when the environment contract and every check predicate remain satisfied and the actual posture is recorded truthfully.
 
-Live QA evidence landing is PR-first and parity-clean. Live QA evidence MUST land under governed roots and follow the same-change-set evidence parity rule:
+Live QA evidence landing is route-aware and parity-clean. Live QA evidence MUST land under governed roots and follow the same-authorized-mutation-set evidence parity rule:
 
-* Live QA step artifacts under audit/qa/\<epic-id\>/checks/\<check\_id\>  
-* the index and mirror trio updates (Human Evidence Index, hash sentinel, Machine Mirror) in the same PR
+* Live QA step artifacts under audit/qa/\\/checks/\\  
+* the index and mirror trio updates (Human Evidence Index, hash sentinel, Machine Mirror) in the same authorized mutation set
 
-Live QA evidence may land either:
+Live QA evidence may land:
 
-* inside the epic close PR  
-    
-* in an evidence-only QA PR (see §0.7 and §4.5) that merges before the close PR
+* inside the epic close mutation set  
+* in an evidence-only QA PR (see §0.7 and §4.5) that merges before the close PR when the authorized route uses PRs  
+* through direct mutation of `main` only under an explicit current operator instruction covering that exact change, with the post-write SHA, diff, and applicable push-triggered CI result recorded
 
 Entrypoint regression test exists in CI (no governed evidence writing). Every entrypoint command documented in the Live QA plan MUST have a corresponding CI test that:
 
 * runs the entrypoint (or a logically equivalent variant) under the canonical env pins  
-    
 * asserts that the expected QA root layout and outputs are created and non-empty  
-    
 * fails if harness behavior regresses
 
-CI tests MUST NOT be treated as a source of governed evidence and MUST NOT require committing audit/qa/\<epic-id\>/\<SUBPATH\> outputs to the repo.
+CI tests MUST NOT be treated as a source of governed evidence and MUST NOT require committing audit/qa/\\/\\ outputs to the repo.
 
 No QA-only epics that only test themselves. QA-heavy epics must deliver shared value. If an epic’s QA work does not upgrade shared QA tools or harnesses and does not strengthen Live QA coverage across multiple existing surfaces, the PLAN/CRD MUST be returned as non-conforming and re-scoped before approval.
 
@@ -3416,21 +3164,13 @@ Close Gate check. The close PR MUST confirm that Live QA evidence exists under g
 Post-QA documentation drainage ordering (normative).
 
 * All required QA tasks, remediation loops, runtime-proof checks, and close-gate QA reviews MUST be completed before documentation drainage begins.  
-    
 * If a canon delta, checklist delta, guide delta, summary correction, or other documentation correction is known but not yet drained, PF10 is the controlling temporary source of truth for that item until drainage occurs.  
-    
 * Undrained documentation changes MUST NOT be used as blockers for finishing QA execution, issuing step verdicts, issuing epic QA closeout review, or deciding epic close posture, provided PF10 explicitly records the truth of what happened and the required QA proof is otherwise complete.  
-    
 * Allowed close blockers remain limited to QA truth and proof failures, including incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.  
-    
 * When a documentation mismatch or canon delta is found during QA or closeout, it MUST be recorded in PF10 as a follow-up, implementation gap, ADR note, or doc-delta item. It MUST NOT be converted into a pre-drain closure blocker solely because the destination PF document has not yet been updated.  
-    
 * Post-QA drain ordering is mandatory. Drainage into canon, checklist rows, guides, or other document homes occurs only after all QA tasks for the epic are complete.  
-    
 * This rule changes timing, not honesty requirements. PF10 MUST still state open doc deltas, remaining follow-ups, and any caveats plainly and explicitly.  
-    
 * Reviewers and closeout authors MUST NOT treat an undrained documentation delta by itself as proof that the epic is not ready. A not-ready posture is justified only when the undrained item also reveals a real QA truth or proof failure.  
-    
 * If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic MAY be recommended as ready for closeout even when undrained documentation deltas remain. Undrained documentation deltas alone do not justify a not-ready verdict.
 
 ### **3.5.3 Repo docs sweep (major epics)**
@@ -3440,11 +3180,8 @@ For major epics (for example, HDE-EPIC018), the close PR MUST also include a fin
 Brings top-level, non-canonical repo docs into alignment. This includes:
 
 * README.md  
-    
 * CHANGELOG.md  
-    
 * AGENTS.md  
-    
 * non-pfcanon files under docs/\*\*
 
 Any operator-facing command blocks in the swept docs MUST follow Copy/paste command safety (0.2 Policy and principles) and MUST be verified and truthy (no dead or misleading commands; default invocation matches CI for check scripts).
@@ -3454,9 +3191,7 @@ If the sweep edits acceptance artifacts or governed evidence wiring, re-run the 
 Brings older, epic-specific guidance into line with the current epic’s rails and acceptance outcomes, or clearly retires it. Examples include:
 
 * EPIC011 and EPIC017-only notes  
-    
 * Alpha and A7-only descriptions  
-    
 * outdated evidence practices
 
 Does not modify PF-Canon itself. The repo docs sweep MUST NOT modify any PF-Canon docs (for example files under docs/pfcanon/\*\*). PF-Canon remains the single home for normative rules; the repo docs sweep is strictly an implementation-level alignment.
@@ -3476,9 +3211,7 @@ The review SHOULD record a future repo-only audit, closeout audit checklist item
 Lives in the close PR. This repo docs sweep is part of the close-out tasks for such epics and is performed in the same close PR that carries:
 
 * the close-pack  
-    
 * the index and mirror trio  
-    
 * other close-out evidence
 
 ### **3.5.4 ADR block in the close-pack (all epics)**
@@ -3488,24 +3221,16 @@ The close PR MUST ensure that the epic’s close-pack includes a brief ADR block
 ADR scope constraints (anti-duplication) apply.
 
 * The ADR block MUST NOT restate or attempt to override existing PF-Canon (rails, acceptance tokens, evidence surfaces, or status semantics). If the topic is already governed, cite the governing PF-Canon doc instead.  
-    
 * If execution is blocked because PF-Canon is missing, ambiguous, or wrong, capture a Doc Delta requirement; ADR content is permitted only to document any temporary local stopgap decision pending canon update.
 
 At minimum, this ADR block MUST:
 
 * use neutral, titles-only references back to PF-Canon, for example:  
-    
   * Glow Infrastructure  
-      
   * HDE-CLI-API-Vendor-Ref  
-      
   * Glow QA Guide  
-      
-  * HDE Phased Epics
-
-
+  * HDE Phased Epics  
 * list each decision as a short item with:  
-    
   * a decision label (for example ADR — QA evidence root and directory casing)  
   * a one–two sentence statement of the decision  
   * the decision point or ambiguity being resolved  
@@ -3521,7 +3246,7 @@ No posture-only PASS. Posture-only / TOOLING\_BLOCKED checks MUST NOT be recorde
 
 Location. The ADR block lives in the close report:
 
-* audit/EPIC-\<ID\>\_close\_report.md
+* audit/EPIC-\\\_close\_report.md
 
 This ADR block is part of the epic’s permanent record. Follow-on epics and doc-only work can then use it to drive PF-Canon deltas.
 
@@ -3530,19 +3255,14 @@ This ADR block is part of the epic’s permanent record. Follow-on epics and doc
 Structural remediations that do not change engine behavior MUST be handled as explicit remediation PRs, not buried inside Live QA runs. Examples include:
 
 * directory casing normalization  
-    
 * path refactors  
-    
 * relocation of evidence files into governed roots
 
 Separate remediation PRs. Each remediation PR should:
 
 * be tracked by its own card or Build Notes addendum  
-    
 * be scoped narrowly to the remediation at hand  
-    
 * include a minimal evidence pointer block (paths only) that points to:  
-    
   * the remediation delta artifact(s) (patch diff, changed-files list, or equivalent)  
   * the post-remediation validation rerun output or receipt
 
@@ -3562,13 +3282,11 @@ A separate plan or Product Owner disposition is required when a new defect is in
 Close Gate responsibility. The Close Gate for the epic MUST confirm that:
 
 * any required remediation PRs have merged  
-    
 * the close-pack and Evidence Index and mirror reflect the post-remediation state
 
 Close-pack regeneration rule (no stale close-pack cuts). If any remediation run or remediation PR changes:
 
 * a step status (FAIL\_\* → PASS or similar)  
-    
 * any governed evidence that the close-pack summarizes or references
 
 then the close-pack artifacts MUST be regenerated after the remediation is complete so they represent the final closure cut.
@@ -3593,7 +3311,7 @@ Using a distinct remediation PR pattern keeps Live QA focused on behavior and ev
 
 ---
 
-# 4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)
+# **4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)**
 
 ## **4.1 Machine header**
 
@@ -3785,12 +3503,12 @@ Every issued plan replaces all placeholders, removes entries that are conditiona
 | Same-PR code, Doc Delta, and applicable evidence parity | Required | Required | Doc Delta remains required. Evidence-index, hash, mirror, and path-proof changes remain scope-sensitive; do not manufacture an index change when no governed proof or artifact changed. |
 | Revert concept | Required | Required | It is concrete and truthful for the slice. |
 | Full close report and close manifest | Prohibited as a generic prerequisite | Required | Close-only. An ordinary PR does not masquerade as the close PR by carrying a convenience copy. |
-| Final PASS roster and binary close decision | Prohibited as a generic prerequisite | Required | Close-only. |
+| Final exact-source acceptance record and binary close decision | Prohibited as a generic prerequisite | Required | Close-only; no PASS-token roster is required. |
 | Final Live QA closeout binding | Not required as final close proof | Required when current close rules require it | Earlier PRs may produce bounded proof without making a final close claim. |
 | Human Index, hash sentinel, and Machine Mirror update | Conditional | Required to the extent current close and changed-artifact rules require | Triggered by governed proof or artifact changes and current close requirements. |
 | Reader and A7 predicates | Conditional | Conditional | Include only when a governed Reader or A7 surface is in approved scope. |
 | Endpoint Catalog and environment-gate proof | Conditional | Conditional | Include only when the current owner requires them for the in-scope A7 surface. |
-| CLI-to-Reader parity | Conditional | Conditional | Include only when the paired surfaces or final close roster require it. |
+| CLI-to-Reader parity | Conditional | Conditional | Include only when the paired surfaces or the applicable governing close requirement require it. |
 | AB/BA identity | Conditional | Conditional | Include only where the owning composite contract requires order identity. |
 | Two-run identity | Conditional | Conditional | Include for an in-scope deterministic identity surface or when the final close contract requires it. |
 | Narrative policy | Conditional | Conditional | Include only when Aux or another governed narrative surface is in scope. |
@@ -3802,7 +3520,7 @@ Every issued plan replaces all placeholders, removes entries that are conditiona
 
 Each premerge\_evidence\_required entry records an exact identifier or artifact identity, applicability basis, assessment state, evidence pointer when assessed, and explicit nonclaim when it is unassessed or not applicable.
 
-The close report, close manifest, final PASS roster, binary close decision, and final Live QA closeout binding are close-only. Reader, A7, Endpoint Catalog, CLI parity, AB/BA identity, two-run identity, narrative, writer/error, logging, and evidence-index requirements are conditional under §4.1.1. The template copies a token name only when PF04-Canon-HDE-Governance establishes that exact name at artifact-authoring time. An unregistered requirement remains a plain obligation; it is not converted into a token-like alias.
+The close report, close manifest, final exact-source acceptance record, binary close decision, and final Live QA closeout binding are close-only. Reader, A7, Endpoint Catalog, CLI parity, AB/BA identity, two-run identity, narrative, writer/error, logging, and evidence-index requirements are conditional under §4.1.1. A future plan MAY copy one bounded legacy-compatible token only when native PF, ADR, epic, task, acceptance-criterion, test, PR, commit, workflow, or artifact identifiers cannot provide necessary traceability. An unregistered requirement remains a plain obligation and MUST NOT be represented as token-like acceptance authority.
 
 Assigned phased PF09 scope is binding for every code-bearing PR. Each assigned task and subtask is completed or is explicitly accounted for under the unresolved-assignment rule in §3.5.1.
 
@@ -3815,11 +3533,8 @@ PF23 consult is not a PR-review input. Do not consult PF23 or treat it as a bloc
 Verify that the PR contains:
 
 * the exact code-bearing slice and its Doc Delta;  
-    
 * the Human Evidence Index, its hash sentinel, the Machine Mirror, and path-proof companions only when changed governed evidence, changed governed artifacts, or the applicable close contract triggers those updates;  
-    
-* the close report, close manifest, final PASS roster, and close decision only when pr\_class is CLOSE\_CODE; and  
-    
+* the close report, close manifest, final exact-source acceptance record, and close decision only when pr\_class is CLOSE\_CODE; no final PASS-token roster is required; and  
 * every feature-conditioned predicate and proof required by the approved scope, using only current owner-established identities.
 
 Wait for the Lead Dev gate review. On a supported PASS, the Product Owner alone performs any squash merge and then notifies the Scrum Master.
@@ -3848,27 +3563,23 @@ For PRs whose sole purpose is to verify evidence and transport posture without c
 
 Paste this as the PR body and fill in:
 
-### Evidence-only QA — \<short scope\> (EPIC-\<ID\> QA)
+### **Evidence-only QA — \\ (EPIC-\\ QA)**
 
-### Summary
+### **Summary**
 
-* Purpose: \<one paragraph describing what is being verified and why\>  
-    
+* Purpose: \\  
 * Scope: evidence-only; no production code changes  
-    
 * Determinism pins set for all determinism-sensitive captures and CI: LC\_ALL=C, LANG=C, TZ=UTC
 
-### Artifacts included (titles and repo-relative paths only)
+### **Artifacts included (titles and repo-relative paths only)**
 
-#### Indexes (must update in the same PR)
+#### **Indexes (must update in the same PR)**
 
 * Evidence Index (human) — docs/evidence/INDEX.json  
-    
 * Evidence Index hash sentinel — docs/evidence/INDEX.sha256  
-    
 * Machine Evidence Index (JSONL) — artifacts/evidence\_index.jsonl (+ artifacts/evidence\_index.jsonl.sha256)
 
-#### Endpoint Catalog (A7 proof surface; Catalog-only)
+#### **Endpoint Catalog (A7 proof surface; Catalog-only)**
 
 * Catalog file (records-only) — docs/ENDPOINTS\_CATALOG.json  
 * Catalog checksum — docs/ENDPOINTS\_CATALOG.json.sha256  
@@ -3881,124 +3592,74 @@ Paste this as the PR body and fill in:
 * Endpoint Catalog snapshot (titles-only) — artifacts/reader/endpoints\_snapshot.json  
 * Env-gate proof (headers-only) — artifacts/proofs/endpoints\_env\_gate\_proof.log
 
-#### A7 proofs on a cataloged JSON success route (headers-only)
+#### **A7 proofs on a cataloged JSON success route (headers-only)**
 
 Note: If these proof artifacts are generated by tests, artifact emission MUST be gated behind an explicit flag (for example HDE\_WRITE\_A7\_PROOFS) so default test runs do not write files.
 
 * GET (200) — artifacts/proofs/success\_get.txt  
-    
 * HEAD (200) — artifacts/proofs/success\_head.txt  
-    
 * 304 — artifacts/proofs/success\_304.txt  
-    
 * Writers/errors posture — artifacts/proofs/success\_writers\_errors.txt  
-    
 * Encoding-invariance — artifacts/proofs/success\_encoding\_invariance.txt  
-    
 * Composite success proof JSON — artifacts/proofs/reader\_success\_get\_head\_304.json  
-  (records-only; validated against PF12 composite proof schema)
-
-  #### Ops — rails refusal proof (closed-rails)
-
-* Refusal probe capture — artifacts/proofs/ops\_refusal\_proof.txt
-
-  #### Ops — /internal/version coupling proof (if in scope)
-
+  (records-only; validated against PF12 composite proof schema)  
+  **Ops — rails refusal proof (closed-rails)**  
+* Refusal probe capture — artifacts/proofs/ops\_refusal\_proof.txt  
+  **Ops — /internal/version coupling proof (if in scope)**  
 * /internal/version two-run identity \+ coupling proof — artifacts/ops/internal\_version/two\_run\_identity.log
 
-Note: single governed log artifact; bound under existing /internal/version token set; indexed \+ mirrored in the same PR when produced/updated.
+Note: single governed log artifact; bound to the applicable governing requirements and evidence identity; indexed \+ mirrored in the same authorized mutation set when produced or updated. An existing token ID may appear only as optional historical compatibility metadata.
 
 Note: headers → blank line → LF-terminated numeric-free JSON body; titles-only routing to HDE-Governance for policy/tokens and HDE-Schemas & Artifacts for indexing/mirror rules.
 
-#### CLI / Reader parity & determinism
+#### **CLI / Reader parity & determinism**
 
 * CLI parity set (AB/BA/summary) — artifacts/cli/ab.json; artifacts/cli/ba.json; artifacts/cli/summary.json  
-    
 * Reader vs CLI parity diff (expected empty) — artifacts/cli/showcompat/reader\_vs\_cli.diff  
-    
 * CLI showcompat stdout (LF-terminated; non-empty) — artifacts/cli/showcompat/stdout.json  
-    
 * CLI two-run identity log — artifacts/cli/showcompat/two\_run\_identity.log  
-    
-* Preimage recompute log — artifacts/cli/showcompat/preimage\_recompute.log
-
-  #### DB evidence (if in scope)
-
+* Preimage recompute log — artifacts/cli/showcompat/preimage\_recompute.log  
+  **DB evidence (if in scope)**  
 * DDL fingerprint — artifacts/db/ddl\_fingerprint.json  
-    
 * Grants snapshot — artifacts/db/grants.txt  
-    
 * Schema/search\_path echo — artifacts/db/check\_schema.txt  
-    
 * Connection env selection proof — artifacts/db/conn\_env\_selection.log  
-    
 * Dev connectivity snapshot (PF10-A) — artifacts/runtime/env\_connectivity.snapshot.json
 
-  ### PASS tokens (check what applies)
+### **Exact-source QA evidence (check what applies)**
 
-  #### Index/mirror gates (same PR)
+#### **Candidate and scope**
 
-* PR opened and exact slice identity verified (process check; not an acceptance token)  
-    
-* DOC\_DELTA\_PRESENT\_OK  
-    
-* EVIDENCE\_INDEX\_UPDATED\_OK  
-    
-* EVIDENCE\_INDEX\_HASH\_OK  
-    
-* MACHINE\_MIRROR\_UPDATED\_OK
+* Repository and exact candidate SHA  
+* PR number and exact head SHA when a PR is used  
+* QA scope and governing acceptance criteria
 
-  #### Determinism & parity
+#### **Relied-upon checks and results**
 
-* CLI\_READER\_PARITY\_OK  
-    
-* TWO\_RUN\_IDENTITY\_OK
+* Applicable workflow, run, exact tested SHA, conclusion, and check set  
+* Tests, checks, commands, fixtures, configurations, or governed evidence relied upon  
+* Applicable results and failures
 
-  #### A7 (Catalog-only)
+#### **Governed evidence**
 
-* ENDPOINTS\_CATALOG\_OK  
-    
-* ENDPOINTS\_CATALOG\_INTERNAL\_OK  
-    
-* A7\_GET\_QUOTED\_ETAG\_OK  
-    
-* A7\_HEAD\_PARITY\_OK  
-    
-* A7\_304\_OMITS\_CT\_CL\_OK  
-    
-* A7\_VARY\_AUTH\_AE\_OK  
-    
-* A7\_ENCODING\_INVARIANCE\_OK  
-    
-* A7\_TRANSPORT\_PROOF\_OK
+* Exact governed artifact paths and SHA-256 digests when integrity is material  
+* Required manifests, indexes, mirrors, path proofs, tool versions, and configuration references  
+* QA decision-maker, decision time, limitations, exclusions, waivers, and unresolved conditions
 
-  #### Writers/errors posture
+#### **Close-pack (when this mutation set carries epic closeout)**
 
-* Writer and error posture verified against current owning requirements; claim only registry-valid tokens with direct semantic-fit evidence
+* Close-pack baseline present — audit/EPIC-\\\_close\_report.md; audit/EPIC-\\\_MANIFEST.json
 
-  #### QA process (branches)
+A complete token roster or token/evidence matrix is not required. An existing token ID MAY appear as optional compatibility metadata only when it is accurate for its original or explicitly bounded scope.
 
-* QA\_EVIDENCE\_ONLY\_OK  
-    
-* QA\_CI\_DIFF\_SCOPED\_OK
-
-  #### Close-pack (use N/A for QA if not an epic close)
-
-* Close-pack baseline present (non-token) — audit/EPIC-\<ID\>\_close\_report.md; audit/EPIC-\<ID\>\_MANIFEST.json
-
-  ### Human↔Machine parity checks
+### **Human↔Machine parity checks**
 
 * 1:1 parity between Human Evidence Index entries and Machine Mirror records  
-    
 * Mirror JSONL is canonical: UTF-8, compact, exactly one LF; ASCII field order; sort-before-write; single mirror file  
-    
 * Unknown keys rejected in mirror schema  
-    
 * Each record has discovered\_physical\_path and proof\_anchor to a path-proof stored with the artifact  
-    
-* All listed paths exist and are repo-relative; governed locations only (audit/**, artifacts/**, docs/\*\*)
-
-  #### Diff-scoped CI status at time of landing
+* All listed paths exist and are repo-relative; governed locations only (audit/**, artifacts/**, docs/\*\*)  
+  **Diff-scoped CI status at time of landing**
 
 catalog\_schema: pass|fail  
 domain\_closure: pass|fail  
@@ -4009,40 +3670,26 @@ mirror\_schema: pass|fail \# CI\_CHECK\_MIRROR\_SCHEMA\_OK
 final\_lf: pass|fail \# CI\_CHECK\_FINAL\_LF\_OK  
 env\_pins: pass|fail \# LC\_ALL=C, LANG=C, TZ=UTC
 
-#### Reviewer checklist
+#### **Reviewer checklist**
 
 * A7 proofs run only on a cataloged JSON success route (not /internal/version)  
-    
 * Catalog file \+ .sha256 present; env-gate proof captured  
-    
 * GET, HEAD, and 304 captured; 304 omits both Content-Type and Content-Length  
-    
 * Vary: Authorization, Accept-Encoding present on success route  
-    
 * Encoding-invariance of identity (ETag) and effective length proven  
-    
 * Composite success proof JSON present and schema-validated (PF12)  
-    
 * Writers are no-store; error responses have Content-Type: application/json; charset=utf-8 and no ETag  
-    
 * Reader and CLI share a single emitter and produce byte-equal bodies for identical inputs  
-    
 * Two-run identity holds for body and ETag  
-    
 * Evidence Index and hash sentinel updated in this same PR  
-    
-* Machine mirror updated in this same PR and passes schema checks (records-only, unknown-key reject, ASCII order, sort-before-write, single file)
-
-  #### Notes
+* Machine mirror updated in this same PR and passes schema checks (records-only, unknown-key reject, ASCII order, sort-before-write, single file)  
+  **Notes**
 
 Cross-doc references (titles only):
 
 * Governance and A7 policy — HDE-Governance  
-    
 * Evidence mirror and artifacts — HDE-Schemas & Artifacts  
-    
 * CLI and Reader contract — HDE-CLI-API-Vendor-Ref  
-    
 * Math and serializer rules — HDE-Math-Spec
 
 ## **4.6 PR review pack template — provenance, diff review, RCA, and pass proof**
@@ -4052,36 +3699,22 @@ Use this template for PRs that require reviewer-facing analysis (remediation seq
 Rules:
 
 * Titles-only cross-doc references (no version numbers in prose).  
-    
 * Repo-relative paths only.  
-    
 * For each non-obvious claim, include:  
-    
-  * Source: \<where the claim originates\>  
-      
-  * Evidence pointer: \<where the supporting evidence can be found\>
-
-
+  * Source: \\  
+  * Evidence pointer: \\  
 * If the PR has multiple attempts or remediations, Provenance, RCA, and Requirement Satisfaction Crosswalk are REQUIRED.  
-    
 * Doc Deltas is ALWAYS INCLUDED (PF-Canon only).  
-    
 * Evidence Print is REQUIRED.  
-    
 * Full-gate first pass is required. Before issuing the first approval decision on the artifact, apply the full active review gate set to the full artifact, not a partial subset.  
-    
 * After the first review on a given artifact line, do not introduce a new blocker from unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior read failure or truncation prevented full visibility.  
-    
 * Any blocker or caveat raised against unchanged text MUST state the trigger that makes it newly raisable.
 
 For close-pack or acceptance-ledger remediation sequences, the review MUST distinguish all of the following separately:
 
 * canonical file existence  
-    
 * content completeness of the acceptance ledger  
-    
 * truthfulness of any claimed write or check workflow  
-    
 * chronology freshness of changed governed companions
 
 An acceptance-ledger slice is not satisfied merely because the acceptance map, token-evidence matrix, or viability log exists. If the reviewed outcome binds only a reduced global subset when the approved slice depends on reused proof families, the review MUST mark that requirement as not yet satisfied until the binding model is expanded or the missing families are explicitly handled as non-claims.
@@ -4094,35 +3727,34 @@ When a review uses Codex Audit observed evidence, the review MUST label it as pl
 
 If a review identifies a remaining canon delta whose correct home is another PF document, the review pack MUST route that delta to the correct home and MUST NOT silently convert it into a PF06 process delta.
 
-### **PR Review Pack — \<PR ID\> (EPIC-\<ID\>)**
+### **PR Review Pack — \\ (EPIC-\\)**
 
 Fill the sections below. Use DR-\#\#\#, F-\#\#\#, and RCA-\#\#\# numbering as needed.
 
 ### **Review Summary**
 
-* Purpose: \<what this PR changes and why\>  
-    
-* Scope: \<what is in scope and what is explicitly out of scope\>  
-    
-* Current state: \<PASS | Non-passing | Remediation required\>  
-    
-* Scope drift check: \<call out any cross-epic or tooling changes and justify them\>  
-    
-* Key risks: \<list residual risks that remain after this PR\>
+* Repository: \\  
+* Base SHA: \\  
+* Reviewed candidate SHA: \\  
+* PR and review record: \\  
+* Relied-upon CI and checks: \\  
+* Purpose: \\  
+* Scope: \\  
+* Current state: \\  
+* Scope drift check: \\  
+* Key risks: \\
 
 ### **Provenance (REQUIRED for remediation sequences)**
 
-* Provenance lineage: \<Original → Remediation 1 → Remediation 2 → Remediation 3\>  
-    
+* Provenance lineage: \\  
 * Attempt record (repeat per attempt):  
-    
-  * Attempt label: \<Attempt 0 | Remediation 1 | Remediation 2 | Remediation 3\>  
-  * Change summary: \<what changed in this attempt\>  
-  * CI status summary: \<PASS/FAIL, and what failed if not PASS\>  
-  * Tests run summary: \<what was run and why it is the right suite\>  
-  * Evidence artifacts changed: \<what artifacts were created or updated\>  
-  * Source: \<Implementation Plan section or other governing input\>  
-  * Evidence pointer: \<PR comment, commit, diff hunk, artifact path\>  
+  * Attempt label: \\  
+  * Change summary: \\  
+  * CI status summary: \\  
+  * Tests run summary: \\  
+  * Evidence artifacts changed: \\  
+  * Source: \\  
+  * Evidence pointer: \\  
   * Net-effective shipped state (required for remediation sequences): after listing attempts, add a short block that states what remains in the final combined outcome after the last remediation. If the review depends on a combined Original plus Remedial result, say so explicitly.  
   * Reversed or canceled drift: if an earlier attempt introduced risky or out-of-scope changes that were later undone, name them and state plainly that they do not remain in the final shipped change-set.  
   * Final approval basis: state which requirements were already satisfied before remediation, which blocker or blockers were resolved later, and why the final review is based on the combined outcome rather than on any single intermediate attempt.  
@@ -4136,40 +3768,26 @@ Fill the sections below. Use DR-\#\#\#, F-\#\#\#, and RCA-\#\#\# numbering as ne
 
 DR-001
 
-* Change summary: \<one change\>  
-    
-* Risk assessment: \<Low | Medium | High\>  
-    
-* Why it matters: \<why a reviewer should care\>  
-    
-* Evidence pointer: \<diff path and hunk; preserve \+ and \- markers if quoting a diff\>  
-    
-* Canon basis: \<CANON ALIGNED | CANON SILENCE | CANON GAP | CANON CONFLICT | NOT ASSESSED\>  
-    
-* Approved Plan linkage: \<approved plan section heading or acceptance token names\>
+* Change summary: \\  
+* Risk assessment: \\  
+* Why it matters: \\  
+* Evidence pointer: \\  
+* Canon basis: \\  
+* Approved Plan linkage: \\
 
 Repeat DR-\#\#\# as needed.
 
 Common DR checks (Lead Dev gate):
 
 * File-list integrity: if the PR review pack includes a "File list:" section, every listed repo path MUST appear as a changed path in the PR diff, unless it is explicitly labeled as non-diff evidence (CI log URL) or as a runtime-generated artifact that is not committed.  
-    
 * Duplicate patch blocks: if the PR diff contains duplicate `diff --git` blocks for the same path, treat this as a packaging or review artifact error and resolve it before approval.  
-    
 * Intermediate vs final posture: when a review bundle contains an early risky hunk and a later corrective hunk for the same logical area, reviewers MUST call out both and MUST state which hunk reflects the final shipped posture.  
-    
 * Scoped proof lane guard: a PR may introduce a narrow closure lane or scoped assertion set only if the main lane retains the broader fail-closed safeguards it previously carried. Dropping those safeguards without an explicit approved scope change is a blocker.  
-    
 * Duplicate diff distinction: duplicate `diff --git` blocks in the actual PR diff remain a packaging error and must be resolved before approval. Duplicate diff excerpts inside the review bundle, when they refer to the same already-reviewed patch and do not correspond to extra changed paths, are a reviewability caveat and MUST NOT be counted as additional shipped behavior.  
-    
 * Output-claim integrity: if the PR review pack enumerates expected outputs, verify that committed outputs have corresponding diffs and that runtime-only outputs are labeled as such.  
-    
 * Positive installability proof: when a PR claims shipped installability, entrypoint readiness, or console or module availability, the review MUST prefer positive proof of the shipped entrypoint or module path. Skipped or negative placeholder artifacts do not satisfy that claim unless the approved plan explicitly allows a non-installability posture.  
-    
 * Fail-closed entrypoint posture: if the claimed shipped entrypoint is missing during proof generation, the proof MUST fail closed or report the missing entrypoint as a blocker. It MUST NOT silently downgrade the artifact to a pseudo-pass.  
-    
 * Ambient environment guard: installability or conformance proof MUST NOT depend on ambient host PATH or other unstated shell state. The generator or captured commands MUST pin or derive the environment they rely on, and the review pack MUST state what path or env basis the proof used.  
-    
 * Single-source proof metadata: when a PR emits installability, help, version, or entrypoint metadata in more than one artifact, the review MUST verify those artifacts agree or identify which artifact is authoritative. Duplicate or conflicting proof metadata is a blocker until reconciled.
 
 ### **Findings**
@@ -4177,21 +3795,13 @@ Common DR checks (Lead Dev gate):
 F-001
 
 * Observed: state what was observed.  
-    
 * Why it matters: state why it matters.  
-    
 * Source: state where the observation originates.  
-    
 * Evidence pointer: state the diff hunk, log, test output, or artifact path.  
-    
 * Review provenance: state exactly one of Introduced by current revision, Previously raised and still unresolved, or Review Drift.  
-    
 * Trigger if based on unchanged text: state the trigger that makes the issue newly raisable, or state Not applicable.  
-    
 * Impacted PF09 task ID(s), if proven: list only task IDs directly supported by this finding, or state No proven PF09 impact.  
-    
 * Impacted PF09 subtask ID(s), if proven: list only subtasks directly supported by this finding, or state No proven PF09 impact.  
-    
 * Supported PF09 status posture: when the finding supports a PF09 status move, state the exact posture supported by this finding. Otherwise state No proven PF09 impact.
 
 Repeat F-\#\#\# as needed.
@@ -4200,17 +3810,12 @@ Repeat F-\#\#\# as needed.
 
 RCA-001
 
-* A) Failure statement: \<quote the failure as it appeared\>  
-    
-* B) Where it occurred: \<attempt number and context\>  
-    
-* C) Root cause: \<what actually caused it\>  
-    
-* D) Fix progression: \<what changed across attempts to resolve it\>  
-    
-* E) Fix verification: \<how the fix was proven\>  
-    
-* Residual risk: \<what remains, and why it is acceptable or what follow-up is needed\>
+* A) Failure statement: \\  
+* B) Where it occurred: \\  
+* C) Root cause: \\  
+* D) Fix progression: \\  
+* E) Fix verification: \\  
+* Residual risk: \\
 
 Common RCA checks:
 
@@ -4250,22 +3855,17 @@ Common RCA checks:
 
 ### **Requirement Satisfaction Crosswalk (REQUIRED for remediation sequences)**
 
-* Requirement: \<requirement label and short statement\>  
-    
-* Status by attempt: \<Attempt 0: FAIL | Remediation 1: PARTIAL | Remediation 2: PASS\>  
-    
-* Evidence pointer: \<where the requirement is proven\>
+* Requirement: \\  
+* Status by attempt: \\  
+* Evidence pointer: \\
 
 Repeat per requirement.
 
 For remediation sequences, each requirement row SHOULD also record:
 
 * Original or earlier blocking state: summarize the state before the successful remediation.  
-    
 * Remediation change that addresses it: identify the later change that resolves the blocker.  
-    
 * Current status after remediation: state whether the requirement is Satisfied, Not satisfied, or still mixed after the final attempt.  
-    
 * Notes: record any earlier drift or intermediate change that was reversed and therefore does not remain in the final shipped state.
 
 ### **PF09 Impact & Status Posture (include when the PR review is used to support PF09 closeout)**
@@ -4289,15 +3889,11 @@ For remediation sequences, each requirement row SHOULD also record:
 
 ### **Doc Deltas (PF-Canon only; ALWAYS INCLUDED)**
 
-* Doc: \<PF doc title\>  
-    
-* Section: \<section heading\>  
-    
-* Delta summary: \<what should change\>  
-    
-* Rationale: \<why the doc needs this change\>  
-    
-* Evidence pointer: \<where the supporting evidence can be found\>
+* Doc: \\  
+* Section: \\  
+* Delta summary: \\  
+* Rationale: \\  
+* Evidence pointer: \\
 
 Repeat per delta.
 
@@ -4316,55 +3912,42 @@ If the CHG item supports a PF09 status action, include exact phased PF09 documen
 
 If canon basis is CANON GAP or CANON CONFLICT, do not silently convert the issue into implementation scope. Route it as a Doc Delta or PO adjudication item unless the approved task explicitly includes that work.
 
-### **Evidence Print (REQUIRED; PASS PROOF)**
+### **Evidence Print (REQUIRED; EXACT-SOURCE PASS PROOF)**
 
-A) Tokens satisfied (names-only; do not invent)
+A) Exact-source acceptance evidence
 
-* \<TOKEN\_NAME\_1\>  
-    
-* \<TOKEN\_NAME\_2\>
+* Repository: \\  
+* PR: \\  
+* Base SHA: \\  
+* Reviewed or tested candidate SHA: \\  
+* Merge and post-merge `main` SHA: \\  
+* Relied-upon CI: \\  
+* QA or approval decision: \\
 
-If no PASS tokens are claimed by name in this PR artifact, state: No PASS tokens claimed by name in this PR artifact.
+A complete token roster or token/evidence matrix is not required. An existing token ID MAY appear only as optional compatibility metadata when it remains accurate for its original or explicitly bounded scope.
 
-When no PASS tokens are claimed by name, the review pack MUST:
-
-* record the search method used to confirm that no token names are claimed in the PR artifact  
-    
-* state that the PR is proved through concrete tests/checks and governed artifact evidence rather than through named token claims  
-    
-* add an Acceptance coverage evidence subsection that groups the core requirement labels, the evidence pointers that prove satisfaction, and the key proof facts for the whole PR outcome
-
-A1) Acceptance coverage evidence (required for remediation sequences; recommended whenever the review supports PF09 closeout even if tokens are claimed)
+A1) Acceptance coverage evidence (required for remediation sequences; recommended whenever the review supports PF09 closeout)
 
 * Requirement label: state the core requirement or closure claim being proved.  
-    
 * Evidence pointer(s): point to the exact diff, artifact, test, or review line that proves the requirement.  
-    
 * Key proof facts: quote the minimal facts that show the requirement is satisfied in the final reviewed outcome.  
-    
 * Final posture: state whether the requirement is Satisfied, Not satisfied, or Mixed in the final combined outcome.
 
 B) Evidence artifacts produced or updated (repo-relative paths)
 
-* Path: \<path\>  
-    
-* Type: \<what the artifact is\>  
-    
-* Key proof facts: \<what the artifact proves\>  
-    
-* sha256: \<sha256 if applicable\>  
-    
-* Evidence pointer: \<where to find the artifact in the PR\>
+* Path: \\  
+* Type: \\  
+* Key proof facts: \\  
+* sha256: \\  
+* Evidence pointer: \\
 
 Repeat per artifact.
 
 C) Test and CI proof
 
-* Command: \<exact command\>  
-    
-* Pass indicator: \<what “PASS” looked like\>  
-    
-* Evidence pointer: \<where the output is recorded\>
+* Command: \\  
+* Pass indicator: \\  
+* Evidence pointer: \\
 
 Evidence hygiene: if you cite multiple runs, keep pass counts and durations consistent, or label them explicitly as distinct runs.
 
@@ -4373,23 +3956,14 @@ D) PR analysis routing (titles only)
 When adjudicating PR correctness, route claims to the owning PF homes (titles only) and do not use PF23 as a PR-review input:
 
 * Governance and tokens — HDE-Governance  
-    
 * QA posture and acceptance — Glow QA Guide  
-    
 * CLI and Reader contract — HDE-CLI-API-Vendor-Ref  
-    
 * Schema and artifact rules — HDE-Schemas & Artifacts  
-    
 * Build workflow and checks — HDE-Build Checklist  
-    
 * Mechanics and semantics — HDE-Mechanics Guide  
-    
 * Architecture and system boundaries — HDE-Architecture  
-    
 * Infra and environments — Glow Infrastructure  
-    
 * Math and serializer rules — HDE-Math-Spec  
-    
 * Epic delivery process — Epic Process Guide
 
 ## **4.7 PR review pack template — docs-only PR (Lead Dev gate)**
@@ -4402,50 +3976,38 @@ Rules:
 
 * Docs-only does not mean evidence-free. If the docs assert contract or behavior (CLI semantics, tokens, governed artifacts, evidence routes), the review pack MUST cite the evidence basis (canon pointer, governed artifact, or new test/proof output).  
   If no CI or test proof is present in the PR bundle, the review pack MUST state that verification was diff-only and record the search method used to look for pass indicators.  
-    
 * "Verified locally" statements MUST be paired with an evidence pointer to captured output (CI log URL or committed evidence artifact). For CLI help checks (example: `hdctl showcompat --help`), include an excerpt and pointer in the Evidence Print.  
-    
 * Docs-only PRs that change docs MUST include a recorded docs-lint or markdown validation proof (CI log URL or committed evidence artifact). If such tooling does not exist, record the gap as a repo issue and treat it as a blocker or as an explicit closure override (with rationale).  
-    
 * Full-gate first pass is required. Before issuing the first approval decision on the artifact, apply the full active review gate set to the full artifact, not a partial subset.  
-    
 * After the first review on a given artifact line, do not introduce a new blocker from unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior read failure or truncation prevented full visibility.  
-    
 * Any blocker or caveat raised against unchanged text MUST state the trigger that makes it newly raisable.
 
 Template:
 
 ### **Review Summary (required)**
 
-* Scope: \<what docs changed, and why\>  
-    
-* Claim surfaces impacted: \<CLI behavior, tokens, governed artifacts, evidence index or mirror semantics, QA harness behavior\>  
-    
-* Risk assessment: \<Low | Medium | High\> (docs-correctness drift is the default risk)  
-    
+* Scope: \\  
+* Claim surfaces impacted: \\  
+* Risk assessment: \\ (docs-correctness drift is the default risk)  
 * Verification posture:  
-    
-  * Evidence-backed via canon pointer: \<title-only pointer(s)\>  
-      
-  * Evidence-backed via governed artifact: \<repo-relative path(s)\>  
-      
-  * Evidence-backed via new proof in this PR: \<what was run, and where the output is recorded\>  
-      
-  * Diff-only: \<explicitly state that no CI/test output was captured in the PR bundle\>
+  * Evidence-backed via canon pointer: \\  
+  * Evidence-backed via governed artifact: \\  
+  * Evidence-backed via new proof in this PR: \\  
+  * Diff-only: \\
 
 ### **Diff Review (required)**
 
 DR-001
 
-Change summary: \<what changed\>
+Change summary: \\
 
-Risk assessment: \<Low | Medium | High\>
+Risk assessment: \\
 
-Why it matters: \<what could be wrong if this is wrong\>
+Why it matters: \\
 
-Evidence pointer: \<diff hunk or file path; cite existing governed evidence if available\>
+Evidence pointer: \\
 
-Approved Plan linkage: \<if applicable\>
+Approved Plan linkage: \\
 
 \[Repeat DR-00N as needed\]
 
@@ -4455,55 +4017,57 @@ Approved Plan linkage: \<if applicable\>
 * For each blocker or caveat, state review provenance using exactly one of Introduced by current revision, Previously raised and still unresolved, or Review Drift.  
 * If a blocker or caveat is raised against unchanged text, state the trigger that makes it newly raisable. Otherwise state Not applicable.
 
-### **Evidence Print (PASS PROOF; required)**
+### **Evidence Print (EXACT-SOURCE PASS PROOF; required)**
 
-A) Tokens satisfied (names-only; do not invent):
+A) Exact-source evidence:
 
-* \<None explicitly claimed as satisfied in PR artifacts\> or \<TokenName\_1\>, \<TokenName\_2\>
+* Repository and exact candidate SHA  
+* exact changed documentation paths and diff  
+* governing PF, ADR, requirement, or contract identities  
+* applicable validation or workflow result against the exact candidate  
+* semantic-impact analysis when canon, requirements, schemas, contracts, or interpretation changed  
+* authorized review or acceptance decision, scope, decision-maker, time, and limitations
+
+No token claim or token/evidence matrix is required. One bounded legacy-compatible token MAY appear only when native identifiers cannot provide the necessary traceability.
 
 B) Evidence artifacts produced or updated:
 
-* Docs changed (repo-relative): \<list paths\>  
-    
-* Canon pointers used (title-only): \<list\>  
-    
-* Governed evidence paths cited: \<list\>
+* Docs changed (repo-relative): \\  
+* Canon pointers used (title-only): \\  
+* Governed evidence paths cited: \\
 
 Key proof facts:
 
-* \<Bullet the facts that are actually supported by the cited evidence\>
+* \\
 
 C) Test and CI proof:
 
 * If present, list the concrete CI or test outputs captured in the PR bundle (or governed evidence paths).  
-    
 * If not present, record the verification limit:  
-    
   * Verification posture: Diff-only (no captured CI/test output in PR bundle)  
-      
   * Search method (example format):  
-      
     * Searched PR artifacts for pass-indicator strings: "passed", "exit 0"  
-        
-    * Result: \<0 hits | N hits\> (include the string set and scope you searched)
+    * Result: \\\<0 hits | N hits\\\> (include the string set and scope you searched)
 
 Decision:
 
 * PASS | PASS WITH CAVEATS | FAIL / BLOCKERS
 
-# 5\) Quick reference: where code exchange is allowed
+# **5\) Quick reference: where code exchange is allowed**
 
 Plan and CRD. Propose/refine code-capsules.
 
 Implementation Plan (IP). Finalize the capsule list; package verbatim components/schemas for CodEx. After IP approval, capsules become immutable. CodEx may apply scoped fixes but must record every change in the Detailed Change Report.
 
-Build. IA provides instructions \+ verbatim materials. CodEx can read PF docs. Even so, paste execution-critical material verbatim to keep an unambiguous in-session reference (formats, schemas, exact token names, commands, and artifact paths).
+Build. IA provides instructions \+ verbatim materials. CodEx can read PF docs. Even so, paste execution-critical formats, schemas, stable requirement IDs, commands, and artifact paths verbatim to keep an unambiguous in-session reference.
 
-PR & Commit. CodEx opens the PR automatically; no new code exchange beyond what CodEx built. PO performs squash merge after Lead Dev gate passes.
+Mutation. The normal code-bearing route is a CodEx-opened PR. The Product Owner MAY explicitly authorize direct-to-`main` mutation for the exact change. Agent direct-main permission MUST NOT be inferred. Record the exact candidate and repository identities for either route.
 
-Escalation. PO may direct CodEx to inspect code/processes at any time. IA keeps docs synchronized (Doc-Delta \+ indices).
+Repository adoption. For a PR, the Product Owner alone performs any supported squash merge. For direct-main, record the exact post-write SHA, diff, and applicable push-triggered CI result. Neither route establishes QA PASS, acceptance, or closure by itself.
 
-# 6\) PHASE EXIT DISCIPLINE (ALCHEMICAL PHASES)
+Escalation. PO may direct CodEx to inspect code or processes at any time. IA keeps docs and applicable evidence companions synchronized in the authorized mutation set.
+
+# **6\) PHASE EXIT DISCIPLINE (ALCHEMICAL PHASES)**
 
 This section defines how the Product Owner and Lead Developer decide that an alchemical phase is ready to exit for planning purposes.
 
@@ -4514,7 +4078,6 @@ It does not redefine what the phases are; that remains in Glow Development Philo
 Use this section whenever the PO and Lead Dev are asking:
 
 * “Are we done enough with this phase to move the next epics into the next phase?”  
-    
 * “Can we stop opening new epics tagged with this phase and carry the remaining work forward as debt?”
 
 If the checks below cannot be evaluated from PF-Canon and governed evidence, the phase exit decision is blocked-by-spec, per §0.6.5. Do not treat gut feel or informal summaries as sufficient.
@@ -4524,11 +4087,8 @@ If the checks below cannot be evaluated from PF-Canon and governed evidence, the
 Before declaring a phase exit-ready, the Product Owner and Lead Developer MUST perform a canon inventory, exactly as in §1.1.1, with explicit attention to:
 
 * the applicable PF09.1 through PF09.7 phased HDE Build Checklist document: exact phase tasks, task and subtask identities, dependencies, Notes, and current recorded statuses;  
-    
 * the current plan and current development board: current intended work, exact epic or card state, ownership, dependencies, carried work, and unresolved scope;  
-    
 * PF20-Reference-HDE-Phased Epics only for historical epic and closure context, never as the current planning, status, rescope, or phase-exit owner; and  
-    
 * PF12-Canon-HDE-Schemas-and-Artifacts plus the applicable PF09 document for the Human Evidence Index, Machine Mirror, close packs, and governed roots.
 
 The current common PF09 status values are Done, Partial, Not done, Consolidation pending, and Optional. PF09.5 also contains the phase-specific literal Pending Revalidation after declaring its list exclusive; preserve that inconsistency as current source truth and do not generalize or silently remove it.
@@ -4542,20 +4102,12 @@ If any later check cannot be evaluated from the applicable PF09 source, current 
 Each phase MUST have at least one current close-out epic for that phase that satisfies all of the following:
 
 * The current plan and development board identify the exact close-out epic, its phase, intended D-goals, exclusions, dependencies, and current state without relying on PF20 as a planning source.  
-    
 * Every assigned PF09 task and subtask is complete or explicitly accounted for under the applicable PF09 source and the unresolved-assignment rules in §3.5.1.  
-    
-* Its applicable current acceptance names and evidence roster are complete under their owning canon and are consistent with the epic acceptance map and manifest.  
-    
+* Its applicable governing requirements and acceptance criteria are complete, and each is bound to the exact completed work, candidate identity, required QA or OPS evidence, close artifacts, and authorized lifecycle decision. A token roster is not required.  
 * The epic close pack:  
-    
-  * lives under governed roots, including audit/EPIC-\<ID\>\_close\_report.md and audit/EPIC-\<ID\>\_MANIFEST.json;  
-      
+  * lives under governed roots, including audit/EPIC-\\\_close\_report.md and audit/EPIC-\\\_MANIFEST.json;  
   * is indexed in the Human Evidence Index at docs/evidence/INDEX.json and the Machine Mirror at artifacts/evidence\_index.jsonl; and  
-      
-  * is consistent with PF12-Canon-HDE-Schemas-and-Artifacts and the applicable phased PF09 HDE Build Checklist source.
-
-
+  * is consistent with PF12-Canon-HDE-Schemas-and-Artifacts and the applicable phased PF09 HDE Build Checklist source.  
 * The current evidence supports the required close decision without allowing plan text, board state, PF09 status, a token name, or static file presence to imply another proof class.
 
 After an authorized close, PF20-Reference-HDE-Phased Epics MAY record the final historical epic disposition. A PF20 entry does not establish current planning readiness, and the lack of a PF20 historical entry does not replace the current closeout proof.
@@ -4587,7 +4139,7 @@ Do not use Canceled for a temporary deferment; work carried to another phase or 
 
 Every Canceled row MUST include this exact, complete Notes line:
 
-CANCELED → \<PO\_DECISION\_POINTER\> \- \<SHORT\_RATIONALE\>; scope\_effect: \<REMOVED\_BEHAVIOR\>; replacement: \<PF09\_ID\_OR\_NONE\>; dependencies: \<DISPOSITION\_OR\_NONE\>; phase\_exit: nonblocking; completion\_credit: none.
+CANCELED → \\ \- \\; scope\_effect: \\; replacement: \\; dependencies: \\; phase\_exit: nonblocking; completion\_credit: none.
 
 The decision pointer resolves to the exact approved decision; a board tag, informal chat summary, or PF20 historical line is insufficient. The rationale explains why the work no longer belongs in required scope. scope\_effect names the removed behavior, interface, asset, or obligation. replacement names the exact replacement PF09 task or subtask or NONE. dependencies names every affected PF09 dependency and its disposition, or NONE only after a dependency check finds none. No unresolved placeholder remains when the status is applied.
 
@@ -4613,7 +4165,6 @@ PF09.5 Pending Revalidation remains a separate current inconsistency. Adding Can
 For the phase under review, Partial and Consolidation pending rows in the applicable phased PF09 source are debt rather than phase-exit blockers only when:
 
 * the Notes show that the remaining work is enhancement, tuning, or consolidation rather than missing foundational behavior; and  
-    
 * each row has an exact current carrier consisting of its PF09 identity plus a current plan or development-board work item that names the remaining scope, owner, dependencies, and intended future mapping.
 
 If current carried work does not yet have a valid PF09 identity, record a declared PF09 gap and route the gap through the authorized current plan and board process. Do not use PF20 as the current carrier.
@@ -4627,15 +4178,10 @@ PF20 MAY later record the historical carry-forward disposition after the relevan
 Before treating a phase as exit-ready:
 
 * Every current close-out epic for that phase MUST identify its tracked issues in the current plan and development-board state.  
-    
 * Every tracked issue MUST record one of these current dispositions:  
-    
-  * Completed under \<EPIC\>: resolved within that epic, with the applicable evidence pointer.  
-      
-  * Carried forward to \<EPIC\>: mapped to an exact current plan and board item plus its PF09 task or subtask identity, or to a declared PF09 gap when no valid identity exists yet.  
-      
+  * Completed under \\: resolved within that epic, with the applicable evidence pointer.  
+  * Carried forward to \\: mapped to an exact current plan and board item plus its PF09 task or subtask identity, or to a declared PF09 gap when no valid identity exists yet.  
   * Promoted to ISSUE-XXX: promoted to an exact current cross-epic or cross-phase board issue with its current plan and PF09 mapping or declared PF09 gap.  
-      
   * Canceled: used only when an applicable PF09 row has the exact drained Canceled status and complete Notes contract in §6.4. A prose drop or board lane alone is insufficient.
 
 A tracked issue outside PF09 dev or OPS scope may be closed or dropped only through its current owning process with a recorded rationale and without implying PF09 completion, implementation, acceptance, or phase credit.
@@ -4649,7 +4195,6 @@ PF20 MAY record the final historical issue disposition after close. It is not th
 When §§6.3 through 6.6 are satisfied, phase exit is a planning decision only:
 
 * It says the core aim of the phase has been achieved and remaining work is explicitly tracked.  
-    
 * It does not say all work tagged with the phase is finished forever.
 
 Remaining current work that properly belongs to the phase MUST be represented by an exact PF09 task or subtask identity, or a declared PF09 gap, and carried by the current plan and development-board state. PF20 MAY receive the final historical disposition after close; it does not own the current work.
@@ -4657,9 +4202,7 @@ Remaining current work that properly belongs to the phase MUST be represented by
 Once a phase is declared exit-ready under this section:
 
 * New epics MUST be opened in the next phase, not the old phase.  
-    
 * Each new epic MUST name carried-forward work in its current scope and bind it to the applicable PF09 identity or declared PF09 gap, so acceptance and evidence for that work live in the new phase.  
-    
 * Canceled rows remain separately reported, receive no completion credit, and are never counted as Done, deferred, Optional, failed, or evidenced work.
 
 This follows Glow Development Philosophy's direction to avoid over-tuning and silent drift and 7 Phases of Alchemical Engineering's expectation that phases do not mix. Once a phase's core aim is achieved and its debt is explicit in current owners, planning moves forward and the old phase stops accumulating new epics.
@@ -4675,90 +4218,49 @@ Template:
 ### **Executive Summary**
 
 * Scope statement: state whether the epic is hardening and completion work, contract expansion, or another posture, and name the boundaries that remained unchanged.  
-    
 * Biggest wins: summarize the most important completed slices or proof improvements.  
-    
-* Biggest remaining risks or gaps: list only the risks or gaps that still matter for closure or follow-up drainage.
-
-  ### **Implementation Report (what happened in the repo)**
-
+* Biggest remaining risks or gaps: list only the risks or gaps that still matter for closure or follow-up drainage.  
+  **Implementation Report (what happened in the repo)**  
 * If the epic reuses already-implemented scope, record that reuse explicitly as Step 0 or Approved reuse baseline and state that it is inherited scope rather than new implementation.  
-    
 * For each PR or step, record:  
-    
   * Purpose  
-      
   * Key changes, high level  
-      
   * Key surfaces touched  
-      
   * Tests or evidence produced  
-      
-  * Outcome
-
-
+  * Outcome  
 * Major surfaces affected: list the runtime, tooling, evidence, and documentation surfaces materially touched by the epic.  
-    
-* Evidence inventory (what exists): list the concrete governed artifacts and where they live.
-
-  ### **Evidence gaps (if any; label Unknown if you cannot verify)**
+* Evidence inventory (what exists): list the concrete governed artifacts and where they live.  
+  **Evidence gaps (if any; label Unknown if you cannot verify)**
 
 For each gap, record:
 
 * Gap: state what is missing or not verified.  
-    
 * Status: use Unknown, Missing, or Ambiguous.  
-    
 * What would prove it: state the minimal test, proof, or artifact that would close the gap.  
-    
 * Where that proof should exist, if known: name the expected canon or governed artifact home.  
-    
 * If implementation PR evidence exists but close-pack, Live QA, PF-Canon drainage, or final aggregate validation is not directly proven, the snapshot MUST mark each missing proof as Missing, Unknown, Ambiguous, or No claim. PR-slice evidence MUST NOT imply formal close-pack proof, Live QA completion, PF-Canon drainage, or final aggregate validation unless those exact artifacts or results are directly proven.  
-    
 * Intended decomposition versus historical execution: a plan states intended decomposition only. Use PF10, PR metadata, and git or commit history to attribute what actually occurred; do not use plan text as historical execution proof.  
-    
-* Historical CI fact: before using review-success text as historical CI fact, reconcile it with run-level Actions data, including reruns. If the complete run or rerun history is unavailable or conflicts with the narrative record, label the result Unknown or Ambiguous and state the minimal evidence needed to resolve it.
-
-  ### **Retrospective (Process)**
-
+* Historical CI fact: before using review-success text as historical CI fact, reconcile it with run-level Actions data, including reruns. If the complete run or rerun history is unavailable or conflicts with the narrative record, label the result Unknown or Ambiguous and state the minimal evidence needed to resolve it.  
+  **Retrospective (Process)**  
 * What went well: process wins.  
-    
 * What did not go well: process gaps, including evidence posture gaps.  
-    
-* What we learned (Process): actionable changes to make next time.
-
-  ### **Retrospective (Application/System) (optional)**
-
+* What we learned (Process): actionable changes to make next time.  
+  **Retrospective (Application/System) (optional)**  
 * What we learned about the system: technical insights.  
-    
-* Known remaining risks or debt: explicit list.
-
-  ### **Canon Alignment and Documentation Outcomes**
-
+* Known remaining risks or debt: explicit list.  
+  **Canon Alignment and Documentation Outcomes**  
 * Canon references used: list only the canon homes that materially informed the closeout analysis.  
-    
 * Source posture and inputs used: name the primary source of truth for what happened, state which plans or other artifacts were used only for intended scope or framing, and state explicitly whether PF20, PF23, or any non-PF artifacts were used.  
-    
 * When PF10 provides the primary epic-specific account of what happened but does not restate the original epic business case or the single consolidated PR or OPS sequence, the report MAY use the Epic Plan or Implementation Plan for those specific gaps only.  
-    
 * The report MUST say explicitly which facts are taken from PF10 and which facts are taken from plan artifacts as gap-filling inputs.  
-    
 * Plans used in this way are framing inputs only and MUST NOT override a live PF10 addendum on the same point.  
-    
 * When PF10 is silent on a docs-only repo-docs sweep, a retrospective or closeout artifact MAY use the docs PR artifact only for documentation-step history, docs file list, validation posture, repo-proof notes, and scope-boundary facts.  
-    
 * The artifact MUST label PF10 silence and MUST NOT use the docs PR artifact to prove implementation behavior, QA completion, close-pack completion, PF-canon drainage, acceptance-token satisfaction, or epic closure unless those stronger proofs are separately present.  
-    
 * Important limits: state any material limits in the current session or evidence set, especially when merged-PR proof, close-pack proof, or other closure-defining artifacts are missing.  
-    
 * Repo-proven versus formally closed posture: if the retrospective can support completion or status moves from repo evidence but cannot prove formal merge or close, say that distinction plainly rather than blurring it.  
-    
 * Later-drain PF-canon updates: when the artifact is intended to support a later PF-canon drain, name the exact affected PF canon home or homes, the exact affected locator or locators, the supported later-drain action, the drain readiness classification, the evidence basis, and whether the drain is expected at epic close, after an additional PR or OPS slice, or after a separate canon-only drain step.  
-    
 * Proposed addenda or live deltas: record any still-live canon deltas, their intended drain homes, and whether they are implementation work, documentation work, or unresolved analysis.  
-    
 * Uncertain drain targets: state None when there are none. Otherwise record the uncertainty explicitly.  
-    
 * Token and evidence semantics, if applicable: distinguish registry or semantics drift from binding or completeness drift, and state whether the issue is resolved, unresolved, or observational only.
 
 ### **Final QA Closeout Review \+ QA RCA (recommended)**
@@ -4768,94 +4270,61 @@ Use this review when closeout depends on synthesizing step-level QA outcomes, re
 Minimum structure
 
 * Artifact Map. Name the epic reviewed, the primary epic-specific source of truth, the canon homes used for closeout interpretation, and any framing inputs such as the Implementation Guide or QA Plan.  
-    
 * Source-of-Truth Posture. State which artifact is primary for epic-specific events, which sources are framing only, and any internal mismatch that affects trust or traceability.  
-    
+* Exact Candidate. Record the exact repository and candidate SHA, applicable workflow or check identities and results, and whether the reviewed evidence is current for that candidate.  
+* Verdict Posture. Record the QA scope and governing acceptance criteria; relied-upon tests, checks, commands, fixtures, configurations, and governed evidence; results and failures; decision-maker and decision time; and limitations, exclusions, waivers, or unresolved conditions.  
 * If a prompt label, artifact-map label, or non-PF input name conflicts with PF10, PF23, the Implementation Guide, the QA Plan, or another governing source used for closeout interpretation, the review MUST record the mismatch explicitly. The review MUST evaluate the epic under the governing source-of-truth identity and may preserve the supplied label only as provenance in the Artifact Map.  
-    
 * Closure Registers. When the review is used as a closure-oriented decision aid, include compact registers that separate:  
-    
   * Deliverables register. Record each closure-critical deliverable, its source, the anchor quote or governing claim, and any exact evidence, path, or token strings that matter.  
-      
   * QA verification register. Record each QA step or verification item, its source, and the required evidence outputs or pass/fail posture.  
-      
   * Execution results register. Record the governing execution or remediation claims the review relies on and the outcome labels those claims carry.  
-      
-  * Current-reality register. Record any repo-reality or surface-existence confirmations used to support closure, the relevant path or surface strings when they matter, and whether each confirmation supports, contradicts, or does not address closure.
-
-
+  * Current-reality register. Record any repo-reality or surface-existence confirmations used to support closure, the relevant path or surface strings when they matter, and whether each confirmation supports, contradicts, or does not address closure.  
 * Closure Trace Ledger. For each closure-critical deliverable or slice, map the deliverable to the QA verification item or items that validate it, the governing execution result or results that claim completion, whether current-reality confirmation was used, a status line (Satisfied | Not satisfied | Caveat), and a short why statement grounded in those inputs.  
-    
 * Path and Surface Reality Ledger. When closure depends on named routes, entrypoints, governed ledgers, or close-pack files, list each required path or surface string verbatim, its source or sources, whether it is proven in current reality or only by execution record, whether it is required for closure, and a short note explaining its closure role.  
-    
 * Proof-Class Separation. When a closure claim relies on more than one proof class, the review MUST name each proof class and state which artifacts prove each class. Do not let public output proof, internal/admin compute proof, vendor-backed behavior proof, QA proof, OPS proof, PF09 drain proof, or close-pack proof imply another proof class unless the review names and proves the bridge.  
-    
 * QA Closeout Summary. State the step-level QA outcome, the overall readiness recommendation, the main blocker or non-blocker themes, and the highest-impact closure risks or gaps that remain.  
-    
 * Closure-decision wording discipline. When a final QA closeout review, retrospective, closure evidence snapshot, ADR, or Lead decision aid uses SATISFIED, Satisfied, READY WITH CAVEATS, supportable to Done, or equivalent closure-oriented wording, it MUST state the exact decision axis covered by that wording.  
-    
 * Unless directly proven in the reviewed evidence, the artifact MUST mark the following as not performed, no claim, or not proven: PO closeout action, board update, merge provenance, formal OPS action, formal close-pack completion, PF-canon drainage, and final PF09 status update.  
-    
 * A closure-trace SATISFIED statement, readiness recommendation, or supportable-status statement is not by itself a PO closeout action, board update, merge provenance assertion, formal OPS completion, formal close-pack completion, or canon-drain completion.  
-    
 * Canonical RCA Requirement Basis. List the canon sections that justify the review method.  
-    
 * For each canonical basis item, include the PF document title and either a short proof excerpt or a precise evidence pointer showing why that source governs the review method.  
-    
 * Required elements checklist. Confirm the presence or absence of the D0 Discovery artifact, runtime functional proof when required, governed current-state QA evidence under the epic QA root, the QA RCA summary, Coverage vs QA Plan accounting, a readiness recommendation, indexed evidence, and the applicable venue posture.  
-    
   * When the approved proof includes a venue-specific claim, confirm the required governed venue binding and treat absent, ambiguous, or contradictory venue proof according to the plan’s stated effect.  
   * When venue is not material, record `NOT CLAIMED`, `NOT APPLICABLE`, or `UNKNOWN - NON-MATERIAL`, as appropriate, and do not treat absent Codespaces provenance as an uncovered QA step or missing closeout element.  
-  * Do not infer the execution venue from a provider name, repository path, current console session, devcontainer configuration, or artifact location.
-
-
+  * Do not infer the execution venue from a provider name, repository path, current console session, devcontainer configuration, or artifact location.  
 * The required elements checklist MUST end with a compliance statement that states Complete, Complete with caveats, Incomplete, or Not assessed. It MUST NOT say Complete when any required element is absent, ambiguous, or unsupported by governed evidence.  
-    
 * Step-cluster approval proof. When a final QA closeout review asks the reviewer to approve an executed Live QA step cluster, governed current-state QA evidence MUST be surfaced at cluster level, not only as a result summary. For every executed step cluster under review, the review MUST identify the manifest entry or entries, the manifest path-proof posture, the primary log or logs, primary-log path-proof binding, captured\_env posture, evidence\_artifacts posture, intended\_tokens posture, claimed\_tokens posture, and the result sidecar or other plan-defined decisive receipt.  
-    
 * A result JSON, PASS label, or summary sentence is not sufficient by itself for final closeout review when the step cluster is being used as current-state Live QA evidence. The closeout review must show the manifest, header, tokenless or token-claim posture, and path-proof surfaces that make the PASS auditable.  
-    
 * QA Timeline. Summarize the major remediation loops, ADR or audit events, and QA step outcomes in a stable chronology. If the governing source is append-only, the review MAY use source order as the canonical chronology and MUST say so explicitly.  
-    
 * Coverage vs QA Plan. List every planned QA step in plan order, record whether it is Fully evidenced, Partially evidenced, or Not evidenced, note any material mismatch, and state the closeout impact for each step.  
-    
 * Coverage vs QA Plan MUST separately call out any accepted plan-execution deviation, even when the step is Fully evidenced and PASS. Examples include bounded Moon Loop reruns, rails changes, and step-local dependency-preflight corrections. Coverage status alone is not sufficient when accepted execution materially diverged from the approved plan.  
-    
 * For each remediated step, Coverage vs QA Plan accounting MUST distinguish original planned receipts from accepted remediation receipts and identify the final accepted receipt or evidence basis. Failed or superseded receipts remain part of the record and MUST NOT be hidden, but they MUST NOT be treated as the governing PASS basis once an accepted remediation receipt is proven.  
-    
 * Findings. Record each substantive finding with what happened, why it matters, classification, PF touchpoints when needed, and evidence-pointer posture.  
-    
 * Root Cause Analysis. State the primary root cause, contributing factors, what made the issue hard to detect or hard to close, and the role of any remediation loops in reducing or preserving uncertainty.  
-    
 * Remediation Loop Assessment. For each major remediation loop, rerun sequence, or ADR-backed correction path used in closeout, state whether it reduced uncertainty, corrected evidence or closure-posture drift, or only preserved a caveat, and explain why. Distinguish productive bounded remediation from churn  
-    
 * Evidence Hygiene Assessment. State which evidence families were strong, which remained risky, and whether each decisive proof depended on step logs, path-proof surfaces, validators, checksums, close-pack binding, or other governed evidence discipline. When a risk could recur in future epics, state the canon, planning, QA, or evidence-posture change that would prevent recurrence.  
-    
 * Implementation Gaps and Proposed Fixes. For each remaining gap, state the symptom, the expected behavior, the likely locus, a high-level fix, and a verification hook.  
-    
 * Doc Deltas. State whether PF06 has any delta from the review. If the correct home is another PF document, route the delta there and say why PF06 is not the correct home.
 
 Guidance on evidence-light decision records
 
 * If a guidance record, ADR set, or other closeout decision note is used but does not carry explicit evidence-pointer lines, the review MUST label it as evidence-light guidance.  
-    
 * Evidence-light guidance MAY inform decision framing, but it MUST NOT be treated as stronger than the evidence-backed implementation, QA-pass, or close-pack records around it.  
-    
 * When possible, the review SHOULD pair each evidence-light guidance item with the governing evidence-backed lines that make the decision auditable.
 
 ### **Closure Evidence Snapshot (for Lead decision)**
 
 Evidence produced:
 
-* \<List the evidence artifacts that exist and are ready for audit\>
+* \\
 
 Evidence missing or ambiguous:
 
-* \<List missing or ambiguous evidence, and the impact\>
+* \\
 
 Open closure items or Lead questions:
 
-* \<What must be decided, accepted, or scheduled before closure\>
+* \\
 
 # **Appendix A — Large Schemas & Assets (CodEx constraints)**
 
@@ -4866,17 +4335,11 @@ Define how to include large schemas or assets when content is too large to paste
 ## **Constraints (facts)**
 
 * CodEx can read PF docs, but may not have reliable access to large external assets via attachment workflows. Execution-critical formats and small schemas should still be pasted inline by the IA to keep an unambiguous in-session reference.  
-    
 * CodEx cannot accept file uploads as part of the build interaction; only IA-provided inline text or snippets and repo contents are used during build.  
-    
 * Only the Product Owner (PO) may load large files into the repo or PR branch when needed. Implementation Agents do not run git and do not create PRs.  
-    
 * CodEx may adapt within scope but must report every change in the Detailed Change Report.  
-    
 * Governed locations only. Assets must live under artifacts/\*\* or docs/**; governed evidence may also live under audit/**. Transient or generator paths are disallowed.  
-    
 * Single-PR parity. When assets are introduced or moved, update all `PF12-Canon-HDE-Schemas-and-Artifacts`\-required evidence ledgers, hash sentinels, mirrors, and path-proofs in the same PR. If the CodEx UI cannot include doc edits, the IA provides verbatim text in the same PR body for CodEx to commit.  
-    
 * Mirror hygiene. Apply the complete current Machine Evidence Mirror and path-proof contract in `PF12-Canon-HDE-Schemas-and-Artifacts`; this appendix does not reproduce its schema or byte rules.
 
 ## **Roles & responsibilities**
@@ -4884,23 +4347,18 @@ Define how to include large schemas or assets when content is too large to paste
 ### **Lead Dev / IA**
 
 * Prepare inline materials (formats, small schemas, snippets).  
-    
 * When assets are too large for inline use, create an Asset Draft Pack (fields below) for the PO to load.  
-    
 * Ensure the CodEx-opened PR captures Evidence Index, hash sentinel, mirror updates, and single-home pointers. Avoid separate docs-only PRs.
 
 ### **Product Owner**
 
 * Load the Asset Draft Pack files into the CodEx PR branch at the specified targets.  
-    
 * Confirm the CodEx-opened PR and, after Lead Dev gate passes, squash-merge.
 
 ### **CodEx**
 
 * Can read PF docs, but the IA SHOULD still paste execution-critical formats and small schemas or snippets inline to keep an unambiguous in-session reference and reduce drift.  
-    
 * Uses IA-provided inline materials and repo contents during build.  
-    
 * Proposes scoped adjustments; lists every change in the Detailed Change Report (files added, modified, removed; deviations and improvements).
 
 ## **When to use an Asset Draft Pack**
@@ -4917,51 +4375,39 @@ owner: "IA or Lead Dev"
 assets:  
 \- asset\_id: "schema\_user\_profile\_v3"  
 title: "User Profile Schema v3"  
-repo\_target\_location: "\<path/inside/repo\>"  
+repo\_target\_location: "\\"  
 size\_bytes: 123456  
-sha256: "\<64-hex\>"  
-license\_note: "\<source/license or 'internal'\>"  
+sha256: "\\\<64-hex\\\>"  
+license\_note: "\\"  
 single\_home\_category: "Architecture" \# route by category title only  
 notes: "Consumed by component X; CodEx will assume this location."
 
 ## **Guardrails**
 
 * No secrets or PII. Include license and source.  
-    
 * Exactly one single home per concept; route by category title only, not by version numbers.  
-    
 * Keep paths repo-relative and stable; list titles and paths in the human Evidence Index.  
-    
 * For governed assets, apply the indexing, Machine Evidence Mirror, and co-located path-proof requirements in `PF12-Canon-HDE-Schemas-and-Artifacts`.
 
 ## **Flow (high level)**
 
 * Lead Dev → IA: approve scope; decide inline versus Asset Pack.  
-    
 * IA → CodEx: send inline materials; name target paths for large assets.  
-    
 * PO: load the Asset Pack at the target paths in the CodEx PR branch.  
-    
 * CodEx: build & test; if something is missing, switch to planning mode and note stubs in the Detailed Change Report.  
-    
 * IA: review the change report; request adjustments or approve.  
-    
 * PO: confirm the CodEx-opened PR, then squash-merge after the Lead Dev gate passes.  
-    
 * Docs & evidence: IA ensures Doc-Delta, human Evidence Index \+ hash sentinel, and machine mirror reflect the final assets in the same PR.
 
 ## **Planning mode (CodEx)**
 
 Use to propose file trees, stub schemas, and integration points; surface gaps early. IA decides what to paste inline versus pack; planning output is advisory.
 
-## **Acceptance and drift guards (titles only; tokens live in Governance)**
+## **Acceptance and drift guards (exact-source; legacy tokens optional)**
 
-* Evidence parity (same PR): use only the current acceptance-token names and semantics in `PF04-Canon-HDE-Governance`; this appendix does not reproduce the roster.  
-    
-* PR posture: use only the current acceptance-token names and semantics in `PF04-Canon-HDE-Governance`; this appendix does not reproduce the roster.  
-    
+* Evidence parity: use the stable governing requirement, acceptance-criterion, test, artifact, commit, workflow, and decision identities applicable to the changed surface. Preserve all required index, mirror, hash, manifest, path-proof, provenance, and deterministic-validation controls.  
+* Mutation posture: for a PR, bind review and relied-upon CI to the exact PR head and distinguish base, head, merge, and post-merge identities. For authorized direct-main mutation, record the current instruction, exact post-write SHA, diff, and applicable push-triggered CI result. Revalidate after candidate movement. A complete acceptance-token roster is not required. Existing token IDs MAY remain as optional historical indexing metadata.  
 * Report completeness: the Detailed Change Report lists every file added/modified/removed and every deviation from IA instructions.  
-    
 * No surprises: if an asset was not present at build time, CodEx records a stub; IA reconciles before close.
 
 # **Appendix B — Remediation Implementation Guides (DEV/OPS only)**
@@ -4993,7 +4439,6 @@ This appendix applies to remediation task plans submitted for approval. It does 
 A remediation task plan MUST contain only two task types:
 
 * DEV tasks are PRs only and MUST be enumerated as PR-01, PR-02, PR-03 (continue as needed) (no mixed-task steps).  
-    
 * OPS tasks are PO-authorized procedures. The PO may execute an authorized task personally or explicitly delegate execution to an automated session agent. OPS tasks MUST be enumerated as OPS-01, OPS-02, OPS-03 (continue as needed) (no mixed-task steps).
 
 Each task MUST also declare its closure posture as exactly one of:
@@ -5010,12 +4455,11 @@ Approval and review of a NON-CLOSURE task MUST judge only the truthful completio
 Each task MUST declare its intent as exactly one of:
 
 * DISCOVERY  
-    
 * CHANGE
 
 Cross-lane dependencies (locked line). If a task depends on outputs produced by a prior task in the other lane, the dependent task MUST include exactly one dependency line in this exact form:
 
-Inputs needed from Task \<ID\> during implementation: \<exact items\>
+Inputs needed from Task \\ during implementation: \\
 
 Placeholders (for example TBD, to be determined, Sx) in this line are a mechanical blocker.
 
@@ -5024,7 +4468,6 @@ Placeholders (for example TBD, to be determined, Sx) in this line are a mechanic
 A remediation task plan submitted for approval MUST be execution-ready:
 
 * every task has a syntax-normalized semantic contract that is executable by its assigned authorized actor; literal paste-and-run syntax is not a plan-approval test  
-    
 * there are no missing inputs, no missing outputs, and no ambiguous success criteria
 
 ## **Approval gate scope (tight)**
@@ -5032,11 +4475,8 @@ A remediation task plan submitted for approval MUST be execution-ready:
 For remediation task plans, approval MUST focus on:
 
 * correct task model (OPS vs DEV; DISCOVERY vs CHANGE; no mixed tasks)  
-    
 * correct sequencing and explicit cross-lane dependencies  
-    
 * concrete deliverables (lowercase paths \+ filenames)  
-    
 * concrete verification success criteria (what done means)
 
 Not approval blockers: Detailed command lines and step-by-step failure handling are not required as plan-approval conditions.
@@ -5061,21 +4501,15 @@ Post-failure command discipline. OPS commands, flags, targets, credentials, host
 In-flight flexibility MUST NOT permit:
 
 * changing governed artifact locations or filenames  
-    
 * introducing new governed files without explicitly stating indexing/mirror intent  
-    
 * indexing remediation-only diagnostics into governed indices/mirror
 
 ## **Mechanical blockers (auto-reject if present anywhere in the plan)**
 
 * Any PR-xx task missing an embedded CodEx Prompt. A present prompt’s syntax-origin or paste-readiness defect is non-blocking and may be normalized during execution when the semantic contract is preserved.  
-    
 * Any task that mixes DEV \+ OPS work in a single task.  
-    
-* Any task output specified only as a directory. Deliverables MUST be concrete file paths including filenames (for example audit/qa/\<epic-id\>/\<task-id\>/\<filename\>), and directory names MUST be lowercase ASCII.  
-    
+* Any task output specified only as a directory. Deliverables MUST be concrete file paths including filenames (for example audit/qa/\\/\\/\\), and directory names MUST be lowercase ASCII.  
 * Any cross-lane dependency missing the exact dependency line, or using non-concrete exact items.  
-    
 * Any task missing explicit verification success criteria (what done means and how it is recognized from produced artifacts).
 
 ## **Governed evidence filenames and path-proofs**
@@ -5097,9 +4531,7 @@ If an Artifact Map is included, it MUST explicitly label non-PF inputs as proven
 When a non-PF observation drives a branching decision, the plan MUST include:
 
 * the observation to look for (exact string/status/shape)  
-    
 * the decision rule  
-    
 * the output artifact path where the observation is captured (file path including filename; lowercase directory names)
 
 ## **Canonical Remediation Task Plan Template (paste-ready)**
@@ -5107,7 +4539,6 @@ When a non-PF observation drives a branching decision, the plan MUST include:
 ### **Artifact Map**
 
 * Inputs (non-PF): provenance only; not required to execute  
-    
 * Output: Remediation Task Plan (for approval)
 
 ### **Observed Evidence Snapshot (self-contained; non-PF)**
