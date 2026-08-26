@@ -2,7 +2,7 @@
 
 **Title:** PF06-Canon-Change-Process-Guide
 
-**Version:** v2.4.7
+**Version:** v2.4.8
 
 **Status:** Canon
 
@@ -14,25 +14,17 @@
 
 ## 0.1 Purpose and scope
 
-This guide defines the change delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. It sets Close to be PR-first. CodEx MUST open the pull request and attach the close pack and the acceptance tokens (PASS) list.
+This guide defines the change delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. The normal route for code-bearing epic or CRD work is PR-based, while an explicit current Product Owner instruction may authorize a bounded direct-to-`main` route. Close requires the applicable exact-source evidence, close-pack material, and authorized decisions; a PASS acceptance-token list is not required.
 
 This is process guidance only. It does not constrain execution environments, repository tooling, transport bytes, or payload bytes. Those remain in their canonical homes.
 
 ## 0.2 Policy and principles
 
-PR-first via CodEx.
+Mutation route is explicit.
 
-CodEx MUST open a PR for each epic slice and push:
+The normal code-bearing epic-slice route is PR-first via CodEx. The Product Owner MAY instead authorize direct mutation of `main` through an explicit current instruction covering the exact change. An agent MUST NOT infer direct-main authority from PF06, repository access, or an earlier authorization.
 
-* Code changes  
-    
-* Doc-Delta updates (repo docs)  
-    
-* Both evidence indices:  
-    
-  * Human: docs/evidence/INDEX.json  
-      
-  * Machine: artifacts/evidence\_index.jsonl
+For the PR route, CodEx MUST open a PR for the exact slice and include code changes, Doc-Delta updates, and each evidence-index, mirror, hash, or path-proof companion required by changed governed artifacts and current canon. For the direct-main route, the exact operator authorization and the post-write exact-source evidence govern.
 
 Implementation Agent analyzes PR bundles and produces PF-canon Doc Deltas.
 
@@ -51,6 +43,24 @@ Allowed blockers remain limited to real truth-and-proof failures, such as incomp
 When a canon or checklist delta is known but not yet drained, PF10 remains the temporary live-truth home until the later drain occurs. Artifacts MUST record the drift or later drain target, use supportable-from-repo-evidence wording when the destination PF home is not yet updated, and MUST NOT require that drainage in order to approve execution, recommend merge, or support epic readiness or closeout.
 
 Product Owner-approved bounded revision. An expressly approved, bounded Product Owner scope, architecture, or ADR revision MAY supersede conflicting PF-Canon only for the exact decision it adjudicates. The approval record MUST include a causal map, name the superseded language, preserve later-slice boundaries, state explicit nonclaims, and identify controlled later drainage. It MUST NOT be treated as a general waiver, unrestricted informal scope expansion, or authority outside the recorded decision. Permanent PF-Canon drainage remains required, but it is separate documentation work and MUST NOT be made a prerequisite for applying the approved bounded revision.
+
+Exact-source acceptance model.
+
+Repository-native exact-source evidence and scoped authorized decisions are the primary acceptance and completion traceability model. Acceptance tokens are legacy-compatible, historical, and optional indexing metadata. New QA acceptance tokens MUST NOT be created by default. A complete token roster, per-step intended-token or claimed-token declaration, or token/evidence matrix MUST NOT be required when no active scoped roster exists, and their absence MUST NOT block otherwise sufficient exact-source evidence.
+
+Existing token IDs and historical evidence MUST remain unchanged and attributable to the exact candidate and scope they originally proved. Existing token-aware fields and tooling MAY remain; empty token arrays remain valid where the governing schema requires those fields. A future plan MAY opt into one bounded token or equivalent cross-reference only when existing PF, ADR, epic, task, test, or acceptance-criterion identifiers cannot supply necessary traceability. That exception does not reactivate a universal token system.
+
+Every current acceptance or completion claim MUST be traceable, as applicable, through the repository identity; exact commit identity; PR base, head, merge, and post-merge identities when a PR is used; applicable workflow identity, exact tested SHA, conclusion, and check set; stable governing and work identifiers; exact governed artifact paths and SHA-256 digests when integrity is material; required manifests, indexes, mirrors, path proofs, tool or configuration references; the authorized decision, decision-maker, scope, and time; and any exception or waiver identity, owner, scope, reason, and expiry. Do not duplicate information that GitHub or an existing governed artifact already records reliably, and do not create a replacement token database or universal evidence form.
+
+Repository presence, applicable CI result, QA decision, operator or role acceptance, and lifecycle completion or closure are separate states. Landing a commit or canonical file on `main` establishes repository reality and, for a current canonical artifact, authority in its declared content lane. It does not by itself establish CI PASS, QA PASS, acceptance, PF09 completion, OPS completion, deployment, release readiness, epic closure, or production readiness.
+
+The Product Owner retains direct-to-`main` authority. An agent MUST NOT infer that permission; a current operator instruction MUST cover the exact mutation. A direct-main route changes the mutation path, not the applicable correctness, evidence, QA, security, privacy, canon, or closure standard. Record the exact post-write SHA and diff and the applicable push-triggered CI result. Pending or failing validation MUST be stated as such. A failure on `main` MUST be corrected or explicitly accepted as a bounded known exception.
+
+Before substantive work, resolve and record the current relevant ref and inspect the current authoritative files and repository state. Before mutation, verify that the working base has not been materially superseded; reconcile any movement or prove it immaterial. Before acceptance or completion language, recheck the candidate SHA, relevant files, applicable workflow result, evidence integrity, and decision scope. Historical PASS does not transfer automatically to a later candidate. Changed canon or acceptance criteria require renewed conformance analysis, and changed implementation or evidence-producing surfaces require appropriate review and validation.
+
+Evidence controls remain layered. Commit identity, PR history, workflow results, SHA-256 and path proofs, manifests and evidence indexes, attestations, and authorized decisions prove different facts. No one identifier replaces the others. Existing release-attestation, evidence-index, mirror, path-proof, source-provenance, deterministic-validation, and strict-claim controls remain in force.
+
+If exact-source repository metadata or required governed evidence is unavailable, the affected acceptance or closure claim fails closed as unavailable or blocked. Confidence MUST NOT be reconstructed through invented tokens or unsupported claims.
 
 Closure axes remain separate. QA evidence, PF09 status drainage, PO closeout, board state, merge provenance, and PF-canon drainage are separate closure axes and MUST NOT be collapsed.
 
@@ -117,11 +127,11 @@ Boundary repetition is protective. For runtime-conformance chains, each decisive
 
 An epic MAY be delivered in a series of PRs (up to 10 PRs per epic), each PR carrying a coherent slice of work with its own code \+ evidence parity.
 
-The Lead Developer gates; the Product Owner is the sole merger and uses squash on PASS.
+For a PR route, the Lead Developer gates; the Product Owner is the sole merger and uses squash on a supported PASS.
 
 Implementation Agents and other non-CodEx process roles do not run git and do not create PRs.
 
-The repository MUST protect `main` and MUST enforce the governed required checks before merge. Squash merging MUST be enabled as the sole pull-request merge method; merge commits and rebase merging MUST be disabled.
+PF06 does not require blanket protection of `main` or a PR for every change. Direct-main authority remains with the Product Owner. An agent may mutate `main` only under an explicit current operator instruction covering the exact change. When a PR is used, governed required checks and the exact reviewed candidate remain controlling; when direct-main is authorized, the exact post-write SHA, diff, applicable push CI, and all other applicable standards remain controlling.
 
 Automated CI budget control.
 
@@ -481,41 +491,29 @@ A packaging-only Ops remediation may support close-pack surfacing or evidence-pr
 
 ## 0.3 Participants and responsibilities
 
-* Implementation Agent (ChatGPT). Runs each epic end to end, prepares CRD-ready drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and both indices are updated in the same PR, and escalates blockers to the Lead Developer. Does not run git or create PRs.  
-    
-* Lead Developer (AI). Defines intent and scope, approves the CRD and Implementation Plan once, performs the gate review on the PR, and otherwise steps out during CodEx execution.  
-    
-* CodEx. Executes in a sandbox, runs Audit and Build/Test, and MUST open the PR using the template and attach the close pack and the PASS list. Adapts within scope and reports all changes. CodEx can read PF docs. Even so, the IA SHOULD paste execution-critical material verbatim during build sessions (formats, schemas, exact token names, commands, and artifact paths) to keep a stable, unambiguous in-session reference and to reduce drift.  
-    
-* Thoth (CRD authority). Owns CRD standards and architecture fit, confirms acceptance tokens and capsule homes by title.  
-    
-* Product Owner (human). Sole merger using squash; signs acceptance on PASS; informs the Scrum Master after merge. Owns Tracked Issues and ADR stubs for planning artifacts; adjudicates drift items and approves token minting decisions.  
-    
-* Scrum Master (AI). Informed after merge; records the close; updates boards and the sprint report.  
-    
+* Implementation Agent (ChatGPT). Runs each epic end to end, prepares CRD-ready drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and every applicable governed evidence companion land in the authorized mutation set, and escalates blockers to the Lead Developer. Does not run git or create PRs.  
+* Lead Developer (AI). Defines intent and scope, approves the CRD and Implementation Plan once, performs the gate review when a PR route is used, and otherwise steps out during CodEx execution.  
+* CodEx. Executes in a sandbox, runs Audit and Build/Test, and follows the mutation route expressly authorized for the change. For a PR route, CodEx opens or amends the PR and supplies the applicable close material. For direct-main mutation, CodEx requires an explicit current operator instruction covering the exact change and records the post-write SHA, diff, and applicable push-CI state. CodEx can read PF docs. Even so, the IA SHOULD paste execution-critical material verbatim during build sessions to keep a stable, unambiguous in-session reference and reduce drift.  
+* Thoth (CRD authority). Owns CRD standards and architecture fit and confirms the governing acceptance criteria and evidence homes by stable identity.  
+* Product Owner (human). Retains direct-to-`main` authority and, when a PR route is used, is the sole merger using squash. Accepts or rejects an exact candidate within a stated scope and adjudicates drift and bounded exception decisions.  
+* Scrum Master (AI). Is informed after the applicable repository-adoption event; records authorized close and updates boards and the sprint report.  
 * Communication rule. AIs do not contact one another directly. The Product Owner routes all messages.
 
-## 0.4 Execution posture and flow (PR-first)
+## 0.4 4 Execution posture and flow (route-aware)
 
 * Lead Dev publishes the Implementation Guide to the Implementation Agent (IA).  
-* IA sends Codex an audit request with explicit report formats and any verbatim components/schemas required.  
-* Codex returns an audit report covering capabilities, gaps, and risks.  
-* IA drafts the Implementation Plan. Lead Dev approves once, then acts only as the PR gate.  
-* IA sends Codex build instructions plus verbatim components/schemas. Codex may adapt within scope, must report all changes, and returns a detailed change report plus artifacts and evidence.  
-* IA either requests changes or approves.  
-* CodEx MUST open the PR, push code, Doc-Delta (repo docs), the human Evidence Index, the machine JSONL mirror, and the close-pack (`audit/EPIC-<NNN>_close_report.md`, `audit/EPIC-<NNN>_MANIFEST.json`).  
-* CodEx's PR-opening and package-publication obligation applies only when the correct repository is resolved, a writable branch can be created or updated within the authorized scope, authenticated GitHub access and the required permissions exist, the required package files exist within the authorized epic scope, and GitHub accepts the requested actions.  
-* If any required execution-time precondition is unavailable, the workflow is blocked. CodEx MUST NOT claim that the PR was opened or that content was pushed or attached, MUST NOT push directly to `main`, MUST NOT silently substitute another actor, and MUST NOT omit required package content.  
-* Machine mirror requirements: records-only canonical JSONL, exactly one LF per line, unknown keys rejected, each record includes a proof\_anchor.  
-* Lead Dev gate review:  
-  * verify PASS tokens  
-  * verify A7 proof surface on the cataloged JSON success route (not /internal/version)  
-  * verify env-gate proof and encoding invariance  
-  * verify same-PR evidence parity  
-  * verify Endpoint Catalog single home present (docs/ENDPOINTS\_CATALOG.json \+ .sha256)  
-  * verify Reader A7 proof JSON is captured and indexed (human \+ machine, same PR)  
-* PO merges: perform squash merge on PASS and notify the Scrum Master.  
-* Closure: IA files the Closure Report; boards and sprint reports updated; suites green-freeze until a qualifying change lands.  
+* IA sends CodEx an audit request with explicit report formats and any verbatim components or schemas required.  
+* CodEx resolves the current ref and returns an audit report covering observed repository facts, gaps, risks, proposals, and unknowns.  
+* IA drafts the Implementation Plan. Lead Dev approves once and later performs the gate only when the selected route uses a PR.  
+* IA sends CodEx build instructions plus verbatim execution-critical material. CodEx may adapt within scope, MUST report all changes, and returns a detailed change report plus artifacts and evidence.  
+* IA either requests changes or records the supported disposition.  
+* For a PR route, CodEx opens or amends the exact-slice PR and includes code, Doc-Delta, and every applicable evidence companion.  
+* For a direct-main route, CodEx acts only under an explicit current operator instruction covering the exact mutation and records the exact post-write SHA, diff, and applicable push-triggered CI result.  
+* If a required execution-time capability or authorization is unavailable, the workflow is blocked. CodEx MUST NOT claim an action occurred, silently substitute another actor, or omit required content.  
+* Machine mirror requirements remain records-only canonical JSONL, exactly one LF per line, unknown keys rejected, and a proof\_anchor on each record when the owning canon requires a mirror update.  
+* Lead Dev PR gate review, when applicable, verifies the exact candidate, applicable checks and acceptance criteria, required proof surfaces, and same-change-set evidence parity.  
+* For a PR route, the PO performs any supported squash merge and notifies the Scrum Master. For direct-main, repository adoption is the exact post-write `main` commit and remains separate from QA, acceptance, and closure.  
+* Closure: IA files the Closure Report; boards and sprint reports are updated through their owning processes; suites green-freeze until a qualifying change lands.  
 * Determinism pins for determinism-sensitive capture and CI checks: set LC\_ALL=C, LANG=C, TZ=UTC to keep bytes stable. Do not add non-canonical “extra pins” as requirements.
 
 ### 0.4.1 Live QA discovery and RCA (execution requirements)
@@ -1359,13 +1357,11 @@ For PO actions that are used as QA inputs (for example: providing production ser
 
 ### **0.6.8 Operational guardrails**
 
-Live QA plans/runbooks MUST NOT include VCS workflow content (branches, commits, PRs, cherry-pick guidance) and MUST NOT instruct or discuss branch/commit/PR operations.
+Every governed Live QA plan, runbook, result, and verdict MUST identify the exact repository and candidate SHA to which its findings apply.
 
-Live QA plans/runbooks MUST NOT gate PASS/FAIL on VCS state (for example “working tree clean,” “on correct branch,” “commit matches expected,” or any similar VCS-derived condition).
+Live QA remains non-mutating unless its governing plan expressly authorizes a bounded QA-produced artifact. Read-only repository or VCS inspection MAY be used to establish repo root, current ref, candidate identity, relevant diff, and claim-time staleness. Those facts are traceability and scope controls; they are not correctness or acceptance proof by themselves.
 
-Limited, read-only git commands MAY be included only as optional, non-gating repo-root sanity checks (“this is a repo” / “repo root exists”). They MUST be non-mutating and MUST NOT print or rely on branch names, commit SHAs, or PR identifiers. If a git sanity check fails, the check outcome is TOOLING\_BLOCKED (not FAIL\_BEHAVIOR), and execution MUST proceed via non-git verification paths.
-
-If any git information is captured at all, it is traceability-only and MUST NOT block execution or acceptance decisions.
+If exact candidate identity required for a verdict cannot be established, the affected current-verdict claim is TOOLING\_BLOCKED or otherwise unavailable under the governing status vocabulary. Execution MAY continue through authorized non-git verification paths, but no current PASS, acceptance, or completion claim may be issued without the required exact-source identity.
 
 ### **0.6.9 Plans are pointers; QA planning is post-implementation**
 
@@ -1385,77 +1381,47 @@ The detailed QA Plan is authored/updated during implementation and QA work, and 
 
 Approval posture: avoid planning stalls. Reviewers SHOULD NOT block PLAN/CRD approval by demanding:
 
-* a full token/evidence matrix embedded in the PLAN/CRD  
+* a complete acceptance-token roster or token/evidence matrix  
+* per-step intended-token or claimed-token declarations when no active scoped roster exists  
 * a fully specified Live QA step list before implementation exists
 
-If a token name/semantics is unclear at planning time, treat it as Deferred (out of scope) and capture the dispute as an ADR/doc-delta rather than debating inside the PLAN.
+If a legacy token name or semantic is unclear at planning time, do not invent or require a substitute. Preserve the underlying source-grounded requirement through its stable governing, acceptance-criterion, test, or evidence identity.
 
-Live QA plan review outcome discipline (Blockers vs Caveats). Reviewers SHOULD keep Live QA plan approval and execution capture separate: the approval gate is about clarity, scope, and evidence routing — not about pre-creating execution artifacts.
+Live QA plan review outcome discipline (Blockers vs Caveats). Reviewers SHOULD keep Live QA plan approval and execution capture separate: the approval gate is about clarity, scope, safety, exact-source identity, evidence routing, and verdictability—not about pre-creating execution artifacts or token bookkeeping.
 
 Live QA Plan approval is an operational-readiness review. Approve when the plan is safe, self-contained, phase-bounded, and clear enough for the assigned operator to execute the QA run and produce a meaningful governed verdict.
 
 Do not return a Live QA Plan for revision solely for exact-command mismatch, command invocation preference, rendered escape characters, formatting, code-block or quote-block style, step-log header polish, path-proof field polish, canonical JSON compactness wording, or evidence-ledger byte-shape polish.
 
-A Live QA Plan approval blocker is valid only when the issue creates concrete operational harm to safe execution, required QA step coverage, required deliverable existence, explicit PASS or FAIL verdictability, rails posture, secret handling, live-provider or external-action boundary, public/private surface boundary, token truth, acceptance overclaim, source authority, self-contained execution, evidence trust, proof target identity, repo-locus truth where an existing locus is required, OPS/QA/implementation category separation, phase scope, or closeout truth.
+A Live QA Plan approval blocker is valid only when the issue creates concrete operational harm to safe execution, required QA step coverage, required deliverable existence, explicit PASS or FAIL verdictability, rails posture, secret handling, live-provider or external-action boundaries, public/private surface boundaries, acceptance overclaim, source authority, self-contained execution, evidence trust, proof-target identity, repo-locus truth where an existing locus is required, OPS/QA/implementation category separation, phase scope, or closeout truth.
 
-At plan approval, the plan must identify what each check proves, what counts as PASS, what counts as FAIL, where the decisive receipt lands, which governed evidence family or evidence class supports the verdict, and how token claims are avoided unless registered and in scope. Final byte-level details of canonical JSON compactness, field ordering, path-proof transcript shape, step-log header shape, mirror-record shape, or evidence-index refresh mechanics are closeout or execution validation issues unless their absence prevents evidence identity, decisive receipt, governed proof, or verdictability.
+At plan approval, the plan must identify what each check proves, what counts as PASS, what counts as FAIL, where the decisive receipt lands, which governed evidence family or evidence class supports the verdict, and the exact candidate identity to which the result will bind. Final byte-level formatting details remain closeout or execution-validation issues unless their absence prevents evidence identity, decisive receipt, governed proof, or verdictability.
 
-Commands in a Live QA Plan are operational instructions, not canon contracts, unless the plan states that an exact invocation is required and the owning PF home requires exactness for the operational result. If an equivalent safe command can produce the same proof target under the same rails, evidence family, and PASS or FAIL predicate, exact-command mismatch is a Caveat, Suggestion, or execution note rather than a Blocker. The exact command actually used must be captured in governed QA evidence.
+Commands in a Live QA Plan are operational instructions, not canon contracts, unless exact invocation is required by the owning PF home. An equivalent safe command that proves the same target under the same rails and PASS or FAIL predicate is a Caveat, Suggestion, or execution note rather than a Blocker. The exact command actually used must be captured in governed QA evidence.
 
-A Live QA Plan MAY create QA-only harness scaffolding during Step 0 when the harness is limited to QA evidence capture and does not create product behavior. Reviewers MUST NOT require repo-existence proof for a QA-created harness that the plan explicitly creates during the QA run. A QA-created harness issue is a Blocker only when creation is not executable, unsafe, out of scope, changes implementation behavior, proves the wrong target, cannot emit a verdict, or cannot produce or point to required governed evidence.
+A Live QA Plan MAY create QA-only harness scaffolding during Step 0 when limited to evidence capture and not product behavior. A QA-created harness issue is a Blocker only when creation is not executable, safe, in scope, capable of proving the intended target, capable of emitting a verdict, or capable of producing or identifying required governed evidence.
 
-A Live QA plan, execution report, or closeout review may define a check as proof-only only when its purpose is to prove current state and not to perform implementation, PF edit, OPS action, evidence-index edit, token-map edit, route or public payload expansion, or closeout action.
+A plan, execution report, or closeout review may define a check as proof-only only when it performs no implementation, PF edit, OPS action, evidence-index edit, route expansion, or closeout action. Its evidence MUST state and verify those non-action boundaries. A proof-only PASS proves only the named target and governed evidence posture.
 
-When a check is proof-only, the plan or result evidence MUST state the non-action boundaries and verify that no prohibited action occurred.
-
-A proof-only PASS proves only the named proof target and governed evidence posture. It MUST NOT imply implementation completion, PF edits, OPS completion, final closeout, live-provider behavior, public surface expansion, or PF09 drainage unless those stronger claims are separately approved and proven.
-
-A reviewer who blocks Live QA Plan approval MUST state the operational harm. If no operational harm is shown, classify the issue as Caveat, Suggestion, Nit, or no issue.
-
-Schema authority (templates \+ step-log headers \+ status vocabulary). The Live QA plan template shape, step-log header schema, and status vocabulary are governed by Plan Templates (titles-only). This guide does not restate or extend that schema; any additional header fields beyond the Plan Templates minimum are optional and MUST NOT be required as a plan-approval condition unless Plan Templates is updated to require them.
-
-Header field omissions are format gaps (capture as caveats). If a plan/template expects specific step-log header fields (for example pf\_refs, intended\_tokens, claimed\_tokens) but the tool-emitted primary.log header omits them, record the omission as a formatting caveat in the QA RCA/doc-delta record. Do not reinterpret PASS/FAIL solely on that omission unless the missing field prevents confident verification of acceptance-decisive proof facts.
-
-Token claims in step logs (claims-only semantics). If a step log includes any \*\_OK token names, they are treated as claims:
-
-* Token lists are optional in runbooks; plans must not be approved/rejected based on token-list completeness.  
-* On PASS, the step log may claim one or more \*\_OK tokens that the step actually verified.  
-* On any non-PASS status, the step log MUST NOT claim any \*\_OK tokens.  
-* If a step needs to record intended tokens without claiming them, list them under a distinct label (for example “intended tokens”) rather than using the claim token list.  
-* When a PASS-grade step log records both intended tokens and claimed tokens, reviewers MUST compare those sets as part of token-fidelity review.  
-* If the intended-token set and claimed-token set match in the governed step evidence, the step MAY be treated as token-aligned for those tokens.  
-* If the claimed-token set is narrower or wider than the intended-token set, the QA review MUST say so explicitly rather than implying exact alignment.  
-* A narrative QA review does not need to restate every matching token proof line when that alignment is already explicit in the governed step evidence and the step’s approved PASS criteria are otherwise satisfied.  
-* When a Live QA plan includes intended tokens in a matrix or rollup view, but the step’s approved Deliverables and PASS/FAIL blocks are deliverable-based, the step block is the decisive contract for the step.  
-* If the step’s required deliverables are present and the approved step-level PASS criteria are satisfied, absence of token-by-token proof lines in the narrative review or deliverables report is a reporting caveat, not an automatic blocker, unless token alignment itself is explicitly required by the step block or by governed step evidence.  
-* If a QA review states that token-level proof lines were not surfaced, the review MUST record the exact search basis used to reach that conclusion, including the searched token names, searched fields, or searched report sections.  
-* Matrix-only intended tokens remain planning metadata unless the step block or the governed step evidence makes token alignment acceptance-decisive for that step.  
-* This is intentionally schematic; see the canonical token registry and per-check token semantics for details.
+Schema authority, template shape, step-log headers, and status vocabulary remain governed by Plan Templates. Additional fields are optional unless that owner requires them. Omission of a legacy token field is not a verdict defect unless a currently governing schema requires the field and its absence prevents confident verification of acceptance-decisive facts.
 
 Each step log MUST:
 
-* Include a stable check ID that is consistent across runs.  
-* Include a rails snapshot (at minimum: SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ, APP\_ENV). Additional env vars may be recorded if helpful. If present, they are diagnostic only and must not be treated as required pins (for example: PYTHONHASHSEED=0).  
-* Include the exact command(s) executed (copy/paste-ready).  
-* Capture exit codes (where applicable).  
-* End with an explicit step outcome classification (tooling vs behavior), consistent with the status vocabulary in Plan Templates.
+* include a stable check ID consistent across runs  
+* identify the exact repository and candidate SHA  
+* include the required rails snapshot  
+* include the exact commands executed  
+* capture applicable exit codes  
+* end with an explicit outcome classification under the governing status vocabulary
 
-Step-log header writer input exports (per-check requirement)
+Header-writer inputs required by PF27-Canon-Plan-Templates remain mechanical requirements. Evidence-capture-only header remediation may preserve existing body bytes exactly as already allowed, and plans MUST NOT mix incompatible header-writer patterns.
 
-If a check generates the primary.log JSON header via a step-log header writer, the plan MUST export the required inputs per check immediately before invoking the writer and MUST use the exact current header-writer contract defined by PF27-Canon-Plan-Templates. Do not rely on inherited values from prior checks.
+Live QA plan review findings MUST be separated into:
 
-Review posture: any export required by PF27-Canon-Plan-Templates that is missing is a mechanical blocker for plan approval and MUST be corrected before execution.
+* BLOCKERS—independently proven non-syntax issues that prevent safe execution or confident PASS/FAIL determination  
+* CAVEATS—non-syntax issues that do not prevent execution or confident verification, including optional legacy-token metadata drift
 
-Moon Loop remediation (allowed; evidence-capture only): if execution already occurred but the header is missing or incorrect due to missing exports, it is allowed to export the required variables, regenerate only the JSON header, and rebuild primary.log by prepending the corrected header line while preserving the existing body bytes verbatim. Record the remediation in the step log notes and do not re-run behavioral steps solely to fix header formatting.
-
-Anti-drift: plans MUST NOT mix patterns where some checks export these variables and other checks omit them while still calling the same header writer.
-
-Live QA plan approval, review findings MUST be separated into exactly two sets:
-
-* BLOCKERS — independently proven non-syntax issues that remain after faithful syntax normalization and prevent the PO from executing the semantic plan or prevent reviewers from determining pass/fail for in-scope behavior with confidence. Examples: missing pass/fail criteria, unspecified evidence capture, an evidence output location that remains indeterminate after normalization, manual-fill placeholders for semantic outputs or evidence, unvalidated or fabricated repo loci, or a plan requirement to change production code. Syntax origin, literal non-executability, punctuation, formatting, or paste-readiness alone MUST NOT enter the Blocker set.  
-* CAVEATS — non-syntax issues that do not prevent execution or confident verification, such as partial token lists, token-registry drift discovered during planning, documentation drift that can be captured through a doc delta, or omission of optional diagnostic artifacts. Syntax-origin defects are excluded from the Caveat set and may be recorded only as a Non-issue, Note, or in-flight normalization that does not worsen or condition the approval decision.
-
-Token/evidence matrix is a QA ledger artifact. When a token/evidence matrix is required for an epic, it is maintained as a governed QA ledger under the epic’s QA root (see §1.1.9). The PLAN may contain a one-line pointer; it must not embed the matrix. The QA root will be filled in during implementation.
+A token/evidence matrix is not a universal PLAN, QA-ledger, acceptance, or closeout requirement. When a bounded plan expressly opts into a legacy token or equivalent cross-reference under the governing exception, its evidence pointer MAY be carried in an existing governed artifact without embedding a matrix in the PLAN.
 
 ### **0.6.10 Redline bundle construction discipline**
 
@@ -1510,83 +1476,48 @@ Evidence-only QA branch acceptance token names and semantics are defined by PF04
 
 ### **1.1.1 Standard epic flow**
 
-Before applying the steps below, every epic MUST perform a canon inventory:
+Before applying the steps below, every epic MUST perform a current-state canon and repository inventory:
 
-* Read, by title, the current Glow Infrastructure, HDE-Build Notes, Glow QA Guide, and Reality Audits (PF23) entries that apply to this epic.  
-    
-* Consult HDE Phased Epics as a historical-only archive of completed epic records (for prior context and precedent). Do not add in-flight epic entries there. The epic record is archived there once, at epic close.  
-    
-* Record, in the PLAN context header or adjacent notes:  
-    
-  * key environment and infra facts from Glow Infrastructure (use canonical values; do not treat as PO inputs unless explicitly marked OPEN/TBD in canon)  
-      
-  * relevant QA tokens and acceptance semantics from Glow QA Guide / PF-Canon (cite the owning canon doc)  
-      
-  * the epic’s D-goals and exclusions from the epic CRD/PLAN; HDE Phased Epics may be consulted only as historical precedent for the D-goal roster and prior close artifacts (it MUST NOT be cited to define evidence surfaces, acceptance tokens, rails, or status semantics)
+* Resolve and record the current relevant repository ref.  
+* Read, by title, the current Glow Infrastructure, HDE-Build Notes, Glow QA Guide, and Reality Audits entries that apply.  
+* Consult HDE Phased Epics only as a historical archive of completed epic records.  
+* Record key environment and infrastructure facts; applicable governing requirements, acceptance criteria, tests, and evidence identities; and the epic’s D-goals and exclusions.  
+* Record the applicable PF23 components and current repository loci as traceability only.  
+* Mark any missing or ambiguous required fact as a spec gap instead of improvising.  
+* Draft the PLAN header and CRD only after the current-state inventory is complete.
 
+Epic Plan record: Draft the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates. PF06 does not define a separate Epic Plan machine-header grammar.
 
-* Add a short PF23 Anchors subsection (or adjacent notes) listing:  
-    
-  * the component(s) used from Reality Audits  
-      
-  * the key pathnames/loci from that audit that this epic will touch
-
-
-* This is traceability only. Do not duplicate PF23 contents. Do not assign PF23 updates as tasks (PO-owned).  
-    
-* If any required fact appears missing or ambiguous, mark it as a spec gap per §0.6.5 (blocked-by-spec) instead of treating it as a PO input or improvising rails.  
-    
-* Only after this canon inventory is complete should the PLAN header and CRD be drafted.
-
-Epic Plan record: Draft the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates as the plan submission. PF06 does not define a separate Epic Plan machine-header grammar.
-
-CRD with approved scope: After one review, issue the CRD with the approved scope and acceptance tokens by title only (for example A3, A4, A7); do not list bytes or payload shapes in the CRD.
+CRD with approved scope: After one review, issue the CRD with its approved scope, stable governing and acceptance-criterion identities, and applicable evidence obligations. A complete token roster is not required.
 
 Code capsules before IP: Finalize code-capsules before IP approval; capsules freeze at IP.
 
-CodEx PR creation: CodEx MUST run Audit \+ Sandbox Build/Test and, when the required authenticated repository capability is available, MUST open the PR using the standard template. If that capability or authorization is unavailable, the workflow is blocked; do not claim that the PR was opened or silently transfer the action to another actor. In that PR, CodEx is responsible for publishing, in a single slice:
+Mutation route: Record whether the authorized route is PR or direct-to-`main`. The normal code-bearing route is PR-first. Agent direct-main mutation requires an explicit current operator instruction covering the exact change.
+
+CodEx execution: CodEx MUST run Audit \+ Sandbox Build/Test and verify that its working base remains current. If `main` advanced, CodEx MUST compare and reconcile the movement or prove it immaterial before mutation.
+
+For a PR route, CodEx opens or amends the exact-slice PR when the required authenticated capability exists and includes:
 
 * Code  
-    
-* Doc-Delta (repo docs)  
-    
-* Human Evidence Index (docs/evidence/INDEX.json)  
-    
-* Machine JSONL mirror (artifacts/evidence\_index.jsonl)
+* Doc-Delta  
+* every applicable Human Evidence Index, hash, Machine Mirror, and path-proof companion  
+* close-pack files only when the slice is the close PR
 
-CodEx MUST also attach:
+For an authorized direct-main route, CodEx records the exact post-write SHA, diff, and applicable push-triggered CI result. It MUST describe pending or failed validation truthfully and MUST NOT claim QA, acceptance, or closure merely because the change landed.
 
-* The close pack  
-    
-* The PASS token list
+Lead Developer PR gate: When a PR is used, Lead Dev verifies the exact head candidate, applicable CI against that candidate, required proof surfaces, acceptance criteria, and evidence parity. A PASS-token list is not required.
 
-Lead Developer gate: Lead Dev gates the PR by verifying, as applicable:
-
-* PASS token list is consistent and complete  
-    
-* A7 proof surface is correct (cataloged JSON success route only)  
-    
-* Env-gates and encoding invariance are respected for A7 proofs  
-    
-* 1:1 Evidence Index ↔ machine mirror parity with path-proofs
-
-PO merge and green-freeze: The Product Owner is the sole merger and uses squash-merge on PASS. After merge:
-
-* Scrum Master is informed  
-    
-* Suites are green-freeze unless a qualifying change lands
+PO repository action: The Product Owner alone performs any authorized squash merge. Direct-main repository adoption is the exact post-write `main` commit. Neither route establishes QA PASS or epic closure by itself.
 
 ### **1.1.2 Multi-PR epics**
 
-For some epics (for example EPIC017 and similar Calcination/Separation passes):
+For epics delivered through multiple PRs:
 
-* The work may be split into a series of PRs (up to 10 PRs per epic).  
-    
-* Each PR must carry a self-contained slice with code \+ Doc-Delta \+ evidence.  
-    
-* The PR-first pattern and same-PR parity (code \+ docs \+ Evidence Index \+ machine mirror) apply to each PR.  
-    
-* Epic-level acceptance is recorded in the current Epic Plan and occurs only after all required PRs for that epic have merged; the final record is archived in PF20-Reference-HDE-Phased Epics only at epic close.
+* The work may be split into up to 10 coherent PR slices.  
+* Each PR carries a self-contained slice with code, Doc-Delta, and applicable governed evidence.  
+* Each PR’s review and relied-upon CI bind to its exact head SHA.  
+* Later pushes create a new candidate and require rerun or explicit scope-equivalence proof for carried review or QA claims.  
+* Epic-level acceptance occurs only after all required slices have been adopted and the remaining governing completion requirements and authorized lifecycle decision are satisfied. The final historical record is archived in PF20 only at epic close.
 
 ### **1.1.3 “Prod via Codespaces” requirements (PLAN/CRD)**
 
@@ -2002,50 +1933,20 @@ are incomplete and must be corrected before PO Live QA is scheduled.
 
 ### **1.1.7 D3 CLI guard runs — CI vs open-rails Live QA**
 
-Live QA planning MUST explicitly distinguish between these contexts:
+Live QA planning MUST distinguish these contexts:
 
 * CI / closed-rails D3 guard runs (authoritative).  
-    
-  * D3 CLI guard tokens (for example the serializer and emitter guard tokens defined by title in the HDE-Build Checklist and HDE-Mechanics Guide) are authoritatively satisfied by CI and closed-rails runs.  
-      
-  * The canonical D3 acceptance condition is: guard tools run under the closed determinism rails (for example LC\_ALL=C, LANG=C, TZ=UTC, SAFE\_MODE=1, ALLOW\_NETWORK=0 as defined by other PF docs) and exit successfully, with their evidence captured and indexed according to those documents.  
-      
-  * Live QA Plans MUST NOT assume that an open-rails Live QA environment is responsible for re-satisfying these D3 guard tokens; instead, they MUST point to the CI/closed-rails evidence when claiming D3 acceptance.
+  * D3 serializer and emitter guard predicates are authoritatively evaluated by the applicable exact-SHA CI or closed-rails run.  
+  * The acceptance condition is that the applicable guard tools run under the governing closed determinism rails, exit successfully, and produce the required governed evidence.  
+  * A Live QA Plan claiming D3 acceptance MUST identify the exact tested candidate and the applicable CI or closed-rails result and evidence. No D3 acceptance-token claim is required.  
+* Open-rails Live QA guard runs (optional, environment-enforcement only).  
+  * Running the CLI guard tools in an intentionally open-rails environment is optional and demonstrates only whether the guards enforce their environment pins.  
+  * A failure caused solely by the expected open-rails mismatch is not a wiring defect and does not contradict a separately established exact-SHA closed-rails D3 result.  
+  * The plan MUST label such a run informational and bind any D3 acceptance claim to the applicable closed-rails evidence.
 
+For PO-run open-rails Live QA, an optional guard run MAY demonstrate environment-pin enforcement. An expected rails-mismatch failure MUST NOT block unrelated Live QA. The plan MUST identify the exact closed-rails result used as the D3 source of truth.
 
-* Open-rails Live QA guard runs (optional, env-enforcement only).  
-    
-  * In an intentionally open-rails Live QA environment (for example, a Codespace used for prod-facing behavior tests and artifact capture per §0.6.3–§0.6.4), running the CLI guard tools is optional and is treated as an env-enforcement check only.  
-      
-  * In this context, a guard run that fails solely due to env mismatch (for example, exit code 1 because the environment is open rails instead of the closed determinism rails expected by CI) MUST NOT be treated as:  
-      
-    * a wiring bug  
-        
-    * a failure to satisfy D3 guard tokens
-
-    
-
-  * Live QA Plans MUST:  
-      
-    * state explicitly when a guard step is being run in an open-rails environment “for information only” (to confirm that guards enforce env pins)  
-        
-    * tie D3 guard tokens back to the CI/closed-rails runs, not to these open-rails checks
-
-Effect on PO Live QA: For PO-run Live QA sessions in open-rails environments:
-
-* Guard runs, if present, MAY be used to demonstrate that env pins are enforced.  
-    
-* Guard failures due solely to env mismatch MUST NOT block PO Live QA or be interpreted as D3 token failures.  
-    
-* The Live QA Plan MUST refer back to the CI/closed-rails guard evidence as the source of truth for D3 acceptance.
-
-Plans are non-conforming and MUST be corrected if they:
-
-* treat open-rails guard failures as D3 token failures  
-    
-* omit the CI vs open-rails distinction for guard steps
-
-These plans MUST be corrected so that D3 acceptance is clearly anchored in CI/closed-rails runs, with open-rails guard runs documented as optional env-enforcement checks only.
+A plan is non-conforming if it treats an open-rails mismatch as failure of a closed-rails D3 predicate or omits the distinction between the two contexts.
 
 ### **1.1.8 CLI commands in QA Plans (canon-backed only)**
 
@@ -2119,319 +2020,51 @@ Plans are non-conforming and MUST be revised before PLAN/CRD approval or Live QA
     
 * assert Expected Outcomes that go beyond PF-Canon requirements without naming the corresponding tokens or docs by title
 
-### **1.1.9 Token fidelity rails for QA tokens and evidence**
+### **1.1.9 Exact-source acceptance and legacy-token compatibility**
 
-This section defines planning \+ review \+ closeout rails for epics that introduce or consume QA Acceptance Tokens.
+Exact-source evidence and scoped authorized decisions are the primary controls for new planning, review, QA, acceptance, and closeout work.
 
-#### **1.1.9.1 Two axes reminder: PF23 audit scope vs PF04 token semantics**
+A complete acceptance-token roster, token-scope block, token/evidence matrix, or token-name claim is not a prerequisite. Absence of that material MUST NOT block otherwise sufficient exact-source evidence.
 
-PF23 audits govern whether particular audit steps are required and how they are executed.
+Every current claim identifies the applicable stable PF, ADR, epic, task, acceptance criterion, test, schema, artifact, repository, commit, PR, workflow, evidence, and decision records. Existing GitHub or governed-artifact records carry facts directly; do not duplicate them into a replacement registry or universal form.
 
-QA Acceptance Tokens remain governed by their canonical registry (names \+ semantics). Waiving, narrowing, or skipping PF23 audits does not waive token fidelity requirements.
+The existing PF04 token registry and derived exports remain historical compatibility sources. Existing token IDs and historical evidence MUST NOT be reinterpreted, reassigned, deleted, or treated as current evidence for a later candidate without rerun or explicit scope-equivalence proof.
 
-#### **1.1.9.2 Token scope discipline (prevent planning stall)**
+Token-aware tools and schemas MAY remain. Empty token arrays remain valid where a governing schema requires the field. No code migration or bulk rewrite of historical plans, logs, reports, indexes, or audit artifacts is required.
 
-Every Epic PLAN/CRD or Implementation Plan that references QA Acceptance Tokens MUST classify referenced tokens into exactly one of these sets:
+A future plan MAY opt into one bounded token or equivalent cross-reference only when existing PF, ADR, epic, task, test, or acceptance-criterion identities cannot supply necessary traceability. The plan must identify the bounded need and evidence relationship. That exception does not reactivate a universal token system.
 
-* In-scope tokens: Tokens this epic will claim (i.e., tokens that appear as acceptance proofs / closeout claims).  
-    
-* Deferred tokens: Tokens identified during planning/discovery, but explicitly out of scope for this epic. Deferred tokens must not be claimed as acceptance proofs for this epic.  
-    
-* Informative tokens: Tokens mentioned only for context (e.g., “related existing token exists”), but not claimed and not evidence-wired for this epic.
+A legacy token-like proof label MAY remain as optional indexing metadata. It is not acceptance authority, does not replace its governing requirement or evidence, and MUST NOT be used to transfer a historical PASS to different repository bytes.
 
-Planning-time rule (no invention): If a token’s canonical name or semantics cannot be identified in the PF04 Token Registry or a current numbered PF10 addendum, the token claim MUST be treated as Deferred. Preserve any source-grounded underlying behavior as a non-token obligation unless separate scope authority defers it. Do not invent local aliases or synonyms.
+### **1.1.10 PLAN submission preflight (mechanical gate: exact sources \+ evidence paths)**
 
-Reviewer rule (anti-stall): A proposed token name that is not yet claimable is Deferred and recorded through the applicable ADR or doc-delta path. The underlying source-grounded requirement remains a non-token obligation unless separate scope authority defers it; token uncertainty must not silently remove required behavior.
-
-#### **1.1.9.3 Split the checkpoints: Plan approval vs QA ledger completion**
-
-This process separates two checkpoints, but token fidelity is enforced at both.
-
-Stage A is PLAN/CRD approval (planning-time). A PLAN/CRD may be approved only if:
-
-* It includes a titles-only acceptance roster (what must be true).  
-    
-* It includes a Token Scope block with stable names for in-scope tokens.  
-    
-* For any epic that introduces or consumes QA Acceptance Tokens, reviewers MUST construct (explicitly or as a checked artifact) a token/evidence matrix for all in-scope tokens.
-
-Stage A token/evidence matrix rule (hard): No in-scope token may have any cell in the token/evidence matrix marked as “e.g.”, “TBD”, or left implicit at approval time.
-
-If a token row cannot be completed without guessing, that token MUST be removed from in-scope and treated as Deferred.
-
-A PLAN/CRD MUST NOT be marked approved (ASK OK) for that token while any row is incomplete or uses placeholders.
-
-Stage A may still defer detailed Live QA runbooks into QA execution artifacts per §1.1.4–§1.1.6, but token naming and token→evidence wiring (by titles/paths/keys) must be explicit.
-
-Stage B is Closeout readiness / Live QA completion (execution-time). Before an epic is considered closeout-ready, the QA ledger must be complete for all in-scope tokens, and the token/evidence matrix must match reality:
-
-* the planned tests/CI jobs/Live QA steps exist and were executed as applicable  
-    
-* the governed evidence artifacts exist under governed roots  
-    
-* the Evidence Index \+ Machine Mirror entries referenced by the matrix exist and are coherent
-
-Stage B is verification of the Stage A matrix against produced evidence; it is not a second chance to “finish naming” or “decide token spellings.”
-
-#### **1.1.9.4 Token/evidence matrix is a QA ledger artifact (not embedded in the PLAN)**
-
-The token/evidence matrix is the governed QA ledger that binds each in-scope QA Acceptance Token to:
-
-* tests (unit/integration)  
-    
-* CI enforcement under closed rails  
-    
-* Live QA steps (if applicable)  
-    
-* governed evidence artifacts (paths)  
-    
-* Evidence Index \+ Machine Mirror entries (keys and proof anchors)
-
-The matrix MUST NOT be embedded inside the Epic PLAN/CRD. The PLAN may include a pointer line to the matrix location (typically under the epic QA root).
-
-Matrix completeness rule (applies at Stage A for in-scope tokens): For every token that is in scope for the epic at PLAN/CRD approval time, the token/evidence matrix MUST have a complete row. No “e.g.”, “TBD”, “??”, or implicit cells are permitted for in-scope tokens at approval time.
-
-Row schema (minimum required fields). Each in-scope token row MUST include:
-
-* PF04 Token Registry name: the canonical acceptance-token name (no aliases).  
-    
-* Acceptance map / manifest token name: MUST exactly match the PF04 Token Registry name (no epic-local synonyms).  
-    
-* Tests: the unit/integration tests that exercise the behavior (by identifier or path).  
-    
-* CI jobs: the CI job(s) that enforce the behavior under closed rails (by job name).  
-    
-* Live QA steps: step identifiers that demonstrate the token (if applicable), pointing to the epic QA root.  
-    
-* Evidence artifacts (paths): governed repo-relative artifact paths produced by those tests/steps.  
-    
-* Evidence Index \+ Machine Mirror entries: the artifact\_key(s) and the expected proof anchoring posture for each artifact:  
-    
-  * artifact\_key  
-      
-  * epic\_id  
-      
-  * tokens (the PF04 Token Registry name)  
-      
-  * proof\_anchor (to the co-located path-proof)
-
-If any in-scope token cannot satisfy this schema without guessing, the token MUST be removed from in-scope (Deferred) before approval.
-
-Uniqueness requirement (always): The token/evidence matrix MUST contain exactly one row per in-scope token. Duplicate rows for the same token are mechanical blockers and must be removed before approval.
-
-Draft scaffolds (not approvable): Draft matrices may exist during plan drafting, but a PLAN/CRD cannot be marked approved (ASK OK) for any token while its row contains placeholders or missing fields.
-
-#### **1.1.9.5 Acceptance token single homes: PF04 registry vs PF19 QA operational library (no local synonyms)**
-
-Acceptance token names and semantics are defined once in the canonical governance registry.
-
-Rules:
-
-* PF04 is the single source of truth for acceptance token names and semantics. Epic plans, acceptance maps, manifests, and step logs MUST reference token names exactly as registered there (no aliases, no near-matches).  
-    
-* PF19 is the canonical home for QA operational guidance about tokens. PF19 may carry execution guidance (metadata, wiring notes, runbook mapping, evidence expectations), but it MUST reference token names exactly as defined in PF04 and MUST NOT introduce new token names or divergent meanings.  
-    
-* Epic Plan acceptance rosters are names-only consumers under PF27-Canon-Plan-Templates. They consume token names and MUST validate spelling against the PF04 Token Registry before tokens are treated as claimable acceptance. PF20-Reference-HDE-Phased Epics receives the final record only at epic close.  
-    
-* No local synonyms. Epic-local token names, aliases, and “equivalent” spellings are prohibited. If a token name cannot be identified without guessing, do not invent or claim a token; preserve the underlying requirement as a non-token obligation when applicable, and record the token gap as a doc delta.
-
-Tool-exported token registries and derived token sets (for example `S1_TokenRegistry` output) are observational only and may lag the PF04 registry; they MUST NOT be treated as acceptance authority or used as the source of record for token spelling in plans, close packs, or PR PASS rosters.
-
-If a tool emits `QA_STEP_LOGS_CONSOLIDATED_OK`, treat it as a deprecated alias for `QA_HARNESS_DISCIPLINE_OK` and record the canonical token name in acceptance artifacts.
-
-#### **1.1.9.6 No silent downgrades**
-
-Once a reviewer has identified token naming or token→evidence wiring as a blocking issue (for example a PF04 Token Registry mismatch, a missing required PF19 operational mapping, placeholder “e.g./TBD” cells in the token/evidence matrix, or incomplete token→artifact bindings), that blocker MUST NOT be downgraded to “non-blocking” in a later review unless:
-
-* the plan/acceptance artifacts have been updated to resolve the issue, or  
-    
-* PF-Canon has been explicitly updated to resolve the issue (for example PF04 Token Registry registration or a current numbered PF10 addendum)
-
-Any downgrade MUST reference the specific resolving change (plan diff and/or PF-Canon change). A change in reviewer interpretation or scope alone is not sufficient.
-
-#### **1.1.9.7 Scope waivers must be explicit and non-transitive**
-
-If the Product Owner or governance chooses to waive or narrow a canon requirement for a particular plan (for example, “PF23 audits are out of scope for this plan”), reviewers MUST:
-
-* record the waiver as a local scope directive in the PLAN/CRD  
-    
-* state explicitly that other rails remain fully in force, including:  
-    
-  * PF04 token naming and semantics, together with PF19 QA operational guidance  
-      
-  * PF12 evidence/index/mirror rules (HDE-Schemas & Artifacts)  
-      
-  * Epic Plan D-goals and token rosters (PF27-Canon-Plan-Templates)  
-      
-  * PF09 CI/QA rails (HDE-Build Checklist)
-
-Such waivers MUST NOT be interpreted as permission to relax token naming, acceptance mapping, evidence wiring, or index/mirror discipline.
-
-#### **1.1.9.8 Re-ground before asserting “no canonical token name exists”**
-
-Before any reviewer asserts “no canonical token name exists yet” for a QA behavior, they MUST:
-
-* re-check the PF04 Token Registry for an existing token that covers the behavior  
-    
-* re-check current numbered PF10 addenda for an exact token minted pending drainage into PF04
-
-A token name is claimable only when it is registered in PF04 or minted by a current numbered PF10 addendum. Epic-specific approval, remediation text, plans, reviews, and evidence artifacts may propose or reference a name, but they do not make it canonical by themselves.
-
-If neither authorized home supplies a claimable name, do not invent an alias or claim a token. Preserve the source-grounded behavior as a non-token obligation with its required proof, and route any token-admission request through the governed ADR, PF10, and PF04 lifecycle. Defer the token claim; do not silently defer the underlying requirement.
-
-#### **1.1.9.9 Token value rubric \+ token budget (reduce token sprawl)**
-
-Guard proofs are evidence-only unless Governance registers tokens (normative).
-
-Default posture: serializer/emitter/guard proofs are evidence-only deliverables, not acceptance tokens. They MUST exist, be mechanically produced, and be reviewable, but they do not create new token obligations unless Governance has registered a token name and semantics for that guard.
-
-No token invention: A plan MUST NOT introduce or claim new “guard tokens” unless the token exists in the canonical token registry owned by HDE Governance.
-
-Evidence quality (still strict): Evidence-only does not mean loose. Guard proof artifacts MUST:
-
-* be mechanically generated (no hand edits)  
-    
-* have a single primary log/artifact per guard check  
-    
-* include a clear PASS or FAIL classification in the primary artifact  
-    
-* be stored under governed roots when used as closure evidence  
-    
-* follow normal index/mirror/path-proof discipline when promoted to governed evidence
-
-Promotion rule: If a guard proof is referenced by acceptance wiring (for example a token/evidence matrix row, acceptance map, or close-pack narrative), it MUST be treated like other governed evidence (stable path, indexed, mirrored, with required path proofs).
-
-Do not admit noise tokens. A QA Acceptance Token should represent an acceptance invariant that can be mechanically evidenced. Do not create tokens for workflow facts (e.g., “docs were read”, “PR was opened”, “a human checked something”).
-
-Default token budget: 0 new tokens per epic.
-
-Exception: up to ≤ 3 new tokens may be introduced only with explicit justification and an ownership plan (doc-delta path). More than 3 requires an explicit governance decision.
-
-#### **1.1.9.10 AB/BA composite identity token name (canonical)**
-
-The only canonical acceptance token name for AB/BA composite identity is:
-
-* COMPOSITE\_ABBA\_IDENTITY\_OK
-
-Any alternate spellings or legacy variants are non-canonical and MUST NOT appear as acceptance tokens in:
-
-* Epic Plans  
-    
-* acceptance maps  
-    
-* token/evidence matrices
-
-If an epic inherits legacy wording from a document, the PLAN may include a one-line clarification (example: “legacy name → canonical COMPOSITE\_ABBA\_IDENTITY\_OK”), but the claimed token name remains canonical.
-
-### **1.1.10 PLAN submission preflight (mechanical gate: tokens \+ evidence paths)**
-
-This section defines a mandatory preflight that must pass before an Epic PLAN is considered approvable. It is designed to prevent plan churn caused by missing close-pack items, unregistered tokens, and misbound evidence paths.
+This mandatory preflight prevents plan churn caused by missing applicable close-pack items, unidentified governing requirements, ambiguous candidate identity, and misbound evidence paths.
 
 #### **1.1.10.1 Close-pack completeness (plan-authoring gate)**
 
-A PLAN is non-conforming unless it explicitly includes the close-pack baseline:
+When the plan covers epic close, it is non-conforming unless it identifies:
 
-* the complete close-pack file set (by path, titles-only)  
-    
-* the required close-pack acceptance marker (titles-only)
+* the complete applicable close-pack file set by exact path  
+* the binary close decision and governing acceptance criteria  
+* the exact-source and evidence records that will support that decision
 
-This is a plan submission gate, not a later Close Gate reminder.
+This is a plan submission gate for close scope, not a universal prerequisite for an ordinary non-close slice.
 
-#### **1.1.10.2 Token registry validation (no unregistered acceptance tokens)**
+#### **1.1.10.2 Exact-source and acceptance-evidence validation**
 
-Token load reduction posture (planning). Default posture for Live QA plan approval:
+Before finalizing PLAN or CRD acceptance claims, the author MUST:
 
-* No per-step token claims are required.  
-    
-* No full token roster is required in the plan body.  
-    
-* Tokens remain an optional indexing layer unless token validity is required to interpret pass/fail for a specific test or check.
+* identify the current relevant repository ref and governing source versions  
+* identify each stable requirement or acceptance-criterion ID the plan will satisfy  
+* identify the planned tests, checks, commands, governed evidence paths, and PASS or FAIL predicates  
+* identify the candidate, workflow, artifact, and authorized-decision identities that will be recorded when they exist  
+* preserve explicit nonclaims for unexecuted, unresolved, or conditionally inapplicable work
 
-If a plan lists tokens:
+A complete token roster, per-step token declaration, or token/evidence matrix is not required. A legacy token MAY appear as optional indexing metadata, but the plan MUST NOT depend on a token to replace the underlying requirement, test, evidence, or exact candidate identity.
 
-* Token names MUST be exact and registry-valid for anything claimed as acceptance.  
-    
-* If a token name is encountered in epic rosters or QA materials but is absent from the registry:  
-    
-  * Do not invent substitute token names.  
-      
-  * Record as a CAVEAT: UNREGISTERED\_TOKEN (and capture it in Doc Delta Capture), and continue executing tests and capturing evidence normally unless the missing token prevents determining pass/fail with confidence.
+If no stable existing identifier adequately supplies a necessary cross-reference, the plan MAY propose one bounded token or equivalent reference under the governing exception. Until authorized, preserve the underlying requirement as a non-token obligation with explicit proof wiring. Do not invent a token-like alias.
 
-Acceptance tokens referenced in an Epic PLAN are governance-controlled names and MUST match the canonical token roster.
-
-Validation gate (mechanical). Every token name listed in:
-
-* the PLAN acceptance roster (Stage A)  
-    
-* the token/evidence matrix (Stage B, when used)
-
-MUST be validated against the canonical token roster before a plan can be approved.
-
-Unregistered token names that remain in a claimed acceptance roster are mechanical blockers to approval or acceptance. During execution, record an unregistered token as `CAVEAT: UNREGISTERED_TOKEN` and continue non-token evidence capture unless the missing token prevents a confident pass/fail determination.
-
-Token Inventory (required before plan finalization)  
-Before finalizing PLAN/CRD acceptance claims, the author MUST:
-
-* List every token the plan intends to claim (including tokens referenced by acceptance maps and token/evidence matrices when used).  
-    
-* For each token, confirm that it exists in the PF04-Canon-HDE-Governance Token Registry or was minted by a current numbered PF10 addendum.  
-    
-* If any needed token does not exist in either authorized home, raise an ADR. Until it is minted in a numbered PF10 addendum or registered in the PF04 Token Registry, it MUST remain a request or non-token obligation and MUST NOT be claimed. A token minted through PF10 remains pending drainage into PF04.
-
-Acceptance claim posture (tokens only; obligations allowed)
-
-* Acceptance claims MUST be written as canonical token names. Do not use freeform acceptance sentences as substitutes for token claims.  
-    
-* If a requirement is epic-local and does not warrant a new token, express it as an obligation (non-token requirement) with explicit proof wiring (commands, evidence artifact path(s), and a pass predicate). Obligations must not be formatted to look like token names.
-
-Keyset posture (no new token by default)
-
-* Do not mint a new token solely to express an internal compatibility posture (for example, a keyset contract). Prove the posture as evidence under existing canonical tokens or as an obligation.
-
-Canonical token string hygiene (common invalid variants). Token strings are contract surfaces. Plans, acceptance maps, token/evidence matrices, and step logs MUST use registry-canonical spellings (no aliases, no near-matches).
-
-Observed invalid variants must be corrected as follows:
-
-* CANON\_JSON\_OK → JSON\_CANONICAL\_CHECK\_OK  
-* DOC\_DELTA\_CAPTURED\_OK → DOC\_DELTA\_PRESENT\_OK  
-* COMPOSITE\_AB\_BA\_IDENTITY\_OK → COMPOSITE\_ABBA\_IDENTITY\_OK  
-* CLI\_READER\_EMITTER\_PARITY\_OK → CLI\_READER\_PARITY\_OK  
-* CATEGORY\_FRAMEWORK\_OK → (non-canonical and ambiguous; replace with the correct canonical token for the intended claim: MAGIC10\_DOMAIN\_CLOSED\_OK for domain closure, or PREFS\_KEYSET\_10\_OK for prefs keyset contract)
-
-Close-pack presence is baseline artifacts, not a token by default. Do not include CLOSE\_PACK\_FILES\_PRESENT\_OK in acceptance rosters or plan token lists unless and until Governance explicitly registers and canonizes it as a token. Close-pack presence is verified by the existence of the canonical close-pack artifacts and their evidence bindings.
-
-No ad-hoc new tokens during revise/resubmit. During a revise/resubmit planning loop, the plan MUST NOT introduce new acceptance tokens unless:
-
-* explicitly requested by Lead review  
-    
-* required due to a clearly identified canon gap
-
-Default posture when a behavior must be enforced and no token exists: state it as a non-token mechanical requirement under the deliverable and prove it via tests/evidence, rather than tokenizing it.
-
-Token-like proof labels named in checklist rows, PF10 addenda, PR summaries, OPS evidence, QA logs, acceptance maps, token-evidence matrices, closeout artifacts, or other review artifacts are not acceptance tokens merely because they are written in token-like form. Unless the exact name is registered in HDE-Governance or minted by a live PF10 addendum, the artifact MUST treat the name as a non-token proof label or obligation.
-
-Non-token proof labels MAY guide evidence collection and review, but they MUST NOT be claimed as satisfied PASS tokens, acceptance tokens, or close-pack tokens.
-
-If review determines such a proof label must become a gated acceptance predicate, the token name and semantics MUST be admitted through HDE-Governance or live PF10 before any acceptance artifact claims it.
-
-If (and only if) a new token is genuinely required, it must be routed, not invented. A plan may propose a new token only when all of the following are true:
-
-* ADR present in the plan. The ADR explicitly states:  
-    
-  * proposed token name  
-      
-  * one-sentence semantics  
-      
-  * intended evidence surface(s) (paths/titles only)  
-      
-  * drain targets (titles only)
-
-
-* Conflict/synonym check performed. The plan records that the proposed token name does not duplicate or alias an existing canonical token.  
-    
-* Doc-Delta required. The token is registered via Doc-Delta in the canonical token home before it can be required as an acceptance claim.
-
-Until registered, the token may be tracked as a proposed ADR item, but it MUST NOT appear as a required acceptance claim in PLAN/CRD, acceptance maps, or token/evidence matrices.
+Close-pack presence remains a baseline artifact requirement when close scope applies; it is not an acceptance token.
 
 #### **1.1.10.3 Evidence bundle completeness for local-bundle deliverables**
 
@@ -2597,19 +2230,11 @@ This validation is enforced as a human review checklist line (pass/fail). An aut
 
 #### **1.1.10.5 PF09 subtask closeout (evidence-binding first)**
 
-When an epic claims closure of a PF09 task or subtask that is described as captured elsewhere or piecemeal, the default closure method is:
+When an epic claims closure of a PF09 task or subtask described as captured elsewhere or piecemeal, the default method is to bind existing governed tests, artifacts, workflow results, and authorized decisions into the applicable acceptance and closeout artifacts rather than create a new evidence family.
 
-* bind existing governed evidence (tests \+ artifacts) into the epic’s acceptance artifacts (acceptance map \+ token/evidence matrix)  
-    
-* rather than creating new evidence families
+Creating a new evidence family is allowed only when the PLAN states exactly what existing evidence lacks and the new evidence follows the governed artifact conventions.
 
-Creating a new evidence family for closeout is allowed only if:
-
-* the PLAN includes an explicit gap statement (what is missing from existing evidence)  
-    
-* the new evidence aligns to governed artifact conventions (titles-only routing to the evidence catalog)
-
-Closure is not considered complete unless the acceptance artifacts explicitly map the PF09 task/subtask to concrete evidence (no implicit it exists somewhere else posture).
+Closure is not complete unless the acceptance artifacts map the PF09 task or subtask to its exact completed work, candidate identity, applicable QA or OPS evidence, and authorized lifecycle decision. A token claim or token/evidence matrix is not required.
 
 When a plan, remediation guide, review artifact, or closeout artifact cites PF09 status or checklist authority, it MUST reference the relevant phased PF09 document or documents rather than a retired single-document PF09 home.
 
@@ -2958,43 +2583,31 @@ Non-goals (for review)
 
 ## **1.2 PLAN: Machine header (paste and fill, then post)**
 
-Use the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates. That template is the single canonical home for the complete Epic Plan shape, required and conditional fields, contract and compatibility posture, token inventory, evidence pointers, review guards, and close preparation.
+Use the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates. That template is the canonical home for the complete Epic Plan shape, required and conditional fields, contract and compatibility posture, stable requirement and acceptance-criterion identities, evidence pointers, review guards, and close preparation.
 
-PF06 retains the process boundaries in this H1: complete the canon inventory before drafting; preserve the plan’s scope, dependencies, public-interface posture, outcomes, acceptance intent, evidence obligations, risks, open decisions, canon anchors, and applicable context-header requirements; exchange proposed code capsules before Implementation Plan approval; and satisfy the PLAN → CRD workflow and adjacent pre-start gates. The PF27 template MUST NOT be narrowed by the legacy pseudo-machine header formerly reproduced here.
+PF06 retains the process boundaries in this H1: complete the current-state canon and repository inventory before drafting; preserve scope, dependencies, public-interface posture, outcomes, acceptance intent, evidence obligations, risks, open decisions, canon anchors, and applicable context-header requirements; exchange proposed code capsules before Implementation Plan approval; and satisfy the PLAN → CRD workflow and adjacent pre-start gates.
 
 ---
 
 ## **1.3 CRD: Machine header (copy/paste)**
 
-Transition posture. PF27-Canon-Plan-Templates is the selected canonical owner of the `Change Request Document (CRD) Template`. The local field copy below remains controlling until PF27 contains that complete destination contract; it MUST NOT be removed or routed away before that condition is met. After the destination exists, this H2 remains as the PF06 process-routing locus and the field contract routes by exact title.
+Transition posture. PF27-Canon-Plan-Templates is the selected canonical owner of the `Change Request Document (CRD) Template`. The local field copy below remains controlling until PF27 contains that complete destination contract.
 
 epic\_id: "HDE-EPIC0XX"  
-crd\_id: "HDE-CRD0XX"  
-type: CRD  
-scope\_mode: FULL | PATCH | VERIFY  
-acceptance\_proofs:
+ crd\_id: "HDE-CRD0XX"  
+ type: CRD  
+ scope\_mode: FULL | PATCH | VERIFY  
+ acceptance\_criteria:
 
-\#"A7\_PROOF\_PRESENT" etc (titles only)
-
-* "\<ACCEPTANCE\_TOKEN\_1\>"
+* "\<STABLE\_REQUIREMENT\_OR\_CRITERION\_ID\>"
 
 evidence\_minima:
 
-\#Reader A7 proofs (required when any A7 proof token is claimed)
+* "\<TEST, CHECK, WORKFLOW, OR GOVERNED ARTIFACT IDENTITY AND PASS/FAIL PREDICATE\>"
 
-* "Endpoint Catalog present at docs/ENDPOINTS\_CATALOG.json with docs/ENDPOINTS\_CATALOG.json.sha256, and referenced through the Human Evidence Index and Machine Mirror as required"
+candidate\_identity:
 
-\#CLI parity artifacts (required when CLI parity is in scope)
-
-* "CLI parity evidence: a CLI output capture \+ a REST response capture (paired) for each in-scope endpoint"
-
-\#DB posture
-
-* "DB posture tokens evidenced (titles-only): DB\_RUNTIME\_SEARCH\_PATH\_OK, DB\_ROLE\_OK, DB\_SCHEMA\_FINGERPRINT\_OK, DB\_CONN\_ENV\_OK, DB\_BOUNDARY\_VIEW\_OK, DB\_WRITERS\_ISOLATED\_OK"
-
-\#BodyGraph ingest (required when BG ingestion is in scope)
-
-* "BodyGraph ingest evidence: ingestion logs, payload snapshots (redacted), and verification artifacts under audit/qa/\<epic-id\>/\<SUBPATH\>"
+* "\<REPOSITORY AND EXACT SHA; INCLUDE PR BASE/HEAD/MERGE IDENTITIES WHEN A PR IS USED\>"
 
 ops\_endpoints:
 
@@ -3004,11 +2617,13 @@ notes\_for\_coder:
 
 * "Short list: routing references, required harness notes, and any non-obvious constraints"
 
+A legacy token identifier MAY appear as optional compatibility metadata. It is not required and does not replace the governing requirement, evidence, or exact candidate identity.
+
 ## **1.4 Adjacent pre-start gates (titles-only)**
 
-Purpose. Some epics depend on deliverables from adjacent roles/streams (e.g., EPIC-010 narrative copy gates).
+Purpose. Some epics depend on deliverables from adjacent roles or streams.
 
-Rule. Pre-start gates must: (a) name the deliverable by title only, (b) register acceptance tokens in Governance, and (c) require evidence entries (human \+ mirror) in the same PR that unblocks the epic. (See Build Notes — Adjacent Subtask gate for EPIC-010.)
+Rule. Pre-start gates must name the deliverable by title, identify the stable governing requirement or acceptance criterion, and require the applicable evidence companions in the same authorized mutation set that unblocks the epic. A token registration is not a prerequisite.
 
 ## **1.5 Code capsules (PLAN/CRD samples)**
 
@@ -3036,9 +2651,9 @@ TypeScript implementations MUST conform to the canonical JSON byte contract in P
 
 # 2\) IMPLEMENTATION GUIDE (Lead Dev; posted immediately after CRD)
 
-Define how the work proceeds after CRD approval in a way CodEx can execute with minimal inference. Lead Dev approves once, then steps out except for the PR gate review. Each issued guide MUST resolve whether CodEx can read PF documents and MUST include all execution-critical material required by that actual access posture. The Implementation Agent (IA) SHOULD provide explicit formats, schemas, current registered token names, commands, and artifact paths verbatim when needed to keep the execution reference unambiguous. CodEx may adapt within approved scope and MUST deliver a detailed change report at the end.
+Define how work proceeds after CRD approval in a way CodEx can execute with minimal inference. Lead Dev approves once and later performs the PR gate only when the authorized route uses a PR. Each issued guide MUST identify the exact repository baseline and selected mutation route, resolve whether CodEx can read PF documents, and include all execution-critical material required by that access posture.
 
-PF06 owns this process, including the CRD-to-guide-to-plan sequence, role handoffs, PR-first discipline, gate timing, and PO-only merge consequence. Under that process, CodEx is assigned to open and amend the PR; this is a workflow requirement, not a claim that platform authorization exists or that a PR has already been opened. Repo docs and the evidence index, hash, mirror, and path-proof companions MUST change in the same PR whenever the applicable owning requirements are triggered by changed governed evidence or artifacts.
+PF06 owns the CRD-to-guide-to-plan sequence, role handoffs, mutation-route decision, gate timing, and PO-only merge consequence when a PR is used. The normal code-bearing route assigns CodEx to open or amend a PR. Agent direct-main mutation requires an explicit current operator instruction covering the exact change. Repo docs and applicable evidence-index, hash, mirror, and path-proof companions MUST change in the same authorized mutation set whenever their owning requirements are triggered.
 
 PF27-Canon-Plan-Templates is the durable owner of the reusable shapes below. Until all five destinations are present and complete, this transitional selection retains the complete local bodies and MUST NOT be read as claiming that a destination already contains them.
 
@@ -3079,31 +2694,17 @@ epic_id: "<EPIC_ID>"
 slice_id: "<SLICE_ID>"
 alchemical_phase: "<ALCHEMICAL_PHASE>"
 execution_flow:
-  - "Lead Dev publishes this Implementation Guide to the Implementation Agent."
-  - "The Implementation Agent sends CodEx an audit request with the explicit formats and execution-critical material required by the approved scope."
-  - "CodEx returns an audit report that separates observed repository facts, gaps, risks, proposals, and unknowns."
-  - "The Implementation Agent drafts the Implementation Plan; Lead Dev approves once and then returns only for the PR gate."
-  - "The Implementation Agent sends CodEx build instructions and verbatim execution-critical material."
-  - "CodEx builds and verifies only the approved scope, returns the detailed change report and any produced artifacts or evidence, and does not imply unexecuted validation."
-  - "The Implementation Agent reviews the returned result and requests changes or records the supported disposition."
-  - "CodEx opens or amends the PR for the exact slice and includes code, repo-doc changes, applicable evidence companions, and close-only artifacts only when the current PF06 class and owning canon require them."
-  - "Lead Dev performs the PR gate using only current registry-valid acceptance tokens and verifies required non-token artifacts separately."
-  - "The Product Owner alone performs the merge after a supported PASS decision and then routes the resulting communications and records."
-roles:
-  lead_dev: "Approves the Implementation Plan once; then acts as PR gate and checks the applicable acceptance and evidence requirements."
-  implementation_agent: "Coordinates with CodEx, supplies explicit formats and execution-critical material, reviews the change report, and prepares the supported closure material without claiming unproved state."
-  codex: "Performs the audit and authorized build or verification work, opens or amends the PR under the approved workflow, adapts only within scope, and reports every change and limitation."
-  po: "Routes communications, performs any authorized merge, and does not delegate the merge consequence to the Implementation Agent."
-evidence_routing:
-  interim: "Audit, build, verification, and result observations return to the Implementation Agent with their actual claim state."
-  pr: "The PR carries the exact slice, repo-doc changes, and every applicable governed evidence companion under audit/**, artifacts/**, or docs/**; close-pack artifacts and the final PASS roster are close-only."
-  repo_docs: "Applicable repo-doc changes land with the code and governed evidence changes in the same PR."
-  final: "After a supported merge event, closure reporting and board or planning updates proceed through their owning authorized processes."
-determinism_pins:
-  lc_all: "C"
-  tz: "UTC"
-capsules_scope: "Capsules finalized by an approved Implementation Plan remain immutable; scoped adaptation is allowed only when reported and otherwise authorized."
-codex_can_see_pf_docs: "unassessed"
+"Lead Dev publishes this Implementation Guide to the Implementation Agent."
+"The Implementation Agent sends CodEx an audit request with the explicit formats and execution-critical material required by the approved scope."
+"CodEx resolves and records the current repository ref and returns an audit report separating observed facts, gaps, risks, proposals, and unknowns."
+"The Implementation Agent drafts the Implementation Plan; Lead Dev approves once and later returns for the PR gate only when the selected route uses a PR."
+"The Implementation Agent sends CodEx build instructions and verbatim execution-critical material."
+"CodEx verifies that its base remains current, builds and verifies only the approved scope, and returns the detailed change report and produced artifacts or evidence."
+"The Implementation Agent reviews the result and requests changes or records the supported disposition."
+"CodEx performs the expressly authorized mutation route: PR for the normal code-bearing path, or direct-main only under an explicit current operator instruction covering the exact change."
+"For a PR, CodEx records the exact PR and candidate identities. For direct-main, CodEx records the exact post-write SHA, diff, and applicable push-CI state."
+"The applicable reviewer verifies the exact candidate, governing criteria, checks, evidence, limitations, and nonclaims."
+"The Product Owner alone performs any authorized merge and separately records any acceptance or closure decision." roles: lead_dev: "Approves the Implementation Plan once; then acts as PR gate when a PR is used and checks applicable acceptance and evidence requirements." implementation_agent: "Coordinates with CodEx, supplies explicit formats and execution-critical material, reviews the change report, and prepares supported closure material without claiming unproved state." codex: "Performs the audit and authorized build or verification work, follows only the expressly authorized mutation route, adapts only within scope, and reports every change and limitation." po: "Routes communications, retains direct-main authority, performs any authorized merge, and records scoped decisions without collapsing repository presence, QA, acceptance, or closure." evidence_routing: interim: "Audit, build, verification, and result observations return to the Implementation Agent with their actual claim state and exact source identity." pr: "A PR carries the exact slice, repo-doc changes, and every applicable governed evidence companion; close-pack artifacts are close-only." direct_main: "A direct-main mutation records the current authorization, exact post-write SHA, diff, and applicable push-triggered CI result." repo_docs: "Applicable repo-doc and evidence-companion changes land in the same authorized mutation set." final: "After repository adoption, QA, acceptance, closure, and board or planning updates proceed separately through their owning authorized processes." determinism_pins: lc_all: "C" tz: "UTC" capsules_scope: "Capsules finalized by an approved Implementation Plan remain immutable; scoped adaptation is allowed only when reported and otherwise authorized." codex_can_see_pf_docs: "unassessed"
 ```
 
 In an issued guide, epic\_id and alchemical\_phase are required exact values. Include slice\_id when the guide governs less than the complete epic; omit it only for a complete-epic guide. Resolve codex\_can\_see\_pf\_docs to "true" or "false" and provide all execution-critical material required by the resolved posture.
