@@ -2,21 +2,62 @@
 
 **Title:** PF06-Canon-Change-Process-Guide
 
-**Version:** v2.5.1
+**Version:** v2.5.3
 
 **Status:** Canon
 
-**Effective date**: 2026-08-26
+**Effective date**: 2026-08-27
 
-**Last Update Gate:** redlines-PF06-Canon-Change-Process-Guide-v2.4.8-from-token\_retirement\_and\_exact\_source\_acceptance\_adr
+**Last Update Gate:** redlines-PF06-Canon-Change-Process-Guide-v2.5.1-from-PF10-HDE-Build-Notes-v12.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## **0.1 Purpose and scope**
 
-This guide defines the change delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. The normal route for code-bearing epic or CRD work is PR-based, while an explicit current Product Owner instruction may authorize a bounded direct-to-`main` route. Close requires the applicable exact-source evidence, close-pack material, and authorized decisions; a PASS acceptance-token list is not required.
+This guide defines the common change-delivery process for a human \+ pair-programming \+ CodEx workflow across two governed lanes: the Epic lane for product-development work originating in or formally mapped to PF09, and the CRD lane for observed features, defects, operational needs, governance needs, and system changes originating outside PF09 and accountable to PF30. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic or CRD. The normal route for code-bearing epic or CRD work is PR-based, while an explicit current Product Owner instruction may authorize a bounded direct-to-`main` route. Close requires the applicable exact-source evidence, close-pack material, and authorized decisions; a PASS acceptance-token list is not required.
 
 This is process guidance only. It does not constrain execution environments, repository tooling, transport bytes, or payload bytes. Those remain in their canonical homes.
+
+## **0.1A Governing lanes, common lifecycle, and authority routing**
+
+PF06 governs one common change lifecycle through two lanes:
+
+* **Epic lane.** Product-development work originating in or formally mapped to PF09 uses Epic identity and PF09 work-item accountability.  
+* **CRD lane.** Observed features, defects, operational needs, governance needs, and system changes originating outside PF09 use CRD identity and PF30 accountability. A canon-changing CRD requires an accompanying approved ADR.
+
+The lanes differ in origin, identity, and controlling work register. They do not differ in applicable development, QA, evidence, operations, or closure rigor. A CRD is a top-level governed change container comparable to an epic and may contain one or more PRs, Ops tasks, or both. PF06 MUST NOT use CRD as an intermediate document or subordinate stage inside every epic.
+
+The common lifecycle is:
+
+1. Change intake or originating requirement.  
+2. Current-state and existing-work analysis.  
+3. Lead Developer plan.  
+4. Required approval.  
+5. Alchemical phase classification.  
+6. Implementation guidance and planning.  
+7. Phase-bounded PR and/or Ops execution.  
+8. Independent QA planning and execution.  
+9. Remediation and QA re-execution when required.  
+10. Exact-source evidence review.  
+11. Closeout decision.  
+12. Build Notes recording.  
+13. Canon drainage when applicable.  
+14. PF09 or PF30 record completion, according to the lane.
+
+Existing epic requirements remain operative unless PF06 explicitly changes them. The CRD lane reuses the established downstream process by substituting CRD identity for Epic identity and PF30 work mapping for PF09 work-item mapping. No duplicate CRD-specific template system is created where that substitution preserves the required contract.
+
+PF06 owns the end-to-end change process and routes specialized authority by title:
+
+* **HDE Governance** controls authority, permissions, approvals, and canon-change requirements.  
+* **Plan Templates** controls reusable planning, implementation, QA, review, Ops, and closeout templates.  
+* **Glow QA Guide** controls QA planning, execution, evidence, remediation, and verdicts.  
+* **HDE Schemas and Artifacts** controls governed evidence, manifests, artifact identity, and path contracts.  
+* **7 Phases of Alchemical Engineering** controls phase meaning and non-mixing.  
+* **HDE Build Checklist** controls PF09 product-development work.  
+* **HDE CRD Records** controls PF30 CRD registration and result tracking.  
+* **HDE Build Notes** records material decisions, activity, results, and temporary pre-drain authority.
+
+PF06 coordinates those authorities but does not replace them. Historical records retain the document names and identities that applied when they were created and are not rewritten solely to adopt the current PF06 title or lane terminology.
 
 ## **0.2 Policy and principles**
 
@@ -447,10 +488,10 @@ A packaging-only Ops remediation may support close-pack surfacing or evidence-pr
 
 ## **0.3 Participants and responsibilities**
 
-* Implementation Agent (ChatGPT). Runs each epic end to end, prepares CRD-ready drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and every applicable governed evidence companion land in the authorized mutation set, and escalates blockers to the Lead Developer. Does not run git or create PRs.  
-* Lead Developer (AI). Defines intent and scope, approves the CRD and Implementation Plan once, performs the gate review when a PR route is used, and otherwise steps out during CodEx execution.  
+* Implementation Agent (ChatGPT). Runs each approved epic or CRD end to end, prepares the applicable planning and execution drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and every applicable governed evidence companion land in the authorized mutation set, and escalates blockers to the Lead Developer. Does not run git or create PRs.  
+* Lead Developer (AI). Defines intent and bounded scope, performs the required current-state and existing-work analysis, produces or governs the applicable Epic Plan or CRD Plan, approves the Implementation Plan once, performs the gate review when a PR route is used, and otherwise steps out during CodEx execution.  
 * CodEx. Executes in a sandbox, runs Audit and Build/Test, and follows the mutation route expressly authorized for the change. For a PR route, CodEx opens or amends the PR and supplies the applicable close material. For direct-main mutation, CodEx requires an explicit current operator instruction covering the exact change and records the post-write SHA, diff, and applicable push-CI state. CodEx can read PF docs. Even so, the IA SHOULD paste execution-critical material verbatim during build sessions to keep a stable, unambiguous in-session reference and reduce drift.  
-* Thoth (CRD authority). Owns CRD standards and architecture fit and confirms the governing acceptance criteria and evidence homes by stable identity.  
+* Thoth (change-process authority). Owns Epic and CRD process standards and architecture fit and confirms the governing acceptance criteria and evidence homes by stable identity.  
 * Product Owner (human). Retains direct-to-`main` authority and, when a PR route is used, is the sole merger using squash. Accepts or rejects an exact candidate within a stated scope and adjudicates drift and bounded exception decisions.  
 * Scrum Master (AI). Is informed after the applicable repository-adoption event; records authorized close and updates boards and the sprint report.  
 * Communication rule. AIs do not contact one another directly. The Product Owner routes all messages.
@@ -478,7 +519,7 @@ A packaging-only Ops remediation may support close-pack surfacing or evidence-pr
 
 Live QA via a QA harness is a required Close Gate stage for every epic. See §3.5.2.8 for the harness-run and evidence-landing requirements.
 
-These requirements are execution and Close Gate deliverables. They MUST NOT be treated as prerequisites for Epic Plan approval and MUST NOT force a detailed Live QA runbook into PLAN/CRD or Implementation planning.
+These requirements are execution and Close Gate deliverables. They MUST NOT be treated as prerequisites for Epic Plan or CRD Plan approval and MUST NOT force a detailed Live QA runbook into Epic Plan, CRD Plan, or Implementation planning.
 
 #### **0.4.1.1 Mandatory D0 Discovery artifact**
 
@@ -766,8 +807,8 @@ The only authoritative Catalog path is docs/ENDPOINTS\_CATALOG.json (canonical J
 Reader A7 proof JSON (machine-checkable)  
 Epics that ship Reader A7 must produce a single proof JSON (records-only, canonical) containing: route\_path, env\_gate, GET/HEAD/after-304 header captures, ETag, vary\_has\_auth, vary\_has\_accept\_encoding, and encoding\_invariance\_ok. Proof JSON and indices update occur in the same authorized mutation set.
 
-CRD routing  
-Thoth receives the CRD only. Keep process artifacts (PLAN/CRD/Doc-Delta) titles-only and route to single homes for bytes/evidence.
+Change-lane routing  
+Route the applicable Epic Plan or CRD Plan through the Lead Developer process. Keep process artifacts (Epic Plan/CRD Plan/Doc-Delta) titles-only and route to single homes for bytes/evidence.
 
 Cross-doc references  
 Use titles only for all external references; do not duplicate transport bytes, schemas, or acceptance rosters in this guide.
@@ -802,7 +843,7 @@ If the orientation demo is not refreshed to match the current Evidence Index and
 This guide uses normalized epic identifiers for file paths. Plans, QA ledgers, Evidence Index entries, and machine mirror records MUST use these canonical patterns and MUST NOT introduce alternate spellings.
 
 Plan path provenance (no fabricated required paths)  
-A PLAN, CRD, or QA Plan MUST NOT reference a file path as required unless one of the following is true:
+An Epic Plan, CRD Plan, or QA Plan MUST NOT reference a file path as required unless one of the following is true:
 
 * Canon-defined — the path (or path pattern) is explicitly defined by PF canon, or  
 * Audit-proven — the path’s existence is already proven by an existing, canon-recognized audit artifact family, or  
@@ -985,7 +1026,7 @@ If legacy artifacts exist under non-canonical names, treat them as deprecated. D
 
 Implementation Agents MUST treat PF-Canon as the primary source of facts for epic planning and QA.
 
-Plans MAY check PF documents during planning and review. Planning artifacts MAY instruct the reviewer or planner to consult PF documents (including Reality Audits) to confirm what PF currently states.
+Plans MAY check current PF documents during planning and review. Reality Audits MAY be read as historical context only. They are Product Owner post-epic review passes, not controlling canon, not a current planning source, and not a substitute for current repository inspection.
 
 Plans MUST NOT mandate PF document updates. Planning artifacts MUST NOT require updates to any PF documents as part of the plan’s PR or OPS deliverables, acceptance posture, tracked issues, confirming artifacts, or completion criteria.
 
@@ -993,44 +1034,20 @@ Reality Audits updates are PO-only. Updates to Reality Audits are a manual PO op
 
 Allowed documentation posture inside plans (informational only). Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note, but these notes MUST be explicitly non-mandatory and MUST NOT be expressed as a required PR or OPS task. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.
 
-How plans MUST express reality and existence confirmation. If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST express confirmation in one of these allowed forms:
+How plans MUST express reality and existence confirmation. If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST use current controlling canon and current repository evidence. Reality Audits may supply historical context, but they MUST NOT establish current repository truth.
 
-* PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.  
-* Repo-local evidence (required when PF is silent or insufficient): capture confirmation as repo-local evidence (for example: deterministic command output recorded into an audit artifact, a governed gate log, a QA step-log entry, or a test/probe result). The plan MUST NOT require turning that result into a PF update.
+Review posture (blocking condition). Any plan that mandates a PF document update, including a Reality Audits update, as part of PR or OPS deliverables MUST be treated as non-portable and returned for revision.
 
-Review posture (blocking condition). Any plan that mandates a PF document update (including Reality Audits) as part of PR or OPS deliverables MUST be treated as non-portable and returned for revision.
+Before drafting any QA Plan or Implementation Plan for a Live QA epic or CRD, the planner MUST:
 
-Before drafting any QA Plan or Implementation Plan for a Live QA epic, they MUST:
-
-* Read Glow Infrastructure, HDE-Build Notes, Glow QA Guide, and HDE Phased Epics (by title) to collect:  
-  * environment and infrastructure facts  
-  * applicable governing requirements, acceptance criteria, tests, and evidence identifiers  
-  * epic D-goals and exclusions  
-* Use canonical infra/env values (for example, production service name, base URL, and DB instance/schema) from those documents directly, instead of treating them as unknowns.  
-* PF23 consultation is required during QA planning whenever a Live QA Plan is drafted, reviewed, or approved.  
-* If a QA plan names any repo-resident locus, the reviewer SHOULD consult PF23 before approval to reduce fabricated or stale locus assumptions.  
-* This consultation is planning-time and read-only. QA plans MUST NOT mandate PF23 edits, and QA execution MUST NOT include PF23 updates as a required output.  
-* If PF23 appears inconsistent with another allowed repo-reality source, treat it as a reality ambiguity. Do not assert a reconciled locus as fact inside the plan.  
-* Consult Reality Audits (PF23) for any epic touching: ingestion vendors, admin bundle behavior surfaces, live QA in prod, schema migrations.  
-* When PF23 consult is required, planning artifacts MUST include a short “PF23 Anchors” note that lists:  
-  * the PF23 components consulted (by title)  
-  * the key pathnames/loci from Reality Audits that this epic will touch  
-* This note is traceability-only. It MUST NOT duplicate PF23 content, and it MUST NOT be presented as a required Live QA deliverable or a required acceptance token.  
-* PF23 consult is non-token closure evidence. It is not a gateable token and MUST NOT be represented as a token (for example: no REALITY\_AUDIT\_OK, no PF23\_OK) on a closure pack acceptance roster.  
-* PF23 consult scope: PF23 consult may be used to inform epic planning, implementation planning, and QA planning. It MUST NOT be used for PR analysis, PR review, or post-hoc “blockers” in a merge decision.  
-* In closeout review, PF23 current-reality context may support surface framing, repo-root context, or contradiction detection, but it does not by itself prove closure, satisfy acceptance, or block closure. If PF23 context appears to contradict PF10, governed QA evidence, approved implementation evidence, or close-pack proof, record the contradiction as drift or an adjudication item and route it rather than treating PF23 as final closure authority.  
-* PF23 audit observations MUST route to their owning canon homes by title and MUST NOT be converted into PF09.x task deltas, remediation scope, implementation deltas, evidence homes, or acceptance tokens by assumption. If an audit observation appears to imply new work, record the classification and routing question for Product Owner or owning-canon adjudication before treating it as executable scope.  
-* Drift handling (protocol stub): If any PF23 Reality Audit statement appears to contradict PF canon, record a drift item (cite the PF canon requirement and the PF23 statement, explain the contradiction, and propose the minimum safe posture). Route the drift item to the Product Owner for adjudication. Do not resolve by ad-hoc interpretation inside the plan.  
-* PF23 is a post-epic audit input: it reflects the latest closed-epic snapshot, not an in-flight PR truth source.  
-* Classify the drift item into exactly one bucket (tentative): canon defect, implementation drift, or necessary reality shift.  
-* Do not fix by assumption. No plan, review, or QA artifact may treat the contradiction as resolved unless the Product Owner adjudicates.  
-* Resolution routing is PO-owned: canon update, implementation remediation, or formalized exception with canon follow-up.  
-* No execution-time PF23 consult artifacts. Live QA plans, runbooks, and step logs MUST NOT introduce required deliverables whose purpose is PF23 consult capture (for example pf23\_consult.md, “PF23 capture” steps, or operator commands intended only to produce PF23 trace artifacts). If a trace anchor is desired beyond the “PF23 Anchors” note above, it MUST remain in plan text only and MUST be informational-only (non-gating).  
-* PF23 consult is non-token closure evidence (no REALITY\_AUDIT\_OK). Plans and implementations MUST NOT mint, claim, or reference REALITY\_AUDIT\_OK (or any similar “PF23 consult completion” acceptance token) unless and until Governance registers such a token.  
-* PF23 consult scope MUST be represented as a consult requirement and closure evidence, not as an acceptance token. When PF23 consult is required, the work MUST capture a short consult record that includes:  
-  * the PF23 Anchors list (components used and loci/pathnames pulled)  
-  * a brief “what changed / what did not” summary scoped to the epic or plan  
-* This consult record MUST live in existing closure surfaces (for example, the epic-scoped meta record under audit/qa//00\_meta/ and/or the epic close report). It MUST NOT appear in the acceptance token roster.  
+* Read Glow Infrastructure, HDE Build Notes, Glow QA Guide, and the applicable HDE Build Checklist or HDE CRD Records material, by title, to collect environment and infrastructure facts; applicable governing requirements, acceptance criteria, tests, and evidence identifiers; and the change’s goals and exclusions.  
+* Consult HDE Phased Epics only as historical closed-epic context.  
+* Use canonical infrastructure and environment values from their current owners directly instead of treating them as unknowns.  
+* Inspect current repository reality for every material current-repository claim.  
+* Treat PF23 consultation, PF23 Anchors, PF23 consult records, and PF23-specific tokens as optional historical context only, never as plan, CRD, implementation, QA, acceptance, or closure obligations.  
+* Never convert a Reality Audit observation into PF09 or PF30 work, remediation scope, implementation scope, an evidence home, acceptance, or closure by assumption.  
+* When Reality Audits context appears to conflict with controlling canon or current repository evidence, record the conflict as drift or an adjudication item and route it to the Product Owner. Do not resolve it by assumption and do not use the unadjudicated conflict as a PR, QA, acceptance, or closure blocker.  
+* Do not create execution-time deliverables whose purpose is only to prove that PF23 was consulted.  
 * Implementation Agents MUST NOT treat canonical infra/env details that PF-Canon or current PF10 explicitly defines as PO inputs unless the source explicitly marks them OPEN/TBD.  
 * When a plan, review artifact, remediation guide, or epic document includes an infra or ops dependency, it MUST bind each required value in exactly one of these postures:  
   * PF07-derived posture: cite the exact PF07 fact directly.  
@@ -1286,13 +1303,13 @@ If exact candidate identity required for a verdict cannot be established, the af
 
 ### **0.6.9 Plans are pointers; QA planning is post-implementation**
 
-Core rule: An Epic PLAN and CRD are pointers to canon and governed artifacts. They are not the place to restate or rebuild canon (token definitions, schemas, CLI semantics, env matrices, etc.).
+Core rule: Epic Plans and CRD Plans are pointers to canon and governed artifacts. They are not the place to restate or rebuild canon (token definitions, schemas, CLI semantics, env matrices, etc.).
 
-Do not rebuild canon inside an Epic PLAN/CRD. The PLAN/CRD may reference canonical docs by title only and point to canonical artifact paths. If review “needs” more definition than canon provides, the correction is a doc-delta (update canon) or a governed artifact — not duplicating canonical content inside the PLAN/CRD.
+Do not rebuild canon inside an Epic Plan or CRD Plan. Either plan may reference canonical documents by title only and point to canonical artifact paths. If review needs more definition than canon provides, the correction is a doc-delta or a governed artifact, not duplicated canonical content inside the plan.
 
-QA planning happens after implementation (and after D0 discovery). A step-by-step QA plan (Live QA step lists, per-step Deliverables blocks, copy/paste command blocks, harness invocation details, etc.) is not an Epic Planning deliverable.
+QA planning happens after implementation (and after D0 discovery). A step-by-step QA plan (Live QA step lists, per-step Deliverables blocks, copy/paste command blocks, harness invocation details, etc.) is not an Epic Plan or CRD Plan deliverable.
 
-The PLAN/CRD SHOULD provide only:
+An Epic Plan or CRD Plan SHOULD provide only:
 
 * titles-only acceptance intent (what must be true)  
 * the QA posture (e.g., “Live QA required”)  
@@ -1300,7 +1317,7 @@ The PLAN/CRD SHOULD provide only:
 
 The detailed QA Plan is authored/updated during implementation and QA work, and must satisfy the mechanical evidence requirements in §0.6.7 and §1.1.4–§1.1.8.
 
-Approval posture: avoid planning stalls. Reviewers SHOULD NOT block PLAN/CRD approval by demanding:
+Approval posture: avoid planning stalls. Reviewers SHOULD NOT block Epic Plan or CRD Plan approval by demanding:
 
 * a complete acceptance-token roster or token/evidence matrix  
 * per-step intended-token or claimed-token declarations when no active scoped roster exists  
@@ -1391,25 +1408,79 @@ Evidence-only QA branch acceptance token names and semantics are defined by PF04
 
 ---
 
-# **1\) EPIC PLAN → CRD (Lead Dev)**
+# **1\) CHANGE INTAKE AND PLANNING (Lead Dev)**
 
-## **1.1 Workflow at a glance**
+## **1.0 CRD lane intake, plan, and PF30 registration**
+
+A CRD is a governed top-level change container for an observed behavior, defect, feature need, infrastructure change, governance change, or other required system change that does not originate as PF09 product-development work. It may contain one or more PRs, Ops tasks, or both.
+
+### **1.0.1 Intake**
+
+The intake MUST identify:
+
+* the observed condition or requested capability;  
+* why change is warranted;  
+* the affected system or governance surface;  
+* known constraints or risks; and  
+* available evidence.
+
+The intake does not authorize implementation.
+
+### **1.0.2 Lead Developer analysis and CRD Plan**
+
+The Lead Developer MUST inspect current repository and governing-document reality and determine:
+
+* whether the request is valid and not already satisfied;  
+* whether it belongs in the CRD lane;  
+* its proposed scope and boundaries;  
+* affected code, data, operations, documentation, and canon;  
+* required PR and Ops work;  
+* applicable alchemical phase or phase blocks;  
+* dependencies and ordering;  
+* QA and evidence requirements; and  
+* whether an ADR is required.
+
+The result is the CRD Plan.
+
+### **1.0.3 PF30 registration and approval**
+
+The CRD MUST receive a stable CRD ID and a concise initial record in PF30 before implementation begins. The CRD Plan MUST receive the approval required by current governance. If the required PF30 record cannot be established, implementation is blocked; do not substitute PF09 accountability or claim that registration occurred.
+
+### **1.0.4 Phase separation and execution**
+
+Every planned CRD PR or Ops task MUST belong to exactly one alchemical phase. A CRD MAY contain one phase or multiple ordered phase blocks, MUST NOT be forced through all seven phases, and MUST NOT mix different phase modes within one PR or Ops task. Dependencies and completion boundaries between phase blocks MUST be explicit. Completion of one phase block does not complete the CRD.
+
+After approval, the CRD follows the applicable downstream Epic process using CRD identity and PF30 work mapping. Existing templates SHOULD be reused by substituting CRD for Epic and PF30 mapping for PF09 mapping when that substitution preserves the contract. Implementation guidance and planning, phase-bounded PR and/or Ops execution, review and correction, exact-source implementation evidence, and controlled candidate handoff to QA remain required as applicable.
+
+### **1.0.5 Canon changes**
+
+A CRD that changes a canonical rule, contract, schema, process, interpretation, permanent policy, or governed-artifact meaning MUST have an accompanying approved ADR. The ADR MUST identify affected canon and drainage consequences. Material CRD activity and decisions enter HDE Build Notes and then drain to the appropriate permanent owner. A CRD Plan alone does not authorize canon supersession.
+
+### **1.0.6 QA, closeout, and PF30 result update**
+
+Every CRD requiring validation undergoes the full applicable Glow QA Guide process, including a separate QA Plan, exact candidate identity, required automated and manual checks, evidence collection, a PASS, FAIL, or blocked disposition, remediation and re-execution after material candidate changes, and a final QA verdict bound to the accepted candidate. CI success alone is not QA acceptance.
+
+A CRD may close only when its applicable implementation, Ops, QA, evidence, ADR, and drainage obligations have received the required decisions. Closeout MUST distinguish work implemented, QA accepted, Ops completed, canon drained or explicitly deferred, residual or deferred work, superseded or rejected scope, and the authorized closure decision.
+
+At closure, update the existing PF30 CRD record with the concise final result. PF30 is the accountability register, not the implementation log, QA archive, or evidence store. Detailed activity remains in its governed source and is referenced from PF30.
+
+## **1.1 Epic-lane workflow at a glance**
 
 ### **1.1.1 Standard epic flow**
 
 Before applying the steps below, every epic MUST perform a current-state canon and repository inventory:
 
 * Resolve and record the current relevant repository ref.  
-* Read, by title, the current Glow Infrastructure, HDE-Build Notes, Glow QA Guide, and Reality Audits entries that apply.  
+* Read, by title, the current Glow Infrastructure, HDE Build Notes, Glow QA Guide, and applicable HDE Build Checklist material.  
 * Consult HDE Phased Epics only as a historical archive of completed epic records.  
-* Record key environment and infrastructure facts; applicable governing requirements, acceptance criteria, tests, and evidence identities; and the epic’s D-goals and exclusions.  
-* Record the applicable PF23 components and current repository loci as traceability only.  
+* Treat Reality Audits as optional historical context only; they are not a required Epic Plan, implementation, or QA input and do not replace current repository inspection or controlling canon.  
+* Record key environment and infrastructure facts; applicable governing requirements, acceptance criteria, tests, and evidence identities; and the epic’s goals and exclusions.  
 * Mark any missing or ambiguous required fact as a spec gap instead of improvising.  
-* Draft the PLAN header and CRD only after the current-state inventory is complete.
+* Draft the Epic Plan only after the current-state inventory is complete.
 
 Epic Plan record: Draft the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates. PF06 does not define a separate Epic Plan machine-header grammar.
 
-CRD with approved scope: After one review, issue the CRD with its approved scope, stable governing and acceptance-criterion identities, and applicable evidence obligations. A complete token roster is not required.
+Approved epic scope: After the required review and approval, preserve the approved scope, stable governing and acceptance-criterion identities, and applicable evidence obligations in the Epic Plan and its approval record. A separate epic-internal CRD is not used. A complete token roster is not required.
 
 Code capsules before IP: Finalize code-capsules before IP approval; capsules freeze at IP.
 
@@ -1440,7 +1511,7 @@ For epics delivered through multiple PRs:
 * Later pushes create a new candidate and require rerun or explicit scope-equivalence proof for carried review or QA claims.  
 * Epic-level acceptance occurs only after all required slices have been adopted and the remaining governing completion requirements and authorized lifecycle decision are satisfied. The final historical record is archived in PF20 only at epic close.
 
-### **1.1.3 “Prod via Codespaces” requirements (PLAN/CRD)**
+### **1.1.3 “Prod via Codespaces” requirements (Epic Plan)**
 
 /internal/version auth posture is not canon (non-invention). This guide treats /internal/version as an identity handshake artifact, but it does not canonize:
 
@@ -1461,19 +1532,19 @@ Auth headers are optional until canonized. Plans and runbooks MUST NOT require a
 
 This evidence is required input for the canon decision and MUST NOT be replaced by assumptions.
 
-Name prod surfaces by title. The PLAN/CRD MUST name (by title, routing to Glow Infrastructure as the single home):
+Name prod surfaces by title. The Epic Plan MUST name (by title, routing to Glow Infrastructure as the single home):
 
 * the production HD Engine service and base URL  
 * the production DB instance/schema
 
 Do not invent new environment labels.
 
-Clarify Codespaces role. The PLAN/CRD MUST state explicitly:
+Clarify Codespaces role. The Epic Plan MUST state explicitly:
 
 * Codespaces is a QA console that runs CLI/HTTP commands against the production service and DB.  
 * Codespaces is not a production environment in its own right.
 
-Describe the prod handshake and artifact location (identity-only). The PLAN/CRD MUST describe (at a high level):
+Describe the prod handshake and artifact location (identity-only). The Epic Plan MUST describe (at a high level):
 
 * an identity/pre-flight handshake step  
 * where its artifact will live
@@ -1487,9 +1558,9 @@ This handshake is identity-only:
 
 Live QA plans MUST NOT use /internal/version to satisfy any behavior D-goals (for example compat math, narratives, vendor ingest, admin bundle). Those goals require separate behavior steps that exercise prod-facing behavior surfaces and produce their own artifacts under audit/qa/\\/\\.
 
-PLAN/CRD entries that refer to “prod via Codespaces” without these clarifications are incomplete and MUST be updated before the epic moves into implementation or Live QA.
+Epic Plan entries that refer to “prod via Codespaces” without these clarifications are incomplete and MUST be updated before the epic moves into implementation or Live QA.
 
-Vendor-first Live QA using “prod via Codespaces”. For epics that intend to run vendor-first Live QA (per §0.6.4 and §1.1.6) using the “prod via Codespaces” pattern above, the PLAN/CRD MUST ALSO ensure:
+Vendor-first Live QA using “prod via Codespaces”. For epics that intend to run vendor-first Live QA (per §0.6.4 and §1.1.6) using the “prod via Codespaces” pattern above, the Epic Plan MUST ALSO ensure:
 
 * The current Epic Plan acceptance criteria and evidence requirements explicitly declare this posture by title (for example: “Live QA will exercise vendor-backed behavior in prod via Codespaces → Railway, with artifacts under audit/qa/\\/\\”).  
 * The Live QA plan includes at least one vendor-focused step that:  
@@ -1500,11 +1571,11 @@ This identity \+ vendor step does not change the identity-only semantics of /int
 
 ### **1.1.4 Live QA mechanical evidence expectations**
 
-For Live QA epics, mechanical, step-explicit QA is still required — but it belongs in the QA Plan and QA execution artifacts, not embedded inside the Epic PLAN/CRD or Implementation Plan.
+For Live QA epics, mechanical, step-explicit QA is still required — but it belongs in the QA Plan and QA execution artifacts, not embedded inside the Epic Plan or Implementation Plan.
 
 QA planning is a separate deliverable. Implementation Plans and Implementation Guides MUST NOT require the production of extensive QA evidence artifacts and MUST NOT embed a full QA runbook (step intents, command blocks, or evidence-generation steps). These planning artifacts MAY state QA objectives and closeout proof obligations, but the QA Plan is where step intents, evidence expectations, and PASS/FAIL posture are specified and where governed QA evidence is produced and indexed.
 
-The Epic PLAN/CRD MUST provide:
+The Epic Plan MUST provide:
 
 * titles-only acceptance intent  
 * the QA posture (e.g., “Live QA required”)  
@@ -1785,7 +1856,7 @@ PR, OPS, and QA sequencing MUST support bounded live proof when required. Open-r
 
 ### **1.1.6 PO Live QA vendor-first scope**
 
-When a PLAN or CRD describes PO Live QA (a Live QA session that requires PO time), it MUST:
+When an Epic Plan describes PO Live QA (a Live QA session that requires PO time), it MUST:
 
 * Declare PO Live QA as vendor-first. Clearly state that PO Live QA for this epic is a short, focused session whose primary goal is to exercise live vendor behavior against the production HD Engine and capture mechanical evidence of that behavior.  
 * Label vendor vs non-vendor steps. For all Live QA steps, classify them into:  
@@ -1865,7 +1936,7 @@ Any time a Plan adds a new CLI usage that is not already present in those source
 
 Plan reviewers MUST treat non-traceable CLI commands as blocking.
 
-During PLAN/CRD review for epics that include CLI steps (especially Live QA epics), Lead Dev and QA reviewers MUST:
+During Epic Plan review for epics that include CLI steps (especially Live QA epics), Lead Dev and QA reviewers MUST:
 
 * spot-check CLI commands in the Plan against HDE-CLI-API-Vendor-Ref, tests, or CodEx audit output  
 * treat any CLI command or flag that cannot be traced to one of those sources as a blocking issue
@@ -1882,7 +1953,7 @@ It complements §1.1.5–§1.1.7 by ensuring that:
 * CLI steps used for behavior runs and artifact capture follow documented command shapes  
 * D3 CLI guard runs in Live QA (when present) still respect the CI vs open-rails distinction while using canon-backed commands
 
-Plans are non-conforming and MUST be revised before PLAN/CRD approval or Live QA scheduling if they:
+Plans are non-conforming and MUST be revised before Epic Plan approval or Live QA scheduling if they:
 
 * rely on CLI commands or flags that are not present in any PF-Canon CLI spec, test harness, or CodEx audit  
 * assert Expected Outcomes that go beyond PF-Canon requirements without naming the corresponding tokens or docs by title
@@ -1919,7 +1990,7 @@ This is a plan submission gate for close scope, not a universal prerequisite for
 
 #### **1.1.10.2 Exact-source and acceptance-evidence validation**
 
-Before finalizing PLAN or CRD acceptance claims, the author MUST:
+Before finalizing Epic Plan acceptance claims, the author MUST:
 
 * identify the current relevant repository ref and governing source versions  
 * identify each stable requirement or acceptance-criterion ID the plan will satisfy  
@@ -2417,39 +2488,13 @@ Non-goals (for review)
 
 Use the current **Epic Record Template (Normative)** in PF27-Canon-Plan-Templates. That template is the canonical home for the complete Epic Plan shape, required and conditional fields, contract and compatibility posture, stable requirement and acceptance-criterion identities, evidence pointers, review guards, and close preparation.
 
-PF06 retains the process boundaries in this H1: complete the current-state canon and repository inventory before drafting; preserve scope, dependencies, public-interface posture, outcomes, acceptance intent, evidence obligations, risks, open decisions, canon anchors, and applicable context-header requirements; exchange proposed code capsules before Implementation Plan approval; and satisfy the PLAN → CRD workflow and adjacent pre-start gates.
+PF06 retains the process boundaries in this H1: complete the current-state canon and repository inventory before drafting; preserve scope, dependencies, public-interface posture, outcomes, acceptance intent, evidence obligations, risks, open decisions, canon anchors, and applicable context-header requirements; exchange proposed code capsules before Implementation Plan approval; and satisfy the Epic Plan approval workflow and adjacent pre-start gates.
 
 ---
 
-## **1.3 CRD: Machine header (copy/paste)**
+## **1.3 Epic approval record**
 
-Transition posture. PF27-Canon-Plan-Templates is the selected canonical owner of the `Change Request Document (CRD) Template`. The local field copy below remains controlling until PF27 contains that complete destination contract.
-
-epic\_id: "HDE-EPIC0XX"  
-crd\_id: "HDE-CRD0XX"  
-type: CRD  
-scope\_mode: FULL | PATCH | VERIFY  
-acceptance\_criteria:
-
-* "\\"
-
-evidence\_minima:
-
-* "\\"
-
-candidate\_identity:
-
-* "\\"
-
-ops\_endpoints:
-
-* "\\"
-
-notes\_for\_coder:
-
-* "Short list: routing references, required harness notes, and any non-obvious constraints"
-
-A legacy token identifier MAY appear as optional compatibility metadata. It is not required and does not replace the governing requirement, evidence, or exact candidate identity.
+The approved Epic Plan and its required approval establish the Epic lane’s bounded scope, governing and acceptance-criterion identities, and applicable evidence obligations. Plan Templates owns the reusable Epic Plan and approval-record structure. PF06 does not use CRD as an epic-internal approval artifact.
 
 ## **1.4 Adjacent pre-start gates (titles-only)**
 
@@ -2457,7 +2502,7 @@ Purpose. Some epics depend on deliverables from adjacent roles or streams.
 
 Rule. Pre-start gates must name the deliverable by title, identify the stable governing requirement or acceptance criterion, and require the applicable evidence companions in the same authorized mutation set that unblocks the epic. A token registration is not a prerequisite.
 
-## **1.5 Code capsules (PLAN/CRD samples)**
+## **1.5 Code capsules (Epic Plan samples)**
 
 ### **canon\_serializer\_v1 (py)**
 
@@ -2481,11 +2526,11 @@ notes: Never emit ETag for writers/errors.
 
 TypeScript implementations MUST conform to the canonical JSON byte contract in PF12-Canon-HDE-Schemas-and-Artifacts and byte-match the service emitter. PF06 does not define a separate TypeScript serialization algorithm. This capsule is a routing example only; no implementation or runtime conformance is asserted here.
 
-# **2\) IMPLEMENTATION GUIDE (Lead Dev; posted immediately after CRD)**
+# **2\) IMPLEMENTATION GUIDE (Lead Dev; posted immediately after Epic Plan or CRD Plan approval)**
 
-Define how work proceeds after CRD approval in a way CodEx can execute with minimal inference. Lead Dev approves once and later performs the PR gate only when the authorized route uses a PR. Each issued guide MUST identify the exact repository baseline and selected mutation route, resolve whether CodEx can read PF documents, and include all execution-critical material required by that access posture.
+Define how work proceeds after the applicable Epic Plan or CRD Plan approval in a way CodEx can execute with minimal inference. Lead Dev approves once and later performs the PR gate only when the authorized route uses a PR. Each issued guide MUST identify the exact repository baseline and selected mutation route, resolve whether CodEx can read PF documents, and include all execution-critical material required by that access posture.
 
-PF06 owns the CRD-to-guide-to-plan sequence, role handoffs, mutation-route decision, gate timing, and PO-only merge consequence when a PR is used. The normal code-bearing route assigns CodEx to open or amend a PR. Agent direct-main mutation requires an explicit current operator instruction covering the exact change. Repo docs and applicable evidence-index, hash, mirror, and path-proof companions MUST change in the same authorized mutation set whenever their owning requirements are triggered.
+PF06 owns the approved-plan-to-guide-to-implementation-plan sequence, role handoffs, mutation-route decision, gate timing, and PO-only merge consequence when a PR is used. The normal code-bearing route assigns CodEx to open or amend a PR. Agent direct-main mutation requires an explicit current operator instruction covering the exact change. Repo docs and applicable evidence-index, hash, mirror, and path-proof companions MUST change in the same authorized mutation set whenever their owning requirements are triggered.
 
 PF27-Canon-Plan-Templates is the durable owner of the reusable shapes below. Until all five destinations are present and complete, this transitional selection retains the complete local bodies and MUST NOT be read as claiming that a destination already contains them.
 
@@ -2703,7 +2748,7 @@ Delta (actionable; 1–3 bullets):
   Evidence pointer(s):  
 * \\  
   PF proof excerpt (required if a section is cited; verbatim lines):  
-  \\\<1–5 verbatim PF lines\\\>
+  \\\\\<1–5 verbatim PF lines\\\\\\\>
 
 Doc-delta proposals are targets-only. Do not restate transport bytes, schemas, or token tables in audit output.
 
@@ -2775,7 +2820,7 @@ artifacts\_recorded contains exact existing pointers only when artifacts were ac
 "type": "IMPLEMENTATION\_PLAN",  
 "epic\_id": "EPIC-?.?",  
 "crd\_link": "\\",  
-"digest": "\\\<≤1 page: how tasks satisfy proofs and surface/contract constraints\>",  
+"digest": "\\\\\<≤1 page: how tasks satisfy proofs and surface/contract constraints\>",  
 "assumptions": \["\\"\],  
 "context\_header": "D=\_\_ W=\_\_ IFC=\_\_ CU=\_\_ POC=\_\_ IC=\_\_ ESC=\_\_ APPLY\_STEPS=\_\_ VERIFY\_CHECKS=\_\_ Ambiguities=\_\_",  
 "code\_capsules\_finalized": \[  
@@ -3077,7 +3122,7 @@ Every epic MUST complete a Live QA stage via a QA harness before it can be consi
 
 This section is process guidance only. It does not define harness implementation details; those are owned by the Glow QA Guide and the HDE-Mechanics Guide (titles only).
 
-Workflow placement (Close Gate work product). The detailed Live QA plan or runbook (commands, step checks, QA root structure, and evidence landing mechanics) is authored as a separate QA artifact during the Close Gate stage. It MUST NOT be treated as an Epic Plan prerequisite and MUST NOT be embedded into PLAN/CRD or Implementation planning. See §0.4.1 for required Live QA execution deliverables.
+Workflow placement (Close Gate work product). The detailed Live QA plan or runbook (commands, step checks, QA root structure, and evidence landing mechanics) is authored as a separate QA artifact during the Close Gate stage. It MUST NOT be treated as an Epic Plan prerequisite and MUST NOT be embedded into Epic Plan or Implementation planning. See §0.4.1 for required Live QA execution deliverables.
 
 Minimum requirements (all epics) are listed below.
 
@@ -3157,7 +3202,7 @@ Entrypoint regression test exists in CI (no governed evidence writing). Every en
 
 CI tests MUST NOT be treated as a source of governed evidence and MUST NOT require committing audit/qa/\\/\\ outputs to the repo.
 
-No QA-only epics that only test themselves. QA-heavy epics must deliver shared value. If an epic’s QA work does not upgrade shared QA tools or harnesses and does not strengthen Live QA coverage across multiple existing surfaces, the PLAN/CRD MUST be returned as non-conforming and re-scoped before approval.
+No QA-only epics that only test themselves. QA-heavy epics must deliver shared value. If an epic’s QA work does not upgrade shared QA tools or harnesses and does not strengthen Live QA coverage across multiple existing surfaces, the Epic Plan MUST be returned as non-conforming and re-scoped before approval.
 
 Close Gate check. The close PR MUST confirm that Live QA evidence exists under governed roots and is indexed (Human Evidence Index \+ hash sentinel \+ Machine Mirror), and it must ensure the epic’s close-pack references the existence of this Live QA evidence by title and path (no URLs required).
 
@@ -3528,7 +3573,7 @@ Assigned phased PF09 scope is binding for every code-bearing PR. Each assigned t
 
 If an applicable governed file, required companion, or current registry-valid evidence binding is missing, do not merge. Ask the IA to have CodEx amend the current PR so the applicable material lands in the same PR before squash-merge.
 
-PF23 consult is not a PR-review input. Do not consult PF23 or treat it as a blocker during PR analysis. If a PF23 statement appears to conflict with PF canon or the approved PLAN/CRD, record a drift item and route it to the Product Owner for adjudication; do not block merge solely on an unadjudicated PF23 conflict.
+PF23 consult is not a PR-review input. Do not consult PF23 or treat it as a blocker during PR analysis. If a PF23 statement appears to conflict with PF canon or the approved Epic Plan or CRD Plan, record a drift item and route it to the Product Owner for adjudication; do not block merge solely on an unadjudicated PF23 conflict.
 
 Verify that the PR contains:
 
@@ -3964,7 +4009,7 @@ When adjudicating PR correctness, route claims to the owning PF homes (titles on
 * Architecture and system boundaries — HDE-Architecture  
 * Infra and environments — Glow Infrastructure  
 * Math and serializer rules — HDE-Math-Spec  
-* Epic delivery process — Epic Process Guide
+* Change delivery process — Change Process Guide
 
 ## **4.7 PR review pack template — docs-only PR (Lead Dev gate)**
 
@@ -4047,7 +4092,7 @@ C) Test and CI proof:
   * Verification posture: Diff-only (no captured CI/test output in PR bundle)  
   * Search method (example format):  
     * Searched PR artifacts for pass-indicator strings: "passed", "exit 0"  
-    * Result: \\\<0 hits | N hits\\\> (include the string set and scope you searched)
+    * Result: \\\\\<0 hits | N hits\\\\\\\> (include the string set and scope you searched)
 
 Decision:
 
@@ -4055,7 +4100,7 @@ Decision:
 
 # **5\) Quick reference: where code exchange is allowed**
 
-Plan and CRD. Propose/refine code-capsules.
+Epic Plan and CRD Plan. Propose/refine code-capsules.
 
 Implementation Plan (IP). Finalize the capsule list; package verbatim components/schemas for CodEx. After IP approval, capsules become immutable. CodEx may apply scoped fixes but must record every change in the Detailed Change Report.
 
@@ -4377,7 +4422,7 @@ assets:
 title: "User Profile Schema v3"  
 repo\_target\_location: "\\"  
 size\_bytes: 123456  
-sha256: "\\\<64-hex\\\>"  
+sha256: "\\\\\<64-hex\\\\\\\>"  
 license\_note: "\\"  
 single\_home\_category: "Architecture" \# route by category title only  
 notes: "Consumed by component X; CodEx will assume this location."

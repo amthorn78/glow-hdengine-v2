@@ -4,9 +4,9 @@
 
 **Title:** PF19-Canon-Glow-QA-Guide  
 **Status:** Canon  
-**Version:** v3.0  
-**Effective date:** 2026-08-26  
-**Last Update Gate:** redlines-PF19-Canon-Glow-QA-Guide-v2.9.7  
+**Version:** v3.0.3  
+**Effective date:** 2026-08-27  
+**Last Update Gate:** redlines-PF19-Canon-Glow-QA-Guide-v3.0-from-PF10-HDE-Build-Notes-v12.9  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## **0.2 Purpose & scope**
@@ -14,6 +14,24 @@
 Purpose. Standardize pre-commit and post-commit QA across HDE, Catalog/A7, Aux, App FE/BE, DB/Vendor ingest, and CLI/API. This guide defines what to check and where to route policy; concrete bytes, schemas, and tokens remain in their existing single homes.
 
 Scope rule. Any document with “HDE” in its title is HD Engine–specific. PF19 points to those documents by title only and does not duplicate their contents. PF19 itself covers all projects (Engine \+ App \+ shared tooling).
+
+Change-lane QA applicability (normative).
+
+PF19 applies the same applicable QA rigor to the Epic/PF09 lane and the CRD/PF30 lane. A CRD identity does not abbreviate QA or substitute implementation validation for QA. QA planning and QA execution remain separate from implementation planning in both lanes.
+
+For PF19, `<change-id>` means the governed work identity used by the applicable lane: `<epic-id>` for Epic work mapped to PF09, or `<crd-id>` for CRD work mapped to PF30. Every active, generally applicable PF19 reference to an epic QA plan, candidate, evidence root, manifest, check, remediation record, QA verdict, or QA closeout record applies to CRD work by substituting the corresponding CRD identity and PF30 lineage. Event-bounded epic history and explicitly epic-only examples remain historical and are not rewritten.
+
+The CRD-compatible QA references are:
+
+* Live QA plan: `docs/qa/<crd-id>-live-qa-plan.md`.  
+* QA evidence root: `audit/qa/<crd-id>/`.  
+* Current-state manifest: `audit/qa/<crd-id>/qa_step_logs_manifest.json`.  
+* Per-check evidence: `audit/qa/<crd-id>/checks/<check_id>/`.  
+* Remediation staging: `audit/qa/<crd-id>/remediation/<lowercase_slug>/`.  
+* Ops evidence consumed by QA remains distinct at `audit/ops/<crd-id>/<task_id>/`.  
+* CRD QA plans, verdicts, remediation records, and closeout records MUST identify the CRD ID and PF30 lineage; Epic equivalents retain the Epic ID and PF09 lineage.
+
+The existing lowercase-directory, governed-evidence, manifest, path-proof, index, mirror, failure-classification, remediation, exact-candidate, and claim-separation rules apply unchanged. A CRD QA verdict MUST bind to the exact repository and candidate SHA, scope, governing criteria, checks, fixtures, configuration, evidence, decision-maker, decision time, limitations, and unresolved conditions. A later CRD candidate requires the applicable QA rerun or the explicit scope-equivalence proof defined in §10.8. CI success alone is not QA acceptance, and PF19 requires no token roster, token claim, or token matrix for CRD work.
 
 HD Engine specifics are delegated, titles-only, to:
 
@@ -38,7 +56,7 @@ PF19 treats epic planning and phase mapping as outside its scope.
 
 For HD Engine epic history:
 
-* HDE Phased Epics is historical-only: it MUST contain only completed epic records (formally closed per Epic-Process-Guide, titles-only) and is updated only at epic close (no in-flight placeholders).  
+* HDE Phased Epics is historical-only: it MUST contain only completed epic records (formally closed per Change Process Guide, titles-only) and is updated only at epic close (no in-flight placeholders).  
 * HDE Epics Map is maintained as historical context only and must not be used as the source of truth for new work.
 
 In particular:
@@ -60,35 +78,11 @@ PF19 owns QA principles, checklists, and cross-component playbooks; it routes al
 
 Reality Audits vs QA acceptance (titles-only).
 
-PF19 treats Reality Audits as a separate axis from QA acceptance. Reality Audits (as defined in Reality Audits) are PO-only, post-epic architecture reviews that may be in scope or out of scope for a given epic or implementation plan.
+PF19 treats Reality Audits as Product Owner post-epic review and historical context. They are not agent-planned work, CRD tasks, implementation obligations, QA obligations, QA-plan prerequisites, acceptance proof, or blockers.
 
-Decisions to run, skip, narrow, or broaden a Reality Audit for a specific epic:
+A QA plan or review MAY consult Reality Audits as historical context. No PF23 consult, capture artifact, operator command, or update is required for QA planning or execution. Current repository claims still require current repository inspection, and PF canon remains authoritative for requirements.
 
-* do not change the applicable QA criteria or governed evidence requirements;  
-* do not create a QA acceptance-token, token-roster, or token-evidence-matrix prerequisite; and  
-* do not change the exact-source identity, evidence, scope, limitation, or decision requirements for a QA verdict.
-
-PF23 scope choices are local to a plan or epic and must be recorded there (for example in HDE Phased Epics or HDE-Build Notes by title). PF19’s exact-source QA and strict-claim rules remain global and unaffected by per-epic Reality Audit decisions.
-
-Planning posture: mandatory PF23 consult (components \+ pathnames).
-
-PF23 is a consultative reality audit. It is a required consult step for QA planning, including drafting, reviewing, and approving Live QA Plans, but it does not itself define QA acceptance and it MUST NOT be treated as acceptance proof.
-
-Freshness posture (informative). PF23 is often fresher than PF19 and older epic plans for repo-reality context, but PF canon remains authoritative when there is a conflict.
-
-How to use PF23 in QA planning (plan lint: no invented claims):
-
-* If PF23 is cited, anchor to a specific PF23 section and heading.  
-* Use direct quotes (verbatim) and label them explicitly as PF23 consult input.  
-* PF23 may be used to identify component boundaries, canonical pathnames, and repo loci, but any repo-resident locus in the plan MUST still satisfy the locus provenance rules in this guide.  
-* Reviewers SHOULD consult PF23 before approving any plan that names repo-resident loci.  
-* PF23 MUST NOT be consulted during PR analysis or review of code diffs.
-
-PF23 consult is planning-time only (no Live QA deliverables). Live QA plans MUST NOT require any PF23 consult capture artifact (for example `pf23_consult.md`) and MUST NOT include PF23 operator commands as execution steps. If present, a “PF23 Anchors” note is informational only and MUST be non-gating.
-
-Deconflicting PF23 vs PF canon (drift protocol stub). If PF23 appears inconsistent with other allowed repo-reality sources, treat the situation as a reality ambiguity and DO NOT guess or assert a reconciled locus as fact in the plan. Record a drift note with the PF23 anchor, the conflicting canon reference (by title and section), and the adjudication owner. Do not treat the QA plan or Live QA execution as the adjudication venue.
-
-Ownership (normative). PF23 is PO-maintained. Planning documents MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.
+Reality Audit decisions do not change applicable QA criteria, governed evidence requirements, exact-source verdict identity, limitations, or decision requirements. Planning documents MUST NOT assign PF23 updates or treat PF23 as a deliverable, acceptance condition, or close condition.
 
 ## **0.3 Legacy acceptance-token compatibility (names-only)**
 
@@ -115,7 +109,7 @@ PF19 routes to these existing single homes:
 * Architecture (single emitter, boundaries): PF02 — HDE Architecture  
 * Build checklists & CI gates: PF09 — HDE-Build Checklist  
 * Narrative rules & surfaces: PF17 — HDE Narratives Guide  
-* Process (PR-first): PF06 — Epic-Process-Guide
+* Process (PR-first): PF06 — Change Process Guide
 
 ### **0.4.3 Core principles (names-only).**
 
@@ -482,7 +476,7 @@ Workflow placement (Live QA runbooks; normative) is as follows:
 
 * Live QA is a required Close Gate activity when an epic’s acceptance requires it. Live QA runbooks (commands, step-by-step checks, QA\_ROOT structure, behavior-run vs artifact capture/analysis, and step deliverables) MUST be authored as separate QA work products during the Close Gate stage and stored at `docs/qa/<epic-id>-live-qa-plan.md`. The authored runbook is a planning and review work product, not execution evidence or a manifest entry.  
 * Functional Live QA is mandatory for functional changes: if a change alters runtime behavior (CLI, HTTP surface, vendor ingest, DB mutation or rejection posture), the Close Gate MUST include a runtime functional proof on that surface (or a CI-sourced runtime proof that executes the surface). Artifact-only close without functional proof is non-conforming.  
-* Epic Plans and implementation plans MUST NOT embed a Live QA runbook. They MUST include only a single statement that Live QA is required for eventual epic close, and may reference the governing documents by title (Epic-Process-Guide; Glow QA Guide).  
+* Epic Plans and implementation plans MUST NOT embed a Live QA runbook. They MUST include only a single statement that Live QA is required for eventual epic close, and may reference the governing documents by title (Change Process Guide; Glow QA Guide).  
 * Epic Implementation Plans and Implementation Guides MUST NOT require the production of extensive QA evidence artifacts. They MAY state QA objectives and closeout proof obligations, but QA planning and QA evidence capture remain separate QA work products owned by Live QA Plans and QA execution artifacts.  
 * Ops tasks are implementation work, not QA steps. Ops evidence is required and must be tracked and evidenced as implementation work, and it does not substitute for required QA evidence or PASS/FAIL evaluation. Keep categories distinct: implementation work, ops tasks, QA planning, QA execution.  
 * Reviewers MUST NOT reject or block an Epic Plan solely because it lacks a detailed Live QA runbook, provided the plan clearly marks Live QA as required for close and routes to the governing documents by title.
@@ -4001,7 +3995,7 @@ This interpretation does not apply when a relied-on artifact is missing, the Hum
 
 # **10\. QA checklists, harnesses, and review rules**
 
-PF19 is the canonical home for the QA checklists, QA harness requirements, evidence-quality and failure-classification rules, exact later-drain QA vocabulary, and QA review semantics in this section. `PF27-Canon-Plan-Templates` owns reusable structure for its declared plan, runbook, review, and closeout classes. `PF06-Canon-Epic-Process-Guide` owns process sequencing, `Remediation Task Plan` structure, and its declared PR review-pack structures. `PF12-Canon-HDE-Schemas-and-Artifacts` owns governed schemas, catalogs, artifact paths, canonical bytes, and evidence-refresh mechanics. This section states only the PF19-owned QA rule or the minimum applicability boundary needed to route safely; it does not reproduce owner-controlled template or schema contracts.
+PF19 is the canonical home for the QA checklists, QA harness requirements, evidence-quality and failure-classification rules, exact later-drain QA vocabulary, and QA review semantics in this section. `PF27-Canon-Plan-Templates` owns reusable structure for its declared plan, runbook, review, and closeout classes. `PF06-Canon-Change-Process-Guide` owns process sequencing, `Remediation Task Plan` structure, and its declared PR review-pack structures. `PF12-Canon-HDE-Schemas-and-Artifacts` owns governed schemas, catalogs, artifact paths, canonical bytes, and evidence-refresh mechanics. This section states only the PF19-owned QA rule or the minimum applicability boundary needed to route safely; it does not reproduce owner-controlled template or schema contracts.
 
 ## **10.1 Pre-commit QA checklist**
 
@@ -4129,9 +4123,9 @@ Any future migration to a `.py` path is an intentional compatibility change. It 
 
 ### **Artifact and owner boundaries**
 
-`PF27-Canon-Plan-Templates` \> `4) Remediation Implementation Guide (Template)` is the single reusable template home for a `Remediation Implementation Guide`. `PF06-Canon-Epic-Process-Guide` Appendix B retains only the process purpose and scope. PF19 retains QA evidence quality, failure classification, review semantics, and QA standard playbooks that are not template shape. A `Remediation Implementation Guide` is not a `Remediation Task Plan` and is not an `Epic Remediation Plan`.
+`PF27-Canon-Plan-Templates` \> `4) Remediation Implementation Guide (Template)` is the single reusable template home for a `Remediation Implementation Guide`. `PF06-Canon-Change-Process-Guide` Appendix B retains only the process purpose and scope. PF19 retains QA evidence quality, failure classification, review semantics, and QA standard playbooks that are not template shape. A `Remediation Implementation Guide` is not a `Remediation Task Plan` and is not an `Epic Remediation Plan`.
 
-`PF06-Canon-Epic-Process-Guide` \> `Appendix C — Remediation Task Plans (DEV PRs + OPS tasks)`, including `Canonical Remediation Task Plan Template (paste-ready)`, is the canonical structure and approval-gate home for the distinct `Remediation Task Plan` artifact. PF06 controls its PR and OPS task model, `DISCOVERY` and `CHANGE` intent, cross-lane dependency line, execution-ready and approval gates, required outputs and verification, OPS authorization and evidence capture, in-flight command posture, mechanical blockers, remediation-only planning boundary, portability and provenance fields, and paste-ready fields. A `Remediation Task Plan` is not an alias, rename, or subtype of either PF27 remediation artifact.
+`PF06-Canon-Change-Process-Guide` \> `Appendix C — Remediation Task Plans (DEV PRs + OPS tasks)`, including `Canonical Remediation Task Plan Template (paste-ready)`, is the canonical structure and approval-gate home for the distinct `Remediation Task Plan` artifact. PF06 controls its PR and OPS task model, `DISCOVERY` and `CHANGE` intent, cross-lane dependency line, execution-ready and approval gates, required outputs and verification, OPS authorization and evidence capture, in-flight command posture, mechanical blockers, remediation-only planning boundary, portability and provenance fields, and paste-ready fields. A `Remediation Task Plan` is not an alias, rename, or subtype of either PF27 remediation artifact.
 
 `PF12-Canon-HDE-Schemas-and-Artifacts` controls governed evidence schemas, paths, canonical Index and Mirror bytes, path-proof contracts, and refresh mechanics. The applicable `PF27-Canon-Plan-Templates` or PF06 artifact class controls reusable review structure, wrapper guards, and an `ASK OK?` submission sentinel where its template requires one. PF19 does not reproduce those owner-controlled contracts. PF19 QA requires that missing, incoherent, stale, or misbound governed evidence cannot support the claimed result.
 
@@ -4207,7 +4201,7 @@ When a QA review, repo audit, PF23 consult, or closeout check proves that a sear
 
 ## **10.7 Later-drain QA semantics**
 
-PF19 governs the exact later-drain QA vocabulary and the evidence-sufficiency, failure-classification, and nonclaim semantics for a later-drain recommendation. `PF27-Canon-Plan-Templates` governs reusable field placement for its declared plan, review, and closeout classes. `PF06-Canon-Epic-Process-Guide` governs reusable field placement for its declared PR review-pack classes. Use the complete owner block where that class already has one and normalize its QA vocabulary to the exact PF19 values. Until the declared owner contains a complete destination, retain the missing field coverage here as an explicitly transitional compatibility rule. A later-drain recommendation does not perform a PF-canon update, move PF09 status, establish QA PASS, close an epic, or make documentation drainage a gate for the approved work.
+PF19 governs the exact later-drain QA vocabulary and the evidence-sufficiency, failure-classification, and nonclaim semantics for a later-drain recommendation. `PF27-Canon-Plan-Templates` governs reusable field placement for its declared plan, review, and closeout classes. `PF06-Canon-Change-Process-Guide` governs reusable field placement for its declared PR review-pack classes. Use the complete owner block where that class already has one and normalize its QA vocabulary to the exact PF19 values. Until the declared owner contains a complete destination, retain the missing field coverage here as an explicitly transitional compatibility rule. A later-drain recommendation does not perform a PF-canon update, move PF09 status, establish QA PASS, close an epic, or make documentation drainage a gate for the approved work.
 
 A later-drain statement applies only when a covered approval artifact is intentionally being used to support a later PF-canon drain. It does not move the drain earlier or make drainage an implementation, approval, QA, OPS, merge, completion, or closeout prerequisite. Approval artifacts MUST NOT stop at vague language such as accepted, complete, merge-ready, approved, or no further remediation needed when the practical intent is to support a later PF-canon update.
 
@@ -4215,8 +4209,8 @@ A later-drain statement applies only when a covered approval artifact is intenti
 
 | Covered artifact class | Durable field-placement owner | PF19 treatment |
 | :---- | :---- | :---- |
-| PF06 PR final review pack | `PF06-Canon-Epic-Process-Guide` `4.6 PR review pack template — provenance, diff review, RCA, and pass proof` | Use the owner’s complete field family, but normalize the two divergent value families to the exact PF19 vocabulary below. |
-| PF06 docs-only PR final review pack | `PF06-Canon-Epic-Process-Guide` `4.7 PR review pack template — docs-only PR (Lead Dev gate)` | Retain only the missing fields as transitional compatibility coverage when the review intentionally supports later drain. |
+| PF06 PR final review pack | `PF06-Canon-Change-Process-Guide` `4.6 PR review pack template — provenance, diff review, RCA, and pass proof` | Use the owner’s complete field family, but normalize the two divergent value families to the exact PF19 vocabulary below. |
+| PF06 docs-only PR final review pack | `PF06-Canon-Change-Process-Guide` `4.7 PR review pack template — docs-only PR (Lead Dev gate)` | Retain only the missing fields as transitional compatibility coverage when the review intentionally supports later drain. |
 | PR remediation acceptance review | `PF27-Canon-Plan-Templates` `5) Remediation Review Record (Template; REVIEW mode only)` | Use the complete owner block. Retain PF19 vocabulary, evidence sufficiency, and failure/nonclaim semantics without duplicating the fields. |
 | Epic closure or final close-pack review | `PF27-Canon-Plan-Templates` `10) Epic Closure Review + Retrospective (Template; REVIEW mode only)` | Use the complete owner block. Retain PF19 evidence-sufficiency and no-overclaim semantics without duplicating the fields. |
 | OPS task final review | `PF27-Canon-Plan-Templates` `11) Ops Task Final Review Record (Template; REVIEW mode only)` | Use the complete owner block. Apply PF19 interpretation only when QA evidence is in scope. |
@@ -4310,11 +4304,11 @@ Different identifiers prove different facts: a Git commit identifies a repositor
 
 ### **Ops tasks (QA-specific boundary; general process routed to PF06)**
 
-PF06-Canon-Epic-Process-Guide defines general Ops task identity, authorization and execution, IA facilitation, required task-record fields, process flow, handoffs, and non-QA responsibilities. PF19 does not restate or override those rules.
+PF06-Canon-Change-Process-Guide defines general Ops task identity, authorization and execution, IA facilitation, required task-record fields, process flow, handoffs, and non-QA responsibilities. PF19 does not restate or override those rules.
 
 QA-specific boundaries are as follows:
 
-* An Ops task that supplies an input or result to QA remains Ops work. The Product Owner retains authorization, accountability, and acceptance. Execution may be performed by the PO or by an automated session agent only through the explicit delegation, scope, safety, evidence, redaction, and completion-claim controls in PF06-Canon-Epic-Process-Guide.  
+* An Ops task that supplies an input or result to QA remains Ops work. The Product Owner retains authorization, accountability, and acceptance. Execution may be performed by the PO or by an automated session agent only through the explicit delegation, scope, safety, evidence, redaction, and completion-claim controls in PF06-Canon-Change-Process-Guide.  
 * When applicable canon already provides concrete operator instructions, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules, the QA plan or QA-facing Ops record MUST carry those instructions explicitly. This does not authorize invention; missing or ambiguous instruction detail must remain identified as unknown.  
 * Ops execution evidence is stored under `audit/ops/<epic-id>/<task_id>/`.  
 * When QA consumes an Ops result, the QA check's governed receipt is `audit/qa/<epic-id>/checks/<check_id>/primary.log`; its required sibling proof is `audit/qa/<epic-id>/checks/<check_id>/primary.log.path_proof.txt`. The receipt points to the distinct Ops evidence instead of copying the Ops lane into an unclassified QA child directory.  
@@ -5465,7 +5459,7 @@ Listing a target does not authorize access, prove reachability, prove secret pre
 * Default rails posture: closed rails.  
 * Closed rails: `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
 * Allowed rails-toggle names: `SAFE_MODE` and `ALLOW_NETWORK`.  
-* Open rails: `SAFE_MODE=0` and `ALLOW_NETWORK=1`, only for an expressly approved step whose owner, target, authorization, secret-safety, evidence, and rollback boundaries are defined. Privileged or external-system mutation remains PO-authorized Ops work; execution follows PF06-Canon-Epic-Process-Guide, including its explicit-delegation controls.  
+* Open rails: `SAFE_MODE=0` and `ALLOW_NETWORK=1`, only for an expressly approved step whose owner, target, authorization, secret-safety, evidence, and rollback boundaries are defined. Privileged or external-system mutation remains PO-authorized Ops work; execution follows PF06-Canon-Change-Process-Guide, including its explicit-delegation controls.  
 * `APP_ENV` is propagated exactly when a check requires it. Infra helpers MUST NOT silently default an empty or unset value. Local/dev HDE checks that require the dev-gated surface use the owner-defined `APP_ENV=dev` posture.  
 * Required secret names for the base closed-rails profile: none.  
 * Check-specific secret names: the applicable plan lists the exact owner-defined names. Current known names such as `DATABASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` are required only when the selected check uses their target; they are not universal profile prerequisites.  
@@ -5504,7 +5498,7 @@ The two Doc Delta files are byte-identical where PF12-Canon-HDE-Schemas-and-Arti
 * Responsible for environment wiring and profile currency: `Infra / Ops owner`  
 * Responsible for HDE CLI, test, and playbook content consumed by the profile: `HDE Lead / Engine owner`  
 * Accountable reviewer: `Lead Developer`  
-* The Product Owner retains authorization, accountability, and acceptance for privileged Ops actions. Any delegated execution follows PF06-Canon-Epic-Process-Guide.
+* The Product Owner retains authorization, accountability, and acceptance for privileged Ops actions. Any delegated execution follows PF06-Canon-Change-Process-Guide.
 
 ### **14.5.2 App Back End — Codespaces QA environment**
 
@@ -5567,8 +5561,7 @@ Profile ownership and future-definition gates are as follows:
 | App Front End — Mobile | `Mobile/App Frontend owner`, with Infra/Ops for environment wiring | `Lead Developer` | Establish whether Codespaces supports the required mobile surfaces and, if not, canonize the alternate QA console before completing §14.5.4. |
 | Update trigger(s) include: |  |  |  |
 
-*   
-  repo/toolchain change that affects QA steps  
+* repo/toolchain change that affects QA steps  
 * Codespaces base image change  
 * secrets or env-var interface changes (names-only)  
 * devcontainer changes that affect shells, entrypoints, or tooling availability
