@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.9.2  
-Effective Date: 2026.08.29  
+**Version:** v12.9.3  
+Effective Date: 2026.08.31  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -183,11 +183,10 @@ TEMPLATE Addendum Entry (do not edit/remove)
 
 ## 1.1 Addendum Index:
 
-No current addenda.
+2.1 Epic/CRD Specification and Implementation-Plan authority; PF20/PF30 historical status  
+2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control
 
 # 2\) Numbered Addenda
-
-# **PF10-HDE-Build-Notes Addendum**
 
 ## **2.1 Epic/CRD Specification and Implementation-Plan authority; PF20/PF30 historical status**
 
@@ -403,10 +402,313 @@ Permanent drainage targets include PF06, PF27, PF30.1, PF09 cross-references whe
 
 Until drainage is complete, any conflict between an old Plan/Guide/PF30 requirement and this adopted operating decision must be surfaced as a governance conflict. A prompt must not silently follow both models or manufacture duplicate artifacts.
 
-### **Nonclaims and status**
+## 2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control
 
-This addendum does not itself approve an Epic Specification, CRD Specification, or IP; authorize implementation; create or alter PF09/PF20/PF30 records; mutate a repository; create a PR; authorize Ops; or declare QA, acceptance, drainage, closeout, or closure.
+**Status:** Product Owner-directed operating addendum; ready for controlled insertion into PF10  
+**Prepared:** 2026-08-30  
+**Scope:** Prompt/workflow architecture, actor ownership, approval semantics, living-map control, and downstream PF drainage targets  
+**Precedence within scope:** This addendum extends Addendum 2.1 and supersedes any overlapping description that assigns the wrong actor, invents an approval binding, collapses Epic and CRD formation, or confuses governance-repair review with runtime approval.  
+**Non-authorization:** This addendum does not publish, activate, retire, archive, or execute any prompt. It does not itself amend downstream PF documents.
 
-This revision remains Addendum 2.1 and supersedes the prior Implementation-Guide wording of the same addendum. It records the Product Owner-directed operating correction for the active Epic and CRD prompt families pending canonical drainage. The previously issued **CRD and Epic Prompt Canon Validation Report 082926** remains evidence of the audited prompt defects, but its earlier PF30-active remediation model and Implementation-Guide terminology are superseded by this Product Owner decision.
+---
+
+### 1\. Product Owner clarification
+
+The operating contract is:
+
+1. **Master Scrum** runs the class-specific kickoff prompt.  
+2. **Isis** runs the class-specific Specification-creation prompt.  
+3. **Thoth** runs the class-specific Specification-review prompt.  
+4. If Thoth denies the Specification, **Isis** runs the class-specific revise-and-redline-apply prompt and returns the revision to the **same continuing Thoth session**.  
+5. After Specification approval, the **Implementation Agent (IA)** creates the **Implementation Audit first**, then the change-wide **Implementation Plan**.  
+6. **Isis** reviews the IA-authored Implementation Plan and, if necessary, redlines it for IA revision.  
+7. The IA creates PR Instructions and Ops Tasks.  
+8. Each planned PR work unit receives a dedicated PR implementation session and a per-PR Implementation Plan.  
+9. The **only Product Owner runtime approval point** is the per-PR Implementation Plan. The Product Owner approves it by running **`PR Implementation Proceed`**.  
+10. Running `PR Implementation Proceed` is the approval. **There is no separate approval binding, token, signature, object, receipt, hash, or ID.**  
+11. QA, reporting, and closure then proceed under the role assignments below.
+
+No prompt, registry, implementation, or audit process may infer an additional Product Owner approval gate.
+
+---
+
+### 2\. Normative runtime sequence
+
+#### 2.1 Formation and Specification
+
+| Order | Actor/session | Action | Required result | Decision owner |
+| ----- | ----- | ----- | ----- | ----- |
+| 1 | Product Owner | Selects the change class: Epic or CRD | Exact class selection | Product Owner |
+| 2 | Master Scrum | Runs the matching Epic or CRD kickoff prompt | Class-bound kickoff handoff | Master Scrum performs the kickoff; no Specification approval occurs here |
+| 3 | Isis | Runs the matching Specification-creation prompt | Initial Epic or CRD Specification | Isis is the substantive author |
+| 4 | Same continuing Thoth session | Reviews the Specification | Approval or exact denial/redline | Thoth |
+| 5, only if denied | Isis | Applies Thoth's exact redline and revises the Specification | Revised Specification with preserved lineage | Isis authors; Thoth does not rewrite it |
+| 6 | Same continuing Thoth session | Re-reviews the revision | Approval or another exact denial/redline | Thoth |
+
+Epic and CRD formation remain separate through Specification approval. They converge only after an approved, class-bound Specification exists.
+
+#### 2.2 Implementation analysis and change-wide planning
+
+| Order | Actor/session | Action | Required result | Decision owner |
+| ----- | ----- | ----- | ----- | ----- |
+| 7 | Implementation Agent | Creates the Implementation Audit | First IA artifact; evidence-grounded implementation analysis of the approved Specification | IA authors; no PO approval |
+| 8 | Implementation Agent | Creates the change-wide Implementation Plan | Plan derived from the approved Specification and Implementation Audit | IA authors |
+| 9 | Isis | Reviews the IA-authored Implementation Plan | Approval or exact redline | Isis |
+| 10, only if redlined | Implementation Agent | Applies Isis's redline and revises the plan | Revised Implementation Plan | IA authors |
+| 11 | Isis | Re-reviews the revision | Approval or another exact redline | Isis |
+
+The Implementation Audit and Implementation Plan are distinct artifacts. “Implementation Analysis” is not a substitute name for either artifact or for the IA role.
+
+#### 2.3 PR and Ops preparation
+
+| Order | Actor/session | Action | Required result | Decision owner |
+| ----- | ----- | ----- | ----- | ----- |
+| 12 | Implementation Agent | Creates PR Instructions | Exact work-unit instructions, dependencies, and evidence expectations | IA |
+| 13 | Implementation Agent | Creates Ops Tasks where needed | Environment/operations work separated from PR implementation | IA |
+| 14 | Dedicated PR session for each planned PR work unit | Creates the per-PR Implementation Plan | Executable plan bounded to that PR work unit | PR session authors |
+| 15 | Product Owner | Runs `PR Implementation Proceed` for that per-PR plan | Approval to implement that PR work unit | Product Owner, by the act of running the prompt |
+| 16 | Same dedicated PR session | Implements and opens the actual PR or ordered PR lineage | Reviewable implementation and evidence | PR session executes within the approved plan |
+
+No implementation may begin merely because a per-PR plan exists. Conversely, no second approval artifact may be demanded after the Product Owner runs `PR Implementation Proceed`.
+
+#### 2.4 Ops execution
+
+1. IA prepares or reviews the Ops work required by the approved change-wide plan.  
+2. The authorized DevOps/environment operator executes the Ops work.  
+3. Execution evidence returns to the responsible review chain.  
+4. Kronos has no Ops execution or approval role.  
+5. Ops execution does not replace PR implementation review, QA, or Isis closure.
+
+#### 2.5 Repository documentation and QA
+
+1. The final repository-documentation PR is completed before QA begins.  
+2. Isis performs QA-readiness preparation and creates the Live QA Guide.  
+3. The PF23 interface is handled only under an explicitly selected and reconciled PF23 policy. The current timing/class/ownership conflict is recorded in Section 8 and must not be silently resolved by a prompt author.  
+4. Kronos creates the QA Audit and then the QA Plan.  
+5. Isis reviews the QA Plan and either approves it or provides an exact redline.  
+6. QA tasks are executed through the authorized environment/DevOps path, and evidence returns to Kronos.  
+7. Kronos reviews the evidence.  
+8. **Every completed QA run** ends with both a final QA Report and an RCA, regardless of pass or fail.
+
+#### 2.6 Closure and post-closure maintenance
+
+1. Isis performs the terminal retrospective and makes the change-closure decision.  
+2. After closure, the operator performs manual PF10 addenda drainage, sends the closure memo to Thoth and Master Scrum, and updates the development board.  
+3. PF drainage and documentation maintenance are required maintenance but are nonblocking for the already-completed runtime change unless a separate governing rule explicitly states otherwise.  
+4. Closing the change does not silently publish, activate, repair, or retire prompt infrastructure.
+
+---
+
+### 3\. Exact authority and approval map
+
+| Subject | Author/executor | Reviewer or decision owner | Product Owner approval? |
+| ----- | ----- | ----- | ----- |
+| Epic or CRD selection | Product Owner | Product Owner | Selection, not downstream approval |
+| Kickoff handoff | Master Scrum | Contract-defined validation downstream | No |
+| Initial or revised Specification | Isis | Same continuing Thoth session | No |
+| Specification approval/denial | Thoth | Thoth | No |
+| Implementation Audit | Implementation Agent | Consumed by the planning/review chain | No |
+| Change-wide Implementation Plan | Implementation Agent | Isis | No |
+| PR Instructions and Ops Tasks | Implementation Agent | Contract-defined downstream review | No |
+| Per-PR Implementation Plan | Dedicated PR session | Product Owner runs `PR Implementation Proceed` | **Yes—the act of running the prompt is the approval** |
+| PR implementation | Same dedicated PR session | Normal PR review/evidence chain | Approval already supplied by Proceed; no new binding |
+| Live QA Guide / QA readiness | Isis | QA chain consumes it | No |
+| QA Audit and QA Plan | Kronos | Isis reviews the QA Plan | No |
+| QA execution | Authorized environment/DevOps path | Kronos reviews evidence | No |
+| Final QA Report and RCA | Kronos | Closure chain consumes them | No |
+| Change closure | Isis | Isis | No |
+
+#### 3.1 Prohibited approval inventions
+
+The following must not be introduced as requirements for PR approval:
+
+* approval binding;  
+* approval token;  
+* approval signature;  
+* approval object;  
+* approval receipt;  
+* approval hash;  
+* approval ID;  
+* a second Product Owner confirmation after `PR Implementation Proceed`.
+
+Durable run and artifact identities may still exist for traceability. They are evidence of what ran or what was produced; they are not a separate approval mechanism.
+
+---
+
+### 4\. Artifact chain
+
+The expected artifact lineage is:
+
+1. Class selection.  
+2. Class-bound kickoff handoff.  
+3. Initial Specification.  
+4. Thoth decision and, if denied, exact redline.  
+5. Revised Specification and lineage receipt, repeated as needed.  
+6. Approved Specification.  
+7. Implementation Audit.  
+8. Change-wide Implementation Plan.  
+9. Isis plan decision and, if needed, exact redline/revision lineage.  
+10. Approved change-wide Implementation Plan.  
+11. PR Instructions and any Ops Tasks.  
+12. Per-PR Implementation Plan for each planned PR work unit.  
+13. `PR Implementation Proceed` run for each approved per-PR plan.  
+14. Actual PR or ordered PR lineage plus implementation evidence.  
+15. Ops execution evidence where applicable.  
+16. Final repository-documentation PR.  
+17. Live QA Guide and QA-readiness evidence.  
+18. QA Audit.  
+19. QA Plan and Isis review decision.  
+20. QA execution evidence.  
+21. Final QA Report and RCA for every completed QA run.  
+22. Isis retrospective and closure decision.  
+23. Manual PF10 addenda drainage, closure memo, and board update.
+
+An artifact may prove lineage, completeness, or replay state without becoming an approval object.
+
+---
+
+### 5\. Living prompt-flow map control
+
+A human-readable **Glow HDE Living Prompt Flow Map** shall be maintained in Notion under the prompt-workflow revalidation area.
+
+#### 5.1 Purpose
+
+The living map shall make the workflow understandable without requiring an operator to reconstruct it from prompt bodies, audit reports, and registry extensions. It shall show:
+
+* runtime sequence;  
+* lane and prompt identity;  
+* actor/session owner;  
+* substantive input and output;  
+* decision owner;  
+* approval semantics;  
+* current prompt lifecycle state;  
+* open conflicts and deferred repairs;  
+* exact links or immutable identities for controlling artifacts.
+
+#### 5.2 Authority boundary
+
+The living map is an operational navigation and reconciliation surface. It does **not** replace:
+
+* PF canon;  
+* the workspace registry;  
+* a Project Prompt Contract Registry;  
+* a prompt contract or prompt body;  
+* a governance audit;  
+* a runtime approval;  
+* source or successor artifact lineage.
+
+When the living map conflicts with governing PF canon or an accepted Product Owner decision, the conflict must be displayed and escalated; the map must not silently choose a winner.
+
+#### 5.3 Required maintenance events
+
+Update the living map whenever a prompt is:
+
+* proposed;  
+* contracted;  
+* authored;  
+* independently reviewed;  
+* repaired;  
+* published;  
+* activated;  
+* held;  
+* superseded;  
+* retired;  
+* or replaced by a new immutable successor.
+
+Each update must preserve exact identities and distinguish mutable Notion representations from immutable Library or registry artifacts.
+
+#### 5.4 Layer discipline
+
+Every entry or review must declare one active layer:
+
+* `RUNTIME_PROMPT_CONTRACT` — what the production workflow does and who runs it; or  
+* `GOVERNANCE_REPAIR` — how prompt contracts and bodies are audited, repaired, reviewed, published, and activated.
+
+An independent cross-prompt consistency reviewer belongs to `GOVERNANCE_REPAIR`. That reviewer is not a new Thoth session and does not replace the same continuing Thoth session that performs runtime Specification review.
+
+---
+
+### 6\. Current Batch 1A tracking note
+
+The first repaired CRD family consists of:
+
+| Contract | Runtime actor | Purpose | Current state at preparation |
+| ----- | ----- | ----- | ----- |
+| CF-C-10 | Master Scrum | Kick off the CRD Specification flow and produce the kickoff handoff | Successor body authored; unpublished; inactive |
+| CF-C-20 | Isis | Create the initial CRD Specification and establish initial Specification lineage | Successor body authored; unpublished; inactive |
+| CF-C-30 | Same continuing Thoth session | Review and approve or deny the CRD Specification | Successor body authored; unpublished; inactive |
+| CF-C-40 | Isis | Revise the denied CRD Specification and apply Thoth's exact redline | Successor body authored; unpublished; inactive |
+
+The next governance gate is a fresh independent cross-prompt consistency and exact-contract-conformance review. That gate reviews the authored successors; it does not run the runtime prompts and does not confer Thoth approval.
+
+The wider source repair population and the candidate-registry record count must not be treated as the same number. A candidate registry may preserve source/history records alongside successors.
+
+---
+
+### 7\. Recovered-context incident and integrity control
+
+During the 2026-08-30 repair/authoring sequence, the operator temporarily mixed the runtime prompt contract with the governance-repair process. This produced incorrect role descriptions and repeated use of “PF10 agenda” instead of **PF10 addenda**. The context was recovered before the next authorized action.
+
+Disposition:
+
+* classification: operator context error;  
+* runtime or canonical mutation caused by the error: none established;  
+* affected understanding: actor/session ownership, approval semantics, and maintenance terminology;  
+* correction source: explicit Product Owner restatement and recovered context files;  
+* preventive controls: the living prompt-flow map, active-layer declaration, exact actor/decision table, and this addendum.
+
+Historical page titles containing “Agenda” may be cited exactly as historical identities. New generic references must use **PF10 addendum** (singular) or **PF10 addenda** (plural).
+
+---
+
+### 8\. Open policy issue: PF23
+
+The restored operating intent and current PF23 text are not yet reconciled on at least:
+
+* timing relative to QA;  
+* applicability to Epic versus CRD changes;  
+* human accountability versus agent/session handling;  
+* the exact artifact supplied to Kronos.
+
+This addendum records the conflict but does not select a replacement PF23 policy. Until the Product Owner makes and records that decision, prompt authors must:
+
+1. expose the conflict;  
+2. avoid inventing an automatic resolution;  
+3. avoid claiming that PF23 has already been harmonized;  
+4. preserve any activation hold that depends on this policy.
+
+---
+
+### 9\. PF canon drainage targets
+
+| Priority | PF target | Required drainage | Completion evidence |
+| ----- | ----- | ----- | ----- |
+| **Primary** | **PF06 — Change Process Guide** | Replace obsolete Lead Developer / Epic Plan / CRD Plan / Implementation Guide routing with the class-specific kickoff → Specification → Thoth review/redline loop → Implementation Audit → change-wide Implementation Plan → PR/Ops → QA → Isis closure flow. Encode exact actor, same-session, convergence, PO approval, manual-maintenance, and nonblocking-drainage rules. | End-to-end sequence and role/approval tables agree with this addendum; obsolete conflicting routes are removed or explicitly historical. |
+| High | PF12 — Schemas and Artifacts | Define or align the identities, minimum fields, lineage, and evidence boundaries for kickoff handoff, Specification, redline, Implementation Audit, change-wide Implementation Plan, PR Instructions, per-PR plan, Ops Task, QA artifacts, closure artifacts, and maintenance receipts. Preserve the distinction between traceability evidence and approval. | Schemas support deterministic handoff and replay without inventing a PO approval binding. |
+| High | PF27 — Plan Templates | Replace or reclassify obsolete Epic Plan, CRD Plan, Implementation Guide, and Remediation Guide templates. Align templates for Specification, Implementation Audit, change-wide Implementation Plan, per-PR Implementation Plan, Ops, QA, RCA, and closure. | Template inventory matches the runtime artifact chain and actor ownership. |
+| High | PF19 — QA Guide | Align Isis QA readiness and Live QA Guide, Kronos QA Audit and QA Plan, Isis plan review, environment/DevOps task execution, evidence return, and the final QA Report plus RCA for every completed run. | QA stages, roles, evidence handoffs, and every-run terminal artifacts are explicit. |
+| **Blocked policy** | **PF23 — Reality Audits** | Reconcile timing, change-class applicability, ownership/accountability, and Kronos handoff with the restored operating intent. | Explicit Product Owner policy decision followed by a versioned PF23 update; no silent choice. |
+| High | PF04 — Governance | Align role authority and approval semantics: Thoth owns Specification approval; Isis owns plan review and terminal closure; PO approval exists only through `PR Implementation Proceed`; no approval binding exists. Retire obsolete token/object semantics within this scope. | Governance authority map has no duplicate or invented approval gate. |
+| Medium | PF09 — Build Checklist | Preserve the Epic-formation source where applicable, remove any use as a CRD source, and align post-Epic maintenance references with the nonblocking drainage rule. | Checklist routing distinguishes Epic from CRD and does not reintroduce obsolete lifecycle gates. |
+| Reference maintenance | PF20 — Phased Epics | Preserve historical/reference value without treating PF20 as current runtime authority for the repaired flow. | Cross-references label PF20 as historical/reference-only where required. |
+| Reference maintenance | PF30.1 — CRD Canonical Record | Preserve historical CRD evidence without using PF30.1 as a new-runtime approval or registration gate. Resolve the exact accepted live version before any version-specific drainage because a later candidate was rolled back. | Accepted identity is pinned and the document is explicitly non-operative for new runtime gates. |
+| Conditional | PF13 — Development Philosophy | Update only if the maker/reader or session-lifecycle principles are elevated into normative workflow requirements. | No unnecessary mutation; any update is tightly scoped to a declared normative dependency. |
+
+#### 9.1 Drainage order
+
+Recommended order:
+
+1. Product Owner resolves the PF23 policy question.  
+2. PF06 establishes the authoritative end-to-end process.  
+3. PF04 aligns authority and approval semantics.  
+4. PF12 aligns artifact identities and schemas.  
+5. PF27 aligns templates.  
+6. PF19 aligns the QA subsystem.  
+7. PF09, PF20, PF30.1, and conditional PF13 maintenance follow.  
+8. Prompt contracts, bodies, registries, skills, and the living Notion map are reconciled against the drained canon through separately authorized governance gates.
+
+---
+
+\<eof\>
 
 # 
