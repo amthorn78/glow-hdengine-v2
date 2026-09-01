@@ -195,7 +195,7 @@ If any element fails its fast proof, stop and adjust there before proceeding.
 
 ## **D. Alchemical delivery cycle**
 
-Seven lightweight phases that let AI sessions move fast through **controlled change**. For each phase, capture only: **purpose**, **entry signal**, **exit signal**, **handoff**. No steps or checklists live in PF13.
+> Seven lightweight phases that let AI sessions move fast through **controlled change**. For each phase, capture only: **purpose**, **entry signal**, **exit signal**, **handoff**. No steps or checklists live in PF13.
 
 ### **1\) Intent**
 
@@ -364,7 +364,7 @@ If still tied, prefer the option that reduces future choices rather than multipl
 
 ## **I. Definition of done (philosophical)**
 
-A change is **done** when these element-truths hold. This is a lens, not a procedure.
+> A change is **done** when these element-truths hold. This is a lens, not a procedure.
 
 ### **1\) FIRE — Outcome is clear and matched by the change (truth)**
 

@@ -8,7 +8,7 @@
 
 ## **Deprecation note**
 
-**Deprecation note.** This epics map is **deprecated** and maintained for historical purposes only. EPIC‑011 is recorded here as a **failed** epic (its acceptance roster was not fully satisfied at the time this document was frozen). EPIC‑012 and later epics in this map are **won’t do** and are preserved only as design history. Current and future epic planning is owned by **PF20 — Canon‑HDE‑Phased Epics**; PF16 must not be used as the source of truth for new work.
+> **Deprecation note.** This epics map is **deprecated** and maintained for historical purposes only. EPIC‑011 is recorded here as a **failed** epic (its acceptance roster was not fully satisfied at the time this document was frozen). EPIC‑012 and later epics in this map are **won’t do** and are preserved only as design history. Current and future epic planning is owned by **PF20 — Canon‑HDE‑Phased Epics**; PF16 must not be used as the source of truth for new work.
 
 ## **Epic principle (North Star)**
 
