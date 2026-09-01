@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.9.3  
-Effective Date: 2026.08.31  
+**Version:** v12.9.4  
+Effective Date: 2026-09-01  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -184,7 +184,8 @@ TEMPLATE Addendum Entry (do not edit/remove)
 ## 1.1 Addendum Index:
 
 2.1 Epic/CRD Specification and Implementation-Plan authority; PF20/PF30 historical status  
-2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control
+2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control  
+2.3 Establish the Persistent Workspace and Local-Client Operating Model
 
 # 2\) Numbered Addenda
 
@@ -706,6 +707,64 @@ Recommended order:
 6. PF19 aligns the QA subsystem.  
 7. PF09, PF20, PF30.1, and conditional PF13 maintenance follow.  
 8. Prompt contracts, bodies, registries, skills, and the living Notion map are reconciled against the drained canon through separately authorized governance gates.
+
+
+## 2.3 Establish the Persistent Workspace and Local-Client Operating Model
+
+**Status:** Product Owner-directed operating addendum; active  
+**Prepared:** 2026-09-01  
+**Scope:** Google Drive, Notion, ChatGPT Library, repository mirroring, local-client handoff, and PFCanon drift control  
+**Precedence within scope:** This addendum establishes the Glow workspace operating model and supersedes any assumption that persistent Glow documents must remain confined to ChatGPT Library or repository storage.  
+**Non-authorization:** This addendum does not authorize automatic reconciliation, repository mutation, deletion, permission changes, or treating a converted native Google Doc as byte-identical to repository Markdown.
+
+### 1. Product Owner decision
+
+Glow uses Google Drive and Notion as complementary persistent workspace systems.
+
+- Google Drive is the persistent home for durable documents, large documents, spreadsheets, reference packages, and source material needed by explicitly assigned local-client tasks.
+- Notion is the operational coordination layer for hubs, registries, checklists, status, indexes, and cross-system links.
+- ChatGPT Library remains the working home for development-cycle files, plan versions, transient artifacts, and source files that should not enter the persistent workspace.
+- Repositories remain the source and delivery surface for code and repo-resident documentation. This addendum does not change repository governance or authorize a repository write.
+
+### 2. PFCanon Drive authority
+
+Core Docs/PFCanon is the authoritative Google Drive PF Canon collection. It mirrors the union of PF Canon paths in repositories authorized for Glow. The initial registered source is `amthorn78/glow-hdengine-v2/docs/pfcanon`. Future component repositories may be added only through explicit authorization.
+
+- Drive PFCanon may contain one native Google Doc for each canonical PF identity.
+- A PF file absent from every authorized repository PF path is moved from Core Docs/PFCanon to Core Docs/Archive. It is not deleted.
+- A repository PF file absent from Drive PFCanon is added from an exact pinned source.
+- A filename, version, or content disagreement is drift. It must be reported and must not be reconciled automatically.
+- Filename parity and native Google Docs conversion do not establish byte identity.
+
+### 3. Local-client handoff
+
+A task is a local-client task only when the Product Owner explicitly identifies it as such. A local Codex instance must not assume access to ChatGPT conversation context or ChatGPT Library files.
+
+- Before dispatch, every required input, authority, constraint, and expected output location must be available through Google Drive or Notion and linked in the task.
+- The task prompt must identify the exact Drive and Notion sources and state applicable read and write limits.
+- Local-client output returns to the designated Drive or Notion location. Development-cycle plan versions remain in ChatGPT Library unless the Product Owner directs otherwise.
+
+### 4. Initial implementation record
+
+The initial workspace reorganization under this decision produced:
+
+- the Glow Operations Hub and a 21-item completion checklist in Notion;
+- dedicated Core Docs/PFCanon, Core Docs/Archive, Foundational References, and Local Client Exchange folders in Google Drive;
+- 31 PF filenames aligned with repository commit `c2eaa9312f2aabd06d8434304058b12ecd26949c`;
+- 12 non-mirror Core Docs items moved to Core Docs/Archive with no deletion;
+- one missing PF09.6 document added from the pinned repository source;
+- 66 relevant Drive identities verified with zero parent-folder mismatches; and
+- no permission changes, repository mutation, or data deletion.
+
+Web Front End/PF Canon remains separately retained pending explicit registration of its component repository source.
+
+### 5. Ongoing control
+
+A read-only PFCanon drift audit is scheduled for the first day of each month at approximately 08:00 Africa/Casablanca. Each run resolves the current default-branch commit for every authorized repository, compares Drive PFCanon with all authorized repository PF paths, and reports missing, extra, version-divergent, duplicate, and unresolved-source items.
+
+The scheduled task cannot move, rename, delete, upload, overwrite, edit, or reconcile files.
+
+This Drive-only PF10 revision is intentionally ahead of the repository copy until a separately authorized repository synchronization occurs. That state is expected drift, not permission to write to the repository.
 
 ---
 
