@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v12.9.4  
-Effective Date: 2026-09-01  
+**Version: v12.9.5**  
+Effective Date: Sep 1, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -708,66 +708,78 @@ Recommended order:
 7. PF09, PF20, PF30.1, and conditional PF13 maintenance follow.  
 8. Prompt contracts, bodies, registries, skills, and the living Notion map are reconciled against the drained canon through separately authorized governance gates.
 
+---
 
 ## 2.3 Establish the Persistent Workspace and Local-Client Operating Model
 
-**Status:** Product Owner-directed operating addendum; active  
-**Prepared:** 2026-09-01  
-**Scope:** Google Drive, Notion, ChatGPT Library, repository mirroring, local-client handoff, and PFCanon drift control  
-**Precedence within scope:** This addendum establishes the Glow workspace operating model and supersedes any assumption that persistent Glow documents must remain confined to ChatGPT Library or repository storage.  
-**Non-authorization:** This addendum does not authorize automatic reconciliation, repository mutation, deletion, permission changes, or treating a converted native Google Doc as byte-identical to repository Markdown.
+Status: Product Owner-directed operating addendum; active
 
-### 1. Product Owner decision
+Prepared: Sep 1, 2026
+
+Scope: Google Drive, Notion, ChatGPT Library, repository mirroring, local-client handoff, and PFCanon drift control
+
+Precedence within scope: This addendum establishes the Glow workspace operating model and supersedes any assumption that persistent Glow documents must remain confined to ChatGPT Library or repository storage.
+
+Non-authorization: This addendum does not authorize automatic reconciliation, repository mutation, deletion, permission changes, or treating a converted native Google Doc as byte-identical to repository Markdown.
+
+### 1\. Product Owner decision
 
 Glow uses Google Drive and Notion as complementary persistent workspace systems.
 
-- Google Drive is the persistent home for durable documents, large documents, spreadsheets, reference packages, and source material needed by explicitly assigned local-client tasks.
-- Notion is the operational coordination layer for hubs, registries, checklists, status, indexes, and cross-system links.
-- ChatGPT Library remains the working home for development-cycle files, plan versions, transient artifacts, and source files that should not enter the persistent workspace.
-- Repositories remain the source and delivery surface for code and repo-resident documentation. This addendum does not change repository governance or authorize a repository write.
+* Google Drive is the persistent home for durable documents, large documents, spreadsheets, reference packages, and source material needed by explicitly assigned local-client tasks.  
+* Notion is the operational coordination layer for hubs, registries, checklists, status, indexes, and cross-system links.  
+* ChatGPT Library remains the working home for development-cycle files, plan versions, transient artifacts, and source files that should not enter the persistent workspace.  
+* Repositories remain the source and delivery surface for code. For PF Canon, authorized repository PF paths are version-controlled publication mirrors of Drive-generated Markdown. This addendum does not itself authorize a repository write.
 
-### 2. PFCanon Drive authority
+### 2\. PFCanon Drive authority
 
-Core Docs/PFCanon is the authoritative Google Drive PF Canon collection. It mirrors the union of PF Canon paths in repositories authorized for Glow. The initial registered source is `amthorn78/glow-hdengine-v2/docs/pfcanon`. Future component repositories may be added only through explicit authorization.
+Core Docs/PFCanon is the authoritative Google Drive PF Canon collection. It contains the current editable Google Docs and generated Markdown publications for PF identities governed through authorized Glow repositories. The initial registered repository target is amthorn78/glow-hdengine-v2/docs/pfcanon. Future component repositories may be added only through explicit authorization.
 
-- Drive PFCanon may contain one native Google Doc for each canonical PF identity.
-- A PF file absent from every authorized repository PF path is moved from Core Docs/PFCanon to Core Docs/Archive. It is not deleted.
-- A repository PF file absent from Drive PFCanon is added from an exact pinned source.
-- A filename, version, or content disagreement is drift. It must be reported and must not be reconciled automatically.
-- Filename parity and native Google Docs conversion do not establish byte identity.
+* Drive PFCanon may contain one current native Google Doc editing source and one version-matched Markdown publication peer for each canonical PF identity.  
+* A PF identity absent from every authorized repository PF path and not part of an authorized in-flight publication is moved from Core Docs/PFCanon to Core Docs/Archive. It is not deleted.  
+* A repository PF file absent from Drive PFCanon is added from an exact pinned source.  
+* A filename, version, or content disagreement is drift. It must be reported and must not be reconciled automatically.  
+* Filename parity and native Google Docs conversion do not establish byte identity.
 
-### 3. Local-client handoff
+### 3\. Local-client handoff
 
 A task is a local-client task only when the Product Owner explicitly identifies it as such. A local Codex instance must not assume access to ChatGPT conversation context or ChatGPT Library files.
 
-- Before dispatch, every required input, authority, constraint, and expected output location must be available through Google Drive or Notion and linked in the task.
-- The task prompt must identify the exact Drive and Notion sources and state applicable read and write limits.
-- Local-client output returns to the designated Drive or Notion location. Development-cycle plan versions remain in ChatGPT Library unless the Product Owner directs otherwise.
+* Before dispatch, every required input, authority, constraint, and expected output location must be available through Google Drive or Notion and linked in the task.  
+* The task prompt must identify the exact Drive Markdown source for technical reading whenever available, the native Google Doc when source editing or rendered review is required, every applicable Notion source, and all read and write limits.  
+* Local-client output returns to the designated Drive or Notion location. Development-cycle plan versions remain in ChatGPT Library unless the Product Owner directs otherwise.
 
-### 4. Initial implementation record
+### 4\. Initial implementation record
 
 The initial workspace reorganization under this decision produced:
 
-- the Glow Operations Hub and a 21-item completion checklist in Notion;
-- dedicated Core Docs/PFCanon, Core Docs/Archive, Foundational References, and Local Client Exchange folders in Google Drive;
-- 31 PF filenames aligned with repository commit `c2eaa9312f2aabd06d8434304058b12ecd26949c`;
-- 12 non-mirror Core Docs items moved to Core Docs/Archive with no deletion;
-- one missing PF09.6 document added from the pinned repository source;
-- 66 relevant Drive identities verified with zero parent-folder mismatches; and
-- no permission changes, repository mutation, or data deletion.
+* the Glow Operations Hub and a 21-item completion checklist in Notion;  
+* dedicated Core Docs/PFCanon, Core Docs/Archive, Foundational References, and Local Client Exchange folders in Google Drive;  
+* 31 PF filenames aligned with repository commit c2eaa9312f2aabd06d8434304058b12ecd26949c;  
+* 12 non-mirror Core Docs items moved to Core Docs/Archive with no deletion;  
+* one missing PF09.6 document added from the pinned repository source;  
+* 66 relevant Drive identities verified with zero parent-folder mismatches; and  
+* no permission changes, repository mutation, or data deletion.
 
 Web Front End/PF Canon remains separately retained pending explicit registration of its component repository source.
 
-### 5. Ongoing control
+### 5\. Paired publication workflow and ongoing control
 
-A read-only PFCanon drift audit is scheduled for the first day of each month at approximately 08:00 Africa/Casablanca. Each run resolves the current default-branch commit for every authorized repository, compares Drive PFCanon with all authorized repository PF paths, and reports missing, extra, version-divergent, duplicate, and unresolved-source items.
+The controlling PF publication sequence is:
+
+* All substantive PF editing MUST occur in the native Google Doc in Drive PFCanon. The Drive Markdown file and repository mirror are publication outputs, not independent editing surfaces.  
+* After Google Doc editing is complete for an authorized publication, a version-matched Markdown file MUST be generated from that Doc and stored beside it in Drive PFCanon.  
+* The generated Markdown MUST be reviewed for semantic and structural fidelity. Native Google Docs and Markdown are different representations and are not expected to be byte-identical.  
+* The exact Drive Markdown bytes MUST be transferred to the authorized repository PF path without intervening rewriting or cleanup. The repository commit records adoption.  
+* The Google Doc, Drive Markdown, and repository mirror MUST carry the same PF identity, version, status, and effective date.  
+* Drive Markdown and the repository mirror MUST be byte-identical. Semantic disagreement between the Google Doc and generated Markdown, or byte disagreement between the two Markdown copies, is drift.  
+* Local clients use Drive Markdown for technical reading and use the native Google Doc only when the assigned work requires source editing or rendered review.
+
+A read-only PFCanon drift audit is scheduled for the first day of each month at approximately 08:00 Africa/Casablanca. Under this paired model, the audit MUST treat a native Google Doc and its version-matched Markdown file as one expected PF pair, compare the Drive Markdown bytes with authorized repository Markdown, and report missing peers, identity or version divergence, repository byte drift, duplicate current pairs, and unresolved-source items.
 
 The scheduled task cannot move, rename, delete, upload, overwrite, edit, or reconcile files.
 
-This Drive-only PF10 revision is intentionally ahead of the repository copy until a separately authorized repository synchronization occurs. That state is expected drift, not permission to write to the repository.
-
----
+PF10 v12.9.5 is the first controlled test of this source-first publication path. The test is complete only after Google Doc readback, creation of the Drive Markdown peer, transfer of those exact Markdown bytes to the authorized repository path, and postflight verification of the resulting repository blob.
 
 \<eof\>
 
-# 
