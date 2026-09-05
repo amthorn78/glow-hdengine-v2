@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Standard step-log header template for QA checks (PF10 §2.34 compliant).
+Compatibility step-log headers with explicit claim rules from PF27.
 
-This module provides a canonical way to generate primary.log headers that satisfy
-PF10 §2.34 step-log header requirements with proper defaultable field handling.
+This helper preserves the existing reduced header interface; it does not produce
+the full current v2 QA schema or prove that a check ran or a token predicate passed.
 
-Per PF10 §2.34:
+Supported fields and outcomes:
 - Hard required fields: check_id, status, command, captured_env
 - Defaultable fields: pf_refs, intended_tokens, claimed_tokens (default to [])
 - Status vocabulary: PASS, FAIL_BEHAVIOR, FAIL_TOOLING, TOOLING_BLOCKED, PARKED
-- Token claims are never inferred from text
+- Claims are explicit PASS-only data, contained in intended_tokens
+- Omitted claims are empty, including on updates to a previously claimed outcome
+- The caller explains PASS intended/claimed differences in the log body
 
 Usage:
     from tools.qa.step_log_header import create_header, write_header
@@ -18,20 +20,19 @@ Usage:
         check_id="D13_human_index",
         command="python3 (embedded) validate INDEX.json",
         pf_refs=["PF12 §8.5"],  # optional, defaults to []
-        intended_tokens=["SOME_TOKEN"]  # optional, defaults to []
+        status="PARKED",  # caller records the actual outcome after its check
     )
     
     write_header(output_path, header)
     # ... write validation output after header
 """
 
-import datetime as _dt
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# PF10 §2.34 allowed status vocabulary (gating)
+# Supported compatibility status vocabulary
 ALLOWED_STATUS = {"PASS", "FAIL_BEHAVIOR", "FAIL_TOOLING", "TOOLING_BLOCKED", "PARKED"}
 
 # Required environment pins for closed-rails execution
@@ -48,6 +49,25 @@ def capture_env() -> Dict[str, Optional[str]]:
     return {key: os.getenv(key) for key in REQUIRED_ENV_PINS}
 
 
+def _validate_claims(
+    status: str,
+    intended_tokens: Optional[List[str]],
+    claimed_tokens: Optional[List[str]],
+) -> List[str]:
+    """Validate a proposed outcome without mutating caller data or issuing claims."""
+    if status not in ALLOWED_STATUS:
+        # Retain the existing invalid-status diagnostic for compatibility.
+        raise ValueError(
+            f"Invalid status '{status}'. Per PF10 §2.34, must be one of: {', '.join(sorted(ALLOWED_STATUS))}"
+        )
+    claims = claimed_tokens if claimed_tokens is not None else []
+    if claims and status != "PASS":
+        raise ValueError("Nonempty claimed_tokens require PASS status")
+    if any(token not in (intended_tokens or []) for token in claims):
+        raise ValueError("Every claimed token must appear in intended_tokens")
+    return claims
+
+
 def create_header(
     check_id: str,
     command: str,
@@ -58,9 +78,9 @@ def create_header(
     captured_env: Optional[Dict[str, Optional[str]]] = None,
 ) -> Dict[str, Any]:
     """
-    Create a PF10 §2.34 compliant step-log header.
+    Create a compatibility header with a truthful caller-selected outcome.
     
-    Per PF10 §2.34:
+    Supported compatibility fields:
     - Hard required fields: check_id, status, command, captured_env
     - Defaultable fields (non-gating): pf_refs, intended_tokens, claimed_tokens
     - Missing defaultable fields are treated as empty lists
@@ -68,24 +88,25 @@ def create_header(
     Args:
         check_id: Unique identifier for the check (e.g., "D13_human_index") [REQUIRED]
         command: Command description (e.g., "python3 (embedded) validate INDEX.json") [REQUIRED]
-        status: Check status from PF10 §2.34 vocabulary (default: "PASS") [REQUIRED]
+        status: Actual check status (default: "PASS", retained for compatibility)
         pf_refs: PF-Canon references (defaultable, defaults to [])
         intended_tokens: Tokens this check intends to validate (defaultable, defaults to [])
-        claimed_tokens: Tokens this check claims on success (defaultable, defaults to [])
+        claimed_tokens: Explicit PASS claims within intended_tokens; None means []
         captured_env: Environment pins (default: auto-captured from current env) [REQUIRED]
     
     Returns:
         Dictionary with 4 hard required fields + 3 defaultable fields.
         
     Raises:
-        ValueError: If status is not in ALLOWED_STATUS vocabulary (gating per PF10 §2.34).
+        ValueError: If the status or explicit claim combination is invalid.
+
+    The caller must justify its outcome and claims. Intended-list alignment is
+    neither registry validation nor predicate proof. Explain any PASS difference
+    between intended and claimed tokens in the log body.
     """
-    if status not in ALLOWED_STATUS:
-        raise ValueError(
-            f"Invalid status '{status}'. Per PF10 §2.34, must be one of: {', '.join(sorted(ALLOWED_STATUS))}"
-        )
+    claims = _validate_claims(status, intended_tokens, claimed_tokens)
     
-    # Per PF10 §2.34: 4 hard required fields + 3 defaultable fields
+    # Preserve the four required and three defaultable compatibility fields.
     return {
         "captured_env": captured_env if captured_env is not None else capture_env(),
         "check_id": check_id,
@@ -93,7 +114,7 @@ def create_header(
         "command": command,
         "pf_refs": pf_refs or [],  # defaultable (non-gating)
         "intended_tokens": intended_tokens or [],  # defaultable (non-gating)
-        "claimed_tokens": claimed_tokens or [],  # defaultable (non-gating)
+        "claimed_tokens": claims,
     }
 
 
@@ -103,50 +124,35 @@ def update_header_status(
     claimed_tokens: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """
-    Update header status and optionally set claimed tokens.
-    
-    Per PF10 §2.34:
-    - Status must be from allowed vocabulary (gating)
-    - Token claims are never inferred from text
-    - Auto-claim intended_tokens on PASS if claimed_tokens not explicitly provided
-    
-    Use this at the end of a check to set final status and record claimed tokens.
+    Record a new outcome, replacing both status and claims after validation.
+
+    Omitted/None or empty claims clear all earlier claims, even on PASS-to-PASS.
+    Non-PASS outcomes cannot carry claims. Invalid input leaves the entire earlier
+    header untouched; it does not record the rejected attempt as a new outcome.
     
     Args:
         header: Header dict to update (modified in-place and returned)
-        status: New status from PF10 §2.34 vocabulary
-        claimed_tokens: Tokens to claim (if None, header's intended_tokens are claimed on PASS)
+        status: New status from the supported vocabulary
+        claimed_tokens: Explicit PASS claims within intentions; None means []
     
     Returns:
         Updated header dict (same object as input).
         
     Raises:
-        ValueError: If status is not in ALLOWED_STATUS vocabulary (gating per PF10 §2.34).
+        ValueError: If the status or explicit claim combination is invalid.
     """
-    if status not in ALLOWED_STATUS:
-        raise ValueError(
-            f"Invalid status '{status}'. Per PF10 §2.34, must be one of: {', '.join(sorted(ALLOWED_STATUS))}"
-        )
-    
+    claims = _validate_claims(status, header.get("intended_tokens"), claimed_tokens)
     header["status"] = status
-    
-    # Auto-claim intended tokens on PASS if claimed_tokens not explicitly provided
-    # Per PF10 §2.34: Token claims are never inferred from text
-    if status == "PASS":
-        if claimed_tokens is not None:
-            header["claimed_tokens"] = claimed_tokens
-        elif header.get("intended_tokens"):
-            header["claimed_tokens"] = header["intended_tokens"][:]
-    
+    header["claimed_tokens"] = claims
     return header
 
 
 def normalize_header(header: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Normalize header by ensuring all defaultable fields exist (PF10 §2.34).
-    
-    Per PF10 §2.34 Rule 2: Missing defaultable fields are interpreted as empty lists.
-    This is an evidence-format repair that does not require re-running the step.
+    Supply missing compatibility arrays without changing retained historical data.
+
+    This is formatting only, not re-execution, claim validation or new acceptance.
+    Existing statuses, claims and caller-added fields remain unchanged.
     
     Args:
         header: Header dict to normalize (modified in-place and returned)
@@ -154,7 +160,7 @@ def normalize_header(header: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Normalized header dict (same object as input).
     """
-    # Ensure defaultable fields exist (non-gating per PF10 §2.34)
+    # Formatting must not infer or remove retained claims.
     header.setdefault("pf_refs", [])
     header.setdefault("intended_tokens", [])
     header.setdefault("claimed_tokens", [])
@@ -164,6 +170,9 @@ def normalize_header(header: Dict[str, Any]) -> Dict[str, Any]:
 def serialize_header(header: Dict[str, Any]) -> str:
     """
     Serialize header to canonical JSON format (compact, sorted keys, trailing newline).
+
+    Formatting retained history does not validate a new outcome; write_header
+    separately guards current publication.
     
     Args:
         header: Header dict to serialize
@@ -176,18 +185,25 @@ def serialize_header(header: Dict[str, Any]) -> str:
 
 def write_header(path: Path, header: Dict[str, Any]) -> None:
     """
-    Write PF10 §2.34 compliant header as first line of primary.log file.
-    
-    Automatically normalizes header to ensure defaultable fields exist.
+    Validate and serialize a compatibility header before replacing its log.
+
+    Rejected input leaves the header, existing file and absent directories intact.
+    Successful writes supply supported defaults in place and retain extra fields.
+    I/O errors propagate; this is not a crash-recovery or header/body transaction.
     
     Args:
         path: Output path for primary.log
         header: Header dict to write
     """
+    candidate = normalize_header(dict(header))
+    candidate["claimed_tokens"] = _validate_claims(
+        candidate["status"], candidate["intended_tokens"], candidate["claimed_tokens"]
+    )
+    serialized = serialize_header(candidate)
     path.parent.mkdir(parents=True, exist_ok=True)
-    normalize_header(header)  # Ensure defaultable fields exist
-    with path.open("w", encoding="utf-8") as f:
-        f.write(serialize_header(header))
+    with path.open("w", encoding="utf-8", newline="\n") as f:
+        f.write(serialized)
+    header.update(candidate)
 
 
 def append_output(path: Path, content: str) -> None:
@@ -204,94 +220,53 @@ def append_output(path: Path, content: str) -> None:
         f.write(content)
 
 
-# Example usage template for embedded scripts (PF10 §2.34 compliant)
+# Illustrative compatibility usage; run from a source root with tools importable.
 EXAMPLE_TEMPLATE = '''
-# Import the header utilities
-import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from tempfile import TemporaryDirectory
 from tools.qa.step_log_header import create_header, write_header, append_output, update_header_status
 
-# Create header - only check_id, command, status, captured_env are hard required
-# pf_refs, intended_tokens, claimed_tokens are defaultable (optional)
+# Demonstration data only: this is not a real QA check or a token predicate proof.
 header = create_header(
-    check_id="D13_human_index",
-    command="python3 (embedded) validate docs/evidence/INDEX.json contains EPIC023 entries",
-    status="PASS",  # Must be from PF10 §2.34 vocabulary (gating)
-    pf_refs=["PF12 §8.5", "PF10 §2.16"],  # optional, defaults to []
-    intended_tokens=["EVIDENCE_INDEX_VALIDATED"],  # optional, defaults to []
+    check_id="illustrative-check",
+    command="illustration only; no real QA executed",
+    status="PARKED",
+    intended_tokens=["DEMO_REFERENCE"],
 )
+update_header_status(header, "PASS")  # Illustrates caller-selected tokenless PASS.
 
-output_path = Path("audit/qa/hde-epic023/checks/D13_human_index/primary.log")
-
-# Perform validation
-try:
-    # ... validation logic ...
-    result = "PASS: INDEX.json contains all required EPIC023 paths."
-    
-    # Update to PASS and claim tokens (if not already PASS)
-    update_header_status(header, "PASS")  # Auto-claims intended_tokens on PASS
-    
-except Exception as e:
-    result = f"FAIL_BEHAVIOR: {e}"
-    update_header_status(header, "FAIL_BEHAVIOR", claimed_tokens=[])
-
-# Write final header and output (auto-normalizes defaultable fields)
-write_header(output_path, header)
-append_output(output_path, result)
+# Keep the demonstration away from tracked evidence and clean it up afterward.
+with TemporaryDirectory(prefix="step-log-example-") as directory:
+    output_path = Path(directory) / "primary.log"
+    write_header(output_path, header)
+    append_output(
+        output_path,
+        "Illustrative PASS only. DEMO_REFERENCE is not claimed because its "
+        "predicate was not evaluated. No real QA or acceptance is asserted.",
+    )
+    print(output_path.read_text(encoding="utf-8"), end="")
 '''
 
 
 if __name__ == "__main__":
-    # Self-test: generate example headers demonstrating PF10 §2.34 compliance
-    print("=== PF10 §2.34 Compliant Headers ===\n")
-    
-    # Example 1: Minimal (only hard required fields + empty defaults)
-    h1 = create_header(
-        check_id="D13_human_index",
-        command="python3 (embedded) validate INDEX.json"
-    )
-    normalize_header(h1)
-    print("Example 1 (minimal - defaultable fields empty):")
-    print(serialize_header(h1))
-    
-    # Example 2: With PF refs and tokens (full)
+    print("Illustrative compatibility headers only; no real QA executed.\n")
+    h1 = create_header("illustrative-tokenless", "illustration only", status="PARKED")
+    update_header_status(h1, "PASS")
+    print("Tokenless PASS supplied for illustration:")
+    print(serialize_header(h1), end="")
+
     h2 = create_header(
-        check_id="D15_machine_mirror",
-        command="python3 (embedded) validate evidence_index.jsonl",
-        pf_refs=["PF12 §8.5", "PF10 §2.16"],
-        intended_tokens=["EVIDENCE_INDEX_MIRROR_OK"]
+        "illustrative-explicit", "illustration only", status="PASS",
+        intended_tokens=["DEMO_REFERENCE"], claimed_tokens=["DEMO_REFERENCE"],
     )
-    normalize_header(h2)
-    print("Example 2 (with PF refs and intended tokens):")
-    print(serialize_header(h2))
-    
-    # Example 3: PASS with auto-claimed tokens
-    h3 = create_header(
-        check_id="D15_machine_mirror",
-        command="python3 (embedded) validate evidence_index.jsonl",
-        pf_refs=["PF12 §8.5"],
-        intended_tokens=["EVIDENCE_INDEX_MIRROR_OK"]
-    )
-    update_header_status(h3, "PASS")  # Auto-claims intended_tokens
-    normalize_header(h3)
-    print("Example 3 (PASS with auto-claimed tokens):")
-    print(serialize_header(h3))
-    
-    # Example 4: FAIL_BEHAVIOR with no claims
-    h4 = create_header(
-        check_id="D11_close_report",
-        command="python3 (embedded) validate close_report.md",
-        intended_tokens=["CLOSE_REPORT_VALIDATED"]
-    )
-    update_header_status(h4, "FAIL_BEHAVIOR", claimed_tokens=[])
-    normalize_header(h4)
-    print("Example 4 (FAIL_BEHAVIOR - no token claims per PF10 §2.34):")
-    print(serialize_header(h4))
-    
-    print("\nPer PF10 §2.34:")
-    print("- Hard required: check_id, status, command, captured_env")
-    print("- Defaultable (non-gating): pf_refs, intended_tokens, claimed_tokens")
-    print("- Missing defaultable fields default to []")
-    print("- Token claims never inferred from text")
-    print("- Status vocabulary (gating): PASS, FAIL_BEHAVIOR, FAIL_TOOLING, TOOLING_BLOCKED, PARKED")
+    print("Explicit aligned caller data; no registry or predicate proof:")
+    print(serialize_header(h2), end="")
+
+    update_header_status(h2, "PASS")
+    print("New PASS with omitted claims clears the earlier illustrative claim:")
+    print(serialize_header(h2), end="")
+    print("DEMO_REFERENCE is not claimed: no predicate was evaluated for this outcome.")
+
+    update_header_status(h2, "FAIL_BEHAVIOR")
+    print("Illustrative non-PASS outcome remains claim-free:")
+    print(serialize_header(h2), end="")
