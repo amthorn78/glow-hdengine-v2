@@ -1386,7 +1386,7 @@ def test_crd_config_preserves_epic_positional_interface(crd_config):
     {}, {"epic_id": "HDE-EPIC039", "crd_id": "HDE-CRD-0001"},
     {"crd_id": ""}, {"crd_id": 1}, {"epic_id": 1},
     *({"crd_id": value} for value in (
-        "hde-crd-0001", "HDE-CRD-1", "HDE-CRD-00001", "HDE-CRD-0001/../x",
+        "hde-crd-0001", "HDE-CRD-1", "HDE-CRD-0001.0", "HDE-CRD-0001/../x",
         "HDE-CRD-0001\n", "HDE-CRD-０００１",
     )),
 ])
@@ -1422,6 +1422,44 @@ def test_crd_ordinary_recording_and_supersession_need_no_epic_inputs(crd_config)
     assert first.read_bytes() == old_bytes
     assert not (crd_config.repo_root / "docs").exists()
     assert not (crd_config.qa_root / "token_evidence_matrix.md").exists()
+
+
+@pytest.mark.parametrize("crd_id", ["HDE-CRD-9999", "HDE-CRD-10000", "HDE-CRD-123456"])
+def test_crd_ordinary_recording_accepts_expanding_canonical_ids(crd_config, crd_id):
+    config = HarnessConfig(crd_id=crd_id, repo_root=crd_config.repo_root)
+    log, _ = record_check(config, _crd_result())
+    assert log == config.repo_root / "audit/qa" / crd_id.lower() / "checks/current/primary.log"
+    assert validate_crd_check_family(config)["current"]["log_path"] == log.relative_to(config.repo_root).as_posix()
+
+
+@pytest.mark.parametrize("relative", ["report.txt", "audit/qa/hde-crd-0002/report.txt", "docs/report.txt"])
+@pytest.mark.parametrize("family", [False, True])
+def test_crd_additional_files_cannot_escape_active_qa_root(crd_config, relative, family):
+    target = crd_config.repo_root / relative
+    with pytest.raises(ValueError, match="inside the active QA root"):
+        if family:
+            record_check_family(crd_config, (_crd_result(),), additional_files=((target, "fixture\n"),))
+        else:
+            record_check(crd_config, _crd_result(), additional_files=((target, "fixture\n"),))
+    assert not target.exists()
+    assert not crd_config.qa_root.exists()
+
+
+def test_crd_additional_files_within_qa_root_share_local_rollback(crd_config):
+    report = crd_config.qa_root / "reports/fixture.txt"
+    record_check(crd_config, _crd_result(), additional_files=((report, "prior\n"),))
+    before = {path: path.read_bytes() for path in crd_config.qa_root.rglob("*") if path.is_file()}
+
+    def reject_after_write():
+        assert report.read_text() == "replaced\n"
+        raise RuntimeError("fixture final rejection")
+
+    with pytest.raises(RuntimeError, match="fixture final rejection"):
+        record_check_family(
+            crd_config, (_crd_result("new"),), additional_files=((report, "replaced\n"),),
+            coherence_verifier=reject_after_write,
+        )
+    assert {path: path.read_bytes() for path in crd_config.qa_root.rglob("*") if path.is_file()} == before
 
 
 @pytest.mark.parametrize("status", list(Status))

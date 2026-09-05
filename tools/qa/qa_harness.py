@@ -20,7 +20,7 @@ from pathlib import Path, PurePosixPath
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
 
 EPIC_RE = re.compile(r"HDE-EPIC([0-9]{3})\Z")
-CRD_RE = re.compile(r"HDE-CRD-[0-9]{4}\Z")
+CRD_RE = re.compile(r"HDE-CRD-[0-9]{4,}\Z")
 CHECK_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
 LEGACY_CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 PF_TITLE_RE = re.compile(
@@ -68,7 +68,7 @@ class HarnessConfig:
             raise ValueError("exactly one of epic_id or crd_id is required")
         if self.crd_id is not None:
             if not isinstance(self.crd_id, str) or not CRD_RE.fullmatch(self.crd_id):
-                raise ValueError("crd_id must match HDE-CRD-<NNNN>")
+                raise ValueError("crd_id must match HDE-CRD- followed by at least four digits")
             selected_root = Path(self.repo_root or Path(__file__).resolve().parents[2])
             if ".." in selected_root.parts:
                 raise ValueError("CRD repository root must be canonical")
@@ -2425,6 +2425,12 @@ def record_check_family(
     result_ids = [validate_check_id(result.check_id) for result in staged_results]
     checks_root = config.qa_root / "checks"
     for path, _ in additional_files:
+        if config.crd_id is not None:
+            _validate_crd_path(config, path)
+            try:
+                path.relative_to(config.qa_root)
+            except ValueError as exc:
+                raise ValueError("CRD additional files must stay inside the active QA root") from exc
         absolute_path = Path(os.path.abspath(path))
         try:
             relative = absolute_path.relative_to(checks_root)
