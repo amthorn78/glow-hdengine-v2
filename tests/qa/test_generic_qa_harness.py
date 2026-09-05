@@ -1,10 +1,12 @@
 import hashlib
 import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
+from tools.qa import qa_harness
 from tools.qa.qa_harness import (
     CheckResult,
     HarnessConfig,
@@ -19,6 +21,8 @@ from tools.qa.qa_harness import (
     run_pytest_check,
     summarize_checks,
     update_manifest,
+    validate_crd_check_family,
+    write_primary_log,
 )
 
 MATRIX_HEADER = (
@@ -1338,3 +1342,316 @@ def test_pytest_returncode_classification_is_causal(returncode, expected):
 def test_pytest_returncode_classification_rejects_non_integer():
     with pytest.raises(ValueError, match="integer"):
         classify_pytest_returncode(True)
+
+
+@pytest.fixture
+def crd_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> HarnessConfig:
+    # Deliberately no Epic map, matrix, PF registry or viability ledger.
+    for key, value in {
+        "ALLOW_NETWORK": "0", "SAFE_MODE": "1", "LANG": "C",
+        "LC_ALL": "C", "TZ": "UTC", "APP_ENV": "test",
+    }.items():
+        monkeypatch.setenv(key, value)
+    return HarnessConfig(crd_id="HDE-CRD-0001", repo_root=tmp_path)
+
+
+def _crd_result(check_id: str = "current") -> CheckResult:
+    return CheckResult(
+        check_id, Status.PASS, command=("fixture-command",), exit_code=0,
+        command_provenance="unit fixture; no live QA outcome asserted",
+    )
+
+
+def test_crd_config_preserves_epic_positional_interface(crd_config):
+    root = crd_config.repo_root
+    for config in (
+        HarnessConfig("HDE-EPIC039", root, ("one",)),
+        HarnessConfig(epic_id="HDE-EPIC039", repo_root=root, step_names=("one",)),
+    ):
+        assert config.epic_number == "039"
+        assert config.qa_root == root / "audit/qa/hde-epic039"
+        assert config.acceptance_map_path == root / "docs/acceptance_map_epic039.json"
+        assert config.token_matrix_path == config.qa_root / "token_evidence_matrix.md"
+        assert config.viability_ledger_path == config.qa_root / "acceptance_map_viability.log"
+        assert config.step_names == ("one",)
+    assert crd_config.epic_id is None
+    assert crd_config.qa_root == root / "audit/qa/hde-crd-0001"
+    assert all(getattr(crd_config, field) is None for field in (
+        "epic_number", "acceptance_map_path", "token_matrix_path", "viability_ledger_path"
+    ))
+    assert list(root.iterdir()) == []
+
+
+@pytest.mark.parametrize("identifiers", [
+    {}, {"epic_id": "HDE-EPIC039", "crd_id": "HDE-CRD-0001"},
+    {"crd_id": ""}, {"crd_id": 1}, {"epic_id": 1},
+    *({"crd_id": value} for value in (
+        "hde-crd-0001", "HDE-CRD-1", "HDE-CRD-0001.0", "HDE-CRD-0001/../x",
+        "HDE-CRD-0001\n", "HDE-CRD-０００１",
+    )),
+])
+def test_crd_config_rejects_ambiguous_or_unsafe_identity(tmp_path, identifiers):
+    with pytest.raises(ValueError):
+        HarnessConfig(repo_root=tmp_path, **identifiers)
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("target", ["root", "audit", "audit/qa", "audit/qa/hde-crd-0001"])
+def test_crd_config_rejects_symlinked_root_and_ancestors(tmp_path, target):
+    repo, external = tmp_path / "repo", tmp_path / "external"
+    external.mkdir()
+    if target == "root":
+        repo.symlink_to(external, target_is_directory=True)
+    else:
+        path = repo / target
+        path.parent.mkdir(parents=True)
+        path.symlink_to(external, target_is_directory=True)
+    with pytest.raises(ValueError, match="aliased|symlink"):
+        HarnessConfig(crd_id="HDE-CRD-0001", repo_root=repo)
+    assert list(external.iterdir()) == []
+
+
+def test_crd_ordinary_recording_and_supersession_need_no_epic_inputs(crd_config):
+    first, manifest = record_check(crd_config, _crd_result("first"))
+    second = write_primary_log(crd_config, _crd_result("second"))
+    assert update_manifest(crd_config, second) == manifest
+    assert set(validate_crd_check_family(crd_config)) == {"first", "second"}
+    old_bytes = first.read_bytes()
+    record_check(crd_config, _crd_result("replacement"), supersede_check_ids=("first",))
+    assert set(validate_crd_check_family(crd_config)) == {"replacement", "second"}
+    assert first.read_bytes() == old_bytes
+    assert not (crd_config.repo_root / "docs").exists()
+    assert not (crd_config.qa_root / "token_evidence_matrix.md").exists()
+
+
+@pytest.mark.parametrize("crd_id", ["HDE-CRD-9999", "HDE-CRD-10000", "HDE-CRD-123456"])
+def test_crd_ordinary_recording_accepts_expanding_canonical_ids(crd_config, crd_id):
+    config = HarnessConfig(crd_id=crd_id, repo_root=crd_config.repo_root)
+    log, _ = record_check(config, _crd_result())
+    assert log == config.repo_root / "audit/qa" / crd_id.lower() / "checks/current/primary.log"
+    assert validate_crd_check_family(config)["current"]["log_path"] == log.relative_to(config.repo_root).as_posix()
+
+
+@pytest.mark.parametrize("relative", ["report.txt", "audit/qa/hde-crd-0002/report.txt", "docs/report.txt"])
+@pytest.mark.parametrize("family", [False, True])
+def test_crd_additional_files_cannot_escape_active_qa_root(crd_config, relative, family):
+    target = crd_config.repo_root / relative
+    with pytest.raises(ValueError, match="inside the active QA root"):
+        if family:
+            record_check_family(crd_config, (_crd_result(),), additional_files=((target, "fixture\n"),))
+        else:
+            record_check(crd_config, _crd_result(), additional_files=((target, "fixture\n"),))
+    assert not target.exists()
+    assert not crd_config.qa_root.exists()
+
+
+def test_crd_additional_files_within_qa_root_share_local_rollback(crd_config):
+    report = crd_config.qa_root / "reports/fixture.txt"
+    record_check(crd_config, _crd_result(), additional_files=((report, "prior\n"),))
+    before = {path: path.read_bytes() for path in crd_config.qa_root.rglob("*") if path.is_file()}
+
+    def reject_after_write():
+        assert report.read_text() == "replaced\n"
+        raise RuntimeError("fixture final rejection")
+
+    with pytest.raises(RuntimeError, match="fixture final rejection"):
+        record_check_family(
+            crd_config, (_crd_result("new"),), additional_files=((report, "replaced\n"),),
+            coherence_verifier=reject_after_write,
+        )
+    assert {path: path.read_bytes() for path in crd_config.qa_root.rglob("*") if path.is_file()} == before
+
+
+@pytest.mark.parametrize("status", list(Status))
+def test_crd_statuses_retain_full_v2_and_empty_claims(crd_config, status):
+    if status is Status.PASS:
+        result = _crd_result()
+    elif status is Status.FAIL_BEHAVIOR:
+        result = replace(_crd_result(), status=status, exit_code=1, status_reason="fixture assertion failed")
+    else:
+        result = CheckResult(
+            "current", status,
+            "Fixture prerequisite unavailable" if status is not Status.PARKED else
+            "Fixture owner parked this check outside present scope; reactivate when the prerequisite is approved",
+        )
+    logs, manifest = record_check_family(crd_config, (result,), captured_at_utc=FIXED_TIMESTAMP)
+    raw = logs[0].read_bytes()
+    header = read_primary_header(logs[0])
+    assert len(header) == 14
+    assert header["schema_version"] == "pf27.step_log_header.v2"
+    assert header["claimed_tokens"] == header["intended_tokens"] == []
+    assert header["status"] == status.value
+    assert raw.endswith(b"\n") and b"\r" not in raw
+    assert raw.split(b"\n")[0] == json.dumps(header, sort_keys=True, separators=(",", ":")).encode()
+    assert validate_crd_check_family(crd_config)["current"]["status"] == status.value
+    before = (raw, manifest.read_bytes())
+    record_check_family(crd_config, (result,), captured_at_utc=FIXED_TIMESTAMP)
+    assert (logs[0].read_bytes(), manifest.read_bytes()) == before
+
+
+def test_crd_intentions_are_explicitly_unclaimed(crd_config):
+    log, _ = record_check(crd_config, replace(_crd_result(), intended_tokens=("FIXTURE_INTENTION",)))
+    assert read_primary_header(log)["claimed_tokens"] == []
+    assert qa_harness.NONCLAIM_EXPLANATION in log.read_text().splitlines()[1:]
+
+
+@pytest.mark.parametrize("mutation", [
+    {"status": Status.PARKED, "status_reason": "not currently authorized"},
+    {"status": Status.FAIL_BEHAVIOR, "status_reason": "unexecuted", "command": (), "exit_code": None, "command_provenance": "Not executed"},
+    {"intended_tokens": "TOKEN"}, {"intended_tokens": {"TOKEN": True}},
+    {"evidence_artifacts": "audit/fixture.log"}, {"output": "hidden\r\nnormalization"},
+])
+def test_crd_rejects_invalid_outcomes_before_writing(crd_config, mutation):
+    result = replace(_crd_result(), **mutation)
+    with pytest.raises(ValueError):
+        record_check(crd_config, result)
+    assert not crd_config.qa_root.exists()
+
+
+@pytest.mark.parametrize("corruption", [
+    "wrapper", "v1", "extra-entry-field", "status", "identity", "duplicate",
+    "absolute", "traversal", "dot", "double-slash", "backslash", "foreign", "wrong-check",
+    "manifest-crlf", "manifest-bom", "manifest-whitespace", "empty",
+])
+def test_crd_manifest_admission_refuses_malformed_current_bytes(crd_config, corruption):
+    log, manifest = record_check(crd_config, _crd_result())
+    checks = json.loads(manifest.read_bytes())
+    entry = checks["current"]
+    raw_path = entry["log_path"]
+    if corruption == "wrapper":
+        checks = {"epic_id": None, "checks": checks}
+    elif corruption == "v1":
+        log.write_text('{"schema_version":"pf27.step_log_header.v1","check_id":"current","status":"PASS"}\n')
+    elif corruption == "extra-entry-field":
+        entry["tokens"] = []
+    elif corruption in {"status", "identity"}:
+        entry["status" if corruption == "status" else "check_id"] = "PARKED" if corruption == "status" else "other"
+    elif corruption in {"absolute", "traversal", "dot", "double-slash", "backslash", "foreign", "wrong-check"}:
+        entry["log_path"] = {
+            "absolute": str(log), "traversal": "../" + raw_path,
+            "dot": raw_path.replace("/checks/", "/./checks/"),
+            "double-slash": raw_path.replace("/checks/", "//checks/"),
+            "backslash": raw_path.replace("/", "\\"),
+            "foreign": raw_path.replace("0001", "0002"),
+            "wrong-check": raw_path.replace("current", "other"),
+        }[corruption]
+    raw = (json.dumps(checks, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    if corruption == "duplicate":
+        raw = raw.replace(b'"check_id":"current"', b'"check_id":"current","check_id":"current"')
+    elif corruption == "manifest-crlf":
+        raw = raw.replace(b"\n", b"\r\n")
+    elif corruption == "manifest-bom":
+        raw = b"\xef\xbb\xbf" + raw
+    elif corruption == "manifest-whitespace":
+        raw = b" " + raw
+    elif corruption == "empty":
+        raw = b"{}\n"
+    manifest.write_bytes(raw)
+    before = (manifest.read_bytes(), log.read_bytes())
+    with pytest.raises(ValueError):
+        validate_crd_check_family(crd_config)
+    with pytest.raises(ValueError):
+        record_check(crd_config, _crd_result("new"))
+    assert (manifest.read_bytes(), log.read_bytes()) == before
+    assert not (crd_config.qa_root / "checks/new").exists()
+
+
+@pytest.mark.parametrize("corruption", [
+    "missing-field", "extra-field", "claims", "own-log", "header-id", "bad-command",
+    "no-exit", "false-provenance", "no-reason", "parked-execution", "behavior-unexecuted",
+    "crlf", "bom", "no-lf", "whitespace", "duplicate", "nonclaim", "invalid-utf8",
+])
+def test_crd_primary_admission_reuses_v2_and_checks_raw_bytes(crd_config, corruption):
+    result = replace(_crd_result(), intended_tokens=("FIXTURE_INTENTION",))
+    log, _ = record_check(crd_config, result)
+    header = read_primary_header(log)
+    if corruption == "missing-field":
+        del header["captured_env"]
+    elif corruption == "extra-field":
+        header["crd_id"] = crd_config.crd_id
+    else:
+        changes = {
+            "claims": {"claimed_tokens": ["FIXTURE_INTENTION"]},
+            "own-log": {"evidence_artifacts": ["other.log"]},
+            "header-id": {"check_id": "other"}, "bad-command": {"command": "true"},
+            "no-exit": {"exit_code": None}, "false-provenance": {"command_provenance": "Not executed"},
+            "no-reason": {"status": "FAIL_TOOLING"},
+            "parked-execution": {"status": "PARKED", "status_reason": "parked"},
+            "behavior-unexecuted": {"status": "FAIL_BEHAVIOR", "status_reason": "not run", "command": [], "command_provenance": "Not executed", "exit_code": None},
+        }
+        header.update(changes.get(corruption, {}))
+    raw = (json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n" + qa_harness.NONCLAIM_EXPLANATION + "\n").encode()
+    if corruption == "crlf":
+        raw = raw.replace(b"\n", b"\r\n")
+    elif corruption == "bom":
+        raw = b"\xef\xbb\xbf" + raw
+    elif corruption == "no-lf":
+        raw = raw.rstrip(b"\n")
+    elif corruption == "whitespace":
+        raw = b" " + raw
+    elif corruption == "duplicate":
+        raw = raw.replace(b'"status":"PASS"', b'"status":"PASS","status":"PASS"')
+    elif corruption == "nonclaim":
+        raw = raw.split(b"\n")[0] + b"\n"
+    elif corruption == "invalid-utf8":
+        raw += b"\xff\n"
+    log.write_bytes(raw)
+    with pytest.raises(ValueError):
+        validate_crd_check_family(crd_config)
+    assert log.read_bytes() == raw
+
+
+@pytest.mark.parametrize("member", ["qa_step_logs_manifest.json", "checks/current/primary.log", "checks/current"])
+def test_crd_validation_and_direct_update_refuse_aliases(crd_config, member):
+    log, _ = record_check(crd_config, _crd_result())
+    path = crd_config.qa_root / member
+    moved = path.with_name(path.name + ".original")
+    path.rename(moved)
+    path.symlink_to(moved, target_is_directory=moved.is_dir())
+    with pytest.raises(ValueError, match="symlink"):
+        validate_crd_check_family(crd_config)
+    with pytest.raises(ValueError, match="symlink"):
+        update_manifest(crd_config, log)
+
+
+def test_crd_rechecks_captured_bytes_during_validation(crd_config, monkeypatch):
+    log, _ = record_check(crd_config, _crd_result())
+    original = qa_harness._read_stable_acceptance_file
+    calls = 0
+
+    def mutate_after_capture(*args, **kwargs):
+        nonlocal calls
+        captured = original(*args, **kwargs)
+        if args[1] == log:
+            calls += 1
+            if calls == 1:
+                log.write_bytes(log.read_bytes() + b"changed during validation\n")
+        return captured
+
+    monkeypatch.setattr(qa_harness, "_read_stable_acceptance_file", mutate_after_capture)
+    with pytest.raises(ValueError, match="changed"):
+        validate_crd_check_family(crd_config)
+
+
+def test_crd_legacy_operations_refuse_before_output(crd_config):
+    for operation in (evaluate_acceptance_map_viability, generate_acceptance_map_viability):
+        with pytest.raises(ValueError, match="unsupported for CRD"):
+            operation(crd_config)
+    for kwargs in ({"replace_legacy_family_ids": ("current",)}, {"admit_new_check_ids": ("current",)}):
+        with pytest.raises(ValueError, match="legacy-family"):
+            record_check_family(crd_config, (_crd_result(),), **kwargs)
+    assert not crd_config.qa_root.exists()
+
+
+@pytest.mark.parametrize("expression, expected", [("True", Status.PASS), ("False", Status.FAIL_BEHAVIOR)])
+def test_crd_pytest_runner_records_actual_same_interpreter_outcome(crd_config, expression, expected):
+    test_file = crd_config.repo_root / "test_fixture.py"
+    test_file.write_text(f"def test_observation():\n    assert {expression}\n")
+    result = run_pytest_check(crd_config, "executed", ("-q", "-p", "no:cacheprovider", "test_fixture.py"))
+    assert result.status is expected
+    assert result.command[0][0] == sys.executable
+    assert "CRD wrapper" in result.command_provenance
+    log, _ = record_check(crd_config, result)
+    header = read_primary_header(log)
+    assert header["exit_code"] == (0 if expected is Status.PASS else 1)
+    assert validate_crd_check_family(crd_config)["executed"]["status"] == expected.value
