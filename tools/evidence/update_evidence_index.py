@@ -22,7 +22,7 @@ import stat as _stat
 import sys
 import tempfile
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Callable, Iterable, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 HUMAN_INDEX = ROOT / "docs/evidence/INDEX.json"
@@ -42,6 +42,13 @@ from engine.runtime.determinism_env import (  # noqa: E402
     DETERMINISM_ENV_PINS,
     ensure_determinism_env,
 )
+from tools.qa import qa_harness  # noqa: E402
+
+# Source-owned admission for this approved CRD. This is not a check roster or
+# directory discovery rule; another CRD needs its own explicit admission.
+CRD_QA_ID = "HDE-CRD-0001"
+CRD_QA_ROOT_REL = "audit/qa/hde-crd-0001"
+CRD_QA_KEY = "audit.qa.hde_crd_0001"
 
 
 class _WriteTransaction:
@@ -3679,8 +3686,62 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
     return sorted(deduped.values(), key=lambda item: (item["artifact_key"], item["discovered_physical_path"]))
 
 
+def _crd_qa_entry(check_id: str | None = None) -> dict[str, object]:
+    if check_id is None:
+        suffix, path, role = "qa_step_logs_manifest", "qa_step_logs_manifest.json", "snapshot"
+    else:
+        qa_harness.validate_check_id(check_id)
+        suffix, path, role = f"checks.{check_id}.primary.log", f"checks/{check_id}/primary.log", "log"
+    return {
+        "artifact_key": f"{CRD_QA_KEY}.{suffix}",
+        "discovered_physical_path": f"{CRD_QA_ROOT_REL}/{path}",
+        "role": role,
+    }
+
+
+def _load_crd_qa_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> tuple[list[Mapping[str, object]], list[dict[str, object]]]:
+    """Reconcile only selected current CRD rows, before generic deduplication."""
+    unrelated: list[Mapping[str, object]] = []
+    selected: list[Mapping[str, object]] = []
+    seen_keys: set[str] = set()
+    seen_paths: set[str] = set()
+    for entry in retained:
+        # Recognize the generic normalizer's legacy aliases too, so they cannot
+        # bypass this boundary and collide with the generated current rows.
+        key = entry.get("artifact_key") or entry.get("title")
+        path = entry.get("discovered_physical_path") or entry.get("path")
+        claims_key = isinstance(key, str) and (key == CRD_QA_KEY or key.startswith(CRD_QA_KEY + "."))
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        claims_path = normalized_path == CRD_QA_ROOT_REL or normalized_path.startswith(CRD_QA_ROOT_REL + "/")
+        if not claims_key and not claims_path:
+            unrelated.append(entry)
+            continue
+        expected = _crd_qa_entry()
+        if path != expected["discovered_physical_path"]:
+            parts = path.split("/") if isinstance(path, str) else []
+            if len(parts) != 6 or "/".join(parts[:4]) != f"{CRD_QA_ROOT_REL}/checks" or parts[-1] != "primary.log":
+                raise ValueError("CRD index key/path relationship is malformed")
+            expected = _crd_qa_entry(parts[-2])
+        if dict(entry) != expected:
+            raise ValueError("CRD index row has foreign or contradictory key/path/metadata")
+        if key in seen_keys or path in seen_paths:
+            raise ValueError("duplicate CRD index identity or path")
+        seen_keys.add(key)
+        seen_paths.add(path)
+        selected.append(entry)
+
+    config = qa_harness.HarnessConfig(crd_id=CRD_QA_ID, repo_root=ROOT)
+    if not config.qa_root.exists() and not selected:
+        return unrelated, []
+    checks = qa_harness.validate_crd_check_family(config)
+    return unrelated, [_crd_qa_entry(), *(_crd_qa_entry(check_id) for check_id in sorted(checks))]
+
+
 def _load_human_index() -> list[dict[str, object]]:
-    payload = json.loads(_read_bytes(HUMAN_INDEX).decode("utf-8"))
+    payload = qa_harness._loads_json_strict(_read_bytes(HUMAN_INDEX).decode("utf-8"))
+    payload, crd_entries = _load_crd_qa_entries(payload)
     payload = [
         entry
         for entry in payload
@@ -3717,6 +3778,7 @@ def _load_human_index() -> list[dict[str, object]]:
     return _dedupe_entries(
         [
             *payload,
+            *crd_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
             *EPIC022_PRIMARY_ARTIFACTS,
@@ -4245,6 +4307,163 @@ def _rebind_sanity_log_only() -> None:
     _run_sanity_log_rebind_transaction()
 
 
+def _run_once(*, check: bool, epic_ids: frozenset[str] = frozenset()) -> None:
+    _validate_epic038_pr02_semantics()
+    isolated_timestamp = _isolated_release_timestamp()
+    produced_default = isolated_timestamp or _isoformat(
+        _dt.datetime.now(tz=_dt.timezone.utc)
+    )
+    mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
+    mirror_proof_existing = _load_existing_proof(mirror_proof_path)
+    mirror_produced = mirror_proof_existing.get("produced_at_utc")
+    if mirror_produced:
+        try:
+            _parse_utc_iso8601(mirror_produced)
+        except Exception:  # noqa: BLE001
+            mirror_produced = None
+    if mirror_produced and isolated_timestamp is None:
+        produced_default = mirror_produced
+    entries = _load_human_index()
+    if "HDE-EPIC020" in epic_ids:
+        epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
+        entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
+
+    index_bytes = _render_human_index(entries)
+    _write_if_changed(HUMAN_INDEX, index_bytes, check=check)
+    hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
+    _write_if_changed(HASH_SENTINEL, hash_line, check=check)
+    _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=check)
+    _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=check)
+
+    orientation_bytes = _render_orientation(entries)
+    _write_if_changed(ORIENTATION_PATH, orientation_bytes, check=check)
+
+    mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
+    mirror_size = len(mirror_bytes)
+    mirror_rec["size_bytes"] = mirror_size
+    _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
+
+    mirror_file_sha = _sha256_path(MIRROR_PATH)
+    mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
+    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=check)
+    _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=check)
+
+    mirror_body_sha = str(mirror_rec["sha256"])
+    proof_anchor, produced_at = _write_path_proof(
+        MIRROR_REL,
+        sha256=mirror_file_sha,
+        size_bytes=_size_bytes(MIRROR_PATH),
+        mtime_utc=mirror_proof_existing.get("mtime_utc"),
+        produced_at=str(mirror_rec.get("produced_at_utc")),
+        default_produced_at=produced_default,
+        check=check,
+        stat_mtime=_proof_mtime(
+            MIRROR_PATH, default_produced_at=produced_default
+        ),
+        extra_fields={"mirror_body_sha256": mirror_body_sha},
+    )
+    if proof_anchor != mirror_rec["proof_anchor"]:
+        mirror_rec["proof_anchor"] = proof_anchor
+        if check:
+            raise SystemExit(f"STALE_PROOF:{proof_anchor}")
+    if produced_at != mirror_rec["produced_at_utc"]:
+        mirror_rec["produced_at_utc"] = produced_at
+        if check:
+            raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
+    if _size_bytes(MIRROR_PATH) != int(mirror_rec["size_bytes"]):
+        if check:
+            raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
+        mirror_rec["size_bytes"] = _size_bytes(MIRROR_PATH)
+
+
+def _converge_and_publish(*, epic_ids: frozenset[str] = frozenset()) -> None:
+    """Use the existing six-pass staged writer inside its caller's transaction."""
+    global _STAGED_VIEW
+    if _ACTIVE_WRITE_TRANSACTION is None or _STAGED_VIEW is not None:
+        raise RuntimeError("evidence convergence requires one active write transaction")
+    try:
+        initial_produced = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+        existing_mirror_proof = _load_existing_proof(
+            MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
+        )
+        staged_produced = existing_mirror_proof.get(
+            "produced_at_utc", initial_produced
+        )
+        try:
+            _parse_utc_iso8601(staged_produced)
+        except (TypeError, ValueError):
+            staged_produced = initial_produced
+        _STAGED_VIEW = _StagedView(ROOT, staged_produced)
+        max_passes = 6
+        last_error: SystemExit | None = None
+        for _ in range(max_passes):
+            _run_once(check=False, epic_ids=epic_ids)
+            try:
+                _run_once(check=True, epic_ids=epic_ids)
+                last_error = None
+                break
+            except SystemExit as exc:
+                last_error = exc
+
+        if last_error is not None:
+            raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
+        staged = dict(_STAGED_VIEW.changes)
+        _STAGED_VIEW = None
+        _publish_staged(staged)
+        _run_once(check=True, epic_ids=epic_ids)
+    finally:
+        _STAGED_VIEW = None
+
+
+def publish_crd_check_family(
+    config: qa_harness.HarnessConfig,
+    results: Sequence[qa_harness.CheckResult],
+    *,
+    captured_at_utc: str | None = None,
+    coherence_verifier: Callable[[], None] | None = None,
+) -> tuple[tuple[Path, ...], Path]:
+    """Publish admitted CRD records and their integrity graph with recovery.
+
+    This module must belong to config.repo_root (including in fixture copies).
+    The optional final verifier is read-only and runs after actual writes, still
+    inside the recovery boundary. Recovery covers exceptions, not process death
+    or atomic visibility to concurrent readers. No acceptance claim is inferred.
+    """
+    if not isinstance(config, qa_harness.HarnessConfig) or config.crd_id != CRD_QA_ID:
+        raise ValueError("governed CRD publication admits only HDE-CRD-0001")
+    if config.repo_root != ROOT:
+        raise ValueError("CRD config must select this updater's repository root")
+    if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
+        raise RuntimeError("CRD publication requires its own outer transaction")
+    ensure_determinism_env()
+    staged_results = tuple(results)
+    if not staged_results or not all(isinstance(result, qa_harness.CheckResult) for result in staged_results):
+        raise ValueError("CRD publication requires a nonempty CheckResult family")
+    result_ids = [qa_harness.validate_check_id(result.check_id) for result in staged_results]
+    if len(result_ids) != len(set(result_ids)):
+        raise ValueError("CRD publication contains duplicate check IDs")
+    planned_logs = [
+        qa_harness._primary_log_content(config, result, captured_at_utc=captured_at_utc)[0]
+        for result in staged_results
+    ]
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    qa_harness._validate_crd_path(config, manifest)
+    # Refuse existing incoherence before touching QA bytes. This entrypoint
+    # cannot silently repair another evidence family's broken prior state.
+    _run_once(check=True)
+    with _WriteTransaction(ROOT) as transaction:
+        for path in (*planned_logs, manifest):
+            transaction.capture(path)
+        published = qa_harness.record_check_family(
+            config, staged_results, captured_at_utc=captured_at_utc
+        )
+        _converge_and_publish()
+        qa_harness.validate_crd_check_family(config)
+        if coherence_verifier is not None:
+            coherence_verifier()
+        return published
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Maintain the evidence index and mirror")
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
@@ -4270,118 +4489,13 @@ def main(argv: list[str] | None = None) -> None:
         _rebind_sanity_log_only()
         return
 
-    epic_ids = set(args.epic_id)
-
-    def _run_once(*, check: bool) -> None:
-        _validate_epic038_pr02_semantics()
-        isolated_timestamp = _isolated_release_timestamp()
-        produced_default = isolated_timestamp or _isoformat(
-            _dt.datetime.now(tz=_dt.timezone.utc)
-        )
-        mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
-        mirror_proof_existing = _load_existing_proof(mirror_proof_path)
-        mirror_produced = mirror_proof_existing.get("produced_at_utc")
-        if mirror_produced:
-            try:
-                _parse_utc_iso8601(mirror_produced)
-            except Exception:  # noqa: BLE001
-                mirror_produced = None
-        if mirror_produced and isolated_timestamp is None:
-            produced_default = mirror_produced
-        entries = _load_human_index()
-        if "HDE-EPIC020" in epic_ids:
-            epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
-            entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
-
-        index_bytes = _render_human_index(entries)
-        _write_if_changed(HUMAN_INDEX, index_bytes, check=check)
-        hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
-        _write_if_changed(HASH_SENTINEL, hash_line, check=check)
-        _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=check)
-        _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=check)
-
-        orientation_bytes = _render_orientation(entries)
-        _write_if_changed(ORIENTATION_PATH, orientation_bytes, check=check)
-
-        mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
-        mirror_size = len(mirror_bytes)
-        mirror_rec["size_bytes"] = mirror_size
-        _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
-
-        mirror_file_sha = _sha256_path(MIRROR_PATH)
-        mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
-        _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=check)
-        _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=check)
-
-        mirror_body_sha = str(mirror_rec["sha256"])
-        proof_anchor, produced_at = _write_path_proof(
-            MIRROR_REL,
-            sha256=mirror_file_sha,
-            size_bytes=_size_bytes(MIRROR_PATH),
-            mtime_utc=mirror_proof_existing.get("mtime_utc"),
-            produced_at=str(mirror_rec.get("produced_at_utc")),
-            default_produced_at=produced_default,
-            check=check,
-            stat_mtime=_proof_mtime(
-                MIRROR_PATH, default_produced_at=produced_default
-            ),
-            extra_fields={"mirror_body_sha256": mirror_body_sha},
-        )
-        if proof_anchor != mirror_rec["proof_anchor"]:
-            mirror_rec["proof_anchor"] = proof_anchor
-            if check:
-                raise SystemExit(f"STALE_PROOF:{proof_anchor}")
-        if produced_at != mirror_rec["produced_at_utc"]:
-            mirror_rec["produced_at_utc"] = produced_at
-            if check:
-                raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
-        if _size_bytes(MIRROR_PATH) != int(mirror_rec["size_bytes"]):
-            if check:
-                raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
-            mirror_rec["size_bytes"] = _size_bytes(MIRROR_PATH)
+    epic_ids = frozenset(args.epic_id)
 
     if args.check:
-        _run_once(check=True)
+        _run_once(check=True, epic_ids=epic_ids)
         return
-
-    # Converge in one invocation with a bounded fixed-point loop.
-    # Mirror rendering depends on artifacts written by this same updater
-    # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
-    # so a single rewrite is not always sufficient.
-    global _STAGED_VIEW
-    try:
-        with _WriteTransaction(ROOT):
-            initial_produced = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-            existing_mirror_proof = _load_existing_proof(
-                MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
-            )
-            staged_produced = existing_mirror_proof.get(
-                "produced_at_utc", initial_produced
-            )
-            try:
-                _parse_utc_iso8601(staged_produced)
-            except (TypeError, ValueError):
-                staged_produced = initial_produced
-            _STAGED_VIEW = _StagedView(ROOT, staged_produced)
-            max_passes = 6
-            last_error: SystemExit | None = None
-            for _ in range(max_passes):
-                _run_once(check=False)
-                try:
-                    _run_once(check=True)
-                    last_error = None
-                    break
-                except SystemExit as exc:
-                    last_error = exc
-
-            if last_error is not None:
-                raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
-            staged = dict(_STAGED_VIEW.changes)
-            _STAGED_VIEW = None
-            _publish_staged(staged)
-            _run_once(check=True)
-    finally:
-        _STAGED_VIEW = None
+    with _WriteTransaction(ROOT):
+        _converge_and_publish(epic_ids=epic_ids)
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Callable, Iterable, Mapping, MutableMapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path, PurePosixPath
@@ -20,6 +20,7 @@ from pathlib import Path, PurePosixPath
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
 
 EPIC_RE = re.compile(r"HDE-EPIC([0-9]{3})\Z")
+CRD_RE = re.compile(r"HDE-CRD-[0-9]{4}\Z")
 CHECK_RE = re.compile(r"[a-z0-9][a-z0-9._-]*\Z")
 LEGACY_CHECK_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 PF_TITLE_RE = re.compile(
@@ -55,13 +56,33 @@ class Status(str, Enum):
 
 @dataclass(frozen=True)
 class HarnessConfig:
-    epic_id: str
+    """Select one Epic or CRD; the existing positional Epic interface is retained."""
+
+    epic_id: str | None = None
     repo_root: Path | None = None
     step_names: Sequence[str] = ()
+    crd_id: str | None = field(default=None, kw_only=True)
 
     def __post_init__(self) -> None:
-        match = EPIC_RE.fullmatch(self.epic_id)
-        if not match:
+        if (self.epic_id is None) == (self.crd_id is None):
+            raise ValueError("exactly one of epic_id or crd_id is required")
+        if self.crd_id is not None:
+            if not isinstance(self.crd_id, str) or not CRD_RE.fullmatch(self.crd_id):
+                raise ValueError("crd_id must match HDE-CRD-<NNNN>")
+            selected_root = Path(self.repo_root or Path(__file__).resolve().parents[2])
+            if ".." in selected_root.parts:
+                raise ValueError("CRD repository root must be canonical")
+            root = Path(os.path.abspath(selected_root))
+            object.__setattr__(self, "repo_root", root)
+            object.__setattr__(self, "qa_root", root / "audit" / "qa" / self.crd_id.lower())
+            for attribute in (
+                "epic_number", "acceptance_map_path", "token_matrix_path", "viability_ledger_path"
+            ):
+                object.__setattr__(self, attribute, None)
+            _validate_crd_path(self, self.qa_root, directory=True)
+            return
+        match = EPIC_RE.fullmatch(self.epic_id) if isinstance(self.epic_id, str) else None
+        if match is None:
             raise ValueError("epic_id must match HDE-EPIC<NNN>")
         root = (self.repo_root or Path(__file__).resolve().parents[2]).resolve()
         if not root.is_dir():
@@ -1493,6 +1514,15 @@ def _primary_log_content(
 ) -> tuple[Path, str]:
     validate_check_id(result.check_id)
     path = config.qa_root / "checks" / result.check_id / "primary.log"
+    if config.crd_id is not None:
+        _validate_crd_path(config, path)
+        result.__post_init__()
+        for field_name in ("evidence_artifacts", "intended_tokens", "pf_refs"):
+            values = getattr(result, field_name)
+            if not isinstance(values, (tuple, list)) or any(
+                not isinstance(value, str) or not value for value in values
+            ):
+                raise ValueError(f"malformed CRD {field_name}")
     rel = _repo_relative(config, path)
     evidence = list(result.evidence_artifacts)
     if rel not in evidence:
@@ -1538,6 +1568,8 @@ def _primary_log_content(
     content = json.dumps(header, sort_keys=True, separators=(",", ":")) + "\n"
     if body:
         content += body + "\n"
+    if config.crd_id is not None:
+        _parse_crd_primary(config, result.check_id, content.encode("utf-8"))
     return path, content
 
 
@@ -1557,7 +1589,18 @@ def _read_primary_header(
 ) -> dict[str, object]:
     if not path.is_file() or path.stat().st_size == 0:
         raise ValueError("primary log is missing or empty")
-    first = path.read_text(encoding="utf-8").splitlines()[0]
+    return _parse_primary_header(
+        path.read_text(encoding="utf-8"), allow_legacy_check_id=allow_legacy_check_id
+    )
+
+
+def _parse_primary_header(
+    text: str, *, allow_legacy_check_id: bool
+) -> dict[str, object]:
+    """Parse the shared v2 contract from one captured primary log."""
+    if not text:
+        raise ValueError("primary log is missing or empty")
+    first = text.splitlines()[0]
     data = _loads_json_strict(first)
     required = {
         "schema_version",
@@ -1636,7 +1679,7 @@ def _read_primary_header(
     if data["claimed_tokens"] != []:
         raise ValueError("PR-03 logs cannot claim tokens")
     if status is Status.PASS and data["intended_tokens"]:
-        body_lines = path.read_text(encoding="utf-8").splitlines()[1:]
+        body_lines = text.splitlines()[1:]
         if NONCLAIM_EXPLANATION not in body_lines:
             raise ValueError(
                 "PF27 v2 PASS with intended tokens lacks an explicit nonclaim"
@@ -1649,6 +1692,99 @@ def _read_primary_header(
 def read_primary_header(path: Path) -> dict[str, object]:
     """Read a canonical current PF27 v2 header."""
     return _read_primary_header(path, allow_legacy_check_id=False)
+
+
+def _validate_crd_path(
+    config: HarnessConfig, path: Path, *, directory: bool = False
+) -> None:
+    root = config.repo_root
+    if not root.is_dir() or root.resolve() != root:
+        raise ValueError("CRD repository root is unavailable or aliased")
+    if ".." in path.parts:
+        raise ValueError("CRD path must be canonical")
+    reason = _aliased_repo_path_reason(root, path)
+    if reason:
+        raise ValueError(f"unsafe CRD path: {reason}")
+    current = path if directory else path.parent
+    while current != root:
+        if current.exists() and not current.is_dir():
+            raise ValueError("CRD parent or root is not a directory")
+        current = current.parent
+    if not directory and path.exists() and not path.is_file():
+        raise ValueError("CRD record is not a regular file")
+
+
+def _crd_file_snapshot(config: HarnessConfig, path: Path) -> _RepositoryFileSnapshot:
+    _validate_crd_path(config, path)
+    status, reason, snapshot = _read_stable_acceptance_file(
+        config.repo_root, path, subject="CRD record"
+    )
+    if status is not Status.PASS or snapshot is None or not snapshot.payload:
+        raise ValueError(f"CRD record is missing, empty or unsafe: {reason}")
+    return snapshot
+
+
+def _crd_text(payload: bytes) -> str:
+    if payload.startswith(b"\xef\xbb\xbf") or b"\r" in payload or not payload.endswith(b"\n"):
+        raise ValueError("CRD records require UTF-8 without BOM, and canonical LF bytes")
+    try:
+        return payload.decode("utf-8")
+    except UnicodeError as exc:
+        raise ValueError("CRD record is not UTF-8") from exc
+
+
+def _parse_crd_primary(
+    config: HarnessConfig, check_id: str, payload: bytes
+) -> dict[str, object]:
+    text = _crd_text(payload)
+    header = _parse_primary_header(text, allow_legacy_check_id=False)
+    if text.split("\n", 1)[0] != json.dumps(header, sort_keys=True, separators=(",", ":")):
+        raise ValueError("CRD primary header must be compact sorted JSON")
+    if header["check_id"] != check_id:
+        raise ValueError("CRD primary identity disagrees with its manifest/path")
+    _require_v2_primary_self_binding(config, check_id, header)
+    if header["status"] == Status.PARKED.value and header["command"]:
+        raise ValueError("CRD PARKED cannot describe executed commands")
+    if header["status"] == Status.FAIL_BEHAVIOR.value and not header["command"]:
+        raise ValueError("CRD FAIL_BEHAVIOR requires exercised behavior")
+    return header
+
+
+def validate_crd_check_family(config: HarnessConfig) -> dict[str, dict[str, str]]:
+    """Validate actual current CRD records; this makes no acceptance decision.
+
+    Local recording owns primaries and the manifest. Governed publication uses
+    tools.evidence.update_evidence_index.publish_crd_check_family as well.
+    """
+    if config.crd_id is None:
+        raise ValueError("current CRD validation requires a CRD config")
+    manifest = config.qa_root / "qa_step_logs_manifest.json"
+    manifest_snapshot = _crd_file_snapshot(config, manifest)
+    text = _crd_text(manifest_snapshot.payload)
+    checks = _manifest_payload(config, captured_bytes=manifest_snapshot.payload)
+    if not isinstance(checks, dict) or not checks:
+        raise ValueError("CRD manifest must be a nonempty flat mapping")
+    snapshots = []
+    for check_id, entry in checks.items():
+        validate_check_id(check_id)
+        expected = config.qa_root / "checks" / check_id / "primary.log"
+        if not isinstance(entry, dict) or set(entry) != {"check_id", "status", "log_path"}:
+            raise ValueError("CRD manifest entry must contain exactly check_id, status and log_path")
+        if entry["check_id"] != check_id or entry["log_path"] != expected.relative_to(config.repo_root).as_posix():
+            raise ValueError("CRD manifest identity or canonical log path disagrees")
+        snapshot = _crd_file_snapshot(config, expected)
+        header = _parse_crd_primary(config, check_id, snapshot.payload)
+        if entry["status"] != header["status"]:
+            raise ValueError("CRD manifest status disagrees with primary header")
+        snapshots.append(snapshot)
+    if text != _manifest_content(checks):
+        raise ValueError("CRD manifest must be compact sorted JSON with one final LF")
+    # Recheck the captured family, including the manifest last. This detects
+    # changed bytes/identities during evaluation, without claiming a file lock.
+    for snapshot in (*snapshots, manifest_snapshot):
+        if _crd_file_snapshot(config, snapshot.lexical_path) != snapshot:
+            raise ValueError("CRD family changed during validation")
+    return checks
 
 
 def _verify_written_primary(path: Path, check_id: str, status: Status) -> None:
@@ -1835,6 +1971,14 @@ def _preflight_manifest(
     config: HarnessConfig, *, captured_bytes: bytes | None = None
 ) -> dict[str, dict[str, str]]:
     path = config.qa_root / "qa_step_logs_manifest.json"
+    if config.crd_id is not None:
+        _validate_crd_path(config, path)
+        if captured_bytes is None and not path.exists():
+            return {}
+        checks = validate_crd_check_family(config)
+        if captured_bytes is not None and _crd_file_snapshot(config, path).payload != captured_bytes:
+            raise ValueError("CRD manifest changed during preflight")
+        return checks
     if captured_bytes is None and not path.exists():
         return {}
     shape, checks = _manifest_shape(
@@ -1875,10 +2019,19 @@ def _manifest_content(checks: Mapping[str, Mapping[str, str]]) -> str:
 
 
 def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
-    header = _read_supported_primary_header(
-        log_path,
-        expected_check_id=validate_check_id(log_path.parent.name),
-    )
+    if config.crd_id is not None:
+        check_id = validate_check_id(log_path.parent.name)
+        expected = config.qa_root / "checks" / check_id / "primary.log"
+        if log_path != expected or ".." in log_path.parts:
+            raise ValueError("non-canonical CRD primary log path")
+        header = _parse_crd_primary(
+            config, check_id, _crd_file_snapshot(config, expected).payload
+        )
+    else:
+        header = _read_supported_primary_header(
+            log_path,
+            expected_check_id=validate_check_id(log_path.parent.name),
+        )
     check_id = validate_check_id(str(header["check_id"]))
     expected = config.qa_root / "checks" / check_id / "primary.log"
     if log_path.resolve() != expected.resolve():
@@ -1902,6 +2055,11 @@ def update_manifest(config: HarnessConfig, log_path: Path) -> Path:
 
 def verify_manifest_entry(config: HarnessConfig, check_id: str) -> dict[str, str]:
     validate_check_id(check_id)
+    if config.crd_id is not None:
+        checks = validate_crd_check_family(config)
+        if check_id not in checks:
+            raise ValueError("canonical flat manifest entry is missing")
+        return checks[check_id]
     path = config.qa_root / "qa_step_logs_manifest.json"
     payload = _loads_json_strict(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or check_id not in payload:
@@ -1925,6 +2083,10 @@ def _verify_flat_manifest(
 ) -> None:
     for check_id in expected:
         validate_check_id(check_id)
+    if config.crd_id is not None:
+        if validate_crd_check_family(config) != expected:
+            raise ValueError("CRD manifest disagrees with the staged family")
+        return
     path = config.qa_root / "qa_step_logs_manifest.json"
     if not path.is_file() or path.stat().st_size == 0:
         raise ValueError("canonical flat manifest is missing or empty")
@@ -2015,6 +2177,7 @@ def run_pytest_check(
     check_name: str = "",
     intended_tokens: Sequence[str] = (),
 ) -> CheckResult:
+    wrapper_label = "CRD wrapper" if config.crd_id is not None else "epic wrapper"
     validate_check_id(check_id)
     command = (sys.executable, "-m", "pytest", *pytest_args)
     readiness_command = (sys.executable, "-m", "pytest", "--version")
@@ -2075,7 +2238,7 @@ def run_pytest_check(
             "pytest readiness check failed",
             check_name,
             readiness_command,
-            "epic wrapper readiness command",
+            f"{wrapper_label} readiness command",
             readiness.returncode,
             readiness.stdout + readiness.stderr,
             intended_tokens=(),
@@ -2091,7 +2254,7 @@ def run_pytest_check(
             f"pytest process malfunction: {exc}",
             check_name,
             readiness_command,
-            "epic wrapper readiness completed; test command launch failed",
+            f"{wrapper_label} readiness completed; test command launch failed",
             readiness.returncode,
             intended_tokens=tuple(intended_tokens),
         )
@@ -2115,7 +2278,7 @@ def run_pytest_check(
         reason,
         check_name,
         (readiness_command, command),
-        "epic wrapper readiness and test commands; exact ordered argv",
+        f"{wrapper_label} readiness and test commands; exact ordered argv",
         completed.returncode,
         completed.stdout + completed.stderr,
         intended_tokens=(
@@ -2251,6 +2414,8 @@ def record_check_family(
     captured_at_utc: str | None = None,
 ) -> tuple[tuple[Path, ...], Path]:
     """Publish a complete current-state family with all verification in-boundary."""
+    if config.crd_id is not None and (replace_legacy_family_ids or admit_new_check_ids):
+        raise ValueError("CRD records do not support Epic legacy-family migration")
     staged_results = tuple(results)
     if not staged_results:
         raise ValueError("check family cannot be empty")
@@ -3293,6 +3458,8 @@ def evaluate_acceptance_map_viability(
     ),
 ) -> tuple[CheckResult, str]:
     """Evaluate every governed map/matrix reference without publishing files."""
+    if config.crd_id is not None:
+        raise ValueError("Epic acceptance-map viability is unsupported for CRD configs")
     validate_check_id(check_id)
     issues: list[tuple[Status, str]] = []
     diagnostics: list[ReferenceDiagnostic] = []
@@ -3733,6 +3900,8 @@ def generate_acceptance_map_viability(
     publish_governed_ledger: bool = False,
 ) -> ViabilityResult:
     """Evaluate and publish a current-state acceptance-map viability check."""
+    if config.crd_id is not None:
+        raise ValueError("Epic acceptance-map viability is unsupported for CRD configs")
     result, evaluation_content = evaluate_acceptance_map_viability(
         config,
         check_id,
