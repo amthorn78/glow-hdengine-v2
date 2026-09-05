@@ -1,5 +1,7 @@
 # HD Engine Repo Docs — Index (HDE-EPIC039 current)
 
+- [GCFPE component-to-prompt provenance](changes/GCFPE_PROMPT_PROVENANCE.md): alpha procedural metadata capture, exact component lookup, read-only validation and a synthetic setup example. Actual reusable prompt bodies remain in Notion.
+
 ## HDE-EPIC039 Calcination Pass 6 orientation
 - Canonical JSON: `tools/evidence/run_canonical_json_gate.py` owns an exact 26-target inventory and six arrays-as-sets rules. Only those declared collections receive set-like normalization; ordered arrays retain their meaning. Use `--check-only` for read-only validation.
 - Narratives: `catalog/narratives/keys.json` and `catalog/narratives/templates.json` each cover 360 direction-native entries, split 120 each across `shared`, `a_to_b`, and `b_to_a`; `catalog/narratives/suppression_map.json` contains two governed suppressions. No Human Design math, scoring, public route, payload, or transport changed.

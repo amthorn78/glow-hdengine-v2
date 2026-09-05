@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version: v12.9.5**  
-Effective Date: Sep 1, 2026  
+**Version: v12.9.10**  
+Effective Date: Sep 5, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -185,7 +185,11 @@ TEMPLATE Addendum Entry (do not edit/remove)
 
 2.1 Epic/CRD Specification and Implementation-Plan authority; PF20/PF30 historical status  
 2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control  
-2.3 Establish the Persistent Workspace and Local-Client Operating Model
+2.3 Establish the Persistent Workspace and Local-Client Operating Model  
+2.4 Select Model, Reasoning Level, and Execution Surface for Downstream Session Prompts  
+2.5 Establish PF Canon Precedence and Glow Drive Information Routing  
+2.6 Ephemeral Change-Process Artifact Storage  
+2.7 Establish and Govern the Glow Change Flow Prompt Ecosystem (GCFPE)
 
 # 2\) Numbered Addenda
 
@@ -726,9 +730,9 @@ Non-authorization: This addendum does not authorize automatic reconciliation, re
 
 Glow uses Google Drive and Notion as complementary persistent workspace systems.
 
-* Google Drive is the persistent home for durable documents, large documents, spreadsheets, reference packages, and source material needed by explicitly assigned local-client tasks.  
+* Google Drive is the persistent home for established durable documents, large documents, spreadsheets, reference packages, and source material needed by explicitly assigned local-client tasks. Important lasting guidance must be recorded in the appropriate existing Drive document and updated in place. Ephemeral evidence, scratch work, raw logs, temporary snapshots, disposable test workspaces, and routine per-run receipts do not belong in Drive unless a governing requirement expressly requires durable Drive evidence.  
 * Notion is the operational coordination layer for hubs, registries, checklists, status, indexes, and cross-system links.  
-* ChatGPT Library remains the working home for development-cycle files, plan versions, transient artifacts, and source files that should not enter the persistent workspace.  
+* ChatGPT Library remains the working home for development-cycle files, plan versions, compact local-client handoff packages, transaction evidence, transient artifacts, and source files that do not belong in an established persistent Drive document.  
 * Repositories remain the source and delivery surface for code. For PF Canon, authorized repository PF paths are version-controlled publication mirrors of Drive-generated Markdown. This addendum does not itself authorize a repository write.
 
 ### 2\. PFCanon Drive authority
@@ -743,11 +747,11 @@ Core Docs/PFCanon is the authoritative Google Drive PF Canon collection. It cont
 
 ### 3\. Local-client handoff
 
-A task is a local-client task only when the Product Owner explicitly identifies it as such. A local Codex instance must not assume access to ChatGPT conversation context or ChatGPT Library files.
+A task is a local-client task only when the Product Owner explicitly identifies it as such. A local Codex instance must not assume access to ChatGPT conversation context or ChatGPT Library files. Its actual workspace-skill access must be measured in a separate read-only capability audit before it is assigned governance-dependent work.
 
 * Before dispatch, every required input, authority, constraint, and expected output location must be available through Google Drive or Notion and linked in the task.  
 * The task prompt must identify the exact Drive Markdown source for technical reading whenever available, the native Google Doc when source editing or rendered review is required, every applicable Notion source, and all read and write limits.  
-* Local-client output returns to the designated Drive or Notion location. Development-cycle plan versions remain in ChatGPT Library unless the Product Owner directs otherwise.
+* Local-client output returns to the designated durable destination. Use local CLI for compute-heavy, repository-local, or deterministic work only when its required skills are verified and its time savings outweigh handoff overhead; prefer standard ChatGPT for connector-heavy governance and live Notion or Drive work. Update established persistent Drive or Notion documents in place when the result is lasting guidance or authoritative content. Keep ephemeral evidence, raw logs, scratch files, temporary snapshots, and routine per-run receipts local or in ChatGPT Library unless a governing requirement expressly requires durable Drive evidence.
 
 ### 4\. Initial implementation record
 
@@ -780,6 +784,376 @@ A read-only PFCanon drift audit is scheduled for the first day of each month at 
 The scheduled task cannot move, rename, delete, upload, overwrite, edit, or reconcile files.
 
 PF10 v12.9.5 is the first controlled test of this source-first publication path. The test is complete only after Google Doc readback, creation of the Drive Markdown peer, transfer of those exact Markdown bytes to the authorized repository path, and postflight verification of the resulting repository blob.
+
+## 2.4 Select Model, Reasoning Level, and Execution Surface for Downstream Session Prompts
+
+Status: Product Owner-directed operating addendum; active
+
+Prepared: Sep 2, 2026
+
+Scope: Prompt creation for downstream sessions; task-specific model and reasoning selection; standard ChatGPT-versus-local-CLI routing
+
+Precedence within scope: This addendum extends Addendum 2.3 and supersedes its requirement for a separate Product Owner designation before a prompt-authoring session may select the local CLI. It governs every session instructed to create a prompt for another session.
+
+Non-authorization: Selecting an execution surface, model, or reasoning level does not grant substantive task authority or bypass any approval, publication, registry, routing, activation, lifecycle, runtime, or PF Canon gate.
+
+### 1\. Product Owner decision
+
+When a session is instructed to create a prompt for another session, the prompt-authoring session must determine and explicitly state:
+
+* Standard ChatGPT web session or local CLI as the execution surface.  
+* The model appropriate to the downstream task.  
+* The reasoning level appropriate to the downstream task.
+
+The selection must be based on the downstream task's actual requirements, available skills and sources, expected handoff cost, and required authority. It must not be inherited mechanically from the current session or reduced to one universal model recommendation.
+
+### 2\. Local CLI eligibility
+
+The local CLI is eligible only when its required skills and inputs are directly verified and its expected net benefit in token efficiency, elapsed time, or operational effectiveness outweighs packaging, transfer, verification, and review overhead without reducing quality or control.
+
+The completed local capability audit passed with limitations. It proved strong skill and runtime access for compute-heavy, filesystem-heavy, deterministic, and read-only analysis, while confirming that ChatGPT Library access is unavailable and that some live connected-state work remains dependent on standard ChatGPT.
+
+Suitable local CLI work includes:
+
+* Large source inventories, collision checks, occurrence matrices, and exact cross-artifact reconciliation.  
+* Deterministic fixture generation and execution.  
+* Hashing, canonicalization, exact diffing, and reverse-diff verification.  
+* Static prompt, workflow, and structural validation from a complete frozen source packet.  
+* Independent non-authoritative technical review.  
+* Compact local handoff-package generation.
+
+The capability audit proves that this work can be performed; it does not by itself prove net time or token savings. Representative tasks should be measured for wall-clock time, active Product Owner handling time, transfer count, status checks, token use when observable, rework, and first-pass acceptance.
+
+### 3\. Standard ChatGPT-only work
+
+The local CLI is ineligible for:
+
+* Development tasks.  
+* QA tasks.  
+* Any task explicitly assigned to a specific session role, including Isis or an Implementation Agent.
+
+Standard ChatGPT is also required for:
+
+* Product Owner decisions and authorization packets.  
+* Live Notion, Google Drive, or Google Docs mutations.  
+* ChatGPT Library persistence and version management.  
+* Prompt publication, registry approval or mutation, routing, activation, lifecycle transitions, and runtime or production operations.  
+* Any PF Canon mutation unless the Product Owner separately names the exact PF document and exact requested mutation.
+
+### 4\. Artifact and handoff policy
+
+Local CLI working files, raw logs, temporary snapshots, disposable test workspaces, routine receipts, and other ephemeral evidence stay in the local workspace. They must not be written to Google Drive unless a governing requirement expressly requires durable Drive evidence.
+
+When a standard ChatGPT handoff is needed, the local CLI should return one dedicated local output directory and one compact archive with a manifest, core deliverables, hashes, results, and limitations. The Product Owner may upload that single archive directly to the receiving ChatGPT session. Do not create many separate Drive artifacts merely to transport a task between execution surfaces.
+
+Lasting guidance and authoritative operational content belong in the appropriate established persistent Google Drive document or Notion page and should be updated in place when authorized. ChatGPT Library remains the preferred durable destination for compact handoff packages and transaction evidence that do not belong in an established Drive document.
+
+### 5\. Selection standard
+
+Choose the local CLI only when it is likely to improve the complete task, including preparation, execution, handoff, verification, and rework. If the required skill, source, current-state access, or role boundary is missing or uncertain, choose standard ChatGPT.
+
+The execution-surface choice changes where work is performed, not the quality bar. Source identity, deterministic checks, semantic validation, governance boundaries, and independent readback remain required.
+
+## 2.5 Establish PF Canon Precedence and Glow Drive Information Routing
+
+Status: Product Owner-directed governance addendum; active
+
+Prepared: Sep 2, 2026
+
+Scope: PF Canon precedence; contradiction handling; durable and ephemeral information routing; Glow Drive folder roles; relationship to downstream-session execution-surface selection
+
+Precedence within scope: This addendum extends Addenda 2.3 and 2.4. The current, active, applicable PF Canon controls over live non-canonical operational references. Folder placement alone does not establish authority.
+
+Non-authorization: This addendum does not authorize creation, movement, deletion, renaming, publication, approval, routing, activation, lifecycle transition, runtime execution, or mutation of any other PF Canon document, Drive item, Notion page, repository, registry, or skill. Any later PF Canon mutation still requires a specific Product Owner directive naming the exact document and requested change.
+
+### 1\. Authority hierarchy
+
+For information within its declared scope, use the following order of authority:
+
+* Current, active, applicable PF Canon.  
+* Current live non-canonical operational references that conform to the controlling PF Canon.  
+* Immutable historical evidence, frozen assessments, completed decision records, and archived material, which preserve what was observed or decided at their recorded time but are not current operating authority.
+
+PF Canon is the binding home for Glow-specific rules, required sequences, acceptance standards, environment facts, and reference information that Development, Implementation, QA, or governance sessions must treat as authoritative when approving or executing plans and workflows.
+
+### 2\. Contradiction-resolution contract
+
+When a non-canonical document appears to conflict with PF Canon:
+
+* First verify the controlling PF document, its current active version and status, and whether both statements actually govern the same scope.  
+* If a true contradiction remains, follow the PF Canon immediately. Treat the conflicting live non-canonical statement as stale.  
+* Update the live non-canonical document to conform to the PF Canon, identify the controlling PF document and version, and preserve any required change history.  
+* Never revise PF Canon merely to make it agree with a non-canonical document. A PF Canon revision requires a separate, specific Product Owner directive.  
+* If authority to correct the live non-canonical source is absent, record or report the drift and stop using the stale statement as operating guidance until a bounded correction is authorized.
+
+### 3\. Historical-record exception
+
+Do not rewrite immutable evidence, frozen snapshots, closed assessments, completed decision records, or archived artifacts to make history look current. Preserve their original content. Where the storage system permits, mark or annotate the record as superseded, outdated, historical, or non-operative and point to the current controlling authority. Historical accuracy and current operating authority are distinct.
+
+### 4\. Storage and promotion contract
+
+* PF Canon: binding Glow requirements and reference material that Development, Implementation, QA, or governance sessions must treat as authoritative.  
+* Glow Drive non-canonical references: durable, reusable, long-form technical references, specifications, workflow documents, operational guidance, and assessments that are too unwieldy for Notion or change too often to warrant immediate PF Canon status.  
+* Notion: current status, ownership, decisions, indexes, queues, and links to authoritative or durable sources.  
+* Local workspace and ChatGPT Library: temporary working material, frozen source packets, routine evidence, logs, drafts, and compact handoff packages unless a governing requirement assigns a different durable home.  
+* Repository: executable behavior, code-adjacent configuration, tests, and version-controlled implementation truth.
+
+Routine ephemeral evidence must not be written to Google Drive merely for transport. Local CLI work should remain local and return one compact handoff package when transfer is necessary. Important lasting operational information should update an established non-canonical Drive reference in place when authorized.
+
+Exploratory specifications and workflow guidance may remain non-canonical. When a requirement becomes mandatory for implementation, acceptance, approval, or workflow execution, it must be promoted through the governed controlled-document process. Repetition, convenience, or folder placement cannot silently elevate a non-canonical document into PF Canon.
+
+Live non-canonical references should identify their authority status, version or last-reviewed date, owner, intended audience, scope boundary, and the controlling PF source to use if a conflict is found.
+
+### 5\. Relationship to downstream-session routing
+
+Addendum 2.4 remains controlling for execution-surface, model, and reasoning selection. This addendum refines where the resulting material belongs:
+
+* A prompt-authoring session selects standard ChatGPT or local CLI, plus the task-appropriate model and reasoning level, using verified capability and net-benefit criteria.  
+* Development, QA, Isis, Implementation Agent, and other explicitly assigned session-role work remains ineligible for local CLI execution.  
+* Local CLI is suitable for bounded compute-heavy, filesystem-heavy, deterministic, and static-review work from a complete frozen packet; it does not gain publication or mutation authority.  
+* Ephemeral CLI artifacts stay local. Durable conclusions update the appropriate established non-canonical reference, while binding requirements enter PF Canon only through a separately authorized controlled revision.
+
+### 6\. Current Glow Drive top-level folder map
+
+Glow root folder ID: 1MZXcC5tKMkI9n8EobkywIj1ifcF6IvZ3. This map was verified on the Prepared date above. It records current structure and intended routing; it does not authorize any folder or file mutation.
+
+Top-level folders:
+
+* Local Client Exchange — 1VqfRBYNsS9TgeazxV2EKLftDgfy8mBRI — bounded local-client exchange, compact task packets, reusable inputs, and completed handoffs when transfer is necessary; not the default home for routine ephemeral evidence.  
+* Web Front End — 1pz5unL9an6oY2JU3EJ1BGx-nBVbqzOqf — web-front-end project material and related durable artifacts.  
+* Ops — 1hFiDVf2rdSwV5i6i-v2T43S-GyFmLWE6 — non-canonical operational references, infrastructure guidance, assessments, and decisions.  
+* Standalone System — 15QeaihEoyILSthJXN6ZA0BgVSGBzXdPR — standalone-system project and reference material.  
+* Marketing — 1mnEMBYanbC22AKz7o4s4KJqb3z299-Zc — marketing material and assets.  
+* Prompts — 1g572otyVG-BNuNHWnyizR9Oq6EAjC\_Rm — prompt-related working material and references; governing status remains determined by the applicable controlled prompt system, registry, and PF Canon.  
+* HD Refs — 1gm6Rbq-LihD65iMcxb1DvI9xaoSVgwFw — Human Design reference material.  
+* Akashic Records — 1AuzrnZalPPQgJQBS\_wv7rFY5LxjnNGIy — Akashic Records project and reference material.  
+* Docs Archive — 1T5tktjk6x0fdl-dKceyHMT7cOeRF6a4L — historical, retired, or legacy documents; non-operative unless a controlling source explicitly reactivates them.  
+* Core Docs — 18T84WC\_Jxjb75V37\_eYcRqn8zOjHYgxu — controlled core material and reusable foundational references.  
+* Human Design Practice — 1hBZA4D0m42Vpc3I9aEMtV7HL-3s3SGHI — Human Design practice and client-facing practice material.
+
+Key second-level routes used by this contract:
+
+* Core Docs / PFCanon — 1gdBmaB\_EqXdlwGBiaz-BP2tlhl9QfXd3 — active PF Canon documents and their controlled revisions.  
+* Core Docs / Foundational References — 1t5-7IEitEGRf4m4qreTClANhYcehBLPU — durable non-canonical methods, technical background, and reusable guidance.  
+* Core Docs / Archive — 19JiFnL4qNo671G5Jeq5tfcAZ3wtUM0DS — historical Core Docs material.  
+* Ops / Access & Infrastructure — 1mlX9d-c1j6Gjxyluw-2OhGFaP81mieMM — connector behavior, access, environment setup, capability notes, and changing operational runbooks.  
+* Ops / Assessments & Decisions — 1rtlPtV1FLkyaeFSvQ2lsw1I-Lq-YFbG8 — dated evaluations, architecture decisions, capability assessments, and recommendations.
+
+Interpretation rule: the folder map routes information; it does not determine truth by itself. When status or content conflicts, apply the authority hierarchy and contradiction-resolution contract above.
+
+## 2.6 Ephemeral Change-Process Artifact Storage
+
+**Scope:** Glow change work across planning, specification, implementation, operations, QA, review, publication, postflight, drainage, and closure
+
+### Purpose
+
+This addendum establishes one storage rule for the files and documents produced while a Glow change is being defined, planned, authorized, executed, reviewed, validated, published, reconciled, recovered, drained, or closed.
+
+All off-repository files created during the change process are **ephemeral change-process artifacts**. This expressly includes plans, specification documents, QA plans, and every other off-repository file created during the change process.
+
+Ephemeral describes the artifact's operational role, not its retention period. An ephemeral artifact may be retained permanently as evidence and remains ephemeral for storage classification.
+
+This addendum applies only to artifacts created, copied, exported, or materially revised after it becomes effective. It does not require retroactive review, migration, duplication, deletion, archival, reclassification, or cleanup of existing files.
+
+### Controlling storage rule
+
+1. Persist ephemeral change-process artifacts only in ChatGPT Library.  
+2. Never persist, duplicate, stage, transport, back up, mirror, or retain an ephemeral change-process artifact in Google Drive.  
+3. Scratch storage may be used only while work is actively in progress. Any artifact that must survive the current session must be saved to ChatGPT Library.  
+4. Notion may hold concise controls, statuses, registry entries, decisions, and pointers to Library artifacts. It must not be used to duplicate the complete ephemeral artifact.  
+5. If ChatGPT Library is unavailable, stop before durable persistence and report a blocking capability. Google Drive is not a fallback.  
+6. File type, format, size, approval state, evidentiary value, or expected retention period does not change this rule.
+
+### Ephemeral artifact classes
+
+The following classes are inclusive rather than exhaustive. If an off-repository file is created because a change is being considered or processed, it belongs to one of these classes and must be stored in ChatGPT Library.
+
+#### EA-01: Intake, scope, and authority artifacts
+
+* Change requests, Epic or CRD intake records, classification analyses, and scope briefs  
+* Authority packets, authorization proposals, approval packets, and decision-support documents  
+* Task specifications, configuration inputs, caveats documents, source inventories, and dependency maps  
+* Session instructions, execution prompts, review prompts, handoff packets, and delegation briefs
+
+#### EA-02: Plans and specification documents
+
+* Prompt-repair plans, implementation plans, operations plans, release plans, and publication plans  
+* **QA plans**, test plans, validation plans, audit plans, acceptance plans, and postflight plans  
+* Rollback plans, recovery plans, drainage plans, closure plans, and remediation plans  
+* **Specification documents**, change specifications, technical specifications, interface contracts, compatibility contracts, and proposed architecture documents  
+* Work breakdowns, checklists, matrices, schedules, sequencing documents, and plan revisions
+
+All plans and specification documents created for a change are ephemeral even when approved, accepted, or used as controlling transaction inputs.
+
+#### EA-03: Authoring and execution artifacts
+
+* Drafts, proposed successors, working copies, redlines, correction drafts, and comparison copies  
+* Proposed changesets, patch proposals, operation manifests, publication candidates, and registry candidates  
+* Generated task files, source-processing outputs, temporary exports, conversion products, and intermediate bundles  
+* Maker evidence, implementation notes, execution notes, and bounded working records
+
+#### EA-04: QA, audit, review, and evidence artifacts
+
+* QA reports, audit reports, review reports, interoperability reviews, and acceptance reviews  
+* Test results, validator outputs, evidence bundles, source snapshots, content snapshots, and verification records  
+* Preflight reports, publication preflights, registry preflights, postflight reports, and readback reports  
+* Diffs, hashes, manifests, command transcripts, logs, screenshots-as-text, collision checks, and receipts  
+* Findings, exceptions, warnings, nonconformity reports, correction instructions, and review-cycle records
+
+Receipts, audits, and accepted evidence remain Library artifacts even when they must be preserved permanently.
+
+#### EA-05: Coordination, approval, and recovery artifacts
+
+* Status reports, progress reports, checkpoints, resume packets, blocker reports, and escalation records  
+* Product Owner question packets, approval requests, approval responses, and mutation-authorization records  
+* Session registrations, session identity records, maker-review handoffs, and isolated-context bundles  
+* Rollback preparation, recovery evidence, inverse-operation plans, and transaction-repair records
+
+#### EA-06: Publication, reconciliation, drainage, and closure artifacts
+
+* Publication evidence, registry evidence, routing evidence, activation evidence, and lifecycle evidence  
+* Candidate-admission packets, integrated-validation reports, tracker-reconciliation changesets, and reconciliation receipts  
+* Drainage records, closure evidence, closure reviews, retrospectives, lessons-learned reports, and terminal transaction summaries  
+* Historical snapshots or preserved superseded artifacts produced by the change process
+
+### Repository-controlled outputs
+
+Repository-native implementation outputs remain at their governed repository paths. Source code, tests, migrations, configuration, executable assets, and repo-resident canonical documentation created as the intended implementation of a change are repository-controlled outputs rather than off-repository workflow artifacts.
+
+Any exported copy, review copy, report, plan, evidence bundle, snapshot, or other file created about those repository outputs is an ephemeral change-process artifact and belongs only in ChatGPT Library.
+
+### Durable operational authorities
+
+A document is eligible for durable Notion or Google Drive storage only when all of the following are true:
+
+1. It is intended to operate as an ongoing authority or business document independent of one change transaction.  
+2. Its controlling process expressly designates that persistent surface.  
+3. It is not a plan, specification, QA artifact, evidence artifact, receipt, working document, or other file created as part of the change process.  
+4. Its creation or mutation is separately authorized when required.
+
+An artifact does not become a durable operational authority merely because it is useful, approved, accepted, frequently referenced, or retained for a long time.
+
+### Required classification before writing
+
+Every governed task, plan, changeset, and delegated execution prompt must classify each expected output before the first write:
+
+* `EPHEMERAL_LIBRARY`: every off-repository file created during change work  
+* `REPOSITORY_CONTROLLED`: the intended implementation output at its governed repository path  
+* `CONTROL_NOTION`: concise operational state, registry data, decisions, and pointers  
+* `DURABLE_DRIVE`: separately authorized ongoing authorities or business documents that exist independently of one change  
+* `TRANSIENT_SCRATCH`: reproducible working data that does not need to survive the session
+
+When classification is uncertain, use `EPHEMERAL_LIBRARY` unless controlling authority establishes another class.
+
+### Execution and review requirements
+
+1. Every task instruction must name the authorized persistence surface for each output.  
+2. A task that creates change-process files must prohibit Google Drive persistence explicitly.  
+3. A reviewer must treat unauthorized Drive creation or duplication of an ephemeral artifact as a storage-policy failure.  
+4. A terminal report must identify each persisted Library artifact by its durable Library identity and version when available.  
+5. Raw connector responses and reproducible temporary data remain in scratch unless they must be preserved; preserved copies move to Library.  
+6. A Library artifact may be linked from Notion, a registry, a tracker, a prompt, or another governed record without changing its storage class.
+
+### Prospective enforcement and legacy records
+
+1. Existing artifacts may remain where they were stored before this addendum became effective.  
+2. No retroactive inventory, migration, duplication, deletion, archival, reclassification, or cleanup is required solely because of this addendum.  
+3. When an existing artifact is materially revised after the effective date, persist the new version in ChatGPT Library. The earlier copy may remain in its historical location.  
+4. Existing pointers may remain until they are updated through ordinary authorized maintenance. New pointers should resolve to the applicable Library artifact.  
+5. If a new ephemeral artifact is placed on an unauthorized persistent surface after the effective date, stop further duplication and place the intended artifact in ChatGPT Library. Any removal or archival of the unauthorized copy requires its ordinary mutation authority.
+
+The presence of a legacy Drive or Notion copy does not authorize those surfaces for new change-process artifacts or later versions.
+
+## 2.7 Establish and Govern the Glow Change Flow Prompt Ecosystem (GCFPE)
+
+**Timestamp:** Sep 5, 2026 03:49 UTC
+
+**Status:** Product Owner-directed operating addendum; adoption is recorded by its authorized publication
+
+**Scope:** Glow Change Flow Prompt Ecosystem identity, membership, prompt maintenance, component-level prompt provenance, supporting skills, documentation and alpha establishment
+
+**Origin:** The Product Owner's direction to establish this ecosystem in Build Notes and subsequent instruction to execute the GCFPE Alpha Establishment and Change Management Checklist.
+
+### 1\. Canonical identity and alpha boundary
+
+The **Glow Change Flow Prompt Ecosystem (GCFPE)** is the canonical, managed and governed prompt ecosystem supporting the Glow development change process. Its prompts are essential operating components of that process, not an ungoverned collection of optional text examples. When carrying out a covered Glow change-flow stage, use its selected, version-identified member prompt and preserve that prompt's governing role and artifact contract.
+
+The **Managing Prompt Engineer** coordinates ecosystem membership, maintenance, contract compatibility, model guidance, release records, defect resolution, and relevant skill alignment. The Product Owner retains canonical and product decisions. This designation does not give the Managing Prompt Engineer another actor's runtime authority.
+
+The ecosystem is in **alpha**. Its initial recorded baseline is the 53 development-flow prompts in [Glow HDE Complete Prompt Set 090526.3](https://app.notion.com/p/3d24590a05eb81148ae2c6c0af7629d2), navigated through the [Glow HDE Prompt Flow Index](https://app.notion.com/p/3cc4590a05eb8101b5ded32c12616eb6). The prior validation session records static authoring readiness, not proven runtime behavior. This establishment work does not itself perform an Epic or CRD test, certify automation, or end alpha.
+
+Complete the required [GCFPE Alpha Establishment and Change Management Checklist](https://app.notion.com/p/3d24590a05eb81059255fa60ed15ee7b) before the Product Owner selects and initiates CRD testing. Completion of that setup checklist does not automatically change the alpha designation.
+
+### 2\. Membership and owning contracts
+
+The Flow Index and its [GCFPE membership register](https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1) shall identify the current ecosystem release and every member by stable prompt ID, prompt version, exact Notion source, role or context, and membership/lifecycle state. A release-level label does not replace each prompt's own identity and version. Preserve historical identities and make the selected complete release unambiguous.
+
+The initial development-flow membership consists of the 53 prompts in the recorded baseline catalog. The adjacent **GCFPE-MGMT-10** management prompt is a managed auxiliary of this ecosystem. Its version and relationship shall be listed explicitly and included in compatibility review. It is not a fifty-fourth development-flow stage or an additional R1 runtime row.
+
+Other stored prompts and other prompt ecosystems are not GCFPE members merely because they share a folder, author, model, skill or workspace. Admission or retirement requires an explicit membership update and the change-management checks in this addendum. A new development-flow member must declare its stage, actor, substantive inputs and outputs, every applicable next action, and failure/revision returns. The alpha does not authorize applying this management system to other ecosystems.
+
+GCFPE implements the current accepted R1 flow contract and the applicable owning Canon. Addendum **2.2 End-to-End Change Flow, Approval Ownership, and Prompt-Map Control** continues to control runtime actor ownership, same-session boundaries and approval semantics within its active scope. The ecosystem's maintenance reviewer is not a replacement runtime Thoth, Isis, Implementation Agent, Kronos, PR engineering session or environment operator. Maintenance acceptance cannot supply a runtime approval, execution result, QA result or change-closure decision.
+
+### 3\. Change management and whole-ecosystem compatibility
+
+Maintain one discoverable change-management process and the complete reusable [GCFPE-MGMT-10 management prompt](https://app.notion.com/p/3d24590a05eb81a0925bd79eeeecbd40) adjacent to the ecosystem in Notion. It shall execute intake, investigation, impact review, coordinated repair, quality control, publication/readback, documentation and the exact next/resume action. It shall not delegate prompt creation as a substitute for doing the assigned management work.
+
+The process covers model updates, prompt-use defects, general change requests, additions and retirements. Reuse the existing error log and controls. A user can report the affected prompt or ecosystem, expected behavior, actual or requested behavior, and any available example; the manager fills in the technical tracking information.
+
+For every proposed member change or addition, compare the proposal with **every other current ecosystem prompt**, including the managed auxiliary. Record an affected or unaffected disposition with a concise reason for every member. Assess shared rules, schemas, actor/session boundaries, model assumptions, producers and consumers, approvals, failure/revision returns, evidence handoffs and applicable skill interfaces.
+
+Update all related prompts, contracts, references and procedural guidance that the impact review identifies. Publish one coherent successor release with compatible producer/consumer contracts. An edited subgroup is not ready for use while an affected counterpart remains incompatible. An unaffected prompt need not be rewritten merely to create activity; its continued inclusion is identified in the successor release.
+
+Quality control consists of a substantive contract/compatibility review, checks of the affected behavior, and complete readback of the changed published bodies and required links. Record who authored the changes, who checked them and who accepted the maintenance result. Preserve genuinely independent or canonical review wherever the applicable contract requires it. Reuse the whole-ecosystem impact result and check newly affected facts when changes occur; do not repeat global audits without a concrete unresolved risk. Do not invent per-edit approval tokens or additional runtime Product Owner gates.
+
+### 4\. Model guidance and defect state
+
+Every reusable prompt shall retain a human operator header naming its recommended execution surface, model and reasoning effort. Choose recommendations for the prompt's actual task, using current verified model availability and relevant capability evidence. Maintain Astra-aware guidance through the existing monthly review and release-triggered appraisal; do not create a duplicate schedule.
+
+The header is selection guidance for the human before invocation. It must not instruct the receiving agent to switch or reconfigure its own model. Distinguish a model recommendation from the actual model/effort used when execution evidence can establish the latter; an unknown actual setting remains unknown.
+
+Record a text defect as corrected when the intended wording and affected contracts have been checked. Record a runtime defect as resolved only when its applicable observed-behavior or user-confirmation condition is met. Preserve the failing case for focused retest. Static inspection, publication readback and a fictional walkthrough do not prove model behavior during a real change.
+
+### 5\. Repository provenance for implemented components
+
+The implementation record for a Specification component shall make the actual prompt versions used traceable in the repository. Capture the record as work occurs and carry it through the existing artifact, PR/review and closure evidence paths. The record shall identify:
+
+* the exact Epic or CRD Specification identity and version;  
+* the component, requirement or work-unit identity being implemented;  
+* the ecosystem release and each relevant prompt's stable ID, version and exact Notion source;  
+* the source/content revision or preserved content identity when available, distinguished from the human version label;  
+* the actual role/stage and the time or execution point at which prompt use was captured;  
+* the resulting substantive artifact or implementation evidence and its applicable PR/commit lineage.
+
+Support multiple prompt versions and stages for one component, including a documented change of version during an active Specification. An ecosystem-wide version or mutable latest-page link alone is insufficient. Do not invent historical provenance or imply that a prompt was executed because it was available. Store prompt references and provenance metadata in the repository; do not mirror reusable prompt bodies there.
+
+Provenance is evidence of what was used. It is not a new approval token, a substitute for implementation evidence, or another runtime approval point. The responsible prompt or skill captures the information within its existing role and permitted output/mutation boundaries; a read-only reviewer does not acquire repository write authority merely because it checks this record. Late QA or closure prompt uses travel through the existing substantive handoffs to an actually authorized repository writer; missing write permission is reported and does not create another closure or drainage gate.
+
+### 6\. Supporting skills and procedural documentation
+
+Review active skills that execute, route, generate, validate, publish, mirror or record Glow change work. Identify and correct affected instructions that select conflicting sources, obsolete versions, bypassed roles, missing provenance or unsupported operations. Record noninteracting skills as outside this implementation scope.
+
+Necessary skill changes shall preserve their existing domain boundaries and the supported manual execution path. Use the applicable skill-maintenance and version-control process and verify the affected prompt-to-skill interfaces. Do not automatically activate dormant orchestration or change an unrelated ecosystem. Record actual changed skill versions and remaining limitations.
+
+Connect membership, current release, the management prompt, change/defect intake, provenance procedure, relevant skills and alpha state through the existing Notion Index, Plan and Operations Hub. Maintain lasting noncanonical procedural guidance in the established logical Drive locations, in Markdown, with links to this adopted addendum and actual Notion sources. The procedural document explains implementation of this contract; it does not independently amend Canon.
+
+### 7\. Storage and archival boundaries
+
+Reusable GCFPE development-flow and management prompt bodies, including their human model headers, live in **Notion** as expressly designated ongoing operational content. They must not be published or mirrored as executable bodies in Drive or the repository. Notion may also hold the ecosystem's current operational controls and links.
+
+Reference instructions inside GCFPE development-flow, management and temporary repair/review/handoff prompts must use source names without source-version suffixes, together with their directory paths and the relevant section anchors. Do not embed static file URLs, hyperlinks, provider file/page IDs or version-pinned source filenames as a substitute for resolving the current source. This applies to Drive, Notion, Library, repository and other stored-file references, including source citations in human headers. The prompt's own version label and its recommended model/effort header remain permitted; those identify the prompt and operator selection, not a pinned external file.
+
+Resolve the required files by name and directory through the available connected source at execution time, retain the source's intended section/role and apply current canonical source-selection rules. Exact resolved versions, content identities, source references and implementation lineage are still captured in the resulting runtime artifacts, repository provenance and external control records. Keep those actual-use records outside the reusable prompt body. A missing or ambiguous live source is reported under the existing task contract; this reference rule adds no new approval or closure gate.
+
+Temporary repair, validation, review and handoff prompts may be stored in **ChatGPT Library**. New change-specific working material and evidence retain the classification established by Addendum **2.6 Ephemeral Change-Process Artifact Storage**. Ongoing procedural references and separately authorized lasting operational reports belong in **Drive as Markdown**. This designation does not convert routine transaction evidence into a durable operating reference or require migration of historical artifacts.
+
+If a Notion item must leave an active surface, move the original item intact to the appropriate **existing Notion archive** and retain its identity and history. Do not substitute deletion, trash, content clearing or copy-then-delete for that move. Preserve usable successor/archive links and truthfully distinguish a draft, a published version, a selected release and observed runtime results.
+
+### 8\. Establishment completion and scope of this decision
+
+Establishment is complete only when the required checklist work has actual evidence: this adopted addendum, explicit membership, the working adjacent management process and prompt, repository provenance integration, necessary skill alignment, and connected procedural documentation. Review those results once as an integrated whole and record concrete remaining issues. The prior static validation of the 53 prompts is retained as prior evidence rather than reused as proof of new implementation.
+
+This addendum extends the living-map and operating-model contracts only within its stated ecosystem scope. It supplies the Product Owner-directed requirements for GCFPE establishment and maintenance. It does not amend unrelated PF content, expand any Specification, authorize CRD execution, alter R1 actor/approval ownership, make post-closure drainage a closure prerequisite, or claim that a documented process has already succeeded at runtime.
 
 \<eof\>
 

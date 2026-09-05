@@ -1,0 +1,118 @@
+{
+  "schema_version": "gcfpe.prompt-usage.v1",
+  "record_kind": "synthetic_example",
+  "change_id": "EXAMPLE-CHANGE-ONLY",
+  "usages": [
+    {
+      "usage_id": "EXAMPLE-PR01-START",
+      "spec": {
+        "id": "EXAMPLE-SPEC-ONLY",
+        "version": "example.1",
+        "source_ref": "fixture:example-spec-v1"
+      },
+      "component_ids": [
+        "EXAMPLE-COMPONENT-A"
+      ],
+      "work_unit_id": "EXAMPLE-PR-01",
+      "ecosystem_release": "EXAMPLE-GCFPE-1",
+      "prompt": {
+        "id": "EXAMPLE-DEV-10",
+        "version": "example.1",
+        "notion_page_id": "00000000000000000000000000000001",
+        "notion_url": "https://app.notion.com/p/00000000000000000000000000000001",
+        "source_revision": "fixture-revision-1",
+        "content_sha256": null
+      },
+      "role": "Example implementation author",
+      "stage": "example PR implementation",
+      "capture_point": "role/work-unit start",
+      "captured_at_utc": "2026-09-05T00:00:00Z",
+      "actual_model": null,
+      "state": "recorded",
+      "result_refs": [
+        {
+          "kind": "artifact",
+          "ref": "fixture:example-implementation-result-v1"
+        }
+      ],
+      "supersedes_usage_id": null,
+      "unknown_fields": {
+        "actual_model": "No model ran; this is a non-development fixture."
+      }
+    },
+    {
+      "usage_id": "EXAMPLE-PR01-REPAIR",
+      "spec": {
+        "id": "EXAMPLE-SPEC-ONLY",
+        "version": "example.1",
+        "source_ref": "fixture:example-spec-v1"
+      },
+      "component_ids": [
+        "EXAMPLE-COMPONENT-A"
+      ],
+      "work_unit_id": "EXAMPLE-PR-01",
+      "ecosystem_release": "EXAMPLE-GCFPE-2",
+      "prompt": {
+        "id": "EXAMPLE-DEV-10",
+        "version": "example.2",
+        "notion_page_id": "00000000000000000000000000000001",
+        "notion_url": "https://app.notion.com/p/00000000000000000000000000000001",
+        "source_revision": "fixture-revision-2",
+        "content_sha256": null
+      },
+      "role": "Example implementation author",
+      "stage": "example PR implementation",
+      "capture_point": "role/work-unit start",
+      "captured_at_utc": "2026-09-05T00:00:00Z",
+      "actual_model": null,
+      "state": "recorded",
+      "result_refs": [
+        {
+          "kind": "artifact",
+          "ref": "fixture:example-correction-result-v2"
+        }
+      ],
+      "supersedes_usage_id": "EXAMPLE-PR01-START",
+      "unknown_fields": {
+        "actual_model": "No model ran; this is a non-development fixture."
+      }
+    },
+    {
+      "usage_id": "EXAMPLE-QA01",
+      "spec": {
+        "id": "EXAMPLE-SPEC-ONLY",
+        "version": "example.1",
+        "source_ref": "fixture:example-spec-v1"
+      },
+      "component_ids": [
+        "EXAMPLE-COMPONENT-A"
+      ],
+      "work_unit_id": "EXAMPLE-QA-01",
+      "ecosystem_release": "EXAMPLE-GCFPE-1",
+      "prompt": {
+        "id": "EXAMPLE-QA-10",
+        "version": "example.1",
+        "notion_page_id": "00000000000000000000000000000002",
+        "notion_url": "https://app.notion.com/p/00000000000000000000000000000002",
+        "source_revision": "fixture-revision-1",
+        "content_sha256": null
+      },
+      "role": "Example independent reviewer",
+      "stage": "example QA review",
+      "capture_point": "role/work-unit start",
+      "captured_at_utc": "2026-09-05T00:00:00Z",
+      "actual_model": null,
+      "state": "recorded",
+      "result_refs": [
+        {
+          "kind": "artifact",
+          "ref": "fixture:example-review-result-v1"
+        }
+      ],
+      "supersedes_usage_id": null,
+      "unknown_fields": {
+        "actual_model": "No model ran; this is a non-development fixture."
+      }
+    }
+  ]
+}

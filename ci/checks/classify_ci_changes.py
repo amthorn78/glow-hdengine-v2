@@ -94,6 +94,7 @@ _HISTORICAL_PREFIXES = (
     "audit/ops/",
 )
 _DOCUMENTATION_PREFIXES = (
+    "docs/changes/gcfpe/prompt-usage/",
     "docs/crd/",
     "docs/pfcanon/",
     "docs/plans/",
@@ -220,6 +221,7 @@ _PRODUCT_PREFIXES = (
     "sql/",
 )
 _SCHEMA_LANE_PREFIXES = (
+    ("schemas/gcfpe_prompt_usage.", {"evidence", "qa"}),
     ("schemas/hde_release_attestation", {"release"}),
     ("schemas/architecture_snapshot", {"evidence"}),
     (
@@ -287,6 +289,9 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
 }
 _PRODUCT_TEST_OWNER_PATHS = {
+    "schemas/gcfpe_prompt_usage.v1.json": (
+        "tests/qa/test_gcfpe_prompt_provenance.py",
+    ),
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
@@ -442,6 +447,10 @@ _QA_TEST_OWNERS = (
 )
 _QA_TOOL_OWNERSHIP_TEST = "tests/qa/test_qa_tool_ownership.py"
 _QA_TOOL_TEST_OWNERS = {
+    "tools/qa/gcfpe_prompt_provenance.py": (
+        "tests/qa/test_gcfpe_prompt_provenance.py",
+        _QA_TOOL_OWNERSHIP_TEST,
+    ),
     "tools/qa/__init__.py": (_QA_TOOL_OWNERSHIP_TEST,),
     "tools/qa/epic021_qa.py": (
         "tests/qa/test_epic021_harness_entrypoint.py",
