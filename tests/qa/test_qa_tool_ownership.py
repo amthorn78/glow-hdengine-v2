@@ -254,6 +254,68 @@ def test_explicit_pass_subset_retains_order_and_duplicates(
 
 @pytest.mark.parametrize("existing", [False, True])
 @pytest.mark.parametrize(
+    "status,intentions,claims,invalid_field",
+    [
+        ("PARKED", [], {}, "claimed_tokens"),
+        ("PASS", ["A"], {}, "claimed_tokens"),
+        ("PASS", ["A"], {"A": True}, "claimed_tokens"),
+        ("PASS", ["A"], "", "claimed_tokens"),
+        ("PASS", ["A"], "A", "claimed_tokens"),
+        ("PASS", ["A"], ("A",), "claimed_tokens"),
+        ("PASS", ["A"], False, "claimed_tokens"),
+        ("PASS", ["A"], 0, "claimed_tokens"),
+        ("PASS", ["A"], [1], "claimed_tokens"),
+        ("PASS", ["A"], [None], "claimed_tokens"),
+        ("PASS", ["A"], [{}], "claimed_tokens"),
+        ("PASS", "PREFIX_A_SUFFIX", ["A"], "intended_tokens"),
+        ("PASS", "", [], "intended_tokens"),
+        ("PARKED", {}, [], "intended_tokens"),
+        ("PASS", {"A": True}, ["A"], "intended_tokens"),
+        ("PASS", ("A",), ["A"], "intended_tokens"),
+        ("PASS", False, [], "intended_tokens"),
+        ("PASS", 0, [], "intended_tokens"),
+        ("PASS", [1], [], "intended_tokens"),
+        ("PASS", [None], [], "intended_tokens"),
+        ("PASS", [["A"]], [], "intended_tokens"),
+    ],
+)
+def test_malformed_token_fields_reject_before_mutation_or_publication(
+    claimed_header: dict, tmp_path: Path, existing: bool,
+    status: str, intentions: object, claims: object, invalid_field: str,
+) -> None:
+    message = invalid_field + " must be a list of strings"
+    with pytest.raises(ValueError, match=message):
+        step_log_header.create_header(
+            "synthetic", "fixture", status=status,
+            intended_tokens=intentions, claimed_tokens=claims,
+        )
+
+    output = tmp_path / "new-directory" / "primary.log"
+    if existing:
+        step_log_header.write_header(output, claimed_header)
+        step_log_header.append_output(output, "Earlier synthetic outcome.")
+        prior_bytes = output.read_bytes()
+
+    claimed_header["intended_tokens"] = deepcopy(intentions)
+    before = deepcopy(claimed_header)
+    with pytest.raises(ValueError, match=message):
+        step_log_header.update_header_status(claimed_header, status, claims)
+    assert claimed_header == before
+
+    claimed_header.pop("pf_refs")  # Rejected defaults must not leak to the caller.
+    claimed_header.update(status=status, claimed_tokens=deepcopy(claims))
+    before = deepcopy(claimed_header)
+    with pytest.raises(ValueError, match=message):
+        step_log_header.write_header(output, claimed_header)
+    assert claimed_header == before
+    if existing:
+        assert output.read_bytes() == prior_bytes
+    else:
+        assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("existing", [False, True])
+@pytest.mark.parametrize(
     "changes,error",
     [
         ({"status": "FAIL_BEHAVIOR"}, ValueError),
@@ -305,13 +367,28 @@ def test_valid_write_defaults_extra_fields_and_exact_bytes(tmp_path: Path) -> No
     assert output.read_bytes() == expected + b"body\n"
 
 
-def test_publication_treats_none_claims_as_empty(tmp_path: Path) -> None:
-    header = step_log_header.create_header("fixture", "fixture", intended_tokens=["A"])
-    header["claimed_tokens"] = None
+@pytest.mark.parametrize("intentions,claims", [([], None), (None, []), (None, None)])
+def test_publication_treats_none_token_fields_as_empty(
+    tmp_path: Path, intentions: list | None, claims: list | None,
+) -> None:
+    header = step_log_header.create_header("fixture", "fixture")
+    header.update(intended_tokens=intentions, claimed_tokens=claims)
     output = tmp_path / "primary.log"
     step_log_header.write_header(output, header)
-    assert header["claimed_tokens"] == []
-    assert json.loads(output.read_text())["claimed_tokens"] == []
+    assert header["intended_tokens"] == header["claimed_tokens"] == []
+    published = json.loads(output.read_text())
+    assert published["intended_tokens"] == published["claimed_tokens"] == []
+
+
+@pytest.mark.parametrize("retained_value", [None, {}, "A"])
+def test_historical_formatting_does_not_revalidate_token_shapes(
+    claimed_header: dict, retained_value: object,
+) -> None:
+    claimed_header.update(intended_tokens=retained_value, claimed_tokens=retained_value)
+    before = deepcopy(claimed_header)
+    assert step_log_header.normalize_header(claimed_header) is claimed_header
+    assert claimed_header == before
+    assert json.loads(step_log_header.serialize_header(claimed_header)) == before
 
 
 def test_historical_formatting_preserves_supplied_values(claimed_header: dict) -> None:

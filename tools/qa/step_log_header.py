@@ -10,6 +10,7 @@ Supported fields and outcomes:
 - Defaultable fields: pf_refs, intended_tokens, claimed_tokens (default to [])
 - Status vocabulary: PASS, FAIL_BEHAVIOR, FAIL_TOOLING, TOOLING_BLOCKED, PARKED
 - Claims are explicit PASS-only data, contained in intended_tokens
+- Token fields accept lists of strings or None for an empty default
 - Omitted claims are empty, including on updates to a previously claimed outcome
 - The caller explains PASS intended/claimed differences in the log body
 
@@ -60,6 +61,14 @@ def _validate_claims(
         raise ValueError(
             f"Invalid status '{status}'. Per PF10 §2.34, must be one of: {', '.join(sorted(ALLOWED_STATUS))}"
         )
+    for field, tokens in (
+        ("intended_tokens", intended_tokens), ("claimed_tokens", claimed_tokens),
+    ):
+        if tokens is not None and (
+            not isinstance(tokens, list)
+            or any(not isinstance(token, str) for token in tokens)
+        ):
+            raise ValueError(f"{field} must be a list of strings or None")
     claims = claimed_tokens if claimed_tokens is not None else []
     if claims and status != "PASS":
         raise ValueError("Nonempty claimed_tokens require PASS status")
@@ -98,7 +107,7 @@ def create_header(
         Dictionary with 4 hard required fields + 3 defaultable fields.
         
     Raises:
-        ValueError: If the status or explicit claim combination is invalid.
+        ValueError: If status, token-list shape or explicit claims are invalid.
 
     The caller must justify its outcome and claims. Intended-list alignment is
     neither registry validation nor predicate proof. Explain any PASS difference
@@ -139,7 +148,7 @@ def update_header_status(
         Updated header dict (same object as input).
         
     Raises:
-        ValueError: If the status or explicit claim combination is invalid.
+        ValueError: If status, token-list shape or explicit claims are invalid.
     """
     claims = _validate_claims(status, header.get("intended_tokens"), claimed_tokens)
     header["status"] = status
@@ -189,6 +198,7 @@ def write_header(path: Path, header: Dict[str, Any]) -> None:
 
     Rejected input leaves the header, existing file and absent directories intact.
     Successful writes supply supported defaults in place and retain extra fields.
+    None token fields become empty arrays; other malformed token fields reject.
     I/O errors propagate; this is not a crash-recovery or header/body transaction.
     
     Args:
@@ -196,6 +206,8 @@ def write_header(path: Path, header: Dict[str, Any]) -> None:
         header: Header dict to write
     """
     candidate = normalize_header(dict(header))
+    if candidate["intended_tokens"] is None:
+        candidate["intended_tokens"] = []
     candidate["claimed_tokens"] = _validate_claims(
         candidate["status"], candidate["intended_tokens"], candidate["claimed_tokens"]
     )
