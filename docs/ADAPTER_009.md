@@ -159,7 +159,7 @@ Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if n
 
 ## Required transport predicates and evidence
 
-All predicates below remain required. The retained identifiers are optional historical/evidence lookup labels with their original meanings; new-work acceptance does not require token issuance or token PASS. A label alone proves no HTTP behavior. Applicable native source, tests and captured transport evidence support the bounded predicate claim.
+All predicates below remain required within this document's stated scope. The retained identifiers are optional historical/evidence lookup labels with their original meanings; new-work acceptance does not require token issuance or token PASS. A label alone proves no HTTP behavior. Any current acceptance claim must be established from applicable native source, tests and captured transport evidence for that predicate and candidate. This framing update does not attest current conformance or reconcile differences in retained technical wording; assess discrepancies against the actual owning sources.
 
 - `HTTP_200_HEADERS_OK` — JSON Content-Type; Cache-Control `private, max-age=0, must-revalidate`;
   `Vary: Authorization, Accept-Encoding` (exact order, single comma+space);
