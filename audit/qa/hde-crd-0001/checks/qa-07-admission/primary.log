@@ -1,0 +1,166 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-07-admission","check_name":"qa-07-admission","claimed_tokens":[],"command":[["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes","tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes","tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-07-admission-8ze2iea3"]],"command_provenance":"Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.","evidence_artifacts":["audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF03-Reference-Technical-Writing-Best-Practices","PF04-Canon-HDE-Governance","PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-07T02:27:21Z"}
+# Actual operator result: qa-07-admission
+
+{
+  "actor": "PO-selected authorized Codex QA environment operator (this session), sole executor",
+  "change_class": "CRD",
+  "change_id": "HDE-CRD-0001",
+  "task_collection": "HDE-CRD-0001-qa-tasks-v1.1.md",
+  "qa_plan": "HDE-CRD-0001-qa-plan-v1.0.md",
+  "qa_plan_review": "HDE-CRD-0001-qa-plan-review-v1.0.md; APPROVE Isis-49",
+  "prompt": "QA-100 \u2014 Execute Bounded QA Task \u2014 090626.2",
+  "prompt_page_id": "3d34590a-05eb-817d-b972-f691f3e2e176",
+  "effective_register": "GCFPE-20260906.2",
+  "repository": "amthorn78/glow-hdengine-v2",
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "pr03_landing": "71307d9ae51927ec2886c3903e52e687834afc22",
+  "evidence_storage_commit": null,
+  "qa_acceptance": "not decided; continuing Kronos-22 QA-110",
+  "attempt": 1,
+  "prior_same_step_execution": "No prior same-step execution found: bounded Library execution/result/evidence name searches empty; operative CRD root absent; complete task/intake states initial tasks unexecuted. Not a global absence claim. No valid prior result discarded.",
+  "source_copy": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "interpreter": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+  "rails": {
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC"
+  },
+  "remaining_process": "Kronos-22 independent QA-110; completed run retains QA-120 QA Report and RCA; no closure decision.",
+  "qa_task_id": "HDE-CRD-0001-qa-07-admission-task-v1.0"
+}
+
+13 actual integration cases passed: five incoherent-prior-state variants, seven index-forgery/alias/metadata/duplicate variants and one multi-case invalid-input/foreign-scope test. Each expected refusal occurs before writes and asserts complete fixture tree bytes/modes/mtimes unchanged; duplicate-key and key/path collision refusal precede generic deduplication. Unsupported CRD2/foreign roots/empty,duplicate,wrong-type families remain refused. These are observed expected negative cases, not hidden QA failures.
+
+Exact collected and executed case membership (no skipped/xfail reported):
+[
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[empty-root]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-indexed-root]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-primary]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[malformed-manifest]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[unrelated-broken-proof]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-key]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-path]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[aliased-path]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[legacy-alias]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[tokens]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate-json-key]",
+  "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs"
+]
+
+## Lossless native command observations
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.3151323220008635,
+  "end": "2026-09-07T02:19:04.153349+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-07-admission",
+  "start": "2026-09-07T02:19:03.838231+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9wdWJsaWNhdGlvbl9yZWZ1c2VzX2luY29oZXJlbnRfcHJpb3Jfc3RhdGVfYmVmb3JlX3dyaXRlc1tlbXB0eS1yb290XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfaW5jb2hlcmVudF9wcmlvcl9zdGF0ZV9iZWZvcmVfd3JpdGVzW21pc3NpbmctaW5kZXhlZC1yb290XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfaW5jb2hlcmVudF9wcmlvcl9zdGF0ZV9iZWZvcmVfd3JpdGVzW21pc3NpbmctcHJpbWFyeV0KdGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9wdWJsaWNhdGlvbl9yZWZ1c2VzX2luY29oZXJlbnRfcHJpb3Jfc3RhdGVfYmVmb3JlX3dyaXRlc1ttYWxmb3JtZWQtbWFuaWZlc3RdCnRlc3RzL2V2aWRlbmNlL3Rlc3RfZXZpZGVuY2VfaW5kZXhfbWlzc2luZ19zdGF0ZS5weTo6dGVzdF9jcmRfcHVibGljYXRpb25fcmVmdXNlc19pbmNvaGVyZW50X3ByaW9yX3N0YXRlX2JlZm9yZV93cml0ZXNbdW5yZWxhdGVkLWJyb2tlbi1wcm9vZl0KdGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9pbmRleF9hZG1pc3Npb25fcmVqZWN0c19mb3JnZXJ5X2JlZm9yZV9kZWR1cGxpY2F0aW9uW2ZvcmVpZ24ta2V5XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZm9yZWlnbi1wYXRoXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bYWxpYXNlZC1wYXRoXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bbGVnYWN5LWFsaWFzXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bdG9rZW5zXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZHVwbGljYXRlXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZHVwbGljYXRlLWpzb24ta2V5XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfZm9yZWlnbl9zY29wZV9hbmRfaW52YWxpZF9pbnB1dHMKCjEzIHRlc3RzIGNvbGxlY3RlZCBpbiAwLjA0cwo=",
+    "length": 1733,
+    "sha256": "1377424ff34a5b89bcf183f5cf7ea5888d3588f6c63ad2b5a32cdfbc3d8a9866"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[empty-root]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-indexed-root]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-primary]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[malformed-manifest]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[unrelated-broken-proof]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-key]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-path]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[aliased-path]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[legacy-alias]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[tokens]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate-json-key]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs
+
+13 tests collected in 0.04s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-07-admission-8ze2iea3"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 33.11785030199826,
+  "end": "2026-09-07T02:20:27.248136+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "execute-qa-07-admission",
+  "start": "2026-09-07T02:19:54.130300+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "Li4uLi4uLi4uLi4uLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQoxMyBwYXNzZWQgaW4gMzIuODFzCg==",
+    "length": 100,
+    "sha256": "9aae69887358e6369c4a301518daf44ff89a0887b68ca15d21bb5ff78b67a01c"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+.............                                                            [100%]
+13 passed in 32.81s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above

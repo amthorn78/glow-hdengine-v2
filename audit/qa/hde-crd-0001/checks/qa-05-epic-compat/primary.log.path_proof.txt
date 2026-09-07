@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log
+size_bytes: 32755
+sha256: 1de86e112ed6a5aa62b7f577a526233903437a6f06c367ab69532dacc1cd9650
+mtime_utc: 2026-09-07T02:27:21Z
+produced_at_utc: 2026-08-18T16:05:54Z

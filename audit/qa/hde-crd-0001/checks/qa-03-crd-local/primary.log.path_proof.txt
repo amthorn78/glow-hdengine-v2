@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log
+size_bytes: 25503
+sha256: 7621a46768f34108df845c46a245f292891359a86768c043c80a5073d15eb2d5
+mtime_utc: 2026-09-07T02:27:21Z
+produced_at_utc: 2026-08-18T16:05:54Z

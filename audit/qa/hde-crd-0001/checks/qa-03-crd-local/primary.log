@@ -1,0 +1,338 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-03-crd-local","check_name":"qa-03-crd-local","claimed_tokens":[],"command":[["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","crd and not pytest","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","crd and not pytest","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-03-crd-local-ehm7twwh"]],"command_provenance":"Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.","evidence_artifacts":["audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log","audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF03-Reference-Technical-Writing-Best-Practices","PF04-Canon-HDE-Governance","PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-07T02:27:21Z"}
+# Actual operator result: qa-03-crd-local
+
+{
+  "actor": "PO-selected authorized Codex QA environment operator (this session), sole executor",
+  "change_class": "CRD",
+  "change_id": "HDE-CRD-0001",
+  "task_collection": "HDE-CRD-0001-qa-tasks-v1.1.md",
+  "qa_plan": "HDE-CRD-0001-qa-plan-v1.0.md",
+  "qa_plan_review": "HDE-CRD-0001-qa-plan-review-v1.0.md; APPROVE Isis-49",
+  "prompt": "QA-100 \u2014 Execute Bounded QA Task \u2014 090626.2",
+  "prompt_page_id": "3d34590a-05eb-817d-b972-f691f3e2e176",
+  "effective_register": "GCFPE-20260906.2",
+  "repository": "amthorn78/glow-hdengine-v2",
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "pr03_landing": "71307d9ae51927ec2886c3903e52e687834afc22",
+  "evidence_storage_commit": null,
+  "qa_acceptance": "not decided; continuing Kronos-22 QA-110",
+  "attempt": 1,
+  "prior_same_step_execution": "No prior same-step execution found: bounded Library execution/result/evidence name searches empty; operative CRD root absent; complete task/intake states initial tasks unexecuted. Not a global absence claim. No valid prior result discarded.",
+  "source_copy": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "interpreter": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+  "rails": {
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC"
+  },
+  "remaining_process": "Kronos-22 independent QA-110; completed run retains QA-120 QA Report and RCA; no closure decision.",
+  "qa_task_id": "HDE-CRD-0001-qa-03-crd-local-task-v1.0"
+}
+
+Exact selector executed six unparametrized CRD cases. They prove positional Epic compatibility, ordinary CRD records and supersession without Epic inputs, scoped additional-file rollback, explicit nonclaims, stable captured bytes and legacy refusal. Required parametrized invalid-ID/path/shape/header cases are in the approved qa04 selection and all passed there; qa04 is cross-bound evidence, not an unexecuted qa03 predicate or selector rewrite. Full-v2 fourteen fields, flat current family, no phantom claims and retained old primary bytes are exercised across that union.
+
+Exact collected and executed case membership (no skipped/xfail reported):
+[
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_preserves_epic_positional_interface",
+  "tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_and_supersession_need_no_epic_inputs",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_within_qa_root_share_local_rollback",
+  "tests/qa/test_generic_qa_harness.py::test_crd_intentions_are_explicitly_unclaimed",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rechecks_captured_bytes_during_validation",
+  "tests/qa/test_generic_qa_harness.py::test_crd_legacy_operations_refuse_before_output"
+]
+
+Cross-step parametrized proof: qa-04-runner current primary and complete membership:
+[
+  "tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[]",
+  "tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[..]",
+  "tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[a/b]",
+  "tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[a\\\\b]",
+  "tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[/absolute]",
+  "tests/qa/test_generic_qa_harness.py::test_current_publishers_reject_uppercase_ids_before_writes_and_admit_lowercase[False]",
+  "tests/qa/test_generic_qa_harness.py::test_current_publishers_reject_uppercase_ids_before_writes_and_admit_lowercase[True]",
+  "tests/qa/test_generic_qa_harness.py::test_same_interpreter_and_classification",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_rejects_uppercase_check_id_without_spawning",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args0]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args1]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args2]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args0-lacks its expression]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args1-admits only -p no:cacheprovider]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args2-uses unsupported option: --basetemp]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_readiness_launch_failure_records_no_executed_command",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_no_collection_is_tooling_blocked",
+  "tests/qa/test_generic_qa_harness.py::test_evidence_graph_failure_classification_is_causal[missing-TOOLING_BLOCKED]",
+  "tests/qa/test_generic_qa_harness.py::test_evidence_graph_failure_classification_is_causal[malformed-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_planned_output_cannot_substitute_for_governed_acceptance_evidence[acceptance_map.evidence_titles]",
+  "tests/qa/test_generic_qa_harness.py::test_planned_output_cannot_substitute_for_governed_acceptance_evidence[matrix.evidence_artifacts]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[../escape.txt-FAIL_BEHAVIOR]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[/tmp/absolute-FAIL_BEHAVIOR]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[no path prose-TOOLING_BLOCKED]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/proof.json and evidence/other.json-FAIL_BEHAVIOR]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/empty.txt-TOOLING_BLOCKED]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/bad.json-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload0-epic identity]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload1-non-empty list]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload2-non-empty list]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload3-not an object]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload4-invalid name]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[None]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[PF19]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[None]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles1]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles2]",
+  "tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles3]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented-Implemented-PASS-VALID]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[covered-Covered-PASS-VALID]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[satisfied-Satisfied-PASS-VALID]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[planned-Implemented-FAIL_TOOLING-STATUS_MISMATCH]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[None-Implemented-FAIL_TOOLING-INVALID_ACCEPTANCE_STATUS]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[done-Implemented-FAIL_TOOLING-INVALID_ACCEPTANCE_STATUS]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented-done-FAIL_TOOLING-INVALID_MATRIX_STATUS]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented--FAIL_TOOLING-INVALID_MATRIX_STATUS]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[planned-Planned-TOOLING_BLOCKED-PLANNED]",
+  "tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[token_incomplete-Token-incomplete-TOOLING_BLOCKED-TOKEN_INCOMPLETE]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[0-PASS]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[1-FAIL_BEHAVIOR]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[2-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[3-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[4-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[5-TOOLING_BLOCKED]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[-9-FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_rejects_non_integer",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers0]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers1]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers2]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers3]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers4]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers5]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers6]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers7]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers8]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers9]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers10]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[root]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit/qa]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit/qa/hde-crd-0001]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-9999]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-10000]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-123456]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-audit/qa/hde-crd-0002/report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-docs/report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-audit/qa/hde-crd-0002/report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-docs/report.txt]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[PASS]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[FAIL_BEHAVIOR]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[FAIL_TOOLING]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[TOOLING_BLOCKED]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[PARKED]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation0]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation1]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation2]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation3]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation4]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation5]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[wrapper]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[v1]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[extra-entry-field]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[status]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[identity]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[duplicate]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[absolute]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[traversal]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[dot]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[double-slash]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[backslash]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[foreign]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[wrong-check]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-crlf]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-bom]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-whitespace]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[empty]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[missing-field]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[extra-field]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[claims]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[own-log]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[header-id]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[bad-command]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-exit]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[false-provenance]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-reason]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[parked-execution]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[behavior-unexecuted]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[crlf]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[bom]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-lf]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[whitespace]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[duplicate]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[nonclaim]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[invalid-utf8]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[qa_step_logs_manifest.json]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[checks/current/primary.log]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[checks/current]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_pytest_runner_records_actual_same_interpreter_outcome[True-PASS]",
+  "tests/qa/test_generic_qa_harness.py::test_crd_pytest_runner_records_actual_same_interpreter_outcome[False-FAIL_BEHAVIOR]"
+]
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "pytest or same_interpreter_and_classification",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-04-runner-ziw7ox18"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 2.0207096690064645,
+  "end": "2026-09-07T02:19:42.917949+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "execute-qa-04-runner",
+  "start": "2026-09-07T02:19:40.897250+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uIFsgNTQlXQouLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4gICAgICAgICAgICAgWzEwMCVdCjEzMiBwYXNzZWQsIDM1IGRlc2VsZWN0ZWQgaW4gMS43MHMK",
+    "length": 195,
+    "sha256": "648fb513cb0a41b87d6a8dea8bdf6615a3f52ff3da8a93fcad77ccc706c47679"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+........................................................................ [ 54%]
+............................................................             [100%]
+132 passed, 35 deselected in 1.70s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+## Lossless native command observations
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "crd and not pytest",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.4652792560009402,
+  "end": "2026-09-07T02:19:02.387732+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-03-crd-local",
+  "start": "2026-09-07T02:19:01.922466+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19wcmVzZXJ2ZXNfZXBpY19wb3NpdGlvbmFsX2ludGVyZmFjZQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfb3JkaW5hcnlfcmVjb3JkaW5nX2FuZF9zdXBlcnNlc3Npb25fbmVlZF9ub19lcGljX2lucHV0cwp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfYWRkaXRpb25hbF9maWxlc193aXRoaW5fcWFfcm9vdF9zaGFyZV9sb2NhbF9yb2xsYmFjawp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfaW50ZW50aW9uc19hcmVfZXhwbGljaXRseV91bmNsYWltZWQKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3JlY2hlY2tzX2NhcHR1cmVkX2J5dGVzX2R1cmluZ192YWxpZGF0aW9uCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9sZWdhY3lfb3BlcmF0aW9uc19yZWZ1c2VfYmVmb3JlX291dHB1dAoKNi8xNjcgdGVzdHMgY29sbGVjdGVkICgxNjEgZGVzZWxlY3RlZCkgaW4gMC4xNXMK",
+    "length": 594,
+    "sha256": "cc690e7b4a46651dbd7104ce7a5eeac930a3f8f4c537c060a96f49a7c3e58c53"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/qa/test_generic_qa_harness.py::test_crd_config_preserves_epic_positional_interface
+tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_and_supersession_need_no_epic_inputs
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_within_qa_root_share_local_rollback
+tests/qa/test_generic_qa_harness.py::test_crd_intentions_are_explicitly_unclaimed
+tests/qa/test_generic_qa_harness.py::test_crd_rechecks_captured_bytes_during_validation
+tests/qa/test_generic_qa_harness.py::test_crd_legacy_operations_refuse_before_output
+
+6/167 tests collected (161 deselected) in 0.15s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "crd and not pytest",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-03-crd-local-ehm7twwh"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.4656301899958635,
+  "end": "2026-09-07T02:19:40.896393+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "execute-qa-03-crd-local",
+  "start": "2026-09-07T02:19:40.430774+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "Li4uLi4uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsxMDAlXQo2IHBhc3NlZCwgMTYxIGRlc2VsZWN0ZWQgaW4gMC4xOXMK",
+    "length": 114,
+    "sha256": "9b4d2b074408bb8efc8a8b2d99defc5d09c674c79e3b23dd5d32e049de284695"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+......                                                                   [100%]
+6 passed, 161 deselected in 0.19s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above

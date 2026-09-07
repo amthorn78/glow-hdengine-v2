@@ -1,0 +1,1415 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-01-setup","check_name":"qa-01-setup","claimed_tokens":[],"command":[["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pip","install","-r","requirements-dev.txt"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","/workspace/scratch/9c5d6db25d49/qa100-inputs/setup_check.py"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","--version"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pip","check"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","tools/evidence/update_evidence_index.py","--check"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","tools/evidence/orientation_demo.py","--check"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","ci/checks/check_mirror_schema.sh"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","tools/evidence/validate_evidence_paths.py"],["bash","ci/checks/check_evidence_index_hash.sh"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","tools/evidence/check_lf_endings.py"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/qa/test_qa_tool_ownership.py","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-02-claims-leu4_5c2"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","crd and not pytest","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","pytest or same_interpreter_and_classification","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-04-runner-labequn_"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/qa/test_generic_qa_harness.py","-k","not crd and not pytest and not same_interpreter_and_classification","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-05-epic-compat-43p7f7k_"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable","tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-06-publication-_n_qvdhe"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes","tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication","tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"],["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","-m","pytest","-q","--collect-only","-p","no:cacheprovider","tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents","tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state","--basetemp","/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-08-recovery-t3tm959y"]],"command_provenance":"Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.","evidence_artifacts":["audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF03-Reference-Technical-Writing-Best-Practices","PF04-Canon-HDE-Governance","PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-07T02:27:21Z"}
+# Actual operator result: qa-01-setup
+
+{
+  "actor": "PO-selected authorized Codex QA environment operator (this session), sole executor",
+  "change_class": "CRD",
+  "change_id": "HDE-CRD-0001",
+  "task_collection": "HDE-CRD-0001-qa-tasks-v1.1.md",
+  "qa_plan": "HDE-CRD-0001-qa-plan-v1.0.md",
+  "qa_plan_review": "HDE-CRD-0001-qa-plan-review-v1.0.md; APPROVE Isis-49",
+  "prompt": "QA-100 \u2014 Execute Bounded QA Task \u2014 090626.2",
+  "prompt_page_id": "3d34590a-05eb-817d-b972-f691f3e2e176",
+  "effective_register": "GCFPE-20260906.2",
+  "repository": "amthorn78/glow-hdengine-v2",
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "pr03_landing": "71307d9ae51927ec2886c3903e52e687834afc22",
+  "evidence_storage_commit": null,
+  "qa_acceptance": "not decided; continuing Kronos-22 QA-110",
+  "attempt": 1,
+  "prior_same_step_execution": "No prior same-step execution found: bounded Library execution/result/evidence name searches empty; operative CRD root absent; complete task/intake states initial tasks unexecuted. Not a global absence claim. No valid prior result discarded.",
+  "source_copy": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "interpreter": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+  "rails": {
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC"
+  },
+  "remaining_process": "Kronos-22 independent QA-110; completed run retains QA-120 QA Report and RCA; no closure decision.",
+  "qa_task_id": "HDE-CRD-0001-qa-01-setup-task-v1.1"
+}
+
+Actual dependency installation, imports, Python/pytest versions, pip check, filesystem mode/mtime/symlink probe, exact 5829-file source derivation, all seven collections and six prior graph checks succeeded. Scoped PF execution copies consulted, source vs storage assessed under supplied section 2.8, no operative CRD root precreated. Routine scratch helper NameError before any collection was normalized from Path to pathlib.Path without changing semantic commands, filters, rails, targets, results or attempts; actual driver exit1 and error retained below. This is the expressly permitted setup/representation normalization, not a retry of a failed behavioral/evidence check. No new in-scope Doc Delta; D01–04 remain pending/manual.
+
+Retained normalization diagnostic:
+{
+  "operation": "outer scratch collection driver preparation",
+  "error": "NameError: name 'Path' is not defined",
+  "stage": "fresh empty basetemp created; before any pytest collection launch",
+  "driver_exit_code": 1,
+  "effect": "all six prior graph checks completed exit0; zero collection commands launched",
+  "recovery": "corrected scratch helper name to pathlib.Path; start collections only, no repeated setup command or test",
+  "authority": "task qa-01 Recovery: correct routine safe invocation/setup; retain failure; no actual behavior rerun"
+}
+
+Dependency-install terminal polling returned: Unified exec process failed: network approval was cancelled before a decision was returned. Read-only reconciliation found the original subprocess completed exit0, stdout2181 bytes and stderr0, so it was not repeated. Native result is retained below.
+
+Complete intake identities/hashes (all 19 originals read):
+[
+  {
+    "name": "HDE-CRD-0001-PR-01-pr-implementation-result-v1.1.md",
+    "sha256": "9972d36da45d3c9978d75c81e6c61fd5625bd4457bf8ffc8f03b43a3fbb213e9",
+    "size_bytes": 20431
+  },
+  {
+    "name": "HDE-CRD-0001-PR-01-pr-work-unit-lineage-review-v1.0.md",
+    "sha256": "667fa4d44001c64a07b2884c9d82e225c59359dfea6464685c6d30ef22132cde",
+    "size_bytes": 33329
+  },
+  {
+    "name": "HDE-CRD-0001-PR-02-pr-implementation-result-v1.0.md",
+    "sha256": "bfb35153e402b63ec5ac5ac1588a71d454238465d63a6f762311953661f9adad",
+    "size_bytes": 27998
+  },
+  {
+    "name": "HDE-CRD-0001-PR-02-pr-work-unit-lineage-review-v1.1.md",
+    "sha256": "1a689c620a980a1959c4da0322ed6bb6e5aad372b76fb85d77281f0400795f78",
+    "size_bytes": 41873
+  },
+  {
+    "name": "HDE-CRD-0001-PR-03-pr-implementation-result-v1.0.md",
+    "sha256": "ccc0b63c5a11d2e2108c58325a1973cb104bbc00ada734c41c12761e541239f2",
+    "size_bytes": 38521
+  },
+  {
+    "name": "HDE-CRD-0001-PR-03-pr-work-unit-lineage-review-v1.0.md",
+    "sha256": "b06c0cff4d1dadbfb6fc9fdc2d8944c4c1d60b5af856e68b12fa8f00993d8e4f",
+    "size_bytes": 48577
+  },
+  {
+    "name": "HDE-CRD-0001-change-audit-triage-v1.0.md",
+    "sha256": "51bba6c5ef7f23126ed7bde16bd36f2efb5fca8771a2b21e0aed4ccbda3546f0",
+    "size_bytes": 26409
+  },
+  {
+    "name": "HDE-CRD-0001-documentation-completion-v1.0.md",
+    "sha256": "55bcbc24ff911951b2bf2e23817549e96357f4ab707e06cea81ff5a28e8cf569",
+    "size_bytes": 36200
+  },
+  {
+    "name": "HDE-CRD-0001-implementation-plan-review-v1.0.md",
+    "sha256": "3ed5fd367c93ef8b87768107e98521b3e949f81970bb93528b98238e8e8bfdf1",
+    "size_bytes": 19113
+  },
+  {
+    "name": "HDE-CRD-0001-implementation-plan-v1.0.md",
+    "sha256": "2301e4731b1a85a7861b2740aec05dd050fdb61cdc8e64fdeab53cedea081c02",
+    "size_bytes": 54804
+  },
+  {
+    "name": "HDE-CRD-0001-live-qa-guide-v1.0.md",
+    "sha256": "dbce5151e8bb4cb75cd7d27afcb018168de245b0821d644551fdb290fb65e16e",
+    "size_bytes": 74654
+  },
+  {
+    "name": "HDE-CRD-0001-qa-audit-v1.0.md",
+    "sha256": "3584cdc8c399ea5e2994fadb4803a1aa689412d23a2d6dc249b3ccdadfd35a60",
+    "size_bytes": 79664
+  },
+  {
+    "name": "HDE-CRD-0001-qa-plan-review-v1.0.md",
+    "sha256": "6318795437253e5652ce0d3babe5f4d5c7a4fe3f948a94860482954e484ab0a6",
+    "size_bytes": 47544
+  },
+  {
+    "name": "HDE-CRD-0001-qa-plan-v1.0.md",
+    "sha256": "6a076cdc2cf754496b3965fb5ea33fa8d693396a2574c0a9b799e9abecb92990",
+    "size_bytes": 110229
+  },
+  {
+    "name": "HDE-CRD-0001-qa-readiness-v1.0.md",
+    "sha256": "8c9edad1f89fe6ac62d604b2683854ab994549014e6cda0dc6804704e8d24ede",
+    "size_bytes": 35134
+  },
+  {
+    "name": "HDE-CRD-0001-qa-readiness-v1.1.md",
+    "sha256": "17a4815467a032354452abed9b7243cb59ccc8cb5c1f9aa2abd8c0ab7973f98d",
+    "size_bytes": 32846
+  },
+  {
+    "name": "HDE-CRD-0001-qa-tasks-v1.1.md",
+    "sha256": "95639d08a928d3ccfdd7db8fa0213edb234e8fc8c18d5f55a4d072d3e21d53ce",
+    "size_bytes": 120694
+  },
+  {
+    "name": "HDE-CRD-0001-reality-audit-v1.0.md",
+    "sha256": "800d1b3b8dfae9014394f0fb18ab621fc85e9d023ababc09775ef2fb7ac9f292",
+    "size_bytes": 97987
+  },
+  {
+    "name": "HDE-CRD-0001-specification-v1.1-approved.md",
+    "sha256": "5d8446cb10c483ad0f7a43df12326511d15803b28073cde9195ce496333a6364",
+    "size_bytes": 63218
+  }
+]
+
+Source identity/scoped consultation observations:
+[
+  {
+    "path": "AGENTS.md",
+    "size_bytes": 45697,
+    "sha256": "b3a307f325942a0277d8c1f64b2a10531e09804fb55c91d1f9d735519e9bb698"
+  },
+  {
+    "path": "docs/qa_harness_pattern.md",
+    "size_bytes": 15111,
+    "sha256": "e7f5b29230bce47efe9851e2d743deb1e52a8572a7d9d2d9285d983d5decc59b"
+  },
+  {
+    "path": "docs/ADAPTER_009.md",
+    "size_bytes": 9513,
+    "sha256": "b5153b87f31c51c55e043ca9645c39b2b8821fe6cc9802482d65975a4c6dcdff"
+  },
+  {
+    "path": "docs/acceptance/http_transport_evidence.md",
+    "size_bytes": 4819,
+    "sha256": "379b560f183dec1b4be2d2de1320ccbe17f5e831eaad83bde86bd779adfa11f6"
+  },
+  {
+    "path": "engine/http/compat_handler.py",
+    "size_bytes": 5745,
+    "sha256": "f30012063517af885c08a53e7329e0678f9aab8ef7687edc388111f7bd38714f"
+  },
+  {
+    "path": "tools/qa/step_log_header.py",
+    "size_bytes": 11057,
+    "sha256": "96541eb321f9a95228ab60405db65349d5fc6f16a8add11fa54f275bc5a2fa4f"
+  },
+  {
+    "path": "tools/qa/qa_harness.py",
+    "size_bytes": 150784,
+    "sha256": "554066080cc4e9e06f261860fe3560ae0481ed0ce120212b18eaca798a69320c"
+  },
+  {
+    "path": "tools/evidence/update_evidence_index.py",
+    "size_bytes": 212292,
+    "sha256": "e5da22404e23e232ba8256a4f391b21ea5d7d46843fc633f98ff9133bc983630"
+  },
+  {
+    "path": "tests/qa/test_qa_tool_ownership.py",
+    "size_bytes": 19202,
+    "sha256": "0f7b091300f7613acc256c6fb46b14de68abf6429960c83f48ddcf4999161f50"
+  },
+  {
+    "path": "tests/qa/test_generic_qa_harness.py",
+    "size_bytes": 63089,
+    "sha256": "9a17881518b5c5da472a2aa59fdd9c17357fd6be1471950b7d8d02c08c46a85f"
+  },
+  {
+    "path": "tests/evidence/test_evidence_index_missing_state.py",
+    "size_bytes": 21757,
+    "sha256": "f61af60393b7a47f7d4c7185fd748fb23eda18eb24446f90d793cff3fc428a02"
+  },
+  {
+    "path": "tests/conftest.py",
+    "size_bytes": 201,
+    "sha256": "6786a96b69546b38f8978af7c946da28976874c848f0c7abd41e260239ec13b7"
+  },
+  {
+    "path": "pytest.ini",
+    "size_bytes": 442,
+    "sha256": "32a35ebdd7c45832ac66978915e104654b30fa625ec63fc74ed6bb623d8a3fc8"
+  },
+  {
+    "path": "pyproject.toml",
+    "size_bytes": 479,
+    "sha256": "2825511b12e12b8071ca253ec07eee613f41b46f9d2df0e451bc079b6bbdbb3c"
+  },
+  {
+    "path": "requirements.txt",
+    "size_bytes": 78,
+    "sha256": "1fab2f1755c8ac790e6bf5e36150c0655748659059b1d10b06608ccf339e786f"
+  },
+  {
+    "path": "requirements-dev.txt",
+    "size_bytes": 118,
+    "sha256": "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"
+  },
+  {
+    "path": "docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.7.md",
+    "size_bytes": 39259,
+    "sha256": "cb123d2134b634c64589c1e193ef41a0bb5045f5d0b3fc85a8ff2cd3336399f3",
+    "consulted_ranges": [
+      [
+        368,
+        425
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF04-Canon-HDE-Governance-v2.8.5.md",
+    "size_bytes": 522094,
+    "sha256": "49def8b93c3f8fb658441361f3798a5f67419d6e50e58b6288b44874061f5408",
+    "consulted_ranges": [
+      [
+        238,
+        314
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.5.md",
+    "size_bytes": 583759,
+    "sha256": "d7b2e0287da884fad6f4f79c69391099157c82e7ec0e78418581e1b873d21a1d",
+    "consulted_ranges": [
+      [
+        23,
+        109
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.4.md",
+    "size_bytes": 643101,
+    "sha256": "d9d3283fe0fc2486557c4b20d9f9a78a7baddfa5c35fe28ce8fb505c4514de0c",
+    "consulted_ranges": [
+      [
+        825,
+        882
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.3.md",
+    "size_bytes": 640570,
+    "sha256": "92efd413c6380691bda3a5798ff561270a6cc8ec557dc9d214f4d42bcfdb49a2",
+    "consulted_ranges": [
+      [
+        1004,
+        1077
+      ],
+      [
+        1889,
+        2098
+      ],
+      [
+        5419,
+        5502
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.4.md",
+    "size_bytes": 304262,
+    "sha256": "aa4ac7201e83beb46d43be80999049edcb43a2d24798a8b51ca6c2cce67b5248",
+    "consulted_ranges": [
+      [
+        470,
+        587
+      ]
+    ]
+  }
+]
+
+## Lossless native command observations
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pip",
+    "install",
+    "-r",
+    "requirements-dev.txt"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 5.330858109999099,
+  "end": "2026-09-07T02:12:13.167636+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-dev-dependencies",
+  "start": "2026-09-07T02:12:07.836782+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "UmVxdWlyZW1lbnQgYWxyZWFkeSBzYXRpc2ZpZWQ6IGpzb25zY2hlbWE9PTQuMjMuMCBpbiAuLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMgKGZyb20gLXIgcmVxdWlyZW1lbnRzLWRldi50eHQgKGxpbmUgMikpICg0LjIzLjApClJlcXVpcmVtZW50IGFscmVhZHkgc2F0aXNmaWVkOiBweXRlc3Q8OS4wLD49Ny40IGluIC4vLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcyAoZnJvbSAtciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSA1KSkgKDguNC4yKQpSZXF1aXJlbWVudCBhbHJlYWR5IHNhdGlzZmllZDogcHl0ZXN0LWNvdjw1LjAsPj00LjEgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIC1yIHJlcXVpcmVtZW50cy1kZXYudHh0IChsaW5lIDYpKSAoNC4xLjApClJlcXVpcmVtZW50IGFscmVhZHkgc2F0aXNmaWVkOiBweXRlc3QtbW9jazw0LjAsPj0zLjEyIGluIC4vLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcyAoZnJvbSAtciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSA3KSkgKDMuMTUuMSkKUmVxdWlyZW1lbnQgYWxyZWFkeSBzYXRpc2ZpZWQ6IGF0dHJzPj0yMi4yLjAgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIGpzb25zY2hlbWE9PTQuMjMuMC0+LXIgcmVxdWlyZW1lbnRzLWRldi50eHQgKGxpbmUgMikpICgyNi4xLjApClJlcXVpcmVtZW50IGFscmVhZHkgc2F0aXNmaWVkOiBqc29uc2NoZW1hLXNwZWNpZmljYXRpb25zPj0yMDIzLjAzLjYgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIGpzb25zY2hlbWE9PTQuMjMuMC0+LXIgcmVxdWlyZW1lbnRzLWRldi50eHQgKGxpbmUgMikpICgyMDI1LjkuMSkKUmVxdWlyZW1lbnQgYWxyZWFkeSBzYXRpc2ZpZWQ6IHJlZmVyZW5jaW5nPj0wLjI4LjQgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIGpzb25zY2hlbWE9PTQuMjMuMC0+LXIgcmVxdWlyZW1lbnRzLWRldi50eHQgKGxpbmUgMikpICgwLjM3LjApClJlcXVpcmVtZW50IGFscmVhZHkgc2F0aXNmaWVkOiBycGRzLXB5Pj0wLjcuMSBpbiAuLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMgKGZyb20ganNvbnNjaGVtYT09NC4yMy4wLT4tciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSAyKSkgKDIwMjYuNi4zKQpSZXF1aXJlbWVudCBhbHJlYWR5IHNhdGlzZmllZDogaW5pY29uZmlnPj0xIGluIC4vLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcyAoZnJvbSBweXRlc3Q8OS4wLD49Ny40LT4tciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSA1KSkgKDIuMy4wKQpSZXF1aXJlbWVudCBhbHJlYWR5IHNhdGlzZmllZDogcGFja2FnaW5nPj0yMCBpbiAuLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMgKGZyb20gcHl0ZXN0PDkuMCw+PTcuNC0+LXIgcmVxdWlyZW1lbnRzLWRldi50eHQgKGxpbmUgNSkpICgyNi4zKQpSZXF1aXJlbWVudCBhbHJlYWR5IHNhdGlzZmllZDogcGx1Z2d5PDIsPj0xLjUgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIHB5dGVzdDw5LjAsPj03LjQtPi1yIHJlcXVpcmVtZW50cy1kZXYudHh0IChsaW5lIDUpKSAoMS42LjApClJlcXVpcmVtZW50IGFscmVhZHkgc2F0aXNmaWVkOiBweWdtZW50cz49Mi43LjIgaW4gLi8udmVudi9saWIvcHl0aG9uMy4xMi9zaXRlLXBhY2thZ2VzIChmcm9tIHB5dGVzdDw5LjAsPj03LjQtPi1yIHJlcXVpcmVtZW50cy1kZXYudHh0IChsaW5lIDUpKSAoMi4yMS4wKQpSZXF1aXJlbWVudCBhbHJlYWR5IHNhdGlzZmllZDogY292ZXJhZ2U+PTUuMi4xIGluIC4vLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcyAoZnJvbSBjb3ZlcmFnZVt0b21sXT49NS4yLjEtPnB5dGVzdC1jb3Y8NS4wLD49NC4xLT4tciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSA2KSkgKDcuMTYuMCkKUmVxdWlyZW1lbnQgYWxyZWFkeSBzYXRpc2ZpZWQ6IHR5cGluZy1leHRlbnNpb25zPj00LjQuMCBpbiAuLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMgKGZyb20gcmVmZXJlbmNpbmc+PTAuMjguNC0+anNvbnNjaGVtYT09NC4yMy4wLT4tciByZXF1aXJlbWVudHMtZGV2LnR4dCAobGluZSAyKSkgKDQuMTYuMCkK",
+    "length": 2181,
+    "sha256": "80904f8092c5dfb21aa161972d360ec6a1f883441c968fb8be45da87ce2ad505"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+Requirement already satisfied: jsonschema==4.23.0 in ./.venv/lib/python3.12/site-packages (from -r requirements-dev.txt (line 2)) (4.23.0)
+Requirement already satisfied: pytest<9.0,>=7.4 in ./.venv/lib/python3.12/site-packages (from -r requirements-dev.txt (line 5)) (8.4.2)
+Requirement already satisfied: pytest-cov<5.0,>=4.1 in ./.venv/lib/python3.12/site-packages (from -r requirements-dev.txt (line 6)) (4.1.0)
+Requirement already satisfied: pytest-mock<4.0,>=3.12 in ./.venv/lib/python3.12/site-packages (from -r requirements-dev.txt (line 7)) (3.15.1)
+Requirement already satisfied: attrs>=22.2.0 in ./.venv/lib/python3.12/site-packages (from jsonschema==4.23.0->-r requirements-dev.txt (line 2)) (26.1.0)
+Requirement already satisfied: jsonschema-specifications>=2023.03.6 in ./.venv/lib/python3.12/site-packages (from jsonschema==4.23.0->-r requirements-dev.txt (line 2)) (2025.9.1)
+Requirement already satisfied: referencing>=0.28.4 in ./.venv/lib/python3.12/site-packages (from jsonschema==4.23.0->-r requirements-dev.txt (line 2)) (0.37.0)
+Requirement already satisfied: rpds-py>=0.7.1 in ./.venv/lib/python3.12/site-packages (from jsonschema==4.23.0->-r requirements-dev.txt (line 2)) (2026.6.3)
+Requirement already satisfied: iniconfig>=1 in ./.venv/lib/python3.12/site-packages (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5)) (2.3.0)
+Requirement already satisfied: packaging>=20 in ./.venv/lib/python3.12/site-packages (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5)) (26.3)
+Requirement already satisfied: pluggy<2,>=1.5 in ./.venv/lib/python3.12/site-packages (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5)) (1.6.0)
+Requirement already satisfied: pygments>=2.7.2 in ./.venv/lib/python3.12/site-packages (from pytest<9.0,>=7.4->-r requirements-dev.txt (line 5)) (2.21.0)
+Requirement already satisfied: coverage>=5.2.1 in ./.venv/lib/python3.12/site-packages (from coverage[toml]>=5.2.1->pytest-cov<5.0,>=4.1->-r requirements-dev.txt (line 6)) (7.16.0)
+Requirement already satisfied: typing-extensions>=4.4.0 in ./.venv/lib/python3.12/site-packages (from referencing>=0.28.4->jsonschema==4.23.0->-r requirements-dev.txt (line 2)) (4.16.0)
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "/workspace/scratch/9c5d6db25d49/qa100-inputs/setup_check.py"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 1.0671879099973012,
+  "end": "2026-09-07T02:13:44.671712+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-imports-copy",
+  "start": "2026-09-07T02:13:43.604530+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "SU1QT1JUIGZsYXNrIC93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMvZmxhc2svX19pbml0X18ucHkKSU1QT1JUIGd1bmljb3JuIC93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMvZ3VuaWNvcm4vX19pbml0X18ucHkKSU1QT1JUIHBzeWNvcGcgL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIvLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcy9wc3ljb3BnL19faW5pdF9fLnB5CklNUE9SVCBqc29uc2NoZW1hIC93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMvanNvbnNjaGVtYS9fX2luaXRfXy5weQpJTVBPUlQgcHl0ZXN0IC93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMvcHl0ZXN0L19faW5pdF9fLnB5CklNUE9SVCBweXRlc3RfY292IC93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyLy52ZW52L2xpYi9weXRob24zLjEyL3NpdGUtcGFja2FnZXMvcHl0ZXN0X2Nvdi9fX2luaXRfXy5weQpJTVBPUlQgcHl0ZXN0X21vY2sgL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIvLnZlbnYvbGliL3B5dGhvbjMuMTIvc2l0ZS1wYWNrYWdlcy9weXRlc3RfbW9jay9fX2luaXRfXy5weQpJTVBPUlQgdG9vbHMucWEucWFfaGFybmVzcyAvd29ya3NwYWNlL3NjcmF0Y2gvOWM1ZDZkYjI1ZDQ5L2Rldm9wcy13b3Jrc3BhY2UvZ2xvdy1oZGVuZ2luZS12Mi90b29scy9xYS9xYV9oYXJuZXNzLnB5CklNUE9SVCB0b29scy5ldmlkZW5jZS51cGRhdGVfZXZpZGVuY2VfaW5kZXggL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIvdG9vbHMvZXZpZGVuY2UvdXBkYXRlX2V2aWRlbmNlX2luZGV4LnB5CklNUE9SVCB0b29scy5xYS5zdGVwX2xvZ19oZWFkZXIgL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIvdG9vbHMvcWEvc3RlcF9sb2dfaGVhZGVyLnB5ClBZVEhPTiAvd29ya3NwYWNlL3NjcmF0Y2gvOWM1ZDZkYjI1ZDQ5L2Rldm9wcy13b3Jrc3BhY2UvZ2xvdy1oZGVuZ2luZS12Mi8udmVudi9iaW4vcHl0aG9uIDMuMTIuMTMKVkVSU0lPTiBGbGFzayAyLjMuMwpWRVJTSU9OIGd1bmljb3JuIDIxLjIuMApWRVJTSU9OIHBzeWNvcGcgMy4yLjEzClZFUlNJT04ganNvbnNjaGVtYSA0LjIzLjAKVkVSU0lPTiBweXRlc3QgOC40LjIKVkVSU0lPTiBweXRlc3QtY292IDQuMS4wClZFUlNJT04gcHl0ZXN0LW1vY2sgMy4xNS4xClJBSUxTIHsiQUxMT1dfTkVUV09SSyI6ICIwIiwgIkFQUF9FTlYiOiAiZGV2IiwgIkxBTkciOiAiQyIsICJMQ19BTEwiOiAiQyIsICJTQUZFX01PREUiOiAiMSIsICJUWiI6ICJVVEMifQpBUkdWIFsiZ2l0IiwgInN0YXR1cyIsICItLXBvcmNlbGFpbj12MSIsICItLXVudHJhY2tlZC1maWxlcz1hbGwiXSBFWElUIDAgU1RET1VUICBTVERFUlIgCkFSR1YgWyJnaXQiLCAicmV2LXBhcnNlIiwgIkhFQUQiXSBFWElUIDAgU1RET1VUIGQ1ZWMyMjEyNmYyMjczNWEzODJkNWI4YzM5ZDZlNDUxZDY3NjNlMTMKIFNUREVSUiAKQVJHViBbImdpdCIsICJyZXYtcGFyc2UiLCAib3JpZ2luL21haW4iXSBFWElUIDAgU1RET1VUIGQ1ZWMyMjEyNmYyMjczNWEzODJkNWI4YzM5ZDZlNDUxZDY3NjNlMTMKIFNUREVSUiAKQVJHViBbImdpdCIsICJkaWZmIiwgIi0tbmFtZS1zdGF0dXMiLCAiNzEzMDdkOWFlNTE5MjdlYzI4ODZjMzkwM2U1MmU2ODc4MzRhZmMyMiIsICJIRUFEIl0gRVhJVCAwIFNURE9VVCBECWRvY3MvcGZjYW5vbi9QRjEwLUhERS1CdWlsZC1Ob3Rlcy12MTIuOS41Lm1kCkEJZG9jcy9wZmNhbm9uL1BGMTAtSERFLUJ1aWxkLU5vdGVzLXYxMy4wLjYubWQKQQlkb2NzL3BmY2Fub24vUEYxNSBIREUgQ29weSBUb25hbGl0eSBHdWlkZSB2MS4yLjAubWQKRAlkb2NzL3BmY2Fub24vUEYxNS1SZWZlcmVuY2UtSERFLUNvcHkgVG9uYWxpdHkgR3VpZGUgdjEuMS4xLm1kCkQJZG9jcy9wZmNhbm9uL1BGMjMtQ2Fub24tUmVhbGl0eS1BdWRpdHMtdjEuMS45Lm1kCkEJZG9jcy9wZmNhbm9uL1BGMjMtQ2Fub24tUmVhbGl0eS1BdWRpdHMtdjEuMi5tZAogU1RERVJSIApTT1VSQ0VfQ09QWSAvd29ya3NwYWNlL3NjcmF0Y2gvOWM1ZDZkYjI1ZDQ5L3FhMTAwLWV4ZWN1dGlvbi1ya2Q5ajhraC9zb3VyY2UtY29weSBUUkFDS0VEIDU4MjkgQUxMX1RSQUNLRURfSEFTSEVTX0FORF9TWU1MSU5LX0lERU5USVRJRVNfRVFVQUwgVHJ1ZQpGSUxFU1lTVEVNX1BST0JFIG1vZGUsbXRpbWUsc3ltbGluayBzdXBwb3J0ZWQKRE9DX0RFTFRBUyBbXQo=",
+    "length": 2654,
+    "sha256": "449a899159d35070aa94fc4a35cf30c3156eeeafa295a6ab2747ab808dd64f93"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+IMPORT flask /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/flask/__init__.py
+IMPORT gunicorn /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/gunicorn/__init__.py
+IMPORT psycopg /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/psycopg/__init__.py
+IMPORT jsonschema /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/jsonschema/__init__.py
+IMPORT pytest /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/pytest/__init__.py
+IMPORT pytest_cov /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/pytest_cov/__init__.py
+IMPORT pytest_mock /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/lib/python3.12/site-packages/pytest_mock/__init__.py
+IMPORT tools.qa.qa_harness /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/tools/qa/qa_harness.py
+IMPORT tools.evidence.update_evidence_index /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/tools/evidence/update_evidence_index.py
+IMPORT tools.qa.step_log_header /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/tools/qa/step_log_header.py
+PYTHON /workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python 3.12.13
+VERSION Flask 2.3.3
+VERSION gunicorn 21.2.0
+VERSION psycopg 3.2.13
+VERSION jsonschema 4.23.0
+VERSION pytest 8.4.2
+VERSION pytest-cov 4.1.0
+VERSION pytest-mock 3.15.1
+RAILS {"ALLOW_NETWORK": "0", "APP_ENV": "dev", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}
+ARGV ["git", "status", "--porcelain=v1", "--untracked-files=all"] EXIT 0 STDOUT  STDERR 
+ARGV ["git", "rev-parse", "HEAD"] EXIT 0 STDOUT d5ec22126f22735a382d5b8c39d6e451d6763e13
+ STDERR 
+ARGV ["git", "rev-parse", "origin/main"] EXIT 0 STDOUT d5ec22126f22735a382d5b8c39d6e451d6763e13
+ STDERR 
+ARGV ["git", "diff", "--name-status", "71307d9ae51927ec2886c3903e52e687834afc22", "HEAD"] EXIT 0 STDOUT D	docs/pfcanon/PF10-HDE-Build-Notes-v12.9.5.md
+A	docs/pfcanon/PF10-HDE-Build-Notes-v13.0.6.md
+A	docs/pfcanon/PF15 HDE Copy Tonality Guide v1.2.0.md
+D	docs/pfcanon/PF15-Reference-HDE-Copy Tonality Guide v1.1.1.md
+D	docs/pfcanon/PF23-Canon-Reality-Audits-v1.1.9.md
+A	docs/pfcanon/PF23-Canon-Reality-Audits-v1.2.md
+ STDERR 
+SOURCE_COPY /workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy TRACKED 5829 ALL_TRACKED_HASHES_AND_SYMLINK_IDENTITIES_EQUAL True
+FILESYSTEM_PROBE mode,mtime,symlink supported
+DOC_DELTAS []
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "--version"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.2646487789970706,
+  "end": "2026-09-07T02:18:23.525020+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-pytest-version",
+  "start": "2026-09-07T02:18:23.260379+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "cHl0ZXN0IDguNC4yCg==",
+    "length": 13,
+    "sha256": "685b9763c7c58cdbc18e815709783c8df7d25180b45147d87452e201d5532e49"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+pytest 8.4.2
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pip",
+    "check"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.2647644929966191,
+  "end": "2026-09-07T02:18:23.790321+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-pip-check",
+  "start": "2026-09-07T02:18:23.525568+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "Tm8gYnJva2VuIHJlcXVpcmVtZW50cyBmb3VuZC4K",
+    "length": 30,
+    "sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+No broken requirements found.
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "tools/evidence/update_evidence_index.py",
+    "--check"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.41496972300228663,
+  "end": "2026-09-07T02:18:24.205730+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-1",
+  "start": "2026-09-07T02:18:23.790776+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "W2V2aWRlbmNlLWluZGV4XSBlbnYgcGluczogQUxMT1dfTkVUV09SSz0wLExBTkc9QyxMQ19BTEw9QyxTQUZFX01PREU9MSxUWj1VVEMK",
+    "length": 78,
+    "sha256": "82ea36a3eb90ae8477d61e1c51eeb918e8c5139890885823dd52b6f4c3add06d"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "tools/evidence/orientation_demo.py",
+    "--check"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.2145689949975349,
+  "end": "2026-09-07T02:18:24.420703+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-2",
+  "start": "2026-09-07T02:18:24.206146+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
+
+NO STDOUT OR STDERR
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "ci/checks/check_mirror_schema.sh"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.06447824299539207,
+  "end": "2026-09-07T02:18:24.485681+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-3",
+  "start": "2026-09-07T02:18:24.421214+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
+
+NO STDOUT OR STDERR
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "tools/evidence/validate_evidence_paths.py"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.11420149300101912,
+  "end": "2026-09-07T02:18:24.600248+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-4",
+  "start": "2026-09-07T02:18:24.486060+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
+
+NO STDOUT OR STDERR
+
+### Actual command capture
+{
+  "argv": [
+    "bash",
+    "ci/checks/check_evidence_index_hash.sh"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.016848713996296283,
+  "end": "2026-09-07T02:18:24.617735+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-5",
+  "start": "2026-09-07T02:18:24.600891+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
+
+NO STDOUT OR STDERR
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "tools/evidence/check_lf_endings.py"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.16440349599724868,
+  "end": "2026-09-07T02:18:24.782413+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "setup-integrity-6",
+  "start": "2026-09-07T02:18:24.618023+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
+
+NO STDOUT OR STDERR
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_qa_tool_ownership.py",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-02-claims-leu4_5c2"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.41497094199439744,
+  "end": "2026-09-07T02:19:01.921767+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-02-claims",
+  "start": "2026-09-07T02:19:01.506801+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9xYV9wYWNrYWdlX21hcmtlcnNfYXJlX2ltcG9ydGFibGUKdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9xYV90b29sX3JlZ2lzdHJ5X21hdGNoZXNfY2FuZGlkYXRlX3NvdXJjZXMKdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9zdGVwX2xvZ19oZWFkZXJfaXNfY2Fub25pY2FsX2FuZF90bXBfc2NvcGVkCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfZXBpYzAyNF9yZWZyZXNoX3dyYXBwZXJfZGVsZWdhdGVzX3RvX2N1cnJlbnRfaW1wbGVtZW50YXRpb24KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9kMTNfZXhhbXBsZV93cml0ZXNfb25seV90b190aGVfaW5qZWN0ZWRfb3V0cHV0W2NvbXBsZXRlLVBBU1MtMF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9kMTNfZXhhbXBsZV93cml0ZXNfb25seV90b190aGVfaW5qZWN0ZWRfb3V0cHV0W21pc3NpbmctaW5kZXgtVE9PTElOR19CTE9DS0VELTEzXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2QxM19leGFtcGxlX3dyaXRlc19vbmx5X3RvX3RoZV9pbmplY3RlZF9vdXRwdXRbbWlzc2luZy1wcm9vZi1UT09MSU5HX0JMT0NLRUQtMTNdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfZDEzX2V4YW1wbGVfd3JpdGVzX29ubHlfdG9fdGhlX2luamVjdGVkX291dHB1dFttaXNzaW5nLWVudHJ5LUZBSUxfQkVIQVZJT1ItMV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9kMTNfZXhhbXBsZV93cml0ZXNfb25seV90b190aGVfaW5qZWN0ZWRfb3V0cHV0W21hbGZvcm1lZC1qc29uLUZBSUxfQkVIQVZJT1ItMV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9kMTNfZXhhbXBsZV93cml0ZXNfb25seV90b190aGVfaW5qZWN0ZWRfb3V0cHV0W3VuZXhwZWN0ZWQtZXJyb3ItRkFJTF9UT09MSU5HLTFdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X2hlYWRlcnNfbmV2ZXJfaW5mZXJfY2xhaW1zW29taXR0ZWQtUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbb21pdHRlZC1GQUlMX0JFSEFWSU9SXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19oZWFkZXJzX25ldmVyX2luZmVyX2NsYWltc1tvbWl0dGVkLUZBSUxfVE9PTElOR10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbb21pdHRlZC1UT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X2hlYWRlcnNfbmV2ZXJfaW5mZXJfY2xhaW1zW29taXR0ZWQtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19oZWFkZXJzX25ldmVyX2luZmVyX2NsYWltc1tub25lLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X2hlYWRlcnNfbmV2ZXJfaW5mZXJfY2xhaW1zW25vbmUtRkFJTF9CRUhBVklPUl0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbbm9uZS1GQUlMX1RPT0xJTkddCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X2hlYWRlcnNfbmV2ZXJfaW5mZXJfY2xhaW1zW25vbmUtVE9PTElOR19CTE9DS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19oZWFkZXJzX25ldmVyX2luZmVyX2NsYWltc1tub25lLVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbZW1wdHktUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbZW1wdHktRkFJTF9CRUhBVklPUl0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfaGVhZGVyc19uZXZlcl9pbmZlcl9jbGFpbXNbZW1wdHktRkFJTF9UT09MSU5HXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19oZWFkZXJzX25ldmVyX2luZmVyX2NsYWltc1tlbXB0eS1UT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X2hlYWRlcnNfbmV2ZXJfaW5mZXJfY2xhaW1zW2VtcHR5LVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbb21pdHRlZC1QQVNTLVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbb21pdHRlZC1QQVNTLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW29taXR0ZWQtRkFJTF9CRUhBVklPUi1QQVJLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW29taXR0ZWQtRkFJTF9CRUhBVklPUi1QQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tvbWl0dGVkLUZBSUxfVE9PTElORy1QQVJLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW29taXR0ZWQtRkFJTF9UT09MSU5HLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW29taXR0ZWQtVE9PTElOR19CTE9DS0VELVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbb21pdHRlZC1UT09MSU5HX0JMT0NLRUQtUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbb21pdHRlZC1QQVJLRUQtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tvbWl0dGVkLVBBUktFRC1QQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tub25lLVBBU1MtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tub25lLVBBU1MtUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbbm9uZS1GQUlMX0JFSEFWSU9SLVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbbm9uZS1GQUlMX0JFSEFWSU9SLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW25vbmUtRkFJTF9UT09MSU5HLVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbbm9uZS1GQUlMX1RPT0xJTkctUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbbm9uZS1UT09MSU5HX0JMT0NLRUQtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tub25lLVRPT0xJTkdfQkxPQ0tFRC1QQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tub25lLVBBUktFRC1QQVJLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW25vbmUtUEFSS0VELVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW2VtcHR5LVBBU1MtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tlbXB0eS1QQVNTLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW2VtcHR5LUZBSUxfQkVIQVZJT1ItUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tlbXB0eS1GQUlMX0JFSEFWSU9SLVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW2VtcHR5LUZBSUxfVE9PTElORy1QQVJLRURdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbmV3X291dGNvbWVzX3JlcGxhY2VfcHJldmlvdXNfY2xhaW1zW2VtcHR5LUZBSUxfVE9PTElORy1QQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tlbXB0eS1UT09MSU5HX0JMT0NLRUQtUEFSS0VEXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X25ld19vdXRjb21lc19yZXBsYWNlX3ByZXZpb3VzX2NsYWltc1tlbXB0eS1UT09MSU5HX0JMT0NLRUQtUEFTU10KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbZW1wdHktUEFSS0VELVBBUktFRF0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9uZXdfb3V0Y29tZXNfcmVwbGFjZV9wcmV2aW91c19jbGFpbXNbZW1wdHktUEFSS0VELVBBU1NdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfaW52YWxpZF9jcmVhdGlvbl9hbmRfdXBkYXRlc19yZWplY3Rfd2l0aG91dF9tdXRhdGlvbltGQUlMX0JFSEFWSU9SLWludGVudGlvbnMwLWNsYWltczAtcmVxdWlyZSBQQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2ludmFsaWRfY3JlYXRpb25fYW5kX3VwZGF0ZXNfcmVqZWN0X3dpdGhvdXRfbXV0YXRpb25bRkFJTF9UT09MSU5HLWludGVudGlvbnMxLWNsYWltczEtcmVxdWlyZSBQQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2ludmFsaWRfY3JlYXRpb25fYW5kX3VwZGF0ZXNfcmVqZWN0X3dpdGhvdXRfbXV0YXRpb25bVE9PTElOR19CTE9DS0VELWludGVudGlvbnMyLWNsYWltczItcmVxdWlyZSBQQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2ludmFsaWRfY3JlYXRpb25fYW5kX3VwZGF0ZXNfcmVqZWN0X3dpdGhvdXRfbXV0YXRpb25bUEFSS0VELWludGVudGlvbnMzLWNsYWltczMtcmVxdWlyZSBQQVNTXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2ludmFsaWRfY3JlYXRpb25fYW5kX3VwZGF0ZXNfcmVqZWN0X3dpdGhvdXRfbXV0YXRpb25bUEFTUy1pbnRlbnRpb25zNC1jbGFpbXM0LWFwcGVhciBpbiBpbnRlbmRlZF90b2tlbnNdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfaW52YWxpZF9jcmVhdGlvbl9hbmRfdXBkYXRlc19yZWplY3Rfd2l0aG91dF9tdXRhdGlvbltQQVNTLU5vbmUtY2xhaW1zNS1hcHBlYXIgaW4gaW50ZW5kZWRfdG9rZW5zXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2ludmFsaWRfY3JlYXRpb25fYW5kX3VwZGF0ZXNfcmVqZWN0X3dpdGhvdXRfbXV0YXRpb25bVU5LTk9XTi1pbnRlbnRpb25zNi1jbGFpbXM2LUludmFsaWQgc3RhdHVzXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2V4cGxpY2l0X3Bhc3Nfc3Vic2V0X3JldGFpbnNfb3JkZXJfYW5kX2R1cGxpY2F0ZXMKdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFSS0VELWludGVudGlvbnMwLWNsYWltczAtY2xhaW1lZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBUktFRC1pbnRlbnRpb25zMC1jbGFpbXMwLWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczEtY2xhaW1zMS1jbGFpbWVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMS1jbGFpbXMxLWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczItY2xhaW1zMi1jbGFpbWVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMi1jbGFpbXMyLWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczMtLWNsYWltZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMzLS1jbGFpbWVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnM0LUEtY2xhaW1lZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczQtQS1jbGFpbWVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnM1LWNsYWltczUtY2xhaW1lZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczUtY2xhaW1zNS1jbGFpbWVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnM2LUZhbHNlLWNsYWltZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnM2LUZhbHNlLWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczctMC1jbGFpbWVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zNy0wLWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczgtY2xhaW1zOC1jbGFpbWVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zOC1jbGFpbXM4LWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczktY2xhaW1zOS1jbGFpbWVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zOS1jbGFpbXM5LWNsYWltZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtaW50ZW50aW9uczEwLWNsYWltczEwLWNsYWltZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMxMC1jbGFpbXMxMC1jbGFpbWVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLVBSRUZJWF9BX1NVRkZJWC1jbGFpbXMxMS1pbnRlbmRlZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtUFJFRklYX0FfU1VGRklYLWNsYWltczExLWludGVuZGVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLS1jbGFpbXMxMi1pbnRlbmRlZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtLWNsYWltczEyLWludGVuZGVkX3Rva2Vucy1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVJLRUQtaW50ZW50aW9uczEzLWNsYWltczEzLWludGVuZGVkX3Rva2Vucy1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFSS0VELWludGVudGlvbnMxMy1jbGFpbXMxMy1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMTQtY2xhaW1zMTQtaW50ZW5kZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMxNC1jbGFpbXMxNC1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMTUtY2xhaW1zMTUtaW50ZW5kZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMxNS1jbGFpbXMxNS1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1GYWxzZS1jbGFpbXMxNi1pbnRlbmRlZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtRmFsc2UtY2xhaW1zMTYtaW50ZW5kZWRfdG9rZW5zLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtMC1jbGFpbXMxNy1pbnRlbmRlZF90b2tlbnMtRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfbWFsZm9ybWVkX3Rva2VuX2ZpZWxkc19yZWplY3RfYmVmb3JlX211dGF0aW9uX29yX3B1YmxpY2F0aW9uW1BBU1MtMC1jbGFpbXMxNy1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMTgtY2xhaW1zMTgtaW50ZW5kZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMxOC1jbGFpbXMxOC1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMTktY2xhaW1zMTktaW50ZW5kZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMxOS1jbGFpbXMxOS1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9tYWxmb3JtZWRfdG9rZW5fZmllbGRzX3JlamVjdF9iZWZvcmVfbXV0YXRpb25fb3JfcHVibGljYXRpb25bUEFTUy1pbnRlbnRpb25zMjAtY2xhaW1zMjAtaW50ZW5kZWRfdG9rZW5zLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X21hbGZvcm1lZF90b2tlbl9maWVsZHNfcmVqZWN0X2JlZm9yZV9tdXRhdGlvbl9vcl9wdWJsaWNhdGlvbltQQVNTLWludGVudGlvbnMyMC1jbGFpbXMyMC1pbnRlbmRlZF90b2tlbnMtVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXMwLVZhbHVlRXJyb3ItRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfcmVqZWN0ZWRfcHVibGljYXRpb25fcHJlc2VydmVzX2lucHV0X2FuZF9maWxlc1tjaGFuZ2VzMC1WYWx1ZUVycm9yLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfcmVqZWN0ZWRfcHVibGljYXRpb25fcHJlc2VydmVzX2lucHV0X2FuZF9maWxlc1tjaGFuZ2VzMS1WYWx1ZUVycm9yLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3JlamVjdGVkX3B1YmxpY2F0aW9uX3ByZXNlcnZlc19pbnB1dF9hbmRfZmlsZXNbY2hhbmdlczEtVmFsdWVFcnJvci1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3JlamVjdGVkX3B1YmxpY2F0aW9uX3ByZXNlcnZlc19pbnB1dF9hbmRfZmlsZXNbY2hhbmdlczItVmFsdWVFcnJvci1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXMyLVZhbHVlRXJyb3ItVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXMzLVZhbHVlRXJyb3ItRmFsc2VdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfcmVqZWN0ZWRfcHVibGljYXRpb25fcHJlc2VydmVzX2lucHV0X2FuZF9maWxlc1tjaGFuZ2VzMy1WYWx1ZUVycm9yLVRydWVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfcmVqZWN0ZWRfcHVibGljYXRpb25fcHJlc2VydmVzX2lucHV0X2FuZF9maWxlc1tjaGFuZ2VzNC1WYWx1ZUVycm9yLUZhbHNlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3JlamVjdGVkX3B1YmxpY2F0aW9uX3ByZXNlcnZlc19pbnB1dF9hbmRfZmlsZXNbY2hhbmdlczQtVmFsdWVFcnJvci1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3JlamVjdGVkX3B1YmxpY2F0aW9uX3ByZXNlcnZlc19pbnB1dF9hbmRfZmlsZXNbY2hhbmdlczUtVmFsdWVFcnJvci1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXM1LVZhbHVlRXJyb3ItVHJ1ZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXM2LVR5cGVFcnJvci1GYWxzZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9yZWplY3RlZF9wdWJsaWNhdGlvbl9wcmVzZXJ2ZXNfaW5wdXRfYW5kX2ZpbGVzW2NoYW5nZXM2LVR5cGVFcnJvci1UcnVlXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3ZhbGlkX3dyaXRlX2RlZmF1bHRzX2V4dHJhX2ZpZWxkc19hbmRfZXhhY3RfYnl0ZXMKdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9wdWJsaWNhdGlvbl90cmVhdHNfbm9uZV90b2tlbl9maWVsZHNfYXNfZW1wdHlbaW50ZW50aW9uczAtTm9uZV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9wdWJsaWNhdGlvbl90cmVhdHNfbm9uZV90b2tlbl9maWVsZHNfYXNfZW1wdHlbTm9uZS1jbGFpbXMxXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X3B1YmxpY2F0aW9uX3RyZWF0c19ub25lX3Rva2VuX2ZpZWxkc19hc19lbXB0eVtOb25lLU5vbmVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfaGlzdG9yaWNhbF9mb3JtYXR0aW5nX2RvZXNfbm90X3JldmFsaWRhdGVfdG9rZW5fc2hhcGVzW05vbmVdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfaGlzdG9yaWNhbF9mb3JtYXR0aW5nX2RvZXNfbm90X3JldmFsaWRhdGVfdG9rZW5fc2hhcGVzW3JldGFpbmVkX3ZhbHVlMV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9oaXN0b3JpY2FsX2Zvcm1hdHRpbmdfZG9lc19ub3RfcmV2YWxpZGF0ZV90b2tlbl9zaGFwZXNbQV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9oaXN0b3JpY2FsX2Zvcm1hdHRpbmdfcHJlc2VydmVzX3N1cHBsaWVkX3ZhbHVlcwp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2Vudmlyb25tZW50X2NhcHR1cmVfaXNfZXhhY3RfYW5kX3ByZXNlcnZlc19leHBsaWNpdF92YWx1ZXMKdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9hY3R1YWxfZXZpZGVuY2VfY2FsbGVyc19wcmVzZXJ2ZV90b2tlbmxlc3Nfb3V0cHV0c1tjaGVja19wb18wMDZfdG9rZW5fcmVnaXN0cnlfdmFsaWRpdHktUEFTUy0wXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2FjdHVhbF9ldmlkZW5jZV9jYWxsZXJzX3ByZXNlcnZlX3Rva2VubGVzc19vdXRwdXRzW2NoZWNrX3BvXzAwNl90b2tlbl9yZWdpc3RyeV92YWxpZGl0eS1GQUlMX0JFSEFWSU9SLTFdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfYWN0dWFsX2V2aWRlbmNlX2NhbGxlcnNfcHJlc2VydmVfdG9rZW5sZXNzX291dHB1dHNbY2hlY2tfZXBpYzAyNF9hY2NlcHRhbmNlX21hcF92aWFiaWxpdHktUEFTUy0wXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2FjdHVhbF9ldmlkZW5jZV9jYWxsZXJzX3ByZXNlcnZlX3Rva2VubGVzc19vdXRwdXRzW2NoZWNrX2VwaWMwMjRfYWNjZXB0YW5jZV9tYXBfdmlhYmlsaXR5LUZBSUxfQkVIQVZJT1ItMV0KdGVzdHMvcWEvdGVzdF9xYV90b29sX293bmVyc2hpcC5weTo6dGVzdF9hY3R1YWxfZXZpZGVuY2VfY2FsbGVyc19wcmVzZXJ2ZV90b2tlbmxlc3Nfb3V0cHV0c1tjaGVja19kMjNfZXZpZGVuY2VfaW5kZXhfc25hcHNob3RfY29udHJhY3QtUEFTUy0wXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2FjdHVhbF9ldmlkZW5jZV9jYWxsZXJzX3ByZXNlcnZlX3Rva2VubGVzc19vdXRwdXRzW2NoZWNrX2QyM19ldmlkZW5jZV9pbmRleF9zbmFwc2hvdF9jb250cmFjdC1GQUlMX0JFSEFWSU9SLTFdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfYWN0dWFsX2V2aWRlbmNlX2NhbGxlcnNfcHJlc2VydmVfdG9rZW5sZXNzX291dHB1dHNbY2hlY2tfZXBpYzAyNF9ldmlkZW5jZV9wYXRoX2JpbmRpbmdfdmFsaWRhdGlvbi1QQVNTLTBdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfYWN0dWFsX2V2aWRlbmNlX2NhbGxlcnNfcHJlc2VydmVfdG9rZW5sZXNzX291dHB1dHNbY2hlY2tfZXBpYzAyNF9ldmlkZW5jZV9wYXRoX2JpbmRpbmdfdmFsaWRhdGlvbi1GQUlMX0JFSEFWSU9SLTFdCnRlc3RzL3FhL3Rlc3RfcWFfdG9vbF9vd25lcnNoaXAucHk6OnRlc3RfYWN0dWFsX2VwaWMwMjRfd3JpdGVyX3ByZXNlcnZlc19ib2R5X2FuZF9leHRyYV9maWVsZHNbUEFTUy0wXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2FjdHVhbF9lcGljMDI0X3dyaXRlcl9wcmVzZXJ2ZXNfYm9keV9hbmRfZXh0cmFfZmllbGRzW0ZBSUxfVE9PTElORy0yXQp0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5Ojp0ZXN0X2N1cnJlbnRfdGVtcGxhdGVfaXNfaXNvbGF0ZWRfYW5kX2V4cGxhaW5zX25vbmNsYWltCgoxMzkgdGVzdHMgY29sbGVjdGVkIGluIDAuMTJzCg==",
+    "length": 16771,
+    "sha256": "fd6c3ed09870bf7e090d4ba0d4dc526b3d2e300f8de5a90d44b587cfd0aedbb2"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/qa/test_qa_tool_ownership.py::test_qa_package_markers_are_importable
+tests/qa/test_qa_tool_ownership.py::test_qa_tool_registry_matches_candidate_sources
+tests/qa/test_qa_tool_ownership.py::test_step_log_header_is_canonical_and_tmp_scoped
+tests/qa/test_qa_tool_ownership.py::test_epic024_refresh_wrapper_delegates_to_current_implementation
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[complete-PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[missing-index-TOOLING_BLOCKED-13]
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[missing-proof-TOOLING_BLOCKED-13]
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[missing-entry-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[malformed-json-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_d13_example_writes_only_to_the_injected_output[unexpected-error-FAIL_TOOLING-1]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[omitted-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[omitted-FAIL_BEHAVIOR]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[omitted-FAIL_TOOLING]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[omitted-TOOLING_BLOCKED]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[omitted-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[none-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[none-FAIL_BEHAVIOR]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[none-FAIL_TOOLING]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[none-TOOLING_BLOCKED]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[none-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[empty-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[empty-FAIL_BEHAVIOR]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[empty-FAIL_TOOLING]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[empty-TOOLING_BLOCKED]
+tests/qa/test_qa_tool_ownership.py::test_new_headers_never_infer_claims[empty-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-PASS-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-PASS-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-FAIL_BEHAVIOR-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-FAIL_BEHAVIOR-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-FAIL_TOOLING-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-FAIL_TOOLING-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-TOOLING_BLOCKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-TOOLING_BLOCKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-PARKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[omitted-PARKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-PASS-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-PASS-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-FAIL_BEHAVIOR-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-FAIL_BEHAVIOR-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-FAIL_TOOLING-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-FAIL_TOOLING-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-TOOLING_BLOCKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-TOOLING_BLOCKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-PARKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[none-PARKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-PASS-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-PASS-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-FAIL_BEHAVIOR-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-FAIL_BEHAVIOR-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-FAIL_TOOLING-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-FAIL_TOOLING-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-TOOLING_BLOCKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-TOOLING_BLOCKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-PARKED-PARKED]
+tests/qa/test_qa_tool_ownership.py::test_new_outcomes_replace_previous_claims[empty-PARKED-PASS]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[FAIL_BEHAVIOR-intentions0-claims0-require PASS]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[FAIL_TOOLING-intentions1-claims1-require PASS]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[TOOLING_BLOCKED-intentions2-claims2-require PASS]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[PARKED-intentions3-claims3-require PASS]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[PASS-intentions4-claims4-appear in intended_tokens]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[PASS-None-claims5-appear in intended_tokens]
+tests/qa/test_qa_tool_ownership.py::test_invalid_creation_and_updates_reject_without_mutation[UNKNOWN-intentions6-claims6-Invalid status]
+tests/qa/test_qa_tool_ownership.py::test_explicit_pass_subset_retains_order_and_duplicates
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PARKED-intentions0-claims0-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PARKED-intentions0-claims0-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions1-claims1-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions1-claims1-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions2-claims2-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions2-claims2-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions3--claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions3--claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions4-A-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions4-A-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions5-claims5-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions5-claims5-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions6-False-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions6-False-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions7-0-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions7-0-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions8-claims8-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions8-claims8-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions9-claims9-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions9-claims9-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions10-claims10-claimed_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions10-claims10-claimed_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-PREFIX_A_SUFFIX-claims11-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-PREFIX_A_SUFFIX-claims11-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS--claims12-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS--claims12-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PARKED-intentions13-claims13-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PARKED-intentions13-claims13-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions14-claims14-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions14-claims14-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions15-claims15-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions15-claims15-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-False-claims16-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-False-claims16-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-0-claims17-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-0-claims17-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions18-claims18-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions18-claims18-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions19-claims19-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions19-claims19-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions20-claims20-intended_tokens-False]
+tests/qa/test_qa_tool_ownership.py::test_malformed_token_fields_reject_before_mutation_or_publication[PASS-intentions20-claims20-intended_tokens-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes0-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes0-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes1-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes1-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes2-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes2-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes3-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes3-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes4-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes4-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes5-ValueError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes5-ValueError-True]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes6-TypeError-False]
+tests/qa/test_qa_tool_ownership.py::test_rejected_publication_preserves_input_and_files[changes6-TypeError-True]
+tests/qa/test_qa_tool_ownership.py::test_valid_write_defaults_extra_fields_and_exact_bytes
+tests/qa/test_qa_tool_ownership.py::test_publication_treats_none_token_fields_as_empty[intentions0-None]
+tests/qa/test_qa_tool_ownership.py::test_publication_treats_none_token_fields_as_empty[None-claims1]
+tests/qa/test_qa_tool_ownership.py::test_publication_treats_none_token_fields_as_empty[None-None]
+tests/qa/test_qa_tool_ownership.py::test_historical_formatting_does_not_revalidate_token_shapes[None]
+tests/qa/test_qa_tool_ownership.py::test_historical_formatting_does_not_revalidate_token_shapes[retained_value1]
+tests/qa/test_qa_tool_ownership.py::test_historical_formatting_does_not_revalidate_token_shapes[A]
+tests/qa/test_qa_tool_ownership.py::test_historical_formatting_preserves_supplied_values
+tests/qa/test_qa_tool_ownership.py::test_environment_capture_is_exact_and_preserves_explicit_values
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_po_006_token_registry_validity-PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_po_006_token_registry_validity-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_epic024_acceptance_map_viability-PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_epic024_acceptance_map_viability-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_d23_evidence_index_snapshot_contract-PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_d23_evidence_index_snapshot_contract-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_epic024_evidence_path_binding_validation-PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_actual_evidence_callers_preserve_tokenless_outputs[check_epic024_evidence_path_binding_validation-FAIL_BEHAVIOR-1]
+tests/qa/test_qa_tool_ownership.py::test_actual_epic024_writer_preserves_body_and_extra_fields[PASS-0]
+tests/qa/test_qa_tool_ownership.py::test_actual_epic024_writer_preserves_body_and_extra_fields[FAIL_TOOLING-2]
+tests/qa/test_qa_tool_ownership.py::test_current_template_is_isolated_and_explains_nonclaim
+
+139 tests collected in 0.12s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "crd and not pytest",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.4652792560009402,
+  "end": "2026-09-07T02:19:02.387732+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-03-crd-local",
+  "start": "2026-09-07T02:19:01.922466+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19wcmVzZXJ2ZXNfZXBpY19wb3NpdGlvbmFsX2ludGVyZmFjZQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfb3JkaW5hcnlfcmVjb3JkaW5nX2FuZF9zdXBlcnNlc3Npb25fbmVlZF9ub19lcGljX2lucHV0cwp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfYWRkaXRpb25hbF9maWxlc193aXRoaW5fcWFfcm9vdF9zaGFyZV9sb2NhbF9yb2xsYmFjawp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfaW50ZW50aW9uc19hcmVfZXhwbGljaXRseV91bmNsYWltZWQKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3JlY2hlY2tzX2NhcHR1cmVkX2J5dGVzX2R1cmluZ192YWxpZGF0aW9uCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9sZWdhY3lfb3BlcmF0aW9uc19yZWZ1c2VfYmVmb3JlX291dHB1dAoKNi8xNjcgdGVzdHMgY29sbGVjdGVkICgxNjEgZGVzZWxlY3RlZCkgaW4gMC4xNXMK",
+    "length": 594,
+    "sha256": "cc690e7b4a46651dbd7104ce7a5eeac930a3f8f4c537c060a96f49a7c3e58c53"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/qa/test_generic_qa_harness.py::test_crd_config_preserves_epic_positional_interface
+tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_and_supersession_need_no_epic_inputs
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_within_qa_root_share_local_rollback
+tests/qa/test_generic_qa_harness.py::test_crd_intentions_are_explicitly_unclaimed
+tests/qa/test_generic_qa_harness.py::test_crd_rechecks_captured_bytes_during_validation
+tests/qa/test_generic_qa_harness.py::test_crd_legacy_operations_refuse_before_output
+
+6/167 tests collected (161 deselected) in 0.15s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "pytest or same_interpreter_and_classification",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-04-runner-labequn_"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.6175390609932947,
+  "end": "2026-09-07T02:19:03.005802+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-04-runner",
+  "start": "2026-09-07T02:19:02.388264+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdW5zYWZlX2NoZWNrX2lkc19hcmVfcmVqZWN0ZWRbXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF91bnNhZmVfY2hlY2tfaWRzX2FyZV9yZWplY3RlZFsuLl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdW5zYWZlX2NoZWNrX2lkc19hcmVfcmVqZWN0ZWRbYS9iXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF91bnNhZmVfY2hlY2tfaWRzX2FyZV9yZWplY3RlZFthXFxiXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF91bnNhZmVfY2hlY2tfaWRzX2FyZV9yZWplY3RlZFsvYWJzb2x1dGVdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2N1cnJlbnRfcHVibGlzaGVyc19yZWplY3RfdXBwZXJjYXNlX2lkc19iZWZvcmVfd3JpdGVzX2FuZF9hZG1pdF9sb3dlcmNhc2VbRmFsc2VdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2N1cnJlbnRfcHVibGlzaGVyc19yZWplY3RfdXBwZXJjYXNlX2lkc19iZWZvcmVfd3JpdGVzX2FuZF9hZG1pdF9sb3dlcmNhc2VbVHJ1ZV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3Rfc2FtZV9pbnRlcnByZXRlcl9hbmRfY2xhc3NpZmljYXRpb24KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3JlamVjdHNfdXBwZXJjYXNlX2NoZWNrX2lkX3dpdGhvdXRfc3Bhd25pbmcKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3ByZWZsaWdodF9za2lwc19hZG1pdHRlZF9vcHRpb25fdmFsdWVzW3B5dGVzdF9hcmdzMF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3ByZWZsaWdodF9za2lwc19hZG1pdHRlZF9vcHRpb25fdmFsdWVzW3B5dGVzdF9hcmdzMV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3ByZWZsaWdodF9za2lwc19hZG1pdHRlZF9vcHRpb25fdmFsdWVzW3B5dGVzdF9hcmdzMl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3ByZWZsaWdodF9yZWplY3RzX3VuYm91bmRlZF9vcHRpb25fY29udHJvbHNfd2l0aG91dF9leGVjdXRpb25bcHl0ZXN0X2FyZ3MwLWxhY2tzIGl0cyBleHByZXNzaW9uXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcHJlZmxpZ2h0X3JlamVjdHNfdW5ib3VuZGVkX29wdGlvbl9jb250cm9sc193aXRob3V0X2V4ZWN1dGlvbltweXRlc3RfYXJnczEtYWRtaXRzIG9ubHkgLXAgbm86Y2FjaGVwcm92aWRlcl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3ByZWZsaWdodF9yZWplY3RzX3VuYm91bmRlZF9vcHRpb25fY29udHJvbHNfd2l0aG91dF9leGVjdXRpb25bcHl0ZXN0X2FyZ3MyLXVzZXMgdW5zdXBwb3J0ZWQgb3B0aW9uOiAtLWJhc2V0ZW1wXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcmVhZGluZXNzX2xhdW5jaF9mYWlsdXJlX3JlY29yZHNfbm9fZXhlY3V0ZWRfY29tbWFuZAp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3Rfbm9fY29sbGVjdGlvbl9pc190b29saW5nX2Jsb2NrZWQKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfZXZpZGVuY2VfZ3JhcGhfZmFpbHVyZV9jbGFzc2lmaWNhdGlvbl9pc19jYXVzYWxbbWlzc2luZy1UT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2V2aWRlbmNlX2dyYXBoX2ZhaWx1cmVfY2xhc3NpZmljYXRpb25faXNfY2F1c2FsW21hbGZvcm1lZC1GQUlMX1RPT0xJTkddCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3BsYW5uZWRfb3V0cHV0X2Nhbm5vdF9zdWJzdGl0dXRlX2Zvcl9nb3Zlcm5lZF9hY2NlcHRhbmNlX2V2aWRlbmNlW2FjY2VwdGFuY2VfbWFwLmV2aWRlbmNlX3RpdGxlc10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcGxhbm5lZF9vdXRwdXRfY2Fubm90X3N1YnN0aXR1dGVfZm9yX2dvdmVybmVkX2FjY2VwdGFuY2VfZXZpZGVuY2VbbWF0cml4LmV2aWRlbmNlX2FydGlmYWN0c10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X3JlamVjdHNfYmFkX3JlZmVyZW5jZXNbLi4vZXNjYXBlLnR4dC1GQUlMX0JFSEFWSU9SXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfcmVqZWN0c19iYWRfcmVmZXJlbmNlc1svdG1wL2Fic29sdXRlLUZBSUxfQkVIQVZJT1JdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9yZWplY3RzX2JhZF9yZWZlcmVuY2VzW25vIHBhdGggcHJvc2UtVE9PTElOR19CTE9DS0VEXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfcmVqZWN0c19iYWRfcmVmZXJlbmNlc1tldmlkZW5jZS9wcm9vZi5qc29uIGFuZCBldmlkZW5jZS9vdGhlci5qc29uLUZBSUxfQkVIQVZJT1JdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9yZWplY3RzX2JhZF9yZWZlcmVuY2VzW2V2aWRlbmNlL2VtcHR5LnR4dC1UT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9yZWplY3RzX2JhZF9yZWZlcmVuY2VzW2V2aWRlbmNlL2JhZC5qc29uLUZBSUxfVE9PTElOR10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfbWFwX3N0cnVjdHVyZV9pc190b29saW5nX2ZhaWx1cmVbcGF5bG9hZDAtZXBpYyBpZGVudGl0eV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfbWFwX3N0cnVjdHVyZV9pc190b29saW5nX2ZhaWx1cmVbcGF5bG9hZDEtbm9uLWVtcHR5IGxpc3RdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X21hbGZvcm1lZF9hY2NlcHRhbmNlX21hcF9zdHJ1Y3R1cmVfaXNfdG9vbGluZ19mYWlsdXJlW3BheWxvYWQyLW5vbi1lbXB0eSBsaXN0XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9tYWxmb3JtZWRfYWNjZXB0YW5jZV9tYXBfc3RydWN0dXJlX2lzX3Rvb2xpbmdfZmFpbHVyZVtwYXlsb2FkMy1ub3QgYW4gb2JqZWN0XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9tYWxmb3JtZWRfYWNjZXB0YW5jZV9tYXBfc3RydWN0dXJlX2lzX3Rvb2xpbmdfZmFpbHVyZVtwYXlsb2FkNC1pbnZhbGlkIG5hbWVdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9yZXF1aXJlc19tYXRjaGluZ19hY2NlcHRhbmNlX293bmVyX3BmW05vbmVdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9yZXF1aXJlc19tYXRjaGluZ19hY2NlcHRhbmNlX293bmVyX3BmW10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X3JlcXVpcmVzX21hdGNoaW5nX2FjY2VwdGFuY2Vfb3duZXJfcGZbUEYxOV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfZXZpZGVuY2VfdGl0bGVzX2FyZV90b29saW5nX2ZhaWx1cmVbTm9uZV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfZXZpZGVuY2VfdGl0bGVzX2FyZV90b29saW5nX2ZhaWx1cmVbZXZpZGVuY2VfdGl0bGVzMV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfZXZpZGVuY2VfdGl0bGVzX2FyZV90b29saW5nX2ZhaWx1cmVbZXZpZGVuY2VfdGl0bGVzMl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFsZm9ybWVkX2FjY2VwdGFuY2VfZXZpZGVuY2VfdGl0bGVzX2FyZV90b29saW5nX2ZhaWx1cmVbZXZpZGVuY2VfdGl0bGVzM10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X25vcm1hbGl6ZXNfYW5kX2NvbXBhcmVzX2FjY2VwdGFuY2VfcG9zdHVyZVtpbXBsZW1lbnRlZC1JbXBsZW1lbnRlZC1QQVNTLVZBTElEXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfbm9ybWFsaXplc19hbmRfY29tcGFyZXNfYWNjZXB0YW5jZV9wb3N0dXJlW2NvdmVyZWQtQ292ZXJlZC1QQVNTLVZBTElEXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfbm9ybWFsaXplc19hbmRfY29tcGFyZXNfYWNjZXB0YW5jZV9wb3N0dXJlW3NhdGlzZmllZC1TYXRpc2ZpZWQtUEFTUy1WQUxJRF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X25vcm1hbGl6ZXNfYW5kX2NvbXBhcmVzX2FjY2VwdGFuY2VfcG9zdHVyZVtwbGFubmVkLUltcGxlbWVudGVkLUZBSUxfVE9PTElORy1TVEFUVVNfTUlTTUFUQ0hdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9ub3JtYWxpemVzX2FuZF9jb21wYXJlc19hY2NlcHRhbmNlX3Bvc3R1cmVbTm9uZS1JbXBsZW1lbnRlZC1GQUlMX1RPT0xJTkctSU5WQUxJRF9BQ0NFUFRBTkNFX1NUQVRVU10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X25vcm1hbGl6ZXNfYW5kX2NvbXBhcmVzX2FjY2VwdGFuY2VfcG9zdHVyZVtkb25lLUltcGxlbWVudGVkLUZBSUxfVE9PTElORy1JTlZBTElEX0FDQ0VQVEFOQ0VfU1RBVFVTXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfbm9ybWFsaXplc19hbmRfY29tcGFyZXNfYWNjZXB0YW5jZV9wb3N0dXJlW2ltcGxlbWVudGVkLWRvbmUtRkFJTF9UT09MSU5HLUlOVkFMSURfTUFUUklYX1NUQVRVU10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X25vcm1hbGl6ZXNfYW5kX2NvbXBhcmVzX2FjY2VwdGFuY2VfcG9zdHVyZVtpbXBsZW1lbnRlZC0tRkFJTF9UT09MSU5HLUlOVkFMSURfTUFUUklYX1NUQVRVU10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X25vcm1hbGl6ZXNfYW5kX2NvbXBhcmVzX2FjY2VwdGFuY2VfcG9zdHVyZVtwbGFubmVkLVBsYW5uZWQtVE9PTElOR19CTE9DS0VELVBMQU5ORURdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV9ub3JtYWxpemVzX2FuZF9jb21wYXJlc19hY2NlcHRhbmNlX3Bvc3R1cmVbdG9rZW5faW5jb21wbGV0ZS1Ub2tlbi1pbmNvbXBsZXRlLVRPT0xJTkdfQkxPQ0tFRC1UT0tFTl9JTkNPTVBMRVRFXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcmV0dXJuY29kZV9jbGFzc2lmaWNhdGlvbl9pc19jYXVzYWxbMC1QQVNTXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcmV0dXJuY29kZV9jbGFzc2lmaWNhdGlvbl9pc19jYXVzYWxbMS1GQUlMX0JFSEFWSU9SXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcmV0dXJuY29kZV9jbGFzc2lmaWNhdGlvbl9pc19jYXVzYWxbMi1GQUlMX1RPT0xJTkddCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3B5dGVzdF9yZXR1cm5jb2RlX2NsYXNzaWZpY2F0aW9uX2lzX2NhdXNhbFszLUZBSUxfVE9PTElOR10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcHl0ZXN0X3JldHVybmNvZGVfY2xhc3NpZmljYXRpb25faXNfY2F1c2FsWzQtRkFJTF9UT09MSU5HXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9weXRlc3RfcmV0dXJuY29kZV9jbGFzc2lmaWNhdGlvbl9pc19jYXVzYWxbNS1UT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3B5dGVzdF9yZXR1cm5jb2RlX2NsYXNzaWZpY2F0aW9uX2lzX2NhdXNhbFstOS1GQUlMX1RPT0xJTkddCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3B5dGVzdF9yZXR1cm5jb2RlX2NsYXNzaWZpY2F0aW9uX3JlamVjdHNfbm9uX2ludGVnZXIKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19yZWplY3RzX2FtYmlndW91c19vcl91bnNhZmVfaWRlbnRpdHlbaWRlbnRpZmllcnMwXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfYW1iaWd1b3VzX29yX3Vuc2FmZV9pZGVudGl0eVtpZGVudGlmaWVyczFdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9jb25maWdfcmVqZWN0c19hbWJpZ3VvdXNfb3JfdW5zYWZlX2lkZW50aXR5W2lkZW50aWZpZXJzMl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19yZWplY3RzX2FtYmlndW91c19vcl91bnNhZmVfaWRlbnRpdHlbaWRlbnRpZmllcnMzXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfYW1iaWd1b3VzX29yX3Vuc2FmZV9pZGVudGl0eVtpZGVudGlmaWVyczRdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9jb25maWdfcmVqZWN0c19hbWJpZ3VvdXNfb3JfdW5zYWZlX2lkZW50aXR5W2lkZW50aWZpZXJzNV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19yZWplY3RzX2FtYmlndW91c19vcl91bnNhZmVfaWRlbnRpdHlbaWRlbnRpZmllcnM2XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfYW1iaWd1b3VzX29yX3Vuc2FmZV9pZGVudGl0eVtpZGVudGlmaWVyczddCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9jb25maWdfcmVqZWN0c19hbWJpZ3VvdXNfb3JfdW5zYWZlX2lkZW50aXR5W2lkZW50aWZpZXJzOF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19yZWplY3RzX2FtYmlndW91c19vcl91bnNhZmVfaWRlbnRpdHlbaWRlbnRpZmllcnM5XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfYW1iaWd1b3VzX29yX3Vuc2FmZV9pZGVudGl0eVtpZGVudGlmaWVyczEwXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfc3ltbGlua2VkX3Jvb3RfYW5kX2FuY2VzdG9yc1tyb290XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfY29uZmlnX3JlamVjdHNfc3ltbGlua2VkX3Jvb3RfYW5kX2FuY2VzdG9yc1thdWRpdF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2NvbmZpZ19yZWplY3RzX3N5bWxpbmtlZF9yb290X2FuZF9hbmNlc3RvcnNbYXVkaXQvcWFdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9jb25maWdfcmVqZWN0c19zeW1saW5rZWRfcm9vdF9hbmRfYW5jZXN0b3JzW2F1ZGl0L3FhL2hkZS1jcmQtMDAwMV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX29yZGluYXJ5X3JlY29yZGluZ19hY2NlcHRzX2V4cGFuZGluZ19jYW5vbmljYWxfaWRzW0hERS1DUkQtOTk5OV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX29yZGluYXJ5X3JlY29yZGluZ19hY2NlcHRzX2V4cGFuZGluZ19jYW5vbmljYWxfaWRzW0hERS1DUkQtMTAwMDBdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9vcmRpbmFyeV9yZWNvcmRpbmdfYWNjZXB0c19leHBhbmRpbmdfY2Fub25pY2FsX2lkc1tIREUtQ1JELTEyMzQ1Nl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2FkZGl0aW9uYWxfZmlsZXNfY2Fubm90X2VzY2FwZV9hY3RpdmVfcWFfcm9vdFtGYWxzZS1yZXBvcnQudHh0XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfYWRkaXRpb25hbF9maWxlc19jYW5ub3RfZXNjYXBlX2FjdGl2ZV9xYV9yb290W0ZhbHNlLWF1ZGl0L3FhL2hkZS1jcmQtMDAwMi9yZXBvcnQudHh0XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfYWRkaXRpb25hbF9maWxlc19jYW5ub3RfZXNjYXBlX2FjdGl2ZV9xYV9yb290W0ZhbHNlLWRvY3MvcmVwb3J0LnR4dF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2FkZGl0aW9uYWxfZmlsZXNfY2Fubm90X2VzY2FwZV9hY3RpdmVfcWFfcm9vdFtUcnVlLXJlcG9ydC50eHRdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9hZGRpdGlvbmFsX2ZpbGVzX2Nhbm5vdF9lc2NhcGVfYWN0aXZlX3FhX3Jvb3RbVHJ1ZS1hdWRpdC9xYS9oZGUtY3JkLTAwMDIvcmVwb3J0LnR4dF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX2FkZGl0aW9uYWxfZmlsZXNfY2Fubm90X2VzY2FwZV9hY3RpdmVfcWFfcm9vdFtUcnVlLWRvY3MvcmVwb3J0LnR4dF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3N0YXR1c2VzX3JldGFpbl9mdWxsX3YyX2FuZF9lbXB0eV9jbGFpbXNbUEFTU10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3N0YXR1c2VzX3JldGFpbl9mdWxsX3YyX2FuZF9lbXB0eV9jbGFpbXNbRkFJTF9CRUhBVklPUl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3N0YXR1c2VzX3JldGFpbl9mdWxsX3YyX2FuZF9lbXB0eV9jbGFpbXNbRkFJTF9UT09MSU5HXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfc3RhdHVzZXNfcmV0YWluX2Z1bGxfdjJfYW5kX2VtcHR5X2NsYWltc1tUT09MSU5HX0JMT0NLRURdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9zdGF0dXNlc19yZXRhaW5fZnVsbF92Ml9hbmRfZW1wdHlfY2xhaW1zW1BBUktFRF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3JlamVjdHNfaW52YWxpZF9vdXRjb21lc19iZWZvcmVfd3JpdGluZ1ttdXRhdGlvbjBdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9yZWplY3RzX2ludmFsaWRfb3V0Y29tZXNfYmVmb3JlX3dyaXRpbmdbbXV0YXRpb24xXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcmVqZWN0c19pbnZhbGlkX291dGNvbWVzX2JlZm9yZV93cml0aW5nW211dGF0aW9uMl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3JlamVjdHNfaW52YWxpZF9vdXRjb21lc19iZWZvcmVfd3JpdGluZ1ttdXRhdGlvbjNdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9yZWplY3RzX2ludmFsaWRfb3V0Y29tZXNfYmVmb3JlX3dyaXRpbmdbbXV0YXRpb240XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcmVqZWN0c19pbnZhbGlkX291dGNvbWVzX2JlZm9yZV93cml0aW5nW211dGF0aW9uNV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW3dyYXBwZXJdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1t2MV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW2V4dHJhLWVudHJ5LWZpZWxkXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfbWFuaWZlc3RfYWRtaXNzaW9uX3JlZnVzZXNfbWFsZm9ybWVkX2N1cnJlbnRfYnl0ZXNbc3RhdHVzXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfbWFuaWZlc3RfYWRtaXNzaW9uX3JlZnVzZXNfbWFsZm9ybWVkX2N1cnJlbnRfYnl0ZXNbaWRlbnRpdHldCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1tkdXBsaWNhdGVdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1thYnNvbHV0ZV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW3RyYXZlcnNhbF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW2RvdF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW2RvdWJsZS1zbGFzaF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW2JhY2tzbGFzaF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW2ZvcmVpZ25dCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1t3cm9uZy1jaGVja10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX21hbmlmZXN0X2FkbWlzc2lvbl9yZWZ1c2VzX21hbGZvcm1lZF9jdXJyZW50X2J5dGVzW21hbmlmZXN0LWNybGZdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1ttYW5pZmVzdC1ib21dCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9tYW5pZmVzdF9hZG1pc3Npb25fcmVmdXNlc19tYWxmb3JtZWRfY3VycmVudF9ieXRlc1ttYW5pZmVzdC13aGl0ZXNwYWNlXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfbWFuaWZlc3RfYWRtaXNzaW9uX3JlZnVzZXNfbWFsZm9ybWVkX2N1cnJlbnRfYnl0ZXNbZW1wdHldCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbbWlzc2luZy1maWVsZF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1tleHRyYS1maWVsZF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1tjbGFpbXNdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbb3duLWxvZ10KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1toZWFkZXItaWRdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbYmFkLWNvbW1hbmRdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbbm8tZXhpdF0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1tmYWxzZS1wcm92ZW5hbmNlXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcHJpbWFyeV9hZG1pc3Npb25fcmV1c2VzX3YyX2FuZF9jaGVja3NfcmF3X2J5dGVzW25vLXJlYXNvbl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1twYXJrZWQtZXhlY3V0aW9uXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcHJpbWFyeV9hZG1pc3Npb25fcmV1c2VzX3YyX2FuZF9jaGVja3NfcmF3X2J5dGVzW2JlaGF2aW9yLXVuZXhlY3V0ZWRdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbY3JsZl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1tib21dCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbbm8tbGZdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbd2hpdGVzcGFjZV0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ByaW1hcnlfYWRtaXNzaW9uX3JldXNlc192Ml9hbmRfY2hlY2tzX3Jhd19ieXRlc1tkdXBsaWNhdGVdCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbbm9uY2xhaW1dCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF9wcmltYXJ5X2FkbWlzc2lvbl9yZXVzZXNfdjJfYW5kX2NoZWNrc19yYXdfYnl0ZXNbaW52YWxpZC11dGY4XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfdmFsaWRhdGlvbl9hbmRfZGlyZWN0X3VwZGF0ZV9yZWZ1c2VfYWxpYXNlc1txYV9zdGVwX2xvZ3NfbWFuaWZlc3QuanNvbl0KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY3JkX3ZhbGlkYXRpb25fYW5kX2RpcmVjdF91cGRhdGVfcmVmdXNlX2FsaWFzZXNbY2hlY2tzL2N1cnJlbnQvcHJpbWFyeS5sb2ddCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2NyZF92YWxpZGF0aW9uX2FuZF9kaXJlY3RfdXBkYXRlX3JlZnVzZV9hbGlhc2VzW2NoZWNrcy9jdXJyZW50XQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcHl0ZXN0X3J1bm5lcl9yZWNvcmRzX2FjdHVhbF9zYW1lX2ludGVycHJldGVyX291dGNvbWVbVHJ1ZS1QQVNTXQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9jcmRfcHl0ZXN0X3J1bm5lcl9yZWNvcmRzX2FjdHVhbF9zYW1lX2ludGVycHJldGVyX291dGNvbWVbRmFsc2UtRkFJTF9CRUhBVklPUl0KCjEzMi8xNjcgdGVzdHMgY29sbGVjdGVkICgzNSBkZXNlbGVjdGVkKSBpbiAwLjIxcwo=",
+    "length": 14549,
+    "sha256": "33d98771936fc6df39eb658edf5f37fd59865c53997cbc4ceead6195e71a790c"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[]
+tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[..]
+tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[a/b]
+tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[a\\b]
+tests/qa/test_generic_qa_harness.py::test_unsafe_check_ids_are_rejected[/absolute]
+tests/qa/test_generic_qa_harness.py::test_current_publishers_reject_uppercase_ids_before_writes_and_admit_lowercase[False]
+tests/qa/test_generic_qa_harness.py::test_current_publishers_reject_uppercase_ids_before_writes_and_admit_lowercase[True]
+tests/qa/test_generic_qa_harness.py::test_same_interpreter_and_classification
+tests/qa/test_generic_qa_harness.py::test_pytest_rejects_uppercase_check_id_without_spawning
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args0]
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args1]
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_skips_admitted_option_values[pytest_args2]
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args0-lacks its expression]
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args1-admits only -p no:cacheprovider]
+tests/qa/test_generic_qa_harness.py::test_pytest_preflight_rejects_unbounded_option_controls_without_execution[pytest_args2-uses unsupported option: --basetemp]
+tests/qa/test_generic_qa_harness.py::test_pytest_readiness_launch_failure_records_no_executed_command
+tests/qa/test_generic_qa_harness.py::test_pytest_no_collection_is_tooling_blocked
+tests/qa/test_generic_qa_harness.py::test_evidence_graph_failure_classification_is_causal[missing-TOOLING_BLOCKED]
+tests/qa/test_generic_qa_harness.py::test_evidence_graph_failure_classification_is_causal[malformed-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_planned_output_cannot_substitute_for_governed_acceptance_evidence[acceptance_map.evidence_titles]
+tests/qa/test_generic_qa_harness.py::test_planned_output_cannot_substitute_for_governed_acceptance_evidence[matrix.evidence_artifacts]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[../escape.txt-FAIL_BEHAVIOR]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[/tmp/absolute-FAIL_BEHAVIOR]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[no path prose-TOOLING_BLOCKED]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/proof.json and evidence/other.json-FAIL_BEHAVIOR]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/empty.txt-TOOLING_BLOCKED]
+tests/qa/test_generic_qa_harness.py::test_viability_rejects_bad_references[evidence/bad.json-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload0-epic identity]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload1-non-empty list]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload2-non-empty list]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload3-not an object]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_map_structure_is_tooling_failure[payload4-invalid name]
+tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[None]
+tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[]
+tests/qa/test_generic_qa_harness.py::test_viability_requires_matching_acceptance_owner_pf[PF19]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[None]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles1]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles2]
+tests/qa/test_generic_qa_harness.py::test_malformed_acceptance_evidence_titles_are_tooling_failure[evidence_titles3]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented-Implemented-PASS-VALID]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[covered-Covered-PASS-VALID]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[satisfied-Satisfied-PASS-VALID]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[planned-Implemented-FAIL_TOOLING-STATUS_MISMATCH]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[None-Implemented-FAIL_TOOLING-INVALID_ACCEPTANCE_STATUS]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[done-Implemented-FAIL_TOOLING-INVALID_ACCEPTANCE_STATUS]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented-done-FAIL_TOOLING-INVALID_MATRIX_STATUS]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[implemented--FAIL_TOOLING-INVALID_MATRIX_STATUS]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[planned-Planned-TOOLING_BLOCKED-PLANNED]
+tests/qa/test_generic_qa_harness.py::test_viability_normalizes_and_compares_acceptance_posture[token_incomplete-Token-incomplete-TOOLING_BLOCKED-TOKEN_INCOMPLETE]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[0-PASS]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[1-FAIL_BEHAVIOR]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[2-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[3-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[4-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[5-TOOLING_BLOCKED]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_is_causal[-9-FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_pytest_returncode_classification_rejects_non_integer
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers0]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers1]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers2]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers3]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers4]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers5]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers6]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers7]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers8]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers9]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_ambiguous_or_unsafe_identity[identifiers10]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[root]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit/qa]
+tests/qa/test_generic_qa_harness.py::test_crd_config_rejects_symlinked_root_and_ancestors[audit/qa/hde-crd-0001]
+tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-9999]
+tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-10000]
+tests/qa/test_generic_qa_harness.py::test_crd_ordinary_recording_accepts_expanding_canonical_ids[HDE-CRD-123456]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-audit/qa/hde-crd-0002/report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[False-docs/report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-audit/qa/hde-crd-0002/report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_additional_files_cannot_escape_active_qa_root[True-docs/report.txt]
+tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[PASS]
+tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[FAIL_BEHAVIOR]
+tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[FAIL_TOOLING]
+tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[TOOLING_BLOCKED]
+tests/qa/test_generic_qa_harness.py::test_crd_statuses_retain_full_v2_and_empty_claims[PARKED]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation0]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation1]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation2]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation3]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation4]
+tests/qa/test_generic_qa_harness.py::test_crd_rejects_invalid_outcomes_before_writing[mutation5]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[wrapper]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[v1]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[extra-entry-field]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[status]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[identity]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[duplicate]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[absolute]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[traversal]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[dot]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[double-slash]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[backslash]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[foreign]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[wrong-check]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-crlf]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-bom]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[manifest-whitespace]
+tests/qa/test_generic_qa_harness.py::test_crd_manifest_admission_refuses_malformed_current_bytes[empty]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[missing-field]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[extra-field]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[claims]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[own-log]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[header-id]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[bad-command]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-exit]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[false-provenance]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-reason]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[parked-execution]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[behavior-unexecuted]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[crlf]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[bom]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[no-lf]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[whitespace]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[duplicate]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[nonclaim]
+tests/qa/test_generic_qa_harness.py::test_crd_primary_admission_reuses_v2_and_checks_raw_bytes[invalid-utf8]
+tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[qa_step_logs_manifest.json]
+tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[checks/current/primary.log]
+tests/qa/test_generic_qa_harness.py::test_crd_validation_and_direct_update_refuse_aliases[checks/current]
+tests/qa/test_generic_qa_harness.py::test_crd_pytest_runner_records_actual_same_interpreter_outcome[True-PASS]
+tests/qa/test_generic_qa_harness.py::test_crd_pytest_runner_records_actual_same_interpreter_outcome[False-FAIL_BEHAVIOR]
+
+132/167 tests collected (35 deselected) in 0.21s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/qa/test_generic_qa_harness.py",
+    "-k",
+    "not crd and not pytest and not same_interpreter_and_classification",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-05-epic-compat-43p7f7k_"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.4655956380011048,
+  "end": "2026-09-07T02:19:03.471979+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-05-epic-compat",
+  "start": "2026-09-07T02:19:03.006396+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfY29uZmlnX2Rlcml2ZXNfY2Fub25pY2FsX3BhdGhzCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2V4YWN0X3N0YXR1c19zZXRfYW5kX2NhdXNhbF9yb2xsdXAKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcGYyN19oZWFkZXJfYW5kX21hbmlmZXN0X3JlcGxhY2VfYnlfY2hlY2tfaWQKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfdmlhYmlsaXR5X3Bhc3Nlc19leGFjdF9hbmRfbGVnYWN5X3NpbmdsZV9wYXRoCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2dvdmVybmFuY2VfYmluZGluZ19kb2VzX25vdF9wcm9tb3RlX2NpX29yX3FhX2xvY2F0b3JzCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2V4aXN0aW5nX3VuaW5kZXhlZF9hY2NlcHRhbmNlX2V2aWRlbmNlX2Nhbm5vdF9wYXNzCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2dvdmVybmFuY2VfZ3JhcGhfcmVxdWlyZXNfZXhhY3Rfa2V5X3NldF9wYXJpdHkKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfZ292ZXJuYW5jZV9ncmFwaF9yZXF1aXJlc19zZWxmX3JlY29yZF9mb3Jfb3JkaW5hcnlfZXZpZGVuY2UKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfZ292ZXJuYW5jZV9ncmFwaF9yZWplY3RzX3VucmVsYXRlZF9nbG9iYWxfcGFyaXR5X2dhcAp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9nb3Zlcm5hbmNlX2dyYXBoX2FsbG93c19tYXRjaGluZ19tdWx0aV9rZXlfcGF0aAp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9hY2NlcHRhbmNlX2V2aWRlbmNlX3JlamVjdHNfbm9uY2Fub25pY2FsX2RvdF9hbGlhcwp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9wbGFubmVkX2FjY2VwdGFuY2Vfb3V0cHV0X3JlamVjdHNfc3ltbGlua19hbGlhcwp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9wbGFubmVkX2FjY2VwdGFuY2Vfb3V0cHV0X3JlamVjdHNfZXhpc3RpbmdfZGlyZWN0b3J5CnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X21pc3Npbmdfc2libGluZ19wYXRoX3Byb29mX2lzX3Rvb2xpbmdfYmxvY2tlZAp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9wYXRoX3Byb29mX2Nhbm5vdF9iZV9wcmltYXJ5X2FjY2VwdGFuY2VfZXZpZGVuY2UKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfZ3JhcGhfc25hcHNob3RfaXNfcmVmcmVzaGVkX2Zvcl9lYWNoX2V2YWx1YXRpb24KdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfcGxhbm5lZF9hY2NlcHRhbmNlX291dHB1dF9leGNlcHRpb25faXNfZXhhY3QKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWFjaGluZV9taXJyb3JfY2hlY2tzdW1faGFzX25vX2FjY2VwdGFuY2VfZXZpZGVuY2VfZXhjZXB0aW9uCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3BmMDRfZGVjbGFyYXRpb25fZm9ybXNfaWdub3JlX2V4cGxhbmF0b3J5X3Byb3NlCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3ZpYWJpbGl0eV92YWxpZGF0ZXNfZWFjaF9zZW1pY29sb25fZGVsaW1pdGVkX3JlZmVyZW5jZQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9nZW5lcmF0b3Jfb25seV92aWFiaWxpdHlfbGVkZ2VyX21hdGNoZXNfcHJpbWFyeV9ldmFsdWF0aW9uCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X2dvdmVybmVkX3ZpYWJpbGl0eV9hZG1pc3Npb25fcmVqZWN0c191bmJvdW5kX2xlZGdlcgp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF92aWFiaWxpdHlfZHVwbGljYXRlX29yX29ycGhhbl90b2tlbnNfZmFpbF90b29saW5nCnRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5Ojp0ZXN0X3dyb25nX2VwaWNfaWRlbnRpdHlfaXNfdG9vbGluZ19mYWlsdXJlX2FuZF9pbnZhbGlkYXRlc190b2tlbnMKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbWlzc2luZ19hbmRfbWFsZm9ybWVkX2lucHV0c19hcmVfc3RydWN0dXJlZAp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF93cml0ZXJfZmFpbHVyZV9pc19mYWlsX3Rvb2xpbmcKdGVzdHMvcWEvdGVzdF9nZW5lcmljX3FhX2hhcm5lc3MucHk6OnRlc3RfbGVnYWN5X21hbmlmZXN0X2lzX3JlcGxhY2VkX3dpdGhvdXRfaW1wb3J0aW5nX3J1bl9zdGF0ZQp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF91bmtub3duX21hbmlmZXN0X3NoYXBlX2ZhaWxzX2JlZm9yZV9wcmltYXJ5X2xvZwp0ZXN0cy9xYS90ZXN0X2dlbmVyaWNfcWFfaGFybmVzcy5weTo6dGVzdF9wdWJsaWNhdGlvbl9yb2xsc19iYWNrX3doZW5fbWFuaWZlc3Rfd3JpdGVfZmFpbHMKCjI5LzE2NyB0ZXN0cyBjb2xsZWN0ZWQgKDEzOCBkZXNlbGVjdGVkKSBpbiAwLjE1cwo=",
+    "length": 2693,
+    "sha256": "e7b7e26053343c222c4d72e3e67962c99597b286b969d5b850d96dbda9ea6991"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/qa/test_generic_qa_harness.py::test_config_derives_canonical_paths
+tests/qa/test_generic_qa_harness.py::test_exact_status_set_and_causal_rollup
+tests/qa/test_generic_qa_harness.py::test_pf27_header_and_manifest_replace_by_check_id
+tests/qa/test_generic_qa_harness.py::test_viability_passes_exact_and_legacy_single_path
+tests/qa/test_generic_qa_harness.py::test_governance_binding_does_not_promote_ci_or_qa_locators
+tests/qa/test_generic_qa_harness.py::test_existing_unindexed_acceptance_evidence_cannot_pass
+tests/qa/test_generic_qa_harness.py::test_governance_graph_requires_exact_key_set_parity
+tests/qa/test_generic_qa_harness.py::test_governance_graph_requires_self_record_for_ordinary_evidence
+tests/qa/test_generic_qa_harness.py::test_governance_graph_rejects_unrelated_global_parity_gap
+tests/qa/test_generic_qa_harness.py::test_governance_graph_allows_matching_multi_key_path
+tests/qa/test_generic_qa_harness.py::test_acceptance_evidence_rejects_noncanonical_dot_alias
+tests/qa/test_generic_qa_harness.py::test_planned_acceptance_output_rejects_symlink_alias
+tests/qa/test_generic_qa_harness.py::test_planned_acceptance_output_rejects_existing_directory
+tests/qa/test_generic_qa_harness.py::test_missing_sibling_path_proof_is_tooling_blocked
+tests/qa/test_generic_qa_harness.py::test_path_proof_cannot_be_primary_acceptance_evidence
+tests/qa/test_generic_qa_harness.py::test_graph_snapshot_is_refreshed_for_each_evaluation
+tests/qa/test_generic_qa_harness.py::test_planned_acceptance_output_exception_is_exact
+tests/qa/test_generic_qa_harness.py::test_machine_mirror_checksum_has_no_acceptance_evidence_exception
+tests/qa/test_generic_qa_harness.py::test_pf04_declaration_forms_ignore_explanatory_prose
+tests/qa/test_generic_qa_harness.py::test_viability_validates_each_semicolon_delimited_reference
+tests/qa/test_generic_qa_harness.py::test_generator_only_viability_ledger_matches_primary_evaluation
+tests/qa/test_generic_qa_harness.py::test_governed_viability_admission_rejects_unbound_ledger
+tests/qa/test_generic_qa_harness.py::test_viability_duplicate_or_orphan_tokens_fail_tooling
+tests/qa/test_generic_qa_harness.py::test_wrong_epic_identity_is_tooling_failure_and_invalidates_tokens
+tests/qa/test_generic_qa_harness.py::test_missing_and_malformed_inputs_are_structured
+tests/qa/test_generic_qa_harness.py::test_writer_failure_is_fail_tooling
+tests/qa/test_generic_qa_harness.py::test_legacy_manifest_is_replaced_without_importing_run_state
+tests/qa/test_generic_qa_harness.py::test_unknown_manifest_shape_fails_before_primary_log
+tests/qa/test_generic_qa_harness.py::test_publication_rolls_back_when_manifest_write_fails
+
+29/167 tests collected (138 deselected) in 0.15s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-06-publication-_n_qvdhe"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.36501791100454284,
+  "end": "2026-09-07T02:19:03.837713+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-06-publication",
+  "start": "2026-09-07T02:19:03.472706+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9nb3Zlcm5lZF9wdWJsaWNhdGlvbl9iaW5kc19hY3R1YWxfcmVjb3Jkc19hbmRfaXNfcmVwZWF0YWJsZQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2N1cnJlbnRfbWFuaWZlc3RfcmVjb25jaWxlc19zdXBlcnNlc3Npb25fd2l0aG91dF9oaXN0b3J5X2NvbnZlcnNpb24KCjIgdGVzdHMgY29sbGVjdGVkIGluIDAuMDZzCg==",
+    "length": 280,
+    "sha256": "4a920979af6e32cdf1a3922c3c9a80262d107e2e5d82f30f7397ea99590902cd"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable
+tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion
+
+2 tests collected in 0.06s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.3151323220008635,
+  "end": "2026-09-07T02:19:04.153349+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-07-admission",
+  "start": "2026-09-07T02:19:03.838231+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9wdWJsaWNhdGlvbl9yZWZ1c2VzX2luY29oZXJlbnRfcHJpb3Jfc3RhdGVfYmVmb3JlX3dyaXRlc1tlbXB0eS1yb290XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfaW5jb2hlcmVudF9wcmlvcl9zdGF0ZV9iZWZvcmVfd3JpdGVzW21pc3NpbmctaW5kZXhlZC1yb290XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfaW5jb2hlcmVudF9wcmlvcl9zdGF0ZV9iZWZvcmVfd3JpdGVzW21pc3NpbmctcHJpbWFyeV0KdGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9wdWJsaWNhdGlvbl9yZWZ1c2VzX2luY29oZXJlbnRfcHJpb3Jfc3RhdGVfYmVmb3JlX3dyaXRlc1ttYWxmb3JtZWQtbWFuaWZlc3RdCnRlc3RzL2V2aWRlbmNlL3Rlc3RfZXZpZGVuY2VfaW5kZXhfbWlzc2luZ19zdGF0ZS5weTo6dGVzdF9jcmRfcHVibGljYXRpb25fcmVmdXNlc19pbmNvaGVyZW50X3ByaW9yX3N0YXRlX2JlZm9yZV93cml0ZXNbdW5yZWxhdGVkLWJyb2tlbi1wcm9vZl0KdGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9pbmRleF9hZG1pc3Npb25fcmVqZWN0c19mb3JnZXJ5X2JlZm9yZV9kZWR1cGxpY2F0aW9uW2ZvcmVpZ24ta2V5XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZm9yZWlnbi1wYXRoXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bYWxpYXNlZC1wYXRoXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bbGVnYWN5LWFsaWFzXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bdG9rZW5zXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZHVwbGljYXRlXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX2luZGV4X2FkbWlzc2lvbl9yZWplY3RzX2ZvcmdlcnlfYmVmb3JlX2RlZHVwbGljYXRpb25bZHVwbGljYXRlLWpzb24ta2V5XQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3B1YmxpY2F0aW9uX3JlZnVzZXNfZm9yZWlnbl9zY29wZV9hbmRfaW52YWxpZF9pbnB1dHMKCjEzIHRlc3RzIGNvbGxlY3RlZCBpbiAwLjA0cwo=",
+    "length": 1733,
+    "sha256": "1377424ff34a5b89bcf183f5cf7ea5888d3588f6c63ad2b5a32cdfbc3d8a9866"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[empty-root]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-indexed-root]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[missing-primary]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[malformed-manifest]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes[unrelated-broken-proof]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-key]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[foreign-path]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[aliased-path]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[legacy-alias]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[tokens]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication[duplicate-json-key]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs
+
+13 tests collected in 0.04s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
+
+
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--collect-only",
+    "-p",
+    "no:cacheprovider",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents",
+    "tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state",
+    "--basetemp",
+    "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-08-recovery-t3tm959y"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "duration": 0.3674820960004581,
+  "end": "2026-09-07T02:19:04.521331+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "collect-qa-08-recovery",
+  "start": "2026-09-07T02:19:04.153865+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "dGVzdHMvZXZpZGVuY2UvdGVzdF9ldmlkZW5jZV9pbmRleF9taXNzaW5nX3N0YXRlLnB5Ojp0ZXN0X2NyZF9vdXRlcl90cmFuc2FjdGlvbl9yZXN0b3Jlc19hbGxfZmlsZXNfYW5kX3BhcmVudHNbd3JpdGUtRmFsc2VdCnRlc3RzL2V2aWRlbmNlL3Rlc3RfZXZpZGVuY2VfaW5kZXhfbWlzc2luZ19zdGF0ZS5weTo6dGVzdF9jcmRfb3V0ZXJfdHJhbnNhY3Rpb25fcmVzdG9yZXNfYWxsX2ZpbGVzX2FuZF9wYXJlbnRzW3dyaXRlLVRydWVdCnRlc3RzL2V2aWRlbmNlL3Rlc3RfZXZpZGVuY2VfaW5kZXhfbWlzc2luZ19zdGF0ZS5weTo6dGVzdF9jcmRfb3V0ZXJfdHJhbnNhY3Rpb25fcmVzdG9yZXNfYWxsX2ZpbGVzX2FuZF9wYXJlbnRzW2ZpbmFsLXZlcmlmaWVyLUZhbHNlXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX291dGVyX3RyYW5zYWN0aW9uX3Jlc3RvcmVzX2FsbF9maWxlc19hbmRfcGFyZW50c1tmaW5hbC12ZXJpZmllci1UcnVlXQp0ZXN0cy9ldmlkZW5jZS90ZXN0X2V2aWRlbmNlX2luZGV4X21pc3Npbmdfc3RhdGUucHk6OnRlc3RfY3JkX3JvbGxiYWNrX2ZhaWx1cmVfcmV0YWluc19vcmlnaW5hbF9jYXVzZV9hbmRfdW50cnVzdHdvcnRoeV9zdGF0ZQoKNSB0ZXN0cyBjb2xsZWN0ZWQgaW4gMC4wNXMK",
+    "length": 666,
+    "sha256": "398fdd9414851e12cf025067e1595eb95ab347e5dd037a2b1df31314a671d8d2"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents[write-False]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents[write-True]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents[final-verifier-False]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents[final-verifier-True]
+tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state
+
+5 tests collected in 0.05s
+
+
+STDERR — human rendering; exact raw bytes are the base64 above
