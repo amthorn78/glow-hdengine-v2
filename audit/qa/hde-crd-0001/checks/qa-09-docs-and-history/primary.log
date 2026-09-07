@@ -1,0 +1,416 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-09-docs-and-history","check_name":"qa-09-docs-and-history","claimed_tokens":[],"command":[["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","/workspace/scratch/9c5d6db25d49/qa100-inputs/source_observe.py"]],"command_provenance":"Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.","evidence_artifacts":["audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF03-Reference-Technical-Writing-Best-Practices","PF04-Canon-HDE-Governance","PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-07T02:27:21Z"}
+# Actual operator result: qa-09-docs-and-history
+
+{
+  "actor": "PO-selected authorized Codex QA environment operator (this session), sole executor",
+  "change_class": "CRD",
+  "change_id": "HDE-CRD-0001",
+  "task_collection": "HDE-CRD-0001-qa-tasks-v1.1.md",
+  "qa_plan": "HDE-CRD-0001-qa-plan-v1.0.md",
+  "qa_plan_review": "HDE-CRD-0001-qa-plan-review-v1.0.md; APPROVE Isis-49",
+  "prompt": "QA-100 \u2014 Execute Bounded QA Task \u2014 090626.2",
+  "prompt_page_id": "3d34590a-05eb-817d-b972-f691f3e2e176",
+  "effective_register": "GCFPE-20260906.2",
+  "repository": "amthorn78/glow-hdengine-v2",
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "pr03_landing": "71307d9ae51927ec2886c3903e52e687834afc22",
+  "evidence_storage_commit": null,
+  "qa_acceptance": "not decided; continuing Kronos-22 QA-110",
+  "attempt": 1,
+  "prior_same_step_execution": "No prior same-step execution found: bounded Library execution/result/evidence name searches empty; operative CRD root absent; complete task/intake states initial tasks unexecuted. Not a global absence claim. No valid prior result discarded.",
+  "source_copy": "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/source-copy",
+  "interpreter": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+  "rails": {
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC"
+  },
+  "remaining_process": "Kronos-22 independent QA-110; completed run retains QA-120 QA Report and RCA; no closure decision.",
+  "qa_task_id": "HDE-CRD-0001-qa-09-docs-and-history-task-v1.1"
+}
+
+# qa-09-docs-and-history — operator semantic observations
+
+All four operative bodies were read completely: AGENTS.md, docs/qa_harness_pattern.md, docs/ADAPTER_009.md and docs/acceptance/http_transport_evidence.md. Relevant actual helper, harness, updater and engine/http/compat_handler.py definitions were inspected. The source-observation capture binds their complete bytes and hashes; file-read success alone is not the semantic determination below.
+
+## Requirement dispositions
+
+| Requirement | Determination | Decisive current evidence and limit |
+| --- | --- | --- |
+| S01 | SUPPORTED | AGENTS Scope and hierarchy and Operating workflow apply adopted PF04 policy, scoped supplied PF10 direction and existing owners. PF04 §2.0/2.0.0 establishes adoption; this execution makes no new adoption or approval. |
+| S02 | SUPPORTED | AGENTS Operating workflow and QA harness pattern separate ordinary tokenless work from explicit legacy compatibility. step_log_header create/update clears omitted claims; generic CRD config has no Epic-only paths. qa02, qa03, qa04 and qa05 exercised the corresponding positive and negative cases. |
+| S03 | SUPPORTED | AGENTS Evidence attribution and QA harness pattern require actual source/action/criteria/configuration/result/actor/time. Full CheckResult headers and manifest use existing native identities. All ten assigned results have distinct actual observations; qa10 separately establishes final binding. No replacement universal ledger is created. |
+| S04 | SUPPORTED | AGENTS Evidence attribution and the harness guide explicitly separate source landing, CI, implementation validation, QA, role acceptance and Isis closure. Both transport introductions expressly disclaim current conformance. Passed local tests do not erase nine historical hosted-CI failures. |
+| S05 | SUPPORTED | AGENTS Operating routes names both PO documentation classes and separately authorized agent implementation. Operative/canon docs require source and downstream semantics; an approved Plan or CI exception grants no standing agent push permission. No route mutation was performed as a policy test. |
+| S06 | SUPPORTED | AGENTS requires native findings/resolutions and corrected-source review attribution. Complete accepted PR01/02/03 reviews and implementation results were consumed, preserving corrected and rejected candidates and publication/landing distinctions. They were not reaccepted. |
+| S07 | SUPPORTED | QA harness pattern causal statuses and same-interpreter runner match actual source and executed tests. QA observations remain bounded to these criteria and source. Kronos-22 must independently review this result; QA-120 Report and RCA remain required after completed execution. |
+| S08 | SUPPORTED | AGENTS Evidence attribution and final harness-guide paragraph apply supplied PF10 §2.8: later storage commits and review HEAD remain distinct; relevant substantive changes matter, SHA movement alone does not. Current code/tests/four docs are unchanged from PR03 landing; the intervening diff only changes PF10/PF15/PF23 publication files. Supplied PF10 content governs this task; no unsupplied PF10 file was consulted. |
+| S09 | SUPPORTED | Harness full-v2 parsing/self-binding and CRD current manifest are distinct from updater Index/Mirror/proof ownership. qa02–08 actual tests exercised strict shape, claims, prior coherence, admission, convergence and recovery. qa10 is the separate actual-publication/final-integrity task. |
+| S10 | SUPPORTED | AGENTS historical guidance preserves prior meaning; harness local supersession retains old primary bytes; explicit Epic migration stays separate. qa05 retains strict viability and legacy history; qa06 proves current replacement without history conversion. qa08 proves bounded restoration. No historical primary is rewritten by this QA operation. |
+| S11 | SUPPORTED | All eight rows in AGENTS Operating routes match the eight approved routes, individually assessed below. Read-only policy assessment is sufficient for inactive routes; it does not exercise or authorize those mutations. |
+| S12 | SUPPORTED | Six ownership destinations remain distinct below. The actual delivery consists of four documents. PR03's 669-member accounting is retained as prior evidence (185 bodies: four changed plus 181 preserved; 484 further historical members accounted for), not a fresh 669-body certification. |
+| S13 | SUPPORTED | Both AGENTS and harness guide describe less duplicate bookkeeping while retaining semantic risk, proof availability and bounded authority. Updater _WriteTransaction and publish_crd_check_family recover handled exceptions; neither source nor docs promises crash recovery, interprocess locking or concurrent atomic visibility. No quantified benefit is claimed. |
+| S14 | SUPPORTED | Scope and preserved-history appendices retain all 25 findings, nine hosted failures and their known/unknown causes, original audit vs Triage, corrected PR/readiness/cancellation lineage, four pending/manual proposals and excluded product gaps. No newly inferred acceptance, Ops, PF drainage or closure. |
+
+## Eight route dispositions
+
+| Route | Determination | Source and assessment |
+| --- | --- | --- |
+| PO direct-main, bounded non-operative documentation | SUPPORTED | AGENTS Operating routes row 1 requires actual PO selection and native post-write/source/check facts. No inference from presence to acceptance. |
+| PO direct-main, canon or operative documentation | SUPPORTED | Row 2 adds owning-source authority and semantic/downstream impact; docs-only is insufficient. |
+| Specifically authorized agent direct-main implementation | SUPPORTED | Row 3 requires exact current agent/action authority; neither ADR, Plan nor CI exception grants it. Current task expressly forbids it. |
+| PR implementation | SUPPORTED | Row 4 preserves proposal, findings/resolutions and source/base/head/landing attribution. Accepted lineages remain historical decisions, not reopened QA prerequisites. |
+| QA verdict | SUPPORTED | Row 5 and Evidence attribution bind actual tested state, criteria/configuration/results, actor/time and limitations. Independent Kronos decision remains pending. |
+| Artifact/release integrity | SUPPORTED | Row 6 and canonical-writer guidance preserve bytes, proofs, ledgers and bounded recovery; they grant no deployment or release-cut permission. |
+| Task/change closure | SUPPORTED | Row 7 reserves the later authorized Isis decision; QA and Plan states do not close the CRD. |
+| Historical token-bearing work | SUPPORTED | Row 8 retains original identifiers, meanings and candidate attribution without default issuance or current acceptance transfer. |
+
+## Six owning-destination dispositions
+
+| Destination | Determination | Source and assessment |
+| --- | --- | --- |
+| PF04 Governance | SUPPORTED | Consulted §2.0/2.0.0 and adopted scope in approved specification/Plan. No new adoption or registry deletion required. |
+| PF19 QA Guide | SUPPORTED within supplied correction | Consulted §3.4.10, §4.4 and local HDE profile. Full-v2 follows PF27 and task. Supplied PF10 §2.8 overrides overlapping source-currentness restrictions. D-04 wording follow-up remains pending. |
+| PF27 Plan Templates | SUPPORTED | Consulted full-v2/claims/outcomes scope. Current full harness and separate reduced helper are correctly distinguished. Historical warning about the pinned old helper is not a current corrected-source finding. |
+| AGENTS.md | SUPPORTED | Complete current body read, especially Scope, QA/Verifier, Operating workflow, Evidence attribution and eight routes. Historical Epic-specific guidance remains in its explicit scope. |
+| PF12 Schemas and Artifacts | SUPPORTED | Consulted evidence index/mirror/companion ownership scope. Current writer emits only admitted key/path/role human rows and required mirror relationships; optional empty token metadata is absent. No closed Epic schema extension. |
+| PF20 Phased Epics | SUPPORTED as reference-only | Approved Plan destination map plus AGENTS Scope explicitly preserve historical/reference status; no new CRD registration, Epic card, PF09 mapping or planning gate is created. No additional PF20 read or edit was required. |
+
+## Technical qualifications and retained history
+
+The transport introductions qualify retained predicates as requirements/lookup labels, not conformance claims. ADAPTER_009 retains body_not_allowed and JSON-header wording while the acceptance crib and actual compat_handler.get_ids_only use invalid_json; the crib retains plaintext captures and --dump-reader parity. This inherited FND-017 difference remains separately owned D-02 and is not falsely repaired or certified by this CRD.
+
+FND-021 public compat vs Core, FND-022 non-BodyGraph loader I/O, FND-024 incomplete Magic-10 matrix and FND-025 incomplete Aux/admin catalog projection remain real excluded product work. FND-023's earlier missing family was true at its capture time; later authorized publication does not rewrite that observation. FND-018 helper warnings belong to old pinned source. FND-019 permanent currentness wording and D-04 remain pending despite applying the supplied correction now.
+
+Original Reality Audit I02 is retained separately and in full from Triage I03. PF23's informational publication is not substituted for I02; technical transcription defects and unconfirmed PF10/Triage proposals remain qualified. D-01/manual PF23, D-02/transport, D-03/PF14 mechanics and D-04/PF19 currentness are not declared drained. The complete task Appendix C is retained below verbatim as upstream history, not relabeled as new execution.
+
+Historical F-001–F-010 retain their 2026-08-21 snapshot at 273889f1a09d609ffbf77f0c77711c6294484b8f: F-001 presenter split, F-002 HTTP mount and F-010 catalog symlink are changed/equivalent; F-003 single CLI, F-004 evidence binding, F-005 bounded purity, F-006 vendor placement, F-007 direct DB facade, F-008 named lowercase roots and F-009 seven-root count remain bounded persistent/closest equivalents. They are mapped one-for-one to FND-001–010, without importing old environment or live-system observations as current facts.
+
+The v1.1 readiness supersedes v1.0 under integrated QA-10/GCFPE-20260906.2. Cancelled QA-15 produced no report or retry. PR02 review v1.0 rejection was withdrawn in v1.1; do not restore it as an open finding. PR03's original introduction finding and capture-normalization history stay retained. All nine hosted-CI failures remain failures; billing cause is evidenced only for the specified PR02 runs. Code/security and local validation duties were not waived by the plan-wide CI direction.
+
+No new in-scope Doc Delta found. AGENTS' old search-tool availability note differs from this workspace's available rg; that is an environment observation, not a CRD correctness or editing prerequisite. Deferred PR398 remains closed-unmerged/uninstalled; no new repository provenance path was created. Current prompt use is recorded in the execution result and QA-110 handoff.
+
+## Observation limits
+
+No production, Railway, vendor, database, Ops, deployment, PR reacceptance, source/test/PF modification, direct commit/push or closure was performed. Recovery tests prove handled-exception behavior and diagnostic preservation, not process-kill recovery. The rollback-failure test calls restoration before injecting its diagnostic failure; it proves the diagnostic/cause contract, not an actually corrupted production recovery. Passed synthetic child-refusal tests intentionally include failed child commands and rejected inputs; those are not hidden outer failures.
+
+The outer source copy preserves tracked bytes and symlink identities. Existing integration tests retain their own source-defined copytree behavior; those nested copies dereference symlinks by default. No test source or fixture assertion was changed, and no broader nested-copy symlink guarantee is inferred.
+
+
+Source identity/scoped consultation observations:
+[
+  {
+    "path": "AGENTS.md",
+    "size_bytes": 45697,
+    "sha256": "b3a307f325942a0277d8c1f64b2a10531e09804fb55c91d1f9d735519e9bb698"
+  },
+  {
+    "path": "docs/qa_harness_pattern.md",
+    "size_bytes": 15111,
+    "sha256": "e7f5b29230bce47efe9851e2d743deb1e52a8572a7d9d2d9285d983d5decc59b"
+  },
+  {
+    "path": "docs/ADAPTER_009.md",
+    "size_bytes": 9513,
+    "sha256": "b5153b87f31c51c55e043ca9645c39b2b8821fe6cc9802482d65975a4c6dcdff"
+  },
+  {
+    "path": "docs/acceptance/http_transport_evidence.md",
+    "size_bytes": 4819,
+    "sha256": "379b560f183dec1b4be2d2de1320ccbe17f5e831eaad83bde86bd779adfa11f6"
+  },
+  {
+    "path": "engine/http/compat_handler.py",
+    "size_bytes": 5745,
+    "sha256": "f30012063517af885c08a53e7329e0678f9aab8ef7687edc388111f7bd38714f"
+  },
+  {
+    "path": "tools/qa/step_log_header.py",
+    "size_bytes": 11057,
+    "sha256": "96541eb321f9a95228ab60405db65349d5fc6f16a8add11fa54f275bc5a2fa4f"
+  },
+  {
+    "path": "tools/qa/qa_harness.py",
+    "size_bytes": 150784,
+    "sha256": "554066080cc4e9e06f261860fe3560ae0481ed0ce120212b18eaca798a69320c"
+  },
+  {
+    "path": "tools/evidence/update_evidence_index.py",
+    "size_bytes": 212292,
+    "sha256": "e5da22404e23e232ba8256a4f391b21ea5d7d46843fc633f98ff9133bc983630"
+  },
+  {
+    "path": "tests/qa/test_qa_tool_ownership.py",
+    "size_bytes": 19202,
+    "sha256": "0f7b091300f7613acc256c6fb46b14de68abf6429960c83f48ddcf4999161f50"
+  },
+  {
+    "path": "tests/qa/test_generic_qa_harness.py",
+    "size_bytes": 63089,
+    "sha256": "9a17881518b5c5da472a2aa59fdd9c17357fd6be1471950b7d8d02c08c46a85f"
+  },
+  {
+    "path": "tests/evidence/test_evidence_index_missing_state.py",
+    "size_bytes": 21757,
+    "sha256": "f61af60393b7a47f7d4c7185fd748fb23eda18eb24446f90d793cff3fc428a02"
+  },
+  {
+    "path": "tests/conftest.py",
+    "size_bytes": 201,
+    "sha256": "6786a96b69546b38f8978af7c946da28976874c848f0c7abd41e260239ec13b7"
+  },
+  {
+    "path": "pytest.ini",
+    "size_bytes": 442,
+    "sha256": "32a35ebdd7c45832ac66978915e104654b30fa625ec63fc74ed6bb623d8a3fc8"
+  },
+  {
+    "path": "pyproject.toml",
+    "size_bytes": 479,
+    "sha256": "2825511b12e12b8071ca253ec07eee613f41b46f9d2df0e451bc079b6bbdbb3c"
+  },
+  {
+    "path": "requirements.txt",
+    "size_bytes": 78,
+    "sha256": "1fab2f1755c8ac790e6bf5e36150c0655748659059b1d10b06608ccf339e786f"
+  },
+  {
+    "path": "requirements-dev.txt",
+    "size_bytes": 118,
+    "sha256": "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"
+  },
+  {
+    "path": "docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.7.md",
+    "size_bytes": 39259,
+    "sha256": "cb123d2134b634c64589c1e193ef41a0bb5045f5d0b3fc85a8ff2cd3336399f3",
+    "consulted_ranges": [
+      [
+        368,
+        425
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF04-Canon-HDE-Governance-v2.8.5.md",
+    "size_bytes": 522094,
+    "sha256": "49def8b93c3f8fb658441361f3798a5f67419d6e50e58b6288b44874061f5408",
+    "consulted_ranges": [
+      [
+        238,
+        314
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.5.md",
+    "size_bytes": 583759,
+    "sha256": "d7b2e0287da884fad6f4f79c69391099157c82e7ec0e78418581e1b873d21a1d",
+    "consulted_ranges": [
+      [
+        23,
+        109
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.4.md",
+    "size_bytes": 643101,
+    "sha256": "d9d3283fe0fc2486557c4b20d9f9a78a7baddfa5c35fe28ce8fb505c4514de0c",
+    "consulted_ranges": [
+      [
+        825,
+        882
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.3.md",
+    "size_bytes": 640570,
+    "sha256": "92efd413c6380691bda3a5798ff561270a6cc8ec557dc9d214f4d42bcfdb49a2",
+    "consulted_ranges": [
+      [
+        1004,
+        1077
+      ],
+      [
+        1889,
+        2098
+      ],
+      [
+        5419,
+        5502
+      ]
+    ]
+  },
+  {
+    "path": "docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.4.md",
+    "size_bytes": 304262,
+    "sha256": "aa4ac7201e83beb46d43be80999049edcb43a2d24798a8b51ca6c2cce67b5248",
+    "consulted_ranges": [
+      [
+        470,
+        587
+      ]
+    ]
+  }
+]
+
+## Upstream Appendix C — retained verbatim, historical evidence
+
+
+### C.1 Delivery and actual failed outcomes
+
+| Unit | Tested corrected local source | Reviewed published head | Actual merged landing |
+| --- | --- | --- | --- |
+| PR-01 / #399 | d3afbeb4f7cca1b8c33c2d4f7d7686b2ed970f81 | 0be6e98003c274a12319d015e012ef65272a55bc | 062f7dbe613cd27ea60725e39069c01d85e959f4 |
+| PR-02 / #400 | bb198384b7c4060a12444fd0500b19cb4b426a44 | 94ca106df741f62615ae4bc24d2ef5030290721f | 72b1af74f98b0168496a1e2c51492aeff51e9af8 |
+| PR-03 / #401 | Documentation/source checks retain their exact initial/corrected candidate attribution in I14 | c848542418e3250adecc350de19e7ced304339bc | 71307d9ae51927ec2886c3903e52e687834afc22 |
+
+I09–I14 remain the exact accepted review/implementation records; PR-02 review v1.1 is the superseding review as identified in I10. The tested/published tree equivalence reported for PR-01/02 belongs to those actual records, not a relabeling of execution as their later squash commits. No later storage commit is invented. PR-01's 149 corrected checks differ from the earlier candidate's 569; PR-02's 167/653/90/52 selections overlap and are not summed; PR-03's V1–V8 are documentation checks, not pytest/live QA. Preserve the documented git diff --no-index --check exit 1 with no diagnostics, not exit 0.
+
+| Attempt | Run / job | Actual outcome and cause limit |
+| --- | --- | --- |
+| Earlier baseline | 33467618187 / 99730643827 | Failure before recorded steps; specific cause unestablished |
+| PR-01 initial | 33962246693 / 101296026758 | Failure before steps; specific cause unestablished |
+| PR-01 corrected | 33963778938 / 101300137273 | Failure; no hosted success supplied |
+| PR-02 initial | 33985352746 / 101357732580 | Failure before steps; I13 records retrieved billing-lock annotation; logs BlobNotFound |
+| PR-02 corrected | 33985997280 / 101359468191 | Failure before steps; I13 records retrieved billing-lock annotation |
+| PR-02 post-merge | 33994697736 / 101383072108 | Failure, no executed steps; cause not independently established |
+| PR-03 initial | 34008783686 / 101420757372 | Failure, no recorded job steps; cause not verified |
+| PR-03 corrected | 34009183236 / 101421857493 | Failure, steps=[]; cause not verified |
+| PR-03 post-merge | 34014353421 / 101435455761 | Failure, steps=[]; cause not verified |
+
+All nine remain failures. Only the two PR-02 attempted runs with recorded billing annotations have that cause evidence; do not infer a common cause for the others. The Plan-wide PO hosted-CI direction covers all three units without a new per-PR waiver, billing repair or CI rerun prerequisite. It does not waive real code/security findings, applicable local checks, evidence integrity or independent QA.
+
+Preserve the PR-01 initial malformed-token P2, premature handoff/security-routing corrections and provider error of unestablished request attribution; PR-02 initial additional_files escape and wider-ID P1 findings plus corrected standalone security coverage and withdrawn review-v1.0 CI interpretation; and PR-03 initial overbroad transport-conformance P2 and actual source/scratch/terminal-blank-line recovery history. Those actual unsuccessful operations remain in I09–I14/A00 §4.4; none becomes a consumed Kronos execution retry by inference.
+
+### C.2 Every Reality Audit finding, Plan finding and proposed delta
+
+The original Reality Audit I02 and its full E-/N-register are the exact evidence source. I03 gives each of the 25 findings its documentation disposition. All original observations and exclusions remain visible below; qa-09 carries every row, and the last column maps additional direct proof where applicable. A carried/excluded finding is not silently resolved by this CRD or by this Plan.
+
+| Finding | Original observation/evidence | Retained consequence/disposition | Plan proof assignment |
+| --- | --- | --- | --- |
+| FND-001 | Presenter namespace split with one shared emitter/serializer delegation; E-015/016/043 | Changed/equivalent historical F-001; permitted role-based mapping, not independent competing emission. Preserve S14; no repair or doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-002 | engine/http compat blueprint mounted by adapter factories; E-006/011/013/043 | Changed/equivalent F-002; module placement is not another surface owner. Preserve mapping; no doc delta or live surface exercise required here. | qa-09; preserve scoped observation/exclusion |
+| FND-003 | One hdctl registration and four current commands; E-003/017–019 | Persistent F-003; exact commands/carriers matter if selected. No CLI redesign; FND-024 carries full-result gap separately. No doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-004 | Distributed evidence bound by Human Index/Mirror and one updater; E-026/027 | Persistent F-004; directly relevant S09 integration burden. Independently test CRD publication across existing layers. No replacement ledger or doc delta. | qa-06/07/08/10 |
+| FND-005 | Bounded core/sampler computation and sanctioned BodyGraph I/O; E-007/008/020–025 | Persistent bounded F-005; do not generalize purity to every module. Loader remains FND-022. No new product scope or doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-006 | No top-level vendor; actual BodyGraph vendor_client and separate provider packages; E-020/021, N-003 | Persistent closest equivalent F-006. Live connectivity unknown; no vendor prerequisite or doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-007 | Shared engine/db direct DBAccess with adapter facade and BodyGraph callers; E-022–024 | Persistent closest equivalent F-007. Production DB state unknown; no Ops or new DB implementation inference. No doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-008 | Named expected roots resolve in lowercase; E-002 | Persistent bounded F-008; not a claim every repository path is lowercase. No repair/doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-009 | Same seven compared roots: docs, artifacts, audit, catalog, proofs, tools, scripts; E-002/026 | Persistent count-only F-009; impact and CRD attribution of all count changes unestablished. No consolidation mandate/doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-010 | docs/ENDPOINTS_CATALOG.json is a symlink to physical artifact storage; E-028 | Changed/equivalent F-010. Preserve logical versus physical identity for proof. D-01 manual PF23 publication; no catalog move. | qa-09; preserve scoped observation/exclusion |
+| FND-011 | Procfile factory differs from alternative WSGI factory; E-005/006 | Configured adapter.factory:create_app() is source evidence, not deployed-process observation. D-01; no deployment/start-command change. | qa-09; preserve scoped observation/exclusion |
+| FND-012 | assert/import are zero-byte root files; E-002 | Runtime impact not established. D-01 factual publication; no deletion or behavior claim. | qa-09; preserve scoped observation/exclusion |
+| FND-013 | Duplicate category IDs raise ValueError before sorting; E-016 | Preserve rejection, not “deduplication” wording. D-01; no emitter change or new domain QA. | qa-09; preserve scoped observation/exclusion |
+| FND-014 | Corrected reduced helper; E-029/033/040 | S02/03/04/10 proof obligation in §§5–6. No new repair established; full-v2 distinction remains. No doc delta. | qa-02 |
+| FND-015 | Accepted CRD configuration/local/current/governed capability; E-030–034 | Core independent QA burden: CRD0001 admission, coherent graph, negative cases and bounded recovery. D-03 PF14 mechanics proposal, non-gating. | qa-03/04/06/07/08/10 |
+| FND-016 | Four-document delivery and complete 669-member accounting; E-038–040/050 | S01–S14 source/semantic review, with no fresh recertification of all historical bodies. No missing final-doc prerequisite or doc delta. | qa-09 |
+| FND-017 | Inherited transport differences; E-012/013/018/038 | D-02 separately owned documentation; immediate interpretation caveat required and supplied. Actual invalid_json, plain-text header capture, --dump-reader parity; no current-conformance claim from framing. | qa-09; excluded transport execution |
+| FND-018 | Actual failed CI and plan-wide PO disposition; E-040/041 | Preserve all failures, cause limits and independent review/QA duties. No new waiver or doc delta; CI restoration separately operator-owned. | qa-01/09; no hosted rerun |
+| FND-019 | Permanent PF19 §10.8 wording still differs from supplied §2.8 direction; E-045/050 | Apply scoped correction now; D-04 retained PF19/TW follow-up. No SHA-only gate or false completed drainage. | qa-01/09; supplied direction |
+| FND-020 | No installed provenance procedure; closed-unmerged PR398 deferred; E-052/053, N-002 | S14 exclusion. Carry actual prompt uses here; future authorized installer/writer owns persistence. No helper/ledger gate or doc delta. | qa-10; non-gating deferred provenance |
+| FND-021 | Public runtime/HTTP/CLI uses compat rather than compute_core; E-007/009/013/018/043, N-007 | Real separately owned architecture gap, excluded by I05 §12/I06 §3. No public-Core conformance claim. Future PO/Thoth scope and IA delivery; no doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-022 | Non-BodyGraph loader reads environment/time/provider and logs; E-025/043 | PF02-classified drift, excluded product work. No universal purity claim; future PO/Thoth/IA orchestration migration. No doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-023 | No tracked current CRD QA root; E-052, N-001 | Independently corroborated in current tree. Expected future QA, not an implementation omission or passed run. Producing tasks later owe actual evidence. No doc delta. | qa-01/10; actual future evidence |
+| FND-024 | Existing compatibility result is not complete magic10_compat_result.v1 full matrix; E-009/018/055 | Real separately owned CLI/math gap. A harmony/older-wrapper proof cannot establish all ten categories. Excluded from this CRD; future PF05/PF01-governed work. No doc delta. | qa-09; preserve scoped observation/exclusion |
+| FND-025 | Endpoint Catalog has nine entries and incomplete Aux/admin projection; E-028/055, N-009 | Real separately owned PF05/PF12 population/validation gap. No complete-catalog claim or new CRD requirement. Future PO-assigned IA/tooling work; no doc delta. | qa-09; preserve scoped observation/exclusion |
+
+Historical F-001–F-010 retain their original 2026-08-21 snapshot at 273889f1a09d609ffbf77f0c77711c6294484b8f. F-001/F-002/F-010 are changed/equivalent; F-003–F-009 retain their bounded persistent/closest-equivalent posture. No historical live environment, vendor or DB observation is imported as present proof. The complete original E-/N evidence register remains in I02; no missing N-004 or other invented source is created.
+
+| Original Implementation Plan finding | QA assignment / retained treatment |
+| --- | --- |
+| F01 — auto/stale claims | qa-02-claims; corrected helper behavior, no historical revalidation |
+| F02 — mandatory transport token headings | qa-09; qualified optional labels and inherited transport limits |
+| F03 — general/legacy guidance | qa-09; correct source/authority/state/local-versus-governed boundaries |
+| F04 — ordinary empty claims already supported | qa-02/03/05; credit retained behavior, preserve strict explicit legacy scope |
+| F05 — Epic-only generic path | qa-03/04/06; real supported CRD API, no fake Epic or obsolete wrapper |
+| F06 — required arrays versus optional index metadata | qa-02/03/06/07/10; explicit empty header arrays and absent optional Index tokens |
+| F07 — CI/native source and narrower Epic closeout | qa-01/09; actual failures and scoped override, no CRD Epic-closeout prerequisite |
+| F08 — policy adoption already present | qa-09; credit prior adoption, no repeated ADR/PF adoption or history rewrite |
+
+| Proposal | Finding / owner | Retained disposition |
+| --- | --- | --- |
+| D-01 | FND-010–013; PO manual PF23 factual snapshot | Publication v1.2 discovered with Guide transcription caveats; original Reality remains the exact QA-10 input; no automatic correction |
+| D-02 | FND-017; PF05/PF12 and normal documentation/IA ownership | Transport/evidence-shape repair is separately owned; immediate interpretation qualification remains in this Plan |
+| D-03 | FND-015; PF14 mechanics/TW owner | Bounded permanent local/governed CRD mechanics clarification proposed; no new API/schema or mandatory publication |
+| D-04 | FND-019; PF19/PO/TW owner | Permanent source-currentness wording alignment pending; supplied §2.8 applies now; no SHA-only gate |
+
+PF10 proposal disposition and whole-ledger overlap remain pending/unconfirmed outside supplied authorized material. Excluded product work FND-021/022/024/025 remains future PO/Thoth/IA scope under its actual architecture/math/API/catalog owners. Deferred PR398 provenance remains outside this delivery. No proposal is presented as an approved entry or closed row.
+
+
+
+## Lossless native command observations
+### Actual command capture
+{
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "/workspace/scratch/9c5d6db25d49/qa100-inputs/source_observe.py"
+  ],
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "duration": 0.06412517499848036,
+  "end": "2026-09-07T02:23:14.845891+00:00",
+  "exception": null,
+  "exit_code": 0,
+  "name": "qa09-source-observation",
+  "start": "2026-09-07T02:23:14.781769+00:00",
+  "stderr": {
+    "base64": "",
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "base64": "eyJwYXRoIjogIkFHRU5UUy5tZCIsICJzaXplX2J5dGVzIjogNDU2OTcsICJzaGEyNTYiOiAiYjNhMzA3ZjMyNTk0MmEwMjc3ZDhjMWY2NGIyYTEwNTMxZTA5ODA0ZmI1NWM5MWQxZjlkNzM1NTE5ZTliYjY5OCJ9CnsicGF0aCI6ICJkb2NzL3FhX2hhcm5lc3NfcGF0dGVybi5tZCIsICJzaXplX2J5dGVzIjogMTUxMTEsICJzaGEyNTYiOiAiZTdmNWIyOTIzMGJjZTQ3ZWZlOTg1MWUyZDc0M2RlYjFlNTJhODU3MmE3ZDlkMmQ5Mjg1ZDk4M2Q1ZGVjYzU5YiJ9CnsicGF0aCI6ICJkb2NzL0FEQVBURVJfMDA5Lm1kIiwgInNpemVfYnl0ZXMiOiA5NTEzLCAic2hhMjU2IjogImI1MTUzYjg3ZjMxYzUxYzU1ZTA0M2NhOTY0NWMzOWIyYjg4MjFmZTZjYzk4MDI0ODJkNjU5NzVhNGM2ZGNkZmYifQp7InBhdGgiOiAiZG9jcy9hY2NlcHRhbmNlL2h0dHBfdHJhbnNwb3J0X2V2aWRlbmNlLm1kIiwgInNpemVfYnl0ZXMiOiA0ODE5LCAic2hhMjU2IjogIjM3OWI1NjBmMTgzZGVjMWI0YmUyZDJkZTEzMjBjY2JlMTdmNWU4MzFlYWFkODNiZGU4NmJkNzc5YWRmYTExZjYifQp7InBhdGgiOiAiZW5naW5lL2h0dHAvY29tcGF0X2hhbmRsZXIucHkiLCAic2l6ZV9ieXRlcyI6IDU3NDUsICJzaGEyNTYiOiAiZjMwMDEyMDYzNTE3YWY4ODVjMDhhNTNlNzMyOWUwNjc4ZjlhYWI4ZWY3Njg3ZWRjMzg4MTExZjdiZDM4NzE0ZiJ9CnsicGF0aCI6ICJ0b29scy9xYS9zdGVwX2xvZ19oZWFkZXIucHkiLCAic2l6ZV9ieXRlcyI6IDExMDU3LCAic2hhMjU2IjogIjk2NTQxZWIzMjFmOWE5NTIyOGFiNjA0MDVkYjY1MzQ5ZDVmYzZmMTZhOGFkZDExZmE1NGYyNzViYzVhMmZhNGYifQp7InBhdGgiOiAidG9vbHMvcWEvcWFfaGFybmVzcy5weSIsICJzaXplX2J5dGVzIjogMTUwNzg0LCAic2hhMjU2IjogIjU1NDA2NjA4MGNjNGU5ZTA2ZjI2MTg2MGZlMzU2MGFlMDQ4MWVkMGNlMTIwMjEyYjE4ZWFjYTc5OGE2OTMyMGMifQp7InBhdGgiOiAidG9vbHMvZXZpZGVuY2UvdXBkYXRlX2V2aWRlbmNlX2luZGV4LnB5IiwgInNpemVfYnl0ZXMiOiAyMTIyOTIsICJzaGEyNTYiOiAiZTVkYTIyNDA0ZTIzZTIzMmJhODI1NmE0ZjM5MWIyMWVhNWQ3ZDQ2ODQzZmM2MzNmOThmZjkxMzNiYzk4MzYzMCJ9CnsicGF0aCI6ICJ0ZXN0cy9xYS90ZXN0X3FhX3Rvb2xfb3duZXJzaGlwLnB5IiwgInNpemVfYnl0ZXMiOiAxOTIwMiwgInNoYTI1NiI6ICIwZjdiMDkxMzAwZjc2MTNhY2MyNTZjNmZiNDZiMTRkZTY4YWJmNjQyOTk2MGM4M2Y0OGRkY2Y0OTk5MTYxZjUwIn0KeyJwYXRoIjogInRlc3RzL3FhL3Rlc3RfZ2VuZXJpY19xYV9oYXJuZXNzLnB5IiwgInNpemVfYnl0ZXMiOiA2MzA4OSwgInNoYTI1NiI6ICI5YTE3ODgxNTE4YjVjNWRhNDcyYTJhYTU5ZmRkOWMxNzM1N2ZkNmJlMTQ3MTk1MGI3ZDhkMDJjMDhjNDZhODVmIn0KeyJwYXRoIjogInRlc3RzL2V2aWRlbmNlL3Rlc3RfZXZpZGVuY2VfaW5kZXhfbWlzc2luZ19zdGF0ZS5weSIsICJzaXplX2J5dGVzIjogMjE3NTcsICJzaGEyNTYiOiAiZjYxYWY2MDM5M2I3YTQ3ZjdkNGM3MTg1ZmQ3NDhmYjIzZWRhMThlYjI0NDQ2ZjkwZDc5M2NmZjNmYzQyOGEwMiJ9CnsicGF0aCI6ICJ0ZXN0cy9jb25mdGVzdC5weSIsICJzaXplX2J5dGVzIjogMjAxLCAic2hhMjU2IjogIjY3ODZhOTZiNjk1NDZiMzhmODk3OGFmN2M5NDZkYTI4OTc2ODc0Yzg0OGYwYzdhYmQ0MWUyNjAyMzllYzEzYjcifQp7InBhdGgiOiAicHl0ZXN0LmluaSIsICJzaXplX2J5dGVzIjogNDQyLCAic2hhMjU2IjogIjMyYTM1ZWJkZDdjNDU4MzJhYzY2OTc4OTE1ZTEwNDY1NGIzMGZhNjI1ZWM2M2ZjNzRlZDZiYjYyM2Q4YTNmYzgifQp7InBhdGgiOiAicHlwcm9qZWN0LnRvbWwiLCAic2l6ZV9ieXRlcyI6IDQ3OSwgInNoYTI1NiI6ICIyODI1NTExYjEyZTEyYjgwNzFjYTI1M2VjMDdlZWU2MTNmNDFiNDZmOWQyZGYwZTQ1MWJjMDc5YjZiYmRiYjNjIn0KeyJwYXRoIjogInJlcXVpcmVtZW50cy50eHQiLCAic2l6ZV9ieXRlcyI6IDc4LCAic2hhMjU2IjogIjFmYWIyZjE3NTVjOGFjNzkwZTZiZjVlMzYxNTBjMDY1NTc0ODY1OTA1OWIxZDEwYjA2NjA4Y2NmMzM5ZTc4NmYifQp7InBhdGgiOiAicmVxdWlyZW1lbnRzLWRldi50eHQiLCAic2l6ZV9ieXRlcyI6IDExOCwgInNoYTI1NiI6ICIyZTI4NmMzNDUxYTQ1NDcyZGQ1NGVmMzU2ODk1MTEwZjZlYzMyMGViZTE5ZDQ4OGI2MzQ4NTcyYzM4NjNlMDRlIn0KeyJwYXRoIjogImRvY3MvcGZjYW5vbi9QRjAzLVJlZmVyZW5jZS1UZWNobmljYWwtV3JpdGluZy1CZXN0LVByYWN0aWNlcy12MS44LjcubWQiLCAic2l6ZV9ieXRlcyI6IDM5MjU5LCAic2hhMjU2IjogImNiMTIzZDIxMzRiNjM0YzY0NTg5YzFlMTkzZWY0MWEwYmI1MDQ1ZjVkMGIzZmM4NWE4ZmYyY2QzMzM2Mzk5ZjMiLCAiY29uc3VsdGVkX3JhbmdlcyI6IFtbMzY4LCA0MjVdXX0KeyJwYXRoIjogImRvY3MvcGZjYW5vbi9QRjA0LUNhbm9uLUhERS1Hb3Zlcm5hbmNlLXYyLjguNS5tZCIsICJzaXplX2J5dGVzIjogNTIyMDk0LCAic2hhMjU2IjogIjQ5ZGVmOGI5M2MzZjhmYjY1ODQ0MTM2MWYzNzk4YTVmNjc0MTlkNmU1MGU1OGI2Mjg4YjQ0ODc0MDYxZjU0MDgiLCAiY29uc3VsdGVkX3JhbmdlcyI6IFtbMjM4LCAzMTRdXX0KeyJwYXRoIjogImRvY3MvcGZjYW5vbi9QRjEyLUNhbm9uLUhERS1TY2hlbWFzLWFuZC1BcnRpZmFjdHMtdjIuOS41Lm1kIiwgInNpemVfYnl0ZXMiOiA1ODM3NTksICJzaGEyNTYiOiAiZDdiMmUwMjg3ZGE4ODRmYWQ2ZjRmNzljNjkzOTEwOTkxNTdjODJlN2VjMGU3ODQxODU4MWUxYjg3M2QyMWExZCIsICJjb25zdWx0ZWRfcmFuZ2VzIjogW1syMywgMTA5XV19CnsicGF0aCI6ICJkb2NzL3BmY2Fub24vUEYxNC1DYW5vbi1IREUtTWVjaGFuaWNzLUd1aWRlLXYzLjUuNC5tZCIsICJzaXplX2J5dGVzIjogNjQzMTAxLCAic2hhMjU2IjogImQ5ZDMyODNmZTBmYzI0ODY1NTdjNGIyMGQ5ZjlhNzhhN2JhZGRmYTVjMzVmZTI4Y2U4ZmI1MDVjNDUxNGRlMGMiLCAiY29uc3VsdGVkX3JhbmdlcyI6IFtbODI1LCA4ODJdXX0KeyJwYXRoIjogImRvY3MvcGZjYW5vbi9QRjE5LUNhbm9uLUdsb3ctUUEtR3VpZGUtdjMuMC4zLm1kIiwgInNpemVfYnl0ZXMiOiA2NDA1NzAsICJzaGEyNTYiOiAiOTJlZmQ0MTNjNjM4MDY5MWJkYTNhNTc5OGZmNTYxMjcwYTZjYzhlYzU1N2RjOWQyMTRmNGQ0MmJjZmRiNDlhMiIsICJjb25zdWx0ZWRfcmFuZ2VzIjogW1sxMDA0LCAxMDc3XSwgWzE4ODksIDIwOThdLCBbNTQxOSwgNTUwMl1dfQp7InBhdGgiOiAiZG9jcy9wZmNhbm9uL1BGMjctQ2Fub24tUGxhbi1UZW1wbGF0ZXMtdjIuMC40Lm1kIiwgInNpemVfYnl0ZXMiOiAzMDQyNjIsICJzaGEyNTYiOiAiYWE0YWM3MjAxZTgzYmViNDZkNDNiZTgwOTk5MDQ5ZWRjYjQzYTJkMjQ3OThhOGI1MWNhNmMyY2NlNjdiNTI0OCIsICJjb25zdWx0ZWRfcmFuZ2VzIjogW1s0NzAsIDU4N11dfQpDT0xMRUNUSU9OX1BBUlRJVElPTiB7J3FhLTAyLWNsYWltcyc6IDEzOSwgJ3FhLTAzLWNyZC1sb2NhbCc6IDYsICdxYS0wNC1ydW5uZXInOiAxMzIsICdxYS0wNS1lcGljLWNvbXBhdCc6IDI5LCAncWEtMDYtcHVibGljYXRpb24nOiAyLCAncWEtMDctYWRtaXNzaW9uJzogMTMsICdxYS0wOC1yZWNvdmVyeSc6IDV9IGRpc3RpbmN0IDMyNgpDVVJSRU5UX0NSRF9ST09UX0VYSVNUUyBGYWxzZQpET0NfREVMVEFfRElTQ09WRVJZIFtdClNPVVJDRV9ERUxUQV9GUk9NX1BSMDMgRAlkb2NzL3BmY2Fub24vUEYxMC1IREUtQnVpbGQtTm90ZXMtdjEyLjkuNS5tZApBCWRvY3MvcGZjYW5vbi9QRjEwLUhERS1CdWlsZC1Ob3Rlcy12MTMuMC42Lm1kCkEJZG9jcy9wZmNhbm9uL1BGMTUgSERFIENvcHkgVG9uYWxpdHkgR3VpZGUgdjEuMi4wLm1kCkQJZG9jcy9wZmNhbm9uL1BGMTUtUmVmZXJlbmNlLUhERS1Db3B5IFRvbmFsaXR5IEd1aWRlIHYxLjEuMS5tZApECWRvY3MvcGZjYW5vbi9QRjIzLUNhbm9uLVJlYWxpdHktQXVkaXRzLXYxLjEuOS5tZApBCWRvY3MvcGZjYW5vbi9QRjIzLUNhbm9uLVJlYWxpdHktQXVkaXRzLXYxLjIubWQKCklOVEFLRV9GSUxFUyAxOSBmdWxsIG9yaWdpbmFscyByZXRhaW5lZCBzZXBhcmF0ZWx5OyBzdXBwbGllZCBQRjEwIHNlY3Rpb24gb25seSwgbm8gUEYxMCBmaWxlIG9wZW5lZAo=",
+    "length": 4106,
+    "sha256": "7bfdb365de1b03aabd2b3e0ffe3d28680c184379d365f2cad5f1cbd935aca826"
+  }
+}
+
+STDOUT — human rendering; exact raw bytes are the base64 above
+{"path": "AGENTS.md", "size_bytes": 45697, "sha256": "b3a307f325942a0277d8c1f64b2a10531e09804fb55c91d1f9d735519e9bb698"}
+{"path": "docs/qa_harness_pattern.md", "size_bytes": 15111, "sha256": "e7f5b29230bce47efe9851e2d743deb1e52a8572a7d9d2d9285d983d5decc59b"}
+{"path": "docs/ADAPTER_009.md", "size_bytes": 9513, "sha256": "b5153b87f31c51c55e043ca9645c39b2b8821fe6cc9802482d65975a4c6dcdff"}
+{"path": "docs/acceptance/http_transport_evidence.md", "size_bytes": 4819, "sha256": "379b560f183dec1b4be2d2de1320ccbe17f5e831eaad83bde86bd779adfa11f6"}
+{"path": "engine/http/compat_handler.py", "size_bytes": 5745, "sha256": "f30012063517af885c08a53e7329e0678f9aab8ef7687edc388111f7bd38714f"}
+{"path": "tools/qa/step_log_header.py", "size_bytes": 11057, "sha256": "96541eb321f9a95228ab60405db65349d5fc6f16a8add11fa54f275bc5a2fa4f"}
+{"path": "tools/qa/qa_harness.py", "size_bytes": 150784, "sha256": "554066080cc4e9e06f261860fe3560ae0481ed0ce120212b18eaca798a69320c"}
+{"path": "tools/evidence/update_evidence_index.py", "size_bytes": 212292, "sha256": "e5da22404e23e232ba8256a4f391b21ea5d7d46843fc633f98ff9133bc983630"}
+{"path": "tests/qa/test_qa_tool_ownership.py", "size_bytes": 19202, "sha256": "0f7b091300f7613acc256c6fb46b14de68abf6429960c83f48ddcf4999161f50"}
+{"path": "tests/qa/test_generic_qa_harness.py", "size_bytes": 63089, "sha256": "9a17881518b5c5da472a2aa59fdd9c17357fd6be1471950b7d8d02c08c46a85f"}
+{"path": "tests/evidence/test_evidence_index_missing_state.py", "size_bytes": 21757, "sha256": "f61af60393b7a47f7d4c7185fd748fb23eda18eb24446f90d793cff3fc428a02"}
+{"path": "tests/conftest.py", "size_bytes": 201, "sha256": "6786a96b69546b38f8978af7c946da28976874c848f0c7abd41e260239ec13b7"}
+{"path": "pytest.ini", "size_bytes": 442, "sha256": "32a35ebdd7c45832ac66978915e104654b30fa625ec63fc74ed6bb623d8a3fc8"}
+{"path": "pyproject.toml", "size_bytes": 479, "sha256": "2825511b12e12b8071ca253ec07eee613f41b46f9d2df0e451bc079b6bbdbb3c"}
+{"path": "requirements.txt", "size_bytes": 78, "sha256": "1fab2f1755c8ac790e6bf5e36150c0655748659059b1d10b06608ccf339e786f"}
+{"path": "requirements-dev.txt", "size_bytes": 118, "sha256": "2e286c3451a45472dd54ef356895110f6ec320ebe19d488b6348572c3863e04e"}
+{"path": "docs/pfcanon/PF03-Reference-Technical-Writing-Best-Practices-v1.8.7.md", "size_bytes": 39259, "sha256": "cb123d2134b634c64589c1e193ef41a0bb5045f5d0b3fc85a8ff2cd3336399f3", "consulted_ranges": [[368, 425]]}
+{"path": "docs/pfcanon/PF04-Canon-HDE-Governance-v2.8.5.md", "size_bytes": 522094, "sha256": "49def8b93c3f8fb658441361f3798a5f67419d6e50e58b6288b44874061f5408", "consulted_ranges": [[238, 314]]}
+{"path": "docs/pfcanon/PF12-Canon-HDE-Schemas-and-Artifacts-v2.9.5.md", "size_bytes": 583759, "sha256": "d7b2e0287da884fad6f4f79c69391099157c82e7ec0e78418581e1b873d21a1d", "consulted_ranges": [[23, 109]]}
+{"path": "docs/pfcanon/PF14-Canon-HDE-Mechanics-Guide-v3.5.4.md", "size_bytes": 643101, "sha256": "d9d3283fe0fc2486557c4b20d9f9a78a7baddfa5c35fe28ce8fb505c4514de0c", "consulted_ranges": [[825, 882]]}
+{"path": "docs/pfcanon/PF19-Canon-Glow-QA-Guide-v3.0.3.md", "size_bytes": 640570, "sha256": "92efd413c6380691bda3a5798ff561270a6cc8ec557dc9d214f4d42bcfdb49a2", "consulted_ranges": [[1004, 1077], [1889, 2098], [5419, 5502]]}
+{"path": "docs/pfcanon/PF27-Canon-Plan-Templates-v2.0.4.md", "size_bytes": 304262, "sha256": "aa4ac7201e83beb46d43be80999049edcb43a2d24798a8b51ca6c2cce67b5248", "consulted_ranges": [[470, 587]]}
+COLLECTION_PARTITION {'qa-02-claims': 139, 'qa-03-crd-local': 6, 'qa-04-runner': 132, 'qa-05-epic-compat': 29, 'qa-06-publication': 2, 'qa-07-admission': 13, 'qa-08-recovery': 5} distinct 326
+CURRENT_CRD_ROOT_EXISTS False
+DOC_DELTA_DISCOVERY []
+SOURCE_DELTA_FROM_PR03 D	docs/pfcanon/PF10-HDE-Build-Notes-v12.9.5.md
+A	docs/pfcanon/PF10-HDE-Build-Notes-v13.0.6.md
+A	docs/pfcanon/PF15 HDE Copy Tonality Guide v1.2.0.md
+D	docs/pfcanon/PF15-Reference-HDE-Copy Tonality Guide v1.1.1.md
+D	docs/pfcanon/PF23-Canon-Reality-Audits-v1.1.9.md
+A	docs/pfcanon/PF23-Canon-Reality-Audits-v1.2.md
+
+INTAKE_FILES 19 full originals retained separately; supplied PF10 section only, no PF10 file opened
+
+
+STDERR — human rendering; exact raw bytes are the base64 above

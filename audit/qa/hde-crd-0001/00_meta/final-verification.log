@@ -1,0 +1,1246 @@
+# Final verification observation after successful composed publication
+
+{
+  "annotation": "Native callback is the final six-check observation; no repeated six-check invocation after publication. Writer-controlled proof produced_at_utc may preserve prior default 2026-08-18T16:05:54Z; actual QA header/publication/command times are separately recorded and were not backdated. No acceptance or closure decision.",
+  "changed_existing": [
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.path_proof.txt",
+    "artifacts/evidence_index.jsonl.sha256",
+    "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+    "audit/gates/topology/orientation_demo.txt",
+    "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.json.path_proof.txt",
+    "docs/evidence/INDEX.sha256",
+    "docs/evidence/INDEX.sha256.path_proof.txt"
+  ],
+  "crd_rows": 11,
+  "evidence_storage_commit": null,
+  "file_identities": {
+    "artifacts/evidence_index.jsonl": {
+      "sha256": "73570bf3363fcabdd67445a98319f05c10b6649be4554320603f6bc9c70f0eb6",
+      "size_bytes": 288821
+    },
+    "artifacts/evidence_index.jsonl.path_proof.txt": {
+      "sha256": "79e7e6c42d7c96562cd01fc0bc057591c5118a54bcf5dab303f6b067b8fe91f1",
+      "size_bytes": 284
+    },
+    "artifacts/evidence_index.jsonl.sha256": {
+      "sha256": "b6285540cb354d346a937b4dc2a80878ce30083462045261dec722c0349d5a26",
+      "size_bytes": 97
+    },
+    "artifacts/evidence_index.jsonl.sha256.path_proof.txt": {
+      "sha256": "d5d20dd22822ea468dce60700500ce3e455c533386f47d5323829d8f4cf1761d",
+      "size_bytes": 202
+    },
+    "audit/gates/topology/orientation_demo.txt": {
+      "sha256": "ba1458dfdb3fd4270481b96cca14f022771d01134c1481e0ca1e2b26863f38ed",
+      "size_bytes": 115
+    },
+    "audit/gates/topology/orientation_demo.txt.path_proof.txt": {
+      "sha256": "64a00cb398b8e4108d475818f36d4538d319c92fe5256d16e7c85b2ee26116c9",
+      "size_bytes": 207
+    },
+    "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log": {
+      "sha256": "f4c0f8adfb6c6b07fc34c2696d6f204797dd563c79a9c3e4212b2d09ae2d3e56",
+      "size_bytes": 133340
+    },
+    "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log.path_proof.txt": {
+      "sha256": "a21d331c6bfaae6a4678be2e24ed3b223b813cd15f97f18d589c55d53c3c6d59",
+      "size_bytes": 221
+    },
+    "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log": {
+      "sha256": "051d25e986607e280df15d7d917bba831f3cc412c0f73b6f04e1fe505e3842e3",
+      "size_bytes": 62964
+    },
+    "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log.path_proof.txt": {
+      "sha256": "899a0d2859fdd3f9bcca70853f88b1e37c3e1c23fb36437f937903f874cac0a7",
+      "size_bytes": 221
+    },
+    "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log": {
+      "sha256": "7621a46768f34108df845c46a245f292891359a86768c043c80a5073d15eb2d5",
+      "size_bytes": 25503
+    },
+    "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log.path_proof.txt": {
+      "sha256": "82b2a369630425ad6ceff177c1aee87716f7935b6b14d14dd377b2c488caf437",
+      "size_bytes": 224
+    },
+    "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log": {
+      "sha256": "ea979f58b6f621ba397e018993f34136d31ad899c61cbf3efe8507b0b87b8d71",
+      "size_bytes": 55964
+    },
+    "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log.path_proof.txt": {
+      "sha256": "b3bb19500558c90977896ba993186e6c749c799d32784826d1a50126f24e526f",
+      "size_bytes": 221
+    },
+    "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log": {
+      "sha256": "1de86e112ed6a5aa62b7f577a526233903437a6f06c367ab69532dacc1cd9650",
+      "size_bytes": 32755
+    },
+    "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log.path_proof.txt": {
+      "sha256": "c2cbf3ed98fded3e0e48c3d317bbf2ec4f565aee91797abaf7d89a595293d626",
+      "size_bytes": 226
+    },
+    "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log": {
+      "sha256": "c1b20727cc52d23de609aae81027fe45744be414af096708aa2cc690195c61b9",
+      "size_bytes": 8147
+    },
+    "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log.path_proof.txt": {
+      "sha256": "e88d9c8e448704e96ba6e34edc2fbf7d69ef735d0180de5e7ab095cab6f3df34",
+      "size_bytes": 225
+    },
+    "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log": {
+      "sha256": "f99aaf89c446a087e0d847ae1012aa7fe55c78eb970dc239e579f65b4c130a0b",
+      "size_bytes": 13413
+    },
+    "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log.path_proof.txt": {
+      "sha256": "d66064d87aa8bdf34511f92e54d7d6078770a5221788f48afa299a2120134ae1",
+      "size_bytes": 224
+    },
+    "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log": {
+      "sha256": "5102216d1f8e2f271bfb9ddb8f1db411d1acc8b8482e9eff7090281f28e34721",
+      "size_bytes": 9385
+    },
+    "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log.path_proof.txt": {
+      "sha256": "0746794e40d0132c8d6a4e62c245a270d37a4112b35bc5fa60033450b98473a4",
+      "size_bytes": 222
+    },
+    "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log": {
+      "sha256": "d425628afda1a23d0c587c5631d1498fa0cddf60ac59c8c85dee861c28cfebb9",
+      "size_bytes": 42500
+    },
+    "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log.path_proof.txt": {
+      "sha256": "6f2124ac76ff4b04745db52e79d8ef5221c7fc7375e27cf5e40de28cc266e466",
+      "size_bytes": 231
+    },
+    "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log": {
+      "sha256": "32d31515aa296332bf94e27272a777f4264dd38efff2ecb2d36ab77adc57631b",
+      "size_bytes": 16026
+    },
+    "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log.path_proof.txt": {
+      "sha256": "4ed0142247dbd162b05199acc54aceadd83f334c84bfee6fd507e180e0832770",
+      "size_bytes": 232
+    },
+    "audit/qa/hde-crd-0001/qa_step_logs_manifest.json": {
+      "sha256": "64cb5ffd66bb1b8f7fc2119b145d81224cebc531081eb89abb001a49f00eddb8",
+      "size_bytes": 1376
+    },
+    "audit/qa/hde-crd-0001/qa_step_logs_manifest.json.path_proof.txt": {
+      "sha256": "223d135af84e6579bf07d49c49c2589a5457a5bf5718ba2687cb5d1f97a67b8a",
+      "size_bytes": 215
+    },
+    "docs/evidence/INDEX.json": {
+      "sha256": "35e9966dd52c6d9f6139a9a215acd04b959fd7182b037b0f7a6150d4966b9af8",
+      "size_bytes": 159818
+    },
+    "docs/evidence/INDEX.json.path_proof.txt": {
+      "sha256": "28deb0b19ff4f960bcc8329d1b390552c9dd602641516345d2448405cf16247c",
+      "size_bytes": 193
+    },
+    "docs/evidence/INDEX.sha256": {
+      "sha256": "1b7ae79560583dc4c14e814fb639086b96b7a948ca384850d95d4c956ca0bb11",
+      "size_bytes": 91
+    },
+    "docs/evidence/INDEX.sha256.path_proof.txt": {
+      "sha256": "764de57ce24b6ac427e89f427d7dfc7d1a112debfaf548f3539f66021d0e5619",
+      "size_bytes": 191
+    }
+  },
+  "final_callback": [
+    {
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/update_evidence_index.py",
+        "--check"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.4152001249967725,
+      "end": "2026-09-07T02:28:05.876383+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-1",
+      "start": "2026-09-07T02:28:05.461189+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "W2V2aWRlbmNlLWluZGV4XSBlbnYgcGluczogQUxMT1dfTkVUV09SSz0wLExBTkc9QyxMQ19BTEw9QyxTQUZFX01PREU9MSxUWj1VVEMK",
+        "length": 78,
+        "sha256": "82ea36a3eb90ae8477d61e1c51eeb918e8c5139890885823dd52b6f4c3add06d"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/orientation_demo.py",
+        "--check"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.21448432999750366,
+      "end": "2026-09-07T02:28:06.091343+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-2",
+      "start": "2026-09-07T02:28:05.876871+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "ci/checks/check_mirror_schema.sh"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.06417079500533873,
+      "end": "2026-09-07T02:28:06.155930+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-3",
+      "start": "2026-09-07T02:28:06.091771+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/validate_evidence_paths.py"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.11430836799991084,
+      "end": "2026-09-07T02:28:06.270640+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-4",
+      "start": "2026-09-07T02:28:06.156344+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "bash",
+        "ci/checks/check_evidence_index_hash.sh"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.016201601996726822,
+      "end": "2026-09-07T02:28:06.287260+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-5",
+      "start": "2026-09-07T02:28:06.271065+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/check_lf_endings.py"
+      ],
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "duration": 0.11410557699855417,
+      "end": "2026-09-07T02:28:06.401692+00:00",
+      "exception": null,
+      "exit_code": 0,
+      "name": "publication-final-verify-6",
+      "start": "2026-09-07T02:28:06.287599+00:00",
+      "stderr": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "base64": "",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "final_publication_outer": {
+    "argv": [
+      "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+      "/workspace/scratch/9c5d6db25d49/qa100-inputs/publish_qa.py",
+      "final"
+    ],
+    "captured_env": {
+      "ALLOW_NETWORK": "0",
+      "APP_ENV": "dev",
+      "LANG": "C",
+      "LC_ALL": "C",
+      "SAFE_MODE": "1",
+      "TZ": "UTC"
+    },
+    "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+    "duration": 1.9202112439961638,
+    "end": "2026-09-07T02:28:06.484324+00:00",
+    "exception": null,
+    "exit_code": 0,
+    "name": "publication-final",
+    "start": "2026-09-07T02:28:04.564149+00:00",
+    "stderr": {
+      "base64": "",
+      "length": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout": {
+      "base64": "eyJuYW1lIjogInB1YmxpY2F0aW9uLWZpbmFsLXZlcmlmeS0xIiwgImV4aXRfY29kZSI6IDAsICJleGNlcHRpb24iOiBudWxsLCAiZHVyYXRpb24iOiAwLjQxNTIwMDEyNDk5Njc3MjV9CnsibmFtZSI6ICJwdWJsaWNhdGlvbi1maW5hbC12ZXJpZnktMiIsICJleGl0X2NvZGUiOiAwLCAiZXhjZXB0aW9uIjogbnVsbCwgImR1cmF0aW9uIjogMC4yMTQ0ODQzMjk5OTc1MDM2Nn0KeyJuYW1lIjogInB1YmxpY2F0aW9uLWZpbmFsLXZlcmlmeS0zIiwgImV4aXRfY29kZSI6IDAsICJleGNlcHRpb24iOiBudWxsLCAiZHVyYXRpb24iOiAwLjA2NDE3MDc5NTAwNTMzODczfQp7Im5hbWUiOiAicHVibGljYXRpb24tZmluYWwtdmVyaWZ5LTQiLCAiZXhpdF9jb2RlIjogMCwgImV4Y2VwdGlvbiI6IG51bGwsICJkdXJhdGlvbiI6IDAuMTE0MzA4MzY3OTk5OTEwODR9CnsibmFtZSI6ICJwdWJsaWNhdGlvbi1maW5hbC12ZXJpZnktNSIsICJleGl0X2NvZGUiOiAwLCAiZXhjZXB0aW9uIjogbnVsbCwgImR1cmF0aW9uIjogMC4wMTYyMDE2MDE5OTY3MjY4MjJ9CnsibmFtZSI6ICJwdWJsaWNhdGlvbi1maW5hbC12ZXJpZnktNiIsICJleGl0X2NvZGUiOiAwLCAiZXhjZXB0aW9uIjogbnVsbCwgImR1cmF0aW9uIjogMC4xMTQxMDU1NzY5OTg1NTQxN30KeyJzdGFnZSI6ICJmaW5hbCIsICJzdGFydGVkIjogIjIwMjYtMDktMDdUMDI6Mjg6MDQuNjU5NTY0KzAwOjAwIiwgImNvbXBsZXRlZCI6ICIyMDI2LTA5LTA3VDAyOjI4OjA2LjQwMjA3MyswMDowMCIsICJhcGkiOiAidG9vbHMuZXZpZGVuY2UudXBkYXRlX2V2aWRlbmNlX2luZGV4LnB1Ymxpc2hfY3JkX2NoZWNrX2ZhbWlseSIsICJ3cml0ZXJfbW9kdWxlIjogIi93b3Jrc3BhY2Uvc2NyYXRjaC85YzVkNmRiMjVkNDkvZGV2b3BzLXdvcmtzcGFjZS9nbG93LWhkZW5naW5lLXYyL3Rvb2xzL2V2aWRlbmNlL3VwZGF0ZV9ldmlkZW5jZV9pbmRleC5weSIsICJyZXBvX3Jvb3QiOiAiL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIiLCAidGVzdGVkX3NvdXJjZSI6ICJkNWVjMjIxMjZmMjI3MzVhMzgyZDViOGMzOWQ2ZTQ1MWQ2NzYzZTEzIiwgInB1Ymxpc2hlZF9jaGVja3MiOiBbInFhLTEwLWdvdmVybmVkLWV2aWRlbmNlIl0sICJwcmltYXJ5X3BhdGhzIjogWyJhdWRpdC9xYS9oZGUtY3JkLTAwMDEvY2hlY2tzL3FhLTEwLWdvdmVybmVkLWV2aWRlbmNlL3ByaW1hcnkubG9nIl0sICJtYW5pZmVzdCI6ICJhdWRpdC9xYS9oZGUtY3JkLTAwMDEvcWFfc3RlcF9sb2dzX21hbmlmZXN0Lmpzb24iLCAibWFuaWZlc3Rfc2hhMjU2IjogIjY0Y2I1ZmZkNjZiYjFiOGY3ZmMyMTE5YjE0NWQ4MTIyNGNlYmM1MzEwODFlYjg5YWJiMDAxYTQ5ZjAwZWRkYjgiLCAib3V0Y29tZSI6ICJjb21wbGV0ZWQiLCAic2NvcGVfbGltaXQiOiAiTm8gaW5kZXBlbmRlbnQgUUEgYWNjZXB0YW5jZSBvciBjbG9zdXJlLiBGaW5hbCBzdGFnZSBzdWNjZXNzIGlzIG5vdCBjbGFpbWVkIGJ5IGl0cyBwcmVleGlzdGluZyBpbnB1dCByZWNlaXB0LiJ9Cg==",
+      "length": 1537,
+      "sha256": "5b044a87e8039cebc6eb097b481e5d8edbc82ae6fed371929ed6a97265609d6b"
+    }
+  },
+  "human_rows": 604,
+  "manifest": {
+    "qa-01-setup": {
+      "check_id": "qa-01-setup",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log",
+      "status": "PASS"
+    },
+    "qa-02-claims": {
+      "check_id": "qa-02-claims",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log",
+      "status": "PASS"
+    },
+    "qa-03-crd-local": {
+      "check_id": "qa-03-crd-local",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log",
+      "status": "PASS"
+    },
+    "qa-04-runner": {
+      "check_id": "qa-04-runner",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log",
+      "status": "PASS"
+    },
+    "qa-05-epic-compat": {
+      "check_id": "qa-05-epic-compat",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log",
+      "status": "PASS"
+    },
+    "qa-06-publication": {
+      "check_id": "qa-06-publication",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log",
+      "status": "PASS"
+    },
+    "qa-07-admission": {
+      "check_id": "qa-07-admission",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log",
+      "status": "PASS"
+    },
+    "qa-08-recovery": {
+      "check_id": "qa-08-recovery",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log",
+      "status": "PASS"
+    },
+    "qa-09-docs-and-history": {
+      "check_id": "qa-09-docs-and-history",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log",
+      "status": "PASS"
+    },
+    "qa-10-governed-evidence": {
+      "check_id": "qa-10-governed-evidence",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log",
+      "status": "PASS"
+    }
+  },
+  "mirror_rows": 604,
+  "observed_at": "2026-09-07T02:29:35.046515+00:00",
+  "primary_headers": {
+    "qa-01-setup": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-01-setup",
+      "check_name": "qa-01-setup",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pip",
+          "install",
+          "-r",
+          "requirements-dev.txt"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "/workspace/scratch/9c5d6db25d49/qa100-inputs/setup_check.py"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "--version"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pip",
+          "check"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "tools/evidence/update_evidence_index.py",
+          "--check"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "tools/evidence/orientation_demo.py",
+          "--check"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "ci/checks/check_mirror_schema.sh"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "tools/evidence/validate_evidence_paths.py"
+        ],
+        [
+          "bash",
+          "ci/checks/check_evidence_index_hash.sh"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "tools/evidence/check_lf_endings.py"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_qa_tool_ownership.py",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-02-claims-leu4_5c2"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "crd and not pytest",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "pytest or same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-04-runner-labequn_"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "not crd and not pytest and not same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-05-epic-compat-43p7f7k_"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-06-publication-_n_qvdhe"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-08-recovery-t3tm959y"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-02-claims": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-02-claims",
+      "check_name": "qa-02-claims",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_qa_tool_ownership.py",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-02-claims-leu4_5c2"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_qa_tool_ownership.py",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-02-claims-2yj449m6"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-03-crd-local": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-03-crd-local",
+      "check_name": "qa-03-crd-local",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "crd and not pytest",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-03-crd-local-tesmmkec"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "crd and not pytest",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-03-crd-local-ehm7twwh"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log",
+        "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-04-runner": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-04-runner",
+      "check_name": "qa-04-runner",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "pytest or same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-04-runner-labequn_"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "pytest or same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-04-runner-ziw7ox18"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-05-epic-compat": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-05-epic-compat",
+      "check_name": "qa-05-epic-compat",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "not crd and not pytest and not same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-05-epic-compat-43p7f7k_"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/qa/test_generic_qa_harness.py",
+          "-k",
+          "not crd and not pytest and not same_interpreter_and_classification",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-05-epic-compat-m3dqvgh4"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log",
+        "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-06-publication": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-06-publication",
+      "check_name": "qa-06-publication",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-06-publication-_n_qvdhe"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_governed_publication_binds_actual_records_and_is_repeatable",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_current_manifest_reconciles_supersession_without_history_conversion",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-06-publication-ww6gdwrx"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-07-admission": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-07-admission",
+      "check_name": "qa-07-admission",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-07-admission-8a543odx"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_incoherent_prior_state_before_writes",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_index_admission_rejects_forgery_before_deduplication",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_publication_refuses_foreign_scope_and_invalid_inputs",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-07-admission-8ze2iea3"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-08-recovery": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-08-recovery",
+      "check_name": "qa-08-recovery",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--collect-only",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/collect-qa-08-recovery-t3tm959y"
+        ],
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_outer_transaction_restores_all_files_and_parents",
+          "tests/evidence/test_evidence_index_missing_state.py::test_crd_rollback_failure_retains_original_cause_and_untrustworthy_state",
+          "--basetemp",
+          "/workspace/scratch/9c5d6db25d49/qa100-execution-rkd9j8kh/execute-qa-08-recovery-6ni_ivhi"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-09-docs-and-history": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-09-docs-and-history",
+      "check_name": "qa-09-docs-and-history",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "/workspace/scratch/9c5d6db25d49/qa100-inputs/source_observe.py"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 / approved Plan; actual ordered argv, same interpreter. Semantic assessment separately labeled; source-reading exit0 alone is not semantic proof.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:27:21Z"
+    },
+    "qa-10-governed-evidence": {
+      "captured_env": {
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC"
+      },
+      "check_id": "qa-10-governed-evidence",
+      "check_name": "qa-10-governed-evidence",
+      "claimed_tokens": [],
+      "command": [
+        [
+          "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+          "/workspace/scratch/9c5d6db25d49/qa100-inputs/publish_qa.py",
+          "first"
+        ]
+      ],
+      "command_provenance": "Complete task v1.1 qa10 bootstrap/finalization; actual completed first publication command and ordered callbacks preserved in body. Does not assert success of the future write of this receipt.",
+      "evidence_artifacts": [
+        "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log"
+      ],
+      "exit_code": 0,
+      "intended_tokens": [],
+      "pf_refs": [
+        "PF03-Reference-Technical-Writing-Best-Practices",
+        "PF04-Canon-HDE-Governance",
+        "PF12-Canon-HDE-Schemas-and-Artifacts",
+        "PF14-Canon-HDE-Mechanics-Guide",
+        "PF19-Canon-Glow-QA-Guide",
+        "PF27-Canon-Plan-Templates"
+      ],
+      "schema_version": "pf27.step_log_header.v2",
+      "status": "PASS",
+      "status_reason": "",
+      "timestamp_utc": "2026-09-07T02:28:04Z"
+    }
+  },
+  "proofs": {
+    "artifacts/evidence_index.jsonl": {
+      "mirror_body_sha256": "2ece634d089a92acff7fa17e4f7dac778289353f61904614968cb83eb8a8b96b",
+      "mtime_utc": "2026-07-23T05:30:59Z",
+      "path": "artifacts/evidence_index.jsonl",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "73570bf3363fcabdd67445a98319f05c10b6649be4554320603f6bc9c70f0eb6",
+      "size_bytes": "288821"
+    },
+    "artifacts/evidence_index.jsonl.sha256": {
+      "mtime_utc": "2026-07-23T05:30:59Z",
+      "path": "artifacts/evidence_index.jsonl.sha256",
+      "produced_at_utc": "2026-07-23T05:30:59Z",
+      "sha256": "b6285540cb354d346a937b4dc2a80878ce30083462045261dec722c0349d5a26",
+      "size_bytes": "97"
+    },
+    "audit/gates/topology/orientation_demo.txt": {
+      "mtime_utc": "2026-09-07T02:27:22Z",
+      "path": "audit/gates/topology/orientation_demo.txt",
+      "produced_at_utc": "2026-09-07T02:27:22Z",
+      "sha256": "ba1458dfdb3fd4270481b96cca14f022771d01134c1481e0ca1e2b26863f38ed",
+      "size_bytes": "115"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "f4c0f8adfb6c6b07fc34c2696d6f204797dd563c79a9c3e4212b2d09ae2d3e56",
+      "size_bytes": "133340"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "051d25e986607e280df15d7d917bba831f3cc412c0f73b6f04e1fe505e3842e3",
+      "size_bytes": "62964"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "7621a46768f34108df845c46a245f292891359a86768c043c80a5073d15eb2d5",
+      "size_bytes": "25503"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "ea979f58b6f621ba397e018993f34136d31ad899c61cbf3efe8507b0b87b8d71",
+      "size_bytes": "55964"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "1de86e112ed6a5aa62b7f577a526233903437a6f06c367ab69532dacc1cd9650",
+      "size_bytes": "32755"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "c1b20727cc52d23de609aae81027fe45744be414af096708aa2cc690195c61b9",
+      "size_bytes": "8147"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "f99aaf89c446a087e0d847ae1012aa7fe55c78eb970dc239e579f65b4c130a0b",
+      "size_bytes": "13413"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "5102216d1f8e2f271bfb9ddb8f1db411d1acc8b8482e9eff7090281f28e34721",
+      "size_bytes": "9385"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "d425628afda1a23d0c587c5631d1498fa0cddf60ac59c8c85dee861c28cfebb9",
+      "size_bytes": "42500"
+    },
+    "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log": {
+      "mtime_utc": "2026-09-07T02:28:04Z",
+      "path": "audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "32d31515aa296332bf94e27272a777f4264dd38efff2ecb2d36ab77adc57631b",
+      "size_bytes": "16026"
+    },
+    "audit/qa/hde-crd-0001/qa_step_logs_manifest.json": {
+      "mtime_utc": "2026-09-07T02:27:21Z",
+      "path": "audit/qa/hde-crd-0001/qa_step_logs_manifest.json",
+      "produced_at_utc": "2026-08-18T16:05:54Z",
+      "sha256": "64cb5ffd66bb1b8f7fc2119b145d81224cebc531081eb89abb001a49f00eddb8",
+      "size_bytes": "1376"
+    },
+    "docs/evidence/INDEX.json": {
+      "mtime_utc": "2026-07-23T05:18:44Z",
+      "path": "docs/evidence/INDEX.json",
+      "produced_at_utc": "2026-07-23T05:27:31Z",
+      "sha256": "35e9966dd52c6d9f6139a9a215acd04b959fd7182b037b0f7a6150d4966b9af8",
+      "size_bytes": "159818"
+    },
+    "docs/evidence/INDEX.sha256": {
+      "mtime_utc": "2026-07-23T05:18:44Z",
+      "path": "docs/evidence/INDEX.sha256",
+      "produced_at_utc": "2026-07-23T05:27:31Z",
+      "sha256": "1b7ae79560583dc4c14e814fb639086b96b7a948ca384850d95d4c956ca0bb11",
+      "size_bytes": "91"
+    }
+  },
+  "steps": [
+    "qa-01-setup",
+    "qa-02-claims",
+    "qa-03-crd-local",
+    "qa-04-runner",
+    "qa-05-epic-compat",
+    "qa-06-publication",
+    "qa-07-admission",
+    "qa-08-recovery",
+    "qa-09-docs-and-history",
+    "qa-10-governed-evidence"
+  ],
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "unchanged_nonallowed_tracked_files": true,
+  "unrelated_human_rows_preserved": true
+}
+
+publication-final-verify-1 exit=0
+stdout:
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+stderr:
+
+
+publication-final-verify-2 exit=0
+NO STDOUT OR STDERR
+
+publication-final-verify-3 exit=0
+NO STDOUT OR STDERR
+
+publication-final-verify-4 exit=0
+NO STDOUT OR STDERR
+
+publication-final-verify-5 exit=0
+NO STDOUT OR STDERR
+
+publication-final-verify-6 exit=0
+NO STDOUT OR STDERR

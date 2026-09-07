@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log
+size_bytes: 13413
+sha256: f99aaf89c446a087e0d847ae1012aa7fe55c78eb970dc239e579f65b4c130a0b
+mtime_utc: 2026-09-07T02:27:21Z
+produced_at_utc: 2026-08-18T16:05:54Z

@@ -1,0 +1,318 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"qa-10-governed-evidence","check_name":"qa-10-governed-evidence","claimed_tokens":[],"command":[["/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python","/workspace/scratch/9c5d6db25d49/qa100-inputs/publish_qa.py","first"]],"command_provenance":"Complete task v1.1 qa10 bootstrap/finalization; actual completed first publication command and ordered callbacks preserved in body. Does not assert success of the future write of this receipt.","evidence_artifacts":["audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF03-Reference-Technical-Writing-Best-Practices","PF04-Canon-HDE-Governance","PF12-Canon-HDE-Schemas-and-Artifacts","PF14-Canon-HDE-Mechanics-Guide","PF19-Canon-Glow-QA-Guide","PF27-Canon-Plan-Templates"],"schema_version":"pf27.step_log_header.v2","status":"PASS","status_reason":"","timestamp_utc":"2026-09-07T02:28:04Z"}
+# qa-10-governed-evidence — actual completed first publication
+
+This receipt describes the completed publication of qa01–09 only. The first composed publication and all six read-only callback commands completed successfully. The actual writer is imported from the operative checkout. No prior CRD family existed, so no prior same-ID primary was replaced and no conditional attempt archive was manufactured.
+
+The forthcoming publication of this receipt and its final callback are not yet proved here. Their actual success or failure and the final ten-member state belong in the subsequent external final-verification receipt and native execution result. This avoids using a primary to certify its own future write. No behavior rerun or second QA attempt is performed during evidence finalization.
+
+Stable identity HDE-CRD-0001; task HDE-CRD-0001-qa-10-governed-evidence-task-v1.0; task collection v1.1; approved QA Plan v1.0; approving review v1.0 APPROVE Isis-49; QA100 090626.2 / GCFPE-20260906.2; attempt1, no prior same-step result found. Actual tested source d5ec22126f22735a382d5b8c39d6e451d6763e13. Actor: PO-selected Codex QA operator, sole executor. No evidence-storage commit has been created or authorized.
+
+The finite task evidence scope and source preimages were checked before first publication. Both token arrays remain empty; no optional Index token fields are supplied. Shared companions belong to the canonical updater. Histories, nine failed hosted-CI runs, all25 findings, excluded gaps and proposal/cancellation/supersession caveats remain bound in qa09 and the complete native result. The scratch-driver precollection NameError and resolved terminal polling discrepancy remain retained in qa01; no silent repeat of an actual test or publication occurred. This mechanism result does not decide independent acceptance or closure. Continuing Kronos-22 reviews all ten results through QA110; QA120 Report and RCA remain due.
+
+## Completed first publication and native observations
+{
+  "stage": "first",
+  "started": "2026-09-07T02:27:21.567466+00:00",
+  "completed": "2026-09-07T02:27:23.320838+00:00",
+  "api": "tools.evidence.update_evidence_index.publish_crd_check_family",
+  "writer_module": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/tools/evidence/update_evidence_index.py",
+  "repo_root": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "tested_source": "d5ec22126f22735a382d5b8c39d6e451d6763e13",
+  "published_checks": [
+    "qa-01-setup",
+    "qa-02-claims",
+    "qa-03-crd-local",
+    "qa-04-runner",
+    "qa-05-epic-compat",
+    "qa-06-publication",
+    "qa-07-admission",
+    "qa-08-recovery",
+    "qa-09-docs-and-history"
+  ],
+  "primary_paths": [
+    "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log",
+    "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log"
+  ],
+  "manifest": "audit/qa/hde-crd-0001/qa_step_logs_manifest.json",
+  "manifest_sha256": "8236eaf9d08d02b5806535610f23f31188b190de3e7b1acc2bcfdbc5b57d2092",
+  "manifest_entries": {
+    "qa-01-setup": {
+      "check_id": "qa-01-setup",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-01-setup/primary.log",
+      "status": "PASS"
+    },
+    "qa-02-claims": {
+      "check_id": "qa-02-claims",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-02-claims/primary.log",
+      "status": "PASS"
+    },
+    "qa-03-crd-local": {
+      "check_id": "qa-03-crd-local",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-03-crd-local/primary.log",
+      "status": "PASS"
+    },
+    "qa-04-runner": {
+      "check_id": "qa-04-runner",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-04-runner/primary.log",
+      "status": "PASS"
+    },
+    "qa-05-epic-compat": {
+      "check_id": "qa-05-epic-compat",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-05-epic-compat/primary.log",
+      "status": "PASS"
+    },
+    "qa-06-publication": {
+      "check_id": "qa-06-publication",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-06-publication/primary.log",
+      "status": "PASS"
+    },
+    "qa-07-admission": {
+      "check_id": "qa-07-admission",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-07-admission/primary.log",
+      "status": "PASS"
+    },
+    "qa-08-recovery": {
+      "check_id": "qa-08-recovery",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-08-recovery/primary.log",
+      "status": "PASS"
+    },
+    "qa-09-docs-and-history": {
+      "check_id": "qa-09-docs-and-history",
+      "log_path": "audit/qa/hde-crd-0001/checks/qa-09-docs-and-history/primary.log",
+      "status": "PASS"
+    }
+  },
+  "callback_records": [
+    {
+      "name": "publication-first-verify-1",
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/update_evidence_index.py",
+        "--check"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:22.374136+00:00",
+      "end": "2026-09-07T02:27:22.789278+00:00",
+      "duration": 0.4151537330035353,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 78,
+        "sha256": "82ea36a3eb90ae8477d61e1c51eeb918e8c5139890885823dd52b6f4c3add06d",
+        "base64": "W2V2aWRlbmNlLWluZGV4XSBlbnYgcGluczogQUxMT1dfTkVUV09SSz0wLExBTkc9QyxMQ19BTEw9QyxTQUZFX01PREU9MSxUWj1VVEMK"
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    },
+    {
+      "name": "publication-first-verify-2",
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/orientation_demo.py",
+        "--check"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:22.789738+00:00",
+      "end": "2026-09-07T02:27:23.004191+00:00",
+      "duration": 0.2144660819976707,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    },
+    {
+      "name": "publication-first-verify-3",
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "ci/checks/check_mirror_schema.sh"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:23.004656+00:00",
+      "end": "2026-09-07T02:27:23.068645+00:00",
+      "duration": 0.06399970599886728,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    },
+    {
+      "name": "publication-first-verify-4",
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/validate_evidence_paths.py"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:23.068980+00:00",
+      "end": "2026-09-07T02:27:23.183165+00:00",
+      "duration": 0.11420167300093453,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    },
+    {
+      "name": "publication-first-verify-5",
+      "argv": [
+        "bash",
+        "ci/checks/check_evidence_index_hash.sh"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:23.189310+00:00",
+      "end": "2026-09-07T02:27:23.205476+00:00",
+      "duration": 0.016168447997188196,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    },
+    {
+      "name": "publication-first-verify-6",
+      "argv": [
+        "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+        "tools/evidence/check_lf_endings.py"
+      ],
+      "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+      "start": "2026-09-07T02:27:23.205803+00:00",
+      "end": "2026-09-07T02:27:23.320042+00:00",
+      "duration": 0.11428030100069009,
+      "exit_code": 0,
+      "exception": null,
+      "captured_env": {
+        "SAFE_MODE": "1",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "dev",
+        "LC_ALL": "C",
+        "LANG": "C",
+        "TZ": "UTC"
+      },
+      "stdout": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      },
+      "stderr": {
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "base64": ""
+      }
+    }
+  ],
+  "outcome": "completed",
+  "scope_limit": "No independent QA acceptance or closure. Final stage success is not claimed by its preexisting input receipt."
+}
+
+Outer generating command raw capture (base64 preserves separate stdout/stderr):
+{
+  "name": "publication-first",
+  "argv": [
+    "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2/.venv/bin/python",
+    "/workspace/scratch/9c5d6db25d49/qa100-inputs/publish_qa.py",
+    "first"
+  ],
+  "cwd": "/workspace/scratch/9c5d6db25d49/devops-workspace/glow-hdengine-v2",
+  "start": "2026-09-07T02:27:21.332625+00:00",
+  "end": "2026-09-07T02:27:23.405573+00:00",
+  "duration": 2.072955618001288,
+  "exit_code": 0,
+  "exception": null,
+  "captured_env": {
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC"
+  },
+  "stdout": {
+    "length": 2152,
+    "sha256": "3d070daeedaefa341705aa6f5f0700073c551cc05820b4736130b730a2bc75f9",
+    "base64": "eyJuYW1lIjogInB1YmxpY2F0aW9uLWZpcnN0LXZlcmlmeS0xIiwgImV4aXRfY29kZSI6IDAsICJleGNlcHRpb24iOiBudWxsLCAiZHVyYXRpb24iOiAwLjQxNTE1MzczMzAwMzUzNTN9CnsibmFtZSI6ICJwdWJsaWNhdGlvbi1maXJzdC12ZXJpZnktMiIsICJleGl0X2NvZGUiOiAwLCAiZXhjZXB0aW9uIjogbnVsbCwgImR1cmF0aW9uIjogMC4yMTQ0NjYwODE5OTc2NzA3fQp7Im5hbWUiOiAicHVibGljYXRpb24tZmlyc3QtdmVyaWZ5LTMiLCAiZXhpdF9jb2RlIjogMCwgImV4Y2VwdGlvbiI6IG51bGwsICJkdXJhdGlvbiI6IDAuMDYzOTk5NzA1OTk4ODY3Mjh9CnsibmFtZSI6ICJwdWJsaWNhdGlvbi1maXJzdC12ZXJpZnktNCIsICJleGl0X2NvZGUiOiAwLCAiZXhjZXB0aW9uIjogbnVsbCwgImR1cmF0aW9uIjogMC4xMTQyMDE2NzMwMDA5MzQ1M30KeyJuYW1lIjogInB1YmxpY2F0aW9uLWZpcnN0LXZlcmlmeS01IiwgImV4aXRfY29kZSI6IDAsICJleGNlcHRpb24iOiBudWxsLCAiZHVyYXRpb24iOiAwLjAxNjE2ODQ0Nzk5NzE4ODE5Nn0KeyJuYW1lIjogInB1YmxpY2F0aW9uLWZpcnN0LXZlcmlmeS02IiwgImV4aXRfY29kZSI6IDAsICJleGNlcHRpb24iOiBudWxsLCAiZHVyYXRpb24iOiAwLjExNDI4MDMwMTAwMDY5MDA5fQp7InN0YWdlIjogImZpcnN0IiwgInN0YXJ0ZWQiOiAiMjAyNi0wOS0wN1QwMjoyNzoyMS41Njc0NjYrMDA6MDAiLCAiY29tcGxldGVkIjogIjIwMjYtMDktMDdUMDI6Mjc6MjMuMzIwODM4KzAwOjAwIiwgImFwaSI6ICJ0b29scy5ldmlkZW5jZS51cGRhdGVfZXZpZGVuY2VfaW5kZXgucHVibGlzaF9jcmRfY2hlY2tfZmFtaWx5IiwgIndyaXRlcl9tb2R1bGUiOiAiL3dvcmtzcGFjZS9zY3JhdGNoLzljNWQ2ZGIyNWQ0OS9kZXZvcHMtd29ya3NwYWNlL2dsb3ctaGRlbmdpbmUtdjIvdG9vbHMvZXZpZGVuY2UvdXBkYXRlX2V2aWRlbmNlX2luZGV4LnB5IiwgInJlcG9fcm9vdCI6ICIvd29ya3NwYWNlL3NjcmF0Y2gvOWM1ZDZkYjI1ZDQ5L2Rldm9wcy13b3Jrc3BhY2UvZ2xvdy1oZGVuZ2luZS12MiIsICJ0ZXN0ZWRfc291cmNlIjogImQ1ZWMyMjEyNmYyMjczNWEzODJkNWI4YzM5ZDZlNDUxZDY3NjNlMTMiLCAicHVibGlzaGVkX2NoZWNrcyI6IFsicWEtMDEtc2V0dXAiLCAicWEtMDItY2xhaW1zIiwgInFhLTAzLWNyZC1sb2NhbCIsICJxYS0wNC1ydW5uZXIiLCAicWEtMDUtZXBpYy1jb21wYXQiLCAicWEtMDYtcHVibGljYXRpb24iLCAicWEtMDctYWRtaXNzaW9uIiwgInFhLTA4LXJlY292ZXJ5IiwgInFhLTA5LWRvY3MtYW5kLWhpc3RvcnkiXSwgInByaW1hcnlfcGF0aHMiOiBbImF1ZGl0L3FhL2hkZS1jcmQtMDAwMS9jaGVja3MvcWEtMDEtc2V0dXAvcHJpbWFyeS5sb2ciLCAiYXVkaXQvcWEvaGRlLWNyZC0wMDAxL2NoZWNrcy9xYS0wMi1jbGFpbXMvcHJpbWFyeS5sb2ciLCAiYXVkaXQvcWEvaGRlLWNyZC0wMDAxL2NoZWNrcy9xYS0wMy1jcmQtbG9jYWwvcHJpbWFyeS5sb2ciLCAiYXVkaXQvcWEvaGRlLWNyZC0wMDAxL2NoZWNrcy9xYS0wNC1ydW5uZXIvcHJpbWFyeS5sb2ciLCAiYXVkaXQvcWEvaGRlLWNyZC0wMDAxL2NoZWNrcy9xYS0wNS1lcGljLWNvbXBhdC9wcmltYXJ5LmxvZyIsICJhdWRpdC9xYS9oZGUtY3JkLTAwMDEvY2hlY2tzL3FhLTA2LXB1YmxpY2F0aW9uL3ByaW1hcnkubG9nIiwgImF1ZGl0L3FhL2hkZS1jcmQtMDAwMS9jaGVja3MvcWEtMDctYWRtaXNzaW9uL3ByaW1hcnkubG9nIiwgImF1ZGl0L3FhL2hkZS1jcmQtMDAwMS9jaGVja3MvcWEtMDgtcmVjb3ZlcnkvcHJpbWFyeS5sb2ciLCAiYXVkaXQvcWEvaGRlLWNyZC0wMDAxL2NoZWNrcy9xYS0wOS1kb2NzLWFuZC1oaXN0b3J5L3ByaW1hcnkubG9nIl0sICJtYW5pZmVzdCI6ICJhdWRpdC9xYS9oZGUtY3JkLTAwMDEvcWFfc3RlcF9sb2dzX21hbmlmZXN0Lmpzb24iLCAibWFuaWZlc3Rfc2hhMjU2IjogIjgyMzZlYWY5ZDA4ZDAyYjU4MDY1MzU2MTBmMjNmMzExODhiMTkwZGUzZTdiMWFjYzJiY2ZkYmM1YjU3ZDIwOTIiLCAib3V0Y29tZSI6ICJjb21wbGV0ZWQiLCAic2NvcGVfbGltaXQiOiAiTm8gaW5kZXBlbmRlbnQgUUEgYWNjZXB0YW5jZSBvciBjbG9zdXJlLiBGaW5hbCBzdGFnZSBzdWNjZXNzIGlzIG5vdCBjbGFpbWVkIGJ5IGl0cyBwcmVleGlzdGluZyBpbnB1dCByZWNlaXB0LiJ9Cg=="
+  },
+  "stderr": {
+    "length": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "base64": ""
+  }
+}

@@ -1,0 +1,5 @@
+path: audit/qa/hde-crd-0001/checks/qa-10-governed-evidence/primary.log
+size_bytes: 16026
+sha256: 32d31515aa296332bf94e27272a777f4264dd38efff2ecb2d36ab77adc57631b
+mtime_utc: 2026-09-07T02:28:04Z
+produced_at_utc: 2026-08-18T16:05:54Z
