@@ -35,7 +35,7 @@ def _select_case(
         if not isinstance(channel_id, str):
             continue
         raw = list(values)
-        normalized = canonicalize_declared_set(raw, identity=None)
+        normalized = sorted(raw) if field == "gates" else canonicalize_declared_set(raw, identity=None)
         if normalized != raw:
             return (
                 {
@@ -82,9 +82,12 @@ def test_arrays_as_sets_registry_report():
     for field in ("centers", "domains", "flags", "gates"):
         case, fallback = _select_case(channels, field)
         assert case["raw"] == case["normalized"]
-        assert case["normalized"] == canonicalize_declared_set(
-            case["raw"], identity=None
-        )
+        if field == "gates":
+            assert all(type(value) is int for value in case["raw"])
+            assert case["normalized"] == sorted(case["raw"])
+            assert "validator: engine.config.registry_loader.validate_channel_gates" in report_text
+        else:
+            assert case["normalized"] == canonicalize_declared_set(case["raw"], identity=None)
         assert (
             f"catalog/channels_v1.json:channels[id={case['channel_id']}].{field}"
             in report_text
@@ -204,3 +207,43 @@ def test_check_mode_rejects_noncanonical_source_before_staleness(
         write_report(check=True)
     assert output.read_bytes() == REPORT_PATH.read_bytes()
     assert output.stat().st_mtime_ns == before
+
+
+@pytest.mark.parametrize("channel_id,gates", [
+    ("02-14", [2, 14]), ("05-15", [5, 15]), ("06-59", [6, 59]),
+    ("07-31", [7, 31]), ("09-52", [9, 52]), ("01-08", [1, 8]),
+    ("10-20", [10, 20]),
+])
+def test_report_channel_endpoints_use_numeric_order(channel_id, gates):
+    row = {"id": channel_id, "gates": gates}
+    case, _ = report_generator._select_case([row], "gates")
+    assert case["raw"] == gates == case["normalized"]
+    assert "strict numeric ascending endpoints" in "\n".join(
+        report_generator._render_case(case, fallback=True)
+    )
+    row["gates"] = list(reversed(gates))
+    with pytest.raises(SystemExit, match=r"SOURCE_NONCANONICAL:\$\.channels\[0\]\.gates"):
+        report_generator._select_case([row], "gates")
+
+
+@pytest.mark.parametrize("gates", [[True, 14], [2.0, 14], ["2", 14], [2, 2], [0, 14], [2, 65]])
+def test_report_gate_tuple_refuses_coercion_and_invalid_domain(gates):
+    with pytest.raises(SystemExit, match=r"SOURCE_NONCANONICAL:\$\.channels\[0\]\.gates"):
+        report_generator._select_case([{"id": "02-14", "gates": gates}], "gates")
+
+
+def test_repeated_report_write_keeps_metadata_and_refuses_symlink_fast_path(tmp_path, monkeypatch):
+    output = tmp_path / "arrays_as_sets_report.log"
+    monkeypatch.setattr(report_generator, "REPORT_PATH", output)
+    write_report()
+    before = (output.read_bytes(), output.stat().st_mtime_ns)
+    write_report()
+    assert (output.read_bytes(), output.stat().st_mtime_ns) == before
+    link = tmp_path / "link.log"
+    link.symlink_to(output)
+    monkeypatch.setattr(report_generator, "REPORT_PATH", link)
+    with pytest.raises(SystemExit, match="ARRAYS_AS_SETS_REPORT_UNSAFE_TARGET"):
+        write_report()
+    with pytest.raises(SystemExit, match="ARRAYS_AS_SETS_REPORT_UNSAFE_TARGET"):
+        write_report(check=True)
+    assert (output.read_bytes(), output.stat().st_mtime_ns) == before

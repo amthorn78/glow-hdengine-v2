@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import stat
 import sys
 from pathlib import Path
 
@@ -11,6 +13,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.mech.helpers import canonicalize_declared_set  # noqa: E402
+from engine.config.registry_loader import (  # noqa: E402
+    RegistryConfigError,
+    validate_channel_gates,
+)
 from engine.runtime.determinism_env import ensure_determinism_env  # noqa: E402
 
 REPORT_PATH = ROOT / "artifacts" / "canonical" / "arrays_as_sets_report.log"
@@ -45,12 +51,23 @@ def _validate_source_sets(channels: list[dict[str, object]]) -> None:
             raise SystemExit(
                 f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels[{index}]"
             )
-        for field in ("centers", "domains", "flags", "gates"):
+        _require_numeric_gates(entry.get("gates"), entry.get("id"), index)
+        for field in ("centers", "domains", "flags"):
             _require_canonical_set(
                 entry.get(field),
                 identity=None,
                 path=f"$.channels[{index}].{field}",
             )
+
+
+def _require_numeric_gates(values: object, channel_id: object, index: int) -> list[int]:
+    """Validate the Channel endpoint tuple; other scalar sets remain ASCII."""
+    try:
+        return list(validate_channel_gates(values, channel_id=channel_id))
+    except (RegistryConfigError, ValueError, TypeError) as exc:
+        raise SystemExit(
+            f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:$.channels[{index}].gates"
+        ) from exc
 
 
 def _select_case(channels: list[dict[str, object]], field: str) -> tuple[dict[str, object], bool]:
@@ -76,7 +93,11 @@ def _select_case(channels: list[dict[str, object]], field: str) -> tuple[dict[st
             )
         raw = list(values)
         try:
-            normalized = canonicalize_declared_set(raw, identity=None)
+            normalized = (
+                _require_numeric_gates(raw, channel_id, index)
+                if field == "gates"
+                else canonicalize_declared_set(raw, identity=None)
+            )
         except ValueError as exc:
             raise SystemExit(f"ARRAYS_AS_SETS_SOURCE_NONCANONICAL:{path}") from exc
         if normalized != raw:
@@ -109,7 +130,12 @@ def _render_case(case: dict[str, object], *, fallback: bool) -> list[str]:
     lines = [
         f"case: channel_id={channel_id} field={field}",
         f"path: {path}",
-        "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)",
+        (
+            "validator: engine.config.registry_loader.validate_channel_gates "
+            "(strict numeric ascending endpoints)"
+            if field == "gates"
+            else "normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)"
+        ),
         f"raw: {json.dumps(raw, ensure_ascii=False)}",
         f"normalized: {json.dumps(normalized, ensure_ascii=False)}",
     ]
@@ -158,13 +184,25 @@ def build_report() -> str:
 
 def write_report(*, check: bool = False) -> Path:
     ensure_determinism_env()
+    # Refuse aliasing even when expected bytes already match. The coordinated
+    # owner captures this primary's preimage before invoking this writer.
+    target = Path(os.path.abspath(REPORT_PATH))
+    for path in (target, *target.parents):
+        if path.is_symlink():
+            raise SystemExit("ARRAYS_AS_SETS_REPORT_UNSAFE_TARGET")
+        if path != target and path.exists() and not path.is_dir():
+            raise SystemExit("ARRAYS_AS_SETS_REPORT_UNSAFE_TARGET")
+    if target.exists() and not stat.S_ISREG(target.stat().st_mode):
+        raise SystemExit("ARRAYS_AS_SETS_REPORT_UNSAFE_TARGET")
     expected = build_report().encode("utf-8")
     if check:
         if not REPORT_PATH.is_file() or REPORT_PATH.read_bytes() != expected:
             raise SystemExit("ARRAYS_AS_SETS_REPORT_STALE")
         return REPORT_PATH
-    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_bytes(expected)
+    if REPORT_PATH.is_file() and REPORT_PATH.read_bytes() == expected:
+        return REPORT_PATH
+    from tools.evidence import update_evidence_index
+    update_evidence_index._publish_staged({REPORT_PATH: expected})
     return REPORT_PATH
 
 

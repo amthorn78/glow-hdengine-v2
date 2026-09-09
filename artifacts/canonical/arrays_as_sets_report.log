@@ -32,7 +32,7 @@ note: raw == normalized (already canonical)
 
 case: channel_id=01-08 field=gates
 path: catalog/channels_v1.json:channels[id=01-08].gates
-normalizer: engine.mech.helpers.canonicalize_declared_set(identity=None)
+validator: engine.config.registry_loader.validate_channel_gates (strict numeric ascending endpoints)
 raw: [1, 8]
 normalized: [1, 8]
 note: raw == normalized (already canonical)

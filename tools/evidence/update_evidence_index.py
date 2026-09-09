@@ -286,6 +286,20 @@ def _capture_transaction_preimage(path: Path) -> None:
         _ACTIVE_WRITE_TRANSACTION.capture(path)
 
 
+def _record_transaction_write(
+    path: Path,
+    *,
+    expected_content: bytes | None,
+    expected_identity: tuple[int, int, int, int, int] | None = None,
+) -> None:
+    transaction = _ACTIVE_WRITE_TRANSACTION
+    if isinstance(transaction, _ConfigWriteTransaction):
+        transaction.record_writes(
+            (path,), expected={path: expected_content},
+            identities={path: expected_identity} if expected_identity is not None else None,
+        )
+
+
 def _assert_unaliased_write_path(path: Path) -> None:
     """Reject aliased updater outputs before any unchanged-byte fast path."""
 
@@ -3739,8 +3753,59 @@ def _load_crd_qa_entries(
     return unrelated, [_crd_qa_entry(), *(_crd_qa_entry(check_id) for check_id in sorted(checks))]
 
 
+# The two catalog reports are already required by PF12 §8.1. Their presence
+# admits this exact pair; no directory discovery or new evidence family exists.
+CATALOG_VALIDATION_ENTRIES: tuple[dict[str, object], ...] = tuple(
+    {
+        "artifact_key": f"catalog.{name}",
+        "discovered_physical_path": f"artifacts/catalog/{filename}.log",
+        "record_type": "catalog_validation",
+        "role": "report",
+        "schema_version": "1.0",
+        "epic_id": "HDE-EPIC040",
+    }
+    for name, filename in (
+        ("catalog_schema_validation", "catalog_schema_validation"),
+        ("domain_closure_report", "domain_closure_report"),
+    )
+)
+
+
+def _catalog_validation_entries(
+    retained: Sequence[Mapping[str, object]],
+) -> list[dict[str, object]]:
+    """Refuse catalog-log identity collisions before the generic deduplicator."""
+    expected = {str(row["artifact_key"]): row for row in CATALOG_VALIDATION_ENTRIES}
+    paths = {str(row["discovered_physical_path"]) for row in CATALOG_VALIDATION_ENTRIES}
+    selected: set[str] = set()
+    for row in retained:
+        key = row.get("artifact_key") or row.get("title")
+        path = row.get("discovered_physical_path") or row.get("path")
+        normalized_path = os.path.normpath(path) if isinstance(path, str) else ""
+        if key not in expected and normalized_path not in paths:
+            continue
+        if key not in expected or dict(row) != expected[key]:
+            raise ValueError("CONFIG_CATALOG_REGISTRATION_COLLISION")
+        if key in selected:
+            raise ValueError("CONFIG_CATALOG_DUPLICATE_REGISTRATION")
+        selected.add(key)
+    present = {path for path in paths if _path_exists(ROOT / path)}
+    if not present and not selected:
+        # A complete historical graph has no newly produced catalog reports.
+        # First generation creates both reports before companion convergence.
+        return []
+    if present != paths or (selected and selected != set(expected)):
+        raise ValueError("CONFIG_CATALOG_INCOMPLETE_FAMILY")
+    for path in paths:
+        _assert_unaliased_write_path(ROOT / path)
+        if not _read_bytes(ROOT / path):
+            raise ValueError(f"CONFIG_CATALOG_EMPTY_REPORT:{path}")
+    return [dict(row) for row in CATALOG_VALIDATION_ENTRIES]
+
+
 def _load_human_index() -> list[dict[str, object]]:
     payload = qa_harness._loads_json_strict(_read_bytes(HUMAN_INDEX).decode("utf-8"))
+    catalog_entries = _catalog_validation_entries(payload)
     payload, crd_entries = _load_crd_qa_entries(payload)
     payload = [
         entry
@@ -3779,6 +3844,7 @@ def _load_human_index() -> list[dict[str, object]]:
         [
             *payload,
             *crd_entries,
+            *catalog_entries,
             *BASELINE_ENTRIES,
             *EPIC021_PRIMARY_ARTIFACTS,
             *EPIC022_PRIMARY_ARTIFACTS,
@@ -4053,6 +4119,7 @@ def _publish_staged(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
             if path.exists():
                 _capture_transaction_preimage(path)
                 path.unlink()
+                _record_transaction_write(path, expected_content=None)
             continue
         if path.exists() and path.read_bytes() == content:
             continue
@@ -4069,7 +4136,10 @@ def _publish_staged(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
                 os.chmod(temporary, _stat.S_IMODE(path.stat().st_mode))
             else:
                 os.chmod(temporary, 0o644)
+            metadata = temporary.stat()
+            identity = (metadata.st_dev, metadata.st_ino, _stat.S_IMODE(metadata.st_mode), metadata.st_size, metadata.st_mtime_ns)
             os.replace(temporary, path)
+            _record_transaction_write(path, expected_content=content, expected_identity=identity)
         finally:
             if temporary.exists():
                 temporary.unlink()
@@ -4088,9 +4158,13 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
     if _STAGED_VIEW is not None:
         _STAGED_VIEW.stage_bytes(path, content)
         return
+    if isinstance(_ACTIVE_WRITE_TRANSACTION, _ConfigWriteTransaction):
+        _publish_staged({path: content})
+        return
     _capture_transaction_preimage(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
+    _record_transaction_write(path, expected_content=content)
 
 
 def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) -> None:
@@ -4376,7 +4450,11 @@ def _run_once(*, check: bool, epic_ids: frozenset[str] = frozenset()) -> None:
         mirror_rec["size_bytes"] = _size_bytes(MIRROR_PATH)
 
 
-def _converge_and_publish(*, epic_ids: frozenset[str] = frozenset()) -> None:
+def _converge_and_publish(
+    *,
+    epic_ids: frozenset[str] = frozenset(),
+    before_publish: Callable[[Mapping[Path, bytes | _StagedDeletion]], None] | None = None,
+) -> None:
     """Use the existing six-pass staged writer inside its caller's transaction."""
     global _STAGED_VIEW
     if _ACTIVE_WRITE_TRANSACTION is None or _STAGED_VIEW is not None:
@@ -4409,10 +4487,337 @@ def _converge_and_publish(*, epic_ids: frozenset[str] = frozenset()) -> None:
             raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
         staged = dict(_STAGED_VIEW.changes)
         _STAGED_VIEW = None
+        if before_publish is not None:
+            before_publish(staged)
         _publish_staged(staged)
         _run_once(check=True, epic_ids=epic_ids)
     finally:
         _STAGED_VIEW = None
+
+
+CONFIG_PRIMARY_PATHS = frozenset({
+    "catalog/manifest.json",
+    "artifacts/registry/registry_report.json",
+    "artifacts/thresholds/magic10_config.json",
+    "artifacts/thresholds/band_edges.json",
+    "artifacts/config_bundles/be_bundle.json",
+    "artifacts/config_bundles/fe_bundle.json",
+    "artifacts/catalog/catalog_schema_validation.log",
+    "artifacts/catalog/domain_closure_report.log",
+    "artifacts/canonical/arrays_as_sets_report.log",
+    "audit/gates/canonical_json/json_canonical_check.log",
+    "audit/gates/canonical_json/json_canon_compare.log",
+    "audit/gates/canonical_json/canonical_json.gate.json",
+    "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
+    "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
+    "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+})
+_CONFIG_SKELETON_PATHS = frozenset({
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.sha256",
+    "audit/gates/topology/orientation_demo.txt",
+})
+_CONFIG_BOUND_PRIMARY_PATHS = CONFIG_PRIMARY_PATHS - {"catalog/manifest.json"}
+_CONFIG_COMPANION_PATHS = (
+    _CONFIG_SKELETON_PATHS
+    | {path + ".path_proof.txt" for path in _CONFIG_SKELETON_PATHS}
+    | {path + ".path_proof.txt" for path in _CONFIG_BOUND_PRIMARY_PATHS}
+)
+_CONFIG_WRITE_PATHS = CONFIG_PRIMARY_PATHS | _CONFIG_COMPANION_PATHS
+
+
+class _ConfigWriteTransaction(_WriteTransaction):
+    """Recover attributed owner writes without overwriting concurrent edits.
+
+    ``prepare`` captures a bounded preimage without claiming a write. Actual
+    owner replacements call ``capture`` immediately before writing and
+    ``record_writes`` afterward. A changed destination is preserved on refusal;
+    unaffected owner writes are restored, and the family remains untrustworthy
+    until its conflict is resolved. This is not a cross-process locking scheme.
+    """
+
+    def __init__(self, root: Path, *, allowed_paths: Iterable[Path] | None = None) -> None:
+        super().__init__(root)
+        self.allowed_paths = set(allowed_paths) if allowed_paths is not None else {
+            root / relative for relative in _CONFIG_WRITE_PATHS
+        }
+        if not self.allowed_paths:
+            raise ValueError("CONFIG_PUBLICATION_EMPTY_CLOSURE")
+        for path in self.allowed_paths:
+            self._assert_scoped(path)
+            if path.relative_to(root).as_posix() not in _CONFIG_WRITE_PATHS:
+                raise ValueError(f"CONFIG_PUBLICATION_OUTSIDE_CLOSURE:{path}")
+        self.expected: dict[Path, tuple | None] = {}
+        self.owned_writes: set[Path] = set()
+
+    def _state(self, path: Path) -> tuple | None:
+        # Inspect from the root down: a concurrent ancestor symlink must never
+        # make rollback inspect or restore a descendant in another location.
+        ancestors = [parent for parent in path.parents if parent == self.root or parent.is_relative_to(self.root)]
+        for parent in reversed(ancestors):
+            if parent.is_symlink():
+                metadata = parent.lstat()
+                return ("symlink-parent", str(parent), os.readlink(parent), metadata.st_mtime_ns)
+            if not parent.exists():
+                return None
+            if not parent.is_dir():
+                metadata = parent.lstat()
+                return ("non-directory-parent", str(parent), metadata.st_mtime_ns)
+        if path.is_symlink():
+            metadata = path.lstat()
+            return ("symlink", os.readlink(path), _stat.S_IMODE(metadata.st_mode), metadata.st_mtime_ns)
+        if not path.exists():
+            return None
+        metadata = path.stat()
+        if not path.is_file():
+            return ("non-file", _stat.S_IMODE(metadata.st_mode), metadata.st_mtime_ns)
+        content = path.read_bytes()
+        after = path.lstat()
+        identity = lambda info: (
+            info.st_dev, info.st_ino, info.st_mode, info.st_size,
+            info.st_mtime_ns, info.st_ctime_ns,
+        )
+        if identity(metadata) != identity(after):
+            raise ValueError(f"CONFIG_PUBLICATION_DESTINATION_CHANGED:{path}")
+        return (
+            "file", content, _stat.S_IMODE(metadata.st_mode), metadata.st_mtime_ns,
+            metadata.st_dev, metadata.st_ino, metadata.st_ctime_ns,
+        )
+
+    def prepare(self, paths: Iterable[Path]) -> None:
+        for path in paths:
+            if path not in self.allowed_paths:
+                raise ValueError(f"CONFIG_PUBLICATION_OUTSIDE_CLOSURE:{path}")
+            if path not in self.expected:
+                before = self._state(path)
+                self.expected[path] = before
+                super().capture(path)
+                if self._state(path) != before:
+                    raise ValueError(f"CONFIG_PUBLICATION_DESTINATION_CHANGED:{path}")
+
+    def assert_unchanged(self, paths: Iterable[Path] | None = None) -> None:
+        selected = tuple(self.expected if paths is None else paths)
+        self.prepare(selected)
+        for path in selected:
+            _assert_unaliased_write_path(path)
+            if self._state(path) != self.expected[path]:
+                raise ValueError(f"CONFIG_PUBLICATION_DESTINATION_CHANGED:{path}")
+
+    def capture(self, path: Path) -> None:
+        self.prepare((path,))
+        self.assert_unchanged((path,))
+
+    def record_writes(
+        self,
+        paths: Iterable[Path],
+        *,
+        expected: Mapping[Path, bytes | None],
+        identities: Mapping[Path, tuple[int, int, int, int, int]] | None = None,
+    ) -> None:
+        for path in paths:
+            if path not in self.expected or path not in expected:
+                raise RuntimeError(f"CONFIG_PUBLICATION_UNPREPARED_WRITE:{path}")
+            current = self._state(path)
+            body = expected[path]
+            matches = current is None if body is None else (
+                current is not None and current[0] == "file" and current[1] == body
+            )
+            if not matches:
+                raise ValueError(f"CONFIG_PUBLICATION_POSTIMAGE_CHANGED:{path}")
+            if identities is not None and path in identities:
+                metadata = path.lstat()
+                identity = (metadata.st_dev, metadata.st_ino, _stat.S_IMODE(metadata.st_mode), metadata.st_size, metadata.st_mtime_ns)
+                if identity != identities[path]:
+                    raise ValueError(f"CONFIG_PUBLICATION_POSTIMAGE_IDENTITY_CHANGED:{path}")
+            if current != self.expected[path]:
+                self.owned_writes.add(path)
+            self.expected[path] = current
+
+    def rollback(self) -> None:
+        conflicts = {path for path in self.expected if self._state(path) != self.expected[path]}
+        protected_directories = {
+            directory for path in conflicts for directory in path.parents
+            if directory == self.root or directory.is_relative_to(self.root)
+        }
+        files, directories = self.files, self.directories
+        self.files = {path: files[path] for path in self.owned_writes - conflicts}
+        self.directories = {
+            path: prior for path, prior in directories.items()
+            if path not in protected_directories
+        }
+        try:
+            super().rollback()
+        finally:
+            self.files, self.directories = files, directories
+        if conflicts:
+            paths = ",".join(sorted(path.relative_to(self.root).as_posix() for path in conflicts))
+            raise RuntimeError(f"CONFIG_PUBLICATION_ROLLBACK_CONFLICT_PRESERVED:{paths}")
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        if exc_value is None:
+            try:
+                self.assert_unchanged()
+            except BaseException as error:  # noqa: BLE001
+                super().__exit__(type(error), error, error.__traceback__)
+                raise
+        return super().__exit__(exc_type, exc_value, traceback)
+
+
+def _config_ledger_records(raw: bytes, *, mirror: bool) -> dict[tuple[str, str], dict[str, object]]:
+    decode = qa_harness._loads_json_strict
+    text = raw.decode("utf-8")
+    rows = [decode(line) for line in text.splitlines()] if mirror else decode(text)
+    if not isinstance(rows, list):
+        raise ValueError("CONFIG_PUBLICATION_INVALID_LEDGER")
+    records: dict[tuple[str, str], dict[str, object]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("CONFIG_PUBLICATION_INVALID_LEDGER_ROW")
+        key, path = row.get("artifact_key"), row.get("discovered_physical_path")
+        if (
+            not isinstance(key, str) or not key or not isinstance(path, str) or not path
+            or Path(path).is_absolute() or ".." in Path(path).parts
+            or Path(path).as_posix() != path
+        ):
+            raise ValueError("CONFIG_PUBLICATION_INVALID_LEDGER_IDENTITY")
+        identity = (key, path)
+        if identity in records:
+            raise ValueError("CONFIG_PUBLICATION_DUPLICATE_LEDGER_IDENTITY")
+        records[identity] = row
+    if list(records) != sorted(records):
+        raise ValueError("CONFIG_PUBLICATION_UNORDERED_LEDGER")
+    return records
+
+
+def _config_logical_delta(
+    before: Mapping[tuple[str, str], Mapping[str, object]],
+    after: Mapping[tuple[str, str], Mapping[str, object]],
+    *,
+    changed_primaries: frozenset[str],
+    mirror: bool,
+) -> None:
+    additions = {
+        (str(row["artifact_key"]), str(row["discovered_physical_path"])): row
+        for row in CATALOG_VALIDATION_ENTRIES
+    }
+    if set(before) - set(after) or (set(after) - set(before)) - set(additions):
+        raise ValueError("CONFIG_PUBLICATION_LEDGER_TOPOLOGY_DRIFT")
+    for identity, row in after.items():
+        if identity not in before:
+            expected = additions[identity]
+            if mirror:
+                metadata = {
+                    key: value for key, value in row.items()
+                    if key not in {"sha256", "size_bytes", "proof_anchor", "produced_at_utc"}
+                }
+                if metadata != expected or row.get("proof_anchor") != identity[1] + ".path_proof.txt":
+                    raise ValueError("CONFIG_PUBLICATION_NEW_RECORD_METADATA_DRIFT")
+            elif dict(row) != expected:
+                raise ValueError("CONFIG_PUBLICATION_NEW_RECORD_METADATA_DRIFT")
+            continue
+        mutable = {"sha256", "size_bytes"} if (
+            identity[1] in changed_primaries or identity[1] in _CONFIG_SKELETON_PATHS
+        ) else set()
+        if mirror and identity[1] in _CONFIG_SKELETON_PATHS and before[identity].get("sha256") != row.get("sha256"):
+            # The existing skeleton writer refreshes capture provenance when
+            # its content changes (notably orientation after new registrations).
+            mutable.add("produced_at_utc")
+        prior = {key: value for key, value in before[identity].items() if key not in mutable}
+        current = {key: value for key, value in row.items() if key not in mutable}
+        if prior != current:
+            raise ValueError(f"CONFIG_PUBLICATION_UNRELATED_RECORD_DRIFT:{identity}")
+
+
+def publish_config_family(
+    *,
+    root: Path,
+    primary_paths: Sequence[Path],
+    produce: Callable[[], None],
+    verify: Callable[[], None],
+    source_verify: Callable[[], None],
+) -> None:
+    """Coordinate the declared configuration owners and updater with recovery.
+
+    Callers prepare/validate their own inputs, recheck destination preimages,
+    and reject nonzero producer outcomes in ``produce``. All functions execute
+    in this process using this updater module and root. ``verify`` and
+    ``source_verify`` are mandatory read-only predicates and must raise on
+    refusal. This catches failures; it is not crash-atomic publication and
+    concurrent readers can observe intermediate primary replacements.
+    """
+    if not isinstance(root, Path) or not root.is_absolute() or root != root.resolve() or root != ROOT:
+        raise ValueError("CONFIG_PUBLICATION_ROOT_MISMATCH")
+    if _ACTIVE_WRITE_TRANSACTION is not None or _STAGED_VIEW is not None:
+        raise RuntimeError("config publication requires its own outer transaction")
+    if any(not callable(check) for check in (produce, verify, source_verify)):
+        raise TypeError("config publication requires producer and read-only verifiers")
+    selected = tuple(primary_paths)
+    expected = {ROOT / path for path in CONFIG_PRIMARY_PATHS}
+    if len(selected) != len(expected) or set(selected) != expected:
+        raise ValueError("CONFIG_PUBLICATION_PRIMARY_SET_MISMATCH")
+    if os.environ.get("HDE_ISOLATED_RELEASE_BUILD"):
+        raise ValueError("CONFIG_PUBLICATION_ISOLATED_RELEASE_FORBIDDEN")
+    ensure_determinism_env()
+    for relative in sorted(_CONFIG_WRITE_PATHS):
+        _assert_unaliased_write_path(ROOT / relative)
+    # Read the exact retained rows, before generic normalizers can discard or
+    # silently reconcile duplicate/colliding history. Do not require unproduced
+    # catalog logs or their companions during first-generation preflight.
+    index_before = _config_ledger_records(HUMAN_INDEX.read_bytes(), mirror=False)
+    mirror_before = _config_ledger_records(MIRROR_PATH.read_bytes(), mirror=True)
+    if list(index_before) != list(mirror_before):
+        raise ValueError("CONFIG_PUBLICATION_PRIOR_TOPOLOGY_DRIFT")
+    _catalog_validation_entries(list(index_before.values()))
+    source_verify()
+    with _ConfigWriteTransaction(ROOT) as transaction:
+        transaction.prepare(ROOT / relative for relative in sorted(_CONFIG_WRITE_PATHS))
+        source_verify()
+        produce()
+        for path in selected:
+            _assert_unaliased_write_path(path)
+            if not path.is_file() or not path.read_bytes():
+                raise ValueError(f"CONFIG_PUBLICATION_PRIMARY_MISSING:{path}")
+        _catalog_validation_entries(list(index_before.values()))
+        source_verify()
+        changed_primaries = frozenset(
+            relative for relative in _CONFIG_BOUND_PRIMARY_PATHS
+            if transaction.files[ROOT / relative] is None
+            or transaction.files[ROOT / relative][0] != (ROOT / relative).read_bytes()
+        )
+
+        def guard(staged: Mapping[Path, bytes | _StagedDeletion]) -> None:
+            source_verify()
+            transaction.assert_unchanged()
+            for path, content in staged.items():
+                _assert_unaliased_write_path(path)
+                if content is _STAGED_DELETION:
+                    raise ValueError(f"CONFIG_PUBLICATION_DELETION_FORBIDDEN:{path}")
+                if path.exists() and path.read_bytes() == content:
+                    continue
+                if path.relative_to(ROOT).as_posix() not in _CONFIG_COMPANION_PATHS:
+                    raise ValueError(f"CONFIG_PUBLICATION_OUTSIDE_CLOSURE:{path}")
+            index_after = _config_ledger_records(
+                staged.get(HUMAN_INDEX, HUMAN_INDEX.read_bytes()), mirror=False
+            )
+            mirror_after = _config_ledger_records(
+                staged.get(MIRROR_PATH, MIRROR_PATH.read_bytes()), mirror=True
+            )
+            if list(index_after) != list(mirror_after):
+                raise ValueError("CONFIG_PUBLICATION_FINAL_TOPOLOGY_DRIFT")
+            _config_logical_delta(index_before, index_after, changed_primaries=changed_primaries, mirror=False)
+            _config_logical_delta(mirror_before, mirror_after, changed_primaries=changed_primaries, mirror=True)
+            # No direct primary owner may also publish the shared ledgers.
+            for ledger in (HUMAN_INDEX, MIRROR_PATH):
+                preimage = transaction.files[ledger]
+                if preimage is None or ledger.read_bytes() != preimage[0]:
+                    raise ValueError(f"CONFIG_PUBLICATION_DESTINATION_CHANGED:{ledger}")
+
+        _converge_and_publish(before_publish=guard)
+        source_verify()
+        verify()
+        source_verify()
 
 
 def publish_crd_check_family(

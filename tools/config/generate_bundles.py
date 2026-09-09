@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -11,40 +12,35 @@ if str(ROOT) not in sys.path:
 
 from engine.config.bundles import (  # noqa: E402
     CONFIG_BUNDLE_ROOT,
-    build_backend_bundle,
-    build_frontend_bundle,
+    _prepare_bundles,
     generate_bundles,
 )
 from engine.serializer import canon  # noqa: E402
-from tools.config.artifacts import require_closed_rails  # noqa: E402
+from tools.config.artifacts import require_closed_rails, _destination_state  # noqa: E402
+from tools.config.generate_config_artifacts import _check_expected, _verify_checked_outputs  # noqa: E402
+from tools.generate_registry_report import _verify_report_source  # noqa: E402
 
 
 def expected_bundles(root: Path | None = None, *, allow_aliases: bool = False) -> dict[Path, bytes]:
     base = root or ROOT
-    bundle_root = base / CONFIG_BUNDLE_ROOT.relative_to(ROOT)
-    return {
-        bundle_root / "be_bundle.json": canon.sercanon(
-            build_backend_bundle(base, allow_aliases=allow_aliases),
-            sort_keys=True,
-        ),
-        bundle_root / "fe_bundle.json": canon.sercanon(
-            build_frontend_bundle(base, allow_aliases=allow_aliases),
-            sort_keys=True,
-        ),
-    }
+    capture, payloads = _prepare_bundles(base, allow_aliases=allow_aliases)
+    expected = {capture.root / f"artifacts/config_bundles/{name}.json":
+            canon.sercanon(payload, sort_keys=True)
+            for name, payload in payloads.items()}
+    capture.verify_unchanged()
+    _verify_report_source(capture)
+    return expected
 
 
 def check_bundles(root: Path | None = None, *, allow_aliases: bool = False) -> None:
     require_closed_rails()
-    base = root or ROOT
-    expected = expected_bundles(base, allow_aliases=allow_aliases)
-    stale = [
-        path.relative_to(base).as_posix()
-        for path, data in expected.items()
-        if not path.is_file() or path.read_bytes() != data
-    ]
-    if stale:
-        raise SystemExit("STALE:" + ",".join(stale))
+    base = Path(os.path.abspath(root or ROOT))
+    capture, payloads = _prepare_bundles(base, allow_aliases=allow_aliases)
+    expected = {base / f"artifacts/config_bundles/{name}.json":
+                canon.sercanon(payload, sort_keys=True)
+                for name, payload in payloads.items()}
+    before = _check_expected(base, expected)
+    _verify_checked_outputs(base, before, capture)
 
 
 def main(argv: list[str] | None = None) -> int:

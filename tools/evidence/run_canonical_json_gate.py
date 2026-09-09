@@ -40,7 +40,13 @@ from engine.cli.main import (
 )
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import band_for, compat_public, conjunction_public
-from engine.config.registry_loader import load_registry_config
+from engine.config.registry_loader import (
+    _LocalCapture,
+    _capture_registry_config,
+    _validate_local_schema,
+    load_registry_config,
+    validate_channel_gates,
+)
 from engine.mech.helpers import canonicalize_declared_set
 from engine.narratives.constants import BANDS
 from engine.narratives.loader import load_pack
@@ -269,7 +275,7 @@ EXPECTED_SET_RULES = (
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _EXPECTED_SCHEMA_SHA256 = {
-    "schemas/channels_v1.schema.json": "a663bf3ffc4d4a7d3da274da359e41c89fea17914f583c963c6f74c0288d8a42",
+    "schemas/channels_v1.schema.json": "33cd685e671b1ee44b93ce3b8ac5119a8d63ae18394f6b899e51f1e172107979",
     "schemas/gates_v1.schema.json": "b3308ca513a1f3e4490ce6c526124675fad1fdcdb5c6abce7257af99d76ed13a",
 }
 _EXPECTED_RELEASE_MANIFEST_PATHS = (
@@ -856,12 +862,19 @@ def _validate_release_manifest_snapshot(_target: Target, obj: object) -> None:
 
 
 def _validate_registry_snapshot(target: Target, obj: object) -> None:
+    # Use accepted bytes from this root, including both owning schemas. The
+    # temporary candidate does not acquire a release handle or a global fallback.
+    capture = _capture_registry_config(ROOT)
     with tempfile.TemporaryDirectory(prefix="canonical-registry-") as temp_name:
         temp_root = Path(temp_name)
-        shutil.copytree(ROOT / "catalog", temp_root / "catalog")
+        for relative_path, source in capture.sources.items():
+            destination = temp_root / relative_path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(source.raw)
         candidate = temp_root / target.rel_path
         candidate.write_bytes(sercanon(obj, sort_keys=True))
         load_registry_config(temp_root)
+    capture.verify_unchanged()
 
 
 def _canonical_json_without_lf(obj: object) -> bytes:
@@ -946,9 +959,11 @@ def _validate_target(target: Target, obj: object) -> None:
     if validator is None:
         label = target.validator or "<empty>"
         raise ValueError(f"unimplemented_validator:{label}")
-    if target.schema:
-        schema = json.loads((ROOT / target.schema).read_text(encoding="utf-8"))
-        jsonschema.Draft202012Validator(schema).validate(obj)
+    schema_capture = _LocalCapture(ROOT) if target.schema else None
+    if schema_capture is not None:
+        # Validate the captured local document before any schema reference can
+        # be resolved, using the loader's strict raw/type/schema boundary.
+        _validate_local_schema(schema_capture, target.schema, obj)
     validator(target, obj)
     _validate_frozen_generated_capture(target, obj)
 
@@ -970,11 +985,20 @@ def _validate_target(target: Target, obj: object) -> None:
                 values = channel.get(field) if isinstance(channel, dict) else None
                 if not isinstance(values, list):
                     raise ValueError(f"set_array_missing:{rule_path}:{index}")
-                expected = canonicalize_declared_set(values, identity=None if identity == "value" else identity)
+                if (target.rel_path, rule_path, identity) == (
+                    "catalog/channels_v1.json", "$.channels[*].gates", "value"
+                ):
+                    # This one owning tuple is numeric. Do not change generic
+                    # scalar-set behavior or any selector's declared identity.
+                    expected = list(validate_channel_gates(values, channel_id=channel.get("id")))
+                else:
+                    expected = canonicalize_declared_set(values, identity=None if identity == "value" else identity)
                 if values != expected:
                     raise ValueError(f"set_not_canonical:{rule_path}:{index}")
         else:
             raise ValueError(f"unimplemented_set_rule:{rule_path}")
+    if schema_capture is not None:
+        schema_capture.verify_unchanged()
 
 
 @dataclass(frozen=True)
@@ -1099,10 +1123,9 @@ def _target_evidence_bytes(
 
 
 def _write_if_changed(path: Path, content: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists() and path.read_bytes() == content:
-        return
-    path.write_bytes(content)
+    # The gate owns these bytes; the updater supplies safe replacement and
+    # the active configuration transaction's write/recovery tracking.
+    update_evidence_index._publish_staged({path: content})
 
 
 def _write_path_proof(rel_path: str, *, produced_at: str) -> None:

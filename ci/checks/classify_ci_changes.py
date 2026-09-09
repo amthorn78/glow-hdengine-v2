@@ -48,6 +48,8 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/config/test_config_artifacts.py",
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
     "tests/config/test_manifest_schema.py",
+    "tests/config/test_magic10_contracts.py",
+    "tests/config/test_registry_catalog_contract.py",
     "tests/config/test_registry_report.py",
     "tests/config/test_registry_report_determinism.py",
     "tests/config/test_registry_report_indexing.py",
@@ -142,6 +144,8 @@ _RELEASE_IMPLEMENTATION_PATHS = {
     "tools/cli/generate_showcompat_artifacts.py",
     "tools/config/generate_bundles.py",
     "tools/config/generate_config_artifacts.py",
+    "tools/config/artifacts.py",
+    "tools/generate_registry_report.py",
     "tools/evidence/build_release_attestation.py",
     "tools/evidence/generate_a7_transport_proofs.py",
     "tools/evidence/generate_bodygraph_policy_proofs.py",
@@ -287,6 +291,31 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
 }
 _PRODUCT_TEST_OWNER_PATHS = {
+    "catalog/channels_v1.json": (
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_typed_bundles.py",
+        "tests/compare/test_arrays_as_sets.py",
+        "tests/evidence/test_canonical_json_gate_check_outputs.py",
+    ),
+    "schemas/channels_v1.schema.json": (
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_typed_bundles.py",
+        "tests/compare/test_arrays_as_sets.py",
+        "tests/evidence/test_canonical_json_gate_check_outputs.py",
+    ),
+    "catalog/magic10_mechanics_v1.json": ("tests/config/test_magic10_contracts.py",),
+    "schemas/magic10_mechanics_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
+    "schemas/magic10_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
+    "schemas/magic10_compat_result_v1.schema.json": ("tests/config/test_magic10_contracts.py",),
+    "engine/config/registry_loader.py": (
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_magic10_contracts.py",
+        "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+        "tests/config/test_alias_policy_enforcement.py",
+        "tests/config/test_manifest_schema.py",
+        "tests/config/test_typed_bundles.py",
+    ),
+    "engine/config/bundles.py": ("tests/config/test_typed_bundles.py",),
     "catalog/manifest.json": (
         "tests/runtime/test_identity.py",
         "tests/evidence/test_release_manifest_content_binding.py",
@@ -334,6 +363,9 @@ _PRODUCT_TEST_OWNER_PREFIXES = (
     ),
 )
 _EVIDENCE_GENERATOR_TEST_OWNERS = {
+    "tools/evidence/generate_arrays_as_sets_report.py": (
+        "tests/compare/test_arrays_as_sets.py",
+    ),
     "tools/evidence/generate_architecture_snapshot.py": (
         "tests/evidence/test_architecture_snapshot.py",
     ),
@@ -416,6 +448,7 @@ _EVIDENCE_HELPER_TEST_OWNERS = {
     "tools/evidence/update_evidence_index.py": (
         "tests/evidence/test_evidence_index_missing_state.py",
         _EVIDENCE_HELPER_OWNERSHIP_TEST,
+        "tests/config/test_config_artifacts.py",
     ),
     "tools/evidence/validate_evidence_paths.py": (
         "tests/evidence/test_evidence_index_missing_state.py",
@@ -492,6 +525,39 @@ _QA_TOOLS_REQUIRING_OWNER = {
     # remain deliberately fail-closed until that ownership is established.
     "tools/qa/generate_epic025_close_pack.py",
     "tools/qa/generate_epic026_close_pack.py",
+}
+_CONFIG_WRITER_TEST_OWNERS = {
+    "tools/generate_registry_report.py": (
+        "tests/config/test_registry_report.py",
+        "tests/config/test_registry_report_determinism.py",
+        "tests/config/test_registry_report_indexing.py",
+    ),
+    "tools/config/artifacts.py": (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+    ),
+    "tools/config/generate_config_artifacts.py": (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+    ),
+    "tools/config/generate_bundles.py": (
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+    ),
+}
+_TEST_SUPPORT_OWNER_PATHS = {
+    "tests/config/helpers.py": (
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_magic10_contracts.py",
+        "tests/config/test_alias_policy_enforcement.py",
+        "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+        "tests/config/test_manifest_schema.py",
+        "tests/config/test_registry_report.py",
+        "tests/config/test_registry_report_determinism.py",
+        "tests/config/test_registry_report_indexing.py",
+        "tests/config/test_config_artifacts.py",
+        "tests/config/test_typed_bundles.py",
+    ),
 }
 _SAFE_TEST_SUPPORT_PREFIXES = {
     "tests/db/": ("tests/db",),
@@ -654,6 +720,10 @@ def _registered_owner_test_paths() -> set[str]:
     for targets in _EVIDENCE_HELPER_TEST_OWNERS.values():
         paths.update(targets)
     for targets in _QA_TOOL_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _CONFIG_WRITER_TEST_OWNERS.values():
+        paths.update(targets)
+    for targets in _TEST_SUPPORT_OWNER_PATHS.values():
         paths.update(targets)
     return paths
 
@@ -849,15 +919,26 @@ def _qa_tool_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
     )
 
 
-def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
-    targets = next(
-        (
-            owner_targets
-            for prefix, owner_targets in _SAFE_TEST_SUPPORT_PREFIXES.items()
-            if path.startswith(prefix)
-        ),
-        None,
+def _config_writer_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    targets = _CONFIG_WRITER_TEST_OWNERS.get(path)
+    if targets is None:
+        return ()
+    return _validated_owner_targets(
+        repo_root, path, targets, error_code="CI_CONFIG_WRITER_OWNER_INVALID"
     )
+
+
+def _test_support_owner_targets(repo_root: Path, path: str) -> tuple[str, ...]:
+    targets = _TEST_SUPPORT_OWNER_PATHS.get(path)
+    if targets is None:
+        targets = next(
+            (
+                owner_targets
+                for prefix, owner_targets in _SAFE_TEST_SUPPORT_PREFIXES.items()
+                if path.startswith(prefix)
+            ),
+            None,
+        )
     if targets is None:
         raise ValueError(f"CI_TEST_SUPPORT_OWNER_MISSING:{path}")
     return _validated_owner_targets(
@@ -1160,6 +1241,7 @@ def changed_test_targets(repo_root: Path, paths: Iterable[str]) -> tuple[str, ..
             continue
         targets.update(_http_reader_control_owner_targets(repo_root, path))
         targets.update(_product_owner_targets(repo_root, path))
+        targets.update(_config_writer_owner_targets(repo_root, path))
         targets.update(
             _evidence_generator_owner_targets(
                 repo_root,

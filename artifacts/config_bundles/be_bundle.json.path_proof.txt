@@ -1,5 +1,5 @@
 path: artifacts/config_bundles/be_bundle.json
-size_bytes: 8750
-sha256: 06b471973e851640db5c0d8752cc8e37ec90f5292dcde1c2db5297bd84d22e5e
+size_bytes: 8822
+sha256: b7524bde903a02a7d8ad70ba52ccdb9175210de06074c432379debf5fbbbdc4e
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T17:07:45Z

@@ -1,0 +1,15 @@
+catalog schema validation v1
+status: PASS
+scope: PR01 local raw JSON and owning schema validation
+validation: duplicate-aware UTF-8, canonical bytes, local schemas, exact integer domains
+source: catalog/channels_v1.json sha256=3a4ea9194121e48cc95848fd34a2903de413260b35bce9800b83f67a8bc3d3e9 size_bytes=6481
+source: catalog/gates_v1.json sha256=2bbf28bb031859e3e20c1a932c57d54e4eae431375770e1253916e24f9cf8326 size_bytes=1877
+source: catalog/magic10.json sha256=ef4ec8dd591294f15ca870f038678116b7932782023301fd8885b1a870b07e64 size_bytes=124
+source: catalog/magic10_caps.json sha256=cfeab8efc1715b39cb8085999978ab3707bb9e5aad50fc01c5da70bf98a17dd9 size_bytes=900
+source: catalog/magic10_mechanics_v1.json sha256=fff779980bdd6985dd0640d1b90ddc0e90046675a3b6cb7c17a08b9a70500eaf size_bytes=7279
+source: catalog/magic10_seeds.json sha256=3b8342c367b38ef7177559f8a30fdb2f26633db0cb39bd48fdd4d6f84d28a700 size_bytes=357
+source: catalog/manifest.json sha256=c0f5f24fbbcbb04d01d1613be386c26fddbfb37d53cbb0f9c65d5cf55e97c2a4 size_bytes=1981
+source: math/thresholds.json sha256=5a9805ac3da14c1d7a9e693a52c7faa5b1e5b9b5fc7a62972e1a8a45561f25a4 size_bytes=82
+source: schemas/channels_v1.schema.json sha256=33cd685e671b1ee44b93ce3b8ac5119a8d63ae18394f6b899e51f1e172107979 size_bytes=1396
+source: schemas/gates_v1.schema.json sha256=b3308ca513a1f3e4490ce6c526124675fad1fdcdb5c6abce7257af99d76ed13a size_bytes=508
+source: schemas/magic10_mechanics_v1.schema.json sha256=4d064366e9d3092127569aa4de328dd00938038ea7d2b790489fd6511f9cebe4 size_bytes=6061

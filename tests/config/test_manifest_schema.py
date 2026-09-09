@@ -4,13 +4,14 @@ from pathlib import Path
 import pytest
 
 from engine.config.registry_loader import DuplicateIdError, SchemaValidationError, load_manifest
+from tests.config.helpers import write_canonical
 
 
 def _write_manifest(tmp_path: Path, payload: dict) -> Path:
     catalog_dir = tmp_path / "catalog"
     catalog_dir.mkdir(exist_ok=True)
     manifest_path = catalog_dir / "manifest.json"
-    manifest_path.write_text(json.dumps(payload, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    write_canonical(manifest_path, payload)
     return tmp_path
 
 
@@ -66,3 +67,20 @@ def test_manifest_forbids_self_listing(tmp_path: Path) -> None:
     root = _write_manifest(tmp_path, payload)
     with pytest.raises(SchemaValidationError):
         load_manifest(root)
+
+
+@pytest.mark.parametrize("size", [True, False, 1.0, "1", -1])
+def test_manifest_size_has_exact_integer_domain(tmp_path: Path, size: object) -> None:
+    payload = {"root": "catalog/", "version": "1.0.0", "built_at_utc": "2025-01-01T00:00:00Z",
+               "files": [{"path": "a.json", "sha256": "0" * 64, "size": size}]}
+    with pytest.raises(SchemaValidationError, match="size"):
+        load_manifest(_write_manifest(tmp_path, payload))
+
+
+@pytest.mark.parametrize("path", ["../a.json", "/a.json", "a/../b.json", "a//b.json", "a\\b.json"])
+def test_manifest_structure_refuses_unsafe_lexical_paths(tmp_path: Path, path: str) -> None:
+    payload = {"root": "catalog/", "version": "1.0.0", "built_at_utc": "2025-01-01T00:00:00Z",
+               "files": [{"path": path, "sha256": "0" * 64, "size": 1}]}
+    with pytest.raises(SchemaValidationError) as error:
+        load_manifest(_write_manifest(tmp_path, payload))
+    assert error.value.code == "INVALID_MANIFEST_PATH"

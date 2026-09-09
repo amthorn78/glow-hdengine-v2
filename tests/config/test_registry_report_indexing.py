@@ -54,3 +54,17 @@ def test_registry_report_index_entries_match_artifact() -> None:
     assert proof_lines.get("sha256") == sha
     assert proof_lines.get("size_bytes") == str(size)
 
+
+
+def test_registry_report_captured_sources_match_selected_root(tmp_path) -> None:
+    from tests.config.helpers import catalog_root
+    from tools.generate_registry_report import build_registry_report
+
+    root = catalog_root(tmp_path)
+    report = build_registry_report(root)
+    assert "manifest" not in report["inputs"]
+    assert "release_id" not in report
+    assert len(report["inputs"]["catalogs"]) == 5
+    for source in report["inputs"]["catalogs"].values():
+        path = root / source["path"]
+        assert source["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()

@@ -72,9 +72,9 @@ def test_full_gate_outputs_remain_current_after_metadata_only_release_cut(
     tmp_path, monkeypatch
 ):
     source_root = run_canonical_json_gate.ROOT
-    for name in ("artifacts", "audit", "schemas"):
+    for name in ("artifacts", "audit"):
         (tmp_path / name).symlink_to(source_root / name, target_is_directory=True)
-    for name in ("adapter", "catalog", "engine", "math", "migrations"):
+    for name in ("adapter", "catalog", "engine", "math", "migrations", "schemas"):
         shutil.copytree(source_root / name, tmp_path / name)
 
     manifest_path = tmp_path / "catalog" / "manifest.json"
@@ -619,19 +619,58 @@ def test_top_level_channel_set_uses_id_identity_and_ascii_order():
     )
     payload["channels"] = list(reversed(payload["channels"]))
 
-    with pytest.raises(ValueError, match=r"set_not_canonical:\$\.channels$"):
+    # The owning catalog now refuses the same noncanonical order before the
+    # gate's generic declared-set check is reached.
+    with pytest.raises(SchemaValidationError) as exc_info:
         run_canonical_json_gate._validate_target(target, payload)
+    assert exc_info.value.code == "CHANNEL_ID_ROSTER_MISMATCH"
 
 
 def test_declared_set_rule_rejects_unique_but_non_ascii_order():
     target = next(target for target in run_canonical_json_gate.TARGETS if target.rel_path == "catalog/channels_v1.json")
     payload = json.loads((run_canonical_json_gate.ROOT / target.rel_path).read_text(encoding="utf-8"))
     payload["channels"][0]["domains"] = ["talk", "narrative"]
-    with pytest.raises(ValueError, match=r"set_not_canonical:\$\.channels\[\*\]\.domains:0"):
+    # Exact retained Product metadata is stronger than vocabulary/set checks.
+    # Its owning refusal must still catch this legal-but-reordered scalar set.
+    with pytest.raises(SchemaValidationError) as exc_info:
         run_canonical_json_gate._validate_target(target, payload)
+    assert exc_info.value.code == "CHANNEL_PRODUCT_METADATA_MISMATCH"
 
 
-def test_channel_gate_set_uses_strict_ascii_scalar_identity_order():
+def test_gate_refuses_nonlocal_owning_schema_before_reference_resolution(tmp_path, monkeypatch):
+    import urllib.request
+    from referencing import Registry
+
+    target = next(target for target in run_canonical_json_gate.TARGETS
+                  if target.rel_path == "catalog/channels_v1.json")
+    source_root = run_canonical_json_gate.ROOT
+    payload = json.loads((source_root / target.rel_path).read_bytes())
+    schema = json.loads((source_root / target.schema).read_bytes())
+    schema["$ref"] = "https://invalid.example/channel-schema"
+    path = tmp_path / target.schema
+    path.parent.mkdir(parents=True)
+    path.write_bytes(run_canonical_json_gate.sercanon(schema, sort_keys=True))
+    calls = []
+
+    def forbidden_resolution(*args, **kwargs):
+        calls.append(True)
+        raise AssertionError("owning schema attempted external resolution")
+
+    monkeypatch.setattr(run_canonical_json_gate, "ROOT", tmp_path)
+    monkeypatch.setattr(urllib.request, "urlopen", forbidden_resolution)
+    monkeypatch.setattr(Registry, "get_or_retrieve", forbidden_resolution)
+    with pytest.raises(SchemaValidationError) as exc_info:
+        run_canonical_json_gate._validate_target(target, payload)
+    assert exc_info.value.code == "NONLOCAL_SCHEMA_REFERENCE"
+    assert calls == []
+
+
+@pytest.mark.parametrize("channel_id,expected", [
+    ("02-14", [2, 14]), ("05-15", [5, 15]), ("06-59", [6, 59]),
+    ("07-31", [7, 31]), ("09-52", [9, 52]), ("01-08", [1, 8]),
+    ("10-20", [10, 20]),
+])
+def test_channel_gate_set_uses_strict_numeric_endpoint_order(channel_id, expected):
     target = next(
         target
         for target in run_canonical_json_gate.TARGETS
@@ -640,13 +679,11 @@ def test_channel_gate_set_uses_strict_ascii_scalar_identity_order():
     payload = json.loads(
         (run_canonical_json_gate.ROOT / target.rel_path).read_bytes()
     )
-    channel = next(row for row in payload["channels"] if row["id"] == "02-14")
-    assert channel["gates"] == [14, 2]
-    channel["gates"] = [2, 14]
-    with pytest.raises(
-        ValueError,
-        match=r"set_not_canonical:\$\.channels\[\*\]\.gates",
-    ):
+    channel = next(row for row in payload["channels"] if row["id"] == channel_id)
+    assert channel["gates"] == expected
+    run_canonical_json_gate._validate_target(target, payload)
+    channel["gates"] = list(reversed(expected))
+    with pytest.raises(SchemaValidationError):
         run_canonical_json_gate._validate_target(target, payload)
 
 
