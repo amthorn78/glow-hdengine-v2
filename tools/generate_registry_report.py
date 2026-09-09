@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as _dt
-import hashlib
 import json
 import os
 import sys
@@ -21,10 +20,10 @@ from engine.config.registry_loader import (  # noqa: E402
     RegistryConfigError,
     SchemaValidationError,
     UnknownIdError,
-    load_registry_config,
+    _capture_registry_config,
 )
 from engine.serializer import canon  # noqa: E402
-from tools.config.artifacts import require_closed_rails  # noqa: E402
+from tools.config.artifacts import require_closed_rails, _destination_state, _publish_prepared  # noqa: E402
 
 
 # Discovery note (PR3 / EPIC017): legacy registry_report lived at artifacts/reports/ with
@@ -36,17 +35,20 @@ from tools.config.artifacts import require_closed_rails  # noqa: E402
 REPORT_PATH = ROOT / "artifacts" / "registry" / "registry_report.json"
 
 
-def _stable_generated_at(report_path: Path) -> str:
+def _stable_generated_at(report_path: Path, *, prior_state=None) -> str:
+    if prior_state is None:
+        prior_state = _destination_state(report_path.parents[2], [report_path])
     env_epoch = os.environ.get("SOURCE_DATE_EPOCH")
     if env_epoch:
         try:
             ts = _dt.datetime.fromtimestamp(int(env_epoch), tz=_dt.timezone.utc)
             return ts.replace(microsecond=0).isoformat().replace("+00:00", "Z")
-        except ValueError:
+        except (ValueError, OverflowError, OSError):
             pass
-    if report_path.exists():
+    prior = prior_state[report_path]
+    if prior is not None:
         try:
-            existing = json.loads(report_path.read_text(encoding="utf-8"))
+            existing = json.loads(prior[0].decode("utf-8"))
             ts = existing.get("generated_at_utc")
             if isinstance(ts, str) and ts:
                 return ts
@@ -55,44 +57,36 @@ def _stable_generated_at(report_path: Path) -> str:
     return "1970-01-01T00:00:00Z"
 
 
-def _sha256_path(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def _verify_report_source(capture) -> None:
+    """Recheck the optional prior-report input, including its absence.
+
+    This input supplies only stable timestamp precedence. It is deliberately
+    separate from catalog validation so malformed historical report bytes keep
+    their existing fixed-epoch fallback and an owner may replace its own output.
+    """
+    before = getattr(capture, "_registry_report_before", None)
+    if before is not None and _destination_state(capture.root, before) != before:
+        raise RuntimeError("REGISTRY_REPORT_SOURCE_CHANGED")
 
 
-def _catalog_meta(path: Path, *, count: int) -> Mapping[str, object]:
-    return {
-        "path": str(path.relative_to(ROOT)),
-        "count": count,
-        "sha256": _sha256_path(path),
+def _catalog_meta(source, *, count: int | None = None) -> Mapping[str, object]:
+    result = {"path": source.relative_path, "sha256": source.sha256}
+    if count is not None:
+        result["count"] = count
+    return result
+
+
+def _build_registry_inputs(config: RegistryConfig, *, capture=None) -> Mapping[str, object]:
+    capture = capture or _capture_registry_config(ROOT)
+    rows = {
+        "channels_v1": dict(_catalog_meta(capture.sources["catalog/channels_v1.json"], count=len(config.channels))),
+        "gates_v1": dict(_catalog_meta(capture.sources["catalog/gates_v1.json"], count=len(config.gates))),
+        "magic10_order": dict(_catalog_meta(capture.sources["catalog/magic10.json"])),
+        "magic10_caps": dict(_catalog_meta(capture.sources["catalog/magic10_caps.json"])),
+        "magic10_seeds": dict(_catalog_meta(capture.sources["catalog/magic10_seeds.json"])),
     }
-
-
-def _build_registry_inputs(config: RegistryConfig) -> Mapping[str, object]:
-    catalog_root = ROOT / "catalog"
-    channels_path = catalog_root / "channels_v1.json"
-    gates_path = catalog_root / "gates_v1.json"
-    order_path = catalog_root / "magic10.json"
-    caps_path = catalog_root / "magic10_caps.json"
-    seeds_path = catalog_root / "magic10_seeds.json"
-    return {
-        "catalogs": {
-            "channels_v1": _catalog_meta(channels_path, count=len(config.channels)),
-            "gates_v1": _catalog_meta(gates_path, count=len(config.gates)),
-            "magic10_order": {
-                "path": str(order_path.relative_to(ROOT)),
-                "sha256": _sha256_path(order_path),
-                "order": list(config.magic10_order),
-            },
-            "magic10_caps": {
-                "path": str(caps_path.relative_to(ROOT)),
-                "sha256": _sha256_path(caps_path),
-            },
-            "magic10_seeds": {
-                "path": str(seeds_path.relative_to(ROOT)),
-                "sha256": _sha256_path(seeds_path),
-            },
-        },
-    }
+    rows["magic10_order"]["order"] = list(config.magic10_order)
+    return {"catalogs": rows}
 
 
 def _domain_counts(config: RegistryConfig) -> Mapping[str, int]:
@@ -126,14 +120,16 @@ def _magic10_versions(config: RegistryConfig) -> Mapping[str, object]:
     }
 
 
-def build_registry_report(root: Path | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> Mapping[str, object]:
-    base = root or ROOT
-    config = load_registry_config(base, allow_aliases=allow_aliases, alias_ledger=alias_ledger)
-    generated_at = _stable_generated_at(REPORT_PATH)
+def _build_registry_report(capture) -> Mapping[str, object]:
+    config = capture.config
+    report_path = capture.root / "artifacts/registry/registry_report.json"
+    if not hasattr(capture, "_registry_report_before"):
+        capture._registry_report_before = _destination_state(capture.root, [report_path])
+    generated_at = _stable_generated_at(report_path, prior_state=capture._registry_report_before)
     return {
         "schema": "registry_report.v1",
         "generated_at_utc": generated_at,
-        "inputs": _build_registry_inputs(config),
+        "inputs": _build_registry_inputs(config, capture=capture),
         "artifacts": {
             "registry": {
                 "channel_ids": sorted(config.channels.keys()),
@@ -154,13 +150,23 @@ def build_registry_report(root: Path | None = None, *, allow_aliases: bool = Fal
     }
 
 
+def build_registry_report(root: Path | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> Mapping[str, object]:
+    capture = _capture_registry_config(root or ROOT, allow_aliases=allow_aliases, alias_ledger=alias_ledger)
+    payload = _build_registry_report(capture)
+    capture.verify_unchanged()
+    _verify_report_source(capture)
+    return payload
+
+
 def write_registry_report(root: Path | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> Path:
     require_closed_rails()
-    payload = build_registry_report(root, allow_aliases=allow_aliases, alias_ledger=alias_ledger)
-    report_path = (root or ROOT) / REPORT_PATH.relative_to(ROOT)
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_bytes(canon.sercanon(payload, sort_keys=True))
-    return report_path
+    base = Path(os.path.abspath(root or ROOT))
+    target = base / "artifacts/registry/registry_report.json"
+    before = _destination_state(base, [target])
+    capture = _capture_registry_config(base, allow_aliases=allow_aliases, alias_ledger=alias_ledger)
+    payload = canon.sercanon(_build_registry_report(capture), sort_keys=True)
+    _publish_prepared(base, {target: payload}, before=before, verify=capture.verify_unchanged)
+    return target
 
 
 def _main(argv: list[str] | None = None) -> int:

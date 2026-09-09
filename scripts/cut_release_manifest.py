@@ -10,7 +10,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Sequence
+from typing import Callable, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -63,8 +63,14 @@ def cut_manifest(
     version: str,
     built_at_utc: str,
     check: bool = False,
+    _publish: Callable[[Path, bytes], None] | None = None,
 ) -> int:
-    """Render or verify one canonical manifest without derived evidence writes."""
+    """Render or verify one canonical manifest without derived evidence writes.
+
+    A coordinating owner may supply a private final-byte publisher to include
+    this cut in its existing transaction. The cutter still validates every
+    input and constructs all bytes; check mode never calls the publisher.
+    """
 
     _require_closed_rails()
     _validate_inputs(version, built_at_utc)
@@ -118,7 +124,10 @@ def cut_manifest(
     expected = canon.sercanon(payload, sort_keys=True)
     if check:
         return 0 if original == expected else 1
-    manifest_path.write_bytes(expected)
+    if _publish is None:
+        manifest_path.write_bytes(expected)
+    else:
+        _publish(manifest_path, expected)
     return 0
 
 

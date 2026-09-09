@@ -23,7 +23,9 @@ def read_text(path: Path) -> str:
 
 
 def extract_ok_tokens(text: str) -> List[str]:
-    return sorted(set(OK_TOKEN_RE.findall(text)))
+    # Controlled Markdown may escape token underscores for presentation.
+    # Decode only those escapes; hashes continue to bind the raw source bytes.
+    return sorted(set(OK_TOKEN_RE.findall(text.replace(r"\_", "_"))))
 
 
 def slice_epic_block(pf20_text: str, epic_id: str) -> str:

@@ -238,3 +238,43 @@ def test_release_cut_rejects_symlinked_source(tmp_path, monkeypatch):
             version="1.0.1",
             built_at_utc="2026-07-23T00:00:00Z",
         )
+
+
+def test_release_cut_private_publisher_receives_validated_bytes_and_check_never_calls_it(tmp_path, monkeypatch):
+    _closed(monkeypatch)
+    source = tmp_path / "payload.txt"
+    source.write_bytes(b"actual callback source\n")
+    manifest = tmp_path / "catalog/manifest.json"
+    manifest.parent.mkdir()
+    original = canon.sercanon({
+        "root": "catalog/", "version": "1.0.0", "built_at_utc": "2025-12-26T00:00:00Z",
+        "files": [{"path": "payload.txt", "sha256": "0" * 64, "size": 0}],
+    }, sort_keys=True)
+    manifest.write_bytes(original)
+    before = manifest.read_bytes(), manifest.stat().st_mtime_ns
+    publications = []
+
+    def publisher(path, content):
+        publications.append((path, content))
+
+    inputs = {"version": "1.0.1", "built_at_utc": "2026-07-23T00:00:00Z", "_publish": publisher}
+    assert cutter.cut_manifest(manifest, check=True, **inputs) == 1
+    assert not publications
+    assert (manifest.read_bytes(), manifest.stat().st_mtime_ns) == before
+    assert cutter.cut_manifest(manifest, **inputs) == 0
+    assert len(publications) == 1
+    path, content = publications[0]
+    assert path == manifest
+    rendered = json.loads(content)
+    assert rendered["version"] == inputs["version"]
+    assert rendered["built_at_utc"] == inputs["built_at_utc"]
+    assert rendered["files"] == [{"path": "payload.txt", "sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "size": len(source.read_bytes())}]
+    assert content == canon.sercanon(rendered, sort_keys=True)
+    assert (manifest.read_bytes(), manifest.stat().st_mtime_ns) == before
+    # Only the injected publisher performs publication; the cutter must neither
+    # bypass it nor invoke it when verifying an already current manifest.
+    manifest.write_bytes(content)
+    before = manifest.read_bytes(), manifest.stat().st_mtime_ns
+    assert cutter.cut_manifest(manifest, check=True, **inputs) == 0
+    assert len(publications) == 1
+    assert (manifest.read_bytes(), manifest.stat().st_mtime_ns) == before

@@ -1,11 +1,22 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import math
+import os
+import stat
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Mapping
+
+import jsonschema
+from jsonschema import validators
+from referencing import Registry
+from referencing.exceptions import NoSuchResource
+
+from engine.serializer import canon
 
 from engine.categories.registry import FROZEN_MAGIC10_ORDER
 
@@ -232,237 +243,454 @@ class RegistryConfig:
     domains: tuple[str, ...]
 
 
-def _load_json(path: Path) -> object:
-    if not path.exists():
-        raise SchemaValidationError("MISSING_FILE", f"missing catalog file: {path}")
+
+# PF10 Addendum 2.5 / PF12: source-fixed construction sentries, not a second catalog.
+_CHANNEL_CLASSIFICATIONS = {'01-08': ('individual', 'knowing'),
+ '02-14': ('individual', 'knowing'),
+ '03-60': ('individual', 'knowing'),
+ '04-63': ('collective', 'logic'),
+ '05-15': ('collective', 'logic'),
+ '06-59': ('tribal', 'defense'),
+ '07-31': ('collective', 'logic'),
+ '09-52': ('collective', 'logic'),
+ '10-20': ('individual', 'integration'),
+ '10-34': ('individual', 'centering'),
+ '10-57': ('individual', 'integration'),
+ '11-56': ('collective', 'sensing'),
+ '12-22': ('individual', 'knowing'),
+ '13-33': ('collective', 'sensing'),
+ '16-48': ('collective', 'logic'),
+ '17-62': ('collective', 'logic'),
+ '18-58': ('collective', 'logic'),
+ '19-49': ('tribal', 'ego'),
+ '20-34': ('individual', 'integration'),
+ '20-57': ('individual', 'knowing'),
+ '21-45': ('tribal', 'ego'),
+ '23-43': ('individual', 'knowing'),
+ '24-61': ('individual', 'knowing'),
+ '25-51': ('individual', 'centering'),
+ '26-44': ('tribal', 'ego'),
+ '27-50': ('tribal', 'defense'),
+ '28-38': ('individual', 'knowing'),
+ '29-46': ('collective', 'sensing'),
+ '30-41': ('collective', 'sensing'),
+ '32-54': ('tribal', 'ego'),
+ '34-57': ('individual', 'integration'),
+ '35-36': ('collective', 'sensing'),
+ '37-40': ('tribal', 'ego'),
+ '39-55': ('individual', 'knowing'),
+ '42-53': ('collective', 'sensing'),
+ '47-64': ('collective', 'sensing')}
+
+_CHANNEL_PRODUCT_METADATA = {'01-08': ('narrative', ['narrative'], []),
+ '02-14': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '03-60': ('rhythm', ['rhythm'], ['format']),
+ '04-63': ('narrative', ['narrative'], []),
+ '05-15': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '06-59': ('narrative', ['narrative'], []),
+ '07-31': ('narrative', ['narrative'], []),
+ '09-52': ('rhythm', ['rhythm'], ['format']),
+ '10-20': ('talk', ['talk'], []),
+ '10-34': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '10-57': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '11-56': ('talk', ['narrative', 'talk'], []),
+ '12-22': ('action_voice', ['action_voice', 'talk'], ['direct_mt']),
+ '13-33': ('narrative', ['narrative'], []),
+ '16-48': ('action_voice', ['action_voice', 'talk'], []),
+ '17-62': ('talk', ['narrative', 'talk'], []),
+ '18-58': ('rhythm', ['rhythm'], []),
+ '19-49': ('rhythm', ['rhythm'], []),
+ '20-34': ('action_voice', ['action_voice', 'talk'], ['direct_mt']),
+ '20-57': ('narrative', ['narrative'], []),
+ '21-45': ('action_voice', ['action_voice', 'talk'], ['direct_mt']),
+ '23-43': ('talk', ['narrative', 'talk'], []),
+ '24-61': ('narrative', ['narrative'], []),
+ '25-51': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '26-44': ('narrative', ['narrative'], []),
+ '27-50': ('narrative', ['narrative'], []),
+ '28-38': ('rhythm', ['rhythm'], []),
+ '29-46': ('bonding_feel', ['bonding_feel', 'rhythm'], []),
+ '30-41': ('rhythm', ['rhythm'], []),
+ '32-54': ('rhythm', ['rhythm'], []),
+ '34-57': ('narrative', ['narrative'], []),
+ '35-36': ('action_voice', ['action_voice', 'talk'], ['direct_mt']),
+ '37-40': ('narrative', ['narrative'], []),
+ '39-55': ('rhythm', ['rhythm'], []),
+ '42-53': ('rhythm', ['rhythm'], ['format']),
+ '47-64': ('narrative', ['narrative'], [])}
+
+_SIGNAL_MEMBERSHIP = {'rapport_delta': ('coherence_bp_v1', ['19-49', '26-44', '27-50', '37-40']),
+ 'resonance_strength': ('coherence_bp_v1', ['05-15', '06-59', '12-22', '13-33']),
+ 'spark_intensity': ('activation_bp_v1', ['06-59', '25-51', '30-41', '39-55']),
+ 'momentum_flux': ('activation_bp_v1', ['03-60', '20-34', '29-46', '35-36']),
+ 'signal_clarity': ('expression_bp_v1', ['04-63', '17-62', '23-43', '24-61', '47-64']),
+ 'exchange_density': ('expression_bp_v1', ['11-56', '12-22', '13-33', '20-57', '26-44']),
+ 'vector_cohesion': ('coherence_bp_v1', ['02-14', '07-31', '10-20', '10-34']),
+ 'axis_agreement': ('coherence_bp_v1', ['19-49', '27-50', '28-38', '32-54']),
+ 'soothe_index': ('coherence_bp_v1', ['06-59', '12-22', '19-49', '37-40']),
+ 'buffer_resilience': ('coherence_bp_v1', ['05-15', '10-57', '27-50', '34-57']),
+ 'pattern_integrity': ('coherence_bp_v1', ['05-15', '09-52', '16-48', '17-62', '18-58']),
+ 'variance_stability': ('coherence_bp_v1', ['03-60', '29-46', '32-54', '42-53']),
+ 'growth_tendency': ('activation_bp_v1', ['03-60', '18-58', '32-54', '42-53']),
+ 'horizon_reach': ('activation_bp_v1', ['11-56', '28-38', '29-46', '35-36']),
+ 'novelty_factor': ('activation_bp_v1', ['01-08', '03-60', '23-43', '25-51']),
+ 'expression_flow': ('expression_bp_v1', ['10-20', '11-56', '12-22', '16-48', '35-36']),
+ 'willpower_current': ('activation_bp_v1', ['02-14', '21-45', '25-51', '26-44', '32-54']),
+ 'focus_pressure': ('activation_bp_v1', ['09-52', '18-58', '20-34', '28-38', '42-53']),
+ 'equilibrium_score': ('twice_min_owner_mass_v1',
+                       ['02-14', '07-31', '21-45', '26-44', '32-54', '37-40']),
+ 'counterweight_ratio': ('companionship_em_mass_v1',
+                         ['05-15', '06-59', '10-20', '13-33', '27-50', '39-55'])}
+
+_PROFILE_RESPONSES = {
+    "activation_bp_v1": {"none": 0, "companionship": 5000, "dominance": 7500, "compromise": 2500, "electromagnetic": 10000},
+    "coherence_bp_v1": {"none": 0, "companionship": 10000, "dominance": 5000, "compromise": 2500, "electromagnetic": 7500},
+    "expression_bp_v1": {"none": 0, "companionship": 7500, "dominance": 5000, "compromise": 2500, "electromagnetic": 10000},
+}
+_MECHANICS_SOURCE_PATHS = {
+    "caps": "catalog/magic10_caps.json", "categories": "catalog/magic10.json",
+    "channels": "catalog/channels_v1.json", "thresholds": "math/thresholds.json",
+}
+_CONSUMER_SCHEMAS = {
+    "docs/schemas/config_bundle_be.json": "config_bundle.be.v1",
+    "docs/schemas/config_bundle_fe.json": "config_bundle.fe.v1",
+}
+_LOCAL_SCHEMAS = frozenset({
+    "schemas/gates_v1.schema.json", "schemas/channels_v1.schema.json",
+    "schemas/magic10_mechanics_v1.schema.json", "schemas/magic10_result_v1.schema.json",
+    "schemas/magic10_compat_result_v1.schema.json", *_CONSUMER_SCHEMAS,
+})
+
+@dataclass(frozen=True)
+class _CapturedJson:
+    relative_path: str
+    raw: bytes
+    data: object
+    sha256: str
+    size_bytes: int
+    identity: tuple[int, int, int, int, int, int]
+
+
+def _file_identity(info: os.stat_result) -> tuple[int, int, int, int, int, int]:
+    return (info.st_dev, info.st_ino, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def _safe_source_path(root: Path, relative_path: str) -> Path:
+    """Check lexical identity before resolution can hide an ancestor symlink."""
+    rel = Path(relative_path)
+    if (not relative_path or rel.is_absolute() or '\\' in relative_path
+            or rel.as_posix() != relative_path or any(part in {'.', '..'} for part in rel.parts)):
+        raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'source path must be a canonical relative path')
+    current = root
+    for part in (None, *rel.parts):
+        if part is not None:
+            current /= part
+        try:
+            info = current.lstat()
+        except OSError as exc:
+            raise SchemaValidationError('MISSING_FILE', f'missing source: {relative_path}') from exc
+        if stat.S_ISLNK(info.st_mode):
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', f'symlink source: {relative_path}')
+        if current != root / rel and not stat.S_ISDIR(info.st_mode):
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', f'non-directory source ancestor: {relative_path}')
+    if not stat.S_ISREG(info.st_mode):
+        raise SchemaValidationError('UNSAFE_SOURCE_PATH', f'non-regular source: {relative_path}')
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception as exc:  # pragma: no cover - raised via typed error
-        raise SchemaValidationError("INVALID_JSON", f"failed to parse {path}") from exc
+        current.resolve(strict=True).relative_to(root.resolve(strict=True))
+    except (ValueError, OSError) as exc:
+        raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'source escaped selected root') from exc
+    return current
 
 
-def _validate_gate_center(center: object, *, centers: set[str]) -> str:
-    if not isinstance(center, str) or not center:
-        raise SchemaValidationError("INVALID_CENTER", "gate center must be a non-empty string")
-    centers.add(center)
-    return center
+def _read_captured_file(root: Path, relative_path: str) -> tuple[bytes, tuple[int, int, int, int, int, int]]:
+    """Read through no-follow directory descriptors, then verify the lexical source."""
+    path = _safe_source_path(root, relative_path)
+    before = _file_identity(path.lstat())
+    descriptors: list[int] = []
+    leaf: int | None = None
+    try:
+        # Walk from the filesystem root so even an upper ancestor swap cannot
+        # redirect the read through a symlink before a later identity refusal.
+        directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        descriptor = os.open(root.anchor, directory_flags)
+        descriptors.append(descriptor)
+        parts = (*root.parts[1:], *Path(relative_path).parts[:-1])
+        for part in parts:
+            descriptor = os.open(part, directory_flags, dir_fd=descriptor)
+            descriptors.append(descriptor)
+        leaf = os.open(Path(relative_path).name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+        opened = _file_identity(os.fstat(leaf))
+        if not stat.S_ISREG(opened[2]):
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'captured source is not a regular file')
+        with os.fdopen(leaf, 'rb') as handle:
+            leaf = None
+            raw = handle.read()
+            after = _file_identity(os.fstat(handle.fileno()))
+        current = _file_identity(_safe_source_path(root, relative_path).lstat())
+        if before != opened or opened != after or after != current:
+            raise SchemaValidationError('SOURCE_CHANGED', f'source changed during capture: {relative_path}')
+        return raw, after
+    except RegistryConfigError:
+        raise
+    except OSError as exc:
+        raise SchemaValidationError('SOURCE_READ_FAILED', f'cannot safely read {relative_path}') from exc
+    finally:
+        if leaf is not None:
+            os.close(leaf)
+        for descriptor in reversed(descriptors):
+            os.close(descriptor)
 
 
-def _load_gates(root: Path) -> tuple[dict[int, Gate], tuple[str, ...]]:
-    raw = _load_json(root / "catalog" / "gates_v1.json")
-    if not isinstance(raw, dict) or "gates" not in raw:
-        raise SchemaValidationError("INVALID_GATES", "gates_v1.json must contain a gates array")
-    gates_raw = raw["gates"]
-    if not isinstance(gates_raw, list):
-        raise SchemaValidationError("INVALID_GATES", "gates must be a list")
-    gates: dict[int, Gate] = {}
-    source_gate_ids: list[int] = []
-    centers: set[str] = set()
-    for entry in gates_raw:
-        if not isinstance(entry, dict):
-            raise SchemaValidationError("INVALID_GATES", "gate entry must be an object")
-        gate_id = entry.get("gate")
-        center = _validate_gate_center(entry.get("center"), centers=centers)
-        if not isinstance(gate_id, int):
-            raise SchemaValidationError("INVALID_GATES", "gate id must be an int")
-        if gate_id in gates:
-            raise DuplicateIdError("DUPLICATE_GATE", f"duplicate gate id {gate_id}")
-        source_gate_ids.append(gate_id)
-        gates[gate_id] = Gate(gate=gate_id, center=center)
-    if tuple(source_gate_ids) != FROZEN_GATE_IDS:
-        raise SchemaValidationError(
-            "GATE_ID_ORDER_MISMATCH",
-            "gate catalog rows must preserve the exact 1..64 source order",
-            {
-                "actual": source_gate_ids,
-                "expected": list(FROZEN_GATE_IDS),
-            },
-        )
-    center_counts = {
-        center: sum(gate.center == center for gate in gates.values())
-        for center in sorted(centers)
-    }
-    if center_counts != FROZEN_GATE_CENTER_COUNTS:
-        raise SchemaValidationError(
-            "GATE_CENTER_COUNTS_MISMATCH",
-            "gate center counts must match the frozen topology",
-            {
-                "actual": center_counts,
-                "expected": dict(FROZEN_GATE_CENTER_COUNTS),
-            },
-        )
-    return gates, tuple(sorted(centers))
+def _duplicate_aware_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise SchemaValidationError('DUPLICATE_JSON_KEY', 'duplicate JSON object key')
+        result[key] = value
+    return result
+
+
+def _refuse_nonfinite(value: str) -> object:
+    raise SchemaValidationError('NONFINITE_JSON', 'non-finite JSON numbers are forbidden')
+
+
+def _validate_unicode(value: object) -> None:
+    if isinstance(value, float) and not math.isfinite(value):
+        raise SchemaValidationError('NONFINITE_JSON', 'non-finite JSON numbers are forbidden')
+    if isinstance(value, str):
+        if any(0xD800 <= ord(char) <= 0xDFFF for char in value):
+            raise SchemaValidationError('INVALID_UNICODE', 'unpaired Unicode surrogate in JSON')
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            _validate_unicode(key)
+            _validate_unicode(item)
+    elif isinstance(value, list):
+        for item in value:
+            _validate_unicode(item)
+
+
+def _parse_source_bytes(raw: bytes, relative_path: str) -> object:
+    try:
+        if raw.startswith(b'\xef\xbb\xbf'):
+            raise SchemaValidationError('INVALID_UTF8', 'JSON BOM is forbidden')
+        text = raw.decode('utf-8', errors='strict')
+        data = json.loads(text, object_pairs_hook=_duplicate_aware_object, parse_constant=_refuse_nonfinite)
+        _validate_unicode(data)
+        # Existing consumer schema documents retain their independently owned formatting.
+        if relative_path not in _CONSUMER_SCHEMAS and canon.sercanon(data, sort_keys=True) != raw:
+            raise SchemaValidationError('NONCANONICAL_JSON', f'noncanonical JSON bytes: {relative_path}')
+        return data
+    except RegistryConfigError:
+        raise
+    except (UnicodeError, ValueError, TypeError, OverflowError, RecursionError) as exc:
+        raise SchemaValidationError('INVALID_JSON', f'failed to parse source: {relative_path}') from exc
+
+
+@dataclass
+class _LocalCapture:
+    """Bounded local construction data; not admitted, recursively frozen or active."""
+    root: Path
+    sources: dict[str, _CapturedJson] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.root = Path(os.path.abspath(self.root))
+        # Reject the selected root itself and its existing symlink ancestors.
+        for ancestor in (self.root, *self.root.parents):
+            if ancestor.is_symlink():
+                raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'selected root has a symlink ancestor')
+
+    def read(self, relative_path: str) -> _CapturedJson:
+        if relative_path in self.sources:
+            return self.sources[relative_path]
+        raw, after = _read_captured_file(self.root, relative_path)
+        data = _parse_source_bytes(raw, relative_path)
+        source = _CapturedJson(relative_path, raw, data, hashlib.sha256(raw).hexdigest(), len(raw), after)
+        self.sources[relative_path] = source
+        return source
+
+    def verify_unchanged(self) -> None:
+        for name, source in self.sources.items():
+            raw, identity = _read_captured_file(self.root, name)
+            if identity != source.identity or raw != source.raw:
+                raise SchemaValidationError('SOURCE_CHANGED', f'captured source changed: {name}')
+
+
+@dataclass
+class _RegistryCapture(_LocalCapture):
+    config: RegistryConfig | None = None
+
+
+@dataclass
+class _MechanicsCapture(_LocalCapture):
+    config: Mapping[str, object] | None = None
+    registry: RegistryConfig | None = None
+
+
+def _reject_schema_retrieval(uri: str) -> object:
+    raise NoSuchResource(ref=uri)
+
+
+def _schema_references(value: object) -> None:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key in {'$ref', '$dynamicRef', '$recursiveRef'} and (not isinstance(item, str) or not item.startswith('#')):
+                raise SchemaValidationError('NONLOCAL_SCHEMA_REFERENCE', 'only same-document schema references are supported')
+            _schema_references(item)
+    elif isinstance(value, list):
+        for item in value:
+            _schema_references(item)
+
+
+def _validate_local_schema(capture: _LocalCapture, relative_path: str, data: object) -> None:
+    """Execute the owning captured schema with strict integers and no remote lookup."""
+    if relative_path not in _LOCAL_SCHEMAS:
+        raise SchemaValidationError('UNKNOWN_SCHEMA', 'schema is outside the local owning set')
+    schema = capture.read(relative_path).data
+    if not isinstance(schema, dict):
+        raise SchemaValidationError('INVALID_SCHEMA', 'schema must be an object')
+    if relative_path in _CONSUMER_SCHEMAS:
+        expected_draft = 'http://json-schema.org/draft-07/schema#'
+        expected_identity = _CONSUMER_SCHEMAS[relative_path]
+        properties = schema.get('properties')
+        identity_schema = properties.get('schema') if isinstance(properties, dict) else None
+        if not isinstance(identity_schema, dict):
+            raise SchemaValidationError('INVALID_SCHEMA', 'consumer schema identity must be an object')
+        if identity_schema.get('const') != expected_identity:
+            raise SchemaValidationError('SCHEMA_IDENTITY_MISMATCH', 'consumer schema identity mismatch')
+        base_validator = jsonschema.Draft7Validator
+    else:
+        expected_draft = 'https://json-schema.org/draft/2020-12/schema'
+        if schema.get('$id') != relative_path:
+            raise SchemaValidationError('SCHEMA_IDENTITY_MISMATCH', 'owning schema identity mismatch')
+        base_validator = jsonschema.Draft202012Validator
+    if schema.get('$schema') != expected_draft:
+        raise SchemaValidationError('SCHEMA_DRAFT_MISMATCH', 'owning schema draft mismatch')
+    _schema_references(schema)
+    strict = validators.extend(base_validator, type_checker=base_validator.TYPE_CHECKER.redefine('integer', lambda checker, value: type(value) is int))
+    try:
+        strict.check_schema(schema)
+        strict(schema, registry=Registry(retrieve=_reject_schema_retrieval)).validate(data)
+    except RegistryConfigError:
+        raise
+    except Exception as exc:
+        raise SchemaValidationError('SCHEMA_VALIDATION_FAILED', f'owning schema refused: {relative_path}', {'schema': relative_path}) from exc
+
+
+def _load_json(path: Path) -> object:
+    return _LocalCapture(path.parent).read(path.name).data
+
+
+def validate_channel_gates(gates: object, channel_id: str | None = None) -> tuple[int, int]:
+    """Validate authoritative numeric endpoints without sorting or coercion."""
+    if not isinstance(gates, (list, tuple)) or len(gates) != 2:
+        raise SchemaValidationError('INVALID_CHANNELS', 'channel must reference two gates')
+    if any(type(gate) is not int or not 1 <= gate <= 64 for gate in gates):
+        raise SchemaValidationError('INVALID_CHANNEL_GATE', 'Channel endpoints must be exact integers in 1..64')
+    first, second = gates
+    if first == second:
+        raise SchemaValidationError('DUPLICATE_CHANNEL_GATE', 'Channel must reference two distinct gates')
+    if first > second:
+        raise SchemaValidationError('CHANNEL_GATE_ORDER_MISMATCH', 'Channel endpoints must already be ascending')
+    if channel_id is not None:
+        if not isinstance(channel_id, str) or re.fullmatch(r'(?:0[1-9]|[1-5][0-9]|6[0-4])-(?:0[1-9]|[1-5][0-9]|6[0-4])', channel_id) is None:
+            raise SchemaValidationError('INVALID_CHANNEL_ID', 'invalid ASCII Channel ID')
+        if channel_id != f'{first:02d}-{second:02d}':
+            raise SchemaValidationError('CHANNEL_ID_MISMATCH', f'channel id {channel_id} does not match gates {gates}')
+    return first, second
 
 
 def _normalize_channel_id(channel_id: str, gates: Iterable[int]) -> str:
-    if not re.match(r"^\d{2}-\d{2}$", channel_id):
-        raise SchemaValidationError("INVALID_CHANNEL_ID", f"invalid channel id format: {channel_id}")
-    a, b = map(int, channel_id.split("-"))
-    g1, g2 = sorted(int(g) for g in gates)
-    if g1 == g2:
-        raise SchemaValidationError(
-            "DUPLICATE_CHANNEL_GATE",
-            f"channel {channel_id} must reference two distinct gates",
-        )
-    if (a, b) != (g1, g2):
-        raise SchemaValidationError("CHANNEL_ID_MISMATCH", f"channel id {channel_id} does not match gates {gates}")
-    return f"{g1:02d}-{g2:02d}"
+    pair = validate_channel_gates(gates, channel_id)
+    return f'{pair[0]:02d}-{pair[1]:02d}'
 
 
-def _load_channels(
-    root: Path,
-    *,
-    gate_map: Mapping[int, Gate],
-    known_centers: set[str],
-    allow_aliases: bool,
-    alias_ledger: Mapping[str, str] | None,
-) -> tuple[dict[str, Channel], dict[str, str], tuple[str, ...]]:
-    raw = _load_json(root / "catalog" / "channels_v1.json")
-    if not isinstance(raw, dict) or "channels" not in raw:
-        raise SchemaValidationError("INVALID_CHANNELS", "channels_v1.json must contain a channels array")
-    channels_raw = raw["channels"]
-    if not isinstance(channels_raw, list):
-        raise SchemaValidationError("INVALID_CHANNELS", "channels must be a list")
+def _load_gates(capture: _LocalCapture) -> tuple[dict[int, Gate], tuple[str, ...]]:
+    raw = capture.read('catalog/gates_v1.json').data
+    _validate_local_schema(capture, 'schemas/gates_v1.schema.json', raw)
+    gates = {}
+    source_ids = []
+    for entry in raw['gates']:
+        gate_id = entry['gate']
+        if type(gate_id) is not int or not 1 <= gate_id <= 64:
+            raise SchemaValidationError('INVALID_GATES', 'gate id must be an exact integer in 1..64')
+        if gate_id in gates:
+            raise DuplicateIdError('DUPLICATE_GATE', f'duplicate gate id {gate_id}')
+        gates[gate_id] = Gate(gate_id, entry['center'])
+        source_ids.append(gate_id)
+    if tuple(source_ids) != FROZEN_GATE_IDS:
+        raise SchemaValidationError('GATE_ID_ORDER_MISMATCH', 'gate catalog rows must preserve the exact 1..64 source order', {'actual': source_ids, 'expected': list(FROZEN_GATE_IDS)})
+    counts = {center: sum(g.center == center for g in gates.values()) for center in sorted({g.center for g in gates.values()})}
+    if counts != FROZEN_GATE_CENTER_COUNTS:
+        raise SchemaValidationError('GATE_CENTER_COUNTS_MISMATCH', 'gate center counts must match the frozen topology', {'actual': counts, 'expected': dict(FROZEN_GATE_CENTER_COUNTS)})
+    return gates, tuple(sorted(counts))
 
-    channels: dict[str, Channel] = {}
-    alias_map: dict[str, str] = {}
-    pending_aliases: list[dict[str, object]] = []
-    domains: set[str] = set()
 
-    for entry in channels_raw:
-        if not isinstance(entry, dict):
-            raise SchemaValidationError("INVALID_CHANNELS", "channel entry must be an object")
-        alias_for = entry.get("alias_for")
-        if alias_for is not None:
-            if not allow_aliases:
-                raise AliasPolicyError("ALIASES_FORBIDDEN", "alias entries are not allowed by default")
-            pending_aliases.append(entry)
-            continue
-
-        channel_id_raw = entry.get("id")
-        gates_raw = entry.get("gates")
-        centers_raw = entry.get("centers")
-        if not isinstance(channel_id_raw, str):
-            raise SchemaValidationError("INVALID_CHANNELS", "channel id must be a string")
-        if not isinstance(gates_raw, list) or len(gates_raw) != 2:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {channel_id_raw} must reference two gates")
-        if not isinstance(centers_raw, list) or len(centers_raw) != 2:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {channel_id_raw} must declare two centers")
-
-        gates_tuple = (int(gates_raw[0]), int(gates_raw[1]))
-        normalized_id = _normalize_channel_id(channel_id_raw, gates_tuple)
-        if normalized_id in channels:
-            raise DuplicateIdError("DUPLICATE_CHANNEL", f"duplicate channel id {normalized_id}")
-
-        for g in gates_tuple:
-            if g not in gate_map:
-                raise UnknownIdError("UNKNOWN_GATE", f"channel {normalized_id} references unknown gate {g}")
-        centers_tuple = (str(centers_raw[0]), str(centers_raw[1]))
-        for c in centers_tuple:
-            if c not in known_centers:
-                raise UnknownIdError("UNKNOWN_CENTER", f"channel {normalized_id} references unknown center {c}")
-        projected_centers = {gate_map[g].center for g in gates_tuple}
-        if len(projected_centers) != 2:
-            raise SchemaValidationError(
-                "DUPLICATE_CHANNEL_CENTER",
-                f"channel {normalized_id} gate projection must contain two distinct centers",
-            )
-        if set(centers_tuple) != projected_centers:
-            raise SchemaValidationError(
-                "CHANNEL_CENTER_PROJECTION_MISMATCH",
-                f"channel {normalized_id} centers do not match its gate projection",
-            )
-        expected_endpoints_raw = FROZEN_CHANNEL_ENDPOINT_CENTERS.get(normalized_id)
-        expected_endpoints = (
-            dict(expected_endpoints_raw) if expected_endpoints_raw is not None else None
-        )
-        actual_endpoints = {gate: gate_map[gate].center for gate in gates_tuple}
-        if expected_endpoints is not None and actual_endpoints != expected_endpoints:
-            raise SchemaValidationError(
-                "CHANNEL_CENTER_IDENTITY_MISMATCH",
-                f"channel {normalized_id} endpoints do not match the frozen Channel topology",
-                {
-                    "actual": [
-                        [gate, actual_endpoints[gate]] for gate in sorted(actual_endpoints)
-                    ],
-                    "expected": [
-                        [gate, expected_endpoints[gate]]
-                        for gate in sorted(expected_endpoints)
-                    ],
-                },
-            )
-        circuit_primary = entry.get("circuit_primary")
-        primary_domain = entry.get("primary_domain")
-        domain_list = entry.get("domains", [])
-        flags_list = entry.get("flags", [])
-        if not isinstance(circuit_primary, str) or not circuit_primary:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {normalized_id} missing circuit_primary")
-        if not isinstance(primary_domain, str) or not primary_domain:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {normalized_id} missing primary_domain")
-        if not isinstance(domain_list, list) or not domain_list:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {normalized_id} missing domains")
-        if primary_domain not in domain_list:
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {normalized_id} primary_domain must be in domains")
-        if not isinstance(flags_list, list):
-            raise SchemaValidationError("INVALID_CHANNELS", f"channel {normalized_id} flags must be a list")
-
-        domains.update(str(d) for d in domain_list)
-        channels[normalized_id] = Channel(
-            id=normalized_id,
-            gates=tuple(sorted(gates_tuple)),
-            centers=centers_tuple,
-            circuit_primary=str(circuit_primary),
-            substream=entry.get("substream"),
-            primary_domain=str(primary_domain),
-            domains=tuple(dict.fromkeys(str(d) for d in domain_list)),
-            flags=tuple(dict.fromkeys(str(f) for f in flags_list)),
-        )
-
-    if pending_aliases and not allow_aliases:
-        raise AliasPolicyError("ALIASES_FORBIDDEN", "alias entries are not allowed")
-
-    actual_channel_ids = set(channels)
-    expected_channel_ids = set(FROZEN_CHANNEL_IDS)
-    if set(FROZEN_CHANNEL_ENDPOINT_CENTERS) != expected_channel_ids:
-        raise SchemaValidationError(
-            "FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH",
-            "frozen Channel center bindings must cover the exact Channel roster",
-        )
-    if actual_channel_ids != expected_channel_ids:
-        missing = sorted(expected_channel_ids - actual_channel_ids)
-        unknown = sorted(actual_channel_ids - expected_channel_ids)
-        raise SchemaValidationError(
-            "CHANNEL_ID_ROSTER_MISMATCH",
-            "channel identities must match the frozen 36-Channel roster",
-            {"missing": missing, "unknown": unknown},
-        )
-
-    ledger = dict(alias_ledger or {})
-    for entry in pending_aliases:
-        alias_id_raw = entry.get("id")
-        alias_for = entry.get("alias_for")
-        gates_raw = entry.get("gates")
-        if not isinstance(alias_id_raw, str) or not isinstance(alias_for, str):
-            raise SchemaValidationError("INVALID_ALIAS", "alias id and alias_for must be strings")
-        if alias_id_raw in channels or alias_id_raw in alias_map:
-            raise DuplicateIdError("DUPLICATE_ALIAS", f"duplicate alias id {alias_id_raw}")
-        if alias_id_raw not in ledger:
-            raise AliasPolicyError("ALIAS_NOT_ALLOWED", f"alias {alias_id_raw} not present in allow-list")
-        target = ledger[alias_id_raw]
-        if target != alias_for:
-            raise AliasPolicyError("ALIAS_LEDGER_MISMATCH", f"alias {alias_id_raw} target mismatch")
+def _load_channels(capture: _LocalCapture, *, gate_map: Mapping[int, Gate], known_centers: set[str], allow_aliases: bool, alias_ledger: Mapping[str, str] | None) -> tuple[dict[str, Channel], dict[str, str], tuple[str, ...]]:
+    raw = capture.read('catalog/channels_v1.json').data
+    _validate_local_schema(capture, 'schemas/channels_v1.schema.json', raw)
+    channels = {}
+    domains = set()
+    for entry in raw['channels']:
+        validate_channel_gates(entry['gates'], entry['id'])
+    source_ids = [entry['id'] for entry in raw['channels']]
+    if len(source_ids) != len(set(source_ids)):
+        raise DuplicateIdError('DUPLICATE_CHANNEL', 'duplicate channel id')
+    expected_ids = set(FROZEN_CHANNEL_IDS)
+    if set(FROZEN_CHANNEL_ENDPOINT_CENTERS) != expected_ids:
+        raise SchemaValidationError('FROZEN_CHANNEL_CENTER_ROSTER_MISMATCH', 'frozen Channel center bindings must cover the exact Channel roster')
+    if set(source_ids) != expected_ids:
+        raise SchemaValidationError('CHANNEL_ID_ROSTER_MISMATCH', 'channel identities must match the frozen 36-Channel roster', {'missing': sorted(expected_ids - set(source_ids)), 'unknown': sorted(set(source_ids) - expected_ids)})
+    for entry in raw['channels']:
+        channel_id = entry['id']
+        pair = validate_channel_gates(entry['gates'], channel_id)
+        if channel_id in channels:
+            raise DuplicateIdError('DUPLICATE_CHANNEL', f'duplicate channel id {channel_id}')
+        for gate in pair:
+            if gate not in gate_map:
+                raise UnknownIdError('UNKNOWN_GATE', f'channel {channel_id} references unknown gate {gate}')
+        centers = entry['centers']
+        if any(center not in known_centers for center in centers):
+            raise UnknownIdError('UNKNOWN_CENTER', f'channel {channel_id} references unknown center')
+        actual_endpoints = {gate: gate_map[gate].center for gate in pair}
+        projected = sorted(set(actual_endpoints.values()))
+        if len(projected) != 2:
+            raise SchemaValidationError('DUPLICATE_CHANNEL_CENTER', f'channel {channel_id} gate projection must contain two distinct centers')
+        if centers != projected:
+            raise SchemaValidationError('CHANNEL_CENTER_PROJECTION_MISMATCH', f'channel {channel_id} centers do not match its gate projection')
+        expected_endpoints = dict(FROZEN_CHANNEL_ENDPOINT_CENTERS.get(channel_id, ()))
+        if actual_endpoints != expected_endpoints:
+            raise SchemaValidationError('CHANNEL_CENTER_IDENTITY_MISMATCH', f'channel {channel_id} endpoints do not match the frozen Channel topology', {'actual': [[g, actual_endpoints[g]] for g in sorted(actual_endpoints)], 'expected': [[g, expected_endpoints[g]] for g in sorted(expected_endpoints)]})
+        if (entry['circuit_primary'], entry['substream']) != _CHANNEL_CLASSIFICATIONS.get(channel_id):
+            raise SchemaValidationError('CHANNEL_ASSIGNMENT_MISMATCH', f'channel {channel_id} classification differs from the approved assignment')
+        if (entry['primary_domain'], entry['domains'], entry['flags']) != _CHANNEL_PRODUCT_METADATA.get(channel_id):
+            raise SchemaValidationError('CHANNEL_PRODUCT_METADATA_MISMATCH', f'channel {channel_id} Product metadata differs from its retained source')
+        domains.update(entry['domains'])
+        channels[channel_id] = Channel(channel_id, pair, tuple(centers), entry['circuit_primary'], entry['substream'], entry['primary_domain'], tuple(entry['domains']), tuple(entry['flags']))
+    if tuple(channels) != FROZEN_CHANNEL_IDS:
+        raise SchemaValidationError('CHANNEL_ID_ROSTER_MISMATCH', 'channel identities must preserve the frozen 36-Channel source order')
+    aliases = {}
+    if alias_ledger is not None and not isinstance(alias_ledger, Mapping):
+        raise AliasPolicyError('INVALID_ALIAS_LEDGER', 'alias ledger must be a mapping')
+    if alias_ledger and not allow_aliases:
+        raise AliasPolicyError('ALIASES_FORBIDDEN', 'alias input is not allowed by default')
+    for alias, target in (alias_ledger or {}).items():
+        if not isinstance(alias, str) or not isinstance(target, str):
+            raise AliasPolicyError('INVALID_ALIAS', 'alias and target must be strings')
+        if re.fullmatch(r'(?:0[1-9]|[1-5][0-9]|6[0-4])-(?:0[1-9]|[1-5][0-9]|6[0-4])', alias) is None:
+            raise AliasPolicyError('INVALID_ALIAS', 'alias must use the supported ASCII spelling')
+        a, b = (int(part) for part in alias.split('-'))
+        if a >= b:
+            raise AliasPolicyError('INVALID_ALIAS', 'alias spelling must be min-first')
+        if alias in channels or alias in aliases:
+            raise DuplicateIdError('DUPLICATE_ALIAS', 'alias collides with a canonical or prior identity')
         if target not in channels:
-            raise UnknownIdError("UNKNOWN_ALIAS_TARGET", f"alias target {target} missing from channels")
-        if not isinstance(gates_raw, list) or len(gates_raw) != 2:
-            raise SchemaValidationError("INVALID_ALIAS", f"alias {alias_id_raw} must reference two gates")
-        _normalize_channel_id(alias_id_raw, (int(gates_raw[0]), int(gates_raw[1])))
-        alias_map[alias_id_raw] = target
-
-    return channels, alias_map, tuple(sorted(domains))
+            raise UnknownIdError('UNKNOWN_ALIAS_TARGET', 'alias target is not a canonical Channel')
+        aliases[alias] = target
+    return channels, aliases, tuple(sorted(domains))
 
 
-def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], dict[str, Magic10Seed]]:
-    order_raw = _load_json(root / "catalog" / "magic10.json")
+def _load_magic10(capture: _LocalCapture) -> tuple[tuple[str, ...], dict[str, Magic10Caps], dict[str, Magic10Seed]]:
+    order_raw = capture.read("catalog/magic10.json").data
     if not isinstance(order_raw, dict) or set(order_raw) != {"order"}:
         raise SchemaValidationError("INVALID_MAGIC10", "magic10.json must contain an order array")
     order_list = order_raw.get("order")
@@ -477,7 +705,7 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
             "frozen Magic-10 input bindings must cover the exact category roster",
         )
 
-    caps_raw = _load_json(root / "catalog" / "magic10_caps.json")
+    caps_raw = capture.read("catalog/magic10_caps.json").data
     if not isinstance(caps_raw, dict):
         raise SchemaValidationError("INVALID_MAGIC10", "magic10_caps must be an object")
     if set(caps_raw.keys()) != set(magic_order):
@@ -524,7 +752,7 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
             inputs=tuple(inputs), bounds={"min": minimum, "max": maximum}
         )
 
-    seeds_raw = _load_json(root / "catalog" / "magic10_seeds.json")
+    seeds_raw = capture.read("catalog/magic10_seeds.json").data
     if not isinstance(seeds_raw, dict):
         raise SchemaValidationError("INVALID_MAGIC10", "magic10_seeds must be an object")
     unknown_seeds = set(seeds_raw.keys()) - set(magic_order)
@@ -588,10 +816,14 @@ def _parse_manifest(raw: object) -> Manifest:
         raise SchemaValidationError("INVALID_MANIFEST_ROOT", "manifest root must be 'catalog/'")
     if not isinstance(version, str) or not version:
         raise SchemaValidationError("INVALID_MANIFEST_VERSION", "manifest version must be a non-empty string")
-    if not isinstance(built_at_utc, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", built_at_utc):
+    if not isinstance(built_at_utc, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", built_at_utc):
         raise SchemaValidationError(
             "INVALID_MANIFEST_TIMESTAMP", "built_at_utc must be an ISO-8601 UTC timestamp ending with Z"
         )
+    try:
+        datetime.strptime(built_at_utc, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError as exc:
+        raise SchemaValidationError("INVALID_MANIFEST_TIMESTAMP", "manifest timestamp is not a valid UTC date") from exc
     if not isinstance(files_raw, list):
         raise SchemaValidationError("INVALID_MANIFEST", "manifest files must be a list")
 
@@ -609,11 +841,15 @@ def _parse_manifest(raw: object) -> Manifest:
         size = entry.get("size")
         if not isinstance(path, str) or not path:
             raise SchemaValidationError("INVALID_MANIFEST", "manifest file path must be a non-empty string")
+        if (Path(path).is_absolute() or "\\" in path or Path(path).as_posix() != path
+                or any(part in {".", ".."} for part in Path(path).parts)
+                or not path.isascii()):
+            raise SchemaValidationError("INVALID_MANIFEST_PATH", "manifest file path must be canonical and relative")
         if path == "catalog/manifest.json":
             raise SchemaValidationError("SELF_LISTING_MANIFEST_FORBIDDEN", "manifest.json must not list itself")
         if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{64}", sha):
             raise SchemaValidationError("INVALID_MANIFEST", f"manifest sha256 invalid for {path}")
-        if not isinstance(size, int) or size < 0:
+        if type(size) is not int or size < 0:
             raise SchemaValidationError("INVALID_MANIFEST", f"manifest size invalid for {path}")
         if path in seen_paths:
             raise DuplicateIdError("DUPLICATE_MANIFEST_ENTRY", f"duplicate manifest path {path}")
@@ -633,37 +869,147 @@ def _parse_manifest(raw: object) -> Manifest:
 
 
 def load_manifest(root: Path | str | None = None) -> Manifest:
-    base = Path(root) if root is not None else Path.cwd()
-    raw = _load_json(base / "catalog" / "manifest.json")
-    return _parse_manifest(raw)
+    """Validate manifest structure and bytes; full member admission belongs to PR02."""
+    capture = _LocalCapture(Path(root) if root is not None else Path.cwd())
+    result = _parse_manifest(capture.read('catalog/manifest.json').data)
+    capture.verify_unchanged()
+    return result
 
 
-def load_registry_config(
-    root: Path | str | None = None,
-    *,
-    allow_aliases: bool = False,
-    alias_ledger: Mapping[str, str] | None = None,
-) -> RegistryConfig:
-    base = Path(root) if root is not None else Path.cwd()
-    gates, centers = _load_gates(base)
-    channels, alias_map, domains = _load_channels(
-        base,
-        gate_map=gates,
-        known_centers=set(centers),
-        allow_aliases=allow_aliases,
-        alias_ledger=alias_ledger,
-    )
-    magic10_order, magic10_caps, magic10_seeds = _load_magic10(base)
-    manifest = load_manifest(base)
+def _capture_registry_config(root: Path | str | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> _RegistryCapture:
+    capture = _RegistryCapture(Path(root) if root is not None else Path.cwd())
+    gates, centers = _load_gates(capture)
+    channels, aliases, domains = _load_channels(capture, gate_map=gates, known_centers=set(centers), allow_aliases=allow_aliases, alias_ledger=alias_ledger)
+    order, caps, seeds = _load_magic10(capture)
+    manifest = _parse_manifest(capture.read('catalog/manifest.json').data)
+    capture.config = RegistryConfig(gates, channels, aliases, order, caps, seeds, manifest, centers, domains)
+    capture.verify_unchanged()
+    return capture
 
-    return RegistryConfig(
-        gates=gates,
-        channels=channels,
-        alias_map=alias_map,
-        magic10_order=magic10_order,
-        magic10_caps=magic10_caps,
-        magic10_seeds=magic10_seeds,
-        manifest=manifest,
-        centers=centers,
-        domains=domains,
-    )
+
+def load_registry_config(root: Path | str | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> RegistryConfig:
+    """Return the existing local registry view, without mechanics release admission."""
+    return _capture_registry_config(root, allow_aliases=allow_aliases, alias_ledger=alias_ledger).config
+
+
+def _validate_thresholds(data: object) -> Mapping[str, object]:
+    """Validate the existing lower-level domain; initial mechanics pins its defaults."""
+    if not isinstance(data, dict) or set(data) != {'clamp', 'edges', 'rounding', 'version'}:
+        raise SchemaValidationError('INVALID_THRESHOLDS', 'threshold fields must be closed')
+    clamp, edges = data['clamp'], data['edges']
+    if (not isinstance(clamp, list) or len(clamp) != 2 or any(type(x) is not int for x in clamp)
+            or clamp != [0, 100] or not isinstance(edges, list) or len(edges) != 4
+            or any(type(x) is not int or not 0 <= x <= 100 for x in edges)
+            or any(a >= b for a, b in zip(edges, edges[1:])) or edges[-1] != 100
+            or data['rounding'] != 'ROUND_HALF_UP' or data['version'] != '1'):
+        raise SchemaValidationError('INVALID_THRESHOLDS', 'threshold domain/order/type contract failed')
+    return data
+
+
+def _validate_mechanics_domain(capture: _LocalCapture, data: object, registry: RegistryConfig) -> None:
+    """Check legal v1 domains/relations only; this is not a publishing/admission path."""
+    _validate_local_schema(capture, 'schemas/magic10_mechanics_v1.schema.json', data)
+    profiles = data['profiles']
+    if [row['profile_id'] for row in profiles] != sorted(_PROFILE_RESPONSES):
+        raise SchemaValidationError('PROFILE_ROSTER_MISMATCH', 'profiles must preserve the exact ordered roster')
+    inequalities = {
+        'activation_bp_v1': ('electromagnetic', 'dominance', 'companionship', 'compromise', 'none'),
+        'coherence_bp_v1': ('companionship', 'electromagnetic', 'dominance', 'compromise', 'none'),
+        'expression_bp_v1': ('electromagnetic', 'companionship', 'dominance', 'compromise', 'none'),
+    }
+    for row in profiles:
+        values = [row['responses'][name] for name in inequalities[row['profile_id']]]
+        if any(a <= b for a, b in zip(values, values[1:])):
+            raise SchemaValidationError('PROFILE_INEQUALITY_MISMATCH', 'profile response ordering failed')
+    expected_signal_order = [signal for category in registry.magic10_order for signal in registry.magic10_caps[category].inputs]
+    if [row['signal_id'] for row in data['signals']] != expected_signal_order:
+        raise SchemaValidationError('SIGNAL_ORDER_MISMATCH', 'signal order must flatten the exact ordered caps pairs')
+    used = set()
+    by_id = {}
+    for signal in data['signals']:
+        signal_id = signal['signal_id']
+        expected_profile, _ = _SIGNAL_MEMBERSHIP[signal_id]
+        if expected_profile.endswith('_bp_v1'):
+            if signal.get('profile_id') != expected_profile or signal['operation'] != 'weighted_state_sum_v1':
+                raise SchemaValidationError('SIGNAL_OPERATION_MISMATCH', 'ordinary signal profile/operation mismatch')
+        elif 'profile_id' in signal or signal['operation'] != expected_profile:
+            raise SchemaValidationError('SIGNAL_OPERATION_MISMATCH', 'Balance operation/profile mismatch')
+        members = [row['channel_id'] for row in signal['channels']]
+        if members != sorted(set(members)) or any(member not in registry.channels for member in members):
+            raise SchemaValidationError('SIGNAL_MEMBERSHIP_INVALID', 'members must be unique ordered canonical Channels')
+        by_id[signal_id] = set(members)
+        used.update(members)
+    for category in registry.magic10_order:
+        a, b = registry.magic10_caps[category].inputs
+        if by_id[a] & by_id[b]:
+            raise SchemaValidationError('SIGNAL_CATEGORY_OVERLAP', 'a Channel cannot occur in both category signals')
+    if used != set(registry.channels):
+        raise SchemaValidationError('CHANNEL_USE_INCOMPLETE', 'the signal map must use every canonical Channel')
+    if [row['category_id'] for row in data['category_weights']] != list(registry.magic10_order):
+        raise SchemaValidationError('CATEGORY_ORDER_MISMATCH', 'category weights must preserve exact category order')
+    for name, path in _MECHANICS_SOURCE_PATHS.items():
+        source = capture.read(path)
+        if data['sources'][name] != {'path': path, 'sha256': source.sha256}:
+            raise SchemaValidationError('MECHANICS_SOURCE_MISMATCH', f'mechanics source binding mismatch: {name}')
+    _validate_thresholds(capture.read('math/thresholds.json').data)
+
+
+def _validate_initial_mechanics(capture: _LocalCapture, data: object, registry: RegistryConfig) -> None:
+    _validate_mechanics_domain(capture, data, registry)
+    if data['config_id'] != 'm10-channel-state-v1.0.0':
+        raise SchemaValidationError('INITIAL_CONFIG_ID_MISMATCH', 'initial mechanics config identity mismatch')
+    if data['profiles'] != [{'profile_id': name, 'responses': responses} for name, responses in sorted(_PROFILE_RESPONSES.items())]:
+        raise SchemaValidationError('INITIAL_PROFILE_MISMATCH', 'initial mechanics responses differ from the adopted defaults')
+    for signal in data['signals']:
+        _, ids = _SIGNAL_MEMBERSHIP[signal['signal_id']]
+        expected = [{'channel_id': name, 'weight': 1} for name in ids]
+        if signal['channels'] != expected:
+            raise SchemaValidationError('INITIAL_SIGNAL_MAP_MISMATCH', 'initial membership/default weights differ from the adopted map')
+    if sum(len(signal['channels']) for signal in data['signals']) != 90:
+        raise SchemaValidationError('INITIAL_MEMBERSHIP_COUNT_MISMATCH', 'initial map must contain ninety memberships')
+    if any(row['weights'] != [1, 1] for row in data['category_weights']):
+        raise SchemaValidationError('INITIAL_CATEGORY_WEIGHTS_MISMATCH', 'initial category weights must be [1,1]')
+    if capture.read('math/thresholds.json').data['edges'] != [24, 49, 74, 100]:
+        raise SchemaValidationError('INITIAL_THRESHOLDS_MISMATCH', 'initial mechanics thresholds differ from the adopted maxima')
+
+
+def _capture_mechanics_config(root: Path | str | None = None) -> _MechanicsCapture:
+    """Validate the complete initial candidate; never return an active release handle."""
+    base = _capture_registry_config(root)
+    capture = _MechanicsCapture(base.root, base.sources, registry=base.config)
+    data = capture.read('catalog/magic10_mechanics_v1.json').data
+    _validate_initial_mechanics(capture, data, base.config)
+    capture.config = data
+    capture.verify_unchanged()
+    return capture
+
+
+def _validate_result_fixture(capture: _MechanicsCapture, data: object) -> None:
+    """Validate a complete interface fixture, without executing the PR03 kernel."""
+    if (not isinstance(data, dict) or not isinstance(data.get('schema'), str)
+            or data['schema'] not in {'magic10_result.v1', 'magic10_compat_result.v1'}):
+        raise SchemaValidationError('RESULT_SCHEMA_IDENTITY_MISMATCH', 'unknown result identity')
+    internal = data['schema'] == 'magic10_compat_result.v1'
+    path = 'schemas/magic10_compat_result_v1.schema.json' if internal else 'schemas/magic10_result_v1.schema.json'
+    _validate_local_schema(capture, path, data)
+    if data['config_id'] != capture.config['config_id']:
+        raise SchemaValidationError('RESULT_CONFIG_ID_MISMATCH', 'result config identity differs from the owning config')
+    signal_order = [signal for category in capture.registry.magic10_order for signal in capture.registry.magic10_caps[category].inputs]
+    if [row['signal_id'] for row in data['signals']] != signal_order:
+        raise SchemaValidationError('RESULT_SIGNAL_ORDER_MISMATCH', 'result signal roster/order mismatch')
+    if [row['category_id'] for row in data['categories']] != list(capture.registry.magic10_order):
+        raise SchemaValidationError('RESULT_CATEGORY_ORDER_MISMATCH', 'result category roster/order mismatch')
+
+
+def _validate_result_augmentation(capture: _MechanicsCapture, pure: object, internal: object) -> None:
+    """Assert the PR04 augmentation promise on fixtures; does not produce a result."""
+    _validate_result_fixture(capture, pure)
+    _validate_result_fixture(capture, internal)
+    if pure['schema'] != 'magic10_result.v1' or internal['schema'] != 'magic10_compat_result.v1':
+        raise SchemaValidationError('RESULT_AUGMENTATION_SHAPE_MISMATCH', 'augmentation needs pure then internal fixtures')
+    for key in ('config_id', 'release_id', 'pair_key', 'signals'):
+        if pure[key] != internal[key]:
+            raise SchemaValidationError('RESULT_AUGMENTATION_MISMATCH', f'augmentation changed {key}')
+    stripped = [{key: row[key] for key in ('category_id', 'score', 'band')} for row in internal['categories']]
+    if stripped != pure['categories']:
+        raise SchemaValidationError('RESULT_AUGMENTATION_MISMATCH', 'augmentation changed category values/bands/order')

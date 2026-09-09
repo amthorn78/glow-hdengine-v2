@@ -247,3 +247,23 @@ def test_refresh_step_logs_wrapper_delegates_cli_dispatch(
 
     assert excinfo.value.code == 23
     assert calls == [None]
+
+
+
+def test_config_family_updater_has_behavioral_owners() -> None:
+    source = "tools/evidence/update_evidence_index.py"
+    expected = {
+        "tests/evidence/test_evidence_index_missing_state.py",
+        "tests/evidence/test_evidence_tool_ownership.py",
+        "tests/config/test_config_artifacts.py",
+    }
+    owners = set(classifier._EVIDENCE_HELPER_TEST_OWNERS[source])
+    assert expected <= owners
+    dispatched = set(classifier._evidence_helper_owner_targets(ROOT, source))
+    changed_targets = set(classifier.changed_test_targets(ROOT, (source,)))
+    for target in expected:
+        path = ROOT / target
+        assert path.is_file() and not path.is_symlink(), target
+        assert target in dispatched or classifier._fixed_lane_covers_test_target(source, target)
+        assert target in changed_targets or classifier._fixed_lane_covers_test_target(source, target)
+    assert "tests/config/test_config_artifacts.py" in changed_targets

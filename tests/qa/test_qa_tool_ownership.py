@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 import runpy
+import sys
 import tempfile
 from copy import deepcopy
 from pathlib import Path
@@ -14,7 +16,7 @@ import tools.qa
 import tools.qa.examples
 from tools.evidence import refresh_epic024_step_logs_manifest as evidence_refresh
 from tools.qa import refresh_epic024_step_logs_manifest as qa_refresh
-from tools.qa import step_log_header
+from tools.qa import step_log_header, token_roster_validate
 from tools.qa.examples import d13_refactored_example as d13_example
 
 
@@ -54,6 +56,56 @@ def test_qa_tool_registry_matches_candidate_sources() -> None:
         classifier._QA_TOOL_OWNERSHIP_TEST in owners
         for owners in classifier._QA_TOOL_TEST_OWNERS.values()
     )
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "**BETA_OK** ALPHA_FIRST_OK BETA_OK",
+        r"**BETA\_OK** ALPHA\_FIRST\_OK BETA\_OK",
+        r"**BETA\_OK** ALPHA\_FIRST_OK BETA_OK ALPHA_FIRST\_OK",
+    ],
+    ids=["plain", "escaped", "mixed"],
+)
+def test_token_reader_preserves_names_order_and_uniqueness(text: str) -> None:
+    assert token_roster_validate.extract_ok_tokens(text) == [
+        "ALPHA_FIRST_OK", "BETA_OK"
+    ]
+
+
+@pytest.mark.parametrize("text", [r"ALPHA\u005fOK", r"ALPHA\x5fOK", r"ALPHA\nOK"])
+def test_token_reader_does_not_decode_other_escapes(text: str) -> None:
+    assert token_roster_validate.extract_ok_tokens(text) == []
+
+
+def test_token_reader_refuses_escaped_unknown_and_preserves_source_hashes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    pf04 = tmp_path / "PF04.md"
+    pf20 = tmp_path / "PF20.md"
+    pf04_bytes = b"**KNOWN\\_OK**\n"
+    pf20_bytes = (
+        b"**Epic ID:** HDE-EPIC999\n"
+        b"KNOWN_OK KNOWN\\_OK UNKNOWN\\_TOKEN\\_OK\n"
+    )
+    pf04.write_bytes(pf04_bytes)
+    pf20.write_bytes(pf20_bytes)
+    monkeypatch.setattr(
+        sys, "argv",
+        ["token_roster_validate", "--epic", "HDE-EPIC999",
+         "--pf04", str(pf04), "--pf20", str(pf20)],
+    )
+
+    assert token_roster_validate.main() == 10
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["epic_tokens_ok"] == ["KNOWN_OK", "UNKNOWN_TOKEN_OK"]
+    assert payload["missing_in_pf04"] == ["UNKNOWN_TOKEN_OK"]
+    assert payload["missing_in_pf04_count"] == 1
+    assert payload["pf04_tokens_ok_count"] == 1
+    assert payload["pf04_sha256"] == hashlib.sha256(pf04_bytes).hexdigest()
+    assert payload["pf20_sha256"] == hashlib.sha256(pf20_bytes).hexdigest()
+    assert pf04.read_bytes() == pf04_bytes
+    assert pf20.read_bytes() == pf20_bytes
 
 
 def test_step_log_header_is_canonical_and_tmp_scoped(tmp_path: Path) -> None:
