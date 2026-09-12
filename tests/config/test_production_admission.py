@@ -89,6 +89,74 @@ def test_candidate_apis_do_not_return_release_bearing_handles() -> None:
     assert not hasattr(registry, "release_id")
 
 
+@pytest.mark.parametrize("retarget", [False, True])
+def test_public_admission_refuses_symlinked_import_root(
+    tmp_path: Path, release_root: Path, monkeypatch, retarget: bool,
+) -> None:
+    imported_alias = tmp_path / "current-release"
+    imported_alias.symlink_to(release_root, target_is_directory=True)
+    monkeypatch.setattr(
+        registry_loader, "__file__", str(imported_alias / "engine/config/registry_loader.py")
+    )
+    if retarget:
+        next_parent = tmp_path / "next"
+        next_parent.mkdir()
+        next_root = synthetic_complete_release_root(next_parent)
+        imported_alias.unlink()
+        imported_alias.symlink_to(next_root, target_is_directory=True)
+    with pytest.raises(RegistryConfigError) as caught:
+        load_active_mechanics_bundle()
+    assert caught.value.code == "UNSAFE_SOURCE_PATH"
+
+
+def test_public_admission_never_resolves_relative_module_path_from_cwd(monkeypatch) -> None:
+    monkeypatch.setattr(registry_loader, "__file__", "engine/config/registry_loader.py")
+    with pytest.raises(RegistryConfigError) as caught:
+        load_active_mechanics_bundle()
+    assert caught.value.code == "UNSAFE_SOURCE_PATH"
+
+
+def test_source_changed_after_its_verification_read_is_refused(release_root: Path, monkeypatch) -> None:
+    original = registry_loader._read_captured_file
+    reads = 0
+
+    def replace_verified_manifest(root, relative_path):
+        nonlocal reads
+        result = original(root, relative_path)
+        if relative_path == "catalog/manifest.json":
+            reads += 1
+            if reads == 2:
+                # Initial capture was read 1. Change a source after read 2
+                # returned its old verified bytes, while other reads remain.
+                (root / relative_path).write_bytes(b"{}\n")
+        return result
+
+    monkeypatch.setattr(registry_loader, "_read_captured_file", replace_verified_manifest)
+    _expect_code(release_root, "SOURCE_CHANGED")
+    assert reads == 2
+
+
+def test_source_removed_during_final_identity_check_has_typed_refusal(release_root: Path, monkeypatch) -> None:
+    capture = _LocalCapture(release_root)
+    capture.read("catalog/gates_v1.json")
+    original = registry_loader._safe_source_path
+    calls = 0
+
+    def remove_after_safe_path(root, relative_path):
+        nonlocal calls
+        result = original(root, relative_path)
+        calls += 1
+        if calls == 3:
+            result.unlink()
+        return result
+
+    monkeypatch.setattr(registry_loader, "_safe_source_path", remove_after_safe_path)
+    with pytest.raises(RegistryConfigError) as caught:
+        capture.verify_unchanged()
+    assert caught.value.code == "SOURCE_CHANGED"
+    assert calls == 3
+
+
 @pytest.mark.parametrize(
     ("raw", "code"),
     [
@@ -405,6 +473,9 @@ def test_every_reachable_container_and_record_is_immutable(release_root: Path) -
                 inspect_value(item)
         elif is_dataclass(value):
             counts["record"] += 1
+            assert not hasattr(value, "__dict__")
+            with pytest.raises(TypeError):
+                vars(value)
             for item in fields(value):
                 with pytest.raises(FrozenInstanceError):
                     setattr(value, item.name, None)
@@ -432,6 +503,19 @@ def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root:
     capture.config["category_weights"][0]["weights"][0] = 99
     capture.config["sources"]["caps"]["sha256"] = "0" * 64
     capture.registry.magic10_caps["harmony"].bounds["max"] = 99
+    # The admitted graph owns new records, even if privileged test machinery
+    # mutates a retained candidate record through frozen-dataclass internals.
+    gate_before = bundle.registry.gates[1].center
+    channel_id = next(iter(capture.registry.channels))
+    channel_before = bundle.registry.channels[channel_id].primary_domain
+    seed_id = next(iter(capture.registry.magic10_seeds))
+    seed_before = bundle.registry.magic10_seeds[seed_id].template_id
+    assert bundle.registry.gates[1] is not capture.registry.gates[1]
+    assert bundle.registry.channels[channel_id] is not capture.registry.channels[channel_id]
+    assert bundle.registry.magic10_seeds[seed_id] is not capture.registry.magic10_seeds[seed_id]
+    object.__setattr__(capture.registry.gates[1], "center", "mutation-probe")
+    object.__setattr__(capture.registry.channels[channel_id], "primary_domain", "mutation-probe")
+    object.__setattr__(capture.registry.magic10_seeds[seed_id], "template_id", "mutation-probe")
     capture.registry.gates.clear()
     capture.registry.channels.clear()
     assert bundle.mechanics["profiles"][0]["responses"]["none"] == 0
@@ -439,5 +523,8 @@ def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root:
     assert bundle.mechanics["category_weights"][0]["weights"] == (1, 1)
     assert bundle.mechanics["sources"]["caps"]["sha256"] != "0" * 64
     assert bundle.registry.magic10_caps["harmony"].bounds["max"] == 100
+    assert bundle.registry.gates[1].center == gate_before
+    assert bundle.registry.channels[channel_id].primary_domain == channel_before
+    assert bundle.registry.magic10_seeds[seed_id].template_id == seed_before
     assert len(bundle.registry.gates) == 64
     assert len(bundle.registry.channels) == 36

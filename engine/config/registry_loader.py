@@ -185,13 +185,13 @@ class SchemaValidationError(RegistryConfigError):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Gate:
     gate: int
     center: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Channel:
     id: str
     gates: tuple[int, int]
@@ -203,13 +203,13 @@ class Channel:
     flags: tuple[str, ...]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Magic10Caps:
     inputs: tuple[str, ...]
     bounds: Mapping[str, int]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Magic10Seed:
     template_id: str
     seed_version: str
@@ -217,14 +217,14 @@ class Magic10Seed:
     checksum_sha256: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class ManifestEntry:
     path: str
     sha256: str
     size: int
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Manifest:
     root: str
     version: str
@@ -232,7 +232,7 @@ class Manifest:
     files: tuple[ManifestEntry, ...]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class RegistryConfig:
     gates: Mapping[int, Gate]
     channels: Mapping[str, Channel]
@@ -628,6 +628,15 @@ class _LocalCapture:
         for name, source in self.sources.items():
             raw, identity = _read_captured_file(self.root, name)
             if identity != source.identity or raw != source.raw:
+                raise SchemaValidationError('SOURCE_CHANGED', f'captured source changed: {name}')
+        # A previously checked file can change while a later file is read.
+        # Recheck the whole identity set after all verification reads finish.
+        for name, source in self.sources.items():
+            try:
+                identity = _file_identity(_safe_source_path(self.root, name).lstat())
+            except OSError as exc:
+                raise SchemaValidationError('SOURCE_CHANGED', f'captured source changed: {name}') from exc
+            if identity != source.identity:
                 raise SchemaValidationError('SOURCE_CHANGED', f'captured source changed: {name}')
 
 
@@ -1273,17 +1282,33 @@ def _freeze_manifest(manifest: Manifest) -> Manifest:
 
 
 def _freeze_registry(registry: RegistryConfig, manifest: Manifest) -> RegistryConfig:
+    gates = {key: Gate(value.gate, value.center) for key, value in registry.gates.items()}
+    channels = {
+        key: Channel(
+            value.id, tuple(value.gates), tuple(value.centers),
+            value.circuit_primary, value.substream, value.primary_domain,
+            tuple(value.domains), tuple(value.flags),
+        )
+        for key, value in registry.channels.items()
+    }
     caps = {
-        key: Magic10Caps(value.inputs, MappingProxyType(dict(value.bounds)))
+        key: Magic10Caps(tuple(value.inputs), MappingProxyType(dict(value.bounds)))
         for key, value in registry.magic10_caps.items()
     }
+    seeds = {
+        key: Magic10Seed(
+            value.template_id, value.seed_version, value.updated_at_utc,
+            value.checksum_sha256,
+        )
+        for key, value in registry.magic10_seeds.items()
+    }
     return RegistryConfig(
-        gates=MappingProxyType(dict(registry.gates)),
-        channels=MappingProxyType(dict(registry.channels)),
+        gates=MappingProxyType(gates),
+        channels=MappingProxyType(channels),
         alias_map=MappingProxyType(dict(registry.alias_map)),
         magic10_order=tuple(registry.magic10_order),
         magic10_caps=MappingProxyType(caps),
-        magic10_seeds=MappingProxyType(dict(registry.magic10_seeds)),
+        magic10_seeds=MappingProxyType(seeds),
         manifest=manifest,
         centers=tuple(registry.centers),
         domains=tuple(registry.domains),
@@ -1341,7 +1366,12 @@ def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBund
 
 def load_active_mechanics_bundle() -> AdmittedMechanicsBundle:
     """Admit the exact installed complete mechanics release, or fail closed."""
-    repository_root = Path(__file__).resolve().parents[2]
+    module_path = Path(__file__)
+    if not module_path.is_absolute():
+        raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'owning module path must be absolute')
+    # Keep the lexical import path: resolving it would hide deployment aliases
+    # from _LocalCapture's symlink-ancestor refusal.
+    repository_root = module_path.parents[2]
     return _load_active_mechanics_bundle_from_root(repository_root)
 
 
