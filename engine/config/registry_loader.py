@@ -1,19 +1,21 @@
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
 import os
-import stat
 import re
+import stat
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from types import MappingProxyType
 from typing import Iterable, Mapping
 
 import jsonschema
 from jsonschema import validators
-from referencing import Registry
+from referencing import Registry, Resource
 from referencing.exceptions import NoSuchResource
 
 from engine.serializer import canon
@@ -232,15 +234,33 @@ class Manifest:
 
 @dataclass(frozen=True)
 class RegistryConfig:
-    gates: dict[int, Gate]
-    channels: dict[str, Channel]
-    alias_map: dict[str, str]
+    gates: Mapping[int, Gate]
+    channels: Mapping[str, Channel]
+    alias_map: Mapping[str, str]
     magic10_order: tuple[str, ...]
-    magic10_caps: dict[str, Magic10Caps]
-    magic10_seeds: dict[str, Magic10Seed]
+    magic10_caps: Mapping[str, Magic10Caps]
+    magic10_seeds: Mapping[str, Magic10Seed]
     manifest: Manifest
     centers: tuple[str, ...]
     domains: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class SourceIdentity:
+    path: str
+    sha256: str
+    size: int
+
+
+@dataclass(frozen=True, slots=True)
+class AdmittedMechanicsBundle:
+    registry: RegistryConfig
+    mechanics: Mapping[str, object]
+    manifest: Manifest
+    config_sha256: str
+    source_identities: tuple[SourceIdentity, ...]
+    manifest_sha256: str
+    release_id: str
 
 
 
@@ -361,11 +381,62 @@ _LOCAL_SCHEMAS = frozenset({
     "schemas/magic10_compat_result_v1.schema.json", *_CONSUMER_SCHEMAS,
 })
 
+# HDE-EPIC040's adopted complete mechanics release.  The active loader accepts
+# this exact sorted union only; catalog/manifest.json itself is never a member.
+ADMITTED_RELEASE_VERSION = "1.1.0"
+ADMITTED_RELEASE_BUILT_AT_UTC = "2026-08-24T18:04:49Z"
+ADMITTED_RELEASE_ROSTER = tuple(sorted({
+    "adapter/http_reader.py",
+    "adapter/schemas/error_v1.schema.json",
+    "catalog/channels_v1.json",
+    "catalog/gates_v1.json",
+    "catalog/magic10.json",
+    "catalog/magic10_caps.json",
+    "catalog/magic10_mechanics_v1.json",
+    "catalog/magic10_seeds.json",
+    "catalog/narratives/keys.json",
+    "catalog/narratives/manifest.json",
+    "catalog/narratives/palettes.json",
+    "catalog/narratives/suppression_map.json",
+    "catalog/narratives/templates.json",
+    "engine/bodygraph/gates.py",
+    "engine/bodygraph/mapped_cache.py",
+    "engine/bodygraph/projection.py",
+    "engine/bodygraph/resolver.py",
+    "engine/bodygraph/v2_adapter.py",
+    "engine/cli/main.py",
+    "engine/compat/compute.py",
+    "engine/compat/error_tokens.py",
+    "engine/config/registry_loader.py",
+    "engine/core/core.py",
+    "engine/http/compat_handler.py",
+    "engine/magic10/calculators.py",
+    "engine/magic10/composite.py",
+    "engine/magic10/signals.py",
+    "engine/narratives/router.py",
+    "engine/presenter/emitter.py",
+    "engine/runtime/public.py",
+    "errors/token_map/token_map.json",
+    "math/thresholds.json",
+    "migrations/005_identity.sql",
+    "presenter/reader_v1/emitter.py",
+    "schemas/channels_v1.schema.json",
+    "schemas/magic10_compat_result_v1.schema.json",
+    "schemas/magic10_mechanics_v1.schema.json",
+    "schemas/magic10_result_v1.schema.json",
+    "schemas/reader.v1.schema.json",
+    "tools/bodygraph/check_magic10_gate_readiness.py",
+    "engine/serializer/canon.py",
+}))
+
+if len(ADMITTED_RELEASE_ROSTER) != 41:  # pragma: no cover - import-time invariant
+    raise RuntimeError("ADMITTED_RELEASE_ROSTER_INVALID")
+
 @dataclass(frozen=True)
 class _CapturedJson:
     relative_path: str
     raw: bytes
-    data: object
+    data: object | None
     sha256: str
     size_bytes: int
     identity: tuple[int, int, int, int, int, int]
@@ -469,7 +540,12 @@ def _validate_unicode(value: object) -> None:
             _validate_unicode(item)
 
 
-def _parse_source_bytes(raw: bytes, relative_path: str) -> object:
+def _parse_source_bytes(
+    raw: bytes,
+    relative_path: str,
+    *,
+    require_canonical: bool | None = None,
+) -> object:
     try:
         if raw.startswith(b'\xef\xbb\xbf'):
             raise SchemaValidationError('INVALID_UTF8', 'JSON BOM is forbidden')
@@ -477,13 +553,39 @@ def _parse_source_bytes(raw: bytes, relative_path: str) -> object:
         data = json.loads(text, object_pairs_hook=_duplicate_aware_object, parse_constant=_refuse_nonfinite)
         _validate_unicode(data)
         # Existing consumer schema documents retain their independently owned formatting.
-        if relative_path not in _CONSUMER_SCHEMAS and canon.sercanon(data, sort_keys=True) != raw:
+        canonical_required = relative_path not in _CONSUMER_SCHEMAS if require_canonical is None else require_canonical
+        if canonical_required and canon.sercanon(data, sort_keys=True) != raw:
             raise SchemaValidationError('NONCANONICAL_JSON', f'noncanonical JSON bytes: {relative_path}')
         return data
     except RegistryConfigError:
         raise
     except (UnicodeError, ValueError, TypeError, OverflowError, RecursionError) as exc:
         raise SchemaValidationError('INVALID_JSON', f'failed to parse source: {relative_path}') from exc
+
+
+def _parse_release_member_bytes(raw: bytes, relative_path: str) -> object | None:
+    """Validate one exact release member without rewriting or normalizing it."""
+    suffix = Path(relative_path).suffix
+    if suffix == '.json':
+        return _parse_source_bytes(raw, relative_path, require_canonical=True)
+    if suffix not in {'.py', '.sql'}:
+        raise SchemaValidationError('UNSUPPORTED_MEMBER_FORMAT', 'release member format is unsupported')
+    if raw.startswith(b'\xef\xbb\xbf'):
+        raise SchemaValidationError('INVALID_UTF8', 'text member BOM is forbidden')
+    try:
+        text = raw.decode('utf-8', errors='strict')
+    except UnicodeError as exc:
+        raise SchemaValidationError('INVALID_UTF8', f'invalid UTF-8 member: {relative_path}') from exc
+    if b'\r' in raw or not raw.endswith(b'\n') or raw.endswith(b'\n\n'):
+        raise SchemaValidationError('INVALID_MEMBER_FINAL_LF', f'member must have exactly one final LF: {relative_path}')
+    if not text[:-1].strip():
+        raise SchemaValidationError('EMPTY_MEMBER', f'release member is empty: {relative_path}')
+    if suffix == '.py':
+        try:
+            ast.parse(text, filename=relative_path)
+        except (SyntaxError, ValueError, TypeError, MemoryError) as exc:
+            raise SchemaValidationError('INVALID_PYTHON_MEMBER', f'Python member is not syntactically valid: {relative_path}') from exc
+    return None
 
 
 @dataclass
@@ -500,10 +602,24 @@ class _LocalCapture:
                 raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'selected root has a symlink ancestor')
 
     def read(self, relative_path: str) -> _CapturedJson:
+        if Path(relative_path).suffix != '.json':
+            raise SchemaValidationError('INVALID_JSON_SOURCE', 'JSON reader accepts only .json sources')
         if relative_path in self.sources:
             return self.sources[relative_path]
         raw, after = _read_captured_file(self.root, relative_path)
         data = _parse_source_bytes(raw, relative_path)
+        source = _CapturedJson(relative_path, raw, data, hashlib.sha256(raw).hexdigest(), len(raw), after)
+        self.sources[relative_path] = source
+        return source
+
+    def capture_release_member(self, relative_path: str) -> _CapturedJson:
+        """Capture one roster member and enforce its exact extension contract."""
+        if relative_path in self.sources:
+            source = self.sources[relative_path]
+            _parse_release_member_bytes(source.raw, relative_path)
+            return source
+        raw, after = _read_captured_file(self.root, relative_path)
+        data = _parse_release_member_bytes(raw, relative_path)
         source = _CapturedJson(relative_path, raw, data, hashlib.sha256(raw).hexdigest(), len(raw), after)
         self.sources[relative_path] = source
         return source
@@ -576,6 +692,77 @@ def _validate_local_schema(capture: _LocalCapture, relative_path: str, data: obj
         raise SchemaValidationError('SCHEMA_VALIDATION_FAILED', f'owning schema refused: {relative_path}', {'schema': relative_path}) from exc
 
 
+def _validate_release_schema_document(
+    capture: _LocalCapture,
+    relative_path: str,
+    *,
+    expected_draft: str,
+    expected_identity: str | None,
+) -> None:
+    """Validate a captured schema dependency without manufacturing an instance."""
+    schema = capture.read(relative_path).data
+    if not isinstance(schema, dict):
+        raise SchemaValidationError('INVALID_SCHEMA', 'schema must be an object')
+    if schema.get('$schema') != expected_draft:
+        raise SchemaValidationError('SCHEMA_DRAFT_MISMATCH', 'release schema draft mismatch')
+    if expected_identity is None:
+        if '$id' in schema:
+            raise SchemaValidationError('SCHEMA_IDENTITY_MISMATCH', 'release schema identity mismatch')
+    elif schema.get('$id') != expected_identity:
+        raise SchemaValidationError('SCHEMA_IDENTITY_MISMATCH', 'release schema identity mismatch')
+    _schema_references(schema)
+    base_validator = (
+        jsonschema.Draft7Validator
+        if expected_draft == 'http://json-schema.org/draft-07/schema#'
+        else jsonschema.Draft202012Validator
+    )
+    strict = validators.extend(
+        base_validator,
+        type_checker=base_validator.TYPE_CHECKER.redefine(
+            'integer', lambda checker, value: type(value) is int
+        ),
+    )
+    try:
+        strict.check_schema(schema)
+        resource = Resource.from_contents(schema)
+        resolver = Registry(retrieve=_reject_schema_retrieval).resolver_with_root(resource)
+
+        def check_references(node: object) -> None:
+            if isinstance(node, dict):
+                # The adopted schemas use one document identity. A nested ID
+                # would change the meaning of otherwise same-document refs.
+                if node is not schema and '$id' in node:
+                    raise SchemaValidationError(
+                        'NESTED_SCHEMA_ID_FORBIDDEN', 'nested schema identities are not admitted'
+                    )
+                for key, value in node.items():
+                    if key in {'$ref', '$dynamicRef', '$recursiveRef'}:
+                        try:
+                            target = resolver.lookup(value).contents
+                        except Exception as exc:
+                            raise SchemaValidationError(
+                                'UNRESOLVED_SCHEMA_REFERENCE', 'schema reference has no captured local target'
+                            ) from exc
+                        if not isinstance(target, (dict, bool)):
+                            raise SchemaValidationError(
+                                'INVALID_SCHEMA_REFERENCE_TARGET', 'schema reference target is not a schema'
+                            )
+                    check_references(value)
+            elif isinstance(node, list):
+                for value in node:
+                    check_references(value)
+
+        check_references(schema)
+    except RegistryConfigError:
+        raise
+    except Exception as exc:
+        raise SchemaValidationError(
+            'SCHEMA_VALIDATION_FAILED',
+            f'release schema refused: {relative_path}',
+            {'schema': relative_path},
+        ) from exc
+
+
 def _load_json(path: Path) -> object:
     return _LocalCapture(path.parent).read(path.name).data
 
@@ -604,12 +791,22 @@ def _normalize_channel_id(channel_id: str, gates: Iterable[int]) -> str:
     return f'{pair[0]:02d}-{pair[1]:02d}'
 
 
-def _load_gates(capture: _LocalCapture) -> tuple[dict[int, Gate], tuple[str, ...]]:
+def _load_gates(
+    capture: _LocalCapture,
+    *,
+    validate_schema: bool = True,
+) -> tuple[dict[int, Gate], tuple[str, ...]]:
     raw = capture.read('catalog/gates_v1.json').data
-    _validate_local_schema(capture, 'schemas/gates_v1.schema.json', raw)
+    if validate_schema:
+        _validate_local_schema(capture, 'schemas/gates_v1.schema.json', raw)
+    if not isinstance(raw, dict) or set(raw) != {'gates'} or not isinstance(raw.get('gates'), list):
+        raise SchemaValidationError('INVALID_GATES', 'gate catalog must contain exactly a gates list')
     gates = {}
     source_ids = []
     for entry in raw['gates']:
+        if (not isinstance(entry, dict) or set(entry) != {'gate', 'center'}
+                or not isinstance(entry.get('center'), str) or not entry['center']):
+            raise SchemaValidationError('INVALID_GATES', 'gate rows must contain exact gate and center fields')
         gate_id = entry['gate']
         if type(gate_id) is not int or not 1 <= gate_id <= 64:
             raise SchemaValidationError('INVALID_GATES', 'gate id must be an exact integer in 1..64')
@@ -982,6 +1179,170 @@ def _capture_mechanics_config(root: Path | str | None = None) -> _MechanicsCaptu
     capture.config = data
     capture.verify_unchanged()
     return capture
+
+
+def _validate_admitted_manifest(manifest: Manifest) -> None:
+    paths = tuple(entry.path for entry in manifest.files)
+    if paths != ADMITTED_RELEASE_ROSTER:
+        expected = set(ADMITTED_RELEASE_ROSTER)
+        actual = set(paths)
+        if actual < expected:
+            raise SchemaValidationError(
+                'INCOMPLETE_RELEASE_ROSTER',
+                'release manifest does not yet contain the complete adopted roster',
+            )
+        raise SchemaValidationError(
+            'RELEASE_ROSTER_MISMATCH',
+            'release manifest does not contain the exact adopted roster',
+        )
+    if manifest.version != ADMITTED_RELEASE_VERSION:
+        raise SchemaValidationError(
+            'RELEASE_VERSION_MISMATCH', 'release manifest version is not the adopted version'
+        )
+    if manifest.built_at_utc != ADMITTED_RELEASE_BUILT_AT_UTC:
+        raise SchemaValidationError(
+            'RELEASE_TIMESTAMP_MISMATCH',
+            'release manifest timestamp is not the adopted timestamp',
+        )
+
+
+def _capture_admitted_members(
+    capture: _MechanicsCapture,
+    manifest: Manifest,
+) -> tuple[SourceIdentity, ...]:
+    identities: list[SourceIdentity] = []
+    for entry in manifest.files:
+        source = capture.capture_release_member(entry.path)
+        if source.sha256 != entry.sha256:
+            raise SchemaValidationError(
+                'MANIFEST_MEMBER_HASH_MISMATCH',
+                f'manifest digest does not match captured member: {entry.path}',
+            )
+        if source.size_bytes != entry.size:
+            raise SchemaValidationError(
+                'MANIFEST_MEMBER_SIZE_MISMATCH',
+                f'manifest size does not match captured member: {entry.path}',
+            )
+        identities.append(SourceIdentity(entry.path, source.sha256, source.size_bytes))
+    return tuple(identities)
+
+
+def _validate_admitted_schema_documents(capture: _MechanicsCapture) -> None:
+    draft_2020 = 'https://json-schema.org/draft/2020-12/schema'
+    for path in (
+        'schemas/channels_v1.schema.json',
+        'schemas/magic10_mechanics_v1.schema.json',
+        'schemas/magic10_result_v1.schema.json',
+        'schemas/magic10_compat_result_v1.schema.json',
+    ):
+        _validate_release_schema_document(
+            capture,
+            path,
+            expected_draft=draft_2020,
+            expected_identity=path,
+        )
+    _validate_release_schema_document(
+        capture,
+        'schemas/reader.v1.schema.json',
+        expected_draft=draft_2020,
+        expected_identity='https://example.org/schemas/reader.v1.schema.json',
+    )
+    _validate_release_schema_document(
+        capture,
+        'adapter/schemas/error_v1.schema.json',
+        expected_draft='http://json-schema.org/draft-07/schema#',
+        expected_identity=None,
+    )
+
+
+def _deep_freeze(value: object) -> object:
+    if isinstance(value, Mapping):
+        return MappingProxyType({key: _deep_freeze(item) for key, item in value.items()})
+    if isinstance(value, (list, tuple)):
+        return tuple(_deep_freeze(item) for item in value)
+    return value
+
+
+def _freeze_manifest(manifest: Manifest) -> Manifest:
+    return Manifest(
+        root=manifest.root,
+        version=manifest.version,
+        built_at_utc=manifest.built_at_utc,
+        files=tuple(ManifestEntry(row.path, row.sha256, row.size) for row in manifest.files),
+    )
+
+
+def _freeze_registry(registry: RegistryConfig, manifest: Manifest) -> RegistryConfig:
+    caps = {
+        key: Magic10Caps(value.inputs, MappingProxyType(dict(value.bounds)))
+        for key, value in registry.magic10_caps.items()
+    }
+    return RegistryConfig(
+        gates=MappingProxyType(dict(registry.gates)),
+        channels=MappingProxyType(dict(registry.channels)),
+        alias_map=MappingProxyType(dict(registry.alias_map)),
+        magic10_order=tuple(registry.magic10_order),
+        magic10_caps=MappingProxyType(caps),
+        magic10_seeds=MappingProxyType(dict(registry.magic10_seeds)),
+        manifest=manifest,
+        centers=tuple(registry.centers),
+        domains=tuple(registry.domains),
+    )
+
+
+def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBundle:
+    """Test seam for the fixed-root production admission algorithm."""
+    capture = _MechanicsCapture(Path(root))
+    manifest_source = capture.read('catalog/manifest.json')
+    manifest = _parse_manifest(manifest_source.data)
+    _validate_admitted_manifest(manifest)
+    source_identities = _capture_admitted_members(capture, manifest)
+
+    # schemas/gates_v1.schema.json is intentionally outside the exact release
+    # roster.  The gate domain is therefore checked by the closed loader rules
+    # below, while every roster-authorized schema is executed from this capture.
+    gates, centers = _load_gates(capture, validate_schema=False)
+    channels, aliases, domains = _load_channels(
+        capture,
+        gate_map=gates,
+        known_centers=set(centers),
+        allow_aliases=False,
+        alias_ledger=None,
+    )
+    order, caps, seeds = _load_magic10(capture)
+    registry = RegistryConfig(
+        gates, channels, aliases, order, caps, seeds, manifest, centers, domains
+    )
+    capture.registry = registry
+
+    mechanics_source = capture.read('catalog/magic10_mechanics_v1.json')
+    mechanics = mechanics_source.data
+    _validate_initial_mechanics(capture, mechanics, registry)
+    capture.config = mechanics
+    _validate_admitted_schema_documents(capture)
+
+    frozen_manifest = _freeze_manifest(manifest)
+    frozen_registry = _freeze_registry(registry, frozen_manifest)
+    frozen_mechanics = _deep_freeze(mechanics)
+    if not isinstance(frozen_mechanics, Mapping):  # guarded by mechanics schema
+        raise SchemaValidationError('INVALID_MECHANICS', 'mechanics config must be an object')
+    manifest_sha256 = manifest_source.sha256
+    capture.verify_unchanged()
+    return AdmittedMechanicsBundle(
+        registry=frozen_registry,
+        mechanics=frozen_mechanics,
+        manifest=frozen_manifest,
+        config_sha256=mechanics_source.sha256,
+        source_identities=source_identities,
+        manifest_sha256=manifest_sha256,
+        release_id=manifest_sha256,
+    )
+
+
+def load_active_mechanics_bundle() -> AdmittedMechanicsBundle:
+    """Admit the exact installed complete mechanics release, or fail closed."""
+    repository_root = Path(__file__).resolve().parents[2]
+    return _load_active_mechanics_bundle_from_root(repository_root)
 
 
 def _validate_result_fixture(capture: _MechanicsCapture, data: object) -> None:

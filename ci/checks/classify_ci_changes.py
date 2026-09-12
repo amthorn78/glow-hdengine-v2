@@ -37,6 +37,7 @@ _FULL_VALIDATION_PATHS = {
     "tests/evidence/test_rails_ci_workflow_integration.py",
 }
 _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
+    "tests/bodygraph/test_gates.py",
     "tests/categories/test_registry_and_purity.py",
     "tests/cli/test_aux_preview.py",
     "tests/cli/test_bg_resolve.py",
@@ -49,6 +50,7 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
     "tests/config/test_manifest_schema.py",
     "tests/config/test_magic10_contracts.py",
+    "tests/config/test_production_admission.py",
     "tests/config/test_registry_catalog_contract.py",
     "tests/config/test_registry_report.py",
     "tests/config/test_registry_report_determinism.py",
@@ -291,6 +293,7 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
 }
 _PRODUCT_TEST_OWNER_PATHS = {
+    "engine/bodygraph/gates.py": ("tests/bodygraph/test_gates.py",),
     "catalog/channels_v1.json": (
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
@@ -313,6 +316,7 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_manifest_schema.py",
+        "tests/config/test_production_admission.py",
         "tests/config/test_typed_bundles.py",
     ),
     "engine/config/bundles.py": ("tests/config/test_typed_bundles.py",),
@@ -552,6 +556,7 @@ _TEST_SUPPORT_OWNER_PATHS = {
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
         "tests/config/test_manifest_schema.py",
+        "tests/config/test_production_admission.py",
         "tests/config/test_registry_report.py",
         "tests/config/test_registry_report_determinism.py",
         "tests/config/test_registry_report_indexing.py",
