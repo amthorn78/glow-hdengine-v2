@@ -17,6 +17,11 @@ VERIFY.out
 # Backups/temps
 *.bak
 server_backup.tar
+/.backup_epic004/changelog_20251024121758.tgz
+/_backup_1761350008.tgz
+/_backup_corrupted_1761349750.tgz
+/_backup_corrupted_1761349780.tgz
+/handoff/epic004_live_evidence_20251022T202304Z.tar.gz
 EPIC1_PATCH_PACKET_*/
 artifacts/bodygraph/refresh_state.json
 

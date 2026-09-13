@@ -58,6 +58,10 @@ def test_synthetic_complete_release_is_labeled_and_admits_exact_identities(relea
     assert isinstance(bundle, AdmittedMechanicsBundle)
     assert bundle.manifest.version == ADMITTED_RELEASE_VERSION
     assert bundle.manifest.built_at_utc == ADMITTED_RELEASE_BUILT_AT_UTC
+    assert len(ADMITTED_RELEASE_ROSTER) == 44
+    assert "schemas/gates_v1.schema.json" in ADMITTED_RELEASE_ROSTER
+    assert "engine/stable/sercanon.py" in ADMITTED_RELEASE_ROSTER
+    assert "engine/categories/registry.py" in ADMITTED_RELEASE_ROSTER
     assert tuple(row.path for row in bundle.manifest.files) == ADMITTED_RELEASE_ROSTER
     assert tuple(row.path for row in bundle.source_identities) == ADMITTED_RELEASE_ROSTER
     assert bundle.config_sha256 == hashlib.sha256(mechanics_raw).hexdigest()
@@ -116,24 +120,56 @@ def test_public_admission_never_resolves_relative_module_path_from_cwd(monkeypat
     assert caught.value.code == "UNSAFE_SOURCE_PATH"
 
 
+def test_public_admission_refuses_file_only_root_substitution(
+    release_root: Path, monkeypatch
+) -> None:
+    module_path = release_root / "engine/config/registry_loader.py"
+    module_path.write_bytes(module_path.read_bytes().rstrip(b"\n") + b"\n# changed after import\n")
+    write_synthetic_release_manifest(release_root)
+    monkeypatch.setattr(registry_loader, "__file__", str(module_path))
+
+    with pytest.raises(RegistryConfigError) as caught:
+        load_active_mechanics_bundle()
+    assert caught.value.code == "UNSAFE_SOURCE_PATH"
+
+
 def test_source_changed_after_its_verification_read_is_refused(release_root: Path, monkeypatch) -> None:
     original = registry_loader._read_captured_file
     reads = 0
+    target = "adapter/http_reader.py"
 
-    def replace_verified_manifest(root, relative_path):
+    def replace_verified_source(root, relative_path):
         nonlocal reads
         result = original(root, relative_path)
-        if relative_path == "catalog/manifest.json":
+        if relative_path == target:
             reads += 1
             if reads == 2:
                 # Initial capture was read 1. Change a source after read 2
                 # returned its old verified bytes, while other reads remain.
-                (root / relative_path).write_bytes(b"{}\n")
+                (root / relative_path).write_bytes(b'"""Changed after verification."""\n')
         return result
 
-    monkeypatch.setattr(registry_loader, "_read_captured_file", replace_verified_manifest)
+    monkeypatch.setattr(registry_loader, "_read_captured_file", replace_verified_source)
     _expect_code(release_root, "SOURCE_CHANGED")
     assert reads == 2
+
+
+def test_packaged_manifest_is_physically_read_once_per_admission(
+    release_root: Path, monkeypatch
+) -> None:
+    original = registry_loader._read_captured_file
+    reads = 0
+
+    def count_manifest_reads(root, relative_path):
+        nonlocal reads
+        if relative_path == "catalog/manifest.json":
+            reads += 1
+        return original(root, relative_path)
+
+    monkeypatch.setattr(registry_loader, "_read_captured_file", count_manifest_reads)
+    bundle = _load_active_mechanics_bundle_from_root(release_root)
+    assert isinstance(bundle, AdmittedMechanicsBundle)
+    assert reads == 1
 
 
 def test_source_removed_during_final_identity_check_has_typed_refusal(release_root: Path, monkeypatch) -> None:
@@ -256,6 +292,57 @@ def test_manifest_requires_exact_roster_version_and_timestamp(release_root: Path
     _expect_code(release_root, "RELEASE_TIMESTAMP_MISMATCH")
 
 
+def test_gate_schema_is_required_and_an_unlisted_43_member_release_is_incomplete(
+    release_root: Path,
+) -> None:
+    manifest = _manifest(release_root)
+    manifest["files"] = [
+        row for row in manifest["files"] if row["path"] != "schemas/gates_v1.schema.json"
+    ]
+    assert len(manifest["files"]) == 43
+    _write_manifest(release_root, manifest)
+    _expect_code(release_root, "INCOMPLETE_RELEASE_ROSTER")
+
+
+def test_missing_gate_schema_member_is_refused(release_root: Path) -> None:
+    (release_root / "schemas/gates_v1.schema.json").unlink()
+    _expect_code(release_root, "MISSING_FILE")
+
+
+@pytest.mark.parametrize(
+    ("raw", "code"),
+    [
+        (b'{"broken":\n', "INVALID_JSON"),
+        (b'{ "$id": "schemas/gates_v1.schema.json" }\n', "NONCANONICAL_JSON"),
+    ],
+)
+def test_gate_schema_member_bytes_must_be_valid_and_canonical(
+    release_root: Path, raw: bytes, code: str
+) -> None:
+    (release_root / "schemas/gates_v1.schema.json").write_bytes(raw)
+    write_synthetic_release_manifest(release_root)
+    _expect_code(release_root, code)
+
+
+def test_gate_schema_hash_and_size_are_manifest_bound(release_root: Path) -> None:
+    manifest = _manifest(release_root)
+    row = next(
+        item for item in manifest["files"] if item["path"] == "schemas/gates_v1.schema.json"
+    )
+    row["sha256"] = "0" * 64
+    _write_manifest(release_root, manifest)
+    _expect_code(release_root, "MANIFEST_MEMBER_HASH_MISMATCH")
+
+    write_synthetic_release_manifest(release_root)
+    manifest = _manifest(release_root)
+    row = next(
+        item for item in manifest["files"] if item["path"] == "schemas/gates_v1.schema.json"
+    )
+    row["size"] += 1
+    _write_manifest(release_root, manifest)
+    _expect_code(release_root, "MANIFEST_MEMBER_SIZE_MISMATCH")
+
+
 @pytest.mark.parametrize("unsafe", ["/absolute.json", "../escape.json", "a\\b.json", "a/./b.json", "a//b.json"])
 def test_manifest_member_paths_remain_canonical(release_root: Path, unsafe: str) -> None:
     manifest = _manifest(release_root)
@@ -337,6 +424,50 @@ def test_schema_identity_remote_reference_and_relation_fail_closed(release_root:
     write_canonical(gates_path, gates)
     write_synthetic_release_manifest(release_root)
     _expect_code(release_root, "GATE_CENTER_COUNTS_MISMATCH")
+
+
+def test_manifest_bound_gate_schema_is_executed(release_root: Path) -> None:
+    schema_path = release_root / "schemas/gates_v1.schema.json"
+    write_canonical(
+        schema_path,
+        {
+            "$id": "schemas/gates_v1.schema.json",
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "not": {},
+        },
+    )
+    write_synthetic_release_manifest(release_root)
+    _expect_code(release_root, "SCHEMA_VALIDATION_FAILED")
+
+
+def test_gate_schema_remote_reference_and_source_change_fail_closed(
+    release_root: Path, monkeypatch
+) -> None:
+    schema_path = release_root / "schemas/gates_v1.schema.json"
+    schema = json.loads(schema_path.read_bytes())
+    schema["$ref"] = "https://example.invalid/gates.json"
+    write_canonical(schema_path, schema)
+    write_synthetic_release_manifest(release_root)
+    _expect_code(release_root, "NONLOCAL_SCHEMA_REFERENCE")
+
+    source_schema = Path(__file__).resolve().parents[2] / "schemas/gates_v1.schema.json"
+    schema_path.write_bytes(source_schema.read_bytes())
+    write_synthetic_release_manifest(release_root)
+    original = registry_loader._read_captured_file
+    reads = 0
+
+    def change_gate_schema_on_verify(root, relative_path):
+        nonlocal reads
+        result = original(root, relative_path)
+        if relative_path == "schemas/gates_v1.schema.json":
+            reads += 1
+            if reads == 2:
+                (root / relative_path).write_bytes(b"{}\n")
+        return result
+
+    monkeypatch.setattr(registry_loader, "_read_captured_file", change_gate_schema_on_verify)
+    _expect_code(release_root, "SOURCE_CHANGED")
+    assert reads == 2
 
 
 def test_mechanics_defaults_and_source_bindings_remain_closed(release_root: Path) -> None:
@@ -491,8 +622,8 @@ def test_parser_and_registry_aliases_cannot_mutate_admitted_values(release_root:
     captures = []
     original = registry_loader._MechanicsCapture.verify_unchanged
 
-    def retain_capture(capture):
-        original(capture)
+    def retain_capture(capture, **kwargs):
+        original(capture, **kwargs)
         captures.append(capture)
 
     monkeypatch.setattr(registry_loader._MechanicsCapture, "verify_unchanged", retain_capture)

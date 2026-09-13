@@ -102,7 +102,7 @@ def synthetic_complete_release_root(
     *,
     source_root: Path | None = None,
 ) -> Path:
-    """Build a labeled, non-production 41-member admission fixture."""
+    """Build a labeled, non-production 44-member admission fixture."""
     from engine.config.registry_loader import (
         ADMITTED_RELEASE_BUILT_AT_UTC,
         ADMITTED_RELEASE_ROSTER,

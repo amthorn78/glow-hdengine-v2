@@ -7,10 +7,11 @@ import math
 import os
 import re
 import stat
+import sys as _sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from types import MappingProxyType
+from types import CodeType, MappingProxyType, ModuleType
 from typing import Iterable, Mapping
 
 import jsonschema
@@ -18,9 +19,20 @@ from jsonschema import validators
 from referencing import Registry, Resource
 from referencing.exceptions import NoSuchResource
 
+from engine.categories import registry as category_registry
+from engine.categories.registry import FROZEN_MAGIC10_ORDER
 from engine.serializer import canon
 
-from engine.categories.registry import FROZEN_MAGIC10_ORDER
+
+# Retain actual execution provenance without reading or executing source bytes.
+# Unsupported provenance leaves candidate APIs usable; active admission refuses.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None
 
 
 # PF12 — HDE Schemas & Artifacts, §2.1 owns the closed Gate domain 1..64,
@@ -405,6 +417,7 @@ ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "engine/bodygraph/resolver.py",
     "engine/bodygraph/v2_adapter.py",
     "engine/cli/main.py",
+    "engine/categories/registry.py",
     "engine/compat/compute.py",
     "engine/compat/error_tokens.py",
     "engine/config/registry_loader.py",
@@ -421,15 +434,17 @@ ADMITTED_RELEASE_ROSTER = tuple(sorted({
     "migrations/005_identity.sql",
     "presenter/reader_v1/emitter.py",
     "schemas/channels_v1.schema.json",
+    "schemas/gates_v1.schema.json",
     "schemas/magic10_compat_result_v1.schema.json",
     "schemas/magic10_mechanics_v1.schema.json",
     "schemas/magic10_result_v1.schema.json",
     "schemas/reader.v1.schema.json",
     "tools/bodygraph/check_magic10_gate_readiness.py",
     "engine/serializer/canon.py",
+    "engine/stable/sercanon.py",
 }))
 
-if len(ADMITTED_RELEASE_ROSTER) != 41:  # pragma: no cover - import-time invariant
+if len(ADMITTED_RELEASE_ROSTER) != 44:  # pragma: no cover - import-time invariant
     raise RuntimeError("ADMITTED_RELEASE_ROSTER_INVALID")
 
 @dataclass(frozen=True)
@@ -624,8 +639,18 @@ class _LocalCapture:
         self.sources[relative_path] = source
         return source
 
-    def verify_unchanged(self) -> None:
+    def verify_unchanged(
+        self,
+        *,
+        identity_only: frozenset[str] = frozenset(),
+    ) -> None:
+        if not identity_only.issubset(self.sources):
+            raise SchemaValidationError(
+                'UNBOUND_SOURCE', 'identity-only verification requires a captured source'
+            )
         for name, source in self.sources.items():
+            if name in identity_only:
+                continue
             raw, identity = _read_captured_file(self.root, name)
             if identity != source.identity or raw != source.raw:
                 raise SchemaValidationError('SOURCE_CHANGED', f'captured source changed: {name}')
@@ -1236,10 +1261,102 @@ def _capture_admitted_members(
     return tuple(identities)
 
 
+def _admission_execution_provenance(
+) -> tuple[Path, tuple[tuple[str, CodeType, int], ...]]:
+    """Validate the four actual consumers' passive import provenance.
+
+    This proves neither historical imported bytes nor arbitrary in-process
+    tamper resistance. It establishes safe common origin and compilation
+    semantics for the bounded executable-equivalence comparison below.
+    """
+    owners = (
+        ('engine/config/registry_loader.py', 'engine.config.registry_loader', globals()),
+        ('engine/serializer/canon.py', 'engine.serializer.canon', canon),
+        ('engine/stable/sercanon.py', 'engine.stable.sercanon', getattr(canon, 'stable_sercanon', None)),
+        ('engine/categories/registry.py', 'engine.categories.registry', category_registry),
+    )
+    root: Path | None = None
+    executions: list[tuple[str, CodeType, int]] = []
+    for relative_path, expected_name, owner in owners:
+        if isinstance(owner, ModuleType):
+            namespace = vars(owner)
+        elif owner is globals():
+            namespace = owner
+        else:
+            raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'covered admission module is unavailable')
+        provenance = namespace.get('_MODULE_EXECUTION')
+        if type(provenance) is not tuple or len(provenance) != 6:
+            raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'module execution provenance is unavailable')
+        code, name, filename, origin, optimization, cache_tag = provenance
+        if not isinstance(code, CodeType) or code.co_name != '<module>':
+            raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'top-level execution code is unavailable')
+        if (
+            type(optimization) is not int or optimization not in (0, 1, 2)
+            or optimization != _sys.flags.optimize
+            or not isinstance(cache_tag, str) or not cache_tag
+            or cache_tag != _sys.implementation.cache_tag
+        ):
+            raise SchemaValidationError('EXECUTION_SEMANTICS_MISMATCH', 'module compilation semantics are incompatible')
+        spec = namespace.get('__spec__')
+        if (
+            name != expected_name or namespace.get('__name__') != expected_name
+            or getattr(spec, 'name', None) != expected_name
+            or not isinstance(filename, str) or not isinstance(origin, str)
+            or filename != origin or namespace.get('__file__') != filename
+            or getattr(spec, 'origin', None) != origin
+            or code.co_filename != filename
+        ):
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'module origin does not match retained execution provenance')
+        path = Path(filename)
+        relative = Path(relative_path)
+        if (
+            not path.is_absolute() or str(path) != filename
+            or '..' in path.parts or path.parts[-len(relative.parts):] != relative.parts
+        ):
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'module origin is not the owning absolute source path')
+        module_root = path.parents[len(relative.parts) - 1]
+        if root is None:
+            root = module_root
+        elif module_root != root:
+            raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'covered admission modules have different roots')
+        _safe_source_path(module_root, relative_path)
+        executions.append((relative_path, code, optimization))
+    assert root is not None  # the fixed four-owner set is nonempty
+    return root, tuple(executions)
+
+
+def _validate_executing_admission_sources(
+    capture: _MechanicsCapture,
+    executions: tuple[tuple[str, CodeType, int], ...],
+) -> None:
+    """Compare actual executed code with compilation of manifest-owned bytes.
+
+    Compilation is passive: no captured source is executed or imported. Code
+    equality is deliberately separate from exact source and release identities.
+    """
+    for relative_path, executed, optimization in executions:
+        source = capture.sources.get(relative_path)
+        if source is None or relative_path not in ADMITTED_RELEASE_ROSTER:
+            raise SchemaValidationError('UNBOUND_SOURCE', 'executing module source is not captured and manifest-bound')
+        try:
+            compiled = compile(
+                source.raw, executed.co_filename, 'exec',
+                dont_inherit=True, optimize=optimization,
+            )
+        except Exception as exc:
+            raise SchemaValidationError('EXECUTION_COMPILATION_FAILED', 'captured admission source cannot be compiled') from exc
+        if compiled != executed:
+            raise SchemaValidationError(
+                'EXECUTING_SOURCE_MISMATCH',
+                f'executing code differs from captured source: {relative_path}',
+            )
+
+
 def _validate_admitted_schema_documents(capture: _MechanicsCapture) -> None:
     draft_2020 = 'https://json-schema.org/draft/2020-12/schema'
     for path in (
         'schemas/channels_v1.schema.json',
+        'schemas/gates_v1.schema.json',
         'schemas/magic10_mechanics_v1.schema.json',
         'schemas/magic10_result_v1.schema.json',
         'schemas/magic10_compat_result_v1.schema.json',
@@ -1316,17 +1433,20 @@ def _freeze_registry(registry: RegistryConfig, manifest: Manifest) -> RegistryCo
 
 
 def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBundle:
-    """Test seam for the fixed-root production admission algorithm."""
+    """Private fixture seam; public admission fixes the verified execution root.
+
+    Isolated fixtures may copy the identical implementation to a different
+    directory. They still undergo the complete executable-equivalence check.
+    """
+    _, executions = _admission_execution_provenance()
     capture = _MechanicsCapture(Path(root))
     manifest_source = capture.read('catalog/manifest.json')
     manifest = _parse_manifest(manifest_source.data)
     _validate_admitted_manifest(manifest)
     source_identities = _capture_admitted_members(capture, manifest)
+    _validate_executing_admission_sources(capture, executions)
 
-    # schemas/gates_v1.schema.json is intentionally outside the exact release
-    # roster.  The gate domain is therefore checked by the closed loader rules
-    # below, while every roster-authorized schema is executed from this capture.
-    gates, centers = _load_gates(capture, validate_schema=False)
+    gates, centers = _load_gates(capture)
     channels, aliases, domains = _load_channels(
         capture,
         gate_map=gates,
@@ -1352,7 +1472,9 @@ def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBund
     if not isinstance(frozen_mechanics, Mapping):  # guarded by mechanics schema
         raise SchemaValidationError('INVALID_MECHANICS', 'mechanics config must be an object')
     manifest_sha256 = manifest_source.sha256
-    capture.verify_unchanged()
+    capture.verify_unchanged(
+        identity_only=frozenset({'catalog/manifest.json'}),
+    )
     return AdmittedMechanicsBundle(
         registry=frozen_registry,
         mechanics=frozen_mechanics,
@@ -1366,12 +1488,9 @@ def _load_active_mechanics_bundle_from_root(root: Path) -> AdmittedMechanicsBund
 
 def load_active_mechanics_bundle() -> AdmittedMechanicsBundle:
     """Admit the exact installed complete mechanics release, or fail closed."""
-    module_path = Path(__file__)
-    if not module_path.is_absolute():
-        raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'owning module path must be absolute')
-    # Keep the lexical import path: resolving it would hide deployment aliases
-    # from _LocalCapture's symlink-ancestor refusal.
-    repository_root = module_path.parents[2]
+    # Derive the lexical root from retained actual execution provenance and
+    # corroborate all four live origins. Patching __file__ cannot select a root.
+    repository_root, _ = _admission_execution_provenance()
     return _load_active_mechanics_bundle_from_root(repository_root)
 
 

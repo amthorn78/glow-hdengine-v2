@@ -29,6 +29,7 @@ _FULL_VALIDATION_PREFIXES = (
     ".github/",
 )
 _FULL_VALIDATION_PATHS = {
+    ".gitignore",
     "ci/checks/classify_ci_changes.py",
     "pyproject.toml",
     "pytest.ini",
@@ -48,6 +49,7 @@ _FULL_VALIDATION_SUPPLEMENTAL_TESTS = (
     "tests/config/test_alias_policy_enforcement.py",
     "tests/config/test_config_artifacts.py",
     "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+    "tests/config/test_execution_coherence.py",
     "tests/config/test_manifest_schema.py",
     "tests/config/test_magic10_contracts.py",
     "tests/config/test_production_admission.py",
@@ -97,6 +99,11 @@ _HISTORICAL_PREFIXES = (
     "audit/historical/",
     "audit/ops/",
 )
+_HISTORICAL_PATHS = {
+    # Exact legacy archives retired by the Product Owner during PR02 recovery.
+    ".backup_epic004/changelog_20251024121758.tgz",
+    "handoff/epic004_live_evidence_20251022T202304Z.tar.gz",
+}
 _DOCUMENTATION_PREFIXES = (
     "docs/crd/",
     "docs/pfcanon/",
@@ -317,7 +324,20 @@ _PRODUCT_TEST_OWNER_PATHS = {
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_manifest_schema.py",
         "tests/config/test_production_admission.py",
+        "tests/config/test_execution_coherence.py",
         "tests/config/test_typed_bundles.py",
+    ),
+    "engine/serializer/canon.py": (
+        "tests/cli/test_serializer_guards.py",
+        "tests/config/test_execution_coherence.py",
+    ),
+    "engine/stable/sercanon.py": (
+        "tests/cli/test_serializer_guards.py",
+        "tests/config/test_execution_coherence.py",
+    ),
+    "engine/categories/registry.py": (
+        "tests/categories/test_registry_and_purity.py",
+        "tests/config/test_execution_coherence.py",
     ),
     "engine/config/bundles.py": ("tests/config/test_typed_bundles.py",),
     "catalog/manifest.json": (
@@ -551,6 +571,7 @@ _CONFIG_WRITER_TEST_OWNERS = {
 }
 _TEST_SUPPORT_OWNER_PATHS = {
     "tests/config/helpers.py": (
+        "tests/config/test_execution_coherence.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_magic10_contracts.py",
         "tests/config/test_alias_policy_enforcement.py",
@@ -1315,7 +1336,7 @@ def _lanes_for_path(path: str) -> set[str] | None:
         return set()
 
     historical_namespace = path.startswith(("audit/", "artifacts/", "docs/", "reports/"))
-    if path.startswith(_HISTORICAL_PREFIXES) or (
+    if path in _HISTORICAL_PATHS or path.startswith(_HISTORICAL_PREFIXES) or (
         historical_namespace
         and any(
             _contains_component(path, component)
