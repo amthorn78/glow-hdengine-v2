@@ -449,18 +449,48 @@ def test_pr01_mechanics_sources_have_the_real_contract_owner(source: str) -> Non
     )
 
 
-def test_pr01_loader_and_bundle_have_exact_behavioral_owners() -> None:
+def test_pr02_loader_gate_and_bundle_have_exact_behavioral_owners() -> None:
+    assert classifier.changed_test_targets(ROOT, ("engine/bodygraph/gates.py",)) == (
+        "tests/bodygraph/test_gates.py",
+    )
     assert classifier.changed_test_targets(ROOT, ("engine/config/registry_loader.py",)) == (
         "tests/config/test_alias_policy_enforcement.py",
         "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+        "tests/config/test_execution_coherence.py",
         "tests/config/test_magic10_contracts.py",
         "tests/config/test_manifest_schema.py",
+        "tests/config/test_production_admission.py",
         "tests/config/test_registry_catalog_contract.py",
         "tests/config/test_typed_bundles.py",
     )
     assert classifier.changed_test_targets(ROOT, ("engine/config/bundles.py",)) == (
         "tests/config/test_typed_bundles.py",
     )
+
+
+@pytest.mark.parametrize("source", [
+    "engine/serializer/canon.py",
+    "engine/stable/sercanon.py",
+    "engine/categories/registry.py",
+])
+def test_pr02_executing_module_changes_select_coherence_proof(source: str) -> None:
+    assert "tests/config/test_execution_coherence.py" in classifier.changed_test_targets(ROOT, (source,))
+
+
+@pytest.mark.parametrize("path", [
+    ".backup_epic004/changelog_20251024121758.tgz",
+    "_backup_1761350008.tgz",
+    "_backup_corrupted_1761349750.tgz",
+    "_backup_corrupted_1761349780.tgz",
+    "handoff/epic004_live_evidence_20251022T202304Z.tar.gz",
+])
+def test_retired_archive_paths_keep_evidence_validation(path: str) -> None:
+    assert classifier._lanes_for_path(path) == {"evidence"}
+
+
+def test_archive_retirement_does_not_open_a_new_unclassified_namespace() -> None:
+    assert classifier._lanes_for_path("handoff/new_runtime.py") is None
+    assert classifier._lanes_for_path(".backup_epic004/new_runtime.py") is None
 
 
 @pytest.mark.parametrize("source", [
@@ -529,9 +559,10 @@ def test_pr01_support_mapping_is_exact_and_new_modules_join_full_validation(tmp_
     assert set(owners) == {
         "tests/config/test_registry_catalog_contract.py", "tests/config/test_magic10_contracts.py",
         "tests/config/test_alias_policy_enforcement.py", "tests/config/test_config_loader_unknown_ids_fail_closed.py",
-        "tests/config/test_manifest_schema.py", "tests/config/test_registry_report.py",
+        "tests/config/test_manifest_schema.py", "tests/config/test_production_admission.py", "tests/config/test_registry_report.py",
         "tests/config/test_registry_report_determinism.py", "tests/config/test_registry_report_indexing.py",
         "tests/config/test_config_artifacts.py", "tests/config/test_typed_bundles.py",
+        "tests/config/test_execution_coherence.py",
     }
     for unknown in ("tests/config/unowned_helper.py", "tools/config/unowned_writer.py", "catalog/unowned.json"):
         p = tmp_path / unknown
@@ -539,10 +570,42 @@ def test_pr01_support_mapping_is_exact_and_new_modules_join_full_validation(tmp_
         p.write_text("# unowned\n", encoding="utf-8")
         with pytest.raises(ValueError, match="CI_(TEST_SUPPORT_OWNER|SOURCE_OWNER_TEST|PRODUCT_OWNER_TEST)_MISSING"):
             classifier.changed_test_targets(tmp_path, (unknown,))
-    for new_test in ("tests/config/test_registry_catalog_contract.py", "tests/config/test_magic10_contracts.py"):
+    for new_test in (
+        "tests/bodygraph/test_gates.py",
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_magic10_contracts.py",
+        "tests/config/test_production_admission.py",
+        "tests/config/test_execution_coherence.py",
+    ):
         assert new_test in classifier._FULL_VALIDATION_SUPPLEMENTAL_TESTS
         assert new_test in classifier._full_validation_test_targets()
     assert classifier._lanes_for_path("ci/checks/classify_ci_changes.py") == set(classifier.LANES)
+
+
+def test_pr02_changed_paths_keep_all_lanes_and_exact_new_test_targets() -> None:
+    changed = (
+        "engine/bodygraph/gates.py",
+        "engine/config/registry_loader.py",
+        "tests/config/helpers.py",
+        "tests/bodygraph/test_gates.py",
+        "tests/config/test_production_admission.py",
+        "tests/config/test_manifest_schema.py",
+        "ci/checks/classify_ci_changes.py",
+        "tests/evidence/test_rails_ci_workflow_integration.py",
+    )
+    lanes = set().union(*(classifier._lanes_for_path(path) for path in changed))
+    assert lanes == set(classifier.LANES)
+    assert classifier.changed_test_targets(ROOT, changed[:2]) == (
+        "tests/bodygraph/test_gates.py",
+        "tests/config/test_alias_policy_enforcement.py",
+        "tests/config/test_config_loader_unknown_ids_fail_closed.py",
+        "tests/config/test_execution_coherence.py",
+        "tests/config/test_magic10_contracts.py",
+        "tests/config/test_manifest_schema.py",
+        "tests/config/test_production_admission.py",
+        "tests/config/test_registry_catalog_contract.py",
+        "tests/config/test_typed_bundles.py",
+    )
 
 
 def test_http_reader_owner_guard_is_selected_without_fixed_lane_duplication(
@@ -872,7 +935,7 @@ def test_behavioral_owner_examples_cover_router_and_epic037_generator(
     ) == ("tests/ops/test_http_logging.py",)
     assert classifier.changed_test_targets(
         ROOT, ("engine/serializer/canon.py",)
-    ) == ()
+    ) == ("tests/config/test_execution_coherence.py",)
     assert classifier.changed_test_targets(
         ROOT, ("catalog/manifest.json",)
     ) == ()

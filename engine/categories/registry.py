@@ -1,5 +1,15 @@
 """Category registry with frozen Magic-10 order (EPIC006)."""
+import sys as _sys
 from typing import Callable, Dict, Tuple
+
+# Passive, immutable top-level execution provenance for active admission.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None
 
 FROZEN_MAGIC10_ORDER = ("harmony","heat","communication","alignment","comfort","consistency","expansion","creativity","drive","balance")
 _REG: Dict[str, Callable] = {}

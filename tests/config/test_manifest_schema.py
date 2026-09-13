@@ -84,3 +84,55 @@ def test_manifest_structure_refuses_unsafe_lexical_paths(tmp_path: Path, path: s
     with pytest.raises(SchemaValidationError) as error:
         load_manifest(_write_manifest(tmp_path, payload))
     assert error.value.code == "INVALID_MANIFEST_PATH"
+
+
+@pytest.mark.parametrize("version", [None, "", 1, True, []])
+def test_generic_manifest_version_is_a_nonempty_string(tmp_path: Path, version: object) -> None:
+    payload = {"root": "catalog/", "version": version, "built_at_utc": "2025-01-01T00:00:00Z", "files": []}
+    with pytest.raises(SchemaValidationError) as caught:
+        load_manifest(_write_manifest(tmp_path, payload))
+    assert caught.value.code == "INVALID_MANIFEST_VERSION"
+
+
+@pytest.mark.parametrize(
+    "timestamp",
+    ["", "2025-01-01", "2025-01-01T00:00:00+00:00", "2025-02-29T00:00:00Z", 1],
+)
+def test_manifest_timestamp_is_an_exact_valid_utc_value(tmp_path: Path, timestamp: object) -> None:
+    payload = {"root": "catalog/", "version": "1.0.0", "built_at_utc": timestamp, "files": []}
+    with pytest.raises(SchemaValidationError) as caught:
+        load_manifest(_write_manifest(tmp_path, payload))
+    assert caught.value.code == "INVALID_MANIFEST_TIMESTAMP"
+
+
+@pytest.mark.parametrize("sha", ["0" * 63, "0" * 65, "A" * 64, "g" * 64, 0, None])
+def test_manifest_digest_is_exact_lowercase_sha256(tmp_path: Path, sha: object) -> None:
+    payload = {
+        "root": "catalog/",
+        "version": "1.0.0",
+        "built_at_utc": "2025-01-01T00:00:00Z",
+        "files": [{"path": "a.json", "sha256": sha, "size": 1}],
+    }
+    with pytest.raises(SchemaValidationError) as caught:
+        load_manifest(_write_manifest(tmp_path, payload))
+    assert caught.value.code == "INVALID_MANIFEST"
+
+
+def test_manifest_entry_keys_are_closed(tmp_path: Path) -> None:
+    payload = {
+        "root": "catalog/",
+        "version": "1.0.0",
+        "built_at_utc": "2025-01-01T00:00:00Z",
+        "files": [{"path": "a.json", "sha256": "0" * 64, "size": 1, "extra": True}],
+    }
+    with pytest.raises(SchemaValidationError) as caught:
+        load_manifest(_write_manifest(tmp_path, payload))
+    assert caught.value.code == "INVALID_MANIFEST"
+
+
+def test_generic_manifest_shape_does_not_claim_full_release_admission() -> None:
+    root = Path(__file__).resolve().parents[2]
+    manifest = load_manifest(root)
+    assert manifest.version == "1.0.0"
+    assert len(manifest.files) == 15
+    assert all(row.path != "catalog/manifest.json" for row in manifest.files)
