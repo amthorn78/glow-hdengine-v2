@@ -1,110 +1,212 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Engine Core ABBA logs v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "engine_core_abba_logs.v1",
   "type": "object",
-  "required": ["schema", "generated_at_utc", "env", "runs"],
+  "required": [
+    "schema",
+    "generated_at_utc",
+    "fixture_kind",
+    "source_sha256",
+    "env",
+    "inputs",
+    "ab_run",
+    "ba_run",
+    "equal_mask_run",
+    "complete_result_equal",
+    "canonical_bytes_equal",
+    "classification_equal",
+    "normalized_owners_verified",
+    "equal_masks_complete"
+  ],
   "properties": {
-    "schema": {"const": "engine_core_abba_logs.v1"},
-    "generated_at_utc": {"type": "string"},
-    "env": {"$ref": "#/definitions/env"},
-    "runs": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "case_id",
-          "viewer_a",
-          "viewer_b",
-          "config",
-          "ab_run",
-          "ba_run",
-          "neutral_match",
-          "ordered_pair_match",
-          "ordered_bands_match",
-          "shared_traits_match",
-          "perspective_swapped"
-        ],
-        "properties": {
-          "case_id": {"type": "string"},
-          "viewer_a": {"$ref": "#/definitions/participant"},
-          "viewer_b": {"$ref": "#/definitions/participant"},
-          "config": {"$ref": "#/definitions/config"},
-          "ab_run": {"$ref": "#/definitions/core_result"},
-          "ba_run": {"$ref": "#/definitions/core_result"},
-          "neutral_match": {"type": "boolean"},
-          "ordered_pair_match": {"type": "boolean"},
-          "ordered_bands_match": {"type": "boolean"},
-          "shared_traits_match": {"type": "boolean"},
-          "perspective_swapped": {"type": "boolean"}
-        },
-        "additionalProperties": false
-      }
-    }
-  },
-  "definitions": {
-    "participant": {
-      "type": "object",
-      "required": ["person_uid", "compat_score", "band", "traits"],
-      "properties": {
-        "person_uid": {"type": "string"},
-        "compat_score": {"type": "integer"},
-        "band": {"type": "string"},
-        "traits": {"type": "array", "items": {"type": "string"}}
-      },
-      "additionalProperties": false
+    "schema": {
+      "const": "engine_core_abba_logs.v1"
     },
-    "config": {
-      "type": "object",
-      "required": ["band_priority"],
-      "properties": {
-        "band_priority": {"type": "array", "items": {"type": "string"}}
-      },
-      "additionalProperties": false
+    "generated_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
     },
-    "core_result": {
+    "fixture_kind": {
+      "const": "synthetic_complete_release_only"
+    },
+    "source_sha256": {
       "type": "object",
       "required": [
-        "viewer_id",
-        "candidate_id",
-        "neutral_score",
-        "ordered_pair",
-        "ordered_bands",
-        "shared_traits",
-        "band_alignment",
-        "perspective"
+        "engine/core/core.py",
+        "engine/magic10/composite.py",
+        "engine/magic10/signals.py",
+        "engine/magic10/calculators.py",
+        "engine/core/__init__.py",
+        "engine/magic10/__init__.py",
+        "engine/bodygraph/gates.py",
+        "engine/config/registry_loader.py",
+        "engine/serializer/canon.py",
+        "engine/stable/sercanon.py",
+        "catalog/magic10_mechanics_v1.json",
+        "schemas/magic10_result_v1.schema.json"
       ],
       "properties": {
-        "viewer_id": {"type": "string"},
-        "candidate_id": {"type": "string"},
-        "neutral_score": {"type": "integer"},
-        "ordered_pair": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 2},
-        "ordered_bands": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 2},
-        "shared_traits": {"type": "array", "items": {"type": "string"}},
-        "band_alignment": {"type": "boolean"},
-        "perspective": {
-          "type": "object",
-          "required": ["from_viewer", "from_candidate", "delta"],
-          "properties": {
-            "from_viewer": {"type": "integer"},
-            "from_candidate": {"type": "integer"},
-            "delta": {"type": "integer"}
-          },
-          "additionalProperties": false
+        "engine/core/core.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/composite.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/signals.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/calculators.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/core/__init__.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/__init__.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/bodygraph/gates.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/config/registry_loader.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/serializer/canon.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/stable/sercanon.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "catalog/magic10_mechanics_v1.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "schemas/magic10_result_v1.schema.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
         }
       },
       "additionalProperties": false
     },
     "env": {
       "type": "object",
-      "required": ["LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK"],
+      "required": [
+        "LC_ALL",
+        "LANG",
+        "TZ",
+        "SAFE_MODE",
+        "ALLOW_NETWORK"
+      ],
       "properties": {
-        "LC_ALL": {"type": "string"},
-        "LANG": {"type": "string"},
-        "TZ": {"type": "string"},
-        "SAFE_MODE": {"type": "string"},
-        "ALLOW_NETWORK": {"type": "string"}
+        "LC_ALL": {
+          "const": "C"
+        },
+        "LANG": {
+          "const": "C"
+        },
+        "TZ": {
+          "const": "UTC"
+        },
+        "SAFE_MODE": {
+          "const": "1"
+        },
+        "ALLOW_NETWORK": {
+          "const": "0"
+        }
       },
       "additionalProperties": false
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "member_a_mask_hex",
+        "member_b_mask_hex",
+        "config_id",
+        "release_id"
+      ],
+      "properties": {
+        "member_a_mask_hex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "member_b_mask_hex": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "config_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      },
+      "additionalProperties": false
+    },
+    "ab_run": {
+      "$ref": "schemas/magic10_result_v1.schema.json"
+    },
+    "ba_run": {
+      "$ref": "schemas/magic10_result_v1.schema.json"
+    },
+    "equal_mask_run": {
+      "$ref": "schemas/magic10_result_v1.schema.json"
+    },
+    "complete_result_equal": {
+      "type": "boolean",
+      "const": true
+    },
+    "canonical_bytes_equal": {
+      "type": "boolean",
+      "const": true
+    },
+    "classification_equal": {
+      "type": "boolean",
+      "const": true
+    },
+    "normalized_owners_verified": {
+      "type": "boolean",
+      "const": true
+    },
+    "equal_masks_complete": {
+      "type": "boolean",
+      "const": true
     }
   },
   "additionalProperties": false

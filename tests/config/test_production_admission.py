@@ -252,7 +252,9 @@ def test_capture_refuses_an_unapproved_extension(release_root: Path) -> None:
 
 def test_manifest_hash_and_size_bind_exact_unmodified_bytes(release_root: Path) -> None:
     target = release_root / "engine/magic10/signals.py"
-    target.write_bytes(target.read_bytes().replace(b"placeholder", b"replacement"))
+    raw = target.read_bytes()
+    # Corrupt exactly one byte without depending on the former PR03 placeholder.
+    target.write_bytes(bytes([raw[0] ^ 1]) + raw[1:])
     _expect_code(release_root, "MANIFEST_MEMBER_HASH_MISMATCH")
 
     write_synthetic_release_manifest(release_root)

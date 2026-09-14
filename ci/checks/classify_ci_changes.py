@@ -300,6 +300,30 @@ _HTTP_READER_LITERAL_REFERENCE_TEST_OWNERS = {
     "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
 }
 _PRODUCT_TEST_OWNER_PATHS = {
+    "engine/core/core.py": (
+        "tests/core/test_engine_core_purity.py",
+        "tests/core/test_engine_core_abba.py",
+        "tests/core/test_engine_core_determinism.py",
+    ),
+    "engine/core/__init__.py": ("tests/core/test_engine_core_purity.py",),
+    "engine/magic10/composite.py": (
+        "tests/core/test_engine_core_determinism.py",
+        "tests/core/test_engine_core_abba.py",
+        "tests/core/test_engine_core_purity.py",
+    ),
+    "engine/magic10/signals.py": (
+        "tests/core/test_engine_core_determinism.py",
+        "tests/core/test_engine_core_purity.py",
+    ),
+    "engine/magic10/calculators.py": (
+        "tests/m10/test_thresholds_rounding.py",
+        "tests/core/test_engine_core_determinism.py",
+        "tests/core/test_engine_core_purity.py",
+    ),
+    "engine/magic10/__init__.py": (
+        "tests/m10/test_defs_order.py",
+        "tests/core/test_engine_core_purity.py",
+    ),
     "engine/bodygraph/gates.py": ("tests/bodygraph/test_gates.py",),
     "catalog/channels_v1.json": (
         "tests/config/test_registry_catalog_contract.py",
@@ -387,6 +411,9 @@ _PRODUCT_TEST_OWNER_PREFIXES = (
     ),
 )
 _EVIDENCE_GENERATOR_TEST_OWNERS = {
+    "tools/evidence/generate_engine_core_evidence.py": (
+        "tests/evidence/test_engine_core_evidence.py",
+    ),
     "tools/evidence/generate_arrays_as_sets_report.py": (
         "tests/compare/test_arrays_as_sets.py",
     ),

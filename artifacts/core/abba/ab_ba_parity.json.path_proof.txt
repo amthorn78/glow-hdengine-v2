@@ -1,5 +1,5 @@
 path: artifacts/core/abba/ab_ba_parity.json
-size_bytes: 1141
-sha256: 6aff11545aaf76d2d917afe88ffc8ca1f0e2d8e36c868084491802a041e75455
+size_bytes: 6431
+sha256: c9667229c56810f25fc58eae1a08ce1c29e6e5f20501914e86dd24ef66fdbd72
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

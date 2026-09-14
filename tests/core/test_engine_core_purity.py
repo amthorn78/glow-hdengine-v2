@@ -1,48 +1,85 @@
 from __future__ import annotations
 
 import ast
-import importlib
+import inspect
+import os
 from pathlib import Path
+import subprocess
+import sys
 
-from engine.runtime.determinism_env import ensure_determinism_env
+import pytest
 
-CORE_MODULE = "engine.core.core"
-CORE_PATH = Path(__file__).resolve().parents[2] / "engine" / "core" / "core.py"
-FORBIDDEN_ROOT_IMPORTS = {
-    "os",
-    "time",
-    "datetime",
-    "random",
-    "socket",
-    "subprocess",
-}
-FORBIDDEN_TEXT_SNIPPETS = (
-    "os.environ",
-    "time.",
-    "datetime.",
-    "random.",
-    "socket.",
+from engine import core
+from engine.core import compute_core
+
+ROOT = Path(__file__).resolve().parents[2]
+PURE_PATHS = (
+    "engine/core/core.py", "engine/magic10/composite.py",
+    "engine/magic10/signals.py", "engine/magic10/calculators.py",
 )
+FORBIDDEN_ROOTS = {
+    "os", "time", "datetime", "random", "secrets", "uuid", "socket", "subprocess",
+    "pathlib", "io", "json", "decimal", "requests", "urllib", "http", "locale",
+    "sqlite3", "psycopg", "redis", "importlib",
+}
+FORBIDDEN_CALLS = {"open", "eval", "exec", "compile", "__import__", "getenv", "read_text", "read_bytes", "write_text", "write_bytes"}
+TYPE_IMPORTS = {
+    "ADMITTED_RELEASE_ROSTER", "AdmittedMechanicsBundle", "Channel", "Gate",
+    "Magic10Caps", "Magic10Seed", "Manifest", "ManifestEntry", "RegistryConfig",
+    "SourceIdentity", "FROZEN_CHANNEL_IDS",
+}
 
 
-def test_engine_core_avoids_forbidden_imports() -> None:
-    tree = ast.parse(CORE_PATH.read_text())
-
+@pytest.mark.parametrize("path", PURE_PATHS)
+def test_all_pure_modules_have_no_forbidden_dependency_or_call(path):
+    tree = ast.parse((ROOT / path).read_text())
     for node in ast.walk(tree):
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            for alias in node.names:
-                root = alias.name.split(".")[0]
-                assert root not in FORBIDDEN_ROOT_IMPORTS
+        if isinstance(node, ast.Import):
+            assert all(a.name.split(".")[0] not in FORBIDDEN_ROOTS for a in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            assert (node.module or "").split(".")[0] not in FORBIDDEN_ROOTS
+            assert not any(part in (node.module or "").split(".") for part in (
+                "compat", "cli", "http", "cache", "narratives", "db", "vendor", "runtime",
+            ))
+            if node.module == "engine.config.registry_loader":
+                assert {a.name for a in node.names} <= TYPE_IMPORTS
+        elif isinstance(node, ast.Call):
+            name = node.func.id if isinstance(node.func, ast.Name) else (
+                node.func.attr if isinstance(node.func, ast.Attribute) else ""
+            )
+            assert name not in FORBIDDEN_CALLS
 
 
-def test_engine_core_text_is_pure_compute() -> None:
-    text = CORE_PATH.read_text()
-    for snippet in FORBIDDEN_TEXT_SNIPPETS:
-        assert snippet not in text
+def test_fresh_pure_import_and_compute_have_no_external_side_effects(tmp_path):
+    script = r'''
+import builtins, importlib, os, pathlib, random, socket, subprocess, time, uuid
+from tempfile import TemporaryDirectory
+from engine.bodygraph.gates import normalize_gates
+from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
+from engine.serializer.canon import sercanon
+from tests.config.helpers import synthetic_complete_release_root
+with TemporaryDirectory() as tmp:
+    bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(pathlib.Path(tmp)))
+    a, b = normalize_gates([1, 8]), normalize_gates([1, 64])
+    def forbidden(*args, **kwargs):
+        raise AssertionError("external side effect")
+    from unittest.mock import patch
+    with patch.object(builtins, "open", forbidden), patch.object(pathlib.Path, "read_text", forbidden), patch.object(pathlib.Path, "read_bytes", forbidden), patch.object(pathlib.Path, "write_text", forbidden), patch.object(pathlib.Path, "write_bytes", forbidden), patch.object(os, "getenv", forbidden), patch.object(os._Environ, "__getitem__", forbidden), patch.object(os._Environ, "__setitem__", forbidden), patch.object(time, "time", forbidden), patch.object(time, "monotonic", forbidden), patch.object(random, "random", forbidden), patch.object(uuid, "uuid4", forbidden), patch.object(socket, "socket", forbidden), patch.object(subprocess, "Popen", forbidden):
+        from engine.core import compute_core
+        result = compute_core(a, b, bundle, bundle.release_id)
+        assert len(result.signals) == 20 and len(result.categories) == 10
+        assert sercanon(result.to_payload())
+'''
+    env = dict(os.environ, PYTHONPATH=str(ROOT), PYTHONDONTWRITEBYTECODE="1")
+    result = subprocess.run([sys.executable, "-c", script], cwd=ROOT, env=env, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
 
 
-def test_engine_core_import_has_no_side_effects() -> None:
-    ensure_determinism_env(apply=True)
-    importlib.invalidate_caches()
-    module = importlib.import_module(CORE_MODULE)
-    importlib.reload(module)
+def test_retired_surface_and_legacy_signature_refuse():
+    for name in ("CoreConfig", "ParticipantState", "PerspectiveBreakdown"):
+        assert not hasattr(core, name)
+    assert tuple(inspect.signature(compute_core).parameters) == ("member_a", "member_b", "mechanics_bundle", "release_id")
+    with pytest.raises(TypeError):
+        compute_core({"compat_score": 50}, {"compat_score": 80}, {})
+    with pytest.raises(TypeError):
+        compute_core({}, {}, {}, "", config={})

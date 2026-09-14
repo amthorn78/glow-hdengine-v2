@@ -1,36 +1,198 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Engine Core purity report v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "engine_core_purity_report.v1",
   "type": "object",
-  "required": ["schema", "generated_at_utc", "module", "checks", "env"],
+  "required": [
+    "schema",
+    "generated_at_utc",
+    "fixture_kind",
+    "source_sha256",
+    "env",
+    "modules",
+    "behavioral_guard_passed",
+    "behavioral_guard_exit_code"
+  ],
   "properties": {
-    "schema": {"const": "engine_core_purity_report.v1"},
-    "generated_at_utc": {"type": "string"},
-    "module": {"type": "string"},
-    "checks": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["check_id", "status", "details"],
-        "properties": {
-          "check_id": {"type": "string"},
-          "status": {"enum": ["pass", "fail"]},
-          "details": {"type": "object"}
+    "schema": {
+      "const": "engine_core_purity_report.v1"
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "fixture_kind": {
+      "const": "synthetic_complete_release_only"
+    },
+    "source_sha256": {
+      "type": "object",
+      "required": [
+        "engine/core/core.py",
+        "engine/magic10/composite.py",
+        "engine/magic10/signals.py",
+        "engine/magic10/calculators.py",
+        "engine/core/__init__.py",
+        "engine/magic10/__init__.py",
+        "engine/bodygraph/gates.py",
+        "engine/config/registry_loader.py",
+        "engine/serializer/canon.py",
+        "engine/stable/sercanon.py",
+        "catalog/magic10_mechanics_v1.json",
+        "schemas/magic10_result_v1.schema.json"
+      ],
+      "properties": {
+        "engine/core/core.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
         },
-        "additionalProperties": false
-      }
+        "engine/magic10/composite.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/signals.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/calculators.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/core/__init__.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/magic10/__init__.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/bodygraph/gates.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/config/registry_loader.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/serializer/canon.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "engine/stable/sercanon.py": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "catalog/magic10_mechanics_v1.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        },
+        "schemas/magic10_result_v1.schema.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      },
+      "additionalProperties": false
     },
     "env": {
       "type": "object",
-      "required": ["LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK"],
+      "required": [
+        "LC_ALL",
+        "LANG",
+        "TZ",
+        "SAFE_MODE",
+        "ALLOW_NETWORK"
+      ],
       "properties": {
-        "LC_ALL": {"type": "string"},
-        "LANG": {"type": "string"},
-        "TZ": {"type": "string"},
-        "SAFE_MODE": {"type": "string"},
-        "ALLOW_NETWORK": {"type": "string"}
+        "LC_ALL": {
+          "const": "C"
+        },
+        "LANG": {
+          "const": "C"
+        },
+        "TZ": {
+          "const": "UTC"
+        },
+        "SAFE_MODE": {
+          "const": "1"
+        },
+        "ALLOW_NETWORK": {
+          "const": "0"
+        }
       },
       "additionalProperties": false
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "module",
+          "forbidden_imports",
+          "forbidden_calls",
+          "passed"
+        ],
+        "properties": {
+          "module": {
+            "enum": [
+              "engine/core/core.py",
+              "engine/magic10/composite.py",
+              "engine/magic10/signals.py",
+              "engine/magic10/calculators.py"
+            ]
+          },
+          "forbidden_imports": {
+            "type": "array",
+            "maxItems": 0,
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_calls": {
+            "type": "array",
+            "maxItems": 0,
+            "items": {
+              "type": "string"
+            }
+          },
+          "passed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    },
+    "behavioral_guard_passed": {
+      "type": "boolean",
+      "const": true
+    },
+    "behavioral_guard_exit_code": {
+      "const": 0
     }
   },
   "additionalProperties": false

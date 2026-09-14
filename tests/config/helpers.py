@@ -48,8 +48,6 @@ def catalog_root(tmp_path: Path, *, source_root: Path | None = None) -> Path:
 
 
 _SYNTHETIC_PLACEHOLDERS = {
-    "engine/magic10/composite.py": b'"""Synthetic nonfunctional future-owner placeholder."""\n',
-    "engine/magic10/signals.py": b'"""Synthetic nonfunctional future-owner placeholder."""\n',
     "tools/bodygraph/check_magic10_gate_readiness.py": (
         b'"""Synthetic nonfunctional future-owner placeholder."""\n'
     ),

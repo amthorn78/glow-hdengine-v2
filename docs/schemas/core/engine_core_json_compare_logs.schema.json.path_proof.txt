@@ -1,5 +1,5 @@
 path: docs/schemas/core/engine_core_json_compare_logs.schema.json
-size_bytes: 3343
-sha256: 165aa1d1e59ffe46db7ed57a1a1022a6c2f58294f52e13298d2d43954cff1d34
+size_bytes: 5220
+sha256: 025faef8d810339409de5e85c1ab9694fcfd4aa106d7da9fae35ac0b2427533e
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z
