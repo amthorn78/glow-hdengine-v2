@@ -52,20 +52,52 @@ def test_all_pure_modules_have_no_forbidden_dependency_or_call(path):
 
 def test_fresh_pure_import_and_compute_have_no_external_side_effects(tmp_path):
     script = r'''
-import builtins, importlib, os, pathlib, random, socket, subprocess, time, uuid
+import builtins, importlib, os, pathlib, random, socket, subprocess, sys, time, uuid
+from contextlib import ExitStack
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 from engine.bodygraph.gates import normalize_gates
 from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
 from engine.serializer.canon import sercanon
 from tests.config.helpers import synthetic_complete_release_root
+def forbidden(*args, **kwargs):
+    raise AssertionError("external side effect")
+def no_external_effects():
+    guards = ExitStack()
+    for owner, name in (
+        (builtins, "open"), (pathlib.Path, "read_text"), (pathlib.Path, "read_bytes"),
+        (pathlib.Path, "write_text"), (pathlib.Path, "write_bytes"), (os, "getenv"),
+        (os._Environ, "__getitem__"), (os._Environ, "__setitem__"),
+        (time, "time"), (time, "monotonic"), (random, "random"), (uuid, "uuid4"),
+        (socket, "socket"), (subprocess, "Popen"), (importlib, "reload"),
+    ):
+        guards.enter_context(patch.object(owner, name, forbidden))
+    return guards
+pure_names = {
+    "engine.core.core", "engine.magic10.composite", "engine.magic10.signals",
+    "engine.magic10.calculators",
+}
+assert pure_names.isdisjoint(sys.modules)
+captured = []
+original_frame = sys._getframe
+def observe_frame(depth=0):
+    frame = original_frame(depth + 1)
+    if depth == 0 and frame.f_code.co_name == "<module>" and frame.f_globals.get("__name__") in pure_names:
+        captured.append(frame.f_globals["__name__"])
+    return frame
+# Import must be genuinely fresh: admission now resolves the pure modules itself.
+with no_external_effects(), patch.object(sys, "_getframe", observe_frame):
+    from engine.core import compute_core
+assert set(captured) == pure_names and len(captured) == 4
 with TemporaryDirectory() as tmp:
     bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(pathlib.Path(tmp)))
     a, b = normalize_gates([1, 8]), normalize_gates([1, 64])
-    def forbidden(*args, **kwargs):
-        raise AssertionError("external side effect")
-    from unittest.mock import patch
-    with patch.object(builtins, "open", forbidden), patch.object(pathlib.Path, "read_text", forbidden), patch.object(pathlib.Path, "read_bytes", forbidden), patch.object(pathlib.Path, "write_text", forbidden), patch.object(pathlib.Path, "write_bytes", forbidden), patch.object(os, "getenv", forbidden), patch.object(os._Environ, "__getitem__", forbidden), patch.object(os._Environ, "__setitem__", forbidden), patch.object(time, "time", forbidden), patch.object(time, "monotonic", forbidden), patch.object(random, "random", forbidden), patch.object(uuid, "uuid4", forbidden), patch.object(socket, "socket", forbidden), patch.object(subprocess, "Popen", forbidden):
-        from engine.core import compute_core
+    with no_external_effects(), ExitStack() as guards:
+        for owner, name in (
+            (builtins, "compile"), (builtins, "exec"), (builtins, "eval"),
+            (builtins, "__import__"), (sys, "_getframe"),
+        ):
+            guards.enter_context(patch.object(owner, name, forbidden))
         result = compute_core(a, b, bundle, bundle.release_id)
         assert len(result.signals) == 20 and len(result.categories) == 10
         assert sercanon(result.to_payload())

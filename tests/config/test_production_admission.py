@@ -3,7 +3,11 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import os
+import py_compile
 import shutil
+import subprocess
+import sys
 from dataclasses import FrozenInstanceError, fields, is_dataclass
 from collections.abc import Mapping
 from pathlib import Path
@@ -12,6 +16,8 @@ from types import MappingProxyType
 import pytest
 
 from engine.config import registry_loader
+from engine.core import core as pure_core
+from engine.magic10 import calculators, composite, signals
 from engine.config.registry_loader import (
     ADMITTED_RELEASE_BUILT_AT_UTC,
     ADMITTED_RELEASE_ROSTER,
@@ -24,15 +30,270 @@ from engine.config.registry_loader import (
     load_active_mechanics_bundle,
 )
 from tests.config.helpers import (
+    closed_rails_env,
     synthetic_complete_release_root,
     write_canonical,
     write_synthetic_release_manifest,
 )
 
 
+MECHANICS_EXECUTION_PATHS = (
+    "engine/core/core.py", "engine/magic10/composite.py",
+    "engine/magic10/signals.py", "engine/magic10/calculators.py",
+)
+MECHANICS_OWNERS = dict(zip(MECHANICS_EXECUTION_PATHS, (pure_core, composite, signals, calculators)))
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_pr03_r02_rehashed_different_mechanics_refuse(release_root: Path, path: str) -> None:
+    source = release_root / path
+    raw = source.read_bytes()
+    if path == "engine/magic10/signals.py":
+        old = b"numerator += weight * responses[row.state]"
+        assert raw.count(old) == 1
+        changed = raw.replace(old, b"numerator -= weight * responses[row.state]")
+    else:
+        changed = raw + b"raise RuntimeError('captured mechanics must never execute')\n"
+    compile(changed, str(source), "exec")
+    source.write_bytes(changed)
+    write_synthetic_release_manifest(release_root)
+    _expect_code(release_root, "EXECUTING_SOURCE_MISMATCH")
+
+
 @pytest.fixture
 def release_root(tmp_path: Path) -> Path:
     return synthetic_complete_release_root(tmp_path)
+
+
+def test_execution_roster_preserves_four_accepted_owners_and_adds_exactly_four() -> None:
+    root, executions = registry_loader._admission_execution_provenance()
+    assert root == Path(__file__).resolve().parents[2]
+    assert tuple(path for path, _, _ in executions) == (
+        "engine/config/registry_loader.py", "engine/serializer/canon.py",
+        "engine/stable/sercanon.py", "engine/categories/registry.py",
+        *MECHANICS_EXECUTION_PATHS,
+    )
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+@pytest.mark.parametrize("defect,expected", [
+    ("missing", "EXECUTION_PROVENANCE_UNAVAILABLE"),
+    ("partial_tuple", "EXECUTION_PROVENANCE_UNAVAILABLE"),
+    ("nonmodule_code", "EXECUTION_PROVENANCE_UNAVAILABLE"),
+    ("initializing", "EXECUTION_PROVENANCE_UNAVAILABLE"),
+    ("optimization", "EXECUTION_SEMANTICS_MISMATCH"),
+    ("cache_tag", "EXECUTION_SEMANTICS_MISMATCH"),
+    ("origin", "UNSAFE_SOURCE_PATH"),
+    ("live_origin", "UNSAFE_SOURCE_PATH"),
+])
+def test_mechanics_provenance_refuses_before_admission(
+    release_root: Path, monkeypatch, path: str, defect: str, expected: str,
+) -> None:
+    owner = MECHANICS_OWNERS[path]
+    provenance = list(owner._MODULE_EXECUTION)
+    if defect == "missing":
+        value = None
+    elif defect == "partial_tuple":
+        value = tuple(provenance[:-1])
+    elif defect == "nonmodule_code":
+        provenance[0] = test_mechanics_provenance_refuses_before_admission.__code__
+        value = tuple(provenance)
+    elif defect == "optimization":
+        provenance[4] = (sys.flags.optimize + 1) % 3
+        value = tuple(provenance)
+    elif defect == "cache_tag":
+        provenance[5] = "incompatible-interpreter"
+        value = tuple(provenance)
+    elif defect == "origin":
+        provenance[3] = "relative/source.py"
+        value = tuple(provenance)
+    else:
+        value = tuple(provenance)
+        if defect == "initializing":
+            monkeypatch.setattr(owner.__spec__, "_initializing", True, raising=False)
+        else:
+            monkeypatch.setattr(owner.__spec__, "origin", str(release_root / path))
+    monkeypatch.setattr(owner, "_MODULE_EXECUTION", value)
+    _expect_code(release_root, expected)
+    # A production refusal does not take over accepted candidate APIs.
+    assert len(registry_loader.load_registry_config(release_root).gates) == 64
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_same_executable_different_bytes_preserve_math_not_release_identity(
+    release_root: Path, path: str,
+) -> None:
+    from engine.bodygraph.gates import normalize_gates
+    from engine.serializer.canon import sercanon
+
+    before = _load_active_mechanics_bundle_from_root(release_root)
+    source = release_root / path
+    source.write_bytes(source.read_bytes() + b"# Nonexecuting trailing comment.\n")
+    write_synthetic_release_manifest(release_root)
+    after = _load_active_mechanics_bundle_from_root(release_root)
+    a = normalize_gates([5, 19, 20, 34, 43, 49])
+    b = normalize_gates([9, 12, 15, 22, 23, 52])
+    old = pure_core.compute_core(a, b, before, before.release_id)
+    new = pure_core.compute_core(a, b, after, after.release_id)
+    assert old.signals == new.signals and old.categories == new.categories
+    assert old.config_id == new.config_id
+    assert old.release_id != new.release_id and old.pair_key != new.pair_key
+    assert sercanon(new.to_payload()) == sercanon(
+        pure_core.compute_core(b, a, after, after.release_id).to_payload(),
+    )
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_uncaptured_source_has_no_fallback_read(release_root: Path, monkeypatch, path: str) -> None:
+    original = registry_loader._validate_executing_admission_sources
+
+    def omit_source(capture, executions):
+        capture.sources.pop(path)
+        return original(capture, executions)
+
+    monkeypatch.setattr(registry_loader, "_validate_executing_admission_sources", omit_source)
+    _expect_code(release_root, "UNBOUND_SOURCE")
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_capture_that_parses_but_cannot_compile_refuses(release_root: Path, path: str) -> None:
+    # ast.parse accepts this module-level statement; passive compile must refuse.
+    (release_root / path).write_bytes(b"return\n")
+    write_synthetic_release_manifest(release_root)
+    _expect_code(release_root, "EXECUTION_COMPILATION_FAILED")
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_changed_after_capture_is_not_reread_or_executed(
+    release_root: Path, monkeypatch, path: str,
+) -> None:
+    original = registry_loader._read_captured_file
+    changed = False
+
+    def change_after_capture(root, relative):
+        nonlocal changed
+        result = original(root, relative)
+        if relative == path and not changed:
+            changed = True
+            (root / path).write_bytes(b"raise RuntimeError('not executed')\n")
+        return result
+
+    monkeypatch.setattr(registry_loader, "_read_captured_file", change_after_capture)
+    _expect_code(release_root, "SOURCE_CHANGED")
+    assert changed
+
+
+def _isolated_mechanics_script(root: Path, script: str, *, optimization: int = 0) -> dict:
+    # Test-only package scaffolding, not additional release-manifest members.
+    for package in ("engine", "engine/config", "engine/serializer", "engine/stable", "engine/categories"):
+        (root / package / "__init__.py").write_bytes(b"")
+    options = ["-I"] + (["-" + "O" * optimization] if optimization else [])
+    result = subprocess.run(
+        [sys.executable, *options, "-c", script, str(root)], cwd=root,
+        env=closed_rails_env(), text=True, capture_output=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stderr == ""
+    return json.loads(result.stdout)
+
+
+_MECHANICS_IMPORT_SCRIPT = """
+import json, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+sys.path.insert(0, str(root))
+"""
+_MECHANICS_ADMIT_SCRIPT = """
+try:
+    bundle = loader.load_active_mechanics_bundle()
+except loader.RegistryConfigError as exc:
+    result = {'state': 'refused', 'code': exc.code}
+else:
+    result = {'state': 'admitted', 'members': len(bundle.source_identities)}
+"""
+
+
+@pytest.mark.parametrize("first", ["loader", "core"])
+@pytest.mark.parametrize("optimization", [0, 1, 2])
+def test_mechanics_fresh_startup_and_optimization_semantics(
+    release_root: Path, first: str, optimization: int,
+) -> None:
+    script = _MECHANICS_IMPORT_SCRIPT
+    if first == "core":
+        script += "from engine.core import core\n"
+    script += "from engine.config import registry_loader as loader\n"
+    script += _MECHANICS_ADMIT_SCRIPT + "print(json.dumps(result))\n"
+    assert _isolated_mechanics_script(release_root, script, optimization=optimization) == {
+        "state": "admitted", "members": 44,
+    }
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_timestamp_valid_stale_bytecode_refuses_and_fresh_source_admits(
+    release_root: Path, path: str,
+) -> None:
+    source = release_root / path
+    raw_a = source.read_bytes() + b"\ndef _r02_behavior():\n    return 'A'\n"
+    source.write_bytes(raw_a)
+    before = source.stat()
+    cached = Path(py_compile.compile(
+        str(source), doraise=True, invalidation_mode=py_compile.PycInvalidationMode.TIMESTAMP,
+    ))
+    raw_b = raw_a.replace(b"return 'A'", b"return 'B'")
+    assert raw_a != raw_b and len(raw_a) == len(raw_b)
+    source.write_bytes(raw_b)
+    os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
+    write_synthetic_release_manifest(release_root)
+    script = _MECHANICS_IMPORT_SCRIPT + "from engine.config import registry_loader as loader\n"
+    script += _MECHANICS_ADMIT_SCRIPT
+    name = path.removesuffix(".py").replace("/", ".")
+    script += f"result['behavior'] = sys.modules[{name!r}]._r02_behavior()\nprint(json.dumps(result))\n"
+    assert _isolated_mechanics_script(release_root, script) == {
+        "state": "refused", "code": "EXECUTING_SOURCE_MISMATCH", "behavior": "A",
+    }
+    cached.unlink()
+    assert _isolated_mechanics_script(release_root, script) == {
+        "state": "admitted", "members": 44, "behavior": "B",
+    }
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_unavailable_import_frame_fails_closed_without_breaking_candidates(
+    release_root: Path, path: str,
+) -> None:
+    name = path.removesuffix(".py").replace("/", ".")
+    script = _MECHANICS_IMPORT_SCRIPT + f"""
+from engine.config import registry_loader as loader
+original_frame = sys._getframe
+def unavailable_frame(depth=0):
+    frame = original_frame(depth + 1)
+    if depth == 0 and frame.f_code.co_name == '<module>' and frame.f_globals.get('__name__') == {name!r}:
+        raise RuntimeError('frame provenance unavailable')
+    return frame
+sys._getframe = unavailable_frame
+from engine.core import core
+sys._getframe = original_frame
+assert len(loader.load_registry_config(root).gates) == 64
+"""
+    script += _MECHANICS_ADMIT_SCRIPT + "print(json.dumps(result))\n"
+    assert _isolated_mechanics_script(release_root, script) == {
+        "state": "refused", "code": "EXECUTION_PROVENANCE_UNAVAILABLE",
+    }
+
+
+@pytest.mark.parametrize("path", MECHANICS_EXECUTION_PATHS)
+def test_mechanics_origin_cannot_come_from_a_different_installation(
+    release_root: Path, monkeypatch, path: str,
+) -> None:
+    owner = MECHANICS_OWNERS[path]
+    provenance = list(owner._MODULE_EXECUTION)
+    filename = str(release_root / path)
+    provenance[0] = provenance[0].replace(co_filename=filename)
+    provenance[2] = provenance[3] = filename
+    monkeypatch.setattr(owner, "_MODULE_EXECUTION", tuple(provenance))
+    monkeypatch.setattr(owner, "__file__", filename)
+    monkeypatch.setattr(owner.__spec__, "origin", filename)
+    _expect_code(release_root, "UNSAFE_SOURCE_PATH")
 
 
 def _manifest(root: Path) -> dict:
@@ -355,6 +616,7 @@ def test_manifest_member_paths_remain_canonical(release_root: Path, unsafe: str)
 
 def test_member_leaf_and_ancestor_symlinks_are_refused(release_root: Path, tmp_path: Path) -> None:
     target = release_root / "engine/magic10/signals.py"
+    original = target.read_bytes()
     outside = tmp_path / "outside.py"
     outside.write_text("pass\n", encoding="utf-8")
     target.unlink()
@@ -362,7 +624,7 @@ def test_member_leaf_and_ancestor_symlinks_are_refused(release_root: Path, tmp_p
     _expect_code(release_root, "UNSAFE_SOURCE_PATH")
 
     target.unlink()
-    target.write_text('"""Synthetic nonfunctional future-owner placeholder."""\n', encoding="utf-8")
+    target.write_bytes(original)
     write_synthetic_release_manifest(release_root)
     token_dir = release_root / "errors/token_map"
     outside_dir = tmp_path / "outside-token-map"
@@ -392,7 +654,7 @@ def test_two_valid_roots_never_cross_read(tmp_path: Path) -> None:
     first_root = synthetic_complete_release_root(tmp_path / "first")
     second_root = synthetic_complete_release_root(tmp_path / "second")
     second_member = second_root / "engine/magic10/signals.py"
-    second_member.write_text('"""Distinct synthetic placeholder."""\n', encoding="utf-8")
+    second_member.write_bytes(second_member.read_bytes() + b"# Distinct bytes; equivalent executable.\n")
     write_synthetic_release_manifest(second_root)
 
     first = _load_active_mechanics_bundle_from_root(first_root)

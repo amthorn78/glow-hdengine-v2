@@ -1263,17 +1263,31 @@ def _capture_admitted_members(
 
 def _admission_execution_provenance(
 ) -> tuple[Path, tuple[tuple[str, CodeType, int], ...]]:
-    """Validate the four actual consumers' passive import provenance.
+    """Validate the eight actual consumers' passive import provenance.
 
     This proves neither historical imported bytes nor arbitrary in-process
     tamper resistance. It establishes safe common origin and compilation
     semantics for the bounded executable-equivalence comparison below.
     """
+    # Resolve mechanics only at admission, after this module's types exist.
+    # These are ordinary imports from the executing installation, never imports
+    # of captured release bytes. Keeping them here avoids core/type import cycles.
+    try:
+        from engine.core import core as pure_core
+        from engine.magic10 import calculators, composite, signals
+    except Exception as exc:
+        raise SchemaValidationError(
+            'EXECUTION_PROVENANCE_UNAVAILABLE', 'covered mechanics module is unavailable',
+        ) from exc
     owners = (
         ('engine/config/registry_loader.py', 'engine.config.registry_loader', globals()),
         ('engine/serializer/canon.py', 'engine.serializer.canon', canon),
         ('engine/stable/sercanon.py', 'engine.stable.sercanon', getattr(canon, 'stable_sercanon', None)),
         ('engine/categories/registry.py', 'engine.categories.registry', category_registry),
+        ('engine/core/core.py', 'engine.core.core', pure_core),
+        ('engine/magic10/composite.py', 'engine.magic10.composite', composite),
+        ('engine/magic10/signals.py', 'engine.magic10.signals', signals),
+        ('engine/magic10/calculators.py', 'engine.magic10.calculators', calculators),
     )
     root: Path | None = None
     executions: list[tuple[str, CodeType, int]] = []
@@ -1284,6 +1298,9 @@ def _admission_execution_provenance(
             namespace = owner
         else:
             raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'covered admission module is unavailable')
+        spec = namespace.get('__spec__')
+        if getattr(spec, '_initializing', False):
+            raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'covered module is partially initialized')
         provenance = namespace.get('_MODULE_EXECUTION')
         if type(provenance) is not tuple or len(provenance) != 6:
             raise SchemaValidationError('EXECUTION_PROVENANCE_UNAVAILABLE', 'module execution provenance is unavailable')
@@ -1297,7 +1314,6 @@ def _admission_execution_provenance(
             or cache_tag != _sys.implementation.cache_tag
         ):
             raise SchemaValidationError('EXECUTION_SEMANTICS_MISMATCH', 'module compilation semantics are incompatible')
-        spec = namespace.get('__spec__')
         if (
             name != expected_name or namespace.get('__name__') != expected_name
             or getattr(spec, 'name', None) != expected_name
@@ -1321,7 +1337,7 @@ def _admission_execution_provenance(
             raise SchemaValidationError('UNSAFE_SOURCE_PATH', 'covered admission modules have different roots')
         _safe_source_path(module_root, relative_path)
         executions.append((relative_path, code, optimization))
-    assert root is not None  # the fixed four-owner set is nonempty
+    assert root is not None  # the fixed eight-owner set is nonempty
     return root, tuple(executions)
 
 

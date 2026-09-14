@@ -1,6 +1,7 @@
 """Integer-only category reduction for the injected Gate kernel."""
 from __future__ import annotations
 
+import sys as _sys
 from dataclasses import dataclass
 
 
@@ -34,3 +35,13 @@ def _reduce_category(category_id, q_values, bounds, weights) -> CategoryValue:
     band = ("Cool" if score <= 24 else "Open" if score <= 49
             else "Warm" if score <= 74 else "Glow")
     return CategoryValue(category_id, score, band)
+
+
+# Passive import provenance; validation remains outside the pure mechanics.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None

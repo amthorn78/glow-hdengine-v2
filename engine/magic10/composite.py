@@ -1,6 +1,7 @@
 """Single five-state Channel classification over intrinsic Gate masks."""
 from __future__ import annotations
 
+import sys as _sys
 from dataclasses import dataclass
 
 
@@ -34,3 +35,13 @@ def _classify_channels(mask_a: int, mask_b: int, channels) -> tuple[ChannelClass
     mask_lo, mask_hi = sorted((mask_a, mask_b))
     return tuple(_classify_channel(row.id, row.gates, mask_lo, mask_hi)
                  for row in channels.values())
+
+
+# Passive import provenance; validation remains outside the pure mechanics.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None

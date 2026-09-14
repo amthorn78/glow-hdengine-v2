@@ -1,6 +1,7 @@
 """Injected integer signal operations; no catalog or calculator registry."""
 from __future__ import annotations
 
+import sys as _sys
 from dataclasses import dataclass
 
 from .composite import ChannelClassification
@@ -117,3 +118,13 @@ def _compute_signals(classified, mechanics, expected_order) -> tuple[SignalValue
     if used != set(states):
         raise ValueError("incomplete signal topology")
     return tuple(values)
+
+
+# Passive import provenance; validation remains outside the pure mechanics.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None

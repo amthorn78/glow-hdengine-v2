@@ -1,6 +1,7 @@
 """Four-argument, data-in/data-out Gate kernel (PF01 §5.2 / PF14 §6.7)."""
 from __future__ import annotations
 
+import sys as _sys
 from dataclasses import dataclass, fields
 from hashlib import sha256
 from types import MappingProxyType
@@ -235,3 +236,14 @@ def compute_core(member_a, member_b, mechanics_bundle, release_id) -> CoreResult
         return result
     except (KeyError, TypeError, AttributeError, ValueError, RecursionError):
         raise ValueError("invalid pure core contract") from None
+
+
+# Retain passive top-level execution provenance only after definitions complete.
+# Admission owns all source capture, compilation and equivalence validation.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None
