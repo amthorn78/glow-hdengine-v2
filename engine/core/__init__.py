@@ -1,17 +1,5 @@
-"""Engine Core package (DISS004)."""
+"""Pure Gate kernel and immutable result."""
 
-from .core import (
-    CoreConfig,
-    CoreResult,
-    ParticipantState,
-    PerspectiveBreakdown,
-    compute_core,
-)
+from .core import CoreResult, compute_core
 
-__all__ = [
-    "CoreConfig",
-    "CoreResult",
-    "ParticipantState",
-    "PerspectiveBreakdown",
-    "compute_core",
-]
+__all__ = ["CoreResult", "compute_core"]

@@ -1,94 +1,47 @@
-"""Magic-10 calculator registry and deterministic scoring helpers."""
+"""Integer-only category reduction for the injected Gate kernel."""
 from __future__ import annotations
 
-import json
-from decimal import Decimal, InvalidOperation
-from pathlib import Path
-from typing import Callable, Dict, Mapping, NamedTuple, Tuple
-
-from engine.categories.registry import FROZEN_MAGIC10_ORDER, register
-
-from .thresholds import band_for_score, clamp_score, round_half_up
-
-ROOT = Path(__file__).resolve().parents[2]
-_CAPS_DATA = json.loads((ROOT / "catalog" / "magic10_caps.json").read_text(encoding="utf-8"))
-_ORDER_DATA = tuple(json.loads((ROOT / "catalog" / "magic10.json").read_text(encoding="utf-8"))["order"])
-
-if _ORDER_DATA != FROZEN_MAGIC10_ORDER:
-    raise ValueError("Magic-10 order mismatch between catalog pack and registry")
-if set(_CAPS_DATA.keys()) != set(_ORDER_DATA):
-    raise ValueError("Magic-10 caps do not cover the full category order")
-
-CATEGORY_INPUTS: Dict[str, Tuple[str, ...]] = {
-    category: tuple(_CAPS_DATA[category]["inputs"]) for category in _ORDER_DATA
-}
+import sys as _sys
+from dataclasses import dataclass
 
 
-class Magic10Result(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class CategoryValue:
+    category_id: str
     score: int
     band: str
 
 
-Magic10Calculator = Callable[[Mapping[str, object]], Magic10Result]
-_CALCULATORS: Dict[str, Magic10Calculator] = {}
+def _reduce_category(category_id, q_values, bounds, weights) -> CategoryValue:
+    if type(category_id) is not str or not category_id:
+        raise ValueError("invalid category identity")
+    if type(q_values) is not tuple or len(q_values) != 2 or any(
+        type(q) is not int or not 0 <= q <= 200 for q in q_values
+    ):
+        raise ValueError("invalid category inputs")
+    if type(weights) is not tuple or len(weights) != 2 or any(
+        type(w) is not int or not 1 <= w <= 3 for w in weights
+    ):
+        raise ValueError("invalid category weights")
+    if set(bounds) != {"min", "max"} or any(type(v) is not int for v in bounds.values()):
+        raise ValueError("invalid category bounds")
+    lower, upper = bounds["min"], bounds["max"]
+    if not 0 <= lower <= upper <= 100:
+        raise ValueError("invalid category bounds")
+    capped = tuple(min(2 * upper, max(2 * lower, q)) for q in q_values)
+    total = sum(weights)
+    weighted = sum(w * q for w, q in zip(weights, capped))
+    score = min(100, max(0, (weighted + total) // (2 * total)))
+    band = ("Cool" if score <= 24 else "Open" if score <= 49
+            else "Warm" if score <= 74 else "Glow")
+    return CategoryValue(category_id, score, band)
 
 
-def _to_decimal(value: object) -> Decimal:
-    if isinstance(value, Decimal):
-        return value
-    try:
-        return Decimal(str(value))
-    except (InvalidOperation, ValueError, TypeError) as exc:
-        raise ValueError(f"Unsupported input value: {value!r}") from exc
-
-
-def _clamp_decimal(value: Decimal, lower: Decimal, upper: Decimal) -> Decimal:
-    if value < lower:
-        return lower
-    if value > upper:
-        return upper
-    return value
-
-
-def _score_for(category: str, payload: Mapping[str, object]) -> int:
-    if category not in CATEGORY_INPUTS:
-        raise ValueError(f"Unknown category id: {category}")
-    inputs = CATEGORY_INPUTS[category]
-    bounds = _CAPS_DATA[category]["bounds"]
-    lower = Decimal(bounds["min"])
-    upper = Decimal(bounds["max"])
-    values = []
-    for key in inputs:
-        if key not in payload:
-            raise ValueError(f"Missing input '{key}' for category '{category}'")
-        values.append(_clamp_decimal(_to_decimal(payload[key]), lower, upper))
-    total = sum(values, start=Decimal("0"))
-    average = total / Decimal(len(values))
-    rounded = round_half_up(average)
-    return clamp_score(rounded)
-
-
-def _make_calculator(category: str) -> Magic10Calculator:
-    def _calculator(payload: Mapping[str, object]) -> Magic10Result:
-        score = _score_for(category, payload)
-        return Magic10Result(score=score, band=band_for_score(score))
-
-    return _calculator
-
-
-for category in FROZEN_MAGIC10_ORDER:
-    calculator = _make_calculator(category)
-    _CALCULATORS[category] = calculator
-    register(category, calculator)
-
-
-def compute_category(category: str, payload: Mapping[str, object]) -> Magic10Result:
-    try:
-        calculator = _CALCULATORS[category]
-    except KeyError as exc:
-        raise ValueError(f"Unknown category id: {category}") from exc
-    return calculator(payload)
-
-
-def calculator_ids() -> Tuple[str, ...]:
-    return tuple(_CALCULATORS.keys())
+# Passive import provenance; validation remains outside the pure mechanics.
+try:
+    _MODULE_EXECUTION = (
+        _sys._getframe().f_code, __name__, __file__, __spec__.origin,
+        _sys.flags.optimize, _sys.implementation.cache_tag,
+    )
+except Exception:
+    _MODULE_EXECUTION = None

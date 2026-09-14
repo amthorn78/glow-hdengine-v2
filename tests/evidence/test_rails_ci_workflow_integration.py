@@ -1753,3 +1753,35 @@ def test_open_rails_producer_check_mode_has_no_repo_residue() -> None:
     assert open_proof.main(["--check-current"]) == 0
     state_after = _repo_state()
     assert state_before == state_after
+
+
+@pytest.mark.parametrize('source,expected', [
+    ('engine/core/core.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py'}),
+    ('engine/core/__init__.py', {'tests/core/test_engine_core_purity.py'}),
+    ('engine/magic10/composite.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_abba.py', 'tests/core/test_engine_core_determinism.py'}),
+    ('engine/magic10/signals.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py'}),
+    ('engine/magic10/calculators.py', {'tests/core/test_engine_core_purity.py', 'tests/core/test_engine_core_determinism.py', 'tests/m10/test_thresholds_rounding.py'}),
+    ('engine/magic10/__init__.py', {'tests/core/test_engine_core_purity.py', 'tests/m10/test_defs_order.py'}),
+    ('tools/evidence/generate_engine_core_evidence.py', {'tests/evidence/test_engine_core_evidence.py'}),
+])
+def test_pr03_pure_sources_have_exact_behavioral_owners(source, expected):
+    assert set(classifier.changed_test_targets(ROOT, (source,))) == expected
+
+
+def test_pr03_classifier_change_requires_all_seven_lanes():
+    result = classifier.classify_paths(('ci/checks/classify_ci_changes.py', 'engine/core/core.py',
+                                        'tools/evidence/generate_engine_core_evidence.py'))
+    assert {lane for lane in classifier.LANES if result.flags[lane]} == set(classifier.LANES)
+
+
+@pytest.mark.parametrize('source,owner,error', [
+    ('engine/core/core.py', 'tests/core/test_engine_core_determinism.py', 'CI_PRODUCT_OWNER_TEST_INVALID'),
+    ('tools/evidence/generate_engine_core_evidence.py', 'tests/evidence/test_engine_core_evidence.py', 'CI_EVIDENCE_OWNER_TEST_INVALID'),
+])
+def test_pr03_missing_owner_still_fails_closed(tmp_path, source, owner, error):
+    _materialize_test_targets(tmp_path, tuple(sorted(
+        classifier._registered_owner_test_paths() - set(classifier._FIXED_LANE_TEST_DIRECTORIES)
+    )))
+    (tmp_path / owner).unlink()
+    with pytest.raises(ValueError, match=error):
+        classifier.changed_test_targets(tmp_path, (source,))

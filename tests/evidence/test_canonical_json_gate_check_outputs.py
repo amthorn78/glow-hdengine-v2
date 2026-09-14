@@ -13,7 +13,6 @@ from engine.config.registry_loader import (
     SchemaValidationError,
     _normalize_channel_id,
 )
-from engine.magic10.calculators import CATEGORY_INPUTS
 from tools.evidence import run_canonical_json_gate
 
 
@@ -1215,8 +1214,11 @@ def test_magic10_caps_binding_rejects_coercions_and_open_entries():
         run_canonical_json_gate._validate_target(target, open_entry)
 
 
-def test_magic10_frozen_input_sentry_matches_runtime_calculators():
-    assert CATEGORY_INPUTS == FROZEN_MAGIC10_INPUTS
+def test_magic10_frozen_input_sentry_matches_admitted_caps(tmp_path):
+    from engine.config.registry_loader import _load_active_mechanics_bundle_from_root
+    from tests.config.helpers import synthetic_complete_release_root
+    bundle = _load_active_mechanics_bundle_from_root(synthetic_complete_release_root(tmp_path))
+    assert {key: caps.inputs for key, caps in bundle.registry.magic10_caps.items()} == FROZEN_MAGIC10_INPUTS
 
 
 @pytest.mark.parametrize(
