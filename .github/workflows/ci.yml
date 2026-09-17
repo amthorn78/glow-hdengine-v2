@@ -2,9 +2,15 @@ name: ci
 
 on:
   pull_request:
+    paths-ignore:
+      - 'docs/pfcanon/**'
+      - 'docs/ephemeral/**'
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/pfcanon/**'
+      - 'docs/ephemeral/**'
 
 permissions:
   contents: read
