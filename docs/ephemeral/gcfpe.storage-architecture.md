@@ -148,11 +148,19 @@ closes it — which is why the prompts name a destination class and nothing more
 
 ## Consequence for the two-pass execution model
 
-The batch ledgers now live in `docs/ephemeral/`, which a chat session cannot
-write. Pass 1 therefore drafts both ledgers and hands them to Pass 2, which
-commits them in the batch's single pull request; if Pass 1 itself runs in Claude
-Code it commits them directly. This is a mechanical consequence of the storage
-change, not an authority change, and Nathan may direct otherwise.
+Both passes run in Claude Code. Nathan does not use chat sessions, so the §6A
+seam is a context budget rather than a capability boundary — Pass 1 is many
+small targeted reads and writes against individual prompt pages in Notion, Pass
+2 is whole-batch reconciliation, and running both in one session is what
+exhausted Batch 2.
+
+Pass 1 writes its own ledgers under `docs/ephemeral/`, opens the batch branch
+and the pull request, and there is no ledger handoff between passes. Pass 2
+commits onto the same branch and the same pull request. One branch, one PR, one
+verdict per batch.
+
+The graph is no longer a driver of the split either: it is held as parts in
+`docs/graph/parts/` and rebuilt by script, so no pass loads a 570 KB file.
 
 ## Open items this closes
 
