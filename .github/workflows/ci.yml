@@ -5,12 +5,14 @@ on:
     paths-ignore:
       - 'docs/pfcanon/**'
       - 'docs/ephemeral/**'
+      - 'docs/graph/**'
   push:
     branches:
       - main
     paths-ignore:
       - 'docs/pfcanon/**'
       - 'docs/ephemeral/**'
+      - 'docs/graph/**'
 
 permissions:
   contents: read
