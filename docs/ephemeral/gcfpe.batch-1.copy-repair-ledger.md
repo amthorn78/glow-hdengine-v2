@@ -2,8 +2,12 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_COPY_REPAIR_LEDGER
-artifact_version: "4.0"
+artifact_version: "5.0"
 ledger_date: 2026-09-17
+calibration_date: 2026-09-17
+calibrated_against: "PF10 addendum 2.14 as corrected; storage survey instrument v1.1; commit 565b4a7d65561432db120d1affff6b68254311b5"
+canon_resolved: "PF10-HDE-Build-Notes-v13.2.9.md, read 2026-09-17 — the exact version resolved, recorded as provenance under PF04 §9.1.2/§9.1.4, not as a routing pin"
+prompts_edited_after_calibration: 0
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
 contract_ledger: docs/ephemeral/gcfpe.batch-1.contract-ledger.md
@@ -137,7 +141,14 @@ for the class word:
 > failed predicate and recovery owner rather than authoring against a guess.
 
 **Kickoff preparers** (`CF-C-10`, `CF-E-10`) — the field list is retained and the
-permission is stated rather than assumed:
+permission is stated rather than assumed. The permission is **bounded**: under the
+corrected 2.14 a kickoff takes content authority from PF04 §9.1.1 and only its
+structure from the prompt, and §9.1.1 gives it no Specification, no Implementation
+Plan, no work-unit structure and no mutation authorization. Both field lists were
+re-tested against that boundary on 2026-09-17 and neither reaches any of the four;
+the test is recorded in the contract ledger at `B1-SFA-05` / `B1-SFA-06`. Both
+bodies state the same bound themselves — *"The kickoff is not a Specification,
+approval, implementation plan, QA plan, or PF10 artifact."*
 
 > The kickoff is transient scaffolding between two stages and does not become a
 > permanent governed record, so this prompt states its format and it carries no
@@ -174,6 +185,19 @@ the drain they resolve. No artifact was produced in that window.
 Product Owner direction: addenda are 100% paste-ready; assume he is pasting them
 when drafted; from the next turn assume the addendum is already in PF10; never
 pin a PF document version; **an agent may not litigate a Product Owner action.**
+
+> **Scope of "never pin", clarified 2026-09-17 — the direction is unchanged.** The
+> corrected 2.14 reference posture is *"a routing rule, not a records rule"*.
+> Applied here it means: the addendum carries no pinned PF version and cites PF
+> documents by canonical name and section, exactly as the `-30` bodies now say,
+> because an addendum becomes a PF10 section and its purpose is to route a reader
+> to current canon. It does **not** mean a copy/repair ledger, a report or a run
+> artifact strips the exact version it actually read; PF04 §9.1.2 and §9.1.4
+> require those to retain it, and 2.14 now says so. The `-30` wording was
+> re-verified against the rescoped rule and is conformant on both counts: it does
+> not forbid naming — *"cite PF documents by name and section only"* requires the
+> naming the rule expects — and it is scoped to the addendum body, so it does not
+> reach either prompt's own returns or records.
 
 | # | Prompt | Pass-3 change | Finding IDs | Disposition | Readback |
 |---|---|---|---|---|---|
