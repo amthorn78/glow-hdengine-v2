@@ -1,0 +1,256 @@
+{
+  "edge_indices": [
+    107,
+    108,
+    109,
+    110,
+    111,
+    112
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_INCOMPLETE"
+          ],
+          "branch_id": "seed_incomplete_terminal",
+          "condition": "the answer is missing, stale, contradictory, wrong-authority or unusably partial, or lacks a real receiver prerequisite. Preserve the exact conflict and owner and return evidence to the actual answer/base owner with no synthetic runnable successor.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_INCOMPLETE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "SEED_INCOMPLETE"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_READY"
+          ],
+          "branch_id": "seed_incomplete_audit",
+          "condition": "the validated answer applies to an incomplete IA-10 Audit",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SEED_READY"
+      ],
+      "to": "IA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_READY"
+          ],
+          "branch_id": "seed_paused_plan",
+          "condition": "the Audit is complete and the answer applies to a paused initial Plan",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SEED_READY"
+      ],
+      "to": "IA-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_READY"
+          ],
+          "branch_id": "seed_plan_review",
+          "condition": "the initial Plan review is paused on the question, or an approved-base source-backed factual finding or actual authorized material-change request exists and no pending delta exists. Supply the pending Plan for REVIEW_MODE=INITIAL_PLAN_REVIEW, or the immutable approved Plan/review plus APPROVED_BASE_FINDING_OR_REQUEST for REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT. Never fabricate a pending delta or review ID.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SEED_READY"
+      ],
+      "to": "IA-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_READY"
+          ],
+          "branch_id": "seed_preapproval_or_delta_correction",
+          "condition": "a pending preapproval Plan correction, or pending approved-base Plan-delta authoring or revision, already has exact IA-30 redlines. Return to the same IA author with the exact target, redlines, answer/seed and reviewer return.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SEED_READY"
+      ],
+      "to": "IA-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-50",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SEED_READY"
+          ],
+          "branch_id": "duplicate_existing_continuation",
+          "condition": "the answer was already applied and its exact valid successor/result resolves. Report SEED_READY with application_disposition: REUSE_EXISTING and reuse that successor; create no second seed or successor.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-50.md",
+            "section": "Required result and routing"
+          },
+          "state": "SEED_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SEED_READY"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "IA-50",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "IA-50",
+    "lane": "IA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute IA Answer Seeder for the exact supplied change.",
+    "output_artifacts": [
+      "IA_RECOVERY_SEED"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8107a012f68e6b8fd98c",
+      "release": "GCFPE-20260913.1",
+      "title": "IA-50 — IA Answer Seeder — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8107a012f68e6b8fd98c",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "IA-10",
+      "IA-20",
+      "IA-30",
+      "IA-40",
+      "ESC-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Act as the IA Answer Seeder, a bounded resolution assistant.",
+    "result_states": [
+      "SEED_READY",
+      "SEED_INCOMPLETE"
+    ],
+    "sequence": 50,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "IA-50 — IA Answer Seeder — 091426.1"
+  },
+  "state_route_order": [
+    "seed_incomplete_audit",
+    "seed_paused_plan",
+    "seed_plan_review",
+    "seed_preapproval_or_delta_correction",
+    "duplicate_existing_continuation",
+    "seed_incomplete_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "IA-50_APPLICATION_DISPOSITION": [
+      "APPLY",
+      "REUSE_EXISTING"
+    ]
+  }
+}

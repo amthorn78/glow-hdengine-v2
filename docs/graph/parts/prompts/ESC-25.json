@@ -1,0 +1,150 @@
+{
+  "edge_indices": [
+    77,
+    78
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-25",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "complete",
+          "condition": "complete discovery result returns to continuing Thoth",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-25.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PARTIAL"
+          ],
+          "branch_id": "partial",
+          "condition": "usable partial discovery result returns to continuing Thoth",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-25.md",
+            "section": "Required result and routing"
+          },
+          "state": "PARTIAL",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked_evidence_return",
+          "condition": "a discovery fact is inaccessible but exact task, evidence/limitations and complete same-Thoth return package are known",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-25.md",
+            "section": "Result routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED"
+      ],
+      "to": "ESC-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-25",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked_terminal",
+          "condition": "the exact discovery task/return owner or complete lawful return package cannot be established",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-25.md",
+            "section": "Result routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "ESC-25",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "ESC-25",
+    "lane": "ESC",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Execute Bounded Escalation Discovery for the exact supplied change.",
+    "output_artifacts": [
+      "DISCOVERY_RESULT"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81e09ff9c34bda83e49e",
+      "release": "GCFPE-20260913.1",
+      "title": "ESC-25 — Execute Bounded Escalation Discovery — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81e09ff9c34bda83e49e",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "ESC-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the explicitly named read-only repository reviewer or authorized environment operator.",
+    "result_states": [
+      "COMPLETE",
+      "PARTIAL",
+      "BLOCKED"
+    ],
+    "sequence": 25,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "ESC-25 — Execute Bounded Escalation Discovery — 091426.1"
+  },
+  "state_route_order": [
+    "complete",
+    "partial",
+    "blocked_evidence_return",
+    "blocked_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

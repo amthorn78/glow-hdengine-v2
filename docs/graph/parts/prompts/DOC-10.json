@@ -1,0 +1,193 @@
+{
+  "edge_indices": [
+    65,
+    66,
+    67,
+    68
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "repairable_instruction_defect",
+          "condition": "instruction defect is repairable in the same IA session from a saved checkpoint",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "DOC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "instruction_terminal",
+          "condition": "product-intent, source, authority, or unrecoverable evidence blocker",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INSTRUCTION_READY"
+          ],
+          "branch_id": "instruction_ready",
+          "condition": "complete documentation PR instruction is ready for detailed planning",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "INSTRUCTION_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INSTRUCTION_READY"
+      ],
+      "to": "PR-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "material_boundary",
+          "condition": "repository evidence proves a complete bounded material boundary",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "DOC-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "DOC-10",
+    "lane": "DOC",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Final Repository Documentation PR Instructions for the exact supplied change.",
+    "output_artifacts": [
+      "PR_INSTRUCTION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81e5b888c8c780244d0c",
+      "release": "GCFPE-20260913.1",
+      "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81e5b888c8c780244d0c",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "PR-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same whole-change Implementation Agent (IA).",
+    "result_states": [
+      "INSTRUCTION_READY",
+      "DRAFT",
+      "PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 10,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "DOC-10 — Create Final Repository Documentation PR Instructions — 091426.1"
+  },
+  "state_route_order": [
+    "instruction_ready",
+    "material_boundary",
+    "repairable_instruction_defect",
+    "instruction_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

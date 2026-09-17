@@ -1,0 +1,169 @@
+{
+  "edge_indices": [
+    42,
+    43,
+    44,
+    45
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "scan_terminal",
+          "condition": "a true source/authority/manual-owner stop has no runnable selected receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_same_task",
+          "condition": "resume the same CL-40 task after the exact missing bounded condition is resolved",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE"
+      ],
+      "to": "CL-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "complete",
+          "condition": "true end-cycle terminal",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "selected_native_boundary",
+          "condition": "a selected post-closure, evidence, scope, acceptance, or recovery branch has an exact native owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    }
+  ],
+  "id": "CL-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CL-40",
+    "lane": "CL",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Scan for PF09 Gaps and CRD Candidates for the exact supplied change.",
+    "output_artifacts": [
+      "CYCLE_GAP_SCAN"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb815ba2e2fb45ba7d056f",
+      "release": "GCFPE-20260913.1",
+      "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb815ba2e2fb45ba7d056f",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same continuing Isis Lead Developer for the exact closed Epic or CRD change.",
+    "result_states": [
+      "COMPLETE",
+      "INCOMPLETE"
+    ],
+    "sequence": 40,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CL-40 — Scan for PF09 Gaps and CRD Candidates — 091426.1"
+  },
+  "state_route_order": [
+    "complete",
+    "incomplete_same_task",
+    "selected_native_boundary",
+    "scan_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

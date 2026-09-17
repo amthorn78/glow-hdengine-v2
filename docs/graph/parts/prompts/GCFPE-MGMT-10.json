@@ -1,0 +1,186 @@
+{
+  "edge_indices": [
+    85,
+    86,
+    87
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "GCFPE-MGMT-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ECOSYSTEM_CHANGE_COMPLETE"
+          ],
+          "branch_id": "maintenance_complete_terminal",
+          "condition": "scoped maintenance complete; no exact further substantive invocation is both authorized and ready; return the saved/read-back GCFPE_ECOSYSTEM_CHANGE_REPORT to Nathan",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "ECOSYSTEM_CHANGE_COMPLETE",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "IMPLEMENTATION_BLOCKED"
+          ],
+          "branch_id": "implementation_blocked",
+          "condition": "real blocker; preserve a read-back recovery checkpoint and return to Nathan",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "IMPLEMENTATION_BLOCKED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "PROMOTION_CHECKPOINT_REQUIRED"
+          ],
+          "branch_id": "promotion_checkpoint_required",
+          "condition": "exact-snapshot promotion approval or a required active control-layer checkpoint is outstanding; return the fully specified imminent transaction without treating general repair authorization as promotion approval",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "PROMOTION_CHECKPOINT_REQUIRED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "ECOSYSTEM_CHANGE_COMPLETE",
+        "IMPLEMENTATION_BLOCKED",
+        "PROMOTION_CHECKPOINT_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "GCFPE-MGMT-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ECOSYSTEM_CHANGE_COMPLETE"
+          ],
+          "branch_id": "maintenance_complete_native_return",
+          "condition": "scoped maintenance complete and the exact case separately authorizes one ready native continuation; resolve the actual selected receiver and preserve original authority, session and inputs; exclude PR-50, merge, PF10 drain, unselected candidates and unauthorized Alpha; emit one complete handoff without executing it",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Result routing"
+          },
+          "state": "ECOSYSTEM_CHANGE_COMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ECOSYSTEM_CHANGE_COMPLETE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "GCFPE-MGMT-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION"
+          ],
+          "branch_id": "ready_for_product_owner_alpha_resumption_decision",
+          "condition": "separately authorized EPIC040 Alpha-preparation branch only, after exact approved promotion, complete production readback/validation and intact archival; exactly one saved/read-back PR-10 invocation for HDE-EPIC040-PR04, for Nathan to review and manually invoke; does not execute Alpha",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/GCFPE-MGMT-10.md",
+            "section": "Separate EPIC040 Alpha preparation branch and Result routing"
+          },
+          "state": "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "GCFPE-MGMT-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "GCFPE-MGMT-10",
+    "lane": "GCFPE-MGMT",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Manage an Ecosystem Change for the exact supplied change.",
+    "output_artifacts": [
+      "GCFPE_ECOSYSTEM_CHANGE_REPORT"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81ac80e6d886a25aa026",
+      "release": "GCFPE-20260913.1",
+      "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81ac80e6d886a25aa026",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "ORIGINAL_NATIVE_STAGE",
+      "PR-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Act as the Managing Prompt Engineer for one requested GCFPE change.",
+    "result_states": [
+      "ECOSYSTEM_CHANGE_COMPLETE",
+      "READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION",
+      "IMPLEMENTATION_BLOCKED",
+      "PROMOTION_CHECKPOINT_REQUIRED"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1"
+  },
+  "state_route_order": [
+    "maintenance_complete_terminal",
+    "maintenance_complete_native_return",
+    "ready_for_product_owner_alpha_resumption_decision",
+    "implementation_blocked",
+    "promotion_checkpoint_required"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

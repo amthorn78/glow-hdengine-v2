@@ -1,0 +1,285 @@
+{
+  "edge_indices": [
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "crd_entry",
+          "condition": "new cycle entry has an exact CRD classification and complete intake",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "CF-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "epic_entry",
+          "condition": "new cycle entry has an exact Epic classification and complete intake",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "CF-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "class_selection",
+          "condition": "new cycle entry has no Product Owner class-decision evidence, or has exact evidence whose selection record is missing; CF-PO-10 receives the unresolved or evidenced-recording case and never chooses the class",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "CF-PO-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "final_scan",
+          "condition": "closure and all selected post-closure work are disposed and the final scan is next",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "CL-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "TERMINAL_RETURN"
+          ],
+          "branch_id": "terminal_return",
+          "condition": "true completed-cycle or Product Owner terminal return",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "TERMINAL_RETURN",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "TERMINAL_RETURN"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "other_native_stage",
+          "condition": "another exact selected native stage is the evidenced next unmet contract; the dynamic boundary resolves one prompt at runtime",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "MGR-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "FLOW_PROGRESS"
+          ],
+          "branch_id": "pre_qa",
+          "condition": "the exact next unmet contract is integrated pre-QA audit/triage/readiness",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/MGR-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "FLOW_PROGRESS",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "FLOW_PROGRESS"
+      ],
+      "to": "QA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "MGR-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "MGR-10",
+    "lane": "MGR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Coordinate the Complete Change Flow within Current Authority for the exact supplied change.",
+    "output_artifacts": [
+      "FLOW_PROGRESS"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81c585d2f70e28f1c2bf",
+      "release": "GCFPE-20260913.1",
+      "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81c585d2f70e28f1c2bf",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CF-PO-10",
+      "CF-E-10",
+      "CF-C-10",
+      "QA-10",
+      "CL-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the Change Flow coordinator, without taking over any substantive actor or approval.",
+    "result_states": [
+      "FLOW_PROGRESS",
+      "TERMINAL_RETURN"
+    ],
+    "sequence": 10,
+    "session_class": "ORCHESTRATOR_RUN",
+    "title": "MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091426.1"
+  },
+  "state_route_order": [
+    "class_selection",
+    "epic_entry",
+    "crd_entry",
+    "pre_qa",
+    "final_scan",
+    "other_native_stage",
+    "terminal_return"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

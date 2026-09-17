@@ -1,0 +1,309 @@
+{
+  "edge_indices": [
+    99,
+    100,
+    101,
+    102,
+    103
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CHANGE_NOT_SUBSTANTIATED"
+          ],
+          "branch_id": "change_not_substantiated",
+          "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the finding is unsupported or no change is required. Preserve the approved base, create no delta or addendum, and return terminally to the actual owner.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "CHANGE_NOT_SUBSTANTIATED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "WRONG_NATIVE_LANE"
+          ],
+          "branch_id": "wrong_native_lane",
+          "condition": "the matter is truly PR rescope, remediation or another lane. Preserve the evidence and return terminally to the actual supplied origin owner without inventing or executing that lane.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "WRONG_NATIVE_LANE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "CHANGE_NOT_SUBSTANTIATED",
+        "WRONG_NATIVE_LANE"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INITIAL_DENY"
+          ],
+          "branch_id": "initial_deny",
+          "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW; exact itemized redlines return to the same IA author for AUTHORING_MODE=PREAPPROVAL_PLAN_REVISION; zero PF10 addenda.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "INITIAL_DENY",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PLAN_DELTA_REDLINE"
+          ],
+          "branch_id": "approved_base_plan_delta_redline",
+          "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; the source-backed factual finding or actual authorized material-change request is justified and no unresolved Product Owner choice remains. Issue the exact PLAN_DELTA_REDLINE with affected Plan anchors, bounded required overlay, effects, exclusions, evidence and return point to the same IA author for AUTHORING_MODE=APPROVED_BASE_PLAN_DELTA_AUTHORING first standalone delta authoring. No pending delta is required at this entry and no addendum is created.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_DELTA_REDLINE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "DELTA_DENY"
+          ],
+          "branch_id": "delta_deny",
+          "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; exact delta redlines return to the same IA author through IA-40; no addendum.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DELTA_DENY",
+        "INITIAL_DENY",
+        "PLAN_DELTA_REDLINE"
+      ],
+      "to": "IA-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DELTA_APPROVE"
+          ],
+          "branch_id": "delta_approve",
+          "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; approve only the standalone delta and never replace the Plan. Create or reuse exactly one qualifying PF10 addendum under the stable addendum_id and normalized approved-delta digest idempotency rule, then return terminally to Nathan for manual drain. No affected continuation runs in this invocation and no continuation block is emitted.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_MANUAL_BOUNDARY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DELTA_APPROVE"
+      ],
+      "to": "NATHAN_MANUAL_PF10_DRAIN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PRODUCT_OWNER_DECISION_REQUIRED"
+          ],
+          "branch_id": "product_owner_decision_required",
+          "condition": "REVIEW_MODE=APPROVED_BASE_CHANGE_ASSESSMENT; an unresolved product or scope decision is required. Return terminally to Nathan with exact alternatives and consequences; IA-30 never decides Product Owner intent.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [],
+          "branch_id": "plan_review_terminal",
+          "condition": "source, authority, or manual-continuation identity blocker; SOURCE_RESOLUTION_ERROR makes no inference about human drainage.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "PRODUCT_OWNER_DECISION_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INITIAL_APPROVE"
+          ],
+          "branch_id": "initial_approve",
+          "condition": "REVIEW_MODE=INITIAL_PLAN_REVIEW and the pending whole-change Plan is approved; zero PF10 addenda. Route the first or next executable PR work unit already defined by the approved Plan, carrying the approved Specification, Audit, Plan, review, exact planned WORK_UNIT_ID, dependency state, conflict register, source/PF10 lineage and IA session. No future PR, Proceed, QA Guide/Plan, Ops receipt or documentation result is required; the approved Plan remains the governing source for its later Ops, documentation and QA-readiness consumers.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "INITIAL_APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INITIAL_APPROVE"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "IA-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "IA-30",
+    "lane": "IA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review Whole-Change Implementation Plan for the exact supplied change.",
+    "output_artifacts": [
+      "IMPLEMENTATION_PLAN_REVIEW / APPROVED_BASE_CHANGE_ASSESSMENT / PLAN_DELTA_REDLINE / MATERIAL_PLAN_DELTA_REVIEW"
+    ],
+    "pf10_addendum_role": "QUALIFYING_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81029c49c21113701638",
+      "release": "GCFPE-20260913.1",
+      "title": "IA-30 — Review Whole-Change Implementation Plan — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81029c49c21113701638",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "PR-10",
+      "IA-40"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the continuing Lead Developer and independent whole-change Implementation Plan reviewer.",
+    "result_states": [
+      "INITIAL_APPROVE",
+      "INITIAL_DENY",
+      "PLAN_DELTA_REDLINE",
+      "CHANGE_NOT_SUBSTANTIATED",
+      "PRODUCT_OWNER_DECISION_REQUIRED",
+      "WRONG_NATIVE_LANE",
+      "DELTA_APPROVE",
+      "DELTA_DENY"
+    ],
+    "sequence": 30,
+    "session_class": "ROLE_CONTINUING",
+    "title": "IA-30 — Review Whole-Change Implementation Plan — 091426.1"
+  },
+  "state_route_order": [
+    "initial_approve",
+    "initial_deny",
+    "approved_base_plan_delta_redline",
+    "delta_deny",
+    "delta_approve",
+    "change_not_substantiated",
+    "product_owner_decision_required",
+    "wrong_native_lane",
+    "plan_review_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "IA-30_RESULT": [
+      "INITIAL_APPROVE",
+      "INITIAL_DENY",
+      "PLAN_DELTA_REDLINE",
+      "CHANGE_NOT_SUBSTANTIATED",
+      "PRODUCT_OWNER_DECISION_REQUIRED",
+      "WRONG_NATIVE_LANE",
+      "DELTA_APPROVE",
+      "DELTA_DENY"
+    ],
+    "IA-30_REVIEW_MODE": [
+      "INITIAL_PLAN_REVIEW",
+      "APPROVED_BASE_CHANGE_ASSESSMENT",
+      "MATERIAL_PLAN_DELTA_REVIEW"
+    ]
+  }
+}

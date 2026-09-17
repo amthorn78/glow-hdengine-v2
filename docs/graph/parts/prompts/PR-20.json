@@ -1,0 +1,225 @@
+{
+  "edge_indices": [
+    155,
+    156,
+    157,
+    158,
+    159
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "planning_terminal",
+          "condition": "accepted manual prerequisite or true source/authority/product decision has no runnable prompt receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "AWAITING_PO_PROCEED"
+          ],
+          "branch_id": "awaiting_po_proceed",
+          "condition": "one complete executable approved-scope plan awaits the original Product Owner Proceed",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "AWAITING_PO_PROCEED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "AWAITING_PO_PROCEED"
+      ],
+      "to": "NATHAN_PROCEED",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "upstream_owner_recovery",
+          "condition": "the exact upstream instruction, Plan, remediation, Specification, or other source owner must act",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "same_owner_recovery",
+          "condition": "a bounded planning defect is repairable by the same dedicated PR planning session",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "PR-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DRAFT",
+            "BLOCKED"
+          ],
+          "branch_id": "material_boundary",
+          "condition": "the planning result substantiates a material scope, architecture, requirement, or design boundary",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [
+            "PR-20 -> RS-10",
+            "RS-10 complete proposal -> RS-20"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DRAFT",
+        "BLOCKED"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "PR-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "PR-20",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Detailed PR Implementation Plan for the exact supplied change.",
+    "output_artifacts": [
+      "PR_IMPLEMENTATION_PLAN"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8147b34ccfabf608c2e3",
+      "release": "GCFPE-20260913.1",
+      "title": "PR-20 — Create Detailed PR Implementation Plan — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8147b34ccfabf608c2e3",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "PR-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the dedicated PR engineering session for this one work unit.",
+    "result_states": [
+      "AWAITING_PO_PROCEED",
+      "DRAFT",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "PR-20 — Create Detailed PR Implementation Plan — 091426.1"
+  },
+  "state_route_order": [
+    "awaiting_po_proceed",
+    "material_boundary",
+    "same_owner_recovery",
+    "upstream_owner_recovery",
+    "planning_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

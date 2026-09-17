@@ -1,0 +1,176 @@
+{
+  "edge_indices": [
+    46,
+    47,
+    48,
+    49
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-C-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CHANGE_CLOSED"
+          ],
+          "branch_id": "change_closed",
+          "condition": "positive CRD closure decision",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-C-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "CHANGE_CLOSED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "CHANGE_CLOSED"
+      ],
+      "to": "CL-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-C-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DO_NOT_CLOSE"
+          ],
+          "branch_id": "do_not_close_new_remedy",
+          "condition": "substantive new bounded remedy requires Thoth remediation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-C-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "DO_NOT_CLOSE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DO_NOT_CLOSE"
+      ],
+      "to": "ESC-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-C-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-C-10.md",
+            "section": "Terminal operator return and receiver compatibility"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-C-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DO_NOT_CLOSE"
+          ],
+          "branch_id": "do_not_close_existing_owner",
+          "condition": "an already-authorized ordinary correction has an exact existing owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CL-C-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "DO_NOT_CLOSE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DO_NOT_CLOSE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    }
+  ],
+  "id": "CL-C-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CL-C-10",
+    "lane": "CL-C",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Perform CRD Retrospective and Decide Closure for the exact supplied change.",
+    "output_artifacts": [
+      "CHANGE_CLOSURE_DECISION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb812bab7bf770bcef9527",
+      "release": "GCFPE-20260913.1",
+      "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb812bab7bf770bcef9527",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CL-20",
+      "ESC-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, continuing Lead Developer and terminal closure authority.",
+    "result_states": [
+      "CHANGE_CLOSED",
+      "DO_NOT_CLOSE"
+    ],
+    "sequence": 10,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CL-C-10 — Perform CRD Retrospective and Decide Closure — 091426.1"
+  },
+  "state_route_order": [
+    "change_closed",
+    "do_not_close_new_remedy",
+    "do_not_close_existing_owner",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

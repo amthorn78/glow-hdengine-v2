@@ -1,0 +1,271 @@
+{
+  "edge_indices": [
+    181,
+    182,
+    183,
+    184,
+    185,
+    186
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_terminal",
+          "condition": "the evidence owner or required authority cannot be resolved into a runnable receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ESCALATION_REQUIRED"
+          ],
+          "branch_id": "escalation_required",
+          "condition": "material QA evidence finding requires the native QA escalation report",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "ESCALATION_REQUIRED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ESCALATION_REQUIRED"
+      ],
+      "to": "ESC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_named_owner",
+          "condition": "another exact evidence owner is identified; preserve QA-110 resume phase",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BOUNDED_RERUN_REQUIRED"
+          ],
+          "branch_id": "rerun_execution",
+          "condition": "the authorized attempt-2 task is already complete and ready for execution",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "BOUNDED_RERUN_REQUIRED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "INCOMPLETE"
+          ],
+          "branch_id": "incomplete_execution_evidence",
+          "condition": "the exact missing evidence is lawfully producible by bounded QA execution",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "INCOMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BOUNDED_RERUN_REQUIRED",
+        "INCOMPLETE"
+      ],
+      "to": "QA-100",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept",
+          "condition": "the complete approved QA run requires final reporting, including a completed failing run; the union of selected collections is reconciled to every required Plan step and requirement, not merely a completed subset",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "QA-120",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-110",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BOUNDED_RERUN_REQUIRED"
+          ],
+          "branch_id": "rerun_task_authoring",
+          "condition": "a new selected attempt-2 execution task still must be authored",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-110.md",
+            "section": "Required result and routing"
+          },
+          "state": "BOUNDED_RERUN_REQUIRED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BOUNDED_RERUN_REQUIRED"
+      ],
+      "to": "QA-90",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-110",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "QA-110",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review QA Evidence and Route the Next Action for the exact supplied change.",
+    "output_artifacts": [
+      "QA_EVIDENCE_REVIEW"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81e2890ec3a36ad7221f",
+      "release": "GCFPE-20260913.1",
+      "title": "QA-110 — Review QA Evidence and Route the Next Action — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81e2890ec3a36ad7221f",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "QA-120",
+      "QA-90",
+      "QA-100",
+      "ESC-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same continuing Kronos QA authority.",
+    "result_states": [
+      "ACCEPT",
+      "BOUNDED_RERUN_REQUIRED",
+      "ESCALATION_REQUIRED",
+      "INCOMPLETE"
+    ],
+    "sequence": 110,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-110 — Review QA Evidence and Route the Next Action — 091426.1"
+  },
+  "state_route_order": [
+    "accept",
+    "rerun_task_authoring",
+    "rerun_execution",
+    "escalation_required",
+    "incomplete_execution_evidence",
+    "incomplete_named_owner",
+    "incomplete_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}
