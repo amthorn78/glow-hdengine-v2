@@ -1,0 +1,192 @@
+{
+  "edge_indices": [
+    104,
+    105,
+    106
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REDLINE_INCOMPLETE"
+          ],
+          "branch_id": "redline_incomplete",
+          "condition": "ambiguous, contradictory, unsupported or unresolvable redline target identity. Preserve the complete checkpoint and return terminally to the same Isis reviewer or actual origin owner without inference.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REDLINE_INCOMPLETE",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "WRONG_NATIVE_LANE"
+          ],
+          "branch_id": "wrong_native_lane",
+          "condition": "the supplied matter is actually PR rescope, remediation, Specification change or another lane. Do not author or route it as a Plan delta; preserve the evidence and return terminally to the exact origin owner identified by the source package.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "WRONG_NATIVE_LANE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "REDLINE_INCOMPLETE",
+        "WRONG_NATIVE_LANE"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PLAN_PENDING_REVISED"
+          ],
+          "branch_id": "plan_pending_revised",
+          "condition": "AUTHORING_MODE=PREAPPROVAL_PLAN_REVISION; the complete revised pending Plan and item-by-item application report return to the same Isis reviewer in REVIEW_MODE=INITIAL_PLAN_REVIEW, same author/reviewer lineage.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_PENDING_REVISED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PLAN_DELTA_PENDING"
+          ],
+          "branch_id": "plan_delta_pending",
+          "condition": "AUTHORING_MODE=APPROVED_BASE_PLAN_DELTA_AUTHORING; the complete standalone MATERIAL_PLAN_DELTA, immutable base/review, assessment or denial redlines, overlays, application report and return point go to the same Isis reviewer in REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW. The approved Plan is never modified or replaced.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_DELTA_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PLAN_DELTA_PENDING",
+        "PLAN_PENDING_REVISED"
+      ],
+      "to": "IA-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "source_authority_terminal",
+          "condition": "source or authority predicate cannot be resolved and no exact origin owner is established; return terminally to Nathan with the preserved checkpoint.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "IA-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "IA-40",
+    "lane": "IA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Prepare or Revise Whole-Change Implementation Plan for the exact supplied change.",
+    "output_artifacts": [
+      "IMPLEMENTATION_PLAN / MATERIAL_PLAN_DELTA"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb819d920ac5f14a042d08",
+      "release": "GCFPE-20260913.1",
+      "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb819d920ac5f14a042d08",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "IA-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same Implementation Agent (IA) who authored the Plan lineage.",
+    "result_states": [
+      "PLAN_PENDING_REVISED",
+      "PLAN_DELTA_PENDING",
+      "REDLINE_INCOMPLETE",
+      "WRONG_NATIVE_LANE"
+    ],
+    "sequence": 40,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091426.1"
+  },
+  "state_route_order": [
+    "plan_pending_revised",
+    "plan_delta_pending",
+    "redline_incomplete",
+    "wrong_native_lane",
+    "source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "IA-40_AUTHORING_MODE": [
+      "PREAPPROVAL_PLAN_REVISION",
+      "APPROVED_BASE_PLAN_DELTA_AUTHORING"
+    ],
+    "IA-40_RESULT": [
+      "PLAN_PENDING_REVISED",
+      "PLAN_DELTA_PENDING",
+      "REDLINE_INCOMPLETE",
+      "WRONG_NATIVE_LANE"
+    ]
+  }
+}

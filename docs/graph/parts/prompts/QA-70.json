@@ -1,0 +1,210 @@
+{
+  "edge_indices": [
+    205,
+    206,
+    207,
+    208,
+    209
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-70",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "delta_approve",
+          "condition": "REVIEW_MODE=DELTA; exactly one addendum and conditional post-drain native continuation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE"
+      ],
+      "to": "NATHAN_MANUAL_PF10_DRAIN",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-70",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "qa70_terminal",
+          "condition": "source, authority, mode, or continuation identity is unresolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-70",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DENY"
+          ],
+          "branch_id": "delta_deny",
+          "condition": "REVIEW_MODE=DELTA; return denial to the exact originating proposed-delta owner; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": "DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DENY"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-70",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DENY"
+          ],
+          "branch_id": "initial_deny",
+          "condition": "REVIEW_MODE=INITIAL; exact redlines return to the same Kronos author; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": "DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DENY"
+      ],
+      "to": "QA-80",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-70",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "initial_approve",
+          "condition": "REVIEW_MODE=INITIAL; approve the pending QA Plan; no addendum",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "APPROVE"
+      ],
+      "to": "QA-90",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-70",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "QA-70",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review Whole-Change QA Plan for the exact supplied change.",
+    "output_artifacts": [
+      "QA_PLAN_REVIEW / MATERIAL_QA_PLAN_DELTA_REVIEW"
+    ],
+    "pf10_addendum_role": "QUALIFYING_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb816f8399e55ce20e4e21",
+      "release": "GCFPE-20260913.1",
+      "title": "QA-70 — Review Whole-Change QA Plan — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb816f8399e55ce20e4e21",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "QA-90",
+      "QA-80"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, continuing Lead Developer and QA Plan reviewer.",
+    "result_states": [
+      "APPROVE",
+      "DENY"
+    ],
+    "sequence": 70,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-70 — Review Whole-Change QA Plan — 091426.1"
+  },
+  "state_route_order": [
+    "initial_approve",
+    "initial_deny",
+    "delta_approve",
+    "delta_deny",
+    "qa70_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

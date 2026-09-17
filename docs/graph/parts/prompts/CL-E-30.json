@@ -1,0 +1,142 @@
+{
+  "edge_indices": [
+    58,
+    59,
+    60
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DENY"
+          ],
+          "branch_id": "deny",
+          "condition": "denied revalidation returns to the same author",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DENY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "DENY"
+      ],
+      "to": "CL-E-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept",
+          "condition": "accepted revalidation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT"
+      ],
+      "to": "CL-E-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "review_terminal",
+          "condition": "unresolved source, closure, authority, or owner",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CL-E-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CL-E-30",
+    "lane": "CL-E",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review Bounded PF09 Revalidation for the exact supplied change.",
+    "output_artifacts": [
+      "PF09_REVALIDATION_REVIEW"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8170abede3b92037d246",
+      "release": "GCFPE-20260913.1",
+      "title": "CL-E-30 — Review Bounded PF09 Revalidation — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8170abede3b92037d246",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CL-E-40",
+      "CL-E-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the assigned reviewer of the bounded revalidation deliverable.",
+    "result_states": [
+      "ACCEPT",
+      "DENY"
+    ],
+    "sequence": 30,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CL-E-30 — Review Bounded PF09 Revalidation — 091426.1"
+  },
+  "state_route_order": [
+    "accept",
+    "deny",
+    "review_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

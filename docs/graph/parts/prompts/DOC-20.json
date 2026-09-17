@@ -1,0 +1,288 @@
+{
+  "edge_indices": [
+    69,
+    70,
+    71,
+    72,
+    73,
+    74
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "instruction_repair",
+          "condition": "documentation instruction is missing or defective",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "DOC-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "documentation_terminal",
+          "condition": "product-intent, source, authority, or unrecoverable merge-evidence failure",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "remediation_complete_native_return",
+          "condition": "approved remediation documentation is verified without the QA-10 predicate; resolve the exact originating selected owner/stage and complete its native intake under unchanged authority",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Result routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "INCOMPLETE",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "remediation_incomplete_native_return",
+          "condition": "an incomplete or blocked remediation result has an exact lawful originating recovery/evidence owner and complete native return package; no PR-50, merge, PF10 drain or manual-gate bypass",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Result routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE",
+        "INCOMPLETE",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "landed_lineage_review",
+          "condition": "actual merged state or landed-lineage review is required after Nathan asserts the manual merge",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "PR-40",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "complete",
+          "condition": "all documentation obligations and landed lineage are verified, and this is ordinary initial documentation or the remedy materially affects readiness or Nathan explicitly requires a QA-10 rerun",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE"
+      ],
+      "to": "QA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "DOC-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "INCOMPLETE",
+            "PENDING",
+            "BLOCKED"
+          ],
+          "branch_id": "material_delta",
+          "condition": "evidence proves a bounded material delta",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/DOC-20.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "INCOMPLETE",
+        "PENDING",
+        "BLOCKED"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "DOC-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "DOC-20",
+    "lane": "DOC",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Verify Final Repository Documentation Completion for the exact supplied change.",
+    "output_artifacts": [
+      "DOCUMENTATION_COMPLETION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81a4bf2ad969439c8ffe",
+      "release": "GCFPE-20260913.1",
+      "title": "DOC-20 — Verify Final Repository Documentation Completion — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81a4bf2ad969439c8ffe",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "QA-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the continuing whole-change Implementation Agent (IA), read-only.",
+    "result_states": [
+      "COMPLETE",
+      "INCOMPLETE",
+      "PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "DOC-20 — Verify Final Repository Documentation Completion — 091426.1"
+  },
+  "state_route_order": [
+    "complete",
+    "remediation_complete_native_return",
+    "remediation_incomplete_native_return",
+    "instruction_repair",
+    "landed_lineage_review",
+    "material_delta",
+    "documentation_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

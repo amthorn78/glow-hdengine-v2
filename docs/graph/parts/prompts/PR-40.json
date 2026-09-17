@@ -1,0 +1,272 @@
+{
+  "edge_indices": [
+    168,
+    169,
+    170,
+    171,
+    172,
+    173
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PENDING"
+          ],
+          "branch_id": "pending_terminal",
+          "condition": "manual merge, repository fact, review result, or evidence remains unavailable and no runnable native owner prompt is resolved",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PENDING",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "PENDING"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "lineage_review_terminal",
+          "condition": "an in-scope correction lacks required repository authority/vehicle or another genuine Product Owner decision is required",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ACCEPT"
+          ],
+          "branch_id": "accept",
+          "condition": "return the accepted whole-unit result to the same whole-change IA/native Plan-progress owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "ACCEPT",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PENDING"
+          ],
+          "branch_id": "pending_native_owner",
+          "condition": "the exact Product Owner, evidence, PR, or IA recovery owner is known and can perform the bounded missing act",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ACCEPT",
+        "PENDING"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_instruction_owner",
+          "condition": "the substantiated in-scope defect is in the IA-issued PR instruction",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "PR-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_existing_pr_owner",
+          "condition": "a precise in-scope implementation/review/corrected-code/PR-lineage defect has an authorized existing PR vehicle and original Proceed",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "REJECT"
+          ],
+          "branch_id": "reject_material_boundary_proposal",
+          "condition": "a substantiated material boundary requires a new bounded rescope proposal",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [
+            "PR-40 -> RS-10",
+            "RS-10 complete proposal -> RS-20",
+            "RS-20 REVISION_REQUIRED -> RS-30"
+          ],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REJECT",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "REJECT"
+      ],
+      "to": "RS-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "PR-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "PR-40",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Review PR Work-Unit Lineage for the exact supplied change.",
+    "output_artifacts": [
+      "PR_WORK_UNIT_LINEAGE_REVIEW"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb813c8b47e77f94ff1def",
+      "release": "GCFPE-20260913.1",
+      "title": "PR-40 — Review PR Work-Unit Lineage — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb813c8b47e77f94ff1def",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "DOC-20",
+      "QA-10",
+      "PR-30",
+      "PR-10",
+      "RS-10",
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the designated PR reviewer for the complete work unit, operating read-only.",
+    "result_states": [
+      "ACCEPT",
+      "REJECT",
+      "PENDING"
+    ],
+    "sequence": 40,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "PR-40 — Review PR Work-Unit Lineage — 091426.1"
+  },
+  "state_route_order": [
+    "accept",
+    "reject_existing_pr_owner",
+    "reject_instruction_owner",
+    "reject_material_boundary_proposal",
+    "pending_native_owner",
+    "pending_terminal",
+    "lineage_review_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

@@ -1,0 +1,201 @@
+{
+  "edge_indices": [
+    175,
+    176,
+    177,
+    178
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ASSESSMENT_INCOMPLETE"
+          ],
+          "branch_id": "qa10_terminal",
+          "condition": "manual prerequisite, source/authority stop, or unresolved evidence owner prevents a runnable continuation",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/QA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "ASSESSMENT_INCOMPLETE"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "NOT_READY"
+          ],
+          "branch_id": "not_ready",
+          "condition": "evidence proves failure of an applicable approved Plan objective",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/QA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "NOT_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "NOT_READY"
+      ],
+      "to": "ESC-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "ASSESSMENT_INCOMPLETE"
+          ],
+          "branch_id": "evidence_owner_recovery",
+          "condition": "the exact evidence/retrieval owner is identified and can perform the smallest supported recovery",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/QA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "ASSESSMENT_INCOMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "NOT_READY",
+            "ASSESSMENT_INCOMPLETE"
+          ],
+          "branch_id": "material_native_boundary",
+          "condition": "a substantiated material scope, Canon, Specification, Plan, or authority boundary has an exact native owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "CONDITIONAL_RECOVERY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/QA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "ASSESSMENT_INCOMPLETE",
+        "NOT_READY"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "QA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "READY_FOR_QA"
+          ],
+          "branch_id": "ready_for_qa",
+          "condition": "complete integrated audit/triage/readiness supports live QA Guide creation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/QA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "READY_FOR_QA",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "READY_FOR_QA"
+      ],
+      "to": "QA-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "QA-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "QA-10",
+    "lane": "QA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Audit Implementation and Establish QA Readiness for the exact supplied change.",
+    "output_artifacts": [
+      "REALITY_AUDIT / CHANGE_AUDIT_TRIAGE / QA_READINESS"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb814fbda7f3b722487b6b",
+      "release": "GCFPE-20260913.1",
+      "title": "QA-10 — Audit Implementation and Establish QA Readiness — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb814fbda7f3b722487b6b",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "QA-20",
+      "ESC-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the continuing Lead Developer and whole-change readiness decision owner for the exact supplied change.",
+    "result_states": [
+      "READY_FOR_QA",
+      "NOT_READY",
+      "ASSESSMENT_INCOMPLETE"
+    ],
+    "sequence": 10,
+    "session_class": "ROLE_CONTINUING",
+    "title": "QA-10 — Audit Implementation and Establish QA Readiness — 091426.1"
+  },
+  "state_route_order": [
+    "ready_for_qa",
+    "not_ready",
+    "evidence_owner_recovery",
+    "material_native_boundary",
+    "qa10_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

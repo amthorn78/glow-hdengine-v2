@@ -1,0 +1,145 @@
+{
+  "edge_indices": [
+    4,
+    5,
+    6
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "invalid_kickoff_recovery",
+          "condition": "kickoff is incomplete or contradictory and the kickoff owner can correct it",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SPECIFICATION_PENDING"
+          ],
+          "branch_id": "specification_pending",
+          "condition": "complete pending CRD Specification is ready for Thoth review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "SPECIFICATION_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "SPECIFICATION_PENDING"
+      ],
+      "to": "CF-C-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "specification_authoring_terminal",
+          "condition": "unrecoverable source, identity, or authority blocker",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CF-C-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CF-C-20",
+    "lane": "CF-C",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create CRD Specification for the exact supplied change.",
+    "output_artifacts": [
+      "CRD_SPECIFICATION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8173a162e1b06427c7bf",
+      "release": "GCFPE-20260913.1",
+      "title": "CF-C-20 — Create CRD Specification — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8173a162e1b06427c7bf",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CF-C-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Isis, the continuing Lead Developer and Specification author.",
+    "result_states": [
+      "SPECIFICATION_PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "ROLE_CONTINUING",
+    "title": "CF-C-20 — Create CRD Specification — 091426.1"
+  },
+  "state_route_order": [
+    "specification_pending",
+    "invalid_kickoff_recovery",
+    "specification_authoring_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

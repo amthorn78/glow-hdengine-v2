@@ -1,0 +1,205 @@
+{
+  "edge_indices": [
+    160,
+    161,
+    162,
+    163
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PRODUCT_OWNER_DECISION_REQUIRED"
+          ],
+          "branch_id": "product_owner_decision_required",
+          "condition": "genuine Product Owner decision outside existing PR authority",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [],
+          "branch_id": "pr30_terminal",
+          "condition": "unrecoverable source, owner, authority, or incompatible identity; never convert this into PR-50",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-30.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "PRODUCT_OWNER_DECISION_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RECOVERY_PENDING"
+          ],
+          "branch_id": "recovery_pending",
+          "condition": "complete same-session re-entry; no new vehicle",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "RECOVERY_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RECOVERY_PENDING"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PR_CANDIDATE_PUBLISHED"
+          ],
+          "branch_id": "pr_candidate_published",
+          "condition": "one complete same-session phase continuation",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "PR_CANDIDATE_PUBLISHED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PR_CANDIDATE_PUBLISHED"
+      ],
+      "to": "PR-35",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "PR-30",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PENDING"
+          ],
+          "branch_id": "rescope_pending",
+          "condition": "formal RESCOPE_REQUEST with exact PR_RETURN_PHASE",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/PR-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PENDING"
+      ],
+      "to": "RS-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "PR-30",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "PR-30",
+    "lane": "PR",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute PR Implementation Proceed for the exact supplied change.",
+    "output_artifacts": [
+      "PR_IMPLEMENTATION_RESULT"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81c0aee0d0862b242e09",
+      "release": "GCFPE-20260913.1",
+      "title": "PR-30 — PR Implementation Proceed — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81c0aee0d0862b242e09",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "PR-35",
+      "RS-20"
+    ],
+    "r1_mapping": "GCF-17",
+    "receiving_role": "You are the same dedicated PR engineering session for one exact approved work unit.",
+    "result_states": [
+      "PR_CANDIDATE_PUBLISHED",
+      "RESCOPE_PENDING",
+      "RECOVERY_PENDING",
+      "PRODUCT_OWNER_DECISION_REQUIRED"
+    ],
+    "sequence": 30,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "PR-30 — PR Implementation Proceed — 091426.1"
+  },
+  "state_route_order": [
+    "pr_candidate_published",
+    "rescope_pending",
+    "recovery_pending",
+    "product_owner_decision_required",
+    "pr30_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "PR-30_RESULT": [
+      "PR_CANDIDATE_PUBLISHED",
+      "RESCOPE_PENDING",
+      "RECOVERY_PENDING",
+      "PRODUCT_OWNER_DECISION_REQUIRED"
+    ]
+  }
+}

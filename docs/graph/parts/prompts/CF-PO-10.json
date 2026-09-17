@@ -1,0 +1,141 @@
+{
+  "edge_indices": [
+    29,
+    30,
+    31
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-PO-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CLASS_SELECTED"
+          ],
+          "branch_id": "class_selected_crd",
+          "condition": "CHANGE_CLASS=CRD with an exact Product Owner selection and change identity",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-PO-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "CLASS_SELECTED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "CLASS_SELECTED"
+      ],
+      "to": "CF-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-PO-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "CLASS_SELECTED"
+          ],
+          "branch_id": "class_selected_epic",
+          "condition": "CHANGE_CLASS=EPIC with an exact Product Owner selection and change identity",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-PO-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "CLASS_SELECTED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "CLASS_SELECTED"
+      ],
+      "to": "CF-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-PO-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "selection_missing_or_conflicting",
+          "condition": "no usable explicit Product Owner selection evidence, conflicting evidence, or unresolved change identity/source remains after CF-PO-10 requests or attempts to record it; return the exact requirement to Nathan with no CLASS_SELECTED result or kickoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-PO-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CF-PO-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CF-PO-10",
+    "lane": "CF-PO",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Record Product Owner Change-Class Selection for the exact supplied change.",
+    "output_artifacts": [
+      "CHANGE_CLASS_SELECTION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8175b86cdfc3d7fc40c7",
+      "release": "GCFPE-20260913.1",
+      "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8175b86cdfc3d7fc40c7",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CF-E-10",
+      "CF-C-10"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the recording assistant in the Product Owner context.",
+    "result_states": [
+      "CLASS_SELECTED"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1"
+  },
+  "state_route_order": [
+    "class_selected_epic",
+    "class_selected_crd",
+    "selection_missing_or_conflicting"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

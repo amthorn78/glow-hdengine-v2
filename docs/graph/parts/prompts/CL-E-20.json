@@ -1,0 +1,146 @@
+{
+  "edge_indices": [
+    55,
+    56,
+    57
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PARTIAL"
+          ],
+          "branch_id": "partial",
+          "condition": "repairable authoring or evidence gap; same author/session resumes",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "PARTIAL",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PARTIAL"
+      ],
+      "to": "CL-E-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "COMPLETE"
+          ],
+          "branch_id": "complete",
+          "condition": "complete PF09 revalidation is ready for review",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "COMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "COMPLETE"
+      ],
+      "to": "CL-E-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CL-E-20",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked",
+          "condition": "missing closure, unresolved authority, or unrecoverable source/access failure",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/CL-E-20.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CL-E-20",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CL-E-20",
+    "lane": "CL-E",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Perform Bounded PF09 Epic Revalidation for the exact supplied change.",
+    "output_artifacts": [
+      "PF09_REVALIDATION"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8182bc57f512fe2fc79c",
+      "release": "GCFPE-20260913.1",
+      "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8182bc57f512fe2fc79c",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CL-E-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the explicitly assigned Lead Developer revalidation session, read-only.",
+    "result_states": [
+      "COMPLETE",
+      "PARTIAL",
+      "BLOCKED"
+    ],
+    "sequence": 20,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1"
+  },
+  "state_route_order": [
+    "complete",
+    "partial",
+    "blocked"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

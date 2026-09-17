@@ -1,0 +1,156 @@
+{
+  "edge_indices": [
+    113,
+    114
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PARTIAL"
+          ],
+          "branch_id": "unusable_partial",
+          "condition": "PARTIAL with usable_for_bounded_seeding: false; the resolved subset cannot lawfully be applied without deciding an unresolved governing choice. Return terminally to the actual source/decision owner with the recoverable package.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "PARTIAL",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "blocked",
+          "condition": "a required source, access path, authority or owner decision is missing; return the exact question and evidence to its native owner. Do not fabricate an IA-50-ready answer.",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED",
+        "PARTIAL"
+      ],
+      "to": "ACTUAL_OWNER_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-60",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESEARCH_COMPLETE"
+          ],
+          "branch_id": "research_to_seeder",
+          "condition": "the bounded planning inquiry is complete and authorized for answer seeding; return the complete finding, ANSWER_REF and unchanged RECOVERY_ENVELOPE, preserving unanswered fields, owners, limitations and the exact paused IA return.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESEARCH_COMPLETE",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "PARTIAL"
+          ],
+          "branch_id": "usable_partial_to_seeder",
+          "condition": "PARTIAL with usable_for_bounded_seeding: true; the resolved subset can lawfully be applied without deciding an unresolved governing choice. Return the complete finding, ANSWER_REF and unchanged RECOVERY_ENVELOPE with the remaining unknowns and their owners preserved.",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/c/IA-60.md",
+            "section": "Required result and routing"
+          },
+          "state": "PARTIAL",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PARTIAL",
+        "RESEARCH_COMPLETE"
+      ],
+      "to": "IA-50",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "IA-60",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "IA-60",
+    "lane": "IA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Thoth Planning Research for the exact supplied change.",
+    "output_artifacts": [
+      "PLANNING_RESEARCH_FINDING"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81f78afcca35f2dcb7db",
+      "release": "GCFPE-20260913.1",
+      "title": "IA-60 — Thoth Planning Research — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81f78afcca35f2dcb7db",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "IA-50",
+      "ESC-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "Act as Thoth for one bounded advanced engineering planning inquiry before Plan approval.",
+    "result_states": [
+      "RESEARCH_COMPLETE",
+      "PARTIAL",
+      "BLOCKED"
+    ],
+    "sequence": 60,
+    "session_class": "ROLE_CONTINUING",
+    "title": "IA-60 — Thoth Planning Research — 091426.1"
+  },
+  "state_route_order": [
+    "research_to_seeder",
+    "usable_partial_to_seeder",
+    "unusable_partial",
+    "blocked"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {
+    "IA-60_PARTIAL_USABILITY": [
+      "usable_for_bounded_seeding:true",
+      "usable_for_bounded_seeding:false"
+    ]
+  }
+}

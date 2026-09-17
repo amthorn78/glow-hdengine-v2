@@ -1,0 +1,213 @@
+{
+  "edge_indices": [
+    14,
+    15,
+    16,
+    17,
+    18
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "wrong_class_crd",
+          "condition": "the supplied Product Owner class is CRD",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-C-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "material_source_omission_recovery",
+          "condition": "material source omission is repairable by the same kickoff owner",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "KICKOFF_READY"
+          ],
+          "branch_id": "kickoff_ready",
+          "condition": "valid Epic class selection and complete sanitized source",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "KICKOFF_READY",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "KICKOFF_READY"
+      ],
+      "to": "CF-E-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "class_selection_recovery",
+          "condition": "Epic selection record or change identity is missing or conflicting; CF-PO-10 records exact existing evidence or requests Nathan's decision and never chooses the class",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-PO-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "kickoff_terminal",
+          "condition": "another true Product Owner/source/authority stop has no runnable receiver",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "CF-E-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "CF-E-10",
+    "lane": "CF-E",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Prepare Epic Specification Kickoff Handoff for the exact supplied change.",
+    "output_artifacts": [
+      "SPECIFICATION_KICKOFF"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb811f927adfc2243861ff",
+      "release": "GCFPE-20260913.1",
+      "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb811f927adfc2243861ff",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "CF-E-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Master Scrum in the class-specific kickoff session.",
+    "result_states": [
+      "KICKOFF_READY",
+      "BLOCKED"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091426.1"
+  },
+  "state_route_order": [
+    "kickoff_ready",
+    "material_source_omission_recovery",
+    "class_selection_recovery",
+    "wrong_class_crd",
+    "kickoff_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

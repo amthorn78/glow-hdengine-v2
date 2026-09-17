@@ -1,0 +1,248 @@
+{
+  "edge_indices": [
+    88,
+    89,
+    90,
+    91,
+    92,
+    93
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "audit_recovery",
+          "condition": "Audit is incomplete but useful local recovery remains in the same IA session; no separate answer-seeding or research package is required",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "IA-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "AUDIT_COMPLETE"
+          ],
+          "branch_id": "plan_interrupted",
+          "condition": "Audit is complete and the Plan phase was interrupted; no separate answer-seeding or research package is required first",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "AUDIT_COMPLETE",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "AUDIT_COMPLETE"
+      ],
+      "to": "IA-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PLAN_PENDING"
+          ],
+          "branch_id": "audit_and_plan_complete",
+          "condition": "both Implementation Audit and initial Plan are complete and decisive architecture/feasibility questions are resolved for submission",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "PLAN_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PLAN_PENDING"
+      ],
+      "to": "IA-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "answer_available",
+          "condition": "an actual partial or complete answer is available for bounded validation/application; carry complete RECOVERY_ENVELOPE and ANSWER_REF with exact paused artifacts and authority; preserve unanswered questions and deadlines and same-author return; do not repeat research or infer whole-Plan readiness",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Planning readiness, questions, and recovery; Result routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "IA-50",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "bounded_research",
+          "condition": "a complete bounded planning research need is identified and no usable answer exists yet; carry PLANNING_INQUIRY and RECOVERY_ENVELOPE",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "IA-60",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "ia10_terminal",
+          "condition": "approved-base rewrite request, product decision, or unrecoverable source/authority blocker",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    }
+  ],
+  "id": "IA-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "IA-10",
+    "lane": "IA",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Whole-Change Implementation Audit and Plan for the exact supplied change.",
+    "output_artifacts": [
+      "IMPLEMENTATION_AUDIT / IMPLEMENTATION_PLAN"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb8130b2fcf3993239096c",
+      "release": "GCFPE-20260913.1",
+      "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb8130b2fcf3993239096c",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "IA-30"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the dedicated Implementation Agent (IA) for this entire change.",
+    "result_states": [
+      "AUDIT_COMPLETE",
+      "PLAN_PENDING",
+      "BLOCKED"
+    ],
+    "sequence": 10,
+    "session_class": "CHANGE_LIFETIME",
+    "title": "IA-10 — Create Whole-Change Implementation Audit and Plan — 091426.1"
+  },
+  "state_route_order": [
+    "audit_and_plan_complete",
+    "audit_recovery",
+    "plan_interrupted",
+    "bounded_research",
+    "answer_available",
+    "ia10_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

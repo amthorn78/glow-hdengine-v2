@@ -1,0 +1,136 @@
+{
+  "edge_indices": [
+    216,
+    217,
+    218
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "shared_source_authority_terminal",
+          "condition": "true source, authority, identity, or owner stop with no runnable selected receiver; preserve evidence and return without a handoff",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "TERMINAL_EXCEPTION",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-10.md",
+            "section": "Terminal operator return and receiver compatibility"
+          },
+          "state": null,
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [],
+          "branch_id": "in_scope_native_return",
+          "condition": "observed ordinary in-scope correction needs no rescope proposal or formal RS-20 decision; exact selected existing repair owner/session and complete native intake are resolved under unchanged authority; no PR-50, merge, PF10 drain or manual-gate bypass",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_OWNER_RETURN",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-10.md",
+            "section": "Required result and routing"
+          },
+          "state": null,
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "COMPLETE_DYNAMIC_NATIVE_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PROPOSAL_PENDING_REVIEW"
+          ],
+          "branch_id": "rescope_proposal_pending_review",
+          "condition": "a real bounded delta has a complete proposal and exact actual native-stage lineage; pre-Proceed planning does not require future Proceed, PR or execution-return-phase fields",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PROPOSAL_PENDING_REVIEW",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PROPOSAL_PENDING_REVIEW"
+      ],
+      "to": "RS-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "RS-10",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "RS-10",
+    "lane": "RS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Create Bounded Work-Unit Rescope Proposal for the exact supplied change.",
+    "output_artifacts": [
+      "RESCOPE_PROPOSAL"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb81f99430fcb7c24fe8af",
+      "release": "GCFPE-20260913.1",
+      "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb81f99430fcb7c24fe8af",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are Sekhmet or the explicitly assigned finding author, with no approval authority.",
+    "result_states": [
+      "RESCOPE_PROPOSAL_PENDING_REVIEW"
+    ],
+    "sequence": 10,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1"
+  },
+  "state_route_order": [
+    "rescope_proposal_pending_review",
+    "in_scope_native_return",
+    "shared_source_authority_terminal"
+  ],
+  "state_routes_extra": [],
+  "state_vocabularies": {}
+}

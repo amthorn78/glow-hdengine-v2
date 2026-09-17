@@ -1,0 +1,338 @@
+{
+  "edge_indices": [
+    228,
+    229,
+    230,
+    231,
+    232
+  ],
+  "edges": [
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "MERGE_PENDING"
+          ],
+          "branch_id": "merge_pending",
+          "condition": "recorded PR-35 phase result; historical pre-merge evidence",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MERGE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "MERGE_PENDING"
+      ],
+      "to": "NATHAN_MANUAL_MERGE_ASSERTION",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "SOURCE_RESOLUTION_ERROR"
+          ],
+          "branch_id": "source_resolution_error",
+          "condition": "unique current controlled PF10 Markdown unresolved; make no drain inference",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "SOURCE_RESOLUTION_ERROR",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "MANUAL_DRAIN_REQUIRED"
+          ],
+          "branch_id": "manual_drain_required",
+          "condition": "current PF10 read; exact anchor absent",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MANUAL_DRAIN_REQUIRED",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "MANUAL_DRAIN_MISMATCH"
+          ],
+          "branch_id": "manual_drain_mismatch",
+          "condition": "related content differs in decision/base/normalized delta or a later conflicting overlay exists",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "MANUAL_DRAIN_MISMATCH",
+          "terminal_for_invocation": true
+        },
+        {
+          "applicable_states": [
+            "PRODUCT_OWNER_DECISION_REQUIRED"
+          ],
+          "branch_id": "product_owner_decision_required",
+          "condition": "genuine Product Owner decision or unrecoverable authority conflict",
+          "next_prompt_handoff_count": 0,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PRODUCT_OWNER_DECISION_REQUIRED",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "SOURCE_RESOLUTION_ERROR",
+        "MANUAL_DRAIN_REQUIRED",
+        "MANUAL_DRAIN_MISMATCH",
+        "PRODUCT_OWNER_DECISION_REQUIRED"
+      ],
+      "to": "NATHAN_TERMINAL_RETURN",
+      "to_kind": "boundary",
+      "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RECOVERY_PENDING"
+          ],
+          "branch_id": "recovery_pr30",
+          "condition": "recorded resumed phase is PR-30_POSTPUBLICATION; same session/vehicle re-entry",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "RECOVERY_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RECOVERY_PENDING"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "PR_CANDIDATE_PUBLISHED"
+          ],
+          "branch_id": "pr_candidate_published",
+          "condition": "recorded PR-30_POSTPUBLICATION phase result",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "PR_CANDIDATE_PUBLISHED",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "RECOVERY_PENDING"
+          ],
+          "branch_id": "recovery_pr35",
+          "condition": "recorded resumed phase is PR-35; same session/vehicle re-entry",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "RECOVERY_PENDING",
+          "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "REMOTE_EVIDENCE_PENDING"
+          ],
+          "branch_id": "remote_evidence_pending",
+          "condition": "PR-35 only; durable checkpoint",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "REMOTE_EVIDENCE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "PR_CANDIDATE_PUBLISHED",
+        "RECOVERY_PENDING",
+        "REMOTE_EVIDENCE_PENDING"
+      ],
+      "to": "PR-35",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "RS-40",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "RESCOPE_PENDING"
+          ],
+          "branch_id": "rescope_pending",
+          "condition": "new formal RESCOPE_REQUEST preserves same vehicle",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/RS-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "RESCOPE_PENDING",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "RESCOPE_PENDING"
+      ],
+      "to": "RS-20",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    }
+  ],
+  "id": "RS-40",
+  "node": {
+    "candidate_page_binding": "NOTION_STAGED_UNSELECTED",
+    "candidate_url": "https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226?pvs=204",
+    "candidate_version": "091426.1",
+    "id": "RS-40",
+    "lane": "RS",
+    "lifecycle": "UNSELECTED_CANDIDATE",
+    "native_function": "Execute Approved Rescope — Resume PR Implementation for the exact supplied change.",
+    "output_artifacts": [
+      "PR_IMPLEMENTATION_RESULT"
+    ],
+    "pf10_addendum_role": "NON_PRODUCER",
+    "predecessor": {
+      "notion_page_id": "3da4590a05eb815e98f5ea7b605b70a3",
+      "release": "GCFPE-20260913.1",
+      "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091326.2",
+      "url": "https://app.notion.com/p/3da4590a05eb815e98f5ea7b605b70a3",
+      "version": "091326.2"
+    },
+    "predecessor_union_destinations": [
+      "PR-35",
+      "RS-20"
+    ],
+    "r1_mapping": "PRESERVED_PREDECESSOR_MAPPING",
+    "receiving_role": "You are the same dedicated PR engineering session for the exact suspended work unit.",
+    "result_states": [
+      "SOURCE_RESOLUTION_ERROR",
+      "MANUAL_DRAIN_REQUIRED",
+      "MANUAL_DRAIN_MISMATCH",
+      "DRAIN_VERIFIED",
+      "PR_CANDIDATE_PUBLISHED",
+      "MERGE_PENDING",
+      "RESCOPE_PENDING",
+      "RECOVERY_PENDING",
+      "REMOTE_EVIDENCE_PENDING",
+      "PRODUCT_OWNER_DECISION_REQUIRED"
+    ],
+    "sequence": 40,
+    "session_class": "DEDICATED_ONE_OFF",
+    "title": "RS-40 — Approved Rescope — Resume PR Implementation — 091426.1"
+  },
+  "state_route_order": [
+    "source_resolution_error",
+    "manual_drain_required",
+    "manual_drain_mismatch",
+    "drain_verified",
+    "pr_candidate_published",
+    "merge_pending",
+    "rescope_pending",
+    "recovery_pr30",
+    "recovery_pr35",
+    "remote_evidence_pending",
+    "product_owner_decision_required"
+  ],
+  "state_routes_extra": [
+    {
+      "applicable_states": [
+        "DRAIN_VERIFIED"
+      ],
+      "branch_id": "drain_verified",
+      "condition": "exact anchor and normalized delta match with no later conflicting overlay; internal gate only; immediately resume recorded eligible phase",
+      "destinations": [],
+      "next_prompt_handoff_count": null,
+      "notes": null,
+      "public_result": false,
+      "route_kind": "NATIVE_RESULT",
+      "route_steps": [],
+      "source_evidence": {
+        "path": "candidate/prompts/d/RS-40.md",
+        "section": "Required result and routing"
+      },
+      "state": "DRAIN_VERIFIED",
+      "terminal_for_invocation": false
+    }
+  ],
+  "state_vocabularies": {}
+}
