@@ -2,7 +2,7 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_COPY_REPAIR_LEDGER
-artifact_version: "3.0"
+artifact_version: "4.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
@@ -215,3 +215,19 @@ And the routing:
 `ESC-40`, `IA-30`, `QA-70` and `RS-20` carry the same addendum clause, and the
 graph carries `pf10_post_drain_verification` and the `RS-40.drain_verified`
 route. Recorded for Batches 3, 4 and 5 under §4.7. Not edited here.
+
+## Fourth pass — the drain machine retired, 2026-09-17
+
+Product Owner specification of the replacement check. `CF-C-30` and `CF-E-30`
+`DELTA_APPROVE` routing now carries the one-check rule verbatim; both read back
+complete. No other prompt changed.
+
+Graph `global.json` changed as a shared governance contract, not per-prompt data:
+`pf10_post_drain_verification` → `pf10_reference_visibility_check`,
+`PF10_POST_DRAIN_VERIFICATION` → `PF10_REFERENCE_VISIBILITY`,
+`pf10_addendum_contract` de-drained and given `forbidden_fields` / `paste_ready` /
+`assume_pasted_next_turn` / `agent_may_litigate_product_owner_action: false`, and
+`terminal_contract` swapped to `PF10_REFERENCE_NOT_VISIBLE`.
+
+Proof token after rebuild: `236 edges · 582678 B · sha256 20be6e3b…`, validation
+PASS, one warning — the known `RS-40.drain_verified` Batch 3 orphan.

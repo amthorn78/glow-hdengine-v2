@@ -192,11 +192,10 @@
       "INITIAL_OR_PREAPPROVAL_AUTHORING",
       "APPROVED_BASE_WITH_OVERLAYS"
     ],
-    "PF10_POST_DRAIN_VERIFICATION": [
-      "SOURCE_RESOLUTION_ERROR",
-      "MANUAL_DRAIN_REQUIRED",
-      "MANUAL_DRAIN_MISMATCH",
-      "DRAIN_VERIFIED"
+    "PF10_REFERENCE_VISIBILITY": [
+      "PF10_REFERENCE_VISIBLE",
+      "PF10_REFERENCE_NOT_VISIBLE",
+      "SOURCE_RESOLUTION_ERROR"
     ],
     "PR_RETURN_PHASE": [
       {
@@ -579,7 +578,8 @@
     "terminal_result_next_prompt_handoff_blocks": 0
   },
   "pf10_addendum_contract": {
-    "canonicality": "NON_CANONICAL_PENDING_MANUAL_DRAIN",
+    "agent_may_litigate_product_owner_action": false,
+    "assume_pasted_next_turn": true,
     "drain_owner": "Nathan / Product Owner",
     "exact_producer_set": [
       "CF-C-30",
@@ -590,6 +590,17 @@
       "RS-20"
     ],
     "exactly_one_per_qualifying_approval": true,
+    "forbidden_fields": [
+      "status",
+      "canonicality",
+      "drain_owner",
+      "pf10_addendum_number",
+      "artifact_version",
+      "drain_verification_anchor",
+      "any pinned PF document version",
+      "any field describing the addendum's own drainage state"
+    ],
+    "format_home": "Glow Operations Hub, Notion. Canonical, and not hard-linked to PF10.",
     "native_outcome_normalization": {
       "CHANGE_NOT_SUBSTANTIATED": "UNCHANGED",
       "DELTA_APPROVE": "MATERIAL_APPROVAL",
@@ -618,6 +629,7 @@
       "EDITORIAL",
       "IN_SCOPE_REPAIR"
     ],
+    "paste_ready": true,
     "producer_allocates_pf10_number": false,
     "producer_claims_canonical_adoption": false,
     "producer_edits_pf10": false,
@@ -630,12 +642,8 @@
       "RS-20": "APPROVE of complete bounded work-unit rescope within approved Specification intent"
     },
     "required_fields": [
-      "artifact_type",
+      "title",
       "addendum_id",
-      "artifact_version",
-      "status",
-      "canonicality",
-      "drain_owner",
       "producing_prompt",
       "approval_decision",
       "immutable_base",
@@ -645,11 +653,7 @@
       "exclusions",
       "conflicts",
       "unresolved_items",
-      "return_phase",
-      "drain_verification_anchor.addendum_id",
-      "drain_verification_anchor.decision_id",
-      "drain_verification_anchor.immutable_base_id",
-      "drain_verification_anchor.approved_delta_digest"
+      "return_phase"
     ],
     "role_vocabulary": {
       "NON_PRODUCER": {
@@ -660,20 +664,27 @@
         "meaning": "This prompt creates exactly one standalone PF10 build-notes addendum on a qualifying material delta approval to an already approved base, and none on any outcome listed in never_for.",
         "prompt_body_token": "QUALIFYING_DELTA_APPROVAL_PRODUCER"
       }
-    },
-    "status": "READY_FOR_MANUAL_DRAIN"
+    }
   },
-  "pf10_post_drain_verification": {
-    "DRAIN_VERIFIED": "Exact anchor and normalized approved delta are verified in freshly resolved current controlled PF10 Markdown and no later conflicting overlay exists; affected continuation may resume at the exact recorded return phase.",
-    "MANUAL_DRAIN_MISMATCH": "Related current PF10 content exists but the decision, immutable base, normalized approved delta differs, or a later conflicting overlay exists.",
-    "MANUAL_DRAIN_REQUIRED": "Current controlled PF10 Markdown was completely read and the exact approved anchor is absent.",
-    "SOURCE_RESOLUTION_ERROR": "Unique controlled current PF10 Markdown cannot be resolved or completely read; no inference about whether Nathan drained.",
+  "pf10_reference_visibility_check": {
+    "PF10_REFERENCE_NOT_VISIBLE": "PF10 was read and the expected reference was not visible to this agent. Report that observation and stop. Make no claim about whether the Product Owner acted.",
+    "PF10_REFERENCE_VISIBLE": "The expected reference is present and visible. The check is complete and the affected continuation resumes at its recorded return phase.",
+    "SOURCE_RESOLUTION_ERROR": "Current PF10 Markdown cannot be resolved or completely read.",
     "exhaustive_mutually_exclusive_results": [
-      "SOURCE_RESOLUTION_ERROR",
-      "MANUAL_DRAIN_REQUIRED",
-      "MANUAL_DRAIN_MISMATCH",
-      "DRAIN_VERIFIED"
-    ]
+      "PF10_REFERENCE_VISIBLE",
+      "PF10_REFERENCE_NOT_VISIBLE",
+      "SOURCE_RESOLUTION_ERROR"
+    ],
+    "prohibited": [
+      "byte-for-byte verification",
+      "verifying the contents of the addendum",
+      "mismatch analysis",
+      "requiring or reporting any drain status",
+      "additional validation, remediation, reconciliation, or follow-up work"
+    ],
+    "scope": "One check only: confirm PF10 reflects the update and that the newly added reference is visible to the agent. Presence and visibility, nothing else.",
+    "sufficient_evidence": "A basic title check. The title need not match exactly.",
+    "when": "The turn immediately after a PF10 build-notes addendum is created."
   },
   "post_merge_three_event_contract": {
     "agent_merge_authorized": false,
@@ -974,8 +985,7 @@
   "terminal_contract": {
     "invocation_terminal_recoverable": [
       "SOURCE_RESOLUTION_ERROR",
-      "MANUAL_DRAIN_REQUIRED",
-      "MANUAL_DRAIN_MISMATCH",
+      "PF10_REFERENCE_NOT_VISIBLE",
       "CURRENT EVIDENCE PENDING IN A NON-PR35 BRANCH WHEN NO RUNNABLE RECEIVER EXISTS"
     ],
     "rule": "state completion/stop and return to Nathan; no continuation prompt",

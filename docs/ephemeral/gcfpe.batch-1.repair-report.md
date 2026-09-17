@@ -2,7 +2,7 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_REPAIR_REPORT
-artifact_version: "4.0"
+artifact_version: "5.0"
 report_date: 2026-09-17
 supersedes_in_place: "v2.0 of the same path, 2026-09-17; v2.0 superseded v1.0 (verdict BATCH_1_BLOCKED)"
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
@@ -203,9 +203,29 @@ Owner action.**
 | The addendum in PF10 carried pre-drain fields, pinned versions, session narrative and a table assigning Nathan work. | Repaired in place on his explicit instruction; PF10's version bumped. It is now the rule and nothing about its own handling. |
 | This session pinned PF versions in the addendum, ledgers and report. | All removed. **PF04 and PF02 already forbade this** — my error against existing canon, not a new rule. |
 
-Recorded for their owning batches, not edited here: `ESC-40`, `IA-30`, `QA-70` and
-`RS-20` carry the same addendum clause, and the graph carries
-`pf10_post_drain_verification` and the `RS-40.drain_verified` route.
+**The drain machine is retired, and the Product Owner specified what replaces it.**
+After a PF10 build note is created, the next turn performs **one check only**:
+confirm PF10 reflects the update and that the newly added reference is visible.
+A basic title check suffices; the title need not match perfectly. No byte-for-byte
+verification, no checking the addendum's contents, no mismatch analysis, no drain
+status required or reported, no further validation, remediation, reconciliation or
+follow-up. Once confirmed, the check is complete.
+
+The graph's `pf10_post_drain_verification` is replaced by
+`pf10_reference_visibility_check`; the `PF10_POST_DRAIN_VERIFICATION` vocabulary by
+`PF10_REFERENCE_VISIBILITY`; `pf10_addendum_contract` loses `status` and
+`canonicality`, keeps twelve content `required_fields`, and gains
+`forbidden_fields`, `paste_ready`, `assume_pasted_next_turn` and
+`agent_may_litigate_product_owner_action: false`. `terminal_contract` swaps the two
+retired states for `PF10_REFERENCE_NOT_VISIBLE`. Both `-30` bodies carry the
+one-check rule verbatim. **Zero residual drain states remain in `global.json`.**
+
+This is a shared governance contract rather than per-prompt data, so it was settled
+here rather than deferred. The consequence is recorded: five prompts still implement
+the old machine and disagree with the contract until their batches run —
+`IA-30` (2), `RS-20` and **`RS-40`** (3), `QA-70` (4), `ESC-40` (5). `RS-40` is the
+substantial one: it implements the retired four-state machine end to end, and its
+`drain_verified` route is the graph's one standing build warning.
 
 ### One observation still open, blocking nothing
 
@@ -222,11 +242,11 @@ hand-edited and no hash was computed by hand.
 python3 graph_parts.py build docs/graph/parts <scratchpad>
   WARNING  state_routes[RS-40]: declared route(s) with no backing edge: drain_verified
   build: 55 nodes, 236 edges, 55 state_routes
-         embedded JSON 582287 bytes  sha256 5c45e58347c9e04f57105fc5d96a44d14ea2ee80003a5aa0a873d8ab440a1b70
+         embedded JSON 582678 bytes  sha256 20be6e3b4147cd62b997c0cd830ae046d28b831e8c771f785fa85174fdb5543a
          validation PASS
 ```
 
-**Proof token — `edges 236 · embedded JSON 582287 B · sha256 5c45e583…`**
+**Proof token — `edges 236 · embedded JSON 582678 B · sha256 20be6e3b…`**
 
 | | |
 |---|---|
@@ -239,9 +259,9 @@ python3 graph_parts.py build docs/graph/parts <scratchpad>
 Parts changed: `global.json` and `prompts/CF-C-10.json`. **53 prompt parts
 untouched**, which is what makes the scope provable rather than asserted.
 
-**The second pass changed no part and the token is unchanged.** Rebuilt from the
-same parts after the specification-format repairs: identical `236 edges ·
-582287 B · sha256 5c45e583…`. This is expected — §4.6 governs artifact *format*,
+**The second pass changed no part.** The fourth pass changed `global.json` only,
+retiring the drain machine: `236 edges · 582678 B · sha256 20be6e3b…`, validation
+PASS, and the only warning is still the known Batch 3 `RS-40.drain_verified` orphan. This is expected — §4.6 governs artifact *format*,
 which the graph does not encode. The six `SPECIFICATION_DELTA` strings in the
 parts are artifact-type names and route conditions in `output_artifacts`,
 `result_states` and edge conditions, not schema declarations.

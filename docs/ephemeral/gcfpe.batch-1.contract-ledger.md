@@ -2,7 +2,7 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_CONTRACT_LEDGER
-artifact_version: "3.0"
+artifact_version: "4.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
@@ -333,6 +333,46 @@ This is named as the central defect the whole repair exists to close.
 appears in the other four producers — `ESC-40`, `IA-30`, `QA-70`, `RS-20` — and the
 graph carries `pf10_post_drain_verification` plus the `RS-40.drain_verified` route.
 Those belong to Batches 3, 4 and 5 under §4.7 of the plan. Not edited here.
+
+### 11.1 The drain machine, retired — Product Owner specification
+
+The Product Owner then specified what replaces it. After a PF10 build note is
+created, the next turn performs **one check only**: confirm PF10 reflects the
+update and that the newly added reference is visible. Presence and visibility,
+not validation. A basic title check suffices and the title need not match
+perfectly. No byte-for-byte verification, no checking the addendum's contents,
+no mismatch analysis, no drain status required or reported, and no further
+validation, remediation, reconciliation or follow-up. Once confirmed, the check
+is complete.
+
+| ID | Was | Now | Status |
+|---|---|---|---|
+| `B1-PAP-05` | `pf10_post_drain_verification` defined a four-state machine: `DRAIN_VERIFIED`, `MANUAL_DRAIN_REQUIRED`, `MANUAL_DRAIN_MISMATCH`, `SOURCE_RESOLUTION_ERROR`, with "no inference about whether Nathan drained" | `pf10_reference_visibility_check` — `when`, `scope`, `sufficient_evidence`, three outcomes, and an explicit `prohibited` list carrying the five bans verbatim | CLOSED |
+| `B1-PAP-06` | `_other_state_vocabularies.PF10_POST_DRAIN_VERIFICATION` | `PF10_REFERENCE_VISIBILITY` — `PF10_REFERENCE_VISIBLE`, `PF10_REFERENCE_NOT_VISIBLE`, `SOURCE_RESOLUTION_ERROR` | CLOSED |
+| `B1-PAP-07` | `pf10_addendum_contract` carried `status: READY_FOR_MANUAL_DRAIN` and `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, and `required_fields` listed those plus `drain_owner` and four `drain_verification_anchor.*` entries | Both removed. `required_fields` is now twelve content fields. Added `forbidden_fields`, `paste_ready: true`, `assume_pasted_next_turn: true`, `agent_may_litigate_product_owner_action: false`, and `format_home` pointing at the Hub | CLOSED |
+| `B1-PAP-08` | `terminal_contract.invocation_terminal_recoverable` listed `MANUAL_DRAIN_REQUIRED` and `MANUAL_DRAIN_MISMATCH` | `PF10_REFERENCE_NOT_VISIBLE`; the mismatch state is gone | CLOSED |
+| `B1-PAP-09` | `CF-C-30` / `CF-E-30` `DELTA_APPROVE` continuation | Carries the one-check rule verbatim, including all five prohibitions and the not-visible observation that makes no claim about the Product Owner's action | CLOSED |
+
+**Zero residual drain states in `global.json`.** Verified by search.
+
+**Why the global contract changed inside a Batch 1 run.** `pf10_addendum_contract`,
+`pf10_post_drain_verification` and the state vocabulary are one shared governance
+statement, not per-prompt data. The Product Owner set the rule; leaving the graph
+asserting the banned posture would have kept it in force for every producer. The
+five prompts that still implement the old machine are named below and belong to
+their batches.
+
+### 11.2 Known disagreement until Batches 2–5 run
+
+| Prompt | Batch | Carries |
+|---|---|---|
+| `IA-30` | 2 | old addendum clause |
+| `RS-20` | 3 | old addendum clause |
+| **`RS-40`** | **3** | **the retired four-state machine end to end — 11 references in its part, and its `drain_verified` route is the graph's one standing build warning** |
+| `QA-70` | 4 | old addendum clause |
+| `ESC-40` | 5 | old addendum clause |
+
+Not edited here. Recorded under §4.7 of the plan.
 
 ## 12. Findings this pass raised and did **not** repair
 
