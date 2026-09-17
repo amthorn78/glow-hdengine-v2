@@ -2,8 +2,10 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_REPAIR_REPORT
-artifact_version: "5.0"
+artifact_version: "6.0"
 report_date: 2026-09-17
+session: https://claude.ai/code/session_01SVYWjz8nykXgyJJjWw4FXH
+managing_prompt: "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1"
 supersedes_in_place: "v2.0 of the same path, 2026-09-17; v2.0 superseded v1.0 (verdict BATCH_1_BLOCKED)"
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 repairs_validation: docs/ephemeral/gcfpe.batch-1.validation-report.md
@@ -45,6 +47,28 @@ A second pass on 2026-09-17 then closed the `SPECIFICATION_FORMAT_AUTHORITY`
 class under the Product Owner's mandate and the canon he drained as PF10 §2.14.
 Nothing is open. Three observations are recorded for Nathan in §7; none blocks
 Batch 1 and two of them are canon defects this session is not permitted to fix.
+
+## 1A. Approval evidence and session identity
+
+| | |
+|---|---|
+| Session | `session_01SVYWjz8nykXgyJJjWw4FXH` |
+| Date | 2026-09-17 |
+| Managing prompt | GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1 |
+| Authorization | Batch 1 repair re-run, Product Owner, 2026-09-17. **Batch 1 only.** Batches 2–6 not reopened |
+
+Three further Product Owner mandates were issued during the run. Each is part of
+the authorization and each is recorded where it binds:
+
+| # | Mandate | Where it landed |
+|---|---|---|
+| 1 | *"spec formats are determined by referenced canon. I don't like to hardcode canon into prompts"* | R1 closed by completing D4; the two `-40` bodies |
+| 2 | *"we do need to mandate. Spec formatting comes from referenced canon… Make note in the notion plan and review your batch again"* | Plan §4.6 and its §5 checklist line; all eleven re-reviewed |
+| 3 | *"AI agents MAY NOT litigate PO action"*, addenda 100% paste-ready, assume pasted next turn, never pin a PF document version, and one presence check on the following turn | Plan §4.7; the Hub's canonical addendum format; the graph contract; `CF-C-30` and `CF-E-30` |
+
+**One explicit canon-write grant.** *"You may repair it in place"*, for the PF10
+Specification-format addendum only. `docs/pfcanon/` is otherwise read-only to this
+session; no other canon file was read for modification or modified.
 
 ## 2. Per-prompt disposition, against the bodies as they now stand
 
@@ -297,3 +321,57 @@ register, Alpha state, catalog, Flow Index and PR/CI state were untouched. No
 historical Batch 1 artifact was edited, renamed or deleted. Batches 2–6 were not
 executed and no Batch 2 handoff was prepared. No ChatGPT Library artifact or
 Library ID was used. O3 was left alone as out of scope. Nothing was merged.
+
+## 10. Changed pages and controls
+
+**Notion — prompts.** All eleven Batch 1 bodies. Each fetched fresh immediately
+before editing and read back completely afterwards; in every readback the target
+clauses are present and no other section moved.
+
+**Notion — controls.**
+
+| Control | Change |
+|---|---|
+| GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1 | §4.6 added (specification format authority); §4.7 added (addendum posture and the one-turn check); three §5 checklist lines added; §13 Batch 1 line and *Position* rewritten; every pinned PF version removed |
+| Glow Operations Hub | The control that *required* `status`/`canonicality`/`drain_owner` replaced; canonical **PF10 build-notes addendum format** added, with the one-turn check; PFCanon source line repointed from the Drive folder to `docs/pfcanon/` |
+
+**Canon.** The PF10 Specification-format addendum rewritten in place to the
+paste-ready standard; PF10's version bumped in filename and header. Written only
+under the explicit grant in §1A.
+
+**Repository.**
+
+| | |
+|---|---|
+| PR #409 | **MERGED**, squashed as `6355add` |
+| PR #410 | **OPEN** — 3 commits, 5 files, `mergeable_state: clean` |
+| Paths | `docs/ephemeral/` (3 records), `docs/graph/parts/global.json`, `docs/graph/parts/prompts/CF-C-10.json`, the one PF10 canon file |
+
+## 11. Author self-assessment
+
+Three faults in this session, all recorded in the ledgers rather than smoothed
+over. None changed the final state, and each is a pattern worth carrying forward.
+
+**1 — Repaired ahead of canon.** Six prompt bodies were edited to resolve a
+Specification format from canon *before* the governing addendum was drained,
+inverting canon-first order and going beyond the instruction, which was to create
+the addendum. Between the edits and the drain the CRD and Epic Specification lanes
+would have returned `SOURCE_RESOLUTION_ERROR`. The Product Owner elected to keep
+the edits rather than revert; the drain landed the same day and nothing was
+produced in the gap. Plan §4.7 now states the order explicitly.
+
+**2 — Pinned PF document versions.** The addendum, both ledgers and this report
+pinned `v13.2.7`, `v2.0.4` and `v0.9`. **PF04 and PF02 already forbade this** —
+"do not anchor to PF10 file versions", "by title only (no version numbers)". It was
+an error against canon that already existed, not a rule that had to be invented.
+All pins removed.
+
+**3 — Understated a defect.** v2.0 of this report described the four `glow-*`
+tokens as *defined* tokens a consumer could validate against. They return zero hits
+across `docs/pfcanon/`. They were false conformance, identical in kind to the delta
+defect R1 raised — the characterization argued against the Product Owner's own
+mandate on weaker evidence than the mandate deserved.
+
+A fourth, structural and not this session's: the Glow Operations Hub *required* the
+addendum drainage fields, so every producer prompt inherited a defect no prompt
+author introduced. It is closed at the control rather than at the eleven prompts.
