@@ -1620,7 +1620,7 @@ The kickoff is the only artifact in the table whose shape a prompt may carry. Wh
 A prompt that produces a Specification, a Specification delta, or an Implementation Plan:
 
 1. Resolves the governing canon at run time through its own PFCanon source contract, and cites the exact canon and section it resolved in the artifact it produces.
-2. Does not name PF04, PF27 or PF30 in its body. The binding lives here so it moves in one place rather than in every prompt.
+2. May name a governing PF document, and names it by its canonical document name and section, never by a versioned filename. `PF27-Canon-Plan-Templates` is correct; `PF27-Canon-Plan-Templates-v2.0.4.md` is a defect. PF02 and PF04 already route by title without version numbers, and this addendum adds no prohibition beyond that.
 3. Declares no `schema_version` for a Specification, a delta, an Implementation Plan, or any other permanent governed record.
 4. Does not restate a governed artifact's section or field structure.
 5. Returns `SOURCE_RESOLUTION_ERROR` with the failed predicate and recovery owner when the governing canon cannot be resolved and read. It does not author against an assumed format, reuse a neighbouring artifact's token, or mint one.
@@ -1635,7 +1635,7 @@ PFCanon's schema convention is namespaced to the PF that defines the artifact.
 
 ### Reference posture
 
-Cite PF documents by name and section in a prompt body, and in any reference whose purpose is to route a reader to current canon. Do not pin a PF file version in either place. Versions move, and a pinned version is stale the moment they do.
+Cite PF documents by canonical document name and section in a prompt body, and in any reference whose purpose is to route a reader to current canon. Naming the document is expected; pinning its file version is the defect. Versions move, and a pinned version is stale the moment they do. Each PF document carries its canonical name in its own header, which is the name to use.
 
 This is a routing rule, not a records rule. Run artifacts, reports, ledgers and historical evidence retain the exact resolved version and identity of what they actually read, as PF04 requires of use and provenance records. Recording what was resolved is not pinning it, and stripping those records does not serve this rule.
 
@@ -1645,6 +1645,6 @@ Replace *CRD Plan* and *Epic Plan* with *CRD Specification* and *Epic Specificat
 
 ### Revision note
 
-This addendum was first issued with a binding table that routed CRD Specification structure to PF30 and left the Implementation Plan's structure to the producing prompt. Both were wrong: PF30 disclaims reusable structures in favour of PF27, and PF27 carries a General Implementation Plan template. The reference posture also read as an unqualified ban on PF versions in any document, which conflicted with PF04's requirement that use and provenance records retain exact resolved identities. Anything authored against the earlier table should be rechecked against this one. No prompt body needs to change on account of this revision, because prompts resolve the binding here rather than restating it.
+This addendum was first issued with a binding table that routed CRD Specification structure to PF30 and left the Implementation Plan's structure to the producing prompt. Both were wrong: PF30 disclaims reusable structures in favour of PF27, and PF27 carries a General Implementation Plan template. The reference posture also read as an unqualified ban on PF versions in any document, which conflicted with PF04's requirement that use and provenance records retain exact resolved identities. It also forbade prompts from naming PF27 or PF30 at all, which is stricter than PF02 and PF04, both of which route by title and forbid only version numbers; prompts may name the governing document by its canonical name. Anything authored against the earlier table should be rechecked against this one. No prompt body needs to change on account of this revision, because prompts resolve the binding here rather than restating it.
 
 \<eof\>
