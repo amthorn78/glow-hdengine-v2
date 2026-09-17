@@ -1,0 +1,273 @@
+schema_version: gcfpe-governance-proposed-changeset/1.0
+run_id: GCFPE-REPAIR-INDEPENDENT-POSTFLIGHT-20260915.1
+status: NON_AUTHORITATIVE_PROPOSAL_ONLY
+mutation_authority: false
+candidate_snapshot_sha256: 06069f7a434dbfcfc71b9fb0df79b7d3e878bdbe7175f7ea894d631e77c90737
+findings:
+- WGA-GCFPE-REPAIR-INDEPENDENT-POSTFLIGHT-20260915.1-0002
+- WGA-GCFPE-REPAIR-INDEPENDENT-POSTFLIGHT-20260915.1-0001
+required_authority: Separate authorized repair-owner work; a resulting changed snapshot
+  requires a fresh independent postflight and later exact-snapshot Product Owner promotion
+  approval.
+smallest_safe_restart: A separate authorized repair author resumes Phase 2 graph/interface
+  reconciliation for the existing unselected candidate, then affected Phase 3/4 binding
+  work, Phase 5 checks and a fresh independent Phase 6 on a newly frozen digest. This
+  audit does not authorize or perform that restart.
+changes:
+- target:
+    key: CL-C-10
+    kind: PROMPT
+    stable_id: 3db4590a05eb81ad8989faa77f441a64
+    url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
+    version: '091426.1'
+    parent: 3db4590a05eb81d59059eb6b95ed5fcf
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body: &id001
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/prompts/a/CL-C-10.md
+      bytes: 36878
+      sha256: bcbfffd5d2d65bdaf679f91a8b04a1581432e9cbd4a27895711b2b171deb7919
+  expected_base: *id001
+  requested_operation: Reconcile class-specific QA PASS producer/receiver compatibility
+    and exact downstream binding; existing closure receiver role contracts are verification
+    targets, not permission to broaden them.
+  intended_result: Epic and CRD PASS each form a lawful native closure intake; no
+    new role, session, approval or R1 row.
+  validation_rules:
+  - TOP-001
+  - TOP-002
+  - CTR-002
+  owner: Authorized GCFPE repair author
+  source_disposition_boundary: Existing unselected candidate only; preserve selected
+    release and all predecessor sources.
+- target:
+    key: CL-E-10
+    kind: PROMPT
+    stable_id: 3db4590a05eb811a8578d75885c16cac
+    url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
+    version: '091426.1'
+    parent: 3db4590a05eb81d59059eb6b95ed5fcf
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body: &id002
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/prompts/a/CL-E-10.md
+      bytes: 37335
+      sha256: 67c97542ac5ae9c6c2da58d5a2f24826e918bcee8d7d3cdc5a04292b8017174d
+  expected_base: *id002
+  requested_operation: Reconcile class-specific QA PASS producer/receiver compatibility
+    and exact downstream binding; existing closure receiver role contracts are verification
+    targets, not permission to broaden them.
+  intended_result: Epic and CRD PASS each form a lawful native closure intake; no
+    new role, session, approval or R1 row.
+  validation_rules:
+  - TOP-001
+  - TOP-002
+  - CTR-002
+  owner: Authorized GCFPE repair author
+  source_disposition_boundary: Existing unselected candidate only; preserve selected
+    release and all predecessor sources.
+- target:
+    key: QA-120
+    kind: PROMPT
+    stable_id: 3db4590a05eb81589d21e798cf38e8ba
+    url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
+    version: '091426.1'
+    parent: 3db4590a05eb814d96d3dcfa8835f96d
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body: &id003
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/prompts/d/QA-120.md
+      bytes: 11781
+      sha256: 7f8a317e97ac10b9b892a8022e8b508216b2cd7f33c7ba14989c09449f718233
+  expected_base: *id003
+  requested_operation: Reconcile class-specific QA PASS producer/receiver compatibility
+    and exact downstream binding; existing closure receiver role contracts are verification
+    targets, not permission to broaden them.
+  intended_result: Epic and CRD PASS each form a lawful native closure intake; no
+    new role, session, approval or R1 row.
+  validation_rules:
+  - TOP-001
+  - TOP-002
+  - CTR-002
+  owner: Authorized GCFPE repair author
+  source_disposition_boundary: Existing unselected candidate only; preserve selected
+    release and all predecessor sources.
+dependent_targets:
+  graph_sha256: 711c7c6635a6ec72e8b6167e8524fa9db1b3b8a07a50d2034a7d8d3149150c27
+  contract_sha256: 94a4929919872c1a8b99d416d92cff7fa16e72261b8ac163c93945fe834a26b0
+  packages:
+  - change-flow
+  - flowmaster-validate
+  controls:
+  - key: CTRL-FLOW-INDEX
+    kind: CONTROL
+    stable_id: 3db4590a05eb81de9736ea69bac61016
+    url: https://app.notion.com/p/3db4590a05eb81de9736ea69bac61016
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Glow-HDE-Prompt-Flow-Index-GCFPE-20260914.1.md
+      bytes: 26444
+      sha256: 1a60c180f3321d46ef3999011c7c108cd86c0d0e60475933df268643a3aac312
+  - key: CTRL-HUB-CHANGE-FLOW
+    kind: CONTROL
+    stable_id: 3db4590a05eb81d59059eb6b95ed5fcf
+    url: https://app.notion.com/p/3db4590a05eb81d59059eb6b95ed5fcf
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Hub-HDE-Change-Flow-GCFPE-20260914.1.md
+      bytes: 4768
+      sha256: bddf03abecb5747b05f98df706a302211f19b69cfd5de768557a94eba2685f2d
+  - key: CTRL-HUB-IA
+    kind: CONTROL
+    stable_id: 3db4590a05eb8195a2ccf7c0959a8b6e
+    url: https://app.notion.com/p/3db4590a05eb8195a2ccf7c0959a8b6e
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Hub-HDE-IA-GCFPE-20260914.1.md
+      bytes: 5201
+      sha256: bc7059af58ce043d77829bfc13c45aee416c290582cb021e957f04479b0aff6e
+  - key: CTRL-HUB-QA
+    kind: CONTROL
+    stable_id: 3db4590a05eb814d96d3dcfa8835f96d
+    url: https://app.notion.com/p/3db4590a05eb814d96d3dcfa8835f96d
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Hub-HDE-QA-GCFPE-20260914.1.md
+      bytes: 3609
+      sha256: d5e55901946ae06b58600ded3be75d9e72e14c5f5bd38a852c3339b939656b5c
+  - key: CTRL-HUB-ESCALATION
+    kind: CONTROL
+    stable_id: 3db4590a05eb81cd938de84cfffead9c
+    url: https://app.notion.com/p/3db4590a05eb81cd938de84cfffead9c
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Hub-Escalation-GCFPE-20260914.1.md
+      bytes: 2566
+      sha256: c01eec884f8f13994fdf852e7af5e96309bc0a2a7ae6ad689ca77146d4a9c4e8
+  - key: CTRL-HUB-TW
+    kind: CONTROL
+    stable_id: 3db4590a05eb811b9c14f2ae89c28df7
+    url: https://app.notion.com/p/3db4590a05eb811b9c14f2ae89c28df7
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/Hub-HDE-TW-GCFPE-20260914.1.md
+      bytes: 2566
+      sha256: 580a2e0794b4fb8acdcf3d24ba686e91943abce5f5c093006f46f761c6173416
+  - key: CTRL-CATALOG
+    kind: CONTROL
+    stable_id: 3db4590a05eb81738ef1d846e3c0df8c
+    url: https://app.notion.com/p/3db4590a05eb81738ef1d846e3c0df8c
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-20260914.1-Candidate-Catalog-Draft.md
+      bytes: 10862
+      sha256: 29461dcc9e6524cd5b571aebe04facc37740684d6eae5fbbf36810d027032292
+  - key: CTRL-ALPHA-CHECKLIST
+    kind: CONTROL
+    stable_id: 3db4590a05eb812f87caed515836687f
+    url: https://app.notion.com/p/3db4590a05eb812f87caed515836687f
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-Alpha-Establishment-and-Change-Management-Checklist-091426.1.md
+      bytes: 6963
+      sha256: 235d521afdbbdb70721ed5525741e0450a9d933d8ab883c5798e519bd0cd8c5e
+  - key: CTRL-ALPHA-NOTES
+    kind: CONTROL
+    stable_id: 3db4590a05eb8182ade0c1eb46c7e80f
+    url: https://app.notion.com/p/3db4590a05eb8182ade0c1eb46c7e80f
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/HDE-EPIC040-Alpha-Run-Notes-20260914.1.md
+      bytes: 4150
+      sha256: 3c77a5016706f90d6a41968f03db7fef5d2080e19717f0fa075eab7f93acbab6
+  - key: CTRL-PE-METAPROMPT
+    kind: CONTROL
+    stable_id: 3db4590a05eb8174be35d9e35acb3f77
+    url: https://app.notion.com/p/3db4590a05eb8174be35d9e35acb3f77
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/PE-Metaprompt-091426.1.md
+      bytes: 66711
+      sha256: 248758dcef05563660e6643ded243728bfaaa086b04623d270cf3c72e905a770
+  - key: CTRL-REGISTER-ENTRY
+    kind: CONTROL
+    stable_id: 3db4590a05eb816f925ef3b0659de3b8
+    url: https://app.notion.com/p/3db4590a05eb816f925ef3b0659de3b8
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-20260914.1-Register-Entry-Draft.md
+      bytes: 2774
+      sha256: 3853ddbffa388c98b9720fd3bab9c9af791a26777e1b8e25457bc1ee0db136de
+  - key: CTRL-SKILL-FIT
+    kind: CONTROL
+    stable_id: 3db4590a05eb81d49943dffdaaaeed7c
+    url: https://app.notion.com/p/3db4590a05eb81d49943dffdaaaeed7c
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-Skill-Fit-and-Interoperability-Decision-20260914.1.md
+      bytes: 12015
+      sha256: 49a8242f4fb65dd3ffab5b97c25fee51618491c2304067e963028b0730ec9ab4
+  - key: CTRL-DRIVE:1TDtZNMNxgqt6h-HzQ2up_syK5zauLqBj
+    kind: CONTROL
+    stable_id: 1TDtZNMNxgqt6h-HzQ2up_syK5zauLqBj
+    url: https://drive.google.com/file/d/1TDtZNMNxgqt6h-HzQ2up_syK5zauLqBj/view
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-Direct-Handoff-and-Runtime-Artifact-Operating-Procedure-v4.0.0-20260914.md
+      bytes: 24123
+      sha256: 34d1f22bcc98ed2cf4ec1753b57a2dfec9eb1afdf345d38636a430bffb7a94e7
+  - key: CTRL-DRIVE:1svSBwxD4HEphs8TCh1gZV9KRTKWq8ZlU
+    kind: CONTROL
+    stable_id: 1svSBwxD4HEphs8TCh1gZV9KRTKWq8ZlU
+    url: https://drive.google.com/file/d/1svSBwxD4HEphs8TCh1gZV9KRTKWq8ZlU/view
+    version: '091426.1'
+    parent: null
+    lifecycle: UNSELECTED_CANDIDATE
+    frozen_body:
+      path: /workspace/scratch/d384c0d6200f/gcfpe-postflight/frozen-audit-snapshot/controls/GCFPE-20260914.1-Direct-Handoff-and-Fixtures-Control-Copy.md
+      bytes: 18897
+      sha256: a99704ad20582fb17dcb5295935e4f12de9bca5a1ebf2b8be08e040435d5e21b
+  operation: Determine exact dependent graph/contract/fixture/control changes in the
+    separate repair role; this proposal does not contain or stage replacement prompt
+    bodies.
+warning_targets:
+- path: /root/.codex/skills/remote-skills/skill-6a93504b3ac881918977417b1bb8085e/references/project-prompt-registry-schema.md
+  expected_sha256: 3aef369fc78811a85d6bf476a960fbac3244bdd129d07281e8b25262de8cefb9
+  requested_operation: Align current examples with immutable approved bases or explicitly
+    mark the old remediation examples historical.
+  owner: Separately authorized skill maintainer
+- path: /root/.codex/skills/remote-skills/skill-6a93504b3ac881918977417b1bb8085e/references/behavioral-fixtures.md
+  expected_sha256: 715140cbb7eaaa91039d22ad860f526294ba5023b1ae2daa4b8d894316711131
+  requested_operation: Align current examples with immutable approved bases or explicitly
+    mark the old remediation examples historical.
+  owner: Separately authorized skill maintainer
+non_actions:
+- No candidate repair performed
+- No promotion packet or selection
+- No checklist or Alpha update
+- No PF10 proposal, edit or drain
+- No product repository, PR, CI, merge, deployment or runtime action
+- No archive move or deletion
