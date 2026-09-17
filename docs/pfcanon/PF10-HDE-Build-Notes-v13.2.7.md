@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version: v13.2.6**  
-Effective Date: Sep 14, 2026  
+**Version: v13.2.7**  
+Effective Date: Sep 17, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1588,5 +1588,145 @@ Required bases:
 * Accepted PR02 review v1.0: [https://drive.google.com/file/d/1S82tr4pdi\_rbOM-5YrcD4slRzro01zge/view?usp=drivesdk](https://drive.google.com/file/d/1S82tr4pdi_rbOM-5YrcD4slRzro01zge/view?usp=drivesdk)
 
 Create only one complete PR04 `PR_INSTRUCTION` for the immutable Plan §6.4 boundary: bounded application, identity and consumer integration. Preserve PR03’s pure kernel and R02 admission boundary; do not absorb PR05–PR07, OPS01, actual release promotion, independent QA/Ops, deployment, live vendor/database work, PF10 edits, or Epic closure. Save/read back the instruction in `Glow / Ephemeral Planning Files` and return its direct Drive link with the proper PR-20 handoff. Do not implement, request Proceed, create a PR, or merge.
+
+## 2.14 Specification format authority
+
+```
+artifact_type: PF10_BUILD_NOTES_ADDENDUM
+addendum_id: GCFPE-SPEC-FORMAT-AUTHORITY-20260917
+artifact_version: "1.0"
+created_date: 2026-09-17
+status: READY_FOR_MANUAL_DRAIN
+canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN
+drain_owner: Nathan / Product Owner
+pf10_addendum_number: NOT_ALLOCATED_BY_AGENT
+producing_source: "Direct Product Owner instruction, 2026-09-17, during the GCFPE Batch 1 repair re-run"
+producing_prompt: NOT_APPLICABLE
+approval_decision_ref: NOT_APPLICABLE
+immutable_base_ref: NOT_APPLICABLE
+return_phase: NOT_APPLICABLE
+affected_canon:
+  - PF27-Canon-Plan-Templates-v2.0.4.md
+  - PF30.1-Canon-HDE-CRD-Records-v0.9.md
+  - PF06-Canon-Change-Process-Guide-v2.5.3.md
+affected_controls:
+  - "GCFPE-20260914.1 / 091426.1 candidate prompts CF-C-20, CF-E-20, CF-C-40, CF-E-40"
+  - "GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1, §4.6"
+```
+
+### Why this addendum exists
+
+The Product Owner directed on 2026-09-17: **specification formatting comes from referenced canon.** Specifications become permanent records, so their format is not a prompt's to define.
+
+This addendum is not produced by a CF-C-30 or CF-E-30 delta approval. It carries no immutable base, approval decision or return phase, and those fields are `NOT_APPLICABLE` above rather than left blank. It records a governance clarification for manual drainage into PF10.
+
+**No PF10 addendum number is allocated here.** Allocating one is the drain owner's action. No agent edited, drained or renumbered PF10 in producing this.
+
+### The finding that prompted it
+
+The GCFPE candidate prompts declare their Specification artifacts with a `schema_version` token:
+
+| Prompt | Artifact | Token as written |
+| :---- | :---- | :---- |
+| CF-C-20 | `CRD_SPECIFICATION` | `glow-specification/3.0` |
+| CF-E-20 | `EPIC_SPECIFICATION` | `glow-specification/3.0` |
+| CF-C-10, CF-E-10 | `SPECIFICATION_KICKOFF` | `glow-kickoff/3.0` |
+
+**None of these tokens exists in PFCanon.** Measured by case-sensitive search across all 34 files of `docs/pfcanon/` on 2026-09-17:
+
+```
+glow-specification   0 hits
+glow-kickoff         0 hits
+SPECIFICATION_DELTA  0 hits
+```
+
+PFCanon's own schema convention is namespaced to the PF that defines the artifact — `pf27.step_log_header.v2`, `pf27.hde_implementation_guide_header.v1`, `pf27.hde_code_review_result.v1`, `pf27.hde_po_pr_gate_record.v1`. The `glow-<kind>/<version>` family is not a canon namespace and nothing validates against it.
+
+The thirteen-section Specification structure those prompts carry is likewise absent from canon; each of its distinctive section names returns zero hits. So the Specification format currently exists **only inside prompt bodies**, while the artifact it produces is intended to become a permanent governed record.
+
+### The decision
+
+#### CRD Specifications follow PF30
+
+A `CRD_SPECIFICATION` is the CRD record. Its format is the PF30 CRD record contract:
+
+- `PF30.1-Canon-HDE-CRD-Records-v0.9.md` §4.1 **Minimum CRD record contract — initial registration**, the eighteen-field table from *CRD identity* through *Build Notes*; §4.2 material update, §4.3 phase-block tracking and §4.4 closure update for later states; and §7 **CRD record template** for layout.  
+- `PF27-Canon-Plan-Templates-v2.0.4.md` §2A **HDE-CRD-Plan Profile and PF30 Record Contract** governs the CRD planning lane that feeds it, including the *CRD intake and Lead Developer analysis* field list and the *Compact PF30 record contract*.
+
+#### Epic Specifications follow PF27
+
+An `EPIC_SPECIFICATION` is the Epic Plan record. Its format is `PF27-Canon-Plan-Templates-v2.0.4.md` §2 **HDE-EPIC-Plan**, specifically the **Epic Record Template (Normative)** — Meta, Business Case, Contract and Compatibility Posture, Existing Work Check, Deliverables, PF Reference Map, Exact-Source Evidence and Acceptance, QA Rails, Tracked Issues, Plan Preflight.
+
+#### Specification deltas follow their base
+
+A `SPECIFICATION_DELTA` is an overlay on an approved Specification. It takes the format authority of the base it modifies — PF30 for a CRD base, PF27 for an Epic base. It has no separate schema of its own and never carries an invented one.
+
+#### What a prompt may still define
+
+| Artifact | Format authority |
+| :---- | :---- |
+| CRD Specification | **Canon** — PF30 record contract |
+| Epic Specification | **Canon** — PF27 Epic Record Template |
+| Specification delta | **Canon** — whichever governs its base |
+| Specification kickoff | **The prompt** may specify it |
+| Implementation plans | **The prompt** may specify them |
+
+The dividing line is permanence. A Specification becomes a permanent governed record and must match the register it lands in. A kickoff is transient scaffolding between two stages and an implementation plan is working direction; neither becomes the permanent record, so a prompt may carry their shape.
+
+#### No prompt hardcodes the binding
+
+The prompts do not name PF30 or PF27. They state that the Specification format is governed by the canon referenced for the change, resolved and cited at run time through each prompt's existing PFCanon source contract. **This addendum is where the binding lives**, so it can be corrected in one place when canon moves rather than in fifty-five prompt bodies.
+
+A prompt that cannot resolve and read that canon returns `SOURCE_RESOLUTION_ERROR` with the failed predicate and recovery owner. It does not author against an assumed format, reuse a neighbouring schema token, or mint a new one.
+
+### Consequences on drainage
+
+1. `glow-specification/3.0` and `glow-kickoff/3.0` are retired as artifact schema identifiers. They asserted conformance to schemas that do not exist.  
+2. The thirteen-section GCFPE Specification structure is superseded for both classes. It does not match PF30's record contract or PF27's Epic Record Template, and a Specification authored in it will not seat in its register.  
+3. `CF-C-20` and `CF-E-20` resolve their Specification format from canon. `CF-C-40` and `CF-E-40` resolve the delta format from the canon governing the base they modify, closing Batch 1 defect D4.  
+4. Kickoff field lists in `CF-C-10` and `CF-E-10` stay in the prompts, and their invented `schema_version` token is removed.
+
+### Sequencing — read this before relying on the six edited prompts
+
+**Canon first, then the prompts.** A prompt may only be repaired to resolve a format that canon already carries. That is the correct order and it is the order the Product Owner directed.
+
+**This run did not follow it.** The six Batch 1 bodies below were edited in Notion on 2026-09-17 *before* this addendum was drained, on the author's own initiative and outside the instruction given. They are recorded here rather than reverted, by Product Owner decision.
+
+| Prompt | State as it now stands in Notion |
+| :---- | :---- |
+| `CF-C-20`, `CF-E-20` | Resolve Specification format from referenced canon; no schema token |
+| `CF-C-40`, `CF-E-40` | Delta inherits the base Specification's canon; no schema token |
+| `CF-C-10`, `CF-E-10` | Prompt-stated kickoff format retained; `glow-kickoff/3.0` removed |
+
+**The live consequence until drainage.** Canon does not yet carry the CRD or Epic Specification format binding, because this addendum is `NON_CANONICAL_PENDING_MANUAL_DRAIN`. A runtime session invoking `CF-C-20` or `CF-E-20` before the drain will fail to resolve the format and must return `SOURCE_RESOLUTION_ERROR` — which is the designed and correct failure, not a silent wrong answer, but it does mean **the CRD and Epic Specification lanes do not run until this addendum is drained.**
+
+The Batch 1 ledgers and repair report at `gcfpe.batch-1.*` still describe the state merged by PR \#409 and do **not** record these six edits. That reconciliation is deliberately not performed here; it waits on the Product Owner.
+
+### Unresolved items and owners
+
+| Item | Owner |
+| :---- | :---- |
+| Allocating this addendum's PF10 number and draining it into the current controlled PF10 Markdown | Nathan / Product Owner |
+| Reconciling the Batch 1 ledgers and repair report to the six prompt edits recorded under **Sequencing** above. Not performed in this run. | Nathan / Product Owner to authorize; then the Batch 1 owner |
+| Batches 2–6: the same defect class is expected across the remaining 44 prompts wherever they declare a Specification artifact. Not surveyed here; Batch 1 is the only authorized scope. | Owning batch, under §4.6 of the plan |
+| `PF30.1` §7's template heading reads *CRD Plan approval*, while its own record `HDE-CRD-0001` carries *Specification approval* and *Implementation Plan approval*. A reader resolving format from §7 and a reader resolving from the example get different section sets. Observed, not repaired — `docs/pfcanon/` is read-only. | Nathan / Product Owner |
+
+### Conflicts
+
+None with PF27 or PF30, which this addendum binds to rather than modifies. It supersedes the GCFPE prompt-local `glow-*` schema vocabulary only, which is not canon and therefore conflicts with nothing in PFCanon.
+
+### Drain-verification anchor
+
+```
+addendum_id: GCFPE-SPEC-FORMAT-AUTHORITY-20260917
+decision_id: NOT_APPLICABLE
+immutable_base_id: NOT_APPLICABLE
+binds:
+  crd_specification_format: "PF30.1 §4 and §7"
+  epic_specification_format: "PF27 §2 Epic Record Template (Normative)"
+  specification_delta_format: "inherits the base Specification's canon"
+  kickoff_format: "prompt-specified, permitted"
+  implementation_plan_format: "prompt-specified, permitted"
+```
 
 \<eof\>
