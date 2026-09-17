@@ -1,7 +1,8 @@
 ---
 artifact_type: GCFPE_STORAGE_ARCHITECTURE_REQUIREMENT
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-17
+last_revised: 2026-09-17
 status: BINDING
 authority: Product Owner decision, 2026-09-17
 applies_to: GCFPE-20260914.1 / 091426.1 / 55 candidate prompts and supporting controls
@@ -97,16 +98,43 @@ no seventh batch and no new gate.
 
 Before repairing, each batch searches its own prompts for:
 
+    Drive                      ← primary term, case-sensitive, bare word
     EPHEMERAL_DRIVE
     Ephemeral Planning Files
     Core Docs / PFCanon
     drive.google.com
     direct Drive link
 
+**The bare `Drive` is the primary term and the other five are secondary.** A
+phrase-only survey provably walks past real clauses: the graph's
+`handoff_contract.required[3]` read *"direct Drive artifacts and repository/PR
+references"* and matched none of the five phrases below it. Search the bare word
+first, then the phrases to catch what a case-sensitive word search misses.
+
 Every hit is recorded in the batch contract ledger under finding class
 `STORAGE_ARCHITECTURE`, and closed or blocked explicitly. None may be silently
 skipped. A prompt already repaired in an earlier batch that still carries one of
 these returns to its owning batch ledger under §6.9 of the plan.
+
+### Lineage is evidence, not routing — never "close" it
+
+A `Drive` hit inside a **source binding** is not a storage defect and must not be
+repaired, repointed, or closed. A source binding is any record of what a run
+actually resolved and read: an entry carrying a hash, a `retrieved_at` stamp, or
+an equivalent capture of a resolved identity at a point in time.
+
+`docs/graph/parts/global.json` holds eleven such `drive.google.com` URLs under
+`source_bindings`, nine of them stamped with `retrieved_at` and `sha256`. They
+are a pinned historical capture. **Rewriting them destroys the evidence of what
+was read and proves nothing about current storage.**
+
+The distinction matches PF10, addendum *Specification format authority*: a
+routing reference points a reader at current canon and carries no version; a
+use or provenance record retains the exact resolved identity of what was
+actually read. This survey repairs routing. It never edits provenance.
+
+Record such a hit in the ledger as `STORAGE_ARCHITECTURE / LINEAGE_PRESERVED`
+with no edit, so the survey is complete without the record being damaged.
 
 ## Known affected surfaces
 
