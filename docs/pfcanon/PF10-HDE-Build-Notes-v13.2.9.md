@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version: v13.2.8**  
+**Version: v13.2.9**  
 Effective Date: Sep 17, 2026  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -1591,44 +1591,60 @@ Create only one complete PR04 `PR_INSTRUCTION` for the immutable Plan §6.4 boun
 
 ## 2.14 Specification format authority
 
-Specification formatting comes from referenced canon. A Specification becomes a permanent governed record, so its format belongs to the register it lands in and is not a prompt's to define.
+Specification formatting comes from referenced canon. A Specification becomes a permanent governed record, so its format belongs to the canon that governs it and is not a prompt's to define.
+
+Two distinct things govern each artifact below, and conflating them is what this addendum exists to prevent. **Content authority** establishes what the artifact may and may not contain. **Structure authority** establishes the shape it is written in. They are not always the same document.
 
 ### Binding
 
-| Artifact | Format authority |
-| :---- | :---- |
-| CRD Specification | PF30 — the CRD record contract and CRD record template |
-| Epic Specification | PF27 — the HDE Epic record template, normative |
-| Specification delta | the canon governing the base Specification it modifies |
-| Specification kickoff | the producing prompt may state its format |
-| Implementation plan | the producing prompt may state its format |
+| Artifact | Content authority | Structure authority |
+| :---- | :---- | :---- |
+| Epic Specification | PF04 §9.1.1 | PF27 — the HDE Epic record template, normative |
+| CRD Specification | PF04 §9.1.1 | PF27 — the HDE-CRD-Plan profile and its compact PF30 record contract |
+| Epic or CRD Implementation Plan | PF04 §9.1.1 | PF27 — the General Implementation Plan template, unless a more specific PF27 template controls the artifact class |
+| Specification delta | the canon governing the base it modifies | the canon governing the base it modifies |
+| Specification kickoff | PF04 §9.1.1 | the producing prompt, within the kickoff boundary below |
 
-The dividing line is permanence. A Specification is a permanent governed record and must match its register. A kickoff is transient scaffolding between two stages and an implementation plan is working direction; neither becomes the permanent record, so a prompt may carry their shape.
+PF27 is the project-wide home for plan and runbook template shape. Where PF27 and PF30 still name a Specification a Plan, the Specification is that artifact under its current name.
 
-A CRD Specification and an Epic Specification are Specifications, not Plans. Where PF27 and PF30 still name the corresponding artifact a Plan, the Specification is that artifact under its current name.
+**PF30 is the CRD register, not a structure home.** It owns persistent CRD identity, ID allocation, concise registration, recorded status, phase-block structure, record order and volume rules. It does not own reusable plan and runbook structures; PF30 assigns those to PF27 itself. PF04 §9.1.1 further holds that HDE CRD Records and HDE Phased Epics are historical and reference homes, and that the active workflow must not create, update or synchronize their entries. A prompt that resolved CRD Specification structure from PF30 would be reading a register that canon forbids the active workflow to write.
+
+### The kickoff boundary
+
+A kickoff is transient scaffolding between two stages. No canon defines its shape, so the producing prompt may state its field list. That permission is bounded by PF04 §9.1.1: a kickoff is a class-bound substantive handoff and carries no Specification, no Implementation Plan, no work-unit structure and no mutation authorization. A prompt-stated kickoff format that reaches any of those is out of scope for the artifact, whatever the prompt says.
+
+The kickoff is the only artifact in the table whose shape a prompt may carry. Where canon defines a structure, the prompt resolves it and does not restate it.
 
 ### Prompt obligations
 
-A prompt that produces a Specification or a Specification delta:
+A prompt that produces a Specification, a Specification delta, or an Implementation Plan:
 
 1. Resolves the governing canon at run time through its own PFCanon source contract, and cites the exact canon and section it resolved in the artifact it produces.
-2. Does not name PF30 or PF27 in its body. The binding lives here so it moves in one place rather than in every prompt.
-3. Declares no `schema_version` for a Specification, a delta, or any other permanent governed record.
-4. Does not restate a Specification's section or field structure.
+2. May name a governing PF document, and names it by its canonical document name and section, never by a versioned filename. `PF27-Canon-Plan-Templates` is correct; `PF27-Canon-Plan-Templates-v2.0.4.md` is a defect. PF02 and PF04 already route by title without version numbers, and this addendum adds no prohibition beyond that.
+3. Declares no `schema_version` for a Specification, a delta, an Implementation Plan, or any other permanent governed record.
+4. Does not restate a governed artifact's section or field structure.
 5. Returns `SOURCE_RESOLUTION_ERROR` with the failed predicate and recovery owner when the governing canon cannot be resolved and read. It does not author against an assumed format, reuse a neighbouring artifact's token, or mint one.
 
 ### Retired vocabulary
 
 `glow-specification`, `glow-kickoff` and any other `glow-<kind>/<version>` token are retired as artifact schema identifiers. They are not a canon namespace, no canon defines them, and nothing validates against them. The thirteen-section GCFPE Specification structure is superseded for both classes; it matches neither register, and a Specification authored in it will not seat.
 
+These tokens appear in this section because this section retires them. Their presence here is a retirement notice and is not a definition, and a search that finds them here has not found canon that defines them.
+
 PFCanon's schema convention is namespaced to the PF that defines the artifact.
 
 ### Reference posture
 
-Cite PF documents by name and section only. Do not pin a PF file version in a prompt, artifact, plan, ledger, report, or addendum. Versions move, and a pinned version is stale the moment they do.
+Cite PF documents by canonical document name and section in a prompt body, and in any reference whose purpose is to route a reader to current canon. Naming the document is expected; pinning its file version is the defect. Versions move, and a pinned version is stale the moment they do. Each PF document carries its canonical name in its own header, which is the name to use.
+
+This is a routing rule, not a records rule. Run artifacts, reports, ledgers and historical evidence retain the exact resolved version and identity of what they actually read, as PF04 requires of use and provenance records. Recording what was resolved is not pinning it, and stripping those records does not serve this rule.
 
 ### Terminology
 
 Replace *CRD Plan* and *Epic Plan* with *CRD Specification* and *Epic Specification* in prompts, plans, ledgers, reports and controls. PF27 and PF30 adopt the same terms on their next revision.
+
+### Revision note
+
+This addendum was first issued with a binding table that routed CRD Specification structure to PF30 and left the Implementation Plan's structure to the producing prompt. Both were wrong: PF30 disclaims reusable structures in favour of PF27, and PF27 carries a General Implementation Plan template. The reference posture also read as an unqualified ban on PF versions in any document, which conflicted with PF04's requirement that use and provenance records retain exact resolved identities. It also forbade prompts from naming PF27 or PF30 at all, which is stricter than PF02 and PF04, both of which route by title and forbid only version numbers; prompts may name the governing document by its canonical name. Anything authored against the earlier table should be rechecked against this one. No prompt body needs to change on account of this revision, because prompts resolve the binding here rather than restating it.
 
 \<eof\>
