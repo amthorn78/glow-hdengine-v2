@@ -2,8 +2,10 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_REPAIR_REPORT
-artifact_version: "6.0"
+artifact_version: "7.0"
 report_date: 2026-09-17
+calibration_date: 2026-09-17
+calibrated_against: "PF10-HDE-Build-Notes-v13.2.9, addendum 2.14 as corrected; storage survey instrument v1.1; repository commit 565b4a7d65561432db120d1affff6b68254311b5"
 session: https://claude.ai/code/session_01SVYWjz8nykXgyJJjWw4FXH
 managing_prompt: "GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1"
 supersedes_in_place: "v2.0 of the same path, 2026-09-17; v2.0 superseded v1.0 (verdict BATCH_1_BLOCKED)"
@@ -12,7 +14,8 @@ repairs_validation: docs/ephemeral/gcfpe.batch-1.validation-report.md
 storage_requirement: docs/ephemeral/gcfpe.storage-architecture.md
 contract_ledger: docs/ephemeral/gcfpe.batch-1.contract-ledger.md
 copy_repair_ledger: docs/ephemeral/gcfpe.batch-1.copy-repair-ledger.md
-verdict: BATCH_1_REPAIRED
+verdict: BATCH_1_REPAIRED_WITH_CORRECTIONS
+verdict_superseded: "BATCH_1_REPAIRED, recorded 2026-09-17 against PF10 addendum 2.14 as first issued. The repair stands; the record carried the superseded binding and is corrected in place."
 blockers: 0
 scope: BATCH_1_ONLY
 candidate: "GCFPE-20260914.1 / 091426.1 / 55 / UNSELECTED_CANDIDATE"
@@ -29,14 +32,23 @@ criteria_not_met: 0
 open_items_for_product_owner: 0
 observations_for_product_owner: 3
 canon_binding: "PF10, addendum: Specification format authority"
+canon_binding_resolved: "PF10-HDE-Build-Notes-v13.2.9.md, read 2026-09-17. Recorded as the exact version actually resolved, which PF04 requires of a provenance record and which 2.14's corrected reference posture expressly protects. This is a record, not a routing pin."
 ```
 
 ## 1. Verdict
 
-**`BATCH_1_REPAIRED`.** All eight recorded defects are now fully closed, the
-`STORAGE_ARCHITECTURE` defect class is closed across all eleven prompts and the
-graph, both prior blockers are retired, and all six Batch 1 completion criteria
-are met.
+**`BATCH_1_REPAIRED_WITH_CORRECTIONS`.** All eight recorded defects are now
+fully closed, the `STORAGE_ARCHITECTURE` defect class is closed across all
+eleven prompts and the graph, both prior blockers are retired, and all six
+Batch 1 completion criteria are met.
+
+> **Superseded verdict, preserved.** This section read `BATCH_1_REPAIRED` when
+> recorded on 2026-09-17. A calibration pass on the same date re-tested every
+> closure against the corrected PF10 addendum 2.14 (v13.2.9) and the v1.1
+> storage survey instrument. Every closure survives and **no prompt body or
+> graph part needs an edit**; what needed correcting was this record, which
+> described the superseded binding as current. The verdict is qualified rather
+> than changed, and the corrections are marked in place below.
 
 | Prior blocker | Outcome |
 |---|---|
@@ -192,15 +204,52 @@ likewise absent from canon and matches neither PF30's record contract nor PF27's
 Epic Record Template.
 
 **The binding is in canon, not in prompts.** PF10 carries the addendum
-**Specification format authority**, which binds the CRD Specification format to the PF30 CRD record contract,
-the Epic Specification format to the PF27 Epic record template, and a delta to the
-canon governing its base. Kickoffs and implementation plans may be
-prompt-stated. No prompt names PF30 or PF27, so the binding moves in one place.
+**Specification format authority**.
+
+> **Superseded, 2026-09-17 calibration.** This paragraph originally read: *"which
+> binds the CRD Specification format to the PF30 CRD record contract, the Epic
+> Specification format to the PF27 Epic record template, and a delta to the canon
+> governing its base. Kickoffs and implementation plans may be prompt-stated. No
+> prompt names PF30 or PF27, so the binding moves in one place."* That describes
+> 2.14 as first issued. The addendum was corrected the same day and now separates
+> **content authority** from **structure authority**.
+
+The corrected binding: Epic Specification, CRD Specification and Implementation
+Plan all take their content authority from **PF04 §9.1.1**. Structure authority
+for all three is **PF27** — the HDE Epic record template for an Epic
+Specification, the HDE-CRD-Plan profile with PF30's compact record contract for a
+CRD Specification, and the General Implementation Plan template for either
+Implementation Plan unless a more specific PF27 template controls. A Specification
+delta takes both from the canon governing the base it modifies. A kickoff takes
+content from PF04 §9.1.1 and structure from the producing prompt, bounded by
+§9.1.1: no Specification, no Implementation Plan, no work-unit structure, no
+mutation authorization.
+
+Two things moved that this report had recorded otherwise. **CRD Specification
+structure is PF27's, not PF30's** — PF30 disclaims reusable structures in PF27's
+favour, and PF04 §9.1.1 forbids the active workflow to write the PF30 register at
+all. **Implementation Plan structure is PF27's, not the producing prompt's.** The
+second has no Batch 1 subject: no prompt in this batch produces an Implementation
+Plan, and the only occurrences of the phrase in the eleven bodies are the
+CF-C-10 / CF-E-10 exclusions.
+
+Naming, finally, is no longer forbidden. A prompt **may** name a governing PF
+document by its canonical name and section; pinning a file version is the defect.
+It remains true that no Batch 1 prompt names PF27 or PF30 as a format authority,
+which is why every closure below survived the correction untouched — the prompts
+resolve the binding rather than restate it, so the move changed the answer they
+get, not the prompts.
 
 **Eight findings closed across six bodies** — `B1-SFA-01` … `B1-SFA-08` in the
 contract ledger. The other five prompts declare no Specification artifact and are
 `CONFIRMED_NO_CHANGE`. Zero `glow-*` tokens remain in the eleven. The resolution
-chain was verified end to end: prompt → `docs/pfcanon/` → PF10 → PF30/PF27.
+chain was verified end to end: prompt → `docs/pfcanon/` → PF10 → PF27, with
+PF30 supplying only the compact CRD record contract.
+
+> **Superseded, 2026-09-17 calibration.** This line originally ended *"→ PF10 →
+> PF30/PF27"*, which was correct against 2.14 as first issued. Re-verified at
+> commit 565b4a7 against PF10 v13.2.9: the chain resolves, and it resolves to a
+> different terminus for the CRD lane than this report first recorded.
 
 **An ordering fault, recorded rather than hidden.** The six bodies were edited
 before 2.14 was drained, which inverts the correct order — canon first, then
@@ -225,7 +274,8 @@ Owner action.**
 | `CF-C-30`/`CF-E-30` specified `status`, `canonicality`, `drain_owner`, `artifact_version` and a drain-verification anchor in the addendum body. | Both draft it paste-ready in the Hub format, with none of those fields, and state that Nathan pastes and numbers it and that it is treated as already in PF10 from the next turn. |
 | `DELTA_APPROVE` gated continuation on `DRAIN_VERIFIED`. | Continuation resolves current PF10 afresh and treats the addendum as already present. No waiting, verifying or asking. |
 | The addendum in PF10 carried pre-drain fields, pinned versions, session narrative and a table assigning Nathan work. | Repaired in place on his explicit instruction; PF10's version bumped. It is now the rule and nothing about its own handling. |
-| This session pinned PF versions in the addendum, ledgers and report. | All removed. **PF04 and PF02 already forbade this** — my error against existing canon, not a new rule. |
+| This session pinned PF versions in the addendum, ledgers and report. | Removed from the addendum and from every canon-routing reference, which is correct. **Over-removed from the ledgers and this report**, which is corrected below. |
+| ~~*Original disposition, preserved:* "All removed. **PF04 and PF02 already forbade this** — my error against existing canon, not a new rule."~~ | Superseded by the 2026-09-17 calibration. The corrected 2.14 reference posture is *"a routing rule, not a records rule"*: run artifacts, reports, ledgers and historical evidence **retain** the exact resolved version of what they actually read. Both quoted prohibitions are PF02's, not PF04's; PF04 §9.1.2 and §9.1.4 impose the opposite duty on records. |
 
 **The drain machine is retired, and the Product Owner specified what replaces it.**
 After a PF10 build note is created, the next turn performs **one check only**:
@@ -361,10 +411,38 @@ the edits rather than revert; the drain landed the same day and nothing was
 produced in the gap. Plan §4.7 now states the order explicitly.
 
 **2 — Pinned PF document versions.** The addendum, both ledgers and this report
-pinned `v13.2.7`, `v2.0.4` and `v0.9`. **PF04 and PF02 already forbade this** —
-"do not anchor to PF10 file versions", "by title only (no version numbers)". It was
-an error against canon that already existed, not a rule that had to be invented.
-All pins removed.
+pinned `v13.2.7`, `v2.0.4` and `v0.9`.
+
+> **Superseded, 2026-09-17 calibration.** This item originally continued: *"**PF04
+> and PF02 already forbade this** — "do not anchor to PF10 file versions", "by
+> title only (no version numbers)". It was an error against canon that already
+> existed, not a rule that had to be invented. All pins removed."* Two things in
+> that are wrong and one is right.
+
+Right: pinning a PF file version **in the addendum** and in any reference whose
+purpose is to route a reader to current canon is a defect, and removing it there
+was correct.
+
+Wrong, first: both quoted sentences are **PF02's**, not PF04's, and PF02 states
+them as a *routing* rule — "Reference PF10 addenda by **addendum number + addendum
+title**". PF04's contribution runs the other way: §9.1.2 requires identifying "the
+exact current sources, versions and conflicting scope", and §9.1.4 requires
+recording "the actual PF copies, versions or other available identifiers used".
+
+Wrong, second: "all pins removed" describes an **over-removal** for the ledgers
+and this report. The corrected 2.14 reference posture settles it — *"This is a
+routing rule, not a records rule. Run artifacts, reports, ledgers and historical
+evidence retain the exact resolved version and identity of what they actually
+read, as PF04 requires of use and provenance records. Recording what was resolved
+is not pinning it, and stripping those records does not serve this rule."*
+
+The de-pinning did not in fact reach the graph's `source_bindings`, whose entries
+still carry `"title": "PF27-Canon-Plan-Templates-v2.0.5.md"` alongside `sha256`,
+`retrieved_at` and `binding_scope:
+REPAIR_BASELINE_EVIDENCE_ONLY_NOT_A_RUNTIME_CURRENT_PF10_ALIAS`. Those are lineage
+and are correctly untouched. The exact version this report and both ledgers
+resolved is restored to their front matter as `canon_binding_resolved` /
+`canon_resolved`.
 
 **3 — Understated a defect.** v2.0 of this report described the four `glow-*`
 tokens as *defined* tokens a consumer could validate against. They return zero hits
