@@ -2,7 +2,7 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_REPAIR_REPORT
-artifact_version: "3.0"
+artifact_version: "4.0"
 report_date: 2026-09-17
 supersedes_in_place: "v2.0 of the same path, 2026-09-17; v2.0 superseded v1.0 (verdict BATCH_1_BLOCKED)"
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
@@ -26,7 +26,7 @@ criteria_met: 6
 criteria_not_met: 0
 open_items_for_product_owner: 0
 observations_for_product_owner: 3
-canon_binding: "PF10-HDE-Build-Notes-v13.2.7.md 2.14, drained 2026-09-17"
+canon_binding: "PF10, addendum: Specification format authority"
 ```
 
 ## 1. Verdict
@@ -167,17 +167,16 @@ hardcoding v2.0 described. The thirteen-section Specification structure is
 likewise absent from canon and matches neither PF30's record contract nor PF27's
 Epic Record Template.
 
-**The binding is in canon, not in prompts.** `PF10-HDE-Build-Notes-v13.2.7.md`
-**§2.14 — Specification format authority**, drained by the Product Owner on
-2026-09-17, binds the CRD Specification format to the PF30 CRD record contract,
-the Epic Specification format to PF27 §2's Epic Record Template (Normative), and
-a delta to the canon governing its base. Kickoffs and implementation plans may be
+**The binding is in canon, not in prompts.** PF10 carries the addendum
+**Specification format authority**, which binds the CRD Specification format to the PF30 CRD record contract,
+the Epic Specification format to the PF27 Epic record template, and a delta to the
+canon governing its base. Kickoffs and implementation plans may be
 prompt-stated. No prompt names PF30 or PF27, so the binding moves in one place.
 
 **Eight findings closed across six bodies** — `B1-SFA-01` … `B1-SFA-08` in the
 contract ledger. The other five prompts declare no Specification artifact and are
 `CONFIRMED_NO_CHANGE`. Zero `glow-*` tokens remain in the eleven. The resolution
-chain was verified end to end: prompt → `docs/pfcanon/` → PF10 2.14 → PF30/PF27.
+chain was verified end to end: prompt → `docs/pfcanon/` → PF10 → PF30/PF27.
 
 **An ordering fault, recorded rather than hidden.** The six bodies were edited
 before 2.14 was drained, which inverts the correct order — canon first, then
@@ -186,15 +185,33 @@ keep them rather than revert. The drain landed the same day, so the lanes now
 resolve; between the two they would have returned `SOURCE_RESOLUTION_ERROR`, and
 no artifact was produced in that window.
 
-### Three observations this pass could not fix
+### The addendum posture — the central defect, closed
 
-| ID | Observation | Owner |
-|---|---|---|
-| `B1-OBS-01` | **PF10 2.14 carries four stale pre-drain fields.** Inside canonical PF10 it still reads `status: READY_FOR_MANUAL_DRAIN`, `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, `pf10_addendum_number: NOT_ALLOCATED_BY_AGENT`, and a paragraph saying canon does not yet carry the binding and the Specification lanes do not run. All four are now false. An addendum inside canonical PF10 that declares itself non-canonical can be read as not in force. Authored by this session pre-drain and carried through verbatim; `docs/pfcanon/` is read-only. | Nathan |
-| `B1-OBS-02` | **`CF-C-30` and `CF-E-30` specify no drain transition** for the addendum they produce, which is `B1-OBS-01` demonstrated on a live artifact. One sentence in each body would close it. Not repaired: a new contract defect outside this pass's authorized classes. | Nathan to authorize |
-| `B1-OBS-03` | `PF30.1` §7's template heading reads *CRD Plan approval* while its own record `HDE-CRD-0001` carries *Specification approval* and *Implementation Plan approval*, so two authors resolving CRD format get different section sets. | Nathan |
+A third pass the same day closed what the Product Owner named as the main problem
+driving this repair: **agents managing, verifying and gating on his manual drain.**
 
-None blocks Batch 1.
+His direction: addenda are 100% paste-ready; the process assumes he is pasting them
+when drafted; once created, assume the addendum is already in PF10 on the next turn;
+never pin PF10 or any PF document version; **an agent may not litigate a Product
+Owner action.**
+
+| Was | Now |
+|---|---|
+| The **Glow Operations Hub** *required* the offending fields: "Every qualifying approval creates one undrained standalone addendum with the exact status/canonicality/drain_owner fields." | Replaced by the canonical **PF10 build-notes addendum format** — paste-ready, one `##` title heading, no drainage-state fields, no pinned versions, no session narrative. Held in Notion, **not hard-linked to PF10**. |
+| `CF-C-30`/`CF-E-30` specified `status`, `canonicality`, `drain_owner`, `artifact_version` and a drain-verification anchor in the addendum body. | Both draft it paste-ready in the Hub format, with none of those fields, and state that Nathan pastes and numbers it and that it is treated as already in PF10 from the next turn. |
+| `DELTA_APPROVE` gated continuation on `DRAIN_VERIFIED`. | Continuation resolves current PF10 afresh and treats the addendum as already present. No waiting, verifying or asking. |
+| The addendum in PF10 carried pre-drain fields, pinned versions, session narrative and a table assigning Nathan work. | Repaired in place on his explicit instruction; PF10's version bumped. It is now the rule and nothing about its own handling. |
+| This session pinned PF versions in the addendum, ledgers and report. | All removed. **PF04 and PF02 already forbade this** — my error against existing canon, not a new rule. |
+
+Recorded for their owning batches, not edited here: `ESC-40`, `IA-30`, `QA-70` and
+`RS-20` carry the same addendum clause, and the graph carries
+`pf10_post_drain_verification` and the `RS-40.drain_verified` route.
+
+### One observation still open, blocking nothing
+
+`B1-OBS-03` — PF30 §7's template heading reads *CRD Plan approval* while its own
+example CRD record carries *Specification approval* and *Implementation Plan
+approval*, so two authors resolving CRD format get different section sets.
 
 ## 8. Graph
 

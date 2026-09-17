@@ -2,7 +2,7 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_COPY_REPAIR_LEDGER
-artifact_version: "2.0"
+artifact_version: "3.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
@@ -10,6 +10,7 @@ contract_ledger: docs/ephemeral/gcfpe.batch-1.contract-ledger.md
 prompts_in_batch: 11
 prompts_edited_pass_1: 11
 prompts_edited_pass_2: 6
+prompts_edited_pass_3: 2
 prompts_reverified_pass_2: 11
 prompts_confirmed_no_change: 0
 complete_readback: 11
@@ -167,3 +168,50 @@ order — canon first, then prompts — and going beyond the instruction given. 
 Product Owner elected to keep them. Between the edits and the drain the CRD and
 Epic Specification lanes would have returned `SOURCE_RESOLUTION_ERROR`; after
 the drain they resolve. No artifact was produced in that window.
+
+## Third pass — `PF10_ADDENDUM_POSTURE`, 2026-09-17
+
+Product Owner direction: addenda are 100% paste-ready; assume he is pasting them
+when drafted; from the next turn assume the addendum is already in PF10; never
+pin a PF document version; **an agent may not litigate a Product Owner action.**
+
+| # | Prompt | Pass-3 change | Finding IDs | Disposition | Readback |
+|---|---|---|---|---|---|
+| 1.06 | CF-C-30 | Addendum drafted paste-ready in the Hub format; drainage-state fields and the drain-verification anchor removed; `DRAIN_VERIFIED` continuation gate replaced with "treats this addendum as already present" | `B1-PAP-02`, `B1-PAP-03` | **REPAIRED** | COMPLETE |
+| 1.10 | CF-E-30 | Same, Epic variant | `B1-PAP-02`, `B1-PAP-03` | **REPAIRED** | COMPLETE |
+
+The other nine were unchanged in this pass. They produce no PF10 addendum and
+pin no PF version.
+
+### The replacement text, identical in both
+
+> The addendum is drafted **paste-ready**, in the canonical PF10 build-notes
+> addendum format recorded in the Glow Operations Hub: one `##` heading carrying
+> its title, and a body stating the approved delta so a reader can act on it
+> without opening another document. It carries **no** status, canonicality,
+> drain_owner, addendum-number, artifact-version or drain-verification field, and
+> **no pinned PF document version** — cite PF documents by name and section only.
+> … Nathan pastes it into PF10 and allocates its number; from the next turn treat
+> it as already in PF10 and in force. Do not track, verify, confirm, gate on or
+> ask about that paste.
+
+And the routing:
+
+> `DELTA_APPROVE`: terminal return to Nathan with the decision and the single
+> read-back, paste-ready addendum repository path. A later continuation resolves
+> current PF10 afresh and treats this addendum as already present in it; it does
+> not wait on, verify, or ask about the paste.
+
+### Surfaces changed outside the eleven
+
+| Surface | Change | Authority |
+|---|---|---|
+| **Glow Operations Hub**, Notion | The control that *required* `status`/`canonicality`/`drain_owner` was replaced; the canonical paste-ready addendum format added, held in Notion and not hard-linked to PF10. The PFCanon source line was repointed from the Drive folder to `docs/pfcanon/`. | "Make a note about this formatting in the glow operations hub in notion." |
+| **PF10**, the addendum itself | Repaired in place: drainage-state fields, pinned-version `affected_canon`, session narrative and the unresolved-item table removed; terminology moved to Specification; reference-posture and terminology rules added. PF10's version bumped in filename and header. | "You may repair it in place." Explicit, for this specific change. `docs/pfcanon/` is otherwise read-only. |
+| **Repair plan**, Notion | §4.7 added; §5 checklist gained three lines; §4.6 de-pinned; §13 and *Position* updated. | "Make sure relevant notion and plans are up to date with this." |
+
+### Not in Batch 1 scope
+
+`ESC-40`, `IA-30`, `QA-70` and `RS-20` carry the same addendum clause, and the
+graph carries `pf10_post_drain_verification` and the `RS-40.drain_verified`
+route. Recorded for Batches 3, 4 and 5 under §4.7. Not edited here.

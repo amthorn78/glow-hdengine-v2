@@ -2,11 +2,11 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_CONTRACT_LEDGER
-artifact_version: "2.0"
+artifact_version: "3.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
-finding_classes: [STORAGE_ARCHITECTURE, SPECIFICATION_DELTA_FORMAT, GRAPH_BODY_RECONCILIATION, SPECIFICATION_FORMAT_AUTHORITY]
+finding_classes: [STORAGE_ARCHITECTURE, SPECIFICATION_DELTA_FORMAT, GRAPH_BODY_RECONCILIATION, SPECIFICATION_FORMAT_AUTHORITY, PF10_ADDENDUM_POSTURE]
 candidate: "GCFPE-20260914.1 / 091426.1 / 55 / UNSELECTED_CANDIDATE"
 protected_selected_release: "GCFPE-20260913.1 / 091326.2 / 54"
 selected_release_mutated: false
@@ -304,21 +304,44 @@ both field lists stand.
 | Link | State |
 |---|---|
 | Prompt → `docs/pfcanon/` | Each `-20` and `-40` body resolves format through its own PFCanon source contract |
-| `docs/pfcanon/` → binding | `PF10-HDE-Build-Notes-v13.2.7.md` §2.14, drained 2026-09-17 |
-| Binding → CRD format | PF30.1 §4 minimum CRD record contract, §7 record template |
-| Binding → Epic format | PF27 §2 `HDE-EPIC-Plan`, Epic Record Template (Normative) |
+| `docs/pfcanon/` → binding | PF10, addendum **Specification format authority** |
+| Binding → CRD format | PF30 — minimum CRD record contract and CRD record template |
+| Binding → Epic format | PF27 — the HDE Epic record template, normative |
 | Binding → delta format | inherits the base Specification's canon |
 
 The CRD and Epic Specification lanes, which could not run between the prompt
 edits and the drain, now run.
 
-## 11. Findings this pass raised and did **not** repair
+## 11. `PF10_ADDENDUM_POSTURE` — third pass, 2026-09-17
+
+Product Owner direction, verbatim in substance: PF10 addenda must be 100% paste-ready;
+the process assumes he is pasting them when drafted; **AI agents may not litigate
+Product Owner action**; once an addendum is created, assume it is already in PF10
+on the next turn; and never pin PF10 or any PF document version.
+
+This is named as the central defect the whole repair exists to close.
+
+| ID | Finding | Repaired to | Status |
+|---|---|---|---|
+| `B1-PAP-01` | The **Glow Operations Hub** control required it: *"Every qualifying approval creates one undrained standalone addendum with the exact status/canonicality/drain_owner fields."* That sentence is the root cause — every producer prompt inherited it. | Replaced. The Hub now carries the canonical **PF10 build-notes addendum format**: paste-ready, one `##` title heading, no drainage-state fields, no pinned PF versions, no session narrative, no unresolved-item table assigning the Product Owner work. Held in Notion and **not hard-linked to PF10**. | CLOSED |
+| `B1-PAP-02` | `CF-C-30` and `CF-E-30` specified the addendum body as carrying `status: READY_FOR_MANUAL_DRAIN`, `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, `drain_owner`, `artifact_version` and a drain-verification anchor. | Both bodies now draft the addendum paste-ready in the Hub format, with none of those fields and no pinned PF version, and state that Nathan pastes and numbers it and that from the next turn it is treated as already in PF10. | CLOSED |
+| `B1-PAP-03` | `CF-C-30` and `CF-E-30` gated continuation on `DRAIN_VERIFIED` — an agent holding a gate on a Product Owner action. | `DELTA_APPROVE` now returns the paste-ready addendum path and states that a later continuation resolves current PF10 afresh and **treats the addendum as already present**, without waiting on, verifying or asking about the paste. | CLOSED |
+| `B1-PAP-04` | The addendum drained into PF10 carried the pre-drain fields, a pinned-version `affected_canon` list, session narrative naming a pull request, and an unresolved-item table assigning the Product Owner work. Previously recorded as `B1-OBS-01`. | Repaired in place in PF10 on the Product Owner's explicit instruction, and PF10's version bumped. The addendum is now the rule and nothing about its own handling. | CLOSED |
+| `B1-PIN-01` | This session pinned PF document versions in the addendum, the ledgers and the report. **PF04 and PF02 already forbade this** — "do not anchor to PF10 file versions", "by title only (no version numbers)". It was an error against existing canon, not a new rule. | All pins removed. PF documents are cited by name and section only, here and in the report. | CLOSED |
+
+**Not in Batch 1 scope, recorded for the owning batch.** The same addendum clause
+appears in the other four producers — `ESC-40`, `IA-30`, `QA-70`, `RS-20` — and the
+graph carries `pf10_post_drain_verification` plus the `RS-40.drain_verified` route.
+Those belong to Batches 3, 4 and 5 under §4.7 of the plan. Not edited here.
+
+## 12. Findings this pass raised and did **not** repair
 
 | ID | Finding | Why not repaired | Owner |
 |---|---|---|---|
-| `B1-OBS-01` | **PF10 2.14 carries four stale pre-drain fields.** Inside canonical PF10 it still reads `status: READY_FOR_MANUAL_DRAIN`, `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, `pf10_addendum_number: NOT_ALLOCATED_BY_AGENT`, and a paragraph stating canon does not yet carry the binding and the Specification lanes do not run. All four are now false. An addendum inside canonical PF10 that declares itself non-canonical can be read as not in force, which would defeat the binding. | `docs/pfcanon/` is read-only. Authored by this session pre-drain and carried through verbatim. | Nathan / Product Owner |
-| `B1-OBS-02` | **`CF-C-30` and `CF-E-30` specify no drain transition for the addendum they produce.** They require the addendum to literally carry `status: READY_FOR_MANUAL_DRAIN` and `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, with no clause stating those become false once Nathan drains it. `B1-OBS-01` is that gap demonstrated on a live artifact. A one-sentence fix in each body would close it. | A new contract defect, outside the §4.5 and §4.6 classes this pass was authorized to close. Not repaired on initiative. | Nathan to authorize; then Batch 1 |
-| `B1-OBS-03` | `PF30.1` §7's template heading reads *CRD Plan approval*, while its own record `HDE-CRD-0001` carries *Specification approval* and *Implementation Plan approval*. A CRD Specification author resolving format from §7 and one resolving from the example get different section sets. | `docs/pfcanon/` is read-only. | Nathan / Product Owner |
+| `B1-OBS-03` | PF30 §7's template heading reads *CRD Plan approval*, while its own example CRD record carries *Specification approval* and *Implementation Plan approval*. A CRD Specification author resolving format from the template and one resolving from the example get different section sets. | A canon content question, not a GCFPE prompt defect, and not covered by the instruction given. | Nathan / Product Owner |
+
+`B1-OBS-01` and `B1-OBS-02` from the previous pass are **closed** as `B1-PAP-04`
+and `B1-PAP-02` above.
 
 ## 9. Prohibited-action confirmation
 
