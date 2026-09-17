@@ -246,7 +246,7 @@
       "PR03 acceptance reread",
       "current controlled PF10 Markdown reread",
       "every applicable active addendum reread",
-      "handoff saved and completely read back in Glow / Ephemeral Planning Files"
+      "handoff written under docs/ephemeral/, committed and pushed on the working branch, and completely read back"
     ],
     "prepare_only": true,
     "resume_alpha": false,
@@ -544,7 +544,9 @@
     "google_docs_fallback": false,
     "native_document_candidate_content_may_be_opened": false,
     "native_document_equivalence_check": false,
+    "pfcanon_access": "READ_ONLY",
     "pfcanon_authority": "CONTROLLED_MARKDOWN_ONLY",
+    "pfcanon_root": "docs/pfcanon",
     "pre_drain_reference_role": "PRE_DRAIN_BASELINE_EVIDENCE",
     "source_failure_result": "SOURCE_RESOLUTION_ERROR"
   },
@@ -570,7 +572,7 @@
       "exact selected prompt full name/version/direct Notion URL",
       "receiving role and exact session",
       "Epic/change and work unit",
-      "direct Drive artifacts and repository/PR references",
+      "artifact repository paths, direct Notion URLs where the artifact is Notion-resident, and repository/PR references",
       "status, completed work, decisions, constraints, unresolved items, preserved authority",
       "next action and expected output"
     ],
@@ -649,6 +651,16 @@
       "drain_verification_anchor.immutable_base_id",
       "drain_verification_anchor.approved_delta_digest"
     ],
+    "role_vocabulary": {
+      "NON_PRODUCER": {
+        "meaning": "This prompt never creates a PF10 build-notes addendum on any branch.",
+        "prompt_body_token": "NONPRODUCER"
+      },
+      "QUALIFYING_PRODUCER": {
+        "meaning": "This prompt creates exactly one standalone PF10 build-notes addendum on a qualifying material delta approval to an already approved base, and none on any outcome listed in never_for.",
+        "prompt_body_token": "QUALIFYING_DELTA_APPROVAL_PRODUCER"
+      }
+    },
     "status": "READY_FOR_MANUAL_DRAIN"
   },
   "pf10_post_drain_verification": {

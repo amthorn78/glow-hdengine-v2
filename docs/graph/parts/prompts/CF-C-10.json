@@ -133,6 +133,38 @@
       "to": "NATHAN_TERMINAL_RETURN",
       "to_kind": "boundary",
       "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-C-10",
+      "from_kind": "prompt",
+      "immediate": true,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "BLOCKED"
+          ],
+          "branch_id": "wrong_class_epic",
+          "condition": "the supplied Product Owner class is EPIC",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-C-10.md",
+            "section": "Required result and routing"
+          },
+          "state": "BLOCKED",
+          "terminal_for_invocation": false
+        }
+      ],
+      "state_predicates": [
+        "BLOCKED"
+      ],
+      "to": "CF-E-10",
+      "to_kind": "prompt",
+      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
     }
   ],
   "id": "CF-C-10",
@@ -172,6 +204,7 @@
     "kickoff_ready",
     "material_source_omission_recovery",
     "class_or_identity_recovery",
+    "wrong_class_epic",
     "kickoff_terminal"
   ],
   "state_routes_extra": [],
