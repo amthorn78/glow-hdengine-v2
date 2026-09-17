@@ -2,9 +2,9 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_REPAIR_REPORT
-artifact_version: "2.0"
+artifact_version: "3.0"
 report_date: 2026-09-17
-supersedes_in_place: "v1.0 of the same path, 2026-09-17 (verdict BATCH_1_BLOCKED)"
+supersedes_in_place: "v2.0 of the same path, 2026-09-17; v2.0 superseded v1.0 (verdict BATCH_1_BLOCKED)"
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 repairs_validation: docs/ephemeral/gcfpe.batch-1.validation-report.md
 storage_requirement: docs/ephemeral/gcfpe.storage-architecture.md
@@ -20,10 +20,13 @@ pf10_edited_or_drained: false
 prompt_bodies_changed: 11
 graph_parts_changed: 2
 defects_fully_closed: 8
+specification_format_findings_closed: 8
 storage_architecture_hits_closed: 52
 criteria_met: 6
 criteria_not_met: 0
-open_items_for_product_owner: 1
+open_items_for_product_owner: 0
+observations_for_product_owner: 3
+canon_binding: "PF10-HDE-Build-Notes-v13.2.7.md 2.14, drained 2026-09-17"
 ```
 
 ## 1. Verdict
@@ -38,8 +41,10 @@ are met.
 | **R1** — `SPECIFICATION_DELTA` has no declared `schema_version` | **Retired by closing D4.** The delta's format is governed by referenced canon, resolved and cited at run time through each prompt's existing PFCanon source contract. No identifier was minted and none was reused. §3. |
 | **R2** — rebuilt graph exceeds the Drive connector ceiling | **Retired: no subject.** The graph is held as parts in `docs/graph/parts/` and the assembled graph is derived output that is never persisted. There is nothing to write to Drive. Confirmed, not re-litigated. |
 
-One item is raised **for Nathan's decision**, and it is not a blocker: it does
-not prevent Batch 1 closing and nothing downstream waits on it. §7.
+A second pass on 2026-09-17 then closed the `SPECIFICATION_FORMAT_AUTHORITY`
+class under the Product Owner's mandate and the canon he drained as PF10 §2.14.
+Nothing is open. Three observations are recorded for Nathan in §7; none blocks
+Batch 1 and two of them are canon defects this session is not permitted to fix.
 
 ## 2. Per-prompt disposition, against the bodies as they now stand
 
@@ -146,30 +151,50 @@ The two ledgers written by **this** run — `gcfpe.batch-1.contract-ledger.md` a
 convention. They do not replace the 2026-09-15 ledgers above, which remain the
 pre-edit review record.
 
-## 7. Open for Nathan — a decision, not a blocker
+## 7. The specification-format mandate — closed
 
-**Hardcoded canon tokens in the kickoff and Specification prompts.** Closing R1
-established that a `schema_version` token in a prompt body is a hardcoded canon
-reference under §4.5. Four Batch 1 prompts still carry one:
+After v2.0 merged as PR #409, the Product Owner mandated: **specification
+formatting comes from referenced canon**, because Specifications become
+permanent records. The open item v2.0 raised is closed by that mandate and by
+this pass.
 
-| Prompt | Token |
-|---|---|
-| CF-C-10, CF-E-10 | `schema_version: glow-kickoff/3.0` |
-| CF-C-20, CF-E-20 | `schema_version: glow-specification/3.0` |
+**v2.0 was wrong about the severity, in the batch's favour.** It reported the
+four `glow-*` tokens as *defined* tokens a consumer could validate against.
+Measured across all 34 files of `docs/pfcanon/`: `glow-specification` 0 hits,
+`glow-kickoff` 0 hits. They validated against nothing. They were false
+conformance — the same defect R1 identified for the delta — not the milder
+hardcoding v2.0 described. The thirteen-section Specification structure is
+likewise absent from canon and matches neither PF30's record contract nor PF27's
+Epic Record Template.
 
-These were not repaired. No recorded defect covers them, and the authorization
-forbids re-authoring beyond what a recorded defect supports. They also differ
-from the delta case in one way that matters: these tokens are *defined* and a
-consumer can validate against them, so they are not false conformance — they are
-only hardcoded.
+**The binding is in canon, not in prompts.** `PF10-HDE-Build-Notes-v13.2.7.md`
+**§2.14 — Specification format authority**, drained by the Product Owner on
+2026-09-17, binds the CRD Specification format to the PF30 CRD record contract,
+the Epic Specification format to PF27 §2's Epic Record Template (Normative), and
+a delta to the canon governing its base. Kickoffs and implementation plans may be
+prompt-stated. No prompt names PF30 or PF27, so the binding moves in one place.
 
-The question is whether §4.5's "do not hardcode canon" rule is meant to reach
-existing defined tokens, or only to prevent inventing new ones. That is a
-Product Owner call, not a derivation. If it reaches them, the same clause used
-for the delta applies, and the change touches most of the 55 prompts rather than
-these four — which makes it its own authorized pass, not a Batch 1 amendment.
+**Eight findings closed across six bodies** — `B1-SFA-01` … `B1-SFA-08` in the
+contract ledger. The other five prompts declare no Specification artifact and are
+`CONFIRMED_NO_CHANGE`. Zero `glow-*` tokens remain in the eleven. The resolution
+chain was verified end to end: prompt → `docs/pfcanon/` → PF10 2.14 → PF30/PF27.
 
-Batch 1 does not wait on this and nothing downstream is blocked by it.
+**An ordering fault, recorded rather than hidden.** The six bodies were edited
+before 2.14 was drained, which inverts the correct order — canon first, then
+prompts — and went beyond the instruction given. The Product Owner elected to
+keep them rather than revert. The drain landed the same day, so the lanes now
+resolve; between the two they would have returned `SOURCE_RESOLUTION_ERROR`, and
+no artifact was produced in that window.
+
+### Three observations this pass could not fix
+
+| ID | Observation | Owner |
+|---|---|---|
+| `B1-OBS-01` | **PF10 2.14 carries four stale pre-drain fields.** Inside canonical PF10 it still reads `status: READY_FOR_MANUAL_DRAIN`, `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, `pf10_addendum_number: NOT_ALLOCATED_BY_AGENT`, and a paragraph saying canon does not yet carry the binding and the Specification lanes do not run. All four are now false. An addendum inside canonical PF10 that declares itself non-canonical can be read as not in force. Authored by this session pre-drain and carried through verbatim; `docs/pfcanon/` is read-only. | Nathan |
+| `B1-OBS-02` | **`CF-C-30` and `CF-E-30` specify no drain transition** for the addendum they produce, which is `B1-OBS-01` demonstrated on a live artifact. One sentence in each body would close it. Not repaired: a new contract defect outside this pass's authorized classes. | Nathan to authorize |
+| `B1-OBS-03` | `PF30.1` §7's template heading reads *CRD Plan approval* while its own record `HDE-CRD-0001` carries *Specification approval* and *Implementation Plan approval*, so two authors resolving CRD format get different section sets. | Nathan |
+
+None blocks Batch 1.
 
 ## 8. Graph
 
@@ -196,6 +221,13 @@ python3 graph_parts.py build docs/graph/parts <scratchpad>
 
 Parts changed: `global.json` and `prompts/CF-C-10.json`. **53 prompt parts
 untouched**, which is what makes the scope provable rather than asserted.
+
+**The second pass changed no part and the token is unchanged.** Rebuilt from the
+same parts after the specification-format repairs: identical `236 edges ·
+582287 B · sha256 5c45e583…`. This is expected — §4.6 governs artifact *format*,
+which the graph does not encode. The six `SPECIFICATION_DELTA` strings in the
+parts are artifact-type names and route conditions in `output_artifacts`,
+`result_states` and edge conditions, not schema declarations.
 
 `predecessor_union_destinations` for CF-C-10 was deliberately left at
 `['CF-C-20']`: it records the selected predecessor's destinations, and

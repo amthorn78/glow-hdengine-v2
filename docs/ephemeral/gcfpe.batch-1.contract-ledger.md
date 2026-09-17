@@ -2,11 +2,11 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_CONTRACT_LEDGER
-artifact_version: "1.0"
+artifact_version: "2.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
-finding_classes: [STORAGE_ARCHITECTURE, SPECIFICATION_DELTA_FORMAT, GRAPH_BODY_RECONCILIATION]
+finding_classes: [STORAGE_ARCHITECTURE, SPECIFICATION_DELTA_FORMAT, GRAPH_BODY_RECONCILIATION, SPECIFICATION_FORMAT_AUTHORITY]
 candidate: "GCFPE-20260914.1 / 091426.1 / 55 / UNSELECTED_CANDIDATE"
 protected_selected_release: "GCFPE-20260913.1 / 091326.2 / 54"
 selected_release_mutated: false
@@ -15,7 +15,10 @@ storage_architecture_closed: 52
 storage_architecture_blocked: 0
 prompt_bodies_changed: 11
 graph_parts_changed: 2
+specification_format_findings: 8
+specification_format_closed: 8
 open_findings: 0
+observations_for_product_owner: 3
 ```
 
 This ledger records the findings this re-run raised and closed. It does not
@@ -232,6 +235,90 @@ Re-run across the CRD and Epic branches after all eleven bodies were persisted.
 - **`never_for` still contains `INITIAL_APPROVAL`**, and both `-30` bodies still
   state `INITIAL_APPROVE … emits no PF10 addendum`. Unchanged by this run and
   re-verified.
+
+## 10. `SPECIFICATION_FORMAT_AUTHORITY` — second pass, 2026-09-17
+
+Added by a Product Owner mandate issued after the first pass merged as PR #409:
+**specification formatting comes from referenced canon.** Specifications become
+permanent governed records, so their format belongs to the register that governs
+them. Recorded in the plan as §4.6 and in canon as **PF10 Addendum 2.14 —
+Specification format authority**.
+
+### 10.1 The finding, measured
+
+The first pass reported these four tokens as *defined* tokens a consumer could
+validate against. **That was wrong.** Measured case-sensitively across all 34
+files of `docs/pfcanon/`:
+
+```
+glow-specification   0 hits
+glow-kickoff         0 hits
+SPECIFICATION_DELTA  0 hits   (as a schema identifier)
+```
+
+Canon's own convention is namespaced to the PF that defines the artifact —
+`pf27.step_log_header.v2`, `pf27.hde_code_review_result.v1`. The
+`glow-<kind>/<version>` family is not a canon namespace. The tokens asserted
+conformance to schemas that do not exist, which is the same false conformance R1
+identified for the delta, not the milder hardcoding the first pass described.
+
+The thirteen-section Specification structure was likewise absent from canon —
+each distinctive section name returns zero hits — and matches neither PF30's
+record contract nor PF27's Epic Record Template, so a Specification authored in
+it would not seat in its own register.
+
+### 10.2 Findings and closures
+
+| ID | Prompt | Finding | Repaired to | Status |
+|---|---|---|---|---|
+| `B1-SFA-01` | CF-C-20 | `schema_version: glow-specification/3.0` on `CRD_SPECIFICATION` | token removed; format resolved from referenced canon and the exact canon cited | CLOSED |
+| `B1-SFA-02` | CF-C-20 | thirteen-section Specification structure hardcoded in Execute step 2 | replaced by canon resolution, with `SOURCE_RESOLUTION_ERROR` as the failure mode | CLOSED |
+| `B1-SFA-03` | CF-E-20 | `schema_version: glow-specification/3.0` on `EPIC_SPECIFICATION` | token removed; format resolved from referenced canon | CLOSED |
+| `B1-SFA-04` | CF-E-20 | thirteen-section Specification structure hardcoded in Execute step 2 | replaced by canon resolution | CLOSED |
+| `B1-SFA-05` | CF-C-10 | `schema_version: glow-kickoff/3.0` on `SPECIFICATION_KICKOFF` | token removed. The kickoff **field list stays** — §4.6 and PF10 2.14 permit a prompt-stated kickoff format | CLOSED |
+| `B1-SFA-06` | CF-E-10 | `schema_version: glow-kickoff/3.0` on `SPECIFICATION_KICKOFF` | token removed; field list retained | CLOSED |
+| `B1-SFA-07` | CF-C-40 | delta format read "the canon referenced for this change" and told the author not to reuse "the base Specification's schema token" — stale once the base carries none | delta inherits the canon governing its base; a delta has no schema of its own | CLOSED |
+| `B1-SFA-08` | CF-E-40 | same, Epic variant | same | CLOSED |
+
+**Sequencing, stated plainly.** These six bodies were edited *before* the
+addendum was drained, which inverts the correct order and was not what the
+Product Owner instructed. He elected to keep them rather than revert. The drain
+landed the same day as **PF10 2.14**, so the chain now resolves and the bodies
+are conformant; the ordering fault is recorded rather than hidden.
+
+### 10.3 The other five prompts
+
+`GCFPE-MGMT-10`, `MGR-10`, `CF-PO-10`, `CF-C-30` and `CF-E-30` declare no
+Specification artifact. Each was re-fetched and re-read in this pass.
+`CONFIRMED_NO_CHANGE` under §4.6.
+
+`CF-PO-10` states a `CHANGE_CLASS_SELECTION` field list and the two `-30`
+prompts state a `PF10_BUILD_NOTES_ADDENDUM` field list. Neither artifact is a
+Specification, and PF10 2.14's table covers only Specifications, deltas,
+kickoffs and implementation plans. Under PF10 §8's silence rule authority
+returns to permanent canon, which defines no structure for either artifact, so
+both field lists stand.
+
+### 10.4 Verification that the chain now resolves
+
+| Link | State |
+|---|---|
+| Prompt → `docs/pfcanon/` | Each `-20` and `-40` body resolves format through its own PFCanon source contract |
+| `docs/pfcanon/` → binding | `PF10-HDE-Build-Notes-v13.2.7.md` §2.14, drained 2026-09-17 |
+| Binding → CRD format | PF30.1 §4 minimum CRD record contract, §7 record template |
+| Binding → Epic format | PF27 §2 `HDE-EPIC-Plan`, Epic Record Template (Normative) |
+| Binding → delta format | inherits the base Specification's canon |
+
+The CRD and Epic Specification lanes, which could not run between the prompt
+edits and the drain, now run.
+
+## 11. Findings this pass raised and did **not** repair
+
+| ID | Finding | Why not repaired | Owner |
+|---|---|---|---|
+| `B1-OBS-01` | **PF10 2.14 carries four stale pre-drain fields.** Inside canonical PF10 it still reads `status: READY_FOR_MANUAL_DRAIN`, `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, `pf10_addendum_number: NOT_ALLOCATED_BY_AGENT`, and a paragraph stating canon does not yet carry the binding and the Specification lanes do not run. All four are now false. An addendum inside canonical PF10 that declares itself non-canonical can be read as not in force, which would defeat the binding. | `docs/pfcanon/` is read-only. Authored by this session pre-drain and carried through verbatim. | Nathan / Product Owner |
+| `B1-OBS-02` | **`CF-C-30` and `CF-E-30` specify no drain transition for the addendum they produce.** They require the addendum to literally carry `status: READY_FOR_MANUAL_DRAIN` and `canonicality: NON_CANONICAL_PENDING_MANUAL_DRAIN`, with no clause stating those become false once Nathan drains it. `B1-OBS-01` is that gap demonstrated on a live artifact. A one-sentence fix in each body would close it. | A new contract defect, outside the §4.5 and §4.6 classes this pass was authorized to close. Not repaired on initiative. | Nathan to authorize; then Batch 1 |
+| `B1-OBS-03` | `PF30.1` §7's template heading reads *CRD Plan approval*, while its own record `HDE-CRD-0001` carries *Specification approval* and *Implementation Plan approval*. A CRD Specification author resolving format from §7 and one resolving from the example get different section sets. | `docs/pfcanon/` is read-only. | Nathan / Product Owner |
 
 ## 9. Prohibited-action confirmation
 

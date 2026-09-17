@@ -2,13 +2,15 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_COPY_REPAIR_LEDGER
-artifact_version: "1.0"
+artifact_version: "2.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
 contract_ledger: docs/ephemeral/gcfpe.batch-1.contract-ledger.md
 prompts_in_batch: 11
-prompts_edited: 11
+prompts_edited_pass_1: 11
+prompts_edited_pass_2: 6
+prompts_reverified_pass_2: 11
 prompts_confirmed_no_change: 0
 complete_readback: 11
 readback_failures: 0
@@ -93,3 +95,75 @@ Three properties a reviewer can check directly:
 - **No lineage was removed**, because none of the eleven bodies contained any.
   The only `drive.google.com` URL in each was the destination folder.
 - **The five historical Batch 1 artifacts** are untouched and unrenamed.
+
+## Second pass — `SPECIFICATION_FORMAT_AUTHORITY`, 2026-09-17
+
+After PR #409 merged, the Product Owner mandated that specification formatting
+comes from referenced canon. Six bodies were edited; all eleven were re-fetched
+and re-read against the mandate.
+
+| # | Prompt | Pass-2 change | Finding IDs | Disposition | Readback |
+|---|---|---|---|---|---|
+| 1.01 | GCFPE-MGMT-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.02 | MGR-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.03 | CF-PO-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.04 | CF-C-10 | kickoff schema token removed; field list kept | `B1-SFA-05` | **REPAIRED** | COMPLETE |
+| 1.05 | CF-C-20 | schema token removed; 13-section list replaced by canon resolution | `B1-SFA-01`, `B1-SFA-02` | **REPAIRED** | COMPLETE |
+| 1.06 | CF-C-30 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.07 | CF-C-40 | delta inherits the base's canon; no schema of its own | `B1-SFA-07` | **REPAIRED** | COMPLETE |
+| 1.08 | CF-E-10 | kickoff schema token removed; field list kept | `B1-SFA-06` | **REPAIRED** | COMPLETE |
+| 1.09 | CF-E-20 | schema token removed; 13-section list replaced by canon resolution | `B1-SFA-03`, `B1-SFA-04` | **REPAIRED** | COMPLETE |
+| 1.10 | CF-E-30 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.11 | CF-E-40 | delta inherits the base's canon; no schema of its own | `B1-SFA-08` | **REPAIRED** | COMPLETE |
+
+**Zero `glow-*` tokens remain across the eleven.** The CRD and Epic lanes stay
+exact mirrors: 2 clauses each on the `-20` pair, 1 each on the `-10` pair, 1 each
+on the `-40` pair.
+
+### The replacement text
+
+**Specification authors** (`CF-C-20`, `CF-E-20`), Execute step 2, identical but
+for the class word:
+
+> Resolve the CRD Specification format from the canon referenced for this change,
+> through this prompt's PFCanon source contract below, and cite the exact canon
+> and section resolved. Write one complete pending Specification in that format,
+> covering every field that canon requires. The format is canon's and not this
+> prompt's: a CRD Specification becomes a permanent governed record and must seat
+> in the register that governs it. Do not author against an assumed structure, do
+> not reuse a neighbouring artifact's schema token, and do not mint one. If that
+> canon cannot be resolved and read, return `SOURCE_RESOLUTION_ERROR` with the
+> failed predicate and recovery owner rather than authoring against a guess.
+
+**Kickoff preparers** (`CF-C-10`, `CF-E-10`) — the field list is retained and the
+permission is stated rather than assumed:
+
+> The kickoff is transient scaffolding between two stages and does not become a
+> permanent governed record, so this prompt states its format and it carries no
+> canon schema token. This does not extend to the Specification itself, whose
+> format CF-C-20 resolves from canon.
+
+**Delta authors** (`CF-C-40`, `CF-E-40`):
+
+> The `SPECIFICATION_DELTA` format … is governed by the same canon that governs
+> the base CRD Specification it modifies … A delta has no schema of its own: do
+> not mint one and do not carry a schema version token.
+
+### What pass 2 deliberately did not touch
+
+- **No section was added, removed or reordered** beyond replacing the
+  thirteen-section list with its canon-resolution clause in the two `-20` bodies.
+- **The `-30` addendum field lists stand.** PF10 2.14 is silent on addendum
+  structure and PF10 §8 returns that authority to permanent canon, which defines
+  none. Recorded as `B1-OBS-02` where the prompts lack a drain transition.
+- **`CF-PO-10`'s `CHANGE_CLASS_SELECTION` field list stands.** Not a Specification.
+- **No `docs/pfcanon/` write.** `B1-OBS-01` and `B1-OBS-03` are canon defects
+  this pass found and could not fix.
+
+### Ordering fault, recorded
+
+The six edits were made before PF10 2.14 was drained, inverting the correct
+order — canon first, then prompts — and going beyond the instruction given. The
+Product Owner elected to keep them. Between the edits and the drain the CRD and
+Epic Specification lanes would have returned `SOURCE_RESOLUTION_ERROR`; after
+the drain they resolve. No artifact was produced in that window.
