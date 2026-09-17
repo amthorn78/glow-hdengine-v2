@@ -1,38 +1,42 @@
-# GCFPE-20260914.1 Predecessor Project Prompt Registry
+# Project Prompt Contract Registry — GCFPE-20260914.1 / 091426.1
 
-artifact_type: `GCFPE_PREDECESSOR_PROJECT_PROMPT_REGISTRY`  
-status: `DRAFT`  
-source_sha256: `4361f3c4edd231321786502b627c0e64be47e1a51620854bb91fb86fdd231336`  
-source_bytes: `130331`
+artifact_type: `PROJECT_PROMPT_CONTRACT_REGISTRY`  
+status: `APPROVED`  
+approved_by: `Nathan / Product Owner`  
+approved_at: `2026-09-17`  
+release: `GCFPE-20260914.1 / 091426.1 / 55`  
+home: `docs/prompt_ecosystem_management/`  
+supersedes: `GCFPE-20260914.1-Predecessor-Project-Prompt-Registry.md` (DRAFT, 091326.2 / 54), removed from `docs/ephemeral/` in the same change
 
 ```yaml
 schema_version: project-prompt-contract-registry/1.0
 registry_id: GCFPE-PCR-20260914.1
 project_id: glow-hde
-status: DRAFT
-approved_by: null
-approved_at: null
+status: APPROVED
+approved_by: Nathan / Product Owner
+approved_at: 2026-09-17
 workspace_skill_registry_id: WSR-20260914.1-OBSERVATIONAL
 authority_sources:
 - type: SELECTED_RELEASE_REGISTER
-  release: GCFPE-20260913.1
+  release: GCFPE-20260914.1
   url: https://app.notion.com/p/3d24590a05eb81ce942ad994cfca9fa1
 - type: SELECTED_CATALOG
-  version_family: '091326.2'
-  member_count: 54
+  version_family: '091426.1'
+  member_count: 55
   url: https://app.notion.com/p/3da4590a05eb81bcbc5deb2d2cec4f1f
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: baseline/prompts/a/manifest.json
+  path: candidate/prompts/manifest.json
+  note: 55-prompt candidate extraction, 2026-09-17
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: baseline/prompts/b/manifest.json
+  path: candidate/prompts/manifest.json
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: baseline/prompts/c/manifest.json
+  path: candidate/prompts/manifest.json
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: baseline/prompts/d/manifest.json
+  path: candidate/prompts/manifest.json
 observation:
-  release: GCFPE-20260913.1
-  version_family: '091326.2'
-  selected_member_count: 54
+  release: GCFPE-20260914.1
+  version_family: '091426.1'
+  selected_member_count: 55
   complete_body_count: 54
   mutation_posture: READ_ONLY
 lanes:
@@ -118,9 +122,9 @@ lanes:
   active: true
 prompts:
 - prompt_key: CF-C-10
-  notion_page_id: 3da4590a05eb81bf954dfd72c05caa31
-  notion_url: https://app.notion.com/p/3da4590a05eb81bf954dfd72c05caa31
-  expected_title: CF-C-10 — Prepare CRD Specification Kickoff Handoff — 091326.2
+  notion_page_id: 3db4590a05eb8119a5a8e4d083fcf360
+  notion_url: https://app.notion.com/p/3db4590a05eb8119a5a8e4d083fcf360
+  expected_title: CF-C-10 — Prepare CRD Specification Kickoff Handoff — 091426.1
   lane: CF-C
   sequence: 10
   lifecycle: ACTIVE
@@ -147,31 +151,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-C-10.md'
-  - 'SHA-256: 34486adf43d903d7ed672b0c5ed274eb46190562fe468548b37ee22763ae830f'
-  - 'Fetched as of: 2026-09-13T11:34:43.367Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7276 bytes'
+  - 'SHA-256 of that extraction: 0e449fe7730e4493e775d407ea38c36b7ac9dec58281f0ba4a030ce134f5105d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id001
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-C-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-C-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-C-10.md
-    sha256: 34486adf43d903d7ed672b0c5ed274eb46190562fe468548b37ee22763ae830f
-    bytes: 45565
+    path: candidate/prompts/CF-C-10.md
+    sha256: 0e449fe7730e4493e775d407ea38c36b7ac9dec58281f0ba4a030ce134f5105d
+    bytes: 7276
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:43.367Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -183,9 +188,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-C-20
-  notion_page_id: 3da4590a05eb8173a162e1b06427c7bf
-  notion_url: https://app.notion.com/p/3da4590a05eb8173a162e1b06427c7bf
-  expected_title: CF-C-20 — Create CRD Specification — 091326.2
+  notion_page_id: 3db4590a05eb8173a73edc73f302a90a
+  notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
+  expected_title: CF-C-20 — Create CRD Specification — 091426.1
   lane: CF-C
   sequence: 20
   lifecycle: ACTIVE
@@ -210,31 +215,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-C-20.md'
-  - 'SHA-256: 82f3a6e804aefdaaeb3acebee5c757f758fa496b01b7b5c864f0ab3b674bbfa1'
-  - 'Fetched as of: 2026-09-13T11:34:43.540Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 5973 bytes'
+  - 'SHA-256 of that extraction: 6995097d2950f2ddd0425ed088cfe1d4dea9b2850ea94deec232965749cb8f6d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id002
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-C-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-C-20.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-C-20.md
-    sha256: 82f3a6e804aefdaaeb3acebee5c757f758fa496b01b7b5c864f0ab3b674bbfa1
-    bytes: 42876
+    path: candidate/prompts/CF-C-20.md
+    sha256: 6995097d2950f2ddd0425ed088cfe1d4dea9b2850ea94deec232965749cb8f6d
+    bytes: 5973
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:43.540Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -246,9 +252,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-C-30
-  notion_page_id: 3da4590a05eb81d19cd5f7ffa80a5f09
-  notion_url: https://app.notion.com/p/3da4590a05eb81d19cd5f7ffa80a5f09
-  expected_title: CF-C-30 — Review and Approve CRD Specification — 091326.2
+  notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
+  notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
+  expected_title: CF-C-30 — Review and Approve CRD Specification — 091426.1
   lane: CF-C
   sequence: 30
   lifecycle: ACTIVE
@@ -277,31 +283,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-C-30.md'
-  - 'SHA-256: 204518eb4f76e3342959897b25b9c4b65a15ade8ed89eb0bf6537cbb3a709646'
-  - 'Fetched as of: 2026-09-13T11:34:43.685Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 10121 bytes'
+  - 'SHA-256 of that extraction: 4b7b6b739c909f6bdb994985d5ec5b6084d63cacf372712301cdb3c2afd76f24'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id003
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-C-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-C-30.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-C-30.md
-    sha256: 204518eb4f76e3342959897b25b9c4b65a15ade8ed89eb0bf6537cbb3a709646
-    bytes: 38094
+    path: candidate/prompts/CF-C-30.md
+    sha256: 4b7b6b739c909f6bdb994985d5ec5b6084d63cacf372712301cdb3c2afd76f24
+    bytes: 10121
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:43.685Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -313,9 +320,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-C-40
-  notion_page_id: 3da4590a05eb81d19536ff2d6eac93dc
-  notion_url: https://app.notion.com/p/3da4590a05eb81d19536ff2d6eac93dc
-  expected_title: CF-C-40 — Revise CRD Specification — 091326.2
+  notion_page_id: 3db4590a05eb81269931cee342ce8a0e
+  notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
+  expected_title: CF-C-40 — Revise CRD Specification — 091426.1
   lane: CF-C
   sequence: 40
   lifecycle: ACTIVE
@@ -340,31 +347,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-C-40.md'
-  - 'SHA-256: 85dcade06503cebac66791b4e74f085b0cd46b7c200693087d0257e9391f05f5'
-  - 'Fetched as of: 2026-09-13T11:34:50.077Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7597 bytes'
+  - 'SHA-256 of that extraction: ccfcbd5d4595d3455f059e90b3a715063d3fc4316f3278b39999e8a331949218'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id004
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-C-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-C-40.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-C-40.md
-    sha256: 85dcade06503cebac66791b4e74f085b0cd46b7c200693087d0257e9391f05f5
-    bytes: 29821
+    path: candidate/prompts/CF-C-40.md
+    sha256: ccfcbd5d4595d3455f059e90b3a715063d3fc4316f3278b39999e8a331949218
+    bytes: 7597
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:50.077Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -376,9 +384,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-E-10
-  notion_page_id: 3da4590a05eb811f927adfc2243861ff
-  notion_url: https://app.notion.com/p/3da4590a05eb811f927adfc2243861ff
-  expected_title: CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091326.2
+  notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
+  notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
+  expected_title: CF-E-10 — Prepare Epic Specification Kickoff Handoff — 091426.1
   lane: CF-E
   sequence: 10
   lifecycle: ACTIVE
@@ -405,31 +413,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-E-10.md'
-  - 'SHA-256: 8f8adb11b56c0bb1793004d7bc939d30ec9725c228331689176f2ee7904b8180'
-  - 'Fetched as of: 2026-09-13T11:34:50.202Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7380 bytes'
+  - 'SHA-256 of that extraction: 02eb026dfb7a891b4ff1e778a66676b070419fbce575c25daec6ef0b0c131410'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id005
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-E-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-E-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-E-10.md
-    sha256: 8f8adb11b56c0bb1793004d7bc939d30ec9725c228331689176f2ee7904b8180
-    bytes: 43595
+    path: candidate/prompts/CF-E-10.md
+    sha256: 02eb026dfb7a891b4ff1e778a66676b070419fbce575c25daec6ef0b0c131410
+    bytes: 7380
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:50.202Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -441,9 +450,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-E-20
-  notion_page_id: 3da4590a05eb81b084acde09866a52db
-  notion_url: https://app.notion.com/p/3da4590a05eb81b084acde09866a52db
-  expected_title: CF-E-20 — Create Epic Specification — 091326.2
+  notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
+  notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
+  expected_title: CF-E-20 — Create Epic Specification — 091426.1
   lane: CF-E
   sequence: 20
   lifecycle: ACTIVE
@@ -468,31 +477,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-E-20.md'
-  - 'SHA-256: b4bfcfa75743f44b972e780523075e879b461ac44061e04b9380825f2684b128'
-  - 'Fetched as of: 2026-09-13T11:34:50.329Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 5985 bytes'
+  - 'SHA-256 of that extraction: a3305b3a9da58e9fbebd8ce7cda8df889aca76cda0342a6826704ddb8fbcfd23'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id006
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-E-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-E-20.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-E-20.md
-    sha256: b4bfcfa75743f44b972e780523075e879b461ac44061e04b9380825f2684b128
-    bytes: 39527
+    path: candidate/prompts/CF-E-20.md
+    sha256: a3305b3a9da58e9fbebd8ce7cda8df889aca76cda0342a6826704ddb8fbcfd23
+    bytes: 5985
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:50.329Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -504,9 +514,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-E-30
-  notion_page_id: 3da4590a05eb817c918ac77bad1bfc97
-  notion_url: https://app.notion.com/p/3da4590a05eb817c918ac77bad1bfc97
-  expected_title: CF-E-30 — Review and Approve Epic Specification — 091326.2
+  notion_page_id: 3db4590a05eb81b4be79f405566da9a7
+  notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
+  expected_title: CF-E-30 — Review and Approve Epic Specification — 091426.1
   lane: CF-E
   sequence: 30
   lifecycle: ACTIVE
@@ -535,31 +545,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-E-30.md'
-  - 'SHA-256: 613d47ffd753ddc475cdc31b974e3b334b5025eda968eebde927d91da3070817'
-  - 'Fetched as of: 2026-09-13T11:34:55.891Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 10129 bytes'
+  - 'SHA-256 of that extraction: 00e55e788b4e6662a37bec715cf503ae783dec3d9fb60c74a11467463e58c3a1'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id007
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-E-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-E-30.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-E-30.md
-    sha256: 613d47ffd753ddc475cdc31b974e3b334b5025eda968eebde927d91da3070817
-    bytes: 36730
+    path: candidate/prompts/CF-E-30.md
+    sha256: 00e55e788b4e6662a37bec715cf503ae783dec3d9fb60c74a11467463e58c3a1
+    bytes: 10129
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:55.891Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -571,9 +582,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-E-40
-  notion_page_id: 3da4590a05eb81ba9fcad5e656614e30
-  notion_url: https://app.notion.com/p/3da4590a05eb81ba9fcad5e656614e30
-  expected_title: CF-E-40 — Revise Epic Specification — 091326.2
+  notion_page_id: 3db4590a05eb8101b655ed223b11a85e
+  notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
+  expected_title: CF-E-40 — Revise Epic Specification — 091426.1
   lane: CF-E
   sequence: 40
   lifecycle: ACTIVE
@@ -598,31 +609,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-E-40.md'
-  - 'SHA-256: cee277a4ddc61b9bc5eff7a51997e4045b6104499d48067857eddfdd77ff1925'
-  - 'Fetched as of: 2026-09-13T11:34:55.985Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7612 bytes'
+  - 'SHA-256 of that extraction: ce8bed7759d9d1b2e6c0f4427da9d45a98514969a6b43bec71d93b453070b73f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id008
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-E-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-E-40.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-E-40.md
-    sha256: cee277a4ddc61b9bc5eff7a51997e4045b6104499d48067857eddfdd77ff1925
-    bytes: 30047
+    path: candidate/prompts/CF-E-40.md
+    sha256: ce8bed7759d9d1b2e6c0f4427da9d45a98514969a6b43bec71d93b453070b73f
+    bytes: 7612
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:55.985Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -634,9 +646,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CF-PO-10
-  notion_page_id: 3da4590a05eb8175b86cdfc3d7fc40c7
-  notion_url: https://app.notion.com/p/3da4590a05eb8175b86cdfc3d7fc40c7
-  expected_title: CF-PO-10 — Record Product Owner Change-Class Selection — 091326.2
+  notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
+  notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
+  expected_title: CF-PO-10 — Record Product Owner Change-Class Selection — 091426.1
   lane: CF-PO
   sequence: 10
   lifecycle: ACTIVE
@@ -665,31 +677,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CF-PO-10.md'
-  - 'SHA-256: 47a8b906e5cc268c2a0495b534da1fc6c047c297e1047ca285674848e17097fe'
-  - 'Fetched as of: 2026-09-13T11:34:56.105Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 6164 bytes'
+  - 'SHA-256 of that extraction: ca3d97a07474b610cdc9f036bac0ec93ccf058502d443724c9fa7ed2dd7adbaa'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id009
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CF-PO-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CF-PO-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CF-PO-10.md
-    sha256: 47a8b906e5cc268c2a0495b534da1fc6c047c297e1047ca285674848e17097fe
-    bytes: 45556
+    path: candidate/prompts/CF-PO-10.md
+    sha256: ca3d97a07474b610cdc9f036bac0ec93ccf058502d443724c9fa7ed2dd7adbaa
+    bytes: 6164
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:34:56.105Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -701,9 +714,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-20
-  notion_page_id: 3da4590a05eb81a2a0c9c98f719350a1
-  notion_url: https://app.notion.com/p/3da4590a05eb81a2a0c9c98f719350a1
-  expected_title: CL-20 — Prepare Post-Closure Drainage and Closure Memo — 091326.2
+  notion_page_id: 3db4590a05eb81f4812be61e8877c02c
+  notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
+  expected_title: CL-20 — Prepare Post-Closure Drainage and Closure Memo — 091426.1
   lane: CL
   sequence: 20
   lifecycle: ACTIVE
@@ -732,31 +745,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CL-20.md'
-  - 'SHA-256: 011ca8bfc1b6d0a7477f3caf5e2efcec39597b1db55c2055779f4cd0100d0fc2'
-  - 'Fetched as of: 2026-09-13T11:35:01.208Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 33952 bytes'
+  - 'SHA-256 of that extraction: bcf1dd21f0ec6afe4f0c6b363a054decc031a94c67b871d22e8d79316b092b78'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id010
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CL-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-20.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CL-20.md
-    sha256: 011ca8bfc1b6d0a7477f3caf5e2efcec39597b1db55c2055779f4cd0100d0fc2
-    bytes: 31766
+    path: candidate/prompts/CL-20.md
+    sha256: bcf1dd21f0ec6afe4f0c6b363a054decc031a94c67b871d22e8d79316b092b78
+    bytes: 33952
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:01.208Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -768,9 +782,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-30
-  notion_page_id: 3da4590a05eb818c8f90db54a25544b1
-  notion_url: https://app.notion.com/p/3da4590a05eb818c8f90db54a25544b1
-  expected_title: CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091326.2
+  notion_page_id: 3db4590a05eb8190a444d8818e445c1d
+  notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
+  expected_title: CL-30 — Prepare Conditional Post-Change ADR Maintenance — 091426.1
   lane: CL
   sequence: 30
   lifecycle: ACTIVE
@@ -797,31 +811,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CL-30.md'
-  - 'SHA-256: 26deff7b98c376c66fd7126a2894574e90081ed6db62c7f82dd535c4988530a9'
-  - 'Fetched as of: 2026-09-13T11:35:01.330Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 30792 bytes'
+  - 'SHA-256 of that extraction: 60e01caed575653a8c0992dce1001f1668de69f734583427f1c9d2545ddb1dd6'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id011
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CL-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-30.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CL-30.md
-    sha256: 26deff7b98c376c66fd7126a2894574e90081ed6db62c7f82dd535c4988530a9
-    bytes: 29748
+    path: candidate/prompts/CL-30.md
+    sha256: 60e01caed575653a8c0992dce1001f1668de69f734583427f1c9d2545ddb1dd6
+    bytes: 30792
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:01.330Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -833,9 +848,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-40
-  notion_page_id: 3da4590a05eb815ba2e2fb45ba7d056f
-  notion_url: https://app.notion.com/p/3da4590a05eb815ba2e2fb45ba7d056f
-  expected_title: CL-40 — Scan for PF09 Gaps and CRD Candidates — 091326.2
+  notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
+  notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
+  expected_title: CL-40 — Scan for PF09 Gaps and CRD Candidates — 091426.1
   lane: CL
   sequence: 40
   lifecycle: ACTIVE
@@ -868,31 +883,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CL-40.md'
-  - 'SHA-256: 3a3fcc0d10934ae2704e2581fc251237f4197d3671aa0e0932e72dbde0ffbafc'
-  - 'Fetched as of: 2026-09-13T11:35:01.406Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 30437 bytes'
+  - 'SHA-256 of that extraction: bc8970a7e52ce216ba20311497e023b9cbee106dd1062783e8794166504decee'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id012
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CL-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-40.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CL-40.md
-    sha256: 3a3fcc0d10934ae2704e2581fc251237f4197d3671aa0e0932e72dbde0ffbafc
-    bytes: 25707
+    path: candidate/prompts/CL-40.md
+    sha256: bc8970a7e52ce216ba20311497e023b9cbee106dd1062783e8794166504decee
+    bytes: 30437
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:01.406Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -904,9 +920,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-C-10
-  notion_page_id: 3da4590a05eb812bab7bf770bcef9527
-  notion_url: https://app.notion.com/p/3da4590a05eb812bab7bf770bcef9527
-  expected_title: CL-C-10 — Perform CRD Retrospective and Decide Closure — 091326.2
+  notion_page_id: 3db4590a05eb81ad8989faa77f441a64
+  notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
+  expected_title: CL-C-10 — Perform CRD Retrospective and Decide Closure — 091426.1
   lane: CL-C
   sequence: 10
   lifecycle: ACTIVE
@@ -935,31 +951,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CL-C-10.md'
-  - 'SHA-256: ea17fa2014f7ca1ed1eaa4682acaeac3eed936aa860de301480c6beab1c79f1e'
-  - 'Fetched as of: 2026-09-13T11:35:06.842Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 37121 bytes'
+  - 'SHA-256 of that extraction: 5e61b02e8939dea84d517ea6c3e80a9e0a45b060fbdd8c8361e96ce9fb92a511'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id013
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CL-C-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-C-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CL-C-10.md
-    sha256: ea17fa2014f7ca1ed1eaa4682acaeac3eed936aa860de301480c6beab1c79f1e
-    bytes: 38505
+    path: candidate/prompts/CL-C-10.md
+    sha256: 5e61b02e8939dea84d517ea6c3e80a9e0a45b060fbdd8c8361e96ce9fb92a511
+    bytes: 37121
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:06.842Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -971,9 +988,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-E-10
-  notion_page_id: 3da4590a05eb8177bf3cd7c9c7ca39f7
-  notion_url: https://app.notion.com/p/3da4590a05eb8177bf3cd7c9c7ca39f7
-  expected_title: CL-E-10 — Perform Epic Retrospective and Decide Closure — 091326.2
+  notion_page_id: 3db4590a05eb811a8578d75885c16cac
+  notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
+  expected_title: CL-E-10 — Perform Epic Retrospective and Decide Closure — 091426.1
   lane: CL-E
   sequence: 10
   lifecycle: ACTIVE
@@ -1002,31 +1019,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/a/CL-E-10.md'
-  - 'SHA-256: cdf30949f54adc9909f03c0eba84d963303dbfc0c03ecd4d025b6d3a86f0607f'
-  - 'Fetched as of: 2026-09-13T11:35:06.954Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 37579 bytes'
+  - 'SHA-256 of that extraction: 13380a6babd2c71cb8a6bedce6b26f3573cc957187e119fddd2850f35a33841b'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id014
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/a/CL-E-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-E-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/a/CL-E-10.md
-    sha256: cdf30949f54adc9909f03c0eba84d963303dbfc0c03ecd4d025b6d3a86f0607f
-    bytes: 38692
+    path: candidate/prompts/CL-E-10.md
+    sha256: 13380a6babd2c71cb8a6bedce6b26f3573cc957187e119fddd2850f35a33841b
+    bytes: 37579
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:06.954Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1038,9 +1056,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-E-20
-  notion_page_id: 3da4590a05eb8182bc57f512fe2fc79c
-  notion_url: https://app.notion.com/p/3da4590a05eb8182bc57f512fe2fc79c
-  expected_title: CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091326.2
+  notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
+  notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
+  expected_title: CL-E-20 — Perform Bounded PF09 Epic Revalidation — 091426.1
   lane: CL-E
   sequence: 20
   lifecycle: ACTIVE
@@ -1068,31 +1086,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/CL-E-20.md'
-  - 'SHA-256: d7f65e6bf2fc04e515c359c88c61b42e3fb8e4a09760f1b504fa765f1902b396'
-  - 'Fetched as of: 2026-09-13T11:35:07.064Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 15304 bytes'
+  - 'SHA-256 of that extraction: 439366e754cba931fe1ef0022ebd516fbe37b7514290703c6bf25f49767b8e70'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id015
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/CL-E-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-E-20.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/CL-E-20.md
-    sha256: d7f65e6bf2fc04e515c359c88c61b42e3fb8e4a09760f1b504fa765f1902b396
-    bytes: 30843
+    path: candidate/prompts/CL-E-20.md
+    sha256: 439366e754cba931fe1ef0022ebd516fbe37b7514290703c6bf25f49767b8e70
+    bytes: 15304
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:07.064Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -1104,9 +1123,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-E-30
-  notion_page_id: 3da4590a05eb8170abede3b92037d246
-  notion_url: https://app.notion.com/p/3da4590a05eb8170abede3b92037d246
-  expected_title: CL-E-30 — Review Bounded PF09 Revalidation — 091326.2
+  notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
+  notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
+  expected_title: CL-E-30 — Review Bounded PF09 Revalidation — 091426.1
   lane: CL-E
   sequence: 30
   lifecycle: ACTIVE
@@ -1135,31 +1154,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/CL-E-30.md'
-  - 'SHA-256: e4d6450a1da904b70e219c72cf93d21fef951429acb638482850277db9901af1'
-  - 'Fetched as of: 2026-09-13T11:35:12.557Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 14180 bytes'
+  - 'SHA-256 of that extraction: 7dfb3c0d6ec737cbcec4fa26b09afa96fc06b91d6742a16f80513f50bf99888d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id016
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/CL-E-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-E-30.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/CL-E-30.md
-    sha256: e4d6450a1da904b70e219c72cf93d21fef951429acb638482850277db9901af1
-    bytes: 30753
+    path: candidate/prompts/CL-E-30.md
+    sha256: 7dfb3c0d6ec737cbcec4fa26b09afa96fc06b91d6742a16f80513f50bf99888d
+    bytes: 14180
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:12.557Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -1171,9 +1191,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: CL-E-40
-  notion_page_id: 3da4590a05eb8148a9cad59ae5bf98ae
-  notion_url: https://app.notion.com/p/3da4590a05eb8148a9cad59ae5bf98ae
-  expected_title: CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091326.2
+  notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
+  notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
+  expected_title: CL-E-40 — Prepare Post-Epic PF09 Maintenance — 091426.1
   lane: CL-E
   sequence: 40
   lifecycle: ACTIVE
@@ -1202,31 +1222,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/CL-E-40.md'
-  - 'SHA-256: a59a6bae3a8a3480b2ec088d27a59fece1a35a1838e0c494cef4518257ac88b1'
-  - 'Fetched as of: 2026-09-13T11:35:12.666Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 16002 bytes'
+  - 'SHA-256 of that extraction: cccef152db6eb0f9d6cd0c4e7338f51d73ffd4069abe7512c4d3b4e6ba8c3a5c'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id017
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/CL-E-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/CL-E-40.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/CL-E-40.md
-    sha256: a59a6bae3a8a3480b2ec088d27a59fece1a35a1838e0c494cef4518257ac88b1
-    bytes: 31772
+    path: candidate/prompts/CL-E-40.md
+    sha256: cccef152db6eb0f9d6cd0c4e7338f51d73ffd4069abe7512c4d3b4e6ba8c3a5c
+    bytes: 16002
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:12.666Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -1238,9 +1259,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: DOC-10
-  notion_page_id: 3da4590a05eb81e5b888c8c780244d0c
-  notion_url: https://app.notion.com/p/3da4590a05eb81e5b888c8c780244d0c
-  expected_title: DOC-10 — Create Final Repository Documentation PR Instructions — 091326.2
+  notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
+  notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
+  expected_title: DOC-10 — Create Final Repository Documentation PR Instructions — 091426.1
   lane: DOC
   sequence: 10
   lifecycle: ACTIVE
@@ -1276,31 +1297,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/DOC-10.md'
-  - 'SHA-256: ecdc242ee3dfe461b6c0b6b19ac55dcef80270b1fbad7277cd588eccbfb7cbd7'
-  - 'Fetched as of: 2026-09-13T11:35:18.857Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 20261 bytes'
+  - 'SHA-256 of that extraction: dbeb6f96a39b4868e750e72b3f39ba6fafaf8d4790626f122385830af3de502f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id018
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/DOC-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/DOC-10.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/DOC-10.md
-    sha256: ecdc242ee3dfe461b6c0b6b19ac55dcef80270b1fbad7277cd588eccbfb7cbd7
-    bytes: 61527
+    path: candidate/prompts/DOC-10.md
+    sha256: dbeb6f96a39b4868e750e72b3f39ba6fafaf8d4790626f122385830af3de502f
+    bytes: 20261
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:18.857Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1312,9 +1334,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: DOC-20
-  notion_page_id: 3da4590a05eb81a4bf2ad969439c8ffe
-  notion_url: https://app.notion.com/p/3da4590a05eb81a4bf2ad969439c8ffe
-  expected_title: DOC-20 — Verify Final Repository Documentation Completion — 091326.2
+  notion_page_id: 3db4590a05eb8164ac09e722dc967f25
+  notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
+  expected_title: DOC-20 — Verify Final Repository Documentation Completion — 091426.1
   lane: DOC
   sequence: 20
   lifecycle: ACTIVE
@@ -1353,31 +1375,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/DOC-20.md'
-  - 'SHA-256: 93d44c6739df817c0b2ecdaa592ffd825daffe009c311ec3326342232b0764f4'
-  - 'Fetched as of: 2026-09-13T11:35:19.093Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 20784 bytes'
+  - 'SHA-256 of that extraction: 967fcdd78641d410e5255579010931146f7711eb4884a0601d6eefb450b5dbc6'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id019
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/DOC-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/DOC-20.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/DOC-20.md
-    sha256: 93d44c6739df817c0b2ecdaa592ffd825daffe009c311ec3326342232b0764f4
-    bytes: 61939
+    path: candidate/prompts/DOC-20.md
+    sha256: 967fcdd78641d410e5255579010931146f7711eb4884a0601d6eefb450b5dbc6
+    bytes: 20784
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:19.093Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1389,9 +1412,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: ESC-10
-  notion_page_id: 3da4590a05eb81dca03dc24874692130
-  notion_url: https://app.notion.com/p/3da4590a05eb81dca03dc24874692130
-  expected_title: ESC-10 — Create QA Escalation Report — 091326.2
+  notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
+  notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
+  expected_title: ESC-10 — Create QA Escalation Report — 091426.1
   lane: ESC
   sequence: 10
   lifecycle: ACTIVE
@@ -1417,31 +1440,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/ESC-10.md'
-  - 'SHA-256: 0dab34bc93f6e4c32fb136ce7054155fe665cff1f1a9c5774072dd3ed7a9fd63'
-  - 'Fetched as of: 2026-09-13T11:35:55.018Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 17169 bytes'
+  - 'SHA-256 of that extraction: 87b310229a85227426392c40e1d928558de07d4fa80efd35657a665aaede3a82'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id020
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/ESC-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/ESC-10.md
   expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
   expected_parent_title: Escalation
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/ESC-10.md
-    sha256: 0dab34bc93f6e4c32fb136ce7054155fe665cff1f1a9c5774072dd3ed7a9fd63
-    bytes: 39018
+    path: candidate/prompts/ESC-10.md
+    sha256: 87b310229a85227426392c40e1d928558de07d4fa80efd35657a665aaede3a82
+    bytes: 17169
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:55.018Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1453,9 +1477,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: ESC-25
-  notion_page_id: 3da4590a05eb81e09ff9c34bda83e49e
-  notion_url: https://app.notion.com/p/3da4590a05eb81e09ff9c34bda83e49e
-  expected_title: ESC-25 — Execute Bounded Escalation Discovery — 091326.2
+  notion_page_id: 3db4590a05eb81bf9326e46a1017de38
+  notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
+  expected_title: ESC-25 — Execute Bounded Escalation Discovery — 091426.1
   lane: ESC
   sequence: 25
   lifecycle: ACTIVE
@@ -1484,31 +1508,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/ESC-25.md'
-  - 'SHA-256: 41bc2796d960bbd415670c3f7d298988a1f6dfbfa821f914638f370dd150d37f'
-  - 'Fetched as of: 2026-09-13T11:35:55.161Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 17817 bytes'
+  - 'SHA-256 of that extraction: 1d04bc4b76a28557502a9b499d10ec00b65b1282f405b0cdf8ea2ec6091499cd'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id021
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/ESC-25.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/ESC-25.md
   expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
   expected_parent_title: Escalation
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/ESC-25.md
-    sha256: 41bc2796d960bbd415670c3f7d298988a1f6dfbfa821f914638f370dd150d37f
-    bytes: 43544
+    path: candidate/prompts/ESC-25.md
+    sha256: 1d04bc4b76a28557502a9b499d10ec00b65b1282f405b0cdf8ea2ec6091499cd
+    bytes: 17817
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:55.161Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1520,9 +1545,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: ESC-30
-  notion_page_id: 3da4590a05eb81f8ba50fdc497a8b2ec
-  notion_url: https://app.notion.com/p/3da4590a05eb81f8ba50fdc497a8b2ec
-  expected_title: ESC-30 — Diagnose and Propose Bounded Remediation — 091326.2
+  notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
+  notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
+  expected_title: ESC-30 — Diagnose and Propose Bounded Remediation — 091426.1
   lane: ESC
   sequence: 30
   lifecycle: ACTIVE
@@ -1556,31 +1581,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/ESC-30.md'
-  - 'SHA-256: 069917d72c7de14706c4a322182c7e6994669a7c52556fbba99141d2051a2284'
-  - 'Fetched as of: 2026-09-13T11:35:55.316Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 18446 bytes'
+  - 'SHA-256 of that extraction: 579c893c9576a25233a7238dffc01333058cedfd8de01d73df8bc669539962c9'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id022
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/ESC-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/ESC-30.md
   expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
   expected_parent_title: Escalation
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/ESC-30.md
-    sha256: 069917d72c7de14706c4a322182c7e6994669a7c52556fbba99141d2051a2284
-    bytes: 35366
+    path: candidate/prompts/ESC-30.md
+    sha256: 579c893c9576a25233a7238dffc01333058cedfd8de01d73df8bc669539962c9
+    bytes: 18446
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:55.316Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1592,9 +1618,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: ESC-40
-  notion_page_id: 3da4590a05eb8101bc3bd23243f1d4c5
-  notion_url: https://app.notion.com/p/3da4590a05eb8101bc3bd23243f1d4c5
-  expected_title: ESC-40 — Review and Return Approved Remediation — 091326.2
+  notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
+  notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
+  expected_title: ESC-40 — Review and Return Approved Remediation — 091426.1
   lane: ESC
   sequence: 40
   lifecycle: ACTIVE
@@ -1625,31 +1651,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/ESC-40.md'
-  - 'SHA-256: c84c94ecece79775727383963abcda89c4e9438eb1ab7ec4d472ce4b45b2265c'
-  - 'Fetched as of: 2026-09-13T11:36:00.509Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 18896 bytes'
+  - 'SHA-256 of that extraction: 8ca0090c6b067e55e744d52eccf5d9f9ba2ff9898e05266dfda0f1033fe2a8c9'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id023
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/ESC-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/ESC-40.md
   expected_parent_id: 3c74590a05eb8123bc55ca7f99ce176c
   expected_parent_title: Escalation
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/ESC-40.md
-    sha256: c84c94ecece79775727383963abcda89c4e9438eb1ab7ec4d472ce4b45b2265c
-    bytes: 32698
+    path: candidate/prompts/ESC-40.md
+    sha256: 8ca0090c6b067e55e744d52eccf5d9f9ba2ff9898e05266dfda0f1033fe2a8c9
+    bytes: 18896
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:00.509Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1661,9 +1688,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: GCFPE-MGMT-10
-  notion_page_id: 3da4590a05eb81ac80e6d886a25aa026
-  notion_url: https://app.notion.com/p/3da4590a05eb81ac80e6d886a25aa026
-  expected_title: GCFPE-MGMT-10 — Manage an Ecosystem Change — 091326.2
+  notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
+  notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
+  expected_title: GCFPE-MGMT-10 — Manage an Ecosystem Change — 091426.1
   lane: GCFPE-MGMT
   sequence: 10
   lifecycle: ACTIVE
@@ -1692,31 +1719,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/GCFPE-MGMT-10.md'
-  - 'SHA-256: c2f8ea1dcb6f0e139b3efdcb9cce02673ee0ad193ef8ee40c3a4aa3e41c458c7'
-  - 'Fetched as of: 2026-09-13T11:36:03.508Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 8065 bytes'
+  - 'SHA-256 of that extraction: 85729677e80aa579fb9ca80684eeab1dd0b7c7a5d95561051c4844da570e4e1c'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id024
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/GCFPE-MGMT-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/GCFPE-MGMT-10.md
   expected_parent_id: 3cc4590a05eb8101b5ded32c12616eb6
   expected_parent_title: Glow HDE Prompt Flow Index
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/GCFPE-MGMT-10.md
-    sha256: c2f8ea1dcb6f0e139b3efdcb9cce02673ee0ad193ef8ee40c3a4aa3e41c458c7
-    bytes: 54469
+    path: candidate/prompts/GCFPE-MGMT-10.md
+    sha256: 85729677e80aa579fb9ca80684eeab1dd0b7c7a5d95561051c4844da570e4e1c
+    bytes: 8065
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:03.508Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1728,9 +1756,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-10
-  notion_page_id: 3da4590a05eb8130b2fcf3993239096c
-  notion_url: https://app.notion.com/p/3da4590a05eb8130b2fcf3993239096c
-  expected_title: IA-10 — Create Whole-Change Implementation Audit and Plan — 091326.2
+  notion_page_id: 3db4590a05eb817aa191f1e822c30480
+  notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
+  expected_title: IA-10 — Create Whole-Change Implementation Audit and Plan — 091426.1
   lane: IA
   sequence: 10
   lifecycle: ACTIVE
@@ -1757,31 +1785,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/IA-10.md'
-  - 'SHA-256: 821b6a5bf462f0ed660d598566dbcf440a88f4d455538d9d26d0b76555014c0e'
-  - 'Fetched as of: 2026-09-13T11:35:19.301Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 10287 bytes'
+  - 'SHA-256 of that extraction: 2adcc3b6a7f7e9264fc4dde8cd64d8242f8fa4f95ddb875f3be2887c85257c68'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id025
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/IA-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-10.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/IA-10.md
-    sha256: 821b6a5bf462f0ed660d598566dbcf440a88f4d455538d9d26d0b76555014c0e
-    bytes: 50362
+    path: candidate/prompts/IA-10.md
+    sha256: 2adcc3b6a7f7e9264fc4dde8cd64d8242f8fa4f95ddb875f3be2887c85257c68
+    bytes: 10287
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:19.301Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1793,9 +1822,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-20
-  notion_page_id: 3da4590a05eb8198bffdf367600ab5b3
-  notion_url: https://app.notion.com/p/3da4590a05eb8198bffdf367600ab5b3
-  expected_title: IA-20 — Create Whole-Change Implementation Plan — 091326.2
+  notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
+  notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
+  expected_title: IA-20 — Create Whole-Change Implementation Plan — 091426.1
   lane: IA
   sequence: 20
   lifecycle: ACTIVE
@@ -1822,31 +1851,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/IA-20.md'
-  - 'SHA-256: 8a9d7443ea516ed3236b819d45e0030711fa7179798dfd5e56dd0fcdcdbfc0e4'
-  - 'Fetched as of: 2026-09-13T11:35:26.414Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 6332 bytes'
+  - 'SHA-256 of that extraction: fccb50a0746843e6d5bbcd401f820a95802d40f1825778e2a7b393b9f558db3f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id026
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/IA-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-20.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/IA-20.md
-    sha256: 8a9d7443ea516ed3236b819d45e0030711fa7179798dfd5e56dd0fcdcdbfc0e4
-    bytes: 45115
+    path: candidate/prompts/IA-20.md
+    sha256: fccb50a0746843e6d5bbcd401f820a95802d40f1825778e2a7b393b9f558db3f
+    bytes: 6332
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:26.414Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1858,9 +1888,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-30
-  notion_page_id: 3da4590a05eb81029c49c21113701638
-  notion_url: https://app.notion.com/p/3da4590a05eb81029c49c21113701638
-  expected_title: IA-30 — Review Whole-Change Implementation Plan — 091326.2
+  notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
+  notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
+  expected_title: IA-30 — Review Whole-Change Implementation Plan — 091426.1
   lane: IA
   sequence: 30
   lifecycle: ACTIVE
@@ -1888,31 +1918,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/b/IA-30.md'
-  - 'SHA-256: d323985188cad57b284151c9d72550986c15bda53ec3c54e06c8acddca0859a0'
-  - 'Fetched as of: 2026-09-13T11:35:26.563Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 9858 bytes'
+  - 'SHA-256 of that extraction: a757109e79b733bc45cb9d05d337f7f361a4d661bcf23586a18d0153681473e7'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id027
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/b/IA-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-30.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/b/IA-30.md
-    sha256: d323985188cad57b284151c9d72550986c15bda53ec3c54e06c8acddca0859a0
-    bytes: 32057
+    path: candidate/prompts/IA-30.md
+    sha256: a757109e79b733bc45cb9d05d337f7f361a4d661bcf23586a18d0153681473e7
+    bytes: 9858
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:26.563Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1924,9 +1955,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-40
-  notion_page_id: 3da4590a05eb819d920ac5f14a042d08
-  notion_url: https://app.notion.com/p/3da4590a05eb819d920ac5f14a042d08
-  expected_title: IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091326.2
+  notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
+  notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
+  expected_title: IA-40 — Prepare or Revise Whole-Change Implementation Plan — 091426.1
   lane: IA
   sequence: 40
   lifecycle: ACTIVE
@@ -1953,31 +1984,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/IA-40.md'
-  - 'SHA-256: 222784053827d722a5067e16e6a49f1b6f189524cd4687c63f3b61503e397edc'
-  - 'Fetched as of: 2026-09-13T11:35:26.674Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 5537 bytes'
+  - 'SHA-256 of that extraction: 78c209da41eb258c4dd5c667e71150b2585eb3355758020aab02294dc5a71083'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id028
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/IA-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-40.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/IA-40.md
-    sha256: 222784053827d722a5067e16e6a49f1b6f189524cd4687c63f3b61503e397edc
-    bytes: 32849
+    path: candidate/prompts/IA-40.md
+    sha256: 78c209da41eb258c4dd5c667e71150b2585eb3355758020aab02294dc5a71083
+    bytes: 5537
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:26.674Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -1989,9 +2021,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-50
-  notion_page_id: 3da4590a05eb8107a012f68e6b8fd98c
-  notion_url: https://app.notion.com/p/3da4590a05eb8107a012f68e6b8fd98c
-  expected_title: IA-50 — IA Answer Seeder — 091326.2
+  notion_page_id: 3db4590a05eb81d78eeae384e93dd697
+  notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
+  expected_title: IA-50 — IA Answer Seeder — 091426.1
   lane: IA
   sequence: 50
   lifecycle: ACTIVE
@@ -2021,31 +2053,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/IA-50.md'
-  - 'SHA-256: 778caa075d543bfa898b5af7eb8e5417ccd3ac2f480f70d593ca389d9299efe5'
-  - 'Fetched as of: 2026-09-13T11:35:31.764Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 6526 bytes'
+  - 'SHA-256 of that extraction: 504f9454328a2230ace76128d1837fbeae404e14d01384226a4a7025daa9492d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id029
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/IA-50.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-50.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/IA-50.md
-    sha256: 778caa075d543bfa898b5af7eb8e5417ccd3ac2f480f70d593ca389d9299efe5
-    bytes: 41138
+    path: candidate/prompts/IA-50.md
+    sha256: 504f9454328a2230ace76128d1837fbeae404e14d01384226a4a7025daa9492d
+    bytes: 6526
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:31.764Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2057,9 +2090,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: IA-60
-  notion_page_id: 3da4590a05eb81f78afcca35f2dcb7db
-  notion_url: https://app.notion.com/p/3da4590a05eb81f78afcca35f2dcb7db
-  expected_title: IA-60 — Thoth Planning Research — 091326.2
+  notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
+  notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
+  expected_title: IA-60 — Thoth Planning Research — 091426.1
   lane: IA
   sequence: 60
   lifecycle: ACTIVE
@@ -2088,31 +2121,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/IA-60.md'
-  - 'SHA-256: 28c544a8d7e0da19e9300bb157eff427a83aa2ed475257bd3df5a423514bb4c7'
-  - 'Fetched as of: 2026-09-13T11:35:31.897Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 5357 bytes'
+  - 'SHA-256 of that extraction: 6a8971c4c2bc1ca9000843b7da2b2df86f08ec6eb8f1b2ffa701a930700c0deb'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id030
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/IA-60.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/IA-60.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/IA-60.md
-    sha256: 28c544a8d7e0da19e9300bb157eff427a83aa2ed475257bd3df5a423514bb4c7
-    bytes: 35448
+    path: candidate/prompts/IA-60.md
+    sha256: 6a8971c4c2bc1ca9000843b7da2b2df86f08ec6eb8f1b2ffa701a930700c0deb
+    bytes: 5357
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:31.897Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2124,9 +2158,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: MGR-10
-  notion_page_id: 3da4590a05eb81c585d2f70e28f1c2bf
-  notion_url: https://app.notion.com/p/3da4590a05eb81c585d2f70e28f1c2bf
-  expected_title: MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091326.2
+  notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
+  notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
+  expected_title: MGR-10 — Coordinate the Complete Change Flow within Current Authority — 091426.1
   lane: MGR
   sequence: 10
   lifecycle: ACTIVE
@@ -2157,31 +2191,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/MGR-10.md'
-  - 'SHA-256: 2689c560c540d926e34c853482c284aac0e62f91262ae98d4afb4c228c45d353'
-  - 'Fetched as of: 2026-09-13T11:35:12.818Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7357 bytes'
+  - 'SHA-256 of that extraction: 63b4897d9774eea985f94b78b4d43b83a3443a3be8adb7543283042e2882810b'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id031
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/MGR-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/MGR-10.md
   expected_parent_id: 3c74590a05eb811d8433e7022629e213
   expected_parent_title: HDE Change Flow
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/MGR-10.md
-    sha256: 2689c560c540d926e34c853482c284aac0e62f91262ae98d4afb4c228c45d353
-    bytes: 50351
+    path: candidate/prompts/MGR-10.md
+    sha256: 63b4897d9774eea985f94b78b4d43b83a3443a3be8adb7543283042e2882810b
+    bytes: 7357
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:12.818Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2193,9 +2228,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: OPS-10
-  notion_page_id: 3da4590a05eb8173b6becbea1fd53aa6
-  notion_url: https://app.notion.com/p/3da4590a05eb8173b6becbea1fd53aa6
-  expected_title: OPS-10 — Create Bounded Ops Task — 091326.2
+  notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
+  notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
+  expected_title: OPS-10 — Create Bounded Ops Task — 091426.1
   lane: OPS
   sequence: 10
   lifecycle: ACTIVE
@@ -2223,31 +2258,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/OPS-10.md'
-  - 'SHA-256: 8a2bee2e155e23dee9b0e150b649e77722dc5575868a3bee5de29bef167e4d63'
-  - 'Fetched as of: 2026-09-13T11:35:32.017Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 43576 bytes'
+  - 'SHA-256 of that extraction: 47f2e40af709fbfc1486d7fca67a2114527aa2a2fd2be8bb3f03e268f236d25d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id032
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/OPS-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/OPS-10.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/OPS-10.md
-    sha256: 8a2bee2e155e23dee9b0e150b649e77722dc5575868a3bee5de29bef167e4d63
-    bytes: 42256
+    path: candidate/prompts/OPS-10.md
+    sha256: 47f2e40af709fbfc1486d7fca67a2114527aa2a2fd2be8bb3f03e268f236d25d
+    bytes: 43576
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:32.017Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -2259,9 +2295,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: OPS-20
-  notion_page_id: 3da4590a05eb8137b923d8f5eee107aa
-  notion_url: https://app.notion.com/p/3da4590a05eb8137b923d8f5eee107aa
-  expected_title: OPS-20 — Execute Bounded Ops Task — 091326.2
+  notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
+  notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
+  expected_title: OPS-20 — Execute Bounded Ops Task — 091426.1
   lane: OPS
   sequence: 20
   lifecycle: ACTIVE
@@ -2291,31 +2327,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/OPS-20.md'
-  - 'SHA-256: 3aec0fb1499c5ea64366951689755b4189499a5bf12b8b33ef55578614a24a4e'
-  - 'Fetched as of: 2026-09-13T11:35:38.925Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 37499 bytes'
+  - 'SHA-256 of that extraction: 066ace58820320724fab5e22b269f33fa13db92c646a46e9b7462b6b273b4a0f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id033
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/OPS-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/OPS-20.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/OPS-20.md
-    sha256: 3aec0fb1499c5ea64366951689755b4189499a5bf12b8b33ef55578614a24a4e
-    bytes: 37046
+    path: candidate/prompts/OPS-20.md
+    sha256: 066ace58820320724fab5e22b269f33fa13db92c646a46e9b7462b6b273b4a0f
+    bytes: 37499
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:38.925Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -2327,9 +2364,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: OPS-30
-  notion_page_id: 3da4590a05eb8134a4fce2e3f4aabf68
-  notion_url: https://app.notion.com/p/3da4590a05eb8134a4fce2e3f4aabf68
-  expected_title: OPS-30 — Review Ops Execution Receipt — 091326.2
+  notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
+  notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
+  expected_title: OPS-30 — Review Ops Execution Receipt — 091426.1
   lane: OPS
   sequence: 30
   lifecycle: ACTIVE
@@ -2368,31 +2405,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/OPS-30.md'
-  - 'SHA-256: b85da5c6f4f08c84994cecf1d7243fed0d608a9d1ff04635083cb0ced2771273'
-  - 'Fetched as of: 2026-09-13T11:35:39.182Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 58399 bytes'
+  - 'SHA-256 of that extraction: 6a90191f32d8c9a8698bb39abb6fd5043dcb1afd8a27f28317e3b0e649f0381e'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id034
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/OPS-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/OPS-30.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/OPS-30.md
-    sha256: b85da5c6f4f08c84994cecf1d7243fed0d608a9d1ff04635083cb0ced2771273
-    bytes: 58591
+    path: candidate/prompts/OPS-30.md
+    sha256: 6a90191f32d8c9a8698bb39abb6fd5043dcb1afd8a27f28317e3b0e649f0381e
+    bytes: 58399
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:39.182Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2404,9 +2442,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: PR-10
-  notion_page_id: 3da4590a05eb81c594a0f9bf5cb151a7
-  notion_url: https://app.notion.com/p/3da4590a05eb81c594a0f9bf5cb151a7
-  expected_title: PR-10 — Create PR Work-Unit Instructions — 091326.2
+  notion_page_id: 3db4590a05eb818e8359de1994e97a7d
+  notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
+  expected_title: PR-10 — Create PR Work-Unit Instructions — 091426.1
   lane: PR
   sequence: 10
   lifecycle: ACTIVE
@@ -2436,31 +2474,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/PR-10.md'
-  - 'SHA-256: c8560e1c966609a02d9915400b1c30b2324d9f2d86d5102e6ac9a81e788d4768'
-  - 'Fetched as of: 2026-09-13T11:35:39.345Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 50295 bytes'
+  - 'SHA-256 of that extraction: a731f158057d5ff896a13e1ada3d323bbd20d827de577ed005ddf01e334913e4'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id035
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/PR-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-10.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/PR-10.md
-    sha256: c8560e1c966609a02d9915400b1c30b2324d9f2d86d5102e6ac9a81e788d4768
-    bytes: 48526
+    path: candidate/prompts/PR-10.md
+    sha256: a731f158057d5ff896a13e1ada3d323bbd20d827de577ed005ddf01e334913e4
+    bytes: 50295
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:39.345Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2472,9 +2511,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: PR-20
-  notion_page_id: 3da4590a05eb8147b34ccfabf608c2e3
-  notion_url: https://app.notion.com/p/3da4590a05eb8147b34ccfabf608c2e3
-  expected_title: PR-20 — Create Detailed PR Implementation Plan — 091326.2
+  notion_page_id: 3db4590a05eb8174abf8c04318ab04be
+  notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
+  expected_title: PR-20 — Create Detailed PR Implementation Plan — 091426.1
   lane: PR
   sequence: 20
   lifecycle: ACTIVE
@@ -2501,31 +2540,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/PR-20.md'
-  - 'SHA-256: 9cee9e6c0d61c573fc70adbed572df462f900438c368ed9e23209a6fd70e1f33'
-  - 'Fetched as of: 2026-09-13T11:35:45.851Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 52673 bytes'
+  - 'SHA-256 of that extraction: 3d0b5c6dec34ce39e04d2229a6e5a3cf5c0919552a40c5e0e4426516a08c3c2f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id036
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/PR-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-20.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/PR-20.md
-    sha256: 9cee9e6c0d61c573fc70adbed572df462f900438c368ed9e23209a6fd70e1f33
-    bytes: 49226
+    path: candidate/prompts/PR-20.md
+    sha256: 3d0b5c6dec34ce39e04d2229a6e5a3cf5c0919552a40c5e0e4426516a08c3c2f
+    bytes: 52673
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:45.851Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2537,9 +2577,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: PR-30
-  notion_page_id: 3da4590a05eb81c0aee0d0862b242e09
-  notion_url: https://app.notion.com/p/3da4590a05eb81c0aee0d0862b242e09
-  expected_title: PR-30 — PR Implementation Proceed — 091326.2
+  notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
+  notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
+  expected_title: PR-30 — PR Implementation Proceed — 091426.1
   lane: PR
   sequence: 30
   lifecycle: ACTIVE
@@ -2569,31 +2609,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/PR-30.md'
-  - 'SHA-256: 52ad1e27706c771cfb632a78649e1c06d5c8fd85c4288b519c1c255d1a1ab844'
-  - 'Fetched as of: 2026-09-13T11:35:45.977Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 40571 bytes'
+  - 'SHA-256 of that extraction: c666d6560a8aac597612944b4ef3755ec29351229ad128d86b9142cc89a546fe'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id037
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/PR-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-30.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/PR-30.md
-    sha256: 52ad1e27706c771cfb632a78649e1c06d5c8fd85c4288b519c1c255d1a1ab844
-    bytes: 37219
+    path: candidate/prompts/PR-30.md
+    sha256: c666d6560a8aac597612944b4ef3755ec29351229ad128d86b9142cc89a546fe
+    bytes: 40571
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:45.977Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2604,10 +2645,79 @@ prompts:
     forbidden_literals: []
     required_regex: []
     forbidden_regex: []
+- prompt_key: PR-35
+  notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
+  notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
+  expected_title: PR-35 — Resolve PR Reviews and Reach Merge Readiness — 091426.1
+  lane: PR
+  sequence: 35
+  lifecycle: ACTIVE
+  function: Execute the review-resolution and merge-readiness phase for one proceeded PR work unit.
+  session_class: SAME_SESSION_CONTINUATION
+  session_role: You are the same dedicated PR-development session that produced or recovered the exact PR_CANDIDATE_PUBLISHED result for one proceeded work unit.
+  creator_role: The same dedicated PR-development session; PR-30 and PR-35 are two phases of one native PR execution work unit.
+  reviewer_role: NONE
+  inputs:
+  - WORK_UNIT_ID and exact change/Epic identity
+  - selected PR-35 prompt identity and direct Notion URL
+  - same dedicated PR session reference with session_disposition RETAIN_EXISTING
+  - original Product Owner Proceed for the exact detailed PR Plan
+  - complete IA-issued PR instruction
+  - immutable approved Specification and whole-change Implementation Plan with review and approved overlay lineage
+  outputs:
+  - artifact: PR_IMPLEMENTATION_RESULT
+    states:
+    - MERGE_PENDING
+    - RESCOPE_PENDING
+    - RECOVERY_PENDING
+    - REMOTE_EVIDENCE_PENDING
+    consumers:
+    - RS-20
+    - PR-35
+  mutations:
+    allowed:
+    - Resolve review findings on the existing pull request for the proceeded work unit
+    - Record remote actions in the durable remote-action ledger and checkpoints
+    - Produce the versioned same-lineage PR_IMPLEMENTATION_RESULT phase record
+    forbidden:
+    - Merge a pull request or enable automatic merge
+    - Edit PF10 directly
+    - Add an R1 row, actor, approval, Proceed, work unit or session
+    - Produce a PF10_BUILD_NOTES_ADDENDUM
+  source_snapshot:
+    path: candidate/prompts/PR-35.md
+    sha256: 39d72456ae6080d47488508005a038e88e4555a20efa5a9c394f03726b675e51
+    bytes: 17934
+    completeness: COMPLETE
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
+  audit_assertions:
+    required_literals:
+    - value: 'Prompt Version: 091426.1'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: GCFPE-20260914.1'
+      rule_id: INV-003
+    - value: NEXT_PROMPT_HANDOFF
+      rule_id: CTR-002
+  evidence_contract:
+  - 'Complete prompt body extracted from Notion 2026-09-17: 17934 bytes'
+  - 'SHA-256 of that extraction: 39d72456ae6080d47488508005a038e88e4555a20efa5a9c394f03726b675e51'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  failure_contract:
+  - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
+  required_interfaces:
+  - RS-20
+  - PR-35
+  controlling_sources:
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-35.md
+  expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
+  registry_note: Added 2026-09-17. Present in the 091426.1 candidate and absent from the 091326.2 predecessor; this entry was derived from the candidate body, not carried over.
 - prompt_key: PR-40
-  notion_page_id: 3da4590a05eb813c8b47e77f94ff1def
-  notion_url: https://app.notion.com/p/3da4590a05eb813c8b47e77f94ff1def
-  expected_title: PR-40 — Review PR Work-Unit Lineage — 091326.2
+  notion_page_id: 3db4590a05eb818786c5cb6051b4d634
+  notion_url: https://app.notion.com/p/3db4590a05eb818786c5cb6051b4d634
+  expected_title: PR-40 — Review PR Work-Unit Lineage — 091426.1
   lane: PR
   sequence: 40
   lifecycle: ACTIVE
@@ -2641,31 +2751,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/PR-40.md'
-  - 'SHA-256: f3a5b61980beddebbed592e99998fdc5e609cd8a0977b132fc0b7f351b7a47f3'
-  - 'Fetched as of: 2026-09-13T11:35:46.151Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 54974 bytes'
+  - 'SHA-256 of that extraction: 9350d497844631345b0ab851f457554a97e4a308aad522b644995a7ea99de3f5'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id038
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/PR-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-40.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/PR-40.md
-    sha256: f3a5b61980beddebbed592e99998fdc5e609cd8a0977b132fc0b7f351b7a47f3
-    bytes: 53350
+    path: candidate/prompts/PR-40.md
+    sha256: 9350d497844631345b0ab851f457554a97e4a308aad522b644995a7ea99de3f5
+    bytes: 54974
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:46.151Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2677,9 +2788,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: PR-50
-  notion_page_id: 3da4590a05eb813bb505eea620942e30
-  notion_url: https://app.notion.com/p/3da4590a05eb813bb505eea620942e30
-  expected_title: PR-50 — Abort PR and Escalate — 091326.2
+  notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
+  notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
+  expected_title: PR-50 — Abort PR and Escalate — 091426.1
   lane: PR
   sequence: 50
   lifecycle: ACTIVE
@@ -2705,31 +2816,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/PR-50.md'
-  - 'SHA-256: d6e184ab61aeb3327ca4600c1a184224c2a7f25188aee22e38d11fd5a235f48a'
-  - 'Fetched as of: 2026-09-13T11:35:51.934Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 7257 bytes'
+  - 'SHA-256 of that extraction: 4c08399c9300b7bf85e007f0512954895a523db9d61a348e333e98241c7b2d8d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id039
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/PR-50.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/PR-50.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/PR-50.md
-    sha256: d6e184ab61aeb3327ca4600c1a184224c2a7f25188aee22e38d11fd5a235f48a
-    bytes: 5472
+    path: candidate/prompts/PR-50.md
+    sha256: 4c08399c9300b7bf85e007f0512954895a523db9d61a348e333e98241c7b2d8d
+    bytes: 7257
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:51.934Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -2739,9 +2851,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-10
-  notion_page_id: 3da4590a05eb814fbda7f3b722487b6b
-  notion_url: https://app.notion.com/p/3da4590a05eb814fbda7f3b722487b6b
-  expected_title: QA-10 — Audit Implementation and Establish QA Readiness — 091326.2
+  notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
+  notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
+  expected_title: QA-10 — Audit Implementation and Establish QA Readiness — 091426.1
   lane: QA
   sequence: 10
   lifecycle: ACTIVE
@@ -2784,31 +2896,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/c/QA-10.md'
-  - 'SHA-256: e0eb0cec7b513104a7a53948fda0ddcdfc14433b8fce8fbda57c23dab4c8d4ec'
-  - 'Fetched as of: 2026-09-13T11:36:08.988Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 83229 bytes'
+  - 'SHA-256 of that extraction: af8f7fa69427a843bd1a8c3c303cf0b2f1a3ceba890d4338d4687b91c4250ca7'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id040
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/c/QA-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-10.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/c/QA-10.md
-    sha256: e0eb0cec7b513104a7a53948fda0ddcdfc14433b8fce8fbda57c23dab4c8d4ec
-    bytes: 83988
+    path: candidate/prompts/QA-10.md
+    sha256: af8f7fa69427a843bd1a8c3c303cf0b2f1a3ceba890d4338d4687b91c4250ca7
+    bytes: 83229
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:08.988Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2820,9 +2933,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-100
-  notion_page_id: 3da4590a05eb8111b12cea07a97f1a50
-  notion_url: https://app.notion.com/p/3da4590a05eb8111b12cea07a97f1a50
-  expected_title: QA-100 — Execute Bounded QA Task — 091326.2
+  notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
+  notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
+  expected_title: QA-100 — Execute Bounded QA Task — 091426.1
   lane: QA
   sequence: 100
   lifecycle: ACTIVE
@@ -2859,31 +2972,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-100.md'
-  - 'SHA-256: 2378cd6a361c5cd9216ed7f3a67980424c841b84a1f6356f96c08b5e1125b335'
-  - 'Fetched as of: 2026-09-13T11:36:09.139Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 13449 bytes'
+  - 'SHA-256 of that extraction: baaa8505fc4f0ba58f97c554d948ce11cf8e35204d95dbc200f7637b69fc77ba'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id041
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-100.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-100.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-100.md
-    sha256: 2378cd6a361c5cd9216ed7f3a67980424c841b84a1f6356f96c08b5e1125b335
-    bytes: 43201
+    path: candidate/prompts/QA-100.md
+    sha256: baaa8505fc4f0ba58f97c554d948ce11cf8e35204d95dbc200f7637b69fc77ba
+    bytes: 13449
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:09.139Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2895,9 +3009,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-110
-  notion_page_id: 3da4590a05eb81e2890ec3a36ad7221f
-  notion_url: https://app.notion.com/p/3da4590a05eb81e2890ec3a36ad7221f
-  expected_title: QA-110 — Review QA Evidence and Route the Next Action — 091326.2
+  notion_page_id: 3db4590a05eb816984d1d34da0e08f40
+  notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
+  expected_title: QA-110 — Review QA Evidence and Route the Next Action — 091426.1
   lane: QA
   sequence: 110
   lifecycle: ACTIVE
@@ -2934,31 +3048,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-110.md'
-  - 'SHA-256: bf140eb54b36988188ed28488808f7a75e5a81e03f1be87bcf544cbc776d838f'
-  - 'Fetched as of: 2026-09-13T11:36:09.282Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 14371 bytes'
+  - 'SHA-256 of that extraction: 92afcc89e220af90c5f26bcf556771741468de84b8cfa707705bf4a26189d197'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id042
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-110.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-110.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-110.md
-    sha256: bf140eb54b36988188ed28488808f7a75e5a81e03f1be87bcf544cbc776d838f
-    bytes: 43236
+    path: candidate/prompts/QA-110.md
+    sha256: 92afcc89e220af90c5f26bcf556771741468de84b8cfa707705bf4a26189d197
+    bytes: 14371
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:09.282Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -2970,9 +3085,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-120
-  notion_page_id: 3da4590a05eb81a99a28d8c1c17aa861
-  notion_url: https://app.notion.com/p/3da4590a05eb81a99a28d8c1c17aa861
-  expected_title: QA-120 — Create Final QA Report and RCA — 091326.2
+  notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
+  notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
+  expected_title: QA-120 — Create Final QA Report and RCA — 091426.1
   lane: QA
   sequence: 120
   lifecycle: ACTIVE
@@ -3010,31 +3125,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-120.md'
-  - 'SHA-256: 3ad8db4891a33aa0464c0e4f6044fae0205f670829d2b39805b92e042585623a'
-  - 'Fetched as of: 2026-09-13T11:36:25.023Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 13751 bytes'
+  - 'SHA-256 of that extraction: 58d9bf66480b7fc07cd057bdef2881dcd031b1cfab8287ea78441226a92ccc48'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id043
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-120.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-120.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-120.md
-    sha256: 3ad8db4891a33aa0464c0e4f6044fae0205f670829d2b39805b92e042585623a
-    bytes: 40653
+    path: candidate/prompts/QA-120.md
+    sha256: 58d9bf66480b7fc07cd057bdef2881dcd031b1cfab8287ea78441226a92ccc48
+    bytes: 13751
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:25.023Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3046,9 +3162,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-20
-  notion_page_id: 3da4590a05eb81e4ac5fe5de703e5455
-  notion_url: https://app.notion.com/p/3da4590a05eb81e4ac5fe5de703e5455
-  expected_title: QA-20 — Create Live QA Guide — 091326.2
+  notion_page_id: 3db4590a05eb816daa3adff37283482b
+  notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
+  expected_title: QA-20 — Create Live QA Guide — 091426.1
   lane: QA
   sequence: 20
   lifecycle: ACTIVE
@@ -3077,31 +3193,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-20.md'
-  - 'SHA-256: dcf7aa566f7428e88c3a6d991079eecccb15912447d804c62969a3bf252a0ca7'
-  - 'Fetched as of: 2026-09-13T11:36:25.177Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 13460 bytes'
+  - 'SHA-256 of that extraction: 8935c48a7be1331c3bf726afffdaa7923bd01b3ea544f14769deaf3af77db4ec'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id044
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-20.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-20.md
-    sha256: dcf7aa566f7428e88c3a6d991079eecccb15912447d804c62969a3bf252a0ca7
-    bytes: 41327
+    path: candidate/prompts/QA-20.md
+    sha256: 8935c48a7be1331c3bf726afffdaa7923bd01b3ea544f14769deaf3af77db4ec
+    bytes: 13460
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:25.177Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3113,9 +3230,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-50
-  notion_page_id: 3da4590a05eb819883dff9cd98c22985
-  notion_url: https://app.notion.com/p/3da4590a05eb819883dff9cd98c22985
-  expected_title: QA-50 — Create Whole-Change QA Audit and Plan — 091326.2
+  notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
+  notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
+  expected_title: QA-50 — Create Whole-Change QA Audit and Plan — 091426.1
   lane: QA
   sequence: 50
   lifecycle: ACTIVE
@@ -3147,31 +3264,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-50.md'
-  - 'SHA-256: e3f3ae8286fb7bb43a431f0aacdaa3f27d5c76feb0178127811fd38bb6e277a3'
-  - 'Fetched as of: 2026-09-13T11:36:25.316Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 16482 bytes'
+  - 'SHA-256 of that extraction: 438a56d57746acfe41c39a0a6354fcc8db2a1ea521ad05ac4ec13890682e5014'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id045
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-50.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-50.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-50.md
-    sha256: e3f3ae8286fb7bb43a431f0aacdaa3f27d5c76feb0178127811fd38bb6e277a3
-    bytes: 46503
+    path: candidate/prompts/QA-50.md
+    sha256: 438a56d57746acfe41c39a0a6354fcc8db2a1ea521ad05ac4ec13890682e5014
+    bytes: 16482
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:25.316Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3183,9 +3301,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-60
-  notion_page_id: 3da4590a05eb81e79893ef7df08bf7fe
-  notion_url: https://app.notion.com/p/3da4590a05eb81e79893ef7df08bf7fe
-  expected_title: QA-60 — Create Whole-Change QA Plan — 091326.2
+  notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
+  notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
+  expected_title: QA-60 — Create Whole-Change QA Plan — 091426.1
   lane: QA
   sequence: 60
   lifecycle: ACTIVE
@@ -3212,31 +3330,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-60.md'
-  - 'SHA-256: 68d6f5d264a2cb7d5b8af210ffd959633fef4c22e387877862ca3f6a0b736752'
-  - 'Fetched as of: 2026-09-13T11:36:30.680Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 14201 bytes'
+  - 'SHA-256 of that extraction: 7b783e2638b7cc8818a8b2f2fa465360f2e9bc9ec2aefb361f148eb126bcd12d'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id046
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-60.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-60.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-60.md
-    sha256: 68d6f5d264a2cb7d5b8af210ffd959633fef4c22e387877862ca3f6a0b736752
-    bytes: 44896
+    path: candidate/prompts/QA-60.md
+    sha256: 7b783e2638b7cc8818a8b2f2fa465360f2e9bc9ec2aefb361f148eb126bcd12d
+    bytes: 14201
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:30.680Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3248,9 +3367,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-70
-  notion_page_id: 3da4590a05eb816f8399e55ce20e4e21
-  notion_url: https://app.notion.com/p/3da4590a05eb816f8399e55ce20e4e21
-  expected_title: QA-70 — Review Whole-Change QA Plan — 091326.2
+  notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
+  notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
+  expected_title: QA-70 — Review Whole-Change QA Plan — 091426.1
   lane: QA
   sequence: 70
   lifecycle: ACTIVE
@@ -3277,31 +3396,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-70.md'
-  - 'SHA-256: 082ab1dfe2efbf9a9af4b631d889acf703b98cebe17ef24549175a87f5aeb1ab'
-  - 'Fetched as of: 2026-09-13T11:36:30.816Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 14302 bytes'
+  - 'SHA-256 of that extraction: 338b991180b96858170988db5043d297163d7353f526b0091e3036964d8cd6cc'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id047
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-70.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-70.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-70.md
-    sha256: 082ab1dfe2efbf9a9af4b631d889acf703b98cebe17ef24549175a87f5aeb1ab
-    bytes: 36358
+    path: candidate/prompts/QA-70.md
+    sha256: 338b991180b96858170988db5043d297163d7353f526b0091e3036964d8cd6cc
+    bytes: 14302
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:30.816Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3313,9 +3433,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-80
-  notion_page_id: 3da4590a05eb81e58172ec98c21f8eb2
-  notion_url: https://app.notion.com/p/3da4590a05eb81e58172ec98c21f8eb2
-  expected_title: QA-80 — Revise Whole-Change QA Plan — 091326.2
+  notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
+  notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
+  expected_title: QA-80 — Revise Whole-Change QA Plan — 091426.1
   lane: QA
   sequence: 80
   lifecycle: ACTIVE
@@ -3342,31 +3462,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-80.md'
-  - 'SHA-256: 9b9d50996dd06ba4f08e7cf712e1bc4c0e0ede73978980674920248cd4357887'
-  - 'Fetched as of: 2026-09-13T11:36:30.920Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 10205 bytes'
+  - 'SHA-256 of that extraction: 7fea018710fd4eabf260a90faf5693153f16696122d4e7cde2cedf35fa3d8178'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id048
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-80.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-80.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-80.md
-    sha256: 9b9d50996dd06ba4f08e7cf712e1bc4c0e0ede73978980674920248cd4357887
-    bytes: 34372
+    path: candidate/prompts/QA-80.md
+    sha256: 7fea018710fd4eabf260a90faf5693153f16696122d4e7cde2cedf35fa3d8178
+    bytes: 10205
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:30.920Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3378,9 +3499,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: QA-90
-  notion_page_id: 3da4590a05eb8118a902dfced4429f2c
-  notion_url: https://app.notion.com/p/3da4590a05eb8118a902dfced4429f2c
-  expected_title: QA-90 — Create Bounded QA Execution Task — 091326.2
+  notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
+  notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
+  expected_title: QA-90 — Create Bounded QA Execution Task — 091426.1
   lane: QA
   sequence: 90
   lifecycle: ACTIVE
@@ -3414,31 +3535,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/QA-90.md'
-  - 'SHA-256: 8249fd2bec2da037bedb8c297c7270942ba05e3c796f539c9e2f6eab16a929bc'
-  - 'Fetched as of: 2026-09-13T11:36:36.292Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 13982 bytes'
+  - 'SHA-256 of that extraction: 83cdc85066147308327b9c57adceb11d1b6de5405fadd5a5de488f91f15ad517'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id049
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/QA-90.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/QA-90.md
   expected_parent_id: 3c74590a05eb8149905fd694f6d2901a
   expected_parent_title: HDE QA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/QA-90.md
-    sha256: 8249fd2bec2da037bedb8c297c7270942ba05e3c796f539c9e2f6eab16a929bc
-    bytes: 44631
+    path: candidate/prompts/QA-90.md
+    sha256: 83cdc85066147308327b9c57adceb11d1b6de5405fadd5a5de488f91f15ad517
+    bytes: 13982
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:36.292Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3450,9 +3572,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: RS-10
-  notion_page_id: 3da4590a05eb81f99430fcb7c24fe8af
-  notion_url: https://app.notion.com/p/3da4590a05eb81f99430fcb7c24fe8af
-  expected_title: RS-10 — Create Bounded Work-Unit Rescope Proposal — 091326.2
+  notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
+  notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
+  expected_title: RS-10 — Create Bounded Work-Unit Rescope Proposal — 091426.1
   lane: RS
   sequence: 10
   lifecycle: ACTIVE
@@ -3479,31 +3601,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/RS-10.md'
-  - 'SHA-256: 465e8abf9d598a83d61dae4b20f8edd180b2a2d4b588c24083199e38c450c75d'
-  - 'Fetched as of: 2026-09-13T11:33:42.827Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 12819 bytes'
+  - 'SHA-256 of that extraction: ef6b73601ce867e02d291358877abbe2446bfccf6136916bd65bdb0a0bd13e33'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id050
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/RS-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/RS-10.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/RS-10.md
-    sha256: 465e8abf9d598a83d61dae4b20f8edd180b2a2d4b588c24083199e38c450c75d
-    bytes: 36261
+    path: candidate/prompts/RS-10.md
+    sha256: ef6b73601ce867e02d291358877abbe2446bfccf6136916bd65bdb0a0bd13e33
+    bytes: 12819
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:33:42.827Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3515,9 +3638,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: RS-20
-  notion_page_id: 3da4590a05eb81d3adf1ecac218d0beb
-  notion_url: https://app.notion.com/p/3da4590a05eb81d3adf1ecac218d0beb
-  expected_title: RS-20 — Review Bounded Work-Unit Rescope — 091326.2
+  notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
+  notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
+  expected_title: RS-20 — Review Bounded Work-Unit Rescope — 091426.1
   lane: RS
   sequence: 20
   lifecycle: ACTIVE
@@ -3549,31 +3672,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/RS-20.md'
-  - 'SHA-256: dcb1028031cb55bce7193f1a3c1e828ff335a24f5904d796ab55988c39e204f4'
-  - 'Fetched as of: 2026-09-13T11:33:42.943Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 15709 bytes'
+  - 'SHA-256 of that extraction: 4736d703b0b34e4767572b61ff50ae67bd2f8660b23b53fb2b93bce84f10f251'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id051
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/RS-20.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/RS-20.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/RS-20.md
-    sha256: dcb1028031cb55bce7193f1a3c1e828ff335a24f5904d796ab55988c39e204f4
-    bytes: 39954
+    path: candidate/prompts/RS-20.md
+    sha256: 4736d703b0b34e4767572b61ff50ae67bd2f8660b23b53fb2b93bce84f10f251
+    bytes: 15709
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:33:42.943Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3585,9 +3709,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: RS-30
-  notion_page_id: 3da4590a05eb81f99c6df22213fe675e
-  notion_url: https://app.notion.com/p/3da4590a05eb81f99c6df22213fe675e
-  expected_title: RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091326.2
+  notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
+  notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
+  expected_title: RS-30 — Revise Bounded Work-Unit Rescope Proposal — 091426.1
   lane: RS
   sequence: 30
   lifecycle: ACTIVE
@@ -3613,31 +3737,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/RS-30.md'
-  - 'SHA-256: 21d258ccc4e5561cbb90bd29028558e188e9f27060bd029a093ac018ebddaf65'
-  - 'Fetched as of: 2026-09-13T11:33:43.043Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 12001 bytes'
+  - 'SHA-256 of that extraction: 347ee4e749843fe50420bcecce47fc1049c303178a45a8e114886beddfa4961f'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id052
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/RS-30.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/RS-30.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/RS-30.md
-    sha256: 21d258ccc4e5561cbb90bd29028558e188e9f27060bd029a093ac018ebddaf65
-    bytes: 35937
+    path: candidate/prompts/RS-30.md
+    sha256: 347ee4e749843fe50420bcecce47fc1049c303178a45a8e114886beddfa4961f
+    bytes: 12001
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:33:43.043Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3649,9 +3774,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: RS-40
-  notion_page_id: 3da4590a05eb815e98f5ea7b605b70a3
-  notion_url: https://app.notion.com/p/3da4590a05eb815e98f5ea7b605b70a3
-  expected_title: RS-40 — Approved Rescope — Resume PR Implementation — 091326.2
+  notion_page_id: 3db4590a05eb8183b5ffdf4270133226
+  notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
+  expected_title: RS-40 — Approved Rescope — Resume PR Implementation — 091426.1
   lane: RS
   sequence: 40
   lifecycle: ACTIVE
@@ -3680,31 +3805,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/RS-40.md'
-  - 'SHA-256: 8ee4d7fba40e58daee1bdb19f8b60f3ae6f679deb9a4aab3ae19516a81e3460d'
-  - 'Fetched as of: 2026-09-13T11:35:51.982Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 8858 bytes'
+  - 'SHA-256 of that extraction: 1bbcfadf8193f22fc11ffb3cb501f49ebdc5669879dd826893927add52d37a11'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id053
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/RS-40.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/RS-40.md
   expected_parent_id: 3c74590a05eb81f2953de712f2adb6fa
   expected_parent_title: HDE IA
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/RS-40.md
-    sha256: 8ee4d7fba40e58daee1bdb19f8b60f3ae6f679deb9a4aab3ae19516a81e3460d
-    bytes: 9464
+    path: candidate/prompts/RS-40.md
+    sha256: 1bbcfadf8193f22fc11ffb3cb501f49ebdc5669879dd826893927add52d37a11
+    bytes: 8858
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:35:51.982Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
@@ -3716,9 +3842,9 @@ prompts:
     required_regex: []
     forbidden_regex: []
 - prompt_key: UTIL-10
-  notion_page_id: 3da4590a05eb8114a88cda5c9728e26c
-  notion_url: https://app.notion.com/p/3da4590a05eb8114a88cda5c9728e26c
-  expected_title: UTIL-10 — Apply Exact Redline to a Complete Artifact — 091326.2
+  notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
+  notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
+  expected_title: UTIL-10 — Apply Exact Redline to a Complete Artifact — 091426.1
   lane: UTIL
   sequence: 10
   lifecycle: ACTIVE
@@ -3744,31 +3870,32 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete enhanced-Markdown fetch: baseline/prompts/d/UTIL-10.md'
-  - 'SHA-256: 4c7c476f128287f4310308a9c6f96f5b659562bdb34a2de08832cfd4d54ebc6f'
-  - 'Fetched as of: 2026-09-13T11:36:39.466Z'
+  - 'Complete prompt body extracted from Notion 2026-09-17: 6653 bytes'
+  - 'SHA-256 of that extraction: 9be2271229c5988b58f15f817b019147c73f834326aa021118d384f4ef6bf382'
+  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces: *id054
   controlling_sources:
-  - GCFPE-20260913.1
-  - '091326.2'
-  - baseline/prompts/d/UTIL-10.md
+  - GCFPE-20260914.1
+  - '091426.1'
+  - candidate/prompts/UTIL-10.md
   expected_parent_id: 3c74590a05eb8176baf8cb59f1631f3c
   expected_parent_title: HDE TW
   supersedes: []
   superseded_by: null
   source_snapshot:
-    path: baseline/prompts/d/UTIL-10.md
-    sha256: 4c7c476f128287f4310308a9c6f96f5b659562bdb34a2de08832cfd4d54ebc6f
-    bytes: 47314
+    path: candidate/prompts/UTIL-10.md
+    sha256: 9be2271229c5988b58f15f817b019147c73f834326aa021118d384f4ef6bf382
+    bytes: 6653
     completeness: COMPLETE
-    fetched_as_of: '2026-09-13T11:36:39.466Z'
+    extracted_as_of: '2026-09-17'
+    representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091326.2'
+    - value: 'Prompt Version: 091426.1'
       rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260913.1'
+    - value: 'Ecosystem release: GCFPE-20260914.1'
       rule_id: INV-003
     - value: select only the controlled Markdown lane
       rule_id: CTR-002
@@ -3784,9 +3911,9 @@ global_literals:
   approved: ASK OK.
 audit_contracts:
   selected_binding:
-    release: GCFPE-20260913.1
-    version_family: '091326.2'
-    member_count: 54
+    release: GCFPE-20260914.1
+    version_family: '091426.1'
+    member_count: 55
   pfcanon_source:
     required_literal: select only the controlled Markdown lane
     failure_state: SOURCE_RESOLUTION_ERROR

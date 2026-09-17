@@ -95,10 +95,15 @@ list is a defect turns entirely on this.
 
 **D4 — Producer role-vocabulary mismatch.**
 `global.json` declares a qualifying producer's body token as
-`QUALIFYING_DELTA_APPROVAL_PRODUCER`; QA-70's body carries `PRODUCER`. The nine
-non-producers in that batch satisfy their side of the same vocabulary, so the mismatch
-is specific to the producer role.
-*Raised by:* `B4-GBR-02` (QA-70).
+`QUALIFYING_DELTA_APPROVAL_PRODUCER`. **Four of the six declared producers disagree
+with it, using three different values:** IA-30 says `QUALIFYING_PRODUCER`; RS-20, QA-70
+and ESC-40 say `PRODUCER`. Only CF-C-30 and CF-E-30 — the two Batch 1 repaired — comply.
+All non-producers are consistent at `NONPRODUCER`.
+
+> **Corrected 2026-09-17.** This entry originally described a QA-70-only mismatch,
+> raised by `B4-GBR-02`. Measured across all six producers it is four of six. The
+> original scope was understated.
+*Raised by:* `B4-GBR-02` (QA-70); scope corrected by direct measurement.
 
 **D5 — Does PF27 govern Ops Task Record and Remediation Review Record structure?**
 OPS-10/20/30 resolve PF27 by name for their artifact and then state their own field
@@ -139,6 +144,17 @@ Per-batch adversarial verification in Phase 4 remains required before any prompt
 - The five completeness critiques did not run. Their absence is why §5 states an estimate
   rather than a coverage claim.
 - Batch 1 is not re-surveyed here; it is closed at `BATCH_1_REPAIRED_WITH_CORRECTIONS`.
+
+## 6A. Decisions taken
+
+D1–D6 were ruled by the Product Owner on 2026-09-17. The rulings and their
+consequences are recorded at
+`docs/prompt_ecosystem_management/gcfpe.decision-record.md`, which supersedes §4 of
+this inventory as the statement of what was decided. §4 remains the record of what
+was *found*.
+
+The largest consequence: **drainage is removed from prompt behaviour entirely**, as
+one cross-cutting repair outside the six-batch sequence.
 
 ## 7. Recommended sequence
 
