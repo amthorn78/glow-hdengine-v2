@@ -651,6 +651,16 @@
       "drain_verification_anchor.immutable_base_id",
       "drain_verification_anchor.approved_delta_digest"
     ],
+    "role_vocabulary": {
+      "NON_PRODUCER": {
+        "meaning": "This prompt never creates a PF10 build-notes addendum on any branch.",
+        "prompt_body_token": "NONPRODUCER"
+      },
+      "QUALIFYING_PRODUCER": {
+        "meaning": "This prompt creates exactly one standalone PF10 build-notes addendum on a qualifying material delta approval to an already approved base, and none on any outcome listed in never_for.",
+        "prompt_body_token": "QUALIFYING_DELTA_APPROVAL_PRODUCER"
+      }
+    },
     "status": "READY_FOR_MANUAL_DRAIN"
   },
   "pf10_post_drain_verification": {
