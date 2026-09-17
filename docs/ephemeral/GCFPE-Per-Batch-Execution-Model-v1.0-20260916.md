@@ -24,13 +24,13 @@ Batch 2 execution was interrupted by session token exhaustion, not by a defect i
 Two facts make this a recurring structural issue rather than a one-time event:
 
 1. Batch 2 is the **smallest** batch at 7 prompts. Batches 3 and 4 carry 10 each, Batch 5 carries 9, Batch 6 carries 8. A budget that did not cover the smallest batch will not reliably cover the larger ones.
-2. Section 9 of the approved plan requires supporting-control reconciliation **after every batch**. The candidate graph contract is 569,990 bytes. That cost recurs in all six batches; it is not specific to Batch 2.
+2. Section 9 of the approved plan requires supporting-control reconciliation **after every batch**. That cost recurs in all six batches; it is not specific to Batch 2.
 
 ## 3. The two-pass model
 
 Each remaining batch executes in two dedicated sessions.
 
-### Pass 1 — Review and repair (chat session)
+### Pass 1 — Review and repair
 
 Scope: the approved plan's Section 5 per-prompt review-and-repair checklist, applied to every prompt in the batch.
 
@@ -51,7 +51,7 @@ SUPPORTING_CONTROLS_AND_VALIDATION_INCOMPLETE
 FINAL_BATCH_<N>_VERDICT_NOT_YET_ISSUED
 ```
 
-### Pass 2 — Synchronization, validation, and closure (Claude Code session)
+### Pass 2 — Synchronization, validation, and closure
 
 Scope: everything downstream of the persisted repairs.
 
@@ -66,9 +66,11 @@ Scope: everything downstream of the persisted repairs.
 
 The seam is placed where the work changes character, not at an arbitrary midpoint.
 
-Pass 1 is Notion-and-Drive work: many small targeted reads and writes against individual prompt pages. It needs no filesystem, git, or shell access.
+**Corrected 2026-09-17.** Both passes run in Claude Code; Nathan does not use chat sessions. The seam is a context budget, not a capability boundary.
 
-Pass 2 is dominated by the 570KB graph contract, which must be scanned in targeted sections rather than loaded whole. A Code session can read a file that size from disk selectively; a chat session cannot. Matching each phase to the surface built for it is the efficiency gain — not a general claim that one surface costs less than another.
+Pass 1 is many small targeted reads and writes against individual prompt pages in Notion, plus its own two ledgers under `docs/ephemeral/`.
+
+Pass 2 is whole-batch reconciliation across the graph parts and every affected control. Running both in one session is what exhausted Batch 2. The graph is no longer a driver of the split: it is held as parts in `docs/graph/parts/` and rebuilt by script, so no pass loads a 570 KB file. If a later batch shows the budget comfortably covers both, collapsing to a single session per batch is the Product Owner's call and changes nothing else.
 
 ## 4. Sub-split thresholds for larger batches
 
@@ -89,11 +91,11 @@ Repair all prompts in a batch against one frozen upstream state, as Section 6.4 
 
 ## 5. Handoff artifacts between passes
 
-Pass 1 → Pass 2 carries: both batch ledgers with direct Drive links; the list of persisted prompt pages with their observed `page_last_edited_at` values; the exit state from Section 3 above; and any finding Pass 1 recorded but could not close.
+Pass 1 → Pass 2 carries: the list of persisted prompt pages with their observed `page_last_edited_at` values; the batch branch and pull request; the exit state from Section 3 above; and any finding Pass 1 recorded but could not close. The ledgers are not handed over — Pass 1 commits them under `docs/ephemeral/` on the batch branch and Pass 2 reads them from there.
 
 Pass 2 → Product Owner carries: the batch report and Notion sibling links, the verdict, per-prompt dispositions, controls changed, validation results, and unresolved blockers.
 
-When Pass 2 runs in Claude Code, it emits its return report as a single fenced `text` block for the Product Owner to paste back into a chat session. Claude Code cannot message a chat session directly; cross-session messaging reaches other Claude Code sessions only.
+Pass 2 reports to the Product Owner directly in its own session and prepares the next handoff as a complete paste-ready invocation. There is no chat session to hand back to.
 
 ## 6. Model selection
 
