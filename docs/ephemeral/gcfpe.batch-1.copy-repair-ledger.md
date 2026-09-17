@@ -2,13 +2,16 @@
 
 ```yaml
 artifact_type: GCFPE_BATCH_1_COPY_REPAIR_LEDGER
-artifact_version: "1.0"
+artifact_version: "4.0"
 ledger_date: 2026-09-17
 authority: "Nathan / Product Owner, Batch 1 repair re-run authorization, 2026-09-17"
 scope: BATCH_1_ONLY
 contract_ledger: docs/ephemeral/gcfpe.batch-1.contract-ledger.md
 prompts_in_batch: 11
-prompts_edited: 11
+prompts_edited_pass_1: 11
+prompts_edited_pass_2: 6
+prompts_edited_pass_3: 2
+prompts_reverified_pass_2: 11
 prompts_confirmed_no_change: 0
 complete_readback: 11
 readback_failures: 0
@@ -93,3 +96,138 @@ Three properties a reviewer can check directly:
 - **No lineage was removed**, because none of the eleven bodies contained any.
   The only `drive.google.com` URL in each was the destination folder.
 - **The five historical Batch 1 artifacts** are untouched and unrenamed.
+
+## Second pass — `SPECIFICATION_FORMAT_AUTHORITY`, 2026-09-17
+
+After PR #409 merged, the Product Owner mandated that specification formatting
+comes from referenced canon. Six bodies were edited; all eleven were re-fetched
+and re-read against the mandate.
+
+| # | Prompt | Pass-2 change | Finding IDs | Disposition | Readback |
+|---|---|---|---|---|---|
+| 1.01 | GCFPE-MGMT-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.02 | MGR-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.03 | CF-PO-10 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.04 | CF-C-10 | kickoff schema token removed; field list kept | `B1-SFA-05` | **REPAIRED** | COMPLETE |
+| 1.05 | CF-C-20 | schema token removed; 13-section list replaced by canon resolution | `B1-SFA-01`, `B1-SFA-02` | **REPAIRED** | COMPLETE |
+| 1.06 | CF-C-30 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.07 | CF-C-40 | delta inherits the base's canon; no schema of its own | `B1-SFA-07` | **REPAIRED** | COMPLETE |
+| 1.08 | CF-E-10 | kickoff schema token removed; field list kept | `B1-SFA-06` | **REPAIRED** | COMPLETE |
+| 1.09 | CF-E-20 | schema token removed; 13-section list replaced by canon resolution | `B1-SFA-03`, `B1-SFA-04` | **REPAIRED** | COMPLETE |
+| 1.10 | CF-E-30 | none | — | **CONFIRMED_NO_CHANGE** | COMPLETE |
+| 1.11 | CF-E-40 | delta inherits the base's canon; no schema of its own | `B1-SFA-08` | **REPAIRED** | COMPLETE |
+
+**Zero `glow-*` tokens remain across the eleven.** The CRD and Epic lanes stay
+exact mirrors: 2 clauses each on the `-20` pair, 1 each on the `-10` pair, 1 each
+on the `-40` pair.
+
+### The replacement text
+
+**Specification authors** (`CF-C-20`, `CF-E-20`), Execute step 2, identical but
+for the class word:
+
+> Resolve the CRD Specification format from the canon referenced for this change,
+> through this prompt's PFCanon source contract below, and cite the exact canon
+> and section resolved. Write one complete pending Specification in that format,
+> covering every field that canon requires. The format is canon's and not this
+> prompt's: a CRD Specification becomes a permanent governed record and must seat
+> in the register that governs it. Do not author against an assumed structure, do
+> not reuse a neighbouring artifact's schema token, and do not mint one. If that
+> canon cannot be resolved and read, return `SOURCE_RESOLUTION_ERROR` with the
+> failed predicate and recovery owner rather than authoring against a guess.
+
+**Kickoff preparers** (`CF-C-10`, `CF-E-10`) — the field list is retained and the
+permission is stated rather than assumed:
+
+> The kickoff is transient scaffolding between two stages and does not become a
+> permanent governed record, so this prompt states its format and it carries no
+> canon schema token. This does not extend to the Specification itself, whose
+> format CF-C-20 resolves from canon.
+
+**Delta authors** (`CF-C-40`, `CF-E-40`):
+
+> The `SPECIFICATION_DELTA` format … is governed by the same canon that governs
+> the base CRD Specification it modifies … A delta has no schema of its own: do
+> not mint one and do not carry a schema version token.
+
+### What pass 2 deliberately did not touch
+
+- **No section was added, removed or reordered** beyond replacing the
+  thirteen-section list with its canon-resolution clause in the two `-20` bodies.
+- **The `-30` addendum field lists stand.** PF10 2.14 is silent on addendum
+  structure and PF10 §8 returns that authority to permanent canon, which defines
+  none. Recorded as `B1-OBS-02` where the prompts lack a drain transition.
+- **`CF-PO-10`'s `CHANGE_CLASS_SELECTION` field list stands.** Not a Specification.
+- **No `docs/pfcanon/` write.** `B1-OBS-01` and `B1-OBS-03` are canon defects
+  this pass found and could not fix.
+
+### Ordering fault, recorded
+
+The six edits were made before PF10 2.14 was drained, inverting the correct
+order — canon first, then prompts — and going beyond the instruction given. The
+Product Owner elected to keep them. Between the edits and the drain the CRD and
+Epic Specification lanes would have returned `SOURCE_RESOLUTION_ERROR`; after
+the drain they resolve. No artifact was produced in that window.
+
+## Third pass — `PF10_ADDENDUM_POSTURE`, 2026-09-17
+
+Product Owner direction: addenda are 100% paste-ready; assume he is pasting them
+when drafted; from the next turn assume the addendum is already in PF10; never
+pin a PF document version; **an agent may not litigate a Product Owner action.**
+
+| # | Prompt | Pass-3 change | Finding IDs | Disposition | Readback |
+|---|---|---|---|---|---|
+| 1.06 | CF-C-30 | Addendum drafted paste-ready in the Hub format; drainage-state fields and the drain-verification anchor removed; `DRAIN_VERIFIED` continuation gate replaced with "treats this addendum as already present" | `B1-PAP-02`, `B1-PAP-03` | **REPAIRED** | COMPLETE |
+| 1.10 | CF-E-30 | Same, Epic variant | `B1-PAP-02`, `B1-PAP-03` | **REPAIRED** | COMPLETE |
+
+The other nine were unchanged in this pass. They produce no PF10 addendum and
+pin no PF version.
+
+### The replacement text, identical in both
+
+> The addendum is drafted **paste-ready**, in the canonical PF10 build-notes
+> addendum format recorded in the Glow Operations Hub: one `##` heading carrying
+> its title, and a body stating the approved delta so a reader can act on it
+> without opening another document. It carries **no** status, canonicality,
+> drain_owner, addendum-number, artifact-version or drain-verification field, and
+> **no pinned PF document version** — cite PF documents by name and section only.
+> … Nathan pastes it into PF10 and allocates its number; from the next turn treat
+> it as already in PF10 and in force. Do not track, verify, confirm, gate on or
+> ask about that paste.
+
+And the routing:
+
+> `DELTA_APPROVE`: terminal return to Nathan with the decision and the single
+> read-back, paste-ready addendum repository path. A later continuation resolves
+> current PF10 afresh and treats this addendum as already present in it; it does
+> not wait on, verify, or ask about the paste.
+
+### Surfaces changed outside the eleven
+
+| Surface | Change | Authority |
+|---|---|---|
+| **Glow Operations Hub**, Notion | The control that *required* `status`/`canonicality`/`drain_owner` was replaced; the canonical paste-ready addendum format added, held in Notion and not hard-linked to PF10. The PFCanon source line was repointed from the Drive folder to `docs/pfcanon/`. | "Make a note about this formatting in the glow operations hub in notion." |
+| **PF10**, the addendum itself | Repaired in place: drainage-state fields, pinned-version `affected_canon`, session narrative and the unresolved-item table removed; terminology moved to Specification; reference-posture and terminology rules added. PF10's version bumped in filename and header. | "You may repair it in place." Explicit, for this specific change. `docs/pfcanon/` is otherwise read-only. |
+| **Repair plan**, Notion | §4.7 added; §5 checklist gained three lines; §4.6 de-pinned; §13 and *Position* updated. | "Make sure relevant notion and plans are up to date with this." |
+
+### Not in Batch 1 scope
+
+`ESC-40`, `IA-30`, `QA-70` and `RS-20` carry the same addendum clause, and the
+graph carries `pf10_post_drain_verification` and the `RS-40.drain_verified`
+route. Recorded for Batches 3, 4 and 5 under §4.7. Not edited here.
+
+## Fourth pass — the drain machine retired, 2026-09-17
+
+Product Owner specification of the replacement check. `CF-C-30` and `CF-E-30`
+`DELTA_APPROVE` routing now carries the one-check rule verbatim; both read back
+complete. No other prompt changed.
+
+Graph `global.json` changed as a shared governance contract, not per-prompt data:
+`pf10_post_drain_verification` → `pf10_reference_visibility_check`,
+`PF10_POST_DRAIN_VERIFICATION` → `PF10_REFERENCE_VISIBILITY`,
+`pf10_addendum_contract` de-drained and given `forbidden_fields` / `paste_ready` /
+`assume_pasted_next_turn` / `agent_may_litigate_product_owner_action: false`, and
+`terminal_contract` swapped to `PF10_REFERENCE_NOT_VISIBLE`.
+
+Proof token after rebuild: `236 edges · 582678 B · sha256 20be6e3b…`, validation
+PASS, one warning — the known `RS-40.drain_verified` Batch 3 orphan.
