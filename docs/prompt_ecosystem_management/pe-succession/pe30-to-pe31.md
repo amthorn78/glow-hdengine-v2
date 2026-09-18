@@ -118,6 +118,34 @@ unless Nathan instructed that specific change in conversation.
 - **`docs/ephemeral/gcfpe.plan.repair-checklist.md`** — a 2026-09-16 export, now labelled
   superseded. The Notion page is the authority.
 
+## The release-scope trap — read this before editing any shared surface
+
+The candidate `091426.1` has the drainage lifecycle **retired**. The selected release
+`091326.2` **still has it, correctly**, because the repair has not been applied there and
+that release is live.
+
+Several workspace-level Notion surfaces — the Glow Operations Hub above all — carry
+blocks for **both**. A block headed *"Current selection — GCFPE-20260913.1 / 091326.2"*
+that describes `READY_FOR_MANUAL_DRAIN` and Drive storage is **correct as written for
+that release and must not be edited**. Editing it would misrepresent the live system.
+
+So: before "fixing" a drainage or Drive reference on a shared page, find its nearest
+heading and establish which release it is scoped to. Only candidate-scoped and
+ecosystem-wide text is in scope. When a surface serves both, the right move is to label
+the scope rather than rewrite the block — which is what was done on the Operations Hub.
+
+## Notion reconciliation performed 2026-09-18
+
+| Surface | What changed |
+|---|---|
+| **PE Metaprompt** `3db4590a05eb8174be35d9e35acb3f77` | The generative authoring control. Four-state drain table deleted; addendum schema replaced with the paste-ready canonical format; PFCanon repointed from Drive to `docs/pfcanon/`; runtime artifacts repointed to `docs/ephemeral/`; pre-drain label, drain gate and "Nathan drains PF10" removed. |
+| **Glow Operations Hub** `3ce4590a05eb814f8892f88ff8539308` | The canonical addendum format lives here. The struck one-check block removed; "PF10 drainage" removed from the worker output standard; an explicit release-scope note added distinguishing candidate from selected. |
+| **Five family hubs** (Change Flow, IA, QA, Escalation, TW) | 14 edits. The shared drain gate on overlays replaced with the in-force-from-next-turn rule; Drive runtime store repointed to `docs/ephemeral/`; RS-40's verified-drain eligibility gate removed; CL-20 renamed; the CL lane's "post-closure drainage" purpose restated. |
+| **Flow Index**, **Complete Prompt Set**, **Six-Batch Plan**, **Alpha Checklist**, **Repair Completion Checklist** | Reconciled in the same pass — see `reconciliation-backlog.md` for the finding list each was worked from. |
+
+`reconciliation-backlog.md` in this directory holds the full audit output. Anything not
+yet closed is listed there, so it is actionable rather than conversational.
+
 ## Remaining work, in priority order
 
 **1. Drive → repository storage pass.** One controlled cross-cutting pass, not
