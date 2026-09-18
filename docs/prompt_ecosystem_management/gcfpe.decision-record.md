@@ -126,6 +126,48 @@ with it:
 - current PF10 as execution authority;
 - any unrelated functional requirement in the same clause.
 
+## Repair scope — measured 2026-09-18
+
+| | |
+|---|---|
+| Prompts containing drainage-related language | **54 of 55** |
+| Line occurrences | **367** |
+| Repeated passage families (3+ prompts) | **30**, covering **214** occurrences |
+| Low-repeat and one-off passages | **141**, covering **153** occurrences |
+
+> ⚠️ **Supersedes the earlier figure of 36 prompts / 162 occurrences.** That count
+> matched only the three uppercase drain-state tokens. Matching drainage language in
+> any form finds 54 prompts and 367 occurrences. The earlier number is superseded and
+> must not be used as a scope estimate.
+
+### The surface that actually needs repair
+
+Separating the retired PF10 addendum lifecycle from legitimate canon drainage — the
+distinction in D6's *What must survive* — narrows it further:
+
+| | Distinct passages | Occurrences |
+|---|---|---|
+| **Require rewrite** — retired lifecycle present | 93 | **218** |
+| **Require no edit** | 78 | **149** |
+| …of which legitimate canon drainage | — | **49** |
+
+The two largest boilerplate families, 36 occurrences between them, need no change at
+all: `CANON_CONFLICT_REGISTER`'s *permanent drainage target/owner* and *permanent Canon
+drainage ownership* are the Canon-maintenance process, not the addendum machine. A
+lexical sweep for the word would have deleted both.
+
+Two passages in the no-edit bucket are in scope for other rulings rather than this one:
+the `CL-20` title reference belongs to the rename, and the
+`Glow / Core Docs / PFCanon` resolution path belongs to D1.
+
+**The repair is a rewrite, not a removal.** An attempt to classify the 30 families into
+"pure drainage" and "mixed with surviving behaviour" found that nearly every family
+carries surviving behaviour — the R1 workflow, PFCanon resolution, approved-base
+immutability, the D4 producer rule, canon-conflict handling, PR routing, handoff and
+terminal rules are all interleaved with drainage clauses in the same sentences.
+Lexical deletion of the word would take functioning behaviour with it. Each family
+gets a drafted rewrite, reviewed before it is applied at scale.
+
 ## Execution decisions
 
 **Drainage removal is one cross-cutting repair**, outside the six-batch sequence,
