@@ -11,6 +11,15 @@ baseline: main @ 3c0b1fa (PR #415, squash-merged)
 
 # PE30 → PE31 succession record
 
+| | |
+|---|---|
+| Predecessor | **PE30** — `session_01VVXpW6iAbd6nHUcWWW6A7i` — **RETIRED 2026-09-18** |
+| Successor | **PE31** — `session_0141Xnieh5hNkutjFgZaM3WS` — initialized 2026-09-18 |
+| Initialized from | branch `docs/20260918-pe31-transition`, which carries this record |
+
+PE30's transcript is not a system of record and is not available to PE31 by design.
+Everything load-bearing is in this directory.
+
 PE30 is retired. This is PE31's working context. It is written so that PE31 never needs
 PE30's transcript: everything load-bearing is here or at a path named here.
 
