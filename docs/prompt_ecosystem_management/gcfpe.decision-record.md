@@ -164,8 +164,36 @@ committed copy at `docs/ephemeral/gcfpe.r20260914-1.graph-contract.md` was remov
 2026-09-18: it had drifted from its source and still carried the retired drainage
 machinery, so a session reading it would have rebuilt exactly what the repair retired.
 
-**Not yet applied to prompt behaviour.** 44 of 55 prompts still name Drive for artifact
-storage and 39 still resolve PFCanon through Drive. That is the next cross-cutting pass.
+**Applied to prompt behaviour 2026-09-18.** The cross-cutting storage pass rewrote **333
+passages across 44 of the 55 prompts**: artifacts now land at `docs/ephemeral/` by
+repository path and PFCanon resolves from `docs/pfcanon/`. Verified 44/44 by isolated
+readback, with zero surviving Drive-as-authority references and the single conditional
+sentence preserved. Report: `docs/ephemeral/gcfpe.storage-pass.repair-report.md`.
+
+> The scope figures in the earlier revision of this note (44 storage / 39 PFCanon) were
+> measured by pattern. Measured against the live bodies the PFCanon figure is **42**, not
+> 39, and the occurrence count is **333**, not 310.
+
+### Applied under D7 — coordinator decisions, not new rulings
+
+Three passages could not be resolved by substitution and were decided centrally so that
+one concept did not acquire several encodings across prompts:
+
+- **`EPHEMERAL_DRIVE` is retired**, replaced by the existing sibling
+  `REPOSITORY_CONTROLLED` in all eight prompts that carried it. Under D7 the class it
+  named no longer exists. It was not renamed: minting a replacement would create a token
+  nothing validates, and the sibling already covers the case. It appeared in no graph
+  part and no registry field.
+- **`QA-10` §55 and `QA-50` §29 were narrowed, not deleted.** Both forbade treating a
+  repository file as PFCanon authority — correct when Drive was authority, inverted under
+  D7, and `QA-10` named `docs/pfcanon` explicitly. `docs/pfcanon/` is now carved out as
+  the authority and the prohibition still covers every other repository file, because the
+  hazard is real: `audit/docdeltas/` holds PF-named files that are not controlled canon.
+
+**Drive references are interpreted by function, never by the word** — the same rule D9
+states for "drain". `global.json`'s eleven Drive URLs are pinned historical captures
+scoped `REPAIR_BASELINE_EVIDENCE_ONLY_NOT_A_RUNTIME_CURRENT_PF10_ALIAS`. They are
+provenance and must survive; the graph needed no change in this pass.
 
 ## D8 — No mandatory post-addendum check, and no replacement for it
 

@@ -162,14 +162,18 @@ yet closed is listed there, so it is actionable rather than conversational.
 
 ## Remaining work, in priority order
 
-**1. Drive → repository storage pass.** One controlled cross-cutting pass, not
-batch-local. Measured against the live bodies: **44 of 55 prompts** still name
-`Glow / Ephemeral Planning Files` or a direct Drive link as the artifact destination;
-**39 of 55** still resolve PFCanon by walking `Glow / Core Docs / PFCanon` in Drive.
-Three carry both. 145 passage families / 310 occurrences; roughly 124 families resolve by
-deterministic substitution, ~21 need authoring. **The 11 Batch 1 prompts are already
-converted and are the wording to converge on** — repository paths throughout, keeping the
-single conditional Drive sentence. Do not invent new phrasing.
+**1. Drive → repository storage pass — DONE 2026-09-18.** 333 passages rewritten across
+44 of 55 prompts; verified 44/44 by isolated readback; registry evidence recomputed for
+all 44 from live captures. Report:
+`docs/ephemeral/gcfpe.storage-pass.repair-report.md`. The coordinator decisions taken
+under D7 (retiring `EPHEMERAL_DRIVE`, narrowing the `QA-10`/`QA-50` repository-authority
+prohibitions) are recorded in `gcfpe.decision-record.md` under D7.
+
+> Two scope figures in this record were wrong and are superseded by the report: PFCanon
+> resolution through Drive was **42** prompts, not 39, and the surface was **333**
+> occurrences, not 310. Both were pattern-derived. A first discovery pass in the
+> executing session repeated the same mistake and undercounted by 97 lines before two
+> workers caught it.
 
 **2. Batch 2 bounded current-state verification.** Not a re-run. Answer three questions
 against the merged bodies: is the recorded blocker obsolete (it is — D10); are there
@@ -196,6 +200,12 @@ post-flight, then the Product Owner promotion decision packet.
   reading, not by pattern, before reporting a scope figure.
 - **A worker that can see the expected answer cannot verify it.** See §7 of
   `execution-and-delegation-model.md`.
+- **A worker that retypes evidence corrupts it.** In the storage pass a readback worker
+  silently flattened curly quotes to ASCII in three captures, and the pre-edit fetch
+  corpus turned out to have dropped a whole line from two prompts and altered a sentence
+  in a third. Live Notion was correct in every case. Where byte fidelity matters,
+  extraction must be **programmatic by an exact documented slice**, never retyped, and
+  compared by bytes rather than by a worker's report.
 - **The local git remote-tracking ref goes stale in this container.** `git push` succeeds
   and the remote updates, but `refs/remotes/origin/...` does not advance, so the stop hook
   reports phantom unpushed commits. Check `git ls-remote` before believing it.
