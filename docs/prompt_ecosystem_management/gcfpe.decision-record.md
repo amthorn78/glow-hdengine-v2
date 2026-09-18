@@ -348,3 +348,61 @@ storage-architecture and specification-format findings.
 
 **The Project Prompt Contract Registry is re-pointed to the current release before
 approval**, not approved stale and updated afterward.
+
+## D11 — Contract assertions validate behaviour, not wording
+
+Ruled 2026-09-18 by the Product Owner's standing instruction that known findings are driven
+to resolution rather than carried as non-blocking backlog.
+
+The Project Prompt Contract Registry asserted prompt correctness through `required_literals`
+— exact substrings that the governance audit tests with `if value not in text`. Measured
+against the live bodies, **70 of 269 assertions failed while behaviour was correct**, and the
+largest single assertion, `select only the controlled Markdown lane`, was **absent from all
+55 bodies and had never been present in any of them**.
+
+**A check that fails on every member of a set carries no information.** It did not flag the
+44 prompts that named Drive as the Canon authority before the storage pass; it failed
+identically before and after. Meanwhile `forbidden_literals`, `required_regex` and
+`forbidden_regex` were empty on all 55 rows, so nothing detected wrong-source resolution at
+all.
+
+**The ruling:** an assertion must distinguish a correct prompt from an incorrect one. Where a
+behavioural requirement can be checked, check the behaviour — the named location, the failure
+state, the prohibited source — not the sentence a prompt happens to use to express it.
+
+Applied 2026-09-18:
+
+- Removed `select only the controlled Markdown lane` (45 rows) and the two exact header
+  literals (55 rows each). The release carries **two header conventions** — eleven prompts use
+  `Prompt version: \`091426.1\`` where forty-four use `Prompt Version: 091426.1` — and both
+  declare the identity the rule exists to guarantee.
+- Added `required_regex` on all 55 rows: header version and release tolerant of both
+  conventions, plus `docs/pfcanon/` as the Canon source.
+- Added `forbidden_regex` on all 55 rows guarding D7: `Glow / Core Docs / PFCanon`,
+  `Glow / Ephemeral Planning Files`, `drive.google.com`, `EPHEMERAL_DRIVE`. **This guard did
+  not previously exist in any form.**
+- `GCFPE-MGMT-10`: dropped the `PF10` assertion — it repairs prompts, not builds — and the
+  `NEXT_PROMPT_HANDOFF` assertion, because all four of its result states return terminally to
+  the Product Owner and the handoff contract requires zero blocks on a terminal result. PR-50
+  is the same and its row already omitted it.
+- `RS-40`: dropped the brittle `controlled Markdown` literal; the body says
+  `controlled PF10 Markdown`.
+
+Result: **499 assertions evaluated, 0 failing**, up from 269 evaluated with 71 failing. The
+new guard was tested against five injected regressions — Canon resolved from Drive folders,
+artifacts saved to the Drive folder, a direct Drive link, a reintroduced `EPHEMERAL_DRIVE`
+token, and a dropped Canon location — and caught all five, while passing a clean control.
+
+### Registry rows corrected to match actual behaviour
+
+The registry describes intended prompt behaviour. Where a row and a body disagreed, the body
+and the graph were authoritative and the row was stale:
+
+- `IA-40`: removed `WRONG_ROUTE_APPROVED_BASE`, a state the body never emits (it emits
+  `WRONG_NATIVE_LANE`); added `MATERIAL_PLAN_DELTA` / `PLAN_DELTA_PENDING`, which IA-30
+  explicitly routes to and consumes.
+- `IA-50`: removed the `ESC-40` consumer — the body states *"Do not route to ESC-30 or
+  ESC-40"*, and Batch 2 redline R25 removed the matching graph edge.
+- `IA-60`: removed the `ESC-30` consumer, on the same evidence and redline R26.
+- `authority_sources`: four duplicate entries pointing at a pre-merge extraction workspace
+  collapsed to one, labelled `HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH`.

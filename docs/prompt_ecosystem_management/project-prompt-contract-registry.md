@@ -26,13 +26,11 @@ authority_sources:
   url: https://app.notion.com/p/3da4590a05eb81bcbc5deb2d2cec4f1f
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
   path: candidate/prompts/manifest.json
-  note: 55-prompt candidate extraction, 2026-09-17
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
+  note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path
+    does not exist in the repository. Current prompt bodies are authored in Notion and
+    are resolved through the candidate catalog; the evidence_contract byte count and
+    SHA-256 on each row below are the reproducible identity.'
+  disposition: HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH
 observation:
   release: GCFPE-20260914.1
   version_family: '091426.1'
@@ -174,19 +172,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-C-20
   notion_page_id: 3db4590a05eb8173a73edc73f302a90a
   notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
@@ -238,19 +244,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-C-30
   notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
   notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
@@ -306,19 +320,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-C-40
   notion_page_id: 3db4590a05eb81269931cee342ce8a0e
   notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
@@ -370,19 +392,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-E-10
   notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
   notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
@@ -436,19 +466,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-E-20
   notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
   notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
@@ -500,19 +538,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-E-30
   notion_page_id: 3db4590a05eb81b4be79f405566da9a7
   notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
@@ -568,19 +614,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-E-40
   notion_page_id: 3db4590a05eb8101b655ed223b11a85e
   notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
@@ -632,19 +686,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CF-PO-10
   notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
   notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
@@ -700,19 +762,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-20
   notion_page_id: 3db4590a05eb81f4812be61e8877c02c
   notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
@@ -768,10 +838,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -779,8 +845,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-30
   notion_page_id: 3db4590a05eb8190a444d8818e445c1d
   notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
@@ -834,10 +914,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -845,8 +921,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-40
   notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
   notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
@@ -906,19 +996,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-C-10
   notion_page_id: 3db4590a05eb81ad8989faa77f441a64
   notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
@@ -974,19 +1072,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-E-10
   notion_page_id: 3db4590a05eb811a8578d75885c16cac
   notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
@@ -1042,19 +1148,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-E-20
   notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
   notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
@@ -1109,10 +1223,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1120,8 +1230,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-E-30
   notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
   notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
@@ -1177,10 +1301,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1188,8 +1308,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: CL-E-40
   notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
   notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
@@ -1245,10 +1379,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1256,8 +1386,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: DOC-10
   notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
   notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
@@ -1320,19 +1464,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: DOC-20
   notion_page_id: 3db4590a05eb8164ac09e722dc967f25
   notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
@@ -1398,19 +1550,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: ESC-10
   notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
   notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
@@ -1463,19 +1623,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: ESC-25
   notion_page_id: 3db4590a05eb81bf9326e46a1017de38
   notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
@@ -1531,19 +1699,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: ESC-30
   notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
   notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
@@ -1604,19 +1780,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: ESC-40
   notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
   notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
@@ -1674,19 +1858,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: GCFPE-MGMT-10
   notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
   notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
@@ -1742,19 +1934,23 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-10
   notion_page_id: 3db4590a05eb817aa191f1e822c30480
   notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
@@ -1808,19 +2004,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-20
   notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
   notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
@@ -1874,19 +2078,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-30
   notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
   notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
@@ -1941,19 +2153,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-40
   notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
   notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
@@ -1973,8 +2193,12 @@ prompts:
   - artifact: IMPLEMENTATION_PLAN
     states:
     - PLAN_PENDING_REVISED
-    - WRONG_ROUTE_APPROVED_BASE
     consumers: &id028
+    - IA-30
+  - artifact: MATERIAL_PLAN_DELTA
+    states:
+    - PLAN_DELTA_PENDING
+    consumers:
     - IA-30
   mutations:
     allowed:
@@ -2007,19 +2231,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-50
   notion_page_id: 3db4590a05eb81d78eeae384e93dd697
   notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
@@ -2044,7 +2276,6 @@ prompts:
     - IA-20
     - IA-30
     - IA-40
-    - ESC-40
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2076,19 +2307,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: IA-60
   notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
   notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
@@ -2112,7 +2351,6 @@ prompts:
     - BLOCKED
     consumers: &id030
     - IA-50
-    - ESC-30
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2144,19 +2382,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: MGR-10
   notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
   notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
@@ -2214,19 +2460,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: OPS-10
   notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
   notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
@@ -2281,10 +2535,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -2292,8 +2542,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: OPS-20
   notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
   notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
@@ -2350,10 +2614,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -2361,8 +2621,22 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: OPS-30
   notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
   notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
@@ -2428,19 +2702,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: PR-10
   notion_page_id: 3db4590a05eb818e8359de1994e97a7d
   notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
@@ -2497,19 +2779,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: PR-20
   notion_page_id: 3db4590a05eb8174abf8c04318ab04be
   notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
@@ -2563,19 +2853,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: PR-30
   notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
   notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
@@ -2632,19 +2930,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: PR-35
   notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
   notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
@@ -2693,12 +2999,25 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: NEXT_PROMPT_HANDOFF
       rule_id: CTR-002
+    forbidden_literals: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
   evidence_contract:
   - 'Complete prompt body extracted from Notion 2026-09-18: 17915 bytes'
   - 'SHA-256 of that extraction: 73fa123d9fc610510f61690186844754735e128a2993c5298614184604b070a8'
@@ -2774,19 +3093,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: PR-50
   notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
   notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
@@ -2839,17 +3166,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-10
   notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
   notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
@@ -2919,19 +3256,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-100
   notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
   notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
@@ -2995,19 +3340,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-110
   notion_page_id: 3db4590a05eb816984d1d34da0e08f40
   notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
@@ -3071,19 +3424,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-120
   notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
   notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
@@ -3148,19 +3509,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-20
   notion_page_id: 3db4590a05eb816daa3adff37283482b
   notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
@@ -3216,19 +3585,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-50
   notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
   notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
@@ -3287,19 +3664,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-60
   notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
   notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
@@ -3353,19 +3738,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-70
   notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
   notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
@@ -3419,19 +3812,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-80
   notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
   notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
@@ -3485,19 +3886,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: QA-90
   notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
   notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
@@ -3558,19 +3967,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: RS-10
   notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
   notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
@@ -3624,19 +4041,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: RS-20
   notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
   notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
@@ -3695,19 +4120,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: RS-30
   notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
   notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
@@ -3760,19 +4193,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: RS-40
   notion_page_id: 3db4590a05eb8183b5ffdf4270133226
   notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
@@ -3828,19 +4269,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: controlled Markdown
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 - prompt_key: UTIL-10
   notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
   notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
@@ -3893,19 +4342,27 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: 'docs/pfcanon/'
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: 'Glow / Core Docs / PFCanon'
+      rule_id: CTR-001
+    - value: 'Glow / Ephemeral Planning Files'
+      rule_id: CTR-001
+    - value: 'drive\.google\.com'
+      rule_id: CTR-001
+    - value: 'EPHEMERAL_DRIVE'
+      rule_id: CTR-001
 global_literals:
   approval_request: ASK OK?
   approved: ASK OK.

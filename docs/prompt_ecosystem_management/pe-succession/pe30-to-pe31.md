@@ -175,13 +175,19 @@ prohibitions) are recorded in `gcfpe.decision-record.md` under D7.
 > executing session repeated the same mistake and undercounted by 97 lines before two
 > workers caught it.
 
-**2. Batch 2 bounded current-state verification.** Not a re-run. Answer three questions
-against the merged bodies: is the recorded blocker obsolete (it is — D10); are there
-remaining actual defects under current rules; do its seven prompts (`IA-10`, `IA-20`,
-`IA-30`, `IA-40`, `IA-50`, `IA-60`, `UTIL-10`) fulfil their contracts. If clean, close it.
-Do not manufacture work because it was historically marked blocked. **Sequence after the
-storage pass**, because all seven prompts are in that pass and verifying first would
-certify bodies about to change.
+**2. Batch 2 — CLOSED 2026-09-18.** Product Owner authorised closure after a bounded
+current-state verification. All 22 original contract findings had already closed on the
+prompt side with no prompt edit required; the batch was held only because a graph
+synchronisation could not be written to Drive. Every one of those redlines was verified
+present in `docs/graph/parts/`. Four clause corrections were applied at closure (IA-20 ×2,
+IA-50, IA-60), each with an established downstream consumer. `rollback` was deliberately
+**not** added to IA-10: no prompt in the release requires it, so it would be normalisation
+without functional purpose. Recorded on the six-batch plan page.
+
+> **Do not reuse the Drive blocker to frame current decisions.** It is obsolete because
+> this ecosystem no longer uses Drive, not because Drive became writable. Verified
+> 2026-09-18: 0 of 55 bodies and 0 of 55 graph parts reference Drive as a store or
+> authority, and no CI, tool or script has a Drive code path.
 
 **3. Batch 3**, then Batches 4–6 per the Notion plan.
 
