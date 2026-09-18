@@ -261,6 +261,44 @@ drainage target and owner. Those are legitimate Canon disposition and must survi
 4. **Verify Batch 2 against the merged bodies** and close it if clean.
 5. **Batch 3**, then 4–6.
 
+## How to report to Nathan
+
+Binding, and load `glow-po-reporting` before writing to him. Added 2026-09-18 after a
+session in which the work was sound and the reporting was not, which cost the Product
+Owner more time than the work saved.
+
+**Asking for a decision.** Give four things in order: what the thing actually does in
+plain language; what concretely breaks in a real run if nothing changes; the options with
+their costs; your recommendation and why. A schema difference is not an impact. If you
+cannot say what the affected prompt does, you are not ready to ask — find out first.
+
+Several decisions get a summary table (number, question, impact, recommendation), then
+one section per decision in the same shape, ordered by impact.
+
+**Ask only for what is genuinely his.** Policy, settled architecture, and expensive or
+hard-to-reverse calls are Nathan's. An implementation consequence of a ruling he has
+already made is yours — make it, say you made it, give the reason. Seeking cover on a
+judgement you are equipped to make costs him two rounds.
+
+**Corrections lead.** When you are correcting something you told him earlier, it is the
+headline, at the top, before the new work. Never buried mid-paragraph, never surfacing
+only as a changed number. What you said, what is true, what changes as a result.
+
+**One structure per message.** Do not stack analyses with different shapes. If you have
+several unrelated things, send the actionable one and say the rest is coming.
+
+**"For the record" means a file or page was written.** Conversation is not a record —
+this document says so about transcripts, and it applies to your own claims too. Record it
+and name the path, or call it an observation.
+
+**Establish behaviour before proposing a change.** Never propose an edit on the strength
+of a rule, an assertion, or a filename. This ecosystem's recurring failure is judging by
+name instead of function — "drain", "Drive", `PF10_*`, a required literal. A check that
+fails on every member of a set is telling you about the check.
+
+**Reporting completed work.** Lead with what changed and whether it is verified, then the
+evidence, then what is left. Name paths, branches and PRs. Numbers beat adjectives.
+
 ## How to work
 
 Coordinate; do not personally grind. Precompute discovery so coverage is arithmetic
