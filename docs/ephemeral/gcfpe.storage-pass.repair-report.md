@@ -105,9 +105,13 @@ present**: `audit/docdeltas/` contains `PF10_EPIC017_addendum.md`,
 canon. `docs/pfcanon/` is now carved out as the authority; the prohibition still covers
 every other repository file.
 
-> **Open, not resolved here.** Those `audit/docdeltas/` files sit outside the four open
-> paths and were not touched. A session resolving canon by filename search would find
-> them. This needs a Product Owner decision at some point.
+> **Investigated 2026-09-18; not a defect and not a Product Owner question.** Those files
+> are application-side doc-delta staging from HDE epic delivery, committed 2026-08-25,
+> each with a `path_proof.txt`, and referenced by `README.md` as evidence anchors and by
+> QA step reports as a D10 gate check. They sit outside the four open paths and were not
+> touched, correctly. The residual risk is a **name collision only**, already closed by
+> the narrowed `QA-10` / `QA-50` prohibitions. An earlier revision of this report called
+> it an open hazard; that was a judgement by filename rather than by function.
 
 ## 4. Scope boundaries confirmed by inspection
 

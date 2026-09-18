@@ -213,17 +213,21 @@ post-flight, then the Product Owner promotion decision packet.
 ## Genuinely open — needs Product Owner input
 
 - **Nothing is currently blocking.** The storage pass is complete (2026-09-18).
-- **`audit/docdeltas/` holds PF-named files that are not controlled canon** —
-  `PF10_EPIC017_addendum.md`, `PF12_EPIC017_registry_and_mirror.md`,
-  `PF14_EPIC017_mechanics_and_CI.md`, `PF19_EPIC017_evidence_CI_rails.md`. They sit
-  outside the four open paths and were deliberately not touched. A session resolving
-  canon by filename search would find them before `docs/pfcanon/`. This is the live
-  instance of the hazard that `QA-10` §55 and `QA-50` §29 guard against, which is why
-  those prohibitions were narrowed rather than deleted. Needs a Product Owner decision.
 - **Deferred, not blocking:** a 13.6 MB evidence manifest in `docs/ephemeral/` embeds
-  whole Python sources and PF Canon documents as escaped strings. It is excluded from the
-  contract scan now, but whether an artifact of that shape belongs in the ephemeral store
-  at all is a storage-architecture question Nathan has not been asked.
+  whole Python sources and PF Canon documents as escaped strings. Whether an artifact of
+  that shape belongs in the ephemeral store is a storage-architecture question Nathan has
+  not been asked.
+
+**Investigated and closed, not open.** `audit/docdeltas/` holds 49 PF-named files
+(`PF10_EPIC017_addendum.md`, `PF12_EPIC017_registry_and_mirror.md` and similar). An
+earlier revision of this record listed them as a canon hazard needing a Product Owner
+ruling. They are not. They are application-side doc-delta staging from HDE epic delivery,
+committed 2026-08-25, each carrying a `path_proof.txt`, and they are referenced by
+`README.md` as evidence anchors and by QA step reports as a D10 gate check. Removing or
+moving them would break live evidence for no gain. The residual risk is only a **name
+collision**, and `QA-10` §55 and `QA-50` §29 already close it by making any repository
+file outside `docs/pfcanon/` a non-authority. That is why those prohibitions were
+narrowed rather than deleted.
 
 ## Warnings against reintroducing superseded behaviour
 
