@@ -2,12 +2,36 @@
 artifact_type: PROMPT_ECOSYSTEM_RECONCILIATION_BACKLOG
 artifact_version: "1.0"
 created_date: 2026-09-18
-status: OPEN
+status: LARGELY_CLOSED_2026-09-18
 baseline: main @ 3c0b1fa (PR #415)
 method: two isolated read-only audits against the settled rulings in gcfpe.decision-record.md
 ---
 
 # Reconciliation backlog — documents that still present retired behaviour as active
+
+> ## Closure status — 2026-09-18
+>
+> **Notion: reconciled.** 51 verified edits across ten surfaces. The two generative
+> controls were done first and re-verified under isolation: the **PE Metaprompt** now
+> returns **zero** retired or Drive-storage markers; the **Glow Operations Hub** retains
+> only release-scoped and historical hits, which are correct, plus Drive links belonging
+> to other Glow workstreams (the Drive map, HD Refs, Readings Authority, CRD list) that
+> are outside this ecosystem's scope.
+>
+> **Repository: reconciled.** The committed assembled graph was deleted, the
+> direct-handoff control copy superseded, the D6/D8 contradiction fixed, eight dated
+> batch records banner-marked, and the machine-readable residues corrected.
+>
+> **Deliberately left for a ruling, not oversights:**
+> - The Hub's `## Current selection — GCFPE-20260913.1 / 091326.2` blocks describe the
+>   **selected** release, which still has the drainage lifecycle. Correct as written.
+> - The Alpha checklist's `GCFPE-19` obligation contains *"without editing or draining
+>   it"* — an open Product Owner obligation, not a negative-authority list entry.
+> - The six-batch plan's `status` / `mutation_performed` front matter is a Product Owner
+>   call about which phase the project is in.
+> - A handful of `PF10 drainage` entries in negative-authority lists on historical
+>   checklists — stale but inert, and on pages already marked superseded.
+
 
 Audited 2026-09-18 against the merged baseline. Every finding below is a place where a
 reader or a validator would take retired behaviour as current instruction.
