@@ -114,7 +114,6 @@
     "output_artifacts": [
       "CRD_SPECIFICATION"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8173a162e1b06427c7bf",
       "release": "GCFPE-20260913.1",

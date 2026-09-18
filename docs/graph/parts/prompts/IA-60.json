@@ -117,7 +117,6 @@
     "output_artifacts": [
       "PLANNING_RESEARCH_FINDING"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81f78afcca35f2dcb7db",
       "release": "GCFPE-20260913.1",

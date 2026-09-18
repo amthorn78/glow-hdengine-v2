@@ -242,15 +242,14 @@
     "id": "CL-20",
     "lane": "CL",
     "lifecycle": "UNSELECTED_CANDIDATE",
-    "native_function": "Execute Prepare Post-Closure Drainage and Closure Memo for the exact supplied change.",
+    "native_function": "Execute Prepare Closure Memo and Post-Closure Record for the exact supplied change.",
     "output_artifacts": [
-      "CLOSURE_MEMO / POST_CLOSURE_DRAINAGE"
+      "CLOSURE_MEMO / POST_CLOSURE_RECORD"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81a2a0c9c98f719350a1",
       "release": "GCFPE-20260913.1",
-      "title": "CL-20 — Prepare Post-Closure Drainage and Closure Memo — 091326.2",
+      "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 091326.2",
       "url": "https://app.notion.com/p/3da4590a05eb81a2a0c9c98f719350a1",
       "version": "091326.2"
     },
@@ -267,7 +266,7 @@
     ],
     "sequence": 20,
     "session_class": "ROLE_CONTINUING",
-    "title": "CL-20 — Prepare Post-Closure Drainage and Closure Memo — 091426.1"
+    "title": "CL-20 — Prepare Closure Memo and Post-Closure Record — 091426.1"
   },
   "state_route_order": [
     "adr_branch",

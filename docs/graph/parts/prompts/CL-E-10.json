@@ -176,7 +176,6 @@
     "output_artifacts": [
       "CHANGE_CLOSURE_DECISION"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8177bf3cd7c9c7ca39f7",
       "release": "GCFPE-20260913.1",

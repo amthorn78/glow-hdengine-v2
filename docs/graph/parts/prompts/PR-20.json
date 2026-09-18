@@ -191,7 +191,6 @@
     "output_artifacts": [
       "PR_IMPLEMENTATION_PLAN"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8147b34ccfabf608c2e3",
       "release": "GCFPE-20260913.1",

@@ -114,7 +114,6 @@
     "output_artifacts": [
       "PF09_REVALIDATION"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8182bc57f512fe2fc79c",
       "release": "GCFPE-20260913.1",

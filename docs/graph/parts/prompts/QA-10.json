@@ -166,7 +166,6 @@
     "output_artifacts": [
       "REALITY_AUDIT / CHANGE_AUDIT_TRIAGE / QA_READINESS"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb814fbda7f3b722487b6b",
       "release": "GCFPE-20260913.1",

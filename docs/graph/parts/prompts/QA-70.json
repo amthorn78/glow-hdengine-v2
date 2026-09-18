@@ -15,38 +15,6 @@
       "immediate": true,
       "route_branches": [
         {
-          "applicable_states": [
-            "APPROVE"
-          ],
-          "branch_id": "delta_approve",
-          "condition": "REVIEW_MODE=DELTA; exactly one addendum and conditional post-drain native continuation",
-          "next_prompt_handoff_count": 1,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/d/QA-70.md",
-            "section": "Required result and routing"
-          },
-          "state": "APPROVE",
-          "terminal_for_invocation": false
-        }
-      ],
-      "state_predicates": [
-        "APPROVE"
-      ],
-      "to": "NATHAN_MANUAL_PF10_DRAIN",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
-    },
-    {
-      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
-      "automatic": false,
-      "from": "QA-70",
-      "from_kind": "prompt",
-      "immediate": true,
-      "route_branches": [
-        {
           "applicable_states": [],
           "branch_id": "qa70_terminal",
           "condition": "source, authority, mode, or continuation identity is unresolved",
@@ -90,9 +58,27 @@
           },
           "state": "DENY",
           "terminal_for_invocation": false
+        },
+        {
+          "applicable_states": [
+            "APPROVE"
+          ],
+          "branch_id": "qa_plan_delta_return",
+          "condition": "REVIEW_MODE=DELTA; the exact native receiver reads current PF10",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/d/QA-70.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": true
         }
       ],
       "state_predicates": [
+        "APPROVE",
         "DENY"
       ],
       "to": "ORIGINAL_NATIVE_STAGE",
@@ -176,7 +162,6 @@
     "output_artifacts": [
       "QA_PLAN_REVIEW / MATERIAL_QA_PLAN_DELTA_REVIEW"
     ],
-    "pf10_addendum_role": "QUALIFYING_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb816f8399e55ce20e4e21",
       "release": "GCFPE-20260913.1",
@@ -201,7 +186,7 @@
   "state_route_order": [
     "initial_approve",
     "initial_deny",
-    "delta_approve",
+    "qa_plan_delta_return",
     "delta_deny",
     "qa70_terminal"
   ],

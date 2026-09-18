@@ -139,7 +139,6 @@
     "output_artifacts": [
       "CYCLE_GAP_SCAN"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb815ba2e2fb45ba7d056f",
       "release": "GCFPE-20260913.1",

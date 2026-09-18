@@ -143,7 +143,6 @@
     "output_artifacts": [
       "QA_TASK / QA_PREEXECUTION_FINDING"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8118a902dfced4429f2c",
       "release": "GCFPE-20260913.1",

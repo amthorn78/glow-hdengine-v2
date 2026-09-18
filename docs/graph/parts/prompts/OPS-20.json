@@ -307,7 +307,6 @@
     "output_artifacts": [
       "OPS_EXECUTION_RESULT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8137b923d8f5eee107aa",
       "release": "GCFPE-20260913.1",

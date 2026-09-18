@@ -45,56 +45,6 @@
       "immediate": true,
       "route_branches": [
         {
-          "applicable_states": [
-            "APPROVE"
-          ],
-          "branch_id": "approve",
-          "condition": "qualifying approved remediation creates exactly one addendum and a conditional post-drain native-delivery handoff",
-          "next_prompt_handoff_count": 1,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/b/ESC-40.md",
-            "section": "Required result and routing"
-          },
-          "state": "APPROVE",
-          "terminal_for_invocation": false
-        },
-        {
-          "applicable_states": [
-            "APPROVE_AS_CHANGED"
-          ],
-          "branch_id": "approve_as_changed",
-          "condition": "qualifying approved-as-changed remediation creates exactly one addendum and a conditional post-drain native-delivery handoff",
-          "next_prompt_handoff_count": 1,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/b/ESC-40.md",
-            "section": "Required result and routing"
-          },
-          "state": "APPROVE_AS_CHANGED",
-          "terminal_for_invocation": false
-        }
-      ],
-      "state_predicates": [
-        "APPROVE",
-        "APPROVE_AS_CHANGED"
-      ],
-      "to": "NATHAN_MANUAL_PF10_DRAIN",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
-    },
-    {
-      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
-      "automatic": false,
-      "from": "ESC-40",
-      "from_kind": "prompt",
-      "immediate": true,
-      "route_branches": [
-        {
           "applicable_states": [],
           "branch_id": "remediation_review_terminal",
           "condition": "native continuation identity, Product Owner/source, or authority predicate is unresolved",
@@ -114,6 +64,108 @@
       "to": "NATHAN_TERMINAL_RETURN",
       "to_kind": "boundary",
       "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_non_pr_return",
+          "condition": "recorded remediation return is a non-PR native delivery owner; that receiver reads current PF10",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_pr30_return",
+          "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly on the qualifying approval, preserving actual vehicle state",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "PR-30",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "ESC-40",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "APPROVE",
+            "APPROVE_AS_CHANGED"
+          ],
+          "branch_id": "remediation_pr35_return",
+          "condition": "recorded remediation return is PR-35; resume PR-35 directly on the qualifying approval in the same open PR",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/ESC-40.md",
+            "section": "Required result and routing"
+          },
+          "state": "APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "APPROVE",
+        "APPROVE_AS_CHANGED"
+      ],
+      "to": "PR-35",
+      "to_kind": "prompt",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
     }
   ],
   "id": "ESC-40",
@@ -128,7 +180,6 @@
     "output_artifacts": [
       "REMEDIATION_REVIEW"
     ],
-    "pf10_addendum_role": "QUALIFYING_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8101bc3bd23243f1d4c5",
       "release": "GCFPE-20260913.1",
@@ -155,8 +206,9 @@
     "title": "ESC-40 — Review and Return Approved Remediation — 091426.1"
   },
   "state_route_order": [
-    "approve",
-    "approve_as_changed",
+    "remediation_pr30_return",
+    "remediation_pr35_return",
+    "remediation_non_pr_return",
     "deny",
     "remediation_review_terminal"
   ],

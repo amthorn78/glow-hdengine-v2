@@ -44,136 +44,6 @@
     },
     {
       "automatic": false,
-      "branch_id": "crd_specification_delta_return",
-      "condition": "the exact affected native receiver recorded by the approved CRD Specification delta freshly verifies current PF10; this is not an RS-40 rescope route",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "CF-C-30",
-      "origin_state": "DELTA_APPROVE",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "epic_specification_delta_return",
-      "condition": "the exact affected native receiver recorded by the approved Epic Specification delta freshly verifies current PF10; this is not an RS-40 rescope route",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "CF-E-30",
-      "origin_state": "DELTA_APPROVE",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "plan_delta_return",
-      "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approved Plan delta freshly verifies current PF10 after Nathan's manual drain; this is not an RS-40 rescope route",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "IA-30",
-      "origin_state": "DELTA_APPROVE",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "qa_plan_delta_return",
-      "condition": "REVIEW_MODE=DELTA; the exact native receiver freshly verifies current PF10",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "QA-70",
-      "origin_state": "APPROVE",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "remediation_non_pr_return",
-      "condition": "recorded remediation return is a non-PR native delivery owner; that receiver freshly verifies current PF10",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "ESC-40",
-      "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "rescope_non_pr",
-      "condition": "qualifying non-PR bounded rescope; exact native stage freshly verifies current PF10",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "RS-20",
-      "origin_state": "APPROVE",
-      "to": "ORIGINAL_NATIVE_STAGE",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "remediation_pr30_return",
-      "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly after fresh verification, preserving actual vehicle state",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "ESC-40",
-      "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-      "to": "PR-30",
-      "to_kind": "prompt",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "rescope_pr30_prepublication",
-      "condition": "PR_RETURN_PHASE=PR-30_PREPUBLICATION; PR-30 freshly verifies current PF10; no open PR and RS-40 forbidden",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "RS-20",
-      "origin_state": "APPROVE",
-      "to": "PR-30",
-      "to_kind": "prompt",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "remediation_pr35_return",
-      "condition": "recorded remediation return is PR-35; resume PR-35 directly after fresh verification in the same open PR",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "ESC-40",
-      "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-      "to": "PR-35",
-      "to_kind": "prompt",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
-      "branch_id": "rescope_open_pr",
-      "condition": "PR_RETURN_PHASE in {PR-30_POSTPUBLICATION, PR-35}; existing open PR identity verified",
-      "from": "NATHAN_MANUAL_PF10_DRAIN",
-      "from_kind": "boundary",
-      "immediate": true,
-      "origin_prompt": "RS-20",
-      "origin_state": "APPROVE",
-      "to": "RS-40",
-      "to_kind": "prompt",
-      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
-    },
-    {
-      "automatic": false,
       "branch_id": "original_proceed",
       "condition": "original explicit Proceed for the exact work unit; never a second Proceed",
       "from": "NATHAN_PROCEED",
@@ -192,29 +62,24 @@
       "INITIAL_OR_PREAPPROVAL_AUTHORING",
       "APPROVED_BASE_WITH_OVERLAYS"
     ],
-    "PF10_REFERENCE_VISIBILITY": [
-      "PF10_REFERENCE_VISIBLE",
-      "PF10_REFERENCE_NOT_VISIBLE",
-      "SOURCE_RESOLUTION_ERROR"
-    ],
     "PR_RETURN_PHASE": [
       {
         "open_pr_required": false,
-        "post_drain_receiver": "PR-30",
+        "receiver": "PR-30",
         "resumed_phase": "PR-30",
         "rs40_eligible": false,
         "value": "PR-30_PREPUBLICATION"
       },
       {
         "open_pr_required": true,
-        "post_drain_receiver": "RS-40",
+        "receiver": "RS-40",
         "resumed_phase": "PR-30",
         "rs40_eligible": true,
         "value": "PR-30_POSTPUBLICATION"
       },
       {
         "open_pr_required": true,
-        "post_drain_receiver": "RS-40",
+        "receiver": "RS-40",
         "resumed_phase": "PR-35",
         "rs40_eligible": true,
         "value": "PR-35"
@@ -408,10 +273,6 @@
       "kind": "manual_product_owner_event",
       "selected_member": false
     },
-    "NATHAN_MANUAL_PF10_DRAIN": {
-      "kind": "manual_product_owner_event",
-      "selected_member": false
-    },
     "NATHAN_PROCEED": {
       "kind": "manual_product_owner_gate",
       "selected_member": false
@@ -444,78 +305,6 @@
         "to": "PR-40"
       }
     ],
-    "NATHAN_MANUAL_PF10_DRAIN": [
-      {
-        "branch_id": "crd_specification_delta_return",
-        "condition": "the exact affected native receiver recorded by the approved CRD Specification delta freshly verifies current PF10; this is not an RS-40 rescope route",
-        "origin_prompt": "CF-C-30",
-        "origin_state": "DELTA_APPROVE",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      },
-      {
-        "branch_id": "epic_specification_delta_return",
-        "condition": "the exact affected native receiver recorded by the approved Epic Specification delta freshly verifies current PF10; this is not an RS-40 rescope route",
-        "origin_prompt": "CF-E-30",
-        "origin_state": "DELTA_APPROVE",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      },
-      {
-        "branch_id": "plan_delta_return",
-        "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approved Plan delta freshly verifies current PF10 after Nathan's manual drain; this is not an RS-40 rescope route",
-        "origin_prompt": "IA-30",
-        "origin_state": "DELTA_APPROVE",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      },
-      {
-        "branch_id": "qa_plan_delta_return",
-        "condition": "REVIEW_MODE=DELTA; the exact native receiver freshly verifies current PF10",
-        "origin_prompt": "QA-70",
-        "origin_state": "APPROVE",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      },
-      {
-        "branch_id": "remediation_pr30_return",
-        "condition": "recorded remediation return is PR-30_PREPUBLICATION or PR-30_POSTPUBLICATION; resume PR-30 directly after fresh verification, preserving actual vehicle state",
-        "origin_prompt": "ESC-40",
-        "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-        "to": "PR-30"
-      },
-      {
-        "branch_id": "remediation_pr35_return",
-        "condition": "recorded remediation return is PR-35; resume PR-35 directly after fresh verification in the same open PR",
-        "origin_prompt": "ESC-40",
-        "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-        "to": "PR-35"
-      },
-      {
-        "branch_id": "remediation_non_pr_return",
-        "condition": "recorded remediation return is a non-PR native delivery owner; that receiver freshly verifies current PF10",
-        "origin_prompt": "ESC-40",
-        "origin_state": "APPROVE_OR_APPROVE_AS_CHANGED",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      },
-      {
-        "branch_id": "rescope_pr30_prepublication",
-        "condition": "PR_RETURN_PHASE=PR-30_PREPUBLICATION; PR-30 freshly verifies current PF10; no open PR and RS-40 forbidden",
-        "origin_prompt": "RS-20",
-        "origin_state": "APPROVE",
-        "to": "PR-30"
-      },
-      {
-        "branch_id": "rescope_open_pr",
-        "condition": "PR_RETURN_PHASE in {PR-30_POSTPUBLICATION, PR-35}; existing open PR identity verified",
-        "origin_prompt": "RS-20",
-        "origin_state": "APPROVE",
-        "to": "RS-40"
-      },
-      {
-        "branch_id": "rescope_non_pr",
-        "condition": "qualifying non-PR bounded rescope; exact native stage freshly verifies current PF10",
-        "origin_prompt": "RS-20",
-        "origin_state": "APPROVE",
-        "to": "ORIGINAL_NATIVE_STAGE"
-      }
-    ],
     "NATHAN_PROCEED": [
       {
         "branch_id": "original_proceed",
@@ -539,14 +328,13 @@
       "DOC",
       "DOCX"
     ],
-    "fresh_current_pf10_resolution_required_after_manual_drain": true,
+    "fresh_current_pf10_resolution_required": true,
     "google_docs_fallback": false,
     "native_document_candidate_content_may_be_opened": false,
     "native_document_equivalence_check": false,
     "pfcanon_access": "READ_ONLY",
     "pfcanon_authority": "CONTROLLED_MARKDOWN_ONLY",
     "pfcanon_root": "docs/pfcanon",
-    "pre_drain_reference_role": "PRE_DRAIN_BASELINE_EVIDENCE",
     "source_failure_result": "SOURCE_RESOLUTION_ERROR"
   },
   "contract_id": "GCFPE-20260914.1-CANDIDATE-GRAPH",
@@ -580,7 +368,6 @@
   "pf10_addendum_contract": {
     "agent_may_litigate_product_owner_action": false,
     "assume_pasted_next_turn": true,
-    "drain_owner": "Nathan / Product Owner",
     "exact_producer_set": [
       "CF-C-30",
       "CF-E-30",
@@ -598,8 +385,9 @@
       "artifact_version",
       "drain_verification_anchor",
       "any pinned PF document version",
-      "any field describing the addendum's own drainage state"
+      "any field describing this addendum's own drainage state — not a Canon destination, Canon target, or PF09 row"
     ],
+    "forbidden_fields_scope": "These fields are forbidden inside a PF10 Build Notes Addendum only, and only because they belong to the retired addendum-drainage lifecycle. They place no restriction on Canon disposition anywhere else. Canon conflict and ADR records, NEW_CANON and CANON_RECONCILIATION classifications, the permanent Canon drainage target and owner, and PF09 rows identifying where an approved change must ultimately land in PF Canon are all legitimate and must be preserved intact. Interpret this list by function, never by the word \"drain\": a validator must not reject a field merely because its name or value contains it.",
     "format_home": "Glow Operations Hub, Notion. Canonical, and not hard-linked to PF10.",
     "native_outcome_normalization": {
       "CHANGE_NOT_SUBSTANTIATED": "UNCHANGED",
@@ -654,37 +442,7 @@
       "conflicts",
       "unresolved_items",
       "return_phase"
-    ],
-    "role_vocabulary": {
-      "NON_PRODUCER": {
-        "meaning": "This prompt never creates a PF10 build-notes addendum on any branch.",
-        "prompt_body_token": "NONPRODUCER"
-      },
-      "QUALIFYING_PRODUCER": {
-        "meaning": "This prompt creates exactly one standalone PF10 build-notes addendum on a qualifying material delta approval to an already approved base, and none on any outcome listed in never_for.",
-        "prompt_body_token": "QUALIFYING_DELTA_APPROVAL_PRODUCER"
-      }
-    }
-  },
-  "pf10_reference_visibility_check": {
-    "PF10_REFERENCE_NOT_VISIBLE": "PF10 was read and the expected reference was not visible to this agent. Report that observation and stop. Make no claim about whether the Product Owner acted.",
-    "PF10_REFERENCE_VISIBLE": "The expected reference is present and visible. The check is complete and the affected continuation resumes at its recorded return phase.",
-    "SOURCE_RESOLUTION_ERROR": "Current PF10 Markdown cannot be resolved or completely read.",
-    "exhaustive_mutually_exclusive_results": [
-      "PF10_REFERENCE_VISIBLE",
-      "PF10_REFERENCE_NOT_VISIBLE",
-      "SOURCE_RESOLUTION_ERROR"
-    ],
-    "prohibited": [
-      "byte-for-byte verification",
-      "verifying the contents of the addendum",
-      "mismatch analysis",
-      "requiring or reporting any drain status",
-      "additional validation, remediation, reconciliation, or follow-up work"
-    ],
-    "scope": "One check only: confirm PF10 reflects the update and that the newly added reference is visible to the agent. Presence and visibility, nothing else.",
-    "sufficient_evidence": "A basic title check. The title need not match exactly.",
-    "when": "The turn immediately after a PF10 build-notes addendum is created."
+    ]
   },
   "post_merge_three_event_contract": {
     "agent_merge_authorized": false,
@@ -730,20 +488,17 @@
       "PR-30_POSTPUBLICATION": [
         "PR-30",
         "RS-20",
-        "NATHAN_MANUAL_PF10_DRAIN",
         "RS-40",
         "PR-30"
       ],
       "PR-30_PREPUBLICATION": [
         "PR-30",
         "RS-20",
-        "NATHAN_MANUAL_PF10_DRAIN",
         "PR-30"
       ],
       "PR-35": [
         "PR-35",
         "RS-20",
-        "NATHAN_MANUAL_PF10_DRAIN",
         "RS-40",
         "PR-35"
       ]
@@ -823,7 +578,6 @@
     "classification": "ACCEPTED_TECHNICAL_HISTORY",
     "evidence_id": "PR03-R02",
     "may_authorize_alpha_resumption": false,
-    "may_prove_pf10_drainage": false,
     "may_prove_prompt_completion_or_hang": false,
     "may_reopen_accepted_pr03": false
   },
@@ -973,7 +727,7 @@
     "candidate_version_family": "091426.1",
     "correction_report_url": "https://drive.google.com/file/d/1BlPiTmlfSdtpkgSkKm9pHaPSvyL4L6br/view?usp=drivesdk",
     "prior_capture_disposition": "HISTORICAL_DEFECTIVE_RAW_CAPTURE_PLUS_ONE_LF_NOT_AUTHORITY",
-    "runtime_rule": "Each affected runtime receiver must freshly resolve current controlled PF10 after manual drain; these historical repair pins never replace that lookup.",
+    "runtime_rule": "Each affected runtime receiver must freshly resolve and read current controlled PF10; these historical repair pins never replace that lookup.",
     "schema_version": "gcfpe-recovery-source-bindings/1.0",
     "selection_status": "UNSELECTED_CANDIDATE",
     "source_manifest_file_sha256": "252fbc9abf573af052e2572c77a3e8dac9725dc8a35c8acbc42d74ee9dca680a",

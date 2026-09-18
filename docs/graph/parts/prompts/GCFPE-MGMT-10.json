@@ -85,7 +85,7 @@
             "ECOSYSTEM_CHANGE_COMPLETE"
           ],
           "branch_id": "maintenance_complete_native_return",
-          "condition": "scoped maintenance complete and the exact case separately authorizes one ready native continuation; resolve the actual selected receiver and preserve original authority, session and inputs; exclude PR-50, merge, PF10 drain, unselected candidates and unauthorized Alpha; emit one complete handoff without executing it",
+          "condition": "scoped maintenance complete and the exact case separately authorizes one ready native continuation; resolve the actual selected receiver and preserve original authority, session and inputs; exclude PR-50, merge, unselected candidates and unauthorized Alpha; emit one complete handoff without executing it",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -150,7 +150,6 @@
     "output_artifacts": [
       "GCFPE_ECOSYSTEM_CHANGE_REPORT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81ac80e6d886a25aa026",
       "release": "GCFPE-20260913.1",

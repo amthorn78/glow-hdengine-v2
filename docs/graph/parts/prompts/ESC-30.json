@@ -115,7 +115,6 @@
       "REMEDIATION_PROPOSAL",
       "DISCOVERY_TASK"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81f8ba50fdc497a8b2ec",
       "release": "GCFPE-20260913.1",

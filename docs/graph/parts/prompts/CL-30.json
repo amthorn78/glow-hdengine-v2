@@ -136,7 +136,6 @@
     "output_artifacts": [
       "ADR_CANDIDATE / NO_ADR_NEEDED"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb818c8f90db54a25544b1",
       "release": "GCFPE-20260913.1",

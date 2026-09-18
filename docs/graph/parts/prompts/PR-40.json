@@ -231,7 +231,6 @@
     "output_artifacts": [
       "PR_WORK_UNIT_LINEAGE_REVIEW"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb813c8b47e77f94ff1def",
       "release": "GCFPE-20260913.1",

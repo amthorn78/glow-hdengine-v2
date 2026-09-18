@@ -48,7 +48,6 @@
     "output_artifacts": [
       "PR_ABORT_ESCALATION_RECORD"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb813bb505eea620942e30",
       "release": "GCFPE-20260913.1",

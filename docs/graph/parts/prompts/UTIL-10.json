@@ -117,7 +117,6 @@
     "output_artifacts": [
       "REVISED_TARGET_ARTIFACT / REDLINE_APPLICATION_REPORT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8114a88cda5c9728e26c",
       "release": "GCFPE-20260913.1",
