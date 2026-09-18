@@ -102,7 +102,7 @@ no seventh batch and no new gate.
 | "referenced by direct Drive link" | "referenced by repository path" |
 | canon resolved through `Glow / Core Docs / PFCanon` | canon read from `docs/pfcanon/`, read-only |
 | "Markdown files in Drive `Glow / Core Docs / PFCanon`" | `docs/pfcanon/` |
-| any implication that repository writes are forbidden outright | the three open paths above, everything else by explicit instruction |
+| any implication that repository writes are forbidden outright | the four open paths above, everything else by explicit instruction |
 
 ### What must not change
 

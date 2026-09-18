@@ -37,7 +37,7 @@ observation:
   release: GCFPE-20260914.1
   version_family: '091426.1'
   selected_member_count: 55
-  complete_body_count: 54
+  complete_body_count: 55
   mutation_posture: READ_ONLY
 lanes:
 - lane: GCFPE-MGMT

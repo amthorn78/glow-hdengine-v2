@@ -85,14 +85,21 @@ reconciling drain evidence — **and no renamed equivalent.**
 
 ### The lifecycle, from every prompt's view
 
-A qualifying approval creates the addendum. After that turn, the addendum is part of
-PF10. On the immediately following turn the receiving prompt reads PF10 and confirms
-the expected update is visible. **That is all.**
+A qualifying approval creates the addendum. From the turn after it is created, the
+addendum is part of PF10 and in force. **That is all.**
+
+> **Amended 2026-09-18 by D8.** This section originally required the receiving prompt to
+> read PF10 and *confirm the expected update is visible* on the immediately following
+> turn. That confirmation is struck. It was itself machinery — another step and another
+> way to stop — and it contradicted this document's own rule that an agent may not
+> litigate a Product Owner action. A later prompt resolves and reads current PF10 as
+> part of its normal job and acts on what it finds. There is no confirmation step, no
+> separate artifact, no status, no gate, and no validation procedure.
 
 It is not a drain check, canonicalization check, synchronization check, ownership
 check, content verification, byte comparison, reconciliation procedure, new status
-machine, or new artifact requirement. After that turn the transition is over, and
-later prompts simply read current PF10 and work from current Canon.
+machine, or new artifact requirement. Later prompts simply read current PF10 and work
+from current Canon.
 
 ### Why
 
@@ -104,9 +111,14 @@ workflows are intended to become increasingly automated.
 
 ### Consequences
 
-- `POST_CLOSURE_DRAINAGE_STATUS` is **removed, not renamed**. CL-20 keeps its closure
-  memo and loses the producer roster, the storage contract, the addendum links, the
-  drain evidence and the drain-state inputs. What it needs, it reads from current PF10.
+- `POST_CLOSURE_DRAINAGE_STATUS` is **removed**. CL-20 loses the producer roster, the
+  storage contract, the drain evidence and the drain-state inputs; what it needs, it
+  reads from current PF10. **Amended 2026-09-18:** under Product Owner authorization the
+  prompt was renamed to **`CL-20 — Prepare Closure Memo and Post-Closure Record`** and
+  now produces `CLOSURE_MEMO` **and** `POST_CLOSURE_RECORD` — the surviving inventory of
+  already-produced addenda, without readback state, reference role or drain
+  verification. The merged registry, graph part, Flow Index and four referring prompts
+  all carry the new name.
 - `PF10_REFERENCE_ROLE` is **deleted as a field**. What is retained is the factual
   provenance — the PF10 version or equivalent identity actually read at that point.
   **Record what was read; do not assign it a workflow state.** A field with allowed

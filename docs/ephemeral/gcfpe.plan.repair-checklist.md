@@ -29,8 +29,8 @@ in_scope_prompt_count: 55
 skill_review_position: AFTER_BATCH_6
 postflight_position: AFTER_SKILL_REVIEW_AND_ANY_APPROVED_SKILL_CORRECTION
 alpha_stop_position: PR03_ACCEPTED_FINAL_BEFORE_PR04_PLANNING
-pf10_drain_owner: Nathan / Product Owner
-runtime_artifact_root: Glow / Ephemeral Planning Files
+pf10_drain_owner: RETIRED_2026-09-18_SEE_DECISION_RECORD_D6
+runtime_artifact_root: docs/ephemeral  # was Glow / Ephemeral Planning Files; repointed 2026-09-18
 mutation_performed: false
 ```
 
