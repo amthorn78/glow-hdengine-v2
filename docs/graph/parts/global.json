@@ -385,8 +385,9 @@
       "artifact_version",
       "drain_verification_anchor",
       "any pinned PF document version",
-      "any field describing the addendum's own drainage state"
+      "any field describing this addendum's own drainage state — not a Canon destination, Canon target, or PF09 row"
     ],
+    "forbidden_fields_scope": "These fields are forbidden inside a PF10 Build Notes Addendum only, and only because they belong to the retired addendum-drainage lifecycle. They place no restriction on Canon disposition anywhere else. Canon conflict and ADR records, NEW_CANON and CANON_RECONCILIATION classifications, the permanent Canon drainage target and owner, and PF09 rows identifying where an approved change must ultimately land in PF Canon are all legitimate and must be preserved intact. Interpret this list by function, never by the word \"drain\": a validator must not reject a field merely because its name or value contains it.",
     "format_home": "Glow Operations Hub, Notion. Canonical, and not hard-linked to PF10.",
     "native_outcome_normalization": {
       "CHANGE_NOT_SUBSTANTIATED": "UNCHANGED",
