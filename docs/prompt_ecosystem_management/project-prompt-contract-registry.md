@@ -745,8 +745,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 32487 bytes'
-  - 'SHA-256 of that extraction: 2a54f48e9d630b50be58535d59254fb83ead13f479cecf8642db4eb500076c55'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 32600 bytes'
+  - 'SHA-256 of that extraction: 3ef45ef337f7d402e21f71c1f7678d04d7fc21cb38c89b114d7819bac14442f5'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -811,8 +811,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29674 bytes'
-  - 'SHA-256 of that extraction: a1c41fb16cdfcefc57495f5ee003c4b0d089cf33404bda9ff0fc8128c1d287f6'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29649 bytes'
+  - 'SHA-256 of that extraction: 18dff8222da4787f032dacae1cfd850797d60f7cfa01e927847ac859b4927516'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -883,8 +883,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29172 bytes'
-  - 'SHA-256 of that extraction: 76037cde37c6580bab32d304f19c8e4f4c6e966edf5f159bd156692a3426740f'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29397 bytes'
+  - 'SHA-256 of that extraction: cd6fd75c7533b5e6ffbcce16de267561a6ffbd8e3dcc975ff8037a742f9cbfad'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -951,8 +951,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 35791 bytes'
-  - 'SHA-256 of that extraction: d06f16c82251f2614b3b34ffa9c110915ca285032911e026e23cd1464abf0350'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 35905 bytes'
+  - 'SHA-256 of that extraction: 8c16cb0e9c5e29f58ccfb99783fc697610a1a90d6532c32c5c0ff5e6a6c0e345'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1019,8 +1019,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36249 bytes'
-  - 'SHA-256 of that extraction: 51ab585d5ad230206fc458fc0c9a89a5b45e359be0f4ab1e46db017ba4222078'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 36380 bytes'
+  - 'SHA-256 of that extraction: 11fcb9cd0e1d506b20f62cef85dc591a43352978d888eedb1340d0b9ad405943'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1086,8 +1086,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14629 bytes'
-  - 'SHA-256 of that extraction: fa47fa0561e4d12eee1090ec730e45b9e66f6674bfc0b00ae54a939f250259ba'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14842 bytes'
+  - 'SHA-256 of that extraction: 754774698fdb55ad8dff76c3092e6f98a6e9b9d549cd95bbb396e0641eac188d'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1154,8 +1154,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13505 bytes'
-  - 'SHA-256 of that extraction: 8979cf271c9145ae932eb4e7832ddedcb3b8a7756b3fa2ce0054914f6d9f2f24'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13638 bytes'
+  - 'SHA-256 of that extraction: 54c49c5b56f72d874b2d3267fe0cf46d3a169e95b0fd5c2486aa956ff88eddc4'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1222,8 +1222,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 15318 bytes'
-  - 'SHA-256 of that extraction: f35a9c7b8522229448c0867c9cc073309b00d1f7605b5c858281ecce51e53206'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 15467 bytes'
+  - 'SHA-256 of that extraction: 47a845664bf181f1593a7e520dca9036d1d74316811085587aec2af77317aaf6'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1297,8 +1297,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 19586 bytes'
-  - 'SHA-256 of that extraction: 495096cc4b658c0e2e20e55355dc1256e53e37345166f1e8d4e571b9868eed2b'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 19796 bytes'
+  - 'SHA-256 of that extraction: c063dc9d9462b3f5b005a674eba476cc20292351cd7a4c31bdf65e784eb36ba0'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1375,8 +1375,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 20095 bytes'
-  - 'SHA-256 of that extraction: af90b8bddf7b5581fcc87b4cea19efd60252d7922132e33006d4da23636a814f'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 20227 bytes'
+  - 'SHA-256 of that extraction: 0687ac5b230ff8855eb45fb8024c18f588b7ee253dcf06d5effa141ca2656ce4'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1440,8 +1440,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16494 bytes'
-  - 'SHA-256 of that extraction: c80c758c0b1560a790b2192dd2f2faba17e9b87c89942cb012551405f8370a70'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 16692 bytes'
+  - 'SHA-256 of that extraction: 9f53e0e93d4051188498eae341d967162eb0d72cb75b33663f56d7493c1cb65f'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1508,8 +1508,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17142 bytes'
-  - 'SHA-256 of that extraction: 56ad8286baedbed31d72e0ef7cf0287513c9bc24cf58f8602bc7fe62dd2bcc72'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17288 bytes'
+  - 'SHA-256 of that extraction: 84efa3e91832b3926b4232aac26547fdebc23e92f458bd46a73ff1a5afbe03b7'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1581,8 +1581,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17771 bytes'
-  - 'SHA-256 of that extraction: 27a29c0c7d07e2c0485d5bbbe1fa70b96e0e35944ceb7db2cd4d61af1f77d437'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17760 bytes'
+  - 'SHA-256 of that extraction: 0698550674554f379752d7215a938cf4f8f1a41c1247c077aded2ed8a5da98ee'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1651,8 +1651,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17785 bytes'
-  - 'SHA-256 of that extraction: 65b7cd2086a4a306c938dd6cd4dd2448032b97f094f0e4811815fba675b89a6e'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 18680 bytes'
+  - 'SHA-256 of that extraction: 0ac69fb87186f9e4ff73b4b7c550fcb8b47ceba736c13c925adaf4a5cadb6bbd'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1785,8 +1785,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10198 bytes'
-  - 'SHA-256 of that extraction: 17811f1afe3e8d0fceeff8821ebbd611779b80c7a22eb8cb3d8d516c6ac5a7c0'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 10301 bytes'
+  - 'SHA-256 of that extraction: 5b7980fe30e9fced15b3c88133f834236d0309dc1f8966db9d0a9430b4fe8659'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1851,8 +1851,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6294 bytes'
-  - 'SHA-256 of that extraction: 34beda5a2fcde776ace154dc6af4873676b0f386215bb41616d352a07d2650b7'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6339 bytes'
+  - 'SHA-256 of that extraction: e85750c7fe8ac0248069f5d6ba00b814f420e6c794435e383845063ce0200955'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1918,8 +1918,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9385 bytes'
-  - 'SHA-256 of that extraction: 066c60abc7356224bf8f1c3f837c5cc3d5c6c52fcdfeddf4690afc776642a895'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 9765 bytes'
+  - 'SHA-256 of that extraction: f04b4124fb95344288c8b958a6e512af6fedd5bf22503c2e4f578fd11d9631fb'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -1984,8 +1984,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5499 bytes'
-  - 'SHA-256 of that extraction: efc2eb2e88be1d70db04c661662662045ffde5e490e1b2c9c64eae215d11a75e'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5712 bytes'
+  - 'SHA-256 of that extraction: 8c9bb2273f3e54ba8b1422a6f8d1c3bd1132497faa0ffd561038342a0c268326'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2053,8 +2053,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6487 bytes'
-  - 'SHA-256 of that extraction: 1467e12e0587d1dfc84bb9ed7c6af503f014930c3710ffb2905e87310e1e8f8c'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6633 bytes'
+  - 'SHA-256 of that extraction: 6f07ad2f2fbe56d8bd4c056bc1267d3911fba97ef82402d9e66a4873a7cc242a'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2121,8 +2121,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5325 bytes'
-  - 'SHA-256 of that extraction: bf0f2f2f0cd352841e71ec029af760584ae9b70213fe03ea50c510195cce643a'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5459 bytes'
+  - 'SHA-256 of that extraction: c476eba9b5ab339ec1d823ab0e005f77b9767e9c225ea5e8c73a193ea50b8b83'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2258,8 +2258,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 43009 bytes'
-  - 'SHA-256 of that extraction: 57b70c7e5140654d3965c40514524afc47d8d6577f41ac28ac782f2b1da2aded'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 42827 bytes'
+  - 'SHA-256 of that extraction: e9220c1208d64fa4363e8436ab321c6b80b6bc006adcf03560868c72c4ca2b4a'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2327,8 +2327,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36979 bytes'
-  - 'SHA-256 of that extraction: 3f1a63b41247ef2919b42e93e4653ef3d39875e470407bac740f424fa4c002b9'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 36907 bytes'
+  - 'SHA-256 of that extraction: 75e3f6f294db82e8008c0bf32c83b81da5ab0b475740c38ee62955053f863f10'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2405,8 +2405,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 57766 bytes'
-  - 'SHA-256 of that extraction: d6b7dde2ba47b490bdd0aab7c5f059da638d5cad273287564e9d983065e3647b'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 57532 bytes'
+  - 'SHA-256 of that extraction: 321e626fc72fb71dddf865860193b9d66fb36eae30b6a43c7d713e27443ff45f'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2474,8 +2474,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 49560 bytes'
-  - 'SHA-256 of that extraction: e0e2ed06711e577fbb7a7f05505daf23c7d8530ef6951b6cf58cdcbd08c3ecf9'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 49351 bytes'
+  - 'SHA-256 of that extraction: d1e2458c39037c9aa1dfbc3f97641e2e6b2c1dd2143447f40c142dacb6a8b623'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2540,8 +2540,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 51957 bytes'
-  - 'SHA-256 of that extraction: fc6213fdb2f564085641fc4c97f67989191699422ce204a42f876fa78dd6493a'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 51725 bytes'
+  - 'SHA-256 of that extraction: d64997b20867063089a23b42d44f6744a6537f158844e0a13f84670fd5f41110'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2609,8 +2609,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 39931 bytes'
-  - 'SHA-256 of that extraction: 045e2231457b80ee67fe07a1730e8f52483b9088e793faabf858ebfe3fd81f06'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 39797 bytes'
+  - 'SHA-256 of that extraction: 72a299f4d3d72b5945bc65f3e9bbdc4326a8a7090328b8f57fa8b80ad4c047ac'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2700,8 +2700,8 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: CTR-002
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17679 bytes'
-  - 'SHA-256 of that extraction: 1352d8f409995ce46e281f32ed12b6c61c1e9adc76ddc7f6eb899928fa145540'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17915 bytes'
+  - 'SHA-256 of that extraction: 73fa123d9fc610510f61690186844754735e128a2993c5298614184604b070a8'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2751,8 +2751,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 54319 bytes'
-  - 'SHA-256 of that extraction: a724b32a34e271da24b5cb151f6b281521a3e334f28710b382530f3fb0952d13'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 54043 bytes'
+  - 'SHA-256 of that extraction: 042255564c9916c4a933f0986ad8f98e36a495bdf1e35a956cdc0704a87991dc'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2816,8 +2816,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6742 bytes'
-  - 'SHA-256 of that extraction: e214eb5bae4d14896c39198ffe6c7597469d8a497e88e4c0e5a5b41d016fc2a6'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6887 bytes'
+  - 'SHA-256 of that extraction: ac910fe9e1374a4206179c58b8fba187b6c0e62e66e9c0cc1ffab85de93a91c8'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2896,8 +2896,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 82572 bytes'
-  - 'SHA-256 of that extraction: b2a2feafce94d222ff3012eeb64f70a7086738d050b9520ed08820dccc28f649'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 82314 bytes'
+  - 'SHA-256 of that extraction: 332dd0cff753968face6244a4c0fa44bd6812f121f99aa0ee41c34ded019a14f'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2972,8 +2972,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13286 bytes'
-  - 'SHA-256 of that extraction: 74bca04ab15a5cb785d02a3bed788fed3e9316b230440607e69a37d52028265d'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13324 bytes'
+  - 'SHA-256 of that extraction: f22714b0cc542a52acad67718a8247e141faed85c762e9343baf02c5c8e80b1c'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3048,8 +3048,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14191 bytes'
-  - 'SHA-256 of that extraction: f74d8a23dbdc8100ffc3217dfa791d63bb6be9cb00729edc6e0e2b067f3409ba'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14305 bytes'
+  - 'SHA-256 of that extraction: 698c44f0c57d7294eed8a9a34049ee729b4a334eda81d6da0da8ad2dfb287718'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3125,8 +3125,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13612 bytes'
-  - 'SHA-256 of that extraction: 0ddef968c4d5102d832dcea60f109ab5b4e01ca208053e4c930f08466cf42470'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13731 bytes'
+  - 'SHA-256 of that extraction: 94d6abb95dc8c637f91e2cb16d5a68323addc416bb961cef32c27477fb6a53d4'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3193,8 +3193,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13280 bytes'
-  - 'SHA-256 of that extraction: 38d58a4780cba42acd1952c67b3a7603c226c1ae171088a2babd961006b7a290'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13217 bytes'
+  - 'SHA-256 of that extraction: 927b57745409bb99c4a83013a84f86ba7a375f2811b03d5a8beb46dcaba453a2'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3264,8 +3264,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16347 bytes'
-  - 'SHA-256 of that extraction: 15bbf8fbbbace3eb88493cccc5ed86e0ade1bc43748ede30e89d62d6c94becb2'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 16351 bytes'
+  - 'SHA-256 of that extraction: 6fee14353c20e21d8ae1d38df31d3be2fc93a73161606fc17a7e45bd385881ff'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3330,8 +3330,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14017 bytes'
-  - 'SHA-256 of that extraction: 62e693e9d4f0543afef047e65fd64980c700d0df2b9741ab7bbc597fd23adbb4'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14012 bytes'
+  - 'SHA-256 of that extraction: f523e6354696e5ba637181f1ad7f1b60b54f11bb421ea39ac55cf7b9ede965a3'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3396,8 +3396,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13828 bytes'
-  - 'SHA-256 of that extraction: ab381134f7f954eb23461b4fbd667bee4eb0f10f290122dee49b0ab9f8a819f7'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14034 bytes'
+  - 'SHA-256 of that extraction: e0c85ea3c5567d43c35eaad32d90546e4738f34e06918a47488fd9766375b406'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3462,8 +3462,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10147 bytes'
-  - 'SHA-256 of that extraction: c0510294a3649903e15f6e546fdd840af4df972025a3594ae7f649b2688cf2ce'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 10163 bytes'
+  - 'SHA-256 of that extraction: 3c0080857a39aa14cf8e8e93f80674858e906a5e30e58d44dfdc944abfa8a02d'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3535,8 +3535,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13901 bytes'
-  - 'SHA-256 of that extraction: e0be79e175ec028768c6e5c890939a502598567d4b07437c1b62e531a8d9a032'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13892 bytes'
+  - 'SHA-256 of that extraction: b77124fc789087f297fb668547617c3d6d82f3b0e4c8fcaff93686684c62d097'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3601,8 +3601,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 12775 bytes'
-  - 'SHA-256 of that extraction: cc1789ce6143883ecd81b6fc2f8d19a68f4bc1ec3b3b0c418041a93aecc66368'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 12732 bytes'
+  - 'SHA-256 of that extraction: 93905c67c008c31d829ad1cf3b3b621ff699a84228df61cb2268a6d0cbfc83c1'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3672,8 +3672,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14780 bytes'
-  - 'SHA-256 of that extraction: 90f7956b5478107e253397e7be3aecfa175a0620a0a06c94c91a06b30f4cf499'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14839 bytes'
+  - 'SHA-256 of that extraction: e8ea69e1e19219ed4d06733b191f91aa180a28590e93cbc7ead58d053a860fa8'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3737,8 +3737,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 11974 bytes'
-  - 'SHA-256 of that extraction: 52c4d2da9d132b5843529e123e35d2933c6e56a55cc22ea011ac0abbc89d2fda'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 12113 bytes'
+  - 'SHA-256 of that extraction: 4c5f96f002762200a18fc8eff864d85157ef5d12487e6b044adc51e3fef5641a'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3805,8 +3805,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8210 bytes'
-  - 'SHA-256 of that extraction: a00a7b40b0434dbba4c3e6bcdded26e1104ba4ee826373000070138dd8b318e4'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 8181 bytes'
+  - 'SHA-256 of that extraction: fe0049626ca311dcbc4de7604d0a831f59c6451167afbe7d628bdec2b9d422be'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -3870,8 +3870,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6661 bytes'
-  - 'SHA-256 of that extraction: d7e15f174ad3cd90fa915117e64f7f9d8e5a31eb89ebc265fb0cb6fe5af0aed8'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6935 bytes'
+  - 'SHA-256 of that extraction: e059fe013991b95541b0d4c856ffd747f2abeabe98770b36d508f14e53d9dd47'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
