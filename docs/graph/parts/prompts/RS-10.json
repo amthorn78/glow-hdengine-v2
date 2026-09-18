@@ -43,7 +43,7 @@
         {
           "applicable_states": [],
           "branch_id": "in_scope_native_return",
-          "condition": "observed ordinary in-scope correction needs no rescope proposal or formal RS-20 decision; exact selected existing repair owner/session and complete native intake are resolved under unchanged authority; no PR-50, merge, PF10 drain or manual-gate bypass",
+          "condition": "observed ordinary in-scope correction needs no rescope proposal or formal RS-20 decision; exact selected existing repair owner/session and complete native intake are resolved under unchanged authority; no PR-50, merge or manual-gate bypass",
           "next_prompt_handoff_count": 1,
           "public_result": true,
           "route_kind": "NATIVE_OWNER_RETURN",
@@ -106,7 +106,6 @@
     "output_artifacts": [
       "RESCOPE_PROPOSAL"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81f99430fcb7c24fe8af",
       "release": "GCFPE-20260913.1",

@@ -140,7 +140,6 @@
     "output_artifacts": [
       "CRD_SPECIFICATION / SPECIFICATION_DELTA"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81d19536ff2d6eac93dc",
       "release": "GCFPE-20260913.1",

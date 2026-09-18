@@ -175,7 +175,6 @@
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": null,
     "predecessor_union_destinations": [],
     "r1_mapping": "GCF-17",

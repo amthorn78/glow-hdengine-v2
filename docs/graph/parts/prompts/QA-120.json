@@ -219,7 +219,6 @@
     "output_artifacts": [
       "QA_REPORT / QA_RCA / QA_INTERIM_STATUS"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81a99a28d8c1c17aa861",
       "release": "GCFPE-20260913.1",

@@ -51,7 +51,7 @@
             "SOURCE_RESOLUTION_ERROR"
           ],
           "branch_id": "source_resolution_error",
-          "condition": "unique current controlled PF10 Markdown unresolved; make no drain inference",
+          "condition": "unique current controlled PF10 Markdown unresolved; make no inference from the failure",
           "next_prompt_handoff_count": 0,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -65,10 +65,10 @@
         },
         {
           "applicable_states": [
-            "MANUAL_DRAIN_REQUIRED"
+            "PRODUCT_OWNER_DECISION_REQUIRED"
           ],
-          "branch_id": "manual_drain_required",
-          "condition": "current PF10 read; exact anchor absent",
+          "branch_id": "pf10_overlay_mismatch_terminal",
+          "condition": "current PF10 carries related content but the decision, immutable base, or normalized approved delta differs; stop terminally, preserve both sources, and state the mismatch",
           "next_prompt_handoff_count": 0,
           "public_result": true,
           "route_kind": "NATIVE_RESULT",
@@ -77,24 +77,7 @@
             "path": "candidate/prompts/d/RS-40.md",
             "section": "Required result and routing"
           },
-          "state": "MANUAL_DRAIN_REQUIRED",
-          "terminal_for_invocation": true
-        },
-        {
-          "applicable_states": [
-            "MANUAL_DRAIN_MISMATCH"
-          ],
-          "branch_id": "manual_drain_mismatch",
-          "condition": "related content differs in decision/base/normalized delta or a later conflicting overlay exists",
-          "next_prompt_handoff_count": 0,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/d/RS-40.md",
-            "section": "Required result and routing"
-          },
-          "state": "MANUAL_DRAIN_MISMATCH",
+          "state": "PRODUCT_OWNER_DECISION_REQUIRED",
           "terminal_for_invocation": true
         },
         {
@@ -116,10 +99,8 @@
         }
       ],
       "state_predicates": [
-        "SOURCE_RESOLUTION_ERROR",
-        "MANUAL_DRAIN_REQUIRED",
-        "MANUAL_DRAIN_MISMATCH",
-        "PRODUCT_OWNER_DECISION_REQUIRED"
+        "PRODUCT_OWNER_DECISION_REQUIRED",
+        "SOURCE_RESOLUTION_ERROR"
       ],
       "to": "NATHAN_TERMINAL_RETURN",
       "to_kind": "boundary",
@@ -270,7 +251,6 @@
     "output_artifacts": [
       "PR_IMPLEMENTATION_RESULT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb815e98f5ea7b605b70a3",
       "release": "GCFPE-20260913.1",
@@ -286,9 +266,6 @@
     "receiving_role": "You are the same dedicated PR engineering session for the exact suspended work unit.",
     "result_states": [
       "SOURCE_RESOLUTION_ERROR",
-      "MANUAL_DRAIN_REQUIRED",
-      "MANUAL_DRAIN_MISMATCH",
-      "DRAIN_VERIFIED",
       "PR_CANDIDATE_PUBLISHED",
       "MERGE_PENDING",
       "RESCOPE_PENDING",
@@ -302,9 +279,7 @@
   },
   "state_route_order": [
     "source_resolution_error",
-    "manual_drain_required",
-    "manual_drain_mismatch",
-    "drain_verified",
+    "pf10_overlay_mismatch_terminal",
     "pr_candidate_published",
     "merge_pending",
     "rescope_pending",
@@ -313,26 +288,6 @@
     "remote_evidence_pending",
     "product_owner_decision_required"
   ],
-  "state_routes_extra": [
-    {
-      "applicable_states": [
-        "DRAIN_VERIFIED"
-      ],
-      "branch_id": "drain_verified",
-      "condition": "exact anchor and normalized delta match with no later conflicting overlay; internal gate only; immediately resume recorded eligible phase",
-      "destinations": [],
-      "next_prompt_handoff_count": null,
-      "notes": null,
-      "public_result": false,
-      "route_kind": "NATIVE_RESULT",
-      "route_steps": [],
-      "source_evidence": {
-        "path": "candidate/prompts/d/RS-40.md",
-        "section": "Required result and routing"
-      },
-      "state": "DRAIN_VERIFIED",
-      "terminal_for_invocation": false
-    }
-  ],
+  "state_routes_extra": [],
   "state_vocabularies": {}
 }

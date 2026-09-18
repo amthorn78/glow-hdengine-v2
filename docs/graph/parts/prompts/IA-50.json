@@ -213,7 +213,6 @@
     "output_artifacts": [
       "IA_RECOVERY_SEED"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8107a012f68e6b8fd98c",
       "release": "GCFPE-20260913.1",

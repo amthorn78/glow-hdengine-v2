@@ -77,7 +77,6 @@
     "output_artifacts": [
       "QA_ESCALATION_REPORT"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81dca03dc24874692130",
       "release": "GCFPE-20260913.1",

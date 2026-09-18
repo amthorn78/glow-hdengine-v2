@@ -134,38 +134,6 @@
       "route_branches": [
         {
           "applicable_states": [
-            "DELTA_APPROVE"
-          ],
-          "branch_id": "delta_approve",
-          "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; approve only the standalone delta and never replace the Plan. Create or reuse exactly one qualifying PF10 addendum under the stable addendum_id and normalized approved-delta digest idempotency rule, then return terminally to Nathan for manual drain. No affected continuation runs in this invocation and no continuation block is emitted.",
-          "next_prompt_handoff_count": 0,
-          "public_result": true,
-          "route_kind": "TERMINAL_MANUAL_BOUNDARY",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/b/IA-30.md",
-            "section": "Required result and routing"
-          },
-          "state": "DELTA_APPROVE",
-          "terminal_for_invocation": true
-        }
-      ],
-      "state_predicates": [
-        "DELTA_APPROVE"
-      ],
-      "to": "NATHAN_MANUAL_PF10_DRAIN",
-      "to_kind": "boundary",
-      "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
-    },
-    {
-      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
-      "automatic": false,
-      "from": "IA-30",
-      "from_kind": "prompt",
-      "immediate": true,
-      "route_branches": [
-        {
-          "applicable_states": [
             "PRODUCT_OWNER_DECISION_REQUIRED"
           ],
           "branch_id": "product_owner_decision_required",
@@ -184,7 +152,7 @@
         {
           "applicable_states": [],
           "branch_id": "plan_review_terminal",
-          "condition": "source, authority, or manual-continuation identity blocker; SOURCE_RESOLUTION_ERROR makes no inference about human drainage.",
+          "condition": "source, authority, or manual-continuation identity blocker; SOURCE_RESOLUTION_ERROR makes no inference beyond the failure itself.",
           "next_prompt_handoff_count": 0,
           "public_result": true,
           "route_kind": "TERMINAL_EXCEPTION",
@@ -203,6 +171,38 @@
       "to": "NATHAN_TERMINAL_RETURN",
       "to_kind": "boundary",
       "transport": "COMPLETE_NEXT_PROMPT_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "IA-30",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DELTA_APPROVE"
+          ],
+          "branch_id": "plan_delta_return",
+          "condition": "REVIEW_MODE=MATERIAL_PLAN_DELTA_REVIEW; the exact return_point receiver recorded by the approved Plan delta reads current PF10; this is not an RS-40 rescope route",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "TERMINAL_MANUAL_BOUNDARY",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/b/IA-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DELTA_APPROVE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
     },
     {
       "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
@@ -249,7 +249,6 @@
     "output_artifacts": [
       "IMPLEMENTATION_PLAN_REVIEW / APPROVED_BASE_CHANGE_ASSESSMENT / PLAN_DELTA_REDLINE / MATERIAL_PLAN_DELTA_REVIEW"
     ],
-    "pf10_addendum_role": "QUALIFYING_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81029c49c21113701638",
       "release": "GCFPE-20260913.1",
@@ -282,7 +281,7 @@
     "initial_deny",
     "approved_base_plan_delta_redline",
     "delta_deny",
-    "delta_approve",
+    "plan_delta_return",
     "change_not_substantiated",
     "product_owner_decision_required",
     "wrong_native_lane",

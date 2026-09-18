@@ -114,38 +114,6 @@
       "immediate": true,
       "route_branches": [
         {
-          "applicable_states": [
-            "DELTA_APPROVE"
-          ],
-          "branch_id": "delta_approve",
-          "condition": "material delta to an already approved base; exactly one addendum; reuse an existing read-back artifact for the same stable addendum_id and approved-delta digest; never duplicate; terminal for this invocation pending Nathan manual drain",
-          "next_prompt_handoff_count": 0,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/a/CF-E-30.md",
-            "section": "Required result and routing"
-          },
-          "state": "DELTA_APPROVE",
-          "terminal_for_invocation": true
-        }
-      ],
-      "state_predicates": [
-        "DELTA_APPROVE"
-      ],
-      "to": "NATHAN_MANUAL_PF10_DRAIN",
-      "to_kind": "boundary",
-      "transport": "MANUAL_PRODUCT_OWNER_BOUNDARY"
-    },
-    {
-      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
-      "automatic": false,
-      "from": "CF-E-30",
-      "from_kind": "prompt",
-      "immediate": true,
-      "route_branches": [
-        {
           "applicable_states": [],
           "branch_id": "review_terminal",
           "condition": "missing source, authority, or review mode",
@@ -195,6 +163,38 @@
       "to": "NATHAN_TERMINAL_RETURN",
       "to_kind": "boundary",
       "transport": "TERMINAL_RETURN_NO_HANDOFF"
+    },
+    {
+      "actual_branch_cardinality": "EXACTLY_ONE_BRANCH_PER_ACTUAL_RESULT",
+      "automatic": false,
+      "from": "CF-E-30",
+      "from_kind": "prompt",
+      "immediate": false,
+      "route_branches": [
+        {
+          "applicable_states": [
+            "DELTA_APPROVE"
+          ],
+          "branch_id": "epic_specification_delta_return",
+          "condition": "the exact affected native receiver recorded by the approved Epic Specification delta reads current PF10; this is not an RS-40 rescope route",
+          "next_prompt_handoff_count": 1,
+          "public_result": true,
+          "route_kind": "NATIVE_RESULT",
+          "route_steps": [],
+          "source_evidence": {
+            "path": "candidate/prompts/a/CF-E-30.md",
+            "section": "Required result and routing"
+          },
+          "state": "DELTA_APPROVE",
+          "terminal_for_invocation": true
+        }
+      ],
+      "state_predicates": [
+        "DELTA_APPROVE"
+      ],
+      "to": "ORIGINAL_NATIVE_STAGE",
+      "to_kind": "boundary",
+      "transport": "MANUAL_PRODUCT_OWNER_INVOCATION"
     }
   ],
   "id": "CF-E-30",
@@ -210,7 +210,6 @@
       "INITIAL_SPECIFICATION_REVIEW / SPECIFICATION_CORRECTION_ASSESSMENT / SPECIFICATION_DELTA_REVIEW",
       "CORRECTION_REDLINE"
     ],
-    "pf10_addendum_role": "QUALIFYING_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb817c918ac77bad1bfc97",
       "release": "GCFPE-20260913.1",
@@ -239,7 +238,7 @@
     "initial_approve",
     "initial_deny",
     "approved_base_correction_redline",
-    "delta_approve",
+    "epic_specification_delta_return",
     "delta_deny",
     "review_terminal",
     "correction_not_substantiated_terminal",

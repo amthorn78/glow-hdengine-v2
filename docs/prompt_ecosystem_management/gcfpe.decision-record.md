@@ -143,30 +143,56 @@ with it:
 ### The surface that actually needs repair
 
 Separating the retired PF10 addendum lifecycle from legitimate canon drainage — the
-distinction in D6's *What must survive* — narrows it further:
+distinction in D6's *What must survive* — classifies every occurrence by **what the
+word is doing in that sentence**, not by where it sits:
 
 | | Distinct passages | Occurrences |
 |---|---|---|
-| **Require rewrite** — retired lifecycle present | 93 | **218** |
-| **Require no edit** | 78 | **149** |
-| …of which legitimate canon drainage | — | **49** |
+| **Require rewrite** — retired lifecycle present | **142** | **280** |
+| **Legitimate canon drainage** — preserve unchanged | 18 | **74** |
+| **`CL-20` title references** — carried by the rename, not the sweep | 11 | 13 |
 
-The two largest boilerplate families, 36 occurrences between them, need no change at
-all: `CANON_CONFLICT_REGISTER`'s *permanent drainage target/owner* and *permanent Canon
-drainage ownership* are the Canon-maintenance process, not the addendum machine. A
-lexical sweep for the word would have deleted both.
+> ⚠️ **Supersedes the earlier figure of 93 passages / 218 occurrences** recorded in an
+> earlier revision of this document. That split was produced by a heuristic that
+> bucketed a passage as no-edit whenever its drain-word sat near register or ownership
+> language. Reading every occurrence in context moved **49 families / 62 occurrences**
+> from no-edit to rewrite. The mis-bucketed passages fall into two kinds:
+>
+> - passages that **gate on the retired lifecycle** — *"only after verified drainage
+>   does RS-40 resume"*, *"its exact manual-drain prerequisite; PR-20 may not rely on it
+>   before verified drain"*, `drain_verification_anchor`, `DRAIN_VERIFIED`. These are the
+>   machine itself and could not be left standing.
+> - **stale negative authority** — *"this prompt does not implement, plan, run QA, merge,
+>   drain PF10, or rewrite an approved base"*. Prohibiting an action that no longer
+>   exists is harmless at run time but tells a future reader the machine is still there,
+>   which is precisely what D6 retires. These are single list-item deletions; the rest
+>   of each prohibition survives.
 
-Two passages in the no-edit bucket are in scope for other rulings rather than this one:
-the `CL-20` title reference belongs to the rename, and the
-`Glow / Core Docs / PFCanon` resolution path belongs to D1.
+The 18 preserved families are the Canon-maintenance process, not the addendum machine:
+`CANON_CONFLICT_REGISTER`'s *permanent drainage target/owner*, *permanent Canon drainage
+ownership*, and *drain PF Canon* in negative-authority lists. A lexical sweep for the
+word would have deleted all of them.
 
-**The repair is a rewrite, not a removal.** An attempt to classify the 30 families into
-"pure drainage" and "mixed with surviving behaviour" found that nearly every family
-carries surviving behaviour — the R1 workflow, PFCanon resolution, approved-base
-immutability, the D4 producer rule, canon-conflict handling, PR routing, handoff and
-terminal rules are all interleaved with drainage clauses in the same sentences.
-Lexical deletion of the word would take functioning behaviour with it. Each family
-gets a drafted rewrite, reviewed before it is applied at scale.
+**The repair is a rewrite, not a removal.** Nearly every family carries surviving
+behaviour — the R1 workflow, PFCanon resolution, approved-base immutability, the D4
+producer rule, canon-conflict handling, PR routing, handoff and terminal rules are all
+interleaved with drainage clauses in the same sentences. Lexical deletion of the word
+would take functioning behaviour with it. Three moves cover the whole surface:
+
+1. **Delete** the drainage clause from an otherwise valid surviving instruction.
+2. **Replace an obsolete drainage gate** with the qualifying approval itself, or with
+   reading current PF10 where current PF10 is what the step actually needs.
+3. **Replace a drainage enum or status** with a recorded provenance fact where
+   historical evidence must be preserved, in these words: *"Record the PF10 version
+   actually read as provenance; it is evidence of what was read, never a gate on later
+   work."*
+
+Sixteen passages were whole-line or whole-block deletions — the `status`,
+`canonicality`, `drain_owner` and `drain_verification_anchor` fields of the addendum
+contract, and the four-value drain-verification enums. Where deleting an enum left its
+lead-in sentence introducing nothing, the lead-in was folded into prose rather than
+left dangling; where it left a bullet with no list, the bullet was folded in or removed.
+No replacement status token, enum or gate was introduced anywhere.
 
 ## Execution decisions
 

@@ -147,7 +147,6 @@
     "output_artifacts": [
       "PF09_MAINTENANCE_CANDIDATE"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8148a9cad59ae5bf98ae",
       "release": "GCFPE-20260913.1",

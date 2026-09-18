@@ -114,7 +114,6 @@
     "output_artifacts": [
       "EPIC_SPECIFICATION"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81b084acde09866a52db",
       "release": "GCFPE-20260913.1",

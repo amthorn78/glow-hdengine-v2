@@ -146,7 +146,6 @@
     "output_artifacts": [
       "IMPLEMENTATION_PLAN / MATERIAL_PLAN_DELTA"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb819d920ac5f14a042d08",
       "release": "GCFPE-20260913.1",

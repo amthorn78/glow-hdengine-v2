@@ -110,7 +110,6 @@
     "output_artifacts": [
       "LIVE_QA_GUIDE"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81e4ac5fe5de703e5455",
       "release": "GCFPE-20260913.1",

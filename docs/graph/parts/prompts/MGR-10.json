@@ -246,7 +246,6 @@
     "output_artifacts": [
       "FLOW_PROGRESS"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb81c585d2f70e28f1c2bf",
       "release": "GCFPE-20260913.1",

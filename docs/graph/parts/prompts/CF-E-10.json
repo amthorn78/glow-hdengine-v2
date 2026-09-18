@@ -180,7 +180,6 @@
     "output_artifacts": [
       "SPECIFICATION_KICKOFF"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb811f927adfc2243861ff",
       "release": "GCFPE-20260913.1",

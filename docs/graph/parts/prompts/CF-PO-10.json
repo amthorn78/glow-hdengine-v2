@@ -110,7 +110,6 @@
     "output_artifacts": [
       "CHANGE_CLASS_SELECTION"
     ],
-    "pf10_addendum_role": "NON_PRODUCER",
     "predecessor": {
       "notion_page_id": "3da4590a05eb8175b86cdfc3d7fc40c7",
       "release": "GCFPE-20260913.1",
