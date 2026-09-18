@@ -216,10 +216,12 @@ interface closure across all 55, isolated readback of everything changed.
 Product Owner promotion decision packet. **One Product Owner gate remains** — approving
 promotion. The pass authorization was given and used on 2026-09-18.
 
-**5. Outstanding, small but real:** the graph **assembly script is not in the repository**, so
-the proof token cannot be reproduced from the repository alone. The gate verified the graph
-invariants directly from `docs/graph/parts/` instead, which is stronger, but committing a
-builder would close the gap.
+**5. Nothing outstanding on the graph.** The proof token was reproduced at the gate by
+`scripts/graph_parts.py build docs/graph/parts`, which ships with the `glow-graph-contract`
+skill: `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…`, validation
+PASS, no orphan-route warning. **Before assuming a tool is missing, read
+`authoritative-surfaces.md` and the skill list — reusable behaviour lives in skills, data lives
+in the repository, and that is the design.**
 
 ## Known risks
 

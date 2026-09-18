@@ -185,11 +185,23 @@ text (*"Preserve the permanent Canon drainage target and owner"*), which must su
 **None.** No finding was carried forward unresolved and no Product Owner decision was required:
 every finding resolved from evidence in the corpus, the graph, or a settled ruling.
 
-## Known limitation, recorded not hidden
+## Graph rebuild — proof token reproduced
 
-The graph **assembly script is not in the repository**. The parts are committed and the derived
-graph correctly is not, but nothing commits the rule that turns parts into the assembled
-contract, so the proof token `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256
-3b54d620…` cannot be reproduced from the repository alone. This gate therefore verified the
-graph invariants **directly from the parts**, which is the stronger check. Committing a builder
-is the remaining work to make the token reproducible.
+The graph was rebuilt from the committed parts with `scripts/graph_parts.py build`, which
+ships with the `glow-graph-contract` skill:
+
+    build: 55 nodes, 227 edges, 55 state_routes
+           embedded JSON 571493 bytes  sha256 3b54d6207126e0a99b7b98cd660a2bf43245b2a049f498ebbd8cc9891e14b09d
+           validation PASS
+
+**The proof token reproduces exactly**, and the builder reported no orphan-route warning — the
+long-standing `RS-40.drain_verified` orphan is confirmed closed. The assembled graph was built
+to the session scratchpad and is not committed, per D7.
+
+> An earlier revision of this report claimed the assembly script was absent from the
+> repository and that the token could not be reproduced. That was wrong. The script is shipped
+> with the `glow-graph-contract` skill — by design, because it is reusable behaviour rather
+> than data — and `authoritative-surfaces.md` lists that skill. The error came from searching
+> only the repository tree instead of reading the document that says where things live. It is
+> the same failure this ecosystem keeps producing: judging by what a search returned rather
+> than establishing what is actually there.

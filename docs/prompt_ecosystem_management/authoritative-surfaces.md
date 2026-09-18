@@ -30,6 +30,25 @@ the repository wins and the Notion page is the thing to correct.
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.
 
+**How to rebuild — this is the whole procedure, do not go looking for it.**
+
+```
+python3 scripts/graph_parts.py build docs/graph/parts "$SCRATCH/graph.md"
+```
+
+`graph_parts.py` ships with the **`glow-graph-contract` skill**, not as a tracked file in this
+repository. That is deliberate: reusable behaviour lives in skills, maintained data lives in
+the repository. Verified working 2026-09-18, output:
+
+```
+build: 55 nodes, 227 edges, 55 state_routes
+       embedded JSON 571493 bytes  sha256 3b54d6207126e0a99b7b98cd660a2bf43245b2a049f498ebbd8cc9891e14b09d
+       validation PASS
+```
+
+Build to the scratchpad, never into `docs/graph/`. The assembled graph is derived output and is
+never committed. **A session that cannot find the builder has not lost it — it is in the skill.**
+
 ## Repository — persistent authority
 
 | Path | Role | Status |
