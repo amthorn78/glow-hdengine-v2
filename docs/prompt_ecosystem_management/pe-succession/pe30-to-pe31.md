@@ -212,3 +212,32 @@ required direct Drive link · PFCanon resolved from Drive.
 **And the converse, equally important:** never delete a PF09 row, a canon-conflict or ADR
 record, a `NEW_CANON` or `CANON_RECONCILIATION` classification, or a permanent Canon
 drainage target and owner. Those are legitimate Canon disposition and must survive.
+
+## PE31's first actions, in order
+
+1. **Read three documents and nothing else to orient**: this record,
+   `authoritative-surfaces.md`, `gcfpe.decision-record.md`. Then
+   `execution-and-delegation-model.md` before delegating anything.
+2. **Close out `reconciliation-backlog.md`.** Most of it was applied on 2026-09-18; what
+   remains is listed there. Re-run the same two isolated audits to confirm, rather than
+   trusting this record.
+3. **Run the Drive → repository storage pass** across the 44 + 39 prompts. One
+   controlled cross-cutting pass. Converge on the Batch 1 wording; do not invent new
+   phrasing. Verify by isolated readback, comparing centrally.
+4. **Verify Batch 2 against the merged bodies** and close it if clean.
+5. **Batch 3**, then 4–6.
+
+## How to work
+
+Coordinate; do not personally grind. Precompute discovery so coverage is arithmetic
+rather than trust, hand each agent an exact scope and the settled rules, require a
+structured return, and validate every return centrally. Isolate any agent whose output
+will be checked against an expectation from that expectation.
+
+Measure every decision against one standard: **does this make the ecosystem simpler,
+more deterministic, more automatable, and less likely to stop an agent from completing
+legitimate work?**
+
+Ask Nathan only when proceeding under any assumption would be unsafe or would waste the
+work if wrong. He has been explicit that settled rules should not come back for repeated
+approval.
