@@ -1,20 +1,48 @@
 ---
-artifact_type: GCFPE_ORCHESTRATION_STANDARD
-artifact_version: "1.0"
+artifact_type: PROMPT_ECOSYSTEM_EXECUTION_AND_DELEGATION_MODEL
+artifact_version: "2.0"
 created_date: 2026-09-17
-status: STANDARD
+status: BINDING
 authority: Product Owner decision, 2026-09-17
 governing_plan: GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1, §6B
 mechanism: IN_SESSION_SUBAGENTS
 model: opus
 pilot_phase: 2
-promotion_gate: Phase 3 proceeds on this standard only if the Phase 2 pilot meets §6
+pilot_outcome: PASSED — adopted as the standing execution model
+last_revised: 2026-09-18
+baseline: main @ 3c0b1fa (PR #415)
 ---
 
-# GCFPE parallel execution standard
+# Execution and delegation model
 
-How parallel work runs in this repair. Adopted as the operating standard, not a
-Phase 2 expedient. Piloted at Phase 2 against the acceptance criteria in §6.
+How work is divided in this prompt ecosystem. Piloted at Phase 2, then run at scale
+for the cross-cutting drainage removal across all 55 prompts. **Adopted as the
+standing model.**
+
+## 0. The coordinating session's role
+
+The session holding this work is the **coordinator, integrator and decision owner**.
+It does not personally perform every large analysis or repetitive operation.
+
+The coordinator keeps, and never delegates:
+
+- defining the governing rules a task runs under;
+- assigning exact scopes;
+- choosing the worker and the return format;
+- reconciling contradictions between workers;
+- integrating results into the record;
+- protecting settled architecture;
+- deciding when Product Owner input is genuinely necessary.
+
+The coordinator delegates bounded work with an exact scope and a deterministic
+return format: large corpus reviews, batch verification, repetitive prompt
+inspection, consistency analysis, documentation reconciliation, structured diff
+review, bounded semantic classification, cross-file comparison.
+
+**A subagent must never invent policy, reinterpret a settled ruling, or introduce a
+competing architecture.** Hand every agent the settled rules it must work under and
+say plainly that its job is to apply them, not to revisit them. An agent that
+reports a ruling looks wrong should say so and stop, not act on its own reading.
 
 ## 1. Mechanism — in-session subagents
 
@@ -152,3 +180,41 @@ A single throwaway agent against one prompt is run as a smoke test first.
 If Notion proves unreachable from a subagent, the design still holds: the
 coordinator fetches the prompt bodies and passes them as input, which §2 already
 half-requires.
+
+
+## 7. Verification must be isolated from the expected answer
+
+Learned the hard way on 2026-09-18, and binding.
+
+A verification pass was run by agents asked to fetch each repaired prompt back and
+save it for comparison. One agent, trying to be helpful, **reconciled what it fetched
+against the expected baseline** and corrected a transcription slip before writing its
+file. Its output then matched the baseline — necessarily, because the baseline had
+been used to produce it. A match obtained that way proves nothing.
+
+The whole pass was discarded and redone under hard isolation:
+
+- each agent could read **only** its own input manifest, and was explicitly forbidden
+  from opening the expected-result file, the applied-edit files, or any sibling's
+  output;
+- extraction had to be **programmatic**, by an exact documented slice, never retyped
+  or proofread;
+- comparison against the expectation happened **only in the coordinator**, after the
+  fact.
+
+The rule: **a worker that produces evidence must not be able to see the answer that
+evidence will be checked against.** When a subagent's output will be compared to an
+expectation, isolate it from that expectation and do the comparison centrally.
+
+## 8. What the coordinator validates on receipt
+
+Never accept a structured return at face value. Validate, centrally, that:
+
+- the returned set equals the assigned set exactly, with no additions or omissions;
+- every claimed change actually differs from its input;
+- no forbidden token, state or vocabulary survives in any returned text;
+- no *new* controlled token was introduced that did not exist in the input;
+- every identifier, route and rule the input carried still appears in the output.
+
+This caught real defects on every run it was applied to, including in the
+coordinator's own authored work.

@@ -126,6 +126,104 @@ with it:
 - current PF10 as execution authority;
 - any unrelated functional requirement in the same clause.
 
+## D7 — The repository is the storage authority; Drive is not one at all
+
+Ruled 2026-09-18, strengthening the 2026-09-17 repository-first decision.
+
+**The repository is the persistent storage and versioning authority for this prompt
+ecosystem. Notion is the operational and indexing layer. Google Drive is not a storage
+authority at all** — not a default, not a fallback, not a place canon is resolved from.
+
+Consequences:
+
+- `Glow / Ephemeral Planning Files` is removed as an artifact destination; artifacts go
+  to `docs/ephemeral/`, referenced by repository path.
+- Direct-Drive-link requirements are removed; a repository path replaces the link.
+- PFCanon is resolved from `docs/pfcanon/`, not by walking Drive folders.
+- One conditional sentence survives: *"Google Drive is used only where Nathan directs a
+  specific file there."* That is an escape hatch for a file he asks for, not an
+  authority.
+- Persistent ecosystem-management infrastructure lives in
+  `docs/prompt_ecosystem_management/` — the fourth open repository path.
+
+**Derived output is never committed.** The assembled graph contract is built from
+`docs/graph/parts/` on demand and represented downstream by its proof token. The
+committed copy at `docs/ephemeral/gcfpe.r20260914-1.graph-contract.md` was removed on
+2026-09-18: it had drifted from its source and still carried the retired drainage
+machinery, so a session reading it would have rebuilt exactly what the repair retired.
+
+**Not yet applied to prompt behaviour.** 44 of 55 prompts still name Drive for artifact
+storage and 39 still resolve PFCanon through Drive. That is the next cross-cutting pass.
+
+## D8 — No mandatory post-addendum check, and no replacement for it
+
+Ruled 2026-09-18.
+
+The original intent was always simple: a qualifying producer creates the addendum; on
+the next turn PF10 is current; nothing ever blocks later work on an addendum transition
+state.
+
+The 2026-09-17 mandate retired the four-state drain machine but kept **one** mandatory
+confirmation check in its place. That check was itself machinery — another step, another
+way to stop, and it contradicted the same section's rule that *an agent may not litigate
+a Product Owner action.* The prompts had already resolved the contradiction in favour of
+not checking.
+
+**The mandatory check is struck.** PF10 is the canonical authority throughout the
+system, so a later prompt resolves and reads current PF10 as part of its normal job and
+acts on what it finds. If that read happens to show the expected reference, nothing
+further is required or recorded. There is no confirmation step, no separate artifact, no
+status, no gate, no validation procedure. Where a record must show what it read, it
+records the PF10 version actually read **as provenance — evidence, never a gate**.
+
+The interim `pf10_reference_visibility_check` and its `PF10_REFERENCE_VISIBILITY`
+vocabulary are removed from the graph with it.
+
+**The standard for any future rule of this kind:** does it make the ecosystem simpler,
+more deterministic, more automatable, and less likely to stop an agent from completing
+legitimate work? A rule that fails that test does not earn its place.
+
+## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
+
+Ruled 2026-09-18.
+
+`pf10_addendum_contract.forbidden_fields` keeps its three drainage entries as an active
+guard against reintroducing the retired fields. **That prohibition is strictly scoped to
+the PF10 Build Notes Addendum lifecycle.**
+
+It places no restriction on Canon disposition. These remain legitimate and must be
+preserved intact:
+
+- canon-conflict and ADR records;
+- `NEW_CANON` and `CANON_RECONCILIATION` classifications;
+- the permanent Canon drainage target and owner;
+- the appropriate Canon target and responsible destination for an approved change;
+- **PF09 rows identifying where an approved change must ultimately land in PF Canon.**
+
+**Interpret by function, never by the word.** A validator must not reject a field because
+its name or value contains "drain". Verified against the repaired bodies before this was
+recorded: PF09 references, canon-conflict registers, `NEW_CANON`, `CANON_RECONCILIATION`,
+permanent drainage target/owner, CRD candidates and ADR references all survive the
+drainage sweep at counts identical to the pre-repair bodies.
+
+## D10 — Batch 2's recorded blocker is obsolete
+
+Ruled 2026-09-18.
+
+Batch 2 was held at `BATCH_2_BLOCKED` on: *"Drive has no content-write for an existing
+file ID, so the synchronized graph, the rebound control copy and report v1.1 cannot be
+persisted."*
+
+That blocker is **structurally dead**, not merely stale. The graph is no longer a Drive
+file — it is held as parts in the repository and the assembled artifact is deliberately
+never persisted. Storage authority is the repository.
+
+A batch status is not preserved for its own sake. Batch 2 needs a bounded current-state
+verification against the merged bodies, not a re-run: is the blocker obsolete, are there
+remaining actual defects under current rules, do its prompts fulfil their contracts. If
+clean, it closes. Work is not manufactured because a batch was historically marked
+blocked.
+
 ## Repair scope — measured 2026-09-18
 
 | | |

@@ -53,6 +53,15 @@ alongside the other documentation paths — because nothing here affects the app
 build or test surface. `epic-closeout-validation.yml` is `workflow_dispatch` only and
 needs no exclusion.
 
+**Three places have to agree, and they did not.** `paths-ignore` only skips the workflow
+when *every* changed file matches it; any other file in the same diff runs the job, and
+the job then reaches two checkers that keep their own path lists:
+`ci/checks/classify_ci_changes.py` raised `CI_CHANGE_SURFACE_UNCLASSIFIED` on an
+unrecognised documentation path and killed the run before a single test executed, and
+`ci/checks/check_direct_db_contract.py` read governance documents as source. Both now
+recognise the four documentation paths. **Adding a fifth documentation path means
+updating all three.**
+
 **Excluded from application CI is not exempt from validation.** Prompt-ecosystem
 validation — registry structure, prompt inventory consistency, controlled values,
 reference integrity, release binding, drift — is a separate concern with a separate
@@ -71,5 +80,8 @@ the application's.
 
 | File | What it is |
 |---|---|
+| `authoritative-surfaces.md` | Where the persistent truth lives — repository paths, Notion pages, release baseline. **Start here.** |
 | `gcfpe.decision-record.md` | Product Owner decisions governing the prompt ecosystem, with their consequences |
 | `project-prompt-contract-registry.md` | The approved machine-readable per-prompt contract registry |
+| `execution-and-delegation-model.md` | How work is divided: the coordinator's role, what may be delegated, the reporting contract, and verification isolation |
+| `pe-succession/` | Session succession records, newest last |
