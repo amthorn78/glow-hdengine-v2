@@ -1,8 +1,8 @@
 ---
 artifact_type: GCFPE_STORAGE_ARCHITECTURE_REQUIREMENT
-artifact_version: "1.1"
+artifact_version: "2.0"
 created_date: 2026-09-17
-last_revised: 2026-09-17
+last_revised: 2026-09-18
 status: BINDING
 authority: Product Owner decision, 2026-09-17
 applies_to: GCFPE-20260914.1 / 091426.1 / 55 candidate prompts and supporting controls
@@ -11,6 +11,8 @@ repository: amthorn78/glow-hdengine-v2
 runtime_artifact_root: docs/ephemeral
 pfcanon_root: docs/pfcanon
 graph_parts_root: docs/graph/parts
+ecosystem_management_root: docs/prompt_ecosystem_management
+baseline: main @ 3c0b1fa (PR #415)
 ---
 
 # GCFPE storage architecture — repository-first
@@ -23,29 +25,56 @@ Nathan moved Glow storage into the repository on 2026-09-17.
 |---|---|---|
 | Ephemeral, working, planning file; report, ledger, checkpoint, handoff record, run evidence | `docs/ephemeral/` | read and write, by pull request |
 | Maintained machine-readable source — currently the GCFPE graph parts | `docs/graph/` | read and write, by pull request |
+| Persistent ecosystem-management infrastructure — registry, decision record, architecture, authoritative-surface map | `docs/prompt_ecosystem_management/` | read and write, by pull request |
 | PFCanon | `docs/pfcanon/` | **read only** |
 | Prompt, plan, checklist, state, verdict | Notion | authored in place |
 | Reusable behaviour | An installed skill | — |
 | A file Nathan specifically directs to Drive | Google Drive | by local round trip |
 
-The 155 files of the former Drive folder `Glow / Ephemeral Planning Files` are
-in `docs/ephemeral/`, including the current GCFPE record:
+The files of the former Drive folder `Glow / Ephemeral Planning Files` are in
+`docs/ephemeral/`, including the current GCFPE record:
 `gcfpe.plan.repair-checklist.md`, `gcfpe.batch-1.repair-report.md`,
 `gcfpe.batch-1.validation-report.md`, the `gcfpe.batch-2.*` ledgers and report,
-and `gcfpe.r20260914-1.graph-contract.md`.
+and `gcfpe.drainage-removal.repair-report.md`.
 
-Google Drive is no longer a default destination for anything. Nathan keeps human
-reference copies there, including of PFCanon. **Those copies carry no authority.**
-Never resolve canon from Drive, and never reconcile a repository file against a
-Drive copy to decide which is current.
+**Strengthened 2026-09-18: Google Drive is not a storage authority for this
+ecosystem at all.** It is not a default destination and it is not a fallback.
+Nathan keeps human reference copies there, including of PFCanon. **Those copies
+carry no authority.** Never resolve canon from Drive, and never reconcile a
+repository file against a Drive copy to decide which is current. A file goes to
+Drive only where Nathan directs that specific file there.
+
+**Derived output is never committed.** The assembled graph contract is built from
+`docs/graph/parts/` on demand into the session scratchpad and represented
+downstream by its proof token. The committed copy that previously sat at
+`docs/ephemeral/gcfpe.r20260914-1.graph-contract.md` was removed on 2026-09-18:
+it was a second copy that had drifted from its source and still carried the
+retired drainage machinery — 28 references to the removed `NATHAN_MANUAL_PF10_DRAIN`
+boundary node, the four-state drain enums, all 55 `pf10_addendum_role` tokens and
+the superseded `CL-20` title. A session reading it would have rebuilt exactly what
+the repair retired.
 
 Every other path in the repository remains off limits without Nathan's explicit
 instruction for that specific change. Nathan alone merges.
 
 The `glow-artifact-storage`, `glow-write-boundary` and `glow-workspace-currency`
-skills are already updated to this. This document exists because the **prompts
-and the supporting controls are not**, and a prompt that still routes an artifact
-to Drive will send a runtime session to the wrong place.
+skills **still need a workspace republish** to carry the fourth open path
+`docs/prompt_ecosystem_management/` and the stronger no-Drive-authority rule. They were
+edited on 2026-09-18, but the edit reached the session container only — the skill sync is
+one-way and a container-local change dies with the container. Installing the updated skills is a
+Product Owner action in the Claude workspace; it is not a repository change.
+
+This document exists because the **prompts are not yet**, and a prompt that still
+routes an artifact to Drive will send a runtime session to the wrong place.
+
+**Remaining work as of the merged baseline**, measured against the live prompt
+bodies: **44 of 55 prompts** still name `Glow / Ephemeral Planning Files` or a
+direct Drive link as the artifact destination, and **39 of 55** still resolve
+PFCanon by walking `Glow / Core Docs / PFCanon` in Drive rather than reading
+`docs/pfcanon/`. Three carry both conventions. The 11 Batch 1 prompts are already
+converted and are the wording to converge on — repository paths throughout, with
+the single conditional Drive sentence retained. This is one controlled
+cross-cutting pass, not batch-local work.
 
 ## Why the repository, specifically
 
@@ -76,7 +105,7 @@ no seventh batch and no new gate.
 | "referenced by direct Drive link" | "referenced by repository path" |
 | canon resolved through `Glow / Core Docs / PFCanon` | canon read from `docs/pfcanon/`, read-only |
 | "Markdown files in Drive `Glow / Core Docs / PFCanon`" | `docs/pfcanon/` |
-| any implication that repository writes are forbidden outright | the three open paths above, everything else by explicit instruction |
+| any implication that repository writes are forbidden outright | the four open paths above, everything else by explicit instruction |
 
 ### What must not change
 

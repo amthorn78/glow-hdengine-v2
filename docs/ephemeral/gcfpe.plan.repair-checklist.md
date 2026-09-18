@@ -1,5 +1,13 @@
 # GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1
 
+> ⚠️ **SUPERSEDED SNAPSHOT — do not read as current instruction.**
+> This is a point-in-time export taken 2026-09-16. The live plan has changed
+> substantially since: the drainage lifecycle was retired, §4.2 and §4.7 were rewritten,
+> the mandatory post-addendum check was struck, Batch 3 and Batch 6 checklist items were
+> cleared, and Batch 6 was renamed. **The Notion page is the authority**:
+> [GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1](https://app.notion.com/p/3dc4590a05eb81a9adf1d8f800863937).
+> This file is retained only as history of what the plan said on 2026-09-16.
+
 Durable Markdown copy of the Notion page [GCFPE Expanded Prompt Repair Plan and Six-Batch Checklist — 20260915.1](https://app.notion.com/p/3dc4590a05eb81a9adf1d8f800863937), exported 2026-09-16 from the page as last edited 2026-09-16T16:27:22.369Z. Notion page mentions are rendered as direct links.
 
 ```yaml
@@ -21,8 +29,8 @@ in_scope_prompt_count: 55
 skill_review_position: AFTER_BATCH_6
 postflight_position: AFTER_SKILL_REVIEW_AND_ANY_APPROVED_SKILL_CORRECTION
 alpha_stop_position: PR03_ACCEPTED_FINAL_BEFORE_PR04_PLANNING
-pf10_drain_owner: Nathan / Product Owner
-runtime_artifact_root: Glow / Ephemeral Planning Files
+pf10_drain_owner: RETIRED_2026-09-18_SEE_DECISION_RECORD_D6
+runtime_artifact_root: docs/ephemeral  # was Glow / Ephemeral Planning Files; repointed 2026-09-18
 mutation_performed: false
 ```
 

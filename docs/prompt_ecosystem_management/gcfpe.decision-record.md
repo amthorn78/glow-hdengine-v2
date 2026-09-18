@@ -85,14 +85,21 @@ reconciling drain evidence — **and no renamed equivalent.**
 
 ### The lifecycle, from every prompt's view
 
-A qualifying approval creates the addendum. After that turn, the addendum is part of
-PF10. On the immediately following turn the receiving prompt reads PF10 and confirms
-the expected update is visible. **That is all.**
+A qualifying approval creates the addendum. From the turn after it is created, the
+addendum is part of PF10 and in force. **That is all.**
+
+> **Amended 2026-09-18 by D8.** This section originally required the receiving prompt to
+> read PF10 and *confirm the expected update is visible* on the immediately following
+> turn. That confirmation is struck. It was itself machinery — another step and another
+> way to stop — and it contradicted this document's own rule that an agent may not
+> litigate a Product Owner action. A later prompt resolves and reads current PF10 as
+> part of its normal job and acts on what it finds. There is no confirmation step, no
+> separate artifact, no status, no gate, and no validation procedure.
 
 It is not a drain check, canonicalization check, synchronization check, ownership
 check, content verification, byte comparison, reconciliation procedure, new status
-machine, or new artifact requirement. After that turn the transition is over, and
-later prompts simply read current PF10 and work from current Canon.
+machine, or new artifact requirement. Later prompts simply read current PF10 and work
+from current Canon.
 
 ### Why
 
@@ -104,9 +111,14 @@ workflows are intended to become increasingly automated.
 
 ### Consequences
 
-- `POST_CLOSURE_DRAINAGE_STATUS` is **removed, not renamed**. CL-20 keeps its closure
-  memo and loses the producer roster, the storage contract, the addendum links, the
-  drain evidence and the drain-state inputs. What it needs, it reads from current PF10.
+- `POST_CLOSURE_DRAINAGE_STATUS` is **removed**. CL-20 loses the producer roster, the
+  storage contract, the drain evidence and the drain-state inputs; what it needs, it
+  reads from current PF10. **Amended 2026-09-18:** under Product Owner authorization the
+  prompt was renamed to **`CL-20 — Prepare Closure Memo and Post-Closure Record`** and
+  now produces `CLOSURE_MEMO` **and** `POST_CLOSURE_RECORD` — the surviving inventory of
+  already-produced addenda, without readback state, reference role or drain
+  verification. The merged registry, graph part, Flow Index and four referring prompts
+  all carry the new name.
 - `PF10_REFERENCE_ROLE` is **deleted as a field**. What is retained is the factual
   provenance — the PF10 version or equivalent identity actually read at that point.
   **Record what was read; do not assign it a workflow state.** A field with allowed
@@ -125,6 +137,132 @@ with it:
 - historical and provenance facts;
 - current PF10 as execution authority;
 - any unrelated functional requirement in the same clause.
+
+## D7 — The repository is the storage authority; Drive is not one at all
+
+Ruled 2026-09-18, strengthening the 2026-09-17 repository-first decision.
+
+**The repository is the persistent storage and versioning authority for this prompt
+ecosystem. Notion is the operational and indexing layer. Google Drive is not a storage
+authority at all** — not a default, not a fallback, not a place canon is resolved from.
+
+Consequences:
+
+- `Glow / Ephemeral Planning Files` is removed as an artifact destination; artifacts go
+  to `docs/ephemeral/`, referenced by repository path.
+- Direct-Drive-link requirements are removed; a repository path replaces the link.
+- PFCanon is resolved from `docs/pfcanon/`, not by walking Drive folders.
+- One conditional sentence survives: *"Google Drive is used only where Nathan directs a
+  specific file there."* That is an escape hatch for a file he asks for, not an
+  authority.
+- Persistent ecosystem-management infrastructure lives in
+  `docs/prompt_ecosystem_management/` — the fourth open repository path.
+
+**Derived output is never committed.** The assembled graph contract is built from
+`docs/graph/parts/` on demand and represented downstream by its proof token. The
+committed copy at `docs/ephemeral/gcfpe.r20260914-1.graph-contract.md` was removed on
+2026-09-18: it had drifted from its source and still carried the retired drainage
+machinery, so a session reading it would have rebuilt exactly what the repair retired.
+
+**Applied to prompt behaviour 2026-09-18.** The cross-cutting storage pass rewrote **333
+passages across 44 of the 55 prompts**: artifacts now land at `docs/ephemeral/` by
+repository path and PFCanon resolves from `docs/pfcanon/`. Verified 44/44 by isolated
+readback, with zero surviving Drive-as-authority references and the single conditional
+sentence preserved. Report: `docs/ephemeral/gcfpe.storage-pass.repair-report.md`.
+
+> The scope figures in the earlier revision of this note (44 storage / 39 PFCanon) were
+> measured by pattern. Measured against the live bodies the PFCanon figure is **42**, not
+> 39, and the occurrence count is **333**, not 310.
+
+### Applied under D7 — coordinator decisions, not new rulings
+
+Three passages could not be resolved by substitution and were decided centrally so that
+one concept did not acquire several encodings across prompts:
+
+- **`EPHEMERAL_DRIVE` is retired**, replaced by the existing sibling
+  `REPOSITORY_CONTROLLED` in all eight prompts that carried it. Under D7 the class it
+  named no longer exists. It was not renamed: minting a replacement would create a token
+  nothing validates, and the sibling already covers the case. It appeared in no graph
+  part and no registry field.
+- **`QA-10` §55 and `QA-50` §29 were narrowed, not deleted.** Both forbade treating a
+  repository file as PFCanon authority — correct when Drive was authority, inverted under
+  D7, and `QA-10` named `docs/pfcanon` explicitly. `docs/pfcanon/` is now carved out as
+  the authority and the prohibition still covers every other repository file, because the
+  hazard is real: `audit/docdeltas/` holds PF-named files that are not controlled canon.
+
+**Drive references are interpreted by function, never by the word** — the same rule D9
+states for "drain". `global.json`'s eleven Drive URLs are pinned historical captures
+scoped `REPAIR_BASELINE_EVIDENCE_ONLY_NOT_A_RUNTIME_CURRENT_PF10_ALIAS`. They are
+provenance and must survive; the graph needed no change in this pass.
+
+## D8 — No mandatory post-addendum check, and no replacement for it
+
+Ruled 2026-09-18.
+
+The original intent was always simple: a qualifying producer creates the addendum; on
+the next turn PF10 is current; nothing ever blocks later work on an addendum transition
+state.
+
+The 2026-09-17 mandate retired the four-state drain machine but kept **one** mandatory
+confirmation check in its place. That check was itself machinery — another step, another
+way to stop, and it contradicted the same section's rule that *an agent may not litigate
+a Product Owner action.* The prompts had already resolved the contradiction in favour of
+not checking.
+
+**The mandatory check is struck.** PF10 is the canonical authority throughout the
+system, so a later prompt resolves and reads current PF10 as part of its normal job and
+acts on what it finds. If that read happens to show the expected reference, nothing
+further is required or recorded. There is no confirmation step, no separate artifact, no
+status, no gate, no validation procedure. Where a record must show what it read, it
+records the PF10 version actually read **as provenance — evidence, never a gate**.
+
+The interim `pf10_reference_visibility_check` and its `PF10_REFERENCE_VISIBILITY`
+vocabulary are removed from the graph with it.
+
+**The standard for any future rule of this kind:** does it make the ecosystem simpler,
+more deterministic, more automatable, and less likely to stop an agent from completing
+legitimate work? A rule that fails that test does not earn its place.
+
+## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
+
+Ruled 2026-09-18.
+
+`pf10_addendum_contract.forbidden_fields` keeps its three drainage entries as an active
+guard against reintroducing the retired fields. **That prohibition is strictly scoped to
+the PF10 Build Notes Addendum lifecycle.**
+
+It places no restriction on Canon disposition. These remain legitimate and must be
+preserved intact:
+
+- canon-conflict and ADR records;
+- `NEW_CANON` and `CANON_RECONCILIATION` classifications;
+- the permanent Canon drainage target and owner;
+- the appropriate Canon target and responsible destination for an approved change;
+- **PF09 rows identifying where an approved change must ultimately land in PF Canon.**
+
+**Interpret by function, never by the word.** A validator must not reject a field because
+its name or value contains "drain". Verified against the repaired bodies before this was
+recorded: PF09 references, canon-conflict registers, `NEW_CANON`, `CANON_RECONCILIATION`,
+permanent drainage target/owner, CRD candidates and ADR references all survive the
+drainage sweep at counts identical to the pre-repair bodies.
+
+## D10 — Batch 2's recorded blocker is obsolete
+
+Ruled 2026-09-18.
+
+Batch 2 was held at `BATCH_2_BLOCKED` on: *"Drive has no content-write for an existing
+file ID, so the synchronized graph, the rebound control copy and report v1.1 cannot be
+persisted."*
+
+That blocker is **structurally dead**, not merely stale. The graph is no longer a Drive
+file — it is held as parts in the repository and the assembled artifact is deliberately
+never persisted. Storage authority is the repository.
+
+A batch status is not preserved for its own sake. Batch 2 needs a bounded current-state
+verification against the merged bodies, not a re-run: is the blocker obsolete, are there
+remaining actual defects under current rules, do its prompts fulfil their contracts. If
+clean, it closes. Work is not manufactured because a batch was historically marked
+blocked.
 
 ## Repair scope — measured 2026-09-18
 
@@ -210,3 +348,206 @@ storage-architecture and specification-format findings.
 
 **The Project Prompt Contract Registry is re-pointed to the current release before
 approval**, not approved stale and updated afterward.
+
+## D11 — Contract assertions validate behaviour, not wording
+
+Ruled 2026-09-18 by the Product Owner's standing instruction that known findings are driven
+to resolution rather than carried as non-blocking backlog.
+
+The Project Prompt Contract Registry asserted prompt correctness through `required_literals`
+— exact substrings that the governance audit tests with `if value not in text`. Measured
+against the live bodies, **70 of 269 assertions failed while behaviour was correct**, and the
+largest single assertion, `select only the controlled Markdown lane`, was **absent from all
+55 bodies and had never been present in any of them**.
+
+**A check that fails on every member of a set carries no information.** It did not flag the
+44 prompts that named Drive as the Canon authority before the storage pass; it failed
+identically before and after. Meanwhile `forbidden_literals`, `required_regex` and
+`forbidden_regex` were empty on all 55 rows, so nothing detected wrong-source resolution at
+all.
+
+**The ruling:** an assertion must distinguish a correct prompt from an incorrect one. Where a
+behavioural requirement can be checked, check the behaviour — the named location, the failure
+state, the prohibited source — not the sentence a prompt happens to use to express it.
+
+Applied 2026-09-18:
+
+- Removed `select only the controlled Markdown lane` (45 rows) and the two exact header
+  literals (55 rows each). The release carries **two header conventions** — eleven prompts use
+  `Prompt version: \`091426.1\`` where forty-four use `Prompt Version: 091426.1` — and both
+  declare the identity the rule exists to guarantee.
+- Added `required_regex` on all 55 rows: header version and release tolerant of both
+  conventions, plus `docs/pfcanon/` as the Canon source.
+- Added `forbidden_regex` on all 55 rows guarding D7: `Glow / Core Docs / PFCanon`,
+  `Glow / Ephemeral Planning Files`, `drive.google.com`, `EPHEMERAL_DRIVE`. **This guard did
+  not previously exist in any form.**
+- `GCFPE-MGMT-10`: dropped the `PF10` assertion — it repairs prompts, not builds — and the
+  `NEXT_PROMPT_HANDOFF` assertion, because all four of its result states return terminally to
+  the Product Owner and the handoff contract requires zero blocks on a terminal result. PR-50
+  is the same and its row already omitted it.
+- `RS-40`: dropped the brittle `controlled Markdown` literal; the body says
+  `controlled PF10 Markdown`.
+
+Result: **499 assertions evaluated, 0 failing**, up from 269 evaluated with 71 failing. The
+new guard was tested against five injected regressions — Canon resolved from Drive folders,
+artifacts saved to the Drive folder, a direct Drive link, a reintroduced `EPHEMERAL_DRIVE`
+token, and a dropped Canon location — and caught all five, while passing a clean control.
+
+### Registry rows corrected to match actual behaviour
+
+The registry describes intended prompt behaviour. Where a row and a body disagreed, the body
+and the graph were authoritative and the row was stale:
+
+- `IA-40`: removed `WRONG_ROUTE_APPROVED_BASE`, a state the body never emits (it emits
+  `WRONG_NATIVE_LANE`); added `MATERIAL_PLAN_DELTA` / `PLAN_DELTA_PENDING`, which IA-30
+  explicitly routes to and consumes.
+- `IA-50`: removed the `ESC-40` consumer — the body states *"Do not route to ESC-30 or
+  ESC-40"*, and Batch 2 redline R25 removed the matching graph edge.
+- `IA-60`: removed the `ESC-30` consumer, on the same evidence and redline R26.
+- `authority_sources`: four duplicate entries pointing at a pre-merge extraction workspace
+  collapsed to one, labelled `HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH`.
+
+## D12 — The batch sequence is retired; changes are managed by rule, not by batch
+
+Ruled 2026-09-18 by the Product Owner, approving the strategic assessment of the repair
+process. **Batches 3–6 are replaced by one consolidated pass over the 37 remaining prompts
+plus one release-wide gate.**
+
+The six-batch model assumed defects are per-prompt and lane-shaped. Two completed batches
+show they are per-rule and corpus-shaped. Batch 1's own report: *"Root cause found at the
+control, not the prompts."* Batch 2 closed **22 of 22** contract findings on the prompt side
+with **zero prompt edits required**; it was held only by a graph synchronisation that could
+not be written to Drive. Meanwhile the two repairs that did change prompt bodies — drainage
+removal and the Drive → repository storage pass, 333 passages across 44 prompts each — were
+single rulings applied corpus-wide, and both were executed **outside** the batch sequence.
+
+Splitting one shared rule across several authorizations creates several chances to apply it
+several different ways. Per-batch rechecking re-verifies the same concerns four more times
+with different eyes, which is where inconsistent application comes from. A single corpus-wide
+gate cannot produce four different answers.
+
+**The ruling has three parts:**
+
+1. **Execution** — one sweep, four lanes concurrent, findings reconciled centrally,
+   cross-cutting decisions taken once and applied uniformly. One release-wide gate: graph
+   rebuild and closure, registry validator, interface closure across all 55, isolated readback
+   of everything changed. Recorded in `execution-and-delegation-model.md` §0A.
+2. **Lessons** — seven binding lessons carried from Batches 1 and 2, recorded in
+   `execution-and-delegation-model.md` §0B.
+3. **Change management** — a standing process for changes after this release, with a
+   defect-class catalogue, a seven-point definition of done, and an explicit authorization
+   boundary. Recorded in `ecosystem-change-management.md`, a new document in this directory.
+
+**Product Owner gates that survive:** authorizing the consolidated pass, and approving
+promotion at the gate. The batch-by-batch authorization checkpoints are removed because they
+bounded the wrong thing — they bounded prompts, and the defects were in rules.
+
+**Consequence for the Notion plan.** The GCFPE Expanded Prompt Repair Plan and Six-Batch
+Checklist remains the historical record of Batches 1 and 2 and the source of the finding
+lists. Its Batch 3–6 sections are **superseded, not deleted**, and are marked as such on the
+page so no future session executes them.
+
+## D13 — The graph is the authority for routing and result states; the registry derives them
+
+Ruled 2026-09-18 during the consolidated pass, under the Product Owner's standing instruction
+that findings are driven to resolution rather than carried.
+
+The consolidated pass raised 62 findings. **33 of them had a single cause**: the registry's
+`outputs[].consumers`, `outputs[].states` and `required_interfaces` had been authored by hand
+rather than derived, and had drifted from the prompts. 28 rows disagreed on consumers and 15 on
+output states.
+
+**The disagreement was adjudicated by two independent instruments, which agreed with each other
+and against the registry**: the machine-readable graph parts, and four workers who read the
+bodies blind — without the graph, without each other's work, and without the registry's answer.
+
+The sharpest case: `PR-30`'s declared success state was `MERGE_PENDING`, which its own body
+forbids; its actual success state `PR_CANDIDATE_PUBLISHED` was undeclared; the lane's busiest
+edge `PR-30 → PR-35` was absent while a twice-prohibited `PR-30 → PR-40` edge was declared.
+
+**The ruling:** routing and result states are **derived** into the registry from
+`docs/graph/parts/`, never authored independently there. The graph's outbound edges give
+`consumers` and `required_interfaces`; `node.result_states` gives `outputs[].states`. Where the
+registry and the graph disagree, the graph wins and the registry is regenerated. A change to
+routing is made in the parts and flows to the registry, so the two cannot drift apart again.
+
+Applied 2026-09-18: 33 rows regenerated; all 55 rows now agree with the graph on both consumers
+and required interfaces.
+
+**What this ruling does not cover.** `inputs`, `function`, `mutations` and `failure_contract`
+remain authored against the body, because the graph does not model them. The registry schema
+also carries a flat consumer list and cannot express per-state routing; the graph expresses it
+through edge state predicates. That is a schema limit, recorded rather than worked around.
+
+## D14 — A settled ruling is enforced by function, and every ruling carries a tested guard
+
+Ruled 2026-09-18, on the evidence of the two body defects the consolidated pass found.
+
+Both had survived every previous sweep because **they violated a settled ruling without using
+any of its banned words**:
+
+- `RS-40` compared current PF10 against an addendum's normalized delta and **stopped terminally
+  on a mismatch** — the retired drainage lifecycle reinstated by function, in a body containing
+  none of the thirteen retired tokens.
+- `QA-10` permitted writing its governed artifacts **off-repository** — a D7 violation naming no
+  Drive location, so the Drive-marker guard could not see it.
+
+**The ruling has two parts.**
+
+**First, a ruling is enforced against behaviour.** Verifying that the banned vocabulary is
+absent does not establish that the retired behaviour is gone. Each pass must ask what the
+prompt makes an agent *do*.
+
+**Second, no ruling is considered applied until a guard exists that would catch its
+reintroduction, and that guard has been fired by an injected regression.** The audit had **no
+guard at all** for the thirteen retired drainage tokens: the removal had been verified once and
+nothing prevented their return.
+
+Applied 2026-09-18. Guards added across all 55 rows for the retired tokens, the off-repository
+permission, and the PF10 comparison-and-stop; a positive requirement added where a prompt takes
+a fresh current-PF10 read, that it also state the provenance rule. Assertions rose from 499 to
+721. All eight injected regressions were caught, the clean control passed, and a negative
+control confirms the guard does not fire on legitimate Canon drainage text, which must survive.
+
+## D15 — Ten qualifying-approval branches were still marked terminal after drainage removal
+
+Found 2026-09-18 while repairing the workflow skills, by a validator that had never been able
+to run against the current graph.
+
+The graph's own invariant is that a public result branch marked `terminal_for_invocation: true`
+emits **zero** handoffs. Ten branches violated it: they were marked terminal **and** declared
+`next_prompt_handoff_count: 1`.
+
+All ten belong to the six PF10 addendum producers — `CF-C-30`, `CF-E-30`, `ESC-40`, `IA-30`,
+`QA-70`, `RS-20`. That is the whole explanation. Before D6 these branches terminated at the
+`NATHAN_MANUAL_PF10_DRAIN` boundary, so `terminal_for_invocation: true` was correct and the
+handoff count was zero. The drainage removal re-pointed each branch to its real receiver and
+set the handoff count to 1, but **left the terminal flag set**.
+
+The branch conditions had already been corrected — they read *"resume PR-30 directly on the
+qualifying approval"* and *"the exact native receiver reads current PF10"*. Only the flag was
+stale, so nothing in prose revealed it.
+
+**Why it survived every earlier check.** The consolidated pass verified edges, consumers,
+states and closure, but not this invariant. The one instrument that tests it,
+`flowmaster-validate`, could not run at all (F6), and the graph copy bundled with it was the
+pre-D6 240-edge version, in which these branches were genuinely terminal. A stale copy and a
+broken validator concealed each other.
+
+**Corrected 2026-09-18**: `terminal_for_invocation` set to `false` on all ten branches in
+`docs/graph/parts/`. Zero violations remain across all 55 parts.
+
+**The proof token changes as a result**, and this is the first time it has moved since the
+repair began:
+
+| | |
+|---|---|
+| Before | `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…` |
+| After | `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` |
+
+Node, edge and state_route counts are unchanged; only the ten flags moved. Any document still
+citing `3b54d620…` predates this correction.
+
+**The general lesson, added to the catalogue as `PAIR-001`:** a stale copy and a disabled
+checker hide each other, and neither looks broken on its own. When a validator cannot run,
+treat the invariants it alone enforces as unverified rather than as passing.

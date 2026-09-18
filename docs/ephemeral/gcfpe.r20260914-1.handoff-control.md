@@ -5,7 +5,12 @@ title: "GCFPE Direct-Handoff Contract and Fixtures Control Copy — GCFPE-202609
 candidate_release: GCFPE-20260914.1
 prompt_version_family: "091426.1"
 candidate_member_count: 55
-status: UNSELECTED_CANDIDATE_DRAFT
+status: SUPERSEDED
+superseded_date: 2026-09-18
+superseded_by: docs/graph/parts/ (machine contract) and docs/prompt_ecosystem_management/project-prompt-contract-registry.md (per-prompt contracts)
+superseded_reason: declares the retired PF10 addendum drainage lifecycle and Drive storage as live contract
+do_not_execute_fixtures: true
+prior_status: UNSELECTED_CANDIDATE_DRAFT
 activation_authority: Nathan / Product Owner after separate explicit approval of the exact validated snapshot
 predecessor_release: GCFPE-20260913.1
 predecessor_version_family: "091326.2"
@@ -16,6 +21,32 @@ validation_status: REVALIDATION_REQUIRED_AFTER_SOURCE_IDENTITY_CORRECTION
 ---
 
 # GCFPE Direct-Handoff Contract and Fixtures Control Copy
+
+> ## ⛔ SUPERSEDED 2026-09-18 — DO NOT READ AS CURRENT CONTRACT, DO NOT EXECUTE ITS FIXTURES
+>
+> This is a control copy of a Google Drive artifact. **Drive is no longer a storage
+> authority for this ecosystem, and this document is no longer a contract.**
+>
+> It declares the entire retired PF10 addendum drainage lifecycle as live behaviour:
+> `READY_FOR_MANUAL_DRAIN`, `NON_CANONICAL_PENDING_MANUAL_DRAIN`, `drain_owner` and
+> `drain_verification_anchor` in the addendum contract; the four-value post-drain
+> verification table and its `PF10_drain_verification` machine block; `DRAIN_VERIFIED`
+> gates on all three `PR_RETURN_PHASE` rows; and five deterministic fixtures that assert
+> the retired states as PASS conditions. It also routes artifacts to
+> `Glow / Ephemeral Planning Files`, resolves PFCanon from Drive, requires direct Drive
+> URLs, and binds the graph to a Drive file ID and a pre-merge path.
+>
+> **Every one of those is retired.** Acting on this document would rebuild the machine
+> the 2026-09-18 repair removed. See `docs/prompt_ecosystem_management/gcfpe.decision-record.md`
+> D6–D10.
+>
+> **What replaced it:** the machine-readable contract is `docs/graph/parts/` (built on
+> demand; proof token `55 nodes · 227 edges · 55 state_routes`). Per-prompt contracts are
+> `docs/prompt_ecosystem_management/project-prompt-contract-registry.md`.
+>
+> Retained only as lineage for the fixture *design*, not its expected values. If the
+> fixtures are wanted again they must be re-derived against the current contract.
+
 
 ## Binding
 

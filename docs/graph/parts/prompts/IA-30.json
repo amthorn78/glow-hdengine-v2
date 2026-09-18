@@ -194,7 +194,7 @@
             "section": "Required result and routing"
           },
           "state": "DELTA_APPROVE",
-          "terminal_for_invocation": true
+          "terminal_for_invocation": false
         }
       ],
       "state_predicates": [

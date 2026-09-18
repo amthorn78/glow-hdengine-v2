@@ -26,18 +26,13 @@ authority_sources:
   url: https://app.notion.com/p/3da4590a05eb81bcbc5deb2d2cec4f1f
 - type: COMPLETE_PROMPT_FETCH_MANIFEST
   path: candidate/prompts/manifest.json
-  note: 55-prompt candidate extraction, 2026-09-17
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
-- type: COMPLETE_PROMPT_FETCH_MANIFEST
-  path: candidate/prompts/manifest.json
+  note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below are the reproducible identity.'
+  disposition: HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH
 observation:
   release: GCFPE-20260914.1
   version_family: '091426.1'
   selected_member_count: 55
-  complete_body_count: 54
+  complete_body_count: 55
   mutation_posture: READ_ONLY
 lanes:
 - lane: GCFPE-MGMT
@@ -140,9 +135,12 @@ prompts:
   outputs:
   - artifact: SPECIFICATION_KICKOFF
     states:
+    - BLOCKED
     - KICKOFF_READY
-    consumers: &id001
+    consumers:
     - CF-C-20
+    - CF-E-10
+    - CF-PO-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -151,12 +149,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7204 bytes'
-  - 'SHA-256 of that extraction: ed9aba9cd4a7bc84786203deeaae8f840b4e3dfc91b7475b37f7cfa4b61ccc8c'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 7203 bytes'
+  - 'SHA-256 of that extraction: 41dce73a62735927d291bd8f7342654d314d38de47070fe37f8a6c9318fd1702'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id001
+  required_interfaces:
+  - CF-C-20
+  - CF-E-10
+  - CF-PO-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -174,19 +176,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-20
   notion_page_id: 3db4590a05eb8173a73edc73f302a90a
   notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
@@ -204,8 +224,10 @@ prompts:
   outputs:
   - artifact: CRD_SPECIFICATION
     states:
+    - BLOCKED
     - SPECIFICATION_PENDING
-    consumers: &id002
+    consumers:
+    - CF-C-10
     - CF-C-30
   mutations:
     allowed:
@@ -215,12 +237,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5889 bytes'
-  - 'SHA-256 of that extraction: 6d75222a418e33cb9fe71475680c54f86779ffcd085b41e5713de13d536c9b6b'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5888 bytes'
+  - 'SHA-256 of that extraction: 4570e718530316c018b18dcb15848f061e938e268ae4ec163630b310c14c67c7'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id002
+  required_interfaces:
+  - CF-C-10
+  - CF-C-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -238,19 +263,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-30
   notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
   notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
@@ -268,11 +311,12 @@ prompts:
   outputs:
   - artifact: INITIAL_SPECIFICATION_REVIEW / SPECIFICATION_DELTA_REVIEW
     states:
-    - INITIAL_APPROVE
-    - INITIAL_DENY
+    - CORRECTION_REDLINE
     - DELTA_APPROVE
     - DELTA_DENY
-    consumers: &id003
+    - INITIAL_APPROVE
+    - INITIAL_DENY
+    consumers:
     - IA-10
     - CF-C-40
   mutations:
@@ -283,12 +327,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9421 bytes'
-  - 'SHA-256 of that extraction: 9fd1db2bd0b5f63b290ac6ee98773d391888572b236176de4cd3c83f63c9a793'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 9420 bytes'
+  - 'SHA-256 of that extraction: b56d218a4f5d2a08f4f12af99fe097b001925dd1a1a445c2375edf4d3cd894e7'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id003
+  required_interfaces:
+  - CF-C-40
+  - IA-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -306,19 +353,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-40
   notion_page_id: 3db4590a05eb81269931cee342ce8a0e
   notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
@@ -337,7 +402,7 @@ prompts:
   - artifact: CRD_SPECIFICATION / SPECIFICATION_DELTA
     states:
     - SPECIFICATION_PENDING
-    consumers: &id004
+    consumers:
     - CF-C-30
   mutations:
     allowed:
@@ -347,12 +412,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7519 bytes'
-  - 'SHA-256 of that extraction: f387c0a380d8afa29a9335a2eb9fd56c4cada17009156966b5addd51e5fccc9a'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 7518 bytes'
+  - 'SHA-256 of that extraction: 9b62004b93aa3a1e93fb5cf325bb6e78ea460ed78f49c523a654be6fd5a0c95f'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id004
+  required_interfaces:
+  - CF-C-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -370,19 +437,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-10
   notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
   notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
@@ -402,9 +487,12 @@ prompts:
   outputs:
   - artifact: SPECIFICATION_KICKOFF
     states:
+    - BLOCKED
     - KICKOFF_READY
-    consumers: &id005
+    consumers:
+    - CF-C-10
     - CF-E-20
+    - CF-PO-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -413,12 +501,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7308 bytes'
-  - 'SHA-256 of that extraction: 3da4b6b539980150c50fe78e305bf2ae459e1d8b468d988962d7842b2dd60d6e'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 7307 bytes'
+  - 'SHA-256 of that extraction: 5cdfce4d502c5b5b564b562b18e108cc38b1ffa85b3b655edd6706d0e76e80fe'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id005
+  required_interfaces:
+  - CF-C-10
+  - CF-E-20
+  - CF-PO-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -436,19 +528,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-20
   notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
   notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
@@ -466,8 +576,10 @@ prompts:
   outputs:
   - artifact: EPIC_SPECIFICATION
     states:
+    - BLOCKED
     - SPECIFICATION_PENDING
-    consumers: &id006
+    consumers:
+    - CF-E-10
     - CF-E-30
   mutations:
     allowed:
@@ -477,12 +589,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5901 bytes'
-  - 'SHA-256 of that extraction: 565ac38f8d4ecac8750085ed63f78415227e833b796d2c5bb1375e4fa461f272'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5900 bytes'
+  - 'SHA-256 of that extraction: 5add38939d7e920b90c4031846e51f0fdb29b1bf50ec3574dcb72eaddc134108'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id006
+  required_interfaces:
+  - CF-E-10
+  - CF-E-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -500,19 +615,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-30
   notion_page_id: 3db4590a05eb81b4be79f405566da9a7
   notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
@@ -530,11 +663,12 @@ prompts:
   outputs:
   - artifact: INITIAL_SPECIFICATION_REVIEW / SPECIFICATION_DELTA_REVIEW
     states:
-    - INITIAL_APPROVE
-    - INITIAL_DENY
+    - CORRECTION_REDLINE
     - DELTA_APPROVE
     - DELTA_DENY
-    consumers: &id007
+    - INITIAL_APPROVE
+    - INITIAL_DENY
+    consumers:
     - IA-10
     - CF-E-40
   mutations:
@@ -545,12 +679,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9429 bytes'
-  - 'SHA-256 of that extraction: e98a7ea4c626e3762a465326da34b1be9c4c462f33fa9f2023ee5cf1b07749fc'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 9428 bytes'
+  - 'SHA-256 of that extraction: 6e92232ba58cc4e8c53004af7176ae2422863f2e1bcf1c6e209dc3a257066e76'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id007
+  required_interfaces:
+  - CF-E-40
+  - IA-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -568,19 +705,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-40
   notion_page_id: 3db4590a05eb8101b655ed223b11a85e
   notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
@@ -599,7 +754,7 @@ prompts:
   - artifact: EPIC_SPECIFICATION / SPECIFICATION_DELTA
     states:
     - SPECIFICATION_PENDING
-    consumers: &id008
+    consumers:
     - CF-E-30
   mutations:
     allowed:
@@ -609,12 +764,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7534 bytes'
-  - 'SHA-256 of that extraction: 4bae70033be7ac950695e75adcd326ee7cb2744f99d09f05bb5ab057a3aabe61'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 7533 bytes'
+  - 'SHA-256 of that extraction: e5e297ebcf0585c4114d30311535089ea16bad4ea679120a8e0e8d08050987ce'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id008
+  required_interfaces:
+  - CF-E-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -632,19 +789,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-PO-10
   notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
   notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
@@ -666,7 +841,7 @@ prompts:
   - artifact: CHANGE_CLASS_SELECTION
     states:
     - CLASS_SELECTED
-    consumers: &id009
+    consumers:
     - CF-E-10
     - CF-C-10
   mutations:
@@ -677,12 +852,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6092 bytes'
-  - 'SHA-256 of that extraction: 9b2d4f403d0f30d44ce04bcd69a86bf1050ba974059118a0f7ff792d51b84762'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6091 bytes'
+  - 'SHA-256 of that extraction: ba98c011ec3607c25618d2dfe8409c4a1f6232dbf0323812b80f551a8a277b79'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id009
+  required_interfaces:
+  - CF-C-10
+  - CF-E-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -700,19 +878,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-20
   notion_page_id: 3db4590a05eb81f4812be61e8877c02c
   notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
@@ -732,11 +928,12 @@ prompts:
   - artifact: CLOSURE_MEMO / POST_CLOSURE_RECORD
     states:
     - POST_CLOSURE_PENDING
-    consumers: &id010
+    consumers:
     - CL-30
-    - CL-E-20
-    - CL-E-40
     - CL-40
+    - CL-E-20
+    - CL-E-30
+    - CL-E-40
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -745,12 +942,18 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 32487 bytes'
-  - 'SHA-256 of that extraction: 2a54f48e9d630b50be58535d59254fb83ead13f479cecf8642db4eb500076c55'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 32597 bytes'
+  - 'SHA-256 of that extraction: eeff6316aa8d3c9d8405a8128b381614cbcb7017c8e8bf1d6fefc5e7bb7942b0'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id010
+  required_interfaces:
+  - CL-30
+  - CL-40
+  - CL-E-20
+  - CL-E-30
+  - CL-E-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -768,10 +971,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -779,8 +978,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-30
   notion_page_id: 3db4590a05eb8190a444d8818e445c1d
   notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
@@ -800,8 +1023,7 @@ prompts:
     states:
     - ADR_CANDIDATE
     - NO_ADR_NEEDED
-    consumers: &id011
-    - CL-20
+    consumers:
     - CL-40
   mutations:
     allowed:
@@ -811,12 +1033,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29674 bytes'
-  - 'SHA-256 of that extraction: a1c41fb16cdfcefc57495f5ee003c4b0d089cf33404bda9ff0fc8128c1d287f6'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29646 bytes'
+  - 'SHA-256 of that extraction: 52d07ec9021efa45300c0b95fb5d1ddc5ac267fce874be0fe21665fb11e8a38c'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id011
+  required_interfaces:
+  - CL-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -834,10 +1058,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -845,8 +1065,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-40
   notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
   notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
@@ -874,7 +1118,7 @@ prompts:
     states:
     - COMPLETE
     - INCOMPLETE
-    consumers: &id012 []
+    consumers: []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -883,12 +1127,13 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29172 bytes'
-  - 'SHA-256 of that extraction: 76037cde37c6580bab32d304f19c8e4f4c6e966edf5f159bd156692a3426740f'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29394 bytes'
+  - 'SHA-256 of that extraction: fa5bff62868d42ad95924e39e944e5288eab30694cad97c928c235a399777060'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id012
+  required_interfaces: []
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -906,19 +1151,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-C-10
   notion_page_id: 3db4590a05eb81ad8989faa77f441a64
   notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
@@ -940,7 +1203,7 @@ prompts:
     states:
     - CHANGE_CLOSED
     - DO_NOT_CLOSE
-    consumers: &id013
+    consumers:
     - CL-20
     - ESC-30
   mutations:
@@ -951,12 +1214,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 35791 bytes'
-  - 'SHA-256 of that extraction: d06f16c82251f2614b3b34ffa9c110915ca285032911e026e23cd1464abf0350'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 35902 bytes'
+  - 'SHA-256 of that extraction: 704365c28eb87858459f9db12cee3be815602e7b163a1de27defd96e89ec9da5'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id013
+  required_interfaces:
+  - CL-20
+  - ESC-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -974,19 +1240,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-10
   notion_page_id: 3db4590a05eb811a8578d75885c16cac
   notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
@@ -1007,7 +1291,7 @@ prompts:
     states:
     - CHANGE_CLOSED
     - DO_NOT_CLOSE
-    consumers: &id014
+    consumers:
     - CL-20
     - CL-E-20
     - ESC-30
@@ -1019,12 +1303,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36249 bytes'
-  - 'SHA-256 of that extraction: 51ab585d5ad230206fc458fc0c9a89a5b45e359be0f4ab1e46db017ba4222078'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 36377 bytes'
+  - 'SHA-256 of that extraction: fdfb9ae189f3c52270e263dcdccd4148236dd61136ce5fd2b39bf897469e8a8d'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id014
+  required_interfaces:
+  - CL-20
+  - CL-E-20
+  - ESC-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1042,19 +1330,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-20
   notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
   notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
@@ -1076,7 +1382,7 @@ prompts:
     - COMPLETE
     - PARTIAL
     - BLOCKED
-    consumers: &id015
+    consumers:
     - CL-E-30
   mutations:
     allowed:
@@ -1086,12 +1392,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14629 bytes'
-  - 'SHA-256 of that extraction: fa47fa0561e4d12eee1090ec730e45b9e66f6674bfc0b00ae54a939f250259ba'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14836 bytes'
+  - 'SHA-256 of that extraction: eb48c4bc6846c83f24c02bb0f7fb615372a47f4c10d63816a868edfd586068c3'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id015
+  required_interfaces:
+  - CL-E-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1109,10 +1417,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1120,8 +1424,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-30
   notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
   notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
@@ -1143,7 +1471,7 @@ prompts:
     states:
     - ACCEPT
     - DENY
-    consumers: &id016
+    consumers:
     - CL-E-40
     - CL-E-20
   mutations:
@@ -1154,12 +1482,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13505 bytes'
-  - 'SHA-256 of that extraction: 8979cf271c9145ae932eb4e7832ddedcb3b8a7756b3fa2ce0054914f6d9f2f24'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13633 bytes'
+  - 'SHA-256 of that extraction: e8bdbf3d4df80d3439160aa3001ba4307cfb14cbcfb4d2e4b6de5f659520c694'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id016
+  required_interfaces:
+  - CL-E-20
+  - CL-E-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1177,10 +1508,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1188,8 +1515,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-40
   notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
   notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
@@ -1209,11 +1560,9 @@ prompts:
   - artifact: PF09_MAINTENANCE_CANDIDATE
     states:
     - MAINTENANCE_PENDING
-    consumers: &id017
-    - CL-E-20
-    - CL-E-30
-    - CL-20
+    consumers:
     - CL-40
+    - CL-E-20
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1222,12 +1571,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 15318 bytes'
-  - 'SHA-256 of that extraction: f35a9c7b8522229448c0867c9cc073309b00d1f7605b5c858281ecce51e53206'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 15461 bytes'
+  - 'SHA-256 of that extraction: 7a1a0d20882a06b5058b7e027b1bd3d92ff0e1d3afd783131e4427dccbd3d452'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id017
+  required_interfaces:
+  - CL-40
+  - CL-E-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1245,10 +1597,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -1256,8 +1604,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: DOC-10
   notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
   notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
@@ -1276,7 +1648,7 @@ prompts:
   - CHANGE_ID
   - CANON_CONFLICT_REGISTER
   - PLAN_REVIEW_ID
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_REVIEW_ID
   - BLOCKED
   - PENDING
   - PARTIAL
@@ -1284,11 +1656,13 @@ prompts:
   outputs:
   - artifact: PR_INSTRUCTION
     states:
-    - INSTRUCTION_READY
-    - DRAFT
     - BLOCKED
-    consumers: &id018
+    - DRAFT
+    - INSTRUCTION_READY
+    - PENDING
+    consumers:
     - PR-20
+    - RS-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1297,12 +1671,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 19586 bytes'
-  - 'SHA-256 of that extraction: 495096cc4b658c0e2e20e55355dc1256e53e37345166f1e8d4e571b9868eed2b'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 19791 bytes'
+  - 'SHA-256 of that extraction: e10922687c1d56bb32adbd6b87adeeec2d17a34a4722c841f1fd3b4cd6e04cd7'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id018
+  required_interfaces:
+  - PR-20
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1320,19 +1697,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: DOC-20
   notion_page_id: 3db4590a05eb8164ac09e722dc967f25
   notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
@@ -1359,14 +1754,19 @@ prompts:
   - PARTIAL
   - FAILED
   - PLAN_REVIEW_ID
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_REVIEW_ID
   outputs:
   - artifact: DOCUMENTATION_COMPLETION
     states:
+    - BLOCKED
     - COMPLETE
     - INCOMPLETE
-    consumers: &id019
+    - PENDING
+    consumers:
+    - DOC-10
+    - PR-40
     - QA-10
+    - RS-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1375,12 +1775,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 20095 bytes'
-  - 'SHA-256 of that extraction: af90b8bddf7b5581fcc87b4cea19efd60252d7922132e33006d4da23636a814f'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 20221 bytes'
+  - 'SHA-256 of that extraction: d7b8af01cb69189b96524ce56c67e3176cb6b358dfe6afbd0ec696127312133f'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id019
+  required_interfaces:
+  - DOC-10
+  - PR-40
+  - QA-10
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1398,19 +1803,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-10
   notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
   notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
@@ -1430,7 +1853,7 @@ prompts:
   - artifact: QA_ESCALATION_REPORT
     states:
     - AWAITING_THOTH_REMEDIATION
-    consumers: &id020
+    consumers:
     - ESC-30
   mutations:
     allowed:
@@ -1440,12 +1863,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16494 bytes'
-  - 'SHA-256 of that extraction: c80c758c0b1560a790b2192dd2f2faba17e9b87c89942cb012551405f8370a70'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 16687 bytes'
+  - 'SHA-256 of that extraction: 862f4755c968300c4e46788fc05714ae0b526e1e8b999651c548e3bea6fa7fe0'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id020
+  required_interfaces:
+  - ESC-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1463,19 +1888,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-25
   notion_page_id: 3db4590a05eb81bf9326e46a1017de38
   notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
@@ -1489,7 +1932,7 @@ prompts:
   creator_role: the explicitly named read-only repository reviewer or authorized environment operator.
   reviewer_role: NONE
   inputs:
-  - REMEDIATION_PLAN_ID
+  - REMEDIATION_PROPOSAL_ID
   - DISCOVERY_TASK_ID
   - TRIAGE_RECEIPT_ID
   outputs:
@@ -1498,7 +1941,7 @@ prompts:
     - COMPLETE
     - PARTIAL
     - BLOCKED
-    consumers: &id021
+    consumers:
     - ESC-30
   mutations:
     allowed:
@@ -1508,12 +1951,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17142 bytes'
-  - 'SHA-256 of that extraction: 56ad8286baedbed31d72e0ef7cf0287513c9bc24cf58f8602bc7fe62dd2bcc72'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17283 bytes'
+  - 'SHA-256 of that extraction: 4d406076859583bad3cc9421621fee20e8fd8df33882ddaf8fac2c29b782b4e6'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id021
+  required_interfaces:
+  - ESC-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1531,19 +1976,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-30
   notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
   notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
@@ -1561,16 +2024,16 @@ prompts:
   - QA_ESCALATION_REPORT_ID
   - CHANGE_CLASS
   - CHANGE_ID
-  - REMEDIATION_PLAN_ID
+  - REMEDIATION_PROPOSAL_ID
   - DISCOVERY_RESULT_IDS
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_REVIEW_ID
   outputs:
   - artifact: REMEDIATION_PROPOSAL
     states:
     - REMEDIATION_PENDING
     - DISCOVERY_REQUIRED
     - BLOCKED
-    consumers: &id022
+    consumers:
     - ESC-25
     - ESC-40
   mutations:
@@ -1581,12 +2044,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17771 bytes'
-  - 'SHA-256 of that extraction: 27a29c0c7d07e2c0485d5bbbe1fa70b96e0e35944ceb7db2cd4d61af1f77d437'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17755 bytes'
+  - 'SHA-256 of that extraction: 9cbf40c9dcb4718d79ed8a8384493ce433e82ec1b18980790aeffdf7fc8a0c44'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id022
+  required_interfaces:
+  - ESC-25
+  - ESC-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1604,19 +2070,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-40
   notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
   notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
@@ -1637,12 +2121,10 @@ prompts:
     - APPROVE
     - APPROVE_AS_CHANGED
     - DENY
-    consumers: &id023
+    consumers:
     - ESC-30
     - PR-30
-    - RS-40
-    - IA-40
-    - IA-30
+    - PR-35
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1651,12 +2133,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17785 bytes'
-  - 'SHA-256 of that extraction: 65b7cd2086a4a306c938dd6cd4dd2448032b97f094f0e4811815fba675b89a6e'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17834 bytes'
+  - 'SHA-256 of that extraction: bba0879b6a96baf441678ba0241aebe66c7127833cf265a5ba97d499d685f144'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id023
+  required_interfaces:
+  - ESC-30
+  - PR-30
+  - PR-35
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1674,19 +2160,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: GCFPE-MGMT-10
   notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
   notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
@@ -1704,13 +2208,12 @@ prompts:
   outputs:
   - artifact: GCFPE_SUCCESSOR_RELEASE / CHANGE_RECORD
     states:
-    - COMPLETED_AND_PUBLISHED
-    - CANDIDATE_AWAITING_DECISION
-    - BLOCKED
-    consumers: &id024
-    - CF-PO-10
-    - CF-E-10
-    - CF-C-10
+    - ECOSYSTEM_CHANGE_COMPLETE
+    - IMPLEMENTATION_BLOCKED
+    - PROMOTION_CHECKPOINT_REQUIRED
+    - READY_FOR_PRODUCT_OWNER_ALPHA_RESUMPTION_DECISION
+    consumers:
+    - PR-10
   mutations:
     allowed:
     - Perform only the authorized GCFPE prompt/control publication mutations
@@ -1719,12 +2222,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8016 bytes'
-  - 'SHA-256 of that extraction: 162e4027c963c54d99ee7d7c01c6b047490d82c2a6579ce94ef1455698f20dd6'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 8015 bytes'
+  - 'SHA-256 of that extraction: e5b77f9c5c9939b2234146b106360b06fe73101b6ec50459ada16b18f6d25b12'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id024
+  required_interfaces:
+  - PR-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1741,20 +2246,34 @@ prompts:
     extracted_as_of: '2026-09-17'
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
-    required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
-    - value: PF10
-      rule_id: CTR-002
-    - value: NEXT_PROMPT_HANDOFF
-      rule_id: TOP-001
+    required_literals: null
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-10
   notion_page_id: 3db4590a05eb817aa191f1e822c30480
   notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
@@ -1775,8 +2294,11 @@ prompts:
     - AUDIT_COMPLETE
     - PLAN_PENDING
     - BLOCKED
-    consumers: &id025
+    consumers:
+    - IA-20
     - IA-30
+    - IA-50
+    - IA-60
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1785,12 +2307,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10198 bytes'
-  - 'SHA-256 of that extraction: 17811f1afe3e8d0fceeff8821ebbd611779b80c7a22eb8cb3d8d516c6ac5a7c0'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 10301 bytes'
+  - 'SHA-256 of that extraction: 5b7980fe30e9fced15b3c88133f834236d0309dc1f8966db9d0a9430b4fe8659'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id025
+  required_interfaces:
+  - IA-20
+  - IA-30
+  - IA-50
+  - IA-60
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1808,19 +2335,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-20
   notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
   notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
@@ -1841,8 +2386,10 @@ prompts:
     states:
     - PLAN_PENDING
     - BLOCKED
-    consumers: &id026
+    consumers:
     - IA-30
+    - IA-50
+    - IA-60
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -1851,12 +2398,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6294 bytes'
-  - 'SHA-256 of that extraction: 34beda5a2fcde776ace154dc6af4873676b0f386215bb41616d352a07d2650b7'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6411 bytes'
+  - 'SHA-256 of that extraction: 802ccd490feb83f6c4df3c73c325342e0202a02935579ffbf33c74feb35451be'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id026
+  required_interfaces:
+  - IA-30
+  - IA-50
+  - IA-60
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1874,19 +2425,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-30
   notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
   notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
@@ -1905,9 +2474,15 @@ prompts:
   outputs:
   - artifact: IMPLEMENTATION_PLAN_REVIEW / MATERIAL_PLAN_DELTA_REVIEW
     states:
-    - APPROVE
-    - DENY
-    consumers: &id027
+    - CHANGE_NOT_SUBSTANTIATED
+    - DELTA_APPROVE
+    - DELTA_DENY
+    - INITIAL_APPROVE
+    - INITIAL_DENY
+    - PLAN_DELTA_REDLINE
+    - PRODUCT_OWNER_DECISION_REQUIRED
+    - WRONG_NATIVE_LANE
+    consumers:
     - PR-10
     - IA-40
   mutations:
@@ -1918,12 +2493,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9385 bytes'
-  - 'SHA-256 of that extraction: 066c60abc7356224bf8f1c3f837c5cc3d5c6c52fcdfeddf4690afc776642a895'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 9764 bytes'
+  - 'SHA-256 of that extraction: 2758efafe4cc0ba19fec1a76c583cf5b79de75f81d0460af2b4bfd3fb8b04c48'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id027
+  required_interfaces:
+  - IA-40
+  - PR-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -1941,19 +2519,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-40
   notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
   notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
@@ -1967,14 +2563,19 @@ prompts:
   creator_role: the same Implementation Agent (IA) who authored the pending preapproval whole-change Plan.
   reviewer_role: Isis / Lead Developer
   inputs:
-  - Require one complete pending initial Implementation Plan plus the exact IA-30 denial/redline for that version, or an interrupted preapproval
-    recovery package with the same author/reviewer lineage.
+  - Require one complete pending initial Implementation Plan plus the exact IA-30 denial/redline for that version, or an interrupted preapproval recovery package with the same author/reviewer lineage.
   outputs:
   - artifact: IMPLEMENTATION_PLAN
     states:
     - PLAN_PENDING_REVISED
-    - WRONG_ROUTE_APPROVED_BASE
-    consumers: &id028
+    - REDLINE_INCOMPLETE
+    - WRONG_NATIVE_LANE
+    consumers:
+    - IA-30
+  - artifact: MATERIAL_PLAN_DELTA
+    states:
+    - PLAN_DELTA_PENDING
+    consumers:
     - IA-30
   mutations:
     allowed:
@@ -1984,12 +2585,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5499 bytes'
-  - 'SHA-256 of that extraction: efc2eb2e88be1d70db04c661662662045ffde5e490e1b2c9c64eae215d11a75e'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5712 bytes'
+  - 'SHA-256 of that extraction: 8c9bb2273f3e54ba8b1422a6f8d1c3bd1132497faa0ffd561038342a0c268326'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id028
+  required_interfaces:
+  - IA-30
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2007,19 +2610,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-50
   notion_page_id: 3db4590a05eb81d78eeae384e93dd697
   notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
@@ -2039,12 +2660,11 @@ prompts:
     states:
     - SEED_READY
     - SEED_INCOMPLETE
-    consumers: &id029
+    consumers:
     - IA-10
     - IA-20
     - IA-30
     - IA-40
-    - ESC-40
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2053,12 +2673,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6487 bytes'
-  - 'SHA-256 of that extraction: 1467e12e0587d1dfc84bb9ed7c6af503f014930c3710ffb2905e87310e1e8f8c'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6668 bytes'
+  - 'SHA-256 of that extraction: 42ce029be426cd3d745b3e9f7099439a091d3ee915c1f4c0dcd660cf5cf0afef'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id029
+  required_interfaces:
+  - IA-10
+  - IA-20
+  - IA-30
+  - IA-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2076,19 +2701,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-60
   notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
   notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
@@ -2102,17 +2745,15 @@ prompts:
   creator_role: Act as Thoth for one bounded advanced engineering planning inquiry before Plan approval.
   reviewer_role: NONE
   inputs:
-  - 'PLANNING_INQUIRY: exact original question/identity; actual files/interfaces and repository evidence; constraints, alternatives, failure modes,
-    decision criteria and specific requested finding.'
+  - 'PLANNING_INQUIRY: exact original question/identity; actual files/interfaces and repository evidence; constraints, alternatives, failure modes, decision criteria and specific requested finding.'
   outputs:
   - artifact: PLANNING_RESEARCH_FINDING
     states:
     - RESEARCH_COMPLETE
     - PARTIAL
     - BLOCKED
-    consumers: &id030
+    consumers:
     - IA-50
-    - ESC-30
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2121,12 +2762,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5325 bytes'
-  - 'SHA-256 of that extraction: bf0f2f2f0cd352841e71ec029af760584ae9b70213fe03ea50c510195cce643a'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5633 bytes'
+  - 'SHA-256 of that extraction: 5addd33093e4c794e609829bba434275f06e798d313eda8ed29d63ffdba3e8c6'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id030
+  required_interfaces:
+  - IA-50
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2144,19 +2787,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: MGR-10
   notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
   notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
@@ -2170,14 +2831,13 @@ prompts:
   creator_role: the Change Flow coordinator, without taking over any substantive actor or approval.
   reviewer_role: NONE
   inputs:
-  - For a request only to prepare Product Owner cycle-entry launch guidance, accept known or unresolved classification and all actual intake without
-    inventing change identity.
+  - For a request only to prepare Product Owner cycle-entry launch guidance, accept known or unresolved classification and all actual intake without inventing change identity.
   outputs:
   - artifact: FLOW_PROGRESS
     states:
     - FLOW_PROGRESS
     - TERMINAL_RETURN
-    consumers: &id031
+    consumers:
     - CF-PO-10
     - CF-E-10
     - CF-C-10
@@ -2191,12 +2851,18 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 7277 bytes'
-  - 'SHA-256 of that extraction: 88eaaca7a245c1772e8118c0fe576d14bb26c1a070394a1149bb76ecce7cc23d'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 7276 bytes'
+  - 'SHA-256 of that extraction: 5c8aebc68f7f7f6aa708851e0464e5793b27df158af1e37537ab450efbd86f6a'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id031
+  required_interfaces:
+  - CF-C-10
+  - CF-E-10
+  - CF-PO-10
+  - CL-40
+  - QA-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2214,19 +2880,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-10
   notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
   notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
@@ -2242,14 +2926,16 @@ prompts:
   inputs:
   - IMPLEMENTATION_PLAN_REF
   - PLAN_REVIEW_ID
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_REVIEW_ID
   outputs:
   - artifact: OPS_TASK
     states:
     - READY
     - BLOCKED
-    consumers: &id032
+    consumers:
+    - ESC-25
     - OPS-20
+    - RS-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2258,12 +2944,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 43009 bytes'
-  - 'SHA-256 of that extraction: 57b70c7e5140654d3965c40514524afc47d8d6577f41ac28ac782f2b1da2aded'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 42826 bytes'
+  - 'SHA-256 of that extraction: 4a30d7342f4a71e314b7962c2f7eb2ab6b313d9323044a1fcc8e6cbc6bc41563'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id032
+  required_interfaces:
+  - ESC-25
+  - OPS-20
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2281,10 +2971,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -2292,8 +2978,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-20
   notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
   notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
@@ -2317,8 +3027,10 @@ prompts:
     - FAILED
     - NOT_EXECUTED
     - NOT_PRODUCED
-    consumers: &id033
+    consumers:
+    - ESC-25
     - OPS-30
+    - RS-10
   mutations:
     allowed:
     - Execute only the bounded OPS_TASK mutations
@@ -2327,12 +3039,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36979 bytes'
-  - 'SHA-256 of that extraction: 3f1a63b41247ef2919b42e93e4653ef3d39875e470407bac740f424fa4c002b9'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 36912 bytes'
+  - 'SHA-256 of that extraction: 429c6ccca8c1602b3457433b85f3c91f96d7c21bb4891ee921dd56decd8b2c0c'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id033
+  required_interfaces:
+  - ESC-25
+  - OPS-30
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2350,10 +3066,6 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
@@ -2361,8 +3073,32 @@ prompts:
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-30
   notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
   notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
@@ -2391,12 +3127,10 @@ prompts:
     states:
     - ACCEPT
     - REJECT
-    consumers: &id034
+    consumers:
+    - ESC-25
     - OPS-10
-    - OPS-20
-    - ESC-30
     - RS-10
-    - RS-20
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2405,12 +3139,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 57766 bytes'
-  - 'SHA-256 of that extraction: d6b7dde2ba47b490bdd0aab7c5f059da638d5cad273287564e9d983065e3647b'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 57532 bytes'
+  - 'SHA-256 of that extraction: 321e626fc72fb71dddf865860193b9d66fb36eae30b6a43c7d713e27443ff45f'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id034
+  required_interfaces:
+  - ESC-25
+  - OPS-10
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2428,19 +3166,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-10
   notion_page_id: 3db4590a05eb818e8359de1994e97a7d
   notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
@@ -2457,15 +3213,16 @@ prompts:
   - IMPLEMENTATION_PLAN_ID
   - PLAN_REVIEW_ID
   - WORK_UNIT_ID
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_REVIEW_ID
   outputs:
   - artifact: PR_INSTRUCTION
     states:
     - INSTRUCTION_READY
     - DRAFT
     - BLOCKED
-    consumers: &id035
+    consumers:
     - PR-20
+    - RS-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2474,12 +3231,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 49560 bytes'
-  - 'SHA-256 of that extraction: e0e2ed06711e577fbb7a7f05505daf23c7d8530ef6951b6cf58cdcbd08c3ecf9'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 49351 bytes'
+  - 'SHA-256 of that extraction: d1e2458c39037c9aa1dfbc3f97641e2e6b2c1dd2143447f40c142dacb6a8b623'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id035
+  required_interfaces:
+  - PR-20
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2497,19 +3257,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-20
   notion_page_id: 3db4590a05eb8174abf8c04318ab04be
   notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
@@ -2530,8 +3308,8 @@ prompts:
     - AWAITING_PO_PROCEED
     - DRAFT
     - BLOCKED
-    consumers: &id036
-    - PR-30
+    consumers:
+    - RS-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2540,12 +3318,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 51957 bytes'
-  - 'SHA-256 of that extraction: fc6213fdb2f564085641fc4c97f67989191699422ce204a42f876fa78dd6493a'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 51725 bytes'
+  - 'SHA-256 of that extraction: d64997b20867063089a23b42d44f6744a6537f158844e0a13f84670fd5f41110'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id036
+  required_interfaces:
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2563,19 +3343,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-30
   notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
   notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
@@ -2594,12 +3392,12 @@ prompts:
   outputs:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
-    - MERGE_PENDING
-    - RESCOPE_PENDING
-    - RECOVERY_PENDING
     - PRODUCT_OWNER_DECISION_REQUIRED
-    consumers: &id037
-    - PR-40
+    - PR_CANDIDATE_PUBLISHED
+    - RECOVERY_PENDING
+    - RESCOPE_PENDING
+    consumers:
+    - PR-35
     - RS-20
   mutations:
     allowed:
@@ -2609,12 +3407,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 39931 bytes'
-  - 'SHA-256 of that extraction: 045e2231457b80ee67fe07a1730e8f52483b9088e793faabf858ebfe3fd81f06'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 39795 bytes'
+  - 'SHA-256 of that extraction: 8c2c0f231da5f10cb08c0328978d198fcc981f5f59a786bbeb240c7b597b33fb'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id037
+  required_interfaces:
+  - PR-35
+  - RS-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2632,19 +3433,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-35
   notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
   notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
@@ -2668,12 +3487,12 @@ prompts:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
     - MERGE_PENDING
-    - RESCOPE_PENDING
+    - PRODUCT_OWNER_DECISION_REQUIRED
     - RECOVERY_PENDING
     - REMOTE_EVIDENCE_PENDING
+    - RESCOPE_PENDING
     consumers:
     - RS-20
-    - PR-35
   mutations:
     allowed:
     - Resolve review findings on the existing pull request for the proceeded work unit
@@ -2693,21 +3512,44 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: NEXT_PROMPT_HANDOFF
       rule_id: CTR-002
+    forbidden_literals: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17679 bytes'
-  - 'SHA-256 of that extraction: 1352d8f409995ce46e281f32ed12b6c61c1e9adc76ddc7f6eb899928fa145540'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17912 bytes'
+  - 'SHA-256 of that extraction: 6554c3f5fef2c62da04c18e9d6ad141c0349d64438279f90c312d84bfcf0e73f'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
   required_interfaces:
   - RS-20
-  - PR-35
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2727,22 +3569,24 @@ prompts:
   creator_role: the designated PR reviewer for the complete work unit, operating read-only.
   reviewer_role: NONE
   inputs:
-  - 'The sole substantive review input is the complete native package containing:
-
-    - PR_INSTRUCTION_ID and complete PR_INSTRUCTION.'
+  - PR_INSTRUCTION_ID and complete PR_INSTRUCTION
+  - PR_IMPLEMENTATION_PLAN_ID and complete PR_IMPLEMENTATION_PLAN
+  - The complete PR-30 result with PR_CANDIDATE_PUBLISHED and the complete PR-35 result whose earlier MERGE_PENDING is historical pre-merge evidence
+  - The complete ordered PR_REFS for this work unit, with each actual PR reference, commit identity, order, review/check state and merge evidence
+  - CHANGE_CLASS, CHANGE_ID, WORK_UNIT_ID, approved Specification, Implementation Audit, Plan, Plan review, dependency and acceptance/evidence lineage
+  - Existing PR reviewer/session lineage for a rereview, the dedicated PR session identity, the whole-change IA context and exact return owner
+  - CANON_CONFLICT_REGISTER, recovery state, truthful pending, NOT PRODUCED and NOT EXECUTED values, and all actual access limitations
+  - Nathan's later invocation asserting the identified PR was manually merged after PR-35 produced MERGE_PENDING
   outputs:
   - artifact: PR_WORK_UNIT_LINEAGE_REVIEW
     states:
     - ACCEPT
     - REJECT
     - PENDING
-    consumers: &id038
-    - DOC-20
-    - QA-10
-    - PR-30
+    consumers:
     - PR-10
+    - PR-30
     - RS-10
-    - RS-20
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2751,12 +3595,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 54319 bytes'
-  - 'SHA-256 of that extraction: a724b32a34e271da24b5cb151f6b281521a3e334f28710b382530f3fb0952d13'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 54043 bytes'
+  - 'SHA-256 of that extraction: 042255564c9916c4a933f0986ad8f98e36a495bdf1e35a956cdc0704a87991dc'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id038
+  required_interfaces:
+  - PR-10
+  - PR-30
+  - RS-10
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2774,19 +3622,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-50
   notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
   notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
@@ -2800,14 +3666,12 @@ prompts:
   creator_role: acting only on Nathan / Product Owner's direct manual invocation.
   reviewer_role: NONE
   inputs:
-  - Require Nathan's direct manual invocation, exact change/work unit, PR/session/workspace/worktree/branch/head, original Proceed, immutable
-    base and applicable overlays, failure/recovery evidence, completed work, reviews/CI, artifacts, constraints and the reason continuation is
-    unrecoverable.
+  - Require Nathan's direct manual invocation, exact change/work unit, PR/session/workspace/worktree/branch/head, original Proceed, immutable base and applicable overlays, failure/recovery evidence, completed work, reviews/CI, artifacts, constraints and the reason continuation is unrecoverable.
   outputs:
   - artifact: PR_ABORT_ESCALATION_RECORD
     states:
     - PR_ABORTED_ESCALATED
-    consumers: &id039 []
+    consumers: []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -2816,12 +3680,13 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6742 bytes'
-  - 'SHA-256 of that extraction: e214eb5bae4d14896c39198ffe6c7597469d8a497e88e4c0e5a5b41d016fc2a6'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6887 bytes'
+  - 'SHA-256 of that extraction: ac910fe9e1374a4206179c58b8fba187b6c0e62e66e9c0cc1ffab85de93a91c8'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id039
+  required_interfaces: []
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2839,17 +3704,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
     - value: controlled Markdown
       rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-10
   notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
   notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
@@ -2876,8 +3761,8 @@ prompts:
   - OPS_EXECUTION_RESULT_ID
   - OPS_TASK_RECEIPT
   - DOCUMENTATION_COMPLETION_ID
-  - REMEDIATION_PLAN_ID
-  - REMEDIATION_PLAN_REVIEW_ID
+  - REMEDIATION_PROPOSAL_ID
+  - REMEDIATION_REVIEW_ID
   - ORIGINATING_FINDING_REF
   outputs:
   - artifact: REALITY_AUDIT / CHANGE_AUDIT_TRIAGE / QA_READINESS
@@ -2885,7 +3770,7 @@ prompts:
     - READY_FOR_QA
     - NOT_READY
     - ASSESSMENT_INCOMPLETE
-    consumers: &id040
+    consumers:
     - QA-20
     - ESC-30
   mutations:
@@ -2896,12 +3781,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 82572 bytes'
-  - 'SHA-256 of that extraction: b2a2feafce94d222ff3012eeb64f70a7086738d050b9520ed08820dccc28f649'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 82485 bytes'
+  - 'SHA-256 of that extraction: 9aeaeff42ad12f44f0e6036e922cb14c9da16457128a07159a8ee4331b152b99'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id040
+  required_interfaces:
+  - ESC-30
+  - QA-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2919,19 +3807,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-100
   notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
   notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
@@ -2959,11 +3865,8 @@ prompts:
     - BLOCKED
     - FAILED
     - NOT_EXECUTED
-    consumers: &id041
+    consumers:
     - QA-110
-    - QA-90
-    - QA-80
-    - QA-70
   mutations:
     allowed:
     - Execute only the bounded QA_TASK actions
@@ -2972,12 +3875,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13286 bytes'
-  - 'SHA-256 of that extraction: 74bca04ab15a5cb785d02a3bed788fed3e9316b230440607e69a37d52028265d'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13321 bytes'
+  - 'SHA-256 of that extraction: cf7d6d43397407f7a0598dcca2bb0097a0182d718d09da6e5bd73603665c48c5'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id041
+  required_interfaces:
+  - QA-110
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -2995,19 +3900,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-110
   notion_page_id: 3db4590a05eb816984d1d34da0e08f40
   notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
@@ -3035,7 +3958,7 @@ prompts:
     - BOUNDED_RERUN_REQUIRED
     - ESCALATION_REQUIRED
     - INCOMPLETE
-    consumers: &id042
+    consumers:
     - QA-120
     - QA-90
     - QA-100
@@ -3048,12 +3971,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14191 bytes'
-  - 'SHA-256 of that extraction: f74d8a23dbdc8100ffc3217dfa791d63bb6be9cb00729edc6e0e2b067f3409ba'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14305 bytes'
+  - 'SHA-256 of that extraction: 698c44f0c57d7294eed8a9a34049ee729b4a334eda81d6da0da8ad2dfb287718'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id042
+  required_interfaces:
+  - ESC-10
+  - QA-100
+  - QA-120
+  - QA-90
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3071,19 +3999,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-120
   notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
   notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
@@ -3101,7 +4047,7 @@ prompts:
   - QA_TASK_ID
   - QA_EXECUTION_RESULT_ID
   - QA_EVIDENCE_REVIEW_ID
-  - QA_GUIDE_ID
+  - LIVE_QA_GUIDE_ID
   - QA_AUDIT_ID
   - REALITY_AUDIT_ID
   - CHANGE_AUDIT_TRIAGE_ID
@@ -3112,11 +4058,12 @@ prompts:
     - PASS
     - FAIL
     - INTERIM
-    consumers: &id043
+    consumers:
     - CL-C-10
+    - CL-E-10
+    - ESC-10
     - QA-110
     - QA-90
-    - ESC-10
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3125,12 +4072,18 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13612 bytes'
-  - 'SHA-256 of that extraction: 0ddef968c4d5102d832dcea60f109ab5b4e01ca208053e4c930f08466cf42470'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13731 bytes'
+  - 'SHA-256 of that extraction: 94d6abb95dc8c637f91e2cb16d5a68323addc416bb961cef32c27477fb6a53d4'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id043
+  required_interfaces:
+  - CL-C-10
+  - CL-E-10
+  - ESC-10
+  - QA-110
+  - QA-90
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3148,19 +4101,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-20
   notion_page_id: 3db4590a05eb816daa3adff37283482b
   notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
@@ -3182,7 +4153,7 @@ prompts:
     states:
     - GUIDE_READY
     - BLOCKED
-    consumers: &id044
+    consumers:
     - QA-50
     - QA-10
   mutations:
@@ -3193,12 +4164,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13280 bytes'
-  - 'SHA-256 of that extraction: 38d58a4780cba42acd1952c67b3a7603c226c1ae171088a2babd961006b7a290'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13217 bytes'
+  - 'SHA-256 of that extraction: 927b57745409bb99c4a83013a84f86ba7a375f2811b03d5a8beb46dcaba453a2'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id044
+  required_interfaces:
+  - QA-10
+  - QA-50
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3216,19 +4190,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-50
   notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
   notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
@@ -3252,10 +4244,11 @@ prompts:
     - AUDIT_COMPLETE
     - PLAN_PENDING
     - BLOCKED
-    consumers: &id045
+    consumers:
+    - QA-60
     - QA-70
     - QA-80
-    - QA-60
+    - QA-90
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3264,12 +4257,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16347 bytes'
-  - 'SHA-256 of that extraction: 15bbf8fbbbace3eb88493cccc5ed86e0ade1bc43748ede30e89d62d6c94becb2'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 16351 bytes'
+  - 'SHA-256 of that extraction: 6fee14353c20e21d8ae1d38df31d3be2fc93a73161606fc17a7e45bd385881ff'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id045
+  required_interfaces:
+  - QA-60
+  - QA-70
+  - QA-80
+  - QA-90
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3287,19 +4285,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-60
   notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
   notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
@@ -3319,9 +4335,10 @@ prompts:
     states:
     - PLAN_PENDING
     - BLOCKED
-    consumers: &id046
+    consumers:
     - QA-70
     - QA-80
+    - QA-90
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3330,12 +4347,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14017 bytes'
-  - 'SHA-256 of that extraction: 62e693e9d4f0543afef047e65fd64980c700d0df2b9741ab7bbc597fd23adbb4'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14012 bytes'
+  - 'SHA-256 of that extraction: f523e6354696e5ba637181f1ad7f1b60b54f11bb421ea39ac55cf7b9ede965a3'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id046
+  required_interfaces:
+  - QA-70
+  - QA-80
+  - QA-90
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3353,19 +4374,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-70
   notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
   notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
@@ -3385,7 +4424,7 @@ prompts:
     states:
     - APPROVE
     - DENY
-    consumers: &id047
+    consumers:
     - QA-90
     - QA-80
   mutations:
@@ -3396,12 +4435,15 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13828 bytes'
-  - 'SHA-256 of that extraction: ab381134f7f954eb23461b4fbd667bee4eb0f10f290122dee49b0ab9f8a819f7'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14034 bytes'
+  - 'SHA-256 of that extraction: e0c85ea3c5567d43c35eaad32d90546e4738f34e06918a47488fd9766375b406'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id047
+  required_interfaces:
+  - QA-80
+  - QA-90
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3419,19 +4461,39 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: never a gate on later work
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-80
   notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
   notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
@@ -3445,14 +4507,13 @@ prompts:
   creator_role: the same Kronos who authored the Plan.
   reviewer_role: Isis / Lead Developer
   inputs:
-  - Require one complete pending initial QA Plan plus the exact QA-70 denial/redline for that version, or an interrupted preapproval recovery
-    package with the same Kronos author and Isis reviewer.
+  - Require one complete pending initial QA Plan plus the exact QA-70 denial/redline for that version, or an interrupted preapproval recovery package with the same Kronos author and Isis reviewer.
   outputs:
   - artifact: QA_PLAN
     states:
     - PLAN_PENDING_REVISED
     - WRONG_ROUTE_APPROVED_BASE
-    consumers: &id048
+    consumers:
     - QA-70
   mutations:
     allowed:
@@ -3462,12 +4523,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 10147 bytes'
-  - 'SHA-256 of that extraction: c0510294a3649903e15f6e546fdd840af4df972025a3594ae7f649b2688cf2ce'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 10163 bytes'
+  - 'SHA-256 of that extraction: 3c0080857a39aa14cf8e8e93f80674858e906a5e30e58d44dfdc944abfa8a02d'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id048
+  required_interfaces:
+  - QA-70
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3485,19 +4548,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-90
   notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
   notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
@@ -3522,11 +4603,10 @@ prompts:
     - TASK_READY
     - ESCALATION_REQUIRED
     - NOT_EXECUTED
-    consumers: &id049
+    consumers:
+    - ESC-10
     - QA-100
     - QA-110
-    - QA-80
-    - QA-70
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3535,12 +4615,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13901 bytes'
-  - 'SHA-256 of that extraction: e0be79e175ec028768c6e5c890939a502598567d4b07437c1b62e531a8d9a032'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13892 bytes'
+  - 'SHA-256 of that extraction: b77124fc789087f297fb668547617c3d6d82f3b0e4c8fcaff93686684c62d097'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id049
+  required_interfaces:
+  - ESC-10
+  - QA-100
+  - QA-110
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3558,19 +4642,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-10
   notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
   notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
@@ -3584,14 +4686,12 @@ prompts:
   creator_role: Sekhmet or the explicitly assigned finding author, with no approval authority.
   reviewer_role: Whole-change Implementation Agent
   inputs:
-  - Supply the exact CHANGE_CLASS, CHANGE_ID and work-unit/finding identity; approved Specification and immutable approved Plan/review; current
-    PF10 Markdown and applicable addenda; actual originating stage, owner/session, suspended boundary and read-only finding evidence; existing
-    draft/result and any prior proposal/review.
+  - Supply the exact CHANGE_CLASS, CHANGE_ID and work-unit/finding identity; approved Specification and immutable approved Plan/review; current PF10 Markdown and applicable addenda; actual originating stage, owner/session, suspended boundary and read-only finding evidence; existing draft/result and any prior proposal/review.
   outputs:
   - artifact: RESCOPE_PROPOSAL
     states:
     - RESCOPE_PROPOSAL_PENDING_REVIEW
-    consumers: &id050
+    consumers:
     - RS-20
   mutations:
     allowed:
@@ -3601,12 +4701,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 12775 bytes'
-  - 'SHA-256 of that extraction: cc1789ce6143883ecd81b6fc2f8d19a68f4bc1ec3b3b0c418041a93aecc66368'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 12732 bytes'
+  - 'SHA-256 of that extraction: 93905c67c008c31d829ad1cf3b3b621ff699a84228df61cb2268a6d0cbfc83c1'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id050
+  required_interfaces:
+  - RS-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3624,19 +4726,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-20
   notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
   notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
@@ -3650,8 +4770,7 @@ prompts:
   creator_role: the continuing whole-change Implementation Agent (IA).
   reviewer_role: NONE
   inputs:
-  - 'Supply exactly one complete read-back rescope artifact: a RESCOPE_REQUEST produced by PR-30 or revised by RS-30, or a RESCOPE_PROPOSAL produced
-    by RS-10 or revised by RS-30.'
+  - 'Supply exactly one complete read-back rescope artifact: a RESCOPE_REQUEST produced by PR-30 or revised by RS-30, or a RESCOPE_PROPOSAL produced by RS-10 or revised by RS-30.'
   outputs:
   - artifact: RESCOPE_REVIEW
     states:
@@ -3660,10 +4779,11 @@ prompts:
     - REVISION_REQUIRED
     - SPECIFICATION_CHANGE_REQUIRED
     - IN_SCOPE_REPAIR
-    consumers: &id051
-    - RS-40
+    consumers:
     - PR-30
+    - PR-35
     - RS-30
+    - RS-40
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3672,12 +4792,17 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14780 bytes'
-  - 'SHA-256 of that extraction: 90f7956b5478107e253397e7be3aecfa175a0620a0a06c94c91a06b30f4cf499'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14838 bytes'
+  - 'SHA-256 of that extraction: f633350f5e254fcc05c963471cbe5264cc3d0326411f2c9a6d5e80c5c4aa1763'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id051
+  required_interfaces:
+  - PR-30
+  - PR-35
+  - RS-30
+  - RS-40
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3695,19 +4820,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-30
   notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
   notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
@@ -3721,13 +4864,12 @@ prompts:
   creator_role: the same Sekhmet or explicitly assigned rescope-artifact author.
   reviewer_role: Whole-change Implementation Agent
   inputs:
-  - 'Supply exactly one RESCOPE_REQUEST_ID or RESCOPE_PROPOSAL_ID and the actual correction authority: either its RS-20 REVISION_REQUIRED review
-    or Nathan''s exact Product Owner correction.'
+  - 'Supply exactly one RESCOPE_REQUEST_ID or RESCOPE_PROPOSAL_ID and the actual correction authority: either its RS-20 REVISION_REQUIRED review or Nathan''s exact Product Owner correction.'
   outputs:
   - artifact: RESCOPE_REQUEST / RESCOPE_PROPOSAL
     states:
     - RESCOPE_PROPOSAL_PENDING_REVIEW
-    consumers: &id052
+    consumers:
     - RS-20
   mutations:
     allowed:
@@ -3737,12 +4879,14 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 11974 bytes'
-  - 'SHA-256 of that extraction: 52c4d2da9d132b5843529e123e35d2933c6e56a55cc22ea011ac0abbc89d2fda'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 12113 bytes'
+  - 'SHA-256 of that extraction: 4c5f96f002762200a18fc8eff864d85157ef5d12487e6b044adc51e3fef5641a'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id052
+  required_interfaces:
+  - RS-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3760,19 +4904,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-40
   notion_page_id: 3db4590a05eb8183b5ffdf4270133226
   notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
@@ -3791,11 +4953,15 @@ prompts:
   - artifact: PR_IMPLEMENTATION_RESULT
     states:
     - MERGE_PENDING
-    - RESCOPE_PENDING
-    - RECOVERY_PENDING
     - PRODUCT_OWNER_DECISION_REQUIRED
-    consumers: &id053
-    - PR-40
+    - PR_CANDIDATE_PUBLISHED
+    - RECOVERY_PENDING
+    - REMOTE_EVIDENCE_PENDING
+    - RESCOPE_PENDING
+    - SOURCE_RESOLUTION_ERROR
+    consumers:
+    - PR-30
+    - PR-35
     - RS-20
   mutations:
     allowed:
@@ -3805,12 +4971,16 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8210 bytes'
-  - 'SHA-256 of that extraction: a00a7b40b0434dbba4c3e6bcdded26e1104ba4ee826373000070138dd8b318e4'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 8237 bytes'
+  - 'SHA-256 of that extraction: 3f62f70af4499565847207ab6e31a7fde8b18b7e31464e4c5916f1b2b38f262f'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id053
+  required_interfaces:
+  - PR-30
+  - PR-35
+  - RS-20
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3828,19 +4998,39 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: controlled Markdown
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    - value: never a gate on later work
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: UTIL-10
   notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
   notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
@@ -3859,9 +5049,10 @@ prompts:
   outputs:
   - artifact: REVISED_TARGET_ARTIFACT / REDLINE_APPLICATION_REPORT
     states:
+    - ALREADY_APPLIED
     - COMPLETE
     - INCOMPLETE
-    consumers: &id054 []
+    consumers: []
   mutations:
     allowed:
     - Produce and save the prompt-defined governed result artifact(s)
@@ -3870,12 +5061,13 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6661 bytes'
-  - 'SHA-256 of that extraction: d7e15f174ad3cd90fa915117e64f7f9d8e5a31eb89ebc265fb0cb6fe5af0aed8'
-  - 'Extraction, not a canonical publication receipt; the Notion page is authority'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6934 bytes'
+  - 'SHA-256 of that extraction: 9234ff70454e2cd12f2d98e40a9ce103f9a27c87d51e7ded78aae5352cd96de4'
+  - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
+  - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
-  required_interfaces: *id054
+  required_interfaces: []
   controlling_sources:
   - GCFPE-20260914.1
   - '091426.1'
@@ -3893,19 +5085,37 @@ prompts:
     representation: NOTION_BODY_EXTRACTION_NOT_A_PUBLICATION_RECEIPT
   audit_assertions:
     required_literals:
-    - value: 'Prompt Version: 091426.1'
-      rule_id: SRC-001
-    - value: 'Ecosystem release: GCFPE-20260914.1'
-      rule_id: INV-003
-    - value: select only the controlled Markdown lane
-      rule_id: CTR-002
     - value: PF10
       rule_id: CTR-002
     - value: NEXT_PROMPT_HANDOFF
       rule_id: TOP-001
     forbidden_literals: []
-    required_regex: []
-    forbidden_regex: []
+    required_regex:
+    - value: 'Prompt [Vv]ersion: `?091426\.1`?'
+      rule_id: SRC-001
+    - value: 'Ecosystem release: `?GCFPE-20260914\.1`?'
+      rule_id: INV-003
+    - value: docs/pfcanon/
+      rule_id: CTR-002
+    forbidden_regex:
+    - value: Glow / Core Docs / PFCanon
+      rule_id: CTR-001
+    - value: Glow / Ephemeral Planning Files
+      rule_id: CTR-001
+    - value: drive\.google\.com
+      rule_id: CTR-001
+    - value: EPHEMERAL_DRIVE
+      rule_id: CTR-001
+    - value: off-repositor
+      rule_id: SRC-001
+    - value: state the mismatch
+      rule_id: CTR-002
+    - value: '[Cc]ompare the current PF10'
+      rule_id: CTR-002
+    - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
+      rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 global_literals:
   approval_request: ASK OK?
   approved: ASK OK.

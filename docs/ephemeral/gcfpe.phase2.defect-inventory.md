@@ -17,6 +17,28 @@ batches_authorized: NONE
 
 # GCFPE Phase 2 defect inventory — Batches 2–6
 
+> ### ⚠️ Read as a dated record, not as current status
+>
+> Written before the cross-cutting drainage removal merged (2026-09-18, PR #415). Where
+> this document reports something as *open, standing, deferred to a later batch, or the
+> current contract*, check it against the merged baseline first. Specifically:
+>
+> - the **interim one-check replacement** (`pf10_reference_visibility_check`,
+>   `PF10_REFERENCE_VISIBILITY`) was **struck** — no post-addendum check survives, and
+>   neither token exists in `docs/graph/parts/global.json`;
+> - the `RS-40.drain_verified` **orphan route is closed** and the builder emits no
+>   warning;
+> - the current graph proof token is **55 nodes · 227 edges · 55 state_routes**; any
+>   235/236/240-edge token here is a dated measurement;
+> - **Batch 2's blocker is dead** (decision record D10);
+> - work deferred here "to Batches 2–5" for the drainage lifecycle was completed outside
+>   the batch sequence by the cross-cutting repair.
+>
+> Current authority: `docs/prompt_ecosystem_management/gcfpe.decision-record.md`,
+> `docs/prompt_ecosystem_management/authoritative-surfaces.md`, and
+> `docs/ephemeral/gcfpe.drainage-removal.repair-report.md`.
+
+
 What the parallel survey found across the 44 prompts Batch 1 does not own. This is
 the Phase 3 input: total scope in one place, and the decisions that are the Product
 Owner's rather than a batch's.
