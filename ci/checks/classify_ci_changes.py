@@ -106,8 +106,11 @@ _HISTORICAL_PATHS = {
 }
 _DOCUMENTATION_PREFIXES = (
     "docs/crd/",
+    "docs/ephemeral/",
+    "docs/graph/",
     "docs/pfcanon/",
     "docs/plans/",
+    "docs/prompt_ecosystem_management/",
     "docs/qa/",
     "docs/run/",
 )
