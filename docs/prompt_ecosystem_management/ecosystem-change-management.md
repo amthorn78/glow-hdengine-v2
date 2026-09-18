@@ -140,7 +140,7 @@ routine; keep them working rather than rebuilding them.
 |---|---|---|
 | **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | 499 assertions across 55 prompts, 0 failing. `required_regex` binds release identity and Canon source; `forbidden_regex` guards D7 against Drive reintroduction in any of its four forms. |
 | **Governance audit** | `amthor-workspace-governance-audit` skill | Executes the registry assertions on demand. Not on push — this material is outside application CI by design (see `README.md`). |
-| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…` proves a rebuild matched. |
+| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` proves a rebuild matched. |
 | **Isolated-readback harness** | pattern, `execution-and-delegation-model.md` §7 | Proves an applied change landed, without the verifier knowing the expectation. |
 | **Regression-injection test** | pattern, D11 | Proves a guard actually catches what it claims. The D7 guard was tested against five injected regressions and a clean control. |
 | **Succession record** | `pe-succession/` | Lets a session be replaced without losing the inheritance. |
@@ -263,6 +263,21 @@ by hand although the graph already modelled routing. 33 of 55 rows had drifted; 
 a success state its own body forbids.
 **Rule:** name the authority for each fact and derive the rest. Where a machine-readable source
 already carries a fact, the second copy is generated, never typed. (D13)
+
+### PAIR-001 — A stale copy and a disabled checker hiding each other
+
+**Symptom:** an invariant is violated for a long time and every check passes, because the only
+instrument that tests it cannot run, and the data it would have tested is a stale copy in which
+the violation does not exist.
+**Example:** ten qualifying-approval branches kept `terminal_for_invocation: true` after the
+drainage removal re-pointed them and gave them a handoff (D15). `flowmaster-validate` is the
+only thing that tests the terminal/handoff invariant, and it aborted before running (F6); the
+graph copy bundled beside it was the pre-D6 version in which those branches really were
+terminal. Neither artifact looked broken on its own.
+**Rule:** when a validator cannot run, the invariants it alone enforces are **unverified**, not
+passing. Record them as unverified and fix the validator before trusting the surface. Treat a
+committed copy of derived output as suspect whenever the checker that reads it is broken —
+`STALE-001` and a dead guard are the same failure seen from two sides.
 
 ### SCOPE-002 — A shared surface edited outside its release scope
 

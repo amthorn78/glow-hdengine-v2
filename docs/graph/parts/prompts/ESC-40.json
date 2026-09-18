@@ -88,7 +88,7 @@
             "section": "Required result and routing"
           },
           "state": "APPROVE",
-          "terminal_for_invocation": true
+          "terminal_for_invocation": false
         }
       ],
       "state_predicates": [
@@ -122,7 +122,7 @@
             "section": "Required result and routing"
           },
           "state": "APPROVE",
-          "terminal_for_invocation": true
+          "terminal_for_invocation": false
         }
       ],
       "state_predicates": [
@@ -156,7 +156,7 @@
             "section": "Required result and routing"
           },
           "state": "APPROVE",
-          "terminal_for_invocation": true
+          "terminal_for_invocation": false
         }
       ],
       "state_predicates": [

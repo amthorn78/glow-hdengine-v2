@@ -53,7 +53,7 @@ that standard.
 | Candidate under repair | `GCFPE-20260914.1` / `091426.1` / **55 prompts**, `UNSELECTED_CANDIDATE` |
 | Selected (live) release | `GCFPE-20260913.1` / `091326.2` / 54 — **never modified** |
 | Repository | `main` @ `3c0b1fa` — PR #415 squash-merged; all nine branch commits landed |
-| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…` |
+| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` |
 
 ## Settled — do not reopen without new evidence
 
@@ -218,7 +218,7 @@ promotion. The pass authorization was given and used on 2026-09-18.
 
 **5. Nothing outstanding on the graph.** The proof token was reproduced at the gate by
 `scripts/graph_parts.py build docs/graph/parts`, which ships with the `glow-graph-contract`
-skill: `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…`, validation
+skill: `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…`, validation
 PASS, no orphan-route warning. **Before assuming a tool is missing, read
 `authoritative-surfaces.md` and the skill list — reusable behaviour lives in skills, data lives
 in the repository, and that is the design.**

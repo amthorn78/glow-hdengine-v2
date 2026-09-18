@@ -508,3 +508,46 @@ permission, and the PF10 comparison-and-stop; a positive requirement added where
 a fresh current-PF10 read, that it also state the provenance rule. Assertions rose from 499 to
 721. All eight injected regressions were caught, the clean control passed, and a negative
 control confirms the guard does not fire on legitimate Canon drainage text, which must survive.
+
+## D15 — Ten qualifying-approval branches were still marked terminal after drainage removal
+
+Found 2026-09-18 while repairing the workflow skills, by a validator that had never been able
+to run against the current graph.
+
+The graph's own invariant is that a public result branch marked `terminal_for_invocation: true`
+emits **zero** handoffs. Ten branches violated it: they were marked terminal **and** declared
+`next_prompt_handoff_count: 1`.
+
+All ten belong to the six PF10 addendum producers — `CF-C-30`, `CF-E-30`, `ESC-40`, `IA-30`,
+`QA-70`, `RS-20`. That is the whole explanation. Before D6 these branches terminated at the
+`NATHAN_MANUAL_PF10_DRAIN` boundary, so `terminal_for_invocation: true` was correct and the
+handoff count was zero. The drainage removal re-pointed each branch to its real receiver and
+set the handoff count to 1, but **left the terminal flag set**.
+
+The branch conditions had already been corrected — they read *"resume PR-30 directly on the
+qualifying approval"* and *"the exact native receiver reads current PF10"*. Only the flag was
+stale, so nothing in prose revealed it.
+
+**Why it survived every earlier check.** The consolidated pass verified edges, consumers,
+states and closure, but not this invariant. The one instrument that tests it,
+`flowmaster-validate`, could not run at all (F6), and the graph copy bundled with it was the
+pre-D6 240-edge version, in which these branches were genuinely terminal. A stale copy and a
+broken validator concealed each other.
+
+**Corrected 2026-09-18**: `terminal_for_invocation` set to `false` on all ten branches in
+`docs/graph/parts/`. Zero violations remain across all 55 parts.
+
+**The proof token changes as a result**, and this is the first time it has moved since the
+repair began:
+
+| | |
+|---|---|
+| Before | `55 nodes · 227 edges · 55 state_routes · 571,493 bytes · sha256 3b54d620…` |
+| After | `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` |
+
+Node, edge and state_route counts are unchanged; only the ten flags moved. Any document still
+citing `3b54d620…` predates this correction.
+
+**The general lesson, added to the catalogue as `PAIR-001`:** a stale copy and a disabled
+checker hide each other, and neither looks broken on its own. When a validator cannot run,
+treat the invariants it alone enforces as unverified rather than as passing.
