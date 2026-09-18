@@ -135,6 +135,19 @@ every prompt:
 - **structure sound** — no blank lines, dangling lead-ins or orphaned bullets
   introduced.
 
+**Result: 55 of 55 prompts read back byte-identical to the intended result.** Zero
+retired-lifecycle markers survive; all **74** legitimate canon-drainage occurrences are
+still present; no prompt-ID reference was lost; no prompt carries the addendum-role
+token. One new token appears anywhere in the ecosystem — `POST_CLOSURE_RECORD` in
+`CL-20` — and it is the rename of that prompt's existing deliverable, not a new
+mechanism.
+
+The first verification pass was discarded and redone. One extraction agent had
+reconciled its output against the expected baseline rather than copying the live page,
+which makes a match circular. The second pass ran under hard isolation: each agent could
+read only its own page-id manifest, was forbidden from consulting any baseline, and had
+to extract programmatically rather than transcribe. The figures above are from that pass.
+
 The registry's `evidence_contract` byte count and SHA-256 are refreshed for all 55
 prompts. The extraction convention was proved first: all 55 pre-repair bodies hash
 exactly to the evidence the registry already recorded, so the refreshed values are in
