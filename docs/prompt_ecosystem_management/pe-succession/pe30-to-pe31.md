@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ENGINEER_SESSION_SUCCESSION_RECORD
-artifact_version: "1.2"
+artifact_version: "1.3"
 created_date: 2026-09-18
 status: BINDING
 predecessor: PE30
@@ -204,9 +204,22 @@ interface closure across all 55, isolated readback of everything changed.
 > **superseded**. Mechanics: `execution-and-delegation-model.md` §0A. Lessons that bind the
 > pass: §0B. Ruling: `gcfpe.decision-record.md` D12.
 
+> **The consolidated pass ran and its gate passed on 2026-09-18.** 37 prompts in four
+> concurrent lanes; 62 findings, all quotes machine-verified, none carried forward, no Product
+> Owner decision required. 33 registry rows regenerated from the graph (D13); three body
+> repairs applied and verified by isolated readback — `RS-40` (retired PF10 gate reinstated by
+> function), `QA-10` (off-repository storage), `OPS-20` (stale prompt reference). Guards added
+> and proved against eight injected regressions; assertions 499 → 721 (D14). Report:
+> `docs/ephemeral/gcfpe.consolidated-pass.repair-report.md`.
+
 **4. Then**: the dedicated workflow-skill review, the independent post-flight, and the
-Product Owner promotion decision packet. Two Product Owner gates remain in the whole
-sequence — authorizing the consolidated pass, and approving promotion.
+Product Owner promotion decision packet. **One Product Owner gate remains** — approving
+promotion. The pass authorization was given and used on 2026-09-18.
+
+**5. Outstanding, small but real:** the graph **assembly script is not in the repository**, so
+the proof token cannot be reproduced from the repository alone. The gate verified the graph
+invariants directly from `docs/graph/parts/` instead, which is stronger, but committing a
+builder would close the gap.
 
 ## Known risks
 
@@ -220,6 +233,15 @@ sequence — authorizing the consolidated pass, and approving promotion.
   reading, not by pattern, before reporting a scope figure.
 - **A worker that can see the expected answer cannot verify it.** See §7 of
   `execution-and-delegation-model.md`.
+- **Comparing captures to captures proves nothing.** 25 of 55 approved `evidence_contract`
+  entries did not reproduce from the live Notion page — 24 by a trailing newline the page does
+  not contain, and `ESC-40` by an 841-byte paragraph the live page has never had. The earlier
+  check compared stored captures against each other and passed. **Always compare to the live
+  page, and record the extraction convention in the evidence itself.**
+- **A ruling with no guard is a one-time verification.** The thirteen retired drainage tokens
+  had no registry assertion at all until 2026-09-18. See D14.
+- **A retired behaviour comes back in different words.** `RS-40` rebuilt the PF10 drainage gate
+  out of ordinary language and passed every token sweep. Test the function. See D14, FUNC-001.
 - **A worker that retypes evidence corrupts it.** In the storage pass a readback worker
   silently flattened curly quotes to ASCII in three captures, and the pre-edit fetch
   corpus turned out to have dropped a whole line from two prompts and altered a sentence

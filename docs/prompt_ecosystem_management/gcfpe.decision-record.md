@@ -446,3 +446,65 @@ bounded the wrong thing — they bounded prompts, and the defects were in rules.
 Checklist remains the historical record of Batches 1 and 2 and the source of the finding
 lists. Its Batch 3–6 sections are **superseded, not deleted**, and are marked as such on the
 page so no future session executes them.
+
+## D13 — The graph is the authority for routing and result states; the registry derives them
+
+Ruled 2026-09-18 during the consolidated pass, under the Product Owner's standing instruction
+that findings are driven to resolution rather than carried.
+
+The consolidated pass raised 62 findings. **33 of them had a single cause**: the registry's
+`outputs[].consumers`, `outputs[].states` and `required_interfaces` had been authored by hand
+rather than derived, and had drifted from the prompts. 28 rows disagreed on consumers and 15 on
+output states.
+
+**The disagreement was adjudicated by two independent instruments, which agreed with each other
+and against the registry**: the machine-readable graph parts, and four workers who read the
+bodies blind — without the graph, without each other's work, and without the registry's answer.
+
+The sharpest case: `PR-30`'s declared success state was `MERGE_PENDING`, which its own body
+forbids; its actual success state `PR_CANDIDATE_PUBLISHED` was undeclared; the lane's busiest
+edge `PR-30 → PR-35` was absent while a twice-prohibited `PR-30 → PR-40` edge was declared.
+
+**The ruling:** routing and result states are **derived** into the registry from
+`docs/graph/parts/`, never authored independently there. The graph's outbound edges give
+`consumers` and `required_interfaces`; `node.result_states` gives `outputs[].states`. Where the
+registry and the graph disagree, the graph wins and the registry is regenerated. A change to
+routing is made in the parts and flows to the registry, so the two cannot drift apart again.
+
+Applied 2026-09-18: 33 rows regenerated; all 55 rows now agree with the graph on both consumers
+and required interfaces.
+
+**What this ruling does not cover.** `inputs`, `function`, `mutations` and `failure_contract`
+remain authored against the body, because the graph does not model them. The registry schema
+also carries a flat consumer list and cannot express per-state routing; the graph expresses it
+through edge state predicates. That is a schema limit, recorded rather than worked around.
+
+## D14 — A settled ruling is enforced by function, and every ruling carries a tested guard
+
+Ruled 2026-09-18, on the evidence of the two body defects the consolidated pass found.
+
+Both had survived every previous sweep because **they violated a settled ruling without using
+any of its banned words**:
+
+- `RS-40` compared current PF10 against an addendum's normalized delta and **stopped terminally
+  on a mismatch** — the retired drainage lifecycle reinstated by function, in a body containing
+  none of the thirteen retired tokens.
+- `QA-10` permitted writing its governed artifacts **off-repository** — a D7 violation naming no
+  Drive location, so the Drive-marker guard could not see it.
+
+**The ruling has two parts.**
+
+**First, a ruling is enforced against behaviour.** Verifying that the banned vocabulary is
+absent does not establish that the retired behaviour is gone. Each pass must ask what the
+prompt makes an agent *do*.
+
+**Second, no ruling is considered applied until a guard exists that would catch its
+reintroduction, and that guard has been fired by an injected regression.** The audit had **no
+guard at all** for the thirteen retired drainage tokens: the removal had been verified once and
+nothing prevented their return.
+
+Applied 2026-09-18. Guards added across all 55 rows for the retired tokens, the off-repository
+permission, and the PF10 comparison-and-stop; a positive requirement added where a prompt takes
+a fresh current-PF10 read, that it also state the provenance rule. Assertions rose from 499 to
+721. All eight injected regressions were caught, the clean control passed, and a negative
+control confirms the guard does not fire on legitimate Canon drainage text, which must survive.

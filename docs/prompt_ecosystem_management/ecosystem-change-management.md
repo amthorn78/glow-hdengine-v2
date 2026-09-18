@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_CHANGE_MANAGEMENT_MODEL
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-18
 status: BINDING
 authority: Product Owner approval, 2026-09-18 (strategic assessment of the repair process)
@@ -232,6 +232,38 @@ machine and would have handed it back to a future session.
 **Rule:** derived output is never committed. Use a proof token. Where a snapshot must be
 kept, label its scope and its staleness.
 
+### FUNC-001 — A retired behaviour reinstated by function
+
+**Symptom:** a prompt violates a settled ruling while containing none of that ruling's banned
+vocabulary, so every token sweep passes it.
+**Example:** `RS-40` compared current PF10 against an addendum's normalized approved delta and
+stopped terminally on a mismatch — the retired PF10 drainage lifecycle, rebuilt out of ordinary
+words, in a body carrying none of the thirteen retired tokens. `QA-10` permitted writing its
+governed artifacts *off-repository*, a D7 violation naming no Drive location.
+**Why it survives:** the sweep that retires a behaviour is normally written against the
+vocabulary the behaviour used, so it cannot see the behaviour expressed differently.
+**Repair:** ask what the prompt makes an agent *do*. For each retired behaviour, state the
+functional test — here, *does anything gate later work on whether the addendum has landed?* —
+and apply it to the bodies, not to a word list. (D14)
+
+### GUARD-001 — A ruling applied without a guard
+
+**Symptom:** a ruling was applied and verified once, and nothing prevents its reintroduction.
+**Example:** the thirteen retired drainage tokens had **no assertion anywhere in the registry**
+after the drainage removal. A whole repair rested on a one-time verification.
+**Rule:** a ruling is not applied until a guard exists that would catch the reintroduction and
+that guard has been fired by an injected regression. Ship the guard with the repair, in the same
+change. (D14)
+
+### DERIV-001 — A derived field authored by hand
+
+**Symptom:** two artifacts state the same fact independently, and drift.
+**Example:** the registry's `consumers`, `required_interfaces` and output `states` were authored
+by hand although the graph already modelled routing. 33 of 55 rows had drifted; `PR-30` declared
+a success state its own body forbids.
+**Rule:** name the authority for each fact and derive the rest. Where a machine-readable source
+already carries a fact, the second copy is generated, never typed. (D13)
+
 ### SCOPE-002 — A shared surface edited outside its release scope
 
 **Symptom:** a "fix" applied to text that is correct for the *selected* release.
@@ -250,8 +282,9 @@ A change to this ecosystem is done when all seven hold. Not six.
 1. **Applied** everywhere the rule reaches, with coverage arithmetic from a measured
    scope (§2).
 2. **Verified** by isolated readback, extracted programmatically, compared by bytes.
-3. **Guarded** — a registry assertion exists that would catch the reintroduction, and it
-   has been tested against an injected regression.
+3. **Guarded** — a registry assertion exists that would catch the reintroduction, it has been
+   tested against an injected regression, and where the change retires a behaviour the guard
+   tests the behaviour, not the vocabulary it happened to use (FUNC-001, GUARD-001).
 4. **Reconciled** — graph parts rebuilt and closing, registry validator at zero failures,
    producer/consumer interfaces closing.
 5. **Recorded** at a named path (§2, Step 5) — repository document, Notion page, or both
