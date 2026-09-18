@@ -406,3 +406,43 @@ and the graph were authoritative and the row was stale:
 - `IA-60`: removed the `ESC-30` consumer, on the same evidence and redline R26.
 - `authority_sources`: four duplicate entries pointing at a pre-merge extraction workspace
   collapsed to one, labelled `HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH`.
+
+## D12 — The batch sequence is retired; changes are managed by rule, not by batch
+
+Ruled 2026-09-18 by the Product Owner, approving the strategic assessment of the repair
+process. **Batches 3–6 are replaced by one consolidated pass over the 37 remaining prompts
+plus one release-wide gate.**
+
+The six-batch model assumed defects are per-prompt and lane-shaped. Two completed batches
+show they are per-rule and corpus-shaped. Batch 1's own report: *"Root cause found at the
+control, not the prompts."* Batch 2 closed **22 of 22** contract findings on the prompt side
+with **zero prompt edits required**; it was held only by a graph synchronisation that could
+not be written to Drive. Meanwhile the two repairs that did change prompt bodies — drainage
+removal and the Drive → repository storage pass, 333 passages across 44 prompts each — were
+single rulings applied corpus-wide, and both were executed **outside** the batch sequence.
+
+Splitting one shared rule across several authorizations creates several chances to apply it
+several different ways. Per-batch rechecking re-verifies the same concerns four more times
+with different eyes, which is where inconsistent application comes from. A single corpus-wide
+gate cannot produce four different answers.
+
+**The ruling has three parts:**
+
+1. **Execution** — one sweep, four lanes concurrent, findings reconciled centrally,
+   cross-cutting decisions taken once and applied uniformly. One release-wide gate: graph
+   rebuild and closure, registry validator, interface closure across all 55, isolated readback
+   of everything changed. Recorded in `execution-and-delegation-model.md` §0A.
+2. **Lessons** — seven binding lessons carried from Batches 1 and 2, recorded in
+   `execution-and-delegation-model.md` §0B.
+3. **Change management** — a standing process for changes after this release, with a
+   defect-class catalogue, a seven-point definition of done, and an explicit authorization
+   boundary. Recorded in `ecosystem-change-management.md`, a new document in this directory.
+
+**Product Owner gates that survive:** authorizing the consolidated pass, and approving
+promotion at the gate. The batch-by-batch authorization checkpoints are removed because they
+bounded the wrong thing — they bounded prompts, and the defects were in rules.
+
+**Consequence for the Notion plan.** The GCFPE Expanded Prompt Repair Plan and Six-Batch
+Checklist remains the historical record of Batches 1 and 2 and the source of the finding
+lists. Its Batch 3–6 sections are **superseded, not deleted**, and are marked as such on the
+page so no future session executes them.

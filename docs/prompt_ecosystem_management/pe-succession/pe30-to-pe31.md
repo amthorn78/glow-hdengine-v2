@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ENGINEER_SESSION_SUCCESSION_RECORD
-artifact_version: "1.0"
+artifact_version: "1.2"
 created_date: 2026-09-18
 status: BINDING
 predecessor: PE30
@@ -24,7 +24,10 @@ PE30 is retired. This is PE31's working context. It is written so that PE31 neve
 PE30's transcript: everything load-bearing is here or at a path named here.
 
 **Read this with `authoritative-surfaces.md` and `gcfpe.decision-record.md`. Those three
-documents are the whole inheritance.**
+documents are the whole inheritance.** Then `execution-and-delegation-model.md` before
+delegating anything, and `ecosystem-change-management.md` before proposing any change — it
+carries the defect-class catalogue that makes most findings recognisable on sight rather
+than re-derived.
 
 ## Who PE31 is
 
@@ -189,10 +192,21 @@ without functional purpose. Recorded on the six-batch plan page.
 > 2026-09-18: 0 of 55 bodies and 0 of 55 graph parts reference Drive as a store or
 > authority, and no CI, tool or script has a Drive code path.
 
-**3. Batch 3**, then Batches 4–6 per the Notion plan.
+**3. The consolidated pass — Batches 3–6 are RETIRED (D12, 2026-09-18).** The Product
+Owner approved replacing the remaining batch sequence with **one consolidated pass over the
+37 remaining prompts plus one release-wide gate**. Four lanes run concurrently; findings
+reconcile centrally; anything cross-cutting is decided once and applied uniformly. The gate
+is a single corpus-wide verification: graph rebuild and closure, registry validator,
+interface closure across all 55, isolated readback of everything changed.
 
-**4. Later**: the dedicated workflow-skill review after Batch 6, then the independent
-post-flight, then the Product Owner promotion decision packet.
+> Do not execute Batches 3–6 as written. The Notion six-batch plan retains them as the
+> historical record and the source of the finding lists; its Batch 3–6 sections are marked
+> **superseded**. Mechanics: `execution-and-delegation-model.md` §0A. Lessons that bind the
+> pass: §0B. Ruling: `gcfpe.decision-record.md` D12.
+
+**4. Then**: the dedicated workflow-skill review, the independent post-flight, and the
+Product Owner promotion decision packet. Two Product Owner gates remain in the whole
+sequence — authorizing the consolidated pass, and approving promotion.
 
 ## Known risks
 
@@ -261,11 +275,11 @@ drainage target and owner. Those are legitimate Canon disposition and must survi
 2. **Close out `reconciliation-backlog.md`.** Most of it was applied on 2026-09-18; what
    remains is listed there. Re-run the same two isolated audits to confirm, rather than
    trusting this record.
-3. **Run the Drive → repository storage pass** across the 44 + 39 prompts. One
-   controlled cross-cutting pass. Converge on the Batch 1 wording; do not invent new
-   phrasing. Verify by isolated readback, comparing centrally.
-4. **Verify Batch 2 against the merged bodies** and close it if clean.
-5. **Batch 3**, then 4–6.
+3. ~~**Run the Drive → repository storage pass**~~ — **DONE 2026-09-18.** 333 passages,
+   44 prompts, verified 44/44 by isolated readback.
+4. ~~**Verify Batch 2 and close it**~~ — **CLOSED 2026-09-18.**
+5. ~~**Batch 3**, then 4–6~~ — **RETIRED by D12.** Run the consolidated pass and the single
+   release-wide gate instead. See item 3 of *Remaining work* above.
 
 ## How to report to Nathan
 

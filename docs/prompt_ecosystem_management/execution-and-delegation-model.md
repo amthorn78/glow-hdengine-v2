@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_EXECUTION_AND_DELEGATION_MODEL
-artifact_version: "2.0"
+artifact_version: "3.0"
 created_date: 2026-09-17
 status: BINDING
 authority: Product Owner decision, 2026-09-17
@@ -9,7 +9,7 @@ mechanism: IN_SESSION_SUBAGENTS
 model: opus
 pilot_phase: 2
 pilot_outcome: PASSED — adopted as the standing execution model
-last_revised: 2026-09-18
+last_revised: 2026-09-18 (v3.0 — batch sequence retired; see §0A)
 baseline: main @ 3c0b1fa (PR #415)
 ---
 
@@ -18,6 +18,91 @@ baseline: main @ 3c0b1fa (PR #415)
 How work is divided in this prompt ecosystem. Piloted at Phase 2, then run at scale
 for the cross-cutting drainage removal across all 55 prompts. **Adopted as the
 standing model.**
+
+## 0A. The batch sequence is retired — consolidated pass and one gate
+
+Product Owner ruling, 2026-09-18. Batches 1 and 2 are complete. **Batches 3–6 are replaced
+by one consolidated pass over the 37 remaining prompts plus one release-wide gate.**
+
+### Why
+
+The six-batch model assumed defects are per-prompt and lane-shaped. Two completed batches
+show they are per-rule and corpus-shaped:
+
+- **Batch 1's own report**: *"Root cause found at the control, not the prompts."*
+- **Batch 2**: 22 of 22 contract findings closed on the prompt side. **Zero required a prompt
+  edit.** Its summary: *"blocker is control-side and tooling-side, not prompt-side."*
+- The two repairs that actually changed prompt bodies — drainage removal (333 passages, 44
+  prompts) and the Drive → repository storage pass (333 passages, 44 prompts) — were single
+  rulings applied corpus-wide, and both were executed **outside** the batch sequence.
+
+This document already records the reason: splitting one shared rule across several
+authorizations *"creates six chances to apply it six different ways."* That argument applies
+to everything that remains.
+
+### The model
+
+**One sweep.** The four remaining lanes run **concurrently**, not sequentially, using the
+instrument that worked for Batch 2: precomputed hit lists, settled rules handed to each
+worker, structured returns, every evidence quote verified verbatim centrally. Each worker
+answers only — does this prompt fulfil its registry contract, do its interfaces close, does it
+violate a settled ruling.
+
+Findings return to the coordinator. **Anything cross-cutting is decided once and applied
+uniformly, never per lane.**
+
+**One gate.** A single release-wide verification replaces per-batch rechecking: graph rebuild
+and closure, registry validator, interface closure across all 55, isolated readback of
+everything changed.
+
+Per-batch checking re-verifies the same concerns with different eyes four more times, which is
+where inconsistent application comes from. **A single corpus-wide gate cannot produce four
+different answers.**
+
+### What the Product Owner still gates
+
+Two decisions, both where they decide something: authorizing the consolidated pass, and
+approving promotion at the gate. The batch-by-batch authorization checkpoints are removed
+because they bounded the wrong thing.
+
+## 0B. Lessons carried from Batches 1 and 2
+
+Binding on how the consolidated pass is run.
+
+**Discovery by pattern systematically undercounts.** Measured three times: 93 passage families
+→ 142 (+53%); 39 PFCanon prompts → 42; 236 occurrence lines → 333 (+41%). Enumerating known
+phrasings finds only known phrasings. **Match the broad term, then subtract the permitted
+exceptions** — never assemble a list of phrasings seen so far.
+
+**Validate behaviour, not wording.** See D11. Exact-substring assertions produced 70 failures
+against correct behaviour and zero true positives; the largest had never been present in any
+of the 55 bodies and never flagged the 44 prompts that genuinely named Drive as Canon
+authority. A check that fails on every member of a set carries no information.
+
+**Judge by function, never by name.** Every false positive in the 2026-09-18 session came from
+this: `audit/docdeltas/PF10_*` looked like Canon and was delivery evidence; a registry
+assertion demanded PF10 from a prompt-repair tool that never touches build notes; `rollback`
+looked like a gap and has no consumer anywhere in 55 prompts. The ecosystem already knew this
+rule for the word "drain". It generalises.
+
+**Resolve from evidence; escalate only policy.** A decision belongs to the Product Owner when
+it is policy, changes settled architecture, or is expensive to reverse. Everything else is the
+coordinator's, and asking for cover on it costs two rounds. Establish what a thing does before
+proposing to change it.
+
+**"Non-blocking" is not a disposition.** Findings parked as non-blocking survived across
+sessions and then took one pass to clear. Drive every finding to resolution in the session
+that finds it, or name the specific Product Owner decision it needs.
+
+**Evidence must be extracted programmatically.** Both defects found in the 2026-09-18
+verification were in the evidence, not in Notion: a worker flattened curly quotes in three
+captures, and the fetch corpus dropped a whole line from two prompts and altered a sentence in
+a third. Byte comparison caught both; worker self-reports did not. Where fidelity matters,
+slice file → Python → file and compare bytes centrally.
+
+**Do not normalise without a consumer.** `rollback` differs between IA-10 and IA-20 and no
+prompt in the release requires it. Structural symmetry is not a defect. Establish the consumer
+before proposing the repair.
 
 ## 0. The coordinating session's role
 

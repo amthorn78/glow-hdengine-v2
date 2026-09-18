@@ -1,6 +1,6 @@
 ---
 artifact_type: PROMPT_ECOSYSTEM_MANAGEMENT_ROOT
-artifact_version: "1.0"
+artifact_version: "1.1"
 created_date: 2026-09-17
 status: BINDING
 authority: Product Owner decision, 2026-09-17
@@ -84,4 +84,5 @@ the application's.
 | `gcfpe.decision-record.md` | Product Owner decisions governing the prompt ecosystem, with their consequences |
 | `project-prompt-contract-registry.md` | The approved machine-readable per-prompt contract registry |
 | `execution-and-delegation-model.md` | How work is divided: the coordinator's role, what may be delegated, the reporting contract, and verification isolation |
+| `ecosystem-change-management.md` | **How a change to this ecosystem is made routine**: the five-step change lifecycle, the defect-class catalogue, the standing instruments, the definition of done, and what needs Product Owner authorization |
 | `pe-succession/` | Session succession records, newest last |
