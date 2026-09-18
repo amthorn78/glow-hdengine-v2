@@ -205,3 +205,38 @@ to the session scratchpad and is not committed, per D7.
 > only the repository tree instead of reading the document that says where things live. It is
 > the same failure this ecosystem keeps producing: judging by what a search returned rather
 > than establishing what is actually there.
+
+## Addendum — `glow-hde-devops` removed from the release, 2026-09-18
+
+**Product Owner decision during the pass.** The skill-review discovery surfaced that
+`glow-hde-devops` was named by 18 prompt bodies as a support skill but was **not in the
+installed skill set** — the one skill in the review's scope that does not exist. The Product
+Owner ruled it unwanted rather than to be installed.
+
+**Measured surface:** 18 occurrences across 18 prompts, in **6 distinct sentence variants**,
+exactly one occurrence per prompt. Coverage was proved before any edit: every occurrence in all
+55 bodies mapped to a planned replacement, with none left over.
+
+**What changed:** only the skill name. Each sentence keeps its capability boundary and its
+prohibition on PR-workflow authority, with the named skill replaced by a generic support-skill
+reference. For example:
+
+> `glow-hde-devops` is support-only for a specifically required environment, Railway, vendor,
+> database, deployment, Ops, or QA capability.
+
+becomes
+
+> A support skill is used only for a specifically required environment, Railway, vendor,
+> database, deployment, Ops, or QA capability.
+
+**Verification:** all 18 pages recaptured after the edit and checked programmatically —
+**18 of 18** carry the new sentence, none retains the old, and **zero** contain
+`glow-hde-devops` anywhere. Evidence entries refreshed for all 18.
+
+**Guard added and proved:** a word-boundary `forbidden_regex` on `glow-hde-devops` across all 55
+rows. Assertions **721 → 776**, clean control 0 failing. Two injected regressions caught, and a
+negative control confirms the guard does **not** fire on the `.docx` prohibition that appears in
+44 bodies — the exact false match that would have corrupted this measurement had it not been
+caught during discovery.
+
+**Standing result:** no prompt in the release names a skill that is not installed.

@@ -205,6 +205,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-20
   notion_page_id: 3db4590a05eb8173a73edc73f302a90a
   notion_url: https://app.notion.com/p/3db4590a05eb8173a73edc73f302a90a
@@ -290,6 +292,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-30
   notion_page_id: 3db4590a05eb8149a8d2ed42c9c01ffd
   notion_url: https://app.notion.com/p/3db4590a05eb8149a8d2ed42c9c01ffd
@@ -378,6 +382,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-C-40
   notion_page_id: 3db4590a05eb81269931cee342ce8a0e
   notion_url: https://app.notion.com/p/3db4590a05eb81269931cee342ce8a0e
@@ -460,6 +466,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-10
   notion_page_id: 3db4590a05eb815b84a5c5a5ace85fe1
   notion_url: https://app.notion.com/p/3db4590a05eb815b84a5c5a5ace85fe1
@@ -549,6 +557,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-20
   notion_page_id: 3db4590a05eb810eb177f7dced41bc8f
   notion_url: https://app.notion.com/p/3db4590a05eb810eb177f7dced41bc8f
@@ -634,6 +644,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-30
   notion_page_id: 3db4590a05eb81b4be79f405566da9a7
   notion_url: https://app.notion.com/p/3db4590a05eb81b4be79f405566da9a7
@@ -722,6 +734,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-E-40
   notion_page_id: 3db4590a05eb8101b655ed223b11a85e
   notion_url: https://app.notion.com/p/3db4590a05eb8101b655ed223b11a85e
@@ -804,6 +818,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CF-PO-10
   notion_page_id: 3db4590a05eb8161b4d7cb6d07f5101c
   notion_url: https://app.notion.com/p/3db4590a05eb8161b4d7cb6d07f5101c
@@ -891,6 +907,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-20
   notion_page_id: 3db4590a05eb81f4812be61e8877c02c
   notion_url: https://app.notion.com/p/3db4590a05eb81f4812be61e8877c02c
@@ -924,8 +942,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 32599 bytes'
-  - 'SHA-256 of that extraction: 07caf8ad41179889a9f1244dc2cf41a1fbc9fc991ddcc3075613a604953f81ac'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 32597 bytes'
+  - 'SHA-256 of that extraction: eeff6316aa8d3c9d8405a8128b381614cbcb7017c8e8bf1d6fefc5e7bb7942b0'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -984,6 +1002,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-30
   notion_page_id: 3db4590a05eb8190a444d8818e445c1d
   notion_url: https://app.notion.com/p/3db4590a05eb8190a444d8818e445c1d
@@ -1013,8 +1033,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29648 bytes'
-  - 'SHA-256 of that extraction: 4406f2098597c8dcd4e11dd9d954c6c43e6569b4e6fcb213b38512fdcbed67ce'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29646 bytes'
+  - 'SHA-256 of that extraction: 52d07ec9021efa45300c0b95fb5d1ddc5ac267fce874be0fe21665fb11e8a38c'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1069,6 +1089,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-40
   notion_page_id: 3db4590a05eb81db9c88cde6027e07bf
   notion_url: https://app.notion.com/p/3db4590a05eb81db9c88cde6027e07bf
@@ -1105,8 +1127,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29396 bytes'
-  - 'SHA-256 of that extraction: f22bfd588d55dff786542c9f97e8b657442a424d673ea3f87d8d8a266df22481'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 29394 bytes'
+  - 'SHA-256 of that extraction: fa5bff62868d42ad95924e39e944e5288eab30694cad97c928c235a399777060'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1158,6 +1180,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-C-10
   notion_page_id: 3db4590a05eb81ad8989faa77f441a64
   notion_url: https://app.notion.com/p/3db4590a05eb81ad8989faa77f441a64
@@ -1190,8 +1214,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 35904 bytes'
-  - 'SHA-256 of that extraction: 6ef26754cf59d839b82dd4bc727aa595ebd942a91b978df425333c49713190c2'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 35902 bytes'
+  - 'SHA-256 of that extraction: 704365c28eb87858459f9db12cee3be815602e7b163a1de27defd96e89ec9da5'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1245,6 +1269,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-10
   notion_page_id: 3db4590a05eb811a8578d75885c16cac
   notion_url: https://app.notion.com/p/3db4590a05eb811a8578d75885c16cac
@@ -1277,8 +1303,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36379 bytes'
-  - 'SHA-256 of that extraction: 5dd3c71bfa7148a7ac0e86b20634635e84747c9c9d2ccafc8a654979cdabbd6d'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 36377 bytes'
+  - 'SHA-256 of that extraction: fdfb9ae189f3c52270e263dcdccd4148236dd61136ce5fd2b39bf897469e8a8d'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1333,6 +1359,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-20
   notion_page_id: 3db4590a05eb81c2b5d5ff46126f9e45
   notion_url: https://app.notion.com/p/3db4590a05eb81c2b5d5ff46126f9e45
@@ -1364,8 +1392,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14841 bytes'
-  - 'SHA-256 of that extraction: fa8bb43e4587abfb626862110f74272c596b829241c5823d3e5b6695f44fe806'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 14836 bytes'
+  - 'SHA-256 of that extraction: eb48c4bc6846c83f24c02bb0f7fb615372a47f4c10d63816a868edfd586068c3'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1420,6 +1448,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-30
   notion_page_id: 3db4590a05eb81b4a649fdcdb1903345
   notion_url: https://app.notion.com/p/3db4590a05eb81b4a649fdcdb1903345
@@ -1452,8 +1482,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13638 bytes'
-  - 'SHA-256 of that extraction: 54c49c5b56f72d874b2d3267fe0cf46d3a169e95b0fd5c2486aa956ff88eddc4'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13633 bytes'
+  - 'SHA-256 of that extraction: e8bdbf3d4df80d3439160aa3001ba4307cfb14cbcfb4d2e4b6de5f659520c694'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1509,6 +1539,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: CL-E-40
   notion_page_id: 3db4590a05eb81e78e82f83a5f2e4b68
   notion_url: https://app.notion.com/p/3db4590a05eb81e78e82f83a5f2e4b68
@@ -1539,8 +1571,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 15466 bytes'
-  - 'SHA-256 of that extraction: 9aa33eab71ce0ed35d4e847a0fa2bfa29c2fbb06e9a136610c74ad820eb5a39a'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 15461 bytes'
+  - 'SHA-256 of that extraction: 7a1a0d20882a06b5058b7e027b1bd3d92ff0e1d3afd783131e4427dccbd3d452'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1596,6 +1628,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: DOC-10
   notion_page_id: 3db4590a05eb8193a9a8d7ddd751cd2d
   notion_url: https://app.notion.com/p/3db4590a05eb8193a9a8d7ddd751cd2d
@@ -1637,8 +1671,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 19796 bytes'
-  - 'SHA-256 of that extraction: c063dc9d9462b3f5b005a674eba476cc20292351cd7a4c31bdf65e784eb36ba0'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 19791 bytes'
+  - 'SHA-256 of that extraction: e10922687c1d56bb32adbd6b87adeeec2d17a34a4722c841f1fd3b4cd6e04cd7'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1692,6 +1726,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: DOC-20
   notion_page_id: 3db4590a05eb8164ac09e722dc967f25
   notion_url: https://app.notion.com/p/3db4590a05eb8164ac09e722dc967f25
@@ -1739,8 +1775,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 20226 bytes'
-  - 'SHA-256 of that extraction: 33060f9da488da620e06d1ac227d278bd19d296b581dc111c5b94e67d0152697'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 20221 bytes'
+  - 'SHA-256 of that extraction: d7b8af01cb69189b96524ce56c67e3176cb6b358dfe6afbd0ec696127312133f'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1796,6 +1832,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-10
   notion_page_id: 3db4590a05eb81d582b8d490e77f9f40
   notion_url: https://app.notion.com/p/3db4590a05eb81d582b8d490e77f9f40
@@ -1825,8 +1863,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16692 bytes'
-  - 'SHA-256 of that extraction: 9f53e0e93d4051188498eae341d967162eb0d72cb75b33663f56d7493c1cb65f'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 16687 bytes'
+  - 'SHA-256 of that extraction: 862f4755c968300c4e46788fc05714ae0b526e1e8b999651c548e3bea6fa7fe0'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1879,6 +1917,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-25
   notion_page_id: 3db4590a05eb81bf9326e46a1017de38
   notion_url: https://app.notion.com/p/3db4590a05eb81bf9326e46a1017de38
@@ -1911,8 +1951,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17288 bytes'
-  - 'SHA-256 of that extraction: 84efa3e91832b3926b4232aac26547fdebc23e92f458bd46a73ff1a5afbe03b7'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17283 bytes'
+  - 'SHA-256 of that extraction: 4d406076859583bad3cc9421621fee20e8fd8df33882ddaf8fac2c29b782b4e6'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1965,6 +2005,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-30
   notion_page_id: 3db4590a05eb813e99b4e416bc7afdae
   notion_url: https://app.notion.com/p/3db4590a05eb813e99b4e416bc7afdae
@@ -2002,8 +2044,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17760 bytes'
-  - 'SHA-256 of that extraction: 0698550674554f379752d7215a938cf4f8f1a41c1247c077aded2ed8a5da98ee'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17755 bytes'
+  - 'SHA-256 of that extraction: 9cbf40c9dcb4718d79ed8a8384493ce433e82ec1b18980790aeffdf7fc8a0c44'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -2057,6 +2099,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: ESC-40
   notion_page_id: 3db4590a05eb81efb6d4cd8d02ba9756
   notion_url: https://app.notion.com/p/3db4590a05eb81efb6d4cd8d02ba9756
@@ -2089,8 +2133,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17839 bytes'
-  - 'SHA-256 of that extraction: 87292ba1c86ed862a7361483ba52cb7ceae33d40e287a678a643b920846677ca'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17834 bytes'
+  - 'SHA-256 of that extraction: bba0879b6a96baf441678ba0241aebe66c7127833cf265a5ba97d499d685f144'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -2145,6 +2189,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: GCFPE-MGMT-10
   notion_page_id: 3db4590a05eb81d1bb64ebcb3ca8eb54
   notion_url: https://app.notion.com/p/3db4590a05eb81d1bb64ebcb3ca8eb54
@@ -2226,6 +2272,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-10
   notion_page_id: 3db4590a05eb817aa191f1e822c30480
   notion_url: https://app.notion.com/p/3db4590a05eb817aa191f1e822c30480
@@ -2316,6 +2364,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-20
   notion_page_id: 3db4590a05eb81c4825df2ad0dec4750
   notion_url: https://app.notion.com/p/3db4590a05eb81c4825df2ad0dec4750
@@ -2404,6 +2454,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-30
   notion_page_id: 3db4590a05eb81c6bfb5f36f7df8f464
   notion_url: https://app.notion.com/p/3db4590a05eb81c6bfb5f36f7df8f464
@@ -2496,6 +2548,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-40
   notion_page_id: 3db4590a05eb8197bb1bc8f52f896969
   notion_url: https://app.notion.com/p/3db4590a05eb8197bb1bc8f52f896969
@@ -2585,6 +2639,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-50
   notion_page_id: 3db4590a05eb81d78eeae384e93dd697
   notion_url: https://app.notion.com/p/3db4590a05eb81d78eeae384e93dd697
@@ -2674,6 +2730,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: IA-60
   notion_page_id: 3db4590a05eb8141b5b2c8fbf7b725e2
   notion_url: https://app.notion.com/p/3db4590a05eb8141b5b2c8fbf7b725e2
@@ -2758,6 +2816,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: MGR-10
   notion_page_id: 3db4590a05eb8108ad2dd4d0e20bd6c4
   notion_url: https://app.notion.com/p/3db4590a05eb8108ad2dd4d0e20bd6c4
@@ -2849,6 +2909,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-10
   notion_page_id: 3db4590a05eb81db98cce3e30a62bce5
   notion_url: https://app.notion.com/p/3db4590a05eb81db98cce3e30a62bce5
@@ -2940,6 +3002,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-20
   notion_page_id: 3db4590a05eb81858a9dd361d3689ce8
   notion_url: https://app.notion.com/p/3db4590a05eb81858a9dd361d3689ce8
@@ -3033,6 +3097,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: OPS-30
   notion_page_id: 3db4590a05eb816f91c9c394f9c9fa57
   notion_url: https://app.notion.com/p/3db4590a05eb816f91c9c394f9c9fa57
@@ -3129,6 +3195,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-10
   notion_page_id: 3db4590a05eb818e8359de1994e97a7d
   notion_url: https://app.notion.com/p/3db4590a05eb818e8359de1994e97a7d
@@ -3218,6 +3286,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-20
   notion_page_id: 3db4590a05eb8174abf8c04318ab04be
   notion_url: https://app.notion.com/p/3db4590a05eb8174abf8c04318ab04be
@@ -3302,6 +3372,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-30
   notion_page_id: 3db4590a05eb8123afb8caeeaa83a294
   notion_url: https://app.notion.com/p/3db4590a05eb8123afb8caeeaa83a294
@@ -3335,8 +3407,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 39797 bytes'
-  - 'SHA-256 of that extraction: 72a299f4d3d72b5945bc65f3e9bbdc4326a8a7090328b8f57fa8b80ad4c047ac'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 39795 bytes'
+  - 'SHA-256 of that extraction: 8c2c0f231da5f10cb08c0328978d198fcc981f5f59a786bbeb240c7b597b33fb'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3390,6 +3462,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-35
   notion_page_id: 3db4590a05eb8120b443ed2cb08b723c
   notion_url: https://app.notion.com/p/3db4590a05eb8120b443ed2cb08b723c
@@ -3465,9 +3539,11 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17914 bytes'
-  - 'SHA-256 of that extraction: a9365233ec381d7f99bfde92172ab2358c359d05599e15beb78a746252447a98'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 17912 bytes'
+  - 'SHA-256 of that extraction: 6554c3f5fef2c62da04c18e9d6ad141c0349d64438279f90c312d84bfcf0e73f'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3575,6 +3651,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: PR-50
   notion_page_id: 3db4590a05eb8138ac99c13cf6f2f282
   notion_url: https://app.notion.com/p/3db4590a05eb8138ac99c13cf6f2f282
@@ -3655,6 +3733,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-10
   notion_page_id: 3db4590a05eb818bad2fcb4bc2610b29
   notion_url: https://app.notion.com/p/3db4590a05eb818bad2fcb4bc2610b29
@@ -3756,6 +3836,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-100
   notion_page_id: 3db4590a05eb811a8d13c0bbbf77a848
   notion_url: https://app.notion.com/p/3db4590a05eb811a8d13c0bbbf77a848
@@ -3793,8 +3875,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13324 bytes'
-  - 'SHA-256 of that extraction: f22714b0cc542a52acad67718a8247e141faed85c762e9343baf02c5c8e80b1c'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 13321 bytes'
+  - 'SHA-256 of that extraction: cf7d6d43397407f7a0598dcca2bb0097a0182d718d09da6e5bd73603665c48c5'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3847,6 +3929,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-110
   notion_page_id: 3db4590a05eb816984d1d34da0e08f40
   notion_url: https://app.notion.com/p/3db4590a05eb816984d1d34da0e08f40
@@ -3944,6 +4028,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-120
   notion_page_id: 3db4590a05eb81589d21e798cf38e8ba
   notion_url: https://app.notion.com/p/3db4590a05eb81589d21e798cf38e8ba
@@ -4044,6 +4130,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-20
   notion_page_id: 3db4590a05eb816daa3adff37283482b
   notion_url: https://app.notion.com/p/3db4590a05eb816daa3adff37283482b
@@ -4131,6 +4219,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-50
   notion_page_id: 3db4590a05eb81a3ac91f602bad8cfa2
   notion_url: https://app.notion.com/p/3db4590a05eb81a3ac91f602bad8cfa2
@@ -4224,6 +4314,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-60
   notion_page_id: 3db4590a05eb810b8aa3e1692830d4b8
   notion_url: https://app.notion.com/p/3db4590a05eb810b8aa3e1692830d4b8
@@ -4311,6 +4403,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-70
   notion_page_id: 3db4590a05eb8143bf26d1459fbbcad7
   notion_url: https://app.notion.com/p/3db4590a05eb8143bf26d1459fbbcad7
@@ -4398,6 +4492,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-80
   notion_page_id: 3db4590a05eb813ba9a9dbd9a641d36c
   notion_url: https://app.notion.com/p/3db4590a05eb813ba9a9dbd9a641d36c
@@ -4481,6 +4577,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: QA-90
   notion_page_id: 3db4590a05eb811e8582cf30238c5b9c
   notion_url: https://app.notion.com/p/3db4590a05eb811e8582cf30238c5b9c
@@ -4573,6 +4671,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-10
   notion_page_id: 3db4590a05eb811ca0cdc66e0d508ac4
   notion_url: https://app.notion.com/p/3db4590a05eb811ca0cdc66e0d508ac4
@@ -4655,6 +4755,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-20
   notion_page_id: 3db4590a05eb81c183aac2ecb40b1497
   notion_url: https://app.notion.com/p/3db4590a05eb81c183aac2ecb40b1497
@@ -4747,6 +4849,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-30
   notion_page_id: 3db4590a05eb81ed9fd3d2ef439ceaaf
   notion_url: https://app.notion.com/p/3db4590a05eb81ed9fd3d2ef439ceaaf
@@ -4829,6 +4933,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: RS-40
   notion_page_id: 3db4590a05eb8183b5ffdf4270133226
   notion_url: https://app.notion.com/p/3db4590a05eb8183b5ffdf4270133226
@@ -4865,8 +4971,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8239 bytes'
-  - 'SHA-256 of that extraction: e0e1e63e0cff685fb439421c0ad7a0f8ed61f4a95c4e393b108551007cc5681a'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 8237 bytes'
+  - 'SHA-256 of that extraction: 3f62f70af4499565847207ab6e31a7fde8b18b7e31464e4c5916f1b2b38f262f'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -4923,6 +5029,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 - prompt_key: UTIL-10
   notion_page_id: 3db4590a05eb81b89fbaf4b31a3ed2a9
   notion_url: https://app.notion.com/p/3db4590a05eb81b89fbaf4b31a3ed2a9
@@ -5006,6 +5114,8 @@ prompts:
       rule_id: CTR-002
     - value: DRAIN_VERIFIED|MANUAL_DRAIN_REQUIRED|MANUAL_DRAIN_MISMATCH|READY_FOR_MANUAL_DRAIN|NON_CANONICAL_PENDING_MANUAL_DRAIN|drain_owner|drain_verification_anchor|PRE_DRAIN_BASELINE_EVIDENCE|pf10_reference_visibility_check|PF10_REFERENCE_VISIBILITY|NATHAN_MANUAL_PF10_DRAIN|pf10_addendum_role|POST_CLOSURE_DRAINAGE_STATUS
       rule_id: INV-003
+    - value: (?<![.\w/-])glow-hde-devops(?![\w-])
+      rule_id: SRC-001
 global_literals:
   approval_request: ASK OK?
   approved: ASK OK.
