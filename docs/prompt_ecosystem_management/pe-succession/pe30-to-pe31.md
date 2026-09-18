@@ -113,8 +113,13 @@ unless Nathan instructed that specific change in conversation.
 - **CI repaired.** The lane classifier did not know the documentation paths `ci.yml`
   ignores and killed every run at the sort step; the direct-DB contract scan read
   governance documents as source. Both now recognise the four documentation paths.
-- **Skills updated**: `glow-write-boundary` and `glow-artifact-storage` carry the fourth
-  open path and the no-Drive-authority rule.
+- **Skills edited but NOT published** — `glow-write-boundary` and `glow-artifact-storage`
+  were updated for the fourth open path and the no-Drive-authority rule, but the edit
+  reached PE30's container only and the sync is one-way. **Your copies are the old ones.**
+  Stale `glow-write-boundary` does not know `docs/prompt_ecosystem_management/` and will
+  treat writes to your own governing documents as forbidden. Nathan installs the updated
+  skills in the Claude workspace; it is not a repository change and no session can do it.
+  What the skills must say is governed by D7 and `authoritative-surfaces.md`.
 
 ## Obsolete — do not carry forward
 

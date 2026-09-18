@@ -58,8 +58,11 @@ Every other path in the repository remains off limits without Nathan's explicit
 instruction for that specific change. Nathan alone merges.
 
 The `glow-artifact-storage`, `glow-write-boundary` and `glow-workspace-currency`
-skills are updated to this, including the fourth open path
-`docs/prompt_ecosystem_management/` and the stronger no-Drive-authority rule.
+skills **still need a workspace republish** to carry the fourth open path
+`docs/prompt_ecosystem_management/` and the stronger no-Drive-authority rule. They were
+edited on 2026-09-18, but the edit reached the session container only — the skill sync is
+one-way and a container-local change dies with the container. Installing the updated skills is a
+Product Owner action in the Claude workspace; it is not a repository change.
 
 This document exists because the **prompts are not yet**, and a prompt that still
 routes an artifact to Drive will send a runtime session to the wrong place.
