@@ -140,7 +140,7 @@ routine; keep them working rather than rebuilding them.
 |---|---|---|
 | **Contract registry with behavioural assertions** | `project-prompt-contract-registry.md` | 499 assertions across 55 prompts, 0 failing. `required_regex` binds release identity and Canon source; `forbidden_regex` guards D7 against Drive reintroduction in any of its four forms. |
 | **Governance audit** | `amthor-workspace-governance-audit` skill | Executes the registry assertions on demand. Not on push — this material is outside application CI by design (see `README.md`). |
-| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` proves a rebuild matched. |
+| **Graph parts + proof token** | `docs/graph/parts/`, rebuilt on demand | Machine-readable restatement of the corpus. Derived output is never committed (D7); the token `55 nodes · 227 edges · 55 state_routes · 571,479 bytes · sha256 021058dd…` proves a rebuild matched. |
 | **Isolated-readback harness** | pattern, `execution-and-delegation-model.md` §7 | Proves an applied change landed, without the verifier knowing the expectation. |
 | **Regression-injection test** | pattern, D11 | Proves a guard actually catches what it claims. The D7 guard was tested against five injected regressions and a clean control. |
 | **Succession record** | `pe-succession/` | Lets a session be replaced without losing the inheritance. |

@@ -548,6 +548,24 @@ repair began:
 Node, edge and state_route counts are unchanged; only the ten flags moved. Any document still
 citing `3b54d620…` predates this correction.
 
+> **The token moved again on 2026-09-18**, after the workflow-skill repair found three further
+> defects in `docs/graph/parts/` that this rebuild did not touch: `PF10_REFERENCE_NOT_VISIBLE` still
+> listed as an invocation-terminal result although **D8** retired the visibility check that produced
+> it; the `CL-20` **predecessor** title rewritten to the candidate name although the `091326.2` page
+> it records is still called *"CL-20 — Prepare Post-Closure Drainage and Closure Memo"* (`SCOPE-002`);
+> and `flowmaster_primary_core_sha256` pinned at `495c2ca6…` against a measured `4d8bb9bf…`. All
+> three were found by validators that had never been able to run. Corrected under Product Owner
+> authorization; node, edge and state_route counts are unchanged.
+>
+> | | |
+> |---|---|
+> | Before | `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` |
+> | After | `55 nodes · 227 edges · 55 state_routes · 571,479 bytes · sha256 021058dd…` |
+>
+> **Any document citing `d7832c73…` / `571,513` predates this correction.** The current token lives
+> in `authoritative-surfaces.md`; the dated succession records keep the token current when they were
+> written and are history, not instruction.
+
 **The general lesson, added to the catalogue as `PAIR-001`:** a stale copy and a disabled
 checker hide each other, and neither looks broken on its own. When a validator cannot run,
 treat the invariants it alone enforces as unverified rather than as passing.

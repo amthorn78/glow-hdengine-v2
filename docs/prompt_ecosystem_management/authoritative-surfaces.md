@@ -25,7 +25,7 @@ the repository wins and the Notion page is the thing to correct.
 | Candidate selection status | `UNSELECTED_CANDIDATE` |
 | Selected (live) release | `GCFPE-20260913.1` / `091326.2` / 54 — **never modified** |
 | Repository baseline | `main` @ `3c0b1fa` |
-| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 571,513 bytes · sha256 d7832c73…` |
+| Graph proof token | `55 nodes · 227 edges · 55 state_routes · 571,479 bytes · sha256 021058dd…` |
 
 The graph proof token is reproduced by building from the committed parts. A session that
 builds and gets the same token has proved agreement; nothing needs a stored copy.
@@ -42,7 +42,7 @@ the repository. Verified working 2026-09-18, output:
 
 ```
 build: 55 nodes, 227 edges, 55 state_routes
-       embedded JSON 571513 bytes  sha256 d7832c73f890dbc5f6cd4f5090e08c5ddbcdd4a0f81672d1ccfbc7cbd6fe4a25
+       embedded JSON 571479 bytes  sha256 021058ddf8795124c34a38d53ac9245b7718b1b9e095f02fb82fc4ef41102bb6
        validation PASS
 ```
 
