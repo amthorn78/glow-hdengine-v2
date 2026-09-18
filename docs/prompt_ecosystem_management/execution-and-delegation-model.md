@@ -255,7 +255,10 @@ The standard is promoted to Phase 3 only if all of the following hold:
 A failure in any of these returns the mechanism to the Product Owner for a
 decision before Phase 3 runs.
 
-## 7. Known unverified dependency
+## 6A. Known unverified dependency
+
+> Renumbered from §7 on 2026-09-18. Two sections carried the number 7; every citation of
+> "§7" in this ecosystem means **verification isolation**, which keeps the number.
 
 Subagent access to the Notion connector has **not** been confirmed. Agents
 inherit the parent tool surface in principle, but the connector has cycled during
