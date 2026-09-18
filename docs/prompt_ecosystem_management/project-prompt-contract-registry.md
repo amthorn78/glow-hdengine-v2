@@ -2055,8 +2055,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6339 bytes'
-  - 'SHA-256 of that extraction: e85750c7fe8ac0248069f5d6ba00b814f420e6c794435e383845063ce0200955'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6411 bytes'
+  - 'SHA-256 of that extraction: 802ccd490feb83f6c4df3c73c325342e0202a02935579ffbf33c74feb35451be'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2284,8 +2284,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 6633 bytes'
-  - 'SHA-256 of that extraction: 6f07ad2f2fbe56d8bd4c056bc1267d3911fba97ef82402d9e66a4873a7cc242a'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 6668 bytes'
+  - 'SHA-256 of that extraction: 42ce029be426cd3d745b3e9f7099439a091d3ee915c1f4c0dcd660cf5cf0afef'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
@@ -2359,8 +2359,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 5459 bytes'
-  - 'SHA-256 of that extraction: c476eba9b5ab339ec1d823ab0e005f77b9767e9c225ea5e8c73a193ea50b8b83'
+  - 'Complete prompt body extracted from Notion 2026-09-18: 5633 bytes'
+  - 'SHA-256 of that extraction: 5addd33093e4c794e609829bba434275f06e798d313eda8ed29d63ffdba3e8c6'
   - 'Extraction, not a canonical publication receipt; the Notion page is authority'
   failure_contract:
   - Return truthful blocked/incomplete state to the exact source, authority, or recovery owner; do not invent missing evidence.
