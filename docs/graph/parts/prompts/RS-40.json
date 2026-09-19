@@ -67,23 +67,6 @@
           "applicable_states": [
             "PRODUCT_OWNER_DECISION_REQUIRED"
           ],
-          "branch_id": "pf10_overlay_mismatch_terminal",
-          "condition": "current PF10 carries related content but the decision, immutable base, or normalized approved delta differs; stop terminally, preserve both sources, and state the mismatch",
-          "next_prompt_handoff_count": 0,
-          "public_result": true,
-          "route_kind": "NATIVE_RESULT",
-          "route_steps": [],
-          "source_evidence": {
-            "path": "candidate/prompts/d/RS-40.md",
-            "section": "Required result and routing"
-          },
-          "state": "PRODUCT_OWNER_DECISION_REQUIRED",
-          "terminal_for_invocation": true
-        },
-        {
-          "applicable_states": [
-            "PRODUCT_OWNER_DECISION_REQUIRED"
-          ],
           "branch_id": "product_owner_decision_required",
           "condition": "genuine Product Owner decision or unrecoverable authority conflict",
           "next_prompt_handoff_count": 0,
@@ -279,7 +262,6 @@
   },
   "state_route_order": [
     "source_resolution_error",
-    "pf10_overlay_mismatch_terminal",
     "pr_candidate_published",
     "merge_pending",
     "rescope_pending",
