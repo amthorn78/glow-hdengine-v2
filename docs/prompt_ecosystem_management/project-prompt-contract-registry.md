@@ -16,6 +16,11 @@ status: APPROVED
 approved_by: Nathan / Product Owner
 approved_at: 2026-09-17
 workspace_skill_registry_id: WSR-20260914.1-OBSERVATIONAL
+workspace_skill_registry_disposition: 'Evidence only. That registry is DRAFT, unapproved, and
+  self-classified INVENTORY_EVIDENCE_NOT_APPROVED_EXPECTED_STATE, observed from a checkout absent
+  from this environment. It confers no skill lifecycle on this approved registry. Its glow-hde-devops
+  row is a dated observation and is preserved unedited; that skill is retired by D16, which is the
+  authority for its disposition, and the forbidden literal on all 55 rows below is correct.'
 authority_sources:
 - type: SELECTED_RELEASE_REGISTER
   release: GCFPE-20260914.1
