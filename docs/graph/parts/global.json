@@ -549,7 +549,7 @@
     "unresolved_edges": []
   },
   "protected_identities": {
-    "flowmaster_primary_core_sha256": "495c2ca6f33a8b6b837754a518b1cbc64570e9c911e137fd5b81004d487e498c",
+    "flowmaster_primary_core_sha256": "4d8bb9bf1c9c85aeba8529995ee97b496d7938571d4b362f49c42aa9aa27d409",
     "r1_core_rows": 26,
     "r1_material_rows": 20,
     "r1_oracle_sha256": "52807e58c4a4659e6c1fc822749f6e50253ad7b01846c833f727ee266ca71d5e",
@@ -739,7 +739,6 @@
   "terminal_contract": {
     "invocation_terminal_recoverable": [
       "SOURCE_RESOLUTION_ERROR",
-      "PF10_REFERENCE_NOT_VISIBLE",
       "CURRENT EVIDENCE PENDING IN A NON-PR35 BRANCH WHEN NO RUNNABLE RECEIVER EXISTS"
     ],
     "rule": "state completion/stop and return to Nathan; no continuation prompt",
