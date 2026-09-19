@@ -569,3 +569,44 @@ citing `3b54d620…` predates this correction.
 **The general lesson, added to the catalogue as `PAIR-001`:** a stale copy and a disabled
 checker hide each other, and neither looks broken on its own. When a validator cannot run,
 treat the invariants it alone enforces as unverified rather than as passing.
+
+## D16 — No DevOps skill exists, and the Ops lane needs none
+
+Decided 2026-09-19 by the Product Owner, in response to the round-5 skill-fit review, which
+reported that OPS-20 has no primary skill and that its natural support skill is both forbidden
+and absent.
+
+**The ruling: "we do not need any devops skill period."**
+
+`glow-hde-devops` is retired. None is installed, none is required, and none is to be created.
+The candidate contract already replaced the named support-skill binding with an unnamed
+capability policy, and the approved registry already forbids the literal `glow-hde-devops` on
+all 55 rows under `SRC-001`. Both are correct and stay.
+
+**What this settles about OPS-20.** The review recorded it as the one prompt whose declared
+role is a standalone environment operator outside a PR work unit, with `glow-hde-pr-development`
+excluding standalone Ops by name and `change-flow` disclaiming substitution for "an authorized
+environment operator". That is not a gap to be filled. **OPS-20 and the Ops lane execute
+natively, by their named human or agent operator, with no skill binding**, and the current
+state is correct by design. The §10 questions it turned on — every prompt that *needs* a
+primary skill has exactly one, and no prompt contract requires a capability no installed skill
+safely supplies — are answered: OPS-20 needs no primary skill.
+
+**What this settles about the registry pointer.** The approved registry names
+`workspace_skill_registry_id: WSR-20260914.1-OBSERVATIONAL`, and that observational registry
+still carries a `glow-hde-devops` row at `lifecycle: ACTIVE`. The row is **not** corrected,
+because that document is an observation: it is `status: DRAFT`, `approved_by: null`, and
+self-classified `INVENTORY_EVIDENCE_NOT_APPROVED_EXPECTED_STATE`, captured from a checkout
+(`/root/.codex/skills/remote-skills`) that does not exist in the current environment. Editing
+its rows would falsify a dated observation, exactly as rewriting a historical Before/After
+token table would. It records what was seen on its date, and what was seen was accurate then.
+
+The defect was never the observation. It was that an **approved** artifact took its
+skill-identity model from an **unapproved** one. A disposition note now sits beside the pointer
+recording that the observational registry is evidence only, confers no lifecycle, and is
+governed for `glow-hde-devops` by this decision.
+
+**The general lesson, added to the catalogue as `AUTH-001`:** an approved artifact must not
+draw authority from an unapproved one. When it does, the contradiction surfaces as a disagreement
+about a fact, and the repair instinct is to change the fact in whichever document is easier to
+edit. The correct repair is to fix the authority relationship and leave the observation intact.
