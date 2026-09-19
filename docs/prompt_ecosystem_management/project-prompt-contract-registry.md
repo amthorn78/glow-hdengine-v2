@@ -189,6 +189,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -276,6 +278,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -366,6 +370,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -450,6 +456,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -541,6 +549,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -628,6 +638,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -718,6 +730,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -802,6 +816,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -891,6 +907,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -986,6 +1004,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1073,6 +1093,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1164,6 +1186,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1253,6 +1277,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1343,6 +1369,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1432,6 +1460,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1523,6 +1553,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1612,6 +1644,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1710,6 +1744,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1816,6 +1852,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1901,6 +1939,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1989,6 +2029,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2083,6 +2125,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2173,6 +2217,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2256,6 +2302,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2348,6 +2396,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2438,6 +2488,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2532,6 +2584,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2623,6 +2677,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2714,6 +2770,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2800,6 +2858,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2893,6 +2953,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2986,6 +3048,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3081,6 +3145,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3179,6 +3245,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3270,6 +3338,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3356,6 +3426,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3446,6 +3518,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3523,6 +3597,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3635,6 +3711,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3717,6 +3795,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3820,6 +3900,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3913,6 +3995,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4012,6 +4096,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4114,6 +4200,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4203,6 +4291,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4298,6 +4388,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4387,6 +4479,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4476,6 +4570,8 @@ prompts:
     - value: never a gate on later work
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4561,6 +4657,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4655,6 +4753,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4739,6 +4839,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4833,6 +4935,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4917,6 +5021,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -5013,6 +5119,8 @@ prompts:
     - value: never a gate on later work
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -5098,6 +5206,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
