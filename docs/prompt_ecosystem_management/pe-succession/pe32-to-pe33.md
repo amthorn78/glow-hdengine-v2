@@ -13,8 +13,9 @@ baseline: main @ e0c0ac3 (PR #417, merged) plus open PR #418
 
 | | |
 |---|---|
-| Predecessor | **PE32** — retired 2026-09-19 |
-| Successor | **PE33** — initialized 2026-09-19 |
+| Predecessor | **PE32** — `session_014ZinT4DGXAoN8bW3KQpzvi` — **RETIRED 2026-09-19** |
+| Successor | **PE33** — `session_01Ch4SUzUjLbqL58QLQ8Y3XD` — initialized 2026-09-19 |
+| Initialized from | branch `docs/20260919-addendum-schema-guard` (PR #418), which carries this record |
 | Baseline | `main @ e0c0ac3`; open PR **#418**, branch `docs/20260919-addendum-schema-guard`, 5 ahead / 0 behind |
 
 PE32's transcript is not a system of record and is not available to PE33 by design.
