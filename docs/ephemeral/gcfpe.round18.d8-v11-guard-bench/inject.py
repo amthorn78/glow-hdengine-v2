@@ -145,21 +145,40 @@ def main():
         if os.path.isdir(work):
             shutil.rmtree(work)
         shutil.copytree(pristine, work, symlinks=True)
+        # Setup and evaluation are judged differently, and conflating them is a silent pass:
+        # if apply() raises, nothing was injected and no guard layer ran, so crediting that
+        # as fail-closed would let a run print "as expected" having tested nothing.
+        harness_error = None
+        L = {}
+        before = open(os.path.join(work, CF), "rb").read()
         try:
             apply(work, PLACEMENTS[name])
-            L = layers(work)
-        except Exception as exc:                          # a crash is fail-closed, not a pass
-            L = {"raised": "%s: %s" % (type(exc).__name__, exc)}
+        except Exception as exc:
+            harness_error = "apply() raised %s: %s" % (type(exc).__name__, exc)
+        else:
+            if open(os.path.join(work, CF), "rb").read() == before:
+                harness_error = "apply() changed nothing; the placement did not land"
+        if harness_error is None:
+            try:
+                L = layers(work)
+            except Exception as exc:                      # HERE a crash IS fail-closed
+                L = {"raised": "%s: %s" % (type(exc).__name__, exc)}
+        print("=" * 78)
+        print("PLACEMENT %s" % name)
+        if harness_error:
+            # Never a pass. Nothing was tested, so there is no guard result to report.
+            print("  HARNESS FAILURE        %s" % harness_error)
+            print("  VERDICT *** HARNESS FAILURE - nothing was tested ***")
+            failures.append("%s (harness)" % name)
+            continue
         gates = subprocess.run(["bash", os.path.join(here, "run_gates.sh"), work],
                                capture_output=True, text=True).stdout.strip()
         green = ("G1 rc=0" in gates and "ok=True errors=[]" in gates
                  and "fixture_suite_ok=True" in gates and "FLOWMASTER_SUITE_PASS" in gates)
-        # A raise is fail-closed, not a pass: non-zero exit, nothing admitted.
+        # A raise from the validator IS fail-closed: non-zero exit, nothing admitted.
         fired = bool(L.get("raised")) or bool(L.get("pin_changed")) or any(
             L.get(k) for k in ("L2_out_of_surface", "L3_key_drift", "L4_top_level_drift",
                                "L5_lifecycle_shape", "L6_list_value_drift", "overlay"))
-        print("=" * 78)
-        print("PLACEMENT %s" % name)
         for k, v in L.items():
             if v not in ([], False):
                 print("  %-22s %s" % (k, v))

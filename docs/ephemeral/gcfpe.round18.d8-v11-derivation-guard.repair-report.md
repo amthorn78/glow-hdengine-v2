@@ -191,7 +191,14 @@ shapes (`H1`–`H6`), and two controls. The verdict is judged on the **D8 guard 
 the four gates, because a gate can go red for an unrelated reason — `H4` also trips
 `PF10_PRODUCER_SET` — and a lawful promotion legitimately fails `G1`'s candidate-lifecycle
 check, since this contract is pinned as an `UNSELECTED_CANDIDATE`, which is not a guard
-finding. A raised exception counts as fail-closed, not as a pass.
+finding.
+
+Setup and evaluation are judged differently, because conflating them is a silent pass. An
+exception raised **by the validator** is fail-closed and counts as the guard firing: non-zero
+exit, nothing admitted. An exception raised **while applying the placement** means nothing was
+injected and no layer ever ran, so it is reported as `HARNESS FAILURE`, is never credited as a
+guard result, and fails the run. The bench also refuses a placement that leaves the contract
+bytes unchanged, since a mutation that silently no-ops would otherwise read as a pass.
 
 **Measured result, v11:** `placements run: 14  unexpected: none` — 13 fire a guard layer, and
 `CONTROL-lawful-promotion` leaves every layer silent.
