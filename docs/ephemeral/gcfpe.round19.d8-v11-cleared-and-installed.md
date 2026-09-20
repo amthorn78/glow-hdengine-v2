@@ -44,6 +44,34 @@ recorded here. PE34 did not install and cannot install.
 | `flowmaster-validate/` subtree, 29 files | `1f2bf7e671325ade34d2cd9b1f9448c964cbb9c7b5ed6c71874ca4ca70aadb3d` |
 | Cross-copy parity of the guard block | identical, 8836 chars, `e80529aac5653adfce29fe4c40227fce` |
 
+## The installed directories match the reviewed packages completely
+
+The three script identities above cover 3 of the 50 files in the two skills. They do not by
+themselves establish that what is installed *is* the package SFR-01 reviewed: a stale or altered
+ancillary file — a reference JSON, a `SKILL.md`, an icon — would pass a three-file check. So both
+installed directories were compared recursively against a fresh extraction of the two reviewed
+archives.
+
+| Archive | sha256 | Reviewed by SFR-01 |
+|---|---|---|
+| `change-flow.skill` | `72d1da48e1619f365b100761f0e41aeef43123d66ab0b9953efc4ec2fbe4ab01` | yes |
+| `flowmaster-validate.skill` | `9e7e79c87db78bc81dc38299dfc5cdab4213cf2b70a7ddd756be2ca0d65f319f` | yes |
+
+| Directory | Files, package vs installed | `diff -r` | Subtree digest, package vs installed |
+|---|---|---|---|
+| `change-flow/` | 21 vs 21 | **no differences** | `5c58d494…` = `5c58d494…` |
+| `flowmaster-validate/` | 29 vs 29 | **no differences** | `1f2bf7e6…` = `1f2bf7e6…` |
+
+```
+unzip -q change-flow.skill        -d <pkg>
+unzip -q flowmaster-validate.skill -d <pkg>
+diff -r <pkg>/change-flow          <synced-tree>/change-flow
+diff -r <pkg>/flowmaster-validate  <synced-tree>/flowmaster-validate
+```
+
+**All 50 files are byte-identical.** What is installed is the reviewed package, not merely a tree
+containing the reviewed scripts.
+
 ## The installed build was exercised, not just hashed
 
 Run from a scratch copy of the installed tree, with `PYTHONDONTWRITEBYTECODE=1`; nothing was
