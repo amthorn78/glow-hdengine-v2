@@ -1,0 +1,213 @@
+diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
+--- base/change-flow/SKILL.md	2026-09-20 20:12:29.344183997 +0000
++++ work/change-flow/SKILL.md	2026-09-20 20:14:40.241505020 +0000
+@@ -553,6 +553,10 @@
+ 
+ The older integrated-readiness, final-scan, Alpha-feedback, assessment-middleware, Epic-alpha, and Epic-reengineering reference files remain immutable historical provenance. They are not executed as current routing overlays. Their retained byte identity supports audit history only and does not reintroduce retired prompts, middleware, selection advice, counts, or gates.
+ 
++The bundled `gcfpe-20260913.1-091326.2`, `gcfpe-20260913.1`, and `gcfpe-20260912.2` direct-handoff contracts are superseded candidate records and remain immutable historical provenance on the same terms. They are not executed as current routing overlays and confer no current skill binding. Three of these files share `contract_id` `GCFPE-PF10-INTEGRITY-20260913.1` with the current contract above; that identifier resolves for current execution to `gcfpe-current-direct-handoff-contract.json` alone, which carries `status: SELECTED_PRODUCTION`. A `CANDIDATE_VALIDATED` or `CANDIDATE_UNTIL_SELECTED_IN_NOTION_REGISTER` copy is never the current answer for that identifier.
++
++The `support_skill` field in those superseded copies names `glow-hde-devops`, which **D16 retires**: none is installed, none is required, and none is to be created. That field is a dated record of what the contract said when it was written; it is not a current support-skill binding, and no current run resolves a support skill from it. The current contract declares only `primary_skill: glow-hde-pr-development`. Do not edit those dated bytes to remove the field.
++
+ Static validation proves only declared contract consistency. It does not execute a worker session, resume Alpha, release automation, adopt PF10 content, or prove live behavior.
+ 
+ ### Completion report
+diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
+--- base/flowmaster-validate/SKILL.md	2026-09-20 20:12:29.353075276 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-20 20:18:22.643760260 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Flowmaster Validate
+ 
+-FLOWMASTER_VALIDATE_REVISION: 3.2.6
++FLOWMASTER_VALIDATE_REVISION: 3.2.7
+ 
+ Maintenance addition: register the self-contained human-design-reading-flowmaster domain
+ contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
+--- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 20:12:29.354244306 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 20:18:22.643901654 +0000
+@@ -42,5 +42,5 @@
+   "selected_release_during_staging": "GCFPE-20260913.1",
+   "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
+   "target_release": "GCFPE-20260914.1",
+-  "validator_revision": "3.2.6"
++  "validator_revision": "3.2.7"
+ }
+diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py
+--- base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-20 20:12:29.354418548 +0000
++++ work/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py	2026-09-20 20:18:22.645034598 +0000
+@@ -531,9 +531,14 @@
+         observed = validate_qa_closure_bodies(bodies, source)
+         cases.append({"name": "accept-live-source-class-specific-closure-intakes",
+                       "passed": observed == [], "errors": observed})
++        # The first two anchors previously assumed the Markdown pipe rendering of
++        # QA-120's class map.  The live body renders it as an HTML table, so the anchors
++        # matched nothing and the runner raised `Mutation anchor absent` -- the body-level
++        # fixtures could not run against the real corpus at all.  Both now anchor on the
++        # receiver identity, which is present in either rendering.
+         for name, prompt_id, old, new, expected_error in (
+-            ("reject-source-epic-to-crd", "QA-120", "| `PASS` | `EPIC` | `CL-E-10", "| `PASS` | `EPIC` | `CL-C-10", "QA_PASS_BODY_CLASS_MAP"),
+-            ("reject-source-missing-crd-branch", "QA-120", "| `PASS` | `CRD` |", "| `PASS` | `UNKNOWN` |", "QA_PASS_BODY_CLASS_MAP"),
++            ("reject-source-epic-to-crd", "QA-120", "`CL-E-10 — ", "`CL-C-10 — ", "QA_PASS_BODY_CLASS_MAP"),
++            ("reject-source-missing-crd-branch", "QA-120", "`CL-C-10 — ", "`CL-Z-99 — ", "QA_PASS_BODY_CLASS_MAP"),
+             ("reject-source-inferred-class", "QA-120", "Do not infer a class", "Infer a class", "QA_CLASS_UNRESOLVED_HANDOFF"),
+             ("reject-source-missing-rca", "QA-120", "`QA_RCA_ID`", "`OMITTED_RCA`", "QA_PASS_BODY_INTAKE"),
+             ("reject-source-epic-receiver-crd-intake", "CL-E-10", "complete approved `Epic` Specification", "complete approved `CRD` Specification", "QA_PASS_RECEIVER_BODY:CL-E-10"),
+@@ -554,7 +559,7 @@
+     section_13_variants = [case for case in cases if case.get("fixture_variant")]
+     return {
+         "schema_version": "gcfpe-fixture-report/2.0",
+-        "validator_revision": "3.2.6",
++        "validator_revision": "3.2.7",
+         "profile": profile.get("profile_id"),
+         "profile_errors": profile_errors,
+         "release": source.get("target_release"),
+diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
+--- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 20:12:29.354596564 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 20:18:22.645285483 +0000
+@@ -1222,7 +1222,7 @@
+         )
+         report: dict[str, object] = {
+             "schema_version": "flowmaster-validation-report-v2",
+-            "validator_revision": "3.2.6",
++            "validator_revision": "3.2.7",
+             "oracle_profile": oracle.get("profile_id"),
+             "oracle_authority": oracle.get("authority"),
+             "skills": {},
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:18:22.644522101 +0000
+@@ -953,7 +953,7 @@
+     errors += subset_errors(profile, {
+         "schema_version": "gcfpe-validation-profile/1.0",
+         "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
+-        "validator_revision": "3.2.6",
++        "validator_revision": "3.2.7",
+         "target_release": "GCFPE-20260914.1",
+         "prompt_version": "091426.1",
+         "candidate_member_count": 55,
+@@ -1936,19 +1936,50 @@
+     return sorted(set(errors))
+ 
+ 
++QA_PASS_ROW_PIPE_RE = re.compile(
++    r"(?m)^\|\s*`PASS`\s*\|\s*`(EPIC|CRD)`\s*\|\s*`(CL-[EC]-10) — [^`]+`\s+at\s+(.+?)\s*\|$"
++)
++QA_PASS_ROW_HTML_RE = re.compile(
++    r"<tr>\s*<td>\s*`PASS`\s*</td>\s*<td>\s*`(EPIC|CRD)`\s*</td>\s*"
++    r"<td>\s*`(CL-[EC]-10) — [^`]+`\s+at\s+(.*?)\s*</td>\s*</tr>",
++    re.S,
++)
++
++
++def qa_pass_class_rows(producer: str) -> list[tuple[str, str, str]]:
++    """QA-120's PASS class map, in either rendering the body may legitimately use.
++
++    The map is authored in Notion and reaches this check as either a Markdown pipe
++    table or an HTML table; the destination is written as a bare URL or as a
++    `<mention-page url="...">` element.  An earlier version accepted only the pipe
++    table with a bare URL, so it matched nothing against the real body and reported
++    a class-map defect on a correct map -- information about the check, not the body,
++    which is the same failure `notion_page_identity` was introduced to end.  Both
++    renderings are accepted here; the third element is the raw destination field and
++    identity is resolved by the caller, never compared as text.
++    """
++
++    rows = [m.groups() for m in QA_PASS_ROW_PIPE_RE.finditer(producer)]
++    rows += [m.groups() for m in QA_PASS_ROW_HTML_RE.finditer(producer)]
++    return rows
++
++
+ def validate_qa_closure_bodies(bodies: dict[str, str], contract: dict[str, Any]) -> list[str]:
+     """Compare the producer's actual class table with both complete native intakes."""
+     errors: list[str] = []
+     producer = bodies.get("QA-120", "")
+     expected = {"EPIC": "CL-E-10", "CRD": "CL-C-10"}
+-    rows = re.findall(
+-        r"(?m)^\| `PASS` \| `(EPIC|CRD)` \| `(CL-[EC]-10) — [^`]+` at (https://[^ |]+) \|$",
+-        producer,
+-    )
++    rows = qa_pass_class_rows(producer)
+     if len(rows) != 2 or {r[0]: r[1] for r in rows} != expected:
+         errors.append("QA_PASS_BODY_CLASS_MAP")
+-    for cls, destination, url in rows:
+-        if url != (contract.get("member_registry") or {}).get(expected[cls], {}).get("notion_url"):
++    for cls, destination, url_field in rows:
++        # The body renders its receiver binding as a page mention and the contract's
++        # notion_url carries ?pvs=204, so identity is the page id -- never the literal
++        # field text.  Same rule the identity-header check already applies.
++        expected_identity = notion_page_identity(
++            (contract.get("member_registry") or {}).get(expected[cls], {}).get("notion_url") or ""
++        )
++        if not expected_identity or notion_page_identity(url_field) != expected_identity:
+             errors.append("QA_PASS_BODY_CLASS_MAP")
+     if ("class evidence is missing or conflicting" not in producer
+             or "without a closure handoff" not in producer
+@@ -2023,9 +2054,29 @@
+             for row in (contract.get("state_routes", {}).get(prompt_id, []))
+             if isinstance(row, dict) and row.get("public_result") is True
+         ]
+-        if any(row.get("terminal_for_invocation") is not True for row in public_states):
+-            if "NEXT_PROMPT_HANDOFF" not in text:
+-                errors.append(f"PROMPT_HANDOFF_CONTRACT:{prompt_id}")
++        nonterminal_public = [
++            row for row in public_states if row.get("terminal_for_invocation") is not True
++        ]
++        if nonterminal_public:
++            # D14 enforces a ruling against behaviour, so test the actual routing
++            # obligation rather than the presence of one token.  A prompt whose
++            # non-terminal public branches route to named prompts must name each of
++            # those receivers in its own body; a prompt with no named receiver owes no
++            # declaration, and the approved registry agrees -- GCFPE-MGMT-10 carries
++            # `required_literals: []`.  Requiring the token there imposed a uniformity
++            # the registry does not ask for.  Symbolic destinations
++            # (NATHAN_TERMINAL_RETURN, ORIGINAL_NATIVE_STAGE, NATHAN_PROCEED,
++            # NATHAN_MANUAL_MERGE_ASSERTION) are not prompts and are not name-checkable.
++            for row in nonterminal_public:
++                destinations = row.get("destinations")
++                if destinations is not None and not isinstance(destinations, list):
++                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
++                    continue
++                for destination in (destinations or []):
++                    if destination in EXPECTED_MEMBERS and destination not in text:
++                        errors.append(
++                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"
++                        )
+         elif public_states and not all(row.get("next_prompt_handoff_count") == 0 for row in public_states):
+             errors.append(f"PROMPT_TERMINAL_HANDOFF_CONTRACT:{prompt_id}")
+         if prompt_id in EXPECTED_PRODUCERS:
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-20 20:12:29.354780920 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-20 20:21:08.971360355 +0000
+@@ -15,8 +15,13 @@
+     return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']
+ 
+ def _inputs(body):
++    # The intake section is matched by what its heading is about, not by one of four
++    # exact phrasings.  The narrow form returned an empty string for CF-C-20, CF-E-20,
++    # CF-PO-10, IA-10 and IA-20 -- five of the ten prompts the input-based checks below
++    # apply to -- so those checks evaluated nothing and could not fail.  A check that
++    # cannot fail is information about the check.
+     chunks=re.split(r'(?m)(?=^## )',body)
+-    return '\n'.join(x for x in chunks if re.match(r'## (?:Inputs|Required inputs|Required input|Sole substantive input)',x))
++    return '\n'.join(x for x in chunks if re.match(r'## [^\n]*[Ii]nputs?\b',x))
+ 
+ def _positive_requirement_sentences(body):
+     for line in body.splitlines():
+@@ -81,7 +86,14 @@
+         changed=dict(bodies)
+         # Place the mutation in a real native input section, not in a fixture-only
+         # declaration or a separate shadow source.
+-        match=re.search(r'(?m)^## (?:Inputs[^\n]*|Required inputs[^\n]*)\n',changed[id])
++        # The anchor locates the prompt's native intake section so the mutation lands in
++        # a real input list.  It previously accepted only the headings "Inputs" and
++        # "Required inputs", and the live corpus also uses "Entry modes and inputs",
++        # "Entry and inputs" and "Required inputs and continuity identity" -- so the
++        # helper raised on IA-10 and the timing fixtures could not run.  Matching any
++        # heading whose title names inputs tracks the corpus instead of one phrasing;
++        # it selects the same section in every case where the narrow form worked.
++        match=re.search(r'(?m)^## [^\n]*[Ii]nputs[^\n]*\n',changed[id])
+         if not match:raise ValueError('Native intake anchor missing: '+id)
+         changed[id]=changed[id][:match.end()]+append+'\n'+changed[id][match.end():]
+         found=validate_artifact_timing_bodies(changed)
