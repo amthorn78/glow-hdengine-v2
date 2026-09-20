@@ -77,7 +77,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
              "skills": {},
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:18:22.644522101 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 21:33:29.225150556 +0000
 @@ -953,7 +953,7 @@
      errors += subset_errors(profile, {
          "schema_version": "gcfpe-validation-profile/1.0",
@@ -144,7 +144,36 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
              errors.append("QA_PASS_BODY_CLASS_MAP")
      if ("class evidence is missing or conflicting" not in producer
              or "without a closure handoff" not in producer
-@@ -2023,9 +2054,29 @@
+@@ -1974,6 +2005,28 @@
+     return sorted(set(errors))
+ 
+ 
++# The two rows the approved registry does NOT require `NEXT_PROMPT_HANDOFF` on.
++# Sourced from `audit_assertions.required_literals` in
++# docs/prompt_ecosystem_management/project-prompt-contract-registry.md, where 53 of the
++# 55 rows carry that literal and these two carry no such requirement.  PR-50 is also the
++# one prompt whose public result states are all terminal; GCFPE-MGMT-10 is not, which is
++# why a graph-derived rule disagreed with the registry about it.
++HANDOFF_LITERAL_EXEMPT = frozenset({"GCFPE-MGMT-10", "PR-50"})
++
++
++def names_prompt(text: str, prompt_id: str) -> bool:
++    """True when `text` names `prompt_id` as a complete identifier.
++
++    A plain `in` test is wrong here: `QA-10` is a prefix of `QA-100`, so a body that
++    dropped every real `QA-10` reference but kept one `QA-100` would satisfy a branch
++    routing to `QA-10`.  That is the only prefix collision among the 55 member ids, and
++    one is enough.  Boundaries reject a leading or trailing identifier character rather
++    than relying on `\b`, which treats `-` as a boundary and so would not help.
++    """
++
++    return re.search(rf"(?<![0-9A-Za-z-]){re.escape(prompt_id)}(?![0-9A-Za-z-])", text) is not None
++
++
+ def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
+     errors: list[str] = []
+     hashes: dict[str, str] = {}
+@@ -2023,9 +2076,40 @@
              for row in (contract.get("state_routes", {}).get(prompt_id, []))
              if isinstance(row, dict) and row.get("public_result") is True
          ]
@@ -154,23 +183,34 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +        nonterminal_public = [
 +            row for row in public_states if row.get("terminal_for_invocation") is not True
 +        ]
++        # Two separate obligations, because collapsing them lost one of them.
++        #
++        # 1. The handoff-block literal.  The approved registry requires
++        #    `NEXT_PROMPT_HANDOFF` on 53 of its 55 rows and exempts exactly two --
++        #    GCFPE-MGMT-10 and PR-50, whose rows carry no such required literal.  An
++        #    earlier revision of this check derived the requirement from the graph's
++        #    branch shape instead, which demanded the token of GCFPE-MGMT-10 (a
++        #    validator defect, since the registry does not).  The fix for that dropped
++        #    the literal test altogether, which silently retired the registry's
++        #    requirement for the other 53 -- a body could lose its handoff block and
++        #    still pass.  The roster below is the registry's, not the graph's.
++        # 2. The receiver binding.  Every prompt-id destination of a non-terminal
++        #    public branch must be named in the body.  Symbolic destinations
++        #    (NATHAN_TERMINAL_RETURN, ORIGINAL_NATIVE_STAGE, NATHAN_PROCEED,
++        #    NATHAN_MANUAL_MERGE_ASSERTION) are not prompts and are not name-checkable.
++        #    Matching uses identifier boundaries: a plain substring test lets `QA-100`
++        #    satisfy a branch that routes to `QA-10`, which is the one prefix collision
++        #    among the 55 ids.
++        if prompt_id not in HANDOFF_LITERAL_EXEMPT and "NEXT_PROMPT_HANDOFF" not in text:
++            errors.append(f"PROMPT_HANDOFF_LITERAL:{prompt_id}")
 +        if nonterminal_public:
-+            # D14 enforces a ruling against behaviour, so test the actual routing
-+            # obligation rather than the presence of one token.  A prompt whose
-+            # non-terminal public branches route to named prompts must name each of
-+            # those receivers in its own body; a prompt with no named receiver owes no
-+            # declaration, and the approved registry agrees -- GCFPE-MGMT-10 carries
-+            # `required_literals: []`.  Requiring the token there imposed a uniformity
-+            # the registry does not ask for.  Symbolic destinations
-+            # (NATHAN_TERMINAL_RETURN, ORIGINAL_NATIVE_STAGE, NATHAN_PROCEED,
-+            # NATHAN_MANUAL_MERGE_ASSERTION) are not prompts and are not name-checkable.
 +            for row in nonterminal_public:
 +                destinations = row.get("destinations")
 +                if destinations is not None and not isinstance(destinations, list):
 +                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
 +                    continue
 +                for destination in (destinations or []):
-+                    if destination in EXPECTED_MEMBERS and destination not in text:
++                    if destination in EXPECTED_MEMBERS and not names_prompt(text, destination):
 +                        errors.append(
 +                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"
 +                        )

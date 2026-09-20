@@ -291,11 +291,22 @@ in the same place:
 | **CF-C-40, CF-E-40** | **drop the flag** — `artifact_type` already distinguishes the two regimes on the artifact itself, per the contract ledger | **drop the flag** — keep their existing conditional wording, which is already the correct rule |
 | **CF-C-20, CF-E-20** | **drop the flag** — one mode only, and `state: SPECIFICATION_PENDING` already carries the regime | **drop the flag** — their governing canon is the Specification format canon, which they already resolve and cite |
 
-**That is your second original option — the contract drops the four Specification authors from
-both flags** — and it is now the recommendation. It is not "drop them from the roster" wholesale:
-the other twelve `plan_writer_contract` entries keep both obligations, and the field itself stays
-mandatory on the nine roster prompts and eight non-roster prompts that genuinely consume it
-(QA-70 branches on its value; CL-E-20 and OPS-10 read it).
+**That is your second original option — the contract exempts the four Specification authors from
+both flags** — and it is now the recommendation. **The other ten `plan_writer_contract` entries keep
+both obligations** (14 − 4 = 10; an earlier version of this line said twelve, which was simply
+wrong), and the field itself stays mandatory on the nine roster prompts and eight non-roster prompts
+that genuinely consume it: QA-70 branches on its value, CL-E-20 reads it to refuse rewriting an
+approved base, OPS-10 resolves it from supplied authority.
+
+**"Exempts" is not "removes from the roster", and the difference is the whole cost.** Review caught
+this: `plan_writer_contract` carries **seven** boolean flags, not two —
+`applicable_overlay_links_required`, `approved_base_live_reauthoring_refused`,
+`authoring_context_required`, `current_pf10_markdown_required`, `immutable_base_plus_overlays`,
+`pf10_lineage_required_in_complete_handoff`, `repository_paths_required` — and they apply to every
+id in `evaluated_prompt_ids`. Dropping the four from that list would exempt them from **all seven**,
+which is not wanted and in one case is actively wrong: **CF-C-40 and CF-E-40 must keep
+`approved_base_live_reauthoring_refused`**, since refusing to rewrite an approved base is the
+central rule of their approved-base mode.
 
 Why this rather than adding the field:
 
@@ -308,12 +319,23 @@ Why this rather than adding the field:
 - It keeps the validator honest: after the change every prompt the check tests actually owes what
   it tests for, so no permanently-red row is left behind.
 
-**Cost: no prompt body changes at all, and one contract change.** `plan_writer_contract` drops the
-four Specification authors from `evaluated_prompt_ids`, or scopes its two flags so they do not
-apply to them. The contract is bundled in both `change-flow` and `flowmaster-validate`, so this is
-a skill change needing independent review, and the validator's `EXPECTED_WRITERS` literal must move
-in lockstep — which the existing `PLAN_WRITER_SET` check already enforces in both directions, so a
-half-done change fails loudly rather than quietly.
+**Cost, re-priced after review. Still no prompt body changes, and more than one edit.** An earlier
+version of this line said "one contract change", which was true only of the wrong implementation.
+What the recommendation actually needs:
+
+1. **Per-obligation scope in the contract.** `evaluated_prompt_ids` stays at 14, and the two flags
+   in question gain an explicit exemption list — or become per-obligation rosters — so
+   `authoring_context_required` and `current_pf10_markdown_required` can exclude the four
+   Specification authors while the other five flags keep applying to all fourteen.
+2. **Matching validator logic.** `EXPECTED_WRITERS` is a single set today, so it must split into the
+   per-obligation rosters the contract declares, and the `PLAN_WRITER_SET` check must assert the new
+   shape. That check already compares contract against validator in both directions, so a half-done
+   change fails loudly rather than quietly — which is the reason to keep it rather than route around
+   it.
+
+Both touch the bundled copies in `change-flow` and `flowmaster-validate`, so this is a skill change
+needing independent review, and it is **larger than the `SF10-03` / `SF10-05` / `SF10-06` package** —
+worth deciding on its own rather than folding in.
 
 **The option not to take:** requiring all four bodies to acquire both obligations. It would add a
 PF10 prerequisite to artifacts that do not use PF10 and a second regime field beside one that

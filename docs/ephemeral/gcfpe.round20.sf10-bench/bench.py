@@ -176,8 +176,13 @@ def handoff_errors(mod, data):
         errors, _hashes = mod.validate_prompt_bodies(tmp, data["contract"])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+    # Every handoff-related code the two builds can emit.  An earlier revision omitted
+    # PROMPT_HANDOFF_LITERAL, so the bench filtered out the very error its own literal
+    # case asserted and reported a working check as missing -- the instrument hiding the
+    # signal rather than the subject failing.
     return sorted(e for e in errors
-                  if e.startswith(("PROMPT_HANDOFF_CONTRACT", "PROMPT_HANDOFF_RECEIVER",
+                  if e.startswith(("PROMPT_HANDOFF_CONTRACT", "PROMPT_HANDOFF_LITERAL",
+                                   "PROMPT_HANDOFF_RECEIVER",
                                    "PROMPT_TERMINAL_HANDOFF_CONTRACT")))
 
 
@@ -209,6 +214,40 @@ def swap_operative_receiver(prompt_id, receiver, other):
         if receiver not in text:
             die(f"fixture invalid: {receiver} no longer appears in {prompt_id}, so the "
                 f"whole-document predicate would catch this and the blind spot is not modelled")
+        data["bodies"][prompt_id] = text
+    return f
+
+
+def drop_literal(prompt_id):
+    """Remove the handoff-block literal from a prompt the registry requires it on.
+
+    The replacement must not itself contain the literal.  A first version substituted
+    `NEXT_PROMPT_HANDOFF_REMOVED_BY_FIXTURE`, which still contains the token, so the
+    check correctly stayed silent and the case looked like a missing check rather than a
+    broken fixture.  The assertion below makes that failure mode impossible to repeat.
+    """
+    def f(data):
+        text = data["bodies"][prompt_id].replace("NEXT_PROMPT_HANDOFF", "HANDOFF_BLOCK_ELIDED")
+        if "NEXT_PROMPT_HANDOFF" in text:
+            die(f"fixture invalid: the literal still appears in {prompt_id} after removal")
+        data["bodies"][prompt_id] = text
+    return f
+
+
+def collide_receiver_prefix(prompt_id, receiver, longer):
+    """Replace every complete `receiver` token with `longer`, which contains it.
+
+    Models the prefix collision: a body that has dropped all real `QA-10` references
+    while retaining `QA-100` satisfies a plain substring test.  The fixture asserts the
+    substring is still present afterwards, so a failure to fire cannot be explained by
+    the name having disappeared.
+    """
+    def f(data):
+        text = re.sub(rf"(?<![0-9A-Za-z-]){re.escape(receiver)}(?![0-9A-Za-z-])",
+                      longer, data["bodies"][prompt_id])
+        if receiver not in text:
+            die(f"fixture invalid: {receiver} is not even a substring of {prompt_id} after "
+                f"the swap, so the collision is not modelled")
         data["bodies"][prompt_id] = text
     return f
 
@@ -272,7 +311,8 @@ def main() -> int:
     print("\n=== SF10-06 — handoff obligation (validate_prompt_bodies) ===")
     case("installed build reports GCFPE-MGMT-10", base, None, handoff_errors,
          ["PROMPT_HANDOFF_CONTRACT:GCFPE-MGMT-10"], bodies_dir=bodies, registry=registry)
-    case("repaired build clears the corpus", work, None, handoff_errors, [], bodies_dir=bodies, registry=registry)
+    case("repaired build clears the corpus, GCFPE-MGMT-10 and PR-50 included",
+         work, None, handoff_errors, [], bodies_dir=bodies, registry=registry)
     case("repaired build catches a dropped receiver (PR-30 -> PR-35)", work,
          drop_receiver("PR-30", "PR-35"), handoff_errors,
          ["PROMPT_HANDOFF_RECEIVER:PR-30:PR-35"], bodies_dir=bodies, registry=registry)
@@ -280,7 +320,26 @@ def main() -> int:
          drop_receiver("GCFPE-MGMT-10", "PR-10"), handoff_errors,
          ["PROMPT_HANDOFF_RECEIVER:GCFPE-MGMT-10:PR-10"], bodies_dir=bodies, registry=registry)
 
-    print("\n=== SF10-06 — the predicate's limit, asserted rather than hidden ===")
+    print("\n=== SF10-06 — the registry's handoff literal, kept alongside the receiver check ===")
+    print("  The approved registry requires NEXT_PROMPT_HANDOFF on 53 of its 55 rows and exempts")
+    print("  exactly GCFPE-MGMT-10 and PR-50. The clean-corpus case above passes while both of")
+    print("  those bodies lack the token, which is the exemption working; the case below proves")
+    print("  the requirement still bites everywhere else. The installed build is not contrasted")
+    print("  here: it also catches a dropped literal on PR-30, because PR-30 has a non-terminal")
+    print("  public branch. The two builds differ only on GCFPE-MGMT-10, which is the case above.")
+    case("repaired build catches a dropped handoff literal (PR-30)", work,
+         drop_literal("PR-30"), handoff_errors, ["PROMPT_HANDOFF_LITERAL:PR-30"],
+         bodies_dir=bodies, registry=registry)
+
+    print("\n=== SF10-06 — receiver ids match as complete tokens ===")
+    print("  QA-10 is a prefix of QA-100, the one such collision among the 55 ids. MGR-10 routes")
+    print("  to QA-10 and names it once; swapping that token for QA-100 leaves the substring")
+    print("  present, so a substring test would pass and boundary matching must not.")
+    case("repaired build catches a prefix-collision receiver (MGR-10 -> QA-10)", work,
+         collide_receiver_prefix("MGR-10", "QA-10", "QA-100"), handoff_errors,
+         ["PROMPT_HANDOFF_RECEIVER:MGR-10:QA-10"], bodies_dir=bodies, registry=registry)
+
+    print("\n=== SF10-06 — the predicate's remaining limit, asserted rather than hidden ===")
     print("  The check asserts that each declared receiver is NAMED in the body. It does not")
     print("  bind that name to the operative handoff, so retargeting PR-30's last mention of")
     print("  PR-35 to PR-40 -- while its earlier mentions stay -- is NOT caught. The case")

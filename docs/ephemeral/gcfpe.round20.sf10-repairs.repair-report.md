@@ -42,12 +42,12 @@ digest and all 55 body digests, is identical between the installed and repaired 
 | `change-flow/SKILL.md` | `e6bd29d59ca01522…` | `aff778a075b4cbd9…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `66999a2160b6bbab…` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `5716f631915d9333…` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `1a000e3357f452cd…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `2fde743a31cc3a90…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 213 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 253 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and the `change-flow` copy of the validator is not changed at all.
@@ -96,7 +96,28 @@ than reusing one whose meaning was different. Symbolic destinations
 `NATHAN_MANUAL_MERGE_ASSERTION`) are not prompts and are not name-checkable. Malformed
 `destinations` fails closed rather than being skipped.
 
-**What the new predicate does and does not prove.** It asserts that each of **166 declared
+**Two obligations, not one.** An earlier revision of this repair replaced the
+`NEXT_PROMPT_HANDOFF` literal test with the receiver test. That was wrong in the other direction:
+the **approved registry requires that literal on 53 of its 55 rows** and exempts exactly two,
+`GCFPE-MGMT-10` and `PR-50`, whose rows carry no such required literal. `GCFPE-MGMT-10`'s empty
+`required_literals` justifies exempting **that row**, not retiring the requirement for the other 53 —
+and as first packaged, a body could have lost its handoff block entirely and still passed. The repair
+now carries both:
+
+1. **`PROMPT_HANDOFF_LITERAL:<prompt>`** — the literal is required of every prompt except the two the
+   registry exempts. The roster is the **registry's**, named in a module constant
+   `HANDOFF_LITERAL_EXEMPT`, not derived from the graph's branch shape. Deriving it from the graph is
+   what produced `SF10-06` in the first place: the graph shape demanded the token of
+   `GCFPE-MGMT-10`, and the registry does not.
+2. **`PROMPT_HANDOFF_RECEIVER:<prompt>:<destination>`** — the routing obligation below.
+
+**Receiver ids match as complete identifiers.** A plain substring test lets `QA-100` satisfy a branch
+routing to `QA-10`. That is the **one** prefix collision among the 55 member ids — measured, not
+assumed — and one is enough: a body could drop every real `QA-10` reference, keep a `QA-100`, and
+pass. `names_prompt()` rejects a leading or trailing identifier character rather than relying on
+`\b`, which treats `-` as a boundary and would not help.
+
+**What the receiver predicate does and does not prove.** It asserts that each of **166 declared
 receivers**, across the 54 prompts with a non-terminal public branch, is **named somewhere in that
 prompt's body**. That is strictly more than the old check, which asserted the presence of one
 string regardless of where any branch routed: a body that carried `NEXT_PROMPT_HANDOFF` while
@@ -128,9 +149,17 @@ mention link at line 34.
 | case | result |
 |---|---|
 | installed build reports `PROMPT_HANDOFF_CONTRACT:GCFPE-MGMT-10` | reproduced |
-| repaired build clears the corpus | clean |
+| repaired build clears the corpus, `GCFPE-MGMT-10` and `PR-50` included | clean — the exemption working, since both bodies lack the literal |
 | repaired build catches PR-30 dropping PR-35 | `PROMPT_HANDOFF_RECEIVER:PR-30:PR-35` |
 | repaired build catches GCFPE-MGMT-10 dropping PR-10 | `PROMPT_HANDOFF_RECEIVER:GCFPE-MGMT-10:PR-10` |
+| repaired build catches a **dropped handoff literal** on PR-30 | `PROMPT_HANDOFF_LITERAL:PR-30` |
+| repaired build catches a **prefix-collision receiver**, MGR-10's `QA-10` swapped for `QA-100` | `PROMPT_HANDOFF_RECEIVER:MGR-10:QA-10` |
+
+The installed build is not contrasted on the literal case, because it also catches a dropped literal
+on PR-30 — PR-30 has a non-terminal public branch, so the old graph-derived rule demanded the token
+too. **The two builds differ only on `GCFPE-MGMT-10`**, which is the first case in the table. An
+earlier version of this bench asserted a contrast that does not exist, and it is removed rather than
+reworded.
 
 ### A correction to the round-10 artifact's classification
 
@@ -253,7 +282,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, **ten cases, exit 0**. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **twelve cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -318,7 +347,7 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241805 | `8e8f366af1f42a6f2ac8275f88c75452496c1c4bed77eb264cdc58ca77bb4fff` |
-| `flowmaster-validate.skill` | 29 | 269958 | `6e76b359c7ccfbe6f5d6c9c768ba9910ea7a9ccbf29588d6609ed649f64cc8fd` |
+| `flowmaster-validate.skill` | 29 | 270717 | `881c20a77e00be839e4a13c4c6fac9196924a2a84ac7ec1c2c2e88e8ad4985f8` |
 
 The validator asserts its own revision against the profile's, so **3.2.6 → 3.2.7 moves in five
 places together**: `flowmaster-validate/SKILL.md`, the validation profile, `validate_gcfpe_20260914.py`,
