@@ -206,17 +206,29 @@ say so at line 8.
 test only through the check's *semantic* fallback — they describe both modes in prose without ever
 naming the two values.
 
-**What breaks without the obligations.** This is the real gap: these prompts emit artifacts in two
-different authoring regimes, and the artifact does not say which one it is in. A downstream reader
-— the CF-C-30/CF-E-30 reviewer, or a later delta author — must infer "is the base in front of me
-immutable?" from lineage and prose rather than read it from the artifact. That is precisely the
-inference the field exists to remove, and it is the kind of ambiguity that produces a wrong
-rewrite of an approved base exactly once, quietly.
+**What breaks without the obligations — corrected, and it is less than this brief first claimed.**
+An earlier revision of this section said a downstream reader must infer "is the base in front of me
+immutable?" from lineage and prose. **That is wrong, and the repository says so.** The checked-in
+contract ledger `docs/ephemeral/GCFPE-Batch-1-Contract-Ledger-v1.0-20260915.md` states for both
+prompts, at lines 1382 and 2110: *"Both SPECIFICATION_PENDING; artifact_type distinguishes modes."*
+
+So the discriminator already exists on the artifact. A whole `CRD_SPECIFICATION` or
+`EPIC_SPECIFICATION` means the preapproval regime; `artifact_type: SPECIFICATION_DELTA` — which
+CF-C-40's own body requires it to emit in approved-base mode — means the approved base is immutable
+and only the overlay is in play. A reader does not have to infer the regime, and the ledger's own
+consistency item B1-C40-C3 is about exactly that distinction being carried in the review package.
+
+What `AUTHORING_CONTEXT` would add for these two prompts is therefore **a second encoding of
+information the artifact already carries**, not a missing discriminator. The residual case —
+distinguishing a *revised* pending Specification from an *initial* one, which `artifact_type` does
+not separate — has no consumer that needs it: CF-C-30 reviews a pending Specification either way,
+and its intake is the pending artifact plus the redline lineage.
 
 **If the bodies acquire the obligations.** Operationally: CF-C-40/CF-E-40 would stamp the value
-that matches the mode they actually ran in, which they already determine at entry. Nothing new is
-demanded of the human — the mode is already an input, not a judgement. The PF10 flag is a separate
-matter, treated in §2.4.
+matching the mode they already determine at entry, so nothing new is demanded of the human. The
+gain is uniformity with the nine roster prompts that carry the field; the cost is a second field
+that can disagree with `artifact_type` and then has to be reconciled by whoever finds the
+disagreement. The PF10 flag is a separate matter, treated in §2.4.
 
 **If the contract drops them.** Nothing breaks immediately; the ambiguity above stays, and the
 next person to touch an approved Specification delta is the one who pays for it.
@@ -269,42 +281,52 @@ PF10/overlay evidence only when the branch relies on it."
 **Split the two flags rather than choosing one of the two options.** Neither "all four bodies
 acquire both obligations" nor "drop all four from the roster" matches what the flow needs.
 
+**Revised after the `artifact_type` correction in §2.3.** The earlier version of this
+recommendation asked CF-C-40 and CF-E-40 to acquire `AUTHORING_CONTEXT` on the strength of an
+ambiguity that the contract ledger shows does not exist. With that removed, the four prompts land
+in the same place:
+
 | prompt | `AUTHORING_CONTEXT` | current-PF10 resolution |
 |---|---|---|
-| **CF-C-40, CF-E-40** | **bodies acquire it** — they emit artifacts in both regimes and nothing downstream can tell them apart | **drop the flag** — keep their existing conditional wording, which is already the correct rule |
-| **CF-C-20, CF-E-20** | **drop the flag** — one mode only, and `SPECIFICATION_PENDING` already carries the regime | **drop the flag** — their governing canon is the Specification format canon, which they already resolve and cite |
+| **CF-C-40, CF-E-40** | **drop the flag** — `artifact_type` already distinguishes the two regimes on the artifact itself, per the contract ledger | **drop the flag** — keep their existing conditional wording, which is already the correct rule |
+| **CF-C-20, CF-E-20** | **drop the flag** — one mode only, and `state: SPECIFICATION_PENDING` already carries the regime | **drop the flag** — their governing canon is the Specification format canon, which they already resolve and cite |
 
-Why this and not either single option:
+**That is your second original option — the contract drops the four Specification authors from
+both flags** — and it is now the recommendation. It is not "drop them from the roster" wholesale:
+the other twelve `plan_writer_contract` entries keep both obligations, and the field itself stays
+mandatory on the nine roster prompts and eight non-roster prompts that genuinely consume it
+(QA-70 branches on its value; CL-E-20 and OPS-10 read it).
 
-- It gives the determinism benefit where there is a real ambiguity (two modes, one artifact shape)
-  and does not pay for it where there is none.
-- It removes a blanket obligation from artifacts that do not depend on PF10, which is the same
-  judgement CF-C-20 and CF-E-20 already state in their own words and which their canon-resolution
-  step already satisfies in substance.
-- It keeps the validator honest: after the change the check still tests two substantive
-  statements, and every prompt it tests actually owes them.
+Why this rather than adding the field:
 
-**Cost.** Two Notion body edits (CF-C-40, CF-E-40) and one contract change to
-`plan_writer_contract` — removing the four Specification authors from
-`current_pf10_markdown_required`'s scope and CF-C-20/CF-E-20 from
-`authoring_context_required`'s. The contract change touches the bundled copies in `change-flow`
-and `flowmaster-validate`, so it is a skill change and needs independent review. The roster
-literal `EXPECTED_WRITERS` in the validator must move in lockstep, which the existing
-`PLAN_WRITER_SET` check already enforces in both directions.
+- The information is already on the artifact. A second encoding that can disagree with the first
+  is a maintenance liability, not a determinism gain — and reconciling a disagreement between
+  `artifact_type` and `AUTHORING_CONTEXT` would fall to whoever next touches an approved
+  Specification delta.
+- It removes a blanket PF10 obligation from artifacts that do not depend on PF10, which is the
+  judgement CF-C-20 and CF-E-20 already state in their own words.
+- It keeps the validator honest: after the change every prompt the check tests actually owes what
+  it tests for, so no permanently-red row is left behind.
 
-**If you prefer one of your two original options instead:** take "bodies acquire the obligations"
-for CF-C-40/CF-E-40 only, and leave CF-C-20/CF-E-20 as they are with the finding recorded as
-accepted. That is the same outcome with less contract surgery, and it leaves a validator that
-fails two prompts permanently — which is worse for maintainability, because a permanently red
-check stops being read.
+**Cost: no prompt body changes at all, and one contract change.** `plan_writer_contract` drops the
+four Specification authors from `evaluated_prompt_ids`, or scopes its two flags so they do not
+apply to them. The contract is bundled in both `change-flow` and `flowmaster-validate`, so this is
+a skill change needing independent review, and the validator's `EXPECTED_WRITERS` literal must move
+in lockstep — which the existing `PLAN_WRITER_SET` check already enforces in both directions, so a
+half-done change fails loudly rather than quietly.
+
+**The option not to take:** requiring all four bodies to acquire both obligations. It would add a
+PF10 prerequisite to artifacts that do not use PF10 and a second regime field beside one that
+already works, and it would need four Notion body edits to buy that.
 
 ---
 
 # 3. `SF-05` — D14's behavioural half, in plain language
 
-You asked to understand the issue before directing a mechanism. The single most useful fact is at
-the end of §3.6: **the prohibited behaviour is not present anywhere in the current system, and
-`SF-05` is a gap in what the registry can express, not an open defect in the flow.**
+You asked to understand the issue before directing a mechanism. The single most useful fact is in
+§3.6: **the prohibited behaviour is not present in the current system — established by reading all
+72 terminal branches, not by a keyword filter — and `SF-05` is a gap in what the available
+mechanisms can express, not an open defect in the flow.**
 
 ## 3.1 The behaviour D14 is meant to guarantee
 
@@ -384,46 +406,75 @@ expressible there because the medium has no structure to pin.**
 Four options, with what each costs and how each is maintained. Measurements are from the current
 corpus.
 
-### Option A — move the rule onto the graph, where it is already structural (recommended)
+### Option A — move the rule onto the graph, but it needs a typed field first (recommended, with a cost)
 
-The prohibited behaviour must end in a **stop** — a terminal branch or a blocking result. Stops
-are not prose: they are declared rows in `state_routes` with `terminal_for_invocation`,
-`next_prompt_handoff_count` and `destinations`. So state the rule where it is checkable:
+The prohibited behaviour must end in a **stop**, and stops are structural: declared rows in
+`state_routes` carrying `terminal_for_invocation`, `next_prompt_handoff_count` and `destinations`.
+So the rule can be stated where the stop lives:
 
 > No branch whose condition depends on comparing current PF10 against an addendum-derived
 > expectation may be terminal or emit a blocking result.
 
-Measured against the current graph — 280 branch rows, 72 terminal, 208 non-terminal. **37 branches
-name PF10, Build Notes or an addendum in their condition.** Their shape is the whole answer:
+**Correction to an earlier version of this section, which called this "vocabulary-free". It is
+not, as written.** `terminal_for_invocation` is typed, but the property that *selects* which
+branches the rule is about — whether a branch's condition compares PF10 against an
+addendum-derived expectation — lives in `condition`, which is free text. Selecting on it is a
+prose match, so a paraphrased comparison escapes selection before the terminal check ever runs.
+That is `SF-05`'s own failure reproduced inside the proposed remedy, and it would have shipped as a
+recommendation if it had not been caught in review.
 
-| shape | count | reading |
-|---|---|---|
-| non-terminal, `next_prompt_handoff_count: 1`, reads current PF10 and continues | 32 | exactly D8's intended shape |
-| terminal because a **finding was unsupported** or a Product Owner decision is required | 4 | CF-C-30, CF-E-30, IA-30, RS-20 — nothing to do with a PF10 comparison |
-| terminal because **PF10 could not be resolved at all** | 1 | RS-40 `source_resolution_error`: "unique current controlled PF10 Markdown unresolved; make no inference from the failure" |
+**What makes A a guard rather than a measurement: a typed per-branch declaration.** Add one
+enumerated field to each `state_routes` row — for example `pf10_dependency` valued `NONE`,
+`READ_ONLY`, `SOURCE_AVAILABILITY` or `COMPARISON` — and then the pin needs no prose at all:
 
-That last row deserves a sentence, because it is the one that looks like the prohibited gate and
-is not: it stops because the canonical source **cannot be read**, not because a comparison found a
-difference — and it explicitly forbids inferring anything from the failure. D8 strikes a mandatory
-*comparison* gate; it does not require an agent to proceed without its canon.
+- no row may carry `pf10_dependency: COMPARISON`, at any depth, with no allow-list — this is D8's
+  prohibition expressed over an enum;
+- a row may be terminal with `SOURCE_AVAILABILITY` (RS-40's case) and not with `READ_ONLY`.
 
-**Strength.** Vocabulary-free, mechanically checkable, and it runs on the same surfaces v11
-already pins. Maintenance is the same as every other graph check.
+That is v11's own lesson applied to the body axis: stop enumerating what to inspect, enumerate what
+may exist.
 
-**Known hole, stated plainly.** A body could instruct a stop that the graph does not declare. That
-is not fully closed today: the validator pins the contract's `state_routes` against the contract's
-own `member_registry.result_states` (`covered_states == set(registered_states)`), but **nothing
-checks a body's announced result states against either.** Option A is therefore only as strong as
-that missing link — which Option A′ supplies.
+**What it costs, stated rather than glossed:** the field must be added to 280 rows across the
+bundled contract copies, the validator must assert the enum and the pin, and the authoring rule
+must require whoever writes a branch to declare its dependency. That is a schema change, not a
+free adoption.
 
-### Option A′ — require each body to carry its own declared result states (recommended with A)
+**What it does and does not buy.** A false declaration — writing `NONE` on a branch that does
+compare — still evades it. But that is a different failure class from paraphrase: it requires an
+author to state something untrue in a typed field, which is auditable and attributable, where a
+paraphrase is neither. Moving the failure mode from "phrasing walks through the check" to "someone
+must misdeclare" is the actual gain, and it is worth claiming only in those terms.
+
+**Known hole, stated plainly.** A body could instruct a stop that the graph does not declare. The
+validator pins the contract's `state_routes` against the contract's own
+`member_registry.result_states` (`covered_states == set(registered_states)`), but **nothing checks
+a body's announced result states against either.** Option A′ narrows that gap and, as measured
+below, does not close it.
+
+### Option A′ — require each body to carry its own declared result states (narrows the gap; does not close it)
 
 Each member declares its `result_states` in the contract. Require that a body contain every state
-it is declared to be able to return. Then a body that announces an undeclared stop fails, and the
-graph rule in Option A becomes binding on prose without ever reading prose for meaning.
+it is declared to be able to return.
 
-Measured: **157 declared result-state tokens across the 55 members; 52 of 55 bodies contain all of
-theirs.** Three bodies miss exactly one each:
+**Correction to an earlier version of this section, which claimed this makes "a body that announces
+an undeclared stop fail". It does not.** The check proves only `declared_states ⊆ body_tokens`. A
+body can keep every declared token, add an undeclared `DIVERGENCE_BLOCKED`, and pass — which is
+precisely the regression this brief uses as its own worked example of the prohibited gate.
+
+**The converse direction was measured and is not cheaply expressible.** The contract declares 75
+distinct state tokens; the 55 bodies contain **239** `ALL_CAPS_UNDERSCORE` tokens, of which **180
+are not declared states** — they are artifact types (`CHANGE_CLOSURE_DECISION`), authoring contexts
+(`APPROVED_BASE_WITH_OVERLAYS`), field names (`AUTHORING_CONTEXT`, `CHANGE_ID`), ids
+(`CHANGE_AUDIT_TRIAGE_ID`) and review modes. A naive "reject undeclared states" check would raise
+180 candidates on a clean corpus. Distinguishing an *announced result state* from an artifact type
+requires reading the token's position in prose, which is the same wall Option A hits — and a
+terminal instruction expressed with no state token at all is invisible to token scanning entirely.
+
+So A′ is worth adopting for what it is — every prompt must at least name each state it can return,
+which the graph already knows — and must not be described as closing the body-to-graph hole.
+
+Measured: **157 declared result-state token slots across the 55 members; 52 of 55 bodies contain
+all of theirs.** Three bodies miss exactly one each:
 
 | prompt | missing token | what the body says instead |
 |---|---|---|
@@ -471,8 +522,45 @@ Two separate questions were being answered as one:
 
 | question | answer |
 |---|---|
-| Does any current prompt implement the prohibited PF10-comparison gate? | **No.** Across 280 branch rows, every PF10-reading branch continues; no terminal branch stops on a comparison. §3.5 Option A has the full breakdown. |
-| Can the registry express the rule that would catch one if it appeared? | **No.** Its mechanism is regex over prose, and the behaviour has unlimited phrasings. |
+| Does any current prompt implement the prohibited PF10-comparison gate? | **No**, on a complete enumeration — see below. |
+| Can the registry, or the graph as currently typed, express the rule that would catch one if it appeared? | **No.** The registry's mechanism is regex over prose; the graph's `condition` is also prose. A typed field would be needed, per Option A. |
+
+**How the first answer was established, after the first attempt was wrong.** An earlier version of
+this brief selected branches by regex over `condition` — "names PF10, Build Notes or an addendum" —
+and reported 37 hits. That is a vocabulary selector, so a paraphrased comparison could have escaped
+the selection and the clean result would have been an artefact of the filter.
+
+The defect can only live in a branch that **stops**, and there are exactly **72 terminal branches**
+in the graph. All 72 were printed and read in full, with no selection of any kind.
+
+Most conditions are **disjunctive** — they list several alternative stop reasons in one branch — so
+they do not partition into disjoint buckets, and any single tally of them would be invented
+precision. What can be counted exactly are the distinctive ones:
+
+| stop reason | count | branches |
+|---|---|---|
+| a source-backed finding assessed as **unsupported** | 3 | CF-C-30, CF-E-30, IA-30 |
+| the matter belongs to **another native lane** | 3 | IA-30, IA-40, QA-80 |
+| a **promotion checkpoint** is outstanding | 1 | GCFPE-MGMT-10 |
+| **PF10 itself cannot be resolved** | 1 | RS-40 `source_resolution_error` |
+| a terminal record after a Nathan-only abort | 1 | PR-50 |
+| a completed cycle or terminal return | 3 | CL-40, MGR-10, GCFPE-MGMT-10 |
+
+The remaining 60 stop on some combination of an unresolvable source, authority, owner, identity or
+access fact and a required Product Owner decision — most naming more than one as alternatives,
+which is why they are not split further here.
+
+**None of the 72 stops because a comparison between current PF10 and an addendum-derived
+expectation found a difference.** The closest is RS-40's `source_resolution_error` — "unique current
+controlled PF10 Markdown unresolved; make no inference from the failure" — which stops because the
+canonical source cannot be read, not because a comparison differed, and which explicitly forbids
+inferring anything from the failure. D8 strikes a mandatory *comparison* gate; it does not require
+an agent to proceed without its canon. All 72 also carry `next_prompt_handoff_count: 0`, so D15's
+invariant holds across the set.
+
+**What this establishes and what it does not.** It establishes that the prohibited behaviour is
+absent from the declared graph, by enumeration rather than by filter. It does not establish that no
+body instructs a stop the graph never declared — that is the hole Option A′ narrows without closing.
 
 `SF-05` is the second, not the first. It is a **mechanism gap**: the flow is currently clean and
 there is no guard that would keep it clean automatically. Under D14 that is a real deficiency —
@@ -481,19 +569,29 @@ is not an open defect in the prompt flow, and it does not make §11's output wro
 
 ## 3.7 Recommendation
 
-**Adopt A + A′.** Together they move the body half of D8 off the vocabulary axis and onto the
-structural axis where v11 already works:
+**Revised after review.** The earlier version of this recommendation said A "costs nothing to
+adopt" and that A + A′ would make `SF-05` a fireable guard. Both were overstated, and the honest
+version is narrower:
 
-- **A** states the rule on the graph, where stops are declared data rather than sentences, and
-  costs nothing to adopt — the current graph already satisfies it, so it lands as a guard over a
-  clean corpus rather than as a repair.
-- **A′** binds bodies to the graph by requiring each to carry its own declared result states, for
-  **three single-token edits**, and it is self-maintaining because the tokens come from the
-  contract.
-- Add **B** later as a supplement if you want the positive provenance sentence everywhere; price
-  it at 15 body edits and decide separately.
-- Do not widen the word list, and do not park `SF-05` — with A + A′ it becomes a guard you can
-  fire with an injected regression, which is what D14 actually asks for.
+- **A, with the typed `pf10_dependency` field, is the only option on the table that can become a
+  guard D14 would accept.** Without the field it is a measurement, not a guard. Cost: an enumerated
+  field on 280 rows in the bundled contract copies, validator support for the enum and the pin, and
+  an authoring rule. It shifts the failure mode from paraphrase to misdeclaration, which is the real
+  gain and the only one worth claiming.
+- **A′ is worth adopting for what it is** — every prompt names each state it can return, for three
+  single-token edits, self-maintaining because the tokens come from the contract — **and it does not
+  close the body-to-graph hole.** Its converse is not cheaply expressible: 180 of the 239 ALL-CAPS
+  tokens in the corpus are not states.
+- **B** remains a later supplement at 15 body edits; decide separately.
+- **Do not widen the word list.** That is unchanged and it is the one thing every option here
+  agrees on.
+
+**So the honest answer to "what concrete mechanism options exist" is: one, at a stated cost.** The
+others narrow the gap. If the typed field is too much for now, the defensible interim position is
+A′ plus the enumeration in §3.6 repeated each round — which is a recurring manual check, not a
+guard, and should be called that.
+
+`SF-05` is not parked, and nothing here changes the registry or widens a word list.
 
 **On §11:** the finding does not need to hold post-flight, because the behaviour is absent today
 and measurably so. If you want the guard in place first, A costs no body changes and can be built
