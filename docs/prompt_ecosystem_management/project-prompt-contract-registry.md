@@ -16,6 +16,11 @@ status: APPROVED
 approved_by: Nathan / Product Owner
 approved_at: 2026-09-17
 workspace_skill_registry_id: WSR-20260914.1-OBSERVATIONAL
+workspace_skill_registry_disposition: 'Evidence only. That registry is DRAFT, unapproved, and
+  self-classified INVENTORY_EVIDENCE_NOT_APPROVED_EXPECTED_STATE, observed from a checkout absent
+  from this environment. It confers no skill lifecycle on this approved registry. Its glow-hde-devops
+  row is a dated observation and is preserved unedited; that skill is retired by D16, which is the
+  authority for its disposition, and the forbidden literal on all 55 rows below is correct.'
 authority_sources:
 - type: SELECTED_RELEASE_REGISTER
   release: GCFPE-20260914.1
@@ -189,6 +194,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -276,6 +283,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -366,6 +375,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -450,6 +461,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -541,6 +554,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -628,6 +643,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -718,6 +735,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -802,6 +821,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -891,6 +912,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -942,8 +965,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 32597 bytes'
-  - 'SHA-256 of that extraction: eeff6316aa8d3c9d8405a8128b381614cbcb7017c8e8bf1d6fefc5e7bb7942b0'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 32573 bytes'
+  - 'SHA-256 of that extraction: 6c7860c0b23210e7a4f58938b134c0f80ba1f2ec69d4c4bfe567d2b83608660e'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -986,6 +1009,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1033,8 +1058,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29646 bytes'
-  - 'SHA-256 of that extraction: 52d07ec9021efa45300c0b95fb5d1ddc5ac267fce874be0fe21665fb11e8a38c'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 29622 bytes'
+  - 'SHA-256 of that extraction: dc0a967032467707c738c465069b0cc3c042b1b1cbcdadb3389356e1d7b7d2c1'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1073,6 +1098,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1127,8 +1154,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 29394 bytes'
-  - 'SHA-256 of that extraction: fa5bff62868d42ad95924e39e944e5288eab30694cad97c928c235a399777060'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 29401 bytes'
+  - 'SHA-256 of that extraction: a3fd6cd79929c91829672faee9c5129e3f0ca80b9eef38360a6c1f80dc898e06'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1164,6 +1191,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1214,8 +1243,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 35902 bytes'
-  - 'SHA-256 of that extraction: 704365c28eb87858459f9db12cee3be815602e7b163a1de27defd96e89ec9da5'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 35878 bytes'
+  - 'SHA-256 of that extraction: 794b9bf3bed9278386379f898039bfde22e1831a92bdf40942fe74ca4d7b1b91'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1253,6 +1282,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1303,8 +1334,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 36377 bytes'
-  - 'SHA-256 of that extraction: fdfb9ae189f3c52270e263dcdccd4148236dd61136ce5fd2b39bf897469e8a8d'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 36353 bytes'
+  - 'SHA-256 of that extraction: 0c2b669d5833dcfb4c60d11fe5afe3851343c2f866251bffeb8f1af952b00753'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1343,6 +1374,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1392,8 +1425,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14836 bytes'
-  - 'SHA-256 of that extraction: eb48c4bc6846c83f24c02bb0f7fb615372a47f4c10d63816a868edfd586068c3'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 14832 bytes'
+  - 'SHA-256 of that extraction: 10698a09852b296886f36d4df4ae0250285f8b13741c122ba9fcb90f54659689'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1432,6 +1465,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1482,8 +1517,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13633 bytes'
-  - 'SHA-256 of that extraction: e8bdbf3d4df80d3439160aa3001ba4307cfb14cbcfb4d2e4b6de5f659520c694'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 13629 bytes'
+  - 'SHA-256 of that extraction: 7e1524159e9f6b00f5b4ffb8d33a90b3cd78e4115b526313322d7a0f5f8b99ae'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1523,6 +1558,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1571,8 +1608,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 15461 bytes'
-  - 'SHA-256 of that extraction: 7a1a0d20882a06b5058b7e027b1bd3d92ff0e1d3afd783131e4427dccbd3d452'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 15457 bytes'
+  - 'SHA-256 of that extraction: 582b6476d38e45bc9733c5d5d3e599281178a1a9f0cadb99aaf451dcbddd3b8c'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1612,6 +1649,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1671,8 +1710,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 19791 bytes'
-  - 'SHA-256 of that extraction: e10922687c1d56bb32adbd6b87adeeec2d17a34a4722c841f1fd3b4cd6e04cd7'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 19787 bytes'
+  - 'SHA-256 of that extraction: c858901a70cf0532395fda643841b9de2ea55b236b48f12bb24cac77661218ac'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1710,6 +1749,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1775,8 +1816,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 20221 bytes'
-  - 'SHA-256 of that extraction: d7b8af01cb69189b96524ce56c67e3176cb6b358dfe6afbd0ec696127312133f'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 20217 bytes'
+  - 'SHA-256 of that extraction: e37624c24c349aff20324721fd2c9ae3d9b23e33b7261d6e49884805fafd4194'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1816,6 +1857,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1863,8 +1906,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 16687 bytes'
-  - 'SHA-256 of that extraction: 862f4755c968300c4e46788fc05714ae0b526e1e8b999651c548e3bea6fa7fe0'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 16683 bytes'
+  - 'SHA-256 of that extraction: 93b05f42c6c18c4a1bc67bac767efc36c8d84f075a90292384a7be64e7e6e75c'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1901,6 +1944,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -1951,8 +1996,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17283 bytes'
-  - 'SHA-256 of that extraction: 4d406076859583bad3cc9421621fee20e8fd8df33882ddaf8fac2c29b782b4e6'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 17279 bytes'
+  - 'SHA-256 of that extraction: 7766e52f3da17ee56e3ff4b60edb2a264215503e53fa7ed286a097769c6c09e2'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -1989,6 +2034,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2044,8 +2091,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17755 bytes'
-  - 'SHA-256 of that extraction: 9cbf40c9dcb4718d79ed8a8384493ce433e82ec1b18980790aeffdf7fc8a0c44'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 17751 bytes'
+  - 'SHA-256 of that extraction: 459ed2988a3fe000e70079a02967a1f47a8644498f54fc6199586c16a428ac6a'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -2083,6 +2130,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2133,8 +2182,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17834 bytes'
-  - 'SHA-256 of that extraction: bba0879b6a96baf441678ba0241aebe66c7127833cf265a5ba97d499d685f144'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 17786 bytes'
+  - 'SHA-256 of that extraction: 9159ec0d9b52a52a58b1cf654547f31089381c331f5d10d133c1f619cea2bd08'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -2173,6 +2222,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2256,6 +2307,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2348,6 +2401,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2438,6 +2493,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2493,8 +2550,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 9764 bytes'
-  - 'SHA-256 of that extraction: 2758efafe4cc0ba19fec1a76c583cf5b79de75f81d0460af2b4bfd3fb8b04c48'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 9729 bytes'
+  - 'SHA-256 of that extraction: a07e8933a00a4979298fabb703a0c2226aaf96eb870f1109a2c71b1252d14ebc'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -2532,6 +2589,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2623,6 +2682,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2714,6 +2775,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2800,6 +2863,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2893,6 +2958,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -2986,6 +3053,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3081,6 +3150,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3179,6 +3250,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3270,6 +3343,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3356,6 +3431,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3407,8 +3484,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 39795 bytes'
-  - 'SHA-256 of that extraction: 8c2c0f231da5f10cb08c0328978d198fcc981f5f59a786bbeb240c7b597b33fb'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 39791 bytes'
+  - 'SHA-256 of that extraction: 482ca2a7657058154147acf3768334dfb956246c45a400a80e6c6f0138004a9d'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3446,6 +3523,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3523,6 +3602,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3542,8 +3623,8 @@ prompts:
     - value: (?<![.\w/-])glow-hde-devops(?![\w-])
       rule_id: SRC-001
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 17912 bytes'
-  - 'SHA-256 of that extraction: 6554c3f5fef2c62da04c18e9d6ad141c0349d64438279f90c312d84bfcf0e73f'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 17908 bytes'
+  - 'SHA-256 of that extraction: 51e8a5e85ca3b66ce755e979d0a1ac61540c7f06e58237f516f3a28148570e79'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3635,6 +3716,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3717,6 +3800,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3820,6 +3905,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -3875,8 +3962,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 13321 bytes'
-  - 'SHA-256 of that extraction: cf7d6d43397407f7a0598dcca2bb0097a0182d718d09da6e5bd73603665c48c5'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 13317 bytes'
+  - 'SHA-256 of that extraction: 373907a43557e87e46892fb35c683228a779765fb388cfff9dc98389d0c3fb7c'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -3913,6 +4000,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4012,6 +4101,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4114,6 +4205,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4203,6 +4296,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4298,6 +4393,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4387,6 +4484,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4435,8 +4534,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14034 bytes'
-  - 'SHA-256 of that extraction: e0c85ea3c5567d43c35eaad32d90546e4738f34e06918a47488fd9766375b406'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 14014 bytes'
+  - 'SHA-256 of that extraction: ed4ee3adca15bf2a3e91525eca413d6aba0d2ef1819ce81640f9b4cbd2505881'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -4476,6 +4575,8 @@ prompts:
     - value: never a gate on later work
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4561,6 +4662,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4655,6 +4758,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4739,6 +4844,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4792,8 +4899,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 14838 bytes'
-  - 'SHA-256 of that extraction: f633350f5e254fcc05c963471cbe5264cc3d0326411f2c9a6d5e80c5c4aa1763'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 14818 bytes'
+  - 'SHA-256 of that extraction: e6ccd013f8b390fc39069bbd3f87508cf630d3c1d267fda5feada00184ec5659'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -4833,6 +4940,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4917,6 +5026,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -4971,8 +5082,8 @@ prompts:
     - Merge a pull request or enable automatic merge
     - Automatically invoke PR-50
   evidence_contract:
-  - 'Complete prompt body extracted from Notion 2026-09-18: 8237 bytes'
-  - 'SHA-256 of that extraction: 3f62f70af4499565847207ab6e31a7fde8b18b7e31464e4c5916f1b2b38f262f'
+  - 'Complete prompt body extracted from Notion 2026-09-19: 8233 bytes'
+  - 'SHA-256 of that extraction: ddef768be169c6eb41660433ff7557d72b3ebc5dd3ba8f617bdeb113b4732630'
   - 'Extraction convention: the exact slice between the fetch result''s <content> and </content> markers, with no trailing newline added'
   - Extraction, not a canonical publication receipt; the Notion page is authority
   failure_contract:
@@ -5013,6 +5124,8 @@ prompts:
     - value: never a gate on later work
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
@@ -5098,6 +5211,8 @@ prompts:
     - value: docs/pfcanon/
       rule_id: CTR-002
     forbidden_regex:
+    - value: 'addendum_id[\s\S]{0,400}?artifact_version'
+      rule_id: CTR-001
     - value: Glow / Core Docs / PFCanon
       rule_id: CTR-001
     - value: Glow / Ephemeral Planning Files
