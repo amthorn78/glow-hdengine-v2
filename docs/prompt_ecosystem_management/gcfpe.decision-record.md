@@ -228,7 +228,7 @@ legitimate work? A rule that fails that test does not earn its place.
 Product Owner instruction, 2026-09-20. This amends how D8 is **enforced**. It does not
 change what D8 prohibits, and it strikes nothing further.
 
-The guard carrying this ruling has been written nine times and defeated eight. Every
+The guard carrying this ruling has been written ten times and defeated nine. Every
 defeat took the same form: **the check selects, and the prohibited gate is written where
 nothing selects.** v1 and v2 selected on phrasing and died to paraphrase and synonym.
 v3 through v6 selected on location and died to a new location each time. v7 selected on
@@ -240,11 +240,27 @@ passed every check.
 
 That eighth defeat is worth stating precisely, because it is the first one that came from
 an **exemption** rather than a selector. The exemption was correct in intent: promotion
-genuinely adds those keys. The error was waiving the **name**. The ninth version waives
-the name and pins the **value** instead — lifecycle keys are promotion metadata and are
-always scalars, so a container under one of them is the attack and nothing else.
+genuinely adds those keys. The error was waiving the **name**.
 
-The ninth version stops enumerating what to inspect and enumerates what may exist:
+The ninth version waived the name and pinned the value **type** instead: lifecycle keys are
+promotion metadata and are always scalars, so a container under one is the attack. That was
+not enough, and the ninth defeat was found on its own bench before the version shipped.
+`str` is a scalar, so the identical gate written as **prose** under `promoted_at` passed a
+type-only pin cleanly. The tenth version pins the value's **form** as well: every lifecycle
+value in every contract copy in this repository is a single token — an identifier, a release
+id, a version, a status or an ISO-8601 timestamp — and a rule an agent can act on is prose,
+which needs whitespace.
+
+A third rule was written, measured and removed, and the record is kept in the guard's own
+source so it is not reinvented: *lifecycle string values may not name PF10*. It failed twice.
+It did not fire on `HALT_ON_PF10_DIVERGENCE`, because `\bPF10\b` finds no word boundary
+against an underscore — the exact token it was added to catch. Widened, it rejected
+`GCFPE-PF10-INTEGRITY-20260913.1`, a real `contract_id` in this repository, failing a lawful
+contract. Even repaired it would have bought one round, because a rename to
+`HALT_ON_BUILD_NOTES_DIVERGENCE` walks through it. **That is the v1/v2 mistake, and making it
+a ninth time would have been worse than the hole.**
+
+The tenth version stops enumerating what to inspect and enumerates what may exist:
 
 - the routing surfaces are pinned whole, both keys, with no selector inside them;
 - every branch-shaped object naming PF10 anywhere else in the contract is an error, with
@@ -256,12 +272,14 @@ The ninth version stops enumerating what to inspect and enumerates what may exis
   let the same clause back in one level down, where it was caught only incidentally by
   two neighbouring checks written for other reasons;
 - the contract's top-level key set is closed, with promotion lifecycle keys exempt by
-  name and pinned to scalar values.
+  name and pinned to a scalar single-token value.
 
-Together these close the **placement** axis. They were measured, not asserted: 14 of 14
-recorded attack placements caught, including all four lifecycle slots and both nested
-positions, at a fixture cost of 1 amended expectation in 140 — unchanged from v8, because
-the ninth version amended no fixture at all.
+Together these close the **placement** axis. They were measured, not asserted: 18 of 18
+recorded attack placements caught — all four lifecycle slots by object and again by prose,
+both nested addendum positions, and every earlier defeat — at a fixture cost of 1 amended
+expectation in 140, unchanged from v8, because neither the ninth nor the tenth version
+amended a fixture at all. All five contract copies in the repository pass the lifecycle
+form check unmodified, and a lawful promotion with scalar values stays clean.
 
 **What they do not close, verified by execution and accepted here rather than left for a
 ninth round to discover:**
