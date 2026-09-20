@@ -315,9 +315,13 @@ residual that happens to be caught elsewhere today is still a residual.
 
 **Enforcement status at the time of writing: the installed build is v6.** Guard v11, described
 below, is a packaged working copy that is **not installed** and has not been cleared by
-independent review; the guard report records it as `PACKAGED_AWAITING_INSTALLATION`. Every v11
-behaviour and measurement in this amendment is a property of that uninstalled copy, recorded so
-the reasoning is not lost, and **none of it describes enforcement currently in force.** What is
+independent review; its own report is
+`docs/ephemeral/gcfpe.round18.d8-v11-derivation-guard.repair-report.md`, which records it as
+`PACKAGED_AWAITING_INDEPENDENT_REVIEW`. The round-17 report's
+`PACKAGED_AWAITING_INSTALLATION` belongs to the **v6** package and is not v11's status. Every
+v11 behaviour and measurement in this amendment is a property of that uninstalled copy and is
+recorded, with its environment, method and limitations, in the round-18 report; **none of it
+describes enforcement currently in force.** What is
 in force is v6, which carries the tenth defeat below and the nine before it. Read any
 present-tense sentence about v11 accordingly.
 
@@ -370,7 +374,12 @@ is unavailable on this axis, so the values are enumerated instead, which is what
 other three lists already were.
 
 Measured against the packaged v11 copy on a scratch rig, not asserted, and not a claim about
-installed enforcement: **13 of 13** attack placements caught, including three dotted-key
+installed enforcement. The run — environment pins, rig construction, per-placement results,
+gate flags, fixture cost, responsible actor and limitations — is recorded in
+`docs/ephemeral/gcfpe.round18.d8-v11-derivation-guard.repair-report.md`, which is the auditable
+source for every figure in this paragraph; the validator sources themselves are not in this
+repository and must not be, so the three sha256 identities in that report are how the packaged
+copies are checked against it. **13 of 13** attack placements caught, including three dotted-key
 targets, a nested dotted key, a bracket-shaped key, a key colliding with a list index, all
 four lists, and a list reversal. Every earlier defeat stays caught — v8's object and v9's
 prose under all lifecycle names, and the nested addendum clause — and a lawful promotion with
