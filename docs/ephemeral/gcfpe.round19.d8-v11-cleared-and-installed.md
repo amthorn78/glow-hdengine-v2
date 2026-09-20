@@ -10,6 +10,8 @@ guard_version: v11
 supersedes_guard_version: v6
 independent_review_verdict: GUARD_HOLDS
 independent_reviewer: SFR-01
+verification_executor: PE34 (prompt-engineer session)
+verification_date: 2026-09-20
 ---
 
 # Round 19 — v11 cleared by independent review, and installed
@@ -23,6 +25,12 @@ The guard has been written eleven times and defeated ten. **v11 is the first ver
 survive an independent attack round.**
 
 ## Installation verified against the installed bytes, not the packages
+
+**Who ran these checks.** Every identity, digest, gate run and bench run below was executed by
+**PE34**, the prompt-engineer session, on 2026-09-20, after the Product Owner's installation and
+after SFR-01's review closed. The Product Owner performed the installation; SFR-01 performed the
+independent attack round on the packages; neither performed the post-installation verification
+recorded here. PE34 did not install and cannot install.
 
 | Check | Result |
 |---|---|
@@ -121,10 +129,11 @@ declined to recommend a fix it had not measured, and this round does not add one
   checks. **No lossy derivation outside the two already known.** `subset_errors` compares raw
   values; its limitation is that it is a subset test, which is E3, a different failure mode.
 
-## Where the remaining risk now sits
+## Where the remaining machine-checkable risk now sits
 
-**E3 is the whole remaining surface.** Every defeat since v7 was inside the one object the guard
-closes exactly. SFR-01 expects the next finding in the other thirty-three `subset_errors` sites,
+**E3 is the whole remaining surface on the placement axis — the axis machinery covers.** It is
+not all remaining risk: the vocabulary axis below is open and is covered by human review, not by
+this guard. Every defeat since v7 was inside the one object the guard closes exactly. SFR-01 expects the next finding in the other thirty-three `subset_errors` sites,
 and states there is no cheap sweep for them: closing them needs a decision about which are
 closed governance objects, not a mechanical pass.
 

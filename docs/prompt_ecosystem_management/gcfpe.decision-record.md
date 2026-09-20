@@ -438,10 +438,12 @@ content space is prose.
 
 **The remaining risk has moved, and the ruling should say where.** Every defeat since v7 was
 inside `pf10_addendum_contract`, the one object enumerated exactly. That object is now closed
-on the placement axis. What remains is **E3**: thirty-three `subset_errors` call sites, of which
-exactly one object is exact-keyed. SFR-01's sweep confirmed no lossy derivation outside the two
-already recorded — `subset_errors` compares raw values, so its limitation is that it is a subset
-test, which is a different failure mode from the tenth defeat. There is **no cheap sweep** for
+on the placement axis. What remains **on that axis** is **E3**: thirty-three `subset_errors`
+call sites, of which exactly one object is exact-keyed. This is the limit of what machinery
+covers, not the limit of the risk — the vocabulary residuals below stay open. SFR-01's sweep
+confirmed no lossy derivation outside the two already recorded: `subset_errors` compares raw
+values, so its limitation is that it is a subset test, which is a different failure mode from
+the tenth defeat. There is **no cheap sweep** for
 those thirty-three: closing them requires a decision about which are closed governance objects,
 prompt by prompt, not a mechanical pass. A future round that widens the guard without making
 that decision first will be selecting a subset again, which is how v3 through v6 died.
