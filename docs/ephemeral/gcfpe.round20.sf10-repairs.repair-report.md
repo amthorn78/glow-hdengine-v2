@@ -601,6 +601,39 @@ firing the regression, not by reading the code. The check now requires the exact
 `"<spelled> cases, exit 0"` **and** rejects any other spelled count in that role. All three controls
 now fire, and the guard passes on the real records.
 
+### The guard reproduced the defect it was built to prevent, twice
+
+The record checker landed last round had two defects of its own, both found by review, and the first
+is the one worth keeping on the record.
+
+**`--check` computed the corpus identities and never read them.** `identities()` built
+`ids["bodies"]` — 55 prompt ids with digests and byte counts — and `check()` never touched it. So the
+command could print **"records agree with the artefacts"** against a stale, substituted or **entirely
+nonexistent** corpus. **That is the bench's own original defect** — a corpus accepted by count while
+the docstring promised a digest check — **reproduced inside the guard written to stop stale records.**
+The same mistake, one abstraction level up, three rounds later.
+
+It now verifies the roster and every digest and size, and it is **fired by four injected
+regressions** rather than trusted:
+
+| injected | result |
+|---|---|
+| one body's bytes substituted | **caught** — names `QA-10` |
+| one body removed (54 supplied) | **caught** — count *and* the now-unmatched row |
+| a body the record does not list | **caught** — both directions |
+| an empty corpus directory | **caught** — 57 problems |
+
+**And `--write` did not write.** It printed an identity JSON document and left both records untouched,
+while the docstring offered `(--write | --check)` and this report claimed regeneration was
+programmatic. I had regenerated the run record with an ad-hoc script and then landed a `--write` that
+could not repeat it — **a command documented by what I meant it to do rather than by what it did.**
+It now regenerates the changed-files table, the package table, the 55-body table and the bench block
+in place, and is **idempotent on the current artefacts**, which is how I know the committed record
+already matched them.
+
+**Nothing in the two skills changed this round**, so the patch is unchanged at 378 lines and both
+package digests are unchanged. The defects were in the repository-side instrument, not the package.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract

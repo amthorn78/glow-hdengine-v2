@@ -19,7 +19,6 @@ expected and actual values named.
 """
 import argparse
 import hashlib
-import json
 import pathlib
 import re
 import subprocess
@@ -73,6 +72,60 @@ def identities(args) -> dict:
     return ids
 
 
+MARK_FILES = ("| file | base sha256 | work sha256 |", "|---|---|---|")
+MARK_PKG = ("| package | files | bytes | sha256 |", "|---|---|---|---|")
+MARK_BODIES = ("| prompt | sha256 | bytes |", "|---|---|---|")
+
+
+def render_table(header: tuple[str, str], rows: list[str]) -> str:
+    return "\n".join([header[0], header[1], *rows])
+
+
+def files_table(ids: dict) -> str:
+    return render_table(MARK_FILES, [f"| `{r}` | `{b}` | `{w}` |" for r, b, w in ids["files"]])
+
+
+def packages_table(ids: dict) -> str:
+    return render_table(MARK_PKG,
+                        [f"| `{n}` | {c} | {s} | `{h}` |" for n, c, s, h in ids["packages"]])
+
+
+def bodies_table(ids: dict) -> str:
+    return render_table(MARK_BODIES,
+                        [f"| `{k}` | `{h}` | {s} |" for k, h, s in ids["bodies"]])
+
+
+def bench_block(ids: dict) -> str:
+    return (f"Exit 0. **{ids['bench_cases']} cases, {ids['bench_failed']} not as expected.** "
+            f"Full stdout:\n\n```\n{ids['bench_stdout']}\n```")
+
+
+def replace_table(doc: str, header: tuple[str, str], new_block: str, label: str) -> str:
+    pat = re.compile(re.escape(header[0]) + r"\n" + re.escape(header[1]) + r"\n(?:\|[^\n]*\|\n?)+")
+    m = pat.search(doc)
+    if not m:
+        raise SystemExit(f"cannot find the {label} table in the run record")
+    return doc[:m.start()] + new_block + "\n" + doc[m.end():]
+
+
+def write_records(ids: dict) -> int:
+    doc = RUN_RECORD.read_text(encoding="utf-8")
+    doc = replace_table(doc, MARK_FILES, files_table(ids), "changed-files")
+    doc = replace_table(doc, MARK_PKG, packages_table(ids), "packages")
+    doc = replace_table(doc, MARK_BODIES, bodies_table(ids), "bodies")
+    pat = re.compile(r"Exit 0\. \*\*\d+ cases, \d+ not as expected\.\*\* Full stdout:\n\n```\n.*?\n```",
+                     re.S)
+    m = pat.search(doc)
+    if not m:
+        raise SystemExit("cannot find the bench section in the run record")
+    doc = doc[:m.start()] + bench_block(ids) + doc[m.end():]
+    RUN_RECORD.write_text(doc, encoding="utf-8")
+    print(f"run record regenerated: {len(ids['files'])} changed files, "
+          f"{len(ids['bodies'])} bodies, {len(ids['packages'])} packages, "
+          f"bench {ids['bench_cases']} cases")
+    return 0
+
+
 def check(ids: dict) -> int:
     problems = []
     rr = RUN_RECORD.read_text(encoding="utf-8")
@@ -118,6 +171,28 @@ def check(ids: dict) -> int:
     if ids["bench_stdout"] not in rr:
         problems.append("run-record does not contain the current bench stdout verbatim")
 
+    # The corpus is verified, not merely computed.  An earlier revision of this checker
+    # built `ids["bodies"]` -- 55 prompt ids, digests and byte counts -- and then never
+    # read it, so `--check` could print "records agree with the artefacts" having compared
+    # no body at all.  That is the bench's own original defect (a corpus accepted by count
+    # while the docstring promised a digest check) reproduced inside the guard written to
+    # stop stale records.  Roster first, then every digest and size.
+    if not ids["bodies"]:
+        problems.append("no bodies were supplied, so the corpus cannot be verified")
+    if len(ids["bodies"]) != 55:
+        problems.append(f"expected 55 bodies, found {len(ids['bodies'])}")
+    missing_rows = [k for k, h, s in ids["bodies"] if f"| `{k}` | `{h}` | {s} |" not in rr]
+    if missing_rows:
+        problems.append(f"{len(missing_rows)} body row(s) in the run record do not match the "
+                        f"supplied corpus: {missing_rows[:5]}"
+                        + (" …" if len(missing_rows) > 5 else ""))
+    recorded = set(re.findall(r"^\| `([A-Z][A-Z0-9-]*)` \| `[0-9a-f]{64}` \| \d+ \|$",
+                              rr, re.M))
+    supplied = {k for k, _h, _s in ids["bodies"]}
+    for extra in sorted(recorded - supplied):
+        problems.append(f"run record lists body {extra!r}, which the supplied corpus does not "
+                        f"contain")
+
     if problems:
         print(f"RECORDS STALE — {len(problems)} problem(s):")
         for p in problems:
@@ -143,8 +218,7 @@ def main() -> int:
     ids = identities(args)
     if args.check:
         return check(ids)
-    print(json.dumps({k: v for k, v in ids.items() if k != "bench_stdout"}, indent=2))
-    return 0
+    return write_records(ids)
 
 
 if __name__ == "__main__":

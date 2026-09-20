@@ -707,11 +707,24 @@ neither pass would have caught it, which is an argument for the mechanism rather
 adopt" and that A + A′ would make `SF-05` a fireable guard. Both were overstated, and the honest
 version is narrower:
 
-- **A, with the typed `pf10_dependency` field, is the only option on the table that can become a
-  guard D14 would accept.** Without the field it is a measurement, not a guard. Cost: an enumerated
-  field on 280 rows in the bundled contract copies, validator support for the enum and the pin, and
-  an authoring rule. It shifts the failure mode from paraphrase to misdeclaration, which is the real
-  gain and the only one worth claiming.
+- **A, with the typed `pf10_dependency` field, is a guard over the *declared graph* — and that is
+  narrower than "a guard D14 would accept".** An earlier version of this bullet claimed the latter,
+  and review was right to reject it: D14 requires a guard that would catch **behavioural**
+  reintroduction, and A inspects only typed `state_routes` rows. **A body that reintroduces the
+  comparison-stop without changing the graph produces no error**, and a row that falsely declares
+  `NONE` evades the rule — both holes this brief already concedes elsewhere, which is exactly why the
+  stronger claim could not stand. Cost: an enumerated field on 280 rows in the bundled contract
+  copies, validator support for the enum and the pin, and an authoring rule. What it buys, stated at
+  its real size: **on the declared axis** it shifts the failure mode from paraphrase to
+  misdeclaration, which is a genuine gain and the only one worth claiming.
+
+  **So no option on the table is a D14-acceptable guard today.** Closing the body axis needs a
+  mechanism this brief does not have: either a body-level check with a typed anchor the bodies do not
+  currently carry, or a runtime observation of the emitted handoff — and the reason that is hard is
+  the same measurement recorded under `SF10-06`, that all 68 `NEXT_PROMPT_HANDOFF` occurrences are
+  prose instructing a runtime rather than a parseable structure. **That is the honest state of
+  `SF-05`, and it is the fourth time review has had to narrow this section.** A remains the best
+  available step and it is a partial one.
 - **A′ is worth adopting for what it is** — every prompt names each state it can return, for three
   single-token edits, self-maintaining because the tokens come from the contract — **and it does not
   close the body-to-graph hole.** Its converse is not cheaply expressible: 180 of the 239 ALL-CAPS
@@ -720,8 +733,8 @@ version is narrower:
 - **Do not widen the word list.** That is unchanged and it is the one thing every option here
   agrees on.
 
-**So the honest answer to "what concrete mechanism options exist" is: one, at a stated cost.** The
-others narrow the gap. If the typed field is too much for now, the defensible interim position is
+**So the honest answer to "what concrete mechanism options exist" is: one partial mechanism, at a
+stated cost, covering the declared graph and not the bodies.** The others narrow the gap further. If the typed field is too much for now, the defensible interim position is
 A′ plus the enumeration in §3.6 repeated each round — which is a recurring manual check, not a
 guard, and should be called that.
 
