@@ -127,7 +127,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
              "skills": {},
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:11:32.545283710 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:20:40.863788859 +0000
 @@ -953,7 +953,7 @@
      errors += subset_errors(profile, {
          "schema_version": "gcfpe-validation-profile/1.0",
@@ -233,7 +233,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
  def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
      errors: list[str] = []
      hashes: dict[str, str] = {}
-@@ -2023,9 +2086,51 @@
+@@ -2023,9 +2086,62 @@
              for row in (contract.get("state_routes", {}).get(prompt_id, []))
              if isinstance(row, dict) and row.get("public_result") is True
          ]
@@ -274,13 +274,24 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +                # a non-string scalar such as an int is silently absent from the set
 +                # and so skipped without a word.  Either way malformed route data
 +                # would escape the structured path this error code exists to provide.
-+                if destinations is not None and not isinstance(destinations, list):
++                # A list is required unconditionally.  `destinations is not None and
++                # ...` let a null or absent value through, and the loop below then
++                # iterated nothing, so a non-terminal public row declaring no route at
++                # all passed body validation silently -- a row whose whole meaning is
++                # that the invocation continues somewhere.  The contract-level
++                # `STATE_DESTINATION` check already requires a list here, so the lax
++                # body-level guard also disagreed with the stricter one in this same
++                # file; they now agree.  Measured on the real contract first: all 208
++                # non-terminal public rows carry a non-empty list, so requiring one
++                # costs nothing.  An EMPTY list is deliberately not flagged, because
++                # `STATE_DESTINATION` does not flag it either and this check should not
++                # be quietly stricter than the contract-level rule it mirrors.
++                if not isinstance(destinations, list) or any(
++                    not isinstance(destination, str) for destination in destinations
++                ):
 +                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
 +                    continue
-+                if any(not isinstance(destination, str) for destination in (destinations or [])):
-+                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
-+                    continue
-+                for destination in destinations or []:
++                for destination in destinations:
 +                    if destination in EXPECTED_MEMBERS and not names_prompt(text, destination):
 +                        errors.append(
 +                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"

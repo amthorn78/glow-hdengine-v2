@@ -48,13 +48,13 @@ recorded below.
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `36c3465ffe3e1791…` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `3379824809242f45…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 338 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 349 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -96,12 +96,19 @@ it was written to remove.
 
 ## `SF10-06` — the handoff obligation
 
-**The repair.** The token test is replaced by the routing obligation. For every non-terminal
-public branch, each destination that is a prompt id must be named in the body; a prompt with no
-named receiver owes no declaration. A new code, `PROMPT_HANDOFF_RECEIVER:<prompt>:<destination>`,
-replaces `PROMPT_HANDOFF_CONTRACT:<prompt>` — a changed predicate gets a new identifier rather
-than reusing one whose meaning was different. Symbolic destinations
-(`NATHAN_TERMINAL_RETURN`, `ORIGINAL_NATIVE_STAGE`, `NATHAN_PROCEED`,
+**The repair, in one sentence: the token test is *scoped to the registry's roster* and a routing
+obligation is *added beside it*.** This summary previously said "the token test is replaced by the
+routing obligation," which describes **the design review rejected** — the one under which a body
+could lose its handoff block entirely and still pass. It was the summary of an earlier revision,
+left standing when the correction was written into the section below it, and it is exactly the sort
+of stale opening that could get the rejected design implemented. Corrected here; the two obligations
+are set out immediately below.
+
+For every non-terminal public branch, each destination that is a prompt id must be named in the
+body; a prompt with no named receiver owes no declaration. A new code,
+`PROMPT_HANDOFF_RECEIVER:<prompt>:<destination>`, replaces `PROMPT_HANDOFF_CONTRACT:<prompt>` — a
+changed predicate gets a new identifier rather than reusing one whose meaning was different.
+Symbolic destinations (`NATHAN_TERMINAL_RETURN`, `ORIGINAL_NATIVE_STAGE`, `NATHAN_PROCEED`,
 `NATHAN_MANUAL_MERGE_ASSERTION`) are not prompts and are not name-checkable. Malformed
 `destinations` fails closed rather than being skipped.
 
@@ -398,11 +405,14 @@ Review found that the `destinations` guard validated only the **container**, nev
 the `MALFORMED_DESTINATIONS` code did not cover what it appeared to. Measured, and it is worse than
 the finding said:
 
-| element | before | after |
+| `destinations` | before | after |
 |---|---|---|
-| a non-string scalar, e.g. `7` | absent from `EXPECTED_MEMBERS`, **silently skipped** | `MALFORMED_DESTINATIONS` |
-| an unhashable **dict** | `TypeError: unhashable type: 'dict'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
-| an unhashable **list** | `TypeError: unhashable type: 'list'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
+| a non-string scalar element, e.g. `7` | absent from `EXPECTED_MEMBERS`, **silently skipped** | `MALFORMED_DESTINATIONS` |
+| an unhashable **dict** element | `TypeError: unhashable type: 'dict'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
+| an unhashable **list** element | `TypeError: unhashable type: 'list'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
+| **`null`** | accepted; the loop iterates nothing | `MALFORMED_DESTINATIONS` |
+| **key absent** | accepted; the loop iterates nothing | `MALFORMED_DESTINATIONS` |
+| an **empty list** | not flagged | **still not flagged** — deliberately, see below |
 
 The finding named the dict; **a list is unhashable too**, so there were two crash shapes rather than
 one. And a crash here is the same failure the installed build already has in its fixture suite:
@@ -420,6 +430,35 @@ read the other way, it **would have scored a contract-mutating case that changed
 No case had exercised that path before, which is exactly how a half-built guard survives being
 written. It now hashes the whole input, bodies and contract together.
 
+### Null and absent `destinations` too — and a matching defect in code this package does not touch
+
+A second review round on the same guard found that `destinations is not None and not isinstance(...)`
+let **null** and an **absent key** through, after which the loop iterated nothing. On a *non-terminal*
+public row that is silence where a verdict belongs: such a row's whole meaning is that the invocation
+continues somewhere, so declaring no route at all is malformed.
+
+**Measured before changing it**, because requiring a list unconditionally could have produced false
+failures: **all 208 non-terminal public rows in the real contract carry a non-empty list.** Zero
+affected. The guard now requires a list unconditionally.
+
+**Two reasons this was the right scope, and one thing deliberately left alone.** The contract-level
+`STATE_DESTINATION` check in this same file **already** requires a list here — so the lax body-level
+guard was not merely incomplete, it **disagreed with the stricter check beside it**, and they now
+agree. For the same reason an **empty list is deliberately still not flagged**: `STATE_DESTINATION`
+does not flag it either, and this check should not become quietly stricter than the rule it mirrors.
+If an empty `destinations` on a non-terminal row ought to be an error, that belongs to both checks at
+once and is a decision, not a fix.
+
+**And a defect in unchanged code, named rather than fixed.** Checking the contract-level rule to
+compare predicates, I found it carries **the same unhashable-element crash** I had just repaired at
+body level: `destination not in allowed_nodes` at `validate_gcfpe_20260914.py:1719` raises
+`TypeError: unhashable type` for a dict or list element, so a malformed contract aborts contract
+validation instead of reporting `STATE_DESTINATION`. Verified by executing the predicate on all four
+shapes. **This is outside the three authorized repairs and I have not touched it** — widening the
+package is not mine to decide. It is recorded here as a finding for the Product Owner, and it is the
+strongest independent evidence that the body-level fix was worth making: the same mistake existed
+twice in the same file, and only one instance was in code this package is allowed to change.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
@@ -428,7 +467,7 @@ those same copies. All of it reproduced: 12 → 10 with the 10 exactly `SF10-07`
 crashing on the installed build with `ValueError: Mutation anchor absent: reject-source-epic-to-crd`
 and clean at 164/0 on the repaired one; 140/0 on both contract suites; `validate_flowmaster.py`
 exit 0 on both; the `change-flow` contract validator exit 0 with byte-identical stdout on both; and
-the bench at sixteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
+the bench at eighteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
 end-to-end outputs are 6179 and 6104 bytes, the same sizes as the first sweep.
 
 **Two of my own invocation errors during that re-run, recorded so they are not read as results.**
@@ -451,7 +490,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, **sixteen cases, exit 0**. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **eighteen cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -516,7 +555,7 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 271831 | `87c473c5f57ad0cf0eff0b6f67bf2ad65668f44a7d13f67d904d149c07748d07` |
+| `flowmaster-validate.skill` | 29 | 272154 | `f3e7a72e3d6f25b4cd02cc942cd701f31405373bb505c9557628303e4fff1ae5` |
 
 The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
 3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation

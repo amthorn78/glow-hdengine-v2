@@ -285,6 +285,36 @@ def bury_receiver_in_enum_token(prompt_id, receiver, enum_suffix):
     return f
 
 
+def blank_destinations(prompt_id, mode, label):
+    """Set a real non-terminal public row's `destinations` to null, or remove the key.
+
+    A non-terminal public row's whole meaning is that the invocation continues somewhere,
+    so a row declaring no route at all is malformed.  The old guard read
+    `destinations is not None and not isinstance(..., list)`, so null and absent both
+    slipped through and the loop then iterated nothing -- silence where a verdict belonged.
+    """
+    def f(data):
+        rows = [r for r in data["contract"].get("state_routes", {}).get(prompt_id, [])
+                if isinstance(r, dict) and r.get("public_result") is True
+                and r.get("terminal_for_invocation") is not True
+                and isinstance(r.get("destinations"), list) and r["destinations"]]
+        if not rows:
+            die(f"fixture invalid: {prompt_id} has no non-terminal public row with a "
+                f"non-empty destinations list, so {label} cannot be modelled")
+        row = rows[0]
+        if mode == "null":
+            row["destinations"] = None
+        elif mode == "absent":
+            del row["destinations"]
+        else:
+            die(f"fixture invalid: unknown mode {mode!r}")
+        if mode == "null" and row.get("destinations") is not None:
+            die(f"fixture invalid: {prompt_id}'s destinations are not null")
+        if mode == "absent" and "destinations" in row:
+            die(f"fixture invalid: {prompt_id}'s destinations key is still present")
+    return f
+
+
 def corrupt_destination_element(prompt_id, bad_element, label):
     """Put one malformed element into a real nonterminal-public row's `destinations`.
 
@@ -429,6 +459,23 @@ def main() -> int:
                        (["PR-30"], "an unhashable list")):
         case(f"repaired build reports MALFORMED_DESTINATIONS for {label}", work,
              corrupt_destination_element("ESC-40", bad, label), handoff_errors,
+             ["PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS"],
+             bodies_dir=bodies, registry=registry)
+
+    print("  Null and absent are rejected too, and for a reason the shape states: a")
+    print("  non-terminal public row's whole meaning is that the invocation continues")
+    print("  somewhere, so declaring no route at all is malformed. The old guard read")
+    print("  `destinations is not None and not isinstance(..., list)`, so both slipped")
+    print("  through and the loop iterated nothing -- silence where a verdict belonged.")
+    print("  The contract-level STATE_DESTINATION check already required a list here, so")
+    print("  the lax body-level guard also disagreed with the stricter one in the same")
+    print("  file. Measured on the real contract first: all 208 non-terminal public rows")
+    print("  carry a non-empty list, so requiring one costs nothing. An EMPTY list is")
+    print("  deliberately NOT flagged, because STATE_DESTINATION does not flag it either")
+    print("  and this check must not be quietly stricter than the rule it mirrors.")
+    for mode, label in (("null", "a null destinations value"), ("absent", "an absent destinations key")):
+        case(f"repaired build reports MALFORMED_DESTINATIONS for {label}", work,
+             blank_destinations("ESC-40", mode, label), handoff_errors,
              ["PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS"],
              bodies_dir=bodies, registry=registry)
 
