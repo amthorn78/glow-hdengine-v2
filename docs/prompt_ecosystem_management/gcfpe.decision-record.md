@@ -311,6 +311,76 @@ objects carry exact checks of their own. That coverage is incidental. Where it w
 guard was extended; where it merely doubles up, it is not counted as enforcement. A
 residual that happens to be caught elsewhere today is still a residual.
 
+### Amendment, 2026-09-20 — the tenth defeat, and the failure class it introduced
+
+The guard has now been written eleven times and defeated ten. The tenth defeat came from
+neither a selector nor a waiver, and it is worth naming as its own class: **a lossy key
+function.** The check compared *derived path strings*, and the derivation was not injective,
+so two different contracts produced the same observed set and the comparison could not see a
+difference that was really there.
+
+Two placements, both inside `pf10_addendum_contract` — the one object this guard enumerates
+exactly, and therefore the one place a hole is least excusable. Both were found by the
+independent reviewer and both were reproduced here before being accepted.
+
+**The tenth defeat.** Nested paths were flattened as `f"{prefix}.{key}"`. A key that already
+contains a dot derives the identical string, so a top-level key inside the addendum named
+exactly `producers.RS-20` derived a path already in the enumeration: nothing added, nothing
+removed, every layer silent, all four gates green. Verified on `producers.RS-20`,
+`producers.CF-C-30` and `native_outcome_normalization.PENDING`. The same value under an
+ordinary key name is caught. The only difference was the dot. There were 22 dotted paths in
+the enumeration, so 22 free slots.
+
+**The second placement, from the same root.** A path was recorded for a list element only
+when that element was itself a dict or a list. Every list inside the addendum is a list of
+scalars, so none of their elements was covered at all, at any depth. A complete prohibited
+gate appended to `forbidden_fields` passed all four gates, and reversing that list was
+invisible. Three of the four lists were caught anyway, each by one unrelated value check;
+by the rule this section already records, that is incidental coverage and not enforcement.
+`forbidden_fields` had nothing behind it, because its only reader is a superset test.
+
+The eleventh version fixes both structurally:
+
+- a path is now a **tuple of typed segments** — dict keys as strings, list indices as
+  integers — which is injective by construction, with no rejection rule and no vocabulary.
+  A key carrying `.` or `[` is additionally reported as `AMBIGUOUS_KEY`, and messages render
+  paths as JSON arrays, so an added and a removed path can never read as the same text;
+- every list inside the addendum is pinned to its **exact element sequence**, order
+  included, under the new code `PF10_ADDENDUM_LIST_VALUE_DRIFT`. An unenumerated list, a
+  missing list and a list replaced by a scalar each report distinctly.
+
+**A shape rule was proposed for the list elements and is refuted by measurement, recorded so
+it is not proposed a third time.** The suggestion was to require every element to match the
+bare single-token form already used for lifecycle values, on the reasoning that a field name
+is a token and a gate needs whitespace. Two elements of the **lawful** `forbidden_fields`
+are prose: *"any pinned PF document version"*, and *"any field describing this addendum's own
+drainage state — not a Canon destination, Canon target, or PF09 row"*. That list does not
+enumerate field names; it describes prohibited content, in English. The rule fails on the
+contract as it stands. **That is the ninth defeat's mistake and the removed PF10-token
+rule's mistake — a form pin that rejects lawful content — and it was not made again.** Shape
+is unavailable on this axis, so the values are enumerated instead, which is what the object's
+other three lists already were.
+
+Measured, not asserted: **13 of 13** attack placements caught, including three dotted-key
+targets, a nested dotted key, a bracket-shaped key, a key colliding with a list index, all
+four lists, and a list reversal. Every earlier defeat stays caught — v8's object and v9's
+prose under all lifecycle names, and the nested addendum clause — and a lawful promotion with
+scalar lifecycle values stays clean. Fixture cost is **1 amended expectation in 140**:
+appending to `exact_producer_set` now also drifts that list's element pin, so that case
+expects both codes. The runner already supports an exact multi-code expectation and has
+precedent for it; comparison stays exact equality, so the original code is still required to
+fire. The guard block is byte-identical between the two validator copies.
+
+**Also swept, and not a hole.** The layer-2 branch scan builds paths with the same dotted
+derivation, but nothing selects on that path — it is a label in a report whose emptiness is
+the only thing tested — so a collision there is cosmetic. A non-scalar element appended to
+an addendum list is caught, then crashes an unrelated set-building step; that crash is
+fail-closed and is the pre-existing class this section already records. Lifecycle values of
+type `bool`, `int`, `float` or `None` receive no form check, which is the same waiver-by-type
+shape as the ninth defeat one branch further down; **no change was made, because that value
+space cannot express a directive.** A rule there would buy nothing, and this section already
+records what writing rules that buy nothing has cost.
+
 ## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
 
 Ruled 2026-09-18.
