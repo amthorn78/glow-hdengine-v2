@@ -28,7 +28,9 @@ are dated records and none is modified.
 
 ## Verdict
 
-`SKILL_REPAIR_REQUIRED`. Three skill findings, two corpus findings, one observation.
+`SKILL_REPAIR_REQUIRED`. Three skill findings, two corpus findings, one observation — and one
+pre-existing open item, `SF-05`, which this run neither closes nor touches and which is routed
+to its owner rather than folded in.
 
 **This is the first run in which the D8/D15 guard is not among the findings.** v11 was
 attacked independently and returned `GUARD_HOLDS`; it is installed and was exercised here. The
@@ -70,24 +72,93 @@ defect in which the snapshot moved mid-review — does not recur.
 Every tool was run from a scratch copy of the whole tree with `PYTHONDONTWRITEBYTECODE=1`.
 The installed directory was never written to. Zero `.pyc` files were produced.
 
-### What was executed
+### What was executed — the complete invocation
 
-The installed `flowmaster-validate` validator was run against the 55-body corpus:
+The verdict rests on this run, so it is recorded in full rather than summarised. `$T` is the
+installed skills root and `$S` the scratch working directory holding the 55 verified bodies.
 
-- validator: `flowmaster-validate/scripts/validate_gcfpe_20260914.py`, sha256
-  `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e`
-- the `change-flow` copy of the same file: sha256
-  `660d61fe619c9dd9aa2b5646a7344084af3c8c333fc044e2e91f51e941363c63`
-- contract: `change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json`,
-  sha256 `7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894`,
-  status `UNSELECTED_CANDIDATE`, 55 members
-- frozen graph resolved: sha256 `1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7`,
-  **55 nodes, 227 edges**
-- bodies supplied: 55; `prompt_body_count: 55`
+**Scratch copy** — the whole tree, never the installed directory:
 
-Result: `ok: false`, **12 error strings across exactly three check families**. No
-`SKILL_MISSING`, no `BUNDLED_CONTRACT_UNREADABLE`, no `PROFILE_UNREADABLE`, no
-`ROUTE_GRAPH`, no `PF10_*` error of any kind.
+```sh
+W=$S/run10b
+rm -rf "$W"; mkdir -p "$W"
+cp -r "$T"/. "$W"/          # 321 files copied
+```
+
+**Environment** (closed rails, no network used by this tool):
+
+```sh
+export PYTHONDONTWRITEBYTECODE=1 LC_ALL=C LANG=C TZ=UTC
+```
+
+**Command**, run with `$W` as the working directory:
+
+```sh
+python3 flowmaster-validate/scripts/validate_gcfpe_20260914.py change-flow \
+  --contract change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json \
+  --prompt-dir "$S/bodies"
+```
+
+**Inputs, by identity:**
+
+| input | identity |
+|---|---|
+| validator executed | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` sha256 `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e` |
+| the `change-flow` copy of the same file | sha256 `660d61fe619c9dd9aa2b5646a7344084af3c8c333fc044e2e91f51e941363c63` |
+| contract | `gcfpe-20260914.1-091426.1-direct-handoff-contract.json` sha256 `7f8d683e672dd4b14766fc2ec9c8ca7e5a964a11e4ddc4dea3fa4f8d7c9b5894`, `UNSELECTED_CANDIDATE`, 55 members |
+| prompt bodies | the 55 files in `$S/bodies`, each previously verified against the registry's `evidence_contract` digest |
+| tree the copy was taken from | 321 files, digest excluding `manifest.json` `c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb` |
+
+**Outcome:**
+
+| | |
+|---|---|
+| exit status | `1` |
+| stderr | empty, 0 bytes |
+| `ok` | `false` |
+| `contract_status` / `selection_status` | `UNSELECTED_CANDIDATE` |
+| `frozen_graph_sha256` | `1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7` |
+| `frozen_graph_node_count` / `edge_count` | 55 / 227 |
+| `prompt_bodies_validated` / `prompt_body_count` | `true` / 55 |
+| `errors` | 12, listed verbatim below |
+| `.pyc` produced | 0 |
+
+**Two-run identity:** the command was run a second time and the returned JSON object is equal
+to the first run's, field for field, including the error list and all 55 body digests.
+
+**The 12 error strings, verbatim and complete:**
+
+```
+PROMPT_HANDOFF_CONTRACT:GCFPE-MGMT-10
+PROMPT_WRITER:CF-C-20:ACTIVE_ADDENDA
+PROMPT_WRITER:CF-C-20:AUTHORING_CONTEXT
+PROMPT_WRITER:CF-C-20:CURRENT_PF10_MARKDOWN
+PROMPT_WRITER:CF-C-40:ACTIVE_ADDENDA
+PROMPT_WRITER:CF-C-40:CURRENT_PF10_MARKDOWN
+PROMPT_WRITER:CF-E-20:ACTIVE_ADDENDA
+PROMPT_WRITER:CF-E-20:AUTHORING_CONTEXT
+PROMPT_WRITER:CF-E-20:CURRENT_PF10_MARKDOWN
+PROMPT_WRITER:CF-E-40:ACTIVE_ADDENDA
+PROMPT_WRITER:CF-E-40:CURRENT_PF10_MARKDOWN
+QA_PASS_BODY_CLASS_MAP
+```
+
+That is the whole list. **No `SKILL_MISSING`, no `BUNDLED_CONTRACT_UNREADABLE`, no
+`BUNDLED_GRAPH_UNREADABLE`, no `PROFILE_UNREADABLE`, no `ROUTE_GRAPH`, no `PROMPT_BODY_IDENTITY`,
+and no `PF10_*` error of any kind** — every one of those absences is a claim this artifact makes,
+and each is checkable against the list above.
+
+The identity-header and negative-control measurements were taken by importing the same frozen
+module from the same scratch copy and calling one function directly:
+
+```python
+import validate_gcfpe_20260914 as V
+V.prompt_identity_header_valid(nonblank, member, prompt_id, production_mode=False)
+```
+
+run over all 55 members of the contract's `member_registry`, then twice more on a mutated
+PR-40 body: with `PR-40` rewritten to `PR-41` throughout, and with the first six non-blank
+lines dropped.
 
 A first attempt at this measurement pointed the validator at the `SELECTED_PRODUCTION`
 contract (54 members) from a partial tree copy and returned 138 errors including
@@ -100,6 +171,26 @@ The D8 guard block is byte-identical across both installed validator copies: the
 contiguous functions `_addendum_paths`, `_ambiguous_addendum_keys`,
 `pf10_addendum_contract_key_drift` and `addendum_list_value_drift`, 7355 characters,
 md5 `46c69eaf8f00672e44f8502bbf43c721`.
+
+### How to resolve the citations in this artifact
+
+Three kinds of source are cited, and they resolve differently:
+
+- **Installed skill files** (`SKILL.md`, `propagate_core.py`, the validator, the bundled
+  contracts) are cited by path and line, and resolve in the frozen tree at digest
+  `c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb`.
+- **Prompt bodies** are cited as `<PROMPT-ID>.md:<line>` against the **strip-both** extraction
+  of the live Notion body — the convention recorded in the registry's
+  `body_extraction_convention` key. Each body in the corpus used here matches its recorded
+  `evidence_contract` digest, so any reviewer who re-fetches under that convention gets the
+  same file and the same line numbers.
+- **`gcfpe.decision-record.md` is cited by decision id and quoted text, never by line number.**
+  Its line numbers shift with every amendment — the same quotes sit at lines 749–769 on `main`
+  at `049d1fe` and at 805–825 on the branch carrying the D8 v11 successor amendment. A line
+  citation into that file is stale the moment the next amendment lands, so the quoted text plus
+  the decision id is the stable reference.
+
+Every quote in §B and §C was matched byte-for-byte against the file it names before acceptance.
 
 ## §A — Prompt-to-skill matrix
 
@@ -232,9 +323,10 @@ Three prompts bind a primary, all the same one. PR-30 line 59: "Use
 RS-40's continuation carry the identical sentence. No prompt binds two primaries, and no
 prompt that executes PR work leaves the primary unnamed. The 51 `NONE` prompts do not need a
 primary: they are authored, reviewed, planned, QA'd or operated natively by their named human
-or agent role. The decision record states the general case at line 824 — "primary skill has
-exactly one, and no prompt contract requires a capability no installed skill" — and at line
-825 gives the worked example: "safely supplies — are answered: OPS-20 needs no primary skill."
+or agent role. The decision record states the general case under **D16** — "primary skill has
+exactly one, and no prompt contract requires a capability no installed skill" — and gives the
+worked example in the next line: "safely supplies — are answered: OPS-20 needs no primary
+skill."
 
 ### 2 — support skills cannot assume workflow authority: YES
 
@@ -262,11 +354,11 @@ omit, or transfer any field." RS-40 line 10 carries the matching corpus-side sta
 
 ### 4 — support-skill limits: NO_SUBJECT
 
-The question's subject was `glow-hde-devops`. **D16** removes it. Decision record line 805:
-"## D16 — No DevOps skill exists, and the Ops lane needs none"; line 811: "**The ruling: 'we
-do not need any devops skill period.'**"; line 813: "`glow-hde-devops` is retired. None is
-installed, none is required, and none is to be created." Line 822 records how the Ops lane
-runs instead: "natively, by their named human or agent operator, with no skill binding".
+The question's subject was `glow-hde-devops`. **D16** removes it, by its own heading: "## D16 —
+No DevOps skill exists, and the Ops lane needs none". Its ruling: "**The ruling: 'we do not need
+any devops skill period.'**" Its disposition: "`glow-hde-devops` is retired. None is installed,
+none is required, and none is to be created." And how the Ops lane runs instead: "natively, by
+their named human or agent operator, with no skill binding".
 
 The Ops prompts name an actor, not a skill — OPS-20 line 9: "You are the authorized DevOps or
 target-environment operator for the exact bounded operation supplied in OPS_TASK_ID." That is
@@ -325,9 +417,9 @@ No prompt contract requires one. The PR lane's capability question resolves insi
 skill's own authority rather than by reaching for another skill — SKILL.md line 168: "Handle a
 genuinely needed environment, Railway, vendor, database, deployment, or bounded operational
 capability inside this skill's own authority. Such work supports PR-30 and PR-35; it never
-governs them or transfers authority to another skill." The decision record line 824 records the
-general finding, and line 813 confirms that the one skill a contract might have reached for is
-retired and "none is required".
+governs them or transfers authority to another skill." **D16** records the general finding, and
+confirms that the one skill a contract might have reached for is retired and "none is
+required".
 
 ### 9 — overlap, contradiction, overreach, or obsolete bindings: YES — two obsolete bindings
 
@@ -517,10 +609,12 @@ contract's `plan_writer_contract` roster drops them. Both are outside a skill re
 
 ## Verified clean
 
-- **The D8/D15 guard.** v11 was attacked by an independent reviewer that could not see the
-  repair and returned `GUARD_HOLDS`. It is installed, its guard block is byte-identical across
-  both installed validator copies, and it was exercised in this run: no `PF10_ADDENDUM_*` error of any kind fired against
-  the candidate contract. Recorded in `gcfpe.round19.d8-v11-cleared-and-installed.md`.
+- **The D8/D15 guard, on the contract axis.** v11 was attacked by an independent reviewer that
+  could not see the repair and returned `GUARD_HOLDS`. It is installed, its guard block is
+  byte-identical across both installed validator copies, and it was exercised in this run: no
+  `PF10_ADDENDUM_*` error of any kind fired against the candidate contract. Recorded in
+  `gcfpe.round19.d8-v11-cleared-and-installed.md`. **This is the contract half of D8 and nothing
+  more** — see `SF-05` below for the body half, which is open.
 - **`SF10-01` at the identity-header site is closed.** All 55 bodies pass
   `prompt_identity_header_valid` in candidate mode — 55/55, zero `PROMPT_BODY_IDENTITY`
   errors — where round 8 measured a check that failed on all 55. Two negative controls were run
@@ -533,6 +627,33 @@ contract's `plan_writer_contract` roster drops them. Both are outside a skill re
 - **Eight of the ten questions answer as intended.** Question 4 has no subject under D16 and
   was not re-litigated. Question 9 answers **YES** — the answer a defect produces — and carries
   findings 2 and 3. The other eight are clean.
+
+### `SF-05` remains open — the body half of D8 is still vocabulary-based
+
+This review does not close `SF-05` and does not touch it. It is recorded here because the
+"verified clean" bullet above could otherwise be read as clearing D8 entirely, which it does
+not.
+
+`SF-05` is recorded in `docs/prompt_ecosystem_management/pe-succession/pe32-to-pe33.md` under
+the heading **"Genuinely open — needs Product Owner input"**, which states that the registry's
+`CTR-002` assertions "are the literals `state the mismatch` and `[Cc]ompare the current PF10`.
+The wordings that defeated v2–v4 contain neither. The registry's mechanism is regex over body
+text, so the structural fix used for the contract is not expressible there."
+
+So the two halves of D8 are in different states, and the difference is not cosmetic:
+
+| axis | mechanism | state |
+|---|---|---|
+| contract | v11's injective typed-tuple derivation plus exact value pinning | **holds**, independently attacked, exercised in this run |
+| prompt body | `CTR-002` regex literals in the registry | **open as `SF-05`** — a vocabulary selector, the class that failed four times |
+
+The same caution applies as in round 19: **do not widen the word list.** That is the move that
+failed v2 through v4 and then v3 through v6. `SF-05` needs a decision about how the behavioural
+half of D14 is satisfied for prompt bodies, and that decision is the Product Owner's — it is not
+a repair this review may specify, and it is not closed by v11 holding on the contract.
+
+It is also independently relevant to §11, which validates all 55 bodies. It is routed to its
+owner alongside the five findings above, not folded into them.
 
 ### `SF10-02` is carried forward, still present and still not violated
 
@@ -564,4 +685,5 @@ was changed; the Round Tracking page records this run, as it records every round
 release `GCFPE-20260913.1 / 091326.2 / 54` was not touched. This review
 is not QA, not acceptance, not promotion, and not post-flight. Per §10, post-flight remains
 blocked: **the three skill findings and the two corpus findings are presented to Nathan for
-separate approval before any repair is attempted.**
+separate approval before any repair is attempted**, and `SF-05` is re-surfaced to him as the
+still-open body half of D8 rather than left in metadata.
