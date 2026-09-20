@@ -223,6 +223,51 @@ vocabulary are removed from the graph with it.
 more deterministic, more automatable, and less likely to stop an agent from completing
 legitimate work? A rule that fails that test does not earn its place.
 
+### Amendment, 2026-09-20 — the enforcement limit, stated so it is not rediscovered
+
+Product Owner instruction, 2026-09-20. This amends how D8 is **enforced**. It does not
+change what D8 prohibits, and it strikes nothing further.
+
+The guard carrying this ruling has been written eight times and defeated seven. Every
+defeat took the same form: **the check selects, and the prohibited gate is written where
+nothing selects.** v1 and v2 selected on phrasing and died to paraphrase and synonym.
+v3 through v6 selected on location and died to a new location each time. v7 selected on
+object shape and died to a clause that is not a branch.
+
+The eighth version stops enumerating what to inspect and enumerates what may exist:
+
+- the routing surfaces are pinned whole, both keys, with no selector inside them;
+- every branch-shaped object naming PF10 anywhere else in the contract is an error unless
+  allow-listed;
+- `pf10_addendum_contract` is key-exact, because `subset_errors` is a subset test and let
+  unknown fields into a closed governance object — which is how v7 fell;
+- the contract's top-level key set is closed, with promotion lifecycle keys exempt.
+
+Together these close the **placement** axis. They were measured, not asserted: 13 of 13
+recorded attack placements caught, at a fixture cost of 1 amended expectation in 140.
+
+**What they do not close, verified by execution and accepted here rather than left for a
+ninth round to discover:**
+
+1. **A branch that never names PF10, placed inside an existing contract key.** A terminal
+   branch reading *"the current controlled Build Notes record differs from the previously
+   approved addendum baseline"* passes. "Build Notes" is PF10's own title; an author
+   writing naturally may never type the token.
+2. **A prohibited rule written into an existing field's value.** Every key check is a
+   key-*name* check; none reads values for prohibited semantics.
+3. **A clause inside any object other than `pf10_addendum_contract`**, which is the only
+   object enumerated exactly.
+
+**This limit is accepted, not overlooked.** Widening the token list to `PF-10`, `PF 10` or
+`Build Notes` buys exactly one round; that is how v1 and v2 died, and repeating it would be
+the ninth instance of the same mistake. The vocabulary axis is therefore **enforced by human
+review, not by machinery**, and no future round should record its existence as a new defeat.
+
+A guard comment that claims more coverage than this is itself a defect. Two shipped guards
+carried such comments, and in both cases the comment stopped a reviewer from running the
+injection that would have exposed them. The installed guard states these three residuals in
+its own source.
+
 ## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
 
 Ruled 2026-09-18.
