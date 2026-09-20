@@ -459,6 +459,26 @@ package is not mine to decide. It is recorded here as a finding for the Product 
 strongest independent evidence that the body-level fix was worth making: the same mistake existed
 twice in the same file, and only one instance was in code this package is allowed to change.
 
+### One habit behind three findings: a correction that stops at the paragraph
+
+Three of this round's findings share a single shape, and calling them three accidents would be the
+wrong record:
+
+| the corrected premise | where the correction landed | where the old conclusion survived |
+|---|---|---|
+| the PF10-comparison stop is not proven absent from the bodies | §3's opening | **§3.6**, two paragraphs after the admission that contradicts it |
+| `artifact_type` already distinguishes the two regimes | §2.3's analysis | **§2.3's own closing**, "the next person pays for it" |
+| the literal test is kept, not replaced | `SF10-06`'s body | **`SF10-06`'s opening summary**, describing the rejected design |
+
+In each case the corrected reasoning went into the body and **the summary above it kept the old
+conclusion** — and the summary is the part a reader trusts first. The third was the worst: an opening
+that stated the design review had rejected, in a document written to guide a decision.
+
+**The rule adopted, not just the three fixes: when a finding corrects a premise, the correction is
+not finished until every summary, opening and recommendation resting on that premise has been
+re-read. The document, not the paragraph.** That pass has now been run over both files for all three
+premises; the only surviving occurrences of the old wording are inside the corrections that quote it.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
