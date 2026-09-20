@@ -60,17 +60,17 @@ look larger and more diffuse than it is.
 
 | file | installed sha256 | repaired sha256 |
 |---|---|---|
-| `change-flow/SKILL.md` | `e6bd29d59ca01522…` | `630f0c0bd575027d…` |
+| `change-flow/SKILL.md` | `e6bd29d59ca01522…` | `b26332af385b7c16…` |
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
-| `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
+| `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `3166ed8671257584…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `b0456a27816c47de…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
-| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
+| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `0460116f1a57e78d…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 378 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 411 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -730,6 +730,51 @@ a fabricated stdout, so the `[FAIL]`-count assertion had to be fired by *actuall
 rather than by editing text. That is a better control and a narrower one — it can only be fired by a
 real defect, which is the point.
 
+### `SF10-04` retired in the two packaged skills — and the install order is forced
+
+The Product Owner authorized retirement conditional on there being no material current dependency.
+There is none, established by measurement rather than reading:
+
+| question | answer |
+|---|---|
+| prompt bodies naming it | **0 of 55** |
+| anything invoking `propagate_core.py` | **nothing** — the only reference is `validate_flowmaster.py`'s required-files map, which merely asserts the file exists |
+| can it run here at all | **no** — it needs a writable git checkout with git-tracked, clean targets; the skills root is one-way synced |
+
+**Four of the nine pointer sites are inside the two packaged skills, and all four are changed:**
+
+| site | change |
+|---|---|
+| `change-flow/SKILL.md` | the post-Primary-update route is now rebuild-and-reinstall |
+| `flowmaster-validate/SKILL.md` | the drift-detection **repair route** is now rebuild-and-reinstall; detection itself is unchanged, and the line says so |
+| `validate_flowmaster.py` `EXPECTED` | `flowmaster-propagate` removed from the required-presence roster |
+| `validate_flowmaster.py` `REQUIRED_SCRIPTS` | its `propagate_core.py` requirement removed |
+
+**The install order is forced, and this is the operative finding.** `EXPECTED` is a
+*required-presence* roster: at `validate_flowmaster.py:1439`, a missing rostered skill sets
+`suite_ok = False`. Tested on three copies:
+
+| order | result |
+|---|---|
+| **skill removed first**, roster unchanged | **exit 1**, `suite_ok=False`, `missing=['flowmaster-propagate']` |
+| **roster updated first**, skill still installed | **exit 0**, `suite_ok=True` — an unrostered extra skill is simply not selected |
+| roster updated **and** skill removed | **exit 0**, `suite_ok=True` |
+
+So: **install the updated `flowmaster-validate` first, then remove the skill.** The reverse order
+breaks validation. With the package installed and the skill still present, the suite validates **6
+skills instead of 7** and passes.
+
+**Five sites are NOT in these packages and are deliberately left**, because each sits in a skill this
+package does not build — `tw-flowmaster`, `session-branch-flowmaster`, `session-relay-flowmaster`,
+`flowmaster-primary` and `amthor-workspace-governance-audit`. Each would need its own archive and its
+own revision bump, which is outside a bounded pass. All five are **prose route pointers**: after
+retirement they are stale text naming an absent skill, a documentation defect that does not fail
+validation — proven by the third row above. They are the separate follow-up.
+
+**Revision scope:** no further bump. `FLOWMASTER_VALIDATE_REVISION` is already 3.2.7 and
+`CHANGE_FLOW_SPECIALIZATION_REVISION` 3.2.6 in this unreleased package, and both still distinguish it
+from every installed build. Review scope is the two skills, with the roster change read as behaviour.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
@@ -825,8 +870,8 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 
 | package | files | bytes | sha256 |
 |---|---|---|---|
-| `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 272630 | `94e3e63f8eaad6285c9116fd5d803714955f1d4bd4ee795c7166b00cd6221757` |
+| `change-flow.skill` | 21 | 241886 | `07864f2b1315aca01c7c0d0fba9278a31afb64f3df5587c55303f5ffd7fddf7b` |
+| `flowmaster-validate.skill` | 29 | 272724 | `43075084f00515f12a3a88bfd61e585054697106c416d8dfef89ab942207d7a0` |
 
 The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
 3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation

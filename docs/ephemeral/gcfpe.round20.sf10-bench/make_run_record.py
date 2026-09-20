@@ -133,6 +133,16 @@ def run_bench(args) -> tuple[str, int]:
     if proc.returncode == 0 and "ALL CASES AS EXPECTED" not in out:
         raise SystemExit("the bench exited 0 without its terminal success marker; refusing to "
                          "record an unrecognised outcome")
+    # Refused HERE, not in check().  An ordinary failing case exits nonzero without printing
+    # HARNESS FAILURE, and with the refusal living only in check() the --write path recorded
+    # "Exit 1" and then exited 0 -- so the report's claim that failures are rejected before
+    # anything is recorded was true of --check and false of --write.  Both modes now stop at
+    # the same point, before any record is touched.
+    failed = out.count("[FAIL]")
+    if proc.returncode != 0 or failed:
+        raise SystemExit(
+            f"the bench exited {proc.returncode} with {failed} case(s) not as expected; "
+            f"refusing to record or check against a failing bench")
     return out.rstrip(), proc.returncode
 
 
@@ -265,19 +275,37 @@ def check(ids: dict) -> int:
         problems.append(f"the supplied trees differ in {extra!r}, which the run record does "
                         f"not list")
 
+    # Every identity is compared as a COMPLETE ROW, binding each value to its file and its
+    # side.  Membership tests were used first -- "does this digest occur somewhere in the
+    # record" -- and they cannot tell a correct record from one that pairs a real digest with
+    # the wrong file, or swaps a file's base and work hashes: both digests still "occur".
+    # Same class of hole as every other defect found in this file: an assertion weaker than
+    # the claim it backs.
     for rel, bh, wh in ids["files"]:
-        if bh not in rr:
-            problems.append(f"run-record is missing the BASE digest of {rel}: {bh}")
-        if wh not in rr:
-            problems.append(f"run-record is missing the current digest of {rel}: {wh}")
+        row = f"| `{rel}` | `{bh}` | `{wh}` |"
+        if row not in rr:
+            problems.append(f"run-record has no row binding {rel} to base {bh[:16]}… and "
+                            f"work {wh[:16]}…; a swapped or misattributed pair would not be "
+                            f"caught by a membership test")
         if wh[:16] not in rp and wh not in rp:
             problems.append(f"report is missing the current digest of {rel}: {wh[:16]}…")
     for name, count, size, h in ids["packages"]:
-        for label, doc in (("run-record", rr), ("report", rp)):
+        # The file COUNT is asserted too.  It was computed and unpacked but never compared,
+        # which left the one identity the report relies on to detect accidentally included
+        # bytecode outside the check -- the .pyc incident earlier in this package was caught
+        # by that count, so leaving it unasserted removed the very signal that worked.
+        row = f"| `{name}` | {count} | {size} | `{h}` |"
+        if row not in rr:
+            problems.append(f"run-record has no row binding {name} to {count} files, "
+                            f"{size} bytes and sha256 {h[:16]}…")
+        for label, doc in (("report", rp),):
             if h not in doc:
                 problems.append(f"{label} is missing {name}'s current sha256 {h}")
             if str(size) not in doc:
                 problems.append(f"{label} is missing {name}'s current byte count {size}")
+            if f"| {count} | {size} |" not in doc:
+                problems.append(f"{label} does not bind {name}'s file count {count} to its "
+                                f"byte count {size}")
     if str(ids["patch_lines"]) not in rp:
         problems.append(f"report does not state the patch's current line count {ids['patch_lines']}")
     # The report spells the bench's case count in words, so the check requires the spelled

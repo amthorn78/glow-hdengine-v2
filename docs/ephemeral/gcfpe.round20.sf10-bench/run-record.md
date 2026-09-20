@@ -124,12 +124,12 @@ harness; the report should not be read as claiming otherwise.
 
 | file | base sha256 | work sha256 |
 |---|---|---|
-| `change-flow/SKILL.md` | `e6bd29d59ca0152254c9f234e79b7fe146152bc20898e6e621c58904b6aa4f93` | `630f0c0bd575027da7b6a968d6f0c11ed15569abd250054ad7f6232d0f16ee60` |
+| `change-flow/SKILL.md` | `e6bd29d59ca0152254c9f234e79b7fe146152bc20898e6e621c58904b6aa4f93` | `b26332af385b7c169739d7635c381a75dfa658c8d967fb9168634458f3592d2c` |
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9aa2b5646a7344084af3c8c333fc044e2e91f51e941363c63` | `8e7cbe435a6e99385c98881ea95b1c9e7525506315172098b5e88672fbd288da` |
-| `flowmaster-validate/SKILL.md` | `f2729ba39de4f46ba32a6d5d5a232b54038c685644835d700f308020f7dca4e3` | `5b5898e6c54f5a645b45e8e929701321c7a6fc32184c9f1cfe706501ecc086a2` |
+| `flowmaster-validate/SKILL.md` | `f2729ba39de4f46ba32a6d5d5a232b54038c685644835d700f308020f7dca4e3` | `3166ed867125758473aaf702ee85a1c594eccdd808c13bcd74368a01f9d5c667` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1064054f82e1e6d921fc5c5b3e079595fd8068b5e989015a7` | `39c44ad84ca05d5e2c02f9cd188506e472a34e7e97211981e2f0b7624e285479` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671aca628ff2cd3d2ea312b9efab064e5a5c67c95c8417d96f4b` | `7523947d952b1372fd1786d5088ad7c92bee77fd5b5a250a58a93b2f98a36cf0` |
-| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701ade4e02551e0ef6ae9d923f756f28c84dc641f1ade6dcbe3` | `527bf522c0c602dfa95ea5517f640e22068f3fd0f19dd20aa85b3b2ccebe38ee` |
+| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701ade4e02551e0ef6ae9d923f756f28c84dc641f1ade6dcbe3` | `0460116f1a57e78db5183c74eb6624d56f9f5ba0a00551839fb0d50d2034cdd2` |
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e` | `b0456a27816c47dea31382a55e3bc9070c329d140a8dcbec76c0e56ef0195094` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d599812498e015fa7dfa88c095a899be80464a394d14d727e5` | `8cff6c7ef685c0a008dc5ea6290a379368723c46d14b184912a1971fd67dd43b` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f172ef4107b084a1b6151bcb056944504572e3e3e245fb7fb` | `272d7b81fa091ce2f03dcf3fcc68c62134a5426bfa26214b0af50e03e5b17f91` |
@@ -138,8 +138,8 @@ harness; the report should not be read as claiming otherwise.
 
 | package | files | bytes | sha256 |
 |---|---|---|---|
-| `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 272630 | `94e3e63f8eaad6285c9116fd5d803714955f1d4bd4ee795c7166b00cd6221757` |
+| `change-flow.skill` | 21 | 241886 | `07864f2b1315aca01c7c0d0fba9278a31afb64f3df5587c55303f5ffd7fddf7b` |
+| `flowmaster-validate.skill` | 29 | 272724 | `43075084f00515f12a3a88bfd61e585054697106c416d8dfef89ab942207d7a0` |
 
 Each archive was verified by extracting it and running a full recursive diff against the
 working copy; both are identical. `zip -X` is used so a rebuild from unchanged content

@@ -1,6 +1,6 @@
 diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
 --- base/change-flow/SKILL.md	2026-09-20 20:12:29.344183997 +0000
-+++ work/change-flow/SKILL.md	2026-09-20 21:43:31.178879584 +0000
++++ work/change-flow/SKILL.md	2026-09-20 23:24:07.971786906 +0000
 @@ -5,7 +5,7 @@
  
  # Change Flow
@@ -23,6 +23,14 @@ diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
  Static validation proves only declared contract consistency. It does not execute a worker session, resume Alpha, release automation, adopt PF10 content, or prove live behavior.
  
  ### Completion report
+@@ -565,6 +571,6 @@
+ 
+ Treat future workflow evidence, RCAs, and operator corrections as maintenance inputs, not runtime dependencies. Change-specific behavior stays between the specialization markers. Generic behavior stays only in the marked Primary block.
+ 
+-After a future approved Primary update, use flowmaster-propagate and then flowmaster-validate. Increment CHANGE_FLOW_SPECIALIZATION_REVISION only for Change-specific behavior. Never edit the embedded core independently.
++After a future approved Primary update, rebuild the affected .skill packages from the updated Primary core, have the Product Owner install them, and then use flowmaster-validate to confirm the embedded cores match. Increment CHANGE_FLOW_SPECIALIZATION_REVISION only for Change-specific behavior. Never edit the embedded core independently.
+ 
+ <!-- FLOWMASTER_SPECIALIZATION_END -->
 diff -ru base/change-flow/scripts/validate_gcfpe_20260914.py work/change-flow/scripts/validate_gcfpe_20260914.py
 --- base/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.345829492 +0000
 +++ work/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-20 21:43:31.137144764 +0000
@@ -37,7 +45,7 @@ diff -ru base/change-flow/scripts/validate_gcfpe_20260914.py work/change-flow/sc
      require(sha256(marked_core(skill_bytes)) == EXPECTED_CORE_SHA, "protected Primary core SHA")
 diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
 --- base/flowmaster-validate/SKILL.md	2026-09-20 20:12:29.353075276 +0000
-+++ work/flowmaster-validate/SKILL.md	2026-09-20 20:18:22.643760260 +0000
++++ work/flowmaster-validate/SKILL.md	2026-09-20 23:24:07.972114191 +0000
 @@ -5,7 +5,7 @@
  
  # Flowmaster Validate
@@ -47,6 +55,15 @@ diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
  
  Maintenance addition: register the self-contained human-design-reading-flowmaster domain
  contract without changing the Primary core or existing domain/oracle checks. Its behavioral
+@@ -133,7 +133,7 @@
+ - domain self-containment and required domain contracts; and
+ - successful bundled self-tests.
+ 
+-Do not normalize newlines before core comparison. A drifted core fails and identifies flowmaster-propagate as the repair route; validation itself performs no propagation.
++Do not normalize newlines before core comparison. A drifted core fails and identifies rebuild-and-reinstall as the repair route -- rebuild the affected .skill packages from the approved Primary core and have the Product Owner install them; validation itself performs no repair. Drift detection is unchanged by this: only the named repair route changed, because the former propagation tool required a writable git checkout that a one-way synced skills root cannot provide.
+ 
+ ## Complete Change checks
+ 
 diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
 --- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 20:12:29.354244306 +0000
 +++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 21:44:51.040844441 +0000
@@ -97,8 +114,16 @@ diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/fl
          "release": source.get("target_release"),
 diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
 --- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 20:12:29.354596564 +0000
-+++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 21:43:31.137662534 +0000
-@@ -145,7 +145,7 @@
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 23:24:07.972382510 +0000
+@@ -46,7 +46,6 @@
+     "change-flow",
+     "session-branch-flowmaster",
+     "session-relay-flowmaster",
+-    "flowmaster-propagate",
+     "flowmaster-validate",
+ )
+ LEGACY_NAMES = ("glow-technical-writing-flow-master",)
+@@ -145,7 +144,7 @@
          "END TECHNICAL WRITING FLOW: NO TARGETS",
      ),
      "change-flow": (
@@ -107,7 +132,15 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
          "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1",
          "R1_ROW_COVERAGE: 46/46",
          "PRIMARY_CHANGE_REQUIRED = false",
-@@ -685,7 +685,7 @@
+@@ -342,7 +341,6 @@
+         "scripts/validate_gcfpe_20260914.py",
+         "references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json",
+     ),
+-    "flowmaster-propagate": ("scripts/propagate_core.py",),
+     "flowmaster-validate": (
+         "scripts/validate_flowmaster.py",
+         "scripts/run_change_flow_fixtures.py",
+@@ -685,7 +683,7 @@
      # compared to the unchanged, hash-verified oracle below.
      maintenance_metadata = {
          "CHANGE_FLOW_SPECIALIZATION_REVISION: 2.0.0":
@@ -116,7 +149,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
          "PROMPT_REPAIR_PLAN_STATUS = SUSPENDED_PENDING_REPAIR_SYSTEM_RECOVERY":
              "PROMPT_REPAIR_PLAN_STATUS = RESOLVE_CURRENT_REGISTER",
      }
-@@ -1222,7 +1222,7 @@
+@@ -1222,7 +1220,7 @@
          )
          report: dict[str, object] = {
              "schema_version": "flowmaster-validation-report-v2",
