@@ -31,9 +31,29 @@ RUN_RECORD = REPO / "docs/ephemeral/gcfpe.round20.sf10-bench/run-record.md"
 REPORT = REPO / "docs/ephemeral/gcfpe.round20.sf10-repairs.repair-report.md"
 PATCH = REPO / "docs/ephemeral/gcfpe.round20.sf10-bench/repairs.patch"
 
+# The frozen installed tree this package was prepared against.  A copy reproduces this
+# digest exactly -- verified -- because the recipe hashes paths relative to the tree root:
+#   find . -type f ! -name manifest.json -print0 | sort -z | xargs -0 sha256sum | sha256sum
+# `manifest.json` is excluded because the sync rewrites it.
+FREEZE_FILES = 321
+FREEZE_FILES_EXCL_MANIFEST = 320
+FREEZE_DIGEST = "c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb"
+EXPECTED_PACKAGES = ("change-flow.skill", "flowmaster-validate.skill")
+
 
 def sha(p: pathlib.Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def tree_identity(root: pathlib.Path) -> tuple[int, int, str]:
+    """Total files, files excluding manifest.json, and the freeze digest of `root`."""
+    files = sorted(q for q in root.rglob("*") if q.is_file())
+    counted = [q for q in files if q.name != "manifest.json"]
+    h = hashlib.sha256()
+    for q in sorted(counted, key=lambda x: x.relative_to(root).as_posix()):
+        line = f"{sha(q)}  ./{q.relative_to(root).as_posix()}\n"
+        h.update(line.encode())
+    return len(files), len(counted), h.hexdigest()
 
 
 def differing(base: pathlib.Path, work: pathlib.Path) -> list[tuple[str, str, str]]:
@@ -53,19 +73,26 @@ def identities(args) -> dict:
     pkg = pathlib.Path(args.pkg)
     bodies = sorted(pathlib.Path(args.bodies).glob("*.md"))
     bench = pathlib.Path(args.bench).read_text(encoding="utf-8")
+    total, counted, digest = tree_identity(base)
     ids = {
+        "base_tree": (total, counted, digest),
         "files": differing(base, work),
         "bodies": [(p.stem, sha(p), p.stat().st_size) for p in bodies],
         "packages": [],
         "patch_lines": len(PATCH.read_text(encoding="utf-8").splitlines()),
         "bench_cases": bench.count("[PASS]") + bench.count("[FAIL]"),
         "bench_failed": bench.count("[FAIL]"),
+        "bench_exit": args.bench_exit,
         "bench_stdout": bench.rstrip(),
     }
-    for name in ("change-flow.skill", "flowmaster-validate.skill"):
+    # Both archives are required.  A silent skip let --check succeed with one package or
+    # none, and let --write delete the absent rows from a record that claims identities for
+    # both deliverables -- the same "computed then discarded" shape as the corpus defect.
+    missing = [n for n in EXPECTED_PACKAGES if not (pkg / n).is_file()]
+    if missing:
+        raise SystemExit(f"missing package artefact(s) in {pkg}: {', '.join(missing)}")
+    for name in EXPECTED_PACKAGES:
         p = pkg / name
-        if not p.is_file():
-            continue
         listing = subprocess.run(["unzip", "-Z1", str(p)], capture_output=True, text=True).stdout
         count = sum(1 for x in listing.splitlines() if not x.endswith("/"))
         ids["packages"].append((name, count, p.stat().st_size, sha(p)))
@@ -96,7 +123,8 @@ def bodies_table(ids: dict) -> str:
 
 
 def bench_block(ids: dict) -> str:
-    return (f"Exit 0. **{ids['bench_cases']} cases, {ids['bench_failed']} not as expected.** "
+    return (f"Exit {ids['bench_exit']}. **{ids['bench_cases']} cases, "
+            f"{ids['bench_failed']} not as expected.** "
             f"Full stdout:\n\n```\n{ids['bench_stdout']}\n```")
 
 
@@ -113,7 +141,7 @@ def write_records(ids: dict) -> int:
     doc = replace_table(doc, MARK_FILES, files_table(ids), "changed-files")
     doc = replace_table(doc, MARK_PKG, packages_table(ids), "packages")
     doc = replace_table(doc, MARK_BODIES, bodies_table(ids), "bodies")
-    pat = re.compile(r"Exit 0\. \*\*\d+ cases, \d+ not as expected\.\*\* Full stdout:\n\n```\n.*?\n```",
+    pat = re.compile(r"Exit \d+\. \*\*\d+ cases, \d+ not as expected\.\*\* Full stdout:\n\n```\n.*?\n```",
                      re.S)
     m = pat.search(doc)
     if not m:
@@ -131,7 +159,34 @@ def check(ids: dict) -> int:
     rr = RUN_RECORD.read_text(encoding="utf-8")
     rp = REPORT.read_text(encoding="utf-8")
 
+    # The bench's success is an observed exit status, never inferred from its stdout.  An
+    # earlier revision hard-coded "Exit 0" into the rendered block and counted [FAIL]
+    # without rejecting a nonzero count, so a FAILING bench could be written into the record
+    # and then certified as agreeing with the artefacts.  That is the harness-reports-success
+    # family this whole package exists to stop, in the recorder itself.
+    if ids["bench_exit"] != 0:
+        problems.append(f"the bench exited {ids['bench_exit']}, not 0; its result cannot be "
+                        f"recorded as evidence")
+    if ids["bench_failed"] != 0:
+        problems.append(f"the bench reported {ids['bench_failed']} case(s) not as expected; "
+                        f"its result cannot be recorded as evidence")
+
+    # The base tree is identified in full, not merely diffed against work.  Both trees could
+    # come from the same stale or corrupted freeze and every shared change would be invisible
+    # to a relative diff.
+    total, counted, digest = ids["base_tree"]
+    if (total, counted) != (FREEZE_FILES, FREEZE_FILES_EXCL_MANIFEST):
+        problems.append(f"--base holds {total} files ({counted} excluding manifest.json); "
+                        f"the freeze is {FREEZE_FILES} ({FREEZE_FILES_EXCL_MANIFEST})")
+    if digest != FREEZE_DIGEST:
+        problems.append(f"--base does not reproduce the frozen tree digest: got {digest}, "
+                        f"expected {FREEZE_DIGEST}")
+    if FREEZE_DIGEST not in rr:
+        problems.append("run-record does not state the frozen tree digest")
+
     for rel, bh, wh in ids["files"]:
+        if bh not in rr:
+            problems.append(f"run-record is missing the BASE digest of {rel}: {bh}")
         if wh not in rr:
             problems.append(f"run-record is missing the current digest of {rel}: {wh}")
         if wh[:16] not in rp and wh not in rp:
@@ -200,7 +255,9 @@ def check(ids: dict) -> int:
         return 1
     print(f"records agree with the artefacts: {len(ids['files'])} changed files, "
           f"{len(ids['packages'])} packages, patch {ids['patch_lines']} lines, "
-          f"bench {ids['bench_cases']} cases ({ids['bench_failed']} failed)")
+          f"bench {ids['bench_cases']} cases ({ids['bench_failed']} failed, "
+          f"exit {ids['bench_exit']}), base tree {ids['base_tree'][0]} files / "
+          f"{ids['base_tree'][2][:16]}…")
     return 0
 
 
@@ -211,6 +268,8 @@ def main() -> int:
     ap.add_argument("--bodies", required=True)
     ap.add_argument("--pkg", required=True)
     ap.add_argument("--bench", required=True, help="a file holding the bench's stdout")
+    ap.add_argument("--bench-exit", required=True, type=int,
+                    help="the bench process's OBSERVED exit status, captured directly")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")

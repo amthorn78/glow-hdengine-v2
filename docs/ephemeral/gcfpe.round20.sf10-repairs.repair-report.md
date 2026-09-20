@@ -634,6 +634,49 @@ already matched them.
 **Nothing in the two skills changed this round**, so the patch is unchanged at 378 lines and both
 package digests are unchanged. The defects were in the repository-side instrument, not the package.
 
+### The recorder could certify a failing bench — and two more places it recorded less than it claimed
+
+Three further defects in the record instrument, all found by review, all in code that exists to make
+claims checkable. **None is in the two skills**, so the patch and both package digests are unchanged.
+
+**The P1: the bench's success was synthesised from its stdout, never observed.** `bench_block()`
+wrote the literal string `Exit 0` whatever had happened, and `check()` counted `[FAIL]` results
+without ever rejecting a nonzero count. **A failing bench could therefore be regenerated into the
+record and then certified as agreeing with the artefacts** — the harness-reports-success family this
+entire package exists to stop, sitting in the recorder. The exit status is now a required
+`--bench-exit` argument, captured from the process, and both a nonzero status and any `[FAIL]` are
+refused.
+
+**The base tree was never identified, only diffed.** Only the relative difference between `--base`
+and `--work` was computed, so two trees from the same stale or corrupted freeze would have every
+shared change invisible, and `check()` unpacked each row's **base** digest and discarded it. The
+checker now recomputes the freeze identity — **321 files, 320 excluding `manifest.json`, digest
+`c321be05…`** — and requires it to match, plus both sides of every changed-file row. Worth recording
+that this is only checkable because the freeze recipe hashes paths *relative* to the tree root, so a
+copy reproduces it; verified before the check was written rather than assumed.
+
+**A missing package was silently skipped.** `if not p.is_file(): continue` meant `--check` could
+succeed with one archive or none, and `--write` would **delete the absent rows** from a record that
+claims identities for both deliverables. Both archives are now required by name.
+
+**Five controls, all firing** — the rule that an unfired guard proves nothing, applied for the third
+consecutive round:
+
+| injected | result |
+|---|---|
+| `--bench-exit 1` | **caught** — "cannot be recorded as evidence" |
+| bench stdout carrying one `[FAIL]` | **caught** — the count, and the stdout mismatch |
+| one byte appended to a base-tree file | **caught** — freeze digest and the row's base digest |
+| package directory missing one archive | **caught** — names `flowmaster-validate.skill` |
+| empty package directory | **caught** — names both |
+
+**The pattern across rounds 12, 13 and 14 is one thing said three ways.** Every defect found in this
+instrument was *the instrument recording or checking less than its own documentation claimed*: the
+corpus computed and discarded, `--write` that did not write, the exit status invented, the base tree
+undiffed, the package skipped. The lesson is not "write more checks" but the narrower one this
+package keeps re-teaching: **a value that is computed and not asserted on is not evidence, and a
+guard nobody has fired is not a guard.**
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
