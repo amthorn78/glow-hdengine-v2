@@ -230,8 +230,14 @@ gain is uniformity with the nine roster prompts that carry the field; the cost i
 that can disagree with `artifact_type` and then has to be reconciled by whoever finds the
 disagreement. The PF10 flag is a separate matter, treated in §2.4.
 
-**If the contract drops them.** Nothing breaks immediately; the ambiguity above stays, and the
-next person to touch an approved Specification delta is the one who pays for it.
+**If the contract drops them.** Nothing breaks, immediately or later — and this paragraph
+previously said the opposite. It said "the ambiguity above stays, and the next person to touch an
+approved Specification delta is the one who pays for it," which contradicted the corrected analysis
+directly above it: `artifact_type` already distinguishes the two regimes, and the one distinction it
+does not carry — revised versus initial pending Specification — has no consumer that needs it. The
+old sentence was the conclusion of the *uncorrected* premise, left standing after the premise was
+fixed. Dropping the obligations for these two prompts therefore costs nothing identified; what it
+gives up is uniformity with the nine roster prompts that carry the field.
 
 ### CF-C-20 and CF-E-20 — the weak case
 
@@ -633,10 +639,17 @@ An unfiltered body conclusion means a complete semantic read of roughly 1,060,00
 55 documents. That is a different exercise from this brief and should be commissioned as one if the
 conclusion needs to be exhaustive on both axes.
 
-`SF-05` is the second, not the first. It is a **mechanism gap**: the flow is currently clean and
-there is no guard that would keep it clean automatically. Under D14 that is a real deficiency —
-"no ruling is considered applied until a guard exists that would catch its reintroduction" — but it
-is not an open defect in the prompt flow, and it does not make §11's output wrong.
+`SF-05` is the second, not the first. It is a **mechanism gap**: no guard exists that would catch
+the behaviour's reintroduction, which under D14 is a real deficiency — "no ruling is considered
+applied until a guard exists that would catch its reintroduction."
+
+**Scoped, because the paragraph above earns nothing wider.** What is established is that the
+**declared graph** contains no comparison-stop, exhaustively, and that the filtered body read found
+none. What is *not* established is that no body instructs an undeclared one. So the claim is not
+that the flow is clean; it is that **no defect was found where the evidence is exhaustive, and the
+one axis that is not exhaustive is the axis `SF-05` exists to make mechanical.** On that basis the
+gap does not make §11's output wrong — and if a body does instruct an undeclared comparison-stop,
+neither pass would have caught it, which is an argument for the mechanism rather than against §11.
 
 ## 3.7 Recommendation
 

@@ -48,13 +48,13 @@ recorded below.
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `1a000e3357f452cd…` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `0729657f19f2bdce…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 317 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 327 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -137,15 +137,29 @@ route inventory, a phase description or a prohibition, and the mention nearest i
 points elsewhere, this check passes. The bench asserts that blind spot as its own case rather than
 leaving it to be discovered.
 
-**A routing-section-scoped variant was built, measured and rejected.** Restricting the search to
-sections whose heading names routing, results or handoffs fails **17 of the 166** on bodies that
-are correct — CL-20 declares CL-30 under `## Next step and recovery`, again under
-`## Candidate direct-destination bindings`, and again under `## Direct native branch packages`;
-CL-C-10, CL-E-10, PR-10 and CL-40 do the same under headings of their own. Any heading list that
-admitted all of them would cover most of the document, and writing one is a vocabulary selector —
-the failure mode this ecosystem has paid for repeatedly. **A check that fails on correct bodies is
-worse than one with a stated limit**, so the whole-document form is what is offered, with its limit
-recorded here and asserted in the bench.
+**The stronger check review asked for is not implementable against this input, and the reason is
+categorical.** Review asked me to "parse or structurally delimit the actual handoff binding before
+validating its receiver." **There is no handoff binding in a body to parse.** Measured across all 55:
+the literal `NEXT_PROMPT_HANDOFF` occurs **68 times, every one of them in prose, and zero inside a
+fenced block.** All 68 are sentences of the form *"Every actual nonterminal result ends with exactly
+one fenced `text` block beginning `NEXT_PROMPT_HANDOFF`"* — 30 distinct wordings of that instruction.
+The bodies are **prompts**: they instruct a runtime to *emit* a handoff block. The block exists in
+the run, not in the artifact, and this validator only ever reads the artifact. Parsing the operative
+binding would require an input this check does not have.
+
+**And the 17-of-166 measurement was a symptom I mistook for the reason.** A routing-section-scoped
+variant was built and failed **17 of the 166** on bodies that are correct — CL-20 declares CL-30
+under `## Next step and recovery`, again under `## Candidate direct-destination bindings`, and again
+under `## Direct native branch packages`; CL-C-10, CL-E-10, PR-10 and CL-40 do the same under
+headings of their own. I recorded that count as the rejection's grounds. It is not. **A false-failure
+count says my locator was wrong; it does not establish that the predicate is unreachable** — and
+treating the two as the same thing is precisely the error `SF-05`'s own analysis distinguishes, a
+selector confused with a locator. The measurement above is the actual reason, and it holds however
+the locator is written. The false-failure count survives only as evidence that any heading list wide
+enough would cover most of the document.
+
+**A check that fails on correct bodies is worse than one with a stated limit**, so the whole-document
+form is what is offered, with its limit recorded here and asserted in the bench.
 
 Closing the remaining gap needs per-branch structure a prose body does not carry; it is named as a
 follow-up, not smuggled in as covered.
@@ -323,6 +337,61 @@ directly, both builds fail identically. **This is the second instance this sessi
 exit-capture bug**, the first being a `tail | tr` pipeline, and the second appeared inside the loop
 written to avoid the first.
 
+### `_` joins the boundary class, and the hazard is real rather than hypothetical
+
+Review asked whether `_` belongs in `names_prompt`'s boundary class. It does. The old class was
+`[0-9A-Za-z-]`, so `QA-10_RECEIVER` satisfied a branch routing to `QA-10` — the `QA-100` failure
+again, one character over.
+
+**Measured, because "could happen" is not evidence.** The corpus contains **54 underscore-adjacent
+prompt-id occurrences**, and they are not contrived: `PR_RETURN_PHASE` values are written
+`PR-30_PREPUBLICATION` and `PR-30_POSTPUBLICATION` across eight bodies, and OPS-20 and OPS-30 write
+`NOT_PRODUCED_BY_OPS-20` / `-30`. Those are enum values, not routing mentions. A body whose last
+plain `PR-30` was edited away while its enum tokens stayed would have passed.
+
+**And it flips nothing today.** Of the **166 declared receiver checks**, adding `_` to the class
+changes **zero** verdicts in either direction — the end-to-end output is byte-identical to the run
+before the change. So this closes a reachable hole at no behavioural cost, which is the only kind of
+safety change that needs no argument.
+
+The new bench case buries **ESC-40**'s five complete `PR-30` mentions inside the real enum token.
+ESC-40 is the subject because it is real on both halves: it declares `PR-30` as a receiver *and*
+already carries six `PR-30_` tokens, so after the mutation it is a body that discusses
+`PR-30_PREPUBLICATION` constantly and never names `PR-30`. **My first version of this case used
+CL-E-20, which does not declare `PR-30` at all** — the fixture would have asserted an error the
+validator had no reason to emit. Caught by checking the declared-receiver set before running, not
+after.
+
+No second `FLOWMASTER_VALIDATE_REVISION` bump: the package is unreleased and 3.2.6 → 3.2.7 already
+distinguishes it from every installed build, so one bump covers the round.
+
+### Two failures of my own this round, both caught by counting rather than by reading
+
+**I shipped bytecode into a package.** The measurement scripts that imported the validator to count
+receiver checks ran **without `PYTHONDONTWRITEBYTECODE=1`**, and Python wrote
+`flowmaster-validate/scripts/__pycache__/*.pyc` into the working copy. The rebuild packaged them:
+`flowmaster-validate.skill` came out at **31 files and 342177 bytes** instead of 29 and ~271k. The
+file count is what exposed it. Cleaned, rebuilt, and re-verified at 29 files with exactly nine files
+differing from base and no binary entries in the patch. **The installed tree was never involved** —
+the contamination was in the scratch copy — but the rule that was broken is the one that exists to
+prevent exactly this, and it was broken in the scripts I wrote to check someone else's finding.
+
+**I nearly reported the frozen tree as altered.** Measuring the freeze from `/root/.claude/skills`
+gave **323 files** and a digest of `4779ca6a…` against the recorded `c321be05…`. The tree is fine:
+the freeze is rooted at `synced/<bucket-id>/`, and my path included `session-start-hook/SKILL.md`
+and a `.bucket-…` marker that live outside it. Measured at the correct root: **321 files, digest
+`c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb`, 0 `.pyc`** — and the only file
+with an mtime after the v11 install is `manifest.json`, which the freeze excludes by construction.
+**A wrong root is not a changed tree**, and the same discipline that stops a failed grep becoming a
+file defect applies to a digest.
+
+For the record, since I had to rediscover them: the D8/D15 guard block is `_addendum_paths`,
+`_ambiguous_addendum_keys`, `pf10_addendum_contract_key_drift` and `addendum_list_value_drift`.
+Verified identical in **all four copies** — both skills, both builds — at 7355 characters and md5
+`46c69eaf8f00672e44f8502bbf43c721`. My first parity script guessed four other function names, found
+none of them, and produced md5 `d41d8cd9…` — the hash of the empty string. That is a harness
+returning a confident answer about nothing, and it is not credited anywhere.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
@@ -331,7 +400,7 @@ those same copies. All of it reproduced: 12 → 10 with the 10 exactly `SF10-07`
 crashing on the installed build with `ValueError: Mutation anchor absent: reject-source-epic-to-crd`
 and clean at 164/0 on the repaired one; 140/0 on both contract suites; `validate_flowmaster.py`
 exit 0 on both; the `change-flow` contract validator exit 0 with byte-identical stdout on both; and
-the bench at twelve cases, exit 0, with the corpus gate confirming all 55 registry digests. The
+the bench at thirteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
 end-to-end outputs are 6179 and 6104 bytes, the same sizes as the first sweep.
 
 **Two of my own invocation errors during that re-run, recorded so they are not read as results.**
@@ -354,7 +423,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, **twelve cases, exit 0**. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **thirteen cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -418,8 +487,8 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 
 | package | files | bytes | sha256 |
 |---|---|---|---|
-| `change-flow.skill` | 21 | 241915 | `8dab0fdd359acd0c0081777fa41fd922012483e1e3165e205f6d0cbfd62f27d3` |
-| `flowmaster-validate.skill` | 29 | 270717 | `153c3c45cdf2bde01f937d827f5ebe542ebfb0545fcc5d3218b8b7f0cbe1d1d6` |
+| `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
+| `flowmaster-validate.skill` | 29 | 271571 | `d49a15da8b88cb93f150233f11958ede23c24f476c871b0134a6d72fe7858f9f` |
 
 The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
 3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation

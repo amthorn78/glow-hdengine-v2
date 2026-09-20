@@ -127,7 +127,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
              "skills": {},
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 21:33:29.225150556 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:00:40.060421328 +0000
 @@ -953,7 +953,7 @@
      errors += subset_errors(profile, {
          "schema_version": "gcfpe-validation-profile/1.0",
@@ -194,7 +194,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
              errors.append("QA_PASS_BODY_CLASS_MAP")
      if ("class evidence is missing or conflicting" not in producer
              or "without a closure handoff" not in producer
-@@ -1974,6 +2005,28 @@
+@@ -1974,6 +2005,38 @@
      return sorted(set(errors))
  
  
@@ -215,15 +215,25 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +    routing to `QA-10`.  That is the only prefix collision among the 55 member ids, and
 +    one is enough.  Boundaries reject a leading or trailing identifier character rather
 +    than relying on `\b`, which treats `-` as a boundary and so would not help.
++
++    `_` is in the boundary class, and that is not decoration.  The corpus writes
++    `PR_RETURN_PHASE` enum values as `PR-30_PREPUBLICATION` and `PR-30_POSTPUBLICATION`,
++    and states a non-production outcome as `NOT_PRODUCED_BY_OPS-20`.  Those are enum
++    tokens, not routing mentions.  Without `_` in the class, a body whose only remaining
++    `PR-30` text sat inside `PR-30_PREPUBLICATION` would satisfy a branch routing to
++    `PR-30` -- the `QA-100` failure again, with a token the corpus really contains.
++    Measured on the 55-body corpus: 54 such underscore-adjacent occurrences exist, and
++    adding `_` to the class flips none of the 166 declared receiver checks, so this
++    closes a reachable hole without changing a single current verdict.
 +    """
 +
-+    return re.search(rf"(?<![0-9A-Za-z-]){re.escape(prompt_id)}(?![0-9A-Za-z-])", text) is not None
++    return re.search(rf"(?<![0-9A-Za-z_-]){re.escape(prompt_id)}(?![0-9A-Za-z_-])", text) is not None
 +
 +
  def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
      errors: list[str] = []
      hashes: dict[str, str] = {}
-@@ -2023,9 +2076,40 @@
+@@ -2023,9 +2086,40 @@
              for row in (contract.get("state_routes", {}).get(prompt_id, []))
              if isinstance(row, dict) and row.get("public_result") is True
          ]

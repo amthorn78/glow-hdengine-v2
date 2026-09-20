@@ -252,6 +252,34 @@ def collide_receiver_prefix(prompt_id, receiver, longer):
     return f
 
 
+def bury_receiver_in_enum_token(prompt_id, receiver, enum_suffix):
+    """Replace every complete `receiver` token with `receiver + enum_suffix`.
+
+    Models the underscore hazard with a token the corpus really contains: the bodies
+    write `PR_RETURN_PHASE` values as `PR-30_PREPUBLICATION`, which is an enum value and
+    not a routing mention.  If `_` were absent from the boundary class, a body whose only
+    remaining `PR-30` text sat inside that token would satisfy a branch routing to
+    `PR-30`.  The fixture asserts afterwards that the receiver survives as a substring
+    but no longer as a complete identifier, so a fire cannot be explained by the name
+    having simply disappeared and a miss cannot be explained by the mutation not landing.
+    """
+    def f(data):
+        buried = receiver + enum_suffix
+        text = re.sub(rf"(?<![0-9A-Za-z_-]){re.escape(receiver)}(?![0-9A-Za-z_-])",
+                      buried, data["bodies"][prompt_id])
+        if receiver not in text:
+            die(f"fixture invalid: {receiver} is not even a substring of {prompt_id} "
+                f"after burial, so the hazard is not modelled")
+        if buried not in text:
+            die(f"fixture invalid: {buried} is absent from {prompt_id}, so the mutation "
+                f"did not land")
+        if re.search(rf"(?<![0-9A-Za-z_-]){re.escape(receiver)}(?![0-9A-Za-z_-])", text):
+            die(f"fixture invalid: {prompt_id} still names {receiver} as a complete "
+                f"identifier, so a passing check would be correct rather than blind")
+        data["bodies"][prompt_id] = text
+    return f
+
+
 def break_class_map_receiver(data):
     data["bodies"]["QA-120"] = data["bodies"]["QA-120"].replace("`CL-E-10 —", "`CL-E-40 —")
 
@@ -339,12 +367,36 @@ def main() -> int:
          collide_receiver_prefix("MGR-10", "QA-10", "QA-100"), handoff_errors,
          ["PROMPT_HANDOFF_RECEIVER:MGR-10:QA-10"], bodies_dir=bodies, registry=registry)
 
+    print("\n=== SF10-06 — `_` is an identifier character too ===")
+    print("  Review asked whether `_` belongs in the boundary class. It does, and the corpus")
+    print("  proves it rather than a hypothetical: `PR_RETURN_PHASE` values are written")
+    print("  `PR-30_PREPUBLICATION` and `PR-30_POSTPUBLICATION`, and OPS-20 writes")
+    print("  `NOT_PRODUCED_BY_OPS-20` -- 54 underscore-adjacent prompt-id occurrences in all.")
+    print("  Those are enum tokens, not routing mentions. ESC-40 is the subject because it is")
+    print("  real on both halves: it declares PR-30 as a receiver AND already carries six")
+    print("  `PR-30_` enum tokens beside its five complete mentions. Burying those five leaves")
+    print("  a body that discusses `PR-30_PREPUBLICATION` constantly and never names PR-30 --")
+    print("  the exact shape of the hazard, not an invented one. Adding `_` to the class flips")
+    print("  none of the 166 declared receiver checks on the clean corpus, so this closes a")
+    print("  reachable hole without moving a single current verdict.")
+    case("repaired build catches a receiver buried in an enum token (ESC-40 -> PR-30)", work,
+         bury_receiver_in_enum_token("ESC-40", "PR-30", "_PREPUBLICATION"), handoff_errors,
+         ["PROMPT_HANDOFF_RECEIVER:ESC-40:PR-30"], bodies_dir=bodies, registry=registry)
+
     print("\n=== SF10-06 — the predicate's remaining limit, asserted rather than hidden ===")
     print("  The check asserts that each declared receiver is NAMED in the body. It does not")
     print("  bind that name to the operative handoff, so retargeting PR-30's last mention of")
     print("  PR-35 to PR-40 -- while its earlier mentions stay -- is NOT caught. The case")
-    print("  below asserts that blind spot so it cannot be mistaken for coverage; see the")
-    print("  report for why a routing-section-scoped variant was measured and rejected.")
+    print("  below asserts that blind spot so it cannot be mistaken for coverage.")
+    print("  Review asked for the stronger check: parse the operative handoff and validate")
+    print("  its receiver. It is not implementable against this input, and the reason is")
+    print("  categorical rather than a tuning problem. Measured over the 55 bodies: all 68")
+    print("  NEXT_PROMPT_HANDOFF occurrences are PROSE, and zero are inside a fenced block.")
+    print("  The bodies are prompts -- they instruct a runtime to EMIT a handoff block; the")
+    print("  block does not exist until the prompt runs, and this validator never sees a run.")
+    print("  There is no operative binding in the artifact to parse. An earlier note here")
+    print("  justified the limit by a 17-of-166 false-failure count from one scoped variant;")
+    print("  that was a symptom, and this is the cause.")
     case("retargeting the last mention is NOT caught (known limit)", work,
          swap_operative_receiver("PR-30", "PR-35", "PR-40"), handoff_errors, [], bodies_dir=bodies, registry=registry)
 
