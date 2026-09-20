@@ -133,10 +133,15 @@ def case(name, tree, mutate, predicate, expect, *, bodies_dir, registry):
     mod = load(tree)
     try:
         data = {"bodies": read_bodies(bodies_dir, registry), "contract": read_contract(tree)}
-        before = json.dumps(data["bodies"], sort_keys=True)
+        # The landed-mutation guard must cover BOTH halves of the input.  It hashed only
+        # the bodies until a contract-mutating case existed, at which point it misfired on
+        # a mutation that had in fact landed -- and, worse, would have scored a
+        # contract-mutating case that changed nothing at all.  No case exercised that path
+        # before, which is exactly how a half-built guard survives.
+        before = json.dumps(data, sort_keys=True, default=repr)
         if mutate is not None:
             mutate(data)
-            if json.dumps(data["bodies"], sort_keys=True) == before:
+            if json.dumps(data, sort_keys=True, default=repr) == before:
                 die(f"{name}: mutation changed nothing")
     except SystemExit:
         raise
@@ -280,6 +285,34 @@ def bury_receiver_in_enum_token(prompt_id, receiver, enum_suffix):
     return f
 
 
+def corrupt_destination_element(prompt_id, bad_element, label):
+    """Put one malformed element into a real nonterminal-public row's `destinations`.
+
+    The container was already validated; the elements were not.  A non-string scalar is
+    silently absent from `EXPECTED_MEMBERS` and skipped without a word, and an unhashable
+    element -- a dict or a list -- makes the membership test raise `TypeError`, aborting
+    body validation rather than reporting a contract defect.  Both must instead surface as
+    the structured `MALFORMED_DESTINATIONS` the code already promises.
+
+    The fixture asserts it found a real row and actually changed it, so a passing case
+    cannot be a mutation that never landed.
+    """
+    def f(data):
+        rows = [r for r in data["contract"].get("state_routes", {}).get(prompt_id, [])
+                if isinstance(r, dict) and r.get("public_result") is True
+                and isinstance(r.get("destinations"), list) and r["destinations"]]
+        if not rows:
+            die(f"fixture invalid: {prompt_id} has no public row with a non-empty "
+                f"destinations list, so {label} cannot be modelled")
+        row = rows[0]
+        before = list(row["destinations"])
+        row["destinations"] = [bad_element] + before[1:]
+        if row["destinations"] == before:
+            die(f"fixture invalid: {prompt_id}'s destinations are unchanged, so the "
+                f"{label} mutation did not land")
+    return f
+
+
 def break_class_map_receiver(data):
     data["bodies"]["QA-120"] = data["bodies"]["QA-120"].replace("`CL-E-10 —", "`CL-E-40 —")
 
@@ -382,6 +415,22 @@ def main() -> int:
     case("repaired build catches a receiver buried in an enum token (ESC-40 -> PR-30)", work,
          bury_receiver_in_enum_token("ESC-40", "PR-30", "_PREPUBLICATION"), handoff_errors,
          ["PROMPT_HANDOFF_RECEIVER:ESC-40:PR-30"], bodies_dir=bodies, registry=registry)
+
+    print("\n=== SF10-06 — malformed route data fails closed through the structured path ===")
+    print("  The container was validated; the elements were not. Review found the gap and")
+    print("  understated it: an int element is silently absent from EXPECTED_MEMBERS and")
+    print("  skipped without a word, and BOTH a dict and a list element raise")
+    print("  `TypeError: unhashable type` from the membership test -- which aborts body")
+    print("  validation entirely rather than reporting a contract defect. That is the same")
+    print("  crash-instead-of-verdict shape as the installed build's fixture-suite failure.")
+    print("  All three now surface as MALFORMED_DESTINATIONS, which is what the code already")
+    print("  promised. The subject is a real ESC-40 public row, not a synthetic contract.")
+    for bad, label in ((7, "a non-string scalar"), ({"prompt": "PR-30"}, "an unhashable dict"),
+                       (["PR-30"], "an unhashable list")):
+        case(f"repaired build reports MALFORMED_DESTINATIONS for {label}", work,
+             corrupt_destination_element("ESC-40", bad, label), handoff_errors,
+             ["PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS"],
+             bodies_dir=bodies, registry=registry)
 
     print("\n=== SF10-06 — the predicate's remaining limit, asserted rather than hidden ===")
     print("  The check asserts that each declared receiver is NAMED in the body. It does not")

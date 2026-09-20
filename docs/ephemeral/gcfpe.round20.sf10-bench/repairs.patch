@@ -127,7 +127,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
              "skills": {},
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:00:40.060421328 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:11:32.545283710 +0000
 @@ -953,7 +953,7 @@
      errors += subset_errors(profile, {
          "schema_version": "gcfpe-validation-profile/1.0",
@@ -233,7 +233,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
  def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
      errors: list[str] = []
      hashes: dict[str, str] = {}
-@@ -2023,9 +2086,40 @@
+@@ -2023,9 +2086,51 @@
              for row in (contract.get("state_routes", {}).get(prompt_id, []))
              if isinstance(row, dict) and row.get("public_result") is True
          ]
@@ -266,10 +266,21 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +        if nonterminal_public:
 +            for row in nonterminal_public:
 +                destinations = row.get("destinations")
++                # Both the container and every element are validated before any set
++                # membership test.  Element validation is not defensive noise: an
++                # unhashable element (a dict or a list) makes `destination in
++                # EXPECTED_MEMBERS` raise `TypeError: unhashable type`, which aborts
++                # body validation entirely instead of reporting a contract defect, and
++                # a non-string scalar such as an int is silently absent from the set
++                # and so skipped without a word.  Either way malformed route data
++                # would escape the structured path this error code exists to provide.
 +                if destinations is not None and not isinstance(destinations, list):
 +                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
 +                    continue
-+                for destination in (destinations or []):
++                if any(not isinstance(destination, str) for destination in (destinations or [])):
++                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
++                    continue
++                for destination in destinations or []:
 +                    if destination in EXPECTED_MEMBERS and not names_prompt(text, destination):
 +                        errors.append(
 +                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"

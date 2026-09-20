@@ -48,13 +48,13 @@ recorded below.
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `0729657f19f2bdce…` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `36c3465ffe3e1791…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 327 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 338 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -392,6 +392,34 @@ Verified identical in **all four copies** — both skills, both builds — at 73
 none of them, and produced md5 `d41d8cd9…` — the hash of the empty string. That is a harness
 returning a confident answer about nothing, and it is not credited anywhere.
 
+### Malformed route data now fails closed, and one of its two shapes was a crash
+
+Review found that the `destinations` guard validated only the **container**, never the elements, so
+the `MALFORMED_DESTINATIONS` code did not cover what it appeared to. Measured, and it is worse than
+the finding said:
+
+| element | before | after |
+|---|---|---|
+| a non-string scalar, e.g. `7` | absent from `EXPECTED_MEMBERS`, **silently skipped** | `MALFORMED_DESTINATIONS` |
+| an unhashable **dict** | `TypeError: unhashable type: 'dict'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
+| an unhashable **list** | `TypeError: unhashable type: 'list'` — **aborts body validation** | `MALFORMED_DESTINATIONS` |
+
+The finding named the dict; **a list is unhashable too**, so there were two crash shapes rather than
+one. And a crash here is the same failure the installed build already has in its fixture suite:
+**an abort instead of a verdict**, which is strictly worse than a reported defect because it takes
+the whole validation down with it. Every element is now checked for `str` before any membership test.
+
+This was the only site at risk. I grepped the other set-membership tests in the changed file — they
+take `prompt_id` or `path.stem`, which are filenames and always strings — and `qa_pass_class_rows`
+operates on regex groups, which are strings by construction. One site, and it was mine.
+
+**The bench's own landed-mutation guard was half-built, and these cases exposed it.** The guard
+hashed `data["bodies"]` only. The first contract-mutating case legitimately leaves the bodies
+untouched, so the guard reported `mutation changed nothing` for a mutation that had landed — and,
+read the other way, it **would have scored a contract-mutating case that changed nothing at all.**
+No case had exercised that path before, which is exactly how a half-built guard survives being
+written. It now hashes the whole input, bodies and contract together.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
@@ -400,7 +428,7 @@ those same copies. All of it reproduced: 12 → 10 with the 10 exactly `SF10-07`
 crashing on the installed build with `ValueError: Mutation anchor absent: reject-source-epic-to-crd`
 and clean at 164/0 on the repaired one; 140/0 on both contract suites; `validate_flowmaster.py`
 exit 0 on both; the `change-flow` contract validator exit 0 with byte-identical stdout on both; and
-the bench at thirteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
+the bench at sixteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
 end-to-end outputs are 6179 and 6104 bytes, the same sizes as the first sweep.
 
 **Two of my own invocation errors during that re-run, recorded so they are not read as results.**
@@ -423,7 +451,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, **thirteen cases, exit 0**. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **sixteen cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -488,7 +516,7 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 271571 | `d49a15da8b88cb93f150233f11958ede23c24f476c871b0134a6d72fe7858f9f` |
+| `flowmaster-validate.skill` | 29 | 271831 | `87c473c5f57ad0cf0eff0b6f67bf2ad65668f44a7d13f67d904d149c07748d07` |
 
 The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
 3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation
