@@ -179,7 +179,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
          if prompt_id in EXPECTED_PRODUCERS:
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-20 20:12:29.354780920 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-20 20:21:08.971360355 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py	2026-09-20 20:40:14.576213792 +0000
 @@ -15,8 +15,13 @@
      return [] if contract.get('artifact_availability_contract') == EXPECTED_POLICY else ['ARTIFACT_AVAILABILITY_CONTRACT']
  
@@ -207,7 +207,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py work
 +        # helper raised on IA-10 and the timing fixtures could not run.  Matching any
 +        # heading whose title names inputs tracks the corpus instead of one phrasing;
 +        # it selects the same section in every case where the narrow form worked.
-+        match=re.search(r'(?m)^## [^\n]*[Ii]nputs[^\n]*\n',changed[id])
++        match=re.search(r'(?m)^## [^\n]*[Ii]nputs?\b[^\n]*\n',changed[id])
          if not match:raise ValueError('Native intake anchor missing: '+id)
          changed[id]=changed[id][:match.end()]+append+'\n'+changed[id][match.end():]
          found=validate_artifact_timing_bodies(changed)

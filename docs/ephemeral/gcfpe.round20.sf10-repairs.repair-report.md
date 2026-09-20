@@ -44,7 +44,7 @@ digest and all 55 body digests, is identical between the installed and repaired 
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `66999a2160b6bbab…` |
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `5716f631915d9333…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
-| `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `f68dae449829758c…` |
+| `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `2fde743a31cc3a90…` |
 
 The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 213 lines.
@@ -201,8 +201,17 @@ therefore **could not fail** for those five. Across all 55 bodies the locator is
 The fixtures existed to catch exactly this and could not, because they crashed first.
 
 **The repair.** Both locators — the fixture mutation helper and `_inputs()` — now match any
-heading whose title names inputs. Verified: the widened form selects the same section in every
-case where the narrow form worked, and matches exactly once per body.
+heading whose title names inputs, **singular or plural**: `## [^\n]*[Ii]nputs?\b`. Verified: the
+widened form selects the same section in every case where the narrow form worked, and matches
+exactly once per body.
+
+**A first version of this repair left the two locators unaligned**, and review caught it. `_inputs()`
+took `inputs?` while the fixture helper still required the plural, so the helper would raise
+`Native intake anchor missing` on a body the production validator supports. That is live rather than
+hypothetical: **OPS-20 is headed `## Sole substantive input` and PR-20 carries
+`## Authoritative PF10 and overlay input`** — and `Required input` was in the original narrow list,
+so the singular form is supported by design. The report had claimed both locators were aligned when
+they were not. They are now, by the same regex.
 
 **This is not the "widen the word list" mistake.** A forbidden-vocabulary list is a safety
 predicate, and widening it buys one round because the next paraphrase walks through. These are
@@ -293,7 +302,7 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241805 | `8e8f366af1f42a6f2ac8275f88c75452496c1c4bed77eb264cdc58ca77bb4fff` |
-| `flowmaster-validate.skill` | 29 | 269957 | `9d874758cd35c62cc375546b4c7af596cdf8016b3bd8ccf81238a887f7de5f48` |
+| `flowmaster-validate.skill` | 29 | 269958 | `6e76b359c7ccfbe6f5d6c9c768ba9910ea7a9ccbf29588d6609ed649f64cc8fd` |
 
 The validator asserts its own revision against the profile's, so **3.2.6 → 3.2.7 moves in five
 places together**: `flowmaster-validate/SKILL.md`, the validation profile, `validate_gcfpe_20260914.py`,
