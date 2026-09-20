@@ -186,8 +186,13 @@ bytes; they do not let a clean checkout obtain the bodies.
 # 1. the bench, and the record.  The recorder RUNS the bench and observes its stdout and
 #    its exit status, so neither can be asserted by the caller; --write regenerates the
 #    generated sections of this file and --check recomputes every identity and fails on drift.
+# regenerate this file's generated sections from the artefacts
 python3 docs/ephemeral/gcfpe.round20.sf10-bench/make_run_record.py \
-    --base prep/base --work prep/work --bodies $B --pkg prep/pkg (--write | --check)
+    --base prep/base --work prep/work --bodies $B --pkg prep/pkg --write
+
+# verify every identity against the artefacts and fail on drift (this is the run recorded below)
+python3 docs/ephemeral/gcfpe.round20.sf10-bench/make_run_record.py \
+    --base prep/base --work prep/work --bodies $B --pkg prep/pkg --check
 
 #    the bench can also be run directly; no env var is needed, since it sets
 #    sys.dont_write_bytecode itself

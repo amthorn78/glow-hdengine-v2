@@ -394,10 +394,25 @@ You asked to understand the issue before directing a mechanism. The single most 
 §3.6, and it is stated there with its exact scope, which this opening now matches rather than
 rounding up:
 
-> **The declared graph contains no PF10-comparison stop** — established by reading all 72 terminal
-> branches, with no selection of any kind. **A filtered read of all 55 bodies found none either**, and
-> RS-40 explicitly forbids the behaviour in its own text. But the body pass is a filter, not an
+> **The declared graph contains no PF10-comparison stop** — established by reading **all 101 rows
+> the rule covers**: the 72 terminal branches and the 29 non-terminal rows in a blocking state, with
+> no selection of any kind. **A filtered read of all 55 bodies found none either**, and RS-40
+> explicitly forbids the behaviour in its own text. But the body pass is a filter, not an
 > enumeration, so **it is not proof that no body instructs an undeclared comparison-stop.**
+
+**Corrected after review, and the correction matters more than the number.** This said "all 72
+terminal branches" and called that exhaustive. The rule stated three paragraphs above covers a branch
+that is terminal **or emits a blocking result** — so 72 was one arm of a two-arm predicate, and 29
+non-terminal rows in a blocking state (`BLOCKED`, `AWAITING_THOTH_REMEDIATION`,
+`RESCOPE_PROPOSAL_PENDING_REVIEW`, `PLAN_PENDING_REVISED`, `AWAITING_PO_PROCEED`) were never read.
+Claiming "no selection of any kind" while silently selecting on one arm was the strongest evidential
+claim in this brief and it was wrong.
+
+Those 29 have now been read in full. **Exactly one mentions PF10 at all**, and it is a *prohibition*,
+not a comparison: RS-30's `product_owner_explicit_native_return` branch reads *"never invent IA
+approval, route PR-50 or bypass Alpha, merge or PF10 controls."* **Zero pair PF10 with comparison
+language.** So the conclusion is unchanged and the graph axis is now genuinely complete at 101 rows —
+but it was asserted before it was earned.
 
 `SF-05` is therefore best described as **a gap in what the available mechanisms can express**, on
 evidence that is exhaustive for the graph and bounded for the bodies. An earlier version of this
@@ -611,7 +626,7 @@ Two separate questions were being answered as one:
 
 | question | answer |
 |---|---|
-| Does the **declared graph** implement the prohibited PF10-comparison gate anywhere? | **No**, on a complete enumeration of all 72 terminal branches — see below. |
+| Does the **declared graph** implement the prohibited PF10-comparison gate anywhere? | **No**, on a complete enumeration of all **101** rows the rule covers — 72 terminal branches and 29 non-terminal blocking rows — see below. |
 | Does any **prompt body** instruct one? | **None found**, on a filtered read of all 55 bodies — 34 candidate passages, all read. Filtered, so not exhaustive; the limit is stated below. |
 | Can the registry, or the graph as currently typed, express the rule that would catch one if it appeared? | **No.** The registry's mechanism is regex over prose; the graph's `condition` is also prose. A typed field would be needed, per Option A. |
 
@@ -620,8 +635,15 @@ this brief selected branches by regex over `condition` — "names PF10, Build No
 and reported 37 hits. That is a vocabulary selector, so a paraphrased comparison could have escaped
 the selection and the clean result would have been an artefact of the filter.
 
-The defect can only live in a branch that **stops**, and there are exactly **72 terminal branches**
-in the graph. All 72 were printed and read in full, with no selection of any kind.
+The defect can only live in a branch that **stops or blocks** — and those are two different row
+shapes, which an earlier version of this section conflated. There are **72 terminal branches** and
+**29 non-terminal rows in a blocking state**: `BLOCKED`, `AWAITING_THOTH_REMEDIATION`,
+`RESCOPE_PROPOSAL_PENDING_REVIEW`, `PLAN_PENDING_REVISED`, `AWAITING_PO_PROCEED`. **All 101 were
+printed and read in full, with no selection of any kind.**
+
+Of the 29 non-terminal blocking rows, exactly one mentions PF10, and as a prohibition rather than a
+comparison — RS-30's `product_owner_explicit_native_return`: *"never invent IA approval, route PR-50
+or bypass Alpha, merge or PF10 controls."* None pairs PF10 with comparison language.
 
 Most conditions are **disjunctive** — they list several alternative stop reasons in one branch — so
 they do not partition into disjoint buckets, and any single tally of them would be invented
@@ -682,7 +704,7 @@ the 34. So the two passes are not equally strong, and the brief does not claim t
 
 | pass | strength |
 |---|---|
-| the declared graph's 72 terminal branches | **exhaustive** — every row read, no selection |
+| the declared graph's 101 stopping-or-blocking rows (72 terminal + 29 blocking) | **exhaustive** — every row read, no selection |
 | the 55 bodies | **filtered** — 34 passages read; a paraphrase avoiding the stop-word list could escape it |
 
 An unfiltered body conclusion means a complete semantic read of roughly 1,060,000 characters across

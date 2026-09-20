@@ -50,6 +50,33 @@ def sha(p: pathlib.Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
+def canonical_patch(text: str, base: pathlib.Path = None, work: pathlib.Path = None) -> str:
+    """A patch's content without its per-run mtimes.
+
+    `diff -ru` writes `--- base/path\t<mtime>` and `+++ work/path\t<mtime>`, so two runs over
+    identical trees produce different bytes.  Dropping the tab-separated timestamp leaves the
+    part that is actually the change, which is what the committed patch is supposed to be.
+    """
+    subs = []
+    if base is not None:
+        subs.append((str(pathlib.Path(base)).rstrip("/"), "base"))
+    if work is not None:
+        subs.append((str(pathlib.Path(work)).rstrip("/"), "work"))
+    out = []
+    for line in text.splitlines():
+        if line.startswith(("--- ", "+++ ")) and "\t" in line:
+            line = line.split("\t", 1)[0]
+        # How the trees were ADDRESSED is not part of the change.  The committed patch was
+        # generated from a parent directory with relative `base`/`work` arguments; regenerating
+        # with absolute paths produced different header text and the comparison failed on a
+        # difference that was not a difference.  Normalising both sides to the same tokens is
+        # what makes the content comparison mean what it claims.
+        for actual, token in subs:
+            line = line.replace(actual, token)
+        out.append(line)
+    return "\n".join(out)
+
+
 def tree_identity(root: pathlib.Path) -> tuple[int, int, str]:
     """Total files, files excluding manifest.json, and the freeze digest of `root`."""
     files = sorted(q for q in root.rglob("*") if q.is_file())
@@ -88,8 +115,10 @@ def differing(base: pathlib.Path, work: pathlib.Path) -> list[tuple[str, str, st
     if proc.returncode != 1:
         raise SystemExit(f"diff -rq failed with status {proc.returncode}: "
                          f"{proc.stderr.strip() or 'no stderr'}")
-    rows, one_sided = [], []
+    rows, one_sided, unparsed = [], [], []
     for line in proc.stdout.splitlines():
+        if not line.strip():
+            continue
         m = re.match(r"Files (.+) and (.+) differ", line)
         if m:
             rel = str(pathlib.Path(m.group(1)).relative_to(base))
@@ -97,9 +126,21 @@ def differing(base: pathlib.Path, work: pathlib.Path) -> list[tuple[str, str, st
             continue
         if line.startswith("Only in "):
             one_sided.append(line)
+            continue
+        # Anything else is refused rather than ignored.  `diff -rq` has output shapes beyond
+        # "Files ... differ" and "Only in ...": a file-type change prints "File X is a regular
+        # file while file Y is a directory", and symlink or unreadable-file notices print their
+        # own forms.  The old parser recognised two shapes and let every other line fall through
+        # silently, so a roster missing a real difference was certified from the rows that did
+        # parse.  Recognising some inputs and ignoring the rest is the same defect as accepting
+        # a subprocess's output without its status.
+        unparsed.append(line)
     if one_sided:
         raise SystemExit("the trees differ by added or deleted files, which the reviewed "
                          "package does not contain:\n  " + "\n  ".join(one_sided))
+    if unparsed:
+        raise SystemExit("diff -rq produced output this parser does not recognise; refusing to "
+                         "certify a possibly incomplete roster:\n  " + "\n  ".join(unparsed))
     if not rows:
         raise SystemExit("diff reported a difference but no changed files were parsed; "
                          "refusing to record an empty roster")
@@ -147,17 +188,38 @@ def run_bench(args) -> tuple[str, int]:
 
 
 def identities(args) -> dict:
+    """Gather every identity, and REFUSE any input that is not what it claims to be.
+
+    This is the single gate both `--write` and `--check` pass through, and that placement is
+    the point.  Input validation used to sit wherever it was first written -- the freeze
+    count and digest were asserted in `check()` only, so `--write` could derive changed-file
+    rows from a stale or modified base tree and still return success, leaving the record's
+    fixed base identity in place.  The same mistake had already been found once and fixed
+    once, for the bench refusal, and not propagated to its siblings.  Validating an input
+    where it enters, rather than in whichever mode happened to grow the check, is what stops
+    that recurring.
+    """
     base, work = pathlib.Path(args.base), pathlib.Path(args.work)
     pkg = pathlib.Path(args.pkg)
     bodies = sorted(pathlib.Path(args.bodies).glob("*.md"))
     bench, bench_exit = run_bench(args)
+
     total, counted, digest = tree_identity(base)
+    if (total, counted) != (FREEZE_FILES, FREEZE_FILES_EXCL_MANIFEST):
+        raise SystemExit(f"--base holds {total} files ({counted} excluding manifest.json); the "
+                         f"freeze is {FREEZE_FILES} ({FREEZE_FILES_EXCL_MANIFEST})")
+    if digest != FREEZE_DIGEST:
+        raise SystemExit(f"--base does not reproduce the frozen tree digest: got {digest}, "
+                         f"expected {FREEZE_DIGEST}")
+
     ids = {
         "base_tree": (total, counted, digest),
         "files": differing(base, work),
         "bodies": [(p.stem, sha(p), p.stat().st_size) for p in bodies],
         "packages": [],
         "patch_lines": len(PATCH.read_text(encoding="utf-8").splitlines()),
+        "patch_sha": hashlib.sha256(
+            canonical_patch(PATCH.read_text(encoding="utf-8"), base, work).encode()).hexdigest(),
         "bench_cases": bench.count("[PASS]") + bench.count("[FAIL]"),
         "bench_failed": bench.count("[FAIL]"),
         "bench_exit": bench_exit,
@@ -171,9 +233,35 @@ def identities(args) -> dict:
         raise SystemExit(f"missing package artefact(s) in {pkg}: {', '.join(missing)}")
     for name in EXPECTED_PACKAGES:
         p = pkg / name
-        listing = subprocess.run(["unzip", "-Z1", str(p)], capture_output=True, text=True).stdout
-        count = sum(1 for x in listing.splitlines() if not x.endswith("/"))
+        # The archive must be READABLE, not merely present.  `unzip -Z1` exits nonzero on a
+        # corrupt or non-ZIP file and prints nothing, and treating that empty stdout as a
+        # zero-file package let an unusable deliverable be recorded successfully.  Existence
+        # was enforced; integrity was not.
+        listing = subprocess.run(["unzip", "-Z1", str(p)], capture_output=True, text=True)
+        if listing.returncode != 0:
+            raise SystemExit(f"{name} is present but not a readable archive (unzip exited "
+                             f"{listing.returncode}): {listing.stderr.strip() or 'no stderr'}")
+        count = sum(1 for x in listing.stdout.splitlines() if not x.endswith("/"))
+        if count == 0:
+            raise SystemExit(f"{name} contains no files; refusing to record an empty package")
         ids["packages"].append((name, count, p.stat().st_size, sha(p)))
+
+    # The committed patch must BE the diff of the supplied trees, not merely have the same
+    # number of lines.  The report calls it the complete change and the only repository-resident
+    # substitute for the trees, which cannot be committed -- so a stale or substituted patch
+    # sends a reviewer to inspect bytes the bench never exercised.  A line count cannot detect
+    # that; the canonical content can.
+    regenerated = subprocess.run(["diff", "-ru", str(base), str(work)],
+                                 capture_output=True, text=True)
+    if regenerated.returncode not in (0, 1):
+        raise SystemExit(f"diff -ru failed with status {regenerated.returncode}: "
+                         f"{regenerated.stderr.strip() or 'no stderr'}")
+    live = hashlib.sha256(canonical_patch(regenerated.stdout, base, work).encode()).hexdigest()
+    if live != ids["patch_sha"]:
+        raise SystemExit(
+            f"repairs.patch is not the diff of the supplied trees: committed canonical sha256 "
+            f"{ids['patch_sha']}, regenerated {live}. Re-generate it with "
+            f"`diff -ru <base> <work> > repairs.patch`.")
     return ids
 
 
@@ -249,16 +337,9 @@ def check(ids: dict) -> int:
         problems.append(f"the bench reported {ids['bench_failed']} case(s) not as expected; "
                         f"its result cannot be recorded as evidence")
 
-    # The base tree is identified in full, not merely diffed against work.  Both trees could
-    # come from the same stale or corrupted freeze and every shared change would be invisible
-    # to a relative diff.
-    total, counted, digest = ids["base_tree"]
-    if (total, counted) != (FREEZE_FILES, FREEZE_FILES_EXCL_MANIFEST):
-        problems.append(f"--base holds {total} files ({counted} excluding manifest.json); "
-                        f"the freeze is {FREEZE_FILES} ({FREEZE_FILES_EXCL_MANIFEST})")
-    if digest != FREEZE_DIGEST:
-        problems.append(f"--base does not reproduce the frozen tree digest: got {digest}, "
-                        f"expected {FREEZE_DIGEST}")
+    # `check()` asserts what the RECORDS say.  The freeze count and digest of `--base` are
+    # properties of an INPUT, enforced in `identities()`, which BOTH modes traverse --
+    # asserting them only here is precisely what let `--write` bypass them.
     if FREEZE_DIGEST not in rr:
         problems.append("run-record does not state the frozen tree digest")
 
@@ -287,8 +368,15 @@ def check(ids: dict) -> int:
             problems.append(f"run-record has no row binding {rel} to base {bh[:16]}… and "
                             f"work {wh[:16]}…; a swapped or misattributed pair would not be "
                             f"caught by a membership test")
-        if wh[:16] not in rp and wh not in rp:
-            problems.append(f"report is missing the current digest of {rel}: {wh[:16]}…")
+        # The report abbreviates digests to 16 characters, so its row is matched in that
+        # form -- but as a ROW, binding the file to both sides.  A membership test survived
+        # on the report side after the run-record fix, so two rows could exchange their
+        # repaired prefixes and still pass, every expected prefix being present somewhere.
+        rp_row = f"| `{rel}` | `{bh[:16]}…` | `{wh[:16]}…` |"
+        if rp_row not in rp:
+            problems.append(f"report has no row binding {rel} to base {bh[:16]}… and work "
+                            f"{wh[:16]}…; a swapped or misattributed pair would not be "
+                            f"caught by a membership test")
     for name, count, size, h in ids["packages"]:
         # The file COUNT is asserted too.  It was computed and unpacked but never compared,
         # which left the one identity the report relies on to detect accidentally included

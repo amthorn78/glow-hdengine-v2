@@ -781,6 +781,60 @@ validation — proven by the third row above. They are the separate follow-up.
 `CHANGE_FLOW_SPECIALIZATION_REVISION` 3.2.6 in this unreleased package, and both still distinguish it
 from every installed build. Review scope is the two skills, with the roster change read as behaviour.
 
+### One review cycle, eight findings, one root cause in the instrument
+
+This batch answers a **completed** review cycle rather than individual comments as they arrived, and
+it is one correction rather than eight. Eight threads were open: five from the cycle on `9e09ca3` and
+three carried over that I had reported without fixing.
+
+**Five of the eight share one root cause: validation sat where it was first written, not where the
+input enters, and every unrecognised or failed input defaulted to *pass*.** Three faces of that:
+
+| face | finding |
+|---|---|
+| **mode-dependent** | the freeze count and digest were asserted in `check()` only, so `--write` could derive rows from a stale base and succeed |
+| **status ignored** | `unzip -Z1` on a corrupt archive exits nonzero and prints nothing, and the empty output was read as a zero-file package |
+| **proxy for content** | `repairs.patch` was bound by *line count*; the report's file rows were whole-document membership tests |
+
+Plus a parser that recognised two `diff -rq` output shapes and **silently ignored every other line** —
+a file-type change prints `File X is a regular file while file Y is a directory`, and that fell
+through, so a roster missing a real difference was certified from the rows that did parse.
+
+**The correction is structural, not five patches.** `identities()` is now the single gate both modes
+traverse: it validates the freeze before anything else, refuses an unreadable or empty archive,
+refuses any unrecognised `diff` line, and **binds `repairs.patch` by content** — regenerating the diff
+from the supplied trees and comparing canonical digests. `check()` now asserts only what the *records*
+say. The mode-dependent face is the same defect I had already found and fixed once, for the bench
+refusal, and failed to propagate to its siblings; putting validation at the input removes the class
+rather than the instance.
+
+**Canonicalisation, because the first comparison was a false failure.** `diff -ru` writes per-run
+mtimes and echoes whatever paths it was given, so the committed patch and a fresh regeneration differ
+in bytes that are not the change. `canonical_patch()` drops the tab-separated timestamp and normalises
+the two tree paths to fixed tokens. I found this by running the gate before trusting it: it fired on
+a difference that was not a difference.
+
+**Five controls, one per finding, all firing:**
+
+| injected | result |
+|---|---|
+| a patch with the **same 411 lines** but one changed content line | refused, canonical digests named |
+| a work tree with a file replaced by a **directory** | refused, quoting the unparsed `diff` line |
+| **`--write`** against a modified base tree | refused, **and the record is byte-unchanged afterwards** |
+| two report rows exchanging their repaired prefixes | refused, both rows named |
+| a present but **corrupt** `.skill` | refused, `unzip exited 9` |
+
+**Two document findings from the same cycle, fixed in the same batch.** The recorder command in the
+run record printed `(--write | --check)`, which is shell syntax and not runnable — now two separate
+invocations, with the one actually used marked. And the `SF-05` graph claim said "all 72 terminal
+branches ... no selection of any kind": the rule covers terminal **or** blocking, so that was one arm
+of two, and **29 non-terminal blocking rows were unread**. They have now been read; the conclusion
+holds, exactly one mentions PF10 and as a prohibition, and the graph axis is complete at **101** rows.
+Corrected in all four places it appeared, not only the one the finding cited.
+
+**No skill byte changed in this batch.** Both package digests are unchanged, and the nine-file split
+and patch are unchanged. The instrument and two documents moved; the deliverable did not.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
