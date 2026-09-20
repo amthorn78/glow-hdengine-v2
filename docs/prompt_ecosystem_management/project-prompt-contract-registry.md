@@ -56,9 +56,21 @@ body_extraction_convention:
     strip-both: CF-C-10 41dce73a… / 7203 B, MGR-10 5c8aebc6… / 7276 B, PR-40 042255564c… /
     54043 B. Recorded in docs/ephemeral/gcfpe.prompt-body-addendum-schema.repair-report.md and
     docs/prompt_ecosystem_management/pe-succession/pe32-to-pe33.md.'
-  - 'Extended to the complete corpus by the Product Owner-relayed human review of 2026-09-20: 55 of
-    55 live bodies match on both SHA-256 and byte count under strip-both, totalling 1,060,573 bytes
-    across the 55 evidence_contract rows.'
+  evidence_scope: 'The evidence above is reproducible in this repository and covers 24 of the 55
+    bodies: 21 repaired bodies by reverse-applied edit, and 3 untouched prompts extracted under all
+    four variants. No body corpus exists on disk and prompt_bodies_validated is false, so no
+    checked-in artifact exercises the remaining 31. The conclusion does not depend on them: the
+    convention in force is established by 0 of 21 reproducing under any other variant, and by three
+    untouched prompts reproducing only under strip-both. A claim of complete-corpus coverage is
+    NOT made by this key.'
+  corroboration_not_reproducible_here: 'A Product Owner-relayed human review dated 2026-09-20
+    reports 55 of 55 live bodies matching on both SHA-256 and byte count under strip-both, totalling
+    1,060,573 bytes across the 55 evidence_contract rows. That figure reconciles exactly with the
+    sum of those rows, which is the only part of it this repository can check. The review itself is
+    a relayed narrative: no report, inputs or command is checked in, so it cannot be reproduced and
+    it is recorded here as corroboration, never as evidence. It is promoted to evidence only by
+    landing the run — per-body digest, byte count and the extraction command — in a repository
+    evidence artifact.'
   applies_to: 'The evidence_contract byte count and SHA-256 on each row below, which are the body
     identity for validation. This key does not alter, revive or reinterpret any source_snapshot
     record; those remain the 2026-09-17 pre-merge extraction that authority_sources dispositions as
