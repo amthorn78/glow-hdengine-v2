@@ -609,11 +609,15 @@ contract's `plan_writer_contract` roster drops them. Both are outside a skill re
 
 ## Verified clean
 
-- **The D8/D15 guard, on the contract axis.** v11 was attacked by an independent reviewer that
-  could not see the repair and returned `GUARD_HOLDS`. It is installed, its guard block is
-  byte-identical across both installed validator copies, and it was exercised in this run: no
-  `PF10_ADDENDUM_*` error of any kind fired against the candidate contract. Recorded in
-  `gcfpe.round19.d8-v11-cleared-and-installed.md`. **This is the contract half of D8 and nothing
+- **The D8/D15 guard, on the contract axis.** Two claims here rest on different evidence and are
+  separated below rather than merged. What **this PR's base can verify by itself**: the v11 guard
+  block is present in the installed tree and byte-identical across both installed validator
+  copies (4 functions, 7355 characters, md5 `46c69eaf8f00672e44f8502bbf43c721`, re-derived in
+  §"What was executed"), and it was exercised in the recorded run — no `PF10_ADDENDUM_*` error of
+  any kind appears in the 12-error list. What this PR's base **cannot** verify: the
+  `GUARD_HOLDS` verdict itself, which is the independent reviewer's, and whose repository record
+  is `gcfpe.round19.d8-v11-cleared-and-installed.md` — **a file on PR #422, not yet on `main`**
+  (see the dependency note below). **Either way this is the contract half of D8 and nothing
   more** — see `SF-05` below for the body half, which is open.
 - **`SF10-01` at the identity-header site is closed.** All 55 bodies pass
   `prompt_identity_header_valid` in candidate mode — 55/55, zero `PROMPT_BODY_IDENTITY`
@@ -627,6 +631,33 @@ contract's `plan_writer_contract` roster drops them. Both are outside a skill re
 - **Eight of the ten questions answer as intended.** Question 4 has no subject under D16 and
   was not re-litigated. Question 9 answers **YES** — the answer a defect produces — and carries
   findings 2 and 3. The other eight are clean.
+
+### Evidence dependency — the `GUARD_HOLDS` record is not on this PR's base
+
+Stated plainly because it would otherwise be found by whoever audits this artifact rather than
+disclosed by it. `gcfpe.round19.d8-v11-cleared-and-installed.md` **does not exist on `main` at
+`049d1fe`**, nor anywhere in `main`'s history, and `main` is this PR's base. It exists on the
+branch of **PR #422**, which is open and unmerged; merge is the Product Owner's decision alone.
+Worse for a reader of `main` only: the round-18 report that *is* on `main` still carries
+`status: PACKAGED_AWAITING_INDEPENDENT_REVIEW`, so `main` read by itself says v11 was neither
+cleared nor installed.
+
+Both statements were true when written and are still true; what changed is which branch the
+reader is standing on. The consequences, kept apart:
+
+| claim | evidence | resolves from `main` today |
+|---|---|---|
+| v11's guard block is installed, identical across both copies | measured here against the frozen tree | **yes** — re-derivable from the digests in this artifact |
+| the guard fired no `PF10_ADDENDUM_*` error on the candidate contract | the recorded 12-error list | **yes** |
+| the independent attack returned `GUARD_HOLDS` | SFR-01's report, recorded in round 19 | **no** — lands when #422 merges |
+| v11 is installed rather than merely packaged | round 19's install verification | **no** — lands when #422 merges |
+
+**So this artifact must not be used to clear D8 until #422 is merged**, or until the
+`GUARD_HOLDS` record is otherwise on `main`. Nothing here should be read as having moved the
+contract-axis state from unverified to holds on the strength of a docs-only commit: the verdict
+is the independent reviewer's and its record is a separate landing, which is exactly why it is
+named rather than summarised. This artifact's own verdict, `SKILL_REPAIR_REQUIRED`, does not
+depend on it — the five findings stand on measurements recorded here.
 
 ### `SF-05` remains open — the body half of D8 is still vocabulary-based
 
