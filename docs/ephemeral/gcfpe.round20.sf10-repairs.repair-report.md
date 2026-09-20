@@ -25,7 +25,7 @@ unrunnable.
 | | |
 |---|---|
 | status | `PACKAGED_AWAITING_INDEPENDENT_REVIEW` |
-| files changed | **9**, across two skills — 7 carrying repairs, 2 carrying only the revision bump |
+| files changed | **9**, across two skills — **4 substantive, 5 revision-only** (table below) |
 | validator revision | 3.2.6 → **3.2.7** |
 | body-level fixture suite | **crashes on the installed build; 164 cases, 0 failed on the repaired build** |
 | contract fixture suite | 140 cases, 0 failed on both; the reports differ in one field, `validator_revision` |
@@ -125,7 +125,9 @@ body; a prompt with no named receiver owes no declaration. A new code,
 `PROMPT_HANDOFF_RECEIVER:<prompt>:<destination>`, replaces `PROMPT_HANDOFF_CONTRACT:<prompt>` — a
 changed predicate gets a new identifier rather than reusing one whose meaning was different.
 Symbolic destinations (`NATHAN_TERMINAL_RETURN`, `ORIGINAL_NATIVE_STAGE`, `NATHAN_PROCEED`,
-`NATHAN_MANUAL_MERGE_ASSERTION`) are not prompts and are not name-checkable. Malformed
+`NATHAN_MANUAL_MERGE_ASSERTION`, `ACTUAL_OWNER_TERMINAL_RETURN` — all **five**, enumerated in
+`SYMBOLIC_DESTINATIONS`) are not prompts and are not name-checkable; anything that is neither a
+member prompt nor one of those five is malformed rather than skipped. Malformed
 `destinations` fails closed rather than being skipped.
 
 **Two obligations, not one.** An earlier revision of this repair replaced the
@@ -560,6 +562,44 @@ it with no environment variable at all**, exactly as the usage block prints: nin
 and **zero `.pyc` or `__pycache__` in either tree afterwards**. A harness must not depend on how it
 was invoked to leave its inputs untouched — and the fix belongs in the harness, not in a note telling
 the caller to remember.
+
+### Three stale records, one cause, and a guard instead of a resolution
+
+All three findings this round were stale figures my own corrections had not propagated: the run
+record still named the **previous validator digest**, the **previous package size** and an
+**18-case bench run**; the report's opening **Verdict** still carried the seven-and-two split its own
+corrected table replaced; and the `SF10-06` description still listed **four** symbolic destinations
+after the correction below established that omitting the fifth was the defect.
+
+**The run record one was the worst of the three.** That file exists so a reviewer can verify the
+reviewed package. Naming last round's digests does not merely mislead — it **sends them to verify
+bytes that are not under review**, which is worse than having no record at all.
+
+**Two rounds ago I adopted a rule for exactly this** — re-read every summary, opening and
+recommendation resting on a corrected premise — and then broke it three times in one round. A rule I
+cannot keep is not a control, so the check is now mechanical.
+
+`gcfpe.round20.sf10-bench/make_run_record.py --check` recomputes every identity from the artefacts —
+the nine file digests, both package digests, file counts and byte counts, the patch's line count, the
+bench's case count and its stdout verbatim — and requires each to appear in the records, naming
+expected and actual on any drift.
+
+**Fired with three injected regressions, because an unfired guard proves nothing** — D14's rule
+applied to my own instrument:
+
+| injected | result |
+|---|---|
+| revert the run record's validator digest to the previous value | **caught**, exit 1 |
+| revert the report's bench case count to "eighteen" | **not caught at first — see below** |
+| revert the package byte count to the previous value | **caught**, exit 1 |
+
+**The second control found a hole in the guard.** The case-count check was
+`if spelled not in rp and str(n) not in rp`, and `"19"` occurs inside unrelated numbers in the
+report, so the bare-digit branch passed a reverted count. **That is the too-weak-selector mistake
+this whole package is about, committed inside the guard written to prevent it** — and it was found by
+firing the regression, not by reading the code. The check now requires the exact phrase
+`"<spelled> cases, exit 0"` **and** rejects any other spelled count in that role. All three controls
+now fire, and the guard passes on the real records.
 
 ### The whole table above was re-run against the packaged copies
 

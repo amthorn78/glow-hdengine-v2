@@ -11,6 +11,13 @@ generated_by: 'Emitted programmatically from the run artefacts; no value in this
 
 # Round 20 run record — inputs, commands, outputs
 
+> **Regenerated at `210bb8f`+1 from the final artefacts.** The first version of this file was
+> emitted before the last validator change and then not refreshed, so it named the previous
+> validator digest, the previous package size and an 18-case bench run — sending a reviewer to
+> verify bytes that were not the bytes under review. `make_run_record.py --check` now recomputes
+> every identity below from the artefacts and fails if any record has drifted; re-reading the
+> summaries by hand was tried and failed three times in one round.
+
 Review asked for this, correctly, and cited the repository's own standard against the earlier
 version of the report. The registry's `corroboration_not_reproducible_here` key says a review whose
 report, inputs and command are not checked in "cannot be reproduced and it is recorded here as
@@ -123,7 +130,7 @@ harness; the report should not be read as claiming otherwise.
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1064054f82e1e6d921fc5c5b3e079595fd8068b5e989015a7` | `39c44ad84ca05d5e2c02f9cd188506e472a34e7e97211981e2f0b7624e285479` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671aca628ff2cd3d2ea312b9efab064e5a5c67c95c8417d96f4b` | `7523947d952b1372fd1786d5088ad7c92bee77fd5b5a250a58a93b2f98a36cf0` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701ade4e02551e0ef6ae9d923f756f28c84dc641f1ade6dcbe3` | `527bf522c0c602dfa95ea5517f640e22068f3fd0f19dd20aa85b3b2ccebe38ee` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e` | `3379824809242f45c18e82289343c6a848f09ec13fa1b2e64dc93892875965a1` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef0996249540b46607b855c8d17d841fdd24ce3b615f97e6199bc2e` | `b0456a27816c47dea31382a55e3bc9070c329d140a8dcbec76c0e56ef0195094` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d599812498e015fa7dfa88c095a899be80464a394d14d727e5` | `8cff6c7ef685c0a008dc5ea6290a379368723c46d14b184912a1971fd67dd43b` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f172ef4107b084a1b6151bcb056944504572e3e3e245fb7fb` | `272d7b81fa091ce2f03dcf3fcc68c62134a5426bfa26214b0af50e03e5b17f91` |
 
@@ -132,7 +139,7 @@ harness; the report should not be read as claiming otherwise.
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 272154 | `f3e7a72e3d6f25b4cd02cc942cd701f31405373bb505c9557628303e4fff1ae5` |
+| `flowmaster-validate.skill` | 29 | 272630 | `94e3e63f8eaad6285c9116fd5d803714955f1d4bd4ee795c7166b00cd6221757` |
 
 Each archive was verified by extracting it and running a full recursive diff against the
 working copy; both are identical. `zip -X` is used so a rebuild from unchanged content
@@ -287,7 +294,7 @@ is untouched by this package.
 
 ### The bench
 
-Exit 0. **18 cases, 0 not as expected.** Full stdout:
+Exit 0. **19 cases, 0 not as expected.** Full stdout:
 
 ```
 corpus gate: 55 registry digests loaded from /home/user/glow-hdengine-v2/docs/prompt_ecosystem_management/project-prompt-contract-registry.md
@@ -394,6 +401,21 @@ corpus gate: all 55 bodies match their recorded evidence_contract digest
   [PASS] repaired build reports MALFORMED_DESTINATIONS for an absent destinations key
         expected ['PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS']
         got      ['PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS']
+
+=== SF10-06 — an unknown destination string is malformed, not a symbol ===
+  The contract declares five non-prompt destinations -- NATHAN_TERMINAL_RETURN (54
+  rows), ORIGINAL_NATIVE_STAGE (39), ACTUAL_OWNER_TERMINAL_RETURN (18),
+  NATHAN_MANUAL_MERGE_ASSERTION (2), NATHAN_PROCEED (1) -- counted from the contract,
+  not recalled. Skipping everything merely absent from EXPECTED_MEMBERS made a typo
+  indistinguishable from a symbol: `PR-300` was ignored exactly as NATHAN_PROCEED is,
+  and the receiver that row meant to name was never checked. With the roster named in
+  SYMBOLIC_DESTINATIONS, anything else fails closed.
+  [PASS] repaired build reports MALFORMED_DESTINATIONS for an unknown destination (ESC-40)
+        expected ['PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS']
+        got      ['PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS']
+  And the five declared symbols must still be skipped rather than flagged -- the
+  clean-corpus case above is that control: all 42 symbolic destinations on
+  non-terminal public rows pass through it without an error.
 
 === SF10-06 — the predicate's remaining limit, asserted rather than hidden ===
   The check asserts that each declared receiver is NAMED in the body. It does not
