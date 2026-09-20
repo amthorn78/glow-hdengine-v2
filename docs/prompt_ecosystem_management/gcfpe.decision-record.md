@@ -399,6 +399,60 @@ shape as the ninth defeat one branch further down; **no change was made, because
 space cannot express a directive.** A rule there would buy nothing, and this section already
 records what writing rules that buy nothing has cost.
 
+
+### Amendment, 2026-09-20 — v11 cleared by independent review, and installed
+
+**This supersedes the enforcement-status statement in the amendment above, which said the
+installed build was v6 and v11 was neither cleared nor installed.** That was true when written
+and is left unedited under `AUTH-001`; this is its successor.
+
+SFR-01 returned **`GUARD_HOLDS`** — the first verdict in this series with no defeat — and the
+Product Owner installed v11. **The installed build is now v11.** Verified against the installed
+bytes rather than the packages: all three file identities match, the previous v6 identities are
+absent, the tree holds 321 files with no bytecode, and the guard block is byte-identical across
+both validator copies. The installed build was exercised, not only hashed: all four gates green
+from a scratch copy, and the round-18 bench reports 14 placements with none unexpected. Recorded
+in `docs/ephemeral/gcfpe.round19.d8-v11-cleared-and-installed.md`.
+
+**The guard has been written eleven times and defeated ten. v11 is the first to survive an
+independent attack round.**
+
+Three things from that round belong in this ruling rather than only in the report.
+
+**The reviewer withdrew its own proposed remedy.** SFR-01 recorded that its token-shape rule for
+`forbidden_fields` elements was wrong, that it had asserted the rule "costs nothing" without
+running it against the lawful contract, and that this was the same error it had been naming in
+v1, v2 and v9 — a form pin that rejects lawful content — made while pointing at it. Independent
+review is not a second opinion to be weighed; it is a mechanism whose findings and whose
+*remedies* both require reproduction before they are accepted. This section now records that a
+refuted remedy is as valuable a result as a confirmed defeat.
+
+**The argument for an exact enumeration is stronger than the argument it displaced.** The
+standing objection to a pin is that it invites quiet editing. Editability was never the
+variable; what matters is what the re-stamp costs. A hex string tells a reviewer nothing, while
+`EXPECTED_ADDENDUM_LIST_VALUES` re-stamps as the literal prose being admitted — landing the list
+injection requires pasting the prohibited gate sentence into guard source, in English, where a
+reviewer reads it. That is a stronger property than the 45 paths, not an equal one, and it is
+the reason exact element enumeration is the right shape for a closed governance object whose
+content space is prose.
+
+**The remaining risk has moved, and the ruling should say where.** Every defeat since v7 was
+inside `pf10_addendum_contract`, the one object enumerated exactly. That object is now closed
+on the placement axis. What remains is **E3**: thirty-three `subset_errors` call sites, of which
+exactly one object is exact-keyed. SFR-01's sweep confirmed no lossy derivation outside the two
+already recorded — `subset_errors` compares raw values, so its limitation is that it is a subset
+test, which is a different failure mode from the tenth defeat. There is **no cheap sweep** for
+those thirty-three: closing them requires a decision about which are closed governance objects,
+prompt by prompt, not a mechanical pass. A future round that widens the guard without making
+that decision first will be selecting a subset again, which is how v3 through v6 died.
+
+The vocabulary axis — residuals E1, E2 and residual 1 — is unchanged and remains enforced by
+human review, not machinery.
+
+**This amendment does not close §10.** The gate requires the dedicated skill-fit review to be
+re-run against the final installed snapshot. That snapshot now exists for the first time; the
+review has not yet been run.
+
 ## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
 
 Ruled 2026-09-18.
