@@ -223,6 +223,94 @@ vocabulary are removed from the graph with it.
 more deterministic, more automatable, and less likely to stop an agent from completing
 legitimate work? A rule that fails that test does not earn its place.
 
+### Amendment, 2026-09-20 — the enforcement limit, stated so it is not rediscovered
+
+Product Owner instruction, 2026-09-20. This amends how D8 is **enforced**. It does not
+change what D8 prohibits, and it strikes nothing further.
+
+The guard carrying this ruling has been written ten times and defeated nine. Every
+defeat took the same form: **the check selects, and the prohibited gate is written where
+nothing selects.** v1 and v2 selected on phrasing and died to paraphrase and synonym.
+v3 through v6 selected on location and died to a new location each time. v7 selected on
+object shape and died to a clause that is not a branch. v8 closed the contract's key set
+and died to the eight key names it had exempted so that a lawful promotion would not trip
+it — four of the eight are absent from the candidate contract, so each was a free
+top-level slot, and a complete prohibited gate written as an object under `promoted_at`
+passed every check.
+
+That eighth defeat is worth stating precisely, because it is the first one that came from
+an **exemption** rather than a selector. The exemption was correct in intent: promotion
+genuinely adds those keys. The error was waiving the **name**.
+
+The ninth version waived the name and pinned the value **type** instead: lifecycle keys are
+promotion metadata and are always scalars, so a container under one is the attack. That was
+not enough, and the ninth defeat was found on its own bench before the version shipped.
+`str` is a scalar, so the identical gate written as **prose** under `promoted_at` passed a
+type-only pin cleanly. The tenth version pins the value's **form** as well: every lifecycle
+value in every contract copy in this repository is a single token — an identifier, a release
+id, a version, a status or an ISO-8601 timestamp — and a rule an agent can act on is prose,
+which needs whitespace.
+
+A third rule was written, measured and removed, and the record is kept in the guard's own
+source so it is not reinvented: *lifecycle string values may not name PF10*. It failed twice.
+It did not fire on `HALT_ON_PF10_DIVERGENCE`, because `\bPF10\b` finds no word boundary
+against an underscore — the exact token it was added to catch. Widened, it rejected
+`GCFPE-PF10-INTEGRITY-20260913.1`, a real `contract_id` in this repository, failing a lawful
+contract. Even repaired it would have bought one round, because a rename to
+`HALT_ON_BUILD_NOTES_DIVERGENCE` walks through it. **That is the v1/v2 mistake, and making it
+a ninth time would have been worse than the hole.**
+
+The tenth version stops enumerating what to inspect and enumerates what may exist:
+
+- the routing surfaces are pinned whole, both keys, with no selector inside them;
+- every branch-shaped object naming PF10 anywhere else in the contract is an error, with
+  no allow-list — v8 carried an empty one, and its key was the first path segment only,
+  so a single entry would have allowed that branch at any depth under that key;
+- `pf10_addendum_contract` is exact over every nested key **path**, not just its top
+  level, because `subset_errors` is a subset test and let unknown fields into a closed
+  governance object — which is how v7 fell, and because v8's top-level-only enumeration
+  let the same clause back in one level down, where it was caught only incidentally by
+  two neighbouring checks written for other reasons;
+- the contract's top-level key set is closed, with promotion lifecycle keys exempt by
+  name and pinned to a scalar single-token value.
+
+Together these close the **placement** axis. They were measured, not asserted: 18 of 18
+recorded attack placements caught — all four lifecycle slots by object and again by prose,
+both nested addendum positions, and every earlier defeat — at a fixture cost of 1 amended
+expectation in 140, unchanged from v8, because neither the ninth nor the tenth version
+amended a fixture at all. All five contract copies in the repository pass the lifecycle
+form check unmodified, and a lawful promotion with scalar values stays clean.
+
+**What they do not close, verified by execution and accepted here rather than left for a
+ninth round to discover:**
+
+1. **A branch that never names PF10, placed inside an existing contract key.** A terminal
+   branch reading *"the current controlled Build Notes record differs from the previously
+   approved addendum baseline"* passes. "Build Notes" is PF10's own title; an author
+   writing naturally may never type the token.
+2. **A prohibited rule written into an existing field's value.** Every key check is a
+   key-*name* check; none reads values for prohibited semantics.
+3. **A clause inside any object other than `pf10_addendum_contract`**, which is the only
+   object enumerated exactly.
+
+**This limit is accepted, not overlooked.** Widening the token list to `PF-10`, `PF 10` or
+`Build Notes` buys exactly one round; that is how v1 and v2 died, and repeating it would be
+the ninth instance of the same mistake. The vocabulary axis is therefore **enforced by human
+review, not by machinery**, and no future round should record its existence as a new defeat.
+
+A guard comment that claims more coverage than this is itself a defect. Two shipped guards
+carried such comments, and in both cases the comment stopped a reviewer from running the
+injection that would have exposed them. The installed guard states these three residuals in
+its own source.
+
+**One further limit, recorded so it is not mistaken for coverage.** Several prohibited
+placements are caught by checks written for unrelated reasons — a branch dropped into
+`member_registry` trips that object's own schema check, and the addendum's two nested
+objects carry exact checks of their own. That coverage is incidental. Where it was the
+*only* thing standing behind a placement, the placement was treated as uncovered and the
+guard was extended; where it merely doubles up, it is not counted as enforcement. A
+residual that happens to be caught elsewhere today is still a residual.
+
 ## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
 
 Ruled 2026-09-18.
