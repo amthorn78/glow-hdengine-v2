@@ -25,7 +25,7 @@ unrunnable.
 | | |
 |---|---|
 | status | `PACKAGED_AWAITING_INDEPENDENT_REVIEW` |
-| files changed | **9**, across two skills — **4 substantive, 5 revision-only** (table below) |
+| files changed | **9**, across two skills — **6 substantive, 3 revision-only** (table below) |
 | validator revision | 3.2.6 → **3.2.7** |
 | body-level fixture suite | **crashes on the installed build; 164 cases, 0 failed on the repaired build** |
 | contract fixture suite | 140 cases, 0 failed on both; the reports differ in one field, `validator_revision` |
@@ -37,26 +37,32 @@ digest and all 55 body digests, is identical between the installed and repaired 
 
 ## What changed
 
-Nine files differ from the installed tree, and the split is **four substantive, five
-revision-only** — not the "seven and two" an earlier version of this line claimed. Review counted
-the patch and was right; the corrected split, measured per file from the diff:
+Nine files differ from the installed tree, and the split is **six substantive, three
+revision-only**, re-measured from the diff after the `SF10-04` retirement landed:
 
-| file | added lines that are not a revision string |
-|---|---|
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | **125** — `SF10-03`, `SF10-06` |
-| `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | **14** — `SF10-08` |
-| `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | **7** — the `SF10-08` fixture anchor |
-| `change-flow/SKILL.md` | **5** — the `SF10-05` disclaimer |
-| `change-flow/scripts/validate_gcfpe_20260914.py` | 0 — revision pin only |
-| `flowmaster-validate/SKILL.md` | 0 — revision declaration only |
-| `flowmaster-validate/references/…-validation-profile.json` | 0 — revision pin only |
-| `flowmaster-validate/scripts/validate_flowmaster.py` | 0 — revision pins only |
-| `flowmaster-validate/scripts/validate_gcfpe_current.py` | 0 — revision pin only |
+| file | non-revision changed lines | what it carries |
+|---|---|---|
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | **163** | `SF10-03`, `SF10-06` |
+| `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | **16** | `SF10-08` |
+| `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | **9** | the `SF10-08` fixture anchor |
+| `change-flow/SKILL.md` | **7** | the `SF10-05` disclaimer, and the retired propagate route |
+| `flowmaster-validate/scripts/validate_flowmaster.py` | **2** | **`SF10-04`: the `EXPECTED` required-presence roster and the `REQUIRED_SCRIPTS` entry** |
+| `flowmaster-validate/SKILL.md` | **2** | **`SF10-04`: the drift-detection repair route** |
+| `change-flow/scripts/validate_gcfpe_20260914.py` | 0 | revision pin only |
+| `flowmaster-validate/references/…-validation-profile.json` | 0 | revision pin only |
+| `flowmaster-validate/scripts/validate_gcfpe_current.py` | 0 | revision pin only |
 
-The distinction matters for review effort: **five of the nine files contain nothing an independent
-reviewer needs to reason about behaviourally**, and treating them as repair implementations spreads
-attention across nine files when four carry the whole change. Getting that wrong made the package
-look larger and more diffuse than it is.
+**This line has now been wrong twice, in opposite directions, and the second time was my own doing.**
+It first claimed "seven and two", counting from my narrative of the work rather than the diff. Review
+corrected it to four and five. Then the `SF10-04` retirement in this same pass moved two files out of
+revision-only — `validate_flowmaster.py` now **removes a required-presence roster**, which is the most
+behavioural change in the package, and `flowmaster-validate/SKILL.md` now changes a documented repair
+route — and I did not re-measure. A stale split points an independent reviewer **away from** the
+roster change, which is precisely the file that most needs their attention.
+
+The distinction still matters for review effort, in the corrected direction: **three of the nine files
+contain nothing to reason about behaviourally**, and the six that do include the two smallest diffs in
+the package, which are also the two with the widest consequences.
 
 | file | installed sha256 | repaired sha256 |
 |---|---|---|
