@@ -228,23 +228,40 @@ legitimate work? A rule that fails that test does not earn its place.
 Product Owner instruction, 2026-09-20. This amends how D8 is **enforced**. It does not
 change what D8 prohibits, and it strikes nothing further.
 
-The guard carrying this ruling has been written eight times and defeated seven. Every
+The guard carrying this ruling has been written nine times and defeated eight. Every
 defeat took the same form: **the check selects, and the prohibited gate is written where
 nothing selects.** v1 and v2 selected on phrasing and died to paraphrase and synonym.
 v3 through v6 selected on location and died to a new location each time. v7 selected on
-object shape and died to a clause that is not a branch.
+object shape and died to a clause that is not a branch. v8 closed the contract's key set
+and died to the eight key names it had exempted so that a lawful promotion would not trip
+it — four of the eight are absent from the candidate contract, so each was a free
+top-level slot, and a complete prohibited gate written as an object under `promoted_at`
+passed every check.
 
-The eighth version stops enumerating what to inspect and enumerates what may exist:
+That eighth defeat is worth stating precisely, because it is the first one that came from
+an **exemption** rather than a selector. The exemption was correct in intent: promotion
+genuinely adds those keys. The error was waiving the **name**. The ninth version waives
+the name and pins the **value** instead — lifecycle keys are promotion metadata and are
+always scalars, so a container under one of them is the attack and nothing else.
+
+The ninth version stops enumerating what to inspect and enumerates what may exist:
 
 - the routing surfaces are pinned whole, both keys, with no selector inside them;
-- every branch-shaped object naming PF10 anywhere else in the contract is an error unless
-  allow-listed;
-- `pf10_addendum_contract` is key-exact, because `subset_errors` is a subset test and let
-  unknown fields into a closed governance object — which is how v7 fell;
-- the contract's top-level key set is closed, with promotion lifecycle keys exempt.
+- every branch-shaped object naming PF10 anywhere else in the contract is an error, with
+  no allow-list — v8 carried an empty one, and its key was the first path segment only,
+  so a single entry would have allowed that branch at any depth under that key;
+- `pf10_addendum_contract` is exact over every nested key **path**, not just its top
+  level, because `subset_errors` is a subset test and let unknown fields into a closed
+  governance object — which is how v7 fell, and because v8's top-level-only enumeration
+  let the same clause back in one level down, where it was caught only incidentally by
+  two neighbouring checks written for other reasons;
+- the contract's top-level key set is closed, with promotion lifecycle keys exempt by
+  name and pinned to scalar values.
 
-Together these close the **placement** axis. They were measured, not asserted: 13 of 13
-recorded attack placements caught, at a fixture cost of 1 amended expectation in 140.
+Together these close the **placement** axis. They were measured, not asserted: 14 of 14
+recorded attack placements caught, including all four lifecycle slots and both nested
+positions, at a fixture cost of 1 amended expectation in 140 — unchanged from v8, because
+the ninth version amended no fixture at all.
 
 **What they do not close, verified by execution and accepted here rather than left for a
 ninth round to discover:**
@@ -267,6 +284,14 @@ A guard comment that claims more coverage than this is itself a defect. Two ship
 carried such comments, and in both cases the comment stopped a reviewer from running the
 injection that would have exposed them. The installed guard states these three residuals in
 its own source.
+
+**One further limit, recorded so it is not mistaken for coverage.** Several prohibited
+placements are caught by checks written for unrelated reasons — a branch dropped into
+`member_registry` trips that object's own schema check, and the addendum's two nested
+objects carry exact checks of their own. That coverage is incidental. Where it was the
+*only* thing standing behind a placement, the placement was treated as uncovered and the
+guard was extended; where it merely doubles up, it is not counted as enforcement. A
+residual that happens to be caught elsewhere today is still a residual.
 
 ## D9 — `forbidden_fields` is scoped to the addendum, never to Canon disposition
 
