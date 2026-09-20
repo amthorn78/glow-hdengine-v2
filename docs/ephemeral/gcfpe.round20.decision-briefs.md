@@ -522,7 +522,8 @@ Two separate questions were being answered as one:
 
 | question | answer |
 |---|---|
-| Does any current prompt implement the prohibited PF10-comparison gate? | **No**, on a complete enumeration — see below. |
+| Does the **declared graph** implement the prohibited PF10-comparison gate anywhere? | **No**, on a complete enumeration of all 72 terminal branches — see below. |
+| Does any **prompt body** instruct one? | **None found**, on a filtered read of all 55 bodies — 34 candidate passages, all read. Filtered, so not exhaustive; the limit is stated below. |
 | Can the registry, or the graph as currently typed, express the rule that would catch one if it appeared? | **No.** The registry's mechanism is regex over prose; the graph's `condition` is also prose. A typed field would be needed, per Option A. |
 
 **How the first answer was established, after the first attempt was wrong.** An earlier version of
@@ -558,9 +559,46 @@ inferring anything from the failure. D8 strikes a mandatory *comparison* gate; i
 an agent to proceed without its canon. All 72 also carry `next_prompt_handoff_count: 0`, so D15's
 invariant holds across the set.
 
-**What this establishes and what it does not.** It establishes that the prohibited behaviour is
-absent from the declared graph, by enumeration rather than by filter. It does not establish that no
-body instructs a stop the graph never declared — that is the hole Option A′ narrows without closing.
+**What the enumeration establishes and what it does not.** It establishes that the prohibited
+behaviour is absent **from the declared graph**, by enumeration rather than by filter. It says
+nothing on its own about a body instructing a stop the graph never declared — and since this brief
+itself concedes that hole exists, a graph-only result cannot support a claim about the flow. That
+gap was pointed out in review and is closed as far as it can be, below.
+
+### The bodies, read under a stated filter
+
+All 55 bodies were scanned for sentences that mention PF10, Build Notes or an addendum **and** a
+stop-shaped word (terminal, stop, block, halt, refuse, mismatch, diverge, differ, cannot proceed).
+That returned **34 passages across 21 bodies**, and all 34 were read. What they are:
+
+| what the passage is | reading |
+|---|---|
+| a `PF10 non-mutation` boundary in a tools/limits line | the majority; a prohibition on editing PF10, not a stop |
+| an artifact-status enumeration (`COMPLETE` / `PARTIAL` / `BLOCKED`) that also lists PF10 lineage | a status vocabulary, not a gate |
+| a writer's obligation to resolve and read current PF10 and active addenda | D8's intended shape |
+| a **source-unavailability** stop | two, both explicit — RS-20 line 40 and RS-40 line 16: "if unique current controlled PF10 cannot be resolved and read, return `SOURCE_RESOLUTION_ERROR` and stop" |
+
+**None instructs a comparison and a stop.** And the strongest single line in the corpus is RS-40's,
+which is worth quoting because RS-40 is the prompt whose historical defect produced D14:
+
+> Do not compare current PF10 against the addendum, and never stop, wait, or route on whether the
+> approved delta is yet present, absent, or worded differently.
+
+The prompt that once implemented the prohibited behaviour now forbids it in its own text.
+
+**The limit of this second pass, stated rather than glossed.** It is a **filter**, not an
+enumeration. A body could instruct a comparison-and-stop using none of those stop words — "return
+the discrepancy to its owner before continuing" contains no listed term — and would not appear in
+the 34. So the two passes are not equally strong, and the brief does not claim they are:
+
+| pass | strength |
+|---|---|
+| the declared graph's 72 terminal branches | **exhaustive** — every row read, no selection |
+| the 55 bodies | **filtered** — 34 passages read; a paraphrase avoiding the stop-word list could escape it |
+
+An unfiltered body conclusion means a complete semantic read of roughly 1,060,000 characters across
+55 documents. That is a different exercise from this brief and should be commissioned as one if the
+conclusion needs to be exhaustive on both axes.
 
 `SF-05` is the second, not the first. It is a **mechanism gap**: the flow is currently clean and
 there is no guard that would keep it clean automatically. Under D14 that is a real deficiency —
@@ -593,9 +631,13 @@ guard, and should be called that.
 
 `SF-05` is not parked, and nothing here changes the registry or widens a word list.
 
-**On §11:** the finding does not need to hold post-flight, because the behaviour is absent today
-and measurably so. If you want the guard in place first, A costs no body changes and can be built
-and reviewed on its own.
+**On §11, narrowed after review.** The earlier version said the behaviour "is absent today and
+measurably so", resting on a graph-only measurement while conceding that bodies can stop undeclared.
+The accurate position: the declared graph is clean by enumeration, and a filtered read of all 55
+bodies found nothing, with RS-40 explicitly forbidding the behaviour in its own text. That is a good
+basis for not treating `SF-05` as a §11 blocker, and it is **not** proof that no body instructs an
+undeclared comparison-stop. If you want that proof before §11, it is the complete semantic body read
+described above, not a check that exists today.
 
 **What I have not done:** no registry change, no word-list change, no body edit, and `SF-05` is not
 parked. A and A′ are proposals with measured adoption costs, awaiting your decision.

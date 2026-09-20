@@ -12,7 +12,13 @@ The three inputs are environment-resident and are deliberately not committed:
     thing under test.
   * `--bodies` is the 55-prompt corpus.  Prompt bodies are authored in Notion in
     place and are never mirrored into this repository, so the corpus is fetched per
-    run and verified against the registry's recorded `evidence_contract` digests.
+    run -- and this script verifies it before using it, against the `evidence_contract`
+    SHA-256 recorded for each of the 55 rows in
+    `docs/prompt_ecosystem_management/project-prompt-contract-registry.md`, which IS
+    repository-resident.  An earlier revision accepted any 55 Markdown files by count
+    alone while its own documentation promised that verification, so a stale or
+    substituted corpus could have produced exit 0 and been credited as evidence for
+    the current one.
 
 The script therefore refuses to guess: a missing or unusable input is reported as a
 HARNESS FAILURE with the path it wanted, and never as a passing gate.
@@ -32,7 +38,7 @@ absent -- a bench that tested its author's copy of the logic.  That is fixed: th
 handoff cases write the mutated corpus to a temporary directory and call
 `validate_prompt_bodies`, the function the validator actually uses.
 """
-import argparse, importlib.util, json, pathlib, re, shutil, sys, tempfile
+import argparse, hashlib, importlib.util, json, pathlib, re, shutil, sys, tempfile
 
 CONTRACT = "change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
 FAIL = 0
@@ -60,11 +66,58 @@ def load(tree: pathlib.Path):
     return mod
 
 
-def read_bodies(bodies_dir: pathlib.Path) -> dict[str, str]:
-    found = {p.stem: p.read_text(encoding="utf-8") for p in sorted(bodies_dir.glob("*.md"))}
-    if len(found) != 55:
-        die(f"expected 55 bodies in {bodies_dir}, found {len(found)}")
-    return found
+REGISTRY_DEFAULT = pathlib.Path("docs/prompt_ecosystem_management/project-prompt-contract-registry.md")
+_REGISTRY_DIGESTS: dict[str, str] | None = None
+
+
+def registry_digests(registry_path: pathlib.Path) -> dict[str, str]:
+    """The 55 `prompt_key` -> `evidence_contract` SHA-256 pairs, from the approved registry.
+
+    Parsed with a regex rather than a YAML loader so the bench carries no dependency
+    beyond the standard library.  Each row's digest is the one recorded under
+    `evidence_contract` as "SHA-256 of that extraction".
+    """
+    global _REGISTRY_DIGESTS
+    if _REGISTRY_DIGESTS is not None:
+        return _REGISTRY_DIGESTS
+    if not registry_path.is_file():
+        die(f"no registry at {registry_path}; pass --registry")
+    text = registry_path.read_text(encoding="utf-8")
+    pairs: dict[str, str] = {}
+    current: str | None = None
+    for line in text.splitlines():
+        key = re.match(r"^- prompt_key:\s*(\S+)\s*$", line)
+        if key:
+            current = key.group(1)
+            continue
+        digest = re.search(r"SHA-256 of that extraction:\s*([0-9a-f]{64})", line)
+        if digest and current:
+            pairs.setdefault(current, digest.group(1))
+    if len(pairs) != 55:
+        die(f"expected 55 registry digests in {registry_path}, parsed {len(pairs)}")
+    _REGISTRY_DIGESTS = pairs
+    return pairs
+
+
+def read_bodies(bodies_dir: pathlib.Path, registry_path: pathlib.Path) -> dict[str, str]:
+    """Load the corpus and refuse to proceed unless it is the corpus the registry names."""
+    expected = registry_digests(registry_path)
+    found = {p.stem: p for p in sorted(bodies_dir.glob("*.md"))}
+    if set(found) != set(expected):
+        missing = sorted(set(expected) - set(found))
+        extra = sorted(set(found) - set(expected))
+        die(f"corpus in {bodies_dir} is not the registry's 55 prompts; missing {missing}, unexpected {extra}")
+    bodies: dict[str, str] = {}
+    mismatched: list[str] = []
+    for prompt_id, path in found.items():
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != expected[prompt_id]:
+            mismatched.append(prompt_id)
+        bodies[prompt_id] = raw.decode("utf-8")
+    if mismatched:
+        die(f"{len(mismatched)} body/bodies do not match their registry evidence_contract "
+            f"digest: {mismatched}. The corpus is stale or substituted; refusing to run.")
+    return bodies
 
 
 def read_contract(tree: pathlib.Path) -> dict:
@@ -74,12 +127,12 @@ def read_contract(tree: pathlib.Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def case(name, tree, mutate, predicate, expect, *, bodies_dir):
+def case(name, tree, mutate, predicate, expect, *, bodies_dir, registry):
     """Phase 1 then phase 3, separated."""
     global FAIL
     mod = load(tree)
     try:
-        data = {"bodies": read_bodies(bodies_dir), "contract": read_contract(tree)}
+        data = {"bodies": read_bodies(bodies_dir, registry), "contract": read_contract(tree)}
         before = json.dumps(data["bodies"], sort_keys=True)
         if mutate is not None:
             mutate(data)
@@ -193,33 +246,39 @@ def main() -> int:
     ap.add_argument("--base", required=True, type=pathlib.Path, help="copy of the installed skills tree")
     ap.add_argument("--work", required=True, type=pathlib.Path, help="copy carrying the prepared repair")
     ap.add_argument("--bodies", required=True, type=pathlib.Path, help="directory of the 55 prompt bodies")
+    ap.add_argument("--registry", type=pathlib.Path, default=REGISTRY_DEFAULT,
+                    help="approved registry whose evidence_contract digests the corpus must match")
     args = ap.parse_args()
     for label, path in (("--base", args.base), ("--work", args.work), ("--bodies", args.bodies)):
         if not path.is_dir():
             die(f"{label} is not a directory: {path}")
-    base, work, bodies = args.base, args.work, args.bodies
+    base, work, bodies, registry = args.base, args.work, args.bodies, args.registry
+    digests = registry_digests(registry)
+    print(f"corpus gate: {len(digests)} registry digests loaded from {registry}")
+    read_bodies(bodies, registry)
+    print(f"corpus gate: all {len(digests)} bodies match their recorded evidence_contract digest\n")
 
     print("=== SF10-03 — QA-120 class map (validate_qa_closure_bodies) ===")
     case("installed build reports a defect on the real body", base, None, qa_errors,
-         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies)
-    case("repaired build reads the real HTML body", work, None, qa_errors, [], bodies_dir=bodies)
+         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies, registry=registry)
+    case("repaired build reads the real HTML body", work, None, qa_errors, [], bodies_dir=bodies, registry=registry)
     case("repaired build also reads the pipe rendering", work, repipe_class_map, qa_errors, [],
-         bodies_dir=bodies)
+         bodies_dir=bodies, registry=registry)
     case("repaired build still rejects a wrong receiver", work, break_class_map_receiver, qa_errors,
-         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies)
+         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies, registry=registry)
     case("repaired build still rejects a wrong page id", work, break_class_map_page_id, qa_errors,
-         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies)
+         ["QA_PASS_BODY_CLASS_MAP"], bodies_dir=bodies, registry=registry)
 
     print("\n=== SF10-06 — handoff obligation (validate_prompt_bodies) ===")
     case("installed build reports GCFPE-MGMT-10", base, None, handoff_errors,
-         ["PROMPT_HANDOFF_CONTRACT:GCFPE-MGMT-10"], bodies_dir=bodies)
-    case("repaired build clears the corpus", work, None, handoff_errors, [], bodies_dir=bodies)
+         ["PROMPT_HANDOFF_CONTRACT:GCFPE-MGMT-10"], bodies_dir=bodies, registry=registry)
+    case("repaired build clears the corpus", work, None, handoff_errors, [], bodies_dir=bodies, registry=registry)
     case("repaired build catches a dropped receiver (PR-30 -> PR-35)", work,
          drop_receiver("PR-30", "PR-35"), handoff_errors,
-         ["PROMPT_HANDOFF_RECEIVER:PR-30:PR-35"], bodies_dir=bodies)
+         ["PROMPT_HANDOFF_RECEIVER:PR-30:PR-35"], bodies_dir=bodies, registry=registry)
     case("repaired build catches GCFPE-MGMT-10 dropping PR-10", work,
          drop_receiver("GCFPE-MGMT-10", "PR-10"), handoff_errors,
-         ["PROMPT_HANDOFF_RECEIVER:GCFPE-MGMT-10:PR-10"], bodies_dir=bodies)
+         ["PROMPT_HANDOFF_RECEIVER:GCFPE-MGMT-10:PR-10"], bodies_dir=bodies, registry=registry)
 
     print("\n=== SF10-06 — the predicate's limit, asserted rather than hidden ===")
     print("  The check asserts that each declared receiver is NAMED in the body. It does not")
@@ -228,7 +287,7 @@ def main() -> int:
     print("  below asserts that blind spot so it cannot be mistaken for coverage; see the")
     print("  report for why a routing-section-scoped variant was measured and rejected.")
     case("retargeting the last mention is NOT caught (known limit)", work,
-         swap_operative_receiver("PR-30", "PR-35", "PR-40"), handoff_errors, [], bodies_dir=bodies)
+         swap_operative_receiver("PR-30", "PR-35", "PR-40"), handoff_errors, [], bodies_dir=bodies, registry=registry)
 
     print(f"\n{'ALL CASES AS EXPECTED' if FAIL == 0 else f'{FAIL} CASE(S) NOT AS EXPECTED'}")
     return 1 if FAIL else 0

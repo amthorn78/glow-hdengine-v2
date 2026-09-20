@@ -278,6 +278,21 @@ run if the mutation removes the name entirely, because then the whole-document p
 catch it and the blind spot would not be modelled — which is exactly the mistake the first version
 of that fixture made.
 
+### The corpus gate
+
+The bench refuses to run on a corpus it cannot verify. Before any case, it parses the 55
+`prompt_key` → `evidence_contract` SHA-256 pairs out of
+`docs/prompt_ecosystem_management/project-prompt-contract-registry.md` — repository-resident, and
+parsed with a regex so the bench carries no dependency beyond the standard library — and requires
+the supplied directory to be exactly those 55 prompts with exactly those digests.
+
+An earlier revision accepted any 55 Markdown files **by count alone**, while its own docstring
+promised the registry verification. A stale or substituted corpus could have produced exit 0 and
+been credited as evidence for the current corpus. Two controls now prove the gate bites: appending
+one line to `PR-30.md` gives `HARNESS FAILURE: 1 body/bodies do not match their registry
+evidence_contract digest: ['PR-30']`, and a directory holding one body is rejected with the 54
+missing prompt ids named. Both exit 1 before a single case runs.
+
 ### Why the fixture trees are not committed
 
 The bench takes `--base`, `--work` and `--bodies` and fails with the path it wanted if any is
@@ -288,8 +303,9 @@ inconvenient:
   synced directory outside this repository and is installed only by the Product Owner. Vendoring
   it would create a second, drifting copy of the thing under test.
 - `--bodies` is the **55-prompt corpus**. Prompt bodies are authored in Notion in place and are
-  never mirrored into this repository; the corpus is fetched per run and verified against the
-  registry's recorded `evidence_contract` digests.
+  never mirrored into this repository; the corpus is fetched per run and is verified against the
+  registry's recorded `evidence_contract` digests by the gate above — so the corpus is not committed
+  but it is also not taken on trust.
 
 So the committed script is the reproducible part and the inputs are named, not assumed. A reader
 who wants the evidence without the inputs has `repairs.patch`, which is the whole change.
