@@ -111,16 +111,26 @@ def apply(work, mutate):
     open(pp, "wb").write(dumps(prof))
 
 
-def layers(work):
+def load_validator(work):
+    """Import the rig's validator. A failure HERE means no guard logic ran at all."""
+
     sdir = os.path.join(work, "flowmaster-validate", "scripts")
     sys.path.insert(0, sdir)
-    for stale in [k for k in list(sys.modules) if k.startswith("validate_") or k == "m"]:
-        del sys.modules[stale]
-    spec = importlib.util.spec_from_file_location("m", os.path.join(work, VALIDATOR))
-    m = importlib.util.module_from_spec(spec)
-    sys.modules["m"] = m
-    spec.loader.exec_module(m)
-    sys.path.remove(sdir)
+    try:
+        for stale in [k for k in list(sys.modules) if k.startswith("validate_") or k == "m"]:
+            del sys.modules[stale]
+        spec = importlib.util.spec_from_file_location("m", os.path.join(work, VALIDATOR))
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["m"] = m
+        spec.loader.exec_module(m)
+        return m
+    finally:
+        sys.path.remove(sdir)
+
+
+def layers(m, work):
+    """Evaluate each guard layer. A failure HERE is the guard refusing: fail-closed."""
+
     c = json.load(open(os.path.join(work, CF)))
     surf, rows = m.routing_surface(c)
     out = {
@@ -159,10 +169,18 @@ def main():
             if open(os.path.join(work, CF), "rb").read() == before:
                 harness_error = "apply() changed nothing; the placement did not land"
         if harness_error is None:
+            # Loading the validator and evaluating it are also judged differently. A
+            # validator that cannot be imported ran no guard logic whatever, so crediting
+            # that as fail-closed is the same silent pass one step further in.
             try:
-                L = layers(work)
-            except Exception as exc:                      # HERE a crash IS fail-closed
-                L = {"raised": "%s: %s" % (type(exc).__name__, exc)}
+                validator = load_validator(work)
+            except Exception as exc:
+                harness_error = "validator failed to import: %s: %s" % (type(exc).__name__, exc)
+            else:
+                try:
+                    L = layers(validator, work)
+                except Exception as exc:                  # HERE a crash IS fail-closed
+                    L = {"raised": "%s: %s" % (type(exc).__name__, exc)}
         print("=" * 78)
         print("PLACEMENT %s" % name)
         if harness_error:
