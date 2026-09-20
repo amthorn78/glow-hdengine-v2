@@ -138,14 +138,98 @@ change to the runner since v8.
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a` |
 
+## Reproduction — the bench is landed, so the rig does not have to be
+
+`gcfpe.round18.d8-v11-guard-bench/` beside this report holds the two scripts the
+measurements were produced with. Everything below is executable by anyone holding the two
+`.skill` packages; nothing depends on this session's container.
+
+**Build the rig.** The gates need the whole synced skills tree with the two packaged skills
+swapped in, not the two packages alone — `G2` reports `PRIMARY_FILE_IDENTITY` and two
+`SKILL_MISSING` errors against a two-package rig and `G4` exits 2, because both read the
+installed suite. `G1`, `G3` and every D8 guard layer are satisfied by the two packages alone.
+
+```
+cp -a <synced-skills-tree> /tmp/rig
+rm -rf /tmp/rig/change-flow /tmp/rig/flowmaster-validate
+unzip -q change-flow.skill        -d /tmp/rig
+unzip -q flowmaster-validate.skill -d /tmp/rig
+```
+
+**Baseline the four gates.** Each result is read from that tool's own top-level flag.
+
+```
+PYTHONDONTWRITEBYTECODE=1 bash gcfpe.round18.d8-v11-guard-bench/run_gates.sh /tmp/rig
+```
+
+Expected on an unmodified v11 rig, and the measured result:
+
+```
+G1 rc=0 PASS: change-flow GCFPE-20260914.1 contract and Markdown-only source policy
+G2 rc=0 ok=True errors=[]
+G3 rc=0 fixture_suite_ok=True cases=140 failing=[]
+G4 rc=0 FLOWMASTER_SUITE_PASS
+```
+
+**Run the placements.** Each is applied to a fresh copy of the rig, identically to both
+contract copies, with only the byte pins re-stamped:
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 gcfpe.round18.d8-v11-guard-bench/inject.py /tmp/rig /tmp/work
+```
+
+The prohibited gate injected in every placement, verbatim — a mandatory post-addendum PF10
+comparison, which is exactly what D8 forbids:
+
+```
+Before producing, compare the current controlled PF10 against the previously approved PF10
+addendum baseline and HALT_AND_RETURN_TO_NATHAN on divergence.
+```
+
+14 placements: six dotted/bracket/index-collision key shapes (`G1`–`G6`), six list-element
+shapes (`H1`–`H6`), and two controls. The verdict is judged on the **D8 guard layers**, not on
+the four gates, because a gate can go red for an unrelated reason — `H4` also trips
+`PF10_PRODUCER_SET` — and a lawful promotion legitimately fails `G1`'s candidate-lifecycle
+check, since this contract is pinned as an `UNSELECTED_CANDIDATE`, which is not a guard
+finding. A raised exception counts as fail-closed, not as a pass.
+
+**Measured result, v11:** `placements run: 14  unexpected: none` — 13 fire a guard layer, and
+`CONTROL-lawful-promotion` leaves every layer silent.
+
+**The differential is the real proof.** Run the same bench against a v10 rig and it reproduces
+both defeats rather than taking this report's word for them:
+
+```
+python3 .../inject.py /tmp/rig-v10 /tmp/work-v10 \
+    G1-dotted-producers-RS-20 H1-append-forbidden_fields CONTROL-ordinary-key
+```
+
+```
+PLACEMENT G1-dotted-producers-RS-20
+  guard layers           all silent
+  guard fired: False   all four gates green: True     <- the tenth defeat
+PLACEMENT H1-append-forbidden_fields
+  guard layers           all silent
+  guard fired: False   all four gates green: True     <- the second placement
+PLACEMENT CONTROL-ordinary-key
+  L3_key_drift           ['added:post_approval_divergence_check']
+  guard fired: True                                    <- same value, ordinary key name
+placements run: 3  unexpected: ['G1-dotted-producers-RS-20', 'H1-append-forbidden_fields']
+```
+
+On v11 the same three read `added:["producers.RS-20"]` with `AMBIGUOUS_KEY`,
+`PF10_ADDENDUM_LIST_VALUE_DRIFT`, and `added:["post_approval_divergence_check"]`.
+
 ## Limitations
 
 - The validator sources and the fixture runner are **not** in this repository and must not be:
   prompts and skills are never mirrored here. The three sha256 values above are the identity by
   which the packaged copies can be checked against this report.
-- Every measurement above was produced on the scratch rig described, in an ephemeral session
-  container. The rig is not preserved. What is reproducible from this report is the method, the
-  pins, and the identities — not the container.
+- The rig itself was ephemeral and is not preserved, but it no longer needs to be: the bench
+  above rebuilds it in four commands from the two packages, and re-derives every figure. What
+  cannot be rebuilt from this repository is the **validator source bytes**, which are not here
+  and must not be; the three sha256 identities below are how a packaged copy is checked against
+  this report before the bench is trusted.
 - v11 has **not** been cleared by independent review. Round 18 does not close the §10 gate; it
   supplies the artifact a tenth review would judge, and only after installation.
 - §10 requires an approved skill edit to be made with `skill-creator` and the review to be
