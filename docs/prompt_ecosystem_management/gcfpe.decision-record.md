@@ -313,6 +313,14 @@ residual that happens to be caught elsewhere today is still a residual.
 
 ### Amendment, 2026-09-20 — the tenth defeat, and the failure class it introduced
 
+**Enforcement status at the time of writing: the installed build is v6.** Guard v11, described
+below, is a packaged working copy that is **not installed** and has not been cleared by
+independent review; the guard report records it as `PACKAGED_AWAITING_INSTALLATION`. Every v11
+behaviour and measurement in this amendment is a property of that uninstalled copy, recorded so
+the reasoning is not lost, and **none of it describes enforcement currently in force.** What is
+in force is v6, which carries the tenth defeat below and the nine before it. Read any
+present-tense sentence about v11 accordingly.
+
 The guard has now been written eleven times and defeated ten. The tenth defeat came from
 neither a selector nor a waiver, and it is worth naming as its own class: **a lossy key
 function.** The check compared *derived path strings*, and the derivation was not injective,
@@ -339,7 +347,7 @@ invisible. Three of the four lists were caught anyway, each by one unrelated val
 by the rule this section already records, that is incidental coverage and not enforcement.
 `forbidden_fields` had nothing behind it, because its only reader is a superset test.
 
-The eleventh version fixes both structurally:
+The eleventh version, packaged and uninstalled, closes both structurally:
 
 - a path is now a **tuple of typed segments** — dict keys as strings, list indices as
   integers — which is injective by construction, with no rejection rule and no vocabulary.
@@ -361,7 +369,8 @@ rule's mistake — a form pin that rejects lawful content — and it was not mad
 is unavailable on this axis, so the values are enumerated instead, which is what the object's
 other three lists already were.
 
-Measured, not asserted: **13 of 13** attack placements caught, including three dotted-key
+Measured against the packaged v11 copy on a scratch rig, not asserted, and not a claim about
+installed enforcement: **13 of 13** attack placements caught, including three dotted-key
 targets, a nested dotted key, a bracket-shaped key, a key colliding with a list index, all
 four lists, and a list reversal. Every earlier defeat stays caught — v8's object and v9's
 prose under all lifecycle names, and the nested addendum clause — and a lawful promotion with
