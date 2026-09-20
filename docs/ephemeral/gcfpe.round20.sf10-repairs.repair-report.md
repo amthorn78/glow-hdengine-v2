@@ -479,6 +479,37 @@ not finished until every summary, opening and recommendation resting on that pre
 re-read. The document, not the paragraph.** That pass has now been run over both files for all three
 premises; the only surviving occurrences of the old wording are inside the corrections that quote it.
 
+### The run is landed, because the repository's own rule said it had to be
+
+Review pointed out that in a clean checkout none of the bench's three inputs exist and no run output
+is committed, so the PASS counts in this report could not be independently verified — and it cited
+the repository's own standard against me. The registry's `corroboration_not_reproducible_here` key
+says a review whose "report, inputs or command is checked in" is absent "cannot be reproduced and it
+is recorded here as corroboration, never as evidence," and that it "is promoted to evidence only by
+landing the run." My counts were in precisely that position: asserted numbers with no landed run, in
+a report that elsewhere insists on the distinction.
+
+`gcfpe.round20.sf10-bench/run-record.md` now lands it, **generated programmatically from the
+artefacts** so nothing in it was transcribed: the commands verbatim, every input's identity (the
+frozen tree's file count and digest, all 55 body SHA-256s and byte counts, the nine changed files'
+before/after digests, the package digests), and the outputs themselves — both end-to-end error lists
+in full, both fixture-suite results including the installed build's crash line, the guard-block
+parity table, and the bench's complete stdout.
+
+**What it does not do, stated rather than glossed.** It does not make the runs reproducible in a
+clean checkout, because the inputs cannot be landed: the 55 bodies are authored in Notion in place and
+never mirrored here, and the two skill trees live in a one-way synced directory that is not a git
+checkout and that only the Product Owner installs into. Neither is mine to commit. So a clean checkout
+gets the commands and the input identities but not the inputs; anyone holding the inputs can confirm
+they are the same ones by digest. That is the strongest form available here and it is weaker than a
+self-contained harness — which is exactly the distinction the registry key draws, and the report
+should not be read as claiming the stronger one.
+
+**Two escaping artefacts in the generated file, found and fixed before committing.** The command
+block came out with a typo'd path (`prompt_ecosystema_management`) and **doubled backslashes**, so the
+shell continuations would not have run. Same species as the mangled regex in an earlier review reply:
+the claim was right and the record was not. Generating a file does not exempt it from being read.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract

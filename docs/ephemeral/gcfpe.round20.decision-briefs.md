@@ -53,8 +53,11 @@ in any prompt's execution path, any handoff, or any result contract.
 **Nothing invokes it.** It is user-invoked only, by its own terms — "Act only when the user asks
 to propagate, synchronize, or apply an approved Primary update."
 
-It is, however, **named as the repair route in six places**, which is what makes retirement a
-change rather than a deletion:
+It is, however, **named in nine places across seven skills**, which is what makes retirement a
+change rather than a deletion. This count was "six places" until review challenged it: the table
+below had six rows, the governance-audit line was mentioned underneath it without being counted, and
+**the two `validate_flowmaster.py` sites were not in the inventory at all** — which mattered, because
+they are the two that make retirement a behaviour change rather than a wording fix:
 
 | location | what it says |
 |---|---|
@@ -64,15 +67,22 @@ change rather than a deletion:
 | `session-branch-flowmaster/SKILL.md:468` | same instruction |
 | `flowmaster-primary/SKILL.md:254` | step 6 of the core-revision procedure |
 | `flowmaster-validate/SKILL.md:136` | "A drifted core fails and identifies flowmaster-propagate as the repair route" |
+| `amthor-workspace-governance-audit/references/interoperability-contracts.md:11` | the audit "may recommend propagation but never performs it" — a governance interoperability contract, in a **seventh skill** |
+| `flowmaster-validate/scripts/validate_flowmaster.py:49` | **code** — `flowmaster-propagate` in the skill roster tuple |
+| `flowmaster-validate/scripts/validate_flowmaster.py:345` | **code** — maps the skill to `scripts/propagate_core.py` in the required-files mapping |
 
-`amthor-workspace-governance-audit/references/interoperability-contracts.md:11` also records that
-the audit "may recommend propagation but never performs it."
+Excludes `flowmaster-propagate/SKILL.md`'s own `name:` line and the sync `manifest.json`, neither of
+which is a pointer to repoint.
 
 ## 1.3 What would stop working if it were retired
 
 **Nothing at runtime, and nothing in the prompt flow.** The single concrete consequence is that
 `flowmaster-validate` would still detect core drift and would then point at a skill that no longer
-exists. That is a broken pointer in six places, not a lost capability.
+exists. That is a broken pointer, not a lost capability — but note that two of the nine sites are in
+`validate_flowmaster.py` itself, where the skill appears in the validation roster and the
+required-files mapping. **So retiring the skill without editing the validator does not leave a merely
+cosmetic dangling pointer: the validator would fail, because it validates that the retired skill's
+files are present.** That is the difference between this being a wording sweep and a behaviour change.
 
 ## 1.4 Whether there is any realistic current use
 
@@ -116,10 +126,39 @@ core-block case, and it is the only route that works when only you can install.
 
 Two things follow, stated so they are not surprises:
 
-1. **Retirement leaves six stale pointers.** Those six lines should name rebuild-and-reinstall
-   instead. That is six one-line edits across five skills — itself a skill change needing
-   independent review. It is cheap but it is not free, and it can ride whenever those skills are
-   next opened rather than being done on its own.
+1. **Retirement leaves nine stale pointers across seven skills, and two of them are code.**
+   This item previously said "six one-line edits across five skills." Both numbers were wrong, and
+   the error was the same one that mispriced `SF10-07`: counting the prose I had read rather than
+   measuring the tree. Review caught it and named six skills; measured against the frozen tree it is
+   **seven**. Excluding `flowmaster-propagate`'s own `SKILL.md` and the sync `manifest.json`:
+
+   | site | kind |
+   |---|---|
+   | `tw-flowmaster/SKILL.md:496` | prose route pointer |
+   | `change-flow/SKILL.md:568` | prose route pointer |
+   | `session-branch-flowmaster/SKILL.md:468` | prose route pointer |
+   | `session-relay-flowmaster/SKILL.md:723` | prose route pointer |
+   | `flowmaster-primary/SKILL.md:254` | prose route pointer |
+   | `flowmaster-validate/SKILL.md:136` | the **drift-detection contract** — names propagate as the repair route a drifted core identifies |
+   | `amthor-workspace-governance-audit/references/interoperability-contracts.md:11` | a governance interoperability contract, in a **seventh skill neither count included** |
+   | `flowmaster-validate/scripts/validate_flowmaster.py:49` | **code** — the skill roster tuple |
+   | `flowmaster-validate/scripts/validate_flowmaster.py:345` | **code** — maps the skill to `scripts/propagate_core.py` in the required-files mapping |
+
+   **So this is not six cheap prose edits that can ride along.** The last two are
+   `flowmaster-validate`'s validation roster: it currently *validates that*
+   `flowmaster-propagate`'s files are present, so retiring the skill without editing the validator
+   makes the validator fail. Changing a roster is execution behaviour, so it needs a
+   `FLOWMASTER_VALIDATE_REVISION` bump and its own independent review — the same shape as the
+   `CHANGE_FLOW_SPECIALIZATION_REVISION` bump in the repair package.
+
+   Line 6 is worth separating because it interacts with the recommendation below: it is the one
+   place where "a drifted core identifies propagate as the repair route" is written down, and it is
+   inside the skill whose drift detection this brief says should **stay**. That line changes its
+   named route; the detection itself does not change.
+
+   **The recommendation is unchanged — retire it — but the price is not "cheap".** Any
+   implementation or review roster for the retirement must explicitly cover all seven skills and
+   treat the two validator lines as a behaviour change, not a wording fix.
 2. **`flowmaster-validate`'s drift detection should stay.** Detecting that a specialization's
    embedded core has diverged is genuinely useful and is unaffected by how the repair is
    performed. Only the named repair route changes.
