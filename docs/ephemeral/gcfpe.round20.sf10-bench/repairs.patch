@@ -127,7 +127,7 @@ diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster
              "skills": {},
 diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowmaster-validate/scripts/validate_gcfpe_20260914.py
 --- base/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.354635208 +0000
-+++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:20:40.863788859 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_20260914.py	2026-09-20 22:39:58.847719546 +0000
 @@ -953,7 +953,7 @@
      errors += subset_errors(profile, {
          "schema_version": "gcfpe-validation-profile/1.0",
@@ -194,7 +194,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
              errors.append("QA_PASS_BODY_CLASS_MAP")
      if ("class evidence is missing or conflicting" not in producer
              or "without a closure handoff" not in producer
-@@ -1974,6 +2005,38 @@
+@@ -1974,6 +2005,57 @@
      return sorted(set(errors))
  
  
@@ -205,6 +205,25 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +# one prompt whose public result states are all terminal; GCFPE-MGMT-10 is not, which is
 +# why a graph-derived rule disagreed with the registry about it.
 +HANDOFF_LITERAL_EXEMPT = frozenset({"GCFPE-MGMT-10", "PR-50"})
++
++# The complete roster of non-prompt destinations the contract declares, taken from the
++# contract by measurement rather than from memory: `NATHAN_TERMINAL_RETURN` (54 rows),
++# `ORIGINAL_NATIVE_STAGE` (39), `ACTUAL_OWNER_TERMINAL_RETURN` (18),
++# `NATHAN_MANUAL_MERGE_ASSERTION` (2) and `NATHAN_PROCEED` (1).  These are actors and
++# stages, not prompts, so they are not name-checkable in a body.
++#
++# The roster has to be explicit.  Skipping every value that is simply absent from
++# EXPECTED_MEMBERS makes a typo indistinguishable from a symbol: a row routing to
++# `PR-300` is silently ignored exactly as `NATHAN_PROCEED` is, and the receiver
++# obligation for the prompt it meant to name is never checked.  With the roster named,
++# anything else that is neither a member nor a symbol is malformed.
++SYMBOLIC_DESTINATIONS = frozenset({
++    "NATHAN_TERMINAL_RETURN",
++    "ORIGINAL_NATIVE_STAGE",
++    "ACTUAL_OWNER_TERMINAL_RETURN",
++    "NATHAN_MANUAL_MERGE_ASSERTION",
++    "NATHAN_PROCEED",
++})
 +
 +
 +def names_prompt(text: str, prompt_id: str) -> bool:
@@ -233,7 +252,7 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
  def validate_prompt_bodies(prompt_dir: Path, contract: dict[str, Any]) -> tuple[list[str], dict[str, str]]:
      errors: list[str] = []
      hashes: dict[str, str] = {}
-@@ -2023,9 +2086,62 @@
+@@ -2023,9 +2105,72 @@
              for row in (contract.get("state_routes", {}).get(prompt_id, []))
              if isinstance(row, dict) and row.get("public_result") is True
          ]
@@ -257,7 +276,9 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +        # 2. The receiver binding.  Every prompt-id destination of a non-terminal
 +        #    public branch must be named in the body.  Symbolic destinations
 +        #    (NATHAN_TERMINAL_RETURN, ORIGINAL_NATIVE_STAGE, NATHAN_PROCEED,
-+        #    NATHAN_MANUAL_MERGE_ASSERTION) are not prompts and are not name-checkable.
++        #    NATHAN_MANUAL_MERGE_ASSERTION, ACTUAL_OWNER_TERMINAL_RETURN) are not prompts,
++        #    are not name-checkable, and are enumerated in SYMBOLIC_DESTINATIONS so that a
++        #    typo cannot masquerade as one.
 +        #    Matching uses identifier boundaries: a plain substring test lets `QA-100`
 +        #    satisfy a branch that routes to `QA-10`, which is the one prefix collision
 +        #    among the 55 ids.
@@ -292,9 +313,17 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_20260914.py work/flowma
 +                    errors.append(f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS")
 +                    continue
 +                for destination in destinations:
-+                    if destination in EXPECTED_MEMBERS and not names_prompt(text, destination):
++                    if destination in EXPECTED_MEMBERS:
++                        if not names_prompt(text, destination):
++                            errors.append(
++                                f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"
++                            )
++                    elif destination not in SYMBOLIC_DESTINATIONS:
++                        # Neither a member prompt nor a declared symbol: a typo or an
++                        # undeclared node, and the receiver it meant to name goes
++                        # unchecked.  Fail closed rather than skip.
 +                        errors.append(
-+                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:{destination}"
++                            f"PROMPT_HANDOFF_RECEIVER:{prompt_id}:MALFORMED_DESTINATIONS"
 +                        )
          elif public_states and not all(row.get("next_prompt_handoff_count") == 0 for row in public_states):
              errors.append(f"PROMPT_TERMINAL_HANDOFF_CONTRACT:{prompt_id}")

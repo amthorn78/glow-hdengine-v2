@@ -37,10 +37,26 @@ digest and all 55 body digests, is identical between the installed and repaired 
 
 ## What changed
 
-Nine files differ from the installed tree. Seven carry the three approved repairs and `SF10-08`;
-two — `change-flow/scripts/validate_gcfpe_20260914.py` and
-`flowmaster-validate/scripts/validate_gcfpe_current.py` — carry nothing but the revision bump
-recorded below.
+Nine files differ from the installed tree, and the split is **four substantive, five
+revision-only** — not the "seven and two" an earlier version of this line claimed. Review counted
+the patch and was right; the corrected split, measured per file from the diff:
+
+| file | added lines that are not a revision string |
+|---|---|
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | **125** — `SF10-03`, `SF10-06` |
+| `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | **14** — `SF10-08` |
+| `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | **7** — the `SF10-08` fixture anchor |
+| `change-flow/SKILL.md` | **5** — the `SF10-05` disclaimer |
+| `change-flow/scripts/validate_gcfpe_20260914.py` | 0 — revision pin only |
+| `flowmaster-validate/SKILL.md` | 0 — revision declaration only |
+| `flowmaster-validate/references/…-validation-profile.json` | 0 — revision pin only |
+| `flowmaster-validate/scripts/validate_flowmaster.py` | 0 — revision pins only |
+| `flowmaster-validate/scripts/validate_gcfpe_current.py` | 0 — revision pin only |
+
+The distinction matters for review effort: **five of the nine files contain nothing an independent
+reviewer needs to reason about behaviourally**, and treating them as repair implementations spreads
+attention across nine files when four carry the whole change. Getting that wrong made the package
+look larger and more diffuse than it is.
 
 | file | installed sha256 | repaired sha256 |
 |---|---|---|
@@ -48,13 +64,13 @@ recorded below.
 | `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
 | `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
-| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `3379824809242f45…` |
+| `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `b0456a27816c47de…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
 | `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
 | `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 349 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 378 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
 across both validator copies, and it still is: four functions, 7355 characters, md5
@@ -510,6 +526,41 @@ block came out with a typo'd path (`prompt_ecosystema_management`) and **doubled
 shell continuations would not have run. Same species as the mangled regex in an earlier review reply:
 the claim was right and the record was not. Generating a file does not exempt it from being read.
 
+### An unknown destination was indistinguishable from a symbol
+
+Review found that a value which is neither a member prompt nor a declared symbol — `PR-300`, say —
+passed the new type guard and was then **silently skipped**, exactly as `NATHAN_PROCEED` is, so the
+receiver that row meant to name went unchecked. Correct, and the fix is an explicit roster rather
+than an absence test.
+
+**The roster, counted from the contract rather than recalled.** 208 destinations sit on non-terminal
+public rows: **166 member prompts and 42 symbolic**, the symbolic being `ORIGINAL_NATIVE_STAGE` (39),
+`NATHAN_MANUAL_MERGE_ASSERTION` (2) and `NATHAN_PROCEED` (1). Across all rows there are **five**
+symbols, adding `NATHAN_TERMINAL_RETURN` (54) and `ACTUAL_OWNER_TERMINAL_RETURN` (18).
+`SYMBOLIC_DESTINATIONS` names all five; anything that is neither a member nor one of them is now
+`MALFORMED_DESTINATIONS`.
+
+**My own comment's roster was wrong twice**, which is the fifth accounting error of this family: it
+listed **four** symbols, **omitted `ACTUAL_OWNER_TERMINAL_RETURN` entirely**, and included
+`NATHAN_TERMINAL_RETURN`, which never appears on the rows this guard actually inspects. Corrected
+from the measurement, with the counts in the constant's docstring so the next reader does not have to
+re-derive them.
+
+### The bench no longer depends on how it was invoked
+
+Review pointed out that the bench's usage block shows no `PYTHONDONTWRITEBYTECODE=1`, and `load()`
+calls `exec_module` on a validator **inside each supplied tree** — so a reviewer following the usage
+block exactly would write `__pycache__/*.pyc` into both trees, mutating inputs this bench calls
+frozen. That is not hypothetical: it is precisely the failure recorded two sections above, which put
+two `.pyc` files into a `.skill` archive, **and it happened for exactly this reason** — a script
+relying on an environment variable its own documentation never showed.
+
+`bench.py` now sets `sys.dont_write_bytecode = True` itself, before any import. **Verified by running
+it with no environment variable at all**, exactly as the usage block prints: nineteen cases, exit 0,
+and **zero `.pyc` or `__pycache__` in either tree afterwards**. A harness must not depend on how it
+was invoked to leave its inputs untouched — and the fix belongs in the harness, not in a note telling
+the caller to remember.
+
 ### The whole table above was re-run against the packaged copies
 
 After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
@@ -518,7 +569,7 @@ those same copies. All of it reproduced: 12 → 10 with the 10 exactly `SF10-07`
 crashing on the installed build with `ValueError: Mutation anchor absent: reject-source-epic-to-crd`
 and clean at 164/0 on the repaired one; 140/0 on both contract suites; `validate_flowmaster.py`
 exit 0 on both; the `change-flow` contract validator exit 0 with byte-identical stdout on both; and
-the bench at eighteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
+the bench at nineteen cases, exit 0, with the corpus gate confirming all 55 registry digests. The
 end-to-end outputs are 6179 and 6104 bytes, the same sizes as the first sweep.
 
 **Two of my own invocation errors during that re-run, recorded so they are not read as results.**
@@ -541,7 +592,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, **eighteen cases, exit 0**. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **nineteen cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -606,7 +657,7 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 | package | files | bytes | sha256 |
 |---|---|---|---|
 | `change-flow.skill` | 21 | 241846 | `cb1239324f080df7c5a8f1f17624542688b1994fc05d04f05cbe45b76367968e` |
-| `flowmaster-validate.skill` | 29 | 272154 | `f3e7a72e3d6f25b4cd02cc942cd701f31405373bb505c9557628303e4fff1ae5` |
+| `flowmaster-validate.skill` | 29 | 272630 | `94e3e63f8eaad6285c9116fd5d803714955f1d4bd4ee795c7166b00cd6221757` |
 
 The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
 3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation

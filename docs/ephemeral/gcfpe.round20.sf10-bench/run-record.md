@@ -138,26 +138,57 @@ Each archive was verified by extracting it and running a full recursive diff aga
 working copy; both are identical. `zip -X` is used so a rebuild from unchanged content
 reproduces the same digest, which was confirmed by building twice.
 
-## Commands, verbatim
+## Commands
 
-All runs used a scratch copy of the whole tree, never the installed tree, with
-`PYTHONDONTWRITEBYTECODE=1 LC_ALL=C LANG=C TZ=UTC`. `$T` is `base` or `work`; `$C` is
-`references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json`.
+**Corrected after review.** The first version of this section was headed "Commands, verbatim" and
+then wrote the corpus as `<55-body corpus>` — a placeholder, not a path — and gave **no extraction
+command at all**, while invoking the registry key that requires exactly that. Both are fixed below:
+the extraction step is named and its script is committed, and the corpus argument is the real path.
+
+`$B` below is the corpus directory, session-local at
+`<scratchpad>/s10/bodies` — the path is not portable, but the **identity** of what it held is pinned
+by the 55 digests above, which is the part a reader can check. All runs used a scratch copy of the
+whole tree, never the installed tree, with `LC_ALL=C LANG=C TZ=UTC`. `$T` is `base` or `work`; `$C`
+is `references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json`.
+
+### 0. Extraction — how the corpus was produced
 
 ```sh
-# 1. the bench
+# once per prompt, from a persisted Notion fetch result
+python3 docs/ephemeral/gcfpe.round20.sf10-bench/extract_body.py <fetch-result.json> $B/<PROMPT>.md
+```
+
+`extract_body.py` **is committed with this record**. It implements the **strip-both** convention the
+registry's recorded digests depend on: the body is the text between the first `<content>` and the
+last `</content>`, with exactly one leading and one trailing newline removed if present. Any other
+variant yields different bytes and a different SHA-256, which is why the registry names the
+convention rather than assuming it.
+
+**Round-trip verified, not asserted.** Of the persisted fetch results retained in this session, **26
+have a counterpart in the corpus, and the committed extractor reproduces all 26 byte-identically.**
+That checks the script against the corpus it is claimed to have produced. It does not cover the other
+29, whose fetch results were not retained; those rest on the registry digest check the bench performs
+before every run.
+
+**Still not reproducible in a clean checkout**, and this is the honest limit: the persisted fetch
+results are per-session artifacts of a Notion read, and prompt bodies are authored in Notion in place
+and never mirrored here. The extractor plus the digests let a holder of the bodies confirm identical
+bytes; they do not let a clean checkout obtain the bodies.
+
+```sh
+# 1. the bench  (no env var needed: the script sets sys.dont_write_bytecode itself)
 python3 docs/ephemeral/gcfpe.round20.sf10-bench/bench.py \
     --base  prep/base  --work prep/work \
-    --bodies <55-body corpus> \
+    --bodies $B \
     --registry docs/prompt_ecosystem_management/project-prompt-contract-registry.md
 
 # 2. end-to-end, body-level, on the 55-body corpus
 python3 prep/$T/flowmaster-validate/scripts/validate_gcfpe_20260914.py prep/$T/change-flow \
-    --contract prep/$T/flowmaster-validate/$C --prompt-dir <55-body corpus>
+    --contract prep/$T/flowmaster-validate/$C --prompt-dir $B
 
 # 3. the body-level fixture suite
 python3 prep/$T/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py prep/$T/change-flow \
-    --contract prep/$T/flowmaster-validate/$C --prompt-dir <55-body corpus>
+    --contract prep/$T/flowmaster-validate/$C --prompt-dir $B
 
 # 4. the contract-only fixture suite
 python3 prep/$T/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py prep/$T/change-flow \

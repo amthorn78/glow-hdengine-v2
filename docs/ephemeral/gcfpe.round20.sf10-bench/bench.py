@@ -2,7 +2,11 @@
 """SF10-03 / SF10-06 bench.
 
 Usage:
-    bench.py --base <installed-tree> --work <repaired-tree> --bodies <55-body-corpus>
+    bench.py --base <installed-tree> --work <repaired-tree> --bodies <55-body-corpus> \
+             [--registry docs/prompt_ecosystem_management/project-prompt-contract-registry.md]
+
+No environment variable is required: the script sets `sys.dont_write_bytecode` itself, so
+running it exactly as written above leaves both supplied trees byte-unchanged.
 
 The three inputs are environment-resident and are deliberately not committed:
 
@@ -39,6 +43,15 @@ handoff cases write the mutated corpus to a temporary directory and call
 `validate_prompt_bodies`, the function the validator actually uses.
 """
 import argparse, hashlib, importlib.util, json, pathlib, re, shutil, sys, tempfile
+
+# Bytecode writing is disabled HERE rather than left to the caller's environment.  `load()`
+# calls `exec_module` on a validator inside each supplied tree, and CPython would write
+# `__pycache__/*.pyc` beside it -- mutating inputs this bench describes as frozen, and
+# contaminating a `--work` tree that is later packaged.  That is not hypothetical: it
+# happened in this session, putting two .pyc files into a .skill archive, and it happened
+# because a measurement script relied on an environment variable the usage block never
+# showed.  A harness must not depend on how it was invoked to leave its inputs untouched.
+sys.dont_write_bytecode = True
 
 CONTRACT = "change-flow/references/gcfpe-20260914.1-091426.1-direct-handoff-contract.json"
 FAIL = 0
@@ -285,6 +298,29 @@ def bury_receiver_in_enum_token(prompt_id, receiver, enum_suffix):
     return f
 
 
+def typo_destination(prompt_id, bad, label):
+    """Replace a real member destination with a near-miss string such as `PR-300`.
+
+    A value that is neither a member prompt nor a declared symbol used to be skipped in
+    silence -- indistinguishable from `NATHAN_PROCEED` -- so the receiver the row meant to
+    name went unchecked.  The fixture asserts the bad value landed and that it is neither a
+    member nor a symbol, so a fire cannot be explained by it accidentally being either.
+    """
+    def f(data):
+        rows = [r for r in data["contract"].get("state_routes", {}).get(prompt_id, [])
+                if isinstance(r, dict) and r.get("public_result") is True
+                and r.get("terminal_for_invocation") is not True
+                and isinstance(r.get("destinations"), list) and r["destinations"]]
+        if not rows:
+            die(f"fixture invalid: {prompt_id} has no non-terminal public row, so {label} "
+                f"cannot be modelled")
+        row = rows[0]
+        row["destinations"] = [bad] + list(row["destinations"])[1:]
+        if bad not in row["destinations"]:
+            die(f"fixture invalid: {bad} did not land in {prompt_id}")
+    return f
+
+
 def blank_destinations(prompt_id, mode, label):
     """Set a real non-terminal public row's `destinations` to null, or remove the key.
 
@@ -478,6 +514,22 @@ def main() -> int:
              blank_destinations("ESC-40", mode, label), handoff_errors,
              ["PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS"],
              bodies_dir=bodies, registry=registry)
+
+    print("\n=== SF10-06 — an unknown destination string is malformed, not a symbol ===")
+    print("  The contract declares five non-prompt destinations -- NATHAN_TERMINAL_RETURN (54")
+    print("  rows), ORIGINAL_NATIVE_STAGE (39), ACTUAL_OWNER_TERMINAL_RETURN (18),")
+    print("  NATHAN_MANUAL_MERGE_ASSERTION (2), NATHAN_PROCEED (1) -- counted from the contract,")
+    print("  not recalled. Skipping everything merely absent from EXPECTED_MEMBERS made a typo")
+    print("  indistinguishable from a symbol: `PR-300` was ignored exactly as NATHAN_PROCEED is,")
+    print("  and the receiver that row meant to name was never checked. With the roster named in")
+    print("  SYMBOLIC_DESTINATIONS, anything else fails closed.")
+    case("repaired build reports MALFORMED_DESTINATIONS for an unknown destination (ESC-40)", work,
+         typo_destination("ESC-40", "PR-300", "a near-miss destination"), handoff_errors,
+         ["PROMPT_HANDOFF_RECEIVER:ESC-40:MALFORMED_DESTINATIONS"],
+         bodies_dir=bodies, registry=registry)
+    print("  And the five declared symbols must still be skipped rather than flagged -- the")
+    print("  clean-corpus case above is that control: all 42 symbolic destinations on")
+    print("  non-terminal public rows pass through it without an error.")
 
     print("\n=== SF10-06 — the predicate's remaining limit, asserted rather than hidden ===")
     print("  The check asserts that each declared receiver is NAMED in the body. It does not")

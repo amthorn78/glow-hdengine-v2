@@ -505,9 +505,20 @@ recommendation if it had not been caught in review.
 enumerated field to each `state_routes` row — for example `pf10_dependency` valued `NONE`,
 `READ_ONLY`, `SOURCE_AVAILABILITY` or `COMPARISON` — and then the pin needs no prose at all:
 
-- no row may carry `pf10_dependency: COMPARISON`, at any depth, with no allow-list — this is D8's
-  prohibition expressed over an enum;
+- **no row may be terminal or emit a blocking result while carrying
+  `pf10_dependency: COMPARISON`**, at any depth, with no allow-list — this is D8's prohibition
+  expressed over an enum;
 - a row may be terminal with `SOURCE_AVAILABILITY` (RS-40's case) and not with `READ_ONLY`.
+
+**Corrected after review.** The first version of this bullet said "no row may carry
+`pf10_dependency: COMPARISON`" — banning the enum value *everywhere*. That is **broader than the
+rule stated four paragraphs above**, which prohibits only a comparison that is terminal or emits a
+blocking result, and broader than D8, which prohibits a comparison **gate**. A branch that compares
+PF10 for an informational or routing purpose and then continues is not a gate, and the unscoped pin
+would have failed it. The typed field is the **selector**; `terminal_for_invocation` and the blocking
+result remain the **predicate**. Banning the selector value on its own discards the distinction the
+field was introduced to make — and the very next bullet already used the terminal predicate, so the
+proposal contradicted itself in adjacent lines.
 
 That is v11's own lesson applied to the body axis: stop enumerating what to inspect, enumerate what
 may exist.
