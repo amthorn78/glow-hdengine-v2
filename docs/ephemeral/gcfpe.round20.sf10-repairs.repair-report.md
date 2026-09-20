@@ -96,10 +96,29 @@ than reusing one whose meaning was different. Symbolic destinations
 `NATHAN_MANUAL_MERGE_ASSERTION`) are not prompts and are not name-checkable. Malformed
 `destinations` fails closed rather than being skipped.
 
-**The new predicate is stronger, not weaker.** It verifies **166 specific receiver bindings**
-across the 54 prompts that have a non-terminal public branch, where the old check verified the
-presence of one string. A body that carried `NEXT_PROMPT_HANDOFF` while naming the wrong receiver
-passed the old check and fails the new one.
+**What the new predicate does and does not prove.** It asserts that each of **166 declared
+receivers**, across the 54 prompts with a non-terminal public branch, is **named somewhere in that
+prompt's body**. That is strictly more than the old check, which asserted the presence of one
+string regardless of where any branch routed: a body that carried `NEXT_PROMPT_HANDOFF` while
+never naming its declared receiver at all passed the old check and fails this one.
+
+**It does not bind the name to the operative handoff.** If a body names its declared receiver in a
+route inventory, a phase description or a prohibition, and the mention nearest its routing tail
+points elsewhere, this check passes. The bench asserts that blind spot as its own case rather than
+leaving it to be discovered.
+
+**A routing-section-scoped variant was built, measured and rejected.** Restricting the search to
+sections whose heading names routing, results or handoffs fails **17 of the 166** on bodies that
+are correct — CL-20 declares CL-30 under `## Next step and recovery`, again under
+`## Candidate direct-destination bindings`, and again under `## Direct native branch packages`;
+CL-C-10, CL-E-10, PR-10 and CL-40 do the same under headings of their own. Any heading list that
+admitted all of them would cover most of the document, and writing one is a vocabulary selector —
+the failure mode this ecosystem has paid for repeatedly. **A check that fails on correct bodies is
+worse than one with a stated limit**, so the whole-document form is what is offered, with its limit
+recorded here and asserted in the bench.
+
+Closing the remaining gap needs per-branch structure a prose body does not carry; it is named as a
+follow-up, not smuggled in as covered.
 
 **Measured: 54 of 54 prompts pass, including GCFPE-MGMT-10**, whose body names PR-10 with a
 mention link at line 34.
@@ -225,7 +244,7 @@ testing nothing, and the reason the bench keeps its three phases apart.
 
 ## The bench
 
-`gcfpe.round20.sf10-bench/bench.py`, nine cases, exit 0. It keeps three phases apart, because
+`gcfpe.round20.sf10-bench/bench.py`, **ten cases, exit 0**. It keeps three phases apart, because
 round 18 proved that sharing one `try` lets a setup failure be credited as a passing gate:
 
 1. **apply** — build the fixture. Failure is `HARNESS FAILURE`, never a result; exit 1.
@@ -234,6 +253,37 @@ round 18 proved that sharing one `try` lets a setup failure be credited as a pas
 
 Each case also refuses to run if applying its mutation leaves the input unchanged, so a placement
 that silently matches nothing cannot be scored as caught.
+
+**Every case calls the validator's own functions.** The `SF10-03` cases call
+`validate_qa_closure_bodies`; the `SF10-06` cases write the mutated corpus to a temporary
+directory and call `validate_prompt_bodies`, which is the function the validator uses in
+production. An earlier revision of this bench reimplemented the `SF10-06` branch and chose between
+implementations by testing for an unrelated symbol, so its cases would have passed even if the
+real branch were absent, unreachable or written differently — a bench that tested its author's
+copy of the logic rather than the repair. That is the third instance this session of an instrument
+that could report success while measuring nothing, and it is why the tenth case exists.
+
+**The tenth case asserts a failure.** It retargets PR-30's last mention of PR-35 to PR-40, leaving
+the earlier mentions in place, and asserts that the check does **not** fire. It also refuses to
+run if the mutation removes the name entirely, because then the whole-document predicate would
+catch it and the blind spot would not be modelled — which is exactly the mistake the first version
+of that fixture made.
+
+### Why the fixture trees are not committed
+
+The bench takes `--base`, `--work` and `--bodies` and fails with the path it wanted if any is
+missing. It cannot reconstruct them, and committing them would be wrong rather than merely
+inconvenient:
+
+- `--base` and `--work` are copies of the **installed skills tree**, which lives in a one-way
+  synced directory outside this repository and is installed only by the Product Owner. Vendoring
+  it would create a second, drifting copy of the thing under test.
+- `--bodies` is the **55-prompt corpus**. Prompt bodies are authored in Notion in place and are
+  never mirrored into this repository; the corpus is fetched per run and verified against the
+  registry's recorded `evidence_contract` digests.
+
+So the committed script is the reproducible part and the inputs are named, not assumed. A reader
+who wants the evidence without the inputs has `repairs.patch`, which is the whole change.
 
 ## Packages
 
