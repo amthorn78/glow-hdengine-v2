@@ -25,10 +25,10 @@ unrunnable.
 | | |
 |---|---|
 | status | `PACKAGED_AWAITING_INDEPENDENT_REVIEW` |
-| files changed | **7**, across two skills |
+| files changed | **9**, across two skills — 7 carrying repairs, 2 carrying only the revision bump |
 | validator revision | 3.2.6 → **3.2.7** |
 | body-level fixture suite | **crashes on the installed build; 164 cases, 0 failed on the repaired build** |
-| contract fixture suite | 140 cases, 0 failed — unchanged |
+| contract fixture suite | 140 cases, 0 failed on both; the reports differ in one field, `validator_revision` |
 | end-to-end errors on the 55-body corpus | **12 → 10**, and the 10 are exactly `SF10-07`, which is the Product Owner's open decision |
 | two-run identity | holds on both the end-to-end run and the fixture suite |
 
@@ -37,20 +37,28 @@ digest and all 55 body digests, is identical between the installed and repaired 
 
 ## What changed
 
+Nine files differ from the installed tree. Seven carry the three approved repairs and `SF10-08`;
+two — `change-flow/scripts/validate_gcfpe_20260914.py` and
+`flowmaster-validate/scripts/validate_gcfpe_current.py` — carry nothing but the revision bump
+recorded below.
+
 | file | installed sha256 | repaired sha256 |
 |---|---|---|
-| `change-flow/SKILL.md` | `e6bd29d59ca01522…` | `aff778a075b4cbd9…` |
+| `change-flow/SKILL.md` | `e6bd29d59ca01522…` | `630f0c0bd575027d…` |
+| `change-flow/scripts/validate_gcfpe_20260914.py` | `660d61fe619c9dd9…` | `8e7cbe435a6e9938…` |
 | `flowmaster-validate/SKILL.md` | `f2729ba39de4f46b…` | `5b5898e6c54f5a64…` |
-| `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `66999a2160b6bbab…` |
+| `flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json` | `fac89991c5c4e5a1…` | `39c44ad84ca05d5e…` |
 | `flowmaster-validate/scripts/validate_gcfpe_20260914.py` | `535a3b161ef09962…` | `1a000e3357f452cd…` |
 | `flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py` | `433d2a1611e5671a…` | `7523947d952b1372…` |
 | `flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py` | `b5716af7882223d5…` | `8cff6c7ef685c0a0…` |
-| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `2fde743a31cc3a90…` |
+| `flowmaster-validate/scripts/validate_flowmaster.py` | `0e4c964c0dbf3701…` | `527bf522c0c602df…` |
+| `flowmaster-validate/scripts/validate_gcfpe_current.py` | `00c8b2035263ed0f…` | `272d7b81fa091ce2…` |
 
-The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 253 lines.
+The complete unified diff is at `gcfpe.round20.sf10-bench/repairs.patch`, 317 lines.
 
 **The D8/D15 guard block is not touched.** It is the one part that must stay byte-identical
-across both validator copies, and the `change-flow` copy of the validator is not changed at all.
+across both validator copies, and it still is: four functions, 7355 characters, md5
+`46c69eaf8f00672e44f8502bbf43c721` in each copy.
 
 ### One thing that made this simpler than expected
 
@@ -59,7 +67,8 @@ here. The `change-flow` copy is 1057 lines and validates the contract only; the
 `flowmaster-validate` copy is 2283 lines and adds the body-level layer. None of
 `validate_qa_closure_bodies`, `validate_prompt_bodies`, `prompt_identity_header_valid` or
 `notion_page_identity` exists in the `change-flow` copy, and it has no `--prompt-dir`. All three
-approved repairs live in the body-level layer, so only the `flowmaster-validate` copy changes.
+approved repairs live in the body-level layer, so the `change-flow` copy of the validator carries
+none of them — its only change is the one revision string described under `SF10-05`.
 
 ## `SF10-03` — the QA-120 class-map check
 
@@ -192,12 +201,46 @@ disclaimer for the older correction reference files, in the same terms:
 
 **No contract bytes were changed**, as instructed. `AUTH-001` holds.
 
-**Regression.** The `change-flow` contract validator passes on the repaired tree, output
-byte-identical to the installed tree, so the `CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5` pin —
-asserted in three places — is still satisfied. The revision was **not** bumped: the disclaimer
-adds no routing behaviour, it states which of several identically-identified files is already
-current. If independent review judges a resolution rule to be behaviour, the bump is 3.2.5 → 3.2.6
-in `change-flow/SKILL.md` plus three pin sites, and is trivially reversible either way.
+**The revision is bumped, 3.2.5 → 3.2.6.** The first version of this repair did not bump it,
+reasoning that the disclaimer only states which of several identically-identified files is already
+current. **Independent review judged otherwise, and it is right:** before the rule, a run had no
+stated way to resolve the shared `contract_id`, so two runs could resolve it differently. That is
+execution behaviour, and leaving the revision at 3.2.5 would let the old and new behaviours
+advertise the same specialization identity — which is exactly what the revision exists to prevent.
+The report had pre-committed to bumping if review judged it behaviour, so this is that.
+
+**Seven sites move together.** This report first said three, then six; both were miscounts of the
+same family as the `SF10-07` pricing, and the seventh was found by the suite rather than by reading:
+
+| site | what it is |
+|---|---|
+| `change-flow/SKILL.md:8` | the declaration |
+| `change-flow/scripts/validate_gcfpe_20260914.py:746` | `require(... "3.2.5" in skill ...)` |
+| `flowmaster-validate/references/…-validation-profile.json` | `installed_skill_revisions.change-flow` |
+| `flowmaster-validate/scripts/validate_gcfpe_current.py:633` | the count check |
+| `flowmaster-validate/scripts/validate_gcfpe_current.py:634` | the error-message string |
+| `flowmaster-validate/scripts/validate_flowmaster.py:148` | the `change-flow` anchor tuple |
+| `flowmaster-validate/scripts/validate_flowmaster.py:688` | the `maintenance_metadata` mapping value |
+
+**How the seventh was found, and the claim it corrects.** The six-site version of this table said
+`validate_gcfpe_20260914.py:2284` "reads the revision from the installed `SKILL.md`, so it follows
+automatically and is not a pin." That was wrong: it reads
+`profile.get("installed_skill_revisions", {}).get("change-flow")` — from the **validation profile**.
+So with the profile still at 3.2.5 the end-to-end run reported an eleventh error,
+`CHANGE_FLOW_CONTRACT:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5`, and the suite caught in one run
+what reading the code had got wrong. With the profile bumped, the run is back to exactly the 10
+`PROMPT_WRITER` errors of `SF10-07`.
+
+The two `CHANGE_FLOW_SPECIALIZATION_REVISION: 2.0.0` references — in the R1 oracle JSON and as the
+`maintenance_metadata` key — are the **immutable R1 oracle's** historical value and are untouched.
+Guard-block parity is unaffected: both installed validator copies still carry the identical four
+functions, 7355 characters, md5 `46c69eaf8f00672e44f8502bbf43c721`.
+
+**Correction to a claim made repeatedly in this report, the PR body and several review replies:**
+the `change-flow` copy of the validator is **no longer unchanged**. Site 2 above is in it. What
+remains true, and is the claim that mattered, is that **the D8/D15 guard block is untouched and
+still byte-identical across both copies** — the change to the `change-flow` copy is one revision
+string, nothing else.
 
 ## `SF10-08` — new: a check that could not fail on half its subjects
 
@@ -260,17 +303,46 @@ are the commands' own, captured directly.
 | run | installed build | repaired build |
 |---|---|---|
 | `change-flow/scripts/validate_gcfpe_20260914.py` | exit 0 | exit 0, output byte-identical |
-| `run_gcfpe_20260914_fixtures.py` (contract only) | exit 0 — 140 cases, 0 failed | exit 0 — 140 cases, 0 failed |
+| `run_gcfpe_20260914_fixtures.py` (contract only) | exit 0 — 140 cases, 0 failed | exit 0 — 140 cases, 0 failed; report differs only in `validator_revision` |
 | `run_gcfpe_20260914_fixtures.py --prompt-dir` | **exit 1 — crash, suite cannot run** | **exit 0 — 164 cases, 0 failed** |
-| `validate_flowmaster.py` | exit 0 | exit 0, identical but for the fixture-source path |
+| `validate_flowmaster.py` | exit 0 | exit 0; the whole 1600-line report differs in exactly two lines, the fixture-source path and `validator_revision` |
 | end-to-end `--prompt-dir` | exit 1 — 12 errors | exit 1 — **10 errors**, all `PROMPT_WRITER` (`SF10-07`) |
 
 Two-run identity holds: the end-to-end JSON is equal field for field across two runs, and the
 fixture report is equal with absolute paths scrubbed.
 
 **One pre-existing failure is recorded and not claimed as fixed:** `validate_gcfpe_current.py`
-exits 1 with `"ok": false` on **both** builds, identically. It validates the 54-member selected
-contract and is outside this package.
+exits 1 on **both** builds with the identical single error `CONTRACT_MISSING`. It validates the
+54-member selected contract and is outside this package.
+
+That line was briefly at risk of being wrong in the other direction. After the revision bump a run
+appeared to show it exiting 0 on the repaired build, which would have meant the bump fixed it. It did
+not: the `exit=0` was a harness artefact — `$?` read after a command substitution in the same
+statement, so it captured the substitution rather than the validator. Re-run with the exit code taken
+directly, both builds fail identically. **This is the second instance this session of the same
+exit-capture bug**, the first being a `tail | tr` pipeline, and the second appeared inside the loop
+written to avoid the first.
+
+### The whole table above was re-run against the packaged copies
+
+After the revision bump, and after the two `.skill` archives were rebuilt and verified to extract
+byte-identically to the working copies, every row of the table was re-run from scratch against
+those same copies. All of it reproduced: 12 → 10 with the 10 exactly `SF10-07`; the body suite
+crashing on the installed build with `ValueError: Mutation anchor absent: reject-source-epic-to-crd`
+and clean at 164/0 on the repaired one; 140/0 on both contract suites; `validate_flowmaster.py`
+exit 0 on both; the `change-flow` contract validator exit 0 with byte-identical stdout on both; and
+the bench at twelve cases, exit 0, with the corpus gate confirming all 55 registry digests. The
+end-to-end outputs are 6179 and 6104 bytes, the same sizes as the first sweep.
+
+**Two of my own invocation errors during that re-run, recorded so they are not read as results.**
+First, the bench was launched without `--registry` from a directory where its default relative path
+does not resolve; it exited 1 with `HARNESS FAILURE: no registry`, which is the corpus gate working
+and not a bench failure. Second, the end-to-end validator was handed the **candidate-graph**
+contract instead of the **direct-handoff** contract and died with
+`TypeError: 'NoneType' object is not iterable` inside `validate_contract`. Both builds died
+identically, so nothing was even comparable, let alone creditable. Neither measurement is credited;
+the numbers above are the runs with the correct inputs, and the output sizes matching the first
+sweep are the check that they are.
 
 ### A harness failure of my own, recorded
 
@@ -346,13 +418,21 @@ source — both identical, with the file counts unchanged from the reviewed v11 
 
 | package | files | bytes | sha256 |
 |---|---|---|---|
-| `change-flow.skill` | 21 | 241805 | `8e8f366af1f42a6f2ac8275f88c75452496c1c4bed77eb264cdc58ca77bb4fff` |
-| `flowmaster-validate.skill` | 29 | 270717 | `881c20a77e00be839e4a13c4c6fac9196924a2a84ac7ec1c2c2e88e8ad4985f8` |
+| `change-flow.skill` | 21 | 241915 | `8dab0fdd359acd0c0081777fa41fd922012483e1e3165e205f6d0cbfd62f27d3` |
+| `flowmaster-validate.skill` | 29 | 270717 | `153c3c45cdf2bde01f937d827f5ebe542ebfb0545fcc5d3218b8b7f0cbe1d1d6` |
 
-The validator asserts its own revision against the profile's, so **3.2.6 → 3.2.7 moves in five
-places together**: `flowmaster-validate/SKILL.md`, the validation profile, `validate_gcfpe_20260914.py`,
-`run_gcfpe_20260914_fixtures.py` and `validate_flowmaster.py`. All five are in this package;
-missing one would turn the suite red.
+The validator asserts its own revision against the profile's, so **`FLOWMASTER_VALIDATE_REVISION`
+3.2.6 → 3.2.7 moves in five places together**: `flowmaster-validate/SKILL.md`, the validation
+profile, `validate_gcfpe_20260914.py`, `run_gcfpe_20260914_fixtures.py` and
+`validate_flowmaster.py`. All five are inside `flowmaster-validate.skill`.
+
+**The two packages must be installed together, or the suite goes red.** The seven
+`CHANGE_FLOW_SPECIALIZATION_REVISION` 3.2.5 → 3.2.6 sites listed under `SF10-05` **span both
+packages**: two are in `change-flow` (its `SKILL.md` and its validator copy) and five are in
+`flowmaster-validate` (the validation profile, `validate_gcfpe_current.py` twice,
+`validate_flowmaster.py` twice). Installing either package alone leaves a 3.2.5 assertion pointed
+at a 3.2.6 declaration, or the reverse. This is a property of the bump, not of the repairs, and it
+is the reason the seventh site was worth chasing.
 
 ## What this package does not claim
 

@@ -1,17 +1,40 @@
 diff -ru base/change-flow/SKILL.md work/change-flow/SKILL.md
 --- base/change-flow/SKILL.md	2026-09-20 20:12:29.344183997 +0000
-+++ work/change-flow/SKILL.md	2026-09-20 20:14:40.241505020 +0000
-@@ -553,6 +553,10 @@
++++ work/change-flow/SKILL.md	2026-09-20 21:43:31.178879584 +0000
+@@ -5,7 +5,7 @@
+ 
+ # Change Flow
+ 
+-CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5
++CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6
+ 
+ R1_CONTRACT_PROFILE: GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1
+ 
+@@ -553,6 +553,12 @@
  
  The older integrated-readiness, final-scan, Alpha-feedback, assessment-middleware, Epic-alpha, and Epic-reengineering reference files remain immutable historical provenance. They are not executed as current routing overlays. Their retained byte identity supports audit history only and does not reintroduce retired prompts, middleware, selection advice, counts, or gates.
  
 +The bundled `gcfpe-20260913.1-091326.2`, `gcfpe-20260913.1`, and `gcfpe-20260912.2` direct-handoff contracts are superseded candidate records and remain immutable historical provenance on the same terms. They are not executed as current routing overlays and confer no current skill binding. Three of these files share `contract_id` `GCFPE-PF10-INTEGRITY-20260913.1` with the current contract above; that identifier resolves for current execution to `gcfpe-current-direct-handoff-contract.json` alone, which carries `status: SELECTED_PRODUCTION`. A `CANDIDATE_VALIDATED` or `CANDIDATE_UNTIL_SELECTED_IN_NOTION_REGISTER` copy is never the current answer for that identifier.
++
++This resolution rule is execution behaviour, not commentary: before it, a run had no stated way to resolve the shared `contract_id` and two runs could resolve it differently. `CHANGE_FLOW_SPECIALIZATION_REVISION` is incremented to 3.2.6 for it, so the two behaviours do not advertise the same specialization identity.
 +
 +The `support_skill` field in those superseded copies names `glow-hde-devops`, which **D16 retires**: none is installed, none is required, and none is to be created. That field is a dated record of what the contract said when it was written; it is not a current support-skill binding, and no current run resolves a support skill from it. The current contract declares only `primary_skill: glow-hde-pr-development`. Do not edit those dated bytes to remove the field.
 +
  Static validation proves only declared contract consistency. It does not execute a worker session, resume Alpha, release automation, adopt PF10 content, or prove live behavior.
  
  ### Completion report
+diff -ru base/change-flow/scripts/validate_gcfpe_20260914.py work/change-flow/scripts/validate_gcfpe_20260914.py
+--- base/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-20 20:12:29.345829492 +0000
++++ work/change-flow/scripts/validate_gcfpe_20260914.py	2026-09-20 21:43:31.137144764 +0000
+@@ -743,7 +743,7 @@
+     topology_bytes = TOPOLOGY_READBACK.read_bytes()
+     topology = json.loads(topology_bytes.decode("utf-8"))
+ 
+-    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5" in skill, "specialization revision")
++    require("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6" in skill, "specialization revision")
+     require("Resolve the selected GCFPE operating procedure through the release register's direct binding" in skill, "register-bound operating procedure")
+     require("Do not infer a `Glow / Ops` procedure route" in skill, "no inferred Ops procedure route")
+     require(sha256(marked_core(skill_bytes)) == EXPECTED_CORE_SHA, "protected Primary core SHA")
 diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
 --- base/flowmaster-validate/SKILL.md	2026-09-20 20:12:29.353075276 +0000
 +++ work/flowmaster-validate/SKILL.md	2026-09-20 20:18:22.643760260 +0000
@@ -26,7 +49,16 @@ diff -ru base/flowmaster-validate/SKILL.md work/flowmaster-validate/SKILL.md
  contract without changing the Primary core or existing domain/oracle checks. Its behavioral
 diff -ru base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json
 --- base/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 20:12:29.354244306 +0000
-+++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 20:18:22.643901654 +0000
++++ work/flowmaster-validate/references/gcfpe-20260914.1-091426.1-validation-profile.json	2026-09-20 21:44:51.040844441 +0000
+@@ -24,7 +24,7 @@
+     "sha256": "1d0b72582df4735b3d22dd325687b0375a624bd9ab5760c9589171049cd715a7"
+   },
+   "installed_skill_revisions": {
+-    "change-flow": "3.2.5",
++    "change-flow": "3.2.6",
+     "glow-hde-pr-development": "1.2.5"
+   },
+   "profile_id": "GCFPE-20260914.1-091426.1-VALIDATION",
 @@ -42,5 +42,5 @@
    "selected_release_during_staging": "GCFPE-20260913.1",
    "staging_rule": "The selected predecessor alias and fixtures always validate independently first. The explicit versioned candidate contract, byte-identical bundled contract and frozen graph, complete 55-member prompt corpus, and section-13 fixtures validate additively without changing or treating the selected alias as the candidate. Promotion and selected-state readback are separate operations.",
@@ -65,7 +97,25 @@ diff -ru base/flowmaster-validate/scripts/run_gcfpe_20260914_fixtures.py work/fl
          "release": source.get("target_release"),
 diff -ru base/flowmaster-validate/scripts/validate_flowmaster.py work/flowmaster-validate/scripts/validate_flowmaster.py
 --- base/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 20:12:29.354596564 +0000
-+++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 20:18:22.645285483 +0000
++++ work/flowmaster-validate/scripts/validate_flowmaster.py	2026-09-20 21:43:31.137662534 +0000
+@@ -145,7 +145,7 @@
+         "END TECHNICAL WRITING FLOW: NO TARGETS",
+     ),
+     "change-flow": (
+-        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5",
++        "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6",
+         "GLOW_HDE_CANONICAL_CHANGE_FLOW_R1_20260831_1",
+         "R1_ROW_COVERAGE: 46/46",
+         "PRIMARY_CHANGE_REQUIRED = false",
+@@ -685,7 +685,7 @@
+     # compared to the unchanged, hash-verified oracle below.
+     maintenance_metadata = {
+         "CHANGE_FLOW_SPECIALIZATION_REVISION: 2.0.0":
+-            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5",
++            "CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6",
+         "PROMPT_REPAIR_PLAN_STATUS = SUSPENDED_PENDING_REPAIR_SYSTEM_RECOVERY":
+             "PROMPT_REPAIR_PLAN_STATUS = RESOLVE_CURRENT_REGISTER",
+     }
 @@ -1222,7 +1222,7 @@
          )
          report: dict[str, object] = {
@@ -251,3 +301,17 @@ diff -ru base/flowmaster-validate/scripts/validate_gcfpe_artifact_timing.py work
          if not match:raise ValueError('Native intake anchor missing: '+id)
          changed[id]=changed[id][:match.end()]+append+'\n'+changed[id][match.end():]
          found=validate_artifact_timing_bodies(changed)
+diff -ru base/flowmaster-validate/scripts/validate_gcfpe_current.py work/flowmaster-validate/scripts/validate_gcfpe_current.py
+--- base/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-20 20:12:29.354801732 +0000
++++ work/flowmaster-validate/scripts/validate_gcfpe_current.py	2026-09-20 21:43:31.137339081 +0000
+@@ -630,8 +630,8 @@
+     for token in ACTIVE_LEGACY_TOKENS:
+         if token in active:
+             errors.append(f"LEGACY_ACTIVE:{token}")
+-    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5") != 1:
+-        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.5")
++    if skill_text.count("CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6") != 1:
++        errors.append("ACTIVE_CONTRACT_MISSING:CHANGE_FLOW_SPECIALIZATION_REVISION: 3.2.6")
+     for marker in (
+         "docs/ephemeral",
+         "NEXT_PROMPT_HANDOFF", "glow-hde-pr-development", "PF10_BUILD_NOTES_ADDENDUM",

@@ -346,9 +346,20 @@ already works, and it would need four Notion body edits to buy that.
 # 3. `SF-05` — D14's behavioural half, in plain language
 
 You asked to understand the issue before directing a mechanism. The single most useful fact is in
-§3.6: **the prohibited behaviour is not present in the current system — established by reading all
-72 terminal branches, not by a keyword filter — and `SF-05` is a gap in what the available
-mechanisms can express, not an open defect in the flow.**
+§3.6, and it is stated there with its exact scope, which this opening now matches rather than
+rounding up:
+
+> **The declared graph contains no PF10-comparison stop** — established by reading all 72 terminal
+> branches, with no selection of any kind. **A filtered read of all 55 bodies found none either**, and
+> RS-40 explicitly forbids the behaviour in its own text. But the body pass is a filter, not an
+> enumeration, so **it is not proof that no body instructs an undeclared comparison-stop.**
+
+`SF-05` is therefore best described as **a gap in what the available mechanisms can express**, on
+evidence that is exhaustive for the graph and bounded for the bodies. An earlier version of this
+paragraph said the behaviour "is not present in the current system" and is "not an open defect in the
+flow" — flow-wide claims resting on graph-only enumeration, and contradicting §3.6's own admission
+two pages later. Review caught the contradiction; the scope above is the honest form, and the §11
+position in §3.7 rests on it rather than on the stronger sentence.
 
 ## 3.1 The behaviour D14 is meant to guarantee
 
