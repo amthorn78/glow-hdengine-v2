@@ -33,6 +33,51 @@ authority_sources:
   path: candidate/prompts/manifest.json
   note: 'Pre-merge extraction workspace, 2026-09-17. Historical lineage only: this path does not exist in the repository. Current prompt bodies are authored in Notion and are resolved through the candidate catalog; the evidence_contract byte count and SHA-256 on each row below are the reproducible identity.'
   disposition: HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH
+body_extraction_convention:
+  in_force: STRIP_BOTH_BOUNDARY_NEWLINES
+  definition: 'The exact slice between the fetch result''s <content> and </content> markers, with
+    the two boundary newlines dropped: the newline that follows <content> and the one that precedes
+    </content>. The markers occupy their own lines, so a literal reading that keeps them yields a
+    body two bytes larger on every prompt. This is the convention under which every
+    evidence_contract byte count and SHA-256 below was produced, and the only convention under
+    which they reproduce.'
+  row_wording_disposition: 'All 55 rows carry the dated line "Extraction convention: the exact
+    slice between the fetch result''s <content> and </content> markers, with no trailing newline
+    added". That wording is incomplete in two ways: it omits the leading newline entirely, and it
+    states the trailing treatment as an addition withheld rather than a byte dropped. Read
+    literally it describes a different corpus from the one the recorded digests identify. Those 55
+    lines are dated evidence statements and are preserved unedited under AUTH-001; this key is the
+    authority for the convention in force, and each row''s recorded byte count and SHA-256 remain
+    the reproducible identity.'
+  evidence:
+  - 'Reverse-applied edits reproduce the recorded pre-edit SHA-256 for 21 of 21 repaired bodies
+    under strip-both and 0 of 21 under as-extracted, leading-only or trailing-only. Three untouched
+    prompts extracted under all four variants reproduce their recorded digests only under
+    strip-both: CF-C-10 41dce73a… / 7203 B, MGR-10 5c8aebc6… / 7276 B, PR-40 042255564c… /
+    54043 B. Recorded in docs/ephemeral/gcfpe.prompt-body-addendum-schema.repair-report.md and
+    docs/prompt_ecosystem_management/pe-succession/pe32-to-pe33.md.'
+  evidence_scope: 'The evidence above is reproducible in this repository and covers 24 of the 55
+    bodies: 21 repaired bodies by reverse-applied edit, and 3 untouched prompts extracted under all
+    four variants. No body corpus exists on disk and prompt_bodies_validated is false, so no
+    checked-in artifact exercises the remaining 31. The conclusion does not depend on them: the
+    convention in force is established by 0 of 21 reproducing under any other variant, and by three
+    untouched prompts reproducing only under strip-both. A claim of complete-corpus coverage is
+    NOT made by this key.'
+  corroboration_not_reproducible_here: 'A Product Owner-relayed human review dated 2026-09-20
+    reports 55 of 55 live bodies matching on both SHA-256 and byte count under strip-both, totalling
+    1,060,573 bytes across the 55 evidence_contract rows. That figure reconciles exactly with the
+    sum of those rows, which is the only part of it this repository can check. The review itself is
+    a relayed narrative: no report, inputs or command is checked in, so it cannot be reproduced and
+    it is recorded here as corroboration, never as evidence. It is promoted to evidence only by
+    landing the run — per-body digest, byte count and the extraction command — in a repository
+    evidence artifact.'
+  applies_to: 'The evidence_contract byte count and SHA-256 on each row below, which are the body
+    identity for validation. This key does not alter, revive or reinterpret any source_snapshot
+    record; those remain the 2026-09-17 pre-merge extraction that authority_sources dispositions as
+    HISTORICAL_LINEAGE_NOT_A_RESOLVABLE_PATH.'
+  why_it_matters: 'The convention defines the ecosystem''s tamper-evidence. The ambiguity already
+    produced one silent two-byte error that no amount of agreement between independent extractions
+    would have surfaced, because both extractions were wrong in the same way.'
 observation:
   release: GCFPE-20260914.1
   version_family: '091426.1'
