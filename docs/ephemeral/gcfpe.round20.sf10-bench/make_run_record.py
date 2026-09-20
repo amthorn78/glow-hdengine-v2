@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Emit the round-20 run record from the artefacts, or check the records against them.
 
-    make_run_record.py --base <tree> --work <tree> --bodies <dir> --pkg <dir> --bench <stdout>
-                       (--write | --check)
+    make_run_record.py --base <tree> --work <tree> --bodies <dir> --pkg <dir>
+                       [--registry <path>] (--write | --check)
+
+The bench is RUN by this script, not supplied to it: its stdout and its exit status are
+observed here, so neither can be asserted by the caller.
 
 Why this exists, stated plainly: the run record and the repair report both quote identities
 -- file digests, package digests and byte counts, the patch's line count, the bench's case
@@ -39,6 +42,8 @@ FREEZE_FILES = 321
 FREEZE_FILES_EXCL_MANIFEST = 320
 FREEZE_DIGEST = "c321be051b90c346a24d26524e132e7b90732953c3cc289e3def511e5fcfbaeb"
 EXPECTED_PACKAGES = ("change-flow.skill", "flowmaster-validate.skill")
+BENCH = REPO / "docs/ephemeral/gcfpe.round20.sf10-bench/bench.py"
+REGISTRY_DEFAULT_REL = "docs/prompt_ecosystem_management/project-prompt-contract-registry.md"
 
 
 def sha(p: pathlib.Path) -> str:
@@ -57,22 +62,85 @@ def tree_identity(root: pathlib.Path) -> tuple[int, int, str]:
 
 
 def differing(base: pathlib.Path, work: pathlib.Path) -> list[tuple[str, str, str]]:
-    out = subprocess.run(["diff", "-rq", str(base), str(work)],
-                         capture_output=True, text=True).stdout
-    rows = []
-    for line in out.splitlines():
+    """The two-way change roster between the trees, or a hard failure.
+
+    Three holes closed here, each of which let `--check` certify a work tree that was not
+    the reviewed one -- measured, not theorised:
+
+      * `--work` pointing at the SAME tree as `--base` produced "0 changed files" and
+        exit 0, so a tree containing NONE of the repairs was certified;
+      * an added or deleted file makes `diff` print "Only in ...", which the old parser
+        ignored entirely, so a one-sided change was invisible;
+      * `--work` pointing at a nonexistent path produced "0 changed files" and exit 0,
+        because the parser read stdout and never looked at the command's status.
+
+    `diff -rq` exits 0 when the trees are identical, 1 when they differ, and 2 on error.
+    Only 1 is acceptable here: the reviewed package differs from the freeze, and an
+    identical or unreadable tree is a caller error rather than a finding.
+    """
+    for label, d in (("--base", base), ("--work", work)):
+        if not d.is_dir():
+            raise SystemExit(f"{label} is not a directory: {d}")
+    proc = subprocess.run(["diff", "-rq", str(base), str(work)], capture_output=True, text=True)
+    if proc.returncode == 0:
+        raise SystemExit(f"--work is identical to --base ({work}); it carries none of the "
+                         f"repairs, so there is nothing to record")
+    if proc.returncode != 1:
+        raise SystemExit(f"diff -rq failed with status {proc.returncode}: "
+                         f"{proc.stderr.strip() or 'no stderr'}")
+    rows, one_sided = [], []
+    for line in proc.stdout.splitlines():
         m = re.match(r"Files (.+) and (.+) differ", line)
         if m:
             rel = str(pathlib.Path(m.group(1)).relative_to(base))
             rows.append((rel, sha(pathlib.Path(m.group(1))), sha(pathlib.Path(m.group(2)))))
+            continue
+        if line.startswith("Only in "):
+            one_sided.append(line)
+    if one_sided:
+        raise SystemExit("the trees differ by added or deleted files, which the reviewed "
+                         "package does not contain:\n  " + "\n  ".join(one_sided))
+    if not rows:
+        raise SystemExit("diff reported a difference but no changed files were parsed; "
+                         "refusing to record an empty roster")
     return sorted(rows)
+
+
+def run_bench(args) -> tuple[str, int]:
+    """Run the bench and return its stdout and its ACTUAL exit status.
+
+    The previous revision took the status as a `--bench-exit` integer and trusted it.  That
+    was unenforced: a bench that exits nonzero before printing any `[FAIL]` -- a corpus gate
+    refusal or an import failure, which print `HARNESS FAILURE` and stop -- could be recorded
+    as a success by a caller passing 0.
+
+    I declined to run the bench here in the previous round, on the grounds that it would put
+    the subject and the recorder in one process and reintroduce the "harness tests its
+    author's copy" problem.  **That reasoning was wrong.** A subprocess is not the same
+    process: the bench is executed as its own interpreter against its own inputs, and the
+    recorder observes only its stdout and status. Subprocess isolation is precisely what
+    keeps them separate, so the objection did not apply and the status stayed trusted for a
+    round longer than it should have.
+    """
+    cmd = [sys.executable, str(BENCH),
+           "--base", args.base, "--work", args.work, "--bodies", args.bodies,
+           "--registry", args.registry]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    out = proc.stdout
+    if "HARNESS FAILURE" in out:
+        raise SystemExit("the bench reported a HARNESS FAILURE; its output is not a result:\n"
+                         + "\n".join(l for l in out.splitlines() if "HARNESS FAILURE" in l))
+    if proc.returncode == 0 and "ALL CASES AS EXPECTED" not in out:
+        raise SystemExit("the bench exited 0 without its terminal success marker; refusing to "
+                         "record an unrecognised outcome")
+    return out.rstrip(), proc.returncode
 
 
 def identities(args) -> dict:
     base, work = pathlib.Path(args.base), pathlib.Path(args.work)
     pkg = pathlib.Path(args.pkg)
     bodies = sorted(pathlib.Path(args.bodies).glob("*.md"))
-    bench = pathlib.Path(args.bench).read_text(encoding="utf-8")
+    bench, bench_exit = run_bench(args)
     total, counted, digest = tree_identity(base)
     ids = {
         "base_tree": (total, counted, digest),
@@ -82,7 +150,7 @@ def identities(args) -> dict:
         "patch_lines": len(PATCH.read_text(encoding="utf-8").splitlines()),
         "bench_cases": bench.count("[PASS]") + bench.count("[FAIL]"),
         "bench_failed": bench.count("[FAIL]"),
-        "bench_exit": args.bench_exit,
+        "bench_exit": bench_exit,
         "bench_stdout": bench.rstrip(),
     }
     # Both archives are required.  A silent skip let --check succeed with one package or
@@ -184,6 +252,19 @@ def check(ids: dict) -> int:
     if FREEZE_DIGEST not in rr:
         problems.append("run-record does not state the frozen tree digest")
 
+    # The roster is compared in both directions.  The old check only asked whether every
+    # file it found was in the record, never whether every file in the record was found --
+    # so a work tree with zero differences passed while the record claimed nine files.
+    recorded_files = set(re.findall(r"^\| `([^`]+)` \| `[0-9a-f]{64}` \| `[0-9a-f]{64}` \|$",
+                                    rr, re.M))
+    found_files = {rel for rel, _b, _w in ids["files"]}
+    for gone in sorted(recorded_files - found_files):
+        problems.append(f"run record lists changed file {gone!r}, which the supplied trees do "
+                        f"not differ in")
+    for extra in sorted(found_files - recorded_files):
+        problems.append(f"the supplied trees differ in {extra!r}, which the run record does "
+                        f"not list")
+
     for rel, bh, wh in ids["files"]:
         if bh not in rr:
             problems.append(f"run-record is missing the BASE digest of {rel}: {bh}")
@@ -267,9 +348,8 @@ def main() -> int:
     ap.add_argument("--work", required=True)
     ap.add_argument("--bodies", required=True)
     ap.add_argument("--pkg", required=True)
-    ap.add_argument("--bench", required=True, help="a file holding the bench's stdout")
-    ap.add_argument("--bench-exit", required=True, type=int,
-                    help="the bench process's OBSERVED exit status, captured directly")
+    ap.add_argument("--registry", default=str(REPO / REGISTRY_DEFAULT_REL),
+                    help="the prompt-contract registry the bench verifies the corpus against")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")

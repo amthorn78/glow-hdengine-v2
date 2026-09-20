@@ -183,7 +183,14 @@ and never mirrored here. The extractor plus the digests let a holder of the bodi
 bytes; they do not let a clean checkout obtain the bodies.
 
 ```sh
-# 1. the bench  (no env var needed: the script sets sys.dont_write_bytecode itself)
+# 1. the bench, and the record.  The recorder RUNS the bench and observes its stdout and
+#    its exit status, so neither can be asserted by the caller; --write regenerates the
+#    generated sections of this file and --check recomputes every identity and fails on drift.
+python3 docs/ephemeral/gcfpe.round20.sf10-bench/make_run_record.py \
+    --base prep/base --work prep/work --bodies $B --pkg prep/pkg (--write | --check)
+
+#    the bench can also be run directly; no env var is needed, since it sets
+#    sys.dont_write_bytecode itself
 python3 docs/ephemeral/gcfpe.round20.sf10-bench/bench.py \
     --base  prep/base  --work prep/work \
     --bodies $B \

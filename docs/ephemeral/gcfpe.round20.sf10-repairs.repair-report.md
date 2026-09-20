@@ -644,8 +644,10 @@ wrote the literal string `Exit 0` whatever had happened, and `check()` counted `
 without ever rejecting a nonzero count. **A failing bench could therefore be regenerated into the
 record and then certified as agreeing with the artefacts** — the harness-reports-success family this
 entire package exists to stop, sitting in the recorder. The exit status is now a required
-`--bench-exit` argument, captured from the process, and both a nonzero status and any `[FAIL]` are
-refused.
+`--bench-exit` argument, and — **after a further finding, correctly** — is no longer an argument at
+all: **the recorder runs the bench itself and observes the status.** Both a nonzero status and any
+`[FAIL]` are refused, and a `HARNESS FAILURE` or a zero exit without the terminal success marker is
+refused before anything is recorded.
 
 **The base tree was never identified, only diffed.** Only the relative difference between `--base`
 and `--work` was computed, so two trees from the same stale or corrupted freeze would have every
@@ -664,7 +666,7 @@ consecutive round:
 
 | injected | result |
 |---|---|
-| `--bench-exit 1` | **caught** — "cannot be recorded as evidence" |
+| a genuinely failing bench (one repair reverted in `--work`) | **caught** — status, failed count *and* two digest mismatches |
 | bench stdout carrying one `[FAIL]` | **caught** — the count, and the stdout mismatch |
 | one byte appended to a base-tree file | **caught** — freeze digest and the row's base digest |
 | package directory missing one archive | **caught** — names `flowmaster-validate.skill` |
@@ -676,6 +678,57 @@ corpus computed and discarded, `--write` that did not write, the exit status inv
 undiffed, the package skipped. The lesson is not "write more checks" but the narrower one this
 package keeps re-teaching: **a value that is computed and not asserted on is not evidence, and a
 guard nobody has fired is not a guard.**
+
+### The checker certified a work tree carrying none of the repairs
+
+Two further P1s, and the first is the most serious defect found in this instrument. Measured rather
+than argued:
+
+| supplied `--work` | old result |
+|---|---|
+| **the same tree as `--base`** | `records agree with the artefacts: 0 changed files`, **exit 0** |
+| a tree with an **added** file | 9 files, exit 0 — `diff`'s `Only in …` lines were never parsed |
+| a **nonexistent path** | `0 changed files`, **exit 0** |
+
+The first line is the one that matters: **a work tree containing none of the three repairs was
+certified as agreeing with the records.** The cause is the same as every other defect in this tool —
+the roster was computed and only half-asserted. `check()` asked whether every file it *found* was in
+the record, never whether every file the record *claims* was found, so an empty roster satisfied it
+vacuously.
+
+Now: both directories are validated; `diff -rq`'s status is honoured (0 identical and 2 error are
+both refused, only 1 accepted); `Only in …` lines are parsed and refused, since the reviewed package
+adds and deletes nothing; an empty roster is refused; and the roster is compared **both ways** against
+the record.
+
+**And the exit status is no longer trusted — my reason for leaving it trusted was wrong.** Last round
+I declined to run the bench from the recorder, arguing it would put subject and recorder in one
+process and reintroduce the "harness tests its author's copy" problem. **A subprocess is not the same
+process.** The bench runs as its own interpreter against its own inputs and the recorder observes only
+its stdout and status; subprocess isolation is exactly what keeps them separate. The objection never
+applied, and a caller-supplied integer survived a round longer than it should have. The recorder now
+runs the bench, and additionally refuses a `HARNESS FAILURE` or a zero exit without the terminal
+success marker.
+
+**Seven controls, all firing:**
+
+| injected | result |
+|---|---|
+| `--work` identical to `--base` | refused before any check |
+| `--work` with an added file | refused, names it |
+| `--work` with a deleted file | refused, names it |
+| `--work` a nonexistent path | refused |
+| an empty corpus directory | `HARNESS FAILURE` refused |
+| a substituted body | corpus gate refusal refused |
+| **one repair reverted in `--work`** | **four independent detections** — nonzero status, one failed case, and both digest mismatches |
+
+The last is the strongest control in the package: it breaks the subject rather than the instrument,
+and every layer that should notice does.
+
+**One honest consequence of the fix:** because the recorder now runs the bench, I can no longer inject
+a fabricated stdout, so the `[FAIL]`-count assertion had to be fired by *actually breaking a repair*
+rather than by editing text. That is a better control and a narrower one — it can only be fired by a
+real defect, which is the point.
 
 ### The whole table above was re-run against the packaged copies
 
